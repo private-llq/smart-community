@@ -1,0 +1,23 @@
+server:
+  port: 6001
+  
+spring:
+  application:
+    name: eureka-registery
+  freemarker:
+    prefer-file-system-access: false
+
+eureka:
+  instance:
+    #eureka 服务端的实例名称
+    hostname: localhost
+  server:
+    renewal-percent-threshold: 0.1
+  client:
+    #表示不向注册中心注册自己
+    register-with-eureka: true
+    #false 表示自己端就是注册中心 职责是维护服务实例 并不需要检索服务
+    fetch-registry: false
+    service-url:
+      # 设置与 Eureka Server 交互的地址 查询服务与注册服务都需要这个地址
+      defaultZone: http://localhost:6001/eureka
