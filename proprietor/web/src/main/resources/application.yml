@@ -1,0 +1,21 @@
+server:
+  port: 6001
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: propeietor-web-api
+
+nacos:
+  discovery:
+    server-addr: 127.0.0.1:8848
+
+dubbo:
+  registry:
+    address: nacos://127.0.0.1:8848
+  protocol:
+    name: dubbo
+    port: 26001
+  application:
+    name: ${spring.application.name}

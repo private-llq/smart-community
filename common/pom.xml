@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-		<artifactId>community</artifactId>
+		<artifactId>com.jsy.community</artifactId>
 		<groupId>com.jsy</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
@@ -13,4 +13,17 @@
 	<name>公共模块</name>
 	<description>工具类、实体类等</description>
 	
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+		
+		<!-- 在线文档 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+		</dependency>
+	</dependencies>
+
 </project>
