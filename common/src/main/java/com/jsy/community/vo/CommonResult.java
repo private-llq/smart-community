@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommonResult<T extends Serializable> implements Serializable {
+public class CommonResult<T> implements Serializable {
 	@ApiModelProperty("接口返回状态码，0表示成功")
 	private int code;
 	
@@ -20,7 +20,7 @@ public class CommonResult<T extends Serializable> implements Serializable {
 	@ApiModelProperty("具体数据体")
 	private T data;
 	
-	public static <T extends Serializable> CommonResult<T> ok(T data) {
+	public static <T> CommonResult<T> ok(T data) {
 		return new CommonResult<>(0, null, data);
 	}
 	
