@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: propeietor-web-api
+  profiles:
+    active: dev
+
+nacos:
+  config:
+    server-addr: 127.0.0.1:8848
+    #指定分组信息
+    group: DEV
+    data-id: example
+    auto-refresh: true

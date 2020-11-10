@@ -8,4 +8,5 @@
 - 服务降级: sentinel 
 - 全局事务: seata
 - 负载均衡: ribbon
+- 分布式日志: elk
 - 网关:    gateway

@@ -30,10 +30,12 @@
     
     <properties>
         <java.version>11</java.version>
-        <mybatis.version>2.1.3</mybatis.version>
+        <mybatis-plus.version>3.4.0</mybatis-plus.version>
+        <druid.version>1.1.20</druid.version>
         <nacos.version>0.2.7</nacos.version>
         <dubbo.version>2.7.8</dubbo.version>
         <springfox.version>3.0.0</springfox.version>
+        <hutool.version>5.4.6</hutool.version>
     </properties>
 
     <dependencyManagement>
@@ -48,6 +50,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-actuator</artifactId>
                 <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-context</artifactId>
+                <version>2.2.5.RELEASE</version>
             </dependency>
             <!-- rabbitmq -->
             <dependency>
@@ -67,9 +74,24 @@
     
             <!-- 数据持久化 -->
             <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis.version}</version>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis-plus.version}</version>
             </dependency>
     
             <!-- 配置中心 -->
@@ -110,9 +132,9 @@
             </dependency>
     
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <scope>runtime</scope>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
