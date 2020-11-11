@@ -1,6 +1,7 @@
 package com.jsy.community.entity.visitor;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -51,8 +52,9 @@ public class VisitorEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "来访事由")
     private String reason;
-
+    
     @ApiModelProperty(value = "预期来访时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime expectTime;
 
     @ApiModelProperty(value = "来访人联系方式")
@@ -60,8 +62,9 @@ public class VisitorEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "来访人身份证")
     private String idCard;
-
+    
     @ApiModelProperty(value = "实际来访时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime visitedTime;
 
     @ApiModelProperty(value = "是否授予来访人社区门禁权限，0无，1临时密码，2人脸识别")
@@ -77,6 +80,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private Integer checkStatus;
 
     @ApiModelProperty(value = "审核时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime checkTime;
 
     @ApiModelProperty(value = "审核拒绝原因")
