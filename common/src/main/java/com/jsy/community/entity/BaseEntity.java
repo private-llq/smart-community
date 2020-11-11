@@ -2,10 +2,12 @@ package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -16,7 +18,10 @@ public class BaseEntity implements Serializable {
 	
 	@TableLogic
 	private Integer deleted;
-	
-	private Date createTime;
-	private Date updateTime;
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime createTime;
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime updateTime;
 }
