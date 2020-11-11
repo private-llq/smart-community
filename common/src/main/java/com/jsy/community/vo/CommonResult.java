@@ -1,5 +1,6 @@
 package com.jsy.community.vo;
 
+import com.jsy.community.exception.JSYError;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +27,10 @@ public class CommonResult<T> implements Serializable {
 	
 	public static CommonResult<Boolean> error(int code, String message) {
 		return new CommonResult<>(code, message, false);
+	}
+	
+	public static CommonResult<Boolean> error(JSYError error) {
+		return error(error.getCode(), error.getMessage());
 	}
 	
 	public static CommonResult<Boolean> error(int code) {
