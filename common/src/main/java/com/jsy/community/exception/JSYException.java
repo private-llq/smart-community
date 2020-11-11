@@ -3,11 +3,9 @@ package com.jsy.community.exception;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class JSYException extends Exception implements Serializable {
+public class JSYException extends RuntimeException {
 	private Integer code;
 	
 	public JSYException(Integer code, String message) {
