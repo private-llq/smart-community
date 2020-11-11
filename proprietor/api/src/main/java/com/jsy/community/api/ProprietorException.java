@@ -13,7 +13,7 @@ public class ProprietorException extends JSYException {
 	}
 	
 	public ProprietorException() {
-		super(JSYError.INTERNAL);
+		super();
 	}
 	
 	public ProprietorException(JSYError error) {

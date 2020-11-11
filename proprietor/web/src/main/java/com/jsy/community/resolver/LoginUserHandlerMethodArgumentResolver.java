@@ -1,9 +1,12 @@
 package com.jsy.community.resolver;
 
 import com.jsy.community.api.IUserService;
+import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.core.MethodParameter;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -11,14 +14,12 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import javax.annotation.Resource;
-
 /**
  * 有@LoginUser注解的方法参数，注入当前登录用户
  */
 @Component
 public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
-	@Resource
+	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IUserService userService;
 	
 	@Override
@@ -27,8 +28,8 @@ public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgu
 	}
 	
 	@Override
-	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container,
-	                              NativeWebRequest request, WebDataBinderFactory factory) throws Exception {
+	public Object resolveArgument(@Nullable MethodParameter parameter, @Nullable ModelAndViewContainer container,
+	                              NativeWebRequest request, @Nullable WebDataBinderFactory factory) throws Exception {
 		//获取用户ID
 		Object object = request.getAttribute(AuthorizationInterceptor.USER_KEY, RequestAttributes.SCOPE_REQUEST);
 		if (object == null) {

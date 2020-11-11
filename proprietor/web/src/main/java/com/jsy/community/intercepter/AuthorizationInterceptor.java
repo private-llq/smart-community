@@ -4,9 +4,9 @@ package com.jsy.community.intercepter;
 import cn.hutool.core.util.StrUtil;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -26,14 +26,26 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		Login annotation;
+		Login methodAnnotation, classAnnotation;
 		if (handler instanceof HandlerMethod) {
-			annotation = ((HandlerMethod) handler).getMethodAnnotation(Login.class);
+			methodAnnotation = ((HandlerMethod) handler).getMethodAnnotation(Login.class);
+			classAnnotation = ((HandlerMethod) handler).getBeanType().getAnnotation(Login.class);
 		} else {
 			return true;
 		}
 		
-		if (annotation == null) {
+		if (methodAnnotation == null && classAnnotation == null) {
+			// 都没有
+			return true;
+		}
+		
+		if (methodAnnotation != null && methodAnnotation.allowAnonymous()) {
+			// 方法注解允许匿名访问
+			return true;
+		}
+		
+		if (methodAnnotation == null && classAnnotation.allowAnonymous()) {
+			// 注解在类中，并且允许匿名访问
 			return true;
 		}
 		
@@ -45,12 +57,12 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		
 		//凭证为空
 		if (StrUtil.isBlank(token)) {
-			throw new ProprietorException(HttpStatus.UNAUTHORIZED.value(), jwtUtils.getHeader() + "不能为空");
+			throw new ProprietorException(JSYError.UNAUTHORIZED.getCode(), jwtUtils.getHeader() + "不能为空");
 		}
 		
 		Claims claims = jwtUtils.getClaimByToken(token);
 		if (claims == null || jwtUtils.isTokenExpired(claims.getExpiration())) {
-			throw new ProprietorException(HttpStatus.UNAUTHORIZED.value(), jwtUtils.getHeader() + "失效，请重新登录");
+			throw new ProprietorException(JSYError.UNAUTHORIZED.getCode(), jwtUtils.getHeader() + "失效，请重新登录");
 		}
 		
 		//设置userId到request里，后续根据userId，获取用户信息

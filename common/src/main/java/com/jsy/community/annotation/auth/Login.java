@@ -14,5 +14,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Login {
-	boolean isAnonymous = false;
+	boolean allowAnonymous() default false;
 }
