@@ -22,6 +22,11 @@ public class ProprietorExceptionHandler {
 		return CommonResult.error(e.getCode(), e.getMessage());
 	}
 	
+	@ExceptionHandler(JSYException.class)
+	public CommonResult<Boolean> handlerJSYException(JSYException e) {
+		return CommonResult.error(e.getCode(), e.getMessage());
+	}
+	
 	/**
 	 * 404
 	 */

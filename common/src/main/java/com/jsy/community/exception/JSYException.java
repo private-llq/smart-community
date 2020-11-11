@@ -13,6 +13,11 @@ public class JSYException extends RuntimeException {
 		this.code = code;
 	}
 	
+	public JSYException() {
+		super(JSYError.INTERNAL.getMessage());
+		this.code = JSYError.INTERNAL.getCode();
+	}
+	
 	public JSYException(JSYError error) {
 		super(error.getMessage());
 		this.code = error.getCode();
