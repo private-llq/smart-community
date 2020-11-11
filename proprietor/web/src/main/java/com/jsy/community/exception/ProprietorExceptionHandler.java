@@ -1,5 +1,6 @@
 package com.jsy.community.exception;
 
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,15 +16,15 @@ import org.yaml.snakeyaml.constructor.DuplicateKeyException;
  */
 @RestControllerAdvice
 @Slf4j
-public class JSYExceptionHandler {
-	/**
-	 * 处理自定义异常
-	 */
-	@ExceptionHandler(JSYException.class)
-	public CommonResult<Boolean> handleRRException(JSYException e) {
+public class ProprietorExceptionHandler {
+	@ExceptionHandler(ProprietorException.class)
+	public CommonResult<Boolean> handlerProprietorException(ProprietorException e) {
 		return CommonResult.error(e.getCode(), e.getMessage());
 	}
 	
+	/**
+	 * 404
+	 */
 	@ExceptionHandler(NoHandlerFoundException.class)
 	public CommonResult<Boolean> handlerNoFoundException(Exception e) {
 		log.error(e.getMessage(), e);
@@ -39,6 +40,9 @@ public class JSYExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public CommonResult<Boolean> handleException(Exception e) {
 		log.error(e.getMessage(), e);
+		if (e instanceof ProprietorException) {
+			return CommonResult.error(((ProprietorException) e).getCode(), e.getMessage());
+		}
 		return CommonResult.error(JSYError.INTERNAL);
 	}
 }

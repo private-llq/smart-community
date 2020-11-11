@@ -6,5 +6,5 @@ import com.jsy.community.entity.UserAuthEntity;
 import java.util.List;
 
 public interface IUserAuthService extends IService<UserAuthEntity> {
-	List<UserAuthEntity> getList();
+	List<UserAuthEntity> getList(boolean a);
 }
