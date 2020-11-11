@@ -27,13 +27,4 @@ public class BaseQO implements Serializable {
 	@ApiModelProperty("分页查询每页数据条数")
 	private Long size;
 
-	private Long id;
-
-	private Integer deleted;
-
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime createTime;
-
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime updateTime;
 }
