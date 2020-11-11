@@ -2,7 +2,8 @@ package com.jsy.community.controller;
 
 import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.qo.visitor.TVisitorQO;
+import com.jsy.community.entity.UserEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.ValidatorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +22,7 @@ public class UserController {
 	
 	@PostMapping("test")
 	@ApiOperation("test")
-	public void test(@RequestBody TVisitorQO qo) {
+	public void test(@RequestBody BaseQO<UserEntity> qo) {
 		ValidatorUtils.validateEntity(qo);
 		
 		userAuthService.getList(true);
