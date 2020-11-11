@@ -35,6 +35,7 @@
         <nacos.version>0.2.7</nacos.version>
         <dubbo.version>2.7.8</dubbo.version>
         <springfox.version>3.0.0</springfox.version>
+        <knife4j.version>3.0.1</knife4j.version>
         <hutool.version>5.4.6</hutool.version>
     </properties>
 
@@ -70,6 +71,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-security</artifactId>
+                <version>${spring-boot.version}</version>
             </dependency>
     
             <!-- 数据持久化 -->
@@ -129,6 +131,11 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-boot-starter</artifactId>
                 <version>${springfox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
             </dependency>
     
             <dependency>
