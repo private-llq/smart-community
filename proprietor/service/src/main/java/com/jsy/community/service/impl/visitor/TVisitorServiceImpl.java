@@ -29,6 +29,6 @@ public class TVisitorServiceImpl extends ServiceImpl<TVisitorMapper, TVisitorEnt
     public Page<TVisitorEntity> queryByPage(TVisitorQO tVisitorQO){
         Page<TVisitorEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page,tVisitorQO); //设置分页参数
-        return tVisitorMapper.selectPage(page, new QueryWrapper<TVisitorEntity>().select("*").eq("door","1710"));
+        return tVisitorMapper.selectPage(page, new QueryWrapper<TVisitorEntity>().select("*"));
     }
 }
