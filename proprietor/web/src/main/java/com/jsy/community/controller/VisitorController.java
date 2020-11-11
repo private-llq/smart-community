@@ -36,7 +36,7 @@ public class VisitorController {
         BeanUtils.copyProperties(tVisitorQO,tVisitorEntity);
         boolean saveResult = tVisitorService.save(tVisitorEntity);
         if(saveResult){
-            return CommonResult.ok(1);
+            return CommonResult.ok("");
         }
         return CommonResult.error(-1,"新增访客登记失败");
     }
