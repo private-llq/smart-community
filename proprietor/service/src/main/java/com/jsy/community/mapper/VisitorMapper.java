@@ -5,6 +5,6 @@ import com.jsy.community.entity.VisitorEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface TVisitorMapper extends BaseMapper<VisitorEntity> {
+public interface VisitorMapper extends BaseMapper<VisitorEntity> {
 
 }
