@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
@@ -20,6 +21,7 @@ import java.util.Map;
 @Api(tags = "车辆控制器")
 @RestController
 @Slf4j
+@Login(allowAnonymous = true)
 public class CarController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
@@ -52,6 +54,8 @@ public class CarController {
     @ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
     @PutMapping("/car")
     public CommonResult<Integer> updateProprietorCar(@ApiParam(value = "修改固定车辆提供的参数对象", required = true) @RequestBody CarEntity carEntity) {
+        //效验前端新增车辆参数合法性
+        ValidatorUtils.validateEntity(carEntity, CarEntity.updateCarValidated.class);
         return CommonResult.ok(carService.updateProprietorCar(carEntity));
     }
 
