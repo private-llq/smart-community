@@ -50,4 +50,11 @@ public interface ICarService extends IService<CarEntity> {
      */
     Boolean carIsExist(String carPlate);
 
+    /**
+     * 车辆图片文件上传服务提供接口
+     * @param carImage 图片文件流
+     * @param fileName 文件名称
+     * @return         上传成功将放回图片URL，否则返回Null
+     */
+    String carImageUpload(byte[] carImage, String fileName);
 }

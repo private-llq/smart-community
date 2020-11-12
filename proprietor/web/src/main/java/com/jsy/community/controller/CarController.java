@@ -1,38 +1,51 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Api(tags = "车辆控制器")
 @RestController
 @Slf4j
+@Login(allowAnonymous = true)
 public class CarController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
 
+    //允许上传的文件后缀种类，临时，后续从Spring配置文件中取值
+    private final String[] carImageAllowSuffix = new String[]{"jpg", "jpeg", "png"};
+
+    //允许上传的文件大小，临时，后续从配置文件中取值 由Spring控制
+    private final int carImageMaxSizeKB = 500;
+
     /**
      * 新增业主固定车辆
-     * @param carEntity         前端参数对象
-     * @return                  返回新增结果
+     *
+     * @param carEntity 前端参数对象
+     * @return 返回新增结果
      */
     @ApiOperation("新增固定车辆登记方法")
     @PostMapping(value = "/car", produces = "application/json;charset=utf-8")
-    public CommonResult<?> addProprietorCar(@ApiParam(value = "车辆登记参数对象", required = true) @RequestBody CarEntity carEntity) {
+    public CommonResult<?> addProprietorCar(@RequestBody CarEntity carEntity) {
         //1.效验前端新增车辆参数合法性
         ValidatorUtils.validateEntity(carEntity, CarEntity.addCarValidated.class);
         //2.效验被登记的车辆是否存在登记过
@@ -46,39 +59,66 @@ public class CarController {
 
     /**
      * 修改业主固定车辆
-     * @param carEntity     前端请求参数对象
-     * @return              返回修改影响行数
+     *
+     * @param carEntity 前端请求参数对象
+     * @return 返回修改影响行数
      */
     @ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
     @PutMapping("/car")
-    public CommonResult<Integer> updateProprietorCar(@ApiParam(value = "修改固定车辆提供的参数对象", required = true) @RequestBody CarEntity carEntity) {
+    public CommonResult<Integer> updateProprietorCar(@RequestBody CarEntity carEntity) {
+        //效验前端新增车辆参数合法性
+        ValidatorUtils.validateEntity(carEntity, CarEntity.updateCarValidated.class);
         return CommonResult.ok(carService.updateProprietorCar(carEntity));
     }
 
 
     /**
      * 业主车辆分页查询
-     * @param page          当前页
-     * @param pageSize      页显示条数
-     * @param uid           业主id
-     * @param checkStatus   是否已经审核
-     * @return              返回当前页业主车辆数据
+     * 所有参数类型为String 不由Spring处理 自定义处理效验
+     *
+     * @param page        当前页
+     * @param pageSize    页显示条数
+     * @param uid         业主id
+     * @param checkStatus 是否已经审核
+     * @return 返回当前页业主车辆数据
      */
     @ApiOperation("所属人固定车辆查询方法")
-    @GetMapping(value = "/car/{page}/{pageSize}/{uid}/{checkStatus}", produces = "application/json;charset=utf-8")
-    public CommonResult<List<CarEntity>> queryProprietorCar(@PathVariable("page") long page, @PathVariable("pageSize") long pageSize, @PathVariable("uid") long uid, @PathVariable("checkStatus") int checkStatus) {
-        //Map传递请求参数
-        Map<String, Object> paramMap = new HashMap<>(4);
-        paramMap.put("page", page);
-        paramMap.put("pageSize", pageSize);
-        paramMap.put("uid", uid);
-        paramMap.put("checkStatus", checkStatus);
-        List<CarEntity> records = carService.queryProprietorCar(paramMap).getRecords();
-        return CommonResult.ok(records);
+    @ApiImplicitParams({@ApiImplicitParam(name = "uid", value = "用户ID", paramType = "path", dataType = "String"),
+            @ApiImplicitParam(name = "checkStatus", value = "审核状态", paramType = "path", dataType = "String", defaultValue = "0"),
+            @ApiImplicitParam(name = "page", value = "当前页数字", paramType = "path", dataType = "String", defaultValue = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "当前页数据条数限制", paramType = "path", dataType = "String", defaultValue = "10")
+    })
+    @GetMapping(value = "/car/{uid}/{checkStatus}/{page}/{pageSize}")
+    public CommonResult<?> queryProprietorCar(@PathVariable("uid") String uid, @PathVariable("checkStatus") String checkStatus, @PathVariable("page") String page, @PathVariable("pageSize") String pageSize) {
+        //参数数字效验
+        if (isNumber(uid) && isNumber(page) && isNumber(pageSize) && isNumber(checkStatus)) {
+            //Map传递请求参数
+            Map<String, Object> paramMap = new HashMap<>(4);
+            paramMap.put("page", page);
+            paramMap.put("pageSize", pageSize);
+            paramMap.put("uid", uid);
+            paramMap.put("checkStatus", checkStatus);
+            List<CarEntity> records = carService.queryProprietorCar(paramMap).getRecords();
+            return CommonResult.ok(records);
+        }
+        //非法参数
+        return CommonResult.error(JSYError.BAD_REQUEST.getCode(), JSYError.BAD_REQUEST.getMessage());
+    }
+
+
+    /**
+     * 判断字符串是否是一个完整的数字
+     *
+     * @param str 字符串
+     * @return 返回这个字符串是否是字符串的布尔值
+     */
+    private Boolean isNumber(String str) {
+        return Pattern.compile("^-?\\d+(\\.\\d+)?$").matcher(str).matches();
     }
 
     /**
      * 根据车牌号检查车辆是否已经登记
+     *
      * @param carPlate 车牌号
      * @return 返回是否存在布尔值
      */
@@ -88,13 +128,51 @@ public class CarController {
 
     /**
      * 通过车辆ID 删除 车辆方法
-     * @param id    车辆id
-     * @return      返回逻辑删除影响行
+     *
+     * @param id 车辆id
+     * @return 返回逻辑删除影响行
      */
     @ApiOperation("所属人固定车辆删除方法")
+    @ApiParam(name = "id", value = "车辆固定id")
     @DeleteMapping(value = "/car/{id}")
     public CommonResult<?> deleteProprietorCar(@PathVariable("id") long id) {
         Integer res = carService.deleteProprietorCar(id);
         return res > 0 ? CommonResult.ok(res) : CommonResult.error(JSYError.DUPLICATE_KEY.getCode(), "车辆不存在!");
     }
+
+    /**
+     * 车辆图片上传接口
+     *
+     * @param carImage 车辆图片
+     * @return 返回图片上传成功后的访问路径地址
+     */
+    @ApiOperation("所属人车辆图片上传接口")
+    @ApiParam(name = "carImage", value = "车辆图片文件")
+    @PostMapping(value = "/car/carImageUpload")
+    public CommonResult<?> carImageUpload(MultipartFile carImage) throws IOException {
+        //1.接口非空验证
+        if (null == carImage) {
+            return CommonResult.error(JSYError.BAD_REQUEST);
+        }
+        //2.文件大小验证
+        long fileSizeForKB = carImage.getSize() / 1024;
+        if (fileSizeForKB > carImageMaxSizeKB) {
+            return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件太大了,最大：" + carImageMaxSizeKB + "KB");
+        }
+        String fileName = carImage.getOriginalFilename();
+        log.info("车辆图片上传文件名：" + fileName + " 车辆图片文件大小：" + fileSizeForKB + "KB");
+        //3.文件后缀验证
+        boolean extension = FilenameUtils.isExtension(fileName, carImageAllowSuffix);
+        if (!extension) {
+            return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件后缀不允许,可用后缀" + Arrays.asList(carImageAllowSuffix));
+        }
+        //4.调用上传车辆图片服务接口 进行上传文件
+        String resultUrl = carService.carImageUpload(carImage.getBytes(), fileName);
+        if (StringUtils.isBlank(resultUrl)) {
+            return CommonResult.error(JSYError.NOT_IMPLEMENTED.getCode(), JSYError.NOT_IMPLEMENTED.getMessage());
+        }
+        return CommonResult.ok(resultUrl);
+
+    }
+
 }

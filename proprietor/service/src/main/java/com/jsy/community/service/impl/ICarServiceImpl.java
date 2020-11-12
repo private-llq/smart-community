@@ -11,6 +11,9 @@ import com.jsy.community.mapper.CarMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -33,15 +36,15 @@ public class ICarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implement
     @Override
     public Page<CarEntity> queryProprietorCar(Map<String,Object> param) {
         QueryWrapper<CarEntity> wrapper = new QueryWrapper<>();
-        Page<CarEntity> page = new Page<>();
-        page.setCurrent((long) param.get("page"));
-        page.setSize((long) param.get("pageSize"));
+        long currentPage = Long.parseLong(param.get("page").toString());
+        long pageSize = Long.parseLong(param.get("pageSize").toString());
+        Page<CarEntity> pageCondition = new Page<>( (currentPage < 1 || currentPage > Integer.MAX_VALUE ) ? 1 : currentPage, (pageSize < 1 || pageSize > 100) ? 100 : pageSize);
         wrapper.eq("uid", param.get("uid"));
         wrapper.eq("check_status", param.get("checkStatus"));
         wrapper.eq("deleted", 0);
-        Page<CarEntity> page1 = page(page, wrapper);
-        log.info("查询所属人车辆满足条件行数："+page1.getTotal() + "每页显示条数："+page1.getSize());
-        return page1;
+        Page<CarEntity> resultData = page(pageCondition, wrapper);
+        log.info("查询所属人车辆满足条件行数："+resultData.getTotal() + "每页显示条数："+resultData.getSize());
+        return resultData;
     }
 
     /**
@@ -84,6 +87,35 @@ public class ICarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implement
     @Override
     public Boolean carIsExist(String carPlate) {
         return carMapper.selectCount(new QueryWrapper<CarEntity>().eq("car_plate", carPlate).eq("deleted",0)) > 0;
+    }
+
+    /**
+     * 车辆图片上传服务接口实现方法
+     * @param carImage 图片文件流
+     * @param fileName 文件名称
+     * @return         上传成功将放回图片URL，否则返回Null
+     */
+    @Override
+    public String carImageUpload(byte[] carImage, String fileName) {
+        //4.临时本地上传方式
+        FileOutputStream fileOutputStream = null;
+        try {
+            //图片文件流
+            fileOutputStream = new FileOutputStream(new File("D:" + File.separator + "TestFileDirectory" + File.separator + fileName));
+            fileOutputStream.write(carImage);
+            //上传成功返回访问路径
+            return "https://www.baidu.com/" + fileName;
+        } catch (IOException e) {
+            return null;
+        } finally {
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 
