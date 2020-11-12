@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class VisitorController {
 
-    @DubboReference(version = Const.version, group = Const.group)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private ITVisitorService iTVisitorService;
 
     /**

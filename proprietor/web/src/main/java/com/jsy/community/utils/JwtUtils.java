@@ -1,5 +1,8 @@
 package com.jsy.community.utils;
 
+import cn.hutool.core.date.DateUtil;
+import com.jsy.community.vo.UserInfoVo;
+import com.jsy.community.vo.UserLoginVo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,18 +30,19 @@ public class JwtUtils {
 	/**
 	 * 生成jwt token
 	 */
-	public String generateToken(long userId) {
+	public UserLoginVo generateToken(UserInfoVo infoVo) {
 		Date nowDate = new Date();
 		//过期时间
 		Date expireDate = new Date(nowDate.getTime() + expire * 1000);
 		
-		return Jwts.builder()
+		String token = Jwts.builder()
 			.setHeaderParam("typ", "JWT")
-			.setSubject(userId + "")
+			.setSubject(infoVo.getId().toString())
 			.setIssuedAt(nowDate)
 			.setExpiration(expireDate)
 			.signWith(SignatureAlgorithm.HS512, secret)
 			.compact();
+		return new UserLoginVo(token, DateUtil.toLocalDateTime(expireDate), infoVo);
 	}
 	
 	public Claims getClaimByToken(String token) {

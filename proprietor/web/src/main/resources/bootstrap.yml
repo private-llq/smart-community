@@ -2,22 +2,19 @@ spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: propeietor-service
+    name: propeietor-web
   profiles:
     active: dev
   cloud:
     nacos:
+      # 服务发现
       discovery:
         server-addr: 127.0.0.1:8848
+      # 配置中心
       config:
         server-addr: 127.0.0.1:8848
         file-extension: yaml
-        extension-configs[0]:
-          data-id: common.yaml
-          refresh: true
-        extension-configs[1]:
-          data-id: proprietor-ext.yaml
-          refresh: true
+
 dubbo:
   registry:
     address: nacos://127.0.0.1:8848
@@ -27,4 +24,4 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: propeietor-web
+    subscribed-services: propeietor-service

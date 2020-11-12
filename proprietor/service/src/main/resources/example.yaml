@@ -3,19 +3,6 @@ server:
   servlet:
     context-path: /
 
-nacos:
-  discovery:
-    server-addr: 127.0.0.1:8848
-
-dubbo:
-  registry:
-    address: nacos://127.0.0.1:8848
-  protocol:
-    name: dubbo
-    port: 26002
-  application:
-    name: ${spring.application.name}
-
 spring:
   # jackson时间格式化
   jackson:
@@ -26,6 +13,10 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
       enabled: true
+  redis:
+    port: 6379
+    host: localhost
+    database: 0
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:

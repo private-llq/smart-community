@@ -31,6 +31,8 @@
     <properties>
         <java.version>11</java.version>
         <mybatis-plus.version>3.4.0</mybatis-plus.version>
+        <spring-cloud-alibaba.version>2.2.3.RELEASE</spring-cloud-alibaba.version>
+        <spring-context.version>2.2.5.RELEASE</spring-context.version>
         <druid.version>1.1.20</druid.version>
         <nacos.version>0.2.7</nacos.version>
         <dubbo.version>2.7.8</dubbo.version>
@@ -62,7 +64,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-context</artifactId>
-                <version>2.2.5.RELEASE</version>
+                <version>${spring-context.version}</version>
             </dependency>
             <!-- rabbitmq -->
             <dependency>
@@ -73,6 +75,17 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-integration</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.integration</groupId>
+                <artifactId>spring-integration-redis</artifactId>
+                <version>${spring-integration.version}</version>
             </dependency>
             <!-- 安全认证 -->
             <dependency>
@@ -115,15 +128,15 @@
     
             <!-- 配置中心 -->
             <dependency>
-                <groupId>com.alibaba.boot</groupId>
-                <artifactId>nacos-config-spring-boot-starter</artifactId>
-                <version>${nacos.version}</version>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
             </dependency>
             <!-- 服务发现 -->
             <dependency>
-                <groupId>com.alibaba.boot</groupId>
-                <artifactId>nacos-discovery-spring-boot-starter</artifactId>
-                <version>${nacos.version}</version>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>spring-context-support</artifactId>
@@ -132,15 +145,9 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.apache.dubbo</groupId>
-                <artifactId>dubbo-spring-boot-starter</artifactId>
-                <version>${dubbo.version}</version>
-            </dependency>
-            <!-- dubbo + nacos -->
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>dubbo</artifactId>
-                <version>${dubbo.version}</version>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-dubbo</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
             </dependency>
     
             <!-- 接口文档 -->
@@ -159,6 +166,11 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>${jakarta-xml-bind.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -191,7 +203,7 @@
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>2.2.3.RELEASE</version>
+                <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

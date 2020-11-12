@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.jsy.community.constant.ConstError;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 
@@ -14,6 +15,10 @@ public class ProprietorException extends JSYException {
 	
 	public ProprietorException() {
 		super();
+	}
+	
+	public ProprietorException(String message) {
+		super(ConstError.NORMAL, message);
 	}
 	
 	public ProprietorException(JSYError error) {

@@ -1,5 +1,6 @@
 package com.jsy.community.vo;
 
+import com.jsy.community.constant.ConstError;
 import com.jsy.community.exception.JSYError;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommonResult<T> implements Serializable {
-	@ApiModelProperty("接口返回状态码，0表示成功")
+	@ApiModelProperty("接口返回状态码，0表示成功，1表示一般错误")
 	private int code;
 	
 	@ApiModelProperty("接口错误返回提示信息")
@@ -25,6 +26,10 @@ public class CommonResult<T> implements Serializable {
 		return new CommonResult<>(0, null, data);
 	}
 	
+	public static CommonResult<Boolean> ok() {
+		return ok(true);
+	}
+	
 	public static CommonResult<Boolean> error(int code, String message) {
 		return new CommonResult<>(code, message, false);
 	}
@@ -33,7 +38,7 @@ public class CommonResult<T> implements Serializable {
 		return error(error.getCode(), error.getMessage());
 	}
 	
-	public static CommonResult<Boolean> error(int code) {
-		return error(code, null);
+	public static CommonResult<Boolean> error(String message) {
+		return error(ConstError.NORMAL, message);
 	}
 }

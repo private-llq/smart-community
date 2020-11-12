@@ -1,21 +1,22 @@
-package com.jsy.community.entity;
+package com.jsy.community.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
+ * 业主个人信息
+ *
  * @author ling
- * @date 2020-11-11 17:42
+ * @date 2020-11-12 16:51
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel("业主实体类")
-public class UserEntity extends BaseEntity {
-	
+@ApiModel("业主个人信息")
+public class UserInfoVo implements Serializable {
 	@ApiModelProperty("业主ID")
-	private Long householderId;
+	private Long id;
 	
 	@ApiModelProperty("昵称")
 	private String nickname;
@@ -35,14 +36,14 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("是否实名认证")
 	private Integer isRealAuth;
 	
-	@ApiModelProperty("省ID")
-	private Integer provinceId;
+	@ApiModelProperty("省")
+	private String province;
 	
-	@ApiModelProperty("市ID")
-	private Integer cityId;
+	@ApiModelProperty("市")
+	private String city;
 	
-	@ApiModelProperty("区ID")
-	private Integer areaId;
+	@ApiModelProperty("区")
+	private String area;
 	
 	@ApiModelProperty("详细地址")
 	private String detailAddress;

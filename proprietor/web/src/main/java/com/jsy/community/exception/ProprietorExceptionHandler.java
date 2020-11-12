@@ -3,6 +3,8 @@ package com.jsy.community.exception;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -25,6 +27,19 @@ public class ProprietorExceptionHandler {
 	@ExceptionHandler(JSYException.class)
 	public CommonResult<Boolean> handlerJSYException(JSYException e) {
 		return CommonResult.error(e.getCode(), e.getMessage());
+	}
+	
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	public CommonResult<Boolean> handlerMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+		return CommonResult.error(JSYError.REQUEST_PARAM);
+	}
+	
+	/**
+	 * 接口参数错误异常
+	 */
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public CommonResult<Boolean> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+		return CommonResult.error(JSYError.BAD_REQUEST.getCode(), e.getMessage());
 	}
 	
 	/**
