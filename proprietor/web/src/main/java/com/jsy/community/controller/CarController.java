@@ -62,7 +62,6 @@ public class CarController {
 
     /**
      * 修改业主固定车辆
-     *
      * @param carEntity 前端请求参数对象
      * @return 返回修改影响行数
      */
@@ -78,7 +77,6 @@ public class CarController {
     /**
      * 业主车辆分页查询
      * 所有参数类型为String 不由Spring处理 自定义处理效验
-     *
      * @param page        当前页
      * @param pageSize    页显示条数
      * @param uid         业主id
@@ -106,7 +104,6 @@ public class CarController {
 
     /**
      * 判断字符串是否是一个完整的数字
-     *
      * @param str 字符串
      * @return 返回这个字符串是否是字符串的布尔值
      */
@@ -116,7 +113,6 @@ public class CarController {
 
     /**
      * 根据车牌号检查车辆是否已经登记
-     *
      * @param carPlate 车牌号
      * @return 返回是否存在布尔值
      */
@@ -126,7 +122,6 @@ public class CarController {
 
     /**
      * 通过车辆ID 删除 车辆方法
-     *
      * @param id 车辆id
      * @return 返回逻辑删除影响行
      */
@@ -137,6 +132,11 @@ public class CarController {
         return res > 0 ? CommonResult.ok(res) : CommonResult.error(JSYError.DUPLICATE_KEY.getCode(), "车辆不存在!");
     }
 
+    /**
+     * 车辆图片上传接口
+     * @param carImage  车辆图片
+     * @return          返回图片上传成功后的访问路径地址
+     */
     @ApiOperation("所属人车辆图片上传接口")
     @PostMapping("/car/carImageUpload")
     public CommonResult<?> carImageUpload(MultipartFile carImage) {
@@ -159,6 +159,7 @@ public class CarController {
         //4.临时本地上传方式
         FileOutputStream fileOutputStream = null;
         try {
+            //图片文件流
             byte[] bytes = carImage.getBytes();
             fileOutputStream = new FileOutputStream(new File("D:" + File.separator + "TestFileDirectory" + File.separator + fileName));
             fileOutputStream.write(bytes);
