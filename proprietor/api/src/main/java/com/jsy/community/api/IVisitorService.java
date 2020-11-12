@@ -26,6 +26,15 @@ public interface IVisitorService extends IService<VisitorEntity> {
     Long addVisitor(VisitorEntity visitorEntity);
     
     /**
+    * @Description: 逻辑删除 访客关联数据(随行人员、随行车辆)
+     * @Param: [visitorId]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+    **/
+    void deletePersonAndCar(Long visitorId);
+    
+    /**
     * @Description: 分页查询
      * @Param: [BaseQO<VisitorQO>]
      * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.VisitorEntity>

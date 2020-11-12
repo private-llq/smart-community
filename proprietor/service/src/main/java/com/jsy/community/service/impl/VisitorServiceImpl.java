@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.VisitingCar;
 import com.jsy.community.entity.VisitorEntity;
+import com.jsy.community.entity.VisitorPerson;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.VisitingCarMapper;
@@ -35,6 +37,12 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     @Autowired
     private VisitorMapper visitorMapper;
     
+    @Autowired
+    private VisitorPersonMapper visitorPersonMapper;
+    
+    @Autowired
+    private VisitingCarMapper visitingCarMapper;
+    
     /**
     * @Description: 访客登记 新增
      * @Param: [visitorEntity]
@@ -49,6 +57,21 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             throw new JSYException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
         }
         return visitorEntity.getId();
+    }
+    
+    /**
+     * @Description: 逻辑删除 访客关联数据(随行人员、随行车辆)
+     * @Param: [visitorId]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+     **/
+    @Override
+    public void deletePersonAndCar(Long visitorId){
+        Map<String, Object> opMap = new HashMap<>();
+        opMap.put("visitor_id",visitorId);
+        visitorPersonMapper.deleteByMap(opMap);
+        visitingCarMapper.deleteByMap(opMap);
     }
     
     /**

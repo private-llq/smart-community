@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
@@ -36,6 +37,17 @@ public class VisitorPerson extends BaseEntity implements Serializable {
     private String idCard;
 
     @ApiModelProperty(value = "随行人手机号")
+    @Pattern(groups = {addPersonValidatedGroup.class,updatePersonValidatedGroup.class}, regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     private String mobile;
+    
+    /**
+     * 添加随行车辆前端参数验证接口
+     */
+    public interface addPersonValidatedGroup{}
+    
+    /**
+     * 修改随行车辆前端参数验证接口
+     */
+    public interface updatePersonValidatedGroup{}
 
 }

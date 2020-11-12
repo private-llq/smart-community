@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -37,6 +38,7 @@ public class VisitingCar extends BaseEntity implements Serializable {
     private Long visitorId;
 
     @ApiModelProperty(value = "来访车辆车牌")
+    @Pattern(groups = {addCarValidatedGroup.class, updateCarValidatedGroup.class}, regexp = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$", message = "请输入一个正确的车牌号!")
     private String carPlate;
 
     @ApiModelProperty(value = "来访车辆图片地址")
@@ -51,4 +53,13 @@ public class VisitingCar extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "实际离开时间(改为权限时效时间？再加次数方式？)")
     private Date leavingTime;
     
+    /**
+     * 添加随行车辆前端参数验证接口
+     */
+    public interface addCarValidatedGroup{}
+    
+    /**
+     * 修改随行车辆前端参数验证接口
+     */
+    public interface updateCarValidatedGroup{}
 }

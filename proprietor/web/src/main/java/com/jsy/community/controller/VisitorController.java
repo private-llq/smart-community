@@ -24,6 +24,7 @@ import java.util.List;
 @RequestMapping("visitor")
 @Api(tags = "访客控制器")
 @RestController
+//TODO 代码提到Service层
 public class VisitorController {
 
     @DubboReference(version = Const.version, group = Const.group)
@@ -51,9 +52,14 @@ public class VisitorController {
         ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addVisitorValidatedGroup.class);
         //添加访客
         Long visitorId = iTVisitorService.addVisitor(visitorEntity);
+        if(visitorId == null){
+            return CommonResult.error(JSYError.INTERNAL.getCode(),"新增访客登记失败");
+        }
         //添加随行人员
         List<VisitorPerson> personList = visitorEntity.getVisitorPerson();
         if(!CollectionUtils.isEmpty(personList)){
+            //TODO 测试是否可以验证List类型
+            ValidatorUtils.validateEntity(personList, VisitorPerson.addPersonValidatedGroup.class);
             for(VisitorPerson person : personList){
                 person.setVisitorId(visitorId);
             }
@@ -62,12 +68,14 @@ public class VisitorController {
         //添加随行车辆
         List<VisitingCar> carList = visitorEntity.getVisitingCar();
         if(!CollectionUtils.isEmpty(carList)){
+            //TODO 测试是否可以验证List类型
+            ValidatorUtils.validateEntity(carList, VisitingCar.addCarValidatedGroup.class);
             for(VisitingCar car : carList){
                 car.setVisitorId(visitorId);
             }
         }
         boolean saveVisitingCar = iVisitingCarService.saveBatch(carList);
-        return (visitorId != null && saveVisitorPerson && saveVisitingCar) ? CommonResult.ok("") : CommonResult.error(JSYError.INTERNAL.getCode(),"新增访客登记失败");
+        return (saveVisitorPerson && saveVisitingCar) ? CommonResult.ok("") : CommonResult.error(JSYError.INTERNAL.getCode(),"新增访客登记失败");
     }
     
     /**
@@ -77,9 +85,14 @@ public class VisitorController {
      * @Author: chq459799974
      * @Date: 2020/11/12
     **/
+    @Transactional(rollbackFor = Exception.class)
     @DeleteMapping("{id}")
     public CommonResult delete(@PathVariable("id")Long id){
         boolean delResult = iTVisitorService.removeById(id);
+        if(delResult){
+            //关联删除
+            iTVisitorService.deletePersonAndCar(id);
+        }
         return delResult ? CommonResult.ok("") : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
     }
     
@@ -94,7 +107,35 @@ public class VisitorController {
     public CommonResult update(@RequestBody VisitorEntity visitorEntity){
         setNull(visitorEntity);
         boolean updateResult = iTVisitorService.updateById(visitorEntity);
-        return updateResult ? CommonResult.ok("") : CommonResult.error(-1,"访客登记申请修改失败");
+        return updateResult ? CommonResult.ok("") : CommonResult.error(JSYError.INTERNAL.getCode(),"访客登记申请 修改失败");
+    }
+    
+    /**
+    * @Description: 修改随行人员
+     * @Param: [visitorPerson]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+    **/
+    @PutMapping("person")
+    public CommonResult updatePerson(@RequestBody VisitorPerson visitorPerson){
+        ValidatorUtils.validateEntity(visitorPerson, VisitingCar.updateCarValidatedGroup.class);
+        boolean updateResult = iVisitorPersonService.updateById(visitorPerson);
+        return updateResult ? CommonResult.ok("") : CommonResult.error(JSYError.INTERNAL.getCode(),"访客登记-随行人员 修改失败");
+    }
+    
+    /**
+    * @Description: 修改随行车辆
+     * @Param: [visitingCar]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+    **/
+    @PutMapping("car")
+    public CommonResult updateCar(@RequestBody VisitingCar visitingCar){
+        ValidatorUtils.validateEntity(visitingCar, VisitingCar.updateCarValidatedGroup.class);
+        boolean updateResult = iVisitingCarService.updateById(visitingCar);
+        return updateResult ? CommonResult.ok("") : CommonResult.error(JSYError.INTERNAL.getCode(),"访客登记-随行车辆 修改失败");
     }
     
     /**
