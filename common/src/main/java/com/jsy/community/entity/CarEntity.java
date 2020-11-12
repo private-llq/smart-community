@@ -7,9 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
 
@@ -24,14 +24,14 @@ import java.util.Date;
 public class CarEntity extends BaseEntity {
 
     @ApiModelProperty(value = "所属人ID")
-    @NotNull(groups = {addCarValidated.class}, message = "用户id必须不为空!")
+    @Range(groups = {addCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "用户id不合法")
     private Long uid;
 
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class}, message = "车位id必须不为空!")
+    @Range(groups = {addCarValidated.class, updateCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "车位id不合法")
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class}, message = "社区id必须不为空!")
+    @Range(groups = {addCarValidated.class, updateCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "社区id不合法")
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
 
@@ -58,7 +58,7 @@ public class CarEntity extends BaseEntity {
     private Integer checkStatus;
 
     @ApiModelProperty(value = "审核时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone="GMT+8")
     private Date checkTime;
 
 
@@ -71,5 +71,7 @@ public class CarEntity extends BaseEntity {
      * 更新车辆前端参数验证接口
      */
     public interface updateCarValidated{}
+
+
 
 }
