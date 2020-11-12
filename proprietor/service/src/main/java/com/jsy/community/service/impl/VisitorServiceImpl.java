@@ -3,16 +3,23 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.visitor.ITVisitorService;
+import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitorEntity;
-import com.jsy.community.mapper.TVisitorMapper;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.mapper.VisitingCarMapper;
+import com.jsy.community.mapper.VisitorMapper;
+import com.jsy.community.mapper.VisitorPersonMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.VisitorQO;
 import com.jsy.community.utils.MyPageUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -23,10 +30,26 @@ import org.springframework.util.StringUtils;
  * @since 2020-11-11
  */
 @DubboService(version = Const.version, group = Const.group)
-public class ITVisitorServiceImpl extends ServiceImpl<TVisitorMapper, VisitorEntity> implements ITVisitorService {
+public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity> implements IVisitorService {
 
     @Autowired
-    private TVisitorMapper tVisitorMapper;
+    private VisitorMapper visitorMapper;
+    
+    /**
+    * @Description: 访客登记 新增
+     * @Param: [visitorEntity]
+     * @Return: java.lang.Long
+     * @Author: Administrator
+     * @Date: 2020/11/12
+    **/
+    @Override
+    public Long addVisitor(VisitorEntity visitorEntity){
+        int insert = visitorMapper.insert(visitorEntity);
+        if(1 != insert){
+            throw new JSYException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
+        }
+        return visitorEntity.getId();
+    }
     
     /**
      * @Description: 分页查询
@@ -48,7 +71,7 @@ public class ITVisitorServiceImpl extends ServiceImpl<TVisitorMapper, VisitorEnt
             queryWrapper.eq("contact",visitorQO.getContact());
         }
         queryAddress(queryWrapper,visitorQO);
-        return tVisitorMapper.selectPage(page, queryWrapper);
+        return visitorMapper.selectPage(page, queryWrapper);
     }
     
     /** 查询楼栋 */
