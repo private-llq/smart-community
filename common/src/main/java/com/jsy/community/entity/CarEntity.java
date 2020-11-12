@@ -39,6 +39,7 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆牌照")
     private String carPlate;
 
+    @Pattern(groups = {addCarValidated.class}, regexp = "(https?)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", message = "请提供一个正确的访问地址!")
     @ApiModelProperty(value = "车辆照片访问路径")
     private String carImageUrl;
 
