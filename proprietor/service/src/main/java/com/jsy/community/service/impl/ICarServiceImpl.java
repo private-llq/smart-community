@@ -33,15 +33,15 @@ public class ICarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implement
     @Override
     public Page<CarEntity> queryProprietorCar(Map<String,Object> param) {
         QueryWrapper<CarEntity> wrapper = new QueryWrapper<>();
-        Page<CarEntity> page = new Page<>();
-        page.setCurrent((long) param.get("page"));
-        page.setSize((long) param.get("pageSize"));
+        long currentPage = Long.parseLong(param.get("page").toString());
+        long pageSize = Long.parseLong(param.get("pageSize").toString());
+        Page<CarEntity> pageCondition = new Page<>( (currentPage < 1 || currentPage > Integer.MAX_VALUE ) ? 1 : currentPage, (pageSize < 1 || pageSize > 100) ? 100 : pageSize);
         wrapper.eq("uid", param.get("uid"));
         wrapper.eq("check_status", param.get("checkStatus"));
         wrapper.eq("deleted", 0);
-        Page<CarEntity> page1 = page(page, wrapper);
-        log.info("查询所属人车辆满足条件行数："+page1.getTotal() + "每页显示条数："+page1.getSize());
-        return page1;
+        Page<CarEntity> resultData = page(pageCondition, wrapper);
+        log.info("查询所属人车辆满足条件行数："+resultData.getTotal() + "每页显示条数："+resultData.getSize());
+        return resultData;
     }
 
     /**
