@@ -1,4 +1,4 @@
-package com.jsy.community.qo.visitor;
+package com.jsy.community.qo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -25,7 +25,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel(value="TVisitor查询、修改入参对象", description="来访人员")
-public class VisitorQO extends BaseQO {
+public class VisitorQO implements Serializable{
 
     @ApiModelProperty(value = "ID")
     private Long id;

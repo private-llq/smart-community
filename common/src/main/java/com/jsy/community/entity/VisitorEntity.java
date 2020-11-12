@@ -1,4 +1,4 @@
-package com.jsy.community.entity.visitor;
+package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
