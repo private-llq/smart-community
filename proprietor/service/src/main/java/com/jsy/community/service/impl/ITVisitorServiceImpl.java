@@ -1,15 +1,14 @@
-package com.jsy.community.service.impl.visitor;
+package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.visitor.ITVisitorService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.visitor.VisitorEntity;
-import com.jsy.community.mapper.visitor.TVisitorMapper;
+import com.jsy.community.entity.VisitorEntity;
+import com.jsy.community.mapper.TVisitorMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.visitor.VisitorQO;
+import com.jsy.community.qo.VisitorQO;
 import com.jsy.community.utils.MyPageUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ public class ITVisitorServiceImpl extends ServiceImpl<TVisitorMapper, VisitorEnt
     /**
      * @Description: 分页查询
      * @Param: [BaseQO<VisitorQO>]
-     * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.visitor.VisitorEntity>
+     * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.VisitorEntity>
      * @Author: chq459799974
      * @Date: 2020/11/11
      **/

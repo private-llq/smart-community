@@ -2,10 +2,10 @@ package com.jsy.community.controller;
 
 import com.jsy.community.api.visitor.ITVisitorService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.visitor.VisitorEntity;
+import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.visitor.VisitorQO;
+import com.jsy.community.qo.VisitorQO;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;

@@ -2,9 +2,9 @@ package com.jsy.community.api.visitor;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.visitor.VisitorEntity;
+import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.visitor.VisitorQO;
+import com.jsy.community.qo.VisitorQO;
 
 /**
  * <p>
@@ -18,7 +18,7 @@ public interface ITVisitorService extends IService<VisitorEntity> {
     /**
     * @Description: 分页查询
      * @Param: [BaseQO<VisitorQO>]
-     * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.visitor.VisitorEntity>
+     * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.VisitorEntity>
      * @Author: chq459799974
      * @Date: 2020/11/11
     **/
