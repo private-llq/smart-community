@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Api(tags = "车辆控制器")
 @RestController
@@ -29,8 +30,8 @@ public class CarController {
 
     /**
      * 新增业主固定车辆
-     * @param carEntity         前端参数对象
-     * @return                  返回新增结果
+     * @param carEntity 前端参数对象
+     * @return 返回新增结果
      */
     @ApiOperation("新增固定车辆登记方法")
     @PostMapping(value = "/car", produces = "application/json;charset=utf-8")
@@ -48,8 +49,8 @@ public class CarController {
 
     /**
      * 修改业主固定车辆
-     * @param carEntity     前端请求参数对象
-     * @return              返回修改影响行数
+     * @param carEntity 前端请求参数对象
+     * @return 返回修改影响行数
      */
     @ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
     @PutMapping("/car")
@@ -62,23 +63,39 @@ public class CarController {
 
     /**
      * 业主车辆分页查询
-     * @param page          当前页
-     * @param pageSize      页显示条数
-     * @param uid           业主id
-     * @param checkStatus   是否已经审核
-     * @return              返回当前页业主车辆数据
+     * 所有参数类型为String 不由Spring处理 自定义处理效验
+     * @param page        当前页
+     * @param pageSize    页显示条数
+     * @param uid         业主id
+     * @param checkStatus 是否已经审核
+     * @return 返回当前页业主车辆数据
      */
     @ApiOperation("所属人固定车辆查询方法")
-    @GetMapping(value = "/car/{page}/{pageSize}/{uid}/{checkStatus}", produces = "application/json;charset=utf-8")
-    public CommonResult<List<CarEntity>> queryProprietorCar(@PathVariable("page") long page, @PathVariable("pageSize") long pageSize, @PathVariable("uid") long uid, @PathVariable("checkStatus") int checkStatus) {
-        //Map传递请求参数
-        Map<String, Object> paramMap = new HashMap<>(4);
-        paramMap.put("page", page);
-        paramMap.put("pageSize", pageSize);
-        paramMap.put("uid", uid);
-        paramMap.put("checkStatus", checkStatus);
-        List<CarEntity> records = carService.queryProprietorCar(paramMap).getRecords();
-        return CommonResult.ok(records);
+    @GetMapping(value = "/car/{uid}/{checkStatus}/{page}/{pageSize}")
+    public CommonResult<?> queryProprietorCar(@PathVariable("uid") String uid, @PathVariable("checkStatus") String checkStatus, @PathVariable("page") String page, @PathVariable("pageSize") String pageSize) {
+        //参数数字效验
+        if(isNumber(uid) && isNumber(page) && isNumber(pageSize) && isNumber(checkStatus)){
+            //Map传递请求参数
+            Map<String, Object> paramMap = new HashMap<>(4);
+            paramMap.put("page", page);
+            paramMap.put("pageSize", pageSize);
+            paramMap.put("uid", uid);
+            paramMap.put("checkStatus", checkStatus);
+            List<CarEntity> records = carService.queryProprietorCar(paramMap).getRecords();
+            return CommonResult.ok(records);
+        }
+        //非法参数
+        return CommonResult.error(JSYError.BAD_REQUEST.getCode(), JSYError.BAD_REQUEST.getMessage());
+    }
+
+
+    /**
+     * 判断字符串是否是一个完整的数字
+     * @param str   字符串
+     * @return      返回这个字符串是否是字符串的布尔值
+     */
+    private Boolean isNumber(String str){
+        return Pattern.compile("^-?\\d+(\\.\\d+)?$").matcher(str).matches();
     }
 
     /**
@@ -92,8 +109,8 @@ public class CarController {
 
     /**
      * 通过车辆ID 删除 车辆方法
-     * @param id    车辆id
-     * @return      返回逻辑删除影响行
+     * @param id 车辆id
+     * @return 返回逻辑删除影响行
      */
     @ApiOperation("所属人固定车辆删除方法")
     @DeleteMapping(value = "/car/{id}")
@@ -101,4 +118,7 @@ public class CarController {
         Integer res = carService.deleteProprietorCar(id);
         return res > 0 ? CommonResult.ok(res) : CommonResult.error(JSYError.DUPLICATE_KEY.getCode(), "车辆不存在!");
     }
+
+
+
 }
