@@ -34,7 +34,7 @@ public class CarController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
 
-    //允许上传的文件后缀种类，临时，后续从配置文件中取值
+    //允许上传的文件后缀种类，临时，后续从Spring配置文件中取值
     private final String[] carImageAllowSuffix = new String[]{"jpg", "jpeg", "png"};
 
     //允许上传的文件大小，临时，后续从配置文件中取值 由Spring控制
@@ -42,7 +42,6 @@ public class CarController {
 
     /**
      * 新增业主固定车辆
-     *
      * @param carEntity 前端参数对象
      * @return 返回新增结果
      */
@@ -139,7 +138,7 @@ public class CarController {
      */
     @ApiOperation("所属人车辆图片上传接口")
     @PostMapping("/car/carImageUpload")
-    public CommonResult<?> carImageUpload(MultipartFile carImage) {
+    public CommonResult<?> carImageUpload(MultipartFile carImage) throws IOException {
         //1.接口非空验证
         if (null == carImage) {
             return CommonResult.error(JSYError.BAD_REQUEST);
@@ -169,11 +168,7 @@ public class CarController {
             return CommonResult.error(JSYError.NOT_IMPLEMENTED.getCode(), "文件上传失败!" + e.getMessage());
         } finally {
             if (fileOutputStream != null) {
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                fileOutputStream.close();
             }
         }
     }
