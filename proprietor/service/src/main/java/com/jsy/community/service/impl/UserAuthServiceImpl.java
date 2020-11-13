@@ -1,13 +1,18 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.mapper.UserAuthMapper;
+import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
+import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -25,6 +30,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	
 	@Resource
 	private RedisLockRegistry redisLockRegistry;
+	
+	@Resource
+	private ICommonService commonService;
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
@@ -56,18 +64,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		String field;
 		if (RegexUtils.isMobile(qo.getAccount())) {
 			// 手机验证码登录
-			String code = redisTemplate.opsForValue().get(qo.getAccount());
-			if (code == null) {
-				throw new ProprietorException("验证码已失效");
-			}
-			
-			if (!code.equals(qo.getCode())) {
-				throw new ProprietorException("验证码错误");
-			}
-			
-			// 验证通过，删除验证码
-			redisTemplate.delete(qo.getAccount());
-			
+			commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 			return baseMapper.queryUserIdByMobile(qo.getAccount());
 		} else {
 			if (RegexUtils.isEmail(qo.getAccount())) {
@@ -83,5 +80,54 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 				throw new ProprietorException("账号密码错误");
 			}
 		}
+	}
+	
+	@Override
+	public boolean addPassword(Long uid, AddPasswordQO qo) {
+		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
+			throw new ProprietorException("密码不一致");
+		}
+		
+		String salt = RandomUtil.randomString(8);
+		String encryptedPassword = SecureUtil.sha256(qo.getPassword() + salt);
+		
+		UserAuthEntity entity = new UserAuthEntity();
+		entity.setPassword(encryptedPassword);
+		entity.setSalt(salt);
+		
+		LambdaQueryWrapper<UserAuthEntity> update = new LambdaQueryWrapper<>();
+		update.eq(UserAuthEntity::getUid, uid);
+		return update(entity, update);
+	}
+	
+	@Override
+	public boolean checkUserExists(String account, String field) {
+		return baseMapper.checkUserExists(account, field) != null;
+	}
+	
+	@Override
+	public boolean resetPassword(ResetPasswordQO qo) {
+		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
+			throw new ProprietorException("密码不一致");
+		}
+		
+		UserAuthEntity entity;
+		if (RegexUtils.isMobile(qo.getAccount())) {
+			entity = baseMapper.queryUserByField(qo.getAccount(), "mobile");
+		} else if (RegexUtils.isEmail(qo.getAccount())) {
+			entity = baseMapper.queryUserByField(qo.getAccount(), "email");
+		} else {
+			entity = baseMapper.queryUserByField(qo.getAccount(), "username");
+		}
+		
+		if (entity == null) {
+			throw new ProprietorException("不存在此账号");
+		}
+		
+		UserAuthEntity update = new UserAuthEntity();
+		update.setId(entity.getId());
+		update.setPassword(SecureUtil.sha256(qo.getPassword() + entity.getSalt()));
+		
+		return updateById(update);
 	}
 }

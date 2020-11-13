@@ -4,7 +4,7 @@ package com.jsy.community.constant;
  * 错误码code
  *
  * @author ling
- * @date 2020-11-12 16:32
+ * @since 2020-11-12 16:32
  */
 public interface ConstError {
 	/**

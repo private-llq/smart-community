@@ -9,4 +9,8 @@
 	<select id="queryUserIdByMobile" resultType="java.lang.Long">
 		select uid from t_user_auth ua where ua.mobile = #{mobile}
 	</select>
+	
+	<select id="checkUserExists" resultType="java.lang.Long">
+		select id from t_user_auth ua where ${field} = #{account}
+	</select>
 </mapper>

@@ -27,7 +27,7 @@ public class CommonResult<T> implements Serializable {
 	}
 	
 	public static CommonResult<Boolean> ok() {
-		return ok(true);
+		return new CommonResult<>(0, "操作成功", true);
 	}
 	
 	public static CommonResult<Boolean> error(int code, String message) {

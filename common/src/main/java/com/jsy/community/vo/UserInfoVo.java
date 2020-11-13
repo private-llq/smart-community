@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 业主个人信息
  *
  * @author ling
- * @date 2020-11-12 16:51
+ * @since 2020-11-12 16:51
  */
 @Data
 @ApiModel("业主个人信息")

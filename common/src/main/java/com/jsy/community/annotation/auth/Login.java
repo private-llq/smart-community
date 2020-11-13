@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * 登录注解
  *
  * @author ling
- * @date 2020-11-11 11:00
+ * @since 2020-11-11 11:00
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

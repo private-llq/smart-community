@@ -1,17 +1,21 @@
 package com.jsy.community.utils;
 
 import cn.hutool.core.date.DateUtil;
+import com.jsy.community.intercepter.AuthorizationInterceptor;
+import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
-import com.jsy.community.vo.UserLoginVo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 /**
@@ -20,8 +24,8 @@ import java.util.Date;
 @ConfigurationProperties(prefix = "jsy.jwt")
 @Component
 @Data
+@Slf4j
 public class JwtUtils {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private String secret;
 	private long expire;
@@ -30,7 +34,7 @@ public class JwtUtils {
 	/**
 	 * 生成jwt token
 	 */
-	public UserLoginVo generateToken(UserInfoVo infoVo) {
+	public UserAuthVo generateToken(UserInfoVo infoVo) {
 		Date nowDate = new Date();
 		//过期时间
 		Date expireDate = new Date(nowDate.getTime() + expire * 1000);
@@ -42,7 +46,7 @@ public class JwtUtils {
 			.setExpiration(expireDate)
 			.signWith(SignatureAlgorithm.HS512, secret)
 			.compact();
-		return new UserLoginVo(token, DateUtil.toLocalDateTime(expireDate), infoVo);
+		return new UserAuthVo(token, DateUtil.toLocalDateTime(expireDate), infoVo);
 	}
 	
 	public Claims getClaimByToken(String token) {
@@ -52,7 +56,7 @@ public class JwtUtils {
 				.parseClaimsJws(token)
 				.getBody();
 		} catch (Exception e) {
-			logger.debug("validate is token error ", e);
+			log.error("validate is token error ", e);
 			return null;
 		}
 	}
@@ -64,5 +68,12 @@ public class JwtUtils {
 	 */
 	public boolean isTokenExpired(Date expiration) {
 		return expiration.before(new Date());
+	}
+	
+	@Nullable
+	public static Long getUserId() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+			.getRequest();
+		return (Long) request.getAttribute(AuthorizationInterceptor.USER_KEY);
 	}
 }

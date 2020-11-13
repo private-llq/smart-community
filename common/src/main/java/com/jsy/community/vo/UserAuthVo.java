@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 
 /**
  * @author ling
- * @date 2020-11-12 16:50
+ * @since 2020-11-12 16:50
  */
 @Data
 @ApiModel("业主登录")
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLoginVo implements Serializable {
+public class UserAuthVo implements Serializable {
 	@ApiModelProperty("token")
 	private String token;
 	

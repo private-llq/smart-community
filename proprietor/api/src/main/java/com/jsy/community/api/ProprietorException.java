@@ -6,7 +6,7 @@ import com.jsy.community.exception.JSYException;
 
 /**
  * @author ling
- * @date 2020-11-11 14:13
+ * @since 2020-11-11 14:13
  */
 public class ProprietorException extends JSYException {
 	public ProprietorException(Integer code, String message) {

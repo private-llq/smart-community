@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
  * 常用正则
  *
  * @author ling
- * @date 2020-11-12 17:02
+ * @since 2020-11-12 17:02
  */
 @SuppressWarnings("unused")
 public class RegexUtils {

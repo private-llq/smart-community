@@ -6,7 +6,7 @@ import com.jsy.community.constant.ConstError;
  * 错误枚举
  *
  * @author ling
- * @date 2020-11-11 11:02
+ * @since 2020-11-11 11:02
  */
 public enum JSYError {
 	BAD_REQUEST(ConstError.BAD_REQUEST, "错误的请求"),

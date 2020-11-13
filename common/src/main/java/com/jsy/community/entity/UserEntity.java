@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,11 +8,12 @@ import lombok.EqualsAndHashCode;
 
 /**
  * @author ling
- * @date 2020-11-11 17:42
+ * @since 2020-11-11 17:42
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("业主实体类")
+@TableName("t_user")
 public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("业主ID")
