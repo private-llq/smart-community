@@ -8,7 +8,6 @@ import com.jsy.community.entity.VisitingCar;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorPerson;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.VisitorQO;
 import com.jsy.community.utils.ValidatorUtils;
@@ -35,7 +34,7 @@ public class VisitorController {
     
     @DubboReference(version = Const.version, group = Const.group)
     private IVisitingCarService iVisitingCarService;
-
+	
     /**
     * @Description: 访客登记 新增
      * @Param: [tVisitor]
