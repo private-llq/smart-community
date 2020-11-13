@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IRegionService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.RegionEntity;
-import com.jsy.community.mapper.RegionDao;
+import com.jsy.community.mapper.RegionMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,7 +27,7 @@ public class RegionServiceImpl implements IRegionService {
 	private StringRedisTemplate stringRedisTemplate;
 	
 	@Resource
-	private RegionDao regionDao;
+	private RegionMapper regionMapper;
 	
 	/**
 	* @Description: 结果缓存进redis 启动自动执行
@@ -51,12 +51,12 @@ public class RegionServiceImpl implements IRegionService {
 	**/
 	@Override
 	public List<RegionEntity> getSubRegion(String id){
-		return regionDao.getSubRegion(id);
+		return regionMapper.getSubRegion(id);
 	}
 	
 	/*获取分级封装后的所有区域id,name,pid*/
 	private List<RegionEntity> getRegionList(){
-		List<RegionEntity> allRegion = regionDao.getAllRegion();
+		List<RegionEntity> allRegion = regionMapper.getAllRegion();
 		List<RegionEntity> regionList  = new ArrayList<RegionEntity>();//封装好的返回结果(regionList)
 		List<RegionEntity> cityList = new ArrayList<>();
 		for (RegionEntity regionEntity : allRegion) {

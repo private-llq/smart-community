@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Select;
  * @since 2020-11-13
  */
 @Mapper
-public interface RegionDao {
+public interface RegionMapper {
 	
 	/**
 	* @Description: 获取分级封装后的所有区域id,name,pid
