@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IRegionService;
 import com.jsy.community.constant.Const;
@@ -51,7 +52,7 @@ public class RegionServiceImpl implements IRegionService {
 	**/
 	@Override
 	public List<RegionEntity> getSubRegion(String id){
-		return regionMapper.getSubRegion(id);
+		return JSONArray.parseObject(String.valueOf(stringRedisTemplate.opsForHash().get("Region:", id)), List.class);
 	}
 	
 	/*获取分级封装后的所有区域id,name,pid*/
