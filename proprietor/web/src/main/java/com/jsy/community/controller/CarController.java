@@ -133,7 +133,7 @@ public class CarController {
      * @return 返回逻辑删除影响行
      */
     @ApiOperation("所属人固定车辆删除方法")
-    @ApiParam(name = "id", value = "车辆固定id")
+    @ApiImplicitParam(name = "id", value = "车辆固定id")
     @DeleteMapping(value = "/car/{id}")
     public CommonResult<?> deleteProprietorCar(@PathVariable("id") long id) {
         Integer res = carService.deleteProprietorCar(id);
@@ -147,7 +147,7 @@ public class CarController {
      * @return 返回图片上传成功后的访问路径地址
      */
     @ApiOperation("所属人车辆图片上传接口")
-    @ApiParam(name = "carImage", value = "车辆图片文件")
+    @ApiImplicitParam(name = "carImage", value = "车辆图片文件")
     @PostMapping(value = "/car/carImageUpload")
     public CommonResult<?> carImageUpload(MultipartFile carImage) throws IOException {
         //1.接口非空验证
@@ -172,7 +172,7 @@ public class CarController {
             return CommonResult.error(JSYError.NOT_IMPLEMENTED.getCode(), JSYError.NOT_IMPLEMENTED.getMessage());
         }
         return CommonResult.ok(resultUrl);
-
     }
+
 
 }
