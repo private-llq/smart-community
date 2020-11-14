@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public interface ICarService extends IService<CarEntity> {
 
+
     /**
      * 查询所属人车辆分页方法
      * @param param   车辆分页条件查询对象
