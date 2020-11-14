@@ -14,5 +14,14 @@
 		select id,name,sname,ssname,pid,level,pinyin from t_region
 		where pid = #{id}
 	</select>
-    
+
+	<!--  省市区，刷数据 -->
+	<insert id="insertRegion" parameterType="java.util.List">
+		insert into t_region(id,name,pid,level)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.id},#{item.name},#{item.pid},#{item.level})
+		</foreach>
+	</insert>
+
 </mapper>

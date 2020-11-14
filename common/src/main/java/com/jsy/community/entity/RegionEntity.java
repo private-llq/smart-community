@@ -1,11 +1,14 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.util.List;
 /**
  * 
  * 区域
  *
  */
+@TableName("t_region2")
 public class RegionEntity {
 	private Integer id;//编号
 	private String name;//全称
@@ -18,6 +21,14 @@ public class RegionEntity {
 	public RegionEntity() {
 		super();
 	}
+	
+	public RegionEntity(Integer id, String name, Integer pid, Integer level) {
+		this.id = id;
+		this.name = name;
+		this.pid = pid;
+		this.level = level;
+	}
+	
 	public Integer getId() {
 		return id;
 	}
