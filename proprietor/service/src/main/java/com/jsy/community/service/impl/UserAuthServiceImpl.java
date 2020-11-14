@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -63,22 +64,32 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	public Long checkUser(LoginQO qo) {
 		String field;
 		if (RegexUtils.isMobile(qo.getAccount())) {
-			// 手机验证码登录
-			commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
-			return baseMapper.queryUserIdByMobile(qo.getAccount());
+			if (StrUtil.isNotEmpty(qo.getCode())) {
+				// 手机验证码登录
+				commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+				return baseMapper.queryUserIdByMobile(qo.getAccount());
+			} else {
+				return checkUserByPassword(qo, "mobile");
+			}
+		} else if (RegexUtils.isEmail(qo.getAccount())) {
+			if (StrUtil.isNotEmpty(qo.getCode())) {
+				// 邮箱验证码登录
+				return null;
+			} else {
+				return checkUserByPassword(qo, "email");
+			}
 		} else {
-			if (RegexUtils.isEmail(qo.getAccount())) {
-				field = "email";
-			} else {
-				field = "username";
-			}
-			UserAuthEntity entity = baseMapper.queryUserByField(qo.getAccount(), field);
-			String password = SecureUtil.sha256(qo.getPassword() + entity.getSalt());
-			if (password.equals(entity.getPassword())) {
-				return entity.getUid();
-			} else {
-				throw new ProprietorException("账号密码错误");
-			}
+			return checkUserByPassword(qo, "username");
+		}
+	}
+	
+	private Long checkUserByPassword(LoginQO qo, String field) {
+		UserAuthEntity entity = baseMapper.queryUserByField(qo.getAccount(), field);
+		String password = SecureUtil.sha256(qo.getPassword() + entity.getSalt());
+		if (password.equals(entity.getPassword())) {
+			return entity.getUid();
+		} else {
+			throw new ProprietorException("账号密码错误");
 		}
 	}
 	

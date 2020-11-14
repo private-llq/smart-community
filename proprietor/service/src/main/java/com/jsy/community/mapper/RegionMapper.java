@@ -1,11 +1,10 @@
 package com.jsy.community.mapper;
 
-import java.util.List;
-
 import com.jsy.community.entity.RegionEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * 省市区表Mapper
@@ -22,7 +21,6 @@ public interface RegionMapper {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/13
 	**/
-	@Select("SELECT id,name,sname,ssname,pid,level,pinyin FROM region")
 	List<RegionEntity> getAllRegion();
 	
 	/**
@@ -32,6 +30,5 @@ public interface RegionMapper {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/13
 	**/
-	@Select("SELECT id,name,sname,ssname,pid,level,pinyou FROM region where pid = #{id}")
 	List<RegionEntity> getSubRegion(@Param("id") String id);
 }
