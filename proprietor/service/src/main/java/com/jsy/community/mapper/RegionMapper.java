@@ -2,9 +2,9 @@ package com.jsy.community.mapper;
 
 import com.jsy.community.entity.RegionEntity;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import org.apache.ibatis.annotations.*;
 
 /**
  * 省市区表Mapper
@@ -24,11 +24,21 @@ public interface RegionMapper {
 	List<RegionEntity> getAllRegion();
 	
 	/**
-	* @Description: 获取子区域
-	 * @Param: [id]
-	 * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+	* @Description: 定时同步区域表-清理旧数据
+	 * @Param: []
+	 * @Return: int
 	 * @Author: chq459799974
-	 * @Date: 2020/11/13
+	 * @Date: 2020/11/14
 	**/
-	List<RegionEntity> getSubRegion(@Param("id") String id);
+	@Delete("truncate t_region")
+	void deleteAll();
+	
+	/**
+	* @Description: 定时同步区域表-更新数据
+	 * @Param: [list]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2020/11/14
+	**/
+	int insertRegion(List<RegionEntity> list);
 }

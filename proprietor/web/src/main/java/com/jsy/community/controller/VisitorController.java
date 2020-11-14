@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.api.IRegionService;
 import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.IVisitorPersonService;
@@ -26,14 +27,17 @@ import java.util.List;
 //TODO 代码提到Service层
 public class VisitorController {
 
-    @DubboReference(version = Const.version, group = Const.group)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private IVisitorService iTVisitorService;
     
-    @DubboReference(version = Const.version, group = Const.group)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private IVisitorPersonService iVisitorPersonService;
     
-    @DubboReference(version = Const.version, group = Const.group)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private IVisitingCarService iVisitingCarService;
+    
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IRegionService iRegionService;
 	
     /**
     * @Description: 访客登记 新增
@@ -110,6 +114,22 @@ public class VisitorController {
     }
     
     /**
+     * 设置不能修改的字段
+     */
+    private void setNull(VisitorEntity visitorEntity){
+        visitorEntity.setCommunityId(null);
+        visitorEntity.setUid(null);
+        visitorEntity.setIsCommunityAccess(null);
+        visitorEntity.setIsBuildingAccess(null);
+        visitorEntity.setCheckType(null);
+        visitorEntity.setCheckStatus(null);
+        visitorEntity.setCheckTime(null);
+        visitorEntity.setRefuseReason(null);
+        visitorEntity.setDeleted(null);
+        visitorEntity.setCreateTime(null);
+    }
+    
+    /**
     * @Description: 修改随行人员
      * @Param: [visitorPerson]
      * @Return: com.jsy.community.vo.CommonResult
@@ -169,19 +189,4 @@ public class VisitorController {
         return CommonResult.ok(visitorEntity);
     }
     
-    /**
-     * 设置不能修改的字段
-     */
-    private void setNull(VisitorEntity visitorEntity){
-        visitorEntity.setCommunityId(null);
-        visitorEntity.setUid(null);
-        visitorEntity.setIsCommunityAccess(null);
-        visitorEntity.setIsBuildingAccess(null);
-        visitorEntity.setCheckType(null);
-        visitorEntity.setCheckStatus(null);
-        visitorEntity.setCheckTime(null);
-        visitorEntity.setRefuseReason(null);
-        visitorEntity.setDeleted(null);
-        visitorEntity.setCreateTime(null);
-    }
 }

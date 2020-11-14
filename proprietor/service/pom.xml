@@ -74,5 +74,20 @@
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-redis</artifactId>
 		</dependency>
+
+		<!-- http-client -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>
