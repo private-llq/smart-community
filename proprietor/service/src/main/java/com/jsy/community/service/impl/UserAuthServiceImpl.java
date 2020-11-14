@@ -22,8 +22,6 @@ import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 @DubboService(version = Const.version, group = Const.group)
 @Slf4j
@@ -40,24 +38,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	
 	@Override
 	public List<UserAuthEntity> getList(boolean a) {
-		Lock lock = null;
-		try {
-			lock = redisLockRegistry.obtain("lock");
-			boolean b1 = lock.tryLock(3, TimeUnit.SECONDS);
-			log.info("b1 is : {}", b1);
-			
-			TimeUnit.SECONDS.sleep(5);
-			
-			boolean b2 = lock.tryLock(3, TimeUnit.SECONDS);
-			log.info("b2 is : {}", b2);
-		} catch (InterruptedException ignore) {
-		} finally {
-			if (lock != null) {
-				lock.unlock();
-				lock.unlock();
-			}
-		}
-		return null;
+		return list();
 	}
 	
 	@Override

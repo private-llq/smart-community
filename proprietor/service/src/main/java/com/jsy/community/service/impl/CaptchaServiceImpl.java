@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @RefreshScope
 public class CaptchaServiceImpl implements ICaptchaService {
 	
-	@Value(value = "${jsy.mobileCodeExpiredTime}")
+	@Value(value = "${jsy.mobileCodeExpiredTime:10}")
 	private Integer mobileExpiredTime;
 	
 	@Resource
@@ -48,8 +48,8 @@ public class CaptchaServiceImpl implements ICaptchaService {
 			}
 		}
 		
-		// 验证码暂时固定111111
-		String code = "111111";
+		// 验证码暂时固定1111
+		String code = "1111";
 		
 		// 5分钟有效期
 		redisTemplate.opsForValue().set(mobile, code, mobileExpiredTime, TimeUnit.MINUTES);
