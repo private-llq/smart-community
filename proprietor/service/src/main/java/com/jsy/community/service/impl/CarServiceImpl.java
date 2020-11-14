@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Slf4j
 @DubboService(version = Const.version, group = Const.group)
-public class ICarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements ICarService {
+public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements ICarService {
 
     @Resource
     private CarMapper carMapper;
