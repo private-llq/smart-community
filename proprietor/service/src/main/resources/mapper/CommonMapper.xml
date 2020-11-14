@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.community.mapper.CommonMapper">
+    <!-- 通用sql -->
+    <sql id="tableNameAndCondition">from t_house where</sql>
+    <!-- 查询所有小区 todo 后续细节修改 -->
+    <select id="getAllCommunity" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        select id,name from t_community
+    </select>
+    <!-- 查询某个#{id}社区下面所有单元 -->
+    <select id="getAllUnitFormCommunity" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        select id,unit <include refid="tableNameAndCondition"/> community_id = #{id}
+    </select>
+    <!-- 查询某个单元#{id}下面的所有楼栋 -->
+    <select id="getAllBuildingFormUnit" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        select id,building <include refid="tableNameAndCondition"/> pid = #{id}
+    </select>
+    <!-- 查询某个楼栋#{id}下面的所有楼层 -->
+    <select id="getAllFloorFormBuilding" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        select id,floor <include refid="tableNameAndCondition"/> pid = #{id}
+    </select>
+    <!-- 查询某楼层#{id}下面的所有门牌 -->
+    <select id="getAllDoorFormFloor" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        select id,door <include refid="tableNameAndCondition"/> pid = #{id}
+    </select>
+</mapper>
