@@ -2,6 +2,7 @@ package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,11 +40,11 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆牌照")
     private String carPlate;
 
-    @Pattern(groups = {addCarValidated.class}, regexp = "(https?)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", message = "请提供一个正确的访问地址!")
+    @Pattern(groups = {addCarValidated.class}, regexp = RegexUtils.REGEX_URL, message = "请提供一个正确的访问地址!")
     @ApiModelProperty(value = "车辆照片访问路径")
     private String carImageUrl;
 
-    @Pattern(groups = {addCarValidated.class, updateCarValidated.class}, regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+    @Pattern(groups = {addCarValidated.class, updateCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     @ApiModelProperty(value = "车主联系方式")
     private String contact;
 
