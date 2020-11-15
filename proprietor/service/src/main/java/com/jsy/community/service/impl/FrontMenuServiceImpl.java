@@ -6,11 +6,20 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFrontMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FrontMenuEntity;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.FrontMenuMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.vo.menu.FrontMenuVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,6 +31,7 @@ import java.util.List;
  * @since 2020-11-14
  */
 @DubboService(version = Const.version, group = Const.group)
+@Slf4j
 public class FrontMenuServiceImpl extends ServiceImpl<FrontMenuMapper, FrontMenuEntity> implements IFrontMenuService {
 	
 	@Autowired
@@ -33,15 +43,111 @@ public class FrontMenuServiceImpl extends ServiceImpl<FrontMenuMapper, FrontMenu
 	}
 	
 	@Override
-	public Integer updateMenu(FrontMenuEntity menuEntity) {
-		return frontMenuMapper.updateById(menuEntity);
+	public Integer updateMenu(Long id, FrontMenuVo frontMenuVo) {
+		String parentName = frontMenuVo.getParentName();
+		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("menu_name", parentName);
+		FrontMenuEntity menuEntity = frontMenuMapper.selectOne(queryWrapper);
+		
+		FrontMenuEntity frontMenuEntity = new FrontMenuEntity();
+		BeanUtils.copyProperties(frontMenuVo, frontMenuEntity);
+		frontMenuEntity.setId(id);
+		
+		if (menuEntity != null) {
+			frontMenuEntity.setParentId(menuEntity.getId());
+			return frontMenuMapper.updateById(frontMenuEntity);
+		}
+		return frontMenuMapper.updateById(frontMenuEntity);
 	}
 	
 	@Override
-	public List<FrontMenuEntity> listFrontMenu(BaseQO<FrontMenuEntity> baseQO) {
+	public List<FrontMenuVo> listFrontMenu(BaseQO<FrontMenuEntity> baseQO) {
 		Page<FrontMenuEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
-//		wrapper.eq("menu_name",baseQO.getQuery().getMenuName()).or().eq()
-		return null;
+		String menuName = baseQO.getQuery().getMenuName();
+		String description = baseQO.getQuery().getDescription();
+		if (!StringUtils.isEmpty(menuName)) {
+			wrapper.like("menu_name", menuName);
+		}
+		if (!StringUtils.isEmpty(description)) {
+			wrapper.like("description", description);
+		}
+		frontMenuMapper.selectPage(page, wrapper);
+		
+		
+		ArrayList<FrontMenuVo> frontMenuVos = new ArrayList<>();
+		
+		List<FrontMenuEntity> records = page.getRecords();
+		for (FrontMenuEntity record : records) {
+			FrontMenuVo menuVo = new FrontMenuVo();
+			BeanUtils.copyProperties(record, menuVo);
+			Long parentId = record.getParentId();
+			QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+			queryWrapper.eq("id", parentId);
+			FrontMenuEntity menuEntity = frontMenuMapper.selectOne(queryWrapper);
+			if (menuEntity != null) {
+				menuVo.setParentName(menuEntity.getMenuName());
+			}
+			frontMenuVos.add(menuVo);
+		}
+		return frontMenuVos;
+	}
+	
+	@Override
+	public List<FrontMenuEntity> listIndexMenu(Integer number) {
+		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+		wrapper.ne("parent_id", 0).orderByAsc("sort").last("limit " + number);
+		return frontMenuMapper.selectList(wrapper);
+	}
+	
+	@Override
+	public Integer removeMenu(Long id) {
+		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("parent_id", id);
+		List<FrontMenuEntity> list = frontMenuMapper.selectList(queryWrapper);
+		if (!CollectionUtils.isEmpty(list)) {
+			log.debug("删除的菜单id：{}", id);
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请先删除子菜单");
+		}
+		return frontMenuMapper.deleteById(id);
+	}
+	
+	@Override
+	public List<FrontMenuEntity> listParentMenu() {
+		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("parent_id", 0L);
+		return frontMenuMapper.selectList(wrapper);
+	}
+	
+	@Override
+	public FrontMenuVo getMenuById(Long id) {
+		FrontMenuEntity menuEntity = frontMenuMapper.selectById(id);
+		FrontMenuVo menuVo = new FrontMenuVo();
+		BeanUtils.copyProperties(menuEntity, menuVo);
+		
+		Long parentId = menuEntity.getParentId();
+		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id", parentId);
+		FrontMenuEntity entity = frontMenuMapper.selectOne(queryWrapper);
+		if (entity != null) {
+			menuVo.setParentName(entity.getMenuName());
+			log.info("父菜单名：{}" + menuVo.getParentName());
+			return menuVo;
+		}
+		log.info("父菜单名：{}" + menuVo.getParentName());
+		menuVo.setParentName("");
+		return menuVo;
+	}
+	
+	@Override
+	public Integer removeListMenu(Long[] ids) {
+		for (Long id : ids) {
+			FrontMenuEntity frontMenuEntity = frontMenuMapper.selectById(id);
+			if (frontMenuEntity.getParentId() == 0) {
+				log.debug("删除的菜单id：{}", frontMenuEntity.getId());
+				throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请先删除子菜单");
+			}
+		}
+		return frontMenuMapper.deleteBatchIds(Arrays.asList(ids));
 	}
 }

@@ -32,9 +32,9 @@ public class FrontMenuEntity extends BaseEntity {
     private String path;
 
     @ApiModelProperty(value = "描述信息")
-    private String descript;
+    private String description;
 
-    @ApiModelProperty(value = "序号")
+    @ApiModelProperty(value = "优先级")
     private Integer sort;
 
     @ApiModelProperty(value = "父id")
