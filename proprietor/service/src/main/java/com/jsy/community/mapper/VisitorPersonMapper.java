@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.VisitorPerson;
+import com.jsy.community.entity.VisitorPersonEntity;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.jsy.community.entity.VisitorPerson;
  * @author jsy
  * @since 2020-11-12
  */
-public interface VisitorPersonMapper extends BaseMapper<VisitorPerson> {
+public interface VisitorPersonMapper extends BaseMapper<VisitorPersonEntity> {
 
 }

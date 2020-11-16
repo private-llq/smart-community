@@ -1,6 +1,7 @@
 package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,7 +24,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @ApiModel(value="VisitorPerson对象", description="访客随行人员")
 @TableName("t_visitor_person")
-public class VisitorPerson extends BaseEntity implements Serializable {
+public class VisitorPersonEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +33,8 @@ public class VisitorPerson extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "随行人名")
     private String name;
-
+    
+    @JsonIgnore
     @ApiModelProperty(value = "随行人身份证")
     private String idCard;
 

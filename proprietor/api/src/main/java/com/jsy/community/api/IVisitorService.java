@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.VisitorQO;
+import com.jsy.community.qo.proprietor.VisitorQO;
 
 /**
  * <p>

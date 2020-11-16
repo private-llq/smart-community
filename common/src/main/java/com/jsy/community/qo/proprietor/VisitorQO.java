@@ -1,4 +1,4 @@
-package com.jsy.community.qo;
+package com.jsy.community.qo.proprietor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -24,7 +24,7 @@ import java.util.Date;
  * @since 2020-11-11
  */
 @Data
-@ApiModel(value="TVisitor查询、修改入参对象", description="来访人员")
+@ApiModel(value="Visitor查询、修改入参对象", description="来访人员")
 public class VisitorQO implements Serializable{
 
     @ApiModelProperty(value = "ID")

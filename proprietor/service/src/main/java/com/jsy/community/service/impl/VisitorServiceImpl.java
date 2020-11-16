@@ -5,16 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.VisitingCar;
 import com.jsy.community.entity.VisitorEntity;
-import com.jsy.community.entity.VisitorPerson;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.VisitingCarMapper;
 import com.jsy.community.mapper.VisitorMapper;
 import com.jsy.community.mapper.VisitorPersonMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.VisitorQO;
+import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.utils.MyPageUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +45,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     * @Description: 访客登记 新增
      * @Param: [visitorEntity]
      * @Return: java.lang.Long
-     * @Author: Administrator
+     * @Author: chq459799974
      * @Date: 2020/11/12
     **/
     @Override
@@ -100,9 +98,9 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     /** 查询楼栋 */
     private void queryAddress(QueryWrapper queryWrapper, VisitorQO visitorQO){
         if(!StringUtils.isEmpty(visitorQO.getUnit())){
-            queryWrapper.eq("unit",visitorQO.getUnit());
+            queryWrapper.eq("building",visitorQO.getBuilding());
             if(!StringUtils.isEmpty(visitorQO.getBuilding())){
-                queryWrapper.eq("building",visitorQO.getBuilding());
+                queryWrapper.eq("unit",visitorQO.getUnit());
                 if(!StringUtils.isEmpty(visitorQO.getFloor())){
                     queryWrapper.eq("floor",visitorQO.getFloor());
                     if(!StringUtils.isEmpty(visitorQO.getDoor())){
