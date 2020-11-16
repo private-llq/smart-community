@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 @Api(tags = "车辆控制器")
 @RestController
@@ -90,48 +89,15 @@ public class CarController {
         if( null == carEntityBaseQO.getQuery()){
             carEntityBaseQO.setQuery(CarEntity.getInstance().setUid(uid));
         }
-        //参数效验
-        BaseQO<CarEntity> legalCarEntityBaseQO = validateCarQueryParam(carEntityBaseQO);
-        List<CarEntity> records = carService.queryProprietorCar(legalCarEntityBaseQO).getRecords();
+        //1.查询参数非空数字效验
+        ValidatorUtils.validatePageParam(carEntityBaseQO);
+        List<CarEntity> records = carService.queryProprietorCar(carEntityBaseQO).getRecords();
         return CommonResult.ok(records);
     }
 
 
     /**
-     * 验证车辆查询参数
-     * @param carEntityBaseQO  车辆查询参数接收实体
-     * @return                 返回合法的参数实体
-     */
-    private BaseQO<CarEntity> validateCarQueryParam(BaseQO<CarEntity> carEntityBaseQO) {
-        String page = carEntityBaseQO.getPage().toString();
-        if( !isNumber(page) ){
-            carEntityBaseQO.setPage(1L);
-        }
-        String size = carEntityBaseQO.getSize().toString();
-        if( !isNumber(size)){
-            carEntityBaseQO.setPage(10L);
-        }
-        return carEntityBaseQO;
-    }
-
-
-    /**
-     * 判断字符串是否是一个正整数
-     * @param str 字符串
-     * @return    返回这个字符串是否是字符串的布尔值
-     */
-    private Boolean isNumber(String str) {
-        boolean matches = Pattern.compile("^[1-9]\\d+$").matcher(str).matches();
-        if(!matches) {
-            return false;
-        }
-        //避免出现同位 2147483647 更大的值 如 2147483648
-        return str.length() <= String.valueOf(Integer.MAX_VALUE).length() && Long.parseLong(str) <= Integer.MAX_VALUE;
-    }
-
-    /**
      * 根据车牌号检查车辆是否已经登记
-     *
      * @param carPlate 车牌号
      * @return 返回是否存在布尔值
      */
@@ -151,7 +117,7 @@ public class CarController {
     public CommonResult<Boolean> deleteProprietorCar(@PathVariable("id") String id) {
         //从请求获得uid
         Long uid = 12L;
-        if( !isNumber(id)  ){
+        if( !ValidatorUtils.isInteger(id)  ){
             return CommonResult.error(JSYError.REQUEST_PARAM);
         }
         //条件参数列表 key=列名  增加删除车辆记录 where条件只改动这里
