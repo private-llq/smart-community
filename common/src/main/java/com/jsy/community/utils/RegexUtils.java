@@ -10,7 +10,13 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("unused")
 public class RegexUtils {
-	
+
+
+	/**
+	 * 正则表达式：验证汽车牌照
+	 */
+	public static final String REGEX_CAR_PLATE = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$";
+
 	/**
 	 * 正则表达式：验证用户名
 	 */
