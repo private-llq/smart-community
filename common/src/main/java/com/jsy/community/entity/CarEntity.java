@@ -2,6 +2,7 @@ package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,7 +26,7 @@ import java.util.Date;
 public class CarEntity extends BaseEntity {
 
     @ApiModelProperty(value = "所属人ID")
-    @Range(groups = {addCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "用户id不合法")
+    @JsonIgnore
     private Long uid;
 
     @Range(groups = {addCarValidated.class, updateCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "车位id不合法")
@@ -63,6 +64,9 @@ public class CarEntity extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone="GMT+8")
     private Date checkTime;
 
+    public static CarEntity getInstance(){
+        return new CarEntity();
+    }
 
     /**
      * 登记车辆前端参数验证接口
