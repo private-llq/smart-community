@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.CarEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.qo.BaseQO;
 
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public interface ICarService extends IService<CarEntity> {
      * @param param   车辆分页条件查询对象
      * @return        返回当前页数据
      */
-    Page<CarEntity> queryProprietorCar(Map<String,Object> param);
+    Page<CarEntity> queryProprietorCar(BaseQO<CarEntity> param);
 
     /**
      * 通过车辆信息更新车辆方法
@@ -30,10 +31,10 @@ public interface ICarService extends IService<CarEntity> {
 
     /**
      * 通过车辆id逻辑删除车辆方法
-     * @param id    车辆id
-     * @return      返回修改影响行数
+     * @param params    参数列表
+     * @return          返回修改影响行数
      */
-    Integer deleteProprietorCar(long id);
+    Integer deleteProprietorCar(Map<String, Object> params);
 
 
     /**
