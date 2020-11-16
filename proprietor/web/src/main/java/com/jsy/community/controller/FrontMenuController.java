@@ -103,8 +103,20 @@ public class FrontMenuController {
 	@DeleteMapping("/removeListMenu/{ids}")
 	public CommonResult removeListMenu(@ApiParam(value = "需要删除的id【数组】")
 	                                   @PathVariable Long[] ids) {
-		frontMenuService.removeListMenu(ids);
-		return CommonResult.ok();
+		try {
+			frontMenuService.removeListMenu(ids);
+			return CommonResult.ok();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return CommonResult.error("请先删除子菜单");
+		}
+	}
+	
+	@ApiOperation("更多菜单")
+	@GetMapping("/moreListMenu")
+	public CommonResult moreListMenu(){
+		List<FrontMenuVo> list = frontMenuService.moreListMenu();
+		return CommonResult.ok(list);
 	}
 	
 }

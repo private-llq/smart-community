@@ -37,7 +37,7 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
 
-    @Pattern(groups = {addCarValidated.class, updateCarValidated.class}, regexp = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$", message = "请输入一个正确的车牌号!")
+    @Pattern(groups = {addCarValidated.class, updateCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
     @ApiModelProperty(value = "车辆牌照")
     private String carPlate;
 

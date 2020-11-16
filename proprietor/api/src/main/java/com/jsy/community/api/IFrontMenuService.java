@@ -81,5 +81,21 @@ public interface IFrontMenuService extends IService<FrontMenuEntity> {
 	 **/
 	FrontMenuVo getMenuById(Long id);
 	
+	/**
+	 * @return java.lang.Integer
+	 * @Author lihao
+	 * @Description 批量删除菜单信息
+	 * @Date 2020/11/16 14:02
+	 * @Param [ids]
+	 **/
 	Integer removeListMenu(Long[] ids);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.FrontMenuEntity>
+	 * @Author lihao
+	 * @Description 更多服务
+	 * @Date 2020/11/16 14:02
+	 * @Param []
+	 **/
+	List<FrontMenuVo> moreListMenu();
 }
