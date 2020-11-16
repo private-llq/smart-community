@@ -36,11 +36,11 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     
     @ApiModelProperty(value = "随行人员对象")
     @TableField(exist = false)
-    private List<VisitorPersonEntity> visitorPersonEntities;
+    private List<VisitorPersonEntity> visitorPersonList;
     
     @ApiModelProperty(value = "随行车辆对象")
     @TableField(exist = false)
-    private List<VisitingCarEntity> visitingCarEntity;
+    private List<VisitingCarEntity> visitingCarList;
     
     @ApiModelProperty(value = "社区ID")
     @NotNull(groups = {addVisitorValidatedGroup.class}, message = "缺少社区ID")

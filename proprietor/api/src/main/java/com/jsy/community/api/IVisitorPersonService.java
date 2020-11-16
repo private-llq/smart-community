@@ -23,5 +23,5 @@ public interface IVisitorPersonService extends IService<VisitorPersonEntity> {
 	 * @Date: 2020/11/12
 	**/
 	 List<VisitorPersonEntity> queryPersonList(Long visitorid);
-	 
+	
 }

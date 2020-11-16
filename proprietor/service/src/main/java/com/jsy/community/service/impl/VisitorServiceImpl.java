@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
+import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.VisitingCarMapper;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,7 +61,55 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     }
     
     /**
-     * @Description: 逻辑删除 访客关联数据(随行人员、随行车辆)
+    * @Description: 批量新增随行人员
+     * @Param: [personList]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/11/16
+    **/
+    @Override
+    public boolean addPersonBatch(List<VisitorPersonEntity> personList){
+        int result = visitorPersonMapper.addPersonBatch(personList);
+        if(result > 0){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * @Description: 批量新增随行车辆
+     * @Param: [carList]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/11/16
+     **/
+    @Override
+    public boolean addCarBatch(List<VisitingCarEntity> carList){
+        int result = visitingCarMapper.addCarBatch(carList);
+        if(result > 0){
+            return true;
+        }
+        return false;
+    }
+    
+	/**
+	 * @Description: 根据ID 删除访客登记申请
+	 * @Param: [id]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/16
+	 **/
+	@Override
+    public boolean deleteVisitorById(Long id){
+	    int result = visitorMapper.deleteById(id);
+	    if(result == 1){
+	    	return true;
+	    }
+	    return false;
+    }
+    
+    /**
+     * @Description: 关联删除 访客关联数据(随行人员、随行车辆)
      * @Param: [visitorId]
      * @Return: int
      * @Author: chq459799974
@@ -70,6 +121,85 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         opMap.put("visitor_id",visitorId);
         visitorPersonMapper.deleteByMap(opMap);
         visitingCarMapper.deleteByMap(opMap);
+    }
+    
+    /**
+     * @Description: 修改访客登记申请
+     * @Param: [visitorEntity]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/11/16
+     **/
+    @Override
+    public boolean updateVisitorById(VisitorEntity visitorEntity){
+        int result = visitorMapper.updateById(visitorEntity);
+        if(result == 1){
+            return true;
+        }
+        return false;
+    }
+    /**
+    * @Description: 修改随行人员
+     * @Param: [visitorPersonEntity]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/11/16
+    **/
+    @Override
+    public boolean updateVisitorPersonById(VisitorPersonEntity visitorPersonEntity){
+        int result = visitorPersonMapper.updateById(visitorPersonEntity);
+        if(result == 1){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+    * @Description: 修改随行车辆
+     * @Param: [visitingCarEntity]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/11/16
+    **/
+    @Override
+    public boolean updateVisitingCarById(VisitingCarEntity visitingCarEntity){
+        int result = visitingCarMapper.updateById(visitingCarEntity);
+        if(result == 1){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+    * @Description: 删除随行人员
+     * @Param: [id]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/11/16
+    **/
+    @Override
+    public boolean deleteVisitorPersonById(Long id){
+        int result = visitorPersonMapper.deleteById(id);
+        if(result == 1){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+    * @Description: 删除随行车辆
+     * @Param: [id]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/11/16
+    **/
+    @Override
+    public boolean deleteVisitingCarById(Long id){
+        int result = visitingCarMapper.deleteById(id);
+        if(result == 1){
+            return true;
+        }
+        return false;
     }
     
     /**
@@ -109,5 +239,17 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
                 }
             }
         }
+    }
+    
+    /**
+    * @Description: 根据ID单查访客
+     * @Param: [id]
+     * @Return: com.jsy.community.entity.VisitorEntity
+     * @Author: chq459799974
+     * @Date: 2020/11/16
+    **/
+    @Override
+    public VisitorEntity selectOneById(Long id){
+        return visitorMapper.selectOne(new QueryWrapper<VisitorEntity>().select("*").eq("id",id));
     }
 }
