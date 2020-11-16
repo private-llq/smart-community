@@ -3,7 +3,7 @@ package com.jsy.community.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jsy.community.entity.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -36,16 +36,17 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     
     @ApiModelProperty(value = "随行人员对象")
     @TableField(exist = false)
-    private List<VisitorPerson> visitorPerson;
+    private List<VisitorPersonEntity> visitorPersonList;
     
     @ApiModelProperty(value = "随行车辆对象")
     @TableField(exist = false)
-    private List<VisitingCar> visitingCar;
+    private List<VisitingCarEntity> visitingCarList;
     
     @ApiModelProperty(value = "社区ID")
     @NotNull(groups = {addVisitorValidatedGroup.class}, message = "缺少社区ID")
     private Long communityId;
     
+    @JsonIgnore
     @ApiModelProperty(value = "业主ID")
     private Long uid;
 
@@ -77,30 +78,38 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "来访人联系方式")
     @Pattern(groups = {addVisitorValidatedGroup.class}, regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     private String contact;
-
+    
+    @JsonIgnore
     @ApiModelProperty(value = "来访人身份证")
     private String idCard;
     
+    @JsonIgnore
     @ApiModelProperty(value = "实际来访时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime visitedTime;
-
+    
+    @JsonIgnore
     @ApiModelProperty(value = "是否授予来访人社区门禁权限，0无，1临时密码，2人脸识别")
     private Integer isCommunityAccess;
-
+    
+    @JsonIgnore
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1临时密码，2可视对讲")
     private Integer isBuildingAccess;
-
+    
+    @JsonIgnore
     @ApiModelProperty(value = "审核方式，1业主审核，2物业审核")
     private Integer checkType;
-
+    
+    @JsonIgnore
     @ApiModelProperty(value = "是否审核，0未审核，1通过，2拒绝")
     private Integer checkStatus;
-
+    
+    @JsonIgnore
     @ApiModelProperty(value = "审核时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime checkTime;
-
+    
+    @JsonIgnore
     @ApiModelProperty(value = "审核拒绝原因")
     private String refuseReason;
     

@@ -1,7 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.VisitorPerson;
+import com.jsy.community.entity.VisitorPersonEntity;
 
 import java.util.List;
 
@@ -13,15 +13,15 @@ import java.util.List;
  * @author jsy
  * @since 2020-11-12
  */
-public interface IVisitorPersonService extends IService<VisitorPerson> {
+public interface IVisitorPersonService extends IService<VisitorPersonEntity> {
 	
 	/**
 	* @Description: 根据关联的访客表ID 列表查询
 	 * @Param: [visitorid]
-	 * @Return: java.util.List<com.jsy.community.entity.VisitorPerson>
+	 * @Return: java.util.List<com.jsy.community.entity.VisitorPersonEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/11/12
 	**/
-	 List<VisitorPerson> queryPersonList(Long visitorid);
-	 
+	 List<VisitorPersonEntity> queryPersonList(Long visitorid);
+	
 }

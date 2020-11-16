@@ -8,6 +8,7 @@ import com.jsy.community.api.ICarService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.mapper.CarMapper;
+import com.jsy.community.qo.BaseQO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import javax.annotation.Resource;
@@ -34,13 +35,14 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return       返回当前页数据
      */
     @Override
-    public Page<CarEntity> queryProprietorCar(Map<String,Object> param) {
+    public Page<CarEntity> queryProprietorCar(BaseQO<CarEntity> param) {
         QueryWrapper<CarEntity> wrapper = new QueryWrapper<>();
-        long currentPage = Long.parseLong(param.get("page").toString());
-        long pageSize = Long.parseLong(param.get("pageSize").toString());
-        Page<CarEntity> pageCondition = new Page<>( (currentPage < 1 || currentPage > Integer.MAX_VALUE ) ? 1 : currentPage, (pageSize < 1 || pageSize > 100) ? 100 : pageSize);
-        wrapper.eq("uid", param.get("uid"));
-        wrapper.eq("check_status", param.get("checkStatus"));
+        CarEntity query = param.getQuery();
+        Page<CarEntity> pageCondition = new Page<>( param.getPage(), param.getSize() );
+        wrapper.eq("uid", query.getUid());
+        //按条件查询
+        //...
+        //wrapper.eq("check_status", 0);
         wrapper.eq("deleted", 0);
         Page<CarEntity> resultData = page(pageCondition, wrapper);
         log.info("查询所属人车辆满足条件行数："+resultData.getTotal() + "每页显示条数："+resultData.getSize());
@@ -54,19 +56,18 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public Integer updateProprietorCar(CarEntity carEntity) {
-        return carMapper.update(carEntity, new UpdateWrapper<CarEntity>().eq("id",carEntity.getId()));
+        return carMapper.update(carEntity, new UpdateWrapper<CarEntity>().eq("id",carEntity.getId()).eq("uid", carEntity.getUid()).eq("deleted", 0));
     }
 
     /**
      * 根据车辆id 进行逻辑删除
-     * @param id   车辆id
-     * @return     返回逻辑删除行数
+     * @param params 条件参数列表
+     * @return       返回逻辑删除行数
      */
     @Override
-    public Integer deleteProprietorCar(long id) {
-        //removeById(id); 物理删除
+    public Integer deleteProprietorCar(Map<String, Object> params) {
         //逻辑删除
-        return carMapper.deleteById(id);
+        return carMapper.deleteByMap(params);
     }
 
     /**
