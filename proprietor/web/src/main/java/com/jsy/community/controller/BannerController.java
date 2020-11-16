@@ -11,6 +11,7 @@ import com.jsy.community.vo.BannerVO;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,7 +67,7 @@ public class BannerController {
 	**/
 	@ApiOperation("轮播图 列表查询")
 	@PostMapping("list")
-	public CommonResult list(@RequestBody BannerQO bannerQO){
+	public CommonResult list(@ApiParam(value = "需要删除的id【数组】") @RequestBody BannerQO bannerQO){
 		ValidatorUtils.validateEntity(bannerQO, BannerQO.queryBannerValidatedGroup.class);
 		List<BannerVO> returnList = iBannerService.queryBannerList(bannerQO);
 		return CommonResult.ok(returnList);
@@ -81,8 +82,8 @@ public class BannerController {
 	**/
 	@ApiOperation("轮播图 批量删除")
 	@DeleteMapping("")
-	public CommonResult deleteBanner(@RequestBody BannerQO bannerQO){
-		boolean result = iBannerService.deleteBannerBatch(bannerQO);
+	public CommonResult deleteBanner(@ApiParam(value = "需要删除的ids集合")@RequestBody Long[] ids){
+		boolean result = iBannerService.deleteBannerBatch(ids);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),JSYError.INTERNAL.getMessage());
 	}
 }

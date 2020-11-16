@@ -40,5 +40,5 @@ public interface IBannerService extends IService<BannerEntity> {
 	 * @Author: chq45799974
 	 * @Date: 2020/11/16
 	**/
-	boolean deleteBannerBatch(BannerQO bannerQO);
+	boolean deleteBannerBatch(Long[] ids);
 }

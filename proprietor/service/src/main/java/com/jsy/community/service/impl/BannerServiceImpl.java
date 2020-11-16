@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -82,11 +83,8 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	 * @Date: 2020/11/16
 	**/
 	@Override
-	public boolean deleteBannerBatch(BannerQO bannerQO){
-		if(CollectionUtils.isEmpty(bannerQO.getIds())){
-			return false;
-		}
-		int result = bannerMapper.deleteBatchIds(bannerQO.getIds());
+	public boolean deleteBannerBatch(Long[] ids){
+		int result = bannerMapper.deleteBatchIds(Arrays.asList(ids));
 		if(result > 0){
 			return true;
 		}
