@@ -126,9 +126,7 @@ public class FrontMenuServiceImpl extends ServiceImpl<FrontMenuMapper, FrontMenu
 		BeanUtils.copyProperties(menuEntity, menuVo);
 		
 		Long parentId = menuEntity.getParentId();
-		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("id", parentId);
-		FrontMenuEntity entity = frontMenuMapper.selectOne(queryWrapper);
+		FrontMenuEntity entity = this.common(parentId);
 		if (entity != null) {
 			menuVo.setParentName(entity.getMenuName());
 			log.info("父菜单名：{}" + menuVo.getParentName());
@@ -149,5 +147,29 @@ public class FrontMenuServiceImpl extends ServiceImpl<FrontMenuMapper, FrontMenu
 			}
 		}
 		return frontMenuMapper.deleteBatchIds(Arrays.asList(ids));
+	}
+	
+	@Override
+	public List<FrontMenuVo> moreListMenu() {
+		List<FrontMenuEntity> list = frontMenuMapper.selectList(null);
+		
+		ArrayList<FrontMenuVo> arrayList = new ArrayList<>();
+		for (FrontMenuEntity frontMenuEntity : list) {
+			FrontMenuVo menuVo = new FrontMenuVo();
+			BeanUtils.copyProperties(frontMenuEntity, menuVo);
+			Long parentId = frontMenuEntity.getParentId();
+			FrontMenuEntity menuEntity = this.common(parentId);
+			if (menuEntity != null) {
+				menuVo.setParentName(menuEntity.getMenuName());
+			}
+			arrayList.add(menuVo);
+		}
+		return arrayList;
+	}
+	
+	private FrontMenuEntity common(Long parentId) {
+		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("id", parentId);
+		return frontMenuMapper.selectOne(wrapper);
 	}
 }
