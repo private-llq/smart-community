@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommonService;
@@ -11,21 +12,34 @@ import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.mapper.UserAuthMapper;
+import com.jsy.community.qo.ThirdPlatformQo;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.vo.ThirdPlatformVo;
+import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.config.AuthSource;
+import me.zhyd.oauth.model.AuthCallback;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.request.AuthRequest;
+import me.zhyd.oauth.utils.AuthStateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @DubboService(version = Const.version, group = Const.group)
 @Slf4j
+@RefreshScope
 public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEntity> implements IUserAuthService {
+	@Resource
+	private AuthRequestFactory factory;
 	
 	@Resource
 	private RedisLockRegistry redisLockRegistry;
@@ -33,8 +47,8 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	@Resource
 	private ICommonService commonService;
 	
-	@Resource
-	private RedisTemplate<String, String> redisTemplate;
+	@Value(value = "${jsy.third-platform-domain:http://www.jsy.com}")
+	private String callbackUrl;
 	
 	@Override
 	public List<UserAuthEntity> getList(boolean a) {
@@ -43,7 +57,6 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	
 	@Override
 	public Long checkUser(LoginQO qo) {
-		String field;
 		if (RegexUtils.isMobile(qo.getAccount())) {
 			if (StrUtil.isNotEmpty(qo.getCode())) {
 				// 手机验证码登录
@@ -121,5 +134,43 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		update.setPassword(SecureUtil.sha256(qo.getPassword() + entity.getSalt()));
 		
 		return updateById(update);
+	}
+	
+	@Override
+	public List<ThirdPlatformVo> getThirdPlatformInfo() {
+		List<String> strings = factory.oauthList();
+		List<ThirdPlatformVo> result = new ArrayList<>();
+		for (String type : strings) {
+			result.add(new ThirdPlatformVo(type.toLowerCase(), String.format("%s/login/%s/callback", callbackUrl, type.toLowerCase())));
+		}
+		return result;
+	}
+	
+	@Override
+	public String thirdPlatformLogin(String oauthType) {
+		AuthRequest authRequest = factory.get(getAuthSource(oauthType));
+		return authRequest.authorize(oauthType + "::" + AuthStateUtils.createState());
+	}
+	
+	@Override
+	public Object thirdPlatformLoginCallback(String oauthType, ThirdPlatformQo callback) {
+		AuthRequest authRequest = factory.get(getAuthSource(oauthType));
+		AuthCallback authCallback = new AuthCallback();
+		authCallback.setCode(callback.getCode());
+		authCallback.setAuth_code(callback.getAuthCode());
+		authCallback.setState(callback.getState());
+		authCallback.setAuthorization_code(callback.getAuthorizationCode());
+		
+		AuthResponse<?> response = authRequest.login(authCallback);
+		log.info("【response】= {}", JSONUtil.toJsonStr(response));
+		return response.getData();
+	}
+	
+	private AuthSource getAuthSource(String type) {
+		if (StrUtil.isNotBlank(type)) {
+			return AuthSource.valueOf(type.toUpperCase());
+		} else {
+			throw new ProprietorException("不支持的登录类型");
+		}
 	}
 }

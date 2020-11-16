@@ -6,6 +6,7 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.qo.ThirdPlatformQo;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
@@ -14,6 +15,7 @@ import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.ThirdPlatformVo;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
@@ -24,6 +26,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 用户认证
@@ -125,5 +128,35 @@ public class UserAuthController {
 		
 		boolean b = userAuthService.resetPassword(qo);
 		return b ? CommonResult.ok() : CommonResult.error("重置失败");
+	}
+	
+	////////////////////////////////////////////////三方登录//////////////////////////////////////////////////////////////
+	
+	/**
+	 * 登录类型
+	 */
+	@GetMapping("/login/type")
+	@ApiOperation("获取三方登录列表")
+	public CommonResult<List<ThirdPlatformVo>> getLoginType() {
+		List<ThirdPlatformVo> list = userAuthService.getThirdPlatformInfo();
+		return CommonResult.ok(list);
+	}
+	
+	
+	/**
+	 * 登录类型
+	 */
+	@GetMapping("/login/{oauthType}")
+	@ApiOperation("三方登录")
+	public CommonResult<String> thirdPlatformLogin(@PathVariable String oauthType) {
+		String url = userAuthService.thirdPlatformLogin(oauthType);
+		return CommonResult.ok(url);
+	}
+	
+	@GetMapping("/login/{oauthType}/callback")
+	@ApiOperation("三方登录回调")
+	public CommonResult<Object> thirdPlatformLoginCallback(@PathVariable String oauthType, @RequestBody ThirdPlatformQo callback) {
+		Object obj = userAuthService.thirdPlatformLoginCallback(oauthType, callback);
+		return CommonResult.ok(obj);
 	}
 }

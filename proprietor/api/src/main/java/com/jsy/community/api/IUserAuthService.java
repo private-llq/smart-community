@@ -2,9 +2,11 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserAuthEntity;
+import com.jsy.community.qo.ThirdPlatformQo;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
+import com.jsy.community.vo.ThirdPlatformVo;
 
 import java.util.List;
 
@@ -43,4 +45,24 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @return boolean
 	 */
 	boolean resetPassword(ResetPasswordQO qo);
+	
+	/**
+	 * 获取三方平台登录信息
+	 */
+	List<ThirdPlatformVo> getThirdPlatformInfo();
+	
+	/**
+	 * 登录
+	 *
+	 * @param oauthType 平台名
+	 */
+	String thirdPlatformLogin(String oauthType);
+	
+	/**
+	 * 请求三方登录
+	 *
+	 * @param oauthType 登录名
+	 * @param callback  回调
+	 */
+	Object thirdPlatformLoginCallback(String oauthType, ThirdPlatformQo callback);
 }

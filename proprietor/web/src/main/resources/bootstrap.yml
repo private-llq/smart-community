@@ -18,6 +18,7 @@ spring:
 dubbo:
   registry:
     address: nacos://127.0.0.1:8848
+    use-as-metadata-center: false
   protocol:
     name: dubbo
     port: -1
