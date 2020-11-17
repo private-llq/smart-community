@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRegionService;
 import com.jsy.community.api.IVisitingCarService;
@@ -156,8 +157,8 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【访客】分页查询")
 	@PostMapping("page")
-	public CommonResult query(@RequestBody BaseQO<VisitorQO> baseQO) {
-		return CommonResult.ok(iTVisitorService.queryByPage(baseQO).getRecords());
+	public CommonResult<Page> query(@RequestBody BaseQO<VisitorQO> baseQO) {
+		return CommonResult.ok(iTVisitorService.queryByPage(baseQO));
 	}
 	
 	/**
