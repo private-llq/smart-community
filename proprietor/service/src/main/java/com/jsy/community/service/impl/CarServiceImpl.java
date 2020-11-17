@@ -40,11 +40,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         CarEntity query = param.getQuery();
         Page<CarEntity> pageCondition = new Page<>( param.getPage(), param.getSize() );
         wrapper.eq("uid", query.getUid());
+        wrapper.eq("community_id",query.getCommunityId());
+        Page<CarEntity> resultData = carMapper.selectPage(pageCondition, wrapper);
         //按条件查询
         //...
         //wrapper.eq("check_status", 0);
-        wrapper.eq("deleted", 0);
-        Page<CarEntity> resultData = page(pageCondition, wrapper);
         log.info("查询所属人车辆满足条件行数："+resultData.getTotal() + "每页显示条数："+resultData.getSize());
         return resultData;
     }

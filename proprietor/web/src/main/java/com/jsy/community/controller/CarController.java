@@ -83,12 +83,13 @@ public class CarController {
 
     @ApiOperation("所属人固定车辆查询方法")
     @PostMapping(value = "/page", produces = "application/json;charset=utf-8")
-    public CommonResult<List<CarEntity>> queryProprietorCar(@RequestBody BaseQO<CarEntity> carEntityBaseQO) {
+    public CommonResult<?> queryProprietorCar(@RequestBody BaseQO<CarEntity> carEntityBaseQO) {
         //0.从request取uid
         long uid = 12L;
         if( null == carEntityBaseQO.getQuery()){
-            carEntityBaseQO.setQuery(CarEntity.getInstance().setUid(uid));
+            return CommonResult.error("没有选择社区!");
         }
+        carEntityBaseQO.getQuery().setUid(uid);
         //1.查询参数非空数字效验
         ValidatorUtils.validatePageParam(carEntityBaseQO);
         List<CarEntity> records = carService.queryProprietorCar(carEntityBaseQO).getRecords();

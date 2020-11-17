@@ -44,12 +44,16 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         QueryWrapper<CommunityInformEntity>  queryWrapper = new QueryWrapper<>();
         CommunityInformEntity query = communityEntity.getQuery();
         Page<CommunityInformEntity> objectPage = new Page<>(communityEntity.getPage(), communityEntity.getSize());
+        //查询社区消息为 1 启用的社区消息
+        queryWrapper.eq("enabled",1);
+        //设置查询条件为用户所在的小区
+        queryWrapper.eq("community_id", query.getCommunityId());
         //初次进入社区页面时固定查询条数
         if(query.isInitialQuery()){
             //在sql最后追加排序条件 初次查询为
             queryWrapper.last("ORDER BY index asc limit 0,"+initialInformCount);
         }
-        return page(objectPage, queryWrapper);
+        return communityInformMapper.selectPage(objectPage,queryWrapper);
     }
 
     /**

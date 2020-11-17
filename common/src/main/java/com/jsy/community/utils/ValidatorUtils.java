@@ -47,7 +47,7 @@ public class ValidatorUtils {
 			return false;
 		}
 		String str = param.toString();
-		boolean matches = Pattern.compile("^[1-9]\\d+$").matcher(str).matches();
+		boolean matches = Pattern.compile("^[1-9]\\d*$").matcher(str).matches();
 		if(!matches) {
 			return false;
 		}

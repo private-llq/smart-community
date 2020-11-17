@@ -10,11 +10,8 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import com.jsy.community.api.ProprietorException;
-import com.jsy.community.constant.Const;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import javax.annotation.Resource;
 
 /**
  * 公共的
