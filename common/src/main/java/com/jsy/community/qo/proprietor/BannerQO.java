@@ -14,7 +14,7 @@ import java.util.List;
  * @Date 2020/11/16 11:44
  **/
 @Data
-@ApiModel(value="Visitor查询、修改入参对象", description="轮播图")
+@ApiModel(description="轮播图")
 public class BannerQO implements Serializable {
 	
 	@ApiModelProperty(value = "社区ID")
@@ -24,9 +24,6 @@ public class BannerQO implements Serializable {
 	@ApiModelProperty(value = "Banner位置1.顶部 2.底部")
 	@NotNull(groups = {queryBannerValidatedGroup.class}, message = "缺少Banner位置")
 	private Integer position;
-	
-	@ApiModelProperty(value = "要删除的数据id集合")
-	private List<Long> ids;
 	
 	/**
 	 * 新增访客验证组

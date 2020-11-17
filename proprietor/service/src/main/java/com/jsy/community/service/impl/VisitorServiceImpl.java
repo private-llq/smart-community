@@ -213,15 +213,17 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     public Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO){
         Page<VisitorEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
-        VisitorQO visitorQO = baseQO.getQuery();
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>().select("*");
-        if(!StringUtils.isEmpty(visitorQO.getName())){
-            queryWrapper.eq("name",visitorQO.getName());
+        VisitorQO visitorQO = baseQO.getQuery();
+        if(visitorQO != null){
+            if(!StringUtils.isEmpty(visitorQO.getName())){
+                queryWrapper.eq("name",visitorQO.getName());
+            }
+            if(!StringUtils.isEmpty(visitorQO.getContact())){
+                queryWrapper.eq("contact",visitorQO.getContact());
+            }
+            queryAddress(queryWrapper,visitorQO);
         }
-        if(!StringUtils.isEmpty(visitorQO.getContact())){
-            queryWrapper.eq("contact",visitorQO.getContact());
-        }
-        queryAddress(queryWrapper,visitorQO);
         return visitorMapper.selectPage(page, queryWrapper);
     }
     

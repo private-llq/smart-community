@@ -105,8 +105,8 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private Integer checkStatus;
     
     @JsonIgnore
-    @ApiModelProperty(value = "审核时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "审核时间",hidden = true)
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime checkTime;
     
     @JsonIgnore

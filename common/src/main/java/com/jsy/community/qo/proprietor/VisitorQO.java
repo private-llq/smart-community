@@ -24,7 +24,7 @@ import java.util.Date;
  * @since 2020-11-11
  */
 @Data
-@ApiModel(value="Visitor查询、修改入参对象", description="来访人员")
+@ApiModel(description="来访人员")
 public class VisitorQO implements Serializable{
 
     @ApiModelProperty(value = "ID")

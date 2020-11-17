@@ -32,8 +32,7 @@ public class BannerEntity extends BaseEntity implements Serializable {
     @NotNull(groups = {addBannerValidatedGroup.class}, message = "缺少社区ID")
     private Long communityId;
 
-    @ApiModelProperty(value = "文件路径")
-    @JsonIgnore
+    @ApiModelProperty(value = "文件路径", hidden = true)
     private String url;
 
     @ApiModelProperty(value = "描述")
