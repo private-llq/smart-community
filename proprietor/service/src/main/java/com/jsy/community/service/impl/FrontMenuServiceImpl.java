@@ -11,6 +11,8 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.FrontMenuMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.vo.menu.FrontMenuVo;
+import com.jsy.community.vo.menu1.FrontChildMenu;
+import com.jsy.community.vo.menu1.FrontParentMenu;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -165,6 +167,38 @@ public class FrontMenuServiceImpl extends ServiceImpl<FrontMenuMapper, FrontMenu
 			arrayList.add(menuVo);
 		}
 		return arrayList;
+	}
+	
+	@Override
+	public List<FrontParentMenu> listMenu() {
+		ArrayList<FrontParentMenu> list = new ArrayList<>();
+		// 1. 查询所有一级分类
+		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("parent_id", 0);
+		List<FrontMenuEntity> parentList = frontMenuMapper.selectList(queryWrapper);
+		
+		//2. 查询所有二级分类
+		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+		wrapper.ne("parent_id", 0);
+		List<FrontMenuEntity> childMenu = frontMenuMapper.selectList(wrapper);
+		
+		//3. 封装数据
+		for (FrontMenuEntity frontMenuEntity : parentList) {
+			FrontParentMenu parentMenu = new FrontParentMenu();
+			BeanUtils.copyProperties(frontMenuEntity, parentMenu);
+			list.add(parentMenu);
+			
+			ArrayList<FrontChildMenu> childMenus = new ArrayList<>();
+			for (FrontMenuEntity menu : childMenu) {
+				if (menu.getParentId().equals(frontMenuEntity.getId())) {
+					FrontChildMenu frontChildMenu = new FrontChildMenu();
+					BeanUtils.copyProperties(menu, frontChildMenu);
+					childMenus.add(frontChildMenu);
+				}
+			}
+			parentMenu.setChildMenus(childMenus);
+		}
+		return list;
 	}
 	
 	private FrontMenuEntity common(Long parentId) {

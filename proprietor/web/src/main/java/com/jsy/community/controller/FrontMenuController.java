@@ -8,6 +8,7 @@ import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.menu.FrontMenuVo;
+import com.jsy.community.vo.menu1.FrontParentMenu;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,6 +40,14 @@ public class FrontMenuController {
 	public CommonResult listFrontMenu(@RequestBody BaseQO<FrontMenuEntity> baseQO) {
 		List<FrontMenuVo> list = frontMenuService.listFrontMenu(baseQO);
 		return CommonResult.ok(list);
+	}
+	
+	// TODO 树形结构
+	@ApiOperation("后台树形结构查询所有菜单")
+	@GetMapping("/listMenu")
+	public CommonResult listMenu() {
+		List<FrontParentMenu> parentMenus = frontMenuService.listMenu();
+		return CommonResult.ok(parentMenus);
 	}
 	
 	/**
@@ -114,7 +123,7 @@ public class FrontMenuController {
 	
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu")
-	public CommonResult moreListMenu(){
+	public CommonResult moreListMenu() {
 		List<FrontMenuVo> list = frontMenuService.moreListMenu();
 		return CommonResult.ok(list);
 	}
