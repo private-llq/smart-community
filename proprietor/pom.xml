@@ -4,11 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>pom</packaging>
-	<modules>
-		<module>api</module>
-		<module>web</module>
-		<module>service</module>
-	</modules>
 	
 	<parent>
 		<groupId>com.jsy</groupId>
@@ -17,8 +12,14 @@
 	</parent>
 	
 	<artifactId>proprietor</artifactId>
-	<name>业主模块</name>
-	<description>业主模块父工程</description>
+	<name>业主端</name>
+	<description>业主端父工程</description>
+	
+	<modules>
+		<module>api</module>
+		<module>web</module>
+		<module>service</module>
+	</modules>
 	
 	<dependencies>
 		<dependency>
