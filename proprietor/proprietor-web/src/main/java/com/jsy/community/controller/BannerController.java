@@ -19,13 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+
 /**
-* @Description: 轮播图控制器
- * @Param:
- * @Return:
- * @Author: chq459799974
- * @Date: 2020/11/17
-**/
+ * @author chq459799974
+ * @since 2020-11-18 16:19
+ **/
 @Api(tags = "轮播图控制器")
 @RestController
 @RequestMapping("/banner")
@@ -44,7 +42,7 @@ public class BannerController {
 	 **/
 	@ApiOperation("【轮播图】列表查询")
 	@PostMapping("list")
-	public CommonResult list(@RequestBody BannerQO bannerQO){
+	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
 		ValidatorUtils.validateEntity(bannerQO, BannerQO.queryBannerValidatedGroup.class);
 		List<BannerVO> returnList = iBannerService.queryBannerList(bannerQO);
 		return CommonResult.ok(returnList);

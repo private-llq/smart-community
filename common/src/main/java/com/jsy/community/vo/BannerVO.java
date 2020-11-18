@@ -21,7 +21,7 @@ public class BannerVO implements Serializable {
 	private String url;
 	
 	@ApiModelProperty(value = "描述")
-	private String description;
+	private String desc;
 	
 	@ApiModelProperty(value = "轮播排序12345")
 	private Integer sort;

@@ -3,7 +3,6 @@ package com.jsy.community.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.web.ApiProprietor;
-import com.jsy.community.api.IRegionService;
 import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.api.IVisitorService;
@@ -28,11 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @Description: 访客控制器
- * @Param:
- * @Return:
- * @Author: chq459799974
- * @Date: 2020/11/17
+ * @author chq459799974
+ * @since 2020-11-18 16:19
  **/
 @RequestMapping("visitor")
 @Api(tags = "访客控制器")
@@ -49,9 +45,6 @@ public class VisitorController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IVisitingCarService iVisitingCarService;
-	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IRegionService iRegionService;
 	
 	/**
 	 * @Description: 访客登记 新增
@@ -151,12 +144,12 @@ public class VisitorController {
 	}
 	
 	/**
-	 * @Description: 分页查询
-	 * @Param: [baseQO<VisitorQO>]
-	 * @Return: com.jsy.community.vo.CommonResult
+	* @Description: 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult<com.baomidou.mybatisplus.extension.plugins.pagination.Page>
 	 * @Author: chq459799974
-	 * @Date: 2020/11/12
-	 **/
+	 * @Date: 2020/11/18
+	**/
 	@ApiOperation("【访客】分页查询")
 	@PostMapping("page")
 	public CommonResult<Page> query(@RequestBody BaseQO<VisitorQO> baseQO) {
@@ -164,18 +157,18 @@ public class VisitorController {
 	}
 	
 	/**
-	 * @Description: 根据ID单查
+	* @Description: 根据ID单查
 	 * @Param: [id]
-	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.entity.VisitorEntity>
 	 * @Author: chq459799974
-	 * @Date: 2020/11/12
-	 **/
+	 * @Date: 2020/11/18
+	**/
 	@ApiOperation("【访客】根据ID单查详情")
 	@GetMapping("{id}")
-	public CommonResult queryById(@PathVariable("id") Long id) {
+	public CommonResult<VisitorEntity> queryById(@PathVariable("id") Long id) {
 		VisitorEntity visitorEntity = iTVisitorService.selectOneById(id);
 		if (visitorEntity == null) {
-			return CommonResult.ok("没有数据");
+			return CommonResult.ok(null);
 		}
 		List<VisitorPersonEntity> personList = iVisitorPersonService.queryPersonList(visitorEntity.getId());
 		List<VisitingCarEntity> carList = iVisitingCarService.queryCarList(visitorEntity.getId());

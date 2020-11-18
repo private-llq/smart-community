@@ -51,7 +51,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	 * @Date: 2020/11/16
 	 **/
 	public List<BannerVO> queryBannerList(BannerQO bannerQO){
-		QueryWrapper<BannerEntity> queryWrapper = new QueryWrapper<BannerEntity>();
+		QueryWrapper<BannerEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("id,position,sort,url,description");
 		queryWrapper.eq("community_id",bannerQO.getCommunityId());
 		queryWrapper.eq("position",bannerQO.getPosition());
@@ -62,6 +62,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		for(BannerEntity bannerEntity : entityList){
 			bannerVO = new BannerVO();
 			BeanUtils.copyProperties(bannerEntity,bannerVO);
+			bannerVO.setDesc(bannerEntity.getDescription());
 			returnList.add(bannerVO);
 		}
 		return returnList;
