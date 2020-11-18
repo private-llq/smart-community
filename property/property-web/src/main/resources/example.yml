@@ -2,24 +2,3 @@ server:
   port: 7001
   servlet:
     context-path: /
-
-spring:
-  # jackson时间格式化
-  jackson:
-    time-zone: GMT+8
-    date-format: yyyy-MM-dd HH:mm:ss
-  servlet:
-    multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
-      enabled: true
-
-jsy:
-  shiro:
-    redis: false
-  jwt:
-    # 加密秘钥
-    secret: XW-EC7D505B-3435-4728-9B04-84513C2BF0EE
-    # token有效时长，7天，单位秒
-    expire: 604800
-    header: token

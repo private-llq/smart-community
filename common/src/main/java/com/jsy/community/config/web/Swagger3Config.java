@@ -1,8 +1,6 @@
 package com.jsy.community.config.web;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
-import com.jsy.community.annotation.web.ApiProperty;
-import com.jsy.community.annotation.web.ApiProprietor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -28,24 +26,7 @@ public class Swagger3Config {
 	public Docket createProprietorApi() {
 		return new Docket(DocumentationType.OAS_30)
 			.apiInfo(apiInfo())
-			.groupName("业主端")
 			.select()
-			.apis(RequestHandlerSelectors.withClassAnnotation(ApiProprietor.class))
-			.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
-			.paths(PathSelectors.any())
-			.build();
-	}
-	
-	/**
-	 * 物业端接口文档
-	 */
-	@Bean
-	public Docket createPropertyApi() {
-		return new Docket(DocumentationType.OAS_30)
-			.apiInfo(apiInfo())
-			.groupName("物业端")
-			.select()
-			.apis(RequestHandlerSelectors.withClassAnnotation(ApiProperty.class))
 			.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
 			.paths(PathSelectors.any())
 			.build();

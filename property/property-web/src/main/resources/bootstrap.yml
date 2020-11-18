@@ -14,6 +14,10 @@ spring:
       config:
         server-addr: 127.0.0.1:8848
         file-extension: yaml
+        # 全部服务提供模块固定不变的配置，比如mybatis plus配置，三方登录配置，
+        extension-configs[0]:
+          data-id: common-web-fixed.yaml
+          refresh: true
 
 dubbo:
   registry:

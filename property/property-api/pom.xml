@@ -6,7 +6,7 @@
 	<packaging>jar</packaging>
 	
 	<parent>
-		<artifactId>com.jsy.community</artifactId>
+		<artifactId>property</artifactId>
 		<groupId>com.jsy</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
