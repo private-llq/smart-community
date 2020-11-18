@@ -16,14 +16,7 @@ import java.util.List;
  * @since 2020-11-16
  */
 public interface IBannerService extends IService<BannerEntity> {
-	/**
-	 * @Description: 轮播图入库
-	 * @Param: [bannerEntity]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2020/11/16
-	 **/
-	boolean addBanner(BannerEntity bannerEntity);
+	
 	/**
 	* @Description: 轮播图 列表查询
 	 * @Param: [bannerQO]
@@ -33,12 +26,4 @@ public interface IBannerService extends IService<BannerEntity> {
 	**/
 	List<BannerVO> queryBannerList(BannerQO bannerQO);
 	
-	/**
-	* @Description: 轮播图 批量删除
-	 * @Param: [bannerQO]
-	 * @Return: boolean
-	 * @Author: chq45799974
-	 * @Date: 2020/11/16
-	**/
-	boolean deleteBannerBatch(Long[] ids);
 }
