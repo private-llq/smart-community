@@ -1,7 +1,8 @@
-package com.jsy.community.config;
+package com.jsy.community.config.web;
 
 import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -14,6 +15,7 @@ import javax.annotation.Resource;
  * MVC配置
  */
 @Configuration
+@ConditionalOnProperty(value = "jsy.module.name", havingValue = "web")
 public class WebMvcConfig implements WebMvcConfigurer {
 	@Resource
 	private AuthorizationInterceptor authorizationInterceptor;

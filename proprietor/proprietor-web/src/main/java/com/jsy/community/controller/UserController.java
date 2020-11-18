@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.constant.Const;
@@ -27,6 +28,7 @@ public class UserController {
 	
 	@PostMapping("test")
 	@ApiOperation("test")
+	@Login
 	public List<UserAuthEntity> test(@RequestBody BaseQO<UserEntity> qo) {
 		ValidatorUtils.validateEntity(qo);
 		

@@ -1,9 +1,10 @@
-package com.jsy.community.config;
+package com.jsy.community.config.web;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.jsy.community.annotation.web.ApiProperty;
 import com.jsy.community.annotation.web.ApiProprietor;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -18,6 +19,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 @EnableOpenApi
 @EnableKnife4j
+@ConditionalOnProperty(value = "jsy.module.name", havingValue = "web")
 public class Swagger3Config {
 	/**
 	 * 业主端接口文档

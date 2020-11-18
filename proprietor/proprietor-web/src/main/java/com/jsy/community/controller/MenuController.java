@@ -34,13 +34,13 @@ import java.util.List;
 public class MenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IMenuService frontMenuService;
+	private IMenuService menuService;
 	
 	// TODO 待定  分页  或  树形结构
 	@ApiOperation("后台分页查询所有菜单")
 	@PostMapping(value = "/listFrontMenu", produces = "application/json;charset=utf-8")
 	public CommonResult listFrontMenu(@RequestBody BaseQO<FrontMenuEntity> baseQO) {
-		List<FrontMenuVo> list = frontMenuService.listFrontMenu(baseQO);
+		List<FrontMenuVo> list = menuService.listFrontMenu(baseQO);
 		return CommonResult.ok(list);
 	}
 	
@@ -48,7 +48,7 @@ public class MenuController {
 	@ApiOperation("后台树形结构查询所有菜单")
 	@GetMapping("/listMenu")
 	public CommonResult listMenu() {
-		List<FrontParentMenu> parentMenus = frontMenuService.listMenu();
+		List<FrontParentMenu> parentMenus = menuService.listMenu();
 		return CommonResult.ok(parentMenus);
 	}
 	
@@ -62,7 +62,7 @@ public class MenuController {
 	@ApiOperation("查询所有父菜单信息")
 	@GetMapping("/listParentMenu")
 	public CommonResult listParentMenu() {
-		List<FrontMenuEntity> list = frontMenuService.listParentMenu();
+		List<FrontMenuEntity> list = menuService.listParentMenu();
 		return CommonResult.ok(list);
 	}
 	
@@ -70,7 +70,7 @@ public class MenuController {
 	@ApiOperation("添加菜单信息")
 	@PostMapping(value = "/saveMenu", produces = "application/json;charset=utf-8")
 	public CommonResult saveMenu(@RequestBody FrontMenuEntity menuEntity) {
-		frontMenuService.saveMenu(menuEntity);
+		menuService.saveMenu(menuEntity);
 		return CommonResult.ok();
 	}
 	
@@ -78,7 +78,7 @@ public class MenuController {
 	@GetMapping("/getMenuById/{id}")
 	public CommonResult getMenuById(@PathVariable Long id) {
 		// 回显
-		FrontMenuVo frontMenuVo = frontMenuService.getMenuById(id);
+		FrontMenuVo frontMenuVo = menuService.getMenuById(id);
 		return CommonResult.ok(frontMenuVo);
 	}
 	
@@ -87,7 +87,7 @@ public class MenuController {
 	@PostMapping(value = "/updateMenu/{id}", produces = "application/json;charset=utf-8")
 	public CommonResult updateMenu(@PathVariable Long id,
 	                               @RequestBody FrontMenuVo frontMenuVo) {
-		frontMenuService.updateMenu(id, frontMenuVo);
+		menuService.updateMenu(id, frontMenuVo);
 		return CommonResult.ok();
 	}
 	
@@ -95,7 +95,7 @@ public class MenuController {
 	@DeleteMapping("/removeMenu/{id}")
 	public CommonResult removeMenu(@PathVariable Long id) {
 		try {
-			frontMenuService.removeMenu(id);
+			menuService.removeMenu(id);
 			return CommonResult.ok();
 		} catch (Exception e) {
 			return CommonResult.error("请先删除子菜单");
@@ -106,7 +106,7 @@ public class MenuController {
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu")
 	public CommonResult listIndexMenu() {
-		List<FrontMenuEntity> list = frontMenuService.listIndexMenu();
+		List<FrontMenuEntity> list = menuService.listIndexMenu();
 		return CommonResult.ok(list);
 	}
 	
@@ -115,7 +115,7 @@ public class MenuController {
 	public CommonResult removeListMenu(@ApiParam(value = "需要删除的id【数组】")
 	                                   @PathVariable Long[] ids) {
 		try {
-			frontMenuService.removeListMenu(ids);
+			menuService.removeListMenu(ids);
 			return CommonResult.ok();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -126,7 +126,7 @@ public class MenuController {
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu")
 	public CommonResult moreListMenu() {
-		List<FrontMenuVo> list = frontMenuService.moreListMenu();
+		List<FrontMenuVo> list = menuService.moreListMenu();
 		return CommonResult.ok(list);
 	}
 	
