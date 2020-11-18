@@ -33,8 +33,8 @@ public class CommonController {
 
     //http://localhost:8080/common/zone?id=(t_house的pid)&queryType=(暂定：1查所有社区，2传社区id查所有单元，3传单元id查所有楼栋，4传楼栋id查所有楼层，5传楼层id查所有门牌)
     //http://192.168.12.11:8080/common/zone?id=4&queryType=5   查id为4楼层下面的所有门牌
-    @ApiOperation("通过查询类型id来查询当前级别的下一级所有数据")
-    @GetMapping("/zone")
+    @ApiOperation("社区区域查询接口")
+    @GetMapping("/community")
 	@SuppressWarnings("unchecked")
     public CommonResult<?> queryZone(@RequestParam(required = true) Integer id, @RequestParam(required = true) Integer queryType) {
         //查询结果Map
