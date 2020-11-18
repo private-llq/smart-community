@@ -1,5 +1,6 @@
 package com.jsy.community.config.web;
 
+import com.jsy.community.annotation.web.ApiAdmin;
 import com.jsy.community.annotation.web.ApiProperty;
 import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
@@ -25,7 +26,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	public void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer
 			.addPathPrefix("/api/v1/proprietor", c -> c.isAnnotationPresent(ApiProprietor.class))
-			.addPathPrefix("/api/v1/property", c -> c.isAnnotationPresent(ApiProperty.class));
+			.addPathPrefix("/api/v1/property", c -> c.isAnnotationPresent(ApiProperty.class))
+			.addPathPrefix("/api/v1/admin", c -> c.isAnnotationPresent(ApiAdmin.class));
 	}
 	
 	@Override
