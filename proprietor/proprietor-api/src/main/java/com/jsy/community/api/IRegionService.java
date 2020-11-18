@@ -13,6 +13,6 @@ public interface IRegionService {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/13
 	**/
-	List<RegionEntity> getSubRegion(String id);
+	List<RegionEntity> getSubRegion(Integer id);
 	
 }
