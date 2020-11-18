@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  * MVC配置
  */
 @Configuration
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "web")
+@ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class WebMvcConfig implements WebMvcConfigurer {
 	@Resource
 	private AuthorizationInterceptor authorizationInterceptor;

@@ -7,7 +7,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
 @Configuration
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "service")
+@ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")
 public class RedisLockConfiguration {
 	@Bean
 	public RedisLockRegistry redisLockRegistry(RedisConnectionFactory redisConnectionFactory) {
