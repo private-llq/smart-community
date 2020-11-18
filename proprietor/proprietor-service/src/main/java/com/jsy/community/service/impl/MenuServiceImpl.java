@@ -67,12 +67,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 		Page<FrontMenuEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
 		String menuName = baseQO.getQuery().getMenuName();
-		String description = baseQO.getQuery().getDescription();
+		String description = baseQO.getQuery().getDescr();
 		if (!StringUtils.isEmpty(menuName)) {
 			wrapper.like("menu_name", menuName);
 		}
 		if (!StringUtils.isEmpty(description)) {
-			wrapper.like("description", description);
+			wrapper.like("descr", description);
 		}
 		menuMapper.selectPage(page, wrapper);
 		

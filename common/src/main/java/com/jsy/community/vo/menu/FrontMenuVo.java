@@ -31,7 +31,7 @@ public class FrontMenuVo implements Serializable {
 	private String path;
 	
 	@ApiModelProperty(value = "描述信息")
-	private String description;
+	private String descr;
 	
 	@ApiModelProperty(value = "优先级")
 	private Integer sort;

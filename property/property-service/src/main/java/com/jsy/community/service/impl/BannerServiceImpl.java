@@ -31,6 +31,19 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	private BannerMapper bannerMapper;
 	
 	/**
+	* @Description: 轮播图入库
+	 * @Param: [bannerEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/16
+	**/
+	@Override
+	public boolean addBanner(BannerEntity bannerEntity){
+		int result = bannerMapper.insert(bannerEntity);
+		return result > 0;
+	}
+	
+	/**
 	 * @Description: 轮播图 列表查询
 	 * @Param: [bannerQO]
 	 * @Return: java.util.List<com.jsy.community.vo.BannerVO>
@@ -53,6 +66,22 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 			returnList.add(bannerVO);
 		}
 		return returnList;
+	}
+	
+	/**
+	* @Description: 轮播图 批量删除
+	 * @Param: [bannerQO]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/16
+	**/
+	@Override
+	public boolean deleteBannerBatch(Long[] ids){
+		int result = bannerMapper.deleteBatchIds(Arrays.asList(ids));
+		if(result > 0){
+			return true;
+		}
+		return false;
 	}
 	
 }

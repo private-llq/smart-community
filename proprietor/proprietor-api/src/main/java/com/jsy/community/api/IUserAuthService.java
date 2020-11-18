@@ -10,6 +10,12 @@ import com.jsy.community.vo.ThirdPlatformVo;
 
 import java.util.List;
 
+/**
+ * 用户认证接口
+ *
+ * @author ling
+ * @since 2020-11-11 15:47
+ */
 public interface IUserAuthService extends IService<UserAuthEntity> {
 	List<UserAuthEntity> getList(boolean a);
 	
