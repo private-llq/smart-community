@@ -13,7 +13,7 @@ import javax.annotation.Resource;
  * Redis配置
  */
 @Configuration
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "service")
+@ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")
 public class RedisConfig {
 	@Resource
 	private RedisConnectionFactory factory;

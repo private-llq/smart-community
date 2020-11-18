@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Configuration
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "web")
+@ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class LocalDateTimeSerializerConfig {
 	
 	@Value("${spring.jackson.date-format}")

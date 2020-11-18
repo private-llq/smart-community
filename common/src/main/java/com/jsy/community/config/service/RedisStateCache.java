@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Configuration
 @RefreshScope
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "service")
+@ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")
 public class RedisStateCache implements AuthStateCache {
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;

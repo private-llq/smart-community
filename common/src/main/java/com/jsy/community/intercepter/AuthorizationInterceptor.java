@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  * 权限(Token)验证
  */
 @Component
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "web")
+@ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	public static final String USER_KEY = "userId";
 	@Resource

@@ -17,7 +17,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 @EnableOpenApi
 @EnableKnife4j
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "web")
+@ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class Swagger3Config {
 	/**
 	 * 业主端接口文档

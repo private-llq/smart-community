@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Component
 @Slf4j
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "service")
+@ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")
 public class MyMetaObjectHandler implements MetaObjectHandler {
 	@Override
 	public void insertFill(MetaObject metaObject) {

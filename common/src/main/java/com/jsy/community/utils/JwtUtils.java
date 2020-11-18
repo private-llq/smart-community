@@ -26,7 +26,7 @@ import java.util.Date;
 @Component
 @Data
 @Slf4j
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "web")
+@ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class JwtUtils {
 	
 	private String secret;

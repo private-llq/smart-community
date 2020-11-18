@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(value = "jsy.module.name", havingValue = "service")
+@ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")
 public class MyBatisPlusConfiguration {
 	
 	/**

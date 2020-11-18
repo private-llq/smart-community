@@ -1,0 +1,47 @@
+spring:
+  redis:
+    port: 6379
+    host: localhost
+    database: 0
+    lettuce:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 32
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: 3000
+        # 连接池中的最大空闲连接 默认 8
+        max-idle: 32
+        # 连接池中的最小空闲连接 默认 0
+        min-idle: 8
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://222.178.212.29:3306/project?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      username: root
+      password: helloworld123
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        #login-username: admin
+        #login-password: admin
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true

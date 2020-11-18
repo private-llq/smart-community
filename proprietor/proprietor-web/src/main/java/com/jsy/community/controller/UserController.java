@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * 业主控制器
+ *
+ * @author ling
+ * @since 2020-11-11 15:47
+ */
 @RequestMapping("user")
 @Api(tags = "用户控制器")
 @RestController
