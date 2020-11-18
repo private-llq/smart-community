@@ -39,7 +39,7 @@ public class CommunityInformController {
     @PostMapping( value = "/page", produces = "application/json;charset=utf-8")
     @ApiOperation("查询社区通知消息")
     public CommonResult<List<CommunityInformEntity>> queryInform(@RequestBody BaseQO<CommunityInformEntity> communityEntity){
-        //1.查询参数非空数字效验
+        //1.查询分页参数非空数字效验
         ValidatorUtils.validatePageParam(communityEntity);
         List<CommunityInformEntity> records = communityInformService.queryCommunityInform(communityEntity).getRecords();
         return CommonResult.ok(records);
@@ -47,16 +47,16 @@ public class CommunityInformController {
 
     /**
      * 修改通知消息 [管理端]
-     * @param communityEntity  修改参数实体接收类
-     * @return                 返回修改结果
+     * @param communityInformEntity  修改参数实体接收类
+     * @return                       返回修改结果
      */
     @PutMapping(produces = "application/json;charset=utf-8")
     @ApiOperation("修改社区通知消息")
-    public CommonResult<Boolean> updateInform(@RequestBody CommunityInformEntity communityEntity){
+    public CommonResult<Boolean> updateInform(@RequestBody CommunityInformEntity communityInformEntity){
         //1.参数效验
-        ValidatorUtils.validateEntity(CommunityInformEntity.updateCommunityInformValidate.class);
+        ValidatorUtils.validateEntity(communityInformEntity, CommunityInformEntity.updateCommunityInformValidate.class);
         //2.修改操作
-        Boolean isUpdateSuccess = communityInformService.updateCommunityInform(communityEntity);
+        Boolean isUpdateSuccess = communityInformService.updateCommunityInform(communityInformEntity);
         return isUpdateSuccess ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
@@ -81,7 +81,7 @@ public class CommunityInformController {
     public CommonResult<Boolean> addInform(@RequestBody CommunityInformEntity communityInformEntity){
         //1.效验用户是否是一个管理员
         //2.验证参数实体效验
-        ValidatorUtils.validateEntity(CommunityInformEntity.addCommunityInformValidate.class);
+        ValidatorUtils.validateEntity(communityInformEntity, CommunityInformEntity.addCommunityInformValidate.class);
         //3.添加当前社区新消息
         Boolean isAddSuccess = communityInformService.addCommunityInform(communityInformEntity);
         return isAddSuccess ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
