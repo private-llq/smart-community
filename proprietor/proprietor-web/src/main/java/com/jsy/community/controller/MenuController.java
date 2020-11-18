@@ -19,13 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * <p>
- * 菜单 前端控制器
- * </p>
- *
- * @author jsy
- * @since 2020-11-14
- */
+ * @return
+ * @Author lihao
+ * @Description 前台菜单控制器
+ * @Date 2020/11/14 22:10
+ * @Param
+ **/
 @Api(tags = "前台菜单控制器")
 @RestController
 @RequestMapping("/menu")
@@ -39,7 +38,7 @@ public class MenuController {
 	// TODO 待定  分页  或  树形结构
 	@ApiOperation("后台分页查询所有菜单")
 	@PostMapping(value = "/listFrontMenu", produces = "application/json;charset=utf-8")
-	public CommonResult listFrontMenu(@RequestBody BaseQO<FrontMenuEntity> baseQO) {
+	public CommonResult<List<FrontMenuVo>> listFrontMenu(@RequestBody BaseQO<FrontMenuEntity> baseQO) {
 		List<FrontMenuVo> list = menuService.listFrontMenu(baseQO);
 		return CommonResult.ok(list);
 	}
@@ -47,7 +46,7 @@ public class MenuController {
 	// TODO 树形结构
 	@ApiOperation("后台树形结构查询所有菜单")
 	@GetMapping("/listMenu")
-	public CommonResult listMenu() {
+	public CommonResult<List<FrontParentMenu>> listMenu() {
 		List<FrontParentMenu> parentMenus = menuService.listMenu();
 		return CommonResult.ok(parentMenus);
 	}
@@ -61,7 +60,7 @@ public class MenuController {
 	 **/
 	@ApiOperation("查询所有父菜单信息")
 	@GetMapping("/listParentMenu")
-	public CommonResult listParentMenu() {
+	public CommonResult<List<FrontMenuEntity>> listParentMenu() {
 		List<FrontMenuEntity> list = menuService.listParentMenu();
 		return CommonResult.ok(list);
 	}
@@ -76,7 +75,7 @@ public class MenuController {
 	
 	@ApiOperation("根据id查询菜单信息")
 	@GetMapping("/getMenuById/{id}")
-	public CommonResult getMenuById(@PathVariable Long id) {
+	public CommonResult<FrontMenuVo> getMenuById(@PathVariable Long id) {
 		// 回显
 		FrontMenuVo frontMenuVo = menuService.getMenuById(id);
 		return CommonResult.ok(frontMenuVo);
