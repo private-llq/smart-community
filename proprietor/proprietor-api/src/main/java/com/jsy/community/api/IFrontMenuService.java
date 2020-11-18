@@ -53,7 +53,7 @@ public interface IFrontMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/14 21:17
 	 * @Param [number]
 	 **/
-	List<FrontMenuEntity> listIndexMenu(Integer number);
+	List<FrontMenuEntity> listIndexMenu();
 	
 	/**
 	 * @return java.lang.Integer
