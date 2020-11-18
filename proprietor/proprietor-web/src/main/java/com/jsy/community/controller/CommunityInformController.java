@@ -40,9 +40,12 @@ public class CommunityInformController {
      */
     @PostMapping( value = "/page", produces = "application/json;charset=utf-8")
     @ApiOperation("查询社区通知消息")
-    public CommonResult<List<CommunityInformEntity>> queryInform(@RequestBody BaseQO<CommunityInformEntity> communityEntity){
+    public CommonResult<?> queryInform(@RequestBody BaseQO<CommunityInformEntity> communityEntity){
         //1.查询分页参数非空数字效验
         ValidatorUtils.validatePageParam(communityEntity);
+        if(communityEntity.getQuery() == null){
+            return CommonResult.error(JSYError.BAD_REQUEST);
+        }
         List<CommunityInformEntity> records = communityInformService.queryCommunityInform(communityEntity).getRecords();
         return CommonResult.ok(records);
     }
