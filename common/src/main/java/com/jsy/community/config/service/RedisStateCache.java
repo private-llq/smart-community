@@ -2,6 +2,7 @@ package com.jsy.community.config.service;
 
 import me.zhyd.oauth.cache.AuthStateCache;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Configuration
 @RefreshScope
+@ConditionalOnClass(value = AuthStateCache.class)
 @ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")
 public class RedisStateCache implements AuthStateCache {
 	@Resource

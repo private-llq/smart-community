@@ -2,6 +2,7 @@ package com.jsy.community.config.web;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +15,36 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import javax.annotation.PostConstruct;
+
 @Configuration
 @EnableOpenApi
 @EnableKnife4j
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class Swagger3Config {
+	
+	@Value("${jsy.web.enable:false}")
+	private boolean isWeb;
+	
+	@Value("${jsy.service.enable:false}")
+	private boolean isService;
+	
+	private String title;
+	
+	@PostConstruct
+	public void init() {
+		if (isWeb && !isService) {
+			title = "智慧社区业主端接口文档";
+		}
+		if (!isWeb && isService) {
+			title = "智慧社区物业端接口文档";
+		}
+		
+		if (isWeb && isService) {
+			title = "智慧社区后台管理接口文档";
+		}
+	}
+	
 	/**
 	 * 业主端接口文档
 	 */
@@ -34,7 +60,7 @@ public class Swagger3Config {
 	
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
-			.title("智慧社区接口文档")
+			.title(title)
 			.contact(new Contact("Ling", null, "503580622@qq.com"))
 			.version("1.0")
 			.build();
