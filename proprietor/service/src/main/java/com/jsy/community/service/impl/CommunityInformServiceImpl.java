@@ -63,7 +63,8 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      */
     @Override
     public Boolean addCommunityInform(CommunityInformEntity communityInformEntity) {
-        return communityInformMapper.insert(communityInformEntity) > 0;
+        int insert = communityInformMapper.insert(communityInformEntity);
+        return  insert > 0;
     }
 
     /**
