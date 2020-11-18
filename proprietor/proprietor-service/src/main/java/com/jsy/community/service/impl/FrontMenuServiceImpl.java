@@ -96,9 +96,9 @@ public class FrontMenuServiceImpl extends ServiceImpl<FrontMenuMapper, FrontMenu
 	}
 	
 	@Override
-	public List<FrontMenuEntity> listIndexMenu(Integer number) {
+	public List<FrontMenuEntity> listIndexMenu() {
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
-		wrapper.ne("parent_id", 0).orderByAsc("sort").last("limit " + number);
+		wrapper.ne("parent_id", 0).orderByAsc("sort").last("limit " + 7);
 		return frontMenuMapper.selectList(wrapper);
 	}
 	

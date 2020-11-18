@@ -102,9 +102,9 @@ public class FrontMenuController {
 	
 	
 	@ApiOperation("查询首页展示的菜单选项")
-	@GetMapping("/listIndexMenu/{number}")
-	public CommonResult listIndexMenu(@ApiParam(value = "首页菜单展示数量") @PathVariable Integer number) {
-		List<FrontMenuEntity> list = frontMenuService.listIndexMenu(number);
+	@GetMapping("/listIndexMenu")
+	public CommonResult listIndexMenu() {
+		List<FrontMenuEntity> list = frontMenuService.listIndexMenu();
 		return CommonResult.ok(list);
 	}
 	
