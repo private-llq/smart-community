@@ -16,7 +16,7 @@ import java.util.List;
  * @author jsy
  * @since 2020-11-14
  */
-public interface IFrontMenuService extends IService<FrontMenuEntity> {
+public interface IMenuService extends IService<FrontMenuEntity> {
 	
 	
 	/**

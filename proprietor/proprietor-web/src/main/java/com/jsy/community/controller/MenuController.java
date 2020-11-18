@@ -3,7 +3,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.web.ApiProprietor;
-import com.jsy.community.api.IFrontMenuService;
+import com.jsy.community.api.IMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.qo.BaseQO;
@@ -28,13 +28,13 @@ import java.util.List;
  */
 @Api(tags = "前台菜单控制器")
 @RestController
-@RequestMapping("/front/menu")
+@RequestMapping("/menu")
 @Login(allowAnonymous = true)
 @ApiProprietor
-public class FrontMenuController {
+public class MenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IFrontMenuService frontMenuService;
+	private IMenuService frontMenuService;
 	
 	// TODO 待定  分页  或  树形结构
 	@ApiOperation("后台分页查询所有菜单")
