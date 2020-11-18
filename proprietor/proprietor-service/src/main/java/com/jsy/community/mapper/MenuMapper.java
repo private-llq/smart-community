@@ -11,6 +11,6 @@ import com.jsy.community.entity.FrontMenuEntity;
  * @author jsy
  * @since 2020-11-14
  */
-public interface FrontMenuMapper extends BaseMapper<FrontMenuEntity> {
+public interface MenuMapper extends BaseMapper<FrontMenuEntity> {
 
 }
