@@ -61,7 +61,8 @@ public class CommonController {
             return CommonResult.error(JSYError.NOT_FOUND);
         }
     }
-    
+	
+	@ApiOperation("查询下级省市区列表 + 获取城市列表")
     @GetMapping("/region")
     public CommonResult<?> queryRegion(@RequestParam(required = true) Integer queryType,Integer regionNumber) {
         String queryMethodName = CommonQueryConsts.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType);
@@ -72,17 +73,17 @@ public class CommonController {
             //调用 用查询类型ID找到的 对应的查询方法
             Method queryMethod = null;
             Object invoke = null;
-            if(regionNumber != null){
-                queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,Integer.class);
-                invoke = queryMethod.invoke(commonService,regionNumber);
-            }else{
+            if(CommonQueryConsts.RegionQueryTypeEnum.CITY.getCode().equals(queryType)){//查询城市列表不带参
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName);
                 invoke = queryMethod.invoke(commonService);
+            }else{
+                queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,Integer.class);
+                invoke = queryMethod.invoke(commonService,regionNumber);
             }
             if (invoke == null) {
                 return CommonResult.ok(null);
             }
-            return CommonResult.ok((List<Map>) invoke);
+            return CommonResult.ok(invoke);
         } catch (Exception e) {
             log.error("com.jsy.community.controller.CommonController.queryZone：{}", e.getMessage());
             //如果出现异常，说明服务并不能调通
