@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
@@ -24,6 +25,7 @@ import java.util.Map;
 @Login( allowAnonymous = true)
 @Slf4j
 @RestController
+@ApiProprietor
 public class CommonController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

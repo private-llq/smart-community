@@ -1,9 +1,11 @@
 package com.jsy.community.config;
 
+import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
@@ -15,6 +17,12 @@ import javax.annotation.Resource;
 public class WebMvcConfig implements WebMvcConfigurer {
 	@Resource
 	private AuthorizationInterceptor authorizationInterceptor;
+	
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		configurer
+			.addPathPrefix("/api/v1/proprietor", c -> c.isAnnotationPresent(ApiProprietor.class));
+	}
 	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {

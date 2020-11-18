@@ -1,6 +1,8 @@
 package com.jsy.community.config;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
+import com.jsy.community.annotation.web.ApiProperty;
+import com.jsy.community.annotation.web.ApiProprietor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +18,32 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 @EnableOpenApi
 @EnableKnife4j
-public class Swagger3 {
+public class Swagger3Config {
+	/**
+	 * 业主端接口文档
+	 */
 	@Bean
-	public Docket createRestApi() {
+	public Docket createProprietorApi() {
 		return new Docket(DocumentationType.OAS_30)
 			.apiInfo(apiInfo())
+			.groupName("业主端")
 			.select()
+			.apis(RequestHandlerSelectors.withClassAnnotation(ApiProprietor.class))
+			.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+			.paths(PathSelectors.any())
+			.build();
+	}
+	
+	/**
+	 * 物业端接口文档
+	 */
+	@Bean
+	public Docket createPropertyApi() {
+		return new Docket(DocumentationType.OAS_30)
+			.apiInfo(apiInfo())
+			.groupName("物业端")
+			.select()
+			.apis(RequestHandlerSelectors.withClassAnnotation(ApiProperty.class))
 			.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
 			.paths(PathSelectors.any())
 			.build();

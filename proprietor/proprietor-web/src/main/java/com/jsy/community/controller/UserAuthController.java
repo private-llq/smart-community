@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
@@ -37,6 +38,7 @@ import java.util.List;
 @RequestMapping("user/auth")
 @Api(tags = "用户认证控制器")
 @RestController
+@ApiProprietor
 public class UserAuthController {
 	@Resource
 	private JwtUtils jwtUtils;
