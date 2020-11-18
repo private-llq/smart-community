@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.ICommonService;
+import com.jsy.community.constant.CommonQueryConsts;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.CommunityType;
@@ -57,6 +58,34 @@ public class CommonController {
         } catch (Exception e) {
             log.error("com.jsy.community.controller.CommonController.queryZone：{}", e.getMessage());
         	//如果出现异常，说明服务并不能调通
+            return CommonResult.error(JSYError.NOT_FOUND);
+        }
+    }
+    
+    @GetMapping("/region")
+    public CommonResult<?> queryRegion(@RequestParam(required = true) Integer queryType,Integer regionNumber) {
+        String queryMethodName = CommonQueryConsts.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType);
+        if(queryMethodName == null){
+            return CommonResult.error(JSYError.REQUEST_PARAM);
+        }
+        try {
+            //调用 用查询类型ID找到的 对应的查询方法
+            Method queryMethod = null;
+            Object invoke = null;
+            if(regionNumber != null){
+                queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,Integer.class);
+                invoke = queryMethod.invoke(commonService,regionNumber);
+            }else{
+                queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName);
+                invoke = queryMethod.invoke(commonService);
+            }
+            if (invoke == null) {
+                return CommonResult.ok(null);
+            }
+            return CommonResult.ok((List<Map>) invoke);
+        } catch (Exception e) {
+            log.error("com.jsy.community.controller.CommonController.queryZone：{}", e.getMessage());
+            //如果出现异常，说明服务并不能调通
             return CommonResult.error(JSYError.NOT_FOUND);
         }
     }

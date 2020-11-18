@@ -1,8 +1,10 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -78,5 +80,15 @@ public class CommonServiceImpl implements ICommonService {
         //todo 后续修改
         log.info("查询楼层门牌 楼层ID是 {}", id);
         return commonMapper.getAllDoorFormFloor(id);
+    }
+    
+    @Override
+    public List<RegionEntity> getCityList(){
+        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityList")), List.class);
+    }
+    
+    @Override
+    public List<RegionEntity> getSubRegion(Integer id){
+        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForHash().get("Region:", String.valueOf(id))), List.class);
     }
 }
