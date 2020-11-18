@@ -1,5 +1,6 @@
-package com.jsy.community.config;
+package com.jsy.community.config.service;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
  * Redis配置
  */
 @Configuration
+@ConditionalOnProperty(value = "jsy.module.name", havingValue = "service")
 public class RedisConfig {
 	@Resource
 	private RedisConnectionFactory factory;

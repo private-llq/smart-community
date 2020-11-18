@@ -1,6 +1,6 @@
 package com.jsy.community.utils;
 
-import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
@@ -48,7 +48,7 @@ public class JwtUtils {
 			.setExpiration(expireDate)
 			.signWith(SignatureAlgorithm.HS512, secret)
 			.compact();
-		return new UserAuthVo(token, DateUtil.toLocalDateTime(expireDate), infoVo);
+		return new UserAuthVo(token, LocalDateTimeUtil.of(expireDate), infoVo);
 	}
 	
 	public Claims getClaimByToken(String token) {

@@ -40,10 +40,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	@Override
 	public boolean addBanner(BannerEntity bannerEntity){
 		int result = bannerMapper.insert(bannerEntity);
-		if(result > 0){
-			return true;
-		}
-		return false;
+		return result > 0;
 	}
 	
 	/**
