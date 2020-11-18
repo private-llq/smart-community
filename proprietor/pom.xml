@@ -16,9 +16,9 @@
 	<description>业主端父工程</description>
 	
 	<modules>
-		<module>api</module>
-		<module>web</module>
-		<module>service</module>
+		<module>proprietor-api</module>
+		<module>proprietor-web</module>
+		<module>proprietor-service</module>
 	</modules>
 	
 	<dependencies>
