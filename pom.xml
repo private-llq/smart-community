@@ -41,6 +41,7 @@
         <hutool.version>5.4.6</hutool.version>
         <jwt.version>0.9.1</jwt.version>
         <shiro.version>1.7.0</shiro.version>
+        <fastjson.version>1.2.70</fastjson.version>
         <justauth-spring-boot.version>1.1.0</justauth-spring-boot.version>
     </properties>
 
@@ -190,6 +191,11 @@
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
                 <version>${jakarta-xml-bind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
