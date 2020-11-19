@@ -17,7 +17,8 @@ public interface CommonQueryConsts {
 	 */
 	enum RegionQueryTypeEnum {
 		SUB("getSubRegion", 1),
-		CITY_MAP("getCityMap", 2);
+		CITY_MAP("getCityMap", 2),
+		HOT_CITY("getHotCityList",3);
 		private String name;
 		private Integer code;
 		RegionQueryTypeEnum(String name, Integer code) {

@@ -84,8 +84,8 @@ public class CommonServiceImpl implements ICommonService {
     }
     
     @Override
-    public List<RegionEntity> getCityList(){
-        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityList")), List.class);
+    public List<RegionEntity> getSubRegion(Integer id){
+        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForHash().get("Region:", String.valueOf(id))), List.class);
     }
     
     @Override
@@ -94,7 +94,12 @@ public class CommonServiceImpl implements ICommonService {
     }
     
     @Override
-    public List<RegionEntity> getSubRegion(Integer id){
-        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForHash().get("Region:", String.valueOf(id))), List.class);
+    public List<RegionEntity> getCityList(){
+        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityList")), List.class);
+    }
+    
+    @Override
+    public List<RegionEntity> getHotCityList(){
+        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("hotCityList")), List.class);
     }
 }
