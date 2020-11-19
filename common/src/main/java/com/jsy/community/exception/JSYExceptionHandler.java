@@ -2,12 +2,12 @@ package com.jsy.community.exception;
 
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 
 /**
  * @author ling
