@@ -102,6 +102,16 @@ public class RegionTask {
 		});
 		//封装二级区域(市)
 		redisTemplate.opsForValue().set("cityList", JSONObject.toJSONString(cityList));
+		//去除cityMap空数据的键
+		List<String> removeKeys = new LinkedList<>();
+		for(Map.Entry<String, List<RegionEntity>> entry : cityMap.entrySet()){
+			if(entry.getValue().size() == 0){
+				removeKeys.add(entry.getKey());
+			}
+		}
+		for(String key : removeKeys){
+			cityMap.remove(key);
+		}
 		//封装带拼音的cityMap
 		redisTemplate.opsForValue().set("cityMap", JSONObject.toJSONString(cityMap));
 		//用一级区域查找子节点
