@@ -1,7 +1,7 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping("user")
 @Api(tags = "用户控制器")
 @RestController
-@ApiProprietor
+@ApiJSYController
 public class UserController {
 	@DubboReference(version = Const.version, group = Const.group, check = false, timeout = 10000)
 	private IUserAuthService userAuthService;

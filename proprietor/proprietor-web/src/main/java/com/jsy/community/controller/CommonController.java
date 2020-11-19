@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.web.ApiProprietor;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.constant.CommonQueryConsts;
 import com.jsy.community.constant.Const;
@@ -23,10 +22,9 @@ import java.util.Map;
 
 @RequestMapping("/common")
 @Api(tags = "公共控制器")
-@Login( allowAnonymous = true)
 @Slf4j
 @RestController
-@ApiProprietor
+@ApiJSYController
 public class CommonController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
@@ -62,7 +60,7 @@ public class CommonController {
         }
     }
 	
-	@ApiOperation("查询下级省市区列表 + 获取城市列表")
+	@ApiOperation("查询下级省市区、查询城市等")
     @GetMapping("/region")
     public CommonResult<?> queryRegion(@RequestParam(required = true) Integer queryType,Integer regionNumber) {
         String queryMethodName = CommonQueryConsts.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType);
@@ -73,10 +71,10 @@ public class CommonController {
             //调用 用查询类型ID找到的 对应的查询方法
             Method queryMethod = null;
             Object invoke = null;
-            if(CommonQueryConsts.RegionQueryTypeEnum.CITY_MAP.getCode().equals(queryType)){//查询城市列表不带参
+            if(!CommonQueryConsts.RegionQueryTypeEnum.SUB.getCode().equals(queryType)){//不带参
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName);
                 invoke = queryMethod.invoke(commonService);
-            }else{
+            }else{//带参
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,Integer.class);
                 invoke = queryMethod.invoke(commonService,regionNumber);
             }

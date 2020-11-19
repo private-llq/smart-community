@@ -1,9 +1,8 @@
 package com.jsy.community.controller;
 
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.web.ApiProperty;
-import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.BannerEntity;
@@ -28,7 +27,7 @@ import java.util.List;
 @Api(tags = "轮播图控制器")
 @RestController
 @RequestMapping("/banner")
-@ApiProperty
+@ApiJSYController
 public class BannerController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
