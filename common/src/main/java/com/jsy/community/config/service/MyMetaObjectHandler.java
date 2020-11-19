@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+/**
+ * 自动设置创建时间、更新时间
+ *
+ * @author ling
+ * @since 2020-11-11 15:47
+ */
 @Component
 @Slf4j
 @ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")

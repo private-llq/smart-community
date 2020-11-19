@@ -15,6 +15,7 @@ public interface ConstError {
 	int UNAUTHORIZED = 401;
 	int FORBIDDEN = 403;
 	int NOT_FOUND = 404;
+	int NOT_SUPPORT_REQUEST_METHOD = 405;
 	int REQUEST_PARAM = 499;
 	int INTERNAL = 500;
 	int NOT_IMPLEMENTED = 501;
