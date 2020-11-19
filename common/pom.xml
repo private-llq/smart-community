@@ -95,11 +95,22 @@
 			<groupId>com.xkcoding</groupId>
 			<artifactId>justauth-spring-boot-starter</artifactId>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.alibaba</groupId>
+					<artifactId>fastjson</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
 			<groupId>cn.hutool</groupId>
 			<artifactId>hutool-all</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
@@ -85,6 +86,11 @@ public class CommonServiceImpl implements ICommonService {
     @Override
     public List<RegionEntity> getCityList(){
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityList")), List.class);
+    }
+    
+    @Override
+    public Map<String,RegionEntity> getCityMap(){
+        return JSONObject.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityMap")), Map.class);
     }
     
     @Override

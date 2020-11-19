@@ -26,10 +26,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Description: 省市区划 自动执行任务类
@@ -58,16 +55,26 @@ public class RegionTask {
 	@PostConstruct
 	public void setRegionToRedis(){
 		logger.info("服务启动任务执行：更新区域表");
-		dealQQMapData();//获取腾讯地图数据，插入本地数据库
-		List<RegionEntity> regionList = getRegionList();//组装redis-hash(查子区域),citylist(城市列表)
-		redisTemplate.opsForValue().set("regionList", JSONObject.toJSONString(regionList));
+		try {
+			dealQQMapData();//获取腾讯地图数据，插入本地数据库
+			List<RegionEntity> regionList = getRegionList();//组装redis-hash(查子区域),citylist(城市列表)
+			redisTemplate.opsForValue().set("regionList", JSONObject.toJSONString(regionList));
+		} catch (Exception e){
+			e.printStackTrace();
+			logger.error("省市区划同步失败，今日取消更新省市区数据");
+		}
 	}
 	
 	/*获取分级封装后的所有区域id,name,pid*/
 	private List<RegionEntity> getRegionList(){
 		List<RegionEntity> allRegion = regionMapper.getAllRegion();
-		List<RegionEntity> regionList  = new ArrayList<RegionEntity>();//封装好的返回结果(regionList)
+		List<RegionEntity> regionList  = new ArrayList<>();//封装好的返回结果(regionList)
 		List<RegionEntity> cityList = new ArrayList<>();
+		Map<String, List<RegionEntity>> cityMap = new HashMap<>();
+		for(int i=0;i<26;i++) {
+			char c = (char)('A'+i);
+			cityMap.put(String.valueOf(c), new LinkedList<>());
+		}
 		for (RegionEntity regionEntity : allRegion) {
 			//找到所有零级区域(国家)
 			//if("0".equals(regionEntity.getPid())){
@@ -78,10 +85,10 @@ public class RegionTask {
 			//if("2".equals(regionEntity.getLevel())){
 			if(regionEntity.getLevel() == 2){
 				cityList.add(regionEntity);
+				if(!StringUtils.isEmpty(regionEntity.getInitials())){
+					cityMap.get(regionEntity.getInitials()).add(regionEntity);
+				}
 			}
-		}
-		for(RegionEntity entity : cityList){
-		
 		}
 		//拼音排序
 		Collections.sort(cityList, new Comparator<RegionEntity>() {
@@ -95,6 +102,8 @@ public class RegionTask {
 		});
 		//封装二级区域(市)
 		redisTemplate.opsForValue().set("cityList", JSONObject.toJSONString(cityList));
+		//封装带拼音的cityMap
+		redisTemplate.opsForValue().set("cityMap", JSONObject.toJSONString(cityMap));
 		//用一级区域查找子节点
 		for (RegionEntity regionEntity : regionList) {
 			//调用查找子节点递归方法
@@ -104,7 +113,7 @@ public class RegionTask {
 	}
 	
 	private List<RegionEntity> getChildren(RegionEntity argEntity,List<RegionEntity> allRegion){
-		List<RegionEntity> childrenList = new ArrayList<RegionEntity>();
+		List<RegionEntity> childrenList = new ArrayList<>();
 		//阶段① 比较当前id所有数据的pid,添加childrenList
 		for (RegionEntity regionEntity : allRegion) {
 			if(!StringUtils.isEmpty(regionEntity.getPid()) && regionEntity.getPid().equals(argEntity.getId())){
@@ -153,10 +162,10 @@ public class RegionTask {
 		//获取
 		JSONObject jSONObject = queryQQMapTest();
 		JSONArray resultArray = jSONObject.getJSONArray("result");
-		if(resultArray == null){
-			logger.error("获取腾讯地图省市区划失败：" + LocalDateTime.now());
-			return;
-		}
+//		if(resultArray == null){
+//			logger.error("获取腾讯地图省市区划失败：" + LocalDateTime.now());
+//			return;
+//		}
 		List<RegionEntity> list = new ArrayList<>();
 		//补数据
 		fillLostData(list);
@@ -172,7 +181,7 @@ public class RegionTask {
 				//设置拼音首字母
 				JSONArray pinyinArray = jsonObject.getJSONArray("pinyin");
 				if(pinyinArray != null && pinyinArray.size() >= 2){
-					String initials = String.valueOf(pinyinArray.get(0)).substring(0, 1);
+					String initials = String.valueOf(pinyinArray.get(0)).substring(0, 1).toUpperCase();
 					entity.setInitials(initials);
 				}
 				//设置pid和level
@@ -206,11 +215,11 @@ public class RegionTask {
 	
 	//腾讯地图接口未提供
 	private void fillLostData(List<RegionEntity> list){
-		list.add(new RegionEntity(100000,"中国",0,0,"z"));
-		list.add(new RegionEntity(500100,"重庆市",500000,2,"c"));
-		list.add(new RegionEntity(110100,"北京市",110000,2,"b"));
-		list.add(new RegionEntity(120100,"天津市",120000,2,"t"));
-		list.add(new RegionEntity(310100,"上海市",310000,2,"s"));
+		list.add(new RegionEntity(100000,"中国",0,0,"Z"));
+		list.add(new RegionEntity(500100,"重庆市",500000,2,"C"));
+		list.add(new RegionEntity(110100,"北京市",110000,2,"B"));
+		list.add(new RegionEntity(120100,"天津市",120000,2,"T"));
+		list.add(new RegionEntity(310100,"上海市",310000,2,"S"));
 	}
 	
 	//调用腾讯地图-行政区划

@@ -57,6 +57,15 @@ public interface ICommonService {
 	List<RegionEntity> getCityList();
 	
 	/**
+	* @Description: 获取城市字典
+	 * @Param: []
+	 * @Return: java.util.Map<java.lang.String,com.jsy.community.entity.RegionEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/19
+	**/
+	Map<String,RegionEntity> getCityMap();
+	
+	/**
 	 * @Description: 根据区域编号获取子区域 (中国编号为100000)
 	 * @Param: [id]
 	 * @Return: java.util.List<com.jsy.community.entity.RegionEntity>

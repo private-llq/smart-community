@@ -40,4 +40,6 @@ public class FrontMenuEntity extends BaseEntity {
     @ApiModelProperty(value = "父id")
     private Long parentId;
 
+    @ApiModelProperty(value = "社区id")
+    private Long communityId;
 }

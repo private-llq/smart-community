@@ -103,9 +103,9 @@ public class MenuController {
 	
 	
 	@ApiOperation("查询首页展示的菜单选项")
-	@GetMapping("/listIndexMenu")
-	public CommonResult listIndexMenu() {
-		List<FrontMenuEntity> list = menuService.listIndexMenu();
+	@GetMapping("/listIndexMenu/{communityId}")
+	public CommonResult listIndexMenu(@PathVariable Long communityId) {
+		List<FrontMenuEntity> list = menuService.listIndexMenu(communityId);
 		return CommonResult.ok(list);
 	}
 	
