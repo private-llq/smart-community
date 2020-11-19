@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.FileVo;
 import io.swagger.annotations.Api;
@@ -14,12 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
  * @since 2020-11-19 15:07
  */
 @RestController
-@Api("文件控制器")
+@Api(tags = "文件控制器")
 @RequestMapping("/file")
+@ApiJSYController
 public class FileController {
 	
 	@ApiOperation("上传文件")
-	@PostMapping("file")
+	@PostMapping("")
 	public CommonResult<FileVo> upload(@RequestParam MultipartFile file) {
 		return CommonResult.ok(null);
 	}
