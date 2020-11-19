@@ -73,7 +73,7 @@ public class CommonController {
             //调用 用查询类型ID找到的 对应的查询方法
             Method queryMethod = null;
             Object invoke = null;
-            if(CommonQueryConsts.RegionQueryTypeEnum.CITY.getCode().equals(queryType)){//查询城市列表不带参
+            if(CommonQueryConsts.RegionQueryTypeEnum.CITY_MAP.getCode().equals(queryType)){//查询城市列表不带参
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName);
                 invoke = queryMethod.invoke(commonService);
             }else{
