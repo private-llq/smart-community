@@ -1,13 +1,10 @@
 package com.jsy.community.controller;
 
 
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.web.ApiProperty;
 import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.BannerEntity;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.BannerVO;
@@ -16,7 +13,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,7 +24,7 @@ import java.util.List;
 @Api(tags = "轮播图控制器")
 @RestController
 @RequestMapping("/banner")
-@ApiProperty
+@ApiProprietor
 public class BannerController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)

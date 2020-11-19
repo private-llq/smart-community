@@ -80,6 +80,9 @@ public class RegionTask {
 				cityList.add(regionEntity);
 			}
 		}
+		for(RegionEntity entity : cityList){
+		
+		}
 		//拼音排序
 		Collections.sort(cityList, new Comparator<RegionEntity>() {
 			@Override
@@ -152,6 +155,7 @@ public class RegionTask {
 		JSONArray resultArray = jSONObject.getJSONArray("result");
 		if(resultArray == null){
 			logger.error("获取腾讯地图省市区划失败：" + LocalDateTime.now());
+			return;
 		}
 		List<RegionEntity> list = new ArrayList<>();
 		//补数据
