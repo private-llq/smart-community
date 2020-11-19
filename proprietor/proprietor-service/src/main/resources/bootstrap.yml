@@ -2,7 +2,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: propeietor-service
+    name: proprietor-service
   profiles:
     active: dev
   cloud:
@@ -26,4 +26,4 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: propeietor-web
+    subscribed-services: proprietor-web
