@@ -13,8 +13,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 /**
@@ -83,13 +85,18 @@ public class CommunityInformController {
      */
     @PostMapping()
     @ApiOperation("添加社区通知消息")
-    public CommonResult<Boolean> addInform(@RequestBody CommunityInformEntity communityInformEntity){
+    public CommonResult<Boolean> addInform(@RequestBody CommunityInformEntity communityInformEntity) throws DuplicateKeyException, SQLIntegrityConstraintViolationException  {
         //1.效验用户是否是一个管理员
         //2.验证参数实体效验
         ValidatorUtils.validateEntity(communityInformEntity, CommunityInformEntity.addCommunityInformValidate.class);
         //3.添加当前社区新消息
-        Boolean isAddSuccess = communityInformService.addCommunityInform(communityInformEntity);
-        return isAddSuccess ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        try{
+            communityInformService.addCommunityInform(communityInformEntity);
+            return CommonResult.ok();
+        }catch (Exception e){
+            log.error("com.jsy.community.controller.CommunityInformController.addInform：{}",e.getMessage());
+            return CommonResult.error("添加失败!");
+        }
     }
 
 
