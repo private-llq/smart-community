@@ -96,9 +96,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public List<FrontMenuEntity> listIndexMenu() {
+	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
-		wrapper.ne("parent_id", 0).orderByAsc("sort").last("limit " + 7);
+		wrapper.ne("parent_id", 0).eq("community_id",communityId).orderByAsc("sort").last("limit " + 7);
 		return menuMapper.selectList(wrapper);
 	}
 	

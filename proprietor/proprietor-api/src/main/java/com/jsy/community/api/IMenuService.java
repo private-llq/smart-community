@@ -53,7 +53,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/14 21:17
 	 * @Param [number]
 	 **/
-	List<FrontMenuEntity> listIndexMenu();
+	List<FrontMenuEntity> listIndexMenu(Long communityId);
 	
 	/**
 	 * @return java.lang.Integer
