@@ -1,7 +1,7 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.ICommunityInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityInformEntity;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequestMapping("/community/inform")
 @Slf4j
 @Login(allowAnonymous = true)
-@ApiProprietor
+@ApiJSYController
 public class CommunityInformController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

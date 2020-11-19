@@ -1,9 +1,8 @@
 package com.jsy.community.config.web;
 
-import com.jsy.community.annotation.web.ApiAdmin;
-import com.jsy.community.annotation.web.ApiProperty;
-import com.jsy.community.annotation.web.ApiProprietor;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -11,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 /**
@@ -19,15 +19,24 @@ import javax.annotation.Resource;
 @Configuration
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class WebMvcConfig implements WebMvcConfigurer {
+	
+	@Value("${spring.application.name}")
+	private String name;
+	
+	private String prefix = "/api/v1/";
+	
+	@PostConstruct
+	public void init() {
+		prefix += name.split("-")[0];
+	}
+	
 	@Resource
 	private AuthorizationInterceptor authorizationInterceptor;
 	
 	@Override
 	public void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer
-			.addPathPrefix("/api/v1/proprietor", c -> c.isAnnotationPresent(ApiProprietor.class))
-			.addPathPrefix("/api/v1/property", c -> c.isAnnotationPresent(ApiProperty.class))
-			.addPathPrefix("/api/v1/admin", c -> c.isAnnotationPresent(ApiAdmin.class));
+			.addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class));
 	}
 	
 	@Override

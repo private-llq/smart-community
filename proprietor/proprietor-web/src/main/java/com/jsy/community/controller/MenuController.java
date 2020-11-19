@@ -1,8 +1,8 @@
 package com.jsy.community.controller;
 
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.IMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FrontMenuEntity;
@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/menu")
 @Login(allowAnonymous = true)
-@ApiProprietor
+@ApiJSYController
 public class MenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)

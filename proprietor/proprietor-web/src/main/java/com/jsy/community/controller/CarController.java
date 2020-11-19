@@ -1,7 +1,7 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
@@ -32,7 +32,7 @@ import java.util.Map;
 @RequestMapping("/car")
 @Slf4j
 @Login(allowAnonymous = true)
-@ApiProprietor
+@ApiJSYController
 public class CarController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

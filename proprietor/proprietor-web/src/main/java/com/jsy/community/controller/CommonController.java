@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.web.ApiProprietor;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.constant.CommonQueryConsts;
 import com.jsy.community.constant.Const;
@@ -23,10 +22,9 @@ import java.util.Map;
 
 @RequestMapping("/common")
 @Api(tags = "公共控制器")
-@Login( allowAnonymous = true)
 @Slf4j
 @RestController
-@ApiProprietor
+@ApiJSYController
 public class CommonController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

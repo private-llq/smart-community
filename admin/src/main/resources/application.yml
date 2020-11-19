@@ -4,6 +4,8 @@ server:
     context-path: /
 
 spring:
+  application:
+    name: admin-community
   profiles:
     active: dev
   # jackson时间格式化

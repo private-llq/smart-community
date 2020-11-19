@@ -1,8 +1,8 @@
 package com.jsy.community.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.web.ApiProprietor;
 import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.api.IVisitorService;
@@ -34,7 +34,7 @@ import java.util.List;
 @Api(tags = "访客控制器")
 @RestController
 @Login
-@ApiProprietor
+@ApiJSYController
 public class VisitorController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
