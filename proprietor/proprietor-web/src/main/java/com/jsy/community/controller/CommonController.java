@@ -44,7 +44,7 @@ public class CommonController {
         CommunityType communityType = CommunityType.valueOf(queryType);
         //当枚举类并没有这个查询类型时，抛出400请求参数错误异常
         if (communityType == null) {
-            return CommonResult.error(JSYError.REQUEST_PARAM);
+            return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "查询社区ID不能为空!");
         }
         try {
             //调用 用查询类型ID找到的 对应的查询方法

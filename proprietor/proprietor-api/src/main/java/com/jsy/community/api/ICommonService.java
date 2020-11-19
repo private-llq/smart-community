@@ -17,7 +17,7 @@ public interface ICommonService {
      * @param id   传入的城市id
      * @return     返回社区集合
      */
-    List<Map> getAllCommunity(Integer id);
+    List<Map> getAllCommunityFormCityId(Integer id);
 
     /**
      * 根据社区id查询下面的所有单元

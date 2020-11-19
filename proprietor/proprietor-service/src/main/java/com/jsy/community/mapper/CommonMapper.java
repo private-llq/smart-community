@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public interface CommonMapper {
 
-    List<Map> getAllCommunity(Integer id);
+    List<Map> getAllCommunityFormCityId(Integer id);
 
     List<Map> getAllUnitFormCommunity(Integer id);
 
