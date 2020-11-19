@@ -6,6 +6,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.service.impl.AppContentServiceImpl;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ public class AppContentController {
 	@Autowired
 	private AppContentServiceImpl aPPContentServiceImpl;
 	
+	@ApiOperation("【推荐城市】新增")
 	@PostMapping("hotCity")
 	public CommonResult setHotCity(@RequestBody List<RegionEntity> regionList){
 		boolean result = aPPContentServiceImpl.setHotCity(regionList);

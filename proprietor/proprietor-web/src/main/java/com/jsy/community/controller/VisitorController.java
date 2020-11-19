@@ -72,10 +72,10 @@ public class VisitorController {
 			for (VisitorPersonEntity person : personList) {
 				person.setVisitorId(visitorId);
 			}
-		}
-		boolean saveVisitorPerson = iTVisitorService.addPersonBatch(personList);
-		if(!saveVisitorPerson){
-			throw new JSYException(JSYError.INTERNAL.getCode(), "新增访客登记失败");
+			boolean saveVisitorPerson = iTVisitorService.addPersonBatch(personList);
+			if(!saveVisitorPerson){
+				throw new JSYException(JSYError.INTERNAL.getCode(), "新增访客登记失败");
+			}
 		}
 		//添加随行车辆
 		List<VisitingCarEntity> carList = visitorEntity.getVisitingCarList();
@@ -85,10 +85,10 @@ public class VisitorController {
 			for (VisitingCarEntity car : carList) {
 				car.setVisitorId(visitorId);
 			}
-		}
-		boolean saveVisitingCar = iTVisitorService.addCarBatch(carList);
-		if(!saveVisitingCar){
-			throw new JSYException(JSYError.INTERNAL.getCode(), "新增访客登记失败");
+			boolean saveVisitingCar = iTVisitorService.addCarBatch(carList);
+			if(!saveVisitingCar){
+				throw new JSYException(JSYError.INTERNAL.getCode(), "新增访客登记失败");
+			}
 		}
 		return CommonResult.ok();
 	}

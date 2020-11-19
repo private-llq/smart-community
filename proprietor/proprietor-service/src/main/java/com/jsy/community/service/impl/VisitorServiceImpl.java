@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
@@ -55,7 +56,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     public Long addVisitor(VisitorEntity visitorEntity){
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
-            throw new JSYException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
+            throw new ProprietorException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
         }
         return visitorEntity.getId();
     }
