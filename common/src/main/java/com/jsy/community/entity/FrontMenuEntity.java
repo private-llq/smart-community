@@ -41,5 +41,5 @@ public class FrontMenuEntity extends BaseEntity {
     private Long parentId;
 
     @ApiModelProperty(value = "社区id")
-    private Long community_id;
+    private Long communityId;
 }
