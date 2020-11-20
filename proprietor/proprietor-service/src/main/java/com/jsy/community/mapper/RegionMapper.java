@@ -11,7 +11,6 @@ import java.util.List;
  * @author chq459799974
  * @since 2020-11-13
  */
-@Mapper
 public interface RegionMapper {
 	
 	/**
