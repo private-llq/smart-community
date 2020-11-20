@@ -2,10 +2,12 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
+import com.jsy.community.service.CommunityService;
 import com.jsy.community.utils.MyPageUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -16,15 +18,16 @@ import java.util.Map;
 
 /**
  * @author chq459799974
- * @description TODO
+ * @description 社区实现类
  * @since 2020-11-19 16:57
  **/
 @Service
-public class CommunityServiceImpl {
+public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityEntity> implements CommunityService {
 	
 	@Resource
 	private CommunityMapper communityMapper;
 	
+	@Override
 	public boolean addCommunity(CommunityEntity communityEntity){
 		int result = communityMapper.insert(communityEntity);
 		if(result == 1){
@@ -33,6 +36,7 @@ public class CommunityServiceImpl {
 		return false;
 	}
 	
+	@Override
 	public boolean deleteCommunity(Long id){
 		int result = communityMapper.deleteById(id);
 		if(result == 1){
@@ -41,6 +45,7 @@ public class CommunityServiceImpl {
 		return false;
 	}
 	
+	@Override
 	public Map<String,Object> updateCommunity(CommunityEntity communityEntity){
 		Map<String, Object> returnMap = new HashMap<>();
 		if(communityEntity.getId() == null){
@@ -54,6 +59,7 @@ public class CommunityServiceImpl {
 		return returnMap;
 	}
 	
+	@Override
 	public Page<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO){
 		Page<CommunityEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
