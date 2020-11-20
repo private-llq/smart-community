@@ -7,7 +7,6 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.service.CommunityService;
-import com.jsy.community.service.impl.CommunityServiceImpl;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,7 @@ import java.util.Map;
 
 /**
  * @author chq459799974
- * @description TODO
+ * @description 社区控制器
  * @since 2020-11-19 16:59
  **/
 @RequestMapping("community")
