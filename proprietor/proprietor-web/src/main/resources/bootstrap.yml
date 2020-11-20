@@ -2,7 +2,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: propeietor-web
+    name: proprietor-web
   profiles:
     active: dev
   cloud:
