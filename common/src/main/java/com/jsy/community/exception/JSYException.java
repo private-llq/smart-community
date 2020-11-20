@@ -1,5 +1,6 @@
 package com.jsy.community.exception;
 
+import com.jsy.community.constant.ConstError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,6 +12,11 @@ public class JSYException extends RuntimeException {
 	public JSYException(Integer code, String message) {
 		super(message);
 		this.code = code;
+	}
+	
+	public JSYException(String message) {
+		super(message);
+		this.code = ConstError.NORMAL;
 	}
 	
 	public JSYException() {

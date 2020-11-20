@@ -103,8 +103,8 @@ public class MenuController {
 	
 	
 	@ApiOperation("查询首页展示的菜单选项")
-	@GetMapping("/listIndexMenu/{communityId}")
-	public CommonResult listIndexMenu(@PathVariable Long communityId) {
+	@GetMapping("/listIndexMenu")
+	public CommonResult listIndexMenu(@RequestParam("communityId") Long communityId) {
 		List<FrontMenuEntity> list = menuService.listIndexMenu(communityId);
 		return CommonResult.ok(list);
 	}

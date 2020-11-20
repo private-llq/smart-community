@@ -3,6 +3,8 @@ package com.jsy.community.vo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 文件上传成功
  *
@@ -10,10 +12,7 @@ import lombok.Data;
  * @since 2020-11-19 15:15
  */
 @Data
-public class FileVo {
-	@ApiModelProperty("文件ID")
-	private Long id;
-	
+public class FileVo implements Serializable {
 	@ApiModelProperty("文件路径，包含域名")
 	private String url;
 	
@@ -24,5 +23,5 @@ public class FileVo {
 	private String path;
 	
 	@ApiModelProperty("文件大小，单位Byte")
-	private Integer size;
+	private Long size;
 }
