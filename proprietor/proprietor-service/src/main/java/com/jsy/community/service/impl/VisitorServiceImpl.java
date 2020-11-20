@@ -10,7 +10,6 @@ import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.VisitingCarMapper;
 import com.jsy.community.mapper.VisitorMapper;
 import com.jsy.community.mapper.VisitorPersonMapper;

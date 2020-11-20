@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 
 /**
  * <p>
@@ -32,5 +34,11 @@ public class CommunityQO extends BaseQO {
 
     @ApiModelProperty(value = "区ID")
     private Integer areaId;
+    
+    @ApiModelProperty(value = "用户经度")
+    private BigDecimal lon;
+    
+    @ApiModelProperty(value = "用户纬度")
+    private BigDecimal lat;
 
 }

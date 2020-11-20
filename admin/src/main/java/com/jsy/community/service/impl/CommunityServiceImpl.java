@@ -7,7 +7,7 @@ import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
-import com.jsy.community.service.CommunityService;
+import com.jsy.community.service.ICommunityService;
 import com.jsy.community.utils.MyPageUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -22,7 +22,7 @@ import java.util.Map;
  * @since 2020-11-19 16:57
  **/
 @Service
-public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityEntity> implements CommunityService {
+public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityEntity> implements ICommunityService {
 	
 	@Resource
 	private CommunityMapper communityMapper;

@@ -13,7 +13,7 @@ import java.util.Map;
  * @description 社区接口
  * @since 2020-11-20 09:06
  **/
-public interface CommunityService extends IService<CommunityEntity> {
+public interface ICommunityService extends IService<CommunityEntity> {
 	/**
 	* @Description: 社区新增
 	 * @Param: [communityEntity]

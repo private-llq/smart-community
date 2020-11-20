@@ -1,6 +1,7 @@
 package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
@@ -50,5 +51,11 @@ public class CommunityEntity extends BaseEntity {
 
     @ApiModelProperty(value = "纬度")
     private BigDecimal lat;
+    
+    //返回字段
+    @TableField(exist=false)
+    private Double distanceDouble;//定位距离(排序用)
+    @TableField(exist=false)
+    private String distanceString;//定位距离(显示用)
 
 }
