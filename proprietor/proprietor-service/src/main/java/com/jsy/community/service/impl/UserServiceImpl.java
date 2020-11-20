@@ -1,14 +1,16 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.ICommonService;
-import com.jsy.community.api.IUserAuthService;
-import com.jsy.community.api.IUserService;
-import com.jsy.community.api.ProprietorException;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.mapper.CarMapper;
+import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
@@ -35,6 +37,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private ICommonService commonService;
+
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICarService carService;
+
+	@Resource
+	private UserMapper userMapper;
+
+	@Resource
+	private UserAuthMapper userAuthMapper;
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
@@ -90,5 +101,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 		vo.setSex(0);
 		vo.setIsRealAuth(0);
 		return vo;
+	}
+
+	@Override
+	public Boolean proprietorRegister(UserEntity userEntity) {
+		//添加业主信息
+		int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("id", userEntity.getId()));
+		if( count == 0 ){
+			return false;
+		}
+		//业主登记时有填写车辆信息的情况下，新增车辆
+		if(userEntity.getHasCar()){
+			CarEntity carEntity = userEntity.getCarEntity();
+			carEntity.setOwner(userEntity.getRealName());
+			//通过uid 查询t_user_auth表的用户手机号码
+			UserAuthEntity userAuthEntity = userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().select("mobile").eq("uid", carEntity.getUid()));
+			carEntity.setContact(userAuthEntity.getMobile());
+			//登记车辆
+			carService.addProprietorCar(userEntity.getCarEntity());
+		}
+		return true;
 	}
 }

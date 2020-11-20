@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.qo.BaseQO;
+import org.springframework.dao.DuplicateKeyException;
+
+import java.sql.SQLIntegrityConstraintViolationException;
 
 /**
  * <p>

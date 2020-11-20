@@ -5,14 +5,17 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityInformService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.mapper.CommunityInformMapper;
 import com.jsy.community.qo.BaseQO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 
 /**
@@ -44,6 +47,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         QueryWrapper<CommunityInformEntity>  queryWrapper = new QueryWrapper<>();
         CommunityInformEntity query = communityEntity.getQuery();
         Page<CommunityInformEntity> objectPage = new Page<>(communityEntity.getPage(), communityEntity.getSize());
+        queryWrapper.select("id,create_time,update_time,community_id,state,title,content,enabled");
         //查询社区消息为 1 启用的社区消息
         queryWrapper.eq("enabled",1);
         //设置查询条件为用户所在的小区
@@ -62,9 +66,8 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      * @return                          返回是否添加成功
      */
     @Override
-    public Boolean addCommunityInform(CommunityInformEntity communityInformEntity) {
-        int insert = communityInformMapper.insert(communityInformEntity);
-        return  insert > 0;
+    public Boolean addCommunityInform(CommunityInformEntity communityInformEntity){
+            return communityInformMapper.insert(communityInformEntity) > 0;
     }
 
     /**

@@ -8,20 +8,20 @@
     <select id="getAllCommunityFormCityId" parameterType="java.lang.Integer" resultType="java.util.HashMap">
         select id,name from t_community where city_id = #{id}
     </select>
-    <!-- 查询某个#{id}社区下面所有单元 -->
+    <!-- 查询某个#{id}社区下面所有单元 数据库type 2 = 单元 -->
     <select id="getAllUnitFormCommunity" parameterType="java.lang.Integer" resultType="java.util.HashMap">
-        select id,unit <include refid="tableNameAndCondition"/> community_id = #{id}
+        select id,unit <include refid="tableNameAndCondition"/> community_id = #{id} and type = 2
     </select>
-    <!-- 查询某个单元#{id}下面的所有楼栋 -->
+    <!-- 查询某个单元#{id}下面的所有楼栋 数据库type 1 = 楼栋 -->
     <select id="getAllBuildingFormUnit" parameterType="java.lang.Integer" resultType="java.util.HashMap">
-        select id,building <include refid="tableNameAndCondition"/> pid = #{id}
+        select id,building <include refid="tableNameAndCondition"/> pid = #{id} and type = 1
     </select>
-    <!-- 查询某个楼栋#{id}下面的所有楼层 -->
+    <!-- 查询某个楼栋#{id}下面的所有楼层 数据库类型 type = 3 楼层 -->
     <select id="getAllFloorFormBuilding" parameterType="java.lang.Integer" resultType="java.util.HashMap">
-        select id,floor <include refid="tableNameAndCondition"/> pid = #{id}
+        select id,floor <include refid="tableNameAndCondition"/> pid = #{id} and type = 3
     </select>
-    <!-- 查询某楼层#{id}下面的所有门牌 -->
+    <!-- 查询某楼层#{id}下面的所有门牌 数据库类型 type = 4 门牌  -->
     <select id="getAllDoorFormFloor" parameterType="java.lang.Integer" resultType="java.util.HashMap">
-        select id,door <include refid="tableNameAndCondition"/> pid = #{id}
+        select id,door <include refid="tableNameAndCondition"/> pid = #{id} and type = 4
     </select>
 </mapper>
