@@ -11,6 +11,15 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public class RegexUtils {
 
+	/**
+	 * 正则表达式：验证性别 参数只能 0-2
+	 */
+	public static final String REGEX_GENDER = "^[0-2]{1}";
+
+	/**
+	 * 正则表达式：验证中国姓名
+	 */
+	public static final String REGEX_REAL_NAME = "^[\u4e00-\u9fa5]{2,4}";
 
 	/**
 	 * 正则表达式：验证汽车牌照
