@@ -42,4 +42,7 @@ public class FrontMenuEntity extends BaseEntity {
 
     @ApiModelProperty(value = "社区id")
     private Long communityId;
+    
+    @ApiModelProperty(value = "菜单状态 0 首页 1不展示在首页")
+    private Integer status;
 }

@@ -90,13 +90,15 @@ public class MenuController {
 		return CommonResult.ok();
 	}
 	
-	@ApiOperation("查询首页展示的菜单选项")
-	@GetMapping("/listIndexMenu")
-	public CommonResult listIndexMenu(
-		@ApiParam(value = "社区id")
-		@RequestParam("communityId") Long communityId) {
-		List<FrontMenuEntity> list = menuService.listIndexMenu(communityId);
-		return CommonResult.ok(list);
+	@ApiOperation("删除菜单信息")
+	@DeleteMapping("/removeMenu")
+	public CommonResult removeMenu(@RequestParam("id") Long id) {
+		try {
+			menuService.removeMenu(id);
+			return CommonResult.ok();
+		} catch (Exception e) {
+			return CommonResult.error("请先删除子菜单");
+		}
 	}
 	
 	@ApiOperation("批量删除菜单")
@@ -111,13 +113,5 @@ public class MenuController {
 			return CommonResult.error("请先删除子菜单");
 		}
 	}
-	
-	@ApiOperation("更多菜单")
-	@GetMapping("/moreListMenu")
-	public CommonResult moreListMenu() {
-		List<FrontParentMenu> list = menuService.listMenu();
-		return CommonResult.ok(list);
-	}
-	
 }
 
