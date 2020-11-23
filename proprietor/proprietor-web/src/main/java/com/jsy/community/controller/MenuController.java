@@ -74,8 +74,8 @@ public class MenuController {
 	}
 	
 	@ApiOperation("根据id查询菜单信息")
-	@GetMapping("/getMenuById/{id}")
-	public CommonResult<FrontMenuVo> getMenuById(@PathVariable Long id) {
+	@GetMapping("/getMenuById")
+	public CommonResult<FrontMenuVo> getMenuById(@RequestParam("id") Long id) {
 		// 回显
 		FrontMenuVo frontMenuVo = menuService.getMenuById(id);
 		return CommonResult.ok(frontMenuVo);
@@ -83,16 +83,16 @@ public class MenuController {
 	
 	// TODO 表单形式修改
 	@ApiOperation("修改菜单信息")
-	@PostMapping(value = "/updateMenu/{id}", produces = "application/json;charset=utf-8")
-	public CommonResult updateMenu(@PathVariable Long id,
+	@PostMapping(value = "/updateMenu", produces = "application/json;charset=utf-8")
+	public CommonResult updateMenu(@RequestParam("id") Long id,
 	                               @RequestBody FrontMenuVo frontMenuVo) {
 		menuService.updateMenu(id, frontMenuVo);
 		return CommonResult.ok();
 	}
 	
 	@ApiOperation("删除菜单信息")
-	@DeleteMapping("/removeMenu/{id}")
-	public CommonResult removeMenu(@PathVariable Long id) {
+	@DeleteMapping("/removeMenu")
+	public CommonResult removeMenu(@RequestParam("id") Long id) {
 		try {
 			menuService.removeMenu(id);
 			return CommonResult.ok();
@@ -110,9 +110,9 @@ public class MenuController {
 	}
 	
 	@ApiOperation("批量删除菜单")
-	@DeleteMapping("/removeListMenu/{ids}")
+	@DeleteMapping("/removeListMenu")
 	public CommonResult removeListMenu(@ApiParam(value = "需要删除的id【数组】")
-	                                   @PathVariable Long[] ids) {
+	                                   Long[] ids) {
 		try {
 			menuService.removeListMenu(ids);
 			return CommonResult.ok();
