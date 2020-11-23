@@ -34,6 +34,7 @@ public class CommunityController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private ICommunityService iCommunityService;
 	
+	//TODO 和公共接口是否重复？
 	@GetMapping("")
 	public CommonResult<Page<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
 		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));
