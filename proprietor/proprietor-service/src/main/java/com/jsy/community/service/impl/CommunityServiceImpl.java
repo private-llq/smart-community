@@ -15,8 +15,11 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 
@@ -76,5 +79,35 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		});
 		return communityEntityPage;
 	}
-	
+
+	/**
+	 * 通过社区名称和城市id查询相关的社区数据
+	 * @author YuLF
+	 * @since  2020/11/23 11:21
+	 * @Param  communityEntity 	查询参数实体
+	 * @return 返回通过社区名称和城市id查询结果
+	 */
+	@Override
+	public List<CommunityEntity> getCommunityByName(CommunityEntity communityEntity) {
+		//按名称何城市id 模糊查询 所有社区
+		List<CommunityEntity> communityEntityList = communityMapper.getCommunityByName(communityEntity);
+		double lat = communityEntity.getLat().doubleValue();
+		double lon = communityEntity.getLon().doubleValue();
+		if( null != communityEntityList ){
+			 //遍历每一个社区实体 获取用户到社区的距离
+			for(CommunityEntity everyOne : communityEntityList){
+				Map<String, Object> distance = DistanceUtil.getDistance(lon, lat, everyOne.getLon().doubleValue(), everyOne.getLat().doubleValue());
+				//如果等于null getDistance出现未知异常
+				if(distance == null){
+					continue;
+				}
+				everyOne.setDistanceDouble((Double) distance.get("distanceDouble"));
+				everyOne.setDistanceString(String.valueOf(distance.get("distanceString")));
+			}
+			//用户到社区的距离 从小到大排序返回
+			communityEntityList.sort(Comparator.comparing(CommunityEntity::getDistanceDouble));
+		}
+		return communityEntityList;
+	}
+
 }

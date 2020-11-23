@@ -4,10 +4,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CommunityEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * @author chq459799974
  * @description 社区Mapper
  * @since 2020-11-19 16:57
  **/
 public interface CommunityMapper extends BaseMapper<CommunityEntity> {
+    List<CommunityEntity> getCommunityByName(CommunityEntity communityEntity);
 }

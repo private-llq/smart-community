@@ -6,6 +6,7 @@ import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,4 +23,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Date: 2020/11/20
 	**/
 	Page<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO);
+
+	/**
+	 * 通过社区名称和城市id查询相关的社区数据 服务提供者
+	 * @author YuLF
+	 * @since  2020/11/23 11:21
+	 * @Param  communityEntity 	必要参数实体
+	 * @return 返回通过社区名称和城市id查询结果
+	 */
+    List<CommunityEntity> getCommunityByName(CommunityEntity communityEntity);
 }

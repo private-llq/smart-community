@@ -8,14 +8,15 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -38,6 +39,21 @@ public class CommunityController {
 	@GetMapping("")
 	public CommonResult<Page<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
 		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));
+	}
+
+	/**
+	 * 通过社区名称和城市id查询相关的社区数据
+	 * @author YuLF
+	 * @since  2020/11/23 11:21
+	 * @Param  communityEntity 	必要参数实体
+	 * @return 返回通过社区名称和城市id查询结果
+	 */
+	@ApiOperation("社区模糊搜索接口")
+	@PostMapping()
+	public CommonResult<List<CommunityEntity>> getCommunityByName(@RequestBody CommunityEntity communityEntity){
+		//验证请求参数
+		ValidatorUtils.validateEntity(communityEntity, CommunityEntity.GetCommunityByName.class);
+		return CommonResult.ok(iCommunityService.getCommunityByName(communityEntity));
 	}
 	
 }

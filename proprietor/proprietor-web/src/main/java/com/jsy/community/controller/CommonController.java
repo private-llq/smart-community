@@ -32,8 +32,6 @@ public class CommonController {
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
     public CommonResult<?> queryZone(@RequestParam Integer id, @RequestParam Integer queryType) {
-        //查询结果Map
-        Map<Integer, String> zoneCodeName = null;
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);
         //当枚举类并没有这个查询类型时，抛出400请求参数错误异常

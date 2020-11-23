@@ -122,8 +122,8 @@ public class CarController {
      */
     @ApiOperation("所属人固定车辆删除方法")
     @ApiImplicitParam(name = "id", value = "车辆固定id")
-    @DeleteMapping(value = "{id}")
-    public CommonResult<Boolean> deleteProprietorCar(@PathVariable("id") String id) {
+    @DeleteMapping()
+    public CommonResult<Boolean> deleteProprietorCar(@RequestParam String id) {
         //从请求获得uid
         Long uid = 12L;
         if( !ValidatorUtils.isInteger(id)  ){

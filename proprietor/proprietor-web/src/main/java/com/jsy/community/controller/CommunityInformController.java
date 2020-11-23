@@ -72,9 +72,9 @@ public class CommunityInformController {
      * @param id   消息id
      * @return     返回修改成功值
      */
-    @DeleteMapping("{id}")
+    @DeleteMapping()
     @ApiOperation("删除社区通知消息")
-    public CommonResult<Boolean> deleteInform(@PathVariable("id")Long id){
+    public CommonResult<Boolean> deleteInform(@RequestParam Long id){
         return communityInformService.delCommunityInform(id) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
