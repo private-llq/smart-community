@@ -9,6 +9,15 @@ import java.util.Map;
  * @Date: 2020/11/18
 **/
 public interface CommonQueryConsts {
+	/**
+	 * 房间成员查询类型 - 查询成员
+	 */
+	Integer QUERY_HOUSE_MEMBER = 1;
+	/**
+	 * 房间成员查询类型 - 查询邀请
+	 */
+	Integer QUERY_HOUSE_MEMBER_INVITATION = 2;
+	
 	
 	/**
 	 * 省市区查询类型

@@ -10,7 +10,7 @@ import java.util.List;
  * 来访车辆 Mapper 接口
  * </p>
  *
- * @author jsy
+ * @author chq459799974
  * @since 2020-11-12
  */
 public interface VisitingCarMapper extends BaseMapper<VisitingCarEntity> {

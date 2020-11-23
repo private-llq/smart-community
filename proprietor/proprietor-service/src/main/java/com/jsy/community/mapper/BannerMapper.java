@@ -8,7 +8,7 @@ import com.jsy.community.entity.BannerEntity;
  * banner轮播图 Mapper 接口
  * </p>
  *
- * @author jsy
+ * @author chq459799974
  * @since 2020-11-16
  */
 public interface BannerMapper extends BaseMapper<BannerEntity> {
