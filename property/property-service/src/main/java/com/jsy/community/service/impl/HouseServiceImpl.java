@@ -92,8 +92,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		return false;
 	}
 
+	//组装需要删除的数据
 	private void setDeleteIds(List<Long> idList, List<Long> subIdList) {
 		if(!CollectionUtils.isEmpty(subIdList)){
+			subIdList.removeAll(idList);
 			idList.addAll(subIdList);
 			setDeleteIds(idList,houseMapper.getSubIdList(subIdList));
 		}
