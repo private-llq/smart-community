@@ -9,6 +9,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @description 社区Mapper
  * @since 2020-11-19 16:57
  **/
-@Mapper
 public interface CommunityMapper extends BaseMapper<CommunityEntity> {
 }

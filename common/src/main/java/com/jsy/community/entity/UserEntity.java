@@ -1,10 +1,18 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author ling
@@ -26,12 +34,18 @@ public class UserEntity extends BaseEntity {
 	private String avatarUrl;
 	
 	@ApiModelProperty("性别，0未知，1男，2女")
+	@NotNull(groups = {ProprietorRegister.class}, message = "性别未选择!")
+	@Range(groups = {ProprietorRegister.class},  min = 0, max = 2, message = "选择的性别不可用")
 	private Integer sex;
 	
 	@ApiModelProperty("真实姓名")
+	@NotBlank(groups = {ProprietorRegister.class}, message = "姓名未填写!")
+	@Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
 	private String realName;
 	
 	@ApiModelProperty("身份证")
+	@NotBlank(groups = {ProprietorRegister.class}, message = "身份证号码未输入!")
+	@Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "请输入一个正确的身份证号码!")
 	private String idCard;
 	
 	@ApiModelProperty("是否实名认证")
@@ -48,4 +62,17 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("详细地址")
 	private String detailAddress;
+
+	@ApiModelProperty("车辆信息")
+	@TableField( exist = false )
+	private CarEntity carEntity;
+
+	@ApiModelProperty("标记是否需要登记车辆")
+	@TableField( exist = false )
+	private Boolean hasCar;
+
+	/**
+	 * 业主登记验证接口
+	 */
+	public interface ProprietorRegister{}
 }

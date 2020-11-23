@@ -11,10 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -30,19 +27,18 @@ public class CommonController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommonService commonService;
 
-    //http://localhost:8080/common/zone?id=(t_house的pid)&queryType=(暂定：1查所有社区，2传社区id查所有单元，3传单元id查所有楼栋，4传楼栋id查所有楼层，5传楼层id查所有门牌)
-    //http://192.168.12.11:8080/common/zone?id=4&queryType=5   查id为4楼层下面的所有门牌
+    //(暂定：1传城市id查所有社区，2传社区id查所有单元，3传单元id查所有楼栋，4传楼栋id查所有楼层，5传楼层id查所有门牌)
     @ApiOperation("社区区域查询接口")
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
-    public CommonResult<?> queryZone(@RequestParam(required = true) Integer id, @RequestParam(required = true) Integer queryType) {
+    public CommonResult<?> queryZone(@RequestParam Integer id, @RequestParam Integer queryType) {
         //查询结果Map
         Map<Integer, String> zoneCodeName = null;
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);
         //当枚举类并没有这个查询类型时，抛出400请求参数错误异常
         if (communityType == null) {
-            return CommonResult.error(JSYError.REQUEST_PARAM);
+            return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "查询社区ID不能为空!");
         }
         try {
             //调用 用查询类型ID找到的 对应的查询方法

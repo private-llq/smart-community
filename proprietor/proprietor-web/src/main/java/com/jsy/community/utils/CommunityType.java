@@ -11,7 +11,7 @@ package com.jsy.community.utils;
 public enum CommunityType {
 
     //社区查询类型-1 查询对应Service方法getAllCommunity
-    COMMUNITY_TYPE(1, "getAllCommunity"),
+    COMMUNITY_TYPE(1, "getAllCommunityFormCityId"),
 
     //单元查询类型-2 查询对应Service方法getAllUnitFormCommunity - 通过社区id查询他下面的所有单元
     UNIT_TYPE(2, "getAllUnitFormCommunity"),

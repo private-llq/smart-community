@@ -48,10 +48,10 @@ public class CommonServiceImpl implements ICommonService {
     }
 
     @Override
-    public List<Map> getAllCommunity(Integer id) {
+    public List<Map> getAllCommunityFormCityId(Integer id) {
         //todo 查询社区修改
         log.info("查询所有社区 ID是 {}", id);
-        return commonMapper.getAllCommunity(id);
+        return commonMapper.getAllCommunityFormCityId(id);
 
     }
 

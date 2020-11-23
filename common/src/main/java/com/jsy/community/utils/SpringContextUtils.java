@@ -16,7 +16,7 @@ import java.util.Locale;
  * @since 2020-11-19 10:09
  */
 @Component
-public class SpringContextUtil implements ApplicationContextAware {
+public class SpringContextUtils implements ApplicationContextAware {
 	
 	private static ApplicationContext context = null;
 	
