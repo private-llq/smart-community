@@ -6,12 +6,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.SysUserEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.SysUserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.NameAndCreatorQO;
-import com.jsy.community.service.ISysRoleService;
-import com.jsy.community.service.ISysUserRoleService;
 import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.Constant;
 import com.jsy.community.utils.Query;
@@ -20,7 +17,6 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -31,10 +27,6 @@ import java.util.List;
  */
 @Service("sysUserService")
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity> implements ISysUserService {
-	@Resource
-	private ISysUserRoleService sysUserRoleService;
-	@Resource
-	private ISysRoleService sysRoleService;
 	
 	@Override
 	public IPage<SysUserEntity> queryPage(BaseQO<NameAndCreatorQO> qo) {
@@ -77,8 +69,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		//检查角色是否越权
 		checkRole(user);
 		
-		//保存用户与角色关系
-		sysUserRoleService.saveOrUpdate(user.getId(), user.getRoleIdList());
+		// TODO 保存用户与角色关系
 	}
 	
 	@Override
@@ -94,8 +85,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		//检查角色是否越权
 		checkRole(user);
 		
-		//保存用户与角色关系
-		sysUserRoleService.saveOrUpdate(user.getId(), user.getRoleIdList());
+		//TODO 保存用户与角色关系
 	}
 	
 	@Override
@@ -121,14 +111,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		//如果不是超级管理员，则需要判断用户的角色是否自己创建
 		if (user.getCreateUserId() == Constant.SUPER_ADMIN) {
 			return;
-		}
-		
-		//查询用户创建的角色列表
-		List<Long> roleIdList = sysRoleService.queryRoleIdList(user.getCreateUserId());
-		
-		//判断是否越权
-		if (!roleIdList.containsAll(user.getRoleIdList())) {
-			throw new JSYException("新增用户所选角色，不是本人创建");
 		}
 	}
 }
