@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IMenuService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -40,7 +41,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	private MenuMapper menuMapper;
 	
 	// TODO 首页展示菜单数量 暂定5个
-	private final Integer INDEXMENUCOUNT = 5;
+	private final Integer INDEXMENUCOUNT = 3;
 	
 	@Override
 	public Integer saveMenu(FrontMenuEntity menuEntity) {
@@ -102,7 +103,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
 //		wrapper.ne("parent_id", 0).eq("community_id",communityId).orderByAsc("sort").last("limit " + INDEXMENUCOUNT);
-		wrapper.ne("parent_id", 0).eq("community_id",communityId).eq("status",0).last("limit " + INDEXMENUCOUNT);
+		wrapper.ne("parent_id", 0).eq("community_id", communityId).eq("status", 0).last("limit " + INDEXMENUCOUNT);
 		return menuMapper.selectList(wrapper);
 	}
 	
@@ -131,15 +132,15 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 		FrontMenuVo menuVo = new FrontMenuVo();
 		BeanUtils.copyProperties(menuEntity, menuVo);
 		
-		Long parentId = menuEntity.getParentId();
-		FrontMenuEntity entity = this.common(parentId);
-		if (entity != null) {
-			menuVo.setParentName(entity.getMenuName());
-			log.info("父菜单名：{}" + menuVo.getParentName());
-			return menuVo;
-		}
-		log.info("父菜单名：{}" + menuVo.getParentName());
-		menuVo.setParentName("");
+//		Long parentId = menuEntity.getParentId();
+//		FrontMenuEntity entity = this.common(parentId);
+//		if (entity != null) {
+//			menuVo.setParentName(entity.getMenuName());
+//			log.info("父菜单名：{}" + menuVo.getParentName());
+//			return menuVo;
+//		}
+//		log.info("父菜单名：{}" + menuVo.getParentName());
+//		menuVo.setParentName("");
 		return menuVo;
 	}
 	
@@ -203,6 +204,22 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 			parentMenu.setChildMenus(childMenus);
 		}
 		return list;
+	}
+	
+	@Override
+	public Long addParentMenu(AdminMenuEntity adminMenuEntity) {
+		FrontMenuEntity frontMenuEntity = new FrontMenuEntity();
+		BeanUtils.copyProperties(adminMenuEntity,frontMenuEntity);
+		menuMapper.insert(frontMenuEntity);
+		return frontMenuEntity.getId();//返回新增后数据的id
+	}
+	
+	@Override
+	public void addChildMenu(AdminMenuEntity adminMenuEntity) {
+		FrontMenuEntity entity = new FrontMenuEntity();
+		BeanUtils.copyProperties(adminMenuEntity,entity);
+		menuMapper.insert(entity);
+	
 	}
 	
 	private FrontMenuEntity common(Long parentId) {

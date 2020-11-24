@@ -38,4 +38,7 @@ public class FrontMenuVo implements Serializable {
 	
 	@ApiModelProperty(value = "父菜单名")
 	private String parentName;
+	
+	@ApiModelProperty(value = "父id")
+	private Long parentId;
 }

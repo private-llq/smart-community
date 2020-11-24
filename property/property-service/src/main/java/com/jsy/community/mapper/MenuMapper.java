@@ -12,5 +12,5 @@ import com.jsy.community.entity.FrontMenuEntity;
  * @since 2020-11-14
  */
 public interface MenuMapper extends BaseMapper<FrontMenuEntity> {
-
+	
 }
