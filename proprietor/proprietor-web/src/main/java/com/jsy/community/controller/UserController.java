@@ -11,6 +11,7 @@ import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -55,8 +56,10 @@ public class UserController {
 
 	@PostMapping("proprietorRegister")
 	@ApiOperation("业主登记")
+//	@Login
 	public CommonResult<?> proprietorRegister(@RequestBody UserEntity userEntity){
 		//获取用户id信息
+//		Long uid = JwtUtils.getUserId();
 		Long uid = 12L;
 		//新增业主信息时，必须要携带当前用户的uid
 		userEntity.setId(uid);

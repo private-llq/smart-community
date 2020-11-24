@@ -64,13 +64,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 		// 设置省市区
 		ValueOperations<String, String> ops = redisTemplate.opsForValue();
 		if (user.getProvinceId() != null) {
-			userInfoVo.setProvince(ops.get(user.getProvinceId().toString()));
+			userInfoVo.setProvince(ops.get("RegionSingle:"+user.getProvinceId().toString()));
 		}
 		if (user.getCityId() != null) {
-			userInfoVo.setCity(ops.get(user.getCityId().toString()));
+			userInfoVo.setCity(ops.get("RegionSingle:"+user.getCityId().toString()));
 		}
 		if (user.getAreaId() != null) {
-			userInfoVo.setArea(ops.get(user.getAreaId().toString()));
+			userInfoVo.setArea(ops.get("RegionSingle:"+user.getAreaId().toString()));
 		}
 		
 		return userInfoVo;
@@ -80,11 +80,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 	public UserInfoVo register(RegisterQO qo) {
 		commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 		
-		// 添加业主
+		// 添加业主(user表插入一条空数据)
 		UserEntity user = new UserEntity();
 		save(user);
 		
-		// 添加认证数据
+		// 添加认证数据(user_auth表uid、手机号)
 		UserAuthEntity userAuth = new UserAuthEntity();
 		userAuth.setUid(user.getId());
 		if (RegexUtils.isMobile(qo.getAccount())) {

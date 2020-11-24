@@ -30,8 +30,8 @@ public class CarEntity extends BaseEntity {
     @JsonIgnore
     private Long uid;
 
-    @Range(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "车位id不合法")
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, message = "车位不能为空")
+//    @Range(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "车位id不合法")
+//    @NotNull(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, message = "车位不能为空")
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
@@ -50,19 +50,18 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆照片访问路径")
     private String carImageUrl;
 
-    @Pattern(groups = {addCarValidated.class, updateCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class}, message = "手机号码未输入!")
+//    @Pattern(groups = {addCarValidated.class, updateCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+//    @NotNull(groups = {addCarValidated.class, updateCarValidated.class}, message = "手机号码未输入!")
     @ApiModelProperty(value = "车主联系方式")
     private String contact;
 
-    @NotBlank(groups = {addCarValidated.class, updateCarValidated.class}, message = "车辆所属人不能为空!")
-
+//    @NotBlank(groups = {addCarValidated.class, updateCarValidated.class}, message = "车辆所属人不能为空!")
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @NotBlank(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, message = "车辆类型未选择!")
+    @NotNull(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, message = "车辆类型未选择!")
     @ApiModelProperty(value = "车辆类型")
-    private String carType;
+    private Integer carType;
 
     @ApiModelProperty(value = "是否通过审核")
     private Integer checkStatus;

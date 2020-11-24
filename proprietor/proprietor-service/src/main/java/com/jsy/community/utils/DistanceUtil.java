@@ -19,7 +19,7 @@ public class DistanceUtil {
     //private static DecimalFormat formatter = new DecimalFormat("00.00");
     
     public static Map<String, Object> getDistance(double longitudeFrom, double latitudeFrom, double longitudeTo, double latitudeTo) {
-    	Map<String, Object> map = new HashMap<String,Object>();
+    	Map<String, Object> map = new HashMap<>();
         GlobalCoordinates source = new GlobalCoordinates(latitudeFrom, longitudeFrom);
         GlobalCoordinates target = new GlobalCoordinates(latitudeTo, longitudeTo);
         double distance;

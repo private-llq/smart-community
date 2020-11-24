@@ -76,6 +76,7 @@ public class RegionTask {
 			cityMap.put(String.valueOf(c), new LinkedList<>());
 		}
 		for (RegionEntity regionEntity : allRegion) {
+			redisTemplate.opsForValue().set("RegionSingle:"+regionEntity.getId(),regionEntity.getName());
 			//找到所有零级区域(国家)
 			//if("0".equals(regionEntity.getPid())){
 			if(regionEntity.getPid() == 0){
