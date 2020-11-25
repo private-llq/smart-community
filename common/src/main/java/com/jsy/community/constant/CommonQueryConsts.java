@@ -1,6 +1,9 @@
 package com.jsy.community.constant;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,6 +21,10 @@ public interface CommonQueryConsts {
 	 */
 	Integer QUERY_HOUSE_MEMBER_INVITATION = 2;
 	
+	/**
+	 * 资源类查询类型
+	 */
+	Map<String,List<Map<String, Object>>> sourceMap = new HashMap<>();
 	
 	/**
 	 * 省市区查询类型
@@ -102,14 +109,17 @@ public interface CommonQueryConsts {
 			return this.code+"_"+this.name;
 		}
 		
+		public static final List<Map<String, Object>> carTypeList = new ArrayList<>();
 		public static final Map<Integer, String> carTypeMap = new HashMap<>();
 		static {
 			for(CarTypeEnum regionQueryTypeEnum : CarTypeEnum.values()){
 				HashMap<String, Object> map = new HashMap<>();
 				map.put("code", regionQueryTypeEnum.getCode());
 				map.put("name", regionQueryTypeEnum.getName());
+				carTypeList.add(map);
 				carTypeMap.put(regionQueryTypeEnum.getCode(), regionQueryTypeEnum.getName());
 			}
+			sourceMap.put("carType",carTypeList);
 		}
 	}
 	
