@@ -1,0 +1,46 @@
+package com.jsy.community.vo;
+
+import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
+
+/**
+ * @author lihao
+ * @ClassName UserHouseVo
+ * @Date 2020/11/25  16:11
+ * @Description 物业端业主房屋认证审核信息
+ * @Version 1.0
+ **/
+public class UserHouseVo implements Serializable {
+	
+	@ApiModelProperty(value = "业主")
+	private String nickname;
+	
+	@ApiModelProperty(value = "社区id")
+	private Long communityId;
+	
+	@ApiModelProperty(value = "所属社区")
+	private String name;
+	
+	@ApiModelProperty(value = "门牌ID")
+	private Long houseId;
+	
+	@ApiModelProperty(value = "楼栋名")
+	private String building;
+	
+	@ApiModelProperty(value = "单元名")
+	private String unit;
+	
+	@ApiModelProperty(value = "楼层名")
+	private String floor;
+	
+	@ApiModelProperty(value = "门牌名")
+	private String door;
+	
+	@ApiModelProperty(value = "门牌唯一标识")
+	private String code;
+	
+	@ApiModelProperty(value = "是否通过审核")
+	private Integer checkStatus;
+	
+}
