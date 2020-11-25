@@ -32,4 +32,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @return 返回通过社区名称和城市id查询结果
 	 */
     List<CommunityEntity> getCommunityByName(CommunityEntity communityEntity);
+	
+    /**
+    * @Description: 小区定位
+     * @Param: [uid, location]
+     * @Return: com.jsy.community.entity.CommunityEntity
+     * @Author: chq459799974
+     * @Date: 2020/11/25
+    **/
+    CommunityEntity locateCommunity(Long uid,Map<String,Double> location);
 }

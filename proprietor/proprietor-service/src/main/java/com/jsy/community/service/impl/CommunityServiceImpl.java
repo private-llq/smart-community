@@ -7,6 +7,7 @@ import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.mapper.CommunityMapper;
+import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.DistanceUtil;
@@ -15,8 +16,6 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,6 +32,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	
 	@Autowired
 	private CommunityMapper communityMapper;
+	
+	@Autowired
+	private UserHouseMapper userHouseMapper;
 	
 	@Override
 	public Page<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO){
@@ -108,6 +110,20 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 			communityEntityList.sort(Comparator.comparing(CommunityEntity::getDistanceDouble));
 		}
 		return communityEntityList;
+	}
+	
+	/**
+	* @Description: 小区定位
+	 * @Param: [uid, location]
+	 * @Return: com.jsy.community.entity.CommunityEntity
+	 * @Author: chq459799974
+	 * @Date: 2020/11/25
+	**/
+	@Override
+	public CommunityEntity locateCommunity(Long uid,Map<String,Double> location){
+		// 查业主房屋所属社区id
+		List<Long> communityIds = userHouseMapper.queryUserCommunityId(uid);
+		return communityMapper.locateCommunity(communityIds,location);
 	}
 
 }

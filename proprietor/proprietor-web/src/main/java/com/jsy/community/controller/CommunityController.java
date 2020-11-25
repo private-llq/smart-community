@@ -17,6 +17,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -54,6 +55,19 @@ public class CommunityController {
 		//验证请求参数
 		ValidatorUtils.validateEntity(communityEntity, CommunityEntity.GetCommunityByName.class);
 		return CommonResult.ok(iCommunityService.getCommunityByName(communityEntity));
+	}
+	
+	/**
+	* @Description: 小区定位
+	 * @Param: [uid, location]
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.entity.CommunityEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/25
+	**/
+	@ApiOperation("社区定位")
+	@PostMapping("locate")
+	public CommonResult<CommunityEntity> locate(Long uid, @RequestBody Map<String,Double> location){
+		return CommonResult.ok(iCommunityService.locateCommunity(uid,location));
 	}
 	
 }

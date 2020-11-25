@@ -5,4 +5,17 @@
         <select id="getCommunityByName" resultType="com.jsy.community.entity.CommunityEntity">
             select id,name,detail_address,lon,lat from t_community where name like concat('%',#{name},'%') and city_id = #{cityId}
         </select>
+
+        <!-- 小区定位 -->
+        <select id="locateCommunity" parameterType="java.util.List" resultType="com.jsy.community.entity.CommunityEntity">
+            select * from t_community
+            <if test="ids != null and ids.size != 0">
+                where id in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+            order by get_distance(#{location.lon},#{location.lat},lon,lat)
+            limit 1
+        </select>
 </mapper>
