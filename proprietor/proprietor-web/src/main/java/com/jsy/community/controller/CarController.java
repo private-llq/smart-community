@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -146,7 +147,7 @@ public class CarController {
     @ApiOperation("所属人车辆图片上传接口")
     @ApiImplicitParam(name = "carImage", value = "车辆图片文件")
     @PostMapping(value = "carImageUpload")
-    public CommonResult<?> carImageUpload(MultipartFile carImage) throws IOException {
+    public CommonResult<?> carImageUpload(MultipartFile carImage, HttpServletRequest request) throws IOException {
         //1.接口非空验证
         if (null == carImage) {
             return CommonResult.error(JSYError.BAD_REQUEST);
@@ -157,11 +158,15 @@ public class CarController {
             return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件太大了,最大：" + carImageMaxSizeKB + "KB");
         }
         String fileName = carImage.getOriginalFilename();
+        log.info("用户请求头：{}", request.getHeader("user-agent"));
         log.info("车辆图片上传文件名：" + fileName + " 车辆图片文件大小：" + fileSizeForKB + "KB");
         //3.文件后缀验证
-        boolean extension = FilenameUtils.isExtension(fileName, carImageAllowSuffix);
-        if (!extension) {
-            return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件后缀不允许,可用后缀" + Arrays.asList(carImageAllowSuffix));
+        if(!isMobileClient(request.getHeader("user-agent"))){
+            //如果是PC端访问上传接口 则需要验证文件后缀名
+            boolean extension = FilenameUtils.isExtension(fileName, carImageAllowSuffix);
+            if (!extension) {
+                return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件后缀不允许,可用后缀" + Arrays.asList(carImageAllowSuffix));
+            }
         }
         //4.调用上传车辆图片服务接口 进行上传文件
         String resultUrl = carService.carImageUpload(carImage.getBytes(), fileName);
@@ -171,5 +176,14 @@ public class CarController {
         return CommonResult.ok(resultUrl);
     }
 
+    /**
+     * 判断是否是移动端访问请求
+     * @param userAgent  请求头
+     */
+    public boolean isMobileClient(String userAgent){
+        if (userAgent.contains("Android")) {
+            return true;
+        } else return userAgent.contains("iPhone") || userAgent.contains("iPad");
+    }
 
 }
