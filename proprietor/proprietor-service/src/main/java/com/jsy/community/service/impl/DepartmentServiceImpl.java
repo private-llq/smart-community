@@ -28,7 +28,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	@Override
 	public List<DepartmentEntity> listDepartment(Long id) {
 		QueryWrapper<DepartmentEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("community_id",id).select("limit 10");
+		queryWrapper.eq("community_id",id).last("limit 10");
 		return departmentMapper.selectList(queryWrapper);
 	}
 }

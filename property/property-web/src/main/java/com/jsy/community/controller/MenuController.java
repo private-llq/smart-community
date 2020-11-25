@@ -77,7 +77,20 @@ public class MenuController {
 		List<AdminMenuEntity> list = adminMenuService.listChildMenu();
 		return CommonResult.ok(list);
 	}
-
+	
+	/**
+	 * @return com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.AdminMenuEntity>>
+	 * @Author lihao
+	 * @Description 根据父菜单id查询其子菜单信息
+	 * @Date 2020/11/25 9:10
+	 * @Param [parentId]
+	 **/
+	@ApiOperation("根据父菜单id查询其子菜单信息")
+	@GetMapping("/listChildMenuById")
+	public CommonResult<List<AdminMenuEntity>> listChildMenuById(@RequestParam("parentId") Long parentId) {
+		List<AdminMenuEntity> list = adminMenuService.listChildMenuById(parentId);
+		return CommonResult.ok(list);
+	}
 
 //	// TODO 表单形式添加菜单信息
 //	@ApiOperation("添加菜单信息")
@@ -104,6 +117,13 @@ public class MenuController {
 //		return CommonResult.ok();
 //	}
 	
+	/**
+	 * @return com.jsy.community.vo.CommonResult
+	 * @Author lihao
+	 * @Description 删除菜单信息
+	 * @Date 2020/11/25 9:13
+	 * @Param [id]
+	 **/
 	@ApiOperation("删除菜单信息")
 	@DeleteMapping("/removeMenu")
 	public CommonResult removeMenu(@RequestParam("id") Long id) {
@@ -128,6 +148,13 @@ public class MenuController {
 //		}
 //	}
 	
+	/**
+	 * @return com.jsy.community.vo.CommonResult
+	 * @Author lihao
+	 * @Description 新增父菜单信息
+	 * @Date 2020/11/25 9:13
+	 * @Param [adminMenuEntity]
+	 **/
 	@ApiOperation("新增父菜单信息")
 	@PostMapping("/addParentMenu")
 	public CommonResult addParentMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
@@ -135,6 +162,13 @@ public class MenuController {
 		return CommonResult.ok(parentId);//返回新增后数据的id
 	}
 	
+	/**
+	 * @return com.jsy.community.vo.CommonResult
+	 * @Author lihao
+	 * @Description 新增子菜单信息
+	 * @Date 2020/11/25 9:13
+	 * @Param [adminMenuEntity]
+	 **/
 	@ApiOperation("新增子菜单信息")
 	@PostMapping("/addChildMenu")
 	public CommonResult addChildMenu(@RequestBody AdminMenuEntity adminMenuEntity) {

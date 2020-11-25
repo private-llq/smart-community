@@ -38,4 +38,11 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 		queryWrapper.ne("parent_id",0);
 		return adminMenuMapper.selectList(queryWrapper);
 	}
+	
+	@Override
+	public List<AdminMenuEntity> listChildMenuById(Long parentId) {
+		QueryWrapper<AdminMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("parent_id",parentId);
+		return adminMenuMapper.selectList(queryWrapper);
+	}
 }

@@ -32,4 +32,13 @@ public interface IAdminMenuService extends IService<AdminMenuEntity> {
 	 * @Param []
 	 **/
 	List<AdminMenuEntity> listChildMenu();
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.AdminMenuEntity>
+	 * @Author lihao
+	 * @Description 根据父菜单id查询其子菜单
+	 * @Date 2020/11/25 9:10
+	 * @Param [parentId]
+	 **/
+	List<AdminMenuEntity> listChildMenuById(Long parentId);
 }
