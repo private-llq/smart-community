@@ -11,8 +11,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +58,7 @@ public class CommonController {
 	
 	@ApiOperation("查询下级省市区、查询城市等")
     @GetMapping("/region")
-    public CommonResult<?> queryRegion(@RequestParam(required = true) Integer queryType,Integer regionNumber) {
+    public CommonResult<?> queryRegion(@RequestParam Integer queryType,Integer regionNumber) {
         String queryMethodName = CommonQueryConsts.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType);
         if(queryMethodName == null){
             return CommonResult.error(JSYError.REQUEST_PARAM);
@@ -82,5 +84,5 @@ public class CommonController {
             return CommonResult.error(JSYError.NOT_FOUND);
         }
     }
-
+    
 }
