@@ -1,13 +1,17 @@
 package com.jsy.community.utils;
 
+import cn.hutool.core.io.FileUtil;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.vo.FileVo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,5 +67,24 @@ public class FileUploadUtils {
 	public void delete() {
 	
 	}
-	
+
+	/**
+	 *  获取Resource下面的文件绝对路径
+	 * @author YuLF
+	 * @since  2020/11/25 15:56
+	 * @Param  resource   resource下面胡目录
+	 * @return            返回资源在resource下面的绝对路径
+	 */
+	public static String getResourceFilePath(String resource)  {
+		try {
+			String path = ResourceUtils.getURL("classpath:").getPath() + resource;
+			if(new File(path).exists()){
+				return path;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }
