@@ -20,6 +20,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -103,6 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 		return vo;
 	}
 
+	@Transactional
 	@Override
 	public Boolean proprietorRegister(UserEntity userEntity) {
 		//添加业主信息
@@ -120,6 +123,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 			//登记车辆
 			carService.addProprietorCar(userEntity.getCarEntity());
 		}
+		//t_user_house 中插入当前这条记录 为了让别人审核
+
 		return true;
 	}
 }
