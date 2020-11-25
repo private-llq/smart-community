@@ -1,7 +1,8 @@
 spring:
   redis:
     port: 6379
-    host: localhost
+    host: 222.178.212.29
+    password: smart99--
     database: 0
     lettuce:
       pool:

@@ -51,8 +51,8 @@ public class CaptchaServiceImpl implements ICaptchaService {
 		// 验证码暂时固定1111
 		String code = "1111";
 		
-		// 5分钟有效期
-		redisTemplate.opsForValue().set(mobile, code, mobileExpiredTime, TimeUnit.MINUTES);
+		// 5分钟有效期(暂时10小时)
+		redisTemplate.opsForValue().set(mobile, code, mobileExpiredTime, TimeUnit.HOURS);
 		
 		return true;
 	}

@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.vo.menu.FrontMenuVo;
@@ -108,4 +109,22 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Param []
 	 **/
 	List<FrontParentMenu> listMenu();
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 新增父菜单
+	 * @Date 2020/11/23 17:28
+	 * @Param [frontMenuEntity]
+	 **/
+	Long addParentMenu(AdminMenuEntity adminMenuEntity);
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 新增子菜单
+	 * @Date 2020/11/23 17:32
+	 * @Param [frontMenuEntity]
+	 **/
+	void addChildMenu(AdminMenuEntity adminMenuEntity);
 }

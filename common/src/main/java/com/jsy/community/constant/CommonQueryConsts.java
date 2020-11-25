@@ -65,4 +65,52 @@ public interface CommonQueryConsts {
 		}
 	}
 	
+	/**
+	 * 车辆类型
+	 */
+	enum CarTypeEnum {
+		TINY("微型车", 1),
+		SMALL("小型车", 2),
+		COMPACT("紧凑型车",3),
+		MIDDLE("中型车",4),
+		ML("中大型车",5);
+		private String name;
+		private Integer code;
+		CarTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public Integer getCode() {
+			return code;
+		}
+		
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+		
+		@Override
+		public String toString() {
+			return this.code+"_"+this.name;
+		}
+		
+		public static final Map<Integer, String> carTypeMap = new HashMap<>();
+		static {
+			for(CarTypeEnum regionQueryTypeEnum : CarTypeEnum.values()){
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", regionQueryTypeEnum.getCode());
+				map.put("name", regionQueryTypeEnum.getName());
+				carTypeMap.put(regionQueryTypeEnum.getCode(), regionQueryTypeEnum.getName());
+			}
+		}
+	}
+	
 }

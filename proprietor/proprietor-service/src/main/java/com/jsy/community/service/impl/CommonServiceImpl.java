@@ -44,7 +44,7 @@ public class CommonServiceImpl implements ICommonService {
         }
 
         // 验证通过后删除验证码
-        redisTemplate.delete(account);
+//        redisTemplate.delete(account);
     }
 
     @Override

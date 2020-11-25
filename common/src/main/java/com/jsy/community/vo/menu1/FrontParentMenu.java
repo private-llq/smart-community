@@ -22,6 +22,8 @@ public class FrontParentMenu implements Serializable {
 	
 	private Long id;
 	
+	private Long parentId;
+	
 	@ApiModelProperty(value = "菜单名")
 	private String menuName;
 	

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class SysUserTokenEntity extends BaseEntity {
 	
 	//用户ID
-	@TableId(type = IdType.INPUT)
+//	@TableId(type = IdType.INPUT)
 	private Long userId;
 	//token
 	private String token;

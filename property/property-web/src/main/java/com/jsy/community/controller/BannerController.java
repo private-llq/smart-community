@@ -29,10 +29,10 @@ import java.util.List;
 @RequestMapping("/banner")
 @ApiJSYController
 public class BannerController {
-	
+
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IBannerService iBannerService;
-	
+
 	/**
 	 * @Description: 轮播图列表查询
 	 * @Param: [bannerQO]
@@ -41,13 +41,13 @@ public class BannerController {
 	 * @Date: 2020/11/16
 	 **/
 	@ApiOperation("【轮播图】列表查询")
-	@PostMapping("list")
+	@PostMapping("/list")
 	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
 		ValidatorUtils.validateEntity(bannerQO, BannerQO.queryBannerValidatedGroup.class);
 		List<BannerVO> returnList = iBannerService.queryBannerList(bannerQO);
 		return CommonResult.ok(returnList);
 	}
-	
+
 	/**
 	* @Description: 轮播图 上传
 	 * @Param: [file, bannerEntity]
@@ -72,7 +72,7 @@ public class BannerController {
 		}
 		return CommonResult.error(JSYError.INTERNAL);
 	}
-	
+
 	/**
 	* @Description: 轮播图 批量删除
 	 * @Param: [bannerQO]
