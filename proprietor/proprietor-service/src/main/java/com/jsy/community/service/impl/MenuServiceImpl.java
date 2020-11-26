@@ -31,13 +31,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	@Autowired
 	private MenuMapper menuMapper;
 	
-	// TODO 首页展示菜单数量 暂定5个
+	// TODO 首页展示菜单数量 暂定3个
 	private final Integer INDEXMENUCOUNT = 3;
 	
 	@Override
 	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
-//		wrapper.ne("parent_id", 0).eq("community_id",communityId).orderByAsc("sort").last("limit " + INDEXMENUCOUNT);
 		wrapper.ne("parent_id", 0).eq("community_id",communityId).eq("status",0).last("limit " + INDEXMENUCOUNT);
 		return menuMapper.selectList(wrapper);
 	}

@@ -23,7 +23,7 @@ import java.util.List;
  * @Date 2020/11/14 22:10
  * @Param
  **/
-@Api(tags = "物业端前台菜单控制器")
+@Api(tags = "物业端控制本小区菜单控制器")
 @RestController
 @RequestMapping("/menu")
 @Login(allowAnonymous = true)

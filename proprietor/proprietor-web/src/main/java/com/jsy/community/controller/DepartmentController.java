@@ -21,13 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * <p>
- * 前端控制器
- * </p>
- *
- * @author jsy
- * @since 2020-11-24
- */
+ * @return
+ * @Author lihao
+ * @Description 社区通讯录
+ * @Date 2020/11/27 6:42
+ * @Param
+ **/
 @Api(tags = "社区通讯录控制器")
 @RestController
 @RequestMapping("/department")
@@ -50,7 +49,7 @@ public class DepartmentController {
 	 **/
 	@ApiOperation("查询所有部门信息")
 	@GetMapping("/listDepartment")
-	public CommonResult<List<DepartmentEntity>> listDepartment(@ApiParam(value = "部门id")
+	public CommonResult<List<DepartmentEntity>> listDepartment(@ApiParam(value = "社区id")
 	                                                           @RequestParam(required = true) Long id) {
 		List<DepartmentEntity> departmentList = departmentService.listDepartment(id);
 		return CommonResult.ok(departmentList);
@@ -65,7 +64,8 @@ public class DepartmentController {
 	 **/
 	@ApiOperation("根据部门查询联系方式")
 	@GetMapping("/listStaffPhone")
-	public CommonResult<List<DepartmentStaffEntity>> listStaffPhone(@RequestParam(required = true) Long departmentId) {
+	public CommonResult<List<DepartmentStaffEntity>> listStaffPhone(@ApiParam(value = "部门id")
+	                                                                @RequestParam(required = true) Long departmentId) {
 		List<DepartmentStaffEntity> staffEntityList = departmentStaffService.listStaffPhone(departmentId);
 		return CommonResult.ok(staffEntityList);
 	}
