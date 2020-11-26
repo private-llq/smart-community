@@ -38,12 +38,12 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	
 	/**
 	* @Description: 成员确认加入房间
-	 * @Param: [id]
+	 * @Param: [houseMemberEntity]
 	 * @Return: boolean
 	 * @Author: chq459799974
-	 * @Date: 2020/11/23
+	 * @Date: 2020/11/26
 	**/
-	boolean confirmJoin(Long id);
+	boolean confirmJoin(HouseMemberEntity houseMemberEntity);
 	
 	/**
 	* @Description: 分页查询成员/查询邀请

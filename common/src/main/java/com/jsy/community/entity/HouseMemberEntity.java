@@ -42,12 +42,13 @@ public class HouseMemberEntity extends  BaseEntity implements Serializable {
     @NotNull(groups = {addHouseMemberValidatedGroup.class}, message = "缺少房间ID")
     private Long houseId;
 
+    @JsonIgnore
     @ApiModelProperty(value = "被操作人有无确认 0.否 1.是")
     private Integer isConfirm;
     
-    @JsonIgnore
-    @ApiModelProperty(value = "操作人ID")
-    private Long createBy;
+    @ApiModelProperty(value = "房主ID")
+    @NotNull(groups = {updateHouseMemberValidatedGroup.class}, message = "缺少社区ID")
+    private Long householderId;
     
     /**
      * 新增访客验证组
