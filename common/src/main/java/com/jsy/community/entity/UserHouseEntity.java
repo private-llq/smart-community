@@ -32,7 +32,7 @@ public class UserHouseEntity extends BaseEntity {
     @ApiModelProperty(value = "楼栋ID")
     private Long houseId;
 
-    @ApiModelProperty(value = "是否通过审核")
+    @ApiModelProperty(value = "是否通过审核 0.否 1.是 2.审核中")
     private Integer checkStatus;
 
 }
