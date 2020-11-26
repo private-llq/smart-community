@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class RegexUtils {
 
 	/**
-	 * 正则表达式：验证性别 参数只能 0-2
+	 * 正则表达式：验证数字性别 参数只能 0-2
 	 */
 	public static final String REGEX_GENDER = "^[0-2]{1}";
 
@@ -65,7 +65,17 @@ public class RegexUtils {
 	 * 正则表达式：验证IP地址
 	 */
 	public static final String REGEX_IP_ADDR = "(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)";
-	
+
+	/**
+	 * 校验姓名
+	 *
+	 * @param nickName 姓名
+	 * @return 校验通过返回true，否则返回false
+	 */
+	public static boolean isRealName(String nickName) {
+		return Pattern.matches(REGEX_REAL_NAME, nickName);
+	}
+
 	/**
 	 * 校验用户名
 	 *

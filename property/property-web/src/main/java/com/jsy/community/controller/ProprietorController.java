@@ -4,18 +4,16 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
-import com.jsy.community.util.ProprietorExcelFactory;
+import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,14 +39,10 @@ public class ProprietorController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IHouseService iHouseService;
-    
-    /**
-     * 社区信息表常量 后期使用时放入Spring配置文件
-     */
-    private static final String PROPROETOR_REGISTER_EXCEL = "社区业主信息录入表";
 
 
     /**
+     * http://localhost:7001/api/v1/property/proprietor/downloadExcel?communityId=1
      * 下载录入业主信息excel、模板
      * @return          返回Excel模板
      */
@@ -57,7 +51,7 @@ public class ProprietorController {
         //1.设置响应格式  设置响应头
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
         //1.1设置响应类型为附件类型直接下载这种
-        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode(PROPROETOR_REGISTER_EXCEL + ".xlsx", StandardCharsets.UTF_8));
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode(ProprietorExcelCommander.PROPROETOR_REGISTER_EXCEL + ".xlsx", StandardCharsets.UTF_8));
         //1.2设置响应的文件mime类型为 xls类型
         multiValueMap.set("Content-type", "application/vnd.ms-excel");
         //2.生成Excel模板
@@ -65,7 +59,7 @@ public class ProprietorController {
             //2.1 查出数据库当前社区的所有楼栋、单元、楼层、门牌 用于excel模板录入业主信息选择
             List<HouseEntity> communityArchitecture = iHouseService.getCommunityArchitecture(communityId);
             //2.2 生成Excel 业主信息录入模板
-            Workbook workbook = ProprietorExcelFactory.generateExcel(communityArchitecture, PROPROETOR_REGISTER_EXCEL);
+            Workbook workbook = ProprietorExcelCommander.exportProprietorExcel(communityArchitecture);
             //2.3 把workbook转换为字节输入流
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             workbook.write(bos);
@@ -88,37 +82,22 @@ public class ProprietorController {
      * @return                  返回效验或登记结果
      */
     @PostMapping("/importProprietorExcel")
-    public CommonResult<Boolean> importProprietorExcel(MultipartFile proprietorExcel, Long communityId){
+    public CommonResult<?> importProprietorExcel(MultipartFile proprietorExcel, Long communityId){
         //参数非空验证
         if(null == proprietorExcel || communityId == null){
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
         //文件后缀验证
-        boolean extension = FilenameUtils.isExtension(proprietorExcel.getOriginalFilename(), "xls,xlsx");
+        boolean extension = FilenameUtils.isExtension(proprietorExcel.getOriginalFilename(), ProprietorExcelCommander.SUPPORT_EXCEL_EXTENSION);
         if (!extension) {
             return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "只支持excel文件!" );
         }
-        //读取excel文件
-
-        //WorkbookFactory.create();
-        return null;
+        //解析Excel
+        List<UserEntity> userEntityList = ProprietorExcelCommander.importProprietorExcel(proprietorExcel);
+        //做数据库写入 userEntityList 读出来的数据
+        //todo 数据库信息写入
+        return CommonResult.ok(userEntityList);
     }
 
-    public void readProprietorExcel(InputStream inputStream){
-        try {
-            //把文件流转换为工作簿
-            Workbook workbook = WorkbookFactory.create(inputStream);
-            //从工作簿中读取工作表
-            Sheet sheetAt = workbook.getSheetAt(0);
-            //如果只是一个空excel文件
-            if(sheetAt == null){
-                throw new JSYException(JSYError.BAD_REQUEST.getCode(), "excel文件信息无效!");
-            }
-        } catch (IOException e) {
-            log.error("com.jsy.community.controller.ProprietorController.readProprietorExcel：{}", e.getMessage());
-            throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), e.getMessage());
-        }
-
-    }
 
 }
