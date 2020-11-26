@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
@@ -14,6 +13,8 @@ import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.PageVoUtils;
 import com.jsy.community.vo.UserHouseVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -46,20 +47,18 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	private HouseMapper houseMapper;
 	
 	@Override
-	public Page<UserHouseVo> selectUserHouse(BaseQO<UserHouseEntity> baseQO,Long communityId) {
+	public PageInfo<UserHouseVo> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId) {
 		List<UserHouseVo> userHouseVos = new ArrayList<>();
-		Page<UserHouseVo> userHouseVoPage = new Page<>();
 		
-		Page<UserHouseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
 		QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("community_id",communityId);
-		Page<UserHouseEntity> selectPage = userHouseMapper.selectPage(page, wrapper);
+		wrapper.eq("community_id", communityId);
+		List<UserHouseEntity> list = userHouseMapper.selectList(wrapper);
 		
-		for (UserHouseEntity userHouseEntity : selectPage.getRecords()) {
+		for (UserHouseEntity userHouseEntity : list) {
 			UserHouseVo houseVo = new UserHouseVo();
 			
 			// 业主房屋认证信息
-			BeanUtils.copyProperties(userHouseEntity,houseVo);
+			BeanUtils.copyProperties(userHouseEntity, houseVo);
 			
 			// 业主名称
 			Long uid = userHouseEntity.getUid();
@@ -75,21 +74,15 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			// 社区楼栋信息
 			Long houseId = userHouseEntity.getHouseId();
 			HouseEntity houseEntity = houseMapper.selectById(houseId);
-			BeanUtils.copyProperties(houseEntity,houseVo);
+			BeanUtils.copyProperties(houseEntity, houseVo);
 			
 			userHouseVos.add(houseVo);
 		}
-		long current = page.getCurrent();
-		long size = page.getSize();
 		
-		int start = (int) ((current - 1) * size);
-		int end = (int) (current * size);
-		
-		if (end>userHouseVos.size()) {
-			end = userHouseVos.size();
-		}
-		userHouseVos.subList(start,end);
-		return userHouseVoPage.setRecords(userHouseVos);
+		long current = baseQO.getPage();
+		long size = baseQO.getSize();
+		long total = list.size();
+		return PageVoUtils.page(current, total, size, userHouseVos);
 	}
 	
 }

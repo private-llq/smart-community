@@ -9,7 +9,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.proprietor.LoginQO;
@@ -20,7 +19,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -51,6 +49,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
+	
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private IUserHouseService userHouseService;
 	
 	@Override
 	public UserInfoVo login(LoginQO qo) {
@@ -124,7 +125,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 			carService.addProprietorCar(userEntity.getCarEntity());
 		}
 		//t_user_house 中插入当前这条记录 为了让别人审核
-
+//		userHouseService.saveUserHouse()
+		
 		return true;
 	}
 }
