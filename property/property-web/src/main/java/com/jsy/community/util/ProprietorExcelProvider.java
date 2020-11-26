@@ -2,23 +2,25 @@ package com.jsy.community.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.jsy.community.entity.HouseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.*;
-
 import java.util.*;
 
 /**
  * @author YuLF
  * @since 2020-11-26 09:48
+ * 业主信息录入.xlsx 下载 模板提供类
  */
-public class ProprietorExcelFactory {
+@Slf4j
+public class ProprietorExcelProvider extends JSYExcelAbstract {
 
     /**
      * 业主信息录入表.xlsx 字段
      */
-    private static final String[] TITLE_FIELD = {"姓名", "性别", "楼栋", "单元", "楼层", "门牌", "身份证", "联系方式", "详细地址"};
+    public static final String[] TITLE_FIELD = {"姓名", "性别", "楼栋", "单元", "楼层", "门牌", "身份证", "联系方式", "详细地址"};
 
 
     /**
@@ -26,17 +28,21 @@ public class ProprietorExcelFactory {
      */
     private static final int VALID_CONSTRAINT_ROW = 5000;
 
+
+
+
     /**
      * 生成录入业主信息excel 模板 返回excel数据流
      *
      * @return 返回生成好的excel模板数据流，供控制层直接输出响应excel.xlsx文件
      * @author YuLF
      * @Param workbook                 excel工作簿对象
-     * @Param communityArchitecture    excel列约束  数据集合 楼栋、单元、楼层、门牌
+     * @Param entityList               excel列约束  数据集合 楼栋、单元、楼层、门牌
      * @Param workSheetName            打开excel 的Sheet 工作表名称
      * @since 2020/11/26 9:50
      */
-    public static Workbook generateExcel(List<HouseEntity> communityArchitecture, String workSheetName) {
+    @Override
+    public  Workbook exportProprietorExcel(List<?> entityList, String workSheetName) {
         //2.2 创建excel 工作簿对象
         Workbook workbook = new XSSFWorkbook();
         //创建 一个工作表
@@ -75,7 +81,7 @@ public class ProprietorExcelFactory {
             //性别、楼栋、单元、楼层、门牌单元格 列 选择约束添加限制
             if (i > 0 && i <= 5) {
                 //绑定约束验证器
-                sheet.addValidationData(setBox(sheet, communityArchitecture, i));
+                sheet.addValidationData(setBox(sheet, entityList, i));
             }
             XSSFCell cell1 = row2.createCell(i);
             cell1.setCellValue(TITLE_FIELD[i]);
@@ -92,7 +98,7 @@ public class ProprietorExcelFactory {
      * @Param  communityArchitecture    数据库的楼栋、单元、楼层、门牌号List数据
      * @return 返回绑定好的数据验证器  用于单元格绑定这个验证器
      */
-    private static DataValidation setBox(XSSFSheet sheet, List<HouseEntity> communityArchitecture, int constraintColIndex) {
+    private static DataValidation setBox(XSSFSheet sheet, List<?> communityArchitecture, int constraintColIndex) {
         CellRangeAddressList addressList = new CellRangeAddressList(2, VALID_CONSTRAINT_ROW, constraintColIndex, constraintColIndex);
         //通过传过来的 约束列constraintColIndex 获得List中的约束数据
         String[] constraintData = getConstraintSet(communityArchitecture, constraintColIndex);
@@ -120,9 +126,10 @@ public class ProprietorExcelFactory {
      * @param colIndex                  列类型：表明性别、楼栋、单元、楼层、门牌
      * @return                          返回去重好的字段 String数组
      */
-    private static String[] getConstraintSet(List<HouseEntity> communityArchitecture, int colIndex) {
+    private static String[] getConstraintSet(List<?> communityArchitecture, int colIndex) {
         Set<String> set = new HashSet<>();
-        for (HouseEntity next : communityArchitecture) {
+        for (Object object : communityArchitecture) {
+            HouseEntity houseEntity = (HouseEntity)object;
             switch (colIndex) {
                 //TITLE_FIELD 索引1为性别
                 case 1:
@@ -130,28 +137,28 @@ public class ProprietorExcelFactory {
                     break;
                 //TITLE_FIELD 索引2为楼栋
                 case 2:
-                    String building = next.getBuilding();
+                    String building = houseEntity.getBuilding();
                     if (StrUtil.isNotEmpty(building)) {
                         set.add(building);
                     }
                     break;
                 //TITLE_FIELD 索引3为单元
                 case 3:
-                    String unit = next.getUnit();
+                    String unit = houseEntity.getUnit();
                     if(StrUtil.isNotEmpty(unit)){
                         set.add(unit);
                     }
                     break;
                 //TITLE_FIELD 索引4为楼层
                 case 4:
-                    String floor = next.getFloor();
+                    String floor = houseEntity.getFloor();
                     if(StrUtil.isNotEmpty(floor)){
                         set.add(floor);
                     }
                     break;
                 //TITLE_FIELD 索引5为门牌
                 case 5:
-                    String door = next.getDoor();
+                    String door = houseEntity.getDoor();
                     if(StrUtil.isNotEmpty(door)){
                         //加 [] 避免excel自动转换为日期格式 如序列值为1-2 被转换为1月2日
                         set.add("["+door+"]");
@@ -163,5 +170,6 @@ public class ProprietorExcelFactory {
         }
         return set.toArray(new String[0]);
     }
+
 
 }

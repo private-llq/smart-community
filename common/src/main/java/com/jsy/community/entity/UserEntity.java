@@ -32,6 +32,9 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("头像地址")
 	private String avatarUrl;
+
+	@ApiModelProperty("电话号码")
+	private String mobile;
 	
 	@ApiModelProperty("性别，0未知，1男，2女")
 	@NotNull(groups = {ProprietorRegister.class}, message = "性别未选择!")
@@ -70,6 +73,10 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("标记是否需要登记车辆")
 	@TableField( exist = false )
 	private Boolean hasCar;
+
+	@ApiModelProperty("导入excel记录用户的房屋信息")
+	@TableField( exist = false )
+	private HouseEntity houseEntity;
 
 	/**
 	 * 业主登记验证接口
