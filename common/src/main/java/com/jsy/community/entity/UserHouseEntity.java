@@ -35,6 +35,4 @@ public class UserHouseEntity extends BaseEntity {
     @ApiModelProperty(value = "是否通过审核")
     private Integer checkStatus;
 
-
-
 }

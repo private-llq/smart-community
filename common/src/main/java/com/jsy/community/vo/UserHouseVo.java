@@ -1,6 +1,10 @@
 package com.jsy.community.vo;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -11,6 +15,10 @@ import java.io.Serializable;
  * @Description 物业端业主房屋认证审核信息
  * @Version 1.0
  **/
+@Data
+@ToString
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false)
 public class UserHouseVo implements Serializable {
 	
 	@ApiModelProperty(value = "业主")
@@ -42,5 +50,5 @@ public class UserHouseVo implements Serializable {
 	
 	@ApiModelProperty(value = "是否通过审核")
 	private Integer checkStatus;
-	
+
 }

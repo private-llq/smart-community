@@ -15,7 +15,11 @@
                     #{item}
                 </foreach>
             </if>
-            order by get_distance(#{location.lon},#{location.lat},lon,lat)
+            order by
+            <choose>
+                <when test="location.lon != null and location.lat != null">get_distance(#{location.lon},#{location.lat},lon,lat)</when>
+                <otherwise>rand()</otherwise>
+            </choose>
             limit 1
         </select>
 </mapper>

@@ -4,11 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.CommonQueryConsts;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.VisitorEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.HouseMemberMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
@@ -32,6 +35,9 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	@Autowired
 	private HouseMemberMapper houseMemberMapper;
 	
+	@Autowired
+	private UserMapper userMapper;
+	
 	/**
 	 * @Description: 邀请房间成员
 	 * @Param: [houseMemberEntity]
@@ -39,6 +45,7 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 * @Author: chq459799974
 	 * @Date: 2020/11/23
 	 **/
+	@Override
 	public boolean addHouseMember(HouseMemberEntity houseMemberEntity){
 		int result = houseMemberMapper.insert(houseMemberEntity);
 		if(result == 1){
@@ -54,6 +61,7 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 * @Author: chq459799974
 	 * @Date: 2020/11/23
 	 **/
+	@Override
 	public boolean deleteHouseMember(List<Long> ids){
 		int result = houseMemberMapper.deleteBatchIds(ids);
 		if(result > 0){
@@ -64,17 +72,19 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	
 	/**
 	 * @Description: 成员确认加入房间
-	 * @Param: [id]
+	 * @Param: [houseMemberEntity]
 	 * @Return: boolean
 	 * @Author: chq459799974
-	 * @Date: 2020/11/23
+	 * @Date: 2020/11/26
 	 **/
-	public boolean confirmJoin(Long id){
-		int result = houseMemberMapper.confirmJoin(id);
-		if(result == 1){
+	@Override
+	public boolean confirmJoin(HouseMemberEntity houseMemberEntity){
+		int result = houseMemberMapper.confirmJoin(houseMemberEntity.getId());
+		int setBelongTo = userMapper.setUserBelongTo(houseMemberEntity.getHouseholderId(),houseMemberEntity.getUid());
+		if(result == 1 && setBelongTo == 1){
 			return true;
 		}
-		return false;
+		throw new ProprietorException(JSYError.INTERNAL.getCode(),"加入失败");
 	}
 	
 	/**
@@ -86,6 +96,7 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 **/
 	//TODO 物业端 houseid
 	//TODO 后台 code(t_house) - id(t_house) - houseid(t_house_member)
+	@Override
 	public Page<HouseMemberEntity> queryHouseMemberPage(BaseQO<HouseMemberQO> baseQO){
 		HouseMemberQO houseMemberQO = baseQO.getQuery();
 		if(houseMemberQO != null){
