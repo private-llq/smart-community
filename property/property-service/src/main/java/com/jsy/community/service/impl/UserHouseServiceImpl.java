@@ -52,6 +52,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		
 		QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("community_id", communityId);
+		wrapper.orderByAsc("check_status");
 		List<UserHouseEntity> list = userHouseMapper.selectList(wrapper);
 		
 		for (UserHouseEntity userHouseEntity : list) {
@@ -85,4 +86,36 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		return PageVoUtils.page(current, total, size, userHouseVos);
 	}
 	
+	@Override
+	public Boolean saveUserHouse(Long uid, Long communityId, Long houseId) {
+		UserHouseEntity houseEntity = new UserHouseEntity();
+		houseEntity.setUid(uid);
+		houseEntity.setCommunityId(communityId);
+		houseEntity.setHouseId(houseId);
+		houseEntity.setCheckStatus(2);//审核中
+		int res = userHouseMapper.insert(houseEntity);
+		return res > 0;
+	}
+	
+	@Override
+	public Boolean pass(Long id) {
+		UserHouseEntity houseEntity = userHouseMapper.selectById(id);
+		if (houseEntity != null) {
+			houseEntity.setCheckStatus(1);
+			userHouseMapper.updateById(houseEntity);
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public Boolean notPass(Long id) {
+		UserHouseEntity houseEntity = userHouseMapper.selectById(id);
+		if (houseEntity != null) {
+			houseEntity.setCheckStatus(0);
+			userHouseMapper.updateById(houseEntity);
+			return true;
+		}
+		return false;
+	}
 }

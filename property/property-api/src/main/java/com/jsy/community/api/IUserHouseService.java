@@ -24,4 +24,31 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @Param [baseQO, communityId]
 	 **/
 	PageInfo<UserHouseVo> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId);
+	
+	/**
+	 * @return java.lang.Boolean
+	 * @Author lihao
+	 * @Description
+	 * @Date 2020/11/26 11:01
+	 * @Param [uid, communityId, houseId]
+	 **/
+	Boolean saveUserHouse(Long uid, Long communityId, Long houseId);
+	
+	/**
+	 * @return java.lang.Boolean
+	 * @Author lihao
+	 * @Description 通过审核
+	 * @Date 2020/11/26 15:39
+	 * @Param [id]
+	 **/
+	Boolean pass(Long id);
+	
+	/**
+	 * @return java.lang.Boolean
+	 * @Author lihao
+	 * @Description 不通过审核
+	 * @Date 2020/11/26 16:32
+	 * @Param [id]
+	 **/
+	Boolean notPass(Long id);
 }

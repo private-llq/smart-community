@@ -50,6 +50,35 @@ public class UserHouseController {
 		return CommonResult.ok(page);
 	}
 	
+	/**
+	 * @return com.jsy.community.vo.CommonResult<java.lang.Boolean>
+	 * @Author lihao
+	 * @Description 通过审核
+	 * @Date 2020/11/26 15:58
+	 * @Param [id]
+	 **/
+	@ApiOperation("通过审核")
+	@GetMapping("/pass")
+	public CommonResult<Boolean> pass(@ApiParam(value = "待审核房屋id") Long id){
+		Boolean b = userHouseService.pass(id);
+		return b?CommonResult.ok():CommonResult.error("审核失败");
+	}
+	
+	/**
+	 * @return com.jsy.community.vo.CommonResult<java.lang.Boolean>
+	 * @Author lihao
+	 * @Description 通过审核
+	 * @Date 2020/11/26 15:58
+	 * @Param [id]
+	 **/
+	@ApiOperation("不通过审核")
+	@GetMapping("/notPass")
+	public CommonResult<Boolean> notPass(@ApiParam(value = "待审核房屋id") Long id){
+		Boolean b = userHouseService.notPass(id);
+		return b?CommonResult.ok():CommonResult.error("审核失败");
+	}
+	
+	
 	
 }
 
