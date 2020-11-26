@@ -1,14 +1,18 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.api.IHouseService;
+import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.utils.FileUploadUtils;
+import com.jsy.community.util.ProprietorExcelFactory;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -16,18 +20,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @author YuLF
@@ -40,6 +39,9 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class ProprietorController {
 
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IHouseService iHouseService;
+    
     /**
      * 社区信息表常量 后期使用时放入Spring配置文件
      */
@@ -51,23 +53,26 @@ public class ProprietorController {
      * @return          返回Excel模板
      */
     @GetMapping("/downloadExcel")
-    public ResponseEntity<byte[]> downloadExcel() {
-        //设置响应头
+    public ResponseEntity<byte[]> downloadExcel(@RequestParam long communityId) {
+        //1.设置响应格式  设置响应头
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
-        //设置响应类型为附件类型直接下载这种
+        //1.1设置响应类型为附件类型直接下载这种
         multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode(PROPROETOR_REGISTER_EXCEL + ".xlsx", StandardCharsets.UTF_8));
-        //设置响应的文件mime类型为 xls类型
+        //1.2设置响应的文件mime类型为 xls类型
         multiValueMap.set("Content-type", "application/vnd.ms-excel");
-        //读取Excel模板
+        //2.生成Excel模板
         try {
-            String resourceFilePath = FileUploadUtils.getResourceFilePath("template"+ File.separator +PROPROETOR_REGISTER_EXCEL);
-            //在当前resource/template下面没有这个excel模板
-            if(resourceFilePath == null){
-                return new ResponseEntity<>(null , multiValueMap, HttpStatus.NOT_FOUND );
-            }
-            @Cleanup InputStream fileInputStream = new FileInputStream(resourceFilePath);
-            byte[] byt = new byte[fileInputStream.available()];
-            fileInputStream.read(byt);
+            //2.1 查出数据库当前社区的所有楼栋、单元、楼层、门牌 用于excel模板录入业主信息选择
+            List<HouseEntity> communityArchitecture = iHouseService.getCommunityArchitecture(communityId);
+            //2.2 生成Excel 业主信息录入模板
+            Workbook workbook = ProprietorExcelFactory.generateExcel(communityArchitecture, PROPROETOR_REGISTER_EXCEL);
+            //2.3 把workbook转换为字节输入流
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            workbook.write(bos);
+            @Cleanup InputStream is = new ByteArrayInputStream(bos.toByteArray());
+            byte[] byt = new byte[is.available()];
+            //2.4 读取字节流 响应实体返回
+            is.read(byt);
             return new ResponseEntity<>(byt , multiValueMap, HttpStatus.OK );
         } catch (IOException e) {
             //已接受。已经接受请求，但未处理完成
@@ -109,7 +114,6 @@ public class ProprietorController {
             if(sheetAt == null){
                 throw new JSYException(JSYError.BAD_REQUEST.getCode(), "excel文件信息无效!");
             }
-
         } catch (IOException e) {
             log.error("com.jsy.community.controller.ProprietorController.readProprietorExcel：{}", e.getMessage());
             throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), e.getMessage());

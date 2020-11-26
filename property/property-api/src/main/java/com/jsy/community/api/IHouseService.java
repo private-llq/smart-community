@@ -6,6 +6,8 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 
+import java.util.List;
+
 /**
  * <p>
  * 社区楼栋 服务类
@@ -51,5 +53,13 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2020/11/20
 	**/
 	boolean updateHouse(HouseEntity houseEntity);
+
+	/**
+	 * 通过社区ID查出所有 楼栋、单元、楼层、门牌
+	 * @author YuLF
+	 * @since  2020/11/26 9:38
+	 * @Param  communityId	社区ID
+	 */
+	List<HouseEntity> getCommunityArchitecture(long communityId);
 
 }

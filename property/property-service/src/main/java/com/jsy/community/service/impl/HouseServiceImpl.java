@@ -136,5 +136,19 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		}
 		return false;
 	}
-	
+
+	/**
+	 * 通过社区ID查出所有 楼栋、单元、楼层、门牌
+	 * @author YuLF
+	 * @since  2020/11/26 9:38
+	 * @Param  communityId	社区ID
+	 */
+	@Override
+	public List<HouseEntity> getCommunityArchitecture(long communityId) {
+		QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("building,unit,floor,door");
+		queryWrapper.eq("community_id",communityId);
+		return list(queryWrapper);
+	}
+
 }
