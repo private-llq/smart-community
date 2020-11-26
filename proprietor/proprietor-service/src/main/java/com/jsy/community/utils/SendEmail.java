@@ -62,7 +62,7 @@ public class SendEmail
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
     
             // Set Subject: 头部头字段
-            message.setSubject("测试邮件头部头字段");
+            message.setSubject("测试邮件标题");
     
             // 设置消息体
             message.setText("测试邮件消息体");
