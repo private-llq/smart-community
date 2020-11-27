@@ -131,7 +131,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 		FrontMenuEntity menuEntity = menuMapper.selectById(id);
 		FrontMenuVo menuVo = new FrontMenuVo();
 		BeanUtils.copyProperties(menuEntity, menuVo);
-		
+
 //		Long parentId = menuEntity.getParentId();
 //		FrontMenuEntity entity = this.common(parentId);
 //		if (entity != null) {
@@ -175,10 +175,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public List<FrontParentMenu> listMenu() {
+	public List<FrontParentMenu> listMenu(Long communityId) {
 		ArrayList<FrontParentMenu> list = new ArrayList<>();
 		// 1. 查询所有一级分类
 		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("community_id", communityId);
 		queryWrapper.eq("parent_id", 0);
 		List<FrontMenuEntity> parentList = menuMapper.selectList(queryWrapper);
 		
@@ -209,7 +210,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	@Override
 	public Long addParentMenu(AdminMenuEntity adminMenuEntity) {
 		FrontMenuEntity frontMenuEntity = new FrontMenuEntity();
-		BeanUtils.copyProperties(adminMenuEntity,frontMenuEntity);
+		BeanUtils.copyProperties(adminMenuEntity, frontMenuEntity);
 		menuMapper.insert(frontMenuEntity);
 		return frontMenuEntity.getId();//返回新增后数据的id
 	}
@@ -217,9 +218,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	@Override
 	public void addChildMenu(AdminMenuEntity adminMenuEntity) {
 		FrontMenuEntity entity = new FrontMenuEntity();
-		BeanUtils.copyProperties(adminMenuEntity,entity);
+		BeanUtils.copyProperties(adminMenuEntity, entity);
 		menuMapper.insert(entity);
-	
+		
 	}
 	
 	private FrontMenuEntity common(Long parentId) {

@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserHouseEntity;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "业主房屋认证控制器")
 @RestController
 @RequestMapping("/userHouse")
-//@Login
+@Login(allowAnonymous = true)
 @ApiJSYController
 public class UserHouseController {
 	
@@ -59,9 +60,9 @@ public class UserHouseController {
 	 **/
 	@ApiOperation("通过审核")
 	@GetMapping("/pass")
-	public CommonResult<Boolean> pass(@ApiParam(value = "待审核房屋id") Long id){
+	public CommonResult<Boolean> pass(@ApiParam(value = "待审核房屋id") Long id) {
 		Boolean b = userHouseService.pass(id);
-		return b?CommonResult.ok():CommonResult.error("审核失败");
+		return b ? CommonResult.ok() : CommonResult.error("审核失败");
 	}
 	
 	/**
@@ -73,11 +74,10 @@ public class UserHouseController {
 	 **/
 	@ApiOperation("不通过审核")
 	@GetMapping("/notPass")
-	public CommonResult<Boolean> notPass(@ApiParam(value = "待审核房屋id") Long id){
+	public CommonResult<Boolean> notPass(@ApiParam(value = "待审核房屋id") Long id) {
 		Boolean b = userHouseService.notPass(id);
-		return b?CommonResult.ok():CommonResult.error("审核失败");
+		return b ? CommonResult.ok() : CommonResult.error("审核失败");
 	}
-	
 	
 	
 }

@@ -37,15 +37,16 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	@Override
 	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
-		wrapper.ne("parent_id", 0).eq("community_id",communityId).eq("status",0).last("limit " + INDEXMENUCOUNT);
+		wrapper.ne("parent_id", 0).eq("community_id", communityId).eq("status", 0).last("limit " + INDEXMENUCOUNT);
 		return menuMapper.selectList(wrapper);
 	}
 	
 	@Override
-	public List<FrontParentMenu> listMenu() {
+	public List<FrontParentMenu> moreIndexMenu(Long communityId) {
 		ArrayList<FrontParentMenu> list = new ArrayList<>();
 		// 1. 查询所有一级分类
 		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("community_id", communityId);
 		queryWrapper.eq("parent_id", 0);
 		List<FrontMenuEntity> parentList = menuMapper.selectList(queryWrapper);
 		

@@ -35,9 +35,9 @@ public class MenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IAdminMenuService adminMenuService;
-
+	
 	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.vo.menu1.FrontParentMenu>>
+	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.vo.menu1.FrontParentMenu>>
 	 * @Author lihao
 	 * @Description 后台树形结构查询所有菜单
 	 * @Date 2020/11/24 11:05
@@ -45,8 +45,8 @@ public class MenuController {
 	 **/
 	@ApiOperation("后台树形结构查询所有菜单")
 	@GetMapping("/listMenu")
-	public CommonResult<List<FrontParentMenu>> listMenu() {
-		List<FrontParentMenu> parentMenus = menuService.listMenu();
+	public CommonResult<List<FrontParentMenu>> listMenu(@RequestParam("communityId") Long communityId) {
+		List<FrontParentMenu> parentMenus = menuService.listMenu(communityId);
 		return CommonResult.ok(parentMenus);
 	}
 	
@@ -65,7 +65,7 @@ public class MenuController {
 	}
 	
 	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.AdminMenuEntity>>
+	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.entity.AdminMenuEntity>>
 	 * @Author lihao
 	 * @Description 查询所有子菜单
 	 * @Date 2020/11/24 11:04
@@ -79,7 +79,7 @@ public class MenuController {
 	}
 	
 	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.AdminMenuEntity>>
+	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.entity.AdminMenuEntity>>
 	 * @Author lihao
 	 * @Description 根据父菜单id查询其子菜单信息
 	 * @Date 2020/11/25 9:10
@@ -99,7 +99,7 @@ public class MenuController {
 //		menuService.saveMenu(menuEntity);
 //		return CommonResult.ok();
 //	}
-	
+
 //	@ApiOperation("根据id查询菜单信息")
 //	@GetMapping("/getMenuById")
 //	public CommonResult<FrontMenuVo> getMenuById(@RequestParam("id") Long id) {
@@ -107,7 +107,7 @@ public class MenuController {
 //		FrontMenuVo frontMenuVo = menuService.getMenuById(id);
 //		return CommonResult.ok(frontMenuVo);
 //	}
-	
+
 //	// TODO 表单形式修改
 //	@ApiOperation("修改菜单信息")
 //	@PostMapping(value = "/updateMenu", produces = "application/json;charset=utf-8")

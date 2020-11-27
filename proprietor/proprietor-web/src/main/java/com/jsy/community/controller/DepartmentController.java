@@ -50,7 +50,7 @@ public class DepartmentController {
 	@ApiOperation("查询所有部门信息")
 	@GetMapping("/listDepartment")
 	public CommonResult<List<DepartmentEntity>> listDepartment(@ApiParam(value = "社区id")
-	                                                           @RequestParam(required = true) Long id) {
+	                                                           @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
 		List<DepartmentEntity> departmentList = departmentService.listDepartment(id);
 		return CommonResult.ok(departmentList);
 	}
@@ -58,15 +58,15 @@ public class DepartmentController {
 	/**
 	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.entity.DepartmentStaffEntity>>
 	 * @Author lihao
-	 * @Description 根据部门查询联系方式
+	 * @Description 根据部门id查询联系方式
 	 * @Date 2020/11/24 17:46
 	 * @Param [departmentId]
 	 **/
 	@ApiOperation("根据部门查询联系方式")
 	@GetMapping("/listStaffPhone")
 	public CommonResult<List<DepartmentStaffEntity>> listStaffPhone(@ApiParam(value = "部门id")
-	                                                                @RequestParam(required = true) Long departmentId) {
-		List<DepartmentStaffEntity> staffEntityList = departmentStaffService.listStaffPhone(departmentId);
+	                                                                @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
+		List<DepartmentStaffEntity> staffEntityList = departmentStaffService.listStaffPhone(id);
 		return CommonResult.ok(staffEntityList);
 	}
 	

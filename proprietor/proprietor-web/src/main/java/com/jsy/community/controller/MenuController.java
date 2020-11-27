@@ -45,9 +45,8 @@ public class MenuController {
 	 **/
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu")
-	public CommonResult listIndexMenu(
-		@ApiParam(value = "社区id")
-		@RequestParam("communityId") Long communityId) {
+	public CommonResult listIndexMenu(@ApiParam(value = "社区id")
+	                                  @RequestParam(value = "communityId", defaultValue = "1", required = false) Long communityId) {
 		List<FrontMenuEntity> list = menuService.listIndexMenu(communityId);
 		return CommonResult.ok(list);
 	}
@@ -61,8 +60,9 @@ public class MenuController {
 	 **/
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu")
-	public CommonResult moreListMenu() {
-		List<FrontParentMenu> list = menuService.listMenu();
+	public CommonResult moreListMenu(@ApiParam(value = "社区id")
+	                                 @RequestParam(value = "communityId", defaultValue = "1", required = false) Long communityId) {
+		List<FrontParentMenu> list = menuService.moreIndexMenu(communityId);
 		return CommonResult.ok(list);
 	}
 	
