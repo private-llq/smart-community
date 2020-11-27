@@ -15,6 +15,11 @@ import java.util.List;
 public class ProprietorExcelCommander {
 
     /**
+     * 业主信息录入表.xlsx 字段
+     */
+    public static final String[] TITLE_FIELD = {"姓名", "性别", "楼栋", "单元", "楼层", "门牌", "身份证", "联系方式", "详细地址"};
+
+    /**
      * 社区信息表常量 后期使用时放入Spring配置文件
      */
     public static final String PROPROETOR_REGISTER_EXCEL = "社区业主信息录入表";
