@@ -31,9 +31,16 @@ public interface IUserService extends IService<UserEntity> {
 	UserInfoVo register(RegisterQO qo);
 
 	/**
-	 * 业主登记
+	 * 业主信息登记
 	 * @param userEntity	登记实体参数
 	 * @return				返回是否登记成功
 	 */
 	Boolean proprietorRegister(UserEntity userEntity);
+
+	/**
+	 * 业主信息更新
+	 * @param userEntity    更新实体
+	 * @return				返回更新行数
+	 */
+    Integer proprietorUpdate(UserEntity userEntity);
 }

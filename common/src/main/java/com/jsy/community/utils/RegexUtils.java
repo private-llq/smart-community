@@ -145,6 +145,16 @@ public class RegexUtils {
 	public static boolean isUrl(String url) {
 		return Pattern.matches(REGEX_URL, url);
 	}
+
+	/**
+	 * 校验性别
+	 *
+	 * @param sex 传入的性别参数
+	 * @return 校验通过返回true，否则返回false
+	 */
+	public static boolean isSex(String sex) {
+		return Pattern.matches(REGEX_GENDER, sex);
+	}
 	
 	/**
 	 * 校验IP地址

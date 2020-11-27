@@ -43,7 +43,7 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("真实姓名")
 	@NotBlank(groups = {ProprietorRegister.class}, message = "姓名未填写!")
-//	@Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
+	@Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
 	private String realName;
 	
 	@ApiModelProperty("身份证")
@@ -82,4 +82,9 @@ public class UserEntity extends BaseEntity {
 	 * 业主登记验证接口
 	 */
 	public interface ProprietorRegister{}
+
+	/**
+	 * 业主修改验证接口
+	 */
+	public interface ProprietorUpdate{}
 }

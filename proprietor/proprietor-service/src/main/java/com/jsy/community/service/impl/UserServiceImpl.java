@@ -31,102 +31,119 @@ import javax.annotation.Resource;
  */
 @DubboService(version = Const.version, group = Const.group)
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements IUserService {
-	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IUserAuthService userAuthService;
-	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private ICommonService commonService;
 
-	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private ICarService carService;
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IUserAuthService userAuthService;
 
-	@Resource
-	private UserMapper userMapper;
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICommonService commonService;
 
-	@Resource
-	private UserAuthMapper userAuthMapper;
-	
-	@Resource
-	private RedisTemplate<String, String> redisTemplate;
-	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IUserHouseService userHouseService;
-	
-	@Override
-	public UserInfoVo login(LoginQO qo) {
-		Long uid = userAuthService.checkUser(qo);
-		UserEntity user = baseMapper.queryUserInfoByUid(uid);
-		if (user.getDeleted() == 1) {
-			throw new ProprietorException("账号不存在");
-		}
-		
-		UserInfoVo userInfoVo = new UserInfoVo();
-		BeanUtil.copyProperties(user, userInfoVo);
-		
-		// 设置省市区
-		ValueOperations<String, String> ops = redisTemplate.opsForValue();
-		if (user.getProvinceId() != null) {
-			userInfoVo.setProvince(ops.get("RegionSingle:"+user.getProvinceId().toString()));
-		}
-		if (user.getCityId() != null) {
-			userInfoVo.setCity(ops.get("RegionSingle:"+user.getCityId().toString()));
-		}
-		if (user.getAreaId() != null) {
-			userInfoVo.setArea(ops.get("RegionSingle:"+user.getAreaId().toString()));
-		}
-		
-		return userInfoVo;
-	}
-	
-	@Override
-	public UserInfoVo register(RegisterQO qo) {
-		commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
-		
-		// 添加业主(user表插入一条空数据)
-		UserEntity user = new UserEntity();
-		save(user);
-		
-		// 添加认证数据(user_auth表uid、手机号)
-		UserAuthEntity userAuth = new UserAuthEntity();
-		userAuth.setUid(user.getId());
-		if (RegexUtils.isMobile(qo.getAccount())) {
-			userAuth.setMobile(qo.getAccount());
-		} else if (RegexUtils.isEmail(qo.getAccount())) {
-			userAuth.setEmail(qo.getAccount());
-		} else {
-			userAuth.setUsername(qo.getAccount());
-		}
-		userAuthService.save(userAuth);
-		
-		UserInfoVo vo = new UserInfoVo();
-		vo.setId(user.getId());
-		vo.setSex(0);
-		vo.setIsRealAuth(0);
-		return vo;
-	}
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICarService carService;
 
-	@Transactional
-	@Override
-	public Boolean proprietorRegister(UserEntity userEntity) {
-		//添加业主信息
-		int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("id", userEntity.getId()));
-		if( count == 0 ){
-			return false;
-		}
-		//业主登记时有填写车辆信息的情况下，新增车辆
-		if(userEntity.getHasCar()){
-			CarEntity carEntity = userEntity.getCarEntity();
-			carEntity.setOwner(userEntity.getRealName());
-			//通过uid 查询t_user_auth表的用户手机号码
-			UserAuthEntity userAuthEntity = userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().select("mobile").eq("uid", carEntity.getUid()));
-			carEntity.setContact(userAuthEntity.getMobile());
-			//登记车辆
-			carService.addProprietorCar(userEntity.getCarEntity());
-		}
-		//t_user_house 中插入当前这条记录 为了让别人审核
-//		userHouseService.saveUserHouse()
-		
-		return true;
-	}
+    @Resource
+    private UserMapper userMapper;
+
+    @Resource
+    private UserAuthMapper userAuthMapper;
+
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IUserHouseService userHouseService;
+
+    @Override
+    public UserInfoVo login(LoginQO qo) {
+        Long uid = userAuthService.checkUser(qo);
+        UserEntity user = baseMapper.queryUserInfoByUid(uid);
+        if (user.getDeleted() == 1) {
+            throw new ProprietorException("账号不存在");
+        }
+
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtil.copyProperties(user, userInfoVo);
+
+        // 设置省市区
+        ValueOperations<String, String> ops = redisTemplate.opsForValue();
+        if (user.getProvinceId() != null) {
+            userInfoVo.setProvince(ops.get("RegionSingle:" + user.getProvinceId().toString()));
+        }
+        if (user.getCityId() != null) {
+            userInfoVo.setCity(ops.get("RegionSingle:" + user.getCityId().toString()));
+        }
+        if (user.getAreaId() != null) {
+            userInfoVo.setArea(ops.get("RegionSingle:" + user.getAreaId().toString()));
+        }
+
+        return userInfoVo;
+    }
+
+    @Override
+    public UserInfoVo register(RegisterQO qo) {
+        commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+
+        // 添加业主(user表插入一条空数据)
+        UserEntity user = new UserEntity();
+        save(user);
+
+        // 添加认证数据(user_auth表uid、手机号)
+        UserAuthEntity userAuth = new UserAuthEntity();
+        userAuth.setUid(user.getId());
+        if (RegexUtils.isMobile(qo.getAccount())) {
+            userAuth.setMobile(qo.getAccount());
+        } else if (RegexUtils.isEmail(qo.getAccount())) {
+            userAuth.setEmail(qo.getAccount());
+        } else {
+            userAuth.setUsername(qo.getAccount());
+        }
+        userAuthService.save(userAuth);
+
+        UserInfoVo vo = new UserInfoVo();
+        vo.setId(user.getId());
+        vo.setSex(0);
+        vo.setIsRealAuth(0);
+        return vo;
+    }
+
+    /**
+     * 页面登记 业主信息
+     *
+     * @param userEntity 登记实体参数
+     * @return 返回是否登记成功
+     */
+    @Transactional(rollbackFor = {Exception.class})
+    @Override
+    public Boolean proprietorRegister(UserEntity userEntity) {
+        //添加业主信息
+        int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("id", userEntity.getId()));
+        if (count == 0) {
+            return false;
+        }
+        //业主登记时有填写车辆信息的情况下，新增车辆
+        if (userEntity.getHasCar()) {
+            CarEntity carEntity = userEntity.getCarEntity();
+            carEntity.setOwner(userEntity.getRealName());
+            //通过uid 查询t_user_auth表的用户手机号码
+            UserAuthEntity userAuthEntity = userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().select("mobile").eq("uid", carEntity.getUid()));
+            carEntity.setContact(userAuthEntity.getMobile());
+            //登记车辆
+            carService.addProprietorCar(userEntity.getCarEntity());
+        }
+        //t_user_house 中插入当前这条记录 为了让物业审核
+		userHouseService.saveUserHouse(userEntity.getId(), userEntity.getHouseEntity().getCommunityId(), userEntity.getHouseEntity().getId());
+        return true;
+    }
+
+    /**
+     * 【用户】业主更新信息
+     * @author YuLF
+     * @Param userEntity        需要更新 实体参数
+     * @return 返回更新成功!
+     * @since 2020/11/27 15:03
+     */
+    @Override
+    public Integer proprietorUpdate(UserEntity userEntity) {
+        return userMapper.proprietorUpdate(userEntity);
+    }
 }
