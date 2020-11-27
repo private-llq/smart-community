@@ -37,14 +37,19 @@ public class SysUserEntity extends BaseEntity {
 	/**
 	 * 邮箱
 	 */
-	@NotBlank(message = "邮箱不能为空")
-	@Email(message = "邮箱格式不正确")
+	@NotBlank(groups = {inviteUserValidatedGroup.class}, message = "邮箱不能为空")
+	@Email(groups = {inviteUserValidatedGroup.class}, message = "邮箱格式不正确")
 	private String email;
 	
 	/**
 	 * 手机号
 	 */
 	private String mobile;
+	
+	private String nickname;
+	
+	@NotBlank(groups = {inviteUserValidatedGroup.class}, message = "人员姓名不能为空")
+	private String realName;
 	
 	/**
 	 * 状态  0：禁用   1：正常
@@ -61,4 +66,9 @@ public class SysUserEntity extends BaseEntity {
 	 * 创建者ID
 	 */
 	private Long createUserId;
+	
+	/**
+	 * 注册邀请
+	 */
+	public interface inviteUserValidatedGroup{}
 }

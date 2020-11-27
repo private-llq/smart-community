@@ -7,6 +7,11 @@ import org.gavaghan.geodesy.GlobalCoordinates;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+* @Description: 经纬度测距
+ * @Author: chq459799974
+ * @Date: 2020/11/27
+**/
 public class DistanceUtil {
 
 	private static GeodeticCalculator geodeticCalculator =  new GeodeticCalculator();
