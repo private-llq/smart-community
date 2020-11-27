@@ -6,6 +6,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -97,6 +98,36 @@ public class ProprietorController {
         //做数据库写入 userEntityList 读出来的数据
         //todo 数据库信息写入
         return CommonResult.ok(userEntityList);
+    }
+
+    /**
+     * 根据业主id 删除业主信息、业主关联的房屋、业主的家庭成员、业主的车辆信息
+     * @param id        业主id
+     * @return          返回删除是否成功
+     */
+    @DeleteMapping()
+    public CommonResult<Boolean> del(@RequestParam Long id){
+        return null;
+    }
+
+    /**
+     * 分页查询业主信息
+     * @param entityBaseQO        查询参数实体
+     * @return                    返回删除是否成功
+     */
+    @PostMapping()
+    public CommonResult<Boolean> query(@RequestParam BaseQO<UserEntity> entityBaseQO){
+        return null;
+    }
+
+    /**
+     * 修改业主信息
+     * @param userEntity          参数实体
+     * @return                    返回删除是否成功
+     */
+    @PostMapping()
+    public CommonResult<Boolean> update(@RequestParam UserEntity userEntity){
+        return null;
     }
 
 
