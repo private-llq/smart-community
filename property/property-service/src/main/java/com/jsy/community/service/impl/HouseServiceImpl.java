@@ -64,8 +64,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	 * @Date: 2020/11/20
 	 **/
 	public boolean addHouse(HouseEntity houseEntity){
-		houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
-		int result = houseMapper.insert(houseEntity);
+		if(Const.HouseTypeConsts.DOOR.equals(houseEntity.getType())){
+			houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
+		}
+		int result = houseMapper.addHouse(houseEntity);
 		if(result == 1){
 			return true;
 		}
