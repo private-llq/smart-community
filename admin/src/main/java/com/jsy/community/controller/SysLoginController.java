@@ -68,7 +68,7 @@ public class SysLoginController {
 		}
 		
 		//账号锁定
-		if (user.getStatus() == 0) {
+		if (user.getStatus() == 1) {
 			return CommonResult.error("账号已被锁定,请联系管理员");
 		}
 		

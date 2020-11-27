@@ -17,6 +17,8 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
       enabled: true
+  thymeleaf:
+    prefix: classpath:/templates/
 
 #mybatis
 mybatis-plus:
@@ -48,3 +50,5 @@ jsy:
     # token有效时长，7天，单位秒
     expire: 604800
     header: token
+
+emailLinkExpiretime: 24

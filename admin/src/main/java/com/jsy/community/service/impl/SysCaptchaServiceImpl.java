@@ -36,7 +36,7 @@ public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaMapper, SysCapt
 		captchaEntity.setUuid(uuid);
 		captchaEntity.setCode(code);
 		// 5分钟后过期
-		captchaEntity.setExpireTime(DateUtil.offset(new Date(), DateField.MINUTE, 5));
+		captchaEntity.setExpireTime(DateUtil.offset(new Date(), DateField.HOUR, 5));
 		this.save(captchaEntity);
 		
 		return producer.createImage(code);
@@ -50,7 +50,7 @@ public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaMapper, SysCapt
 		}
 		
 		//删除验证码
-		this.removeById(uuid);
+		//this.remove(new QueryWrapper<SysCaptchaEntity>().eq("uuid",uuid));
 		
 		return captchaEntity.getCode().equalsIgnoreCase(code) && captchaEntity.getExpireTime().getTime() >= System.currentTimeMillis();
 	}

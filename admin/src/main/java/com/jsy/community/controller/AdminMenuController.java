@@ -21,7 +21,7 @@ import java.util.List;
  * @author jsy
  * @since 2020-11-24
  */
-@Api(tags = "APP内容控制器")
+@Api(tags = "APP菜单控制器")
 //@Login
 @Slf4j
 @RestController

@@ -29,7 +29,7 @@ public class SysUserTokenServiceImpl extends ServiceImpl<SysUserTokenMapper, Sys
 		//过期时间
 		LocalDateTime expireTime = now.plusHours(EXPIRE_IN_HOUR);
 		
-		//判断是否生成过token
+		//判断是否生成过token(没有就生成，有就更新过期时间)
 		SysUserTokenEntity tokenEntity = this.getById(userId);
 		if (tokenEntity == null) {
 			tokenEntity = new SysUserTokenEntity();
