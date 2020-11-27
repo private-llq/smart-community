@@ -17,10 +17,6 @@ import java.util.*;
 @Slf4j
 public class ProprietorExcelProvider extends JSYExcelAbstract {
 
-    /**
-     * 业主信息录入表.xlsx 字段
-     */
-    public static final String[] TITLE_FIELD = {"姓名", "性别", "楼栋", "单元", "楼层", "门牌", "身份证", "联系方式", "详细地址"};
 
 
     /**
@@ -65,8 +61,9 @@ public class ProprietorExcelProvider extends JSYExcelAbstract {
         //设置居中显示
         workBook_cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cell.setCellStyle(workBook_cellStyle);
+        String[] titleField = ProprietorExcelCommander.TITLE_FIELD;
         //合并单元格
-        CellRangeAddress region = new CellRangeAddress(0, 0, 0, TITLE_FIELD.length);
+        CellRangeAddress region = new CellRangeAddress(0, 0, 0, titleField.length);
         sheet.addMergedRegion(region);
         //2.创建 工作表 字段标题 第二行
         XSSFRow row2 = sheet.createRow(1);
@@ -76,7 +73,7 @@ public class ProprietorExcelProvider extends JSYExcelAbstract {
         fieldFont.setBold(true);
         fieldCellStyle.setFont(fieldFont);
         //创建字段标题头
-        for (int i = 0; i < TITLE_FIELD.length; i++) {
+        for (int i = 0; i < titleField.length; i++) {
             //只要TITLE_FIELD 索引为 1、2、3、4、5都需要添加选择填写约束
             //性别、楼栋、单元、楼层、门牌单元格 列 选择约束添加限制
             if (i > 0 && i <= 5) {
@@ -84,7 +81,7 @@ public class ProprietorExcelProvider extends JSYExcelAbstract {
                 sheet.addValidationData(setBox(sheet, entityList, i));
             }
             XSSFCell cell1 = row2.createCell(i);
-            cell1.setCellValue(TITLE_FIELD[i]);
+            cell1.setCellValue(titleField[i]);
             cell1.setCellStyle(fieldCellStyle);
         }
         return workbook;

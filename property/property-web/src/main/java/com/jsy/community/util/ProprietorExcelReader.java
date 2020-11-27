@@ -12,6 +12,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class ProprietorExcelReader extends JSYExcelAbstract {
             if (row == null) {
                 throw new JSYException(JSYError.BAD_REQUEST.getCode(), "excel文件信息无效!请重新下载模板");
             }
-            String[] titleField = ProprietorExcelProvider.TITLE_FIELD;
+            String[] titleField = ProprietorExcelCommander.TITLE_FIELD;
             for (int i = 0; i < titleField.length; i++) {
                 Cell cell = row.getCell(i);
                 //如果标题 字段 列为空 或者 标题列字段 和 titleField 里面对应的下标 列内容不匹配 则抛出异常
@@ -54,12 +56,10 @@ public class ProprietorExcelReader extends JSYExcelAbstract {
                     UserEntity userEntity = new UserEntity();
                     userEntity.setHouseEntity(new HouseEntity());
                     //遍历列
-                    for (int z = 0; z < dataRow.getLastCellNum(); z++) {
+                    //dataRow.getLastCellNum()避免有的列为空，所以 需要检查 9个列的字段 titleField.length
+                    for (int z = 0; z < titleField.length; z++) {
                         Cell cell = dataRow.getCell(z);
-                        /*if (cell != null) {
-                            cell.setCellValue("");
-                        }*/
-                        String CellValue = cell.getStringCellValue();
+                        String CellValue = getCellValForType(cell).toString();
                         //列字段效验
                         switch (z) {
                             // 1列 验证是否 是一个 正确的中国姓名
@@ -140,9 +140,8 @@ public class ProprietorExcelReader extends JSYExcelAbstract {
                             default:
                                 break;
                         } //switch-end
-                        userEntityList.add(userEntity);
-
                     }
+                    userEntityList.add(userEntity);
                 }
             }
             return userEntityList;
@@ -150,5 +149,43 @@ public class ProprietorExcelReader extends JSYExcelAbstract {
             log.error("com.jsy.community.controller.ProprietorController.readProprietorExcel：{}", e.getMessage());
             throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), e.getMessage());
         }
+    }
+    /**
+     *  根据 excel单元格的类型获取值
+     * @author YuLF
+     * @since  2020/11/27 9:31
+     * @Param       cell   每一列单元格
+     * @return      返回单元格的值
+     */
+    public static Object getCellValForType(Cell cell)
+    {
+        Object CellValue = StringUtils.EMPTY;
+        if(cell != null){
+            CellType cellType = cell.getCellType();
+            switch (cellType){
+                case NUMERIC: //数字
+                    //如果是日期类型
+                    if (DateUtil.isCellDateFormatted(cell)){
+                        CellValue =   cell.getDateCellValue();
+                    }else{
+                        //避免poi读入手机号 自动变为 科学计数
+                        NumberFormat f=new DecimalFormat("############");
+                        f.setMaximumFractionDigits(0);
+                        CellValue= f.format(cell.getNumericCellValue());
+                    }
+                    break;
+                case STRING: //字符串
+                    CellValue =   cell.getStringCellValue();
+                    break;
+                case BOOLEAN: //Boolean
+                    CellValue =  cell.getBooleanCellValue();
+                    break;
+                case ERROR: //故障
+                    break;
+                default:
+                    break;
+            }
+        }
+        return CellValue;
     }
 }
