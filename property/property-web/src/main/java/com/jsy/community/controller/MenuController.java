@@ -8,7 +8,7 @@ import com.jsy.community.api.IMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.FrontParentMenu;
+import com.jsy.community.vo.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -37,7 +37,7 @@ public class MenuController {
 	private IAdminMenuService adminMenuService;
 	
 	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.vo.FrontParentMenu>>
+	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.vo.menu.FrontParentMenu>>
 	 * @Author lihao
 	 * @Description 后台树形结构查询所有菜单
 	 * @Date 2020/11/24 11:05

@@ -5,7 +5,7 @@ import com.jsy.community.vo.FrontMenuVO;
 import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.vo.FrontParentMenu;
+import com.jsy.community.vo.menu.FrontParentMenu;
 
 import java.util.List;
 
@@ -102,7 +102,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	List<FrontMenuVO> moreListMenu();
 	
 	/**
-	 * @return java.util.List<com.jsy.community.vo.FrontParentMenu>
+	 * @return java.util.List<com.jsy.community.vo.menu.FrontParentMenu>
 	 * @Author lihao
 	 * @Description 树形结构
 	 * @Date 2020/11/17 10:14
