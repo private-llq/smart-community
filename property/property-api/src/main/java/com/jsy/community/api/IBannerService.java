@@ -12,7 +12,7 @@ import java.util.List;
  * banner轮播图 服务类
  * </p>
  *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-16
  */
 public interface IBannerService extends IService<BannerEntity> {

@@ -13,7 +13,7 @@ import java.util.List;
  * 房间成员表 服务类
  * </p>
  *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-23
  */
 public interface IHouseMemberService extends IService<HouseMemberEntity> {

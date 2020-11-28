@@ -13,11 +13,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * <p>
- * 来访车辆
- * </p>
- *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-12
  */
 @Data

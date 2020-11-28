@@ -12,11 +12,7 @@ import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
- * <p>
- * 访客随行人员
- * </p>
- *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-12
  */
 @Data

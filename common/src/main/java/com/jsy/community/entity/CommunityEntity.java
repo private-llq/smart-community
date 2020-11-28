@@ -16,11 +16,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * <p>
- * 社区
- * </p>
- *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-19
  */
 @Data

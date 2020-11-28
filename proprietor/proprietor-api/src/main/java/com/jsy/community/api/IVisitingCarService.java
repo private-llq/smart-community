@@ -10,7 +10,7 @@ import java.util.List;
  * 来访车辆 服务类
  * </p>
  *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-12
  */
 public interface IVisitingCarService extends IService<VisitingCarEntity> {

@@ -21,7 +21,7 @@ import java.util.List;
  * banner轮播图 服务实现类
  * </p>
  *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-16
  */
 @DubboService(version = Const.version, group = Const.group)

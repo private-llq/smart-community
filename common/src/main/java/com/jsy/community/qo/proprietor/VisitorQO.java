@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- * <p>
- * 来访人员
- * </p>
- *
  * @author chq459799974
  * @since 2020-11-11
  */

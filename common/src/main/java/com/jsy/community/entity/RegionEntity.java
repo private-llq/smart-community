@@ -2,9 +2,9 @@ package com.jsy.community.entity;
 
 import java.util.List;
 /**
- * 
  * 省市区划
- *
+ * @author qq459799974
+ * @since 2020-11-23
  */
 public class RegionEntity {
 	private Integer id;//编号

@@ -11,11 +11,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * <p>
- * banner轮播图
- * </p>
- *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-16
  */
 @Data

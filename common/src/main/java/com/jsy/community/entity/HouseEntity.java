@@ -11,11 +11,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * <p>
- * 社区楼栋
- * </p>
- *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-20
  */
 @Data

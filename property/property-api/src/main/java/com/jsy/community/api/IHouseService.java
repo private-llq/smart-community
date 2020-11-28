@@ -13,7 +13,7 @@ import java.util.List;
  * 社区楼栋 服务类
  * </p>
  *
- * @author jsy
+ * @author qq459799974
  * @since 2020-11-20
  */
 public interface IHouseService extends IService<HouseEntity> {

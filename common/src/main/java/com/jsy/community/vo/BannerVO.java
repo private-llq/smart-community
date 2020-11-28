@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  * @Description: 轮播图返回前端
- * @Author
+ * @Author qq459799974
  * @Date 2020/11/16 14:16
  **/
 @Data

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Properties;
 
 /**
- * @author chq459799974
+ * @author ling
  * @description 图片验证码kaptcha要求的实例Bean(暂时加上解决启动报错，待修改)
  * @since 2020-11-24 10:43
  **/

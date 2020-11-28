@@ -1,6 +1,5 @@
 package com.jsy.community.constant;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
