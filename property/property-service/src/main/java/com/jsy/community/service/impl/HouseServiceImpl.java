@@ -5,17 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.BannerEntity;
 import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.ValidatorUtils;
-import com.jsy.community.vo.BannerVO;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 

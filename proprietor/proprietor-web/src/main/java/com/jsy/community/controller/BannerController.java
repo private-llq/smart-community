@@ -5,8 +5,8 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.proprietor.BannerQO;
+import com.jsy.community.returnVO.BannerRVO;
 import com.jsy.community.utils.ValidatorUtils;
-import com.jsy.community.vo.BannerVO;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,9 +41,9 @@ public class BannerController {
 	 **/
 	@ApiOperation("【轮播图】列表查询")
 	@PostMapping("list")
-	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
+	public CommonResult<List<BannerRVO>> list(@RequestBody BannerQO bannerQO){
 		ValidatorUtils.validateEntity(bannerQO, BannerQO.queryBannerValidatedGroup.class);
-		List<BannerVO> returnList = iBannerService.queryBannerList(bannerQO);
+		List<BannerRVO> returnList = iBannerService.queryBannerList(bannerQO);
 		return CommonResult.ok(returnList);
 	}
 	
