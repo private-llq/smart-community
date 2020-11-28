@@ -1,7 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.dto.userhouse.UserHouseDto;
+import com.jsy.community.vo.UserHouseVO;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
@@ -17,13 +17,13 @@ import com.jsy.community.utils.PageInfo;
 public interface IUserHouseService extends IService<UserHouseEntity> {
 	
 	/**
-	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.dto.userhouse.UserHouseDto>
+	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.vo.UserHouseVO>
 	 * @Author lihao
 	 * @Description
 	 * @Date 2020/11/26 15:23
 	 * @Param [baseQO, communityId]
 	 **/
-	PageInfo<UserHouseDto> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId);
+	PageInfo<UserHouseVO> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId);
 	
 	/**
 	 * @return java.lang.Boolean

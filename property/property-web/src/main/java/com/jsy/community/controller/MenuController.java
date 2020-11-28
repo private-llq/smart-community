@@ -8,7 +8,7 @@ import com.jsy.community.api.IMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.dto.menu.FrontParentMenu;
+import com.jsy.community.vo.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -37,7 +37,7 @@ public class MenuController {
 	private IAdminMenuService adminMenuService;
 	
 	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.dto.menu.FrontParentMenu>>
+	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.vo.menu.FrontParentMenu>>
 	 * @Author lihao
 	 * @Description 后台树形结构查询所有菜单
 	 * @Date 2020/11/24 11:05
@@ -102,9 +102,9 @@ public class MenuController {
 
 //	@ApiOperation("根据id查询菜单信息")
 //	@GetMapping("/getMenuById")
-//	public CommonResult<FrontMenuDto> getMenuById(@RequestParam("id") Long id) {
+//	public CommonResult<FrontMenuVO> getMenuById(@RequestParam("id") Long id) {
 //		// 回显
-//		FrontMenuDto frontMenuVo = menuService.getMenuById(id);
+//		FrontMenuVO frontMenuVo = menuService.getMenuById(id);
 //		return CommonResult.ok(frontMenuVo);
 //	}
 
@@ -112,7 +112,7 @@ public class MenuController {
 //	@ApiOperation("修改菜单信息")
 //	@PostMapping(value = "/updateMenu", produces = "application/json;charset=utf-8")
 //	public CommonResult updateMenu(@RequestParam("id") Long id,
-//	                               @RequestBody FrontMenuDto frontMenuVo) {
+//	                               @RequestBody FrontMenuVO frontMenuVo) {
 //		menuService.updateMenu(id, frontMenuVo);
 //		return CommonResult.ok();
 //	}

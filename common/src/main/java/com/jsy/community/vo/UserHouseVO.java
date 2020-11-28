@@ -1,4 +1,4 @@
-package com.jsy.community.dto.userhouse;
+package com.jsy.community.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 /**
  * @author lihao
- * @ClassName UserHouseDto
+ * @ClassName UserHouseVO
  * @Date 2020/11/25  16:11
  * @Description 物业端业主房屋认证审核信息
  * @Version 1.0
@@ -19,7 +19,7 @@ import java.io.Serializable;
 @ToString
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public class UserHouseDto implements Serializable {
+public class UserHouseVO implements Serializable {
 	
 	@ApiModelProperty(value = "业主")
 	private String nickname;
