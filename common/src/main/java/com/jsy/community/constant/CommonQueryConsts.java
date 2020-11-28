@@ -10,6 +10,7 @@ import java.util.Map;
  * @Author: chq459799974
  * @Date: 2020/11/18
 **/
+//TODO 非枚举类业务常量移到BusinessConst
 public interface CommonQueryConsts {
 	/**
 	 * 房间成员查询类型 - 查询成员
@@ -110,6 +111,7 @@ public interface CommonQueryConsts {
 		
 		public static final List<Map<String, Object>> carTypeList = new ArrayList<>();
 		public static final Map<Integer, String> carTypeMap = new HashMap<>();
+		public static final String REGEX_CAR_TYPE = "^[1-5]{1}";
 		static {
 			for(CarTypeEnum regionQueryTypeEnum : CarTypeEnum.values()){
 				HashMap<String, Object> map = new HashMap<>();
