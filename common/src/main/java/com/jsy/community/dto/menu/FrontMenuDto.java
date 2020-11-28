@@ -1,4 +1,4 @@
-package com.jsy.community.vo.menu;
+package com.jsy.community.dto.menu;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 /**
  * @Author lihao
- * @ClassName FrontMenuVo
+ * @ClassName FrontMenuDto
  * @Date 2020/11/15  15:10
  * @Description TODO
  * @Version 1.0
@@ -19,7 +19,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel("前台菜单信息")
-public class FrontMenuVo implements Serializable {
+public class FrontMenuDto implements Serializable {
 	
 	@ApiModelProperty(value = "菜单名")
 	private String menuName;

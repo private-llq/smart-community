@@ -7,7 +7,7 @@ import com.jsy.community.api.IMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.menu1.FrontParentMenu;
+import com.jsy.community.dto.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

@@ -9,7 +9,7 @@ import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.UserHouseVo;
+import com.jsy.community.dto.userhouse.UserHouseDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -44,10 +44,10 @@ public class UserHouseController {
 	 **/
 	@ApiOperation("业主房屋认证审核列表")
 	@PostMapping("/selectUserHouse")
-	public CommonResult<PageInfo<UserHouseVo>> selectUserHouse(@RequestBody BaseQO<UserHouseEntity> baseQO,
-	                                                           @ApiParam(value = "社区id")
-	                                                           @RequestParam Long communityId) {
-		PageInfo<UserHouseVo> page = userHouseService.selectUserHouse(baseQO, communityId);
+	public CommonResult<PageInfo<UserHouseDto>> selectUserHouse(@RequestBody BaseQO<UserHouseEntity> baseQO,
+	                                                            @ApiParam(value = "社区id")
+	                                                            @RequestParam Long communityId) {
+		PageInfo<UserHouseDto> page = userHouseService.selectUserHouse(baseQO, communityId);
 		return CommonResult.ok(page);
 	}
 	

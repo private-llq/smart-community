@@ -5,15 +5,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IMenuService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.dto.menu.FrontMenuDto;
 import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.MenuMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.vo.menu.FrontMenuVo;
-import com.jsy.community.vo.menu1.FrontChildMenu;
-import com.jsy.community.vo.menu1.FrontParentMenu;
+import com.jsy.community.dto.menu.FrontChildMenu;
+import com.jsy.community.dto.menu.FrontParentMenu;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -49,14 +49,14 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public Integer updateMenu(Long id, FrontMenuVo frontMenuVo) {
-		String parentName = frontMenuVo.getParentName();
+	public Integer updateMenu(Long id, FrontMenuDto frontMenuDto) {
+		String parentName = frontMenuDto.getParentName();
 		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("menu_name", parentName);
 		FrontMenuEntity menuEntity = menuMapper.selectOne(queryWrapper);
 		
 		FrontMenuEntity frontMenuEntity = new FrontMenuEntity();
-		BeanUtils.copyProperties(frontMenuVo, frontMenuEntity);
+		BeanUtils.copyProperties(frontMenuDto, frontMenuEntity);
 		frontMenuEntity.setId(id);
 		
 		if (menuEntity != null) {
@@ -67,7 +67,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public List<FrontMenuVo> listFrontMenu(BaseQO<FrontMenuEntity> baseQO) {
+	public List<FrontMenuDto> listFrontMenu(BaseQO<FrontMenuEntity> baseQO) {
 		Page<FrontMenuEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
 		String menuName = baseQO.getQuery().getMenuName();
@@ -81,11 +81,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 		menuMapper.selectPage(page, wrapper);
 		
 		
-		ArrayList<FrontMenuVo> frontMenuVos = new ArrayList<>();
+		ArrayList<FrontMenuDto> frontMenuDtos = new ArrayList<>();
 		
 		List<FrontMenuEntity> records = page.getRecords();
 		for (FrontMenuEntity record : records) {
-			FrontMenuVo menuVo = new FrontMenuVo();
+			FrontMenuDto menuVo = new FrontMenuDto();
 			BeanUtils.copyProperties(record, menuVo);
 			Long parentId = record.getParentId();
 			QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
@@ -94,9 +94,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 			if (menuEntity != null) {
 				menuVo.setParentName(menuEntity.getMenuName());
 			}
-			frontMenuVos.add(menuVo);
+			frontMenuDtos.add(menuVo);
 		}
-		return frontMenuVos;
+		return frontMenuDtos;
 	}
 	
 	@Override
@@ -127,9 +127,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public FrontMenuVo getMenuById(Long id) {
+	public FrontMenuDto getMenuById(Long id) {
 		FrontMenuEntity menuEntity = menuMapper.selectById(id);
-		FrontMenuVo menuVo = new FrontMenuVo();
+		FrontMenuDto menuVo = new FrontMenuDto();
 		BeanUtils.copyProperties(menuEntity, menuVo);
 
 //		Long parentId = menuEntity.getParentId();
@@ -157,12 +157,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public List<FrontMenuVo> moreListMenu() {
+	public List<FrontMenuDto> moreListMenu() {
 		List<FrontMenuEntity> list = menuMapper.selectList(null);
 		
-		ArrayList<FrontMenuVo> arrayList = new ArrayList<>();
+		ArrayList<FrontMenuDto> arrayList = new ArrayList<>();
 		for (FrontMenuEntity frontMenuEntity : list) {
-			FrontMenuVo menuVo = new FrontMenuVo();
+			FrontMenuDto menuVo = new FrontMenuDto();
 			BeanUtils.copyProperties(frontMenuEntity, menuVo);
 			Long parentId = frontMenuEntity.getParentId();
 			FrontMenuEntity menuEntity = this.common(parentId);

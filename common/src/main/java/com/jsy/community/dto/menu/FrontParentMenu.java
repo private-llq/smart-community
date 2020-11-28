@@ -1,4 +1,4 @@
-package com.jsy.community.vo.menu1;
+package com.jsy.community.dto.menu;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -6,10 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Author lihao
- * @ClassName FrontChildMenu
+ * @ClassName FrontParentMenu
  * @Date 2020/11/17  10:10
  * @Description TODO
  * @Version 1.0
@@ -17,7 +18,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FrontChildMenu implements Serializable {
+public class FrontParentMenu implements Serializable {
 	
 	private Long id;
 	
@@ -25,4 +26,6 @@ public class FrontChildMenu implements Serializable {
 	
 	@ApiModelProperty(value = "菜单名")
 	private String menuName;
+	
+	private List<FrontChildMenu> childMenus;
 }

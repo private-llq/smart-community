@@ -1,9 +1,11 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.dto.userhouse.UserHouseDto;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
@@ -15,7 +17,6 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.PageVoUtils;
-import com.jsy.community.vo.UserHouseVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +48,17 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	private HouseMapper houseMapper;
 	
 	@Override
-	public PageInfo<UserHouseVo> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId) {
-		List<UserHouseVo> userHouseVos = new ArrayList<>();
+	public PageInfo<UserHouseDto> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId) {
+		List<UserHouseDto> userHouseDtos = new ArrayList<>();
 		
 		QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("community_id", communityId);
 		wrapper.orderByAsc("check_status");
-		List<UserHouseEntity> list = userHouseMapper.selectList(wrapper);
+		Page<UserHouseEntity> page = new Page<>(baseQO.getPage(),baseQO.getSize());
+		List<UserHouseEntity> list = userHouseMapper.selectPage(page,wrapper).getRecords();
 		
 		for (UserHouseEntity userHouseEntity : list) {
-			UserHouseVo houseVo = new UserHouseVo();
+			UserHouseDto houseVo = new UserHouseDto();
 			
 			// 业主房屋认证信息
 			BeanUtils.copyProperties(userHouseEntity, houseVo);
@@ -77,13 +79,13 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			HouseEntity houseEntity = houseMapper.selectById(houseId);
 			BeanUtils.copyProperties(houseEntity, houseVo);
 			
-			userHouseVos.add(houseVo);
+			userHouseDtos.add(houseVo);
 		}
 		
 		long current = baseQO.getPage();
 		long size = baseQO.getSize();
 		long total = list.size();
-		return PageVoUtils.page(current, total, size, userHouseVos);
+		return PageVoUtils.page(current, total, size, userHouseDtos);
 	}
 	
 	@Override
