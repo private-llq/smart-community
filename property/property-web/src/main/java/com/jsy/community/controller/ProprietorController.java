@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IHouseService;
+import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
@@ -39,8 +40,10 @@ import java.util.List;
 public class ProprietorController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
-    private IHouseService iHouseService;
+    private IProprietorService iProprietorService;
 
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IHouseService iHouseService;
 
     /**
      * http://localhost:7001/api/v1/property/proprietor/downloadExcel?communityId=1
@@ -107,7 +110,8 @@ public class ProprietorController {
      */
     @DeleteMapping()
     public CommonResult<Boolean> del(@RequestParam Long id){
-        return null;
+        iProprietorService.del(id);
+        return CommonResult.ok();
     }
 
     /**
@@ -125,7 +129,7 @@ public class ProprietorController {
      * @param userEntity          参数实体
      * @return                    返回删除是否成功
      */
-    @PostMapping()
+    @PutMapping()
     public CommonResult<Boolean> update(@RequestParam UserEntity userEntity){
         return null;
     }
