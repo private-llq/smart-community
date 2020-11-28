@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -90,7 +91,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	 * @return 返回通过社区名称和城市id查询结果
 	 */
 	@Override
-	public List<CommunityEntity> getCommunityByName(CommunityEntity communityEntity) {
+	public List<CommunityEntity> getCommunityByName(CommunityQO communityQO) {
+		CommunityEntity communityEntity = new CommunityEntity();
+		BeanUtil.copyProperties(communityQO , communityEntity);
 		//按名称何城市id 模糊查询 所有社区
 		List<CommunityEntity> communityEntityList = communityMapper.getCommunityByName(communityEntity);
 		double lat = communityEntity.getLat().doubleValue();

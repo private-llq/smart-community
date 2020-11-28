@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,6 +10,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.CarQO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -52,12 +54,15 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     /**
      * 根据实体类字段 进行更新
-     * @param carEntity 车辆修改参数实体对象
+     * @param carQO      车辆修改参数实体对象
+     * @param uid        用户id
      * @return           返回修改影响行数
      */
     @Override
-    public Integer updateProprietorCar(CarEntity carEntity) {
-        return carMapper.update(carEntity, new UpdateWrapper<CarEntity>().eq("id",carEntity.getId()).eq("uid", carEntity.getUid()).eq("deleted", 0));
+    public Integer updateProprietorCar(CarQO carQO, Long uid) {
+        CarEntity carEntity = new CarEntity();
+        BeanUtil.copyProperties(carQO, carEntity);
+        return carMapper.update(carEntity, new UpdateWrapper<CarEntity>().eq("id",carEntity.getId()).eq("uid", uid).eq("deleted", 0));
     }
 
     /**

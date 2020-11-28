@@ -28,14 +28,13 @@ public class CommunityEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(groups = {GetCommunityByName.class}, message = "社区名称未输入!")
     @ApiModelProperty(value = "社区名称")
     private String name;
 
     @ApiModelProperty(value = "省份ID")
     private Integer provinceId;
 
-    @NotNull(groups = {GetCommunityByName.class}, message = "城市id不能为空!")
+
     @ApiModelProperty(value = "城市ID")
     private Integer cityId;
 
@@ -45,11 +44,11 @@ public class CommunityEntity extends BaseEntity {
     @ApiModelProperty(value = "详细地址")
     private String detailAddress;
 
-    @NotNull(groups = {GetCommunityByName.class}, message = "经度不能为空!")
+
     @ApiModelProperty(value = "经度")
     private BigDecimal lon;
 
-    @NotNull(groups = {GetCommunityByName.class}, message = "纬度不能为空!")
+
     @ApiModelProperty(value = "纬度")
     private BigDecimal lat;
     
@@ -59,11 +58,6 @@ public class CommunityEntity extends BaseEntity {
     @TableField(exist=false)
     private String distanceString;//定位距离(显示用)
 
-   /**
-    * 通过名称查询社区 验证参数接口
-    * @author YuLF
-    * @since  2020/11/23 11:16
-    */
-    public interface GetCommunityByName{}
+
 
 }

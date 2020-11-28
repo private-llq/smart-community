@@ -3,6 +3,9 @@ package com.jsy.community.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jsy.community.constant.BusinessConst;
+import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.constant.Const;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,14 +14,13 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 /**
  * 车辆实体对象
  * YuLF
+ * 数据访问对象：这个类主要用于对应数据库表t_car的数据字段的映射关系，
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -31,18 +33,18 @@ public class CarEntity extends BaseEntity {
     @JsonIgnore
     private Long uid;
 
-    @Range(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "车位id不合法")
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, message = "车位不能为空")
+    @Range(groups = {addCarValidated.class, proprietorCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "车位id不合法")
+    @NotNull(groups = {addCarValidated.class, proprietorCarValidated.class}, message = "车位不能为空")
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
-    @Range(groups = {addCarValidated.class, updateCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "社区id不合法")
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class}, message = "社区不能为空")
+    @Range(groups = {addCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "社区id不合法")
+    @NotNull(groups = {addCarValidated.class}, message = "社区不能为空")
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
 
-    @Pattern(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, message = "车牌不能为空!")
+    @Pattern(groups = {addCarValidated.class, proprietorCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
+    @NotNull(groups = {addCarValidated.class, proprietorCarValidated.class}, message = "车牌不能为空!")
     @ApiModelProperty(value = "车辆牌照")
     private String carPlate;
 
@@ -51,18 +53,19 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆照片访问路径")
     private String carImageUrl;
 
-    @Pattern(groups = {addCarValidated.class, updateCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class}, message = "手机号码未输入!")
+    @Pattern(groups = {addCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+    @NotNull(groups = {addCarValidated.class}, message = "手机号码未输入!")
     @ApiModelProperty(value = "车主联系方式")
     private String contact;
 
-    @NotBlank(groups = {addCarValidated.class, updateCarValidated.class}, message = "车辆所属人不能为空!")
+    @NotBlank(groups = {addCarValidated.class}, message = "车辆所属人不能为空!")
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @NotNull(groups = {addCarValidated.class, updateCarValidated.class, proprietorCarValidated.class}, message = "车辆类型未选择!")
+    @Range(groups = { CarEntity.addCarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
     @ApiModelProperty(value = "车辆类型")
     private Integer carType;
+
 
     @ApiModelProperty(value = "是否通过审核")
     private Integer checkStatus;
@@ -86,10 +89,6 @@ public class CarEntity extends BaseEntity {
      */
     public interface addCarValidated{}
 
-    /**
-     * 更新车辆前端参数验证接口
-     */
-    public interface updateCarValidated{}
 
 
 

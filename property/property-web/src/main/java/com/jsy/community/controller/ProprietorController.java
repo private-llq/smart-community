@@ -106,12 +106,13 @@ public class ProprietorController {
     /**
      * TODO  Seata全局事务处理
      * 根据业主id 删除业主信息、业主关联的房屋、业主的家庭成员、业主的车辆信息
-     * @param id        业主id
      * @return          返回删除是否成功
      */
     @DeleteMapping()
-    public CommonResult<Boolean> del(@RequestParam Long id){
-        iProprietorService.del(id);
+    public CommonResult<Boolean> del(@RequestParam Long uid){
+        //从JWT获取业主ID
+        //Long uid = 12L;
+        iProprietorService.del(uid);
         return CommonResult.ok();
     }
 
@@ -122,6 +123,7 @@ public class ProprietorController {
      */
     @PostMapping()
     public CommonResult<Boolean> query(@RequestParam BaseQO<UserEntity> entityBaseQO){
+
         return null;
     }
 
@@ -132,7 +134,7 @@ public class ProprietorController {
      */
     @PutMapping()
     public CommonResult<Boolean> update(@RequestParam UserEntity userEntity){
-        return null;
+        return iProprietorService.update(userEntity) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
 

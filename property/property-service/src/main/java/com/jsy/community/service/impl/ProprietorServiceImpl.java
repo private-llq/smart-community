@@ -9,7 +9,6 @@ import com.jsy.community.mapper.ProprietorMapper;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,5 +47,15 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
         proprietorMapper.deleteById(id);
 
 
+    }
+
+    /**
+     * 通过传入的参数更新业主信息
+     * @param userEntity   更新业主信息参数
+     * @return             返回是否更新成功
+     */
+    @Override
+    public Boolean update(UserEntity userEntity) {
+        return null;
     }
 }

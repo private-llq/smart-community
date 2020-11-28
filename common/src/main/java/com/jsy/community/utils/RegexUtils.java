@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class RegexUtils {
 
 	/**
-	 * 正则表达式：验证数字性别 参数只能 0-2
+	 * 正则表达式：验证数字性别、参数只能 0-2
 	 */
 	public static final String REGEX_GENDER = "^[0-2]{1}";
 
@@ -20,6 +20,11 @@ public class RegexUtils {
 	 * 正则表达式：验证中国姓名
 	 */
 	public static final String REGEX_REAL_NAME = "^[\u4e00-\u9fa5]{2,4}";
+
+	/**
+	 * 正则表达式：验证 0-1限制
+	 */
+	public static final String REGEX_INFORM_STATE = "^[0-1]{1}";
 
 	/**
 	 * 正则表达式：验证汽车牌照

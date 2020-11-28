@@ -31,7 +31,7 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Param  communityEntity 	必要参数实体
 	 * @return 返回通过社区名称和城市id查询结果
 	 */
-    List<CommunityEntity> getCommunityByName(CommunityEntity communityEntity);
+    List<CommunityEntity> getCommunityByName(CommunityQO communityQO);
 	
     /**
     * @Description: 小区定位

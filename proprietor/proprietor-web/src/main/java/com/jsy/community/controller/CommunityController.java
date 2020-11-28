@@ -52,10 +52,10 @@ public class CommunityController {
 	 */
 	@ApiOperation("社区模糊搜索接口")
 	@PostMapping()
-	public CommonResult<List<CommunityEntity>> getCommunityByName(@RequestBody CommunityEntity communityEntity){
+	public CommonResult<List<CommunityEntity>> getCommunityByName(@RequestBody CommunityQO communityQO){
 		//验证请求参数
-		ValidatorUtils.validateEntity(communityEntity, CommunityEntity.GetCommunityByName.class);
-		return CommonResult.ok(iCommunityService.getCommunityByName(communityEntity));
+		ValidatorUtils.validateEntity(communityQO, CommunityQO.GetCommunityByName.class);
+		return CommonResult.ok(iCommunityService.getCommunityByName(communityQO));
 	}
 	
 	/**

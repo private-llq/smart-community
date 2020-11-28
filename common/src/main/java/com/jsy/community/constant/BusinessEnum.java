@@ -106,6 +106,8 @@ public interface BusinessEnum {
 		
 		public static final List<Map<String, Object>> carTypeList = new ArrayList<>();
 		public static final Map<Integer, String> carTypeMap = new HashMap<>();
+		public static  final  int CARTYPE_MAX = 5;
+		public static  final  int CARTYPE_MIN = 1;
 		static {
 			for(CarTypeEnum regionQueryTypeEnum : CarTypeEnum.values()){
 				HashMap<String, Object> map = new HashMap<>();
@@ -158,7 +160,7 @@ public interface BusinessEnum {
 		
 		public static final List<Map<String, Object>> checkStatusList = new ArrayList<>();
 		public static final Map<Integer, String> checkStatusMap = new HashMap<>();
-		
+
 		static {
 			for (CheckStatusEnum checkStatusEnum : CheckStatusEnum.values()) {
 				HashMap<String, Object> map = new HashMap<>();

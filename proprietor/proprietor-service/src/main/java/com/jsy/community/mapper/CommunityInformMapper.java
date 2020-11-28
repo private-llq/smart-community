@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CommunityInformEntity;
+import com.jsy.community.qo.proprietor.CommunityInformQO;
 
 /**
  * <p>
@@ -13,4 +14,5 @@ import com.jsy.community.entity.CommunityInformEntity;
  */
 public interface CommunityInformMapper extends BaseMapper<CommunityInformEntity> {
 
+    Integer updateCommunityInform(CommunityInformQO communityInformQO);
 }

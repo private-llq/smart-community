@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jsy.community.mapper.CommunityMapper">
+        <!-- 社区根据name 和城市id 模糊搜索查询 -->
         <select id="getCommunityByName" resultType="com.jsy.community.entity.CommunityEntity">
             select id,name,detail_address,lon,lat from t_community where name like concat('%',#{name},'%') and city_id = #{cityId}
         </select>

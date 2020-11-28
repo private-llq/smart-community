@@ -19,7 +19,7 @@
 			<if test="sex != null">
 				,sex = #{sex}
 			</if>
-			<if test="provinceId">
+			<if test="provinceId != null">
 				,province_id = #{provinceId}
 			</if>
 			<if test="cityId != null">

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -34,7 +35,7 @@ import javax.validation.constraints.Pattern;
 public class CommunityInformEntity extends BaseEntity {
 
     @ApiModelProperty(value = "社区id")
-    @NotNull( groups = {addCommunityInformValidate.class, updateCommunityInformValidate.class}, message = "社区ID不能为空")
+    @NotNull( groups = {updateCommunityInformValidate.class}, message = "社区ID不能为空")
     private Long communityId;
 
     @ApiModelProperty(value = "社区通知消息状态，0紧急，1重要，2一般")
@@ -71,5 +72,6 @@ public class CommunityInformEntity extends BaseEntity {
      * 修改社区消息接口
      */
     public interface updateCommunityInformValidate{}
+
 
 }

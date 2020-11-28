@@ -7,6 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -58,14 +59,10 @@ public class CarController {
     @PostMapping(produces = "application/json;charset=utf-8")
     @Transactional(rollbackFor = {Exception.class}, isolation = Isolation.READ_COMMITTED)
     public CommonResult<Boolean> addProprietorCar(@RequestBody CarEntity carEntity) {
-        //0.从request取uid
+        //0.从JWT取uid
         carEntity.setUid(12L);
         //1.效验前端新增车辆参数合法性
         ValidatorUtils.validateEntity(carEntity, CarEntity.addCarValidated.class);
-        //2.效验被登记的车辆是否存在登记过
-        if (carPlateExist(carEntity.getCarPlate())) {
-            return CommonResult.error(JSYError.NOT_IMPLEMENTED.getCode(), "车辆车牌已经登记存在!");
-        }
         Integer integer = carService.addProprietorCar(carEntity);
         //3.登记新增车辆操作
         return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
@@ -74,18 +71,17 @@ public class CarController {
 
     /**
      * 修改业主固定车辆
-     * @param carEntity 前端请求参数对象
+     * @param carQO 前端请求参数对象
      * @return 返回修改影响行数
      */
     @ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
     @PutMapping()
-    public CommonResult<Boolean> updateProprietorCar(@RequestBody CarEntity carEntity) {
-        //从请求获取uid
+    public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO carQO) {
+        //从JWT中取 uid
         Long uid = 12L;
-        carEntity.setUid(uid);
         //效验前端新增车辆参数合法性
-        ValidatorUtils.validateEntity(carEntity, CarEntity.updateCarValidated.class);
-        Integer integer = carService.updateProprietorCar(carEntity);
+        ValidatorUtils.validateEntity(carQO, CarQO.updateCarValidated.class);
+        Integer integer = carService.updateProprietorCar(carQO, uid);
         return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
@@ -105,15 +101,6 @@ public class CarController {
         return CommonResult.ok(records);
     }
 
-
-    /**
-     * 根据车牌号检查车辆是否已经登记
-     * @param carPlate 车牌号
-     * @return 返回是否存在布尔值
-     */
-    private Boolean carPlateExist(String carPlate) {
-        return carService.carIsExist(carPlate);
-    }
 
     /**
      * 通过车辆ID 删除 车辆方法

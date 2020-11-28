@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.CarQO;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public interface ICarService extends IService<CarEntity> {
      * @param carEntity 车辆对象实体
      * @return          返回修改影响行数
      */
-    Integer updateProprietorCar(CarEntity carEntity);
+    Integer updateProprietorCar(CarQO carEntity,Long uid);
 
     /**
      * 通过车辆id逻辑删除车辆方法

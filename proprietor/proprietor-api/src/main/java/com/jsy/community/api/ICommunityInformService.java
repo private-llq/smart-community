@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.CommunityInformQO;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -34,10 +35,10 @@ public interface ICommunityInformService extends IService<CommunityInformEntity>
 
     /**
      * 更新社区消息
-     * @param communityEntity       参数实体
+     * @param communityInformQO     参数实体
      * @return                      返回更新是否成功
      */
-    Boolean updateCommunityInform(CommunityInformEntity communityEntity);
+    Boolean updateCommunityInform(CommunityInformQO communityInformQO);
 
     /**
      * 根据id逻辑删除社区消息

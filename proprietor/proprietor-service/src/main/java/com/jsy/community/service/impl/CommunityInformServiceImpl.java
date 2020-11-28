@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -7,9 +8,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityInformService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.mapper.CommunityInformMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.CommunityInformQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -72,13 +75,12 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
 
     /**
      * 修改社区消息
-     * @param communityEntity  参数实体
+     * @param communityInformQO 参数实体
      * @return                 返回是否修改成功
      */
     @Override
-    public Boolean updateCommunityInform(CommunityInformEntity communityEntity) {
-        int update = communityInformMapper.update(communityEntity, new UpdateWrapper<CommunityInformEntity>().eq("id", communityEntity.getId()).eq("community_id", communityEntity.getCommunityId()).eq("deleted", 0));
-        return update > 0;
+    public Boolean updateCommunityInform(CommunityInformQO communityInformQO) {
+        return communityInformMapper.updateCommunityInform(communityInformQO) > 0;
     }
 
     /**
