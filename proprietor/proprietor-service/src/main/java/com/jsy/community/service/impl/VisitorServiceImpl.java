@@ -16,7 +16,9 @@ import com.jsy.community.mapper.VisitorPersonMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.vo.VisitorVO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -132,7 +134,9 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Date: 2020/11/16
      **/
     @Override
-    public boolean updateVisitorById(VisitorEntity visitorEntity){
+    public boolean updateVisitorById(VisitorVO visitorVO){
+        VisitorEntity visitorEntity = new VisitorEntity();
+        BeanUtils.copyProperties(visitorVO,visitorEntity);
         int result = visitorMapper.updateById(visitorEntity);
         if(result == 1){
             return true;

@@ -17,6 +17,7 @@ import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.VisitorVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -33,7 +34,7 @@ import java.util.List;
 @RequestMapping("visitor")
 @Api(tags = "访客控制器")
 @RestController
-@Login
+//@Login
 @ApiJSYController
 public class VisitorController {
 	
@@ -67,8 +68,6 @@ public class VisitorController {
 		//添加随行人员
 		List<VisitorPersonEntity> personList = visitorEntity.getVisitorPersonList();
 		if (!CollectionUtils.isEmpty(personList)) {
-			//TODO 测试是否可以验证List类型 否
-			ValidatorUtils.validateEntity(personList, VisitorPersonEntity.addPersonValidatedGroup.class);
 			for (VisitorPersonEntity person : personList) {
 				person.setVisitorId(visitorId);
 			}
@@ -80,8 +79,6 @@ public class VisitorController {
 		//添加随行车辆
 		List<VisitingCarEntity> carList = visitorEntity.getVisitingCarList();
 		if (!CollectionUtils.isEmpty(carList)) {
-			//TODO 测试是否可以验证List类型 否
-			ValidatorUtils.validateEntity(carList, VisitingCarEntity.addCarValidatedGroup.class);
 			for (VisitingCarEntity car : carList) {
 				car.setVisitorId(visitorId);
 			}
@@ -121,27 +118,27 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【访客】修改")
 	@PutMapping("")
-	public CommonResult update(@RequestBody VisitorEntity visitorEntity) {
-		setNull(visitorEntity);
-		boolean updateResult = iTVisitorService.updateVisitorById(visitorEntity);
+	public CommonResult update(@RequestBody VisitorVO visitorVO) {
+//		setNull(visitorEntity);
+		boolean updateResult = iTVisitorService.updateVisitorById(visitorVO);
 		return updateResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记申请 修改失败");
 	}
 	
 	/**
 	 * 设置不能修改的字段
 	 */
-	private void setNull(VisitorEntity visitorEntity) {
-		visitorEntity.setCommunityId(null);
-		visitorEntity.setUid(null);
-		visitorEntity.setIsCommunityAccess(null);
-		visitorEntity.setIsBuildingAccess(null);
-		visitorEntity.setCheckType(null);
-		visitorEntity.setCheckStatus(null);
-		visitorEntity.setCheckTime(null);
-		visitorEntity.setRefuseReason(null);
-		visitorEntity.setDeleted(null);
-		visitorEntity.setCreateTime(null);
-	}
+//	private void setNull(VisitorEntity visitorEntity) {
+//		visitorEntity.setCommunityId(null);
+//		visitorEntity.setUid(null);
+//		visitorEntity.setIsCommunityAccess(null);
+//		visitorEntity.setIsBuildingAccess(null);
+//		visitorEntity.setCheckType(null);
+//		visitorEntity.setCheckStatus(null);
+//		visitorEntity.setCheckTime(null);
+//		visitorEntity.setRefuseReason(null);
+//		visitorEntity.setDeleted(null);
+//		visitorEntity.setCreateTime(null);
+//	}
 	
 	/**
 	* @Description: 分页查询

@@ -7,6 +7,7 @@ import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorQO;
+import com.jsy.community.vo.VisitorVO;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @Author: chq459799974
      * @Date: 2020/11/16
     **/
-    boolean updateVisitorById(VisitorEntity visitorEntity);
+    boolean updateVisitorById(VisitorVO visitorVO);
     
     /**
      * @Description: 修改随行人员
