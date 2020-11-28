@@ -1,10 +1,8 @@
-package com.jsy.community.returnVO;
+package com.jsy.community.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * @Description: 轮播图查询返回类
@@ -13,7 +11,7 @@ import java.io.Serializable;
  **/
 @Data
 @ApiModel("轮播图查询返回")
-public class BannerRVO implements Serializable {
+public class BannerVO extends BaseVO {
 	@ApiModelProperty(value = "ID")
 	private Long id;
 	

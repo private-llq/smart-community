@@ -6,8 +6,7 @@ import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.VisitorQO;
-import com.jsy.community.vo.VisitorVO;
+import com.jsy.community.qo.VisitorQO;
 
 import java.util.List;
 
@@ -68,12 +67,12 @@ public interface IVisitorService extends IService<VisitorEntity> {
     
     /**
     * @Description: 修改访客登记申请
-     * @Param: [visitorVO]
+     * @Param: [visitorQO]
      * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/11/16
     **/
-    boolean updateVisitorById(VisitorVO visitorVO);
+    boolean updateVisitorById(VisitorQO visitorQO);
     
     /**
      * @Description: 修改随行人员
@@ -118,7 +117,7 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @Author: chq459799974
      * @Date: 2020/11/11
     **/
-    Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO);
+    Page<VisitorEntity> queryByPage(BaseQO<com.jsy.community.qo.proprietor.VisitorQO> baseQO);
     
     /**
     * @Description: 根据ID单查访客

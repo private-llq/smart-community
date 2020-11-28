@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.api.IVisitorService;
@@ -13,11 +12,10 @@ import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.VisitorVO;
+import com.jsy.community.qo.VisitorQO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -111,16 +109,16 @@ public class VisitorController {
 	
 	/**
 	 * @Description: 访客登记 修改
-	 * @Param: [visitorVO]
+	 * @Param: [visitorQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/12
 	 **/
 	@ApiOperation("【访客】修改")
 	@PutMapping("")
-	public CommonResult update(@RequestBody VisitorVO visitorVO) {
-		ValidatorUtils.validateEntity(visitorVO);
-		boolean updateResult = iTVisitorService.updateVisitorById(visitorVO);
+	public CommonResult update(@RequestBody VisitorQO visitorQO) {
+		ValidatorUtils.validateEntity(visitorQO);
+		boolean updateResult = iTVisitorService.updateVisitorById(visitorQO);
 		return updateResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记申请 修改失败");
 	}
 	
@@ -133,7 +131,7 @@ public class VisitorController {
 	**/
 	@ApiOperation("【访客】分页查询")
 	@PostMapping("page")
-	public CommonResult<Page> query(@RequestBody BaseQO<VisitorQO> baseQO) {
+	public CommonResult<Page> query(@RequestBody BaseQO<com.jsy.community.qo.proprietor.VisitorQO> baseQO) {
 		return CommonResult.ok(iTVisitorService.queryByPage(baseQO));
 	}
 	

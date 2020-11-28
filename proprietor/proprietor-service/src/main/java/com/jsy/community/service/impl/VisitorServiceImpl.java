@@ -15,15 +15,13 @@ import com.jsy.community.mapper.VisitingCarMapper;
 import com.jsy.community.mapper.VisitorMapper;
 import com.jsy.community.mapper.VisitorPersonMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.vo.VisitorVO;
+import com.jsy.community.qo.VisitorQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,15 +127,15 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     
     /**
      * @Description: 修改访客登记申请
-     * @Param: [visitorVO]
+     * @Param: [visitorQO]
      * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/11/16
      **/
     @Override
-    public boolean updateVisitorById(VisitorVO visitorVO){
+    public boolean updateVisitorById(VisitorQO visitorQO){
         VisitorEntity visitorEntity = new VisitorEntity();
-        BeanUtils.copyProperties(visitorVO,visitorEntity);
+        BeanUtils.copyProperties(visitorQO,visitorEntity);
         int result = visitorMapper.update(visitorEntity,new QueryWrapper<VisitorEntity>()
             .eq("id",visitorEntity.getId())
             .ne("check_status", BusinessEnum.CheckStatusEnum.PASS.getCode())  // 已审核通过的访客登记不能修改
@@ -219,11 +217,11 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Date: 2020/11/11
      **/
     @Override
-    public Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO){
+    public Page<VisitorEntity> queryByPage(BaseQO<com.jsy.community.qo.proprietor.VisitorQO> baseQO){
         Page<VisitorEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>().select("*");
-        VisitorQO visitorQO = baseQO.getQuery();
+        com.jsy.community.qo.proprietor.VisitorQO visitorQO = baseQO.getQuery();
         if(visitorQO != null){
             if(!StringUtils.isEmpty(visitorQO.getName())){
                 queryWrapper.eq("name",visitorQO.getName());
@@ -237,7 +235,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     }
     
     /** 查询楼栋 */
-    private void queryAddress(QueryWrapper queryWrapper, VisitorQO visitorQO){
+    private void queryAddress(QueryWrapper queryWrapper, com.jsy.community.qo.proprietor.VisitorQO visitorQO){
         if(!StringUtils.isEmpty(visitorQO.getUnit())){
             queryWrapper.eq("building",visitorQO.getBuilding());
             if(!StringUtils.isEmpty(visitorQO.getBuilding())){

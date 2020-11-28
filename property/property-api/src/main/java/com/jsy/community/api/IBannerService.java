@@ -3,7 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.BannerEntity;
 import com.jsy.community.qo.proprietor.BannerQO;
-import com.jsy.community.returnVO.BannerRVO;
+import com.jsy.community.vo.BannerVO;
 
 import java.util.List;
 
@@ -27,11 +27,11 @@ public interface IBannerService extends IService<BannerEntity> {
 	/**
 	* @Description: 轮播图 列表查询
 	 * @Param: [bannerQO]
-	 * @Return: java.util.List<com.jsy.community.returnVO.BannerRVO>
+	 * @Return: java.util.List<com.jsy.community.vo.BannerVO>
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	**/
-	List<BannerRVO> queryBannerList(BannerQO bannerQO);
+	List<BannerVO> queryBannerList(BannerQO bannerQO);
 	
 	/**
 	* @Description: 轮播图 批量删除

@@ -1,17 +1,11 @@
-package com.jsy.community.vo;
+package com.jsy.community.qo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jsy.community.entity.VisitingCarEntity;
-import com.jsy.community.entity.VisitorPersonEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @author chq459799974
@@ -19,7 +13,10 @@ import java.util.List;
  * @since 2020-11-28 10:58
  **/
 @Data
-public class VisitorVO extends BaseVO {
+public class VisitorQO extends BaseQO {
+	
+	@ApiModelProperty(value = "ID")
+	private Long id;
 	
 	@ApiModelProperty(value = "来访人姓名")
 	private String name;

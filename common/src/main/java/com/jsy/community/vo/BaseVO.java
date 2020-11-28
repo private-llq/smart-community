@@ -1,5 +1,6 @@
 package com.jsy.community.vo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @Data
 public class BaseVO implements Serializable {
 	
+	@ApiModelProperty(value = "ID")
 	private Long id;
 	
 }
