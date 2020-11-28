@@ -106,7 +106,8 @@ public interface BusinessEnum {
 		
 		public static final List<Map<String, Object>> carTypeList = new ArrayList<>();
 		public static final Map<Integer, String> carTypeMap = new HashMap<>();
-		public static final String REGEX_CAR_TYPE = "^[1-5]{1}";
+		public static final Integer min = 1;
+		public static final Integer max = CarTypeEnum.values().length;
 		static {
 			for(CarTypeEnum regionQueryTypeEnum : CarTypeEnum.values()){
 				HashMap<String, Object> map = new HashMap<>();
