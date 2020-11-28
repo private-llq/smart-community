@@ -55,7 +55,7 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	}
 	
 	/**
-	 * @Description: 删除房间成员/撤销邀请
+	 * @Description: 删除房间成员/撤销邀请 by批量id
 	 * @Param: [ids]
 	 * @Return: boolean
 	 * @Author: chq459799974
@@ -64,6 +64,21 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	@Override
 	public boolean deleteHouseMember(List<Long> ids){
 		int result = houseMemberMapper.deleteBatchIds(ids);
+		if(result > 0){
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @Description: 删除房间成员/撤销邀请 by房主id
+	 * @Param: [houseHolderId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/28
+	 **/
+	public boolean deleteHouseMember(Long houseHolderId){
+		int result = houseMemberMapper.delete(new QueryWrapper<HouseMemberEntity>().eq("householder_id",houseHolderId));
 		if(result > 0){
 			return true;
 		}

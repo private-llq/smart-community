@@ -28,13 +28,22 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	boolean addHouseMember(HouseMemberEntity houseMemberEntity);
 	
 	/**
-	* @Description: 删除房间成员/撤销邀请
+	* @Description: 删除房间成员/撤销邀请 by批量id
 	 * @Param: [ids]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/11/23
 	**/
 	boolean deleteHouseMember(List<Long> ids);
+	
+	/**
+	* @Description: 删除房间成员/撤销邀请 by房主id
+	 * @Param: [houseHolderId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/28
+	**/
+	boolean deleteHouseMember(Long houseHolderId);
 	
 	/**
 	* @Description: 成员确认加入房间
