@@ -11,7 +11,7 @@ import java.util.List;
  * 菜单 服务类
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-11-14
  */
 public interface IMenuService extends IService<FrontMenuEntity> {

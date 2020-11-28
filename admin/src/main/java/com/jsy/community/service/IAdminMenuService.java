@@ -8,7 +8,7 @@ import com.jsy.community.entity.AdminMenuEntity;
  * 菜单 服务类
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-11-24
  */
 public interface IAdminMenuService extends IService<AdminMenuEntity> {

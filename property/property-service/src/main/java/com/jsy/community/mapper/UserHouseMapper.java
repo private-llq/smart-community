@@ -8,7 +8,7 @@ import com.jsy.community.entity.UserHouseEntity;
  * 业主房屋认证 Mapper 接口
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-11-25
  */
 public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {

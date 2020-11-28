@@ -10,7 +10,7 @@ import java.util.List;
  *  服务类
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-11-24
  */
 public interface IDepartmentService extends IService<DepartmentEntity> {

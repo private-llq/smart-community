@@ -16,7 +16,7 @@ import java.util.List;
  *  服务实现类
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-11-24
  */
 @DubboService(version = Const.version, group = Const.group)
@@ -28,7 +28,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	@Override
 	public List<DepartmentEntity> listDepartment(Long id) {
 		QueryWrapper<DepartmentEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("community_id",id).last("limit 10");
+		queryWrapper.eq("community_id",id).last("limit 10");// TODO 最多展示10个 先写死
 		return departmentMapper.selectList(queryWrapper);
 	}
 }

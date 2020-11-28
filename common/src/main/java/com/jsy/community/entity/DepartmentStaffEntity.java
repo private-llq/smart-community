@@ -13,13 +13,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * <p>
- * 
- * </p>
- *
- * @author jsy
- * @since 2020-11-24
- */
+ * @return
+ * @Author lihao
+ * @Description 部门成员
+ * @Date 2020/11/28 10:06
+ * @Param
+ **/
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

@@ -8,7 +8,7 @@ import com.jsy.community.entity.DepartmentStaffEntity;
  *  Mapper 接口
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-11-24
  */
 public interface DepartmentStaffMapper extends BaseMapper<DepartmentStaffEntity> {

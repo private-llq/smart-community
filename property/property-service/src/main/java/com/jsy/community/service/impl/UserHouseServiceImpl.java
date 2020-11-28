@@ -28,7 +28,7 @@ import java.util.List;
  * 业主房屋认证 服务实现类
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-11-25
  */
 @DubboService(version = Const.version, group = Const.group)
@@ -117,5 +117,11 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public Boolean removeUserHouse(Long id) {
+		int count = userHouseMapper.deleteById(id);
+		return count!=0;
 	}
 }

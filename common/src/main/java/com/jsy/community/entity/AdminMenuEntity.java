@@ -8,13 +8,12 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * <p>
- * 菜单
- * </p>
- *
- * @author jsy
- * @since 2020-11-24
- */
+ * @return
+ * @Author lihao
+ * @Description 菜单
+ * @Date 2020/11/28 10:06
+ * @Param
+ **/
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * 业主房屋认证 前端控制器
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-11-25
  */
 @Api(tags = "业主房屋认证控制器")
