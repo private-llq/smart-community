@@ -18,6 +18,7 @@ import java.util.Date;
 
 /**
  * 车辆实体对象
+ * YuLF
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

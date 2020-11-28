@@ -8,7 +8,7 @@ import com.jsy.community.entity.UserEntity;
  * 业主 服务类
  * </p>
  *
- * @author jsy
+ * @author YuLF
  * @since 2020-11-25
  */
 public interface IProprietorService extends IService<UserEntity> {

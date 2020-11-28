@@ -15,11 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p>
  * 业主 服务实现类
- * </p>
- *
- * @author jsy
+ * @author YuLF
  * @since 2020-11-25
  */
 @Service
@@ -31,7 +28,12 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService iCarService;
 
-    @Transactional
+    /**
+     *  TODO seata 全局事务处理
+     * @author YuLF
+     * @since  2020/11/28 9:46
+     * @Param  id  - 被删除的业主Id
+     */
     @Override
     public void del(Long id) {
         //删除业主车辆信息
@@ -41,7 +43,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
         //删除业主关联的家庭成员
 
         //删除业主关联的房屋
-
 
         //删除业主信息
         proprietorMapper.deleteById(id);
