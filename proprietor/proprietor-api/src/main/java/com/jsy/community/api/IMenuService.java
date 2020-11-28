@@ -2,7 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.FrontMenuEntity;
-import com.jsy.community.dto.menu.FrontParentMenu;
+import com.jsy.community.vo.FrontParentMenu;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	List<FrontMenuEntity> listIndexMenu(Long communityId);
 	
 	/**
-	 * @return java.util.List<com.jsy.community.dto.menu.FrontParentMenu>
+	 * @return java.util.List<com.jsy.community.vo.FrontParentMenu>
 	 * @Author lihao
 	 * @Description 树形结构
 	 * @Date 2020/11/17 10:14

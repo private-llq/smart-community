@@ -1,11 +1,11 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.dto.menu.FrontMenuDto;
+import com.jsy.community.vo.FrontMenuVO;
 import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.dto.menu.FrontParentMenu;
+import com.jsy.community.vo.FrontParentMenu;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/14 17:52
 	 * @Param [menuEntity]
 	 **/
-	Integer updateMenu(Long id, FrontMenuDto frontMenuDto);
+	Integer updateMenu(Long id, FrontMenuVO frontMenuVO);
 	
 	/**
 	 * @return java.util.List<com.jsy.community.entity.FrontMenuEntity>
@@ -45,7 +45,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/14 17:59
 	 * @Param [baseEntity]
 	 **/
-	List<FrontMenuDto> listFrontMenu(BaseQO<FrontMenuEntity> baseQO);
+	List<FrontMenuVO> listFrontMenu(BaseQO<FrontMenuEntity> baseQO);
 	
 	/**
 	 * @return java.util.List<com.jsy.community.entity.FrontMenuEntity>
@@ -81,7 +81,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/15 15:00
 	 * @Param [id]
 	 **/
-	FrontMenuDto getMenuById(Long id);
+	FrontMenuVO getMenuById(Long id);
 	
 	/**
 	 * @return java.lang.Integer
@@ -99,10 +99,10 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/16 14:02
 	 * @Param []
 	 **/
-	List<FrontMenuDto> moreListMenu();
+	List<FrontMenuVO> moreListMenu();
 	
 	/**
-	 * @return java.util.List<com.jsy.community.dto.menu.FrontParentMenu>
+	 * @return java.util.List<com.jsy.community.vo.FrontParentMenu>
 	 * @Author lihao
 	 * @Description 树形结构
 	 * @Date 2020/11/17 10:14

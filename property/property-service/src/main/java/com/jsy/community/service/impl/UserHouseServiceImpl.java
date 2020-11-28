@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.dto.userhouse.UserHouseDto;
+import com.jsy.community.vo.UserHouseVO;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
@@ -48,8 +48,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	private HouseMapper houseMapper;
 	
 	@Override
-	public PageInfo<UserHouseDto> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId) {
-		List<UserHouseDto> userHouseDtos = new ArrayList<>();
+	public PageInfo<UserHouseVO> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId) {
+		List<UserHouseVO> userHouseVOS = new ArrayList<>();
 		
 		QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("community_id", communityId);
@@ -58,7 +58,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		List<UserHouseEntity> list = userHouseMapper.selectPage(page,wrapper).getRecords();
 		
 		for (UserHouseEntity userHouseEntity : list) {
-			UserHouseDto houseVo = new UserHouseDto();
+			UserHouseVO houseVo = new UserHouseVO();
 			
 			// 业主房屋认证信息
 			BeanUtils.copyProperties(userHouseEntity, houseVo);
@@ -79,13 +79,13 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			HouseEntity houseEntity = houseMapper.selectById(houseId);
 			BeanUtils.copyProperties(houseEntity, houseVo);
 			
-			userHouseDtos.add(houseVo);
+			userHouseVOS.add(houseVo);
 		}
 		
 		long current = baseQO.getPage();
 		long size = baseQO.getSize();
 		long total = list.size();
-		return PageVoUtils.page(current, total, size, userHouseDtos);
+		return PageVoUtils.page(current, total, size, userHouseVOS);
 	}
 	
 	@Override

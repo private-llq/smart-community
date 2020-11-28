@@ -1,4 +1,4 @@
-package com.jsy.community.dto.menu;
+package com.jsy.community.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
