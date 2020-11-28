@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
@@ -128,7 +129,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     
     /**
      * @Description: 修改访客登记申请
-     * @Param: [visitorEntity]
+     * @Param: [visitorVO]
      * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/11/16
@@ -137,7 +138,10 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     public boolean updateVisitorById(VisitorVO visitorVO){
         VisitorEntity visitorEntity = new VisitorEntity();
         BeanUtils.copyProperties(visitorVO,visitorEntity);
-        int result = visitorMapper.updateById(visitorEntity);
+        int result = visitorMapper.update(visitorEntity,new QueryWrapper<VisitorEntity>()
+            .eq("id",visitorEntity.getId())
+            .ne("check_status", BusinessEnum.CheckStatusEnum.PASS.getCode())  // 已审核通过的访客登记不能修改
+        );
         if(result == 1){
             return true;
         }

@@ -68,7 +68,7 @@ public interface IVisitorService extends IService<VisitorEntity> {
     
     /**
     * @Description: 修改访客登记申请
-     * @Param: [visitorEntity]
+     * @Param: [visitorVO]
      * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/11/16

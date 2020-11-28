@@ -1,11 +1,10 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.constant.CommonQueryConsts;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,12 +29,12 @@ public class SourceController {
 	//初始化静态代码块
 	@PostConstruct
 	public void initSource(){
-		System.out.println(CommonQueryConsts.CarTypeEnum.carTypeList);
+		System.out.println(BusinessEnum.CarTypeEnum.carTypeList);
 	}
 	
 	@ApiOperation("字典资源查询")
 	@GetMapping("typeSource")
 	public CommonResult<List<Map<String, Object>>> typeSource(@RequestParam String typeName){
-		return CommonResult.ok(CommonQueryConsts.sourceMap.get(typeName));
+		return CommonResult.ok(BusinessEnum.sourceMap.get(typeName));
 	}
 }

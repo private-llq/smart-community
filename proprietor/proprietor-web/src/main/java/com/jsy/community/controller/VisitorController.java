@@ -59,7 +59,7 @@ public class VisitorController {
 	@PostMapping("")
 	public CommonResult save(@RequestBody VisitorEntity visitorEntity) {
 		visitorEntity.setUid(JwtUtils.getUserId());
-		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addVisitorValidatedGroup.class);
+		ValidatorUtils.validateEntity(visitorEntity);
 		//添加访客
 		Long visitorId = iTVisitorService.addVisitor(visitorEntity);
 		if (visitorId == null) {
@@ -111,7 +111,7 @@ public class VisitorController {
 	
 	/**
 	 * @Description: 访客登记 修改
-	 * @Param: [visitorEntity]
+	 * @Param: [visitorVO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/12
@@ -119,26 +119,10 @@ public class VisitorController {
 	@ApiOperation("【访客】修改")
 	@PutMapping("")
 	public CommonResult update(@RequestBody VisitorVO visitorVO) {
-//		setNull(visitorEntity);
+		ValidatorUtils.validateEntity(visitorVO);
 		boolean updateResult = iTVisitorService.updateVisitorById(visitorVO);
 		return updateResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记申请 修改失败");
 	}
-	
-	/**
-	 * 设置不能修改的字段
-	 */
-//	private void setNull(VisitorEntity visitorEntity) {
-//		visitorEntity.setCommunityId(null);
-//		visitorEntity.setUid(null);
-//		visitorEntity.setIsCommunityAccess(null);
-//		visitorEntity.setIsBuildingAccess(null);
-//		visitorEntity.setCheckType(null);
-//		visitorEntity.setCheckStatus(null);
-//		visitorEntity.setCheckTime(null);
-//		visitorEntity.setRefuseReason(null);
-//		visitorEntity.setDeleted(null);
-//		visitorEntity.setCreateTime(null);
-//	}
 	
 	/**
 	* @Description: 分页查询

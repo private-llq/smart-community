@@ -39,7 +39,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private List<VisitingCarEntity> visitingCarList;
     
     @ApiModelProperty(value = "社区ID")
-    @NotNull(groups = {addVisitorValidatedGroup.class}, message = "缺少社区ID")
+    @NotNull(message = "缺少社区ID")
     private Long communityId;
     
     @JsonIgnore
@@ -47,7 +47,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private Long uid;
 
     @ApiModelProperty(value = "来访人姓名")
-    @NotEmpty(groups = {addVisitorValidatedGroup.class}, message = "缺少来访人姓名")
+    @NotEmpty(message = "缺少来访人姓名")
     private String name;
 
     @ApiModelProperty(value = "所属单元")
@@ -60,19 +60,19 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private String floor;
 
     @ApiModelProperty(value = "所属门牌号")
-    @NotEmpty(groups = {addVisitorValidatedGroup.class}, message = "缺少门牌号地址")
+    @NotEmpty(message = "缺少门牌号地址")
     private String door;
 
     @ApiModelProperty(value = "来访事由")
     private String reason;
     
     @ApiModelProperty(value = "预期来访时间")
-    @NotNull(groups = {addVisitorValidatedGroup.class}, message = "缺少预期来访时间")
+    @NotNull(message = "缺少预期来访时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime expectTime;
 
     @ApiModelProperty(value = "来访人联系方式")
-    @Pattern(groups = {addVisitorValidatedGroup.class}, regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+    @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     private String contact;
     
     @JsonIgnore
@@ -81,15 +81,13 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     
     @JsonIgnore
     @ApiModelProperty(value = "实际来访时间")
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime visitedTime;
     
-    @JsonIgnore
-    @ApiModelProperty(value = "是否授予来访人社区门禁权限，0无，1临时密码，2人脸识别")
+    @ApiModelProperty(value = "是否授予来访人社区门禁权限，0无，1二维码通行证，2人脸识别")
     private Integer isCommunityAccess;
     
-    @JsonIgnore
-    @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1临时密码，2可视对讲")
+    @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1二维码通行证，2可视对讲")
     private Integer isBuildingAccess;
     
     @JsonIgnore
@@ -102,20 +100,11 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     
     @JsonIgnore
     @ApiModelProperty(value = "审核时间",hidden = true)
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime checkTime;
     
     @JsonIgnore
     @ApiModelProperty(value = "审核拒绝原因")
     private String refuseReason;
     
-    /**
-     * 新增访客验证组
-     */
-    public interface addVisitorValidatedGroup{}
-    
-    /**
-     * 修改访客验证组
-     */
-    public interface updateVisitorValidatedGroup{}
 }

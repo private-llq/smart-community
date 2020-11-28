@@ -5,15 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.api.ProprietorException;
-import com.jsy.community.constant.CommonQueryConsts;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.MyPageUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -119,11 +117,11 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 			MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
 			QueryWrapper<HouseMemberEntity> queryWrapper = new QueryWrapper<>();
 			queryWrapper.select("*");// 暂时
-			if(CommonQueryConsts.QUERY_HOUSE_MEMBER.equals(houseMemberQO.getType())){ //查成员
+			if(BusinessConst.QUERY_HOUSE_MEMBER.equals(houseMemberQO.getType())){ //查成员
 				queryWrapper.eq("is_confirm",Const.HouseMemberConsts.JOINED);//已加入
 				queryWrapper.eq("house_id",houseMemberQO.getHouseId());
 				return houseMemberMapper.selectPage(page, queryWrapper);
-			}else if(CommonQueryConsts.QUERY_HOUSE_MEMBER_INVITATION.equals(houseMemberQO.getType())){ // 查邀请
+			}else if(BusinessConst.QUERY_HOUSE_MEMBER_INVITATION.equals(houseMemberQO.getType())){ // 查邀请
 				queryWrapper.eq("is_confirm",Const.HouseMemberConsts.UNJOIN);//未加入
 				queryWrapper.eq("uid",houseMemberQO.getUid());
 				return houseMemberMapper.selectPage(page,queryWrapper);

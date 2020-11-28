@@ -2,7 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICommonService;
-import com.jsy.community.constant.CommonQueryConsts;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.CommunityType;
@@ -11,10 +11,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +57,7 @@ public class CommonController {
 	@ApiOperation("查询下级省市区、查询城市等")
     @GetMapping("/region")
     public CommonResult<?> queryRegion(@RequestParam Integer queryType,Integer regionNumber) {
-        String queryMethodName = CommonQueryConsts.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType);
+        String queryMethodName = BusinessEnum.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType);
         if(queryMethodName == null){
             return CommonResult.error(JSYError.REQUEST_PARAM);
         }
@@ -67,7 +65,7 @@ public class CommonController {
             //调用 用查询类型ID找到的 对应的查询方法
             Method queryMethod = null;
             Object invoke = null;
-            if(!CommonQueryConsts.RegionQueryTypeEnum.SUB.getCode().equals(queryType)){//不带参
+            if(!BusinessEnum.RegionQueryTypeEnum.SUB.getCode().equals(queryType)){//不带参
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName);
                 invoke = queryMethod.invoke(commonService);
             }else{//带参
