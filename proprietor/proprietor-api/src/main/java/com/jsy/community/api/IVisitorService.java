@@ -6,7 +6,9 @@ import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.VisitorQO;
+import com.jsy.community.qo.proprietor.VisitorPersonQO;
+import com.jsy.community.qo.proprietor.VisitorQO;
+import com.jsy.community.qo.proprietor.VisitingCarQO;
 
 import java.util.List;
 
@@ -76,21 +78,21 @@ public interface IVisitorService extends IService<VisitorEntity> {
     
     /**
      * @Description: 修改随行人员
-     * @Param: [visitorPersonEntity]
+     * @Param: [visitorPersonQO]
      * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/11/16
      **/
-    boolean updateVisitorPersonById(VisitorPersonEntity visitorPersonEntity);
+    boolean updateVisitorPersonById(VisitorPersonQO visitorPersonQO);
     
     /**
      * @Description: 修改随行车辆
-     * @Param: [visitingCarEntity]
+     * @Param: [visitingCarQO]
      * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/11/16
      **/
-    boolean updateVisitingCarById(VisitingCarEntity visitingCarEntity);
+    boolean updateVisitingCarById(VisitingCarQO visitingCarQO);
     
     /**
     * @Description: 删除随行人员

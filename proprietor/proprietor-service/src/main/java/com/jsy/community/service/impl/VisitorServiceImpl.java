@@ -15,8 +15,10 @@ import com.jsy.community.mapper.VisitingCarMapper;
 import com.jsy.community.mapper.VisitorMapper;
 import com.jsy.community.mapper.VisitorPersonMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.VisitingCarQO;
+import com.jsy.community.qo.proprietor.VisitorPersonQO;
 import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.qo.VisitorQO;
+import com.jsy.community.qo.proprietor.VisitorQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,14 +149,16 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     }
     /**
     * @Description: 修改随行人员
-     * @Param: [visitorPersonEntity]
+     * @Param: [visitorPersonQO]
      * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/11/16
     **/
     @Override
-    public boolean updateVisitorPersonById(VisitorPersonEntity visitorPersonEntity){
-        int result = visitorPersonMapper.updateById(visitorPersonEntity);
+    public boolean updateVisitorPersonById(VisitorPersonQO visitorPersonQO){
+        VisitorPersonEntity entity = new VisitorPersonEntity();
+        BeanUtils.copyProperties(visitorPersonQO,entity);
+        int result = visitorPersonMapper.updateById(entity);
         if(result == 1){
             return true;
         }
@@ -163,14 +167,16 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     
     /**
     * @Description: 修改随行车辆
-     * @Param: [visitingCarEntity]
+     * @Param: [visitingCarQO]
      * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/11/16
     **/
     @Override
-    public boolean updateVisitingCarById(VisitingCarEntity visitingCarEntity){
-        int result = visitingCarMapper.updateById(visitingCarEntity);
+    public boolean updateVisitingCarById(VisitingCarQO visitingCarQO){
+        VisitingCarEntity entity = new VisitingCarEntity();
+        BeanUtils.copyProperties(visitingCarQO,entity);
+        int result = visitingCarMapper.updateById(entity);
         if(result == 1){
             return true;
         }
@@ -217,7 +223,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Date: 2020/11/11
      **/
     @Override
-    public Page<VisitorEntity> queryByPage(BaseQO<com.jsy.community.qo.proprietor.VisitorQO> baseQO){
+    public Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO){
         Page<VisitorEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>().select("*");
@@ -229,26 +235,26 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             if(!StringUtils.isEmpty(visitorQO.getContact())){
                 queryWrapper.eq("contact",visitorQO.getContact());
             }
-            queryAddress(queryWrapper,visitorQO);
+//            queryAddress(queryWrapper,visitorQO);
         }
         return visitorMapper.selectPage(page, queryWrapper);
     }
     
     /** 查询楼栋 */
-    private void queryAddress(QueryWrapper queryWrapper, com.jsy.community.qo.proprietor.VisitorQO visitorQO){
-        if(!StringUtils.isEmpty(visitorQO.getUnit())){
-            queryWrapper.eq("building",visitorQO.getBuilding());
-            if(!StringUtils.isEmpty(visitorQO.getBuilding())){
-                queryWrapper.eq("unit",visitorQO.getUnit());
-                if(!StringUtils.isEmpty(visitorQO.getFloor())){
-                    queryWrapper.eq("floor",visitorQO.getFloor());
-                    if(!StringUtils.isEmpty(visitorQO.getDoor())){
-                        queryWrapper.eq("door",visitorQO.getDoor());
-                    }
-                }
-            }
-        }
-    }
+//    private void queryAddress(QueryWrapper queryWrapper, com.jsy.community.qo.proprietor.VisitorQO visitorQO){
+//        if(!StringUtils.isEmpty(visitorQO.getUnit())){
+//            queryWrapper.eq("building",visitorQO.getBuilding());
+//            if(!StringUtils.isEmpty(visitorQO.getBuilding())){
+//                queryWrapper.eq("unit",visitorQO.getUnit());
+//                if(!StringUtils.isEmpty(visitorQO.getFloor())){
+//                    queryWrapper.eq("floor",visitorQO.getFloor());
+//                    if(!StringUtils.isEmpty(visitorQO.getDoor())){
+//                        queryWrapper.eq("door",visitorQO.getDoor());
+//                    }
+//                }
+//            }
+//        }
+//    }
     
     /**
     * @Description: 根据ID单查访客

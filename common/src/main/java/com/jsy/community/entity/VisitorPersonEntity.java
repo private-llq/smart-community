@@ -27,7 +27,7 @@ public class VisitorPersonEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "访客记录ID")
     private Long visitorId;
 
-    @ApiModelProperty(value = "随行人名")
+    @ApiModelProperty(value = "随行人姓名")
     private String name;
     
     @JsonIgnore

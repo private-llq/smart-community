@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.api.IVisitorService;
@@ -12,10 +13,12 @@ import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.VisitingCarQO;
+import com.jsy.community.qo.proprietor.VisitorPersonQO;
 import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.qo.VisitorQO;
+import com.jsy.community.qo.proprietor.VisitorQO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -32,7 +35,7 @@ import java.util.List;
 @RequestMapping("visitor")
 @Api(tags = "访客控制器")
 @RestController
-//@Login
+@Login
 @ApiJSYController
 public class VisitorController {
 	
@@ -97,8 +100,8 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【访客】删除")
 	@Transactional(rollbackFor = Exception.class)
-	@DeleteMapping("{id}")
-	public CommonResult delete(@PathVariable("id") Long id) {
+	@DeleteMapping("")
+	public CommonResult delete(@RequestParam("id") Long id) {
 		boolean delResult = iTVisitorService.deleteVisitorById(id);
 		if (delResult) {
 			//关联删除
@@ -131,7 +134,7 @@ public class VisitorController {
 	**/
 	@ApiOperation("【访客】分页查询")
 	@PostMapping("page")
-	public CommonResult<Page> query(@RequestBody BaseQO<com.jsy.community.qo.proprietor.VisitorQO> baseQO) {
+	public CommonResult<Page> query(@RequestBody BaseQO<VisitorQO> baseQO) {
 		return CommonResult.ok(iTVisitorService.queryByPage(baseQO));
 	}
 	
@@ -143,8 +146,8 @@ public class VisitorController {
 	 * @Date: 2020/11/18
 	**/
 	@ApiOperation("【访客】根据ID单查详情")
-	@GetMapping("{id}")
-	public CommonResult<VisitorEntity> queryById(@PathVariable("id") Long id) {
+	@GetMapping("")
+	public CommonResult<VisitorEntity> queryById(@RequestParam("id") Long id) {
 		VisitorEntity visitorEntity = iTVisitorService.selectOneById(id);
 		if (visitorEntity == null) {
 			return CommonResult.ok(null);
@@ -158,17 +161,16 @@ public class VisitorController {
 	
 	/**
 	 * @Description: 修改随行人员
-	 * @Param: [visitorPersonEntity]
+	 * @Param: [visitorPersonQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/12
 	 **/
 	@ApiOperation("【随行人员】修改")
 	@PutMapping("person")
-	public CommonResult updatePerson(@RequestBody VisitorPersonEntity visitorPersonEntity) {
-		ValidatorUtils.validateEntity(visitorPersonEntity, VisitingCarEntity.updateCarValidatedGroup.class);
-		visitorPersonEntity.setVisitorId(null);
-		boolean updateResult = iTVisitorService.updateVisitorPersonById(visitorPersonEntity);
+	public CommonResult updatePerson(@RequestBody VisitorPersonQO visitorPersonQO) {
+		ValidatorUtils.validateEntity(visitorPersonQO);
+		boolean updateResult = iTVisitorService.updateVisitorPersonById(visitorPersonQO);
 		return updateResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记-随行人员 修改失败");
 	}
 	
@@ -180,10 +182,10 @@ public class VisitorController {
 	 * @Date: 2020/11/16
 	 **/
 	@ApiOperation("【随行人员】删除")
-	@DeleteMapping("person/{id}")
-	public CommonResult deletePerson(@PathVariable("id") Long id) {
+	@DeleteMapping("person")
+	public CommonResult deletePerson(@RequestParam("id") Long id) {
 		boolean result = iTVisitorService.deleteVisitorPersonById(id);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), JSYError.INTERNAL.getMessage());
+		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记-随行人员 删除失败");
 	}
 	
 	/**
@@ -195,10 +197,8 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【随行车辆】修改")
 	@PutMapping("car")
-	public CommonResult updateCar(@RequestBody VisitingCarEntity visitingCarEntity) {
-		ValidatorUtils.validateEntity(visitingCarEntity, VisitingCarEntity.updateCarValidatedGroup.class);
-		visitingCarEntity.setVisitorId(null);
-		boolean updateResult = iTVisitorService.updateVisitingCarById(visitingCarEntity);
+	public CommonResult updateCar(@RequestBody VisitingCarQO visitingCarQO) {
+		boolean updateResult = iTVisitorService.updateVisitingCarById(visitingCarQO);
 		return updateResult ? CommonResult.ok("") : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记-随行车辆 修改失败");
 	}
 	
@@ -210,11 +210,10 @@ public class VisitorController {
 	 * @Date: 2020/11/16
 	 **/
 	@ApiOperation("【随行车辆】删除")
-	@DeleteMapping("car/{id}")
-	public CommonResult deleteCar(@PathVariable("id") Long id) {
+	@DeleteMapping("car")
+	public CommonResult deleteCar(@RequestParam("id") Long id) {
 		boolean result = iTVisitorService.deleteVisitingCarById(id);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), JSYError.INTERNAL.getMessage());
+		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记-随行车辆 删除失败");
 	}
-	
 	
 }

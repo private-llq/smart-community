@@ -44,8 +44,11 @@ public class VisitingCarEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "来访车辆图片地址")
     private String carImageUrl;
 
-    @ApiModelProperty(value = "来访车辆类型")
+    @ApiModelProperty(value = "来访车辆类型ID")
     private Integer carType;
+    
+    @ApiModelProperty(value = "来访车辆类型名")
+    private String carTypeStr;
     
     @JsonIgnore
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1临时密码，2可视对讲")

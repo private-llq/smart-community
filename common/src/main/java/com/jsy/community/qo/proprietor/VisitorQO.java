@@ -1,47 +1,42 @@
 package com.jsy.community.qo.proprietor;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.qo.BaseQO;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
-import java.io.Serializable;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * @author chq459799974
- * @since 2020-11-11
- */
+ * @description 访客VO
+ * @since 2020-11-28 10:58
+ **/
 @Data
-@ApiModel(description="来访人员")
-public class VisitorQO implements Serializable{
-
-    @ApiModelProperty(value = "ID")
-    private Long id;
-
-    @ApiModelProperty(value = "来访人姓名")
-    private String name;
-
-    @ApiModelProperty(value = "所属单元")
-    private String unit;
-
-    @ApiModelProperty(value = "所属楼栋")
-    private String building;
-
-    @ApiModelProperty(value = "所属楼层")
-    private String floor;
-
-    @ApiModelProperty(value = "所属门牌号")
-    private String door;
-
-    @ApiModelProperty(value = "来访人联系方式")
-    private String contact;
-
+public class VisitorQO extends BaseQO {
+	
+	@ApiModelProperty(value = "ID")
+	private Long id;
+	
+	@ApiModelProperty(value = "来访人姓名")
+	private String name;
+	
+	@ApiModelProperty(value = "来访人联系方式")
+	@Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+	private String contact;
+	
+	@ApiModelProperty(value = "来访事由")
+	private String reason;
+	
+	@ApiModelProperty(value = "预期来访时间")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime expectTime;
+	
+	@ApiModelProperty(value = "是否授予来访人社区门禁权限，0无，1二维码通行证，2人脸识别")
+	private Integer isCommunityAccess;
+	
+	@ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1二维码通行证，2可视对讲")
+	private Integer isBuildingAccess;
+	
 }

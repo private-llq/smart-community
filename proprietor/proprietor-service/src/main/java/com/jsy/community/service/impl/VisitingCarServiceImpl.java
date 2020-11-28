@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitingCarService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.mapper.VisitingCarMapper;
@@ -34,9 +35,13 @@ public class VisitingCarServiceImpl extends ServiceImpl<VisitingCarMapper, Visit
     **/
 	@Override
 	public List<VisitingCarEntity> queryCarList(Long visitorid){
-		return visitingCarMapper.selectList(new QueryWrapper<VisitingCarEntity>()
+		List<VisitingCarEntity> entityList = visitingCarMapper.selectList(new QueryWrapper<VisitingCarEntity>()
 			.select("id,car_plate,car_type")
-			.eq("visitor_id",visitorid)
+			.eq("visitor_id", visitorid)
 		);
+		for (VisitingCarEntity entity : entityList) {
+			entity.setCarTypeStr(BusinessEnum.CarTypeEnum.carTypeMap.get(entity.getCarType()));
+		}
+		return entityList;
 	}
 }
