@@ -7,11 +7,8 @@ import com.jsy.community.mapper.CommunityMapper;
 import org.springframework.stereotype.Service;
 
 /**
- * <p>
  * 社区 服务实现类
- * </p>
- *
- * @author jsy
+ * @author YuLF
  * @since 2020-11-25
  */
 @Service

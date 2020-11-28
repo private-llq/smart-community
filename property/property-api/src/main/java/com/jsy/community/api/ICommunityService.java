@@ -8,7 +8,7 @@ import com.jsy.community.entity.CommunityEntity;
  * 社区 服务类
  * </p>
  *
- * @author jsy
+ * @author YuLF
  * @since 2020-11-25
  */
 public interface ICommunityService extends IService<CommunityEntity> {

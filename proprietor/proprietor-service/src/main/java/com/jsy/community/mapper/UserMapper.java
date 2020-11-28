@@ -5,6 +5,11 @@ import com.jsy.community.entity.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Update;
 
+
+/**
+ * YuLF
+ * 2020-11-28
+ */
 @Mapper
 public interface UserMapper extends BaseMapper<UserEntity> {
 	UserEntity queryUserInfoByUid(Long uid);

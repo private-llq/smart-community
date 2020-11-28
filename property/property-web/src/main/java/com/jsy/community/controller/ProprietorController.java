@@ -104,6 +104,7 @@ public class ProprietorController {
     }
 
     /**
+     * TODO  Seata全局事务处理
      * 根据业主id 删除业主信息、业主关联的房屋、业主的家庭成员、业主的车辆信息
      * @param id        业主id
      * @return          返回删除是否成功
