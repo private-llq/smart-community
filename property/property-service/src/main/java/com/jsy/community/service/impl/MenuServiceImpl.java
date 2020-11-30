@@ -103,7 +103,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.select("menu_name","path","icon");
-		wrapper.ne("parent_id", 0).eq("community_id", communityId).eq("status", 0).last("limit " + INDEXMENUCOUNT);
+		wrapper.ne("parent_id", 0).eq("community_id", communityId)
+			.eq("status", 0).orderByAsc("sort")
+			.last("limit " + INDEXMENUCOUNT);
 		return menuMapper.selectList(wrapper);
 	}
 	
