@@ -7,6 +7,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.NameAndCreatorQO;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -56,4 +57,22 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	 * @param newPassword 新密码
 	 */
 	boolean updatePassword(Long userId, String password, String newPassword);
+	
+	/**
+	* @Description: 邮件注册邀请
+	 * @Param: [sysUserEntity]
+	 * @Return: java.util.Map<java.lang.String,java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/30
+	**/
+	Map<String,String> invitation(SysUserEntity sysUserEntity);
+	
+	/**
+	* @Description: 邮件注册激活确认
+	 * @Param: [sysUserEntity]
+	 * @Return: java.util.Map<java.lang.String,java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/30
+	**/
+	Map<String,String> activation(SysUserEntity sysUserEntity);
 }

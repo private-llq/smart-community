@@ -26,7 +26,8 @@
 <!--  手机号：<input th:type="text"/>-->
 <!--  <input th:type="submit" th:value="提交" />-->
 <!--</form>-->
-<a href="http://localhost:8001/sys/user/activation">http://localhost:8001/sys/user/activation</a>
+<a th:href="@{http://localhost:8001/sys/user/activation(email=${email},createUserId=${id})}">点击此处验证</a>
+<!--<a href="'http://localhost:8001/sys/user/activation?email=' + '${email}'">点击此处验证</a>-->
 </center>
 </body>
 </html>

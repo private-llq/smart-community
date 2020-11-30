@@ -50,6 +50,7 @@ public class HouseController {
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增楼栋信息失败");
 	}
 	
+	//TODO 修改入参QO 关联修改下级
 	@ApiOperation("【楼栋】修改楼栋信息")
 	@PutMapping("")
 	public CommonResult updateHouse(@RequestBody HouseEntity houseEntity){

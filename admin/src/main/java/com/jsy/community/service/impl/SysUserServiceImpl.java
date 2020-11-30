@@ -12,14 +12,19 @@ import com.jsy.community.qo.admin.NameAndCreatorQO;
 import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.Constant;
 import com.jsy.community.utils.Query;
+import com.jsy.community.utils.SimpleMailSender;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -27,6 +32,15 @@ import java.util.List;
  */
 @Service("sysUserService")
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity> implements ISysUserService {
+	
+	@Value("${email.linkExpiretime}")
+	public long emailLinkExpiretime;
+	
+	@Autowired
+	private SimpleMailSender simpleMailSender;
+	
+	@Autowired
+	private RedisTemplate redisTemplate;
 	
 	@Override
 	public IPage<SysUserEntity> queryPage(BaseQO<NameAndCreatorQO> qo) {
@@ -67,7 +81,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		this.save(user);
 		
 		//检查角色是否越权
-		checkRole(user);
+//		checkRole(user);
 		
 		// TODO 保存用户与角色关系
 	}
@@ -113,4 +127,90 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 			return;
 		}
 	}
+	
+	/**
+	* @Description: 邮件注册邀请
+	 * @Param: [sysUserEntity]
+	 * @Return: java.util.Map<java.lang.String,java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/30
+	**/
+	public Map<String,String> invitation(SysUserEntity sysUserEntity){
+		Map<String, String> map = new HashMap<>();
+		if(checkEmailExists(sysUserEntity.getEmail())){
+			map.put("result","false");
+			map.put("reason","用户已注册，无需邀请");
+			return map;
+		}
+		//TODO token获取uid，查询邀请者姓名invitor
+//		Long userId = JwtUtils.getUserId();
+		Long userId = 1L;
+		sysUserEntity.setId(userId);
+		String invitor = "张先森";
+		//redis暂存邮件邀请
+		redisTemplate.opsForValue().set("AdminInvite:" + sysUserEntity.getEmail(),sysUserEntity.getRealName(),emailLinkExpiretime, TimeUnit.HOURS);
+		//发送邀请邮件
+		simpleMailSender.sendRegisterEmail("mail/invite.html",sysUserEntity,invitor);
+		map.put("result","true");
+		return map;
+	}
+	
+	/**
+	* @Description: 邮件注册激活确认
+	 * @Param: [sysUserEntity]
+	 * @Return: java.util.Map<java.lang.String,java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/30
+	**/
+	public Map<String,String> activation(SysUserEntity sysUserEntity){
+		Map<String, String> map = new HashMap<>();
+		map.put("templateName","mail/activation.html");
+		//检测邮箱是否已注册
+		if(checkEmailExists(sysUserEntity.getEmail())){
+			map.put("reason","您已注册，请直接登录");
+			map.put("templateName","mail/activation_fail.html");
+			return map;
+		}
+		//redis取出暂存的邮件邀请
+		String realName = String.valueOf(redisTemplate.opsForValue().get("AdminInvite:" + sysUserEntity.getEmail()));
+		if("null".equals(realName)){
+			map.put("reason","邀请过期，请联系邀请者重新邀请");
+			map.put("templateName","mail/activation_fail.html");
+			return map;
+		}
+		//生成随机初始密码
+		String password = UUID.randomUUID().toString().substring(0, 6);
+		map.put("password", password);
+		sysUserEntity.setPassword(password);
+		sysUserEntity.setRealName(realName);
+		//user存库
+		try{
+			this.saveUser(sysUserEntity);
+		}catch (Exception e){
+			e.printStackTrace();
+			map.put("reason","账户激活失败，请联系邀请者重新邀请或联系管理员");
+			map.put("templateName","mail/activation_fail.html");
+			return map;
+		}
+		//redis销毁邀请
+		redisTemplate.delete("AdminInvite:" + sysUserEntity.getEmail());
+		//发邮件通知
+		SysUserEntity noticeEntity = new SysUserEntity();
+		noticeEntity.setEmail(sysUserEntity.getEmail());
+		noticeEntity.setPassword(password);
+		simpleMailSender.sendRegisterEmail("mail/activation.html",noticeEntity,null);
+		return map;
+	}
+	
+	/**
+	 * 检测邮箱是否已注册
+	 */
+	private boolean checkEmailExists(String email){
+		Integer count = baseMapper.selectCount(new QueryWrapper<SysUserEntity>().eq("email", email));
+		if(count > 0){
+			return true;
+		}
+		return false;
+	}
+	
 }
