@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.qo.property.ProprietorQO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Update;
 
@@ -19,8 +20,8 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 
 	/**
 	 * 【用户】业主信息更新接口、
-	 * @param userEntity 参数实体
+	 * @param proprietorQO 参数实体
 	 * @return			 返回更新行数
 	 */
-    int proprietorUpdate(UserEntity userEntity);
+    int proprietorUpdate(ProprietorQO proprietorQO);
 }

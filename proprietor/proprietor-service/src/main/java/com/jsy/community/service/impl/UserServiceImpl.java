@@ -11,6 +11,7 @@ import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.qo.property.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.utils.RegexUtils;
@@ -138,12 +139,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * 【用户】业主更新信息
      * @author YuLF
-     * @Param userEntity        需要更新 实体参数
+     * @Param proprietorQO        需要更新 实体参数
      * @return 返回更新成功!
      * @since 2020/11/27 15:03
      */
     @Override
-    public Integer proprietorUpdate(UserEntity userEntity) {
-        return userMapper.proprietorUpdate(userEntity);
+    public Integer proprietorUpdate(ProprietorQO proprietorQO) {
+        return userMapper.proprietorUpdate(proprietorQO);
     }
 }

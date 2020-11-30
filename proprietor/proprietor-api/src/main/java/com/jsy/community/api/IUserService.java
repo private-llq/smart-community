@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.qo.property.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.vo.UserInfoVo;
@@ -39,8 +40,8 @@ public interface IUserService extends IService<UserEntity> {
 
 	/**
 	 * 业主信息更新
-	 * @param userEntity    更新实体
+	 * @param proprietorQO  更新实体
 	 * @return				返回更新行数
 	 */
-    Integer proprietorUpdate(UserEntity userEntity);
+    Integer proprietorUpdate(ProprietorQO proprietorQO);
 }

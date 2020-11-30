@@ -8,9 +8,13 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.ProprietorQO;
 import com.jsy.community.util.ProprietorExcelCommander;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.ProprietorVO;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -51,6 +55,7 @@ public class ProprietorController {
      * @return          返回Excel模板
      */
     @GetMapping("/downloadExcel")
+    @ApiOperation("下载业主信息录入Excel")
     public ResponseEntity<byte[]> downloadExcel(@RequestParam long communityId) {
         //1.设置响应格式  设置响应头
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
@@ -86,6 +91,7 @@ public class ProprietorController {
      * @return                  返回效验或登记结果
      */
     @PostMapping("/importProprietorExcel")
+    @ApiOperation("导入业主信息excel")
     public CommonResult<?> importProprietorExcel(MultipartFile proprietorExcel, Long communityId){
         //参数非空验证
         if(null == proprietorExcel || communityId == null){
@@ -109,6 +115,7 @@ public class ProprietorController {
      * @return          返回删除是否成功
      */
     @DeleteMapping()
+    @ApiOperation("删除业主信息")
     public CommonResult<Boolean> del(@RequestParam Long uid){
         //从JWT获取业主ID
         //Long uid = 12L;
@@ -118,23 +125,29 @@ public class ProprietorController {
 
     /**
      * 分页查询业主信息
-     * @param entityBaseQO        查询参数实体
+     * @param proprietorQOBaseQO   查询参数实体
      * @return                    返回删除是否成功
      */
     @PostMapping()
-    public CommonResult<Boolean> query(@RequestParam BaseQO<UserEntity> entityBaseQO){
-
-        return null;
+    @ApiOperation("分页查询业主信息")
+    public CommonResult<List<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> proprietorQOBaseQO){
+        //1.验证分页 查询参数
+        ValidatorUtils.validatePageParam(proprietorQOBaseQO);
+        //2.查询信息返回
+        return CommonResult.ok(iProprietorService.query(proprietorQOBaseQO));
     }
 
     /**
      * 修改业主信息
-     * @param userEntity          参数实体
+     * @param proprietorQO        参数实体
      * @return                    返回删除是否成功
      */
     @PutMapping()
-    public CommonResult<Boolean> update(@RequestParam UserEntity userEntity){
-        return iProprietorService.update(userEntity) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    @ApiOperation("修改业主信息")
+    public CommonResult<Boolean> update(@RequestBody ProprietorQO proprietorQO){
+        //效验id
+        ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.propertyUpdateValid.class);
+        return iProprietorService.update(proprietorQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
 
