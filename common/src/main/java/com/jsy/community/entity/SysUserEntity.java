@@ -71,4 +71,5 @@ public class SysUserEntity extends BaseEntity {
 	 * 注册邀请
 	 */
 	public interface inviteUserValidatedGroup{}
+	
 }

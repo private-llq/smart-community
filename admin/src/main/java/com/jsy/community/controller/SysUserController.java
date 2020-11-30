@@ -1,18 +1,27 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.SysUserEntity;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.SysUserMapper;
+import com.jsy.community.service.ISysUserService;
+import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.SimpleMailSender;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -28,32 +37,42 @@ import java.util.concurrent.TimeUnit;
 @RestController
 public class SysUserController {
 	
-	@Value("${emailLinkExpiretime}")
-	public long emailLinkExpiretime;
-	
-	@Resource
-	private SimpleMailSender simpleMailSender;
-	
 	@Autowired
-	private RedisTemplate redisTemplate;
+	private ISysUserService iSysUserService;
 
+	/**
+	* @Description: 邮件注册邀请
+	 * @Param: [sysUserEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/11/30
+	**/
 	@PostMapping("invitation")
 	public CommonResult invitation(@RequestBody SysUserEntity sysUserEntity) {
 		ValidatorUtils.validateEntity(sysUserEntity,SysUserEntity.inviteUserValidatedGroup.class);
-		//redis暂存邮件邀请
-		redisTemplate.opsForValue().set("AdminInvite:" + sysUserEntity.getEmail(),sysUserEntity.getRealName(),emailLinkExpiretime, TimeUnit.HOURS);
-		//TODO token获取uid，查询邀请者姓名invitor
-		String invitor = "张先森";
-		simpleMailSender.sendTemplateMail(sysUserEntity,invitor);
-		return CommonResult.ok();
+		Map<String, String> resultMap = iSysUserService.invitation(sysUserEntity);
+		return Boolean.parseBoolean(resultMap.get("result")) ? CommonResult.ok() : CommonResult.error(JSYError.REQUEST_PARAM.getCode(),resultMap.get("reason"));
 	}
 	
+	/**
+	* @Description: 邮件注册激活确认
+	 * @Param: [sysUserEntity]
+	 * @Return: org.springframework.web.servlet.ModelAndView
+	 * @Author: chq459799974
+	 * @Date: 2020/11/30
+	**/
 	@GetMapping("activation")
-	public ModelAndView activation(){
-		//TODO 数据库添加用户
-		//TODO 发邮件通知
-		ModelAndView mv = new ModelAndView("mail/activation.html");
-		mv.addObject("password", UUID.randomUUID().toString().substring(0,6));
+	public ModelAndView activation(SysUserEntity sysUserEntity){
+		ModelAndView mv = new ModelAndView();
+		// 链接参数有误
+		if(StringUtils.isEmpty(sysUserEntity.getEmail()) || sysUserEntity.getCreateUserId() == null){
+			mv.setViewName("main/error.html");
+			return mv;
+		}
+		Map<String, String> resultMap = iSysUserService.activation(sysUserEntity);
+		mv.addObject("reason",resultMap.get("reason"));
+		mv.addObject("password",resultMap.get("password"));
+		mv.setViewName(resultMap.get("templateName"));
 		return mv;
 	}
 

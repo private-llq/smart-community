@@ -40,13 +40,6 @@ public class DepartmentController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IDepartmentStaffService departmentStaffService;
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.entity.DepartmentEntity>>
-	 * @Author lihao
-	 * @Description 查询所有部门信息
-	 * @Date 2020/11/24 17:14
-	 * @Param [id]
-	 **/
 	@ApiOperation("查询所有部门信息")
 	@GetMapping("/listDepartment")
 	public CommonResult<List<DepartmentEntity>> listDepartment(@ApiParam(value = "社区id")
@@ -55,13 +48,6 @@ public class DepartmentController {
 		return CommonResult.ok(departmentList);
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.entity.DepartmentStaffEntity>>
-	 * @Author lihao
-	 * @Description 根据部门id查询联系方式
-	 * @Date 2020/11/24 17:46
-	 * @Param [departmentId]
-	 **/
 	@ApiOperation("根据部门查询联系方式")
 	@GetMapping("/listStaffPhone")
 	public CommonResult<List<DepartmentStaffEntity>> listStaffPhone(@ApiParam(value = "部门id")

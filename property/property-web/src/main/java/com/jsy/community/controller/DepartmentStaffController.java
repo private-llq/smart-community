@@ -5,19 +5,18 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IDepartmentStaffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentStaffEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author lihao
@@ -32,18 +31,37 @@ public class DepartmentStaffController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IDepartmentStaffService departmentStaffService;
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.DepartmentStaffEntity>>
-	 * @Author lihao
-	 * @Description 测试环境
-	 * @Date 2020/11/24 16:35
-	 * @Param []
-	 **/
-	@ApiOperation("测试")
-	@GetMapping("/listStaff")
-	public CommonResult<List<DepartmentStaffEntity>> listStaff(){
-		List<DepartmentStaffEntity> staffEntities = departmentStaffService.listStaff();
-		return CommonResult.ok(staffEntities);
+	@ApiOperation("查询所有员工信息")
+	@PostMapping("/listDepartmentStaff")
+	public CommonResult<PageInfo<DepartmentStaffEntity>> listDepartmentStaff(@ApiParam("departmentId") @RequestParam Long departmentId,
+	                                                                         @RequestBody BaseQO<DepartmentStaffEntity> staffEntity) {
+		PageInfo<DepartmentStaffEntity> page = departmentStaffService.listDepartmentStaff(departmentId,staffEntity);
+		return CommonResult.ok(page);
 	}
+	
+	@ApiOperation("添加员工")
+	@PostMapping("/addDepartmentStaff")
+	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffEntity staffEntity){
+		departmentStaffService.addDepartmentStaff(staffEntity);
+		return CommonResult.ok();
+	}
+	
+	@ApiOperation("修改员工信息")
+	@PutMapping("/updateDepartmentStaff")
+	public CommonResult updateDepartmentStaff(@RequestBody DepartmentStaffEntity departmentStaffEntity){
+		departmentStaffService.updateDepartmentStaff(departmentStaffEntity);
+		return CommonResult.ok();
+	}
+	
+	@ApiOperation("批量删除员工")
+	@PostMapping("/deleteStaffByIds")
+	public CommonResult deleteStaffByIds(@RequestBody Integer[] ids){
+		departmentStaffService.deleteStaffByIds(ids);
+		return CommonResult.ok();
+	}
+	
+	
+	
+	
 }
 

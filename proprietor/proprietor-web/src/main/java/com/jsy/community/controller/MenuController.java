@@ -36,13 +36,6 @@ public class MenuController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IMenuService menuService;
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult
-	 * @Author lihao
-	 * @Description 查询首页展示的菜单选项
-	 * @Date 2020/11/27 6:37
-	 * @Param [communityId]
-	 **/
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu")
 	public CommonResult listIndexMenu(@ApiParam(value = "社区id")
@@ -51,13 +44,6 @@ public class MenuController {
 		return CommonResult.ok(list);
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult
-	 * @Author lihao
-	 * @Description 更多菜单
-	 * @Date 2020/11/27 6:37
-	 * @Param []
-	 **/
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu")
 	public CommonResult moreListMenu(@ApiParam(value = "社区id")

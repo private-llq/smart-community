@@ -36,13 +36,6 @@ public class MenuController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IAdminMenuService adminMenuService;
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.vo.menu.FrontParentMenu>>
-	 * @Author lihao
-	 * @Description 后台树形结构查询所有菜单
-	 * @Date 2020/11/24 11:05
-	 * @Param []
-	 **/
 	@ApiOperation("后台树形结构查询所有菜单")
 	@GetMapping("/listMenu")
 	public CommonResult<List<FrontParentMenu>> listMenu(@RequestParam("communityId") Long communityId) {
@@ -50,13 +43,6 @@ public class MenuController {
 		return CommonResult.ok(parentMenus);
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult
-	 * @Author lihao
-	 * @Description 查询所有父菜单
-	 * @Date 2020/11/14 22:10
-	 * @Param []
-	 **/
 	@ApiOperation("查询所有父菜单信息")
 	@GetMapping("/listParentMenu")
 	public CommonResult<List<AdminMenuEntity>> listParentMenu() {
@@ -64,13 +50,6 @@ public class MenuController {
 		return CommonResult.ok(list);
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.entity.AdminMenuEntity>>
-	 * @Author lihao
-	 * @Description 根据父菜单id查询其子菜单信息
-	 * @Date 2020/11/25 9:10
-	 * @Param [parentId]
-	 **/
 	@ApiOperation("根据父菜单id查询其子菜单信息")
 	@GetMapping("/listChildMenuById")
 	public CommonResult<List<AdminMenuEntity>> listChildMenuById(@RequestParam("parentId") Long parentId) {
@@ -78,13 +57,6 @@ public class MenuController {
 		return CommonResult.ok(list);
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult
-	 * @Author lihao
-	 * @Description 删除菜单信息
-	 * @Date 2020/11/25 9:13
-	 * @Param [id]
-	 **/
 	@ApiOperation("删除菜单信息")
 	@DeleteMapping("/removeMenu")
 	public CommonResult removeMenu(@RequestParam("id") Long id) {
@@ -96,13 +68,6 @@ public class MenuController {
 		}
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult
-	 * @Author lihao
-	 * @Description 新增父菜单信息
-	 * @Date 2020/11/25 9:13
-	 * @Param [adminMenuEntity]
-	 **/
 	@ApiOperation("新增父菜单信息")
 	@PostMapping("/addParentMenu")
 	public CommonResult addParentMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
@@ -110,13 +75,6 @@ public class MenuController {
 		return CommonResult.ok(parentId);//返回新增后数据的id
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult
-	 * @Author lihao
-	 * @Description 新增子菜单信息
-	 * @Date 2020/11/25 9:13
-	 * @Param [adminMenuEntity]
-	 **/
 	@ApiOperation("新增子菜单信息")
 	@PostMapping("/addChildMenu")
 	public CommonResult addChildMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
@@ -125,13 +83,6 @@ public class MenuController {
 		return CommonResult.ok();
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult
-	 * @Author lihao
-	 * @Description 修改子菜单信息
-	 * @Date 2020/11/30 11:37
-	 * @Param [adminMenuEntity]
-	 **/
 	@ApiOperation("修改子菜单信息")
 	@PutMapping("/updateChildMenu")
 	public CommonResult updateChildMenu(@RequestBody AdminMenuEntity adminMenuEntity) {

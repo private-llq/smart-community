@@ -34,14 +34,6 @@ public class UserHouseController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IUserHouseService userHouseService;
 	
-	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<com.baomidou.mybatisplus.extension.plugins.pagination.Page < com.jsy.community.entity.UserHouseEntity>>
-	 * @Author lihao
-	 * @Description 业主房屋认证审核列表
-	 * @Date 2020/11/25 15:35
-	 * @Param [baseQO]
-	 **/
 	@ApiOperation("业主房屋认证审核列表")
 	@PostMapping("/selectUserHouse")
 	public CommonResult<PageInfo<UserHouseVO>> selectUserHouse(@RequestBody BaseQO<UserHouseEntity> baseQO,
@@ -51,13 +43,6 @@ public class UserHouseController {
 		return CommonResult.ok(page);
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<java.lang.Boolean>
-	 * @Author lihao
-	 * @Description 通过审核
-	 * @Date 2020/11/26 15:58
-	 * @Param [id]
-	 **/
 	@ApiOperation("通过审核")
 	@GetMapping("/pass")
 	public CommonResult<Boolean> pass(@ApiParam(value = "待审核房屋id") Long id) {
@@ -65,13 +50,6 @@ public class UserHouseController {
 		return b ? CommonResult.ok() : CommonResult.error("审核失败");
 	}
 	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<java.lang.Boolean>
-	 * @Author lihao
-	 * @Description 通过审核
-	 * @Date 2020/11/26 15:58
-	 * @Param [id]
-	 **/
 	@ApiOperation("不通过审核")
 	@GetMapping("/notPass")
 	public CommonResult<Boolean> notPass(@ApiParam(value = "待审核房屋id") Long id) {

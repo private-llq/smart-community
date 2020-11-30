@@ -51,4 +51,8 @@ jsy:
     expire: 604800
     header: token
 
-emailLinkExpiretime: 24
+email:
+  host: smtp.qq.com
+  baseAccount: 459799974@qq.com
+  authPass: nfezhwyeduksbjjh
+  linkExpiretime: 24
