@@ -102,7 +102,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	@Override
 	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
-//		wrapper.ne("parent_id", 0).eq("community_id",communityId).orderByAsc("sort").last("limit " + INDEXMENUCOUNT);
+		wrapper.select("menu_name","path","icon");
 		wrapper.ne("parent_id", 0).eq("community_id", communityId).eq("status", 0).last("limit " + INDEXMENUCOUNT);
 		return menuMapper.selectList(wrapper);
 	}
@@ -221,6 +221,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 		BeanUtils.copyProperties(adminMenuEntity, entity);
 		menuMapper.insert(entity);
 		
+	}
+	
+	@Override
+	public void updateChildMenu(AdminMenuEntity adminMenuEntity) {
+		FrontMenuEntity entity = new FrontMenuEntity();
+		BeanUtils.copyProperties(adminMenuEntity, entity);
+		menuMapper.updateById(entity);
 	}
 	
 	private FrontMenuEntity common(Long parentId) {

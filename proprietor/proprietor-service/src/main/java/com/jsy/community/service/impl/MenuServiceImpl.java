@@ -32,7 +32,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	private MenuMapper menuMapper;
 	
 	// TODO 首页展示菜单数量 暂定3个
-	private final Integer INDEXMENUCOUNT = 3;
+//	@Value(value = "${jsy.menu}")
+	private Integer INDEXMENUCOUNT = 3;
 	
 	@Override
 	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
