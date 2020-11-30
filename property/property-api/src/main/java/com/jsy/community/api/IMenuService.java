@@ -127,4 +127,13 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Param [frontMenuEntity]
 	 **/
 	void addChildMenu(AdminMenuEntity adminMenuEntity);
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 修改子菜单
+	 * @Date 2020/11/30 11:31
+	 * @Param [adminMenuEntity]
+	 **/
+	void updateChildMenu(AdminMenuEntity adminMenuEntity);
 }

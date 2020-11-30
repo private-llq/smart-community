@@ -104,6 +104,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		UserHouseEntity houseEntity = userHouseMapper.selectById(id);
 		if (houseEntity != null) {
 			houseEntity.setCheckStatus(1);
+			// 修改审核状态    PS：业主与房屋的关系是他们做的  在审核之前就绑定了关系   所以这里审核只是把状态改下  2020年11月30日10:04:18
 			userHouseMapper.updateById(houseEntity);
 			return true;
 		}

@@ -27,7 +27,7 @@ public class AdminMenuEntity extends BaseEntity {
     @ApiModelProperty(value = "父id")
     private Long parentId;
 
-    @ApiModelProperty(value = "菜单状态 0 展示在首页  1 不展示在首页")
+    @ApiModelProperty(value = "菜单状态 0 展示在首页  1 不展示在首页  默认1")
     private Integer status;
 
     @ApiModelProperty(value = "菜单名")
@@ -41,7 +41,8 @@ public class AdminMenuEntity extends BaseEntity {
 
     @ApiModelProperty(value = "描述信息")
     private String descr;
-
+    
+    @ApiModelProperty(value = "首页展示位置")
     private Integer sort;
 
 }

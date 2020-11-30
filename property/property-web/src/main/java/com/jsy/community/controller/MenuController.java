@@ -67,20 +67,6 @@ public class MenuController {
 	/**
 	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.entity.AdminMenuEntity>>
 	 * @Author lihao
-	 * @Description 查询所有子菜单
-	 * @Date 2020/11/24 11:04
-	 * @Param []
-	 **/
-	@ApiOperation("查询所有子菜单信息")
-	@GetMapping("/listChildMenu")
-	public CommonResult<List<AdminMenuEntity>> listChildMenu() {
-		List<AdminMenuEntity> list = adminMenuService.listChildMenu();
-		return CommonResult.ok(list);
-	}
-	
-	/**
-	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.entity.AdminMenuEntity>>
-	 * @Author lihao
 	 * @Description 根据父菜单id查询其子菜单信息
 	 * @Date 2020/11/25 9:10
 	 * @Param [parentId]
@@ -91,31 +77,6 @@ public class MenuController {
 		List<AdminMenuEntity> list = adminMenuService.listChildMenuById(parentId);
 		return CommonResult.ok(list);
 	}
-
-//	// TODO 表单形式添加菜单信息
-//	@ApiOperation("添加菜单信息")
-//	@PostMapping(value = "/saveMenu", produces = "application/json;charset=utf-8")
-//	public CommonResult saveMenu(@RequestBody FrontMenuEntity menuEntity) {
-//		menuService.saveMenu(menuEntity);
-//		return CommonResult.ok();
-//	}
-
-//	@ApiOperation("根据id查询菜单信息")
-//	@GetMapping("/getMenuById")
-//	public CommonResult<FrontMenuVO> getMenuById(@RequestParam("id") Long id) {
-//		// 回显
-//		FrontMenuVO frontMenuVo = menuService.getMenuById(id);
-//		return CommonResult.ok(frontMenuVo);
-//	}
-
-//	// TODO 表单形式修改
-//	@ApiOperation("修改菜单信息")
-//	@PostMapping(value = "/updateMenu", produces = "application/json;charset=utf-8")
-//	public CommonResult updateMenu(@RequestParam("id") Long id,
-//	                               @RequestBody FrontMenuVO frontMenuVo) {
-//		menuService.updateMenu(id, frontMenuVo);
-//		return CommonResult.ok();
-//	}
 	
 	/**
 	 * @return com.jsy.community.vo.CommonResult
@@ -134,19 +95,6 @@ public class MenuController {
 			return CommonResult.error("请先删除子菜单");
 		}
 	}
-
-//	@ApiOperation("批量删除菜单")
-//	@DeleteMapping("/removeListMenu")
-//	public CommonResult removeListMenu(@ApiParam(value = "需要删除的id【数组】")
-//		                                   Long[] ids) {
-//		try {
-//			menuService.removeListMenu(ids);
-//			return CommonResult.ok();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return CommonResult.error("请先删除子菜单");
-//		}
-//	}
 	
 	/**
 	 * @return com.jsy.community.vo.CommonResult
@@ -172,7 +120,22 @@ public class MenuController {
 	@ApiOperation("新增子菜单信息")
 	@PostMapping("/addChildMenu")
 	public CommonResult addChildMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
+		// TODO 新增的时候 让用户选择是否展示在首页，首页的位置根据序号来
 		menuService.addChildMenu(adminMenuEntity);
+		return CommonResult.ok();
+	}
+	
+	/**
+	 * @return com.jsy.community.vo.CommonResult
+	 * @Author lihao
+	 * @Description 修改子菜单信息
+	 * @Date 2020/11/30 11:37
+	 * @Param [adminMenuEntity]
+	 **/
+	@ApiOperation("修改子菜单信息")
+	@PutMapping("/updateChildMenu")
+	public CommonResult updateChildMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
+		menuService.updateChildMenu(adminMenuEntity);
 		return CommonResult.ok();
 	}
 	

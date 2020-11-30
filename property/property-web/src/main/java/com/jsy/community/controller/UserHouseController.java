@@ -46,7 +46,7 @@ public class UserHouseController {
 	@PostMapping("/selectUserHouse")
 	public CommonResult<PageInfo<UserHouseVO>> selectUserHouse(@RequestBody BaseQO<UserHouseEntity> baseQO,
 	                                                           @ApiParam(value = "社区id")
-	                                                            @RequestParam Long communityId) {
+	                                                           @RequestParam Long communityId) {
 		PageInfo<UserHouseVO> page = userHouseService.selectUserHouse(baseQO, communityId);
 		return CommonResult.ok(page);
 	}
