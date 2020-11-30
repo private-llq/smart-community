@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.vo.UserHouseVO;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
@@ -16,7 +15,7 @@ import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.PageVoUtils;
+import com.jsy.community.vo.UserHouseVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +53,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("community_id", communityId);
 		wrapper.orderByAsc("check_status");
-		Page<UserHouseEntity> page = new Page<>(baseQO.getPage(),baseQO.getSize());
-		List<UserHouseEntity> list = userHouseMapper.selectPage(page,wrapper).getRecords();
-		
+		Page<UserHouseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
+		List<UserHouseEntity> list = userHouseMapper.selectPage(page, wrapper).getRecords();
 		for (UserHouseEntity userHouseEntity : list) {
 			UserHouseVO houseVo = new UserHouseVO();
 			
@@ -77,15 +75,20 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			// 社区楼栋信息
 			Long houseId = userHouseEntity.getHouseId();
 			HouseEntity houseEntity = houseMapper.selectById(houseId);
-			BeanUtils.copyProperties(houseEntity, houseVo);
-			
+			if (houseEntity != null) {
+				BeanUtils.copyProperties(houseEntity, houseVo);
+			}
 			userHouseVOS.add(houseVo);
 		}
-		
-		long current = baseQO.getPage();
-		long size = baseQO.getSize();
-		long total = list.size();
-		return PageVoUtils.page(current, total, size, userHouseVOS);
+		PageInfo<UserHouseVO> info = new PageInfo<>();
+		BeanUtils.copyProperties(page, info);
+		info.setRecords(userHouseVOS);
+		return info;
+
+//		long current = baseQO.getPage();
+//		long size = baseQO.getSize();
+//		long total = list.size();
+//		return PageVoUtils.page(current, total, size, userHouseVOS);
 	}
 	
 	@Override
@@ -125,6 +128,6 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Override
 	public Boolean removeUserHouse(Long id) {
 		int count = userHouseMapper.deleteById(id);
-		return count!=0;
+		return count != 0;
 	}
 }
