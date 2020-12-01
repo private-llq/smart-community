@@ -4,11 +4,11 @@ package com.jsy.community.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.IBannerService;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.ProprietorExceptionHandler;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.JwtUtils;
@@ -45,8 +45,11 @@ public class HouseMemberController {
 	@PostMapping("")
 	public CommonResult addHouseMember(@RequestBody HouseMemberEntity houseMemberEntity){
 		ValidatorUtils.validateEntity(houseMemberEntity, HouseMemberEntity.addHouseMemberValidatedGroup.class);
-		//TODO 验证是不是房主
-		
+		// 验证是不是房主
+		boolean b = iHouseMemberService.checkHouseHolder(JwtUtils.getUserId(), houseMemberEntity.getHouseId());
+		if(!b){
+			return CommonResult.error(JSYError.UNAUTHORIZED.getCode(),"房主认证失败");
+		}
 		houseMemberEntity.setHouseholderId(JwtUtils.getUserId());
 		houseMemberEntity.setIsConfirm(null);
 		boolean result = iHouseMemberService.addHouseMember(houseMemberEntity);
