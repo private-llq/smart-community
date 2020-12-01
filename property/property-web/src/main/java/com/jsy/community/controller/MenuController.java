@@ -37,9 +37,9 @@ public class MenuController {
 	private IAdminMenuService adminMenuService;
 	
 	@ApiOperation("后台树形结构查询所有菜单")
-	@GetMapping("/listMenu")
-	public CommonResult<List<FrontParentMenu>> listMenu(@RequestParam("communityId") Long communityId) {
-		List<FrontParentMenu> parentMenus = menuService.listMenu(communityId);
+	@GetMapping("/listAdminMenu")
+	public CommonResult<List<FrontParentMenu>> listAdminMenu(@RequestParam("communityId") Long communityId) {
+		List<FrontParentMenu> parentMenus = menuService.listAdminMenu(communityId);
 		return CommonResult.ok(parentMenus);
 	}
 	
@@ -79,6 +79,7 @@ public class MenuController {
 	@PostMapping("/addChildMenu")
 	public CommonResult addChildMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
 		// TODO 新增的时候 让用户选择是否展示在首页，首页的位置根据序号来
+		// TODO 新增子菜单 没有验证 等与前端联调的时候再调整
 		menuService.addChildMenu(adminMenuEntity);
 		return CommonResult.ok();
 	}

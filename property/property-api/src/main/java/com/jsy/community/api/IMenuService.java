@@ -108,7 +108,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/17 10:14
 	 * @Param []
 	 **/
-	List<FrontParentMenu> listMenu(Long communityId);
+	List<FrontParentMenu> listAdminMenu(Long communityId);
 	
 	/**
 	 * @return void

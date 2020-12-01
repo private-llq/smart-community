@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @return
  * @Author lihao
@@ -24,6 +26,7 @@ public class DepartmentStaffEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "部门id")
+    @NotNull(groups = {DepartmentStaffEntity.addStaffValidate.class, DepartmentStaffEntity.updateStaffValidate.class}, message = "部门id不能为空")
     private Long departmentId;
 
     @ApiModelProperty(value = "联系人")
@@ -31,4 +34,10 @@ public class DepartmentStaffEntity extends BaseEntity {
 
     @ApiModelProperty(value = "联系电话")
     private String phone;
+    
+    public interface addStaffValidate {
+    }
+    
+    public interface updateStaffValidate {
+    }
 }

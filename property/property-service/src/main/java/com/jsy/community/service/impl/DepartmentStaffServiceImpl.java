@@ -34,7 +34,7 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 	public PageInfo<DepartmentStaffEntity> listDepartmentStaff(Long departmentId, BaseQO<DepartmentStaffEntity> staffEntity) {
 		DepartmentStaffEntity entity = staffEntity.getQuery();
 		QueryWrapper<DepartmentStaffEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("department_id",departmentId).orderByDesc("update_time","updateTime");
+		queryWrapper.eq("department_id",departmentId).orderByDesc("update_time");
 		if (!StringUtils.isEmpty(entity.getPerson())) {
 			queryWrapper.like("person",entity.getPerson());
 		}

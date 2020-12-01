@@ -45,14 +45,14 @@ public class UserHouseController {
 	
 	@ApiOperation("通过审核")
 	@GetMapping("/pass")
-	public CommonResult<Boolean> pass(@ApiParam(value = "待审核房屋id") Long id) {
+	public CommonResult<Boolean> pass(@ApiParam(value = "待审核房屋id") @RequestParam Long id) {
 		Boolean b = userHouseService.pass(id);
 		return b ? CommonResult.ok() : CommonResult.error("审核失败");
 	}
 	
 	@ApiOperation("不通过审核")
 	@GetMapping("/notPass")
-	public CommonResult<Boolean> notPass(@ApiParam(value = "待审核房屋id") Long id) {
+	public CommonResult<Boolean> notPass(@ApiParam(value = "待审核房屋id") @RequestParam Long id) {
 		Boolean b = userHouseService.notPass(id);
 		return b ? CommonResult.ok() : CommonResult.error("审核失败");
 	}

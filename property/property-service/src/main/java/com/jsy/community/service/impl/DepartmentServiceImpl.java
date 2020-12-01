@@ -9,6 +9,7 @@ import com.jsy.community.entity.DepartmentEntity;
 import com.jsy.community.entity.DepartmentStaffEntity;
 import com.jsy.community.mapper.DepartmentMapper;
 import com.jsy.community.mapper.DepartmentStaffMapper;
+import com.jsy.community.utils.ValidatorUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;

@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * @return
  * @Author lihao
@@ -18,13 +21,20 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("t_department")
-@ApiModel(value="Department对象", description="部门")
+@ApiModel(value = "Department对象", description = "部门")
 public class DepartmentEntity extends BaseEntity {
-
-    @ApiModelProperty(value = "社区id")
-    private Long communityId;
-
-    @ApiModelProperty(value = "部门名称")
-    private String department;
-
+	
+	@ApiModelProperty(value = "社区id")
+	@NotNull(groups = {addDepartmentValidate.class, updateDepartmentValidate.class}, message = "社区id不能为空")
+	private Long communityId;
+	
+	@ApiModelProperty(value = "部门名称")
+	@NotBlank(groups = {addDepartmentValidate.class, updateDepartmentValidate.class}, message = "部门名称不能为空")
+	private String department;
+	
+	public interface addDepartmentValidate {
+	}
+	
+	public interface updateDepartmentValidate {
+	}
 }
