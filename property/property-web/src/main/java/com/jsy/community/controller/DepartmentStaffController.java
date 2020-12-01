@@ -7,6 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentStaffEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +43,7 @@ public class DepartmentStaffController {
 	@ApiOperation("添加员工")
 	@PostMapping("/addDepartmentStaff")
 	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffEntity staffEntity){
+		ValidatorUtils.validateEntity(staffEntity, DepartmentStaffEntity.addStaffValidate.class);
 		departmentStaffService.addDepartmentStaff(staffEntity);
 		return CommonResult.ok();
 	}
@@ -49,7 +51,7 @@ public class DepartmentStaffController {
 	@ApiOperation("修改员工信息")
 	@PutMapping("/updateDepartmentStaff")
 	public CommonResult updateDepartmentStaff(@RequestBody DepartmentStaffEntity departmentStaffEntity){
-		departmentStaffService.updateDepartmentStaff(departmentStaffEntity);
+		ValidatorUtils.validateEntity(departmentStaffEntity, DepartmentStaffEntity.updateStaffValidate.class);
 		return CommonResult.ok();
 	}
 	

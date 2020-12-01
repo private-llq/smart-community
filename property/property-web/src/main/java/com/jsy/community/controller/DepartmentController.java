@@ -5,6 +5,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IDepartmentService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentEntity;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +43,7 @@ public class DepartmentController {
 	@ApiOperation("新增部门")
 	@PostMapping("/addDepartment")
 	public CommonResult addDepartment(@RequestBody DepartmentEntity departmentEntity) {
+		ValidatorUtils.validateEntity(departmentEntity, DepartmentEntity.addDepartmentValidate.class);
 		departmentService.addDepartment(departmentEntity);
 		return CommonResult.ok();
 	}
@@ -49,6 +51,7 @@ public class DepartmentController {
 	@ApiOperation("修改部门")
 	@PutMapping("/updateDepartment")
 	public CommonResult updateDepartment(@RequestBody DepartmentEntity departmentEntity) {
+		ValidatorUtils.validateEntity(departmentEntity,DepartmentEntity.updateDepartmentValidate.class);
 		departmentService.updateDepartment(departmentEntity);
 		return CommonResult.ok();
 	}
