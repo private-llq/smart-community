@@ -62,7 +62,8 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @Range(groups = { CarEntity.addCarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
+    @Range(groups = { addCarValidated.class,proprietorCarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
+    @NotNull(groups = {proprietorCarValidated.class}, message = "车辆类型未选择!")
     @ApiModelProperty(value = "车辆类型")
     private Integer carType;
 
@@ -80,12 +81,12 @@ public class CarEntity extends BaseEntity {
 
 
     /**
-     * 业主登记时的车辆参数验证
+     * [业主信息和车辆信息登记]业主登记时的车辆参数验证
      */
     public interface proprietorCarValidated{}
 
     /**
-     * 登记车辆前端参数验证接口
+     * 单独[业主]登记车辆前端参数验证接口
      */
     public interface addCarValidated{}
 
