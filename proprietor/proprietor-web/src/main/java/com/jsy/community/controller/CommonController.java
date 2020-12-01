@@ -77,7 +77,7 @@ public class CommonController {
             }
             return CommonResult.ok(invoke);
         } catch (Exception e) {
-            log.error("com.jsy.community.controller.CommonController.queryZone：{}", e.getMessage());
+            log.error("com.jsy.community.controller.CommonController.queryRegion：{}", e.getMessage());
             //如果出现异常，说明服务并不能调通
             return CommonResult.error(JSYError.NOT_FOUND);
         }

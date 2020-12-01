@@ -60,7 +60,12 @@ public class SysLoginController {
 		}
 		
 		//用户信息
-		SysUserEntity user = sysUserService.queryByUserName(form.getUsername());
+		SysUserEntity user;
+		if(form.getUsername().contains("@")){
+			user = sysUserService.queryByEmail(form.getUsername());
+		}else{
+			user = sysUserService.queryByUserName(form.getUsername());
+		}
 		
 		//账号不存在、密码错误
 		if (user == null || !user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())) {

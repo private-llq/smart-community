@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.SysUserEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.SysUserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.NameAndCreatorQO;
@@ -14,6 +15,7 @@ import com.jsy.community.utils.Constant;
 import com.jsy.community.utils.Query;
 import com.jsy.community.utils.SimpleMailSender;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.shiro.crypto.hash.Hash;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,6 +73,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	}
 	
 	@Override
+	public SysUserEntity queryByEmail(String email) {
+		return baseMapper.queryByEmail(email);
+	}
+	
+	@Override
 	@Transactional
 	public void saveUser(SysUserEntity user) {
 		user.setCreateTime(LocalDateTime.now());
@@ -87,19 +94,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	}
 	
 	@Override
-	@Transactional
-	public void update(SysUserEntity user) {
+//	@Transactional
+	public boolean updateUser(SysUserEntity user) {
 		if (StrUtil.isBlank(user.getPassword())) {
 			user.setPassword(null);
 		} else {
 			user.setPassword(new Sha256Hash(user.getPassword(), user.getSalt()).toHex());
 		}
-		this.updateById(user);
+		boolean result = this.updateById(user);
 		
 		//检查角色是否越权
-		checkRole(user);
+//		checkRole(user);
 		
 		//TODO 保存用户与角色关系
+		return result;
 	}
 	
 	@Override
@@ -203,14 +211,69 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	}
 	
 	/**
-	 * 检测邮箱是否已注册
-	 */
+	* @Description: 检测邮箱是否已注册
+	 * @Param: [email]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/1
+	**/
 	private boolean checkEmailExists(String email){
 		Integer count = baseMapper.selectCount(new QueryWrapper<SysUserEntity>().eq("email", email));
 		if(count > 0){
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	* @Description: 检测用户名是否已存在
+	 * @Param: [username]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/1
+	**/
+	private boolean checkUsernameExists(String username){
+		Integer count = baseMapper.selectCount(new QueryWrapper<SysUserEntity>().eq("username", username));
+		if(count > 0){
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	* @Description: 邮件邀请注册后设置用户名
+	 * @Param: [uid, username]
+	 * @Return: java.util.Map<java.lang.String,java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/1
+	**/
+	@Override
+	public Map<String,String> setUserName(Long uid,String username){
+		Map<String, String> map = new HashMap<>();
+		if(username.contains("@")){
+			map.put("result","false");
+			map.put("code", String.valueOf(JSYError.REQUEST_PARAM.getCode()));
+			map.put("reason","用户名不能带有@符号");
+			return map;
+		}
+		if(checkUsernameExists(username)){
+			map.put("result","false");
+			map.put("code", String.valueOf(JSYError.REQUEST_PARAM.getCode()));
+			map.put("reason","用户名已被占用");
+			return map;
+		}
+		SysUserEntity sysUserEntity = new SysUserEntity();
+		sysUserEntity.setId(uid);
+		sysUserEntity.setUsername(username);
+		boolean result = this.updateUser(sysUserEntity);
+		if(!result){
+			map.put("result","false");
+			map.put("code", String.valueOf(JSYError.INTERNAL.getCode()));
+			map.put("reason","设置用户名失败");
+			return map;
+		}
+		map.put("result","true");
+		return map;
 	}
 	
 }

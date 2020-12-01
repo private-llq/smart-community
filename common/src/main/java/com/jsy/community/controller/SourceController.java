@@ -30,6 +30,10 @@ public class SourceController {
 	@PostConstruct
 	public void initSource(){
 		System.out.println(BusinessEnum.CarTypeEnum.carTypeList);
+		System.out.println(BusinessEnum.CheckStatusEnum.checkStatusList);
+		System.out.println(BusinessEnum.VisitReasonEnum.visitReasonList);
+		System.out.println(BusinessEnum.CommunityAccessEnum.communityAccessList);
+		System.out.println(BusinessEnum.BuildingAccessEnum.buildingAccessList);
 	}
 	
 	@ApiOperation("字典资源查询")

@@ -24,4 +24,10 @@
 		from t_sys_user
 		where username = #{username}
 	</select>
+
+	<select id="queryByEmail" resultType="com.jsy.community.entity.SysUserEntity">
+		select *
+		from t_sys_user
+		where email = #{email}
+	</select>
 </mapper>

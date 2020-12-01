@@ -126,9 +126,9 @@ public interface BusinessEnum {
 	 * @Date: 2020/11/28
 	**/
 	enum CheckStatusEnum {
-		UN_CHECK("未审核", 1),
-		PASS("通过", 2),
-		UNPASS("拒绝", 3);
+		UN_CHECK("未审核", 0),
+		PASS("通过", 1),
+		UNPASS("拒绝", 2);
 		private String name;
 		private Integer code;
 		
@@ -224,6 +224,112 @@ public interface BusinessEnum {
 				visitReasonMap.put(visitReasonEnum.getCode(), visitReasonEnum.getName());
 			}
 			sourceMap.put("visitReason",visitReasonList);
+		}
+	}
+	
+	/**
+	 * @Description: 社区授权类型
+	 * @Author: chq459799974
+	 * @Date: 2020/12/01
+	 **/
+	enum CommunityAccessEnum {
+		NONE("无", 0),
+		PASSWORD("临时密码", 1),
+		FACE("人脸识别", 2);
+		private String name;
+		private Integer code;
+		
+		CommunityAccessEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public Integer getCode() {
+			return code;
+		}
+		
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+		
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+		
+		public static final List<Map<String, Object>> communityAccessList = new ArrayList<>();
+		public static final Map<Integer, String> communityAccessMap = new HashMap<>();
+		
+		static {
+			for (CommunityAccessEnum communityAccessEnum : CommunityAccessEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", communityAccessEnum.getCode());
+				map.put("name", communityAccessEnum.getName());
+				communityAccessList.add(map);
+				communityAccessMap.put(communityAccessEnum.getCode(), communityAccessEnum.getName());
+			}
+			sourceMap.put("communityAccess",communityAccessList);
+		}
+	}
+	
+	/**
+	 * @Description: 楼栋授权类型
+	 * @Author: chq459799974
+	 * @Date: 2020/12/01
+	 **/
+	enum BuildingAccessEnum {
+		NONE("无", 0),
+		PASSWORD("临时密码", 1),
+		COMMUNICATION("可视对讲", 2);
+		private String name;
+		private Integer code;
+		
+		BuildingAccessEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public Integer getCode() {
+			return code;
+		}
+		
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+		
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+		
+		public static final List<Map<String, Object>> buildingAccessList = new ArrayList<>();
+		public static final Map<Integer, String> buildingAccessMap = new HashMap<>();
+		
+		static {
+			for (BuildingAccessEnum buildingAccessEnum : BuildingAccessEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", buildingAccessEnum.getCode());
+				map.put("name", buildingAccessEnum.getName());
+				buildingAccessList.add(map);
+				buildingAccessMap.put(buildingAccessEnum.getCode(), buildingAccessEnum.getName());
+			}
+			sourceMap.put("buildingAccess",buildingAccessList);
 		}
 	}
 }

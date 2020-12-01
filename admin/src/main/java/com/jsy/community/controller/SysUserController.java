@@ -75,5 +75,39 @@ public class SysUserController {
 		mv.setViewName(resultMap.get("templateName"));
 		return mv;
 	}
+	
+	/**
+	* @Description: 禁用账户
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/1
+	**/
+	@PutMapping("disable")
+	public CommonResult disableUser(@RequestParam Long uid){
+		SysUserEntity sysUserEntity = new SysUserEntity();
+		sysUserEntity.setId(uid);
+		sysUserEntity.setStatus(1);
+		iSysUserService.updateUser(sysUserEntity);
+		return null;
+	}
+	
+	//用户名ajax查重
+	
+	
+	//邮箱注册后添加用户名
+	@PutMapping("username")
+	public CommonResult setUserName(@RequestParam String userName){
+		//TODO TOKEN获取uid
+		Long uid = 1L;
+		Map<String, String> resultMap = iSysUserService.setUserName(uid, userName);
+		return Boolean.parseBoolean(String.valueOf(resultMap.get("result"))) ? CommonResult.ok() : CommonResult.error(Integer.parseInt(resultMap.get("code")),resultMap.get("reason"));
+	}
+	
+	//添加手机号(短信验证)
+	@PutMapping("mobile")
+	public CommonResult changeMobile(){
+		return null;
+	}
 
 }

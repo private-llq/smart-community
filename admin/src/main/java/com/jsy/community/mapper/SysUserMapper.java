@@ -29,4 +29,9 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
 	 */
 	SysUserEntity queryByUserName(String username);
 	
+	/**
+	 * 根据邮箱，查询系统用户
+	 */
+	SysUserEntity queryByEmail(String email);
+	
 }

@@ -35,6 +35,11 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	SysUserEntity queryByUserName(String username);
 	
 	/**
+	 * 根据邮箱，查询系统用户
+	 */
+	SysUserEntity queryByEmail(String email);
+	
+	/**
 	 * 保存用户
 	 */
 	void saveUser(SysUserEntity user);
@@ -42,7 +47,7 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	/**
 	 * 修改用户
 	 */
-	void update(SysUserEntity user);
+	boolean updateUser(SysUserEntity user);
 	
 	/**
 	 * 删除用户
@@ -75,4 +80,13 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	 * @Date: 2020/11/30
 	**/
 	Map<String,String> activation(SysUserEntity sysUserEntity);
+	
+	/**
+	* @Description: 邮件邀请注册后设置用户名
+	 * @Param: [uid, username]
+	 * @Return: java.util.Map<java.lang.String,java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/1
+	**/
+	Map<String,String> setUserName(Long uid,String username);
 }
