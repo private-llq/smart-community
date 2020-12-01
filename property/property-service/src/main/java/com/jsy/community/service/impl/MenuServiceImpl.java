@@ -4,14 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IMenuService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.vo.FrontMenuVO;
 import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
+import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.mapper.MenuMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.vo.FrontMenuVO;
 import com.jsy.community.vo.menu.FrontChildMenu;
 import com.jsy.community.vo.menu.FrontParentMenu;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	
 	@Autowired
 	private MenuMapper menuMapper;
+	
+	@Autowired
+	private AdminMenuMapper adminMenuMapper;
 	
 	// TODO 首页展示菜单数量 暂定5个
 	private final Integer INDEXMENUCOUNT = 3;
@@ -102,7 +107,6 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	@Override
 	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
-		wrapper.select("menu_name","path","icon");
 		wrapper.ne("parent_id", 0).eq("community_id", communityId)
 			.eq("status", 0).orderByAsc("sort")
 			.last("limit " + INDEXMENUCOUNT);
@@ -177,18 +181,24 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public List<FrontParentMenu> listMenu(Long communityId) {
+	public List<FrontParentMenu> listAdminMenu(Long communityId) {
 		ArrayList<FrontParentMenu> list = new ArrayList<>();
 		// 1. 查询所有一级分类
 		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("community_id", communityId);
 		queryWrapper.eq("parent_id", 0);
 		List<FrontMenuEntity> parentList = menuMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(parentList)) {
+			throw new PropertyException("该小区不存在");
+		}
 		
 		//2. 查询所有二级分类
 		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.ne("parent_id", 0);
 		List<FrontMenuEntity> childMenu = menuMapper.selectList(wrapper);
+		if (CollectionUtils.isEmpty(childMenu)) {
+			return null;
+		}
 		
 		//3. 封装数据
 		for (FrontMenuEntity frontMenuEntity : parentList) {
@@ -212,6 +222,15 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	@Override
 	public Long addParentMenu(AdminMenuEntity adminMenuEntity) {
 		FrontMenuEntity frontMenuEntity = new FrontMenuEntity();
+		QueryWrapper<AdminMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("parent_id",0);
+		List<AdminMenuEntity> list = adminMenuMapper.selectList(queryWrapper);
+		for (AdminMenuEntity menuEntity : list) {
+			if (!menuEntity.getMenuName().equals(frontMenuEntity.getMenuName()) ||
+				!menuEntity.getPath().equals(frontMenuEntity.getPath())) {
+				throw new PropertyException("您添加的菜单不是父菜单");
+			}
+		}
 		BeanUtils.copyProperties(adminMenuEntity, frontMenuEntity);
 		menuMapper.insert(frontMenuEntity);
 		return frontMenuEntity.getId();//返回新增后数据的id
