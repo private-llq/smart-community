@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
+import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
@@ -14,6 +15,7 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.MyPageUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,7 +31,10 @@ import java.util.List;
  */
 @DubboService(version = Const.version, group = Const.group)
 public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, HouseMemberEntity> implements IHouseMemberService {
-
+	
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private IUserHouseService iUserHouseService;
+	
 	@Autowired
 	private HouseMemberMapper houseMemberMapper;
 	
@@ -128,6 +133,18 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * @Description: 检查是否是房主
+	 * @Param: [uid, houseId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/1
+	 **/
+	@Override
+	public boolean checkHouseHolder(Long uid, Long houseId){
+		return iUserHouseService.checkHouseHolder(uid,houseId);
 	}
 	
 }

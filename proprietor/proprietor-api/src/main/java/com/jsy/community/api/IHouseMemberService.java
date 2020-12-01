@@ -62,5 +62,14 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @Date: 2020/11/23
 	**/
 	Page<HouseMemberEntity> queryHouseMemberPage(BaseQO<HouseMemberQO> baseQO);
+	
+	/**
+	* @Description: 检查是否是房主
+	 * @Param: [uid, houseId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/1
+	**/
+	boolean checkHouseHolder(Long uid, Long houseId);
 
 }
