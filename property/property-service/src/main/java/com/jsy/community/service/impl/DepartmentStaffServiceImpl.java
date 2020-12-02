@@ -24,7 +24,7 @@ import java.util.Arrays;
  * @author lihao
  * @since 2020-11-24
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_property)
 public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMapper, DepartmentStaffEntity> implements IDepartmentStaffService {
 	
 	@Autowired

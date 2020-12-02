@@ -34,10 +34,10 @@ import java.util.List;
 @Login(allowAnonymous = true)
 public class DepartmentController {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IDepartmentService departmentService;
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IDepartmentStaffService departmentStaffService;
 	
 	@ApiOperation("查询所有部门信息")

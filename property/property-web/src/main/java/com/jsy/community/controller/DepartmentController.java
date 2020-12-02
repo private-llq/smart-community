@@ -29,7 +29,7 @@ import java.util.List;
 @ApiJSYController
 public class DepartmentController {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IDepartmentService departmentService;
 
 	@ApiOperation("查询所有部门")

@@ -34,6 +34,7 @@ public class SourceController {
 		System.out.println(BusinessEnum.VisitReasonEnum.visitReasonList);
 		System.out.println(BusinessEnum.CommunityAccessEnum.communityAccessList);
 		System.out.println(BusinessEnum.BuildingAccessEnum.buildingAccessList);
+		System.out.println(BusinessEnum.RelationshipEnum.relationshipList);
 	}
 	
 	@ApiOperation("字典资源查询")

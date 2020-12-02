@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.ProprietorServiceApp;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.ProprietorException;
@@ -18,6 +19,7 @@ import com.jsy.community.utils.MyPageUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.util.List;
 
@@ -50,7 +52,12 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 **/
 	@Override
 	public boolean addHouseMember(HouseMemberEntity houseMemberEntity){
-		int result = houseMemberMapper.insert(houseMemberEntity);
+		int result = 0;
+		try{
+			result = houseMemberMapper.insert(houseMemberEntity);
+		} catch (DuplicateKeyException e) {
+			throw new ProprietorException(JSYError.DUPLICATE_KEY.getCode(),"请勿重复邀请");
+		}
 		if(result == 1){
 			return true;
 		}

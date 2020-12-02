@@ -24,7 +24,7 @@ import java.util.List;
  * @author qq459799974
  * @since 2020-11-16
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_property)
 public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> implements IBannerService {
 	
 	@Autowired
