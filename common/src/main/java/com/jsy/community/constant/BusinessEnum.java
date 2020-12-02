@@ -332,4 +332,60 @@ public interface BusinessEnum {
 			sourceMap.put("buildingAccess",buildingAccessList);
 		}
 	}
+	
+	/**
+	 * @Description: 亲属关系枚举
+	 * @Author: chq459799974
+	 * @Date: 2020/12/01
+	 **/
+	enum RelationshipEnum {
+		SPOUSE("夫妻", 1),
+		FATHER_AND_SON("父子", 2),
+		MOTHER_AND_SON("母子", 3),
+		FATHER_AND_DAUGHTER("父女", 4),
+		MOTHER_AND_DAUGHTER("母女", 5),
+		RELATIVES("亲属", 6);
+		private String name;
+		private Integer code;
+		
+		RelationshipEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public Integer getCode() {
+			return code;
+		}
+		
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+		
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+		
+		public static final List<Map<String, Object>> relationshipList = new ArrayList<>();
+		public static final Map<Integer, String> relationshipMap = new HashMap<>();
+		
+		static {
+			for (RelationshipEnum relationshipEnum : RelationshipEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", relationshipEnum.getCode());
+				map.put("name", relationshipEnum.getName());
+				relationshipList.add(map);
+				relationshipMap.put(relationshipEnum.getCode(), relationshipEnum.getName());
+			}
+			sourceMap.put("relationship",relationshipList);
+		}
+	}
 }

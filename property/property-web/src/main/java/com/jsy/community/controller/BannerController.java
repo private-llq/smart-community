@@ -30,7 +30,7 @@ import java.util.List;
 @ApiJSYController
 public class BannerController {
 
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IBannerService iBannerService;
 
 	/**
@@ -56,7 +56,7 @@ public class BannerController {
 	 * @Date: 2020/11/16
 	**/
 	@ApiOperation("【轮播图】上传")
-	@Login
+//	@Login
 	@PostMapping("upload")
 	public CommonResult upload(MultipartFile[] file, BannerEntity bannerEntity){
 		if(file == null || file.length == 0){
@@ -81,7 +81,7 @@ public class BannerController {
 	 * @Date: 2020/11/16
 	**/
 	@ApiOperation("【轮播图】批量删除")
-	@Login
+//	@Login
 	@DeleteMapping("")
 	public CommonResult deleteBanner(@RequestBody Long[] ids){
 		if(ids.length == 0){
