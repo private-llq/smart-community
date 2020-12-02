@@ -33,8 +33,6 @@ public class CarEntity extends BaseEntity {
     @JsonIgnore
     private Long uid;
 
-    @Range(groups = {addCarValidated.class, proprietorCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "车位id不合法")
-    @NotNull(groups = {addCarValidated.class, proprietorCarValidated.class}, message = "车位不能为空")
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 

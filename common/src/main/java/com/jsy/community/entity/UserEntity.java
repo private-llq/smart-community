@@ -36,8 +36,6 @@ public class UserEntity extends BaseEntity {
 	private String mobile;
 	
 	@ApiModelProperty("性别，0未知，1男，2女")
-	@NotNull(groups = {ProprietorRegister.class}, message = "性别未选择!")
-	@Range(groups = {ProprietorRegister.class},  min = 0, max = 2, message = "选择的性别不可用")
 	private Integer sex;
 	
 	@ApiModelProperty("真实姓名")
@@ -69,9 +67,6 @@ public class UserEntity extends BaseEntity {
 	@TableField( exist = false )
 	private CarEntity carEntity;
 
-	@ApiModelProperty("标记是否需要登记车辆")
-	@TableField( exist = false )
-	private Boolean hasCar;
 
 	@ApiModelProperty("导入excel记录用户的房屋信息")
 	@TableField( exist = false )
@@ -82,8 +77,4 @@ public class UserEntity extends BaseEntity {
 	 */
 	public interface ProprietorRegister{}
 
-	/**
-	 * 业主修改验证接口
-	 */
-	public interface ProprietorUpdate{}
 }

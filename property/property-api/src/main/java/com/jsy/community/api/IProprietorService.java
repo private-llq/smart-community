@@ -3,8 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.property.ProprietorQO;
-import com.jsy.community.vo.CommonResult;
+import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.vo.ProprietorVO;
 
 import java.util.List;

@@ -1,5 +1,9 @@
-package com.jsy.community.qo.property;
+package com.jsy.community.qo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,12 +13,14 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.util.List;
 
 /**
- * 接收业主查询参数
+ * 业主更新接口 - 接收业主参数QO
  * @author YuLF
  * @since  2020/11/30 10:21
  */
@@ -47,15 +53,18 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("电话号码")
     private String mobile;
 
-    @Range(groups = {propertyUpdateValid.class, proprietorUpdateValid.class}, min = 0, max = 2, message = "性别不可用")
+    @Range(groups = {propertyUpdateValid.class, proprietorUpdateValid.class, ProprietorRegister.class}, min = 0, max = 2, message = "性别不可用")
+    @NotNull(groups = {ProprietorRegister.class}, message = "性别不能为空")
     @ApiModelProperty("性别，0未知，1男，2女")
     private Integer sex;
 
-    @Pattern(groups = {propertyUpdateValid.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "您的姓名填写为错误长度")
+    @Pattern(groups = {propertyUpdateValid.class, ProprietorRegister.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
     @ApiModelProperty("真实姓名")
+    @NotBlank(groups = {ProprietorRegister.class}, message = "姓名未填写!")
     private String realName;
 
-    @Pattern(groups = {propertyUpdateValid.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "身份证错误")
+    @Pattern(groups = {propertyUpdateValid.class, ProprietorRegister.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "身份证错误")
+    @NotBlank(groups = {ProprietorRegister.class}, message = "身份证号码未输入!")
     @ApiModelProperty("身份证")
     private String idCard;
 
@@ -79,6 +88,16 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("详细地址")
     private String detailAddress;
 
+    @ApiModelProperty("标记是否需要登记车辆")
+    @TableField( exist = false )
+    private Boolean hasCar;
+
+    @ApiModelProperty("车辆集合")
+    private List<CarEntity> carEntityList;
+
+    @ApiModelProperty("用来存储House的id和社区id")
+    private HouseEntity houseEntity;
+
     /**
      * [物业]业主更新效验接口
      */
@@ -88,4 +107,9 @@ public class ProprietorQO implements Serializable {
      * [业主]业主更新效验接口
      */
     public interface proprietorUpdateValid{}
+
+    /**
+     * [业主] 登记接口
+     */
+    public interface ProprietorRegister{}
 }

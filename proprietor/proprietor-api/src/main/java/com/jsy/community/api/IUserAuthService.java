@@ -71,4 +71,11 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @param callback  回调
 	 */
 	Object thirdPlatformLoginCallback(String oauthType, ThirdPlatformQo callback);
+
+	/**
+	 * 通过用户ID 查询用户手机号码
+	 * @param id 	用户id
+	 * @return		返回消息实体
+	 */
+    String selectContactById(Long id);
 }

@@ -17,11 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
@@ -41,14 +43,19 @@ import java.util.Map;
 @ApiJSYController
 public class CarController {
 
+
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
 
     //允许上传的文件后缀种类，临时，后续从Spring配置文件中取值
     private final String[] carImageAllowSuffix = new String[]{"jpg", "jpeg", "png"};
 
+    @Resource
+    private MinioController minioController;
+
     //允许上传的文件大小，临时，后续从配置文件中取值 由Spring控制
     private final int carImageMaxSizeKB = 500;
+
 
     /**
      * 新增业主固定车辆
@@ -155,12 +162,8 @@ public class CarController {
                 return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件后缀不允许,可用后缀" + Arrays.asList(carImageAllowSuffix));
             }
         }
-        //4.调用上传车辆图片服务接口 进行上传文件
-        String resultUrl = carService.carImageUpload(carImage.getBytes(), fileName);
-        if (StringUtils.isBlank(resultUrl)) {
-            return CommonResult.error(JSYError.NOT_IMPLEMENTED.getCode(), JSYError.NOT_IMPLEMENTED.getMessage());
-        }
-        return CommonResult.ok(resultUrl);
+        //4.调用上传服务接口 进行上传文件  返回访问路径
+        return minioController.uploadFile(carImage);
     }
 
     /**

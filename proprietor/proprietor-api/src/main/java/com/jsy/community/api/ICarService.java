@@ -6,6 +6,7 @@ import com.jsy.community.entity.CarEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,11 +54,11 @@ public interface ICarService extends IService<CarEntity> {
      */
     Boolean carIsExist(String carPlate);
 
+
     /**
-     * 车辆图片文件上传服务提供接口
-     * @param carImage 图片文件流
-     * @param fileName 文件名称
-     * @return         上传成功将放回图片URL，否则返回Null
+     * 业主登记时，调用车辆登记接口登记业主的车辆
+     * @param carEntityList   业主车辆信息 列表
+     * @return                返回sql插入影响行数
      */
-    String carImageUpload(byte[] carImage, String fileName);
+    Integer addProprietorCar(List<CarEntity> carEntityList);
 }
