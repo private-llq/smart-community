@@ -8,7 +8,7 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.property.ProprietorQO;
+import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;

@@ -5,14 +5,15 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.api.IUserService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.property.ProprietorQO;
+import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -42,6 +43,9 @@ public class UserController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
 
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IUserAuthService iUserAuthService;
+
     @PostMapping("test")
     @ApiOperation("test")
     @Login
@@ -53,42 +57,49 @@ public class UserController {
 
     /**
      * 【用户】业主信息登记
-     * @param userEntity    参数实体
+     * @param proprietorQO  参数实体
      * @return              返回是否登记成功
      */
     @PostMapping("proprietorRegister")
     @ApiOperation("业主信息登记")
-    public CommonResult<Boolean> proprietorRegister(@RequestBody UserEntity userEntity) {
+    @Login
+    public CommonResult<Boolean> proprietorRegister(@RequestBody ProprietorQO proprietorQO) {
         //获取用户id信息
-//		Long uid = JwtUtils.getUserId();
-        Long uid = 12L;
-        //新增业主信息时，必须要携带当前用户的uid
-        userEntity.setId(uid);
-        //1.验证业主信息登记必填项
-        ValidatorUtils.validateEntity(userEntity, UserEntity.ProprietorRegister.class);
+		Long uid = JwtUtils.getUserId();
+        //1.数据填充  新增业主信息时，必须要携带当前用户的uid  业主id首次不需要新增，只有在审核房屋通过时，业主id才会改变
+        proprietorQO.setId(uid);
+        proprietorQO.setHouseholderId(null);
+        //2.验证业主信息登记必填项
+        ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.ProprietorRegister.class);
         //2.验证业主信息实体里面的房屋实体id是否为空，如果为空 说明前端并没有选择所属房屋
-        if (userEntity.getHouseEntity() == null || userEntity.getHouseEntity().getId() == null
-                || userEntity.getHouseEntity().getId() == 0
-                || userEntity.getHouseEntity().getCommunityId() == null
-                || userEntity.getHouseEntity().getCommunityId() == 0) {
-            throw new JSYException(1, "缺失房屋id或社区id!!");
+        if (proprietorQO.getHouseEntity() == null || proprietorQO.getHouseEntity().getId() == null
+                || proprietorQO.getHouseEntity().getId() == 0
+                || proprietorQO.getHouseEntity().getCommunityId() == null
+                || proprietorQO.getHouseEntity().getCommunityId() == 0) {
+            throw new ProprietorException(1, "缺失房屋id或社区id!!");
         }
         //3.有填登记车辆信息的情况下
-        if (userEntity.getHasCar()) {
-            if (null == userEntity.getCarEntity()) {
-                throw new JSYException(1, "车辆信息未填写!");
+        if (proprietorQO.getHasCar()) {
+            if (null == proprietorQO.getCarEntityList()) {
+                throw new ProprietorException(1, "车辆信息未填写!");
             }
-            //验证车辆信息
-            ValidatorUtils.validateEntity(userEntity.getCarEntity(), CarEntity.proprietorCarValidated.class);
-            if (carService.carIsExist(userEntity.getCarEntity().getCarPlate())) {
-                throw new JSYException(1, "车辆车牌已经登记存在!");
+            //通过uid 查询t_user_auth表的用户手机号码
+            String userMobile = iUserAuthService.selectContactById(proprietorQO.getId());
+            //t_user_auth 表中用户没有注册
+            if(userMobile == null){
+                throw new ProprietorException(JSYError.FORBIDDEN.getCode(), "用户不存在!");
             }
-            //由于在登记车辆时，数据库字段也需要 uid 和 社区id
-            userEntity.getCarEntity().setUid(uid);
-            userEntity.getCarEntity().setCommunityId(userEntity.getHouseEntity().getCommunityId());
+            //验证所有车辆信息 验证成功没有抛异常 则把当前这个对象的一些社区id 所属人 手机号码 设置进去 方便后续车辆登记
+            for (CarEntity carEntity : proprietorQO.getCarEntityList()){
+                ValidatorUtils.validateEntity(carEntity, CarEntity.proprietorCarValidated.class);
+                carEntity.setCommunityId(proprietorQO.getHouseEntity().getCommunityId());
+                carEntity.setUid(uid);
+                carEntity.setOwner(proprietorQO.getRealName());
+                carEntity.setContact(userMobile);
+            }
         }
-        //登记业主信息
-        return userService.proprietorRegister(userEntity) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        //登记业主相关信息
+        return userService.proprietorRegister(proprietorQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     /**

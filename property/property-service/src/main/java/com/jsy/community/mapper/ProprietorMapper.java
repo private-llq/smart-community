@@ -3,9 +3,8 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.property.ProprietorQO;
+import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.vo.ProprietorVO;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 

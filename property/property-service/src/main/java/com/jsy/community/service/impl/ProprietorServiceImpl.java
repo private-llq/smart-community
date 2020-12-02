@@ -7,7 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.property.ProprietorQO;
+import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.vo.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;

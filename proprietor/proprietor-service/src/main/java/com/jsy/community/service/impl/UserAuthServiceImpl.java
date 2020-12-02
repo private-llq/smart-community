@@ -5,12 +5,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.qo.ThirdPlatformQo;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
@@ -46,6 +48,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	
 	@Resource
 	private ICommonService commonService;
+
+	@Resource
+	private UserAuthMapper userAuthMapper;
 	
 	@Value(value = "${jsy.third-platform-domain:http://www.jsy.com}")
 	private String callbackUrl;
@@ -165,7 +170,25 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		log.info("【response】= {}", JSONUtil.toJsonStr(response));
 		return response.getData();
 	}
-	
+
+	/**
+	 *  通过用户ID查询 t_user_auth 用户手机号
+	 * @author YuLF
+	 * @since  2020/12/2 13:55
+	 * @Param  id  用户ID
+	 * @return	   返回用户手机号码
+	 */
+	@Override
+	public String selectContactById(Long id) {
+		QueryWrapper<UserAuthEntity> eq = new QueryWrapper<UserAuthEntity>().select("mobile").eq("uid", id);
+		UserAuthEntity userAuthEntity = userAuthMapper.selectOne(eq);
+		//未注册直接访问
+		if(userAuthEntity == null){
+			return null;
+		}
+		return userAuthEntity.getMobile();
+	}
+
 	private AuthSource getAuthSource(String type) {
 		if (StrUtil.isNotBlank(type)) {
 			return AuthSource.valueOf(type.toUpperCase());

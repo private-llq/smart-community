@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.community.mapper.CarMapper">
+    <!-- 批量新增车辆 -->
+    <insert id="addProprietorCar" parameterType="java.util.List">
+        insert into t_car(uid,community_id,car_plate,contact,owner,car_type,car_image_url)
+        values
+        <foreach collection="carEntityList" item="item" separator=",">
+            (#{item.uid},#{item.communityId},#{item.carPlate},#{item.contact},#{item.owner},#{item.carType},#{item.carImageUrl})
+        </foreach>
+    </insert>
+</mapper>

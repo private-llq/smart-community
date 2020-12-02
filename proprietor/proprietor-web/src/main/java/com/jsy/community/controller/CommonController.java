@@ -41,7 +41,7 @@ public class CommonController {
         try {
             //调用 用查询类型ID找到的 对应的查询方法
             Method commonZoneApi = ICommonService.class.getDeclaredMethod(communityType.method(), Integer.class);
-            //传入用户提供的 社区/单元/楼栋/楼层/ id 查询该级下一级的数据 如 传入某个单元id 查出这个单元下面的所有楼栋
+            //传入用户提供的 市/社区/单元/楼栋/ id 查询该级下一级的数据 如 传入某个城市id 查出这个城市下面的所有社区
             Object invoke = commonZoneApi.invoke(commonService, id);
             if (invoke == null) {
                 return CommonResult.ok(null);

@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,33 +97,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         return carMapper.selectCount(new QueryWrapper<CarEntity>().eq("car_plate", carPlate).eq("deleted",0)) > 0;
     }
 
+
+
     /**
-     * 车辆图片上传服务接口实现方法
-     * @param carImage 图片文件流
-     * @param fileName 文件名称
-     * @return         上传成功将放回图片URL，否则返回Null
+     * 列表添加车辆信息方式
+     * @param carEntityList 业主车辆信息 列表
+     * @return              返回影响行数
      */
     @Override
-    public String carImageUpload(byte[] carImage, String fileName) {
-        //4.临时本地上传方式
-        FileOutputStream fileOutputStream = null;
-        try {
-            //图片文件流
-            fileOutputStream = new FileOutputStream(new File("D:" + File.separator + "TestFileDirectory" + File.separator + fileName));
-            fileOutputStream.write(carImage);
-            //上传成功返回访问路径
-            return "https://www.baidu.com/" + fileName;
-        } catch (IOException e) {
-            return null;
-        } finally {
-            if (fileOutputStream != null) {
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public Integer addProprietorCar(List<CarEntity> carEntityList) {
+        return carMapper.addProprietorCar(carEntityList);
     }
 
 
