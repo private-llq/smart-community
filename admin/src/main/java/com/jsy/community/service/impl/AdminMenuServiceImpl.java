@@ -99,7 +99,7 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 	public void insertChildMenu(AdminMenuEntity adminMenu) {
 		String icon = adminMenu.getIcon();// 图片地址
 		if (!StringUtils.isEmpty(icon)) {
-			redisTemplate.opsForSet().add("imgUp_part", icon);// 将图片地址存入redis
+			redisTemplate.opsForSet().add("imgUp_all", icon);// 最终上传时将图片地址再存入redis
 		}
 		adminMenuMapper.insert(adminMenu);
 	}
