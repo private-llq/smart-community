@@ -59,8 +59,5 @@ public class AdminMenuController {
 		return CommonResult.ok();
 	}
 	
-	
-	
-	
 }
 

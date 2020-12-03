@@ -36,7 +36,7 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 	private AdminMenuMapper adminMenuMapper;
 	
 	@Resource
-	private RedisTemplate<String, String> redisTemplate;
+	private RedisTemplate<String,String> redisTemplate;
 	
 	@Override
 	public List<FrontParentMenu> listAdminMenu() {
