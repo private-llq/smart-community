@@ -92,8 +92,9 @@ public class UserAuthController {
 		}
 		
 		UserInfoVo infoVo = userService.login(qo);
-		UserAuthVo loginVo = jwtUtils.generateToken(infoVo);
-		return CommonResult.ok(loginVo);
+		//生成带token和用户信息的的UserAuthVo
+		UserAuthVo userAuthVo = userService.createAuthVoWithToken(infoVo);
+		return CommonResult.ok(userAuthVo);
 	}
 	
 	@ApiOperation("注册")
@@ -101,9 +102,10 @@ public class UserAuthController {
 	public CommonResult<UserAuthVo> register(@RequestBody RegisterQO qo) {
 		ValidatorUtils.validateEntity(qo);
 		
-		UserInfoVo infoVo = userService.register(qo);
-		UserAuthVo loginVo = jwtUtils.generateToken(infoVo);
-		return CommonResult.ok(loginVo);
+		userService.register(qo); //token不再与userid有关，改为不返回userInfo，生成token直接new
+		//生成带token和用户信息的的UserAuthVo(注册后设置密码用)
+		UserAuthVo userAuthVo = userService.createAuthVoWithToken(new UserInfoVo());
+		return CommonResult.ok(userAuthVo);
 	}
 	
 	@ApiOperation(value = "注册后设置密码", notes = "需要登录")

@@ -25,7 +25,7 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @param qo 登录信息
 	 * @return 业主ID
 	 */
-	Long checkUser(LoginQO qo);
+	String checkUser(LoginQO qo);
 	
 	/**
 	 * 注册添加密码

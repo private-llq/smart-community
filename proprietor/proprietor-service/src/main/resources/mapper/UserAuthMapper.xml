@@ -6,7 +6,7 @@
 		select * from t_user_auth ua where ${field} = #{account}
 	</select>
 	
-	<select id="queryUserIdByMobile" resultType="java.lang.Long">
+	<select id="queryUserIdByMobile" resultType="java.lang.String">
 		select uid from t_user_auth ua where ua.mobile = #{mobile}
 	</select>
 	

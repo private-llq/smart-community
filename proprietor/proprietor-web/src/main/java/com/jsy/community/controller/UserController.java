@@ -49,10 +49,9 @@ public class UserController {
     @PostMapping("test")
     @ApiOperation("test")
     @Login
-    public List<UserAuthEntity> test(@RequestBody BaseQO<UserEntity> qo) {
+    public String test(@RequestBody BaseQO<UserEntity> qo) {
         ValidatorUtils.validateEntity(qo);
-
-        return userAuthService.getList(true);
+        return "success...";
     }
 
     /**

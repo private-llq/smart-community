@@ -23,6 +23,9 @@ import javax.validation.constraints.Pattern;
 @TableName("t_user")
 public class UserEntity extends BaseEntity {
 	
+	@ApiModelProperty("uid")
+	private String uid;
+	
 	@ApiModelProperty("业主ID")
 	private Long householderId;
 	

@@ -3,7 +3,7 @@
 
 <mapper namespace="com.jsy.community.mapper.UserMapper">
 	<select id="queryUserInfoByUid" resultType="com.jsy.community.entity.UserEntity">
-		select * from t_user where id = #{uid}
+		select * from t_user where uid = #{uid}
 	</select>
 	<!-- 业主信息更新sql -->
 	<update id="com.jsy.community.mapper.UserMapper.proprietorUpdate">

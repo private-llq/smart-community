@@ -1,6 +1,8 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +17,7 @@ import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -26,6 +29,8 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * 业主实现
@@ -50,13 +55,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+    
+    private long expire = 60*60*24*7; //暂时
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserHouseService userHouseService;
 
     @Override
+    public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo){
+        String token = UUID.randomUUID().toString().replace("-", "");
+        Date expireDate = new Date(new Date().getTime() + expire * 1000);
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setToken(token);
+        userAuthVo.setExpiredTime(LocalDateTimeUtil.of(expireDate));
+        userAuthVo.setUserInfo(userInfoVo);
+        redisTemplate.opsForValue().set("Login:" + token,JSONObject.toJSONString(userInfoVo));
+        return userAuthVo;
+    }
+    
+    @Override
     public UserInfoVo login(LoginQO qo) {
-        Long uid = userAuthService.checkUser(qo);
+        String uid = userAuthService.checkUser(qo);
         UserEntity user = baseMapper.queryUserInfoByUid(uid);
         if (user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");
@@ -65,7 +84,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(user, userInfoVo);
 
-        // 设置省市区
+        // 刷新省市区
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
         if (user.getProvinceId() != null) {
             userInfoVo.setProvince(ops.get("RegionSingle:" + user.getProvinceId().toString()));
@@ -77,34 +96,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userInfoVo.setArea(ops.get("RegionSingle:" + user.getAreaId().toString()));
         }
 
+        //redis存<token,用户信息>
+        redisTemplate.opsForValue().set("Login:" + user.getId(), JSONObject.toJSONString(user));
         return userInfoVo;
     }
 
     @Override
-    public UserInfoVo register(RegisterQO qo) {
+    public void register(RegisterQO qo) {
         commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
-
-        // 添加业主(user表插入一条空数据)
+    
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        
+        // 业主数据(user表)
         UserEntity user = new UserEntity();
-        save(user);
+        user.setUid(uuid);
 
-        // 添加认证数据(user_auth表uid、手机号)
+        // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
-        userAuth.setUid(user.getId());
-        if (RegexUtils.isMobile(qo.getAccount())) {
+        userAuth.setUid(uuid);
+        if (RegexUtils.isMobile(qo.getAccount())) { //手机注册
             userAuth.setMobile(qo.getAccount());
-        } else if (RegexUtils.isEmail(qo.getAccount())) {
+            user.setMobile(qo.getAccount());
+        } else if (RegexUtils.isEmail(qo.getAccount())) { // 邮箱注册
             userAuth.setEmail(qo.getAccount());
-        } else {
+        } else { //用户名注册
             userAuth.setUsername(qo.getAccount());
         }
+        //添加业主(user表)
+        save(user);
+        //添加账户(user_auth表)
         userAuthService.save(userAuth);
-
-        UserInfoVo vo = new UserInfoVo();
-        vo.setId(user.getId());
-        vo.setSex(0);
-        vo.setIsRealAuth(0);
-        return vo;
     }
 
     /**

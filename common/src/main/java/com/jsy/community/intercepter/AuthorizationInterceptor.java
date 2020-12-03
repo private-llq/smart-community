@@ -5,14 +5,14 @@ import cn.hutool.core.util.StrUtil;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.utils.JwtUtils;
-import io.jsonwebtoken.Claims;
+import com.jsy.community.utils.UserUtils;
+import com.jsy.community.vo.UserInfoVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,29 +23,14 @@ import javax.servlet.http.HttpServletResponse;
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	public static final String USER_KEY = "userId";
-	@Resource
-	private JwtUtils jwtUtils;
+	
+	@Autowired
+	private UserUtils userUtils;
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		
-		boolean tokenCheck = false;
-		boolean tokenExpiredCheck = false;
-		//============================================ 取参 ========================================
-		String token = request.getHeader(jwtUtils.getHeader());
-		if (StrUtil.isBlank(token)) {
-			token = request.getParameter(jwtUtils.getHeader());
-		}
-		if(!StrUtil.isBlank(token)){
-			tokenCheck = true;
-			Claims claims = jwtUtils.getClaimByToken(token);
-			if (claims != null && !jwtUtils.isTokenExpired(claims.getExpiration())) {
-				tokenExpiredCheck = true;
-				request.setAttribute(USER_KEY, Long.parseLong(claims.getSubject()));
-			}
-		}
-		
-		//===================================== 注解验证和抛异常 ========================================
+		//===================================== 注解验证 ========================================
 		Login methodAnnotation, classAnnotation;
 		if (handler instanceof HandlerMethod) {
 			methodAnnotation = ((HandlerMethod) handler).getMethodAnnotation(Login.class);
@@ -69,11 +54,13 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			return true;
 		}
 		
-		//前三种情况都不满足，开始token非空和时效检查
-		if (!tokenCheck) {
-			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), jwtUtils.getHeader() + "不能为空");
-		} else if (!tokenExpiredCheck) {
-			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), jwtUtils.getHeader() + "失效，请重新登录");
+		String token = request.getHeader("token");
+		if (StrUtil.isBlank(token)) {
+			token = request.getParameter("token");
+		}
+		UserInfoVo userInfo = userUtils.getUserInfo(token);
+		if(userInfo == null){
+			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
 		}
 		
 		return true;

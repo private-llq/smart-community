@@ -20,18 +20,6 @@ spring:
           refresh: true
   thymeleaf:
     prefix: classpath:/templates/
-#  mail:
-#    host: smtp.qq.com
-#    port: 25
-#    username: 459799974@qq.com
-#    password: nfezhwyeduksbjjh
-#    properties:
-#      mail:
-#        smtp:
-#          auth: true
-#          starttls:
-#            enable: false
-#            required: false
 
 dubbo:
   registry:

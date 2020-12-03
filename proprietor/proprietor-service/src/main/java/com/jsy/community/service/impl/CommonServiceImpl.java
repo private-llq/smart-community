@@ -34,7 +34,7 @@ public class CommonServiceImpl implements ICommonService {
 
     @Override
     public void checkVerifyCode(String account, String code) {
-        String oldCode = redisTemplate.opsForValue().get(account);
+        String oldCode = redisTemplate.opsForValue().get("vCode:" + account);
         if (oldCode == null) {
             throw new ProprietorException("验证码已失效");
         }

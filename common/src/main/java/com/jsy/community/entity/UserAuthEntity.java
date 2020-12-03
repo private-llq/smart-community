@@ -29,7 +29,7 @@ public class UserAuthEntity extends BaseEntity {
 	public static final int CODE_TYPE_FORGET_PWD = 3;
 	
 	@ApiModelProperty("业主ID")
-	private Long uid;
+	private String uid;
 	
 	@ApiModelProperty("用户名")
 	private String username;

@@ -5,6 +5,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
+import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 
 /**
@@ -14,6 +15,15 @@ import com.jsy.community.vo.UserInfoVo;
  * @since 2020-11-11 17:41
  */
 public interface IUserService extends IService<UserEntity> {
+	
+	/**
+	* @Description: 生成带token的UserAuthVo
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.UserAuthVo
+	 * @Author: chq459799974
+	 * @Date: 2020/12/3
+	**/
+	UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo);
 	
 	/**
 	 * 登录接口
@@ -29,7 +39,7 @@ public interface IUserService extends IService<UserEntity> {
 	 * @param qo 参数
 	 * @return 登录信息
 	 */
-	UserInfoVo register(RegisterQO qo);
+	void register(RegisterQO qo);
 
 	/**
 	 * 业主信息登记

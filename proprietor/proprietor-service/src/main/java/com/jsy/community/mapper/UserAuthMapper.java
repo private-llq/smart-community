@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 public interface UserAuthMapper extends BaseMapper<UserAuthEntity> {
 	UserAuthEntity queryUserByField(@Param("account") String account, @Param("field") String field);
 	
-	Long queryUserIdByMobile(@Param("mobile") String mobile);
+	String queryUserIdByMobile(@Param("mobile") String mobile);
 	
 	Long checkUserExists(@Param("account") String account, @Param("field") String field);
 }

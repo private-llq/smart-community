@@ -61,7 +61,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	}
 	
 	@Override
-	public Long checkUser(LoginQO qo) {
+	public String checkUser(LoginQO qo) {
 		if (RegexUtils.isMobile(qo.getAccount())) {
 			if (StrUtil.isNotEmpty(qo.getCode())) {
 				// 手机验证码登录
@@ -82,7 +82,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		}
 	}
 	
-	private Long checkUserByPassword(LoginQO qo, String field) {
+	private String checkUserByPassword(LoginQO qo, String field) {
 		UserAuthEntity entity = baseMapper.queryUserByField(qo.getAccount(), field);
 		String password = SecureUtil.sha256(qo.getPassword() + entity.getSalt());
 		if (password.equals(entity.getPassword())) {
