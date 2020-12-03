@@ -14,6 +14,7 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.ThirdPlatformVo;
@@ -24,6 +25,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -42,6 +44,9 @@ import java.util.List;
 public class UserAuthController {
 	@Resource
 	private JwtUtils jwtUtils;
+	
+	@Autowired
+	private UserUtils userUtils;
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	@SuppressWarnings("unused")
@@ -113,6 +118,7 @@ public class UserAuthController {
 	@Login
 	public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
 		Long uid = JwtUtils.getUserId();
+		
 		boolean b = userAuthService.addPassword(uid, qo);
 		return b ? CommonResult.ok() : CommonResult.error("密码设置失败");
 	}

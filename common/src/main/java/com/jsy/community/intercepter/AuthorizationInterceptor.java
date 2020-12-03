@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	public static final String USER_KEY = "userId";
+	public static final String USER_INFO = "userInfo";
 	
 	@Autowired
 	private UserUtils userUtils;
@@ -62,6 +63,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		if(userInfo == null){
 			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
 		}
+		request.setAttribute(USER_INFO, userInfo);
+		request.setAttribute(USER_KEY, userInfo.getUid());
 		
 		return true;
 	}

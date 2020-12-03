@@ -1,6 +1,5 @@
 package com.jsy.community.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -18,6 +17,7 @@ import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
 
         UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtil.copyProperties(user, userInfoVo);
+        BeanUtils.copyProperties(user, userInfoVo);
 
         // 刷新省市区
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
@@ -90,8 +90,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userInfoVo.setArea(ops.get("RegionSingle:" + user.getAreaId().toString()));
         }
 
-        //redis存<token,用户信息>
-        redisTemplate.opsForValue().set("Login:" + user.getId(), JSONObject.toJSONString(user));
         return userInfoVo;
     }
 
@@ -133,7 +131,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public Boolean proprietorRegister(ProprietorQO proprietorQO) {
         //把参数对象里面的值赋值给UserEntity  使用Mybatis plus的insert需要 Entity里面写的表名
         UserEntity userEntity = new UserEntity();
-        BeanUtil.copyProperties(proprietorQO, userEntity);
+        BeanUtils.copyProperties(proprietorQO, userEntity);
         //添加业主信息 由于在注册时会像t_user表插入一条空记录为用户的id，这里直接做更新操作，
         int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("id", proprietorQO.getId()));
         if (count == 0) {

@@ -14,11 +14,14 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.utils.JwtUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,12 +48,17 @@ public class UserController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserAuthService iUserAuthService;
+    
+//    @Autowired
+//    private UserUtils userUtils;
 
     @PostMapping("test")
-    @ApiOperation("test")
     @Login
     public String test(@RequestBody BaseQO<UserEntity> qo) {
         ValidatorUtils.validateEntity(qo);
+        UserInfoVo userInfo = UserUtils.getUserInfo();
+        UserUtils.getUserId();
+        System.out.println("111111111111....");
         return "success...";
     }
 

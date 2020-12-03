@@ -15,8 +15,11 @@ import java.io.Serializable;
 @Data
 @ApiModel("业主个人信息")
 public class UserInfoVo implements Serializable {
+//	@ApiModelProperty("ID")
+//	private Long id;
+	
 	@ApiModelProperty("业主ID")
-	private Long id;
+	private String uid;
 	
 	@ApiModelProperty("昵称")
 	private String nickname;

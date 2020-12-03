@@ -36,32 +36,32 @@ public class JwtUtils {
 	/**
 	 * 生成jwt token
 	 */
-	public UserAuthVo generateToken(UserInfoVo infoVo) {
-		Date nowDate = new Date();
-		//过期时间
-		Date expireDate = new Date(nowDate.getTime() + expire * 1000);
-		
-		String token = Jwts.builder()
-			.setHeaderParam("typ", "JWT")
-			.setSubject(infoVo.getId().toString())
-			.setIssuedAt(nowDate)
-			.setExpiration(expireDate)
-			.signWith(SignatureAlgorithm.HS512, secret)
-			.compact();
-		return new UserAuthVo(token, LocalDateTimeUtil.of(expireDate), infoVo);
-	}
-	
-	public Claims getClaimByToken(String token) {
-		try {
-			return Jwts.parser()
-				.setSigningKey(secret)
-				.parseClaimsJws(token)
-				.getBody();
-		} catch (Exception e) {
-			log.error("validate is token error ", e);
-			return null;
-		}
-	}
+//	public UserAuthVo generateToken(UserInfoVo infoVo) {
+//		Date nowDate = new Date();
+//		//过期时间
+//		Date expireDate = new Date(nowDate.getTime() + expire * 1000);
+//
+//		String token = Jwts.builder()
+//			.setHeaderParam("typ", "JWT")
+//			.setSubject(infoVo.getId().toString())
+//			.setIssuedAt(nowDate)
+//			.setExpiration(expireDate)
+//			.signWith(SignatureAlgorithm.HS512, secret)
+//			.compact();
+//		return new UserAuthVo(token, LocalDateTimeUtil.of(expireDate), infoVo);
+//	}
+//
+//	public Claims getClaimByToken(String token) {
+//		try {
+//			return Jwts.parser()
+//				.setSigningKey(secret)
+//				.parseClaimsJws(token)
+//				.getBody();
+//		} catch (Exception e) {
+//			log.error("validate is token error ", e);
+//			return null;
+//		}
+//	}
 	
 	/**
 	 * token是否过期
