@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 
 @RestController
-@Api("分布式文件存储")
+@Api(tags = "分布式文件存储")
 @Slf4j
 public class MinioController {
 	
-	@Resource(name = "redisSetTemplate")
+	@Resource
 	private RedisTemplate<String,String> redisTemplate;
 	
 	

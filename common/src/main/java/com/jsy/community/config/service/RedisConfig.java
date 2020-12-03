@@ -44,7 +44,7 @@ public class RedisConfig {
 		return redisTemplate.opsForList();
 	}
 	
-	@Bean("redisSetTemplate")
+	@Bean
 	public SetOperations<String, Object> setOperations(RedisTemplate<String, Object> redisTemplate) {
 		return redisTemplate.opsForSet();
 	}
