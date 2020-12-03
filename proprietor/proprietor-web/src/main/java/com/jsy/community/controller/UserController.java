@@ -8,7 +8,6 @@ import com.jsy.community.api.IUserService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
@@ -21,10 +20,8 @@ import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 /**
  * 业主控制器
@@ -49,9 +46,6 @@ public class UserController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserAuthService iUserAuthService;
     
-//    @Autowired
-//    private UserUtils userUtils;
-
     @PostMapping("test")
     @Login
     public String test(@RequestBody BaseQO<UserEntity> qo) {

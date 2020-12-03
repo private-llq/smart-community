@@ -93,7 +93,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	}
 	
 	@Override
-	public boolean addPassword(Long uid, AddPasswordQO qo) {
+	public boolean addPassword(String uid, AddPasswordQO qo) {
 		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
 			throw new ProprietorException("密码不一致");
 		}

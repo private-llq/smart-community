@@ -3,6 +3,7 @@ package com.jsy.community.intercepter;
 
 import cn.hutool.core.util.StrUtil;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.UserUtils;
@@ -31,7 +32,22 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		
-		//===================================== 注解验证 ========================================
+		//===================================== 需要授权的操作 ========================================
+		Auth authAnnotation;
+		if (handler instanceof HandlerMethod) {
+			authAnnotation = ((HandlerMethod) handler).getMethodAnnotation(Auth.class);
+			if(authAnnotation != null){
+				String token = request.getHeader("token");
+				if (StrUtil.isBlank(token)) {
+					token = request.getParameter("token");
+				}
+				if(userUtils.getRedisToken("Auth", token) == null){
+					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
+				}
+			}
+		}
+		
+		//===================================== 登录验证 ========================================
 		Login methodAnnotation, classAnnotation;
 		if (handler instanceof HandlerMethod) {
 			methodAnnotation = ((HandlerMethod) handler).getMethodAnnotation(Login.class);

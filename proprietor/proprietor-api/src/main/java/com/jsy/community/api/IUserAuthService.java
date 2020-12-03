@@ -34,7 +34,7 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @param qo  参数
 	 * @return boolean
 	 */
-	boolean addPassword(Long uid, AddPasswordQO qo);
+	boolean addPassword(String uid, AddPasswordQO qo);
 	
 	/**
 	 * 根据指定字段，检查业主是否存在

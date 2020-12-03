@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import cn.hutool.core.util.StrUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
@@ -12,7 +13,6 @@ import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
-import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -27,8 +27,10 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -42,8 +44,6 @@ import java.util.List;
 @RestController
 @ApiJSYController
 public class UserAuthController {
-	@Resource
-	private JwtUtils jwtUtils;
 	
 	@Autowired
 	private UserUtils userUtils;
@@ -117,7 +117,7 @@ public class UserAuthController {
 	@PostMapping("/password")
 	@Login
 	public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
-		Long uid = JwtUtils.getUserId();
+		String uid = UserUtils.getUserId();
 		
 		boolean b = userAuthService.addPassword(uid, qo);
 		return b ? CommonResult.ok() : CommonResult.error("密码设置失败");
@@ -125,18 +125,28 @@ public class UserAuthController {
 	
 	@ApiOperation(value = "验证码是否正确", notes = "忘记密码")
 	@GetMapping("/check/code")
-	public CommonResult<Boolean> checkCode(@RequestParam String account, @RequestParam String code) {
+	public CommonResult<String> checkCode(@RequestParam String account, @RequestParam String code) {
 		commonService.checkVerifyCode(account, code);
-		
-		return CommonResult.ok();
+		userUtils.setRedisToken("Auth",account);
+		return CommonResult.ok("");
 	}
 	
 	@ApiOperation("重置密码")
 	@PostMapping("/reset/password")
+	@Auth
 	public CommonResult<Boolean> resetPassword(@RequestBody ResetPasswordQO qo) {
 		ValidatorUtils.validateEntity(qo);
 		
 		boolean b = userAuthService.resetPassword(qo);
+		if(b){
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+			String token = request.getHeader("token");
+			if (StrUtil.isBlank(token)) {
+				token = request.getParameter("token");
+			}
+			// TODO 判断结果或设置过期时间
+			userUtils.destroyToken("Auth",token);
+		}
 		return b ? CommonResult.ok() : CommonResult.error("重置失败");
 	}
 	

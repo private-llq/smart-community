@@ -15,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
 
 /**
  * @author chq459799974
@@ -26,6 +27,16 @@ public class UserUtils {
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 	
+	@Autowired
+	private RedisTemplate redisTemplate;
+	
+	/**
+	* @Description: 通过token获取用户信息
+	 * @Param: [loginToken]
+	 * @Return: com.jsy.community.vo.UserInfoVo
+	 * @Author: chq459799974
+	 * @Date: 2020/12/3
+	**/
 	public UserInfoVo getUserInfo(String loginToken) {
 		if(StringUtils.isEmpty(loginToken)){
 			return null;
@@ -40,16 +51,54 @@ public class UserUtils {
 		return user;
 	}
 	
+	/**
+	* @Description: 获取request域中用户信息(登录用户自己的信息)
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.UserInfoVo
+	 * @Author: chq459799974
+	 * @Date: 2020/12/3
+	**/
 	public static UserInfoVo getUserInfo() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
 		return (UserInfoVo)request.getAttribute(AuthorizationInterceptor.USER_INFO);
 	}
 	
+	/**
+	* @Description: 获取request域中用户id(登录用户自己的uid)
+	 * @Param: []
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2020/12/3
+	**/
 	public static String getUserId() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
 		return (String) request.getAttribute(AuthorizationInterceptor.USER_KEY);
+	}
+	
+	/**
+	* @Description: 生成用户token(目前是uuid)
+	 * @Param: []
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2020/12/3
+	**/
+	public static String createUserToken(){
+		return UUID.randomUUID().toString().replace("-", "");
+	}
+	
+	public void setRedisToken(String typeName,Object o){
+		String userToken = createUserToken();
+		redisTemplate.opsForValue().set(typeName + ":" + userToken,o);
+	}
+	
+	public Object getRedisToken(String typeName,String token){
+		return redisTemplate.opsForValue().get(typeName + ":" + token);
+	}
+	
+	public boolean destroyToken(String typeName,String token){
+		return redisTemplate.delete(typeName + ":" + token);
 	}
 	
 }
