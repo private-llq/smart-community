@@ -23,7 +23,7 @@ public class UserHouseEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private Long uid;
+    private String uid;
 
     @ApiModelProperty(value = "社区id")
     private Long communityId;

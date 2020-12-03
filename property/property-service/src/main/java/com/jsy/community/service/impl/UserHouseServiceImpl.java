@@ -62,23 +62,27 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			BeanUtils.copyProperties(userHouseEntity, houseVo);
 			
 			// 业主名称
-			Long uid = userHouseEntity.getUid();
-			UserEntity userEntity = userMapper.selectById(uid);
-			String nickname = userEntity.getNickname();
-			houseVo.setNickname(nickname);
-			
-			// 所属社区
-			CommunityEntity communityEntity = communityMapper.selectById(communityId);
-			String name = communityEntity.getName();
-			houseVo.setName(name);
-			
-			// 社区楼栋信息
-			Long houseId = userHouseEntity.getHouseId();
-			HouseEntity houseEntity = houseMapper.selectById(houseId);
-			if (houseEntity != null) {
-				BeanUtils.copyProperties(houseEntity, houseVo);
+			String uid = userHouseEntity.getUid();
+			QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+			queryWrapper.eq("uid", uid);
+			UserEntity userEntity = userMapper.selectOne(queryWrapper);
+			if (userEntity != null) {
+				String nickname = userEntity.getNickname();
+				houseVo.setNickname(nickname);
+				
+				// 所属社区
+				CommunityEntity communityEntity = communityMapper.selectById(communityId);
+				String name = communityEntity.getName();
+				houseVo.setName(name);
+				
+				// 社区楼栋信息
+				Long houseId = userHouseEntity.getHouseId();
+				HouseEntity houseEntity = houseMapper.selectById(houseId);
+				if (houseEntity != null) {
+					BeanUtils.copyProperties(houseEntity, houseVo);
+				}
+				userHouseVOS.add(houseVo);
 			}
-			userHouseVOS.add(houseVo);
 		}
 		PageInfo<UserHouseVO> info = new PageInfo<>();
 		BeanUtils.copyProperties(page, info);
@@ -92,7 +96,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	}
 	
 	@Override
-	public Boolean saveUserHouse(Long uid, Long communityId, Long houseId) {
+	public Boolean saveUserHouse(String uid, Long communityId, Long houseId) {
 		UserHouseEntity houseEntity = new UserHouseEntity();
 		houseEntity.setUid(uid);
 		houseEntity.setCommunityId(communityId);
@@ -139,9 +143,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 * @Date: 2020/12/1
 	 **/
 	@Override
-	public boolean checkHouseHolder(Long uid, Long houseId){
+	public boolean checkHouseHolder(Long uid, Long houseId) {
 		Integer integer = userHouseMapper.selectCount(new QueryWrapper<UserHouseEntity>().eq("uid", uid).eq("house_id", houseId));
-		if(integer == 1){
+		if (integer == 1) {
 			return true;
 		}
 		return false;

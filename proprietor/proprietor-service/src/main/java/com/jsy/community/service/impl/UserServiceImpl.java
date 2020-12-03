@@ -3,15 +3,12 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
@@ -26,9 +23,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Date;
 import java.util.UUID;
 
@@ -150,7 +144,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             carService.addProprietorCar(proprietorQO.getCarEntityList());
         }
         //t_user_house 中插入当前这条记录 为了让物业审核
-		userHouseService.saveUserHouse(userEntity.getId(), userEntity.getHouseEntity().getCommunityId(), userEntity.getHouseEntity().getId());
+		userHouseService.saveUserHouse(userEntity.getUid(), userEntity.getHouseEntity().getCommunityId(), userEntity.getHouseEntity().getId());
         return true;
     }
 

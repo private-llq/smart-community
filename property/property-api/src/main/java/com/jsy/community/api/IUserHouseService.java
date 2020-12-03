@@ -32,7 +32,7 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @Date 2020/11/26 11:01
 	 * @Param [uid, communityId, houseId]
 	 **/
-	Boolean saveUserHouse(Long uid, Long communityId, Long houseId);
+	Boolean saveUserHouse(String uid, Long communityId, Long houseId);
 	
 	/**
 	 * @return java.lang.Boolean
