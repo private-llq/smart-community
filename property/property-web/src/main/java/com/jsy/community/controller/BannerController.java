@@ -2,12 +2,12 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.BannerEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.proprietor.BannerQO;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.BannerVO;
 import com.jsy.community.vo.CommonResult;
@@ -32,7 +32,10 @@ public class BannerController {
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IBannerService iBannerService;
-
+	
+	private static final String BUCKETNAME = "bannner-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	
+	
 	/**
 	 * @Description: 轮播图列表查询
 	 * @Param: [bannerQO]
@@ -54,22 +57,32 @@ public class BannerController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	**/
-	@ApiOperation("【轮播图】上传")
+	@ApiOperation("【轮播图基本信息】上传")
 //	@Login
 	@PostMapping("upload")
-	public CommonResult upload(MultipartFile[] file, BannerEntity bannerEntity){
-		if(file == null || file.length == 0){
-			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"文件为空");
-		}
+	public CommonResult upload(@RequestBody BannerEntity bannerEntity){
 		ValidatorUtils.validateEntity(bannerEntity, BannerEntity.addBannerValidatedGroup.class);
 		//TODO 调CommonService方法，文件上传到fastdfs。url暂时写死
-		bannerEntity.setUrl("http://3gimg.qq.com/map_openplat/lbs_web/custom_map_templates/custom_map_template_2.png");
 		//写库
 		boolean b = iBannerService.addBanner(bannerEntity);
 		if(b){
 			return CommonResult.ok();
 		}
 		return CommonResult.error(JSYError.INTERNAL);
+	}
+	
+	/**
+	 * @return com.jsy.community.vo.CommonResult
+	 * @Author lihao
+	 * @Description 轮播图图片上传
+	 * @Date 2020/12/4 18:04
+	 * @Param [file]
+	 **/
+	@ApiOperation("【轮播图图片】上传")
+	@PostMapping("uploadImg")
+	public CommonResult uploadImg(@RequestParam("file") MultipartFile file){
+		String filePath = MinioUtils.upload(file, BUCKETNAME);
+		return CommonResult.ok(filePath);
 	}
 
 	/**
