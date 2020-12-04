@@ -113,13 +113,12 @@ public class CarController {
     @DeleteMapping()
     public CommonResult<Boolean> deleteProprietorCar(@RequestParam String id) {
         //从请求获得uid
-        Long uid = 12L;
         if( !ValidatorUtils.isInteger(id)  ){
             return CommonResult.error(JSYError.REQUEST_PARAM);
         }
         //条件参数列表 key=列名  增加删除车辆记录 where条件只改动这里
         Map<String, Object> params = new HashMap<>();
-        params.put("uid", uid);
+        params.put("uid", UserUtils.getUserId());
         params.put("id",id);
         Integer res = carService.deleteProprietorCar(params);
         return res > 0 ? CommonResult.ok() : CommonResult.error(JSYError.DUPLICATE_KEY.getCode(), "车辆不存在!");
