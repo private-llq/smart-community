@@ -7,15 +7,12 @@ import io.minio.ObjectStat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
@@ -25,20 +22,19 @@ import java.io.InputStream;
 @Slf4j
 public class MinioController {
 	
-	@Resource
-	private RedisTemplate<String,String> redisTemplate;
+//	@Resource
+//	private StringRedisTemplate stringRedisTemplate;
 	
-	@Resource
-	private StringRedisTemplate stringRedisTemplate;
+	private static final String BUCKETNAME = "common"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
 	
 	@ApiOperation("上传文件")
 	@PostMapping("/uploadFile")
 	public CommonResult uploadFile(@RequestParam(value = "file", required = false) MultipartFile file) {
 		try {
-			String str = MinioUtil.INSTANCE.upload(file);
+			String str = MinioUtil.upload(file,BUCKETNAME);
 //			redisTemplate.opsForSet().add("imgUp_part", str);// 最终上传时将图片地址再存入redis
-			stringRedisTemplate.opsForSet().add("imgUp_part", str);
+//			stringRedisTemplate.opsForSet().add("imgUp_part", str);
 			return CommonResult.ok(str);// str：上传成功后的地址
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -51,7 +47,7 @@ public class MinioController {
 	@GetMapping("/removeFile")
 	public CommonResult removeFile(@RequestParam(value = "filePath", required = false) String filePath) {
 		try {
-			String str = MinioUtil.INSTANCE.removeFile(filePath);
+			String str = MinioUtil.removeFile(filePath);
 			return CommonResult.ok(str); //str：删除成功后的提示信息
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -62,7 +58,7 @@ public class MinioController {
 	@ApiOperation("下载文件")
 	@PostMapping("/downLoadFile")
 	public CommonResult downLoadFile(@RequestParam("filePath") String filePath, HttpServletResponse response) throws Exception {
-		MinioClient minioClient = MinioUtil.INSTANCE.getFile();
+		MinioClient minioClient = MinioUtil.getFile();
 		String[] split = filePath.split("/");
 		String bucketName = split[3];
 		String objectName = split[4];
