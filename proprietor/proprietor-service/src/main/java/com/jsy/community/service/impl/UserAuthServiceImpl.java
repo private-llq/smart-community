@@ -179,7 +179,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	 * @return	   返回用户手机号码
 	 */
 	@Override
-	public String selectContactById(Long id) {
+	public String selectContactById(String id) {
 		QueryWrapper<UserAuthEntity> eq = new QueryWrapper<UserAuthEntity>().select("mobile").eq("uid", id);
 		UserAuthEntity userAuthEntity = userAuthMapper.selectOne(eq);
 		//未注册直接访问

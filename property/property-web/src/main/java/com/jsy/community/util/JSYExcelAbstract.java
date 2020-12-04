@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YuLF
@@ -20,7 +21,7 @@ public abstract class JSYExcelAbstract implements JSYExcel {
     }
 
     @Override
-    public Workbook exportProprietorExcel(List<?> entityList, String workSheetName) {
+    public Workbook exportProprietorExcel(List<?> entityList, Map<String, Object> res) {
         return null;
     }
 }

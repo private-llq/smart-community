@@ -16,6 +16,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author YuLF
@@ -47,11 +48,10 @@ public class ProprietorExcelReader extends JSYExcelAbstract {
                     throw new JSYException(ConstError.NORMAL, "字段匹配错误：预期第" + i + "列字段是" + titleField[i] + "，但发现的是：" + row.getCell(i).getStringCellValue());
                 }
             }
-            int lastRowNum = sheetAt.getLastRowNum();
             //开始读入excel数据 跳过标题和字段 从真正的数据行开始读取
             for (int j = 2; j <= sheetAt.getLastRowNum(); j++) {
                 Row dataRow = sheetAt.getRow(j);
-                if (dataRow != null) {
+                if (dataRow != null && !cellOneIsNull(dataRow)) {
                     //如果这行数据不为空 创建一个 实体接收 信息
                     UserEntity userEntity = new UserEntity();
                     userEntity.setHouseEntity(new HouseEntity());
@@ -131,10 +131,10 @@ public class ProprietorExcelReader extends JSYExcelAbstract {
                                 break;
                             //第9列 详细地址
                             case 8:
-                                if (StringUtils.isNoneBlank(CellValue)) {
+                                if (StringUtils.isNoneBlank(CellValue) && CellValue.length() < 128) {
                                     userEntity.setDetailAddress(CellValue);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列未填写您的详细地址!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列  '" + CellValue + "' 详细地址不能为空，且字符不能大于127!");
                                 }
                                 break;
                             default:
@@ -150,6 +150,20 @@ public class ProprietorExcelReader extends JSYExcelAbstract {
             throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), e.getMessage());
         }
     }
+
+    /**
+     * 主要是用来判断用户 第一个单元格是否有值  如果有值 则读取这一行，没有值就不读取这行了，因为在设置门牌单元格格式时 这一行就已经不为空了
+     * @param dataRow       当前行
+     * @return              返回当前行第一列的值是否为空
+     */
+    private boolean cellOneIsNull(Row dataRow) {
+        Cell cell = dataRow.getCell(0);
+        if(cell == null){
+            return true;
+        }
+        return cell.getStringCellValue().equals("");
+    }
+
     /**
      *  根据 excel单元格的类型获取值
      * @author YuLF

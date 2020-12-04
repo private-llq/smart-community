@@ -15,9 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +57,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return           返回修改影响行数
      */
     @Override
-    public Integer updateProprietorCar(CarQO carQO, Long uid) {
+    public Integer updateProprietorCar(CarQO carQO, String uid) {
         CarEntity carEntity = new CarEntity();
         BeanUtil.copyProperties(carQO, carEntity);
         return carMapper.update(carEntity, new UpdateWrapper<CarEntity>().eq("id",carEntity.getId()).eq("uid", uid).eq("deleted", 0));

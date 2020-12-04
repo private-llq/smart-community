@@ -77,5 +77,5 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @param id 	用户id
 	 * @return		返回消息实体
 	 */
-    String selectContactById(Long id);
+    String selectContactById(String id);
 }

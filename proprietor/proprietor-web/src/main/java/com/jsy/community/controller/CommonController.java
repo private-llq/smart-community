@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -31,6 +32,7 @@ public class CommonController {
     @ApiOperation("社区区域查询接口")
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
+    @Login
     public CommonResult<?> queryZone(@RequestParam Integer id, @RequestParam Integer queryType) {
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);

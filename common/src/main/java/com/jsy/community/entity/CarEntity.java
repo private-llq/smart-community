@@ -31,7 +31,7 @@ public class CarEntity extends BaseEntity {
 
     @ApiModelProperty(value = "所属人ID")
     @JsonIgnore
-    private Long uid;
+    private String uid;
 
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;

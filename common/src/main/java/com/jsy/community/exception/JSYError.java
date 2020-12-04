@@ -18,7 +18,7 @@ public enum JSYError {
 	INTERNAL(ConstError.INTERNAL, "服务器错误"),
 	NOT_IMPLEMENTED(ConstError.NOT_IMPLEMENTED, "未实现"),
 	GATEWAY(ConstError.GATEWAY, "网关错误"),
-	DUPLICATE_KEY(ConstError.DUPLICATE_KEY, "数据已存在");
+	DUPLICATE_KEY(ConstError.DUPLICATE_KEY, "数据已存在!请检查重复的数据");
 	
 	
 	private final Integer code;

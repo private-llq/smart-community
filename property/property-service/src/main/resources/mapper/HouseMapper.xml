@@ -16,5 +16,8 @@
 		select #{houseEntity.code},#{houseEntity.communityId},#{houseEntity.building},#{houseEntity.unit},#{houseEntity.floor},#{houseEntity.door},#{houseEntity.pid},#{houseEntity.type},#{houseEntity.comment} from dual
 		where EXISTS (select id from t_house where id = #{houseEntity.pid}) or #{houseEntity.pid} = 0
 	</insert>
-
+	<!-- 按社区id获取社区名称 和社区 房间数量 -->
+	<select id="getCommunityNameAndUserAmountById"  resultType="java.util.HashMap">
+		select c.name,(SELECT count(*) from t_house where community_id = c.id and type = 4) as communityUserNum from t_community as c where c.id = #{communityId}
+	</select>
 </mapper>

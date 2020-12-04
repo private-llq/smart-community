@@ -133,7 +133,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(proprietorQO, userEntity);
         //添加业主信息 由于在注册时会像t_user表插入一条空记录为用户的id，这里直接做更新操作，
-        int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("id", proprietorQO.getId()));
+        int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("uid", proprietorQO.getUid()));
         if (count == 0) {
             return false;
         }

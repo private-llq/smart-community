@@ -7,6 +7,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -62,4 +63,12 @@ public interface IHouseService extends IService<HouseEntity> {
 	 */
 	List<HouseEntity> getCommunityArchitecture(long communityId);
 
+	/**
+	 * 按社区ID获取 社区名称和 当前社区住户房间数量
+	 * @author YuLF
+	 * @since  2020/12/3 11:06
+	 * @Param  communityId   社区id
+	 * @return				 返回社区名称和 当前社区住户房间数量
+	 */
+    Map<String, Object> getCommunityNameAndUserAmountById(long communityId);
 }

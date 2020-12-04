@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -21,4 +22,12 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	
 	int addHouse(@Param("houseEntity") HouseEntity houseEntity);
 
+	/**
+	 * 按社区ID获取 社区名称和 当前社区住户房间数量
+	 * @author YuLF
+	 * @since  2020/12/3 11:06
+	 * @Param  communityId   社区id
+	 * @return				 返回社区名称和 当前社区住户房间数量
+	 */
+    Map<String, Object> getCommunityNameAndUserAmountById(long communityId);
 }

@@ -147,5 +147,18 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		queryWrapper.eq("community_id",communityId);
 		return list(queryWrapper);
 	}
+	
+	
+	/**
+	 * 按社区ID获取 社区名称和 当前社区住户房间数量
+	 * @author YuLF
+	 * @since  2020/12/3 11:06
+	 * @Param  communityId   社区id
+	 * @return				 返回社区名称和 当前社区住户房间数量
+	 */
+	@Override
+	public Map<String, Object> getCommunityNameAndUserAmountById(long communityId) {
+		return houseMapper.getCommunityNameAndUserAmountById(communityId);
+	}
 
 }

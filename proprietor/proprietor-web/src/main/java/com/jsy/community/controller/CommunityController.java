@@ -52,6 +52,7 @@ public class CommunityController {
 	 */
 	@ApiOperation("社区模糊搜索接口")
 	@PostMapping()
+	@Login
 	public CommonResult<List<CommunityEntity>> getCommunityByName(@RequestBody CommunityQO communityQO){
 		//验证请求参数
 		ValidatorUtils.validateEntity(communityQO, CommunityQO.GetCommunityByName.class);

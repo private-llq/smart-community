@@ -12,7 +12,6 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
-import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -64,11 +63,11 @@ public class UserController {
     @PostMapping("proprietorRegister")
     @ApiOperation("业主信息登记")
     @Login
-    public CommonResult<Boolean> proprietorRegister(@RequestBody ProprietorQO proprietorQO) {
+    public CommonResult<Boolean> proprietorRegister(@RequestBody  ProprietorQO proprietorQO) {
         //获取用户id信息
-		Long uid = JwtUtils.getUserId();
+		String uid = UserUtils.getUserId() ;
         //1.数据填充  新增业主信息时，必须要携带当前用户的uid  业主id首次不需要新增，只有在审核房屋通过时，业主id才会改变
-        proprietorQO.setId(uid);
+        proprietorQO.setUid(uid);
         proprietorQO.setHouseholderId(null);
         //2.验证业主信息登记必填项
         ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.ProprietorRegister.class);
@@ -85,7 +84,7 @@ public class UserController {
                 throw new ProprietorException(1, "车辆信息未填写!");
             }
             //通过uid 查询t_user_auth表的用户手机号码
-            String userMobile = iUserAuthService.selectContactById(proprietorQO.getId());
+            String userMobile = iUserAuthService.selectContactById(proprietorQO.getUid());
             //t_user_auth 表中用户没有注册
             if(userMobile == null){
                 throw new ProprietorException(JSYError.FORBIDDEN.getCode(), "用户不存在!");
@@ -111,15 +110,14 @@ public class UserController {
      * @return 返回更新成功!
      * @since 2020/11/27 15:03
      */
+    @Login
 	@ApiOperation("业主信息更新")
     @PutMapping("proprietorUpdate")
     public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO proprietorQO) {
-        //1.从JWT获取用户uid
-        Long uid = 12L;
         //2.参数效验,判断用户能更新的字段 是否都是空 如果都是空，则不进入数据数据访问层
         ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.proprietorUpdateValid.class);
 		//3.更新业主信息
-        proprietorQO.setId(uid);
+        proprietorQO.setUid(UserUtils.getUserId());
         return userService.proprietorUpdate(proprietorQO) > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 

@@ -7,6 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.util.ProprietorExcelCommander;
@@ -31,6 +32,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YuLF
@@ -58,17 +60,22 @@ public class ProprietorController {
     @ApiOperation("下载业主信息录入Excel")
     public ResponseEntity<byte[]> downloadExcel(@RequestParam long communityId) {
         //1.设置响应格式  设置响应头
+        //1.1 查出数据库当前communityId对应的小区名和住户数量   返回结果如：name = 花园小区 coummunityUserNum = 54   如果根本没有这个小区，那就提前结束业务
+        Map<String,Object> res = iHouseService.getCommunityNameAndUserAmountById(communityId);
+        if(res == null){
+            throw new JSYException(JSYError.BAD_REQUEST);
+        }
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
-        //1.1设置响应类型为附件类型直接下载这种
-        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode(ProprietorExcelCommander.PROPROETOR_REGISTER_EXCEL + ".xlsx", StandardCharsets.UTF_8));
-        //1.2设置响应的文件mime类型为 xls类型
+        //1.2设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode(res.get("name") + "业主登记表.xlsx", StandardCharsets.UTF_8));
+        //1.3设置响应的文件mime类型为 xls类型
         multiValueMap.set("Content-type", "application/vnd.ms-excel");
         //2.生成Excel模板
         try {
             //2.1 查出数据库当前社区的所有楼栋、单元、楼层、门牌 用于excel模板录入业主信息选择
             List<HouseEntity> communityArchitecture = iHouseService.getCommunityArchitecture(communityId);
             //2.2 生成Excel 业主信息录入模板
-            Workbook workbook = ProprietorExcelCommander.exportProprietorExcel(communityArchitecture);
+            Workbook workbook = ProprietorExcelCommander.exportProprietorExcel(communityArchitecture, res);
             //2.3 把workbook转换为字节输入流
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             workbook.write(bos);
