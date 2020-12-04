@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.UserInformMapper">
+
+    <!-- 查询所有已读通知消息的人 -->
+    <select id="findList" parameterType="Long" resultMap="UserInformMap">
+        SELECT u.id uid,u.real_name urn,ci.id cid,ci.title cit,ti.inform_status isf
+        FROM t_user u join t_user_inform ti on u.id=ti.user_id join t_community_inform ci on ti.inform_id=ci.id
+        where ci.id=#{informId}
+    </select>
+    <!-- 查询所有已读通知消息的总行数 -->
+    <select id="findCount" parameterType="Long" resultType="java.lang.Long">
+        SELECT count(*)
+        FROM t_user u join t_user_inform ti on u.id=ti.user_id join t_community_inform ci on ti.inform_id=ci.id
+        where ci.id=#{informId}
+    </select>
+    <resultMap id="UserInformMap" type="com.jsy.community.vo.UserInformVO">
+        <result column="uid" property="userId"/>
+        <result column="urn" property="userName"/>
+        <result column="cid" property="informId"/>
+        <result column="cit" property="title"/>
+        <result column="isf" property="informStatus"/>
+    </resultMap>
+
+</mapper>

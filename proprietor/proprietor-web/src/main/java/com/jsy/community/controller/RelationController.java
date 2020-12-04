@@ -4,8 +4,8 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.qo.RelationQo;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.RelationVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -26,10 +26,10 @@ public class RelationController {
 
     @ApiOperation("添加家属信息")
     @PutMapping("/add")
-    public CommonResult addRelation(@RequestBody RelationVO relationVO){
+    public CommonResult addRelation(@RequestBody RelationQo relationQo){
         System.out.println(relationService);
-        System.out.println(relationVO);
+
 //        relationService.addRelation(relationVO);
-        return relationService.addRelation(relationVO)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
+        return relationService.addRelation(relationQo)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
     }
 }

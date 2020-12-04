@@ -1,4 +1,4 @@
-package com.jsy.community.vo;
+package com.jsy.community.qo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Data
 @ApiModel("添加车辆信息")
-public class RelationCarsVO implements Serializable {
+public class RelationCarsQo implements Serializable {
     @ApiModelProperty("车牌号")
     private String carId;
     @ApiModelProperty("车辆类型")
@@ -39,10 +39,5 @@ public class RelationCarsVO implements Serializable {
     //是否通过审核
     @ApiModelProperty("是否通过审核")
     private Integer checkStatus;
-
-
-
-
-
 
 }

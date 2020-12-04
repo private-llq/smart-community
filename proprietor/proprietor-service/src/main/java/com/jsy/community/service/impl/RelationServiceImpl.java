@@ -8,8 +8,8 @@ import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.RelationMapper;
 import com.jsy.community.mapper.UserMapper;
-import com.jsy.community.vo.RelationCarsVO;
-import com.jsy.community.vo.RelationVO;
+import com.jsy.community.qo.RelationCarsQo;
+import com.jsy.community.qo.RelationQo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,31 +39,31 @@ public class RelationServiceImpl implements IRelationService {
 
     /**
      * 添加家属
-     * @param relationVO
+     * @param relationQo
      * @return
      */
     @Override
     @Transactional
-    public Boolean addRelation(RelationVO relationVO) {
+    public Boolean addRelation(RelationQo relationQo) {
 
             UserEntity userEntity = new UserEntity();
-            userEntity.setRealName(relationVO.getName());
-            userEntity.setMobile(relationVO.getPhoneTel());
-            userEntity.setSex(relationVO.getSex());
+            userEntity.setRealName(relationQo.getName());
+            userEntity.setMobile(relationQo.getPhoneTel());
+            userEntity.setSex(relationQo.getSex());
 
             //当前登录用户id暂时暂时写死
             userEntity.setHouseholderId(12l);
-            userEntity.setIdCard(relationVO.getIdNumber());
+            userEntity.setIdCard(relationQo.getIdNumber());
             userMapper.insert(userEntity);
 
 
-            List<RelationCarsVO> cars = relationVO.getCars();
+            List<RelationCarsQo> cars = relationQo.getCars();
             if (cars.size()>0) {
-                for (RelationCarsVO car : cars) {
+                for (RelationCarsQo car : cars) {
                     car.setUid(userEntity.getId());
-                    car.setCommunityId(relationVO.getCommunityId());
-                    car.setOwner(relationVO.getName());
-                    car.setPhoneTel(relationVO.getPhoneTel());
+                    car.setCommunityId(relationQo.getCommunityId());
+                    car.setOwner(relationQo.getName());
+                    car.setPhoneTel(relationQo.getPhoneTel());
                 }
                 relationMapper.addCars(cars);
             }
@@ -71,11 +71,11 @@ public class RelationServiceImpl implements IRelationService {
 
             HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
             houseMemberEntity.setUid(userEntity.getId());
-            houseMemberEntity.setCommunityId(relationVO.getCommunityId());
+            houseMemberEntity.setCommunityId(relationQo.getCommunityId());
 
             //当前登录用户id暂时暂时写死
             houseMemberEntity.setHouseholderId(12l);
-            houseMemberEntity.setHouseId(relationVO.getHouseId());
+            houseMemberEntity.setHouseId(relationQo.getHouseId());
             houseMemberMapper.insert(houseMemberEntity);
             return true;
 
