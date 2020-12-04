@@ -7,6 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLoginLogEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.JwtUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -32,7 +33,7 @@ public class UserLogController {
 	
 	@PostMapping("")
 	public CommonResult addUserLoginLog(@RequestBody UserLoginLogEntity userLoginLogEntity){
-		userLoginLogEntity.setUid(JwtUtils.getUserId());
+		userLoginLogEntity.setUid(UserUtils.getUserId());
 		boolean result = iUserLogService.addUserLoginLog(userLoginLogEntity);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增用户登录日志失败");
 	}

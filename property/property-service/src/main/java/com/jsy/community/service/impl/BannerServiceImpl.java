@@ -52,10 +52,22 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	 **/
 	public List<BannerVO> queryBannerList(BannerQO bannerQO){
 		QueryWrapper<BannerEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.select("id,position,sort,url,description");
-		queryWrapper.eq("community_id",bannerQO.getCommunityId());
-		queryWrapper.eq("position",bannerQO.getPosition());
-		queryWrapper.orderByAsc("sort");
+		queryWrapper.select("id,position,sort,url,description,type,click");
+		if(bannerQO.getCommunityId() != null){
+			queryWrapper.eq("community_id",bannerQO.getCommunityId());
+		}
+		if(bannerQO.getPosition() != null){
+			queryWrapper.eq("position",bannerQO.getPosition());
+		}
+		if(bannerQO.getType() != null){
+			queryWrapper.eq("type",bannerQO.getType());
+		}
+		//物业端不按sort排序，支持点击量排序
+		if(-1 == bannerQO.getClickOrder()){
+			queryWrapper.orderByDesc("click");
+		}else if(1 == bannerQO.getClickOrder()){
+			queryWrapper.orderByAsc("click");
+		}
 		List<BannerEntity> entityList = bannerMapper.selectList(queryWrapper);
 		List<BannerVO> returnList = new ArrayList<>(entityList.size());
 		BannerVO bannerVO = null;

@@ -29,7 +29,7 @@ import java.util.List;
 @ApiJSYController
 public class BannerController {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IBannerService iBannerService;
 	
 	/**
