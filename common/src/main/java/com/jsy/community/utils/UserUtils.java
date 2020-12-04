@@ -13,9 +13,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author chq459799974
@@ -88,15 +88,50 @@ public class UserUtils {
 		return UUID.randomUUID().toString().replace("-", "");
 	}
 	
-	public void setRedisToken(String typeName,Object o){
+	/**
+	* @Description: 设置token
+	 * @Param: [typeName, o]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2020/12/4
+	**/
+	public String setRedisToken(String typeName,Object o){
 		String userToken = createUserToken();
 		redisTemplate.opsForValue().set(typeName + ":" + userToken,o);
+		return userToken;
 	}
 	
+	/**
+	* @Description: 设置token(带过期时间)
+	 * @Param: [typeName, o, time, timeUnit]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2020/12/4
+	**/
+	public String setRedisTokenWithTime(String typeName,Object o,long time,TimeUnit timeUnit){
+		String userToken = createUserToken();
+		redisTemplate.opsForValue().set(typeName + ":" + userToken,o,time,timeUnit);
+		return userToken;
+	}
+	
+	/**
+	* @Description: 获取token
+	 * @Param: [typeName, token]
+	 * @Return: java.lang.Object
+	 * @Author: chq459799974
+	 * @Date: 2020/12/4
+	**/
 	public Object getRedisToken(String typeName,String token){
 		return redisTemplate.opsForValue().get(typeName + ":" + token);
 	}
 	
+	/**
+	* @Description: 销毁token
+	 * @Param: [typeName, token]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/4
+	**/
 	public boolean destroyToken(String typeName,String token){
 		return redisTemplate.delete(typeName + ":" + token);
 	}

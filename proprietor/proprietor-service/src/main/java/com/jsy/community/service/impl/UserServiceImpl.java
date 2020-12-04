@@ -13,11 +13,13 @@ import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 业主实现
@@ -50,6 +53,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Resource
     private RedisTemplate<String, String> redisTemplate;
     
+    @Autowired
+    private UserUtils userUtils;
+    
     private long expire = 60*60*24*7; //暂时
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
@@ -57,13 +63,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Override
     public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo){
-        String token = UUID.randomUUID().toString().replace("-", "");
         Date expireDate = new Date(new Date().getTime() + expire * 1000);
         UserAuthVo userAuthVo = new UserAuthVo();
-        userAuthVo.setToken(token);
         userAuthVo.setExpiredTime(LocalDateTimeUtil.of(expireDate));
         userAuthVo.setUserInfo(userInfoVo);
-        redisTemplate.opsForValue().set("Login:" + token,JSONObject.toJSONString(userInfoVo));
+        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(userInfoVo), expire, TimeUnit.SECONDS);
+        userAuthVo.setToken(token);
         return userAuthVo;
     }
     
@@ -94,7 +99,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     @Override
-    public void register(RegisterQO qo) {
+    public String register(RegisterQO qo) {
         commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
     
         String uuid = UUID.randomUUID().toString().replace("-", "");
@@ -118,6 +123,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         save(user);
         //添加账户(user_auth表)
         userAuthService.save(userAuth);
+        return uuid;
     }
 
     /**

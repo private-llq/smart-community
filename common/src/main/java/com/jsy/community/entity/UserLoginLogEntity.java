@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 public class UserLoginLogEntity implements Serializable {
 	
 	@ApiModelProperty("业主ID")
-	private Long uid;
+	private String uid;
 	
 	@ApiModelProperty("系统类型 1.安卓 2.IOS 3.其他")
 	private Integer st;

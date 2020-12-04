@@ -39,7 +39,7 @@ public interface IUserService extends IService<UserEntity> {
 	 * @param qo 参数
 	 * @return 登录信息
 	 */
-	void register(RegisterQO qo);
+	String register(RegisterQO qo);
 
 	/**
 	 * 业主信息登记
