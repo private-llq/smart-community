@@ -41,6 +41,12 @@ public class BannerEntity extends BaseEntity implements Serializable {
     @NotNull(groups = {addBannerValidatedGroup.class}, message = "缺少Banner位置")
     private Integer position;
     
+    @ApiModelProperty(value = "轮播图类型1.非广告 2.广告")
+    private Integer type;
+    
+    @ApiModelProperty(value = "点击量", hidden = true)
+    private Integer click;
+    
     /**
      * 新增访客验证组
      */

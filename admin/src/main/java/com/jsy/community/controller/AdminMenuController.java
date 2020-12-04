@@ -3,16 +3,18 @@ package com.jsy.community.controller;
 
 import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.service.IAdminMenuService;
-import com.jsy.community.utils.MinioUtil;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -32,6 +34,9 @@ public class AdminMenuController {
 	
 	@Autowired
 	private IAdminMenuService adminMenuService;
+	
+	@Resource
+	private StringRedisTemplate stringRedisTemplate;
 	
 	private static final String BUCKETNAME = "app-menu-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
@@ -67,8 +72,9 @@ public class AdminMenuController {
 	@PostMapping("/uploadMenuImg")
 	public CommonResult uploadMenuImg(@RequestParam("file") MultipartFile file){
 		try {
-			String upload = MinioUtil.upload(file, BUCKETNAME);
-			return CommonResult.ok(upload);
+			String filePath = MinioUtils.upload(file, BUCKETNAME);
+			stringRedisTemplate.opsForSet().add("menu_img_part",filePath);// 文件上传成功后，将其图片名称存入redis
+			return CommonResult.ok(filePath);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return CommonResult.error("上传失败");

@@ -11,7 +11,7 @@ import com.jsy.community.vo.menu.FrontChildMenu;
 import com.jsy.community.vo.menu.FrontParentMenu;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -36,7 +36,7 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 	private AdminMenuMapper adminMenuMapper;
 	
 	@Resource
-	private RedisTemplate<String,String> redisTemplate;
+	private StringRedisTemplate stringRedisTemplate;
 	
 	@Override
 	public List<FrontParentMenu> listAdminMenu() {
@@ -99,7 +99,7 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 	public void insertChildMenu(AdminMenuEntity adminMenu) {
 		String icon = adminMenu.getIcon();// 图片地址
 		if (!StringUtils.isEmpty(icon)) {
-			redisTemplate.opsForSet().add("imgUp_all", icon);// 最终上传时将图片地址再存入redis
+			stringRedisTemplate.opsForSet().add("menu_img_all", icon);// 最终上传时将图片地址再存入redis
 		}
 		adminMenuMapper.insert(adminMenu);
 	}

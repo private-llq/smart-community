@@ -26,4 +26,11 @@ public class BannerVO extends BaseVO {
 	
 	@ApiModelProperty(value = "Banner位置1.顶部 2.底部")
 	private Integer position;
+	
+	@ApiModelProperty(value = "轮播图类型1.非广告 2.广告")
+	private Integer type;
+	
+	@ApiModelProperty(value = "点击量")
+	private Integer click;
+	
 }

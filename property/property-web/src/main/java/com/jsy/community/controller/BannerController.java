@@ -43,7 +43,6 @@ public class BannerController {
 	@ApiOperation("【轮播图】列表查询")
 	@PostMapping("/list")
 	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
-		ValidatorUtils.validateEntity(bannerQO, BannerQO.queryBannerValidatedGroup.class);
 		List<BannerVO> returnList = iBannerService.queryBannerList(bannerQO);
 		return CommonResult.ok(returnList);
 	}

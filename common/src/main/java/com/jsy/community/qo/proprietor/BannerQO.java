@@ -25,8 +25,14 @@ public class BannerQO implements Serializable {
 	@NotNull(groups = {queryBannerValidatedGroup.class}, message = "缺少Banner位置")
 	private Integer position;
 	
+	@ApiModelProperty(value = "轮播图类型1.非广告 2.广告")
+	private Integer type;
+	
+	@ApiModelProperty(value = "点击量排序 1.升序 -1.降序")
+	private int clickOrder;
+	
 	/**
-	 * 新增访客验证组
+	 * APP端查询轮播图验证组
 	 */
 	public interface queryBannerValidatedGroup{}
 	
