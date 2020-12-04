@@ -2,6 +2,7 @@ package com.jsy.community.intercepter;
 
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.exception.JSYError;
@@ -16,6 +17,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 /**
  * 权限(Token)验证
@@ -32,7 +35,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		
-		//===================================== 需要授权的操作 ========================================
+		//===================================== 需要授权的敏感操作 ========================================
 		Auth authAnnotation;
 		if (handler instanceof HandlerMethod) {
 			authAnnotation = ((HandlerMethod) handler).getMethodAnnotation(Auth.class);
@@ -41,9 +44,17 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 				if (StrUtil.isBlank(token)) {
 					token = request.getParameter("token");
 				}
-				if(userUtils.getRedisToken("Auth", token) == null){
+				Object authTokenContent = userUtils.getRedisToken("Auth", token);
+				if(authTokenContent == null){
 					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
 				}
+				String body = readBody(request);
+				JSONObject jsonObject = JSONObject.parseObject(body);
+				if(jsonObject == null || !(String.valueOf(authTokenContent).equals(jsonObject.getString("account")))){
+					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
+				}
+				request.setAttribute("body", body);
+				return true;
 			}
 		}
 		
@@ -83,6 +94,21 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		request.setAttribute(USER_KEY, userInfo.getUid());
 		
 		return true;
+	}
+	
+	private String readBody(HttpServletRequest request){
+		StringBuilder sb = new StringBuilder();
+		String line;
+		try {
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+			}
+		} catch (IOException e) {
+			System.out.println("读请求体异常");
+			throw new RuntimeException(e);
+		}
+		return sb.toString();
 	}
 	
 }

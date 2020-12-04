@@ -78,25 +78,27 @@ public class CarController {
      * @param carQO 前端请求参数对象
      * @return 返回修改影响行数
      */
-    @Login
     @ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
     @PutMapping()
     public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO carQO) {
+        //从JWT中取 uid
+        Long uid = 12L;
         //效验前端新增车辆参数合法性
         ValidatorUtils.validateEntity(carQO, CarQO.updateCarValidated.class);
-        Integer integer = carService.updateProprietorCar(carQO, UserUtils.getUserId());
+        Integer integer = carService.updateProprietorCar(carQO, uid);
         return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
 
-    @Login
     @ApiOperation("所属人固定车辆查询方法")
     @PostMapping(value = "/page", produces = "application/json;charset=utf-8")
     public CommonResult<?> queryProprietorCar(@RequestBody BaseQO<CarEntity> carEntityBaseQO) {
+        //0.从request取uid
+        long uid = 12L;
         if( null == carEntityBaseQO.getQuery()){
             return CommonResult.error("没有选择社区!");
         }
-        carEntityBaseQO.getQuery().setUid(UserUtils.getUserId());
+        carEntityBaseQO.getQuery().setUid(uid);
         //1.查询参数非空数字效验
         ValidatorUtils.validatePageParam(carEntityBaseQO);
         List<CarEntity> records = carService.queryProprietorCar(carEntityBaseQO).getRecords();
@@ -110,17 +112,18 @@ public class CarController {
      * @param id 车辆id
      * @return 返回逻辑删除影响行
      */
-    @Login
     @ApiOperation("所属人固定车辆删除方法")
     @ApiImplicitParam(name = "id", value = "车辆固定id")
     @DeleteMapping()
     public CommonResult<Boolean> deleteProprietorCar(@RequestParam String id) {
+        //从请求获得uid
+        Long uid = 12L;
         if( !ValidatorUtils.isInteger(id)  ){
             return CommonResult.error(JSYError.REQUEST_PARAM);
         }
         //条件参数列表 key=列名  增加删除车辆记录 where条件只改动这里
         Map<String, Object> params = new HashMap<>();
-        params.put("uid", UserUtils.getUserId());
+        params.put("uid", uid);
         params.put("id",id);
         Integer res = carService.deleteProprietorCar(params);
         return res > 0 ? CommonResult.ok() : CommonResult.error(JSYError.DUPLICATE_KEY.getCode(), "车辆不存在!");
@@ -132,7 +135,6 @@ public class CarController {
      * @param carImage 车辆图片
      * @return 返回图片上传成功后的访问路径地址
      */
-    @Login
     @ApiOperation("所属人车辆图片上传接口")
     @ApiImplicitParam(name = "carImage", value = "车辆图片文件")
     @PostMapping(value = "carImageUpload")

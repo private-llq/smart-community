@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.api.IUserAuthService;
@@ -19,6 +20,7 @@ import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -46,12 +48,16 @@ public class UserController {
     private IUserAuthService iUserAuthService;
     
     @PostMapping("test")
-    @Login
+//    @Login
+    @Auth
     public String test(@RequestBody BaseQO<UserEntity> qo) {
         ValidatorUtils.validateEntity(qo);
         UserInfoVo userInfo = UserUtils.getUserInfo();
         UserUtils.getUserId();
         System.out.println("111111111111....");
+        if(true){
+           throw new DuplicateKeyException("测试数据重复异常");
+        }
         return "success...";
     }
 

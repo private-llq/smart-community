@@ -5,12 +5,9 @@ import io.minio.ObjectStat;
 import io.minio.policy.PolicyType;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
-public enum MinioUtil {
-    //例子
-    INSTANCE;
+public class MinioUtil {
     //ip
     private static final String ENDPOINT = "http://222.178.212.29";
     //端口
@@ -28,10 +25,10 @@ public enum MinioUtil {
      * @return
      * @throws Exception
      */
-    public String upload(MultipartFile file) throws Exception {
+    public static String upload(MultipartFile file,String bucketName) throws Exception {
         MinioClient minioClient = new MinioClient(ENDPOINT, PROT, ACCESSKEY, SECRETKET);
         // 存储桶
-        BUCKETNAME = String.valueOf(LocalDate.now());
+        BUCKETNAME = bucketName;
         //存入bucket不存在则创建
         if (!minioClient.bucketExists(BUCKETNAME)) {
             minioClient.makeBucket(BUCKETNAME);
@@ -53,7 +50,7 @@ public enum MinioUtil {
      * @return
      * @throws Exception
      */
-    public MinioClient getFile() throws Exception {
+    public static MinioClient getFile() throws Exception {
         MinioClient minioClient = new MinioClient(ENDPOINT, PROT, ACCESSKEY, SECRETKET);
         return minioClient;
     }
@@ -64,7 +61,7 @@ public enum MinioUtil {
      * @return
      * @throws Exception
      */
-    public String removeFile(String filePath) throws Exception {
+    public static String removeFile(String filePath) throws Exception {
         MinioClient minioClient = new MinioClient(ENDPOINT, PROT, ACCESSKEY, SECRETKET);
         String[] split = filePath.split("/");
         BUCKETNAME = split[3];

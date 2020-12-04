@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.auth.Auth;
@@ -31,7 +32,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 用户认证
@@ -97,6 +101,7 @@ public class UserAuthController {
 		}
 		
 		UserInfoVo infoVo = userService.login(qo);
+		
 		//生成带token和用户信息的的UserAuthVo
 		UserAuthVo userAuthVo = userService.createAuthVoWithToken(infoVo);
 		return CommonResult.ok(userAuthVo);
@@ -107,9 +112,12 @@ public class UserAuthController {
 	public CommonResult<UserAuthVo> register(@RequestBody RegisterQO qo) {
 		ValidatorUtils.validateEntity(qo);
 		
-		userService.register(qo); //token不再与userid有关，改为不返回userInfo，生成token直接new
+		String uid = userService.register(qo);
+		UserInfoVo userInfoVo = new UserInfoVo();
+		userInfoVo.setUid(uid);
+		
 		//生成带token和用户信息的的UserAuthVo(注册后设置密码用)
-		UserAuthVo userAuthVo = userService.createAuthVoWithToken(new UserInfoVo());
+		UserAuthVo userAuthVo = userService.createAuthVoWithToken(userInfoVo);
 		return CommonResult.ok(userAuthVo);
 	}
 	
@@ -123,20 +131,23 @@ public class UserAuthController {
 		return b ? CommonResult.ok() : CommonResult.error("密码设置失败");
 	}
 	
-	@ApiOperation(value = "验证码是否正确", notes = "忘记密码")
+	@ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
 	@GetMapping("/check/code")
-	public CommonResult<String> checkCode(@RequestParam String account, @RequestParam String code) {
+	public CommonResult<Map<String,Object>> checkCode(@RequestParam String account, @RequestParam String code) {
 		commonService.checkVerifyCode(account, code);
-		userUtils.setRedisToken("Auth",account);
-		return CommonResult.ok("");
+		String token = userUtils.setRedisTokenWithTime("Auth", account,1, TimeUnit.HOURS);
+		Map<String, Object> map = new HashMap<>();
+		map.put("token",token);
+		map.put("msg","验证通过，请在1小时内完成操作");
+		return CommonResult.ok(map);
 	}
 	
 	@ApiOperation("重置密码")
 	@PostMapping("/reset/password")
 	@Auth
-	public CommonResult<Boolean> resetPassword(@RequestBody ResetPasswordQO qo) {
+	public CommonResult<Boolean> resetPassword(@RequestAttribute(value = "body") String body) {
+		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
 		ValidatorUtils.validateEntity(qo);
-		
 		boolean b = userAuthService.resetPassword(qo);
 		if(b){
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -144,7 +155,7 @@ public class UserAuthController {
 			if (StrUtil.isBlank(token)) {
 				token = request.getParameter("token");
 			}
-			// TODO 判断结果或设置过期时间
+			//销毁Auth token
 			userUtils.destroyToken("Auth",token);
 		}
 		return b ? CommonResult.ok() : CommonResult.error("重置失败");

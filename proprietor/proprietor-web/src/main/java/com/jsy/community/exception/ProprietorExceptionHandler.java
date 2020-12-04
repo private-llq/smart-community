@@ -44,6 +44,7 @@ public class ProprietorExceptionHandler extends JSYExceptionHandler {
 	 */
 	@ExceptionHandler(RuntimeException.class)
 	public CommonResult<Boolean> handleRuntimeException(RuntimeException e) {
+		log.error(e.getMessage(),e);
 		//唯一索引 数据重复异常
 		if(e.getMessage().contains("DuplicateKeyException")){
 			return CommonResult.error(JSYError.DUPLICATE_KEY);
