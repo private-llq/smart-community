@@ -81,11 +81,9 @@ public class CarController {
     @ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
     @PutMapping()
     public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO carQO) {
-        //从JWT中取 uid
-        Long uid = 12L;
         //效验前端新增车辆参数合法性
         ValidatorUtils.validateEntity(carQO, CarQO.updateCarValidated.class);
-        Integer integer = carService.updateProprietorCar(carQO, uid);
+        Integer integer = carService.updateProprietorCar(carQO, UserUtils.getUserId());
         return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
@@ -93,12 +91,10 @@ public class CarController {
     @ApiOperation("所属人固定车辆查询方法")
     @PostMapping(value = "/page", produces = "application/json;charset=utf-8")
     public CommonResult<?> queryProprietorCar(@RequestBody BaseQO<CarEntity> carEntityBaseQO) {
-        //0.从request取uid
-        long uid = 12L;
         if( null == carEntityBaseQO.getQuery()){
             return CommonResult.error("没有选择社区!");
         }
-        carEntityBaseQO.getQuery().setUid(uid);
+        carEntityBaseQO.getQuery().setUid(UserUtils.getUserId());
         //1.查询参数非空数字效验
         ValidatorUtils.validatePageParam(carEntityBaseQO);
         List<CarEntity> records = carService.queryProprietorCar(carEntityBaseQO).getRecords();
