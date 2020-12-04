@@ -1,13 +1,14 @@
 package com.jsy.community.utils;
 
 import io.minio.MinioClient;
-import io.minio.ObjectStat;
+import io.minio.messages.Bucket;
 import io.minio.policy.PolicyType;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
-public class MinioUtil {
+public class MinioUtils {
     //ip
     private static final String ENDPOINT = "http://222.178.212.29";
     //端口
@@ -57,21 +58,21 @@ public class MinioUtil {
 
     /**
      * 删除文件
-     * @param filePath  路径
+     * @param filePath  路径   http://222.178.212.29:9000/app-menu-img/ccf58b1f-0b24-4c7d-9681-b2b4db2b4450-Chrysanthemum.jpg
      * @return
      * @throws Exception
      */
-    public static String removeFile(String filePath) throws Exception {
+    public static void removeFile(String filePath) throws Exception {
         MinioClient minioClient = new MinioClient(ENDPOINT, PROT, ACCESSKEY, SECRETKET);
         String[] split = filePath.split("/");
         BUCKETNAME = split[3];
         String objectName = split[4];
-        ObjectStat objectStat = minioClient.statObject(BUCKETNAME, objectName);
-        if (objectStat != null) {
-            minioClient.removeObject(BUCKETNAME, objectName);
-            return "删除成功";
-        } else {
-            return "删除文件不存在!";
+        List<Bucket> buckets = minioClient.listBuckets();
+        for (Bucket bucket : buckets) {
+            String name = bucket.name();
+            if (name.equals("app-menu-img")) {
+                minioClient.removeObject(BUCKETNAME,objectName);
+            }
         }
     }
 }

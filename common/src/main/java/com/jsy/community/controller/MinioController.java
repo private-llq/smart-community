@@ -1,6 +1,6 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.utils.MinioUtil;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.vo.CommonResult;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
@@ -32,7 +32,7 @@ public class MinioController {
 	@PostMapping("/uploadFile")
 	public CommonResult uploadFile(@RequestParam(value = "file", required = false) MultipartFile file) {
 		try {
-			String str = MinioUtil.upload(file,BUCKETNAME);
+			String str = MinioUtils.upload(file,BUCKETNAME);
 //			redisTemplate.opsForSet().add("imgUp_part", str);// 最终上传时将图片地址再存入redis
 //			stringRedisTemplate.opsForSet().add("imgUp_part", str);
 			return CommonResult.ok(str);// str：上传成功后的地址
@@ -47,7 +47,7 @@ public class MinioController {
 	@GetMapping("/removeFile")
 	public CommonResult removeFile(@RequestParam(value = "filePath", required = false) String filePath) {
 		try {
-			String str = MinioUtil.removeFile(filePath);
+			String str = MinioUtils.removeFile(filePath);
 			return CommonResult.ok(str); //str：删除成功后的提示信息
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -58,7 +58,7 @@ public class MinioController {
 	@ApiOperation("下载文件")
 	@PostMapping("/downLoadFile")
 	public CommonResult downLoadFile(@RequestParam("filePath") String filePath, HttpServletResponse response) throws Exception {
-		MinioClient minioClient = MinioUtil.getFile();
+		MinioClient minioClient = MinioUtils.getFile();
 		String[] split = filePath.split("/");
 		String bucketName = split[3];
 		String objectName = split[4];
