@@ -1,4 +1,4 @@
-package com.jsy.community.vo;
+package com.jsy.community.qo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @ApiModel("添加家属")
-public class RelationVO implements Serializable {
+public class RelationQo implements Serializable {
     @ApiModelProperty(value = "家属姓名",required = true)
     private String name;
     @ApiModelProperty("性别")
@@ -29,5 +29,5 @@ public class RelationVO implements Serializable {
     @ApiModelProperty(value = "所属单元",required = true)
     private Long houseId;
     @ApiModelProperty("车辆信息集合")
-    private List<RelationCarsVO> cars = new ArrayList<>();
+    private List<RelationCarsQo> cars = new ArrayList<>();
 }

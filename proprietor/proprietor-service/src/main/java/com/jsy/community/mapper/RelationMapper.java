@@ -1,6 +1,6 @@
 package com.jsy.community.mapper;
 
-import com.jsy.community.vo.RelationCarsVO;
+import com.jsy.community.qo.RelationCarsQo;
 
 import java.util.List;
 
@@ -17,6 +17,6 @@ public interface RelationMapper {
      * 添加家属车辆
      * @param cars
      */
-    void addCars(List<RelationCarsVO> cars);
+    void addCars(List<RelationCarsQo> cars);
 
 }

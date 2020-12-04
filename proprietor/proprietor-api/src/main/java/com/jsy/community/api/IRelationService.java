@@ -1,10 +1,10 @@
 package com.jsy.community.api;
 
-import com.jsy.community.vo.RelationVO;
+import com.jsy.community.qo.RelationQo;
 
 /**
  * 家属信息
  */
 public interface IRelationService {
-    Boolean addRelation(RelationVO relationVO);
+    Boolean addRelation(RelationQo relationQo);
 }
