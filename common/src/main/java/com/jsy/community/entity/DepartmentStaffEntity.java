@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -30,9 +31,11 @@ public class DepartmentStaffEntity extends BaseEntity {
     private Long departmentId;
 
     @ApiModelProperty(value = "联系人")
+    @NotBlank(groups = {DepartmentStaffEntity.addStaffValidate.class, DepartmentStaffEntity.updateStaffValidate.class},message = "联系人不能为空")
     private String person;
 
     @ApiModelProperty(value = "联系电话")
+    @NotBlank(groups = {DepartmentStaffEntity.addStaffValidate.class, DepartmentStaffEntity.updateStaffValidate.class},message = "联系电话不能为空")
     private String phone;
     
     public interface addStaffValidate {

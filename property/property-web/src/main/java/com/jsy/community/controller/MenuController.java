@@ -7,6 +7,7 @@ import com.jsy.community.api.IAdminMenuService;
 import com.jsy.community.api.IMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AdminMenuEntity;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
@@ -71,6 +72,7 @@ public class MenuController {
 	@ApiOperation("新增父菜单信息")
 	@PostMapping("/addParentMenu")
 	public CommonResult addParentMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
+		ValidatorUtils.validateEntity(adminMenuEntity,AdminMenuEntity.addAdmin.class);
 		Long parentId = menuService.addParentMenu(adminMenuEntity);
 		return CommonResult.ok(parentId);//返回新增后数据的id
 	}
@@ -80,6 +82,7 @@ public class MenuController {
 	public CommonResult addChildMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
 		// TODO 新增的时候 让用户选择是否展示在首页，首页的位置根据序号来
 		// TODO 新增子菜单 没有验证 等与前端联调的时候再调整
+		ValidatorUtils.validateEntity(adminMenuEntity,AdminMenuEntity.addAdmin.class);
 		menuService.addChildMenu(adminMenuEntity);
 		return CommonResult.ok();
 	}
@@ -87,6 +90,7 @@ public class MenuController {
 	@ApiOperation("修改子菜单信息")
 	@PutMapping("/updateChildMenu")
 	public CommonResult updateChildMenu(@RequestBody AdminMenuEntity adminMenuEntity) {
+		ValidatorUtils.validateEntity(adminMenuEntity,AdminMenuEntity.updateAdmin.class);
 		menuService.updateChildMenu(adminMenuEntity);
 		return CommonResult.ok();
 	}
