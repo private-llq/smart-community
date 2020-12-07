@@ -20,4 +20,16 @@
 	<select id="getCommunityNameAndUserAmountById"  resultType="java.util.HashMap">
 		select c.name,(SELECT count(*) from t_house where community_id = c.id and type = 4) as communityUserNum from t_community as c where c.id = #{communityId}
 	</select>
+
+	<!-- 按社区ID获取 社区名称 社区用户名和社区用户uid -->
+	<select id="getCommunityNameAndUserInfo"  resultMap="useNameInfoMap">
+		select u.real_name,u.uid,c.name from t_user as u left join t_user_house as h on u.uid = h.uid JOIN t_community as c on h.community_id = c.id where h.community_id = #{communityId}
+	</select>
+	<resultMap id="useNameInfoMap" type="com.jsy.community.entity.UserEntity">
+		<result column="real_name" property="realName"/>
+		<result column="uid" property="uid"/>
+		<!--由于实体字段信息并不会返回到前端，所以我这里直接用UserEntity的nickname字段来封装 社区名称-->
+		<result column="name" property="nickname"/>
+	</resultMap>
+
 </mapper>

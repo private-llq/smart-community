@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/community/inform")
 @Slf4j
-@Login(allowAnonymous = true)
+@Login
 @ApiJSYController
 public class CommunityInformController {
 
@@ -100,7 +100,7 @@ public class CommunityInformController {
             return CommonResult.ok();
         } catch (Exception e) {
             log.error("com.jsy.community.controller.CommunityInformController.addInform：{}", e.getMessage());
-            return CommonResult.error("添加失败!");
+            return CommonResult.error("添加失败!可能数据重复");
         }
     }
 

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
@@ -159,6 +160,18 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	@Override
 	public Map<String, Object> getCommunityNameAndUserAmountById(long communityId) {
 		return houseMapper.getCommunityNameAndUserAmountById(communityId);
+	}
+
+	/**
+	 * 按社区ID获取 社区名称 社区用户名和社区用户uid
+	 * @author YuLF
+	 * @since  2020/12/7 11:06
+	 * @param communityId 			社区id
+	 * @return						返回社区名称和 当前社区所有住户名称，住户uid
+	 */
+	@Override
+	public List<UserEntity> getCommunityNameAndUserInfo(long communityId) {
+		return houseMapper.getCommunityNameAndUserInfo(communityId);
 	}
 
 }

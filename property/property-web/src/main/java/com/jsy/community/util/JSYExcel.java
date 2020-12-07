@@ -19,7 +19,7 @@ public interface JSYExcel {
      * @param excel     业主信息表.xlsx
      * @return          返回解析好的 List<Entity> 数据
      */
-    <T> List<UserEntity> importProprietorExcel(MultipartFile excel);
+    List<?> importProprietorExcel(MultipartFile excel);
 
     /**
      * 导出业主Excel模板

@@ -1,9 +1,13 @@
 package com.jsy.community.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
+import com.jsy.community.util.excel.impl.ProprietorMemberProvider;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +37,8 @@ public class ProprietorExcelCommander {
      * @Param list    生成模板 需要用到的数据库数据List，用于excel模板给单元格增加约束，限制单元格只能选择数据库的数据，如录入单元时，让excel录入者只能选择当前社区在数据库已有的单元
      * @since 2020/11/26 16:00
      */
-    public static Workbook exportProprietorExcel(List<?> list, Map<String, Object> res) {
-        JSYExcel jsyExcel = new ProprietorExcelProvider();
-        return jsyExcel.exportProprietorExcel(list, res);
+    public static Workbook exportProprietorInfo(List<?> list, Map<String, Object> res) {
+        return new ProprietorInfoProvider().exportProprietorExcel(list, res);
     }
 
     /**
@@ -46,8 +49,20 @@ public class ProprietorExcelCommander {
      * @Param proprietorExcel      excel文件
      * @since 2020/11/26 16:55
      */
-    public static List<UserEntity> importProprietorExcel(MultipartFile proprietorExcel) {
-        JSYExcel jsyExcel = new ProprietorExcelReader();
-        return jsyExcel.importProprietorExcel(proprietorExcel);
+    public static Object importProprietorExcel(MultipartFile proprietorExcel) {
+        return new ProprietorInfoProvider().importProprietorExcel(proprietorExcel);
     }
+    
+    
+    /**
+     * 下载业主家庭成员Excel控制方法
+     * @author YuLF
+     * @since  2020/12/7 14:57
+     * @Param  userEntityList       社区名称、社区住户名、社区住户uid信息
+     * @return 返回创建好的Workbook
+     */
+    public static Workbook exportProprietorMember(List<UserEntity> userEntityList) {
+        return new ProprietorMemberProvider().exportProprietorExcel(userEntityList,new HashMap<>(1));
+    }
+
 }

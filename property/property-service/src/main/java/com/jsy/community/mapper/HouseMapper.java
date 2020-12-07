@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.UserEntity;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -30,4 +31,14 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @return				 返回社区名称和 当前社区住户房间数量
 	 */
     Map<String, Object> getCommunityNameAndUserAmountById(long communityId);
+
+
+	/**
+	 * 按社区ID获取 社区名称 社区用户名和社区用户uid
+	 * @author YuLF
+	 * @since  2020/12/7 11:06
+	 * @param communityId 			社区id
+	 * @return						返回社区名称和 当前社区所有住户名称，住户uid
+	 */
+    List<UserEntity> getCommunityNameAndUserInfo(long communityId);
 }

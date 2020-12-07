@@ -1,6 +1,7 @@
-package com.jsy.community.util;
+package com.jsy.community.util.excel.impl;
 
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.util.JSYExcel;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,19 +10,22 @@ import java.util.Map;
 
 /**
  * @author YuLF
- * @since 2020-11-26 15:17
- * 中间抽象层，用于具体的子类实现类 继承  选择性某些方法实现
- * 避免功能子类实现类 直接实现 接口 需要重写接口所有的方法
+ * @since 2020-12-07 15:21
+ * 业主家属成员.xlsx 下载模板 、信息解析类
  */
-public abstract class JSYExcelAbstract implements JSYExcel {
+public class ProprietorMemberProvider implements JSYExcel {
+
 
     @Override
-    public <T> List<UserEntity> importProprietorExcel(MultipartFile multipartFile) {
+    public List<?> importProprietorExcel(MultipartFile excel) {
         return null;
     }
 
     @Override
     public Workbook exportProprietorExcel(List<?> entityList, Map<String, Object> res) {
+
+
+
         return null;
     }
 }
