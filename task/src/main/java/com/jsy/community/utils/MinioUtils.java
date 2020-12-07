@@ -1,12 +1,10 @@
 package com.jsy.community.utils;
 
 import io.minio.MinioClient;
-import io.minio.messages.Bucket;
 import io.minio.policy.PolicyType;
 import netscape.javascript.JSException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
 
 public class MinioUtils {
@@ -75,12 +73,6 @@ public class MinioUtils {
 		String[] split = filePath.split("/");
 		BUCKETNAME = split[3];
 		String objectName = split[4];
-		List<Bucket> buckets = minioClient.listBuckets();
-		for (Bucket bucket : buckets) {
-			String name = bucket.name();
-			if (name.equals("app-menu-img")) {
-				minioClient.removeObject(BUCKETNAME, objectName);
-			}
-		}
+		minioClient.removeObject(BUCKETNAME, objectName);
 	}
 }
