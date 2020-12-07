@@ -18,10 +18,12 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,13 +50,13 @@ public class CarController {
 	//允许上传的文件后缀种类，临时，后续从Spring配置文件中取值
 	private final String[] carImageAllowSuffix = new String[]{"jpg", "jpeg", "png"};
 	
-	@Resource
-	private MinioController minioController;
-	
 	//允许上传的文件大小，临时，后续从配置文件中取值 由Spring控制
 	private final int carImageMaxSizeKB = 500;
 	
 	private static final String BUCKETNAME = "car-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 	
 	
 	/**
@@ -72,6 +74,10 @@ public class CarController {
 		//1.效验前端新增车辆参数合法性
 		ValidatorUtils.validateEntity(carEntity, CarEntity.addCarValidated.class);
 		Integer integer = carService.addProprietorCar(carEntity);
+		String filePath = carEntity.getCarImageUrl();
+		if (!StringUtils.isEmpty(filePath)) {
+			redisTemplate.opsForSet().add("car_img_all",filePath); // 将图片地址存入redis 用于对比 便于清理无用图片
+		}
 		//3.登记新增车辆操作
 		return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
 	}
@@ -139,7 +145,7 @@ public class CarController {
 	@ApiOperation("所属人车辆图片上传接口")
 	@ApiImplicitParam(name = "carImage", value = "车辆图片文件")
 	@PostMapping(value = "carImageUpload")
-	public CommonResult<?> carImageUpload(MultipartFile carImage, HttpServletRequest request) throws IOException {
+	public CommonResult<?> carImageUpload(@RequestParam("file") MultipartFile carImage, HttpServletRequest request) throws IOException {
 		//1.接口非空验证
 		if (null == carImage) {
 			return CommonResult.error(JSYError.BAD_REQUEST);
@@ -162,6 +168,7 @@ public class CarController {
 		}
 		//4.调用上传服务接口 进行上传文件  返回访问路径
 		String filePath = MinioUtils.upload(carImage, BUCKETNAME);
+		redisTemplate.opsForSet().add("car_img_part",filePath); // 将图片地址存入redis  用于对比 便于清理无用图片
 		return CommonResult.ok(filePath);
 	}
 	

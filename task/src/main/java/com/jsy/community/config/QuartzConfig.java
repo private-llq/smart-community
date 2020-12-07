@@ -30,8 +30,8 @@ public class QuartzConfig {
 		CronTriggerFactoryBean factory = new CronTriggerFactoryBean();
 		factory.setJobDetail(jobDetailFactoryBean.getObject());
 		//设置触发时间
-		factory.setCronExpression("0 0/4 * * * ? *"); // TODO 暂定
-//		factory.setCronExpression("0/2 * * * * ?");
+//		factory.setCronExpression("0 0/4 * * * ? *"); // TODO 暂定
+		factory.setCronExpression("0/2 * * * * ?");
 //		factory.setCronExpression("0 0 0 * * ? *");
 		return factory;
 	}
