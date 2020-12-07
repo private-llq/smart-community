@@ -5,10 +5,10 @@ import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.qo.proprietor.UserInformQO;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,10 +47,9 @@ public class UserInformController {
      * @return:
      */
     @ApiOperation("所有已读通知人员")
-    @GetMapping("/list")
-    public CommonResult list(@ApiParam(value = "通知消息ID")
-                                 @RequestParam(value = "informId", defaultValue = "1", required = false) Long informId){
-        Map<String,Object> map = userInformService.fildList(informId);
+    @PostMapping("/list")
+    public CommonResult list(@RequestBody UserInformQO userInformQO){
+        Map<String,Object> map = userInformService.findList(userInformQO);
         return CommonResult.ok(map);
     }
 

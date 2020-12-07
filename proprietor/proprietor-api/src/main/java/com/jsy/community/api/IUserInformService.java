@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserInformEntity;
+import com.jsy.community.qo.proprietor.UserInformQO;
 
 import java.util.Map;
 
@@ -12,6 +13,6 @@ import java.util.Map;
  * @since 2020-11-11 15:47
  */
 public interface IUserInformService extends IService<UserInformEntity> {
-    Map<String,Object> fildList(Long informId);
+    Map<String,Object> findList(UserInformQO userInformQO);
 
 }

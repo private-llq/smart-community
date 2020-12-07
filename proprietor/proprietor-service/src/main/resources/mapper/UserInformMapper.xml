@@ -2,24 +2,65 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.UserInformMapper">
 
+    <sql id="Query">
+        <where>
+            <if test="informId!=null and informId>0">
+                and ci.id=#{informId}
+            </if>
+            <if test="informStatus!=null">
+                and ti.inform_status=#{informStatus}
+            </if>
+            <if test="communityId!=null and communityId>0">
+                and ci.community_id=#{communityId}
+            </if>
+            <if test="houseId!=null and houseId>0">
+                and ti.house_id=#{houseId}
+            </if>
+            <if test="userName!=null and userName!=''">
+                and u.real_name like concat('%',#{userName},'%')
+            </if>
+        </where>
+    </sql>
+
     <!-- 查询所有已读通知消息的人 -->
-    <select id="findList" parameterType="Long" resultMap="UserInformMap">
-        SELECT u.id uid,u.real_name urn,ci.id cid,ci.title cit,ti.inform_status isf
-        FROM t_user u join t_user_inform ti on u.id=ti.user_id join t_community_inform ci on ti.inform_id=ci.id
-        where ci.id=#{informId}
+    <select id="findList" parameterType="com.jsy.community.qo.proprietor.UserInformQO" resultMap="UserInformMap">
+        SELECT
+        u.id as userId,u.real_name as userName,ci.id as informId,ci.title
+        as title,ci.content as coutent,ti.inform_status as informStatus,ci.community_id
+        as communityId,tc.name as communityName,ti.house_id as houseId,th.building
+        as building,th.unit as unit,th.floor as floor,th.door as door
+        FROM t_user u
+        join t_user_inform ti on u.id=ti.user_id
+        join t_community_inform ci on ti.inform_id=ci.id
+        join t_community tc on ci.community_id=tc.id
+        left join t_house th on ti.house_id=th.id
+        <include refid="Query"></include>
+        limit #{pageNo},#{pageSize}
     </select>
     <!-- 查询所有已读通知消息的总行数 -->
-    <select id="findCount" parameterType="Long" resultType="java.lang.Long">
+    <select id="findCount" parameterType="com.jsy.community.qo.proprietor.UserInformQO" resultType="java.lang.Long">
         SELECT count(*)
-        FROM t_user u join t_user_inform ti on u.id=ti.user_id join t_community_inform ci on ti.inform_id=ci.id
-        where ci.id=#{informId}
+        FROM t_user u
+        join t_user_inform ti on u.id=ti.user_id
+        join t_community_inform ci on ti.inform_id=ci.id
+        join t_community tc on ci.community_id=tc.id
+        left join t_house th on ti.house_id=th.id
+        <include refid="Query"></include>
     </select>
     <resultMap id="UserInformMap" type="com.jsy.community.vo.UserInformVO">
-        <result column="uid" property="userId"/>
-        <result column="urn" property="userName"/>
-        <result column="cid" property="informId"/>
-        <result column="cit" property="title"/>
-        <result column="isf" property="informStatus"/>
+        <result column="userId" property="userId"/>
+        <result column="userName" property="userName"/>
+        <result column="informId" property="informId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="informStatus" property="informStatus"/>
+        <result column="communityId" property="communityId"/>
+        <result column="communityName" property="communityName"/>
+        <result column="houseId" property="houseId"/>
+        <result column="building" property="building"/>
+        <result column="unit" property="unit"/>
+        <result column="floor" property="floor"/>
+        <result column="door" property="door"/>
     </resultMap>
 
 </mapper>
