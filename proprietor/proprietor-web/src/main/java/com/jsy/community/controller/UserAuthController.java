@@ -165,7 +165,7 @@ public class UserAuthController {
 	}
 	
 	// @Login是旧手机 @Auth是验证新手机
-	@ApiOperation("更换手机号(绑定手机号)")
+	@ApiOperation("更换手机号(旧手机在线)")
 	@PutMapping("/reset/mobile")
 	@Auth
 	@Login
@@ -196,7 +196,7 @@ public class UserAuthController {
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
 	}
 	
-	//TODO 手机丢失找回
+	//TODO 手机丢失更换新手机(旧手机不在线)
 	
 	
 	
