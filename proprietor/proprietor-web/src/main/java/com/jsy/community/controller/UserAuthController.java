@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -80,6 +81,8 @@ public class UserAuthController {
 	})
 	public CommonResult<Boolean> sendCode(@RequestParam String account,
 	                                      @RequestParam Integer type) {
+		//TODO 验证type范围
+		
 		boolean b;
 		if (RegexUtils.isMobile(account)) {
 			b = captchaService.sendMobile(account, type);
@@ -137,7 +140,7 @@ public class UserAuthController {
 		commonService.checkVerifyCode(account, code);
 		String token = userUtils.setRedisTokenWithTime("Auth", account,1, TimeUnit.HOURS);
 		Map<String, Object> map = new HashMap<>();
-		map.put("token",token);
+		map.put("authToken",token);
 		map.put("msg","验证通过，请在1小时内完成操作");
 		return CommonResult.ok(map);
 	}
@@ -151,15 +154,51 @@ public class UserAuthController {
 		boolean b = userAuthService.resetPassword(qo);
 		if(b){
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-			String token = request.getHeader("token");
-			if (StrUtil.isBlank(token)) {
-				token = request.getParameter("token");
+			String authToken = request.getHeader("authToken");
+			if (StrUtil.isBlank(authToken)) {
+				authToken = request.getParameter("authToken");
 			}
 			//销毁Auth token
-			userUtils.destroyToken("Auth",token);
+			userUtils.destroyToken("Auth",authToken);
 		}
 		return b ? CommonResult.ok() : CommonResult.error("重置失败");
 	}
+	
+	// @Login是旧手机 @Auth是验证新手机
+	@ApiOperation("更换手机号(绑定手机号)")
+	@PutMapping("/reset/mobile")
+	@Auth
+	@Login
+	@Transactional(rollbackFor = Exception.class)
+	public CommonResult changeMobile(@RequestAttribute(value = "body") String body){
+		String newMobile = JSONObject.parseObject(body).getString("account");
+		boolean exists = userAuthService.checkUserExists(newMobile, "mobile");
+		if(exists){
+			return CommonResult.error(JSYError.DUPLICATE_KEY.getCode(),"手机号已被注册，请直接登录");
+		}
+		String uid = UserUtils.getUserId();
+		boolean b = userAuthService.changeMobile(newMobile, uid);
+		if(b){
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+			String authToken = request.getHeader("authToken");
+			if (StrUtil.isBlank(authToken)) {
+				authToken = request.getParameter("authToken");
+			}
+			//销毁Auth token
+			userUtils.destroyToken("Auth", authToken);
+			String token = request.getHeader("token");
+			if (StrUtil.isBlank(authToken)) {
+				token = request.getParameter("token");
+			}
+			//销毁token
+			userUtils.destroyToken("Login", token);
+		}
+		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
+	}
+	
+	//TODO 手机丢失找回
+	
+	
 	
 	////////////////////////////////////////////////三方登录//////////////////////////////////////////////////////////////
 	

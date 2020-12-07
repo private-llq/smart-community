@@ -53,6 +53,15 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	boolean resetPassword(ResetPasswordQO qo);
 	
 	/**
+	* @Description: 更换手机号
+	 * @Param: [newMobile, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/7
+	**/
+	boolean changeMobile(String newMobile,String uid);
+	
+	/**
 	 * 获取三方平台登录信息
 	 */
 	List<ThirdPlatformVo> getThirdPlatformInfo();

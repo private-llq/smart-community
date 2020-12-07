@@ -133,7 +133,12 @@ public class UserUtils {
 	 * @Date: 2020/12/4
 	**/
 	public boolean destroyToken(String typeName,String token){
-		return redisTemplate.delete(typeName + ":" + token);
+		Boolean result1 = redisTemplate.delete(typeName + ":" + token);
+		Boolean result2 = stringRedisTemplate.delete(typeName + ":" + token);
+		if(result1 || result2){
+			return true;
+		}
+		return false;
 	}
 	
 }

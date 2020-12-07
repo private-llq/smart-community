@@ -1,9 +1,9 @@
 package com.jsy.community.utils;
 
+import com.jsy.community.exception.JSYException;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
 import io.minio.policy.PolicyType;
-import netscape.javascript.JSException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
@@ -47,7 +47,7 @@ public class MinioUtils {
 			String filePath = ENDPOINT + ":" + PROT + "/" + BUCKETNAME + "/" + objectName;
 			return filePath;
 		} catch (Exception e) {
-			throw new JSException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
+			throw new JSYException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
 		}
 	}
 	

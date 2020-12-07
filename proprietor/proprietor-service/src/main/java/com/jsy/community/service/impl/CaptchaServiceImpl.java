@@ -35,7 +35,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
 	
 	@Override
 	public boolean sendMobile(String mobile, Integer type) {
-		if (type == UserAuthEntity.CODE_TYPE_REGISTER) {
+		if (type == UserAuthEntity.CODE_TYPE_REGISTER || type == UserAuthEntity.CODE_TYPE_CHANGE_MOBILE) {
 			// 验证是否已存在
 			boolean isExists = userAuthService.checkUserExists(mobile, "mobile");
 			if (isExists) {
@@ -46,6 +46,8 @@ public class CaptchaServiceImpl implements ICaptchaService {
 			if (!isExists) {
 				throw new ProprietorException("您还没有注册");
 			}
+		} else{
+			throw new ProprietorException("不支持的验证码类型");
 		}
 		
 		// 验证码暂时固定1111

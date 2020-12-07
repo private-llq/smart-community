@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.ProprietorQO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
 
@@ -24,4 +25,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @return			 返回更新行数
 	 */
     int proprietorUpdate(ProprietorQO proprietorQO);
+	
+	@Update("update t_user set mobile = #{newMobile} where uid = #{uid}")
+	int changeMobile(@Param("newMobile")String newMobile, @Param("uid")String uid);
 }

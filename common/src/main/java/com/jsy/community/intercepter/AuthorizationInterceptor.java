@@ -40,9 +40,9 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		if (handler instanceof HandlerMethod) {
 			authAnnotation = ((HandlerMethod) handler).getMethodAnnotation(Auth.class);
 			if(authAnnotation != null){
-				String token = request.getHeader("token");
+				String token = request.getHeader("authToken");
 				if (StrUtil.isBlank(token)) {
-					token = request.getParameter("token");
+					token = request.getParameter("authToken");
 				}
 				Object authTokenContent = userUtils.getRedisToken("Auth", token);
 				if(authTokenContent == null){
@@ -54,7 +54,6 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
 				}
 				request.setAttribute("body", body);
-				return true;
 			}
 		}
 		

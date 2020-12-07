@@ -28,6 +28,11 @@ public class UserAuthEntity extends BaseEntity {
 	 */
 	public static final int CODE_TYPE_FORGET_PWD = 3;
 	
+	/**
+	 * 更换手机号
+	 */
+	public static final int CODE_TYPE_CHANGE_MOBILE = 4;
+	
 	@ApiModelProperty("业主ID")
 	private String uid;
 	

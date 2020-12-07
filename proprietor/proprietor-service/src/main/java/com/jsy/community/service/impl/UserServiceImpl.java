@@ -76,7 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public UserInfoVo login(LoginQO qo) {
         String uid = userAuthService.checkUser(qo);
         UserEntity user = baseMapper.queryUserInfoByUid(uid);
-        if (user.getDeleted() == 1) {
+        if (user == null || user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");
         }
 

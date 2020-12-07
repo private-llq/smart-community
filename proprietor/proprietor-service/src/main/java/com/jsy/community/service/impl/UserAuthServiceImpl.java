@@ -14,11 +14,13 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.UserAuthMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.ThirdPlatformQo;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.ThirdPlatformVo;
 import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +53,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 
 	@Resource
 	private UserAuthMapper userAuthMapper;
+	
+	@Resource
+	private UserMapper userMapper;
 	
 	@Value(value = "${jsy.third-platform-domain:http://www.jsy.com}")
 	private String callbackUrl;
@@ -139,6 +144,16 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		update.setPassword(SecureUtil.sha256(qo.getPassword() + entity.getSalt()));
 		
 		return updateById(update);
+	}
+	
+	@Override
+	public boolean changeMobile(String newMobile,String uid){
+		int result1 = userAuthMapper.changeMobile(newMobile, uid);
+		int result2 = userMapper.changeMobile(newMobile, uid);
+		if(result1 == 1 && result2 == 1){
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
