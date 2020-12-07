@@ -13,6 +13,8 @@ import com.jsy.community.vo.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +38,9 @@ public class MenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IAdminMenuService adminMenuService;
+	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 	
 	@ApiOperation("后台树形结构查询所有菜单")
 	@GetMapping("/listAdminMenu")
@@ -62,7 +67,10 @@ public class MenuController {
 	@DeleteMapping("/removeMenu")
 	public CommonResult removeMenu(@RequestParam("id") Long id) {
 		try {
+			redisTemplate.delete("indexMenuList"); // TODO  延时双删
 			menuService.removeMenu(id);
+			Thread.sleep(500);
+			redisTemplate.delete("indexMenuList"); // TODO  延时双删
 			return CommonResult.ok();
 		} catch (Exception e) {
 			return CommonResult.error("请先删除子菜单");
