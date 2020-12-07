@@ -26,7 +26,7 @@
     <select id="findList" parameterType="com.jsy.community.qo.proprietor.UserInformQO" resultMap="UserInformMap">
         SELECT
         u.id as userId,u.real_name as userName,ci.id as informId,ci.title
-        as title,ci.content as coutent,ti.inform_status as informStatus,ci.community_id
+        as title,ci.content as content,ti.inform_status as informStatus,ci.community_id
         as communityId,tc.name as communityName,ti.house_id as houseId,th.building
         as building,th.unit as unit,th.floor as floor,th.door as door
         FROM t_user u
@@ -35,7 +35,6 @@
         join t_community tc on ci.community_id=tc.id
         left join t_house th on ti.house_id=th.id
         <include refid="Query"></include>
-        limit #{pageNo},#{pageSize}
     </select>
     <!-- 查询所有已读通知消息的总行数 -->
     <select id="findCount" parameterType="com.jsy.community.qo.proprietor.UserInformQO" resultType="java.lang.Long">

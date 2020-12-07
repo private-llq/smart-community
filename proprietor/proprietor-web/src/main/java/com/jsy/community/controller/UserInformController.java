@@ -49,6 +49,7 @@ public class UserInformController {
     @ApiOperation("所有已读通知人员")
     @PostMapping("/list")
     public CommonResult list(@RequestBody UserInformQO userInformQO){
+        System.out.println(userInformQO);
         Map<String,Object> map = userInformService.findList(userInformQO);
         return CommonResult.ok(map);
     }

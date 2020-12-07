@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.BannerEntity;
@@ -14,6 +15,9 @@ import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +38,9 @@ public class BannerController {
 	private IBannerService iBannerService;
 	
 	private static final String BUCKETNAME = "bannner-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 	
 	
 	/**
@@ -58,13 +65,17 @@ public class BannerController {
 	 * @Date: 2020/11/16
 	**/
 	@ApiOperation("【轮播图基本信息】上传")
-//	@Login
+	@Login
 	@PostMapping("upload")
 	public CommonResult upload(@RequestBody BannerEntity bannerEntity){
 		ValidatorUtils.validateEntity(bannerEntity, BannerEntity.addBannerValidatedGroup.class);
 		//TODO 调CommonService方法，文件上传到fastdfs。url暂时写死
 		//写库
 		boolean b = iBannerService.addBanner(bannerEntity);
+		String filePath = bannerEntity.getUrl();
+		if (!StringUtils.isEmpty(filePath)) {
+			redisTemplate.opsForSet().add("banner_img_all",filePath);
+		}
 		if(b){
 			return CommonResult.ok();
 		}
@@ -82,6 +93,7 @@ public class BannerController {
 	@PostMapping("uploadImg")
 	public CommonResult uploadImg(@RequestParam("file") MultipartFile file){
 		String filePath = MinioUtils.upload(file, BUCKETNAME);
+		redisTemplate.opsForSet().add("banner_img_part",filePath);
 		return CommonResult.ok(filePath);
 	}
 

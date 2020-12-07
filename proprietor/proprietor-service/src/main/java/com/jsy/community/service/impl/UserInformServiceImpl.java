@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
@@ -30,6 +31,8 @@ public class UserInformServiceImpl extends ServiceImpl<UserInformMapper, UserInf
     @Override
     public Map<String, Object> findList(UserInformQO userInformQO) {
 
+        Page<UserInformQO> page = new Page<>(userInformQO.getPage(),userInformQO.getSize());
+//        MyPageUtils.setPageAndSize(page,userInformQO);
         Map<String, Object> map = new HashMap<>();
         List<UserInformVO> list = userInformMapper.findList(userInformQO);
         for (UserInformVO userInformVO : list) {
