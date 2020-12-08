@@ -42,26 +42,21 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @NotNull(message = "缺少社区ID")
     private Long communityId;
     
+    @ApiModelProperty(value = "楼栋ID")
+    @NotNull(message = "缺少楼栋ID")
+    private Long buildingId;
+    
     @JsonIgnore
     @ApiModelProperty(value = "业主ID")
-    private Long uid;
+    private String uid;
 
     @ApiModelProperty(value = "来访人姓名")
     @NotEmpty(message = "缺少来访人姓名")
     private String name;
 
-    @ApiModelProperty(value = "所属单元")
-    private String unit;
-
-    @ApiModelProperty(value = "所属楼栋")
-    private String building;
-
-    @ApiModelProperty(value = "所属楼层")
-    private String floor;
-
     @ApiModelProperty(value = "所属门牌号")
-    @NotEmpty(message = "缺少门牌号地址")
-    private String door;
+    @NotEmpty(message = "缺少详细地址")
+    private String address;
 
     @ApiModelProperty(value = "来访事由")
     private String reason;

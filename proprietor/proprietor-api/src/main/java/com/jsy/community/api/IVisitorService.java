@@ -68,15 +68,6 @@ public interface IVisitorService extends IService<VisitorEntity> {
     void deletePersonAndCar(Long visitorId);
     
     /**
-    * @Description: 修改访客登记申请
-     * @Param: [visitorQO]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-    **/
-    boolean updateVisitorById(VisitorQO visitorQO);
-    
-    /**
      * @Description: 修改随行人员
      * @Param: [visitorPersonQO]
      * @Return: boolean

@@ -1,9 +1,11 @@
 package com.jsy.community.qo.proprietor;
 
+import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 /**
  * @author chq459799974
@@ -11,7 +13,7 @@ import javax.validation.constraints.Pattern;
  * @since 2020-11-28 16:22
  **/
 @Data
-public class VisitorPersonQO {
+public class VisitorPersonQO extends BaseEntity implements Serializable {
 	
 	@ApiModelProperty(value = "随行人姓名")
 	private String name;

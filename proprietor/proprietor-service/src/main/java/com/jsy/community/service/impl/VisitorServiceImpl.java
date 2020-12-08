@@ -36,7 +36,7 @@ import java.util.Map;
  * @author chq459799974
  * @since 2020-11-11
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_proprietor)
 public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity> implements IVisitorService {
 
     @Autowired
@@ -127,26 +127,6 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         visitingCarMapper.deleteByMap(opMap);
     }
     
-    /**
-     * @Description: 修改访客登记申请
-     * @Param: [visitorQO]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-     **/
-    @Override
-    public boolean updateVisitorById(VisitorQO visitorQO){
-        VisitorEntity visitorEntity = new VisitorEntity();
-        BeanUtils.copyProperties(visitorQO,visitorEntity);
-        int result = visitorMapper.update(visitorEntity,new QueryWrapper<VisitorEntity>()
-            .eq("id",visitorEntity.getId())
-            .ne("check_status", BusinessEnum.CheckStatusEnum.PASS.getCode())  // 已审核通过的访客登记不能修改
-        );
-        if(result == 1){
-            return true;
-        }
-        return false;
-    }
     /**
     * @Description: 修改随行人员
      * @Param: [visitorPersonQO]
