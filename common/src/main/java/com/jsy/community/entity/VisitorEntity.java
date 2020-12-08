@@ -14,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,34 +43,33 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @NotNull(message = "缺少社区ID")
     private Long communityId;
     
+    @ApiModelProperty(value = "楼栋ID")
+    @NotNull(message = "缺少楼栋ID")
+    private Long buildingId;
+    
     @JsonIgnore
     @ApiModelProperty(value = "业主ID")
-    private Long uid;
+    private String uid;
 
     @ApiModelProperty(value = "来访人姓名")
     @NotEmpty(message = "缺少来访人姓名")
     private String name;
 
-    @ApiModelProperty(value = "所属单元")
-    private String unit;
-
-    @ApiModelProperty(value = "所属楼栋")
-    private String building;
-
-    @ApiModelProperty(value = "所属楼层")
-    private String floor;
-
     @ApiModelProperty(value = "所属门牌号")
-    @NotEmpty(message = "缺少门牌号地址")
-    private String door;
+    @NotEmpty(message = "缺少详细地址")
+    private String address;
 
     @ApiModelProperty(value = "来访事由")
     private String reason;
     
-    @ApiModelProperty(value = "预期来访时间")
+    @ApiModelProperty(value = "预期来访开始时间")
     @NotNull(message = "缺少预期来访时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime expectTime;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startTime;
+    
+    @ApiModelProperty(value = "预期来访结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endTime;
 
     @ApiModelProperty(value = "来访人联系方式")
     @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")

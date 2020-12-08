@@ -20,7 +20,7 @@ import java.util.List;
  * @author chq459799974
  * @since 2020-11-12
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_proprietor)
 public class VisitingCarServiceImpl extends ServiceImpl<VisitingCarMapper, VisitingCarEntity> implements IVisitingCarService {
 	
     @Autowired

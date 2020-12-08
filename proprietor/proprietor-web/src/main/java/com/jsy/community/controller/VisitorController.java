@@ -15,7 +15,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
-import com.jsy.community.utils.JwtUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.qo.proprietor.VisitorQO;
@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -39,18 +40,18 @@ import java.util.List;
 @ApiJSYController
 public class VisitorController {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IVisitorService iTVisitorService;
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IVisitorPersonService iVisitorPersonService;
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IVisitingCarService iVisitingCarService;
 	
 	/**
 	 * @Description: 访客登记 新增
-	 * @Param: [tVisitor]
+	 * @Param: [visitorEntity]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/11
@@ -58,9 +59,10 @@ public class VisitorController {
 	@ApiOperation("【访客】新增")
 	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("")
+	@Login
 	public CommonResult save(@RequestBody VisitorEntity visitorEntity) {
-		visitorEntity.setUid(JwtUtils.getUserId());
 		ValidatorUtils.validateEntity(visitorEntity);
+		visitorEntity.setUid(UserUtils.getUserId());
 		//添加访客
 		Long visitorId = iTVisitorService.addVisitor(visitorEntity);
 		if (visitorId == null) {
@@ -108,21 +110,6 @@ public class VisitorController {
 			iTVisitorService.deletePersonAndCar(id);
 		}
 		return delResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "删除失败");
-	}
-	
-	/**
-	 * @Description: 访客登记 修改
-	 * @Param: [visitorQO]
-	 * @Return: com.jsy.community.vo.CommonResult
-	 * @Author: chq459799974
-	 * @Date: 2020/11/12
-	 **/
-	@ApiOperation("【访客】修改")
-	@PutMapping("")
-	public CommonResult update(@RequestBody VisitorQO visitorQO) {
-		ValidatorUtils.validateEntity(visitorQO);
-		boolean updateResult = iTVisitorService.updateVisitorById(visitorQO);
-		return updateResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记申请 修改失败");
 	}
 	
 	/**
@@ -190,7 +177,7 @@ public class VisitorController {
 	
 	/**
 	 * @Description: 修改随行车辆
-	 * @Param: [visitingCarEntity]
+	 * @Param: [visitingCarQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/12
@@ -198,8 +185,9 @@ public class VisitorController {
 	@ApiOperation("【随行车辆】修改")
 	@PutMapping("car")
 	public CommonResult updateCar(@RequestBody VisitingCarQO visitingCarQO) {
+		ValidatorUtils.validateEntity(visitingCarQO);
 		boolean updateResult = iTVisitorService.updateVisitingCarById(visitingCarQO);
-		return updateResult ? CommonResult.ok("") : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记-随行车辆 修改失败");
+		return updateResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "访客登记-随行车辆 修改失败");
 	}
 	
 	/**

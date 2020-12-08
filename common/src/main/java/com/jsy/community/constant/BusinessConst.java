@@ -15,14 +15,4 @@ public interface BusinessConst {
 	 */
 	Integer QUERY_HOUSE_MEMBER_INVITATION = 2;
 	
-	/**
-	 * 车辆类型最小取值
-	 */
-	Integer CARTYPE_MIN = 1;
-	
-	/**
-	 * 车辆类型最大取值
-	 */
-	Integer CARTYPE_MAX = BusinessEnum.CarTypeEnum.values().length;
-	
 }

@@ -1,11 +1,13 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.proprietor.UserInformQO;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +37,9 @@ public class UserInformController {
      */
     @ApiOperation("添加已读通知人员")
     @PostMapping("/add")
+    @Login
     public CommonResult save(@RequestBody UserInformEntity userInformEntity) {
+        String userId = UserUtils.getUserId();
         return userInformService.save(userInformEntity)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
     }
 

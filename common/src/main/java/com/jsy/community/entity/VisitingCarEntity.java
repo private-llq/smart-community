@@ -31,7 +31,7 @@ public class VisitingCarEntity extends BaseEntity implements Serializable {
     
     @JsonIgnore
     @ApiModelProperty(value = "业主ID")
-    private Long uid;
+    private String uid;
 
     @ApiModelProperty(value = "访客登记表ID")
     private Long visitorId;
