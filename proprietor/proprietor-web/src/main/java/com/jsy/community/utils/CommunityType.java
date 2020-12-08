@@ -10,20 +10,17 @@ package com.jsy.community.utils;
  */
 public enum CommunityType {
 
-    //社区查询类型-1 查询对应Service方法getAllCommunity
+    //【查询城市下面的所有社区】社区查询类型-1 查询对应Service方法getAllCommunity
     COMMUNITY_TYPE(1, "getAllCommunityFormCityId"),
 
-    //单元查询类型-2 查询对应Service方法getAllUnitFormCommunity - 通过社区id查询他下面的所有单元
-    UNIT_TYPE(2, "getAllUnitFormCommunity"),
+    //【查询楼栋或单元动态sql方法】根据社区查询他下一级的结构是什么数据  单元楼栋  就查社区下面的所有单元  楼栋单元 就查社区下面的所有楼栋  单楼栋 就查所有楼栋 单单元就查所有单元
+    COMMUNITY_BUILDING_TYPE(2, "getBuildingOrUnitByCommunityId"),
 
-    //楼栋查询类型-3 查询对应Service方法getAllBuildingFormUnit - 通过单元id查询他下面的所有楼栋
-    BUILDING_TYPE(3, "getAllBuildingFormUnit"),
+    //【根据楼栋id 查询 下面所有单元 或者 根据单元id 查询单元下面所有楼栋】
+    BUILDING_UNIT_TYPE(3, "getBuildingOrUnitOrFloorById"),
 
-    //楼层查询类型-4 查询对应Service方法getAllFloorFormBuilding - 通过楼栋id查询他下面的所有楼层
-    FLOOR_TYPE(4, "getAllFloorFormBuilding"),
-
-    //门牌查询类型-5 查询对应Service方法getAllDoorFormFloor - 通过楼层id查询他下面的所有门牌
-    DOOR_TYPE(5, "getAllDoorFormFloor");
+    //【根据楼层id查询门牌】 查询对应Service方法getAllDoorFormFloor - 通过楼层id查询他下面的所有门牌
+    DOOR_TYPE(4, "getAllDoorFormFloor");
 
     private final int value;
     private final String serviceMethod;

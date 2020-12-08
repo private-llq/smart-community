@@ -127,9 +127,4 @@ public class UserController {
         return userService.proprietorUpdate(proprietorQO) > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
-
-    private boolean isEmpty(String str){
-        return str == null || str.trim().equals("") || "null".equals(str) || "undefined".equals(str);
-    }
-
 }

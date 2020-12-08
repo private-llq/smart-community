@@ -31,12 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.Collections.addAll;
+import java.util.*;
 
 /**
  * @author YuLF
@@ -91,18 +86,30 @@ public class ProprietorController {
     @GetMapping(params = {"downloadMemberExcel"})
     @ApiOperation("下载业主家属成员信息录入Excel")
     public ResponseEntity<byte[]> downloadMemberExcel(@RequestParam long communityId) {
-        List<UserEntity> userEntityList = iHouseService.getCommunityNameAndUserInfo(communityId);
-        if( userEntityList == null || userEntityList.isEmpty() ){
-            throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), "目前这个小区没有任何用户信息!");
-        }
+        List<UserEntity> userEntityList = getUserInfo(communityId);
+        //获取excel 响应头信息
         MultiValueMap<String, String> multiValueMap = setHeader(userEntityList.get(0).getNickname() + "家属成员登记表.xlsx");
         try {
+            //获得excel下载模板
             Workbook workbook = ProprietorExcelCommander.exportProprietorMember(userEntityList);
+            //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
             return new ResponseEntity<>(readWorkbook(workbook) , multiValueMap, HttpStatus.OK );
         } catch (IOException e) {
             log.error("com.jsy.community.controller.ProprietorController.downloadMemberExcel：{}", e.getMessage());
             return new ResponseEntity<>(null , multiValueMap, HttpStatus.ACCEPTED );
         }
+    }
+
+    /**
+     * 按communityId 获取用户信息
+     * @return       返回查找到的信息
+     */
+    private List<UserEntity> getUserInfo(Long communityId){
+        List<UserEntity> userEntityList = iHouseService.getCommunityNameAndUserInfo(communityId);
+        if( userEntityList == null || userEntityList.isEmpty() ){
+            throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), "目前这个小区没有任何用户信息!");
+        }
+        return userEntityList;
     }
 
     /**
@@ -118,7 +125,7 @@ public class ProprietorController {
         @Cleanup InputStream is = new ByteArrayInputStream(bos.toByteArray());
         byte[] byt = new byte[is.available()];
         //2.4 读取字节流 响应实体返回
-        is.read(byt);
+        int read = is.read(byt);
         return byt;
     }
     /**
@@ -134,32 +141,62 @@ public class ProprietorController {
         multiValueMap.set("Content-type", "application/vnd.ms-excel");
         return multiValueMap;
     }
+
     /**
-     * 业主登记excel 导入 登记
+     * 【业主登记excel 导入】 登记
      * @param proprietorExcel   用户上传的excel
      * @param communityId       社区id
      * @return                  返回效验或登记结果
      */
-    @SuppressWarnings("unchecked")
-    @PostMapping("/importProprietorExcel")
+    @PostMapping(params = {"importProprietorExcel"})
     @ApiOperation("导入业主信息excel")
     public CommonResult<?> importProprietorExcel(MultipartFile proprietorExcel, Long communityId){
-        //参数非空验证
-        if(null == proprietorExcel || communityId == null){
-            return CommonResult.error(JSYError.BAD_REQUEST);
-        }
-        //文件后缀验证
-        boolean extension = FilenameUtils.isExtension(proprietorExcel.getOriginalFilename(), ProprietorExcelCommander.SUPPORT_EXCEL_EXTENSION);
-        if (!extension) {
-            return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "只支持excel文件!" );
-        }
+        //参数验证
+        validFileSuffix(proprietorExcel, communityId);
         //解析Excel  这里强转Object得保证 importProprietorExcel 实现类返回的类型是UserEntity
-        List<UserEntity> userEntityList = (List<UserEntity>)ProprietorExcelCommander.importProprietorExcel(proprietorExcel);
+        List<UserEntity> userEntityList = ProprietorExcelCommander.importProprietorExcel(proprietorExcel,new HashMap<>(1));
         //做数据库写入 userEntityList 读出来的数据
         //todo 数据库信息写入
         return CommonResult.ok(userEntityList);
     }
 
+    /**
+     * 【业主家属信息导入】
+     * @param proprietorExcel   用户上传的excel
+     * @param communityId       社区id
+     * @return                  返回效验或登记结果
+     */
+    @PostMapping(params = {"importMemberExcel"})
+    @ApiOperation("导入业主家属信息信息excel")
+    public CommonResult<?> importMemberExcel(MultipartFile proprietorExcel, Long communityId){
+        //参数验证
+        validFileSuffix(proprietorExcel, communityId);
+        //控制层需要传递给实现类的参数
+        List<UserEntity> userInfoList = getUserInfo(communityId);
+        //把List中的 realName 和uid 转换为Map存储
+        Map<String, Object> userInfoParams = ProprietorExcelCommander.getAllUidAndNameForList(userInfoList, "realName", "uid");
+        List<UserEntity> userEntityList = ProprietorExcelCommander.importMemberExcel(proprietorExcel, userInfoParams);
+        //做数据库写入 userEntityList 读出来的数据
+        //todo 数据库信息写入
+        return CommonResult.ok(userEntityList);
+    }
+
+    /**
+     * excel 文件上传上来后 验证方法
+     * @param file          excel文件
+     * @param communityId   社区id
+     */
+    private void validFileSuffix(MultipartFile file, Long communityId){
+        //参数非空验证
+        if(null == file || communityId == null){
+            throw new JSYException(JSYError.BAD_REQUEST);
+        }
+        //文件后缀验证
+        boolean extension = FilenameUtils.isExtension(file.getOriginalFilename(), ProprietorExcelCommander.SUPPORT_EXCEL_EXTENSION);
+        if (!extension) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "只支持excel文件!");
+        }
+    }
     /**
      * TODO  Seata全局事务处理
      * 根据业主id 删除业主信息、业主关联的房屋、业主的家庭成员、业主的车辆信息

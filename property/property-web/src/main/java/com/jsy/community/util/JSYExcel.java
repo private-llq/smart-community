@@ -10,21 +10,22 @@ import java.util.Map;
 /**
  * @author YuLF
  * @since 2020-11-26 14:59
- * Excel功能指定
+ * Excel导入导出
  */
 public interface JSYExcel {
 
     /**
      * 对业主的Excel导入进行处理
      * @param excel     业主信息表.xlsx
+     * @Param map       存放实现类需要传递的数据
      * @return          返回解析好的 List<Entity> 数据
      */
-    List<?> importProprietorExcel(MultipartFile excel);
+    List<?> importProprietorExcel(MultipartFile excel, Map<String, Object> map);
 
     /**
      * 导出业主Excel模板
      * @param entityList        实体List
-     * @param res               其中的key name = 社区名称  communityUserNum = 社区房间数量   这两个值为了在excel中设置 工作表名称 和约束行数 = communityUserNum
+     * @param res               存放实现类需要传递的数据
      * @return                  返回生成好的工作簿
      */
      Workbook exportProprietorExcel(List<?> entityList, Map<String, Object> res);

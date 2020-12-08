@@ -15,38 +15,40 @@ public interface ICommonService {
 
     /**
      * 根据城市id查询下面所有社区
+	 * @author YuLF
+	 * @since  2020/12/8 16:39
      * @param id   传入的城市id
      * @return     返回社区集合
      */
-    List<Map> getAllCommunityFormCityId(Integer id);
+    List<Map> getAllCommunityFormCityId(Integer id,Integer houseLevelMode);
 
     /**
-     * 根据社区id查询下面的所有单元
-     * @param id    社区id
-     * @return      返回单元集合
+     * 根据社区id和社区层级结构 查询下面的所有单元 或 所有楼栋
+	 * @author YuLF
+	 * @since  2020/12/8 16:39
+     * @param id    			社区id
+	 * @param houseLevelMode	社区层级结构id
+     * @return      			返回单元或楼栋集合
      */
-    List<Map> getAllUnitFormCommunity(Integer id);
+    List<Map> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode);
 
     /**
-     * 根据单元id查询所有楼栋
+     * 根据社区层级结构 和 单元id|楼栋id 查询下一级的数据
+	 * 比如 层级结构 为单元楼栋 那就是根据单元id查询下面所有楼栋  如果是楼栋单元 那就是根据楼栋id查询下面的所有单元  如果是单楼栋 那就根据楼栋id查询楼层 单单元也是查询楼层】
+	 * @author YuLF
+	 * @since  2020/12/8 16:39
      * @param id    单元id
      * @return      返回楼栋集合
      */
-    List<Map> getAllBuildingFormUnit(Integer id);
+    List<Map> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode);
 
     /**
-     * 根据楼栋id查询楼层
-     * @param id    楼栋id
-     * @return      返回楼层集合
+     * 根据楼层id查询所有门牌号
+     * @author YuLF
+     * @since  2020/12/8 16:39
+     * @Param  id   楼层id
      */
-    List<Map> getAllFloorFormBuilding(Integer id);
-
-    /**
-     * 根据楼层查询所有门牌号
-     * @param id    楼层id
-     * @return      返回门牌集合
-     */
-    List<Map> getAllDoorFormFloor(Integer id);
+    List<Map> getAllDoorFormFloor(Integer id, Integer houseLevelMode);
 	
 	/**
 	 * @Description: 根据区域编号获取子区域 (中国编号为100000)

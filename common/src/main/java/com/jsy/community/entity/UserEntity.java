@@ -66,10 +66,13 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("详细地址")
 	private String detailAddress;
 
+	@ApiModelProperty("家属关系code")
+	@TableField( exist = false )
+	private Integer relationCode;
+
 	@ApiModelProperty("车辆信息")
 	@TableField( exist = false )
 	private CarEntity carEntity;
-
 
 	@ApiModelProperty("导入excel记录用户的房屋信息")
 	@TableField( exist = false )

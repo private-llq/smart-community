@@ -47,39 +47,31 @@ public class CommonServiceImpl implements ICommonService {
 //        redisTemplate.delete(account);
     }
 
+    /**
+     * houseLevelMode没有用到的原因 是因为控制层需要使用反射 统一调度业务方法，所以参数类型个数必须一样
+     * 根据城市id查询下面所有社区
+     * @author YuLF
+     * @since  2020/12/8 16:39
+     * @param id   传入的城市id
+     * @return     返回社区集合
+     */
     @Override
-    public List<Map> getAllCommunityFormCityId(Integer id) {
-        //todo 查询社区修改
-        log.info("查询所有社区 ID是 {}", id);
+    public List<Map> getAllCommunityFormCityId(Integer id, Integer houseLevelMode) {
         return commonMapper.getAllCommunityFormCityId(id);
-
     }
 
     @Override
-    public List<Map> getAllUnitFormCommunity(Integer id) {
-        //todo 查询社区单元修改
-        log.info("查询社区单元 社区ID是 {}", id);
-        return commonMapper.getAllUnitFormCommunity(id);
+    public List<Map> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode) {
+        return commonMapper.getBuildingOrUnitByCommunityId(id, houseLevelMode);
     }
 
     @Override
-    public List<Map> getAllBuildingFormUnit(Integer id) {
-        //todo 后续修改
-        log.info("查询单元楼栋 单元ID是 {}", id);
-        return commonMapper.getAllBuildingFormUnit(id);
+    public List<Map> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode) {
+        return commonMapper.getBuildingOrUnitOrFloorById(id, houseLevelMode);
     }
 
     @Override
-    public List<Map> getAllFloorFormBuilding(Integer id) {
-        //todo 后续修改
-        log.info("查询楼栋楼层 楼层ID是 {}", id);
-        return commonMapper.getAllFloorFormBuilding(id);
-    }
-
-    @Override
-    public List<Map> getAllDoorFormFloor(Integer id) {
-        //todo 后续修改
-        log.info("查询楼层门牌 楼层ID是 {}", id);
+    public List<Map> getAllDoorFormFloor(Integer id, Integer houseLevelMode) {
         return commonMapper.getAllDoorFormFloor(id);
     }
     

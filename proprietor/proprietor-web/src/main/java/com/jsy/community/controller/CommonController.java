@@ -33,7 +33,7 @@ public class CommonController {
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
     @Login
-    public CommonResult<?> queryZone(@RequestParam Integer id, @RequestParam Integer queryType) {
+    public CommonResult<?> queryZone(@RequestParam Integer id, @RequestParam Integer houseLevelMode, @RequestParam Integer queryType) {
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);
         //当枚举类并没有这个查询类型时，抛出400请求参数错误异常
@@ -42,20 +42,23 @@ public class CommonController {
         }
         try {
             //调用 用查询类型ID找到的 对应的查询方法
-            Method commonZoneApi = ICommonService.class.getDeclaredMethod(communityType.method(), Integer.class);
-            //传入用户提供的 市/社区/单元/楼栋/ id 查询该级下一级的数据 如 传入某个城市id 查出这个城市下面的所有社区
-            Object invoke = commonZoneApi.invoke(commonService, id);
+            Method commonZoneApi = ICommonService.class.getDeclaredMethod(communityType.method(), Integer.class, Integer.class);
+            //根据社区层级结构id 和 传过来的id 判断用户的社区 具体层级结构
+            Object invoke = commonZoneApi.invoke(commonService, id,houseLevelMode);
             if (invoke == null) {
                 return CommonResult.ok(null);
             }
-            return CommonResult.ok((List<Map>) invoke);
+            return CommonResult.ok((List<Map<?,?>>) invoke);
         } catch (Exception e) {
             log.error("com.jsy.community.controller.CommonController.queryZone：{}", e.getMessage());
         	//如果出现异常，说明服务并不能调通
             return CommonResult.error(JSYError.NOT_FOUND);
         }
     }
-	
+
+
+
+
 	@ApiOperation("查询下级省市区、查询城市等")
     @GetMapping("/region")
     public CommonResult<?> queryRegion(@RequestParam Integer queryType,Integer regionNumber) {

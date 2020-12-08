@@ -13,11 +13,9 @@ public interface CommonMapper {
 
     List<Map> getAllCommunityFormCityId(Integer id);
 
-    List<Map> getAllUnitFormCommunity(Integer id);
+    List<Map> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode);
 
-    List<Map> getAllBuildingFormUnit(Integer id);
-
-    List<Map> getAllFloorFormBuilding(Integer id);
+    List<Map> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMod);
 
     List<Map> getAllDoorFormFloor(Integer id);
 }
