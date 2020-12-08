@@ -1,0 +1,20 @@
+package com.jsy.community.service.impl;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.IRepairOrderService;
+import com.jsy.community.entity.RepairOrderEntity;
+import com.jsy.community.mapper.RepairOrderMapper;
+import org.springframework.stereotype.Service;
+
+/**
+ * <p>
+ * 报修订单信息 服务实现类
+ * </p>
+ *
+ * @author jsy
+ * @since 2020-12-08
+ */
+@Service
+public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, RepairOrderEntity> implements IRepairOrderService {
+
+}
