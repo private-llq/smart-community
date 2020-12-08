@@ -88,8 +88,29 @@
             <groupId>com.jsy</groupId>
             <artifactId>proprietor-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+<!--            <scope>compile</scope>-->
         </dependency>
     </dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!-- springboot main方法入口 -->
+					<mainClass>com.jsy.community.PropertyServiceApp</mainClass>
+					<layout>ZIP</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
