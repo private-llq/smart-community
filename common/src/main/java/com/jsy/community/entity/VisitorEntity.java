@@ -14,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -61,10 +62,14 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "来访事由")
     private String reason;
     
-    @ApiModelProperty(value = "预期来访时间")
+    @ApiModelProperty(value = "预期来访开始时间")
     @NotNull(message = "缺少预期来访时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime expectTime;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startTime;
+    
+    @ApiModelProperty(value = "预期来访结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endTime;
 
     @ApiModelProperty(value = "来访人联系方式")
     @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
