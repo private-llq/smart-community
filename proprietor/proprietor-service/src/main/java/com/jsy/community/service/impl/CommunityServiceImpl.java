@@ -123,7 +123,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	 * @Date: 2020/11/25
 	**/
 	@Override
-	public CommunityEntity locateCommunity(Long uid,Map<String,Double> location){
+	public CommunityEntity locateCommunity(String uid,Map<String,Double> location){
 		// 查业主房屋所属社区id
 		List<Long> communityIds = userHouseMapper.queryUserCommunityId(uid);
 		return communityMapper.locateCommunity(communityIds,location);

@@ -66,6 +66,16 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			return true;
 		}
 		
+		String token = request.getHeader("token");
+		if (StrUtil.isBlank(token)) {
+			token = request.getParameter("token");
+		}
+		UserInfoVo userInfo = userUtils.getUserInfo(token);
+		if(userInfo != null){
+			request.setAttribute(USER_INFO, userInfo);
+			request.setAttribute(USER_KEY, userInfo.getUid());
+		}
+		
 		if (methodAnnotation == null && classAnnotation == null) {
 			// 都没有
 			return true;
@@ -81,16 +91,9 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			return true;
 		}
 		
-		String token = request.getHeader("token");
-		if (StrUtil.isBlank(token)) {
-			token = request.getParameter("token");
-		}
-		UserInfoVo userInfo = userUtils.getUserInfo(token);
 		if(userInfo == null){
 			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
 		}
-		request.setAttribute(USER_INFO, userInfo);
-		request.setAttribute(USER_KEY, userInfo.getUid());
 		
 		return true;
 	}

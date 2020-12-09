@@ -9,6 +9,7 @@ import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.JwtUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -70,7 +71,7 @@ public class CommunityController {
 	@PostMapping("locate")
 	@Login(allowAnonymous = true)
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
-		return CommonResult.ok(iCommunityService.locateCommunity(JwtUtils.getUserId(),location));
+		return CommonResult.ok(iCommunityService.locateCommunity(UserUtils.getUserId(),location));
 	}
 	
 }

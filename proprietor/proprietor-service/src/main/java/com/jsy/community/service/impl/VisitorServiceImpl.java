@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
-import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
@@ -207,7 +206,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         Page<VisitorEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>().select("*");
-        com.jsy.community.qo.proprietor.VisitorQO visitorQO = baseQO.getQuery();
+        VisitorQO visitorQO = baseQO.getQuery();
         if(visitorQO != null){
             if(!StringUtils.isEmpty(visitorQO.getName())){
                 queryWrapper.eq("name",visitorQO.getName());

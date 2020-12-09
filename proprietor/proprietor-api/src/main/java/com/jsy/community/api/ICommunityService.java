@@ -40,5 +40,5 @@ public interface ICommunityService extends IService<CommunityEntity> {
      * @Author: chq459799974
      * @Date: 2020/11/25
     **/
-    CommunityEntity locateCommunity(Long uid,Map<String,Double> location);
+    CommunityEntity locateCommunity(String uid,Map<String,Double> location);
 }

@@ -14,6 +14,6 @@ import java.util.List;
 public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	
 	@Select("select community_id from t_user_house where check_status = 1 and uid = #{uid}")
-	List<Long> queryUserCommunityId(Long uid);
+	List<Long> queryUserCommunityId(String uid);
 	
 }
