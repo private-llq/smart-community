@@ -3,7 +3,6 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.ProprietorServiceApp;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.ProprietorException;
@@ -102,15 +101,15 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 * @Author: chq459799974
 	 * @Date: 2020/11/26
 	 **/
-	@Override
-	public boolean confirmJoin(HouseMemberEntity houseMemberEntity){
-		int result = houseMemberMapper.confirmJoin(houseMemberEntity.getId());
-		int setBelongTo = userMapper.setUserBelongTo(houseMemberEntity.getHouseholderId(),houseMemberEntity.getUid());
-		if(result == 1 && setBelongTo == 1){
-			return true;
-		}
-		throw new ProprietorException(JSYError.INTERNAL.getCode(),"加入失败");
-	}
+//	@Override
+//	public boolean confirmJoin(HouseMemberEntity houseMemberEntity){
+//		int result = houseMemberMapper.confirmJoin(houseMemberEntity.getId());
+//		int setBelongTo = userMapper.setUserBelongTo(houseMemberEntity.getHouseholderId(),houseMemberEntity.getUid());
+//		if(result == 1 && setBelongTo == 1){
+//			return true;
+//		}
+//		throw new ProprietorException(JSYError.INTERNAL.getCode(),"加入失败");
+//	}
 	
 	/**
 	 * @Description: 分页查询成员/查询邀请

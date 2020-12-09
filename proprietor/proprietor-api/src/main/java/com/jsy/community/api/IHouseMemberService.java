@@ -52,7 +52,7 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/26
 	**/
-	boolean confirmJoin(HouseMemberEntity houseMemberEntity);
+//	boolean confirmJoin(HouseMemberEntity houseMemberEntity);
 	
 	/**
 	* @Description: 分页查询成员/查询邀请

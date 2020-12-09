@@ -8,16 +8,13 @@ import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.ProprietorExceptionHandler;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.JwtUtils;
-import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,20 +38,20 @@ public class HouseMemberController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IHouseMemberService iHouseMemberService;
 	
-	@ApiOperation("【房间成员】邀请")
-	@PostMapping("")
-	public CommonResult addHouseMember(@RequestBody HouseMemberEntity houseMemberEntity){
-		ValidatorUtils.validateEntity(houseMemberEntity, HouseMemberEntity.addHouseMemberValidatedGroup.class);
-		// 验证是不是房主
-		boolean b = iHouseMemberService.checkHouseHolder(JwtUtils.getUserId(), houseMemberEntity.getHouseId());
-		if(!b){
-			return CommonResult.error(JSYError.UNAUTHORIZED.getCode(),"房主认证失败");
-		}
-		houseMemberEntity.setHouseholderId(JwtUtils.getUserId());
-		houseMemberEntity.setIsConfirm(null);
-		boolean result = iHouseMemberService.addHouseMember(houseMemberEntity);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"房间成员邀请失败");
-	}
+//	@ApiOperation("【房间成员】邀请")
+//	@PostMapping("")
+//	public CommonResult addHouseMember(@RequestBody HouseMemberEntity houseMemberEntity){
+//		ValidatorUtils.validateEntity(houseMemberEntity, HouseMemberEntity.addHouseMemberValidatedGroup.class);
+//		// 验证是不是房主
+//		boolean b = iHouseMemberService.checkHouseHolder(JwtUtils.getUserId(), houseMemberEntity.getHouseId());
+//		if(!b){
+//			return CommonResult.error(JSYError.UNAUTHORIZED.getCode(),"房主认证失败");
+//		}
+//		houseMemberEntity.setHouseholderId(JwtUtils.getUserId());
+//		houseMemberEntity.setIsConfirm(null);
+//		boolean result = iHouseMemberService.addHouseMember(houseMemberEntity);
+//		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"房间成员邀请失败");
+//	}
 	
 	@ApiOperation("【房间成员】批量删除成员/撤销邀请")
 	@DeleteMapping("")
@@ -66,15 +63,15 @@ public class HouseMemberController {
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 	}
 	
-	@ApiOperation("【房间成员】接受邀请")
-	@PutMapping("")
-	@Transactional(rollbackFor = Exception.class)
-	public CommonResult confirmJoin(@RequestBody HouseMemberEntity houseMemberEntity){
-		ValidatorUtils.validateEntity(houseMemberEntity, HouseMemberEntity.updateHouseMemberValidatedGroup.class);
-		houseMemberEntity.setUid(JwtUtils.getUserId());
-		boolean result = iHouseMemberService.confirmJoin(houseMemberEntity);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"加入失败");
-	}
+//	@ApiOperation("【房间成员】接受邀请")
+//	@PutMapping("")
+//	@Transactional(rollbackFor = Exception.class)
+//	public CommonResult confirmJoin(@RequestBody HouseMemberEntity houseMemberEntity){
+//		ValidatorUtils.validateEntity(houseMemberEntity, HouseMemberEntity.updateHouseMemberValidatedGroup.class);
+//		houseMemberEntity.setUid(JwtUtils.getUserId());
+//		boolean result = iHouseMemberService.confirmJoin(houseMemberEntity);
+//		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"加入失败");
+//	}
 	
 	@ApiOperation("【房间成员】查询成员/查询邀请")
 	@PostMapping("page")

@@ -17,19 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "添加家属信息")
 @RestController
 @RequestMapping("/relation")
-//@Login
 @ApiJSYController
 public class RelationController {
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
 
     @ApiOperation("添加家属信息")
     @PutMapping("/add")
+    //@Login
     public CommonResult addRelation(@RequestBody RelationQo relationQo){
         System.out.println(relationService);
-
-//        relationService.addRelation(relationVO);
         return relationService.addRelation(relationQo)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
     }
 }

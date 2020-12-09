@@ -22,7 +22,7 @@ public class RelationCarsQo implements Serializable {
 
     //用户ID
     @ApiModelProperty(hidden = true)
-    private Long uid;
+    private String uid;
 
     //家属名字
     @ApiModelProperty(hidden = true)
