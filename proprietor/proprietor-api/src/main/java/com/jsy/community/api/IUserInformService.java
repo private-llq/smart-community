@@ -12,4 +12,5 @@ import com.jsy.community.entity.UserInformEntity;
 public interface IUserInformService extends IService<UserInformEntity> {
 
 
+
 }

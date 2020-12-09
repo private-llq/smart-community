@@ -6,15 +6,15 @@ import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.qo.proprietor.UserInformQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RequestMapping("/inform")
@@ -41,21 +41,6 @@ public class UserInformController {
     public CommonResult save(@RequestBody UserInformEntity userInformEntity) {
         String userId = UserUtils.getUserId();
         return userInformService.save(userInformEntity)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
-    }
-
-    /**
-     * @Description: 查询所有所读通知消息人员
-     * @author: Hu
-     * @since: 2020/12/4 14:46
-     * @Param:
-     * @return:
-     */
-    @ApiOperation("所有已读通知人员")
-    @PostMapping("/list")
-    public CommonResult list(@RequestBody UserInformQO userInformQO){
-        System.out.println(userInformQO);
-        Map<String,Object> map = userInformService.findList(userInformQO);
-        return CommonResult.ok(map);
     }
 
 
