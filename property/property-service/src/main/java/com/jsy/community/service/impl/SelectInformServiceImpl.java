@@ -36,6 +36,13 @@ public class SelectInformServiceImpl implements ISelectInformService {
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * @Description: 查询已读
+     * @author: Hu
+     * @since: 2020/12/9 9:44
+     * @Param:
+     * @return:
+     */
     @Override
     public Map<String, Object> findList(UserInformQO userInformQO) {
 
@@ -52,8 +59,15 @@ public class SelectInformServiceImpl implements ISelectInformService {
         return map;
     }
 
+    /**
+     * @Description: 查询未读
+     * @author: Hu
+     * @since: 2020/12/9 9:44
+     * @Param:
+     * @return:
+     */
     @Override
-    public Map<String, Object> findNotList(UserInformQO userInformQO) {
+    public List<UserEntity> findNotList(UserInformQO userInformQO) {
         InformIdsEntity informIdsEntity = informIdsMapper.selectOne(new QueryWrapper<InformIdsEntity>().eq("community_id", userInformQO.getCommunityId()).eq("inform_id", userInformQO.getInformId()));
         System.out.println(informIdsEntity);
         String ids = informIdsEntity.getIds();
@@ -66,8 +80,6 @@ public class SelectInformServiceImpl implements ISelectInformService {
             yidu[xiabiao]=userInformEntity.getUserId();
             ++xiabiao;
         }
-
-
         for (int i=0;i<split.length;i++){
             for (int j=0;j< yidu.length;j++){
                 if(split[i].equals(yidu[j])){
@@ -77,12 +89,7 @@ public class SelectInformServiceImpl implements ISelectInformService {
         }
         System.out.println(split.toString());
         System.out.println(yidu.toString());
-
-
-        for (String s : split) {
-            UserEntity uid = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", s));
-            System.out.println(uid);
-        }
-        return null;
+        List<UserEntity> uid = userMapper.selectList(new QueryWrapper<UserEntity>().in("uid", split));
+        return uid;
     }
 }

@@ -21,6 +21,10 @@ public class RelationQo implements Serializable {
     @ApiModelProperty(value = "身份证号码",required = true)
     private String idNumber;
 
+    @ApiModelProperty(hidden = true)
+    private String userId;
+
+
 
     @ApiModelProperty(value = "与业主关系 1.夫妻 2.父子 3.母子 4.父女 5.母女 6.亲属")
     private Integer concern;

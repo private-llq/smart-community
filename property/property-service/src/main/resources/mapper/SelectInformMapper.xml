@@ -30,7 +30,7 @@
         as communityId,tc.name as communityName,ti.house_id as houseId,th.building
         as building,th.unit as unit,th.floor as floor,th.door as door
         FROM t_user u
-        join t_user_inform ti on u.id=ti.user_id
+        join t_user_inform ti on u.uid=ti.user_id
         join t_community_inform ci on ti.inform_id=ci.id
         join t_community tc on ci.community_id=tc.id
         left join t_house th on ti.house_id=th.id
@@ -40,7 +40,7 @@
     <select id="findCount" parameterType="com.jsy.community.qo.proprietor.UserInformQO" resultType="java.lang.Long">
         SELECT count(*)
         FROM t_user u
-        join t_user_inform ti on u.id=ti.user_id
+        join t_user_inform ti on u.uid=ti.user_id
         join t_community_inform ci on ti.inform_id=ci.id
         join t_community tc on ci.community_id=tc.id
         left join t_house th on ti.house_id=th.id

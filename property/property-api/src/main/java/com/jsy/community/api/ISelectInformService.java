@@ -1,7 +1,9 @@
 package com.jsy.community.api;
 
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.proprietor.UserInformQO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,5 +22,5 @@ public interface ISelectInformService {
      */
     Map<String, Object> findList(UserInformQO userInformQO);
 
-    Map<String, Object> findNotList(UserInformQO userInformQO);
+    List<UserEntity> findNotList(UserInformQO userInformQO);
 }

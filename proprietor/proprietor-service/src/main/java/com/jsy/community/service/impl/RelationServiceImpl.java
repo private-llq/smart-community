@@ -9,7 +9,6 @@ import com.jsy.community.mapper.RelationMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.RelationCarsQo;
 import com.jsy.community.qo.RelationQo;
-import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,12 +45,11 @@ public class RelationServiceImpl implements IRelationService {
     @Transactional
     public Boolean addRelation(RelationQo relationQo) {
 
-        String userId = UserUtils.getUserId();
 
         List<RelationCarsQo> cars = relationQo.getCars();
             if (cars.size()>0) {
                 for (RelationCarsQo car : cars) {
-                    car.setUid(userId);
+                    car.setUid(relationQo.getUserId());
                     car.setCommunityId(relationQo.getCommunityId());
                     car.setOwner(relationQo.getName());
                     car.setPhoneTel(relationQo.getPhoneTel());
@@ -62,7 +60,7 @@ public class RelationServiceImpl implements IRelationService {
 
             HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
             houseMemberEntity.setHouseId(relationQo.getHouseId());
-            houseMemberEntity.setHouseholderId(userId);
+            houseMemberEntity.setHouseholderId(relationQo.getUserId());
             houseMemberEntity.setName(relationQo.getName());
             houseMemberEntity.setCommunityId(relationQo.getCommunityId());
             houseMemberEntity.setIdCard(relationQo.getIdNumber());

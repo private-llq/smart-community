@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ISelectInformService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.proprietor.UserInformQO;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,7 +58,7 @@ public class SelectInformController {
     @PostMapping("/notList")
     public CommonResult notList(@RequestBody UserInformQO userInformQO){
         System.out.println(userInformQO);
-        selectInformService.findNotList(userInformQO);
-        return CommonResult.ok();
+        List<UserEntity> notList = selectInformService.findNotList(userInformQO);
+        return CommonResult.ok(notList);
     }
 }
