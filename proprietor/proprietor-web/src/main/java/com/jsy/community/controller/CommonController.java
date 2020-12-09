@@ -28,7 +28,6 @@ public class CommonController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommonService commonService;
 
-    //(暂定：1传城市id查所有社区，2传社区id查所有单元，3传单元id查所有楼栋，4传楼栋id查所有楼层，5传楼层id查所有门牌)
     @ApiOperation("社区区域查询接口")
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
@@ -48,11 +47,12 @@ public class CommonController {
             if (invoke == null) {
                 return CommonResult.ok(null);
             }
-            return CommonResult.ok((List<Map<?,?>>) invoke);
+            return CommonResult.ok((List<Map<String, Object>>) invoke);
         } catch (Exception e) {
             log.error("com.jsy.community.controller.CommonController.queryZone：{}", e.getMessage());
+            e.printStackTrace();
         	//如果出现异常，说明服务并不能调通
-            return CommonResult.error(JSYError.NOT_FOUND);
+            return CommonResult.error(JSYError.NOT_IMPLEMENTED);
         }
     }
 

@@ -56,25 +56,44 @@ public class CommonServiceImpl implements ICommonService {
      * @return     返回社区集合
      */
     @Override
-    public List<Map> getAllCommunityFormCityId(Integer id, Integer houseLevelMode) {
+    public List<Map<String, Object>> getAllCommunityFormCityId(Integer id, Integer houseLevelMode) {
         return commonMapper.getAllCommunityFormCityId(id);
     }
 
+
     @Override
-    public List<Map> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode) {
-        return commonMapper.getBuildingOrUnitByCommunityId(id, houseLevelMode);
+    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode) {
+        List<Map<String, Object>> buildingOrUnitByCommunityId = commonMapper.getBuildingOrUnitByCommunityId(id, houseLevelMode);
+        return setHouseLevelMode(buildingOrUnitByCommunityId, houseLevelMode);
     }
 
     @Override
-    public List<Map> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode) {
-        return commonMapper.getBuildingOrUnitOrFloorById(id, houseLevelMode);
+    public List<Map<String, Object>> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode) {
+        List<Map<String, Object>> buildingOrUnitOrFloorById = commonMapper.getBuildingOrUnitOrFloorById(id, houseLevelMode);
+        System.out.println(buildingOrUnitOrFloorById);
+        return setHouseLevelMode(buildingOrUnitOrFloorById, houseLevelMode);
     }
 
     @Override
-    public List<Map> getAllDoorFormFloor(Integer id, Integer houseLevelMode) {
-        return commonMapper.getAllDoorFormFloor(id);
+    public List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode) {
+        List<Map<String, Object>> allDoorFormFloor = commonMapper.getAllDoorFormFloor(id);
+        return setHouseLevelMode(allDoorFormFloor, houseLevelMode);
     }
-    
+
+    /**
+     * 批量设置 返回值得 社区层级结构CODE     方便前端请求接口时调用标识
+     * @author YuLF
+     * @since  2020/12/9 9:30
+     * @Param  map                        数据库查询结果
+     */
+    private List<Map<String, Object>> setHouseLevelMode(List<Map<String, Object>> map, Integer houseLevelId){
+        for (Map<String, Object> value : map) {
+            value.put("houseLevelMode", houseLevelId);
+        }
+        return map;
+    }
+
+
     @Override
     public List<RegionEntity> getSubRegion(Integer id){
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForHash().get("Region:", String.valueOf(id))), List.class);

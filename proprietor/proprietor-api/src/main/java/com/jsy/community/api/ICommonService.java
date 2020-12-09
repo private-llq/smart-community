@@ -1,7 +1,6 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.RegionEntity;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -20,17 +19,17 @@ public interface ICommonService {
      * @param id   传入的城市id
      * @return     返回社区集合
      */
-    List<Map> getAllCommunityFormCityId(Integer id,Integer houseLevelMode);
+	List<Map<String, Object>> getAllCommunityFormCityId(Integer id,Integer houseLevelMode);
 
     /**
      * 根据社区id和社区层级结构 查询下面的所有单元 或 所有楼栋
 	 * @author YuLF
 	 * @since  2020/12/8 16:39
-     * @param id    			社区id
-	 * @param houseLevelMode	社区层级结构id
+     * @param id                社区id
+	 * @param houseLevelMode    社区层级结构id
      * @return      			返回单元或楼栋集合
      */
-    List<Map> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode);
+    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode);
 
     /**
      * 根据社区层级结构 和 单元id|楼栋id 查询下一级的数据
@@ -40,7 +39,7 @@ public interface ICommonService {
      * @param id    单元id
      * @return      返回楼栋集合
      */
-    List<Map> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode);
+	List<Map<String, Object>> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode);
 
     /**
      * 根据楼层id查询所有门牌号
@@ -48,7 +47,7 @@ public interface ICommonService {
      * @since  2020/12/8 16:39
      * @Param  id   楼层id
      */
-    List<Map> getAllDoorFormFloor(Integer id, Integer houseLevelMode);
+	List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode);
 	
 	/**
 	 * @Description: 根据区域编号获取子区域 (中国编号为100000)

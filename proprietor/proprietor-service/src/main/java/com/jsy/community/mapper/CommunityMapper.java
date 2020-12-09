@@ -14,6 +14,14 @@ import java.util.Map;
  * @since 2020-11-19 16:57
  **/
 public interface CommunityMapper extends BaseMapper<CommunityEntity> {
+
+    /**
+     * 根据姓名和城市id查询社区信息
+     * @author YuLF
+     * @since  2020/12/9 11:37
+     * @Param  communityEntity
+     * @return 返回社区信息
+     */
     List<CommunityEntity> getCommunityByName(CommunityEntity communityEntity);
     
     /**

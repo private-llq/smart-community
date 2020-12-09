@@ -145,7 +145,7 @@ public class CarController {
 	@ApiOperation("所属人车辆图片上传接口")
 	@ApiImplicitParam(name = "carImage", value = "车辆图片文件")
 	@PostMapping(value = "carImageUpload")
-	public CommonResult<?> carImageUpload(@RequestParam("file") MultipartFile carImage, HttpServletRequest request) throws IOException {
+	public CommonResult<?> carImageUpload(@RequestParam("carImage") MultipartFile carImage, HttpServletRequest request)  {
 		//1.接口非空验证
 		if (null == carImage) {
 			return CommonResult.error(JSYError.BAD_REQUEST);

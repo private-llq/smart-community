@@ -364,6 +364,7 @@ public class ProprietorExcelCommander {
                 resMap.put(aClass.getDeclaredMethod(keyFieldMethod).invoke(t).toString(), aClass.getDeclaredMethod(valFieldMethod).invoke(t).toString());
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("com.jsy.community.util.ProprietorExcelCommander.getAllUidAndNameForList:{}", e.getMessage());
             throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(),"数据类型转换失败!请重试");
         }
