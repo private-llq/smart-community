@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -32,24 +31,17 @@ public class RepairOrderEntity extends BaseEntity {
 
     @ApiModelProperty(value = "订单编号")
     private String number;
-
-    @ApiModelProperty(value = "维修人电话")
-    private String dealMobile;
-
-    @ApiModelProperty(value = "维修人姓名")
-    private String dealName;
+    
+    @ApiModelProperty(value = "社区id")
+    private Long communityId;
+    
 
     @ApiModelProperty(value = "用户评价")
     private String comment;
-
-    @ApiModelProperty(value = "维修金额")
-    private BigDecimal repairMoney;
-
-    @ApiModelProperty(value = "订单状态 0 待处理 1 处理中 2 已处理 3 未通过审核")
-    private Integer orderStatus;
-
-    @ApiModelProperty(value = "订单处理状态 0 待处理 1 处理中 2 已处理 3 未通过审核")
-    private Integer result;
+    
+    @ApiModelProperty(value = "评价类型 0 好评 1 差评")
+    private Integer commentStatus;
+    
 
     @ApiModelProperty(value = "下单时间")
     private Date orderTime;

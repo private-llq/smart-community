@@ -32,7 +32,7 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/8 12:23
 	 * @Param [repairEntity]
 	 **/
-	void addRepair(RepairEntity repairEntity);
+	void addRepair(RepairEntity repairEntity, String uid);
 	
 	/**
 	 * @return com.jsy.community.entity.RepairEntity
@@ -41,7 +41,7 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/8 12:30
 	 * @Param [id]
 	 **/
-	List<RepairEntity> getRepair(Long id);
+	List<RepairEntity> getRepair(String id);
 	
 	/**
 	 * @return void
@@ -50,7 +50,7 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/8 12:41
 	 * @Param [id, userId]
 	 **/
-	void cancelRepair(Long id, Long userId);
+	void cancelRepair(Long id, String userId);
 	
 	/**
 	 * @return void
@@ -64,11 +64,11 @@ public interface IRepairService extends IService<RepairEntity> {
 	/**
 	 * @return void
 	 * @Author lihao
-	 * @Description 评价报修
-	 * @Date 2020/12/8 14:57
-	 * @Param [id, appraise]
+	 * @Description
+	 * @Date 2020/12/9 10:46
+	 * @Param [id, appraise, uid, status]
 	 **/
-	void appraiseRepair(Long id, String appraise);
+	void appraiseRepair(Long id, String appraise, String uid, Integer status);
 	
 	/**
 	 * @return com.jsy.community.vo.CommonResult
@@ -77,7 +77,7 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/8 15:11
 	 * @Param [id, userId]
 	 **/
-	RepairVO repairDetails(Long id, Long userId);
+	RepairVO repairDetails(Long id, String userId);
 	
 	/**
 	 * @return void
