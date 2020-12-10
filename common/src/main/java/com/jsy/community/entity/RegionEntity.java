@@ -15,17 +15,20 @@ public class RegionEntity {
 	private Integer level;//层级
 	private String pinyin;//拼音
 	private String initials;//首字母
+	private Float lng;//经度
+	private Float lat;//纬度
 	private List<RegionEntity> children;//子级封装
 	public RegionEntity() {
 		super();
 	}
 	
-	public RegionEntity(Integer id, String name, Integer pid, Integer level, String initials) {
+	public RegionEntity(Integer id, String name, Integer pid, Integer level, String initials, String pinyin) {
 		this.id = id;
 		this.name = name;
 		this.pid = pid;
 		this.level = level;
 		this.initials = initials;
+		this.pinyin = pinyin;
 	}
 	
 	public Integer getId() {
@@ -79,6 +82,18 @@ public class RegionEntity {
 	public String getInitials() {
 		return initials;
 	}
+	public Float getLng() {
+		return lng;
+	}
+	public void setLng(Float lng) {
+		this.lng = lng;
+	}
+	public Float getLat() {
+		return lat;
+	}
+	public void setLat(Float lat) {
+		this.lat = lat;
+	}
 	
 	public void setInitials(String initials) {
 		this.initials = initials;
@@ -95,8 +110,9 @@ public class RegionEntity {
 			", level=" + level +
 			", pinyin='" + pinyin + '\'' +
 			", initials='" + initials + '\'' +
+			", lng=" + lng +
+			", lat=" + lat +
 			", children=" + children +
 			'}';
 	}
-	
 }
