@@ -3,8 +3,8 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.RepairOrderEntity;
 import com.jsy.community.entity.UserEntity;
-
-import java.util.List;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
 
 /**
  * <p>
@@ -23,7 +23,7 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Date 2020/12/9 15:51
 	 * @Param [communityId]
 	 **/
-	List<RepairOrderEntity> listRepairOrder(Long communityId);
+	PageInfo<RepairOrderEntity> listRepairOrder(Long communityId, BaseQO<RepairOrderEntity> baseQO);
 	
 	/**
 	 * @return void

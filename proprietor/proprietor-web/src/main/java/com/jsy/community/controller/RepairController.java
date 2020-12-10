@@ -101,15 +101,6 @@ public class RepairController {
 	}
 	
 
-	
-	
-
-	
-
-	
-
-
-
 //	@ApiOperation("完成报修")
 //	@GetMapping("/completeRepair")
 //	public CommonResult completeRepair(@ApiParam(value = "房屋报修id") @RequestParam Long id,
