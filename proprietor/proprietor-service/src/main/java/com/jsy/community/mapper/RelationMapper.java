@@ -10,7 +10,7 @@ import java.util.List;
  * 家属 Mapper 接口
  * </p>
  *
- * @author chq459799974
+ * @author
  * @since 2020-12-3
  */
 public interface RelationMapper {
@@ -19,6 +19,9 @@ public interface RelationMapper {
      * @param cars
      */
     void addCars(List<RelationCarsQo> cars);
-
+    /**
+     * 通过业主id查询家属信息
+     * @param id
+     */
     List<HouseMemberEntity> selectID(String id);
 }
