@@ -1,7 +1,5 @@
 package com.jsy.community.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -26,13 +23,9 @@ import java.util.Date;
 @Accessors(chain = true)
 @TableName("t_pay_house_owner")
 @ApiModel(value="PayHouseOwner对象", description="缴费户号")
-public class PayHouseOwnerEntity implements Serializable {
+public class PayHouseOwnerEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(value = "主键id")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
 
     @ApiModelProperty(value = "户组id")
     private Long groupId;
@@ -51,15 +44,6 @@ public class PayHouseOwnerEntity implements Serializable {
 
     @ApiModelProperty(value = "户主余额")
     private BigDecimal payBalance;
-
-    @ApiModelProperty(value = "创建时间")
-    private Date createTime;
-
-    @ApiModelProperty(value = "更新时间")
-    private Date updateTime;
-
-    @ApiModelProperty(value = "逻辑删除 0 未删除 1已删除")
-    private Integer deleted;
 
     @ApiModelProperty(value = "缴费类型 0 水费 1 电费 2燃气费")
     private Integer type;
