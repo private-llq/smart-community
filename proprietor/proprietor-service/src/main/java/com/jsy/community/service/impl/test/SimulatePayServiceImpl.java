@@ -1,0 +1,98 @@
+package com.jsy.community.service.impl.test;
+
+import com.jsy.community.api.ProprietorException;
+import com.jsy.community.api.test.ISimulatePayService;
+import com.jsy.community.constant.Const;
+import com.jsy.community.entity.test.PayData;
+import com.jsy.community.entity.test.SimulateTypeEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboService;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author lihao
+ * @ClassName SimulatePayServiceImpl
+ * @Date 2020/12/10  15:58
+ * @Description TODO
+ * @Version 1.0
+ **/
+@Slf4j
+@DubboService(version = Const.version, group = Const.group_proprietor)
+public class SimulatePayServiceImpl implements ISimulatePayService {
+	
+	@Override
+	public List<SimulateTypeEntity> getCompany(Integer type) {
+		List<SimulateTypeEntity> list = new ArrayList<>();
+		if (type.equals(0)) {//0 水费  1 电费 2燃气费
+			list.add(new SimulateTypeEntity(1,"重庆水务公司"));
+			return list;
+		}
+		if (type.equals(1)) {
+			list.add(new SimulateTypeEntity(2,"重庆电力公司"));
+			return list;
+		}
+		if (type.equals(3)) {
+			list.add(new SimulateTypeEntity(2,"重庆燃气公司"));
+			return list;
+		}
+		throw new ProprietorException("请选择正确的缴费类型");
+	}
+	
+	@Override
+	public PayData getPayData(String number,SimulateTypeEntity type) {
+		if (type.getCompany().equals("重庆水务公司")) {
+			if (number.equals("1")) { // 如果是   重庆水务公司1     如果户号是  1   余额不够
+				PayData data = getData(number, type);
+				log.info("该户号信息："+data.toString());
+				return data;
+			}
+			if (number.equals("2")) { // 如果是   重庆水务公司1     如果户号是  2   余额够
+				PayData data = getData(number, type);
+				data.setPayBalance(new BigDecimal(56));
+				data.setPayExpen(new BigDecimal(177));
+				log.info("该户号信息："+data.toString());
+				return data;
+			}
+		}
+		
+		if (type.getCompany().equals("重庆电力公司")) {
+			if (number.equals("1")) { // 如果是   重庆水务公司1     如果户号是  1   余额不够
+				PayData data = getData(number, type);
+				log.info("该户号信息："+data.toString());
+				return data;
+			}
+			if (number.equals("2")) { // 如果是   重庆水务公司1     如果户号是  2   余额够
+				PayData data = getData(number, type);
+				data.setPayBalance(new BigDecimal(56));
+				data.setPayExpen(new BigDecimal(177));
+				log.info("该户号信息："+data.toString());
+				return data;
+			}
+		}
+		throw new ProprietorException("您的查询不存在");
+	}
+	
+	private PayData getData(String number,SimulateTypeEntity type){
+		PayData payData = new PayData();
+		Integer id = Integer.parseInt(number);
+		payData.setId(id);
+		payData.setName(number+"李四");
+		payData.setAddress(number+"重庆");
+		payData.setNumber(number);
+		payData.setCompany(type.getCompany());
+		payData.setPayExpen(new BigDecimal(67.81));
+		payData.setPayBalance(new BigDecimal(32));
+		return payData;
+	}
+	
+	
+	public static void main(String[] args) {
+		SimulatePayServiceImpl simulatePayService = new SimulatePayServiceImpl();
+		SimulateTypeEntity simulateTypeEntity = new SimulateTypeEntity(2,"重庆电力公司");
+		simulatePayService.getPayData("1",simulateTypeEntity);
+	}
+	
+}
