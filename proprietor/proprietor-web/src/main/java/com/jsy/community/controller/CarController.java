@@ -36,7 +36,6 @@ import java.util.*;
 @RestController
 @RequestMapping("/car")
 @Slf4j
-@Login(allowAnonymous = true)
 @ApiJSYController
 public class CarController {
 	
@@ -86,6 +85,7 @@ public class CarController {
 	 * @param carQO 前端请求参数对象
 	 * @return 返回修改影响行数
 	 */
+	@Login
 	@ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
 	@PutMapping()
 	public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO carQO) {
@@ -95,7 +95,7 @@ public class CarController {
 		return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
 	}
 	
-	
+	@Login
 	@ApiOperation("所属人固定车辆查询方法")
 	@PostMapping(value = "/page", produces = "application/json;charset=utf-8")
 	public CommonResult<?> queryProprietorCar(@RequestBody BaseQO<CarEntity> carEntityBaseQO) {
@@ -117,6 +117,7 @@ public class CarController {
 	 * @param id 车辆id
 	 * @return 返回逻辑删除影响行
 	 */
+	@Login
 	@ApiOperation("所属人固定车辆删除方法")
 	@ApiImplicitParam(name = "id", value = "车辆固定id")
 	@DeleteMapping()
@@ -139,6 +140,7 @@ public class CarController {
 	 * @param carImage 车辆图片
 	 * @return 返回图片上传成功后的访问路径地址
 	 */
+	@Login
 	@ApiOperation("所属人车辆图片上传接口")
 	@ApiImplicitParam(name = "carImage", value = "车辆图片文件")
 	@PostMapping(value = "carImageUpload")
@@ -155,7 +157,7 @@ public class CarController {
 		String fileName = carImage.getOriginalFilename();
 		log.info("车辆图片上传文件名：" + fileName + " 车辆图片文件大小：" + fileSizeForKB + "KB");
 		//3.文件后缀验证
-		if (!isMobileClient(request.getHeader("user-agent"))) {
+		if (isMobileClient(request.getHeader("user-agent"))) {
 			//如果是PC端访问上传接口 则需要验证文件后缀名
 			boolean extension = FilenameUtils.isExtension(fileName, carImageAllowSuffix);
 			if (!extension) {
@@ -169,11 +171,12 @@ public class CarController {
 	}
 
 
+	@Login
 	@ApiOperation("所属人车辆图片批量上传接口")
 	@ApiImplicitParam(name = "carImageForBatch", value = "所有车辆图片文件")
 	@PostMapping(value = "carImageBatchUpload")
 	public CommonResult<String[]> carImageUpload(MultipartFile[] carImages, HttpServletRequest request)  {
-		if (!isMobileClient(request.getHeader("user-agent"))) {
+		if (isMobileClient(request.getHeader("user-agent"))) {
 			//如果是PC端访问上传接口 则需要验证文件后缀名
 			for( MultipartFile multipartFile : carImages ){
 				if(multipartFile == null || multipartFile.isEmpty() || Objects.equals(multipartFile.getOriginalFilename(), "")){
@@ -192,8 +195,8 @@ public class CarController {
 	 * 判断是否是移动端访问请求
 	 * @param userAgent 请求头
 	 */
-	public boolean isMobileClient(String userAgent) {
-		return userAgent.contains("Android") || userAgent.contains("iPhone") || userAgent.contains("iPad");
+	private  boolean isMobileClient(String userAgent) {
+		return !userAgent.contains("Android") || !userAgent.contains("iPhone") || !userAgent.contains("iPad");
 	}
-	
+
 }

@@ -1,5 +1,7 @@
 package com.jsy.community.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
@@ -11,6 +13,17 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public class RegexUtils {
 
+	/**
+	 * 正则表达式：验证只能输入特定的字符
+	 */
+	public static final String REGEX_DATE = "^[年|月|周|日]{1}";
+
+
+	/**
+	 * 年代正则表达式：匹配用户选择的是否是1930~当前年
+	 */
+	//public static final String REGEX_YEAR = String.format("^(19[3-9]\\d|20[01]\\d|%s)$", new SimpleDateFormat("yyyy").format(new Date()));
+	public static final String REGEX_YEAR = "^[0-9]{4}";
 	/**
 	 * 正则表达式：验证数字性别、参数只能 0-2
 	 */

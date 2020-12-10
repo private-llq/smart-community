@@ -388,4 +388,137 @@ public interface BusinessEnum {
 			sourceMap.put("relationship",relationshipList);
 		}
 	}
+
+
+	/**
+	 * 房屋租售 房屋朝向 常量
+	 * @author YuLF
+	 * @since  2020/12/10 10:02
+	 */
+	enum HouseDirectionEnum {
+		//1.东.2.西 3.南 4.北. 5.东南 6.东北 7.西北 8.西南
+		EAST("东", 1),
+		WEST("西", 2),
+		SOUTH("南", 3),
+		NORTH("北", 4),
+		SOUTHEAST("东南", 5),
+		NORTHEAST("东北", 6),
+		NORTHWEST("西北", 7),
+		SOUTHWEST("西南", 8);
+		private final String name;
+		private final Integer code;
+
+		HouseDirectionEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public static final int min = 1;
+
+		public static final int max = 8;
+
+		private volatile static Map<String, Integer> kv = null;
+		/**
+		 * 返回当前常量的Key Val  由于当使用HouseDirectionEnum的时候 不一定会用到kv
+		 * 例：{东南=5, 东北=6, 南=3, 北=4, 西北=7, 西南=8, 东=1, 西=2}
+		 */
+		public static Map<String, Integer> getKv(){
+			if( kv == null ){
+				synchronized (HouseDirectionEnum.class){
+					if(kv == null){
+						HouseDirectionEnum[] values = values();
+						kv = new HashMap<>(values.length);
+						for(HouseDirectionEnum everyOne : values){
+							kv.put(everyOne.name, everyOne.code);
+						}
+					}
+				}
+			}
+			return kv;
+		}
+	}
+
+	/**
+	 * 房屋租售 房屋用途 常量
+	 * @author YuLF
+	 * @since  2020/12/10 10:02
+	 *  1住宅、2工商业、3仓库
+	 */
+	enum HouseUsageEnum {
+		RESIDENCE("住宅", 1),
+		INDUSTRY_AND_COMMERCE("工商业", 2),
+		WAREHOUSE("仓库", 3);
+		private final String name;
+		private final Integer code;
+
+		HouseUsageEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public static final int min = 1;
+
+		public static final int max = 3;
+
+		private volatile static Map<String, Integer> kv = null;
+
+		public static Map<String, Integer> getKv(){
+			if( kv == null ){
+				synchronized (HouseDirectionEnum.class){
+					if(kv == null){
+						HouseUsageEnum[] values = values();
+						kv = new HashMap<>(values.length);
+						for(HouseUsageEnum everyOne : values){
+							kv.put(everyOne.name, everyOne.code);
+						}
+					}
+				}
+			}
+			return kv;
+		}
+	}
+
+	/**
+	 * 房屋租售 房屋种类 常量
+	 * @author YuLF
+	 * @since  2020/12/10 10:02
+	 *  1.商品房、2.经济适用房、3.央产房、4.军产房、5.公房、6.小产权房、7.自建住房
+	 */
+	enum HouseKindEnum {
+		COMMERCIAL_HOUSE("商品房", 1),
+		ECONOMIC_HOUSE("经济房", 2),
+		CENTER_PRODUCTION_HOUSE("央产房", 3),
+		ARMY_PRODUCTION_HOUSE("军产房", 4),
+		COMMON_HOUSE("公房", 5),
+		SMALL_PROPERTY_HOUSE("小产权房", 6),
+		BUILD_BY_ONESELF_HOUSE("自建住房", 7);
+		private final String name;
+		private final Integer code;
+
+		HouseKindEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public static final int min = 1;
+
+		public static final int max = 7;
+
+		private volatile static Map<String, Integer> kv = null;
+
+		public static Map<String, Integer> getKv(){
+			if( kv == null ){
+				synchronized (HouseDirectionEnum.class){
+					if(kv == null){
+						HouseKindEnum[] values = values();
+						kv = new HashMap<>(values.length);
+						for(HouseKindEnum everyOne : values){
+							kv.put(everyOne.name, everyOne.code);
+						}
+					}
+				}
+			}
+			return kv;
+		}
+	}
 }

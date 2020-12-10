@@ -54,4 +54,11 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return				返回更新行数
 	 */
     Integer proprietorUpdate(ProprietorQO proprietorQO);
+
+    /**
+     * 根据业主id查询业主信息及业主家属信息
+     * @author YuLF
+     * @since  2020/12/10 16:25
+     */
+    UserInfoVo proprietorQuery(String userId);
 }

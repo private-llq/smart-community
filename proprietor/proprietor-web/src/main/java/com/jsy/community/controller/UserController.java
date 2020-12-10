@@ -127,4 +127,15 @@ public class UserController {
         return userService.proprietorUpdate(proprietorQO) > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
+
+    @Login
+    @ApiOperation("业主信息及业主家属信息查询接口")
+    @PostMapping("proprietorQuery")
+    public CommonResult<UserInfoVo> proprietorQuery() {
+        String userId = UserUtils.getUserId();
+        UserInfoVo userInfoVo = userService.proprietorQuery(userId);
+        return CommonResult.ok(userInfoVo);
+    }
+
+
 }

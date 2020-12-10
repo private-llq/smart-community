@@ -1,11 +1,14 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.UserMapper;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +50,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IRelationService relationService;
 
     @Resource
     private UserMapper userMapper;
@@ -163,5 +170,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public Integer proprietorUpdate(ProprietorQO proprietorQO) {
         return userMapper.proprietorUpdate(proprietorQO);
+    }
+
+    /**
+     * 根据业主id查询业主信息及业主家属信息
+     * @author YuLF
+     * @since  2020/12/10 16:25
+     */
+    @Transactional
+    @Override
+    public UserInfoVo proprietorQuery(String userId) {
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",userId).select("real_name,sex,detail_address,avatar_url"));
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtil.copyProperties(userEntity, userInfoVo);
+        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId);
+        userInfoVo.setProprietorMembers(houseMemberEntities);
+        return userInfoVo;
     }
 }
