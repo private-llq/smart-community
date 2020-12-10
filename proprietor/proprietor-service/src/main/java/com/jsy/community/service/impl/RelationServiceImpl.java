@@ -17,7 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 用户家属信息
+ * @Description: 家属操作接口
+ * @author: Hu
+ * @since: 2020/12/10 16:37
+ * @Param:
+ * @return:
  */
 @DubboService(version = Const.version, group = Const.group_proprietor)
 @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
@@ -72,10 +76,14 @@ public class RelationServiceImpl implements IRelationService {
 
     }
 
+    /**
+     * 查询业主下面的家属
+     * @param id
+     * @return
+     */
     @Override
-    public List<HouseMemberEntity> selectID(Long id) {
+    public List<HouseMemberEntity> selectID(String id) {
         List<HouseMemberEntity> houseMemberEntities = relationMapper.selectID(id);
-
         return houseMemberEntities;
     }
 }

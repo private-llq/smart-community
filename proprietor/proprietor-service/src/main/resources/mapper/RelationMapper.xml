@@ -20,7 +20,7 @@
             (#{item.uid},#{item.carImgURL},#{item.carType},#{item.carId},#{item.phoneTel},#{item.owner},#{item.communityId},#{item.carPosition},#{item.checkStatus})
         </foreach>
     </insert>
-    <select id="selectID" resultType="com.jsy.community.entity.HouseMemberEntity" parameterType="Long">
+    <select id="selectID" resultType="com.jsy.community.entity.HouseMemberEntity" parameterType="String">
         select <include refid="selectId"></include> from t_house_member where householder_id=#{id}
     </select>
 </mapper>

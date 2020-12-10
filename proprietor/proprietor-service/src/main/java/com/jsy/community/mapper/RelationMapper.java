@@ -20,5 +20,5 @@ public interface RelationMapper {
      */
     void addCars(List<RelationCarsQo> cars);
 
-    List<HouseMemberEntity> selectID(Long id);
+    List<HouseMemberEntity> selectID(String id);
 }

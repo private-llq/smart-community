@@ -6,13 +6,25 @@ import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.RelationQo;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * @Description: 添加家属控制器
+ * @author: Hu
+ * @since: 2020/12/10 16:35
+ * @Param:
+ * @return:
+ */
 @Api(tags = "添加家属信息")
 @RestController
 @RequestMapping("/relation")
@@ -28,9 +40,16 @@ public class RelationController {
     @PutMapping("/add")
     @Login
     public CommonResult addRelation(@RequestBody RelationQo relationQo){
+        // 多张图片
+        MinioUtils.upload(file,"abc");// 服务 / xxx
+
+
         String userId = UserUtils.getUserId();
         System.out.println(userId);
         relationQo.setUserId(userId);
         return relationService.addRelation(relationQo)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
     }
+
+
+
 }
