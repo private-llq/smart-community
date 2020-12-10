@@ -7,6 +7,7 @@ import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
+import com.jsy.community.mapper.RegionMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,6 +29,9 @@ public class CommonServiceImpl implements ICommonService {
 
     @Resource
     private CommonMapper commonMapper;
+    
+    @Resource
+    private RegionMapper regionMapper;
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
@@ -112,5 +116,10 @@ public class CommonServiceImpl implements ICommonService {
     @Override
     public List<RegionEntity> getHotCityList(){
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("hotCityList")), List.class);
+    }
+    
+    @Override
+    public List<RegionEntity> vagueQueryCity(String searchStr){
+        return regionMapper.vagueQueryCity(searchStr);
     }
 }

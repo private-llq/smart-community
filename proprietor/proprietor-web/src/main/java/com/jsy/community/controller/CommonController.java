@@ -61,8 +61,8 @@ public class CommonController {
 
 	@ApiOperation("查询下级省市区、查询城市等")
     @GetMapping("/region")
-    public CommonResult<?> queryRegion(@RequestParam Integer queryType,Integer regionNumber) {
-        String queryMethodName = BusinessEnum.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType);
+    public CommonResult<?> queryRegion(@RequestParam Integer queryType,Integer regionNumber,String searchStr) {
+        String queryMethodName = BusinessEnum.RegionQueryTypeEnum.regionQueryNameMap.get(queryType);
         if(queryMethodName == null){
             return CommonResult.error(JSYError.REQUEST_PARAM);
         }
@@ -70,12 +70,17 @@ public class CommonController {
             //调用 用查询类型ID找到的 对应的查询方法
             Method queryMethod = null;
             Object invoke = null;
-            if(!BusinessEnum.RegionQueryTypeEnum.SUB.getCode().equals(queryType)){//不带参
+            if(BusinessEnum.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType) == 2){//不带参
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName);
                 invoke = queryMethod.invoke(commonService);
             }else{//带参
-                queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,Integer.class);
-                invoke = queryMethod.invoke(commonService,regionNumber);
+                Class paramType = BusinessEnum.RegionQueryTypeEnum.regionQueryClassTypeMap.get(queryType);
+                queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,paramType);
+                if(paramType.equals(Integer.class)){
+                    invoke = queryMethod.invoke(commonService,regionNumber);
+                }else{
+                    invoke = queryMethod.invoke(commonService,searchStr);
+                }
             }
             if (invoke == null) {
                 return CommonResult.ok(null);
