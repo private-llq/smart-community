@@ -6,11 +6,8 @@ import com.jsy.community.entity.VisitingCarEntity;
 import java.util.List;
 
 /**
- * <p>
- * 来访车辆 Mapper 接口
- * </p>
- *
  * @author chq459799974
+ * @description 随行车辆Mapper接口
  * @since 2020-11-12
  */
 public interface VisitingCarMapper extends BaseMapper<VisitingCarEntity> {

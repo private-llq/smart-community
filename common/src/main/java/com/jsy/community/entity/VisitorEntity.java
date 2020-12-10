@@ -25,19 +25,19 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="TVisitor对象", description="来访人员")
+@ApiModel(value="来访人员", description="来访人员")
 @TableName("t_visitor")
 public class VisitorEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    @ApiModelProperty(value = "随行人员对象")
+    @ApiModelProperty(value = "随行人员记录")
     @TableField(exist = false)
-    private List<VisitorPersonEntity> visitorPersonList;
+    private List<VisitorPersonRecordEntity> visitorPersonRecordList;
     
-    @ApiModelProperty(value = "随行车辆对象")
+    @ApiModelProperty(value = "随行车辆记录")
     @TableField(exist = false)
-    private List<VisitingCarEntity> visitingCarList;
+    private List<VisitingCarRecordEntity> visitingCarRecordList;
     
     @ApiModelProperty(value = "社区ID")
     @NotNull(message = "缺少社区ID")

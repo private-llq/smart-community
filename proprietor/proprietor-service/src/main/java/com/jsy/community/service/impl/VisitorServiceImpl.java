@@ -5,14 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.VisitingCarEntity;
-import com.jsy.community.entity.VisitorEntity;
-import com.jsy.community.entity.VisitorPersonEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.mapper.VisitingCarMapper;
-import com.jsy.community.mapper.VisitorMapper;
-import com.jsy.community.mapper.VisitorPersonMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
@@ -23,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,54 +43,57 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     private VisitorPersonMapper visitorPersonMapper;
     
     @Autowired
+    private VisitorPersonRecordMapper visitorPersonRecordMapper;
+    
+    @Autowired
     private VisitingCarMapper visitingCarMapper;
+    
+    @Autowired
+    private VisitingCarRecordMapper visitingCarRecordMapper;
     
     /**
     * @Description: 访客登记 新增
      * @Param: [visitorEntity]
-     * @Return: java.lang.Long
+     * @Return: void
      * @Author: chq459799974
      * @Date: 2020/11/12
     **/
     @Override
-    public Long addVisitor(VisitorEntity visitorEntity){
+    public void addVisitor(VisitorEntity visitorEntity){
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
         }
-        return visitorEntity.getId();
     }
     
     /**
-    * @Description: 批量新增随行人员
-     * @Param: [personList]
-     * @Return: boolean
+     * @Description: 批量添加随行人员
+     * @Param: [personRecordList]
+     * @Return: void
      * @Author: chq459799974
-     * @Date: 2020/11/16
-    **/
-    @Override
-    public boolean addPersonBatch(List<VisitorPersonEntity> personList){
-        int result = visitorPersonMapper.addPersonBatch(personList);
-        if(result > 0){
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * @Description: 批量新增随行车辆
-     * @Param: [carList]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
+     * @Date: 2020/12/10
      **/
     @Override
-    public boolean addCarBatch(List<VisitingCarEntity> carList){
-        int result = visitingCarMapper.addCarBatch(carList);
-        if(result > 0){
-            return true;
+    public void addPersonBatch(List<VisitorPersonRecordEntity> personRecordList){
+        int result = visitorPersonRecordMapper.addPersonBatch(personRecordList);
+        if(result != personRecordList.size()){
+            throw new ProprietorException(JSYError.INTERNAL.getCode(),"添加随行人员失败");
         }
-        return false;
+    }
+    
+    /**
+     * @Description: 批量添加随行车辆
+     * @Param: [carList]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2020/12/10
+     **/
+    @Override
+    public void addCarBatch(List<VisitingCarRecordEntity> carRecordList){
+        int result = visitingCarRecordMapper.addCarBatch(carRecordList);
+        if(result != carRecordList.size()){
+            throw new ProprietorException(JSYError.INTERNAL.getCode(),"添加随行车辆失败");
+        }
     }
     
 	/**
@@ -122,76 +123,8 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     public void deletePersonAndCar(Long visitorId){
         Map<String, Object> opMap = new HashMap<>();
         opMap.put("visitor_id",visitorId);
-        visitorPersonMapper.deleteByMap(opMap);
-        visitingCarMapper.deleteByMap(opMap);
-    }
-    
-    /**
-    * @Description: 修改随行人员
-     * @Param: [visitorPersonQO]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-    **/
-    @Override
-    public boolean updateVisitorPersonById(VisitorPersonQO visitorPersonQO){
-        VisitorPersonEntity entity = new VisitorPersonEntity();
-        BeanUtils.copyProperties(visitorPersonQO,entity);
-        int result = visitorPersonMapper.updateById(entity);
-        if(result == 1){
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-    * @Description: 修改随行车辆
-     * @Param: [visitingCarQO]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-    **/
-    @Override
-    public boolean updateVisitingCarById(VisitingCarQO visitingCarQO){
-        VisitingCarEntity entity = new VisitingCarEntity();
-        BeanUtils.copyProperties(visitingCarQO,entity);
-        int result = visitingCarMapper.updateById(entity);
-        if(result == 1){
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-    * @Description: 删除随行人员
-     * @Param: [id]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-    **/
-    @Override
-    public boolean deleteVisitorPersonById(Long id){
-        int result = visitorPersonMapper.deleteById(id);
-        if(result == 1){
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-    * @Description: 删除随行车辆
-     * @Param: [id]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-    **/
-    @Override
-    public boolean deleteVisitingCarById(Long id){
-        int result = visitingCarMapper.deleteById(id);
-        if(result == 1){
-            return true;
-        }
-        return false;
+        visitorPersonRecordMapper.deleteByMap(opMap);
+        visitingCarRecordMapper.deleteByMap(opMap);
     }
     
     /**
@@ -214,26 +147,9 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             if(!StringUtils.isEmpty(visitorQO.getContact())){
                 queryWrapper.eq("contact",visitorQO.getContact());
             }
-//            queryAddress(queryWrapper,visitorQO);
         }
         return visitorMapper.selectPage(page, queryWrapper);
     }
-    
-    /** 查询楼栋 */
-//    private void queryAddress(QueryWrapper queryWrapper, com.jsy.community.qo.proprietor.VisitorQO visitorQO){
-//        if(!StringUtils.isEmpty(visitorQO.getUnit())){
-//            queryWrapper.eq("building",visitorQO.getBuilding());
-//            if(!StringUtils.isEmpty(visitorQO.getBuilding())){
-//                queryWrapper.eq("unit",visitorQO.getUnit());
-//                if(!StringUtils.isEmpty(visitorQO.getFloor())){
-//                    queryWrapper.eq("floor",visitorQO.getFloor());
-//                    if(!StringUtils.isEmpty(visitorQO.getDoor())){
-//                        queryWrapper.eq("door",visitorQO.getDoor());
-//                    }
-//                }
-//            }
-//        }
-//    }
     
     /**
     * @Description: 根据ID单查访客
@@ -245,5 +161,39 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     @Override
     public VisitorEntity selectOneById(Long id){
         return visitorMapper.selectOne(new QueryWrapper<VisitorEntity>().select("*").eq("id",id));
+    }
+    
+    /**
+     * @Description: 根据ID单查随行人员记录
+     * @Param: [visitorid]
+     * @Return: java.util.List<com.jsy.community.entity.VisitorPersonRecordEntity>
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+     **/
+    @Override
+    public List<VisitorPersonRecordEntity> queryPersonRecordList(Long visitorid){
+        return visitorPersonRecordMapper.selectList(new QueryWrapper<VisitorPersonRecordEntity>()
+            .select("id,name,mobile")
+            .eq("visitor_id",visitorid)
+        );
+    }
+    
+    /**
+     * @Description: 根据ID单查随行车辆记录
+     * @Param: [visitorid]
+     * @Return: java.util.List<com.jsy.community.entity.VisitingCarRecordEntity>
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+     **/
+    @Override
+    public List<VisitingCarRecordEntity> queryCarRecordList(Long visitorid){
+        List<VisitingCarRecordEntity> entityList = visitingCarRecordMapper.selectList(new QueryWrapper<VisitingCarRecordEntity>()
+            .select("id,car_plate,car_type")
+            .eq("visitor_id", visitorid)
+        );
+        for (VisitingCarRecordEntity entity : entityList) {
+            entity.setCarTypeStr(BusinessEnum.CarTypeEnum.carTypeMap.get(entity.getCarType()));
+        }
+        return entityList;
     }
 }

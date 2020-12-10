@@ -2,9 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.VisitingCarEntity;
-import com.jsy.community.entity.VisitorEntity;
-import com.jsy.community.entity.VisitorPersonEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
 import com.jsy.community.qo.proprietor.VisitorQO;
@@ -25,29 +23,29 @@ public interface IVisitorService extends IService<VisitorEntity> {
     /**
     * @Description: 访客登记 新增
      * @Param: [visitorEntity]
-     * @Return: java.lang.Long(自增ID)
+     * @Return: void
      * @Author: chq45799974
      * @Date: 2020/11/12
     **/
-    Long addVisitor(VisitorEntity visitorEntity);
+    void addVisitor(VisitorEntity visitorEntity);
     
     /**
      * @Description: 批量添加随行人员
-     * @Param: [personList]
-     * @Return: boolean
+     * @Param: [personRecordList]
+     * @Return: void
      * @Author: chq459799974
-     * @Date: 2020/11/16
+     * @Date: 2020/12/10
      **/
-    boolean addPersonBatch(List<VisitorPersonEntity> personList);
+    void addPersonBatch(List<VisitorPersonRecordEntity> personList);
     
     /**
-     * @Description: 批量添加随行车辆
+    * @Description: 批量添加随行车辆
      * @Param: [carList]
-     * @Return: boolean
+     * @Return: void
      * @Author: chq459799974
-     * @Date: 2020/11/16
-     **/
-    boolean addCarBatch(List<VisitingCarEntity> carList);
+     * @Date: 2020/12/10
+    **/
+    void addCarBatch(List<VisitingCarRecordEntity> carRecordList);
     
     /**
     * @Description: 根据ID 删除访客登记申请
@@ -66,43 +64,7 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @Date: 2020/11/12
     **/
     void deletePersonAndCar(Long visitorId);
-    
-    /**
-     * @Description: 修改随行人员
-     * @Param: [visitorPersonQO]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-     **/
-    boolean updateVisitorPersonById(VisitorPersonQO visitorPersonQO);
-    
-    /**
-     * @Description: 修改随行车辆
-     * @Param: [visitingCarQO]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-     **/
-    boolean updateVisitingCarById(VisitingCarQO visitingCarQO);
-    
-    /**
-    * @Description: 删除随行人员
-     * @Param: [id]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-    **/
-    boolean deleteVisitorPersonById(Long id);
-    
-    /**
-    * @Description: 删除随行车辆
-     * @Param: [id]
-     * @Return: boolean
-     * @Author: chq459799974
-     * @Date: 2020/11/16
-    **/
-    boolean deleteVisitingCarById(Long id);
-    
+
     /**
     * @Description: 分页查询
      * @Param: [BaseQO<VisitorQO>]
@@ -120,5 +82,23 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @Date: 2020/11/16
     **/
     VisitorEntity selectOneById(Long id);
+    
+    /**
+     * @Description: 根据ID单查随行人员记录
+     * @Param: [visitorid]
+     * @Return: java.util.List<com.jsy.community.entity.VisitorPersonRecordEntity>
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+     **/
+    List<VisitorPersonRecordEntity> queryPersonRecordList(Long visitorid);
+    
+    /**
+     * @Description: 根据ID单查随行车辆记录
+     * @Param: [visitorid]
+     * @Return: java.util.List<com.jsy.community.entity.VisitingCarRecordEntity>
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+     **/
+    List<VisitingCarRecordEntity> queryCarRecordList(Long visitorid);
     
 }

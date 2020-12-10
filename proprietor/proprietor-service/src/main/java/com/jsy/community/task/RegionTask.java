@@ -91,7 +91,7 @@ public class RegionTask {
 				}
 			}
 		}
-		//拼音排序
+		//拼音首字母排序
 		Collections.sort(cityList, new Comparator<RegionEntity>() {
 			@Override
 			public int compare(RegionEntity o1, RegionEntity o2) {

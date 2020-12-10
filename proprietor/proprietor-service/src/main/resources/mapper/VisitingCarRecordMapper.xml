@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.VisitingCarRecordMapper">
+
+	<!-- 批量新增随行车辆记录 -->
+	<insert id="addCarBatch" parameterType="java.util.List">
+		insert into t_visiting_car_record(visitor_id,car_plate,car_type,create_time)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.visitorId},#{item.carPlate},#{item.carType},now())
+		</foreach>
+	</insert>
+
+</mapper>
