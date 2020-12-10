@@ -4,6 +4,7 @@ import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
@@ -16,6 +17,7 @@ import java.io.Serializable;
 public class VisitorPersonQO extends BaseEntity implements Serializable {
 	
 	@ApiModelProperty(value = "随行人姓名")
+	@NotBlank(message = "缺少随行人员姓名")
 	private String name;
 	
 	@ApiModelProperty(value = "随行人手机号")

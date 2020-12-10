@@ -1,13 +1,18 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.mapper.VisitingCarMapper;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.VisitingCarQO;
+import com.jsy.community.utils.MyPageUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -26,22 +31,67 @@ public class VisitingCarServiceImpl extends ServiceImpl<VisitingCarMapper, Visit
     @Autowired
     private VisitingCarMapper visitingCarMapper;
 	
-    /**
-    * @Description: 根据关联的访客表ID 列表查询
-     * @Param: [visitorid]
-     * @Return: java.util.List<com.jsy.community.entity.VisitingCarEntity>
-     * @Author: chq459799974
-     * @Date: 2020/11/12
-    **/
+	/**
+	 * @Description: 添加随行车辆
+	 * @Param: [visitingCarEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/10
+	 **/
 	@Override
-	public List<VisitingCarEntity> queryCarList(Long visitorid){
-		List<VisitingCarEntity> entityList = visitingCarMapper.selectList(new QueryWrapper<VisitingCarEntity>()
-			.select("id,car_plate,car_type")
-			.eq("visitor_id", visitorid)
-		);
-		for (VisitingCarEntity entity : entityList) {
-			entity.setCarTypeStr(BusinessEnum.CarTypeEnum.carTypeMap.get(entity.getCarType()));
+	public boolean addVisitingCar(VisitingCarEntity visitingCarEntity){
+		int result = visitingCarMapper.insert(visitingCarEntity);
+		if(result == 1){
+			return true;
 		}
-		return entityList;
+		return false;
+	}
+	
+	/**
+	 * @Description: 修改随行车辆
+	 * @Param: [visitingCarQO]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/16
+	 **/
+	@Override
+	public boolean updateVisitingCarById(VisitingCarQO visitingCarQO){
+		VisitingCarEntity entity = new VisitingCarEntity();
+		BeanUtils.copyProperties(visitingCarQO,entity);
+		int result = visitingCarMapper.updateById(entity);
+		if(result == 1){
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @Description: 删除随行车辆
+	 * @Param: [id]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/16
+	 **/
+	@Override
+	public boolean deleteVisitingCarById(Long id){
+		int result = visitingCarMapper.deleteById(id);
+		if(result == 1){
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	* @Description: 随行车辆 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.VisitingCarEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/10
+	**/
+	@Override
+	public Page<VisitingCarEntity> queryVisitingCarPage(BaseQO<String> baseQO){
+		Page<VisitingCarEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		return visitingCarMapper.selectPage(page,new QueryWrapper<VisitingCarEntity>().select("*").eq("uid",baseQO.getQuery()));
 	}
 }

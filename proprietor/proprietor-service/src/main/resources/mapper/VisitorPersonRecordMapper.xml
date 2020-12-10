@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.VisitorPersonRecordMapper">
+
+	<!-- 批量新增随行人员记录 -->
+	<insert id="addPersonBatch" parameterType="java.util.List">
+		insert into t_visitor_person_record(visitor_id,name,mobile,create_time)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.visitorId},#{item.name},#{item.mobile},now())
+		</foreach>
+	</insert>
+
+</mapper>
