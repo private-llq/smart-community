@@ -3,7 +3,6 @@ package com.jsy.community.service.impl;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.RelationMapper;
@@ -74,10 +73,9 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     @Override
-    public List<UserEntity> selectID(Long id) {
-        relationMapper.selectID(id);
+    public List<HouseMemberEntity> selectID(Long id) {
+        List<HouseMemberEntity> houseMemberEntities = relationMapper.selectID(id);
 
-
-        return null;
+        return houseMemberEntities;
     }
 }

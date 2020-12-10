@@ -1,5 +1,6 @@
 package com.jsy.community.mapper;
 
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.RelationCarsQo;
 
 import java.util.List;
@@ -19,5 +20,5 @@ public interface RelationMapper {
      */
     void addCars(List<RelationCarsQo> cars);
 
-    void selectID(Long id);
+    List<HouseMemberEntity> selectID(Long id);
 }

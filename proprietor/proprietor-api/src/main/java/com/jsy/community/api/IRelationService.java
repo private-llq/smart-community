@@ -1,6 +1,6 @@
 package com.jsy.community.api;
 
-import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.RelationQo;
 
 import java.util.List;
@@ -12,5 +12,5 @@ public interface IRelationService {
     Boolean addRelation(RelationQo relationQo);
 
 
-    List<UserEntity> selectID(Long id);
+    List<HouseMemberEntity> selectID(Long id);
 }
