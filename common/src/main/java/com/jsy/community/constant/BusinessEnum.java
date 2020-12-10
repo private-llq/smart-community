@@ -234,7 +234,7 @@ public interface BusinessEnum {
 	 **/
 	enum CommunityAccessEnum {
 		NONE("无", 0),
-		PASSWORD("临时密码", 1),
+		PASSWORD("二维码通行证", 1),
 		FACE("人脸识别", 2);
 		private String name;
 		private Integer code;
@@ -287,7 +287,7 @@ public interface BusinessEnum {
 	 **/
 	enum BuildingAccessEnum {
 		NONE("无", 0),
-		PASSWORD("临时密码", 1),
+		PASSWORD("二维码通行证", 1),
 		COMMUNICATION("可视对讲", 2);
 		private String name;
 		private Integer code;

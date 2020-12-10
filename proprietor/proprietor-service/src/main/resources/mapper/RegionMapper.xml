@@ -5,22 +5,22 @@
 
 	<!-- 获取分级封装后的所有区域id,name,pid -->
 	<select id="getAllRegion" resultType="com.jsy.community.entity.RegionEntity">
-		select id,name,pid,level,initials from t_region
+		select id,name,pid,level,initials,pinyin,lng,lat from t_region
 		<!-- order by CONVERT (pinyin USING gbk) -->
 	</select>
 
 	<!-- 获取子区域 -->
 	<select id="getSubRegion" resultType="com.jsy.community.entity.RegionEntity">
-		select id,name,pid,level,initials from t_region
+		select id,name,pid,level,initials,pinyin,lng,lat from t_region
 		where pid = #{id}
 	</select>
 
 	<!--  省市区，刷数据 -->
 	<insert id="insertRegion" parameterType="java.util.List">
-		insert into t_region(id,name,pid,level,initials)
+		insert into t_region(id,name,pid,level,initials,pinyin,lng,lat)
 		values
 		<foreach collection="list" item="item" separator=",">
-			(#{item.id},#{item.name},#{item.pid},#{item.level},#{item.initials})
+			(#{item.id},#{item.name},#{item.pid},#{item.level},#{item.initials},#{item.pinyin},#{item.lng},#{item.lat})
 		</foreach>
 	</insert>
 

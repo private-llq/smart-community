@@ -194,6 +194,13 @@ public class RegionTask {
 				if(pinyinArray != null && pinyinArray.size() >= 2){
 					String initials = String.valueOf(pinyinArray.get(0)).substring(0, 1).toUpperCase();
 					entity.setInitials(initials);
+					entity.setPinyin(String.valueOf(pinyinArray.get(0)).concat(String.valueOf(pinyinArray.get(1))));
+				}
+				//设置经纬度
+				JSONObject location = jsonObject.getJSONObject("location");
+				if(location != null){
+					entity.setLng(location.getFloat("lng"));
+					entity.setLat(location.getFloat("lat"));
 				}
 				//设置pid和level
 				if(id%10000 == 0){ //省
@@ -226,11 +233,11 @@ public class RegionTask {
 	
 	//腾讯地图接口未提供
 	private void fillLostData(List<RegionEntity> list){
-		list.add(new RegionEntity(100000,"中国",0,0,"Z"));
-		list.add(new RegionEntity(500100,"重庆市",500000,2,"C"));
-		list.add(new RegionEntity(110100,"北京市",110000,2,"B"));
-		list.add(new RegionEntity(120100,"天津市",120000,2,"T"));
-		list.add(new RegionEntity(310100,"上海市",310000,2,"S"));
+		list.add(new RegionEntity(100000,"中国",0,0,"Z","zhongguo"));
+		list.add(new RegionEntity(500100,"重庆市",500000,2,"C","chongqing"));
+		list.add(new RegionEntity(110100,"北京市",110000,2,"B","beijing"));
+		list.add(new RegionEntity(120100,"天津市",120000,2,"T","tianjin"));
+		list.add(new RegionEntity(310100,"上海市",310000,2,"S","shanghai"));
 	}
 	
 	//调用腾讯地图-行政区划
