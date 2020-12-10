@@ -19,4 +19,5 @@ public interface RelationMapper {
      */
     void addCars(List<RelationCarsQo> cars);
 
+    void selectID(Long id);
 }

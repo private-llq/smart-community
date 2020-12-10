@@ -2,7 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.RelationMapper">
 
-
+<sql id="selectId">
+        id,
+        householder_id,
+        community_id,
+        house_id,
+        name,
+        sex,
+        mobile,
+        id_card,
+        relation
+</sql>
     <insert id="addCars" parameterType="List">
         insert into t_car(uid,car_image_url,car_type,car_plate,contact,owner,community_id,car_position_id,check_status)
         values
@@ -10,4 +20,7 @@
             (#{item.uid},#{item.carImgURL},#{item.carType},#{item.carId},#{item.phoneTel},#{item.owner},#{item.communityId},#{item.carPosition},#{item.checkStatus})
         </foreach>
     </insert>
+    <select id="selectID" resultType="com.jsy.community.entity.HouseMemberEntity" parameterType="Long">
+        select <include refid="selectId"></include> from t_house_member where householder_id=#{id}
+    </select>
 </mapper>
