@@ -13,7 +13,6 @@ import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.netflix.ribbon.proxy.annotation.Http;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -155,7 +153,6 @@ public class CarController {
 			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件太大了,最大：" + carImageMaxSizeKB + "KB");
 		}
 		String fileName = carImage.getOriginalFilename();
-		log.info("用户请求头：{}", request.getHeader("user-agent"));
 		log.info("车辆图片上传文件名：" + fileName + " 车辆图片文件大小：" + fileSizeForKB + "KB");
 		//3.文件后缀验证
 		if (!isMobileClient(request.getHeader("user-agent"))) {
@@ -193,13 +190,10 @@ public class CarController {
 
 	/**
 	 * 判断是否是移动端访问请求
-	 *
 	 * @param userAgent 请求头
 	 */
 	public boolean isMobileClient(String userAgent) {
-		if (userAgent.contains("Android")) {
-			return true;
-		} else return userAgent.contains("iPhone") || userAgent.contains("iPad");
+		return userAgent.contains("Android") || userAgent.contains("iPhone") || userAgent.contains("iPad");
 	}
 	
 }
