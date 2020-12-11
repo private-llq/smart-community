@@ -15,5 +15,5 @@ import java.util.List;
 public interface ISimulatePayService {
 	List<SimulateTypeEntity> getCompany(Integer type);
 	
-	PayData getPayData(String number,SimulateTypeEntity type);
+	PayData getPayData(String number,Integer id);
 }
