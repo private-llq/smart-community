@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.jsy.community.entity.RegionEntity;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -40,4 +41,13 @@ public interface RegionMapper {
 	 * @Date: 2020/11/14
 	**/
 	int insertRegion(List<RegionEntity> list);
+	
+	/**
+	* @Description: 城市模糊查询
+	 * @Param: [searchStr]
+	 * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/10
+	**/
+	List<RegionEntity> vagueQueryCity(@Param("searchStr")String searchStr);
 }

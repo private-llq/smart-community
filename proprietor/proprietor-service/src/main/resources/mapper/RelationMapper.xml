@@ -13,6 +13,7 @@
         id_card,
         relation
 </sql>
+<!--  添加车辆  -->
     <insert id="addCars" parameterType="List">
         insert into t_car(uid,car_image_url,car_type,car_plate,contact,owner,community_id,car_position_id,check_status)
         values
@@ -20,6 +21,7 @@
             (#{item.uid},#{item.carImgURL},#{item.carType},#{item.carId},#{item.phoneTel},#{item.owner},#{item.communityId},#{item.carPosition},#{item.checkStatus})
         </foreach>
     </insert>
+    <!--  通过id查询业主家属  -->
     <select id="selectID" resultType="com.jsy.community.entity.HouseMemberEntity" parameterType="String">
         select <include refid="selectId"></include> from t_house_member where householder_id=#{id}
     </select>

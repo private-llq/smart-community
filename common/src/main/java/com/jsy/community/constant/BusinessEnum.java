@@ -18,19 +18,24 @@ public interface BusinessEnum {
 	Map<String,List<Map<String, Object>>> sourceMap = new HashMap<>();
 	
 	/**
-	* @Description: 省市区查询类型
+	* @Description: 省市区查询类型(type 1.带参 2.不带参 ; classType 带参类型)
 	 * @Author: chq459799974
 	 * @Date: 2020/11/28
 	**/
 	enum RegionQueryTypeEnum {
-		SUB("getSubRegion", 1),
-		CITY_MAP("getCityMap", 2),
-		HOT_CITY("getHotCityList",3);
+		SUB("getSubRegion", 1, 1, Integer.class),
+		CITY_MAP("getCityMap", 2, 2, null),
+		HOT_CITY("getHotCityList", 3,2, null),
+		VAGUE_QUERY_CITY("vagueQueryCity", 4,1, String.class);
 		private String name;
 		private Integer code;
-		RegionQueryTypeEnum(String name, Integer code) {
+		private Integer type;
+		private Class classType;
+		RegionQueryTypeEnum(String name, Integer code, Integer type, Class classType) {
 			this.name = name;
 			this.code = code;
+			this.type = type;
+			this.classType = classType;
 		}
 		
 		public String getName() {
@@ -49,18 +54,35 @@ public interface BusinessEnum {
 			this.code = code;
 		}
 		
-		@Override
-		public String toString() {
-			return this.code+"_"+this.name;
+		public Integer getType() {
+			return type;
 		}
 		
-		public static final Map<Integer, String> regionQueryTypeMap = new HashMap<>();
+		public void setType(Integer type) {
+			this.type = type;
+		}
+		
+		public Class getClassType() {
+			return classType;
+		}
+		
+		public void setClassType(Class classType) {
+			this.classType = classType;
+		}
+		
+		@Override
+		public String toString() {
+			return this.name+"_"+this.code+"_"+this.type+"_"+this.classType;
+		}
+		
+		public static final Map<Integer, String> regionQueryNameMap = new HashMap<>();
+		public static final Map<Integer, Integer> regionQueryTypeMap = new HashMap<>();
+		public static final Map<Integer, Class> regionQueryClassTypeMap = new HashMap<>();
 		static {
 			for(RegionQueryTypeEnum regionQueryTypeEnum : RegionQueryTypeEnum.values()){
-				HashMap<String, Object> map = new HashMap<>();
-				map.put("code", regionQueryTypeEnum.getCode());
-				map.put("name", regionQueryTypeEnum.getName());
-				regionQueryTypeMap.put(regionQueryTypeEnum.getCode(), regionQueryTypeEnum.getName());
+				regionQueryNameMap.put(regionQueryTypeEnum.getCode(), regionQueryTypeEnum.getName());
+				regionQueryTypeMap.put(regionQueryTypeEnum.getCode(), regionQueryTypeEnum.getType());
+				regionQueryClassTypeMap.put(regionQueryTypeEnum.getCode(), regionQueryTypeEnum.getClassType());
 			}
 		}
 	}

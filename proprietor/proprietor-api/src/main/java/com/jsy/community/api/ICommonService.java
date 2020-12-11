@@ -92,4 +92,13 @@ public interface ICommonService {
 	 * @param code    验证码
 	 */
 	void checkVerifyCode(String account, String code);
+	
+	/**
+	* @Description: 城市模糊查询
+	 * @Param: [searchStr]
+	 * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/10
+	**/
+	List<RegionEntity> vagueQueryCity(String searchStr);
 }

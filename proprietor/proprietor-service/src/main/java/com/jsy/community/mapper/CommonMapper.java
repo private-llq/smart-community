@@ -1,6 +1,8 @@
 package com.jsy.community.mapper;
 
 
+import com.jsy.community.entity.RegionEntity;
+
 import java.util.List;
 import java.util.Map;
 
@@ -18,4 +20,5 @@ public interface CommonMapper {
     List<Map<String, Object>> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode);
 
     List<Map<String, Object>> getAllDoorFormFloor(Integer id);
+    
 }

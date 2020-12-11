@@ -1,12 +1,13 @@
 package com.jsy.community.entity;
 
+import java.io.Serializable;
 import java.util.List;
 /**
  * 省市区划
  * @author qq459799974
  * @since 2020-11-23
  */
-public class RegionEntity {
+public class RegionEntity implements Serializable {
 	private Integer id;//编号
 	private String name;//全称
 	private String sname;//简称

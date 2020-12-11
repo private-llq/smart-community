@@ -10,7 +10,7 @@ import java.io.Serializable;
 @ApiModel("添加车辆信息")
 public class RelationCarsQo implements Serializable {
     @ApiModelProperty("车牌号")
-    private String carId;
+    private String carId;// 85
     @ApiModelProperty("车辆类型")
     private Integer carType;
     @ApiModelProperty("车辆图片")
