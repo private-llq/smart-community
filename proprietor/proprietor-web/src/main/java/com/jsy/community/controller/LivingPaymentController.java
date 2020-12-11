@@ -3,15 +3,21 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ILivingPaymentService;
+import com.jsy.community.api.IPayTypeService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.PayCompanyEntity;
+import com.jsy.community.entity.PayTypeEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.GroupVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,12 +37,26 @@ public class LivingPaymentController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ILivingPaymentService livingPaymentService;
-
-    // 1. 根据城市id查询缴费类型  id =1  jiaofei   1 23 344
-
-    // 2. 缴费类型id 查询缴费单位 集合 某一个公司
-
-    //2.
+    
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IPayTypeService payTypeService;
+    
+    @ApiOperation("根据城市id查询其支持的缴费类型")
+    @GetMapping("/getPayType")
+    public CommonResult getPayType(@ApiParam("城市id") @RequestParam Long id){
+        List<PayTypeEntity> payType = payTypeService.getPayTypes(id);
+        return CommonResult.ok(payType);
+    }
+    
+	@ApiOperation("查询支持的缴费单位")
+	@PostMapping("/getPayCompany")
+	public CommonResult<PageInfo<PayCompanyEntity>> getPayCompany(@RequestBody BaseQO<PayCompanyEntity> baseQO,
+                                                @ApiParam("缴费类型id") @RequestParam Long type,
+                                                @ApiParam("城市id") @RequestParam Long cityId){
+        PageInfo<PayCompanyEntity> pageInfo = payTypeService.getPayCompany(baseQO,type,cityId);
+        return CommonResult.ok(pageInfo);
+	}
+	
 
     /**
      * 添加缴费记录

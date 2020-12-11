@@ -36,4 +36,11 @@
 		)
 	</select>
 
+	<select id="getListPayTypeId" resultType="long">
+		SELECT tr.type_id
+		from t_type_region tr
+		inner join t_region r on tr.region_id = r.id
+		where tr.region_id = #{id}
+	</select>
+
 </mapper>

@@ -14,5 +14,4 @@ public interface RegionMapper {
 	
 	List<Long> getPayTypeIds(Long id);
 	
-	void insertMiddle(Integer id, Long id1);
 }
