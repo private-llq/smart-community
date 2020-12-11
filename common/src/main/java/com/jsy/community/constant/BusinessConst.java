@@ -22,7 +22,6 @@ public interface BusinessConst {
 	 */
 	short HOUSE_INTRODUCE_CHAR_MAX = 1000;
 
-
 	/**
 	 *  房屋租售 房屋详细地址内容最大字符
 	 * @author YuLF
@@ -57,4 +56,29 @@ public interface BusinessConst {
 	 * @since  2020/12/10 10:29
 	 */
 	short HOUSE_FLOOR_CHAR_MAX = 10;
+	
+	/**
+	 * 小区门禁-无
+	 */
+	String ACCESS_COMMUNITY_NONE = "0";
+	/**
+	 * 小区门禁-二维码
+	 */
+	String ACCESS_COMMUNITY_QR_CODE = "1";
+	/**
+	 * 小区门禁-人脸识别
+	 */
+	String ACCESS_COMMUNITY_FACE = "2";
+	/**
+	 * 楼栋门禁-无
+	 */
+	String ACCESS_BUILDING_NONE = "0";
+	/**
+	 * 楼栋门禁-二维码
+	 */
+	String ACCESS_BUILDING_QR_CODE = "1";
+	/**
+	 * 楼栋门禁-可视对讲
+	 */
+	String ACCESS_BUILDING_COMMUNICATION = "2";
 }
