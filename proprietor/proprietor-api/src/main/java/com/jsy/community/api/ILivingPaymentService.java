@@ -38,7 +38,7 @@ public interface ILivingPaymentService {
     void selectOrder(PaymentRecordsQO paymentRecordsQO);
 
     /**
-     * 查询
+     * 默认查询所有缴费信息
      * @param
      * @return
      */

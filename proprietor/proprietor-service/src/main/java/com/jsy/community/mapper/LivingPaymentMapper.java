@@ -1,5 +1,9 @@
 package com.jsy.community.mapper;
 
+import com.jsy.community.vo.DefaultHouseOwnerVO;
+
+import java.util.List;
+
 /**
  * @program: com.jsy.community
  * @description: 生活缴费mapper层
@@ -8,4 +12,5 @@ package com.jsy.community.mapper;
  **/
 public interface LivingPaymentMapper {
 
+    List<DefaultHouseOwnerVO> selectList(String userId);
 }

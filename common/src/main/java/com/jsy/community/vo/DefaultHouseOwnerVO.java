@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @program: com.jsy.community
  * @description: 登录默认查询当月缴费信息
@@ -11,8 +13,8 @@ import lombok.Data;
  * @create: 2020-12-11 15:44
  **/
 @Data
-@ApiModel("默认查询当月缴费信息")
-public class DefaultHouseOwnerVO {
+@ApiModel("默认查询所有缴费信息")
+public class DefaultHouseOwnerVO implements Serializable {
     @ApiModelProperty(value = "户组id")
     private Long groupId;
     @ApiModelProperty(value = "户组id")

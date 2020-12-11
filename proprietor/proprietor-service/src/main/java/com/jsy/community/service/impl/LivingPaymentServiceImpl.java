@@ -105,27 +105,11 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     public void selectOrder(PaymentRecordsQO paymentRecordsQO) {
 
     }
-
+    //默认查询所有缴费信息
     @Override
     public List selectList(String userId) {
-        List<PayGroupEntity> list = payGroupMapper.selectList(new QueryWrapper<PayGroupEntity>().eq("uid", userId));
-        long[] id=null;
-        int i=0;
-        for (PayGroupEntity payGroupEntity : list) {
-            id[i]=payGroupEntity.getId();
-            ++i;
-        }
-        List<DefaultHouseOwnerVO> defaultHouseOwnerVOS=new ArrayList<>();
-        DefaultHouseOwnerVO defaultHouseOwnerVO=null;
-        List<PayHouseOwnerEntity> entities = payHouseOwnerMapper.selectList(new QueryWrapper<PayHouseOwnerEntity>().in("group_id", id));
-        for (PayHouseOwnerEntity entity : entities) {
-            defaultHouseOwnerVO=new DefaultHouseOwnerVO();
-            defaultHouseOwnerVO.setGroupId(entity.getGroupId());
-
-            //defaultHouseOwnerVO.setGroupName(entity.get);
-        }
-
-        return null;
+        List<DefaultHouseOwnerVO> list=livingPaymentMapper.selectList(userId);
+        return list;
     }
 
 

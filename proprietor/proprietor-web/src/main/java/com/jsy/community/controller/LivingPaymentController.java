@@ -105,17 +105,17 @@ public class LivingPaymentController {
     }
 
     /**
-     * 通过组户号查询订单详情
+     * 默认查询所有缴费信息
      * @param
      * @return
      */
-    @ApiOperation("通过组户号查询订单详情")
-    @PostMapping("/selectList")
+    @ApiOperation("默认查询所有缴费信息")
+    @GetMapping("/selectList")
     @Login
     public CommonResult selectList(){
         String userId = UserUtils.getUserId();
-        livingPaymentService.selectList(userId);
-        return CommonResult.ok();
+        List list = livingPaymentService.selectList(userId);
+        return CommonResult.ok(list);
     }
 
 }
