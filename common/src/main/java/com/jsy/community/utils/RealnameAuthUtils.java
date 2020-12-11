@@ -26,7 +26,7 @@ public class RealnameAuthUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/11
 	**/
-	//TODO 商家待定
+	//TODO 三方接口商家待定
 	public boolean twoElements(String name,String idCard){
 		
 		String appCode = "xxxxxxxxxxxxxxxxxxxxx";

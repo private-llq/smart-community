@@ -74,7 +74,7 @@ public class MyHttpUtils {
 		return builder;
 	}
 	
-	//获取HttpGet
+	//构建HttpGet
 	public static HttpGet httpGet(String url){
 		return httpGet(url,null);
 	}
@@ -94,6 +94,8 @@ public class MyHttpUtils {
 		}
 		return httpGet;
 	}
+	
+	//TODO 构建HttpPost
 	
 	//获取连接
 	public static CloseableHttpClient getConn() {
