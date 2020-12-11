@@ -5,10 +5,10 @@
 
 	<!-- 批量新增随行人员记录 -->
 	<insert id="addPersonBatch" parameterType="java.util.List">
-		insert into t_visitor_person_record(visitor_id,name,mobile,create_time)
+		insert into t_visitor_person_record(id,visitor_id,name,mobile,create_time)
 		values
 		<foreach collection="list" item="item" separator=",">
-			(#{item.visitorId},#{item.name},#{item.mobile},now())
+			(#{item.id},#{item.visitorId},#{item.name},#{item.mobile},now())
 		</foreach>
 	</insert>
 

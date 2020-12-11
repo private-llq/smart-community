@@ -27,60 +27,64 @@ public class SimulatePayServiceImpl implements ISimulatePayService {
 	public List<SimulateTypeEntity> getCompany(Integer type) {
 		List<SimulateTypeEntity> list = new ArrayList<>();
 		if (type.equals(0)) {//0 水费  1 电费 2燃气费
-			list.add(new SimulateTypeEntity(1,"重庆水务公司"));
+			list.add(new SimulateTypeEntity(1, "重庆水务公司"));
 			return list;
 		}
 		if (type.equals(1)) {
-			list.add(new SimulateTypeEntity(2,"重庆电力公司"));
+			list.add(new SimulateTypeEntity(2, "重庆电力公司"));
 			return list;
 		}
 		if (type.equals(3)) {
-			list.add(new SimulateTypeEntity(2,"重庆燃气公司"));
+			list.add(new SimulateTypeEntity(3, "重庆燃气公司"));
 			return list;
 		}
 		throw new ProprietorException("请选择正确的缴费类型");
 	}
 	
 	@Override
-	public PayData getPayData(String number,SimulateTypeEntity type) {
-		if (type.getCompany().equals("重庆水务公司")) {
-			if (number.equals("1")) { // 如果是   重庆水务公司1     如果户号是  1   余额不够
-				PayData data = getData(number, type);
-				log.info("该户号信息："+data.toString());
-				return data;
+	public PayData getPayData(String number, Integer id) {
+		if (id == 1) {
+			SimulateTypeEntity simulateTypeEntity = new SimulateTypeEntity();
+			simulateTypeEntity.setCompany("重庆水务公司");
+			if (simulateTypeEntity.getCompany().equals("重庆水务公司")) {
+				if (number.equals("1")) { // 如果是   重庆水务公司1     如果户号是  1   余额不够
+					PayData data = getData(number, simulateTypeEntity);
+					log.info("该户号信息：" + data.toString());
+					return data;
+				}
+				if (number.equals("2")) { // 如果是   重庆水务公司1     如果户号是  2   余额够
+					PayData data = getData(number, simulateTypeEntity);
+					data.setPayBalance(new BigDecimal(56));
+					data.setPayExpen(new BigDecimal(177));
+					log.info("该户号信息：" + data.toString());
+					return data;
+				}
 			}
-			if (number.equals("2")) { // 如果是   重庆水务公司1     如果户号是  2   余额够
-				PayData data = getData(number, type);
-				data.setPayBalance(new BigDecimal(56));
-				data.setPayExpen(new BigDecimal(177));
-				log.info("该户号信息："+data.toString());
-				return data;
-			}
-		}
-		
-		if (type.getCompany().equals("重庆电力公司")) {
-			if (number.equals("1")) { // 如果是   重庆水务公司1     如果户号是  1   余额不够
-				PayData data = getData(number, type);
-				log.info("该户号信息："+data.toString());
-				return data;
-			}
-			if (number.equals("2")) { // 如果是   重庆水务公司1     如果户号是  2   余额够
-				PayData data = getData(number, type);
-				data.setPayBalance(new BigDecimal(56));
-				data.setPayExpen(new BigDecimal(177));
-				log.info("该户号信息："+data.toString());
-				return data;
+			
+			if (simulateTypeEntity.getCompany().equals("重庆电力公司")) {
+				if (number.equals("1")) { // 如果是   重庆水务公司1     如果户号是  1   余额不够
+					PayData data = getData(number, simulateTypeEntity);
+					log.info("该户号信息：" + data.toString());
+					return data;
+				}
+				if (number.equals("2")) { // 如果是   重庆水务公司1     如果户号是  2   余额够
+					PayData data = getData(number, simulateTypeEntity);
+					data.setPayBalance(new BigDecimal(56));
+					data.setPayExpen(new BigDecimal(177));
+					log.info("该户号信息：" + data.toString());
+					return data;
+				}
 			}
 		}
 		throw new ProprietorException("您的查询不存在");
 	}
 	
-	private PayData getData(String number,SimulateTypeEntity type){
+	private PayData getData(String number, SimulateTypeEntity type) {
 		PayData payData = new PayData();
 		Integer id = Integer.parseInt(number);
 		payData.setId(id);
-		payData.setName(number+"李四");
-		payData.setAddress(number+"重庆");
+		payData.setName(number + "李四");
+		payData.setAddress(number + "重庆");
 		payData.setNumber(number);
 		payData.setCompany(type.getCompany());
 		payData.setPayExpen(new BigDecimal(67.81));
@@ -91,8 +95,7 @@ public class SimulatePayServiceImpl implements ISimulatePayService {
 	
 	public static void main(String[] args) {
 		SimulatePayServiceImpl simulatePayService = new SimulatePayServiceImpl();
-		SimulateTypeEntity simulateTypeEntity = new SimulateTypeEntity(2,"重庆电力公司");
-		simulatePayService.getPayData("1",simulateTypeEntity);
+		simulatePayService.getPayData("2", 1);
 	}
 	
 }

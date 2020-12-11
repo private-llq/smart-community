@@ -2,7 +2,6 @@ package com.jsy.community.mapper;
 
 import com.jsy.community.entity.RegionEntity;
 import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -50,4 +49,14 @@ public interface RegionMapper {
 	 * @Date: 2020/12/10
 	**/
 	List<RegionEntity> vagueQueryCity(@Param("searchStr")String searchStr);
+	
+	/**
+	 * @return java.util.List<java.lang.Long>
+	 * @Author lihao
+	 * @Description 根据城市id 获取其下 缴费类型id集合
+	 * @Date 2020/12/11 16:19
+	 * @Param [id]
+	 **/
+	List<Long> getListPayTypeId(Long id);
+	
 }

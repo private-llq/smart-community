@@ -51,6 +51,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 			bannerVO.setDesc(bannerEntity.getDescription());
 			returnList.add(bannerVO);
 		}
+
 		return returnList;
 	}
 	

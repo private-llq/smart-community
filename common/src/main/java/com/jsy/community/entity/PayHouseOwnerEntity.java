@@ -8,14 +8,14 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <p>
  * 缴费户号
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-12-10
  */
 @Data
@@ -37,7 +37,7 @@ public class PayHouseOwnerEntity extends BaseEntity {
     private String payCompany;
 
     @ApiModelProperty(value = "缴费时间")
-    private Date payTime;
+    private LocalDateTime payTime;
 
     @ApiModelProperty(value = "缴费金额")
     private BigDecimal payExpen;

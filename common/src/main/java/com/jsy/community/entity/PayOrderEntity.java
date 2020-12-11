@@ -7,14 +7,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * <p>
  * 订单表
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-12-10
  */
 @Data
@@ -33,7 +34,7 @@ public class PayOrderEntity extends BaseEntity {
     private String unit;
 
     @ApiModelProperty(value = "缴费金额")
-    private Double paymentAmount;
+    private BigDecimal paymentAmount;
 
     @ApiModelProperty(value = "缴费状态 0 未到账 1已到账")
     private Integer status;
@@ -42,6 +43,10 @@ public class PayOrderEntity extends BaseEntity {
     private String familyId;
 
     @ApiModelProperty(value = "下单时间")
-    private Date orderTime;
+    private LocalDateTime orderTime;
+
+    @ApiModelProperty(value = "付款方式1银行卡，2微信支付，3支付宝支付")
+    private Integer payType;
+
 
 }

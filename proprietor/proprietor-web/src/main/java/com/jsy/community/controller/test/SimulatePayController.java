@@ -39,7 +39,7 @@ public class SimulatePayController {
 	
 	@PostMapping("/getPayData")
 	@ApiOperation("根据户号得到其缴费信息")
-	public PayData getPayData(String number,@RequestBody SimulateTypeEntity type){
-		return simulatePayService.getPayData(number,type);
+	public PayData getPayData(String number,Integer id){
+		return simulatePayService.getPayData(number,id);
 	}
 }

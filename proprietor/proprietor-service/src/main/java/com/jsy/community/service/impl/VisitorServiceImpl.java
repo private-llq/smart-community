@@ -1,10 +1,13 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
@@ -13,17 +16,20 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
+import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.qo.proprietor.VisitorQO;
+import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -51,6 +57,12 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     @Autowired
     private VisitingCarRecordMapper visitingCarRecordMapper;
     
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    
+//    @Value("${}")
+    private Integer visitorTimeLimit = 60*24; //分
+    
     /**
     * @Description: 访客登记 新增
      * @Param: [visitorEntity]
@@ -59,10 +71,74 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Date: 2020/11/12
     **/
     @Override
-    public void addVisitor(VisitorEntity visitorEntity){
+    public VisitorEntryVO addVisitor(VisitorEntity visitorEntity){
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
+        }
+        //0是无权限 小区和楼栋都是0 则不需要后续操作
+        if((visitorEntity.getIsCommunityAccess() != null && visitorEntity.getCommunityId() != 0)
+           || (visitorEntity.getIsBuildingAccess() != null && visitorEntity.getIsBuildingAccess() != 0)){
+           return getVisitorEntry(visitorEntity);// 返回门禁权限VO
+        }
+        return null;
+    }
+    
+    /**
+    * @Description: 设置门禁权限
+     * @Param: [visitorEntity]
+     * @Return: com.jsy.community.vo.VisitorEntryVO
+     * @Author: chq459799974
+     * @Date: 2020/12/11
+    **/
+    private VisitorEntryVO getVisitorEntry(VisitorEntity visitorEntity){
+        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
+        visitorEntryVO.setPassword(MyMathUtils.randomCode(7));
+        visitorEntryVO.setIsCommunityAccess(visitorEntity.getIsCommunityAccess());
+        visitorEntryVO.setIsBuildingAccess(visitorEntity.getIsBuildingAccess());
+        String token = UUID.randomUUID().toString().replace("-","");
+        visitorEntryVO.setToken(token);
+        visitorEntryVO.setTimeLimit(visitorTimeLimit);
+        //小区门禁权限
+        if(visitorEntryVO.getIsCommunityAccess() != null && visitorEntryVO.getIsCommunityAccess() != 0){
+            redisTemplate.opsForValue().set("CEntry:" + token, String.valueOf(visitorEntryVO.getIsCommunityAccess()), visitorTimeLimit, TimeUnit.MINUTES);
+        }
+        //楼栋门禁权限
+        if(visitorEntryVO.getIsBuildingAccess() != null && visitorEntryVO.getIsBuildingAccess() != 0){
+            redisTemplate.opsForValue().set("BEntry:" + token, String.valueOf(visitorEntryVO.getIsBuildingAccess()), visitorTimeLimit, TimeUnit.MINUTES);
+        }
+        return visitorEntryVO;
+    }
+    
+    /**
+     * @Description: 访客门禁验证
+     * @Param: [token, type]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2020/12/11
+     **/
+    //TODO 后续流程未知，返回值未定
+    public void verifyEntry(String token,Integer type){
+        if(BusinessEnum.EntryTypeEnum.COMMUNITY.getCode().equals(type)){ //小区门禁认证
+            String cEntry = redisTemplate.opsForValue().get("CEntry:" + token);
+            switch (cEntry){
+                case BusinessConst.ACCESS_COMMUNITY_QR_CODE :
+                    //TODO 二维码类型
+                    break;
+                case BusinessConst.ACCESS_COMMUNITY_FACE :
+                    //TODO 人脸
+                    break;
+            }
+        }else if(BusinessEnum.EntryTypeEnum.BUILDING.getCode().equals(type)){ //楼栋门禁验证
+            String bEntry = redisTemplate.opsForValue().get("BEntry:" + token);
+            switch (bEntry){
+                case BusinessConst.ACCESS_BUILDING_QR_CODE:
+                    //TODO 二维码类型
+                    break;
+                case BusinessConst.ACCESS_BUILDING_COMMUNICATION:
+                    //TODO 可视对讲
+                    break;
+            }
         }
     }
     
