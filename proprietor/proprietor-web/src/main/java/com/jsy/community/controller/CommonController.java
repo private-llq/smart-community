@@ -25,7 +25,7 @@ import java.util.Map;
 @ApiJSYController
 public class CommonController {
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
 
     @ApiOperation("社区区域查询接口")
@@ -92,5 +92,8 @@ public class CommonController {
             return CommonResult.error(JSYError.NOT_FOUND);
         }
     }
-    
+    public static void main(String[] args) {
+        String s = BusinessEnum.RegionQueryTypeEnum.regionQueryNameMap.get(2);
+        System.out.println(s);
+    }
 }

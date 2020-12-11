@@ -1,5 +1,7 @@
 package com.jsy.community.constant;
 
+import com.jsy.community.entity.HouseLeaseConstEntity;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -543,4 +545,15 @@ public interface BusinessEnum {
 			return kv;
 		}
 	}
+
+	/**
+	 * 房屋租售常量类，所有常量在第一次调用时 从数据库获取 保持在内存
+	 */
+	class HouseLeaseSaleEnum {
+
+		public static List<HouseLeaseConstEntity> houseLeaseConstEntityList = null;
+
+
+	}
+
 }

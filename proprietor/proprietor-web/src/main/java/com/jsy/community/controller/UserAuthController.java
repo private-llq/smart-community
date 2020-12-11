@@ -65,7 +65,7 @@ public class UserAuthController {
 	@SuppressWarnings("unused")
 	private IUserAuthService userAuthService;
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	@SuppressWarnings("unused")
 	private ICommonService commonService;
 	

@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
 
 import java.util.List;
@@ -48,6 +49,17 @@ public interface ICommonService {
      * @Param  id   楼层id
      */
 	List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode);
+
+
+	/**
+	 *  根据常量类型 获取属于这个类型的List数据
+	 * @author YuLF
+	 * @since  2020/12/11 11:36
+	 * @Param  type				常量类型
+	 * @return					返回这个类型对应的List
+	 */
+	List<HouseLeaseConstEntity> getHouseConstListByType(String type);
+
 	
 	/**
 	 * @Description: 根据区域编号获取子区域 (中国编号为100000)

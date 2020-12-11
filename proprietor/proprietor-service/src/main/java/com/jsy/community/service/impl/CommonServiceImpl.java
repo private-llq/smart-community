@@ -1,10 +1,12 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
@@ -13,8 +15,10 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -29,7 +33,7 @@ public class CommonServiceImpl implements ICommonService {
 
     @Resource
     private CommonMapper commonMapper;
-    
+
     @Resource
     private RegionMapper regionMapper;
 
@@ -54,10 +58,11 @@ public class CommonServiceImpl implements ICommonService {
     /**
      * houseLevelMode没有用到的原因 是因为控制层需要使用反射 统一调度业务方法，所以参数类型个数必须一样
      * 根据城市id查询下面所有社区
+     *
+     * @param id 传入的城市id
+     * @return 返回社区集合
      * @author YuLF
-     * @since  2020/12/8 16:39
-     * @param id   传入的城市id
-     * @return     返回社区集合
+     * @since 2020/12/8 16:39
      */
     @Override
     public List<Map<String, Object>> getAllCommunityFormCityId(Integer id, Integer houseLevelMode) {
@@ -74,7 +79,6 @@ public class CommonServiceImpl implements ICommonService {
     @Override
     public List<Map<String, Object>> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode) {
         List<Map<String, Object>> buildingOrUnitOrFloorById = commonMapper.getBuildingOrUnitOrFloorById(id, houseLevelMode);
-        System.out.println(buildingOrUnitOrFloorById);
         return setHouseLevelMode(buildingOrUnitOrFloorById, houseLevelMode);
     }
 
@@ -86,11 +90,12 @@ public class CommonServiceImpl implements ICommonService {
 
     /**
      * 批量设置 返回值得 社区层级结构CODE     方便前端请求接口时调用标识
+     *
      * @author YuLF
-     * @since  2020/12/9 9:30
-     * @Param  map                        数据库查询结果
+     * @Param map                        数据库查询结果
+     * @since 2020/12/9 9:30
      */
-    private List<Map<String, Object>> setHouseLevelMode(List<Map<String, Object>> map, Integer houseLevelId){
+    private List<Map<String, Object>> setHouseLevelMode(List<Map<String, Object>> map, Integer houseLevelId) {
         for (Map<String, Object> value : map) {
             value.put("houseLevelMode", houseLevelId);
         }
@@ -99,27 +104,52 @@ public class CommonServiceImpl implements ICommonService {
 
 
     @Override
-    public List<RegionEntity> getSubRegion(Integer id){
+    public List<RegionEntity> getSubRegion(Integer id) {
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForHash().get("Region:", String.valueOf(id))), List.class);
     }
-    
+
     @Override
-    public Map<String,RegionEntity> getCityMap(){
+    public Map<String, RegionEntity> getCityMap() {
         return JSONObject.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityMap")), Map.class);
     }
-    
+
     @Override
-    public List<RegionEntity> getCityList(){
+    public List<RegionEntity> getCityList() {
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityList")), List.class);
     }
-    
+
     @Override
-    public List<RegionEntity> getHotCityList(){
+    public List<RegionEntity> getHotCityList() {
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("hotCityList")), List.class);
     }
-    
+
     @Override
-    public List<RegionEntity> vagueQueryCity(String searchStr){
+    public List<RegionEntity> vagueQueryCity(String searchStr) {
         return regionMapper.vagueQueryCity(searchStr);
+    }
+
+    /**
+     * 根据常量类型 获取属于这个类型的List数据
+     *
+     * @author YuLF
+     * @Param type                常量类型
+     * @return 返回这个类型对应的List
+     * @since 2020/12/11 11:36
+     */
+    public List<HouseLeaseConstEntity> getHouseConstListByType(String type) {
+        var list = JSON.parseObject(String.valueOf(redisTemplate.opsForValue().get("houseConst:" + type)), List.class);
+        List<HouseLeaseConstEntity> houseLeaseConstEntityList = new ArrayList<>(list.size());
+        for (Object o : list) {
+            JSONObject jsonObject = JSON.parseObject(String.valueOf(o));
+            HouseLeaseConstEntity entity = new HouseLeaseConstEntity(jsonObject.getLong("id"),
+                    jsonObject.getString("houseConstName"),
+                    jsonObject.getString("houseConstType"),
+                    jsonObject.getString("annotation"));
+            if (!Objects.equals(jsonObject.getString("houseConstValue"), "")) {
+                entity.setAnnotation(jsonObject.getString("houseConstValue"));
+            }
+            houseLeaseConstEntityList.add(entity);
+        }
+        return houseLeaseConstEntityList;
     }
 }

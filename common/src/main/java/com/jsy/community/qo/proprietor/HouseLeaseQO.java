@@ -29,14 +29,13 @@ import java.math.BigDecimal;
 @ApiModel(value="房屋出租收参对象", description="接收前端参数")
 public class HouseLeaseQO implements Serializable {
 
+    private Long id;
+
     @ApiModelProperty(value = "业务数据唯一标识")
     private String rowGuid;
 
     @ApiModelProperty(value = "所属人ID")
-    @JsonIgnore
     private String uid;
-
-
 
     @ApiModelProperty(value = "房屋租售标题")
     @Length(groups = {addLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_TITLE_CHAR_MAX, message = "标题长度在1~32之间")
@@ -61,8 +60,11 @@ public class HouseLeaseQO implements Serializable {
     @NotBlank(groups = {addLeaseSaleHouse.class}, message = "未填写房屋租售详细地址")
     private String houseAddress;
 
-    @ApiModelProperty(value = "房屋租售优势标签ID")
-    private Short[] houseAdvantageId;
+    @ApiModelProperty(value = "房屋租售优势标签ID数组")
+    private Short[] houseAdvantage;
+
+    //在把houseAdvantage添加至中间表之后 返回 中间表存储的id
+    private String houseAdvantageId;
 
     @ApiModelProperty(value = "房屋租售价格")
     @Range(groups = {addLeaseSaleHouse.class}, min = 1, max = Integer.MAX_VALUE, message = "价格没有在指定范围之内!")
@@ -81,7 +83,7 @@ public class HouseLeaseQO implements Serializable {
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
     @ApiModelProperty(value = "房屋出租方式id /1.压一付一/2.压一付三/3.压一付六")
-    private Short houseLeaseMode;
+    private Short houseLeasedepositId;
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
     @ApiModelProperty(value = "房屋类型id：1.四室一厅、2.二室一厅...")
@@ -107,6 +109,10 @@ public class HouseLeaseQO implements Serializable {
     //值是变动  需要存id至数据库 对应 名称 由后台人员管理
     @ApiModelProperty(value = "房屋装修样式ID、1、精装修2、现代风格、3.古典风格、4.欧美风")
     private Short houseStyleId;
+
+    //值是变动  需要存id至数据库 对应 名称 由后台人员管理
+    @ApiModelProperty(value = "房源类型ID、73不限(默认) 74可短租 75邻地铁  76压一付一  77配套齐全  78精装修 79南北通透  80有阳台")
+    private Short houseSourcetypeId;
 
     @ApiModelProperty(value = "房屋年代")
     @Pattern(groups = {addLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_YEAR , message = "房屋年代过于久远!")
@@ -134,18 +140,20 @@ public class HouseLeaseQO implements Serializable {
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "您的房屋没有图片!请上传至少一张实景")
     private String[] houseImage;
 
+    //t_house_lease  数据库house_image_id保存图片的id
+    private String houseImageId;
 
     //65不限 66普通住宅 67别墅 68公寓
     @ApiModelProperty(value = "房屋出租类型ID")
     //业务层效验值的有效性
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未填写出租类型!")
-    private Integer houseLeaseytypeId;
+    private Integer houseLeasetypeId;
 
 
     //69不限 70整租，71合租
     @ApiModelProperty(value = "房屋出租方式ID")
     //业务层效验 值有效性
-    @NotNull(groups = {addLeaseSaleHouse.class}, message = "未填写出租类型!")
+    @NotNull(groups = {addLeaseSaleHouse.class}, message = "未填写出租方式!")
     private Integer houseLeaseymodeId;
 
     /**

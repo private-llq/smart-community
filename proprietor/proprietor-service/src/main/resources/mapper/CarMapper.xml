@@ -6,7 +6,7 @@
     <insert id="addProprietorCar" parameterType="java.util.List">
         insert into t_car(uid,community_id,car_plate,contact,owner,car_type,car_image_url)
         values
-        <foreach collection="carEntityList" item="item" separator=",">
+        <foreach collection="houseLeaseQO." item="item" separator=",">
             (#{item.uid},#{item.communityId},#{item.carPlate},#{item.contact},#{item.owner},#{item.carType},#{item.carImageUrl})
         </foreach>
     </insert>
