@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  * 户主详情表
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-12-10
  */
 @Data
