@@ -31,17 +31,20 @@ public class RealnameAuthUtils {
 		
 		String appCode = "xxxxxxxxxxxxxxxxxxxxx";
 		String url = "https://idcert.market.alicloudapi.com/idcard";
-		
+		//新建请求，设置参数
 		Map<String, String> paramsMap = new HashMap<>();
 		paramsMap.put("name",name);
 		paramsMap.put("idCard",idCard);
 		HttpGet httpGet = MyHttpUtils.httpGet(url,paramsMap);
+		//设置header
 		Map<String,String> headers = new HashMap<>();
 		headers.put("Authorization","APPCODE " + appCode);
-		MyHttpUtils.setHeader(httpGet,headers);//设置header
-		// 17e38ac209824aab9d0e82097f59ba11
-		httpGet.setConfig(MyHttpUtils.getRequestConfig());//设置默认配置
+		MyHttpUtils.setHeader(httpGet,headers);
+		//设置默认配置
+		MyHttpUtils.setRequestConfig(httpGet);
+		//执行请求，返回结果
 		String httpResult = MyHttpUtils.exec(httpGet);
+		//解析结果
 		JSONObject result = JSONObject.parseObject(httpResult);
 		if(result != null && "01".equals(result.getString("status"))){
 			return true;

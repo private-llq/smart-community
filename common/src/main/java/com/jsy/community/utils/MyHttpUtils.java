@@ -48,8 +48,16 @@ public class MyHttpUtils {
 		}
 	}
 	
-	// 设置默认配置
-	public static RequestConfig getRequestConfig(){
+	//Http请求配置
+	public static void setRequestConfig(HttpRequestBase httpRequest){
+		httpRequest.setConfig(getDefaultRequestConfig());
+	}
+	public static void setRequestConfig(HttpRequestBase httpRequest,RequestConfig requestConfig){
+		httpRequest.setConfig(requestConfig);
+	}
+	
+	// 默认配置
+	private static RequestConfig getDefaultRequestConfig(){
 		return RequestConfig.custom().setConnectTimeout(2000)
 			.setConnectionRequestTimeout(2000)
 			.setSocketTimeout(2000).build();
