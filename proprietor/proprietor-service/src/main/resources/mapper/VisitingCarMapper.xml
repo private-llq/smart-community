@@ -5,10 +5,10 @@
 
 	<!-- 批量新增随行车辆 -->
 	<insert id="addCarBatch" parameterType="java.util.List">
-		insert into t_visiting_car(visitor_id,car_plate,car_type,create_time)
+		insert into t_visiting_car(id,visitor_id,car_plate,car_type,create_time)
 		values
 		<foreach collection="list" item="item" separator=",">
-			(#{item.visitorId},#{item.carPlate},#{item.carType},now())
+			(#{item.id},#{item.visitorId},#{item.carPlate},#{item.carType},now())
 		</foreach>
 	</insert>
 

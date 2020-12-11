@@ -6,19 +6,20 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.api.IVisitorService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
+import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.qo.proprietor.VisitorQO;
+import com.jsy.community.vo.VisitorEntryVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -26,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author chq459799974
@@ -56,6 +57,7 @@ public class VisitorController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/11
 	 **/
+	//TODO 权限和一次访客登记对应还是和每个随行人员一一对应？
 	@ApiOperation("【访客】新增")
 	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("")
@@ -66,7 +68,7 @@ public class VisitorController {
 		long visitorId = SnowFlake.nextId();
 		visitorEntity.setId(visitorId);
 		//添加访客
-		iVisitorService.addVisitor(visitorEntity);
+		VisitorEntryVO visitorEntryVO = iVisitorService.addVisitor(visitorEntity);
 		//添加随行人员
 		List<VisitorPersonRecordEntity> personRecordList = visitorEntity.getVisitorPersonRecordList();
 		if (!CollectionUtils.isEmpty(personRecordList)) {
@@ -85,8 +87,27 @@ public class VisitorController {
 			}
 			iVisitorService.addCarBatch(carRecordList);
 		}
-		return CommonResult.ok();
+		return CommonResult.ok(visitorEntryVO);
 	}
+	
+	//三方调用进来
+	@ApiOperation("【访客】社区门禁验证(模拟)")
+	@GetMapping("verifyCommunityEntry")
+	@Login(allowAnonymous = true)
+	//TODO 流程未知，参数和返回值待确定
+	public void verifyCommunityEntry(@RequestParam("entryToken") String token){
+		iVisitorService.verifyEntry(token, BusinessEnum.EntryTypeEnum.COMMUNITY.getCode());
+	}
+	
+	//三方调用进来
+	@ApiOperation("【访客】楼栋门禁验证(模拟)")
+	@GetMapping("verifyBuildingEntry")
+	@Login(allowAnonymous = true)
+	//TODO 流程未知，参数和返回值待确定
+	public void verifyBuildingEntry(@RequestParam("entryToken") String token){
+		iVisitorService.verifyEntry(token,BusinessEnum.EntryTypeEnum.BUILDING.getCode());
+	}
+	
 	
 	/**
 	 * @Description: 访客登记 逻辑删除
@@ -258,5 +279,5 @@ public class VisitorController {
 		baseQO.setQuery(UserUtils.getUserId());
 		return CommonResult.ok(iVisitingCarService.queryVisitingCarPage(baseQO));
 	}
-	
+
 }

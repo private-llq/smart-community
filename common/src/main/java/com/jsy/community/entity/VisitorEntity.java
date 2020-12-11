@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -85,9 +86,11 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private LocalDateTime visitedTime;
     
     @ApiModelProperty(value = "是否授予来访人社区门禁权限，0无，1二维码通行证，2人脸识别")
+    @Range(min = 0,max = 2, message = "社区门禁授权选择出错")
     private Integer isCommunityAccess;
     
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1二维码通行证，2可视对讲")
+    @Range(min = 0,max = 2, message = "楼栋门禁授权选择出错")
     private Integer isBuildingAccess;
     
     @JsonIgnore

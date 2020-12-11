@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * @author chq459799974
- * @description 业务相关枚举
+ * @description 业务相关枚举(不会变动的数据)(如有改变，提到表里做后台配置)
  * @since 2020-11-28 13:47
  **/
 public interface BusinessEnum {
@@ -250,13 +250,13 @@ public interface BusinessEnum {
 	}
 	
 	/**
-	 * @Description: 社区授权类型
+	 * @Description: 社区门禁授权类型
 	 * @Author: chq459799974
 	 * @Date: 2020/12/01
 	 **/
 	enum CommunityAccessEnum {
 		NONE("无", 0),
-		PASSWORD("二维码通行证", 1),
+		QR_CODE("二维码通行证", 1),
 		FACE("人脸识别", 2);
 		private String name;
 		private Integer code;
@@ -303,13 +303,13 @@ public interface BusinessEnum {
 	}
 	
 	/**
-	 * @Description: 楼栋授权类型
+	 * @Description: 楼栋门禁授权类型
 	 * @Author: chq459799974
 	 * @Date: 2020/12/01
 	 **/
 	enum BuildingAccessEnum {
 		NONE("无", 0),
-		PASSWORD("二维码通行证", 1),
+		QR_CODE("二维码通行证", 1),
 		COMMUNICATION("可视对讲", 2);
 		private String name;
 		private Integer code;
@@ -352,6 +352,56 @@ public interface BusinessEnum {
 				buildingAccessMap.put(buildingAccessEnum.getCode(), buildingAccessEnum.getName());
 			}
 			sourceMap.put("buildingAccess",buildingAccessList);
+		}
+	}
+	
+	/**
+	 * @Description: 门禁类型
+	 * @Author: chq459799974
+	 * @Date: 2020/12/01
+	 **/
+	enum EntryTypeEnum {
+		COMMUNITY("小区", 1),
+		BUILDING("楼栋", 2);
+		private String name;
+		private Integer code;
+		
+		EntryTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public Integer getCode() {
+			return code;
+		}
+		
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+		
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+		
+		public static final List<Map<String, Object>> entryTypeList = new ArrayList<>();
+		
+		static {
+			for (EntryTypeEnum entryTypeEnum : EntryTypeEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", entryTypeEnum.getCode());
+				map.put("name", entryTypeEnum.getName());
+				entryTypeList.add(map);
+			}
+			sourceMap.put("entryType",entryTypeList);
 		}
 	}
 	

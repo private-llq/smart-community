@@ -7,6 +7,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
+import com.jsy.community.vo.VisitorEntryVO;
 
 import java.util.List;
 
@@ -27,7 +28,16 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @Author: chq45799974
      * @Date: 2020/11/12
     **/
-    void addVisitor(VisitorEntity visitorEntity);
+    VisitorEntryVO addVisitor(VisitorEntity visitorEntity);
+    
+    /**
+    * @Description: 访客门禁验证
+     * @Param: [token, type]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2020/12/11
+    **/
+    void verifyEntry(String token,Integer type);
     
     /**
      * @Description: 批量添加随行人员

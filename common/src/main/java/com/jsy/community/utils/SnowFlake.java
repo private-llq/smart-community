@@ -73,7 +73,6 @@ public class SnowFlake {
 			if (sequence == 0L) {
 				currStmp = getNextMill();
 			}
-			System.out.println(sequence);
 		} else {
 			//不同毫秒内，序列号置为0
 			sequence = 0L;
