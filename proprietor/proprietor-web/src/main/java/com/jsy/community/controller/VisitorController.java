@@ -108,7 +108,6 @@ public class VisitorController {
 		iVisitorService.verifyEntry(token,BusinessEnum.EntryTypeEnum.BUILDING.getCode());
 	}
 	
-	
 	/**
 	 * @Description: 访客登记 逻辑删除
 	 * @Param: [id]
