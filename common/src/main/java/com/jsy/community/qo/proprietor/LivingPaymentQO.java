@@ -14,8 +14,8 @@ import java.math.BigDecimal;
  * @create: 2020-12-11 09:50
  **/
 @Data
-@ApiModel("社区消息接收参数对象")
-public class ElectricityQO implements Serializable {
+@ApiModel("生活缴费接收参数对象")
+public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "水电气类型，0水费，1电费，2燃气费")
     private Long type;
 
@@ -28,11 +28,14 @@ public class ElectricityQO implements Serializable {
     @ApiModelProperty(value = "缴费单位")
     private String PayCostUnit;
 
-    @ApiModelProperty(value = "用户ID")
+    @ApiModelProperty(value = "用户ID",hidden = true)
     private String userID;
 
     @ApiModelProperty(value = "付款方式")
     private Integer payTpye;
+
+    @ApiModelProperty(value = "账户余额")
+    private BigDecimal payBalance;
 
     @ApiModelProperty(value = "付款金额")
     private BigDecimal payNum;
