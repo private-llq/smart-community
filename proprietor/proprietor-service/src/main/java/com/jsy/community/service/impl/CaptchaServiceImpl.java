@@ -5,13 +5,16 @@ import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
+import com.jsy.community.utils.SmsUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,6 +36,9 @@ public class CaptchaServiceImpl implements ICaptchaService {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IUserAuthService userAuthService;
 	
+	@Autowired
+	private SmsUtil smsUtil;
+	
 	@Override
 	public boolean sendMobile(String mobile, Integer type) {
 		if (type == UserAuthEntity.CODE_TYPE_REGISTER || type == UserAuthEntity.CODE_TYPE_CHANGE_MOBILE) {
@@ -50,11 +56,15 @@ public class CaptchaServiceImpl implements ICaptchaService {
 			throw new ProprietorException("不支持的验证码类型");
 		}
 		
+		//发短信
+//		Map<String, String> smsSendMap = smsUtil.sendSms(mobile, "模板名");
 		// 验证码暂时固定1111
 		String code = "1111";
 		
 		// 5分钟有效期
-//		redisTemplate.opsForValue().set("vCode:" + mobile, code, mobileExpiredTime, TimeUnit.MINUTES);
+//		if(smsSendMap != null){
+//			redisTemplate.opsForValue().set("vCode:" + mobile, smsSendMap.get(mobile), mobileExpiredTime, TimeUnit.MINUTES);
+//		}
 		redisTemplate.opsForValue().set("vCode:" + mobile, code); //测试阶段不过期
 		
 		return true;
