@@ -129,6 +129,14 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<RepairEntity> entityQueryWrapper = new QueryWrapper<>();
 		entityQueryWrapper.eq("user_id", uid).eq("id",id);
 		RepairEntity repairEntity = repairMapper.selectOne(entityQueryWrapper);
+		if (repairEntity==null) {
+			throw new ProprietorException("您好,您选择的订单并不存在,请联系管理员");
+		}
+		Integer flag = repairEntity.getStatus();
+		if (flag!=null && flag!=2) {
+			log.debug("预评价的订单状态类型为："+flag);
+			throw new ProprietorException("您好,该订单尚未处理完成");
+		}
 		
 		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("repair_id", repairEntity.getId());

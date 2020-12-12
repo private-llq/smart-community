@@ -75,7 +75,7 @@ public class RepairController {
 	@Login(allowAnonymous = true)
 	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile file) {
 		String filePath = MinioUtils.upload(file, BUCKETNAME);
-		redisTemplate.opsForSet().add("repair_img_part", filePath); // TODO 前端要注意调整 repairImg
+		redisTemplate.opsForSet().add("repair_img_part", filePath); // TODO 前端要注意调整 repairImg   而且只能一张一张选择上传  【其实应该支持一次性多张上传的】
 		return CommonResult.ok(filePath);
 	}
 	

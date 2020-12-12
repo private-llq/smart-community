@@ -33,8 +33,8 @@ public class RepairVO implements Serializable {
 	@ApiModelProperty(value = "联系电话")
 	private String phone;
 	
-	@ApiModelProperty(value = "报修地址id")
-	private Long userHouseId;
+	@ApiModelProperty(value = "报修地址")
+	private String address;
 	
 	@ApiModelProperty(value = "订单编号")
 	private String number;

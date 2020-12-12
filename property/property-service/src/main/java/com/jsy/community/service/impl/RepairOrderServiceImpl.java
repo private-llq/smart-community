@@ -59,7 +59,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	@Override
 	public void dealOrder(Long id) {
 		RepairEntity repairEntity = commOrder(id);
-		repairEntity.setStatus(2); // 将状态设置为 处理中
+		repairEntity.setStatus(1); // 将状态设置为 处理中
 		repairMapper.updateById(repairEntity); // 更新报修表
 	}
 	
