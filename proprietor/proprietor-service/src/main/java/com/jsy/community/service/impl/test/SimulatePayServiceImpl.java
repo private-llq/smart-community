@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author lihao
@@ -22,24 +20,6 @@ import java.util.List;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class SimulatePayServiceImpl implements ISimulatePayService {
-	
-	@Override
-	public List<SimulateTypeEntity> getCompany(Integer type) {
-		List<SimulateTypeEntity> list = new ArrayList<>();
-		if (type.equals(0)) {//0 水费  1 电费 2燃气费
-			list.add(new SimulateTypeEntity(1, "重庆水务公司"));
-			return list;
-		}
-		if (type.equals(1)) {
-			list.add(new SimulateTypeEntity(2, "重庆电力公司"));
-			return list;
-		}
-		if (type.equals(3)) {
-			list.add(new SimulateTypeEntity(3, "重庆燃气公司"));
-			return list;
-		}
-		throw new ProprietorException("请选择正确的缴费类型");
-	}
 	
 	@Override
 	public PayData getPayData(String number, Integer id) {

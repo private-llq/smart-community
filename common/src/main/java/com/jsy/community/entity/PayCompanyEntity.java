@@ -27,7 +27,7 @@ public class PayCompanyEntity extends BaseEntity {
     private Long typeId;
     
     @ApiModelProperty(value = "市区id")
-    private Long region_id;
+    private Long regionId;
 
     @ApiModelProperty(value = "缴费单位")
     private String name;
