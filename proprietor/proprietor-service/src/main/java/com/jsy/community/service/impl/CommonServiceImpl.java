@@ -104,27 +104,61 @@ public class CommonServiceImpl implements ICommonService {
         return map;
     }
 
-
+    /**
+    * @Description: 获取子区域
+     * @Param: [id]
+     * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+     * @Author: chq459799974
+     * @Date: 2020/12/12
+    **/
     @Override
     public List<RegionEntity> getSubRegion(Integer id) {
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForHash().get("Region:", String.valueOf(id))), List.class);
     }
 
+    /**
+    * @Description: 城市字典
+     * @Param: []
+     * @Return: java.util.Map<java.lang.String,com.jsy.community.entity.RegionEntity>
+     * @Author: chq459799974
+     * @Date: 2020/12/12
+    **/
     @Override
     public Map<String, RegionEntity> getCityMap() {
         return JSONObject.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityMap")), Map.class);
     }
 
+    /**
+    * @Description: 城市列表
+     * @Param: []
+     * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+     * @Author: chq459799974
+     * @Date: 2020/12/12
+    **/
     @Override
     public List<RegionEntity> getCityList() {
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityList")), List.class);
     }
 
+    /**
+    * @Description: 热门城市
+     * @Param: []
+     * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+     * @Author: chq459799974
+     * @Date: 2020/12/12
+    **/
     @Override
     public List<RegionEntity> getHotCityList() {
         return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("hotCityList")), List.class);
     }
 
+    /**
+    * @Description: 城市模糊查询
+     * @Param: [searchStr]
+     * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+     * @Author: chq459799974
+     * @Date: 2020/12/12
+    **/
     @Override
     public List<RegionEntity> vagueQueryCity(String searchStr) {
         return regionMapper.vagueQueryCity(searchStr);

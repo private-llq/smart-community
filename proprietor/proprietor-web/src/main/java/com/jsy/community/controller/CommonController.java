@@ -92,7 +92,7 @@ public class CommonController {
             return CommonResult.error(JSYError.NOT_FOUND);
         }
     }
-    public static void main(String[] args) {
+    private static void main(String[] args) {
         String s = BusinessEnum.RegionQueryTypeEnum.regionQueryNameMap.get(2);
         System.out.println(s);
     }
