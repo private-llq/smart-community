@@ -12,6 +12,7 @@ import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
@@ -28,7 +29,8 @@ import java.util.Objects;
  * @since 2020-11-13 14:59
  */
 @Slf4j
-@DubboService(version = Const.version, group = Const.group)
+@Primary
+@DubboService(version = Const.version, group = Const.group_proprietor)
 public class CommonServiceImpl implements ICommonService {
 
     @Resource
@@ -137,7 +139,7 @@ public class CommonServiceImpl implements ICommonService {
      * @since 2020/12/11 11:36
      */
     public List<HouseLeaseConstEntity> getHouseConstListByType(String type) {
-        var list = JSON.parseObject(String.valueOf(redisTemplate.opsForValue().get("houseConst:" + type)), List.class);
+        List list = JSON.parseObject(String.valueOf(redisTemplate.opsForValue().get("houseConst:" + type)), List.class);
         List<HouseLeaseConstEntity> houseLeaseConstEntityList = new ArrayList<>(list.size());
         for (Object o : list) {
             JSONObject jsonObject = JSON.parseObject(String.valueOf(o));
