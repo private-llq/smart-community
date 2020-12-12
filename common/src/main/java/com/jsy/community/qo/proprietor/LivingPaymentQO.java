@@ -19,8 +19,11 @@ public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "水电气类型，0水费，1电费，2燃气费")
     private Long type;
 
-    @ApiModelProperty(value = "组号id")
-    private Long group;
+    @ApiModelProperty(value = "1我家，2父母，3房东，4朋友，5其他")
+    private Integer typeGroup;
+
+    @ApiModelProperty(value = "分组名称")
+    private String groupName;
 
     @ApiModelProperty(value = "户号")
     private String doorNo;
@@ -31,7 +34,7 @@ public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "用户ID",hidden = true)
     private String userID;
 
-    @ApiModelProperty(value = "付款方式")
+    @ApiModelProperty(value = "付款方式,1银行卡，2微信支付，3支付宝支付")
     private Integer payTpye;
 
     @ApiModelProperty(value = "账户余额")

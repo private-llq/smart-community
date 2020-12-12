@@ -22,6 +22,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -94,14 +95,14 @@ public class LivingPaymentController {
      * @param paymentRecordsQO
      * @return
      */
-    @ApiOperation("通过组户号查询订单详情")
+    @ApiOperation("查询每月的缴费详情")
     @PostMapping("/selectOrder")
     @Login
     public CommonResult selectOrder(@RequestBody PaymentRecordsQO paymentRecordsQO){
         String userId = UserUtils.getUserId();
         paymentRecordsQO.setUserID(userId);
-        livingPaymentService.selectOrder(paymentRecordsQO);
-        return CommonResult.ok();
+        Map<String, Object> map = livingPaymentService.selectOrder(paymentRecordsQO);
+        return CommonResult.ok(map);
     }
 
     /**

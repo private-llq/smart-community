@@ -20,7 +20,7 @@ public class UserInformEntity extends BaseEntity {
     @ApiModelProperty(value = "通知消息ID")
     private Long informId;
     @ApiModelProperty(value = "业主ID")
-    private String userId;
+    private String uid;
     @ApiModelProperty(value = "通知消息是否已读，1表示已读，0表示未读")
     private Integer informStatus;
     @ApiModelProperty(value = "房间ID")

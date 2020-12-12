@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.LivingPaymentMapper">
+    <sql id="query">
+        where tg.uid=#{userID}
+            <if test="doorNo!=null and doorNo!=''">
+                and t.family_id=#{doorNo}
+            </if>
+            <if test="payYear!=null and payYear>0">
+                and t.pay_year=#{payYear}
+            </if>
+            <if test="payMonth!=null and payMonth>0">
+                and t.pay_month=#{payMonth}
+            </if>
 
+    </sql>
 
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
         SELECT tp.id as groupId,tp.name as groupName,t.pay_number as payNumber,t.pay_company as payCompany FROM t_pay_house_owner t join t_pay_group tp on t.group_id=tp.id where tp.uid=#{userId}
+    </select>
+
+
+    <select id="selectOrder" resultMap="PaymentRecordsVOMAP">
+        SELECT
+        t.pay_year as payYear,t.pay_month as payMonth,t.order_num as orderNum,t.unit as unitName,t.family_id as familyId,t.order_time as orderTime,t.payment_amount paySum,t.pay_type as payType
+        FROM t_pay_order t join t_pay_group tg on t.group_id=tg.id
+        <include refid="query"></include>
     </select>
 
     <resultMap id="DefaultHouseOwnerMap" type="com.jsy.community.vo.DefaultHouseOwnerVO">
@@ -12,6 +32,18 @@
         <result property="groupName" column="groupName"/>
         <result property="payNumber" column="payNumber"/>
         <result property="payCompany" column="payCompany"/>
+    </resultMap>
+
+    <resultMap id="PaymentRecordsVOMAP" type="com.jsy.community.vo.PaymentRecordsVO">
+        <result column="payYear" property="payYear"/>
+        <result column="payMonth" property="payMonth"/>
+        <result column="payType" property="payType"/>
+        <result column="paySum" property="paySum"/>
+        <result column="unitName" property="unitName"/>
+<!--        <result column="address" property="address"/>-->
+        <result column="familyId" property="familyId"/>
+        <result column="orderNum" property="orderNum"/>
+        <result column="orderTime" property="orderTime"/>
     </resultMap>
 
 </mapper>

@@ -6,6 +6,7 @@ import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.vo.GroupVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -31,11 +32,11 @@ public interface ILivingPaymentService {
 
 
     /**
-     * 通过组户号查询订单详情
+     * 查询每月订单详情
      * @param paymentRecordsQO
      * @return
      */
-    void selectOrder(PaymentRecordsQO paymentRecordsQO);
+    Map<String, Object> selectOrder(PaymentRecordsQO paymentRecordsQO);
 
     /**
      * 默认查询所有缴费信息

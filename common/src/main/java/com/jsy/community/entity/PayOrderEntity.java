@@ -48,5 +48,14 @@ public class PayOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "付款方式1银行卡，2微信支付，3支付宝支付")
     private Integer payType;
 
+    @ApiModelProperty(value = "年份")
+    private Integer payYear;
+
+    @ApiModelProperty(value = "月份")
+    private Integer payMonth;
+
+    @ApiModelProperty(value = "分组")
+    private Long groupId;
+
 
 }
