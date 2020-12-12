@@ -16,10 +16,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -124,8 +121,8 @@ public class CommonServiceImpl implements ICommonService {
      * @Date: 2020/12/12
     **/
     @Override
-    public Map<String, RegionEntity> getCityMap() {
-        return JSONObject.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityMap")), Map.class);
+    public TreeMap<String, RegionEntity> getCityMap() {
+        return JSONObject.parseObject(String.valueOf(redisTemplate.opsForValue().get("cityMap")), TreeMap.class);
     }
 
     /**

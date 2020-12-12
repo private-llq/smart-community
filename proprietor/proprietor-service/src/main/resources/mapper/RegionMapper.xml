@@ -32,8 +32,9 @@
 		(
 			initials = #{searchStr}
 			or name like concat('%',#{searchStr},'%')
-			or pinyin like concat('%',#{searchStr},'%')
+			or pinyin like concat(#{searchStr},'%')
 		)
+		order by if(left(name,1) = #{searchStr},0,1)
 	</select>
 
 	<select id="getListPayTypeId" resultType="long">
