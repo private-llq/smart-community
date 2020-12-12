@@ -141,7 +141,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	}
 	
 	@Override
-	public RepairVO repairDetails(Long id, String userId) {
+	public RepairVO repairDetails(Long id, String userId) { // id 房屋id
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", id).eq("user_id", userId);
 		RepairEntity repairEntity = repairMapper.selectOne(wrapper);

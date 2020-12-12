@@ -12,7 +12,7 @@ import org.apache.dubbo.config.annotation.DubboService;
  * 报修订单信息 服务实现类
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-12-08
  */
 @DubboService(version = Const.version, group = Const.group_proprietor)

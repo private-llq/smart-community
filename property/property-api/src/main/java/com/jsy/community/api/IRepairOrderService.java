@@ -11,7 +11,7 @@ import com.jsy.community.utils.PageInfo;
  * 报修订单信息 服务类
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-12-08
  */
 public interface IRepairOrderService extends IService<RepairOrderEntity> {
