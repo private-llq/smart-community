@@ -39,25 +39,52 @@ public class CommunityController {
 	
 	private static final String BUCKETNAME = "community-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
-	
+	/**
+	* @Description: 新增社区
+	 * @Param: [communityEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	**/
 	@PostMapping("")
 	public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity){
 		boolean result = iCommunityService.addCommunity(communityEntity);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
 	}
 	
+	/**
+	* @Description: 删除社区
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	**/
 	@DeleteMapping("{id}")
 	public CommonResult deleteCommunity(@PathVariable Long id){
 		boolean result = iCommunityService.deleteCommunity(id);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
 	}
 	
+	/**
+	* @Description: 修改社区
+	 * @Param: [communityQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	**/
 	@PutMapping("")
 	public CommonResult updateCommunity(@RequestBody CommunityQO communityQO){
 		Map<String, Object> resultMap = iCommunityService.updateCommunity(communityQO);
 		return (boolean)resultMap.get("result") ? CommonResult.ok() : CommonResult.error(JSYError.REQUEST_PARAM.getCode(),String.valueOf(resultMap.get("msg")));
 	}
 	
+	/**
+	* @Description: 查询社区
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult<com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.CommunityEntity>>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	**/
 	@GetMapping("")
 	public CommonResult<Page<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
 		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));

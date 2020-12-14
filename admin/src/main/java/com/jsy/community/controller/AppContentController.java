@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.AppContentService;
 import com.jsy.community.service.impl.AppContentServiceImpl;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -29,13 +30,20 @@ import java.util.List;
 public class AppContentController {
 	
 	@Autowired
-	private AppContentServiceImpl aPPContentServiceImpl;
+	private AppContentService appContentService;
 	
-	@ApiOperation("【推荐城市】新增")
+	/**
+	* @Description: 设置推荐城市
+	 * @Param: [regionList]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	**/
+	@ApiOperation("【推荐城市】设置")
 	@PostMapping("hotCity")
 	@Transactional(rollbackFor = Exception.class)
 	public CommonResult setHotCity(@RequestBody List<RegionEntity> regionList){
-		boolean result = aPPContentServiceImpl.setHotCity(regionList);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
+		boolean result = appContentService.setHotCity(regionList);
+		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"设置失败");
 	}
 }

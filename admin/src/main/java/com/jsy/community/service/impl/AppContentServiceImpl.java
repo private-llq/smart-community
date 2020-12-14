@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.AppContentMapper;
+import com.jsy.community.mapper.AppContentService;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import java.util.List;
  **/
 @Slf4j
 @Service
-public class AppContentServiceImpl {
+public class AppContentServiceImpl implements AppContentService {
 	
 	@Autowired
 	private RedisTemplate redisTemplate;
@@ -35,6 +36,7 @@ public class AppContentServiceImpl {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/19
 	**/
+	@Override
 	public boolean setHotCity(List<RegionEntity> hotCityList){
 		if(CollectionUtils.isEmpty(hotCityList)){
 			return false;

@@ -28,6 +28,13 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	@Resource
 	private CommunityMapper communityMapper;
 	
+	/**
+	 * @Description: 社区新增
+	 * @Param: [communityEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/20
+	 **/
 	@Override
 	public boolean addCommunity(CommunityEntity communityEntity){
 		int result = communityMapper.insert(communityEntity);
@@ -37,6 +44,13 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		return false;
 	}
 	
+	/**
+	 * @Description: 社区删除
+	 * @Param: [id]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/20
+	 **/
 	@Override
 	public boolean deleteCommunity(Long id){
 		int result = communityMapper.deleteById(id);
@@ -46,6 +60,13 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		return false;
 	}
 	
+	/**
+	 * @Description: 社区修改
+	 * @Param: [communityQO]
+	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/20
+	 **/
 	@Override
 	public Map<String,Object> updateCommunity(CommunityQO communityQO){
 		CommunityEntity communityEntity = new CommunityEntity();
@@ -62,6 +83,13 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		return returnMap;
 	}
 	
+	/**
+	 * @Description: 社区查询
+	 * @Param: [baseQO]
+	 * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.CommunityEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/20
+	 **/
 	@Override
 	public Page<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO){
 		Page<CommunityEntity> page = new Page<>();
