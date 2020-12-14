@@ -9,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.service.ICommunityService;
 import com.jsy.community.utils.MyPageUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -46,7 +47,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	}
 	
 	@Override
-	public Map<String,Object> updateCommunity(CommunityEntity communityEntity){
+	public Map<String,Object> updateCommunity(CommunityQO communityQO){
+		CommunityEntity communityEntity = new CommunityEntity();
+		BeanUtils.copyProperties(communityQO,communityEntity);
 		Map<String, Object> returnMap = new HashMap<>();
 		if(communityEntity.getId() == null){
 			returnMap.put("result",false);

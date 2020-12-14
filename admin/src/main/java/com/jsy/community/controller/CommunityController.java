@@ -53,8 +53,8 @@ public class CommunityController {
 	}
 	
 	@PutMapping("")
-	public CommonResult updateCommunity(@RequestBody CommunityEntity communityEntity){
-		Map<String, Object> resultMap = iCommunityService.updateCommunity(communityEntity);
+	public CommonResult updateCommunity(@RequestBody CommunityQO communityQO){
+		Map<String, Object> resultMap = iCommunityService.updateCommunity(communityQO);
 		return (boolean)resultMap.get("result") ? CommonResult.ok() : CommonResult.error(JSYError.REQUEST_PARAM.getCode(),String.valueOf(resultMap.get("msg")));
 	}
 	

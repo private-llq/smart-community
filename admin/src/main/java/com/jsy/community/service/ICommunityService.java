@@ -32,12 +32,12 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	boolean deleteCommunity(Long id);
 	/**
 	* @Description: 社区修改
-	 * @Param: [communityEntity]
+	 * @Param: [communityQO]
 	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
 	 * @Author: chq459799974
 	 * @Date: 2020/11/20
 	**/
-	Map<String,Object> updateCommunity(CommunityEntity communityEntity);
+	Map<String,Object> updateCommunity(CommunityQO communityQO);
 	/**
 	* @Description: 社区查询
 	 * @Param: [baseQO]
