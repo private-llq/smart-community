@@ -77,7 +77,7 @@ public class SelectInformServiceImpl implements ISelectInformService {
         String[] yidu=new String[split.length];
         int xiabiao=0;
         for (UserInformEntity userInformEntity : list) {
-            yidu[xiabiao]=userInformEntity.getUserId();
+            yidu[xiabiao]=userInformEntity.getUid();
             ++xiabiao;
         }
         for (int i=0;i<split.length;i++){
