@@ -7,11 +7,15 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.service.ICommunityService;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -29,6 +33,12 @@ public class CommunityController {
 	
 	@Autowired
 	private ICommunityService iCommunityService;
+	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
+	
+	private static final String BUCKETNAME = "community-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	
 	
 	@PostMapping("")
 	public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity){
@@ -51,6 +61,15 @@ public class CommunityController {
 	@GetMapping("")
 	public CommonResult<Page<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
 		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));
+	}
+	
+	
+	@PostMapping("/uploadIconImg")
+	@ApiOperation("社区头图上传")
+	public CommonResult uploadIconImg(@RequestParam("file") MultipartFile file){
+		String filePath = MinioUtils.upload(file, BUCKETNAME);
+		redisTemplate.opsForSet().add("community_img_part",filePath);
+		return CommonResult.ok(filePath);
 	}
 	
 }
