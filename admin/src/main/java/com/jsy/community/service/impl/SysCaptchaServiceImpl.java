@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.code.kaptcha.Producer;
-import com.jsy.community.entity.SysCaptchaEntity;
+import com.jsy.community.entity.admin.SysCaptchaEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.SysCaptchaMapper;
 import com.jsy.community.service.ISysCaptchaService;
@@ -24,6 +24,9 @@ public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaMapper, SysCapt
 	@Resource
 	private Producer producer;
 	
+	@Resource
+	private SysCaptchaMapper sysCaptchaMapper;
+	
 	@Override
 	public BufferedImage getCaptcha(String uuid) {
 		if (StrUtil.isBlank(uuid)) {
@@ -37,7 +40,8 @@ public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaMapper, SysCapt
 		captchaEntity.setCode(code);
 		// 5分钟后过期
 		captchaEntity.setExpireTime(DateUtil.offset(new Date(), DateField.HOUR, 5));
-		this.save(captchaEntity);
+		sysCaptchaMapper.updateCaptcha(captchaEntity);
+//		this.save(captchaEntity);
 		
 		return producer.createImage(code);
 	}

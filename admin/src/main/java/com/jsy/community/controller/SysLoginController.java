@@ -1,12 +1,11 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.io.IoUtil;
-import com.jsy.community.entity.SysUserEntity;
+import com.jsy.community.entity.admin.SysUserEntity;
 import com.jsy.community.qo.admin.SysLoginQO;
 import com.jsy.community.service.ISysCaptchaService;
 import com.jsy.community.service.ISysUserService;
 import com.jsy.community.service.ISysUserTokenService;
-import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +55,7 @@ public class SysLoginController {
 	public CommonResult<?> login(@RequestBody SysLoginQO form) {
 		boolean captcha = sysCaptchaService.validate(form.getUuid(), form.getCaptcha());
 		if (!captcha) {
-			return CommonResult.error("验证码不正确");
+			return CommonResult.error("验证码无效");
 		}
 		
 		//用户信息
@@ -77,8 +76,8 @@ public class SysLoginController {
 			return CommonResult.error("账号已被锁定,请联系管理员");
 		}
 		
-		//生成token，并保存到数据库
-		return sysUserTokenService.createToken(user.getId());
+		//生成token，并保存到redis
+		return sysUserTokenService.createToken(user);
 	}
 	
 	
@@ -87,10 +86,7 @@ public class SysLoginController {
 	 */
 	@PostMapping("/sys/logout")
 	public CommonResult<Boolean> logout() {
-		Long uid = JwtUtils.getUserId();
-		if (uid != null) {
-			sysUserTokenService.logout(uid);
-		}
+		
 		return CommonResult.ok();
 	}
 	

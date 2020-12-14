@@ -27,7 +27,6 @@ import java.util.List;
  * @since 2020-11-24
  */
 @Api(tags = "APP菜单控制器")
-//@Login
 @Slf4j
 @RestController
 @RequestMapping("/community/adminMenu")

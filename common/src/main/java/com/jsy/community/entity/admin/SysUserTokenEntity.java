@@ -1,8 +1,9 @@
-package com.jsy.community.entity;
+package com.jsy.community.entity.admin;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * 系统用户Token
+ * 后台系统用户Token
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

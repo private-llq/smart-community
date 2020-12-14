@@ -1,7 +1,8 @@
 package com.jsy.community.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.SysUserTokenEntity;
+import com.jsy.community.entity.admin.SysUserEntity;
+import com.jsy.community.entity.admin.SysUserTokenEntity;
 import com.jsy.community.vo.CommonResult;
 
 /**
@@ -12,15 +13,8 @@ public interface ISysUserTokenService extends IService<SysUserTokenEntity> {
 	/**
 	 * 生成token
 	 *
-	 * @param userId 用户ID
+	 * @param user 用户信息
 	 */
-	CommonResult<Object> createToken(long userId);
-	
-	/**
-	 * 退出，修改token值
-	 *
-	 * @param userId 用户ID
-	 */
-	void logout(long userId);
+	CommonResult<Object> createToken(SysUserEntity user);
 	
 }

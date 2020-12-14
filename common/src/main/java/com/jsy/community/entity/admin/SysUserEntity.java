@@ -1,7 +1,8 @@
-package com.jsy.community.entity;
+package com.jsy.community.entity.admin;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
- * 系统用户
+ * 后台系统用户
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -60,15 +61,16 @@ public class SysUserEntity extends BaseEntity {
 	 * 角色ID列表
 	 */
 	@TableField(exist = false)
-	private List<Long> roleIdList;
+	private List<Integer> roleIdList;
 	
 	/**
 	 * 创建者ID
 	 */
 	private Long createUserId;
 	
+	
 	/**
-	 * 注册邀请
+	 * 注册邀请传参验证
 	 */
 	public interface inviteUserValidatedGroup{}
 	

@@ -2,7 +2,7 @@ package com.jsy.community.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.SysUserEntity;
+import com.jsy.community.entity.admin.SysUserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.NameAndCreatorQO;
 
@@ -14,6 +14,15 @@ import java.util.Map;
  * 系统用户
  */
 public interface ISysUserService extends IService<SysUserEntity> {
+	
+	/**
+	* @Description: 设置用户角色
+	 * @Param: [roleIds, userId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	**/
+	boolean setUserRoles(List<Long> roleIds,Long userId);
 	
 	IPage<SysUserEntity> queryPage(BaseQO<NameAndCreatorQO> qo);
 	

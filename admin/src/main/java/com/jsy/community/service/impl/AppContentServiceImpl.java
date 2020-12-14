@@ -3,6 +3,8 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.AppContentMapper;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
  * @description APP内容控制服务类
  * @since 2020-11-19 13:38
  **/
+@Slf4j
 @Service
 public class AppContentServiceImpl {
 	
@@ -40,9 +43,12 @@ public class AppContentServiceImpl {
 		List<RegionEntity> hotCitys = appContentMapper.getHotCity();
 		//清空
 		appContentMapper.clearHotCity();
-		//入库
+		//新增
 		int rows = appContentMapper.insertHotCity(hotCityList);
+		//还原
 		if(rows != hotCityList.size()){
+			log.error("设置推荐城市出错：" + hotCityList,"成功条数：" + rows);
+			appContentMapper.clearHotCity();
 			appContentMapper.insertHotCity(hotCitys);
 			return false;
 		}

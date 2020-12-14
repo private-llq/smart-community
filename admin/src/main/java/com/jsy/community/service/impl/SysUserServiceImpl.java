@@ -5,7 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.entity.SysUserEntity;
+import com.jsy.community.entity.admin.SysUserEntity;
+import com.jsy.community.entity.admin.SysUserRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.SysUserMapper;
 import com.jsy.community.qo.BaseQO;
@@ -14,16 +15,16 @@ import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.Constant;
 import com.jsy.community.utils.Query;
 import com.jsy.community.utils.SimpleMailSender;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.shiro.crypto.hash.Hash;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 系统用户
  */
+@Slf4j
 @Service("sysUserService")
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity> implements ISysUserService {
 	
@@ -43,6 +45,33 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	
 	@Autowired
 	private RedisTemplate redisTemplate;
+	
+	@Resource
+	private SysUserMapper sysUserMapper;
+	
+	/**
+	* @Description: 设置用户角色
+	 * @Param: [roleIds, userId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	**/
+	public boolean setUserRoles(List<Long> roleIds,Long userId){
+		//备份
+		List<Long> userRoles = sysUserMapper.getUserRole(userId);
+		//清空
+		sysUserMapper.clearUserRole(userId);
+		//新增
+		int rows = sysUserMapper.addUserRoleBatch(roleIds, userId);
+		//还原
+		if(rows != roleIds.size()){
+			log.error("设置用户角色出错：" + userId,"成功条数：" + rows);
+			sysUserMapper.clearUserRole(userId);
+			sysUserMapper.addUserRoleBatch(userRoles, userId);
+			return false;
+		}
+		return true;
+	}
 	
 	@Override
 	public IPage<SysUserEntity> queryPage(BaseQO<NameAndCreatorQO> qo) {

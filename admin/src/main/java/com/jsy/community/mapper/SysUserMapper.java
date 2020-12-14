@@ -1,8 +1,8 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.SysUserEntity;
-import org.apache.ibatis.annotations.Mapper;
+import com.jsy.community.entity.admin.SysUserEntity;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -11,6 +11,17 @@ import java.util.List;
  */
 @Mapper
 public interface SysUserMapper extends BaseMapper<SysUserEntity> {
+	
+	//备份用户角色
+	@Select("select role_id from t_sys_user_role where user_id = #{userId}")
+	List<Long> getUserRole(Long userId);
+	
+	//清空用户角色
+	@Delete("delete from t_sys_user_role where user_id = #{userId}")
+	void clearUserRole(Long userId);
+	
+	//批量添加用户角色
+	int addUserRoleBatch(@Param("list") List<Long> list, @Param("userId") Long userId);
 	
 	/**
 	 * 查询用户的所有权限

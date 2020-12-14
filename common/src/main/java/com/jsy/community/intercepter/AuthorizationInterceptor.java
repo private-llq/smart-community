@@ -24,7 +24,6 @@ import java.io.IOException;
  * 权限(Token)验证
  */
 @Component
-@ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	public static final String USER_KEY = "userId";
 	public static final String USER_INFO = "userInfo";

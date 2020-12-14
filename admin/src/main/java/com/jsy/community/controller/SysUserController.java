@@ -1,29 +1,21 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.entity.SysUserEntity;
+import com.jsy.community.entity.admin.SysUserEntity;
+import com.jsy.community.entity.admin.SysUserRoleEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.mapper.SysUserMapper;
 import com.jsy.community.service.ISysUserService;
-import com.jsy.community.utils.JwtUtils;
-import com.jsy.community.utils.SimpleMailSender;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author chq459799974
@@ -32,7 +24,6 @@ import java.util.concurrent.TimeUnit;
  **/
 @RequestMapping("sys/user")
 @Api(tags = "系统用户控制器")
-//@Login
 @Slf4j
 @RestController
 public class SysUserController {
@@ -40,6 +31,19 @@ public class SysUserController {
 	@Autowired
 	private ISysUserService iSysUserService;
 
+	/**
+	* @Description: 设置用户角色
+	 * @Param: [sysUserRoleEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	**/
+	@PostMapping("roles")
+	public CommonResult setUserRoles(@RequestBody SysUserRoleEntity sysUserRoleEntity){
+		boolean b = iSysUserService.setUserRoles(sysUserRoleEntity.getRoleIds(), sysUserRoleEntity.getUserId());
+		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"设置用户角色失败");
+	}
+	
 	/**
 	* @Description: 邮件注册邀请
 	 * @Param: [sysUserEntity]
@@ -88,8 +92,8 @@ public class SysUserController {
 		SysUserEntity sysUserEntity = new SysUserEntity();
 		sysUserEntity.setId(uid);
 		sysUserEntity.setStatus(1);
-		iSysUserService.updateUser(sysUserEntity);
-		return null;
+		boolean b = iSysUserService.updateUser(sysUserEntity);
+		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"禁用失败");
 	}
 	
 	//用户名ajax查重
@@ -107,7 +111,8 @@ public class SysUserController {
 	//添加手机号(短信验证)
 	@PutMapping("mobile")
 	public CommonResult changeMobile(){
-		return null;
+		Long uid = 1L;
+		return CommonResult.ok();
 	}
 
 }

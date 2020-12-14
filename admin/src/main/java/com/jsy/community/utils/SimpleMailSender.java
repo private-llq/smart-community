@@ -1,6 +1,6 @@
 package com.jsy.community.utils;
 
-import com.jsy.community.entity.SysUserEntity;
+import com.jsy.community.entity.admin.SysUserEntity;
 import com.jsy.community.exception.JSYException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
