@@ -24,7 +24,7 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-14
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_proprietor)
 @Slf4j
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> implements IMenuService {
 	

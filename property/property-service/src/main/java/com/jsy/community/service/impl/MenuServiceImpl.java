@@ -13,6 +13,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.mapper.MenuMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.FrontMenuVO;
 import com.jsy.community.vo.menu.FrontChildMenu;
 import com.jsy.community.vo.menu.FrontParentMenu;
@@ -232,6 +233,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 			}
 		}
 		BeanUtils.copyProperties(adminMenuEntity, frontMenuEntity);
+		frontMenuEntity.setId(SnowFlake.nextId());
 		menuMapper.insert(frontMenuEntity);
 		return frontMenuEntity.getId();//返回新增后数据的id
 	}
@@ -240,6 +242,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	public void addChildMenu(AdminMenuEntity adminMenuEntity) {
 		FrontMenuEntity entity = new FrontMenuEntity();
 		BeanUtils.copyProperties(adminMenuEntity, entity);
+		entity.setId(SnowFlake.nextId());
 		menuMapper.insert(entity);
 		
 	}

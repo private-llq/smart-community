@@ -8,6 +8,7 @@ import com.jsy.community.mapper.PayCompanyMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.service.IPayCompanyService;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -43,6 +44,7 @@ public class PayCompanyServiceImpl extends ServiceImpl<PayCompanyMapper, PayComp
 	
 	@Override
 	public void addPayCompany(PayCompanyEntity companyEntity) {
+		companyEntity.setId(SnowFlake.nextId());
 		payCompanyMapper.insert(companyEntity);
 	}
 }

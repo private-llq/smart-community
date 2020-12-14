@@ -51,7 +51,7 @@ public class DepartmentController {
 	@ApiOperation("根据部门查询联系方式")
 	@GetMapping("/listStaffPhone")
 	public CommonResult<List<DepartmentStaffEntity>> listStaffPhone(@ApiParam(value = "部门id")
-	                                                                @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
+	                                                                @RequestParam(required = true, value = "id") Long id) {
 		List<DepartmentStaffEntity> staffEntityList = departmentStaffService.listStaffPhone(id);
 		return CommonResult.ok(staffEntityList);
 	}

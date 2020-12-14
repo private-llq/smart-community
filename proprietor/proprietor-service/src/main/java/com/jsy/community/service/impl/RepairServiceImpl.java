@@ -12,6 +12,7 @@ import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.RepairMapper;
 import com.jsy.community.mapper.RepairOrderMapper;
 import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.repair.RepairVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -61,15 +62,18 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		
 		
 		repairEntity.setUserId(uid);
+		repairEntity.setId(SnowFlake.nextId());
 		repairMapper.insert(repairEntity); // 1.png;2.png;3.png;   或 1.png;2.png;3.png 都可以            redis 现在存的是  3个 xx.png
 		String repairImg = repairEntity.getRepairImg();
 		String[] split = repairImg.split(";");
 		for (String filePath : split) {
 			redisTemplate.opsForSet().add("repair_img_all", filePath); // 存入redis
 		}
-		Long id = repairEntity.getId();// 自增得到的报修id
+		Long id = repairEntity.getId();// 得到新添加报修的报修id
 		
 		RepairOrderEntity orderEntity = new RepairOrderEntity(); // 关联订单表
+		long l = SnowFlake.nextId();
+		orderEntity.setId(l);
 		orderEntity.setRepairId(id);
 		orderEntity.setNumber(UUID.randomUUID().toString().replace("-", ""));
 		orderEntity.setOrderTime(new DateTime());

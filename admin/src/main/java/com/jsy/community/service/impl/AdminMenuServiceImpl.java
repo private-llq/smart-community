@@ -7,6 +7,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.service.IAdminMenuService;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.menu.FrontChildMenu;
 import com.jsy.community.vo.menu.FrontParentMenu;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +82,7 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 		if (!adminMenu.getParentId().equals(0L)) {
 			throw new JSYException("您添加的不是父菜单");
 		}
+		adminMenu.setId(SnowFlake.nextId());
 		adminMenuMapper.insert(adminMenu);
 	}
 	
@@ -101,6 +103,7 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 		if (!StringUtils.isEmpty(icon)) {
 			stringRedisTemplate.opsForSet().add("menu_img_all", icon);// 最终上传时将图片地址再存入redis
 		}
+		adminMenu.setId(SnowFlake.nextId());
 		adminMenuMapper.insert(adminMenu);
 	}
 }

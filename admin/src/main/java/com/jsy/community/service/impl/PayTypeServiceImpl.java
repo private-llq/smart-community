@@ -7,6 +7,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.PayTypeMapper;
 import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.service.IPayTypeService;
+import com.jsy.community.utils.SnowFlake;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +63,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayTypeEntity
 		} else {
 			PayTypeEntity entity = new PayTypeEntity();
 			BeanUtils.copyProperties(payType,entity);
+			entity.setId(SnowFlake.nextId());
 			payTypeMapper.insert(entity); // 添加一个新缴费类型
 			payTypeMapper.insertMiddle(id, entity.getId()); // 设置关联关系
 		}

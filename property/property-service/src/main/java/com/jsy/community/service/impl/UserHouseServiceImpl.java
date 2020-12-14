@@ -15,6 +15,7 @@ import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.UserHouseVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -102,6 +103,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		houseEntity.setCommunityId(communityId);
 		houseEntity.setHouseId(houseId);
 		houseEntity.setCheckStatus(2);//审核中
+		houseEntity.setId(SnowFlake.nextId());
 		int res = userHouseMapper.insert(houseEntity);
 		return res > 0;
 	}

@@ -38,7 +38,7 @@ import java.util.List;
 @ApiJSYController
 public class MenuController {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IMenuService menuService;
 	
 	@Autowired

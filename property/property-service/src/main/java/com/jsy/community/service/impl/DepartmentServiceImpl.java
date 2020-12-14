@@ -9,7 +9,7 @@ import com.jsy.community.entity.DepartmentEntity;
 import com.jsy.community.entity.DepartmentStaffEntity;
 import com.jsy.community.mapper.DepartmentMapper;
 import com.jsy.community.mapper.DepartmentStaffMapper;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -42,6 +42,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	
 	@Override
 	public void addDepartment(DepartmentEntity departmentEntity) {
+		departmentEntity.setId(SnowFlake.nextId());
 		departmentMapper.insert(departmentEntity);
 	}
 	
