@@ -20,6 +20,7 @@ import com.jsy.community.vo.UserHouseVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,15 +98,24 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	}
 	
 	@Override
-	public Boolean saveUserHouse(String uid, Long communityId, Long houseId) {
-		UserHouseEntity houseEntity = new UserHouseEntity();
-		houseEntity.setUid(uid);
-		houseEntity.setCommunityId(communityId);
-		houseEntity.setHouseId(houseId);
-		houseEntity.setCheckStatus(2);//审核中
-		houseEntity.setId(SnowFlake.nextId());
-		int res = userHouseMapper.insert(houseEntity);
-		return res > 0;
+	public Boolean saveUserHouse(String uid, List<HouseEntity> houseEntityList) {
+		if (!CollectionUtils.isEmpty(houseEntityList)) {
+			for (HouseEntity houseEntity : houseEntityList) {
+				Long communityId = houseEntity.getCommunityId();
+				Long id = houseEntity.getId();
+				
+				UserHouseEntity userHouseEntity = new UserHouseEntity();
+				userHouseEntity.setUid(uid);
+				userHouseEntity.setCommunityId(communityId);
+				userHouseEntity.setHouseId(id);
+				userHouseEntity.setCheckStatus(2);//审核中
+				userHouseEntity.setId(SnowFlake.nextId());
+				
+				userHouseMapper.insert(userHouseEntity);
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	@Override

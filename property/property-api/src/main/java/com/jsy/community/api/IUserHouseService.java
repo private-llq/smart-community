@@ -1,10 +1,13 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.vo.UserHouseVO;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -25,14 +28,14 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 **/
 	PageInfo<UserHouseVO> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId);
 	
-	/**
+	/**  
 	 * @return java.lang.Boolean
 	 * @Author lihao
-	 * @Description
-	 * @Date 2020/11/26 11:01
-	 * @Param [uid, communityId, houseId]
+	 * @Description 
+	 * @Date 2020/12/15 15:07
+	 * @Param [uid, houseEntityList] 
 	 **/
-	Boolean saveUserHouse(String uid, Long communityId, Long houseId);
+	Boolean saveUserHouse(String uid, List<HouseEntity> houseEntityList);
 	
 	/**
 	 * @return java.lang.Boolean
