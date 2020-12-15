@@ -6,12 +6,15 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -42,8 +45,27 @@ public class CommunityFunController {
     @PostMapping("/save")
     public CommonResult save(@RequestBody CommunityFunEntity communityFunEntity) {
         communityFunEntity.setStatus(1);
-
+        communityFunEntity.setId(SnowFlake.nextId());
         return  communityFunService.save(communityFunEntity)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
+    }
+
+    @ApiOperation("新增缩略图")
+    @PostMapping("/smallImge")
+    public CommonResult upload(@RequestBody MultipartFile file) {
+        String upload = MinioUtils.upload(file, "smallimge");
+        return  CommonResult.ok(upload);
+    }
+    @ApiOperation("新增封面图片")
+    @PostMapping("/coverImge")
+    public CommonResult coverImge(@RequestBody MultipartFile file) {
+        String upload = MinioUtils.upload(file, "coverimge");
+        return  CommonResult.ok(upload);
+    }
+    @ApiOperation("新增内容图片")
+    @PostMapping("/contentImge")
+    public CommonResult content(@RequestBody MultipartFile file) {
+        String upload = MinioUtils.upload(file, "contentimge");
+        return  CommonResult.ok(upload);
     }
     @ApiOperation("修改")
     @PutMapping("/update")

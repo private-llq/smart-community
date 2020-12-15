@@ -1,6 +1,5 @@
 package com.jsy.community.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,12 +20,13 @@ import java.time.LocalDateTime;
 @TableName("t_community_fun")
 public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "社区趣事标题")
-    @TableField("description")
-    private String description;
+    private String title;
     @ApiModelProperty(value = "社区趣事内容")
     private String content;
-    @ApiModelProperty(value = "社区趣事图片地址")
-    private String imageUrl;
+    @ApiModelProperty(value = "社区趣事缩略图地址")
+    private String smallImageUrl;
+    @ApiModelProperty(value = "社区趣事封面图地址")
+    private String coverImageUrl;
     @ApiModelProperty(value = "社区趣事状态1表示未上线，2二表示已上线")
     private Integer status;
     @ApiModelProperty(value = "上线时间")

@@ -7,6 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -14,7 +15,10 @@ import com.jsy.community.vo.CommunityVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -42,14 +46,14 @@ public class UserInformController {
     @Login
     public CommonResult save(@RequestBody UserInformEntity userInformEntity) {
         String userId = UserUtils.getUserId();
-        userInformEntity.setUid(userId);
+        userInformEntity.setId(SnowFlake.nextId());
         return userInformService.save(userInformEntity)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
     }
 
     @Login
     @PostMapping("/totalList")
     @ApiOperation("用户社区总未读消息列表查看")
-    public CommonResult<List<CommunityVO>> totalCommunityInformList(@RequestBody BaseQO<?>  baseQO){
+    public CommonResult<List<CommunityVO>> totalCommunityInformList(@RequestBody BaseQO<?> baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         List<CommunityVO> list = userInformService.totalCommunityInformList(UserUtils.getUserId(), baseQO.getPage() , baseQO.getSize());
         return CommonResult.ok(list);

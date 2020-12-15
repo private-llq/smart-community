@@ -8,6 +8,7 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
+import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.DefaultHouseOwnerVO;
 import com.jsy.community.vo.GroupVO;
@@ -89,6 +90,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payOrderEntity.setPayYear(LocalDateTime.now().getYear());
         payOrderEntity.setPayMonth(LocalDateTime.now().getMonthValue());
         payOrderEntity.setGroupId(group_id);
+        payOrderEntity.setPaymentType(livingPaymentQO.getType());
         payOrderMapper.insert(payOrderEntity);
         //添加缴费户号
         PayHouseOwnerEntity payHouseOwnerEntity = new PayHouseOwnerEntity();
@@ -203,6 +205,23 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     public List selectList(String userId) {
         List<DefaultHouseOwnerVO> list=livingPaymentMapper.selectList(userId);
         return list;
+    }
+    /**
+     * @Description: 添加订单备注
+     * @author: Hu
+     * @since: 2020/12/12 10:15
+     * @Param:
+     * @return:
+     */
+    @Override
+    @Transactional
+    public void addRemark(RemarkQO remarkQO) {
+        PayOrderEntity payOrderEntity = payOrderMapper.selectById(remarkQO.getId());
+        payOrderEntity.setBillClassification(remarkQO.getBillClassification());
+        payOrderEntity.setLabel(remarkQO.getLabel());
+        payOrderEntity.setRemark(remarkQO.getRemark());
+        payOrderEntity.setRemarkImg(remarkQO.getRemarkImg());
+        payOrderMapper.updateById(payOrderEntity);
     }
 
 

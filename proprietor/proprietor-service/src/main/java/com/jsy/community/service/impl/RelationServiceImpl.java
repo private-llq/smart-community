@@ -9,6 +9,7 @@ import com.jsy.community.mapper.RelationMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.RelationCarsQo;
 import com.jsy.community.qo.RelationQo;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -53,6 +54,7 @@ public class RelationServiceImpl implements IRelationService {
         List<RelationCarsQo> cars = relationQo.getCars();
             if (cars.size()>0) {
                 for (RelationCarsQo car : cars) {
+                    car.setId(SnowFlake.nextId());
                     car.setUid(relationQo.getUserId());
                     car.setCommunityId(relationQo.getCommunityId());
                     car.setOwner(relationQo.getName());
@@ -61,6 +63,7 @@ public class RelationServiceImpl implements IRelationService {
                 relationMapper.addCars(cars);
             }
             HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
+            houseMemberEntity.setId(SnowFlake.nextId());
             houseMemberEntity.setHouseId(relationQo.getHouseId());
             houseMemberEntity.setHouseholderId(relationQo.getUserId());
             houseMemberEntity.setName(relationQo.getName());

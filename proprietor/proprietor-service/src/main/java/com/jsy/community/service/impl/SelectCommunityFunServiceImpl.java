@@ -33,7 +33,7 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
             communityFunQO.setSize(10l);
         QueryWrapper<CommunityFunEntity> wrapper = new QueryWrapper<CommunityFunEntity>().eq("status",2);
         if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
-            wrapper.like("description", communityFunQO.getHeadline());
+            wrapper.like("title", communityFunQO.getHeadline());
         }
         IPage<CommunityFunEntity> page = selectCommunityFunMapper.selectPage(new Page<CommunityFunEntity>(communityFunQO.getPage(), communityFunQO.getSize()),wrapper);
         List<CommunityFunEntity> list = page.getRecords();

@@ -26,6 +26,7 @@
         <module>admin</module>
         <!-- 公共 -->
         <module>common</module>
+        <module>gateway</module>
     </modules>
     
     <properties>
