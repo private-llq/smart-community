@@ -96,7 +96,7 @@ public class ProprietorQO implements Serializable {
     private List<CarEntity> carEntityList;
 
     @ApiModelProperty("用来存储House的id和社区id")
-    private HouseEntity houseEntity;
+    private List<HouseEntity> houseEntity;
 
     /**
      * [物业]业主更新效验接口
