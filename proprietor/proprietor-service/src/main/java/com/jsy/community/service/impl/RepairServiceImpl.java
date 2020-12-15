@@ -81,17 +81,6 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		repairOrderMapper.insert(orderEntity);
 	}
 	
-	public static void main(String[] args) {//
-		String repairImg = "1.png;2.png;3.png;";
-		
-		String[] split = repairImg.split(";");
-		for (String s : split) {
-			System.out.println(s);
-		}
-		System.out.println(1);
-	}
-	
-	
 	@Override
 	public List<RepairEntity> getRepair(String id) {
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
