@@ -64,10 +64,20 @@ public class SysUserEntity extends BaseEntity {
 	private List<Integer> roleIdList;
 	
 	/**
+	 * 用户菜单列表
+	 */
+	@TableField(exist = false)
+	private List<SysMenuEntity> menuList;
+	
+	/**
 	 * 创建者ID
 	 */
 	private Long createUserId;
 	
+	/**
+	 * token
+	 */
+	private String token;
 	
 	/**
 	 * 注册邀请传参验证

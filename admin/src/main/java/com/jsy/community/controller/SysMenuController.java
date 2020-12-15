@@ -3,7 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.entity.admin.SysMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.SysMenuQO;
-import com.jsy.community.service.SysConfigService;
+import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import java.util.List;
 public class SysMenuController {
 	
 	@Autowired
-	private SysConfigService sysConfigService;
+	private ISysConfigService ISysConfigService;
 	
 	/**
 	* @Description: 新增
@@ -33,7 +33,7 @@ public class SysMenuController {
 	@PostMapping("")
 	public CommonResult addMenu(@RequestBody SysMenuEntity sysMenuEntity){
 		ValidatorUtils.validateEntity(sysMenuEntity);
-		boolean b = sysConfigService.addMenu(sysMenuEntity);
+		boolean b = ISysConfigService.addMenu(sysMenuEntity);
 		return b? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"添加失败");
 	}
 	
@@ -46,7 +46,7 @@ public class SysMenuController {
 	**/
 	@DeleteMapping("")
 	public CommonResult delMenu(@RequestParam("id") Long id){
-		boolean b = sysConfigService.delMenu(id);
+		boolean b = ISysConfigService.delMenu(id);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
 	}
 	
@@ -59,7 +59,7 @@ public class SysMenuController {
 	**/
 	@PutMapping("")
 	public CommonResult updateMenu(@RequestBody SysMenuQO sysMenuQO){
-		boolean b = sysConfigService.updateMenu(sysMenuQO);
+		boolean b = ISysConfigService.updateMenu(sysMenuQO);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
 	}
 	
@@ -72,6 +72,6 @@ public class SysMenuController {
 	**/
 	@GetMapping("")
 	public CommonResult<List<SysMenuEntity>> listOfMenu(){
-		return CommonResult.ok(sysConfigService.listOfMenu());
+		return CommonResult.ok(ISysConfigService.listOfMenu());
 	}
 }

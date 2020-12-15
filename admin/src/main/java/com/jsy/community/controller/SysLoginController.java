@@ -1,9 +1,11 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.io.IoUtil;
+import com.jsy.community.entity.admin.SysMenuEntity;
 import com.jsy.community.entity.admin.SysUserEntity;
 import com.jsy.community.qo.admin.SysLoginQO;
 import com.jsy.community.service.ISysCaptchaService;
+import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.service.ISysUserService;
 import com.jsy.community.service.ISysUserTokenService;
 import com.jsy.community.vo.CommonResult;
@@ -19,6 +21,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 登录相关
@@ -31,6 +35,8 @@ public class SysLoginController {
 	private ISysUserTokenService sysUserTokenService;
 	@Resource
 	private ISysCaptchaService sysCaptchaService;
+	@Resource
+	private ISysConfigService sysConfigService;
 	
 	/**
 	 * 验证码
@@ -77,7 +83,12 @@ public class SysLoginController {
 		}
 		
 		//生成token，并保存到redis
-		return sysUserTokenService.createToken(user);
+		String token = sysUserTokenService.createToken(user);
+		user.setToken(token);
+		//查询用户菜单
+		List<SysMenuEntity> menuList = sysConfigService.queryUserMenu(user.getId());
+		user.setMenuList(menuList);
+		return CommonResult.ok(user);
 	}
 	
 	

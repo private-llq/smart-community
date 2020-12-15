@@ -38,8 +38,6 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
 	@Select("select id,pid,belong_to from t_sys_menu where id = #{pid}")
 	SysMenuEntity findParent(Long pid);
 	
-//	@Select("select")
-	
 	/**
 	* @Description: 获取子菜单列表
 	 * @Param: [id]
@@ -67,6 +65,14 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
 	 * @Date: 2020/12/15
 	 **/
 	List<Long> getIdBelongList(List<Long> ids);
-
+	
+	/**
+	* @Description: 查询用户菜单
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
+	List<SysMenuEntity> queryUserMenu(Long uid);
 
 }

@@ -19,4 +19,12 @@
 		</foreach>
 	</select>
 
+	<!-- 用户菜单权限查询 -->
+	<select id="queryUserMenu" resultType="com.jsy.community.entity.admin.SysMenuEntity">
+		select m.* from t_sys_user_role ur
+		join t_sys_role_menu rm on ur.role_id = rm.role_id
+		join t_sys_menu m on m.id = rm.menu_id
+		where ur.user_id = #{uid}
+	</select>
+
 </mapper>
