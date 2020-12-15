@@ -5,15 +5,19 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.IHouseLeaseService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.HouseLeaseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/lease")
 @Api(tags = "房屋租售控制器")
@@ -29,7 +33,7 @@ public class HouseLeaseController {
     private ICommonService iCommonService;
 
     @ApiOperation("新增房屋租售")
-    @PostMapping("/addHouseLease")
+    @PostMapping()//addHouseLease
     @Login
     public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQO) {
         //新增参数常规效验
@@ -54,12 +58,22 @@ public class HouseLeaseController {
     }
 
     @ApiOperation("删除房屋租售")
-    @PostMapping("/delHouseLease")
+    @DeleteMapping()//delHouseLease
     @Login
-    public CommonResult<Boolean> delLeaseHouse(@RequestParam String rowGuid) {
+    public CommonResult<Boolean> delLeaseHouse(@RequestParam Long rowGuid) {
         return iHouseLeaseService.delLeaseHouse(rowGuid, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(1, "数据不存在");
     }
 
+
+    @ApiOperation("查询房屋出租数据")
+    @GetMapping()//queryHouseLeaseByList
+    @Login
+    public CommonResult<Boolean> queryHouseLeaseByList(@RequestParam BaseQO<HouseLeaseQO> houseLeaseQO) {
+        //验证 分页参数合法性
+        ValidatorUtils.validatePageParam(houseLeaseQO);
+        List<HouseLeaseVO> res = iHouseLeaseService.queryHouseLeaseByList(houseLeaseQO);
+        return null;
+    }
 
 
 

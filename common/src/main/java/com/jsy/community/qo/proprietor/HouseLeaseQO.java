@@ -29,10 +29,8 @@ import java.math.BigDecimal;
 @ApiModel(value="房屋出租收参对象", description="接收前端参数")
 public class HouseLeaseQO implements Serializable {
 
+    @NotNull(groups = {updateLeaseSaleHouse.class}, message = "房屋id不能为空!")
     private Long id;
-
-    @ApiModelProperty(value = "业务数据唯一标识")
-    private String rowGuid;
 
     @ApiModelProperty(value = "所属人ID")
     private String uid;
@@ -64,7 +62,7 @@ public class HouseLeaseQO implements Serializable {
     private Short[] houseAdvantage;
 
     //在把houseAdvantage添加至中间表之后 返回 中间表存储的id
-    private String houseAdvantageId;
+    private Long houseAdvantageId;
 
     @ApiModelProperty(value = "房屋租售价格")
     @Range(groups = {addLeaseSaleHouse.class}, min = 1, max = Integer.MAX_VALUE, message = "价格没有在指定范围之内!")
@@ -141,7 +139,7 @@ public class HouseLeaseQO implements Serializable {
     private String[] houseImage;
 
     //t_house_lease  数据库house_image_id保存图片的id
-    private String houseImageId;
+    private Long houseImageId;
 
     //65不限 66普通住宅 67别墅 68公寓
     @ApiModelProperty(value = "房屋出租类型ID")
@@ -157,9 +155,13 @@ public class HouseLeaseQO implements Serializable {
     private Integer houseLeaseymodeId;
 
     /**
-     * 新增房屋租售验证接口
+     * 新增房屋租售验证接口参数验证
      */
     public interface addLeaseSaleHouse{};
 
+    /**
+     * 修改房屋参数验证接口
+     */
+    public interface updateLeaseSaleHouse{};
 
 }

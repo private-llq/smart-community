@@ -12,6 +12,9 @@
             <if test="title != null">
                 ,title = #{title}
             </if>
+            <if test="subTitle != null">
+                ,sub_title = #{subTitle}
+            </if>
             <if test="content != null">
                 ,content = #{content}
             </if>
@@ -21,4 +24,11 @@
         </trim>
         where deleted = 0 and id = #{id}
     </update>
+
+    <!-- 社区主页 轮播消息获取 -->
+    <select id="rotationCommunityInform" resultType="com.jsy.community.entity.CommunityInformEntity">
+        select title,create_time,state from t_community_inform where community_id = #{communityId} and enabled = 1 ORDER BY create_time desc limit #{initialInformCount}
+    </select>
+
+
 </mapper>

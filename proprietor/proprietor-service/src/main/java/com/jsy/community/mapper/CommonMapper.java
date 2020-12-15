@@ -17,8 +17,9 @@ public interface CommonMapper {
 
     List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode);
 
-    List<Map<String, Object>> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode);
+    List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode);
 
     List<Map<String, Object>> getAllDoorFormFloor(Integer id);
-    
+
+    List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode);
 }

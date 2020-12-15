@@ -2,7 +2,11 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseLeaseEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
+import com.jsy.community.vo.HouseLeaseVO;
+
+import java.util.List;
 
 /**
  * 房屋租售接口提供类
@@ -25,5 +29,12 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param rowGuid       业务主键
      * @param userId        用户id
      */
-    boolean delLeaseHouse(String rowGuid, String userId);
+    boolean delLeaseHouse(Long rowGuid, String userId);
+
+    /**
+     * 根据参数对象条件查询 出租房屋数据
+     * @param houseLeaseQO      查询参数对象
+     * @return                  返回数据集合
+     */
+    List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> houseLeaseQO);
 }

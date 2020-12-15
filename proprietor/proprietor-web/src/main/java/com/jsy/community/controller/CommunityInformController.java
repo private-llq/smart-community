@@ -7,7 +7,9 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -37,19 +39,45 @@ public class CommunityInformController {
 
 
     /**
-     * 查询 通知消息
+     * 属于社区主页  通知消息轮播的接口 条数有限制
+     */
+    @Login
+    @GetMapping("/rotation")
+    @ApiOperation("社区轮播消息")
+    public CommonResult<List<CommunityInformEntity>> rotationCommunityInform(@RequestParam Long communityId) {
+        //页面起始页查询社区消息的初始条数 暂定10
+        //@Value("${jsy.community-inform.initial.count}")
+        Integer initialInformCount = 10;
+        return CommonResult.ok(communityInformService.rotationCommunityInform(initialInformCount, communityId));
+    }
+
+    /**
+     * 用户社区消息详情查看
+     */
+    @Login
+    @GetMapping("/details")
+    @ApiOperation("用户社区消息详情查看")
+    public CommonResult<CommunityInformEntity> detailsCommunityInform(@RequestParam Long communityId, @RequestParam Long informId) {
+        return CommonResult.ok(communityInformService.detailsCommunityInform(communityId, informId, UserUtils.getUserId()));
+    }
+
+
+    /**
+     * 查询 通知消息 从轮播消息点进去之后的显示界面 分页查询
      *
      * @param communityEntity 查询参数
      * @return 返回查询结果
      */
+    @Login
     @PostMapping(value = "/page", produces = "application/json;charset=utf-8")
     @ApiOperation("查询社区通知消息")
-    public CommonResult<?> queryInform(@RequestBody BaseQO<CommunityInformEntity> communityEntity) {
+    public CommonResult<?> listCommunityInform(@RequestBody BaseQO<CommunityInformEntity> communityEntity) {
         //1.查询分页参数非空数字效验
         ValidatorUtils.validatePageParam(communityEntity);
         if (communityEntity.getQuery() == null) {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
+        communityEntity.getQuery().setUid(UserUtils.getUserId());
         List<CommunityInformEntity> records = communityInformService.queryCommunityInform(communityEntity).getRecords();
         return CommonResult.ok(records);
     }
@@ -60,6 +88,7 @@ public class CommunityInformController {
      * @param communityInformQO 修改参数实体接收类
      * @return 返回修改结果
      */
+    @Login
     @PutMapping(produces = "application/json;charset=utf-8")
     @ApiOperation("修改社区通知消息")
     public CommonResult<Boolean> updateInform(@RequestBody CommunityInformQO communityInformQO) {
@@ -76,6 +105,7 @@ public class CommunityInformController {
      * @param id 消息id
      * @return 返回修改成功值
      */
+    @Login
     @DeleteMapping()
     @ApiOperation("删除社区通知消息")
     public CommonResult<Boolean> deleteInform(@RequestParam Long id) {
@@ -88,6 +118,7 @@ public class CommunityInformController {
      * @param communityInformEntity 新增消息参数实体
      * @return 返回是否新增成功
      */
+    @Login
     @PostMapping()
     @ApiOperation("添加社区通知消息")
     public CommonResult<Boolean> addInform(@RequestBody CommunityInformEntity communityInformEntity) throws DuplicateKeyException, SQLIntegrityConstraintViolationException {

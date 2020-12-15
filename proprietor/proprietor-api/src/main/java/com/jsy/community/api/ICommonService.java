@@ -34,13 +34,23 @@ public interface ICommonService {
 
     /**
      * 根据社区层级结构 和 单元id|楼栋id 查询下一级的数据
-	 * 比如 层级结构 为单元楼栋 那就是根据单元id查询下面所有楼栋  如果是楼栋单元 那就是根据楼栋id查询下面的所有单元  如果是单楼栋 那就根据楼栋id查询楼层 单单元也是查询楼层】
+	 * 比如 层级结构 为单元楼栋 那就是根据单元id查询下面所有楼栋  如果是楼栋单元 那就是根据楼栋id查询下面的所有单元 】
 	 * @author YuLF
 	 * @since  2020/12/8 16:39
      * @param id    单元id
      * @return      返回楼栋集合
      */
-	List<Map<String, Object>> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode);
+	List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode);
+
+
+	/**
+	 * 按单元或楼栋id查询楼层
+	 * @param id				单元或楼栋id
+	 * @param houseLevelMode	层级ID
+	 * @return					返回数据List
+	 */
+	List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode);
+
 
     /**
      * 根据楼层id查询所有门牌号

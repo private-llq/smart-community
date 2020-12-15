@@ -37,8 +37,14 @@ public class CommunityInformQO implements Serializable {
     @Range(  groups = {updateCommunityInformValidate.class}, min = 0, max = 2, message = "消息状态不正确")
     private Integer state;
 
+    @ApiModelProperty(value = "消息浏览次数")
+    private Integer browseCount;
+
     @ApiModelProperty(value = "社区通知消息头(标题)")
     private String title;
+
+    @ApiModelProperty(value = "社区通知消息头(副标题)")
+    private String subTitle;
 
 
     /**

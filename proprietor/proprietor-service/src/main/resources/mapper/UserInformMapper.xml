@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.UserInformMapper">
+    <!-- 向t_user_inform数据表插入 当前社区消息状态的用户已读信息 记录 -->
+    <select id="setInformReadByUser" >
+        insert into t_user_inform
+        (id,inform_id,uid,inform_status,community_id)
+        select #{id},#{informId},#{userId},#{informStatus},#{communityId}
+        from dual where not exists
+        (select id,inform_id,uid,inform_status,community_id from t_user_inform where uid = #{userId} and inform_id = #{informId});
+    </select>
 
+    <!-- 按用户ID查出用户所在社区id列表 -->
+    <select id="queryUserAllCommunityId" resultType="java.lang.Long">
+        select community_id from t_user_house where uid = #{userId} limit #{page},#{size}
+    </select>
 
+    <!-- 根据id查询社区相关信息 -->
+    <select id="queryCommunityInform" resultMap="queryCommunityInformMap">
+        select c.id,c.name,c.icon_url,i.title,i.create_time from t_community as c
+        left JOIN t_community_inform as i
+        on c.id = i.community_id
+        where community_id = 1 ORDER BY i.create_time desc LIMIT 1
+    </select>
+    <resultMap id="queryCommunityInformMap" type="com.jsy.community.vo.CommunityVO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="icon_url" property="avatarUrl"/>
+        <result column="title" property="unreadInformTitle"/>
+        <result column="create_time" property="unreadInformCreateTime"/>
+    </resultMap>
 </mapper>

@@ -57,7 +57,6 @@ public class CommonServiceImpl implements ICommonService {
     /**
      * houseLevelMode没有用到的原因 是因为控制层需要使用反射 统一调度业务方法，所以参数类型个数必须一样
      * 根据城市id查询下面所有社区
-     *
      * @param id 传入的城市id
      * @return 返回社区集合
      * @author YuLF
@@ -68,19 +67,28 @@ public class CommonServiceImpl implements ICommonService {
         return commonMapper.getAllCommunityFormCityId(id);
     }
 
-
+    //按社区Id查询下面的楼栋或单元
     @Override
     public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode) {
         List<Map<String, Object>> buildingOrUnitByCommunityId = commonMapper.getBuildingOrUnitByCommunityId(id, houseLevelMode);
         return setHouseLevelMode(buildingOrUnitByCommunityId, houseLevelMode);
     }
 
+    //按楼栋Id查询 单元 或 按 单元id查询楼栋 只对 社区结构为 楼栋单元 或单元楼栋有效
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitOrFloorById(Integer id, Integer houseLevelMode) {
-        List<Map<String, Object>> buildingOrUnitOrFloorById = commonMapper.getBuildingOrUnitOrFloorById(id, houseLevelMode);
+    public List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode) {
+        List<Map<String, Object>> buildingOrUnitOrFloorById = commonMapper.getBuildingOrUnitById(id, houseLevelMode);
         return setHouseLevelMode(buildingOrUnitOrFloorById, houseLevelMode);
     }
 
+    //按单元id或楼栋id查询  楼层
+    @Override
+    public List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode) {
+        List<Map<String, Object>> maps = commonMapper.getFloorByBuildingOrUnitId(id, houseLevelMode);
+        return setHouseLevelMode(maps, houseLevelMode);
+    }
+
+    //按楼层id获取门牌
     @Override
     public List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode) {
         List<Map<String, Object>> allDoorFormFloor = commonMapper.getAllDoorFormFloor(id);

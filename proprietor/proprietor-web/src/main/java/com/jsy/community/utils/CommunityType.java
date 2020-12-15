@@ -17,10 +17,13 @@ public enum CommunityType {
     COMMUNITY_BUILDING_TYPE(2, "getBuildingOrUnitByCommunityId"),
 
     //【根据楼栋id 查询 下面所有单元 或者 根据单元id 查询单元下面所有楼栋】
-    BUILDING_UNIT_TYPE(3, "getBuildingOrUnitOrFloorById"),
+    BUILDING_UNIT_TYPE(3, "getBuildingOrUnitById"),
+
+    //楼栋或单元ID查询下级楼层数据
+    SINGLE_TYPE(4, "getFloorByBuildingOrUnitId"),
 
     //【根据楼层id查询门牌】 查询对应Service方法getAllDoorFormFloor - 通过楼层id查询他下面的所有门牌
-    DOOR_TYPE(4, "getAllDoorFormFloor");
+    DOOR_TYPE(5, "getAllDoorFormFloor");
 
     private final int value;
     private final String serviceMethod;

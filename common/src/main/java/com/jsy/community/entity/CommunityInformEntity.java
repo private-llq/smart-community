@@ -34,6 +34,8 @@ import javax.validation.constraints.Pattern;
 @ApiModel(value="CommunityInform对象", description="接收社区消息的实体类")
 public class CommunityInformEntity extends BaseEntity {
 
+    private String uid;
+
     @ApiModelProperty(value = "社区id")
     @NotNull( groups = {updateCommunityInformValidate.class}, message = "社区ID不能为空")
     private Long communityId;
@@ -47,6 +49,10 @@ public class CommunityInformEntity extends BaseEntity {
     @NotBlank( groups = {addCommunityInformValidate.class}, message = "请输入一个社区标题!")
     private String title;
 
+    @ApiModelProperty(value = "社区通知消息头(副标题)")
+    @NotBlank( groups = {addCommunityInformValidate.class}, message = "请输入一个社区副标题说明!")
+    private String subTitle;
+
     @ApiModelProperty(value = "社区通知消息体(内容)")
     @NotBlank( groups = {addCommunityInformValidate.class}, message = "请输入一个社区通知消息内容!")
     private String content;
@@ -55,9 +61,16 @@ public class CommunityInformEntity extends BaseEntity {
     @NotNull( groups = {addCommunityInformValidate.class}, message = "请选择消息是否需要启用!")
     private Integer enabled;
 
+    @ApiModelProperty(value = "消息浏览次数")
+    private Integer browseCount;
+
     @ApiModelProperty(value = "表明是初次进入社区页面的查询，不分页")
     @TableField(exist = false)
     private boolean initialQuery = false;
+
+    @ApiModelProperty(value = "表明消息在当前社区当前用户状态是否已读，默认是未读")
+    @TableField(exist = false)
+    private boolean read = false;
 
     @JsonIgnore
     @ApiModelProperty(value = "备用字段")

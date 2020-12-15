@@ -1,24 +1,24 @@
 package com.jsy.community.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityInformService;
-import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.CommunityInformEntity;
+import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.mapper.CommunityInformMapper;
+import com.jsy.community.mapper.UserInformMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 
 /**
@@ -36,9 +36,8 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
     @Resource
     private CommunityInformMapper communityInformMapper;
 
-    //页面起始页查询社区消息的初始条数 暂定10
-    //@Value("${jsy.community-inform.initial.count}")
-    private final Integer initialInformCount = 10;
+    @Resource
+    private UserInformMapper userInformMapper;
 
     /**
      * 查询社区消息
@@ -50,17 +49,20 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         QueryWrapper<CommunityInformEntity>  queryWrapper = new QueryWrapper<>();
         CommunityInformEntity query = communityEntity.getQuery();
         Page<CommunityInformEntity> objectPage = new Page<>(communityEntity.getPage(), communityEntity.getSize());
-        queryWrapper.select("id,create_time,update_time,community_id,state,title,content,enabled");
-        //查询社区消息为 1 启用的社区消息
+        queryWrapper.select("id,create_time,community_id,state,title,sub_title");
         queryWrapper.eq("enabled",1);
-        //设置查询条件为用户所在的小区
         queryWrapper.eq("community_id", query.getCommunityId());
-        //初次进入社区页面时固定查询条数
-        if(query.isInitialQuery()){
-            //在sql最后追加排序条件 初次查询为
-            queryWrapper.last("ORDER BY index asc limit 0,"+initialInformCount);
+        queryWrapper.last("ORDER BY create_time desc");
+        Page<CommunityInformEntity> communityInformEntityPage = communityInformMapper.selectPage(objectPage, queryWrapper);
+        //使用当前用户查询该用户在当前社区已读信息
+        List<Long> integerList = userInformMapper.queryUserReadCommunityInform(query.getCommunityId(), query.getUid());
+        //标识用户已读的数据
+        for(CommunityInformEntity communityInformEntity : communityInformEntityPage.getRecords()){
+            if(integerList.contains(communityInformEntity.getId())){
+                communityInformEntity.setRead(true);
+            }
         }
-        return communityInformMapper.selectPage(objectPage,queryWrapper);
+        return communityInformEntityPage;
     }
 
     /**
@@ -70,6 +72,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      */
     @Override
     public Boolean addCommunityInform(CommunityInformEntity communityInformEntity){
+            communityInformEntity.setId(SnowFlake.nextId());
             return communityInformMapper.insert(communityInformEntity) > 0;
     }
 
@@ -89,8 +92,50 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      * @param id    社区消息id
      * @return      返回删除成功
      */
+    @Transactional
     @Override
     public Boolean delCommunityInform(Long id) {
+        //物理删除：删除该条社区消息之前 先删除 所有用户已读消息记录
+        userInformMapper.delUserReadInform(id);
         return communityInformMapper.deleteById(id) > 0;
     }
+
+
+    /**
+     * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量
+     * @param initialInformCount     初始轮播消息条数
+     * @return                       返回消息列表
+     */
+    @Override
+    public List<CommunityInformEntity> rotationCommunityInform(Integer initialInformCount , Long communityId) {
+        return communityInformMapper.rotationCommunityInform(initialInformCount, communityId);
+    }
+
+    /**
+     *  用户社区消息详情查看
+     */
+    @Transactional
+    @Override
+    public CommunityInformEntity detailsCommunityInform(Long communityId, Long informId , String userId) {
+        //根据社区id和消息id查出消息
+        QueryWrapper<CommunityInformEntity> wrapper = new QueryWrapper<>();
+        wrapper.select("title,create_time,update_time,browse_count,content,state");
+        wrapper.eq("community_id", communityId);
+        wrapper.eq("id", informId);
+        CommunityInformEntity communityInformEntity = communityInformMapper.selectOne(wrapper);
+        //标识用户已读该社区消息
+        UserInformEntity userInformEntity = new UserInformEntity();
+        userInformEntity.setId(SnowFlake.nextId());
+        userInformEntity.setCommunityId(communityId);
+        userInformEntity.setInformId(informId);
+        userInformEntity.setInformStatus(1);
+        userInformEntity.setUserId(userId);
+        userInformMapper.setInformReadByUser(userInformEntity);
+        //社区该消息的浏览量+1
+        communityInformMapper.updateCommunityInformBrowseCount(communityId, informId);
+        return communityInformEntity;
+    }
+
+
+
 }

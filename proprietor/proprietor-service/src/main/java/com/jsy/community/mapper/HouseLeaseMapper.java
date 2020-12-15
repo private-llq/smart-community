@@ -3,7 +3,9 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.HouseLeaseEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
+import com.jsy.community.vo.HouseLeaseVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -48,7 +50,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param guid_id        t_house_lease数据唯一标识
      * @return               影响行数
      */
-    int delUserMiddleInfo(@Param("guid_id") String guid_id);
+    int delUserMiddleInfo(@Param("guid_id") Long guid_id);
 
 
     /**
@@ -56,5 +58,15 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param guid_id   数据唯一标识业务主键 暂定
      * @return          返回影响行数
      */
-    int delHouseLeaseInfo(@Param("guid_id") String guid_id);
+    int delHouseLeaseInfo(@Param("guid_id") Long guid_id);
+
+
+    /**
+     * 根据参数对象条件查询 出租房屋数据
+     * @param houseLeaseQO      查询参数对象
+     * @return                  返回数据集合
+     */
+    List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> houseLeaseQO);
+
+    List<Integer> queryHouseLeaseConstByIds(List<String> houseAvatarsIds);
 }

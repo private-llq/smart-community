@@ -20,8 +20,8 @@
                  unit <include refid="tableNameAndCondition"/> community_id = #{id} and type = 2
             </if>
     </select>
-    <!-- 【变动的层级】 传单元 或者 楼栋 和 社区结构层次id 获取单元 或 楼栋 或楼层 queryType = 3 -->
-    <select id="getBuildingOrUnitOrFloorById" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+    <!-- 【变动的层级】 传单元 或者 楼栋 和 社区结构层次id 获取单元 或 楼栋 queryType = 3 -->
+    <select id="getBuildingOrUnitById" parameterType="java.lang.Integer" resultType="java.util.HashMap">
         <choose>
             <!-- 楼栋单元层级 那就根据楼栋id 查单元 t_user_house  type = 2就表示该数据为单元 -->
             <when test="houseLevelMode == 1">
@@ -31,19 +31,15 @@
             <when test="houseLevelMode == 2">
                 select id,building <include refid="tableNameAndCondition"/> pid = #{id} and type = 1
             </when>
-            <!-- 单楼栋层级 那就根据楼栋id 查楼层 -->
-            <when test="houseLevelMode == 3">
-                select id,floor <include refid="tableNameAndCondition"/> pid = #{id} and type = 3
-            </when>
-            <!-- 单单元层级 那就根据单元id 查楼层 t_user_house  type = 3就表示该数据为楼层 -->
-            <when test="houseLevelMode == 4">
-                select id,floor <include refid="tableNameAndCondition"/> pid = #{id} and type = 3
-            </when>
             <otherwise>
             </otherwise>
         </choose>
     </select>
-    <!-- 查询某楼层#{id}下面的所有门牌 数据库类型 type = 4 门牌 queryType = 4  -->
+    <!-- 按单元或楼栋id查询楼层 -->
+    <select id="getFloorByBuildingOrUnitId" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        select id,floor <include refid="tableNameAndCondition"/> pid = #{id} and type = 3
+    </select>
+    <!-- 查询某楼层#{id}下面的所有门牌 数据库类型 type = 4 门牌 queryType = 5  -->
     <select id="getAllDoorFormFloor" parameterType="java.lang.Integer" resultType="java.util.HashMap">
         select id,door <include refid="tableNameAndCondition"/> pid = #{id} and type = 4
     </select>

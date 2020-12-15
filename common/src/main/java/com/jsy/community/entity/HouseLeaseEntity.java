@@ -21,9 +21,6 @@ import java.math.BigDecimal;
 @TableName("t_house_lease")
 public class HouseLeaseEntity extends BaseEntity {
 
-    @ApiModelProperty(value = "业务数据唯一标识")
-    private String rowGuid;
-
     @ApiModelProperty(value = "所属人ID")
     @JsonIgnore
     private String uid;
@@ -47,7 +44,7 @@ public class HouseLeaseEntity extends BaseEntity {
     private String houseAddress;
 
     @ApiModelProperty(value = "房屋租售优势标签ID")
-    private String houseAdvantageId;
+    private Long houseAdvantageId;
 
     @ApiModelProperty(value = "房屋租售价格")
     private BigDecimal housePrice;
@@ -89,7 +86,7 @@ public class HouseLeaseEntity extends BaseEntity {
     private String houseIntroduce;
 
     @ApiModelProperty(value = "房屋图片id,用于在中间表寻找拥有的图片地址")
-    private Integer houseImageId;
+    private Long houseImageId;
 
     //65不限 66普通住宅 67别墅 68公寓
     @ApiModelProperty(value = "房屋出租类型ID")

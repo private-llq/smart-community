@@ -4,16 +4,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 /**
- * <p>
  *  服务类
- * </p>
- *
  * @author YuLF
  * @since 2020-11-16
  */
@@ -46,4 +45,19 @@ public interface ICommunityInformService extends IService<CommunityInformEntity>
      * @return              返回删除是否成功
      */
     Boolean delCommunityInform(Long id);
+
+    /**
+     * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量
+     * @param initialInformCount     初始轮播消息条数
+     * @return                       返回消息列表
+     */
+    List<CommunityInformEntity> rotationCommunityInform(Integer initialInformCount, Long communityId);
+
+
+    /**
+     *  用户社区消息详情查看
+     */
+    CommunityInformEntity detailsCommunityInform(Long communityId, Long informId ,String userId);
+
+
 }

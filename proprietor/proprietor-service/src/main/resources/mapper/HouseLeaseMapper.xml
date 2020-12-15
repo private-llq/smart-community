@@ -2,44 +2,62 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jsy.community.mapper.HouseLeaseMapper">
+
     <!-- 房屋租赁常量获取 -->
     <select id="getAllHouseConstForDatabases" resultType="com.jsy.community.entity.HouseLeaseConstEntity">
         select id,house_const_name,house_const_value,house_const_type,annotation from t_house_const
     </select>
+
+
     <!-- 保存房屋租售信息 -->
     <insert id="insertHouseLease">
-        insert into t_house_lease (row_guid,uid,house_title,house_city_id,house_area_id,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_leasedeposit_id
+        insert into t_house_lease (id,uid,house_title,house_city_id,house_area_id,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_leasedeposit_id
         ,house_type_id,house_floor,house_direction,house_has_elevator,house_style_id,house_year,house_usage_id,house_kind_id
         ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_sourcetype_id
         )
         values
-        (#{rowGuid},#{uid},#{houseTitle},#{houseCityId},#{houseAreaId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseUnit},#{houseSquareMeter},#{houseLeasedepositId}
+        (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAreaId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseUnit},#{houseSquareMeter},#{houseLeasedepositId}
         ,#{houseTypeId},#{houseFloor},#{houseDirection},#{houseHasElevator},#{houseStyleId},#{houseYear},#{houseUsageId},#{houseKindId}
         ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeaseymodeId},#{houseSourcetypeId}
         )
     </insert>
+
+
     <!-- 插入房屋优势标签ID至中间库 -->
     <insert id="insertHouseAdvantage" >
-        insert into t_house_leasesale_const(guid_id,house_const_id,house_lease_id)
+        insert into t_house_leasesale_const(house_const_id,house_lease_id)
         values
         <foreach collection="houseLeaseQO.houseAdvantage" item="item" separator=",">
-            (#{houseLeaseQO.rowGuid},#{item},#{houseLeaseQO.houseAdvantageId})
+            (#{item},#{houseLeaseQO.houseAdvantageId})
         </foreach>
     </insert>
+
+
     <!-- 插入房屋图片至中间库 -->
     <insert id="insertHouseImages" >
-        insert into t_house_leasesale_const(guid_id,house_content,house_lease_id)
+        insert into t_house_leasesale_const(house_img_url,house_lease_id)
         values
         <foreach collection="houseLeaseQO.houseImage" item="item" separator=",">
-            (#{houseLeaseQO.rowGuid},#{item},#{houseLeaseQO.houseImageId})
+            (#{item},#{houseLeaseQO.houseImageId})
         </foreach>
     </insert>
+
+
     <!-- 删除用户中间表信息 -->
     <delete id="delUserMiddleInfo">
         delete from t_house_leasesale_const where guid_id = #{guid_id}
     </delete>
+
+
     <!-- 删除用户t_house_lease表中的数据 -->
     <delete id="delHouseLeaseInfo">
         delete from t_house_lease where row_guid = #{guid_id}
     </delete>
+
+    <!-- 按列表查询房屋出租信息 -->
+    <select id="queryHouseLeaseByList" resultType="com.jsy.community.qo.proprietor.HouseLeaseQO">
+        select house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id from t_house_lease limit #{houseLeaseQO.page},#{houseLeaseQO.size}
+    </select>
+
+
 </mapper>
