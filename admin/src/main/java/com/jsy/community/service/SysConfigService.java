@@ -87,4 +87,15 @@ public interface SysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	List<SysRoleEntity> listOfRole();
+	
+	//==================================================== 角色-菜单 ===============================================================
+	
+	/**
+	* @Description: 为角色设置菜单
+	 * @Param: [menuIds, roleId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
+	boolean setRoleMenus(List<Long> menuIds,Long roleId);
 }

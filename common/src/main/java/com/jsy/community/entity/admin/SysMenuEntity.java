@@ -1,6 +1,7 @@
 package com.jsy.community.entity.admin;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
@@ -23,6 +24,8 @@ public class SysMenuEntity extends BaseEntity {
 	private String url;//菜单url
 	private Integer sort;//排序
 	private Long pid;//父级id
+	@JsonIgnore
+	private Long belongTo;//顶级菜单id
 	private List<SysMenuEntity> childrenList;//子菜单
 	
 	private Long createBy;//创建人
