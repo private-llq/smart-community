@@ -16,6 +16,7 @@ import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
@@ -114,6 +115,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         // 业主数据(user表)
         UserEntity user = new UserEntity();
         user.setUid(uuid);
+        user.setId(SnowFlake.nextId());
 
         // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
@@ -155,7 +157,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             carService.addProprietorCar(proprietorQO.getCarEntityList());
         }
         //t_user_house 中插入当前这条记录 为了让物业审核
-		userHouseService.saveUserHouse(userEntity.getUid(), userEntity.getHouseEntity().getCommunityId(), userEntity.getHouseEntity().getId());
+		userHouseService.saveUserHouse(userEntity.getUid(), proprietorQO.getHouseEntityList());
         return true;
     }
 
