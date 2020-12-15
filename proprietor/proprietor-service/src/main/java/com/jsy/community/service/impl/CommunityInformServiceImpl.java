@@ -129,7 +129,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         userInformEntity.setCommunityId(communityId);
         userInformEntity.setInformId(informId);
         userInformEntity.setInformStatus(1);
-        userInformEntity.setUserId(userId);
+        userInformEntity.setUid(userId);
         userInformMapper.setInformReadByUser(userInformEntity);
         //社区该消息的浏览量+1
         communityInformMapper.updateCommunityInformBrowseCount(communityId, informId);
