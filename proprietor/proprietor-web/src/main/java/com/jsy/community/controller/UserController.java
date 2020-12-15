@@ -64,30 +64,30 @@ public class UserController {
     /**
      * 【用户】业主信息登记
      * @param proprietorQO  参数实体
+     * @author YuLF
+     * @since  2020/11/15 11:29
      * @return              返回是否登记成功
      */
+    @Login
     @PostMapping("proprietorRegister")
     @ApiOperation("业主信息登记")
-    @Login
     public CommonResult<Boolean> proprietorRegister(@RequestBody  ProprietorQO proprietorQO) {
-        //获取用户id信息
-		String uid = UserUtils.getUserId() ;
+        String userId = UserUtils.getUserId();
         //1.数据填充  新增业主信息时，必须要携带当前用户的uid  业主id首次不需要新增，只有在审核房屋通过时，业主id才会改变
-        proprietorQO.setUid(uid);
+        proprietorQO.setUid(userId);
         proprietorQO.setHouseholderId(null);
         //2.验证业主信息登记必填项
         ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.ProprietorRegister.class);
-        //2.验证业主信息实体里面的房屋实体id是否为空，如果为空 说明前端并没有选择所属房屋
-        if (proprietorQO.getHouseEntity() == null || proprietorQO.getHouseEntity().getId() == null
-                || proprietorQO.getHouseEntity().getId() == 0
-                || proprietorQO.getHouseEntity().getCommunityId() == null
-                || proprietorQO.getHouseEntity().getCommunityId() == 0) {
-            throw new ProprietorException(1, "缺失房屋id或社区id!!");
+        //2.1 验证业主信息实体里面的房屋实体id是否为空，如果为空 说明前端并没有选择所属房屋
+        if (proprietorQO.getHouseEntityList() == null || proprietorQO.getHouseEntityList().isEmpty()) {
+            throw new ProprietorException(1, "缺失房屋登记信息!");
         }
+        //验证房屋第一个id和社区id参数值是否正确 至少需要登记一个房屋
+
         //3.有填登记车辆信息的情况下
         if (proprietorQO.getHasCar()) {
-            if (null == proprietorQO.getCarEntityList()) {
-                throw new ProprietorException(1, "车辆信息未填写!");
+            if (null == proprietorQO.getCarEntityList()  || proprietorQO.getCarEntityList().isEmpty()) {
+                throw new ProprietorException(1, "缺失车辆登记信息!");
             }
             //通过uid 查询t_user_auth表的用户手机号码
             String userMobile = iUserAuthService.selectContactById(proprietorQO.getUid());
@@ -98,8 +98,8 @@ public class UserController {
             //验证所有车辆信息 验证成功没有抛异常 则把当前这个对象的一些社区id 所属人 手机号码 设置进去 方便后续车辆登记
             for (CarEntity carEntity : proprietorQO.getCarEntityList()){
                 ValidatorUtils.validateEntity(carEntity, CarEntity.proprietorCarValidated.class);
-                carEntity.setCommunityId(proprietorQO.getHouseEntity().getCommunityId());
-                carEntity.setUid(uid);
+                carEntity.setCommunityId(proprietorQO.getHouseEntityList().get(0).getCommunityId());
+                carEntity.setUid(userId);
                 carEntity.setOwner(proprietorQO.getRealName());
                 carEntity.setContact(userMobile);
             }
