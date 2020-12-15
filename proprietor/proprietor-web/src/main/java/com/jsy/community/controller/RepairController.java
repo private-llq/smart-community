@@ -73,9 +73,14 @@ public class RepairController {
 	@ApiOperation("报修内容图片上传")
 	@PostMapping("/uploadRepairImg")
 	@Login(allowAnonymous = true)
-	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile file) {
-		String filePath = MinioUtils.upload(file, BUCKETNAME);
-		redisTemplate.opsForSet().add("repair_img_part", filePath); // TODO 前端要注意调整 repairImg   而且只能一张一张选择上传  【其实应该支持一次性多张上传的】
+	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files) {
+		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME);
+		StringBuilder filePath = new StringBuilder();
+		for (String s : filePaths) {
+			redisTemplate.opsForSet().add("repair_img_part", s); // TODO 前端要注意调整 repairImg
+			filePath.append(s);
+			filePath.append(";");
+		}
 		return CommonResult.ok(filePath);
 	}
 	
@@ -93,13 +98,13 @@ public class RepairController {
 	@PostMapping("/addRepair")
 	public CommonResult addRepair(@RequestBody RepairEntity repairEntity) {
 		ValidatorUtils.validateEntity(repairEntity, RepairEntity.addRepairValidate.class);
-		String filePath = repairEntity.getRepairImg();
-		redisTemplate.opsForSet().add("repair_img_all",filePath);
+//		String filePath = repairEntity.getRepairImg();
+//		redisTemplate.opsForSet().add("repair_img_all", filePath);
 		String uid = UserUtils.getUserId();
-		repairService.addRepair(repairEntity,uid);
+		repairService.addRepair(repairEntity, uid);
 		return CommonResult.ok();
 	}
-	
+
 
 //	@ApiOperation("完成报修")
 //	@GetMapping("/completeRepair")
