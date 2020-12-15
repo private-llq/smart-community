@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.entity.admin.SysMenuEntity;
 import com.jsy.community.entity.admin.SysRoleEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.SysMenuMapper;
 import com.jsy.community.mapper.SysRoleMapper;
 import com.jsy.community.qo.admin.SysMenuQO;
@@ -51,9 +52,20 @@ public class SysConfigServiceImpl implements SysConfigService {
 	**/
 	@PostConstruct
 	private void cacheMenuToRedis(){
+		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(queryMenu()));
+	}
+	
+	/**
+	* @Description: 查询大后台菜单
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
+	public List<SysMenuEntity> queryMenu(){
 		List<SysMenuEntity> menuList = sysMenuMapper.selectList(new QueryWrapper<SysMenuEntity>().select("*").eq("pid", 0));
 		setChildren(menuList,new LinkedList<SysMenuEntity>());
-		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(menuList));
+		return menuList;
 	}
 	
 	//组装子菜单
@@ -76,8 +88,19 @@ public class SysConfigServiceImpl implements SysConfigService {
 	**/
 	@Override
 	public boolean addMenu(SysMenuEntity sysMenuEntity){
-		if(sysMenuEntity.getPid() == null){
+		if(sysMenuEntity.getPid() != null && sysMenuEntity.getPid() != 0){ //①非顶级节点，查找父节点，确保数据严密性
+			SysMenuEntity parent = sysMenuMapper.findParent(sysMenuEntity.getPid());
+			if(parent == null){
+				return false;
+			}
+			if(0 == parent.getBelongTo()){//父级是顶级节点
+				sysMenuEntity.setBelongTo(parent.getId());
+			}else{ //父级也是子级
+				sysMenuEntity.setBelongTo(parent.getBelongTo());//同步父节点的顶级节点
+			}
+		}else { //②顶级节点
 			sysMenuEntity.setPid(0L);
+			sysMenuEntity.setBelongTo(0L);
 		}
 		int result = 0;
 		if(sysMenuEntity.getSort() == null){
@@ -92,6 +115,18 @@ public class SysConfigServiceImpl implements SysConfigService {
 		return false;
 	}
 	
+	//寻找顶级菜单ID
+//	private void setBelongTo(SysMenuEntity sysMenuEntity,SysMenuEntity parent){
+//		if(0L != parent.getPid()){ //要新增的菜单非顶级
+//			parent = sysMenuMapper.findParent(parent.getPid());//寻找父节点
+//			if(parent.getPid() == 0){ //顶级节点
+//				sysMenuEntity.setBelongTo(parent.getId());
+//			}else{
+//				setBelongTo(sysMenuEntity,parent);
+//			}
+//		}
+//	}
+	
 	/**
 	* @Description: 级联删除
 	 * @Param: [id]
@@ -103,10 +138,12 @@ public class SysConfigServiceImpl implements SysConfigService {
 	public boolean delMenu(Long id){
 		List<Long> idList = new LinkedList<>(); // 级联出的要删除的id
 		idList.add(id);
-		List<Long> subIdList = sysMenuMapper.getSubIdList(Arrays.asList(id));
-		setDeleteIds(idList, subIdList);
-		int result = sysMenuMapper.deleteBatchIds(idList);
-		if(result > 0){
+//		List<Long> subIdList = sysMenuMapper.getSubIdList(Arrays.asList(id));
+//		setDeleteIds(idList, subIdList);
+//		int result = sysMenuMapper.deleteBatchIds(idList);
+		int result = sysMenuMapper.deleteById(id);
+		sysMenuMapper.delete(new QueryWrapper<SysMenuEntity>().eq("belong_to",id));
+		if(result == 1){
 			cacheMenuToRedis(); //刷新redis
 			return true;
 		}
@@ -114,13 +151,13 @@ public class SysConfigServiceImpl implements SysConfigService {
 	}
 	
 	//组装全部需要删除的id
-	private void setDeleteIds(List<Long> idList, List<Long> subIdList) {
-		if(!CollectionUtils.isEmpty(subIdList)){
-			subIdList.removeAll(idList);
-			idList.addAll(subIdList);
-			setDeleteIds(idList,sysMenuMapper.getSubIdList(subIdList));
-		}
-	}
+//	private void setDeleteIds(List<Long> idList, List<Long> subIdList) {
+//		if(!CollectionUtils.isEmpty(subIdList)){
+//			subIdList.removeAll(idList);
+//			idList.addAll(subIdList);
+//			setDeleteIds(idList,sysMenuMapper.getSubIdList(subIdList));
+//		}
+//	}
 	
 	/**
 	* @Description: 修改菜单
@@ -150,7 +187,14 @@ public class SysConfigServiceImpl implements SysConfigService {
 	**/
 	@Override
 	public List<SysMenuEntity> listOfMenu() {
-		return JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
+		List<SysMenuEntity> list = null;
+		try{
+			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
+		}catch (Exception e){
+			log.error("redis获取菜单失败");
+			return queryMenu();//从mysql获取
+		}
+		return list;
 	}
 	
 	//==================================================== Role角色 ===============================================================
@@ -226,6 +270,12 @@ public class SysConfigServiceImpl implements SysConfigService {
 	 **/
 	@Override
 	public boolean setRoleMenus(List<Long> menuIds,Long roleId){
+		//设置子菜单
+		if(!CollectionUtils.isEmpty(menuIds)){
+//			List<Long> subIdList = sysMenuMapper.getSubIdList(menuIds);
+			List<Long> idBelongList = sysMenuMapper.getIdBelongList(menuIds);
+			menuIds.addAll(idBelongList);
+		}
 		//备份
 		List<Long> userRoles = sysRoleMapper.getRoleMenu(roleId);
 		//清空

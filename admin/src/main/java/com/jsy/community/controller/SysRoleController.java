@@ -9,6 +9,7 @@ import com.jsy.community.service.SysConfigService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -84,6 +85,7 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
+	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("menus")
 	public CommonResult setUserRoles(@RequestBody SysRoleMenuEntity sysRoleMenuEntity){
 		boolean b = sysConfigService.setRoleMenus(sysRoleMenuEntity.getMenuIds(), sysRoleMenuEntity.getRoleId());

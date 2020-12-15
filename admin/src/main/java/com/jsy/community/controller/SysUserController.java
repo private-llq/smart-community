@@ -9,6 +9,7 @@ import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("roles")
 	public CommonResult setUserRoles(@RequestBody SysUserRoleEntity sysUserRoleEntity){
 		boolean b = iSysUserService.setUserRoles(sysUserRoleEntity.getRoleIds(), sysUserRoleEntity.getUserId());

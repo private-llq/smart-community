@@ -3,9 +3,17 @@
  
 <mapper namespace="com.jsy.community.mapper.SysMenuMapper">
 
-	<select id="getSubIdList" parameterType="java.util.List" resultType="Long">
+<!--	<select id="getSubIdList" parameterType="java.util.List" resultType="Long">
 		select id from t_sys_menu
 		where pid in
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>-->
+
+    <select id="getIdBelongList" parameterType="java.util.List" resultType="Long">
+		select id from t_sys_menu
+		where belong_to in
 		<foreach collection="list" item="item" separator="," open="(" close=")">
 			#{item}
 		</foreach>

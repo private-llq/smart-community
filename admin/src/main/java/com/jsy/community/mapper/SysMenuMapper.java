@@ -29,7 +29,19 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
 	int addMenu(@Param("entity") SysMenuEntity sysMenuEntity);
 	
 	/**
-	* @Description: 获取子菜单
+	* @Description: 寻找父节点
+	 * @Param: [pid]
+	 * @Return: java.lang.Long
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
+	@Select("select id,pid,belong_to from t_sys_menu where id = #{pid}")
+	SysMenuEntity findParent(Long pid);
+	
+//	@Select("select")
+	
+	/**
+	* @Description: 获取子菜单列表
 	 * @Param: [id]
 	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
 	 * @Author: chq459799974
@@ -39,13 +51,22 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
 	List<SysMenuEntity> getChildrenList(Long id);
 	
 	/**
-	* @Description: 获取子菜单id
+	* @Description: 批量获取子菜单id列表(查询pid)
 	 * @Param: [ids]
 	 * @Return: java.util.List<java.lang.Long>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
-	@Select("select id from t_sys_menu where pid = #{id}")
-	List<Long> getSubIdList(List<Long> ids);
+//	List<Long> getSubIdList(List<Long> ids);
 	
+	/**
+	 * @Description: 批量获取子菜单id列表(查询belong_to)
+	 * @Param: [ids]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	 **/
+	List<Long> getIdBelongList(List<Long> ids);
+
+
 }

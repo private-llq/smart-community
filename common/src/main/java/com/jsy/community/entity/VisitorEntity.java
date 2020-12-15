@@ -93,6 +93,13 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @Range(min = 0,max = 2, message = "楼栋门禁授权选择出错")
     private Integer isBuildingAccess;
     
+    @ApiModelProperty(value = "来访车辆车牌", hidden = true)
+    @Pattern(regexp = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$", message = "请输入一个正确的车牌号!")
+    private String carPlate;
+    
+    @ApiModelProperty(value = "来访车辆类型", hidden = true)
+    private Integer carType;
+    
     @JsonIgnore
     @ApiModelProperty(value = "审核方式，1业主审核，2物业审核")
     private Integer checkType;
