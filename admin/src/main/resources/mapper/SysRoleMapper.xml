@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.SysRoleMapper">
+
+	<!-- 批量添加角色菜单 -->
+	<insert id="addRoleMenuBatch" parameterType="java.util.List">
+		insert into t_sys_role_menu(role_id,menu_id)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{roleId},#{item})
+		</foreach>
+	</insert>
+
+</mapper>

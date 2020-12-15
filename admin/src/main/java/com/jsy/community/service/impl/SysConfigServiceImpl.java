@@ -10,6 +10,7 @@ import com.jsy.community.mapper.SysRoleMapper;
 import com.jsy.community.qo.admin.SysMenuQO;
 import com.jsy.community.qo.admin.SysRoleQO;
 import com.jsy.community.service.SysConfigService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,6 +28,7 @@ import java.util.List;
  * @description 系统配置，菜单，角色，权限等
  * @since 2020-12-14 10:29
  **/
+@Slf4j
 @Service
 public class SysConfigServiceImpl implements SysConfigService {
 	
@@ -159,6 +161,7 @@ public class SysConfigServiceImpl implements SysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
+	@Override
 	public boolean addRole(SysRoleEntity sysRoleEntity){
 		int result = sysRoleMapper.insert(sysRoleEntity);
 		if(result == 1){
@@ -174,6 +177,7 @@ public class SysConfigServiceImpl implements SysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
+	@Override
 	public boolean delRole(Long id){
 		int result = sysRoleMapper.deleteById(id);
 		if(result == 1){
@@ -189,6 +193,7 @@ public class SysConfigServiceImpl implements SysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
+	@Override
 	public boolean updateRole(SysRoleQO sysRoleOQ){
 		SysRoleEntity entity = new SysRoleEntity();
 		BeanUtils.copyProperties(sysRoleOQ,entity);
@@ -206,8 +211,35 @@ public class SysConfigServiceImpl implements SysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
+	@Override
 	public List<SysRoleEntity> listOfRole(){
 		return sysRoleMapper.selectList(new QueryWrapper<SysRoleEntity>().select("*"));
+	}
+	
+	//==================================================== 角色-菜单 ===============================================================
+	/**
+	 * @Description: 为角色设置菜单
+	 * @Param: [menuIds, roleId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	 **/
+	@Override
+	public boolean setRoleMenus(List<Long> menuIds,Long roleId){
+		//备份
+		List<Long> userRoles = sysRoleMapper.getRoleMenu(roleId);
+		//清空
+		sysRoleMapper.clearRoleMenu(roleId);
+		//新增
+		int rows = sysRoleMapper.addRoleMenuBatch(menuIds, roleId);
+		//还原
+		if(rows != menuIds.size()){
+			log.error("设置角色菜单出错：" + roleId,"成功条数：" + rows);
+			sysRoleMapper.clearRoleMenu(roleId);
+			sysRoleMapper.addRoleMenuBatch(userRoles, roleId);
+			return false;
+		}
+		return true;
 	}
 	
 }

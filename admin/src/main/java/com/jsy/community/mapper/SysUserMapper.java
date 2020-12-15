@@ -12,15 +12,33 @@ import java.util.List;
 @Mapper
 public interface SysUserMapper extends BaseMapper<SysUserEntity> {
 	
-	//备份用户角色
+	/**
+	* @Description: 备份用户角色
+	 * @Param: [userId]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
 	@Select("select role_id from t_sys_user_role where user_id = #{userId}")
 	List<Long> getUserRole(Long userId);
 	
-	//清空用户角色
+	/**
+	* @Description: 清空用户角色
+	 * @Param: [userId]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
 	@Delete("delete from t_sys_user_role where user_id = #{userId}")
 	void clearUserRole(Long userId);
 	
-	//批量添加用户角色
+	/**
+	* @Description: 批量添加用户角色
+	 * @Param: [list, userId]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
 	int addUserRoleBatch(@Param("list") List<Long> list, @Param("userId") Long userId);
 	
 	/**

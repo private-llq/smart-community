@@ -1,6 +1,8 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.entity.admin.SysRoleEntity;
+import com.jsy.community.entity.admin.SysRoleMenuEntity;
+import com.jsy.community.entity.admin.SysUserRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.SysRoleQO;
 import com.jsy.community.service.SysConfigService;
@@ -73,5 +75,18 @@ public class SysRoleController {
 	@GetMapping("")
 	public CommonResult<List<SysRoleEntity>> listOfMenu(){
 		return CommonResult.ok(sysConfigService.listOfRole());
+	}
+	
+	/** 
+	* @Description: 为角色设置菜单
+	 * @Param: [sysRoleMenuEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
+	@PostMapping("menus")
+	public CommonResult setUserRoles(@RequestBody SysRoleMenuEntity sysRoleMenuEntity){
+		boolean b = sysConfigService.setRoleMenus(sysRoleMenuEntity.getMenuIds(), sysRoleMenuEntity.getRoleId());
+		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"设置角色菜单失败");
 	}
 }
