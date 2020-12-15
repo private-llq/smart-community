@@ -12,7 +12,7 @@ import java.util.List;
  * @description 系统配置，菜单，角色，权限等
  * @since 2020-12-14 10:55
  **/
-public interface SysConfigService {
+public interface ISysConfigService {
 	
 	//==================================================== Menu菜单 ===============================================================
 	/**
@@ -98,4 +98,14 @@ public interface SysConfigService {
 	 * @Date: 2020/12/15
 	**/
 	boolean setRoleMenus(List<Long> menuIds,Long roleId);
+	
+	//==================================================== 用户-菜单 ===============================================================
+	/**
+	* @Description: 查询用户菜单权限
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
+	List<SysMenuEntity> queryUserMenu(Long uid);
 }

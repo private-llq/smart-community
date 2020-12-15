@@ -5,12 +5,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.entity.admin.SysMenuEntity;
 import com.jsy.community.entity.admin.SysRoleEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.SysMenuMapper;
 import com.jsy.community.mapper.SysRoleMapper;
 import com.jsy.community.qo.admin.SysMenuQO;
 import com.jsy.community.qo.admin.SysRoleQO;
-import com.jsy.community.service.SysConfigService;
+import com.jsy.community.service.ISysConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,7 +29,7 @@ import java.util.List;
  **/
 @Slf4j
 @Service
-public class SysConfigServiceImpl implements SysConfigService {
+public class ISysConfigServiceImpl implements ISysConfigService {
 	
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -290,6 +288,19 @@ public class SysConfigServiceImpl implements SysConfigService {
 			return false;
 		}
 		return true;
+	}
+	
+	//==================================================== 用户-菜单 ===============================================================
+	/**
+	* @Description: 查询用户菜单权限
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	**/
+	@Override
+	public List<SysMenuEntity> queryUserMenu(Long uid){
+		return sysMenuMapper.queryUserMenu(uid);
 	}
 	
 }
