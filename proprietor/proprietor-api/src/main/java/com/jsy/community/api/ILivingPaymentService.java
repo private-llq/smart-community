@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
+import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.vo.GroupVO;
 
 import java.util.List;
@@ -44,4 +45,12 @@ public interface ILivingPaymentService {
      * @return
      */
     List selectList(String userId);
+    /**
+     * @Description: 添加订单备注
+     * @author: Hu
+     * @since: 2020/12/12 10:15
+     * @Param:
+     * @return:
+     */
+    void addRemark(RemarkQO remarkQO);
 }

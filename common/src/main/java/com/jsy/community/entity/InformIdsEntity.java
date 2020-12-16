@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description: 所有收到推送消息的id集合
  * @author: Hu
  * @create: 2020-12-08 13:48
  **/

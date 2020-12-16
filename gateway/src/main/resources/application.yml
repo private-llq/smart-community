@@ -1,0 +1,23 @@
+server:
+  port: 9527
+spring:
+  application:
+    name: cao-gateway
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        # 跳转URL
+        - id: property
+          uri: lb://property-web
+          predicates:
+            - Path=/property/**
+          filters:
+            - PrefixPath=/api/v1
+        - id: proprietor
+          uri: lb://proprietor-web
+          predicates:
+            - Path=/proprietor/**
+          filters:
+            - PrefixPath=/api/v1

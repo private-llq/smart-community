@@ -11,6 +11,8 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
+import com.jsy.community.qo.proprietor.RemarkQO;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -20,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -80,7 +83,7 @@ public class LivingPaymentController {
      * @param groupQO
      * @return
      */
-    @ApiOperation("选择分组查询下面缴过费的水电气户号")
+    @ApiOperation("选择分组查询缴过费的户号")
     @PostMapping("/selectGroup")
     @Login
     public CommonResult selectGroup(@RequestBody GroupQO groupQO){
@@ -117,6 +120,34 @@ public class LivingPaymentController {
         String userId = UserUtils.getUserId();
         List list = livingPaymentService.selectList(userId);
         return CommonResult.ok(list);
+    }
+
+
+    /**
+     * 添加订单备注
+     * @param
+     * @return
+     */
+    @ApiOperation("添加订单备注")
+    @PostMapping("/addRemark")
+    @Login
+    public CommonResult addRemark(@RequestBody RemarkQO remarkQO){
+        String userId = UserUtils.getUserId();
+        remarkQO.setUid(userId);
+        livingPaymentService.addRemark(remarkQO);
+        return CommonResult.ok();
+    }
+    /**
+     * 添加备注图片
+     * @param
+     * @return
+     */
+    @ApiOperation("添加备注图片")
+    @PostMapping("/addRemarkImg")
+    @Login
+    public CommonResult addRemarkImg(@RequestParam("file") MultipartFile file){
+        String upload = MinioUtils.upload(file, "bbbb");
+        return CommonResult.ok(upload);
     }
 
 }

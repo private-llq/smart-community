@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("t_pay_order")
-@ApiModel(value="PayOrder对象", description="订单表")
+@ApiModel(value = "PayOrder对象", description = "订单表")
 public class PayOrderEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -56,6 +56,21 @@ public class PayOrderEntity extends BaseEntity {
 
     @ApiModelProperty(value = "分组")
     private Long groupId;
+
+    @ApiModelProperty(value = "账单类型，1,生活日用，2饮食，3交通出行，4文教娱乐，5服饰美容，6运动健康，7住房缴费，8通讯缴费，9其他消费")
+    private Integer billClassification;
+
+    @ApiModelProperty(value = "标签")
+    private String label;
+
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
+    @ApiModelProperty(value = "备注图片")
+    private String remarkImg;
+
+    @ApiModelProperty(value = "缴费类型，如水电气")
+    private Long paymentType;
 
 
 }

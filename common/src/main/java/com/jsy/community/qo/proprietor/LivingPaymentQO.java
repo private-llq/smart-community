@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Data
 @ApiModel("生活缴费接收参数对象")
 public class LivingPaymentQO implements Serializable {
-    @ApiModelProperty(value = "水电气类型，0水费，1电费，2燃气费")
+    @ApiModelProperty(value = "缴费类型,如水电气")
     private Long type;
 
     @ApiModelProperty(value = "1我家，2父母，3房东，4朋友，5其他")
