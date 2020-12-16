@@ -6,6 +6,8 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.List;
+
 /**
  * <p>
  * 访客随行人员 服务类
@@ -35,13 +37,13 @@ public interface IVisitorPersonService extends IService<VisitorPersonEntity> {
 	boolean updateVisitorPersonById(VisitorPersonQO visitorPersonQO);
 	
 	/**
-	 * @Description: 删除随行人员
-	 * @Param: [id]
+	 * @Description: 批量删除随行人员
+	 * @Param: [ids]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
-	boolean deleteVisitorPersonById(Long id);
+	boolean deleteVisitorPersonById(List<Long> ids);
 	
 	/**
 	* @Description: 随行人员 分页查询

@@ -67,16 +67,16 @@ public class VisitorPersonServiceImpl extends ServiceImpl<VisitorPersonMapper, V
 	}
 
 	/**
-	 * @Description: 删除随行人员
-	 * @Param: [id]
+	 * @Description: 批量删除随行人员
+	 * @Param: [ids]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
 	@Override
-	public boolean deleteVisitorPersonById(Long id){
-		int result = visitorPersonMapper.deleteById(id);
-		if(result == 1){
+	public boolean deleteVisitorPersonById(List<Long> ids){
+		int result = visitorPersonMapper.deleteBatchIds(ids);
+		if(result > 0){
 			return true;
 		}
 		return false;

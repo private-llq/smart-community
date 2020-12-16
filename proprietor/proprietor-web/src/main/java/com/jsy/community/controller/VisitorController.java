@@ -190,17 +190,17 @@ public class VisitorController {
 	}
 	
 	/**
-	 * @Description: 删除随行人员
-	 * @Param: [id]
+	 * @Description: 批量删除随行人员
+	 * @Param: [ids]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
-	@ApiOperation("【随行人员】删除")
+	@ApiOperation("【随行人员】批量删除")
 	@DeleteMapping("person")
-	public CommonResult deletePerson(@RequestParam("id") Long id) {
-		boolean result = iVisitorPersonService.deleteVisitorPersonById(id);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行人员 删除失败");
+	public CommonResult deletePerson(@RequestBody List<Long> ids) {
+		boolean result = iVisitorPersonService.deleteVisitorPersonById(ids);
+		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行人员 批量删除失败");
 	}
 	
 	/**
@@ -250,17 +250,17 @@ public class VisitorController {
 	}
 	
 	/**
-	 * @Description: 删除随行车辆
-	 * @Param: [id]
+	 * @Description: 批量删除随行车辆
+	 * @Param: [ids]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
-	@ApiOperation("【随行车辆】删除")
+	@ApiOperation("【随行车辆】批量删除")
 	@DeleteMapping("car")
-	public CommonResult deleteCar(@RequestParam("id") Long id) {
-		boolean result = iVisitingCarService.deleteVisitingCarById(id);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行车辆 删除失败");
+	public CommonResult deleteCar(@RequestBody List<Long> ids) {
+		boolean result = iVisitingCarService.deleteVisitingCarById(ids);
+		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行车辆 批量删除失败");
 	}
 	
 	/**

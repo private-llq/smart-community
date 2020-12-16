@@ -67,16 +67,16 @@ public class VisitingCarServiceImpl extends ServiceImpl<VisitingCarMapper, Visit
 	}
 	
 	/**
-	 * @Description: 删除随行车辆
+	 * @Description: 批量删除随行车辆
 	 * @Param: [id]
 	 * @Return: boolean
 	 * @Author: chq459799974
-	 * @Date: 2020/11/16
+	 * @Date: 2020/12/16
 	 **/
 	@Override
-	public boolean deleteVisitingCarById(Long id){
-		int result = visitingCarMapper.deleteById(id);
-		if(result == 1){
+	public boolean deleteVisitingCarById(List<Long> ids){
+		int result = visitingCarMapper.deleteBatchIds(ids);
+		if(result > 0){
 			return true;
 		}
 		return false;
