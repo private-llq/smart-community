@@ -77,6 +77,9 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房屋是否有电梯：1有 0无")
     private Short houseHasElevator;
 
+    @ApiModelProperty(value = "房屋联系人电话")
+    private String houseContact;
+
     //值是变动  需要存id至数据库 对应 名称 由后台人员管理
     @ApiModelProperty(value = "房屋装修样式ID、1、精装修2、现代风格、3.古典风格、4.欧美风")
     private Short houseStyleId;

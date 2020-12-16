@@ -69,15 +69,28 @@ public class HouseLeaseQO implements Serializable {
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未输入价格")
     private BigDecimal housePrice;
 
+    private BigDecimal housePriceMin;
+
+    private BigDecimal housePriceMax;
+
     @ApiModelProperty(value = "房屋出租单位/年/月/周/日")
     @Pattern(groups = {addLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_DATE, message = "指定的日期单位没有在范围之内")
     @NotBlank(groups = {addLeaseSaleHouse.class}, message = "日期单位错误")
     private String houseUnit;
 
+    @ApiModelProperty(value = "房屋联系人电话")
+    @Pattern(groups = {addLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_MOBILE, message = "手机号不正确! 电信|联通|移动")
+    @NotBlank(groups = {addLeaseSaleHouse.class}, message = "手机号不能为空")
+    private String houseContact;
+
     @ApiModelProperty(value = "房屋租售平方米")
     @Range(groups = {addLeaseSaleHouse.class}, min = 1, max =BusinessConst.HOUSE_SQUARE_METER_MAX, message = "房屋面积请输入一个有效的值")
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未输入房屋面积")
     private BigDecimal houseSquareMeter;
+
+    private BigDecimal houseSquareMeterMin;
+
+    private BigDecimal houseSquareMeterMax;
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
     @ApiModelProperty(value = "房屋出租方式id /1.压一付一/2.压一付三/3.压一付六")
@@ -111,6 +124,10 @@ public class HouseLeaseQO implements Serializable {
     //值是变动  需要存id至数据库 对应 名称 由后台人员管理
     @ApiModelProperty(value = "房源类型ID、73不限(默认) 74可短租 75邻地铁  76压一付一  77配套齐全  78精装修 79南北通透  80有阳台")
     private Short houseSourcetypeId;
+
+    @ApiModelProperty(value = "房屋来源类型ID、1.个人 2.经纪人 3.不限")
+    @NotNull(groups = {addLeaseSaleHouse.class}, message = "房屋来源类型ID未选择!")
+    private Short houseSourceId;
 
     @ApiModelProperty(value = "房屋年代")
     @Pattern(groups = {addLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_YEAR , message = "房屋年代过于久远!")

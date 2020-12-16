@@ -85,6 +85,9 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "房屋介绍内容")
     private String houseIntroduce;
 
+    @ApiModelProperty(value = "房屋联系人电话")
+    private String houseContact;
+
     @ApiModelProperty(value = "房屋图片id,用于在中间表寻找拥有的图片地址")
     private Long houseImageId;
 
