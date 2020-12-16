@@ -135,7 +135,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	 * @Date: 2020/12/16
 	 **/
 	@Override
-	public Map<String,Map<String,String>> queryCommunityNameByIdBatch(Collection<Long> ids){
+	public Map<Long,Map<Long,String>> queryCommunityNameByIdBatch(Collection<Long> ids){
 		return communityMapper.queryCommunityNameByIdBatch(ids);
 	}
 	

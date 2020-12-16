@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -214,12 +215,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         for(UserHouseEntity userHouseEntity : houses){
             communityIdSet.add(userHouseEntity.getCommunityId());
         }
-        Map<String, Map<String,String>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
+        Map<Long, Map<Long,String>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
         for(UserHouseEntity userHouseEntity : houses){
-            Map<String, String> stringStringMap1 = communityMap.get(1L);
-            Map<String, String> stringStringMap2 = communityMap.get("1");
-            Map<String, String> stringStringMap = communityMap.get(String.valueOf(userHouseEntity.getCommunityId()));
-            userHouseEntity.setCommunityName(communityMap.get(String.valueOf(userHouseEntity.getCommunityId())).get("name"));
+            userHouseEntity.setCommunityName(communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId())).get("name"));
         }
         return houses;
     }

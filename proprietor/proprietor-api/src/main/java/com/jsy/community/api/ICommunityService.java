@@ -50,5 +50,5 @@ public interface ICommunityService extends IService<CommunityEntity> {
      * @Author: chq459799974
      * @Date: 2020/12/16
     **/
-	Map<String,Map<String,String>> queryCommunityNameByIdBatch(Collection<Long> ids);
+	Map<Long,Map<Long,String>> queryCommunityNameByIdBatch(Collection<Long> ids);
 }
