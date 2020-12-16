@@ -2,8 +2,6 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.ICommonService;
-import com.jsy.community.api.IHouseLeaseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
@@ -11,6 +9,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.lease.api.IHouseLeaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -19,18 +18,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/lease")
-@Api(tags = "房屋租售控制器")
 @Slf4j
-@RestController
 @ApiJSYController
+@RestController
+@RequestMapping("/house")
+@Api(tags = "房屋租售控制器")
 public class HouseLeaseController {
 
-    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseLeaseService iHouseLeaseService;
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
-    private ICommonService iCommonService;
 
     @ApiOperation("新增房屋租售")
     @PostMapping()//addHouseLease

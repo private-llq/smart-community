@@ -1,16 +1,14 @@
-package com.jsy.community.task;
+package com.jsy.lease.task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.HouseLeaseConstEntity;
-import com.jsy.community.entity.RegionEntity;
-import com.jsy.community.mapper.HouseLeaseMapper;
+import com.jsy.lease.mapper.HouseLeaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;

@@ -1,4 +1,4 @@
-package com.jsy.community.mapper;
+package com.jsy.lease.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseLeaseConstEntity;

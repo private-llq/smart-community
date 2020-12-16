@@ -1,4 +1,4 @@
-package com.jsy.community.api;
+package com.jsy.lease.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseLeaseEntity;

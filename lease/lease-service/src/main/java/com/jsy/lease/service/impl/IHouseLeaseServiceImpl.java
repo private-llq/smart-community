@@ -1,27 +1,26 @@
-package com.jsy.community.service.impl;
+package com.jsy.lease.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.IHouseLeaseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseEntity;
-import com.jsy.community.mapper.HouseLeaseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.lease.api.IHouseLeaseService;
+import com.jsy.lease.mapper.HouseLeaseMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author YuLF
  * @since 2020-12-11 09:22
  */
-@DubboService(version = Const.version, group = Const.group_proprietor)
+@DubboService(version = Const.version, group = Const.group_lease)
 public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLeaseEntity> implements IHouseLeaseService {
 
     @Resource
