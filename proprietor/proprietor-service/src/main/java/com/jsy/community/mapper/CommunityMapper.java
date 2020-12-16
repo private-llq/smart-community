@@ -39,7 +39,7 @@ public interface CommunityMapper extends BaseMapper<CommunityEntity> {
     /**
     * @Description: 根据社区id批量查询社区名
      * @Param: [list]
-     * @Return: java.util.List<java.util.Map<java.lang.Long,java.lang.String>>
+     * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.Long,java.lang.String>>
      * @Author: chq459799974
      * @Date: 2020/12/16
     **/

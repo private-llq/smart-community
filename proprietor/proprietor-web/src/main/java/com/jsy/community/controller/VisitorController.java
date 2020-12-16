@@ -13,10 +13,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
-import com.jsy.community.utils.MyMathUtils;
-import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.vo.VisitorEntryVO;
@@ -130,13 +127,13 @@ public class VisitorController {
 	/**
 	* @Description: 分页查询
 	 * @Param: [baseQO]
-	 * @Return: com.jsy.community.vo.CommonResult<com.baomidou.mybatisplus.extension.plugins.pagination.Page>
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo>
 	 * @Author: chq459799974
 	 * @Date: 2020/11/18
 	**/
 	@ApiOperation("【访客】分页查询")
 	@PostMapping("page")
-	public CommonResult<Page> query(@RequestBody BaseQO<VisitorQO> baseQO) {
+	public CommonResult<PageInfo> query(@RequestBody BaseQO<VisitorQO> baseQO) {
 		return CommonResult.ok(iVisitorService.queryByPage(baseQO,UserUtils.getUserId()));
 	}
 	
@@ -209,13 +206,13 @@ public class VisitorController {
 	/**
 	* @Description: 随行人员 分页查询
 	 * @Param: [baseQO]
-	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/10
 	**/
 	@ApiOperation("【随行人员】分页查询")
 	@PostMapping("person/page")
-	public CommonResult queryPersonPage(@RequestBody BaseQO<String> baseQO){
+	public CommonResult<PageInfo<VisitorPersonEntity>> queryPersonPage(@RequestBody BaseQO<String> baseQO){
 		baseQO.setQuery(UserUtils.getUserId());
 		return CommonResult.ok(iVisitorPersonService.queryVisitorPersonPage(baseQO));
 	}
@@ -269,13 +266,13 @@ public class VisitorController {
 	/**
 	 * @Description: 随行车辆 分页查询
 	 * @Param: [baseQO]
-	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/10
 	 **/
 	@ApiOperation("【随行车辆】分页查询")
 	@PostMapping("car/page")
-	public CommonResult queryCarPage(@RequestBody BaseQO<String> baseQO){
+	public CommonResult<PageInfo<VisitingCarEntity>> queryCarPage(@RequestBody BaseQO<String> baseQO){
 		baseQO.setQuery(UserUtils.getUserId());
 		return CommonResult.ok(iVisitingCarService.queryVisitingCarPage(baseQO));
 	}

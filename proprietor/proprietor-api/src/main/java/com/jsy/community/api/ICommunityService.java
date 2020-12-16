@@ -1,10 +1,10 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +23,7 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/20
 	**/
-	Page<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO);
+	PageInfo<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO);
 
 	/**
 	 * 通过社区名称和城市id查询相关的社区数据 服务提供者
@@ -43,12 +43,12 @@ public interface ICommunityService extends IService<CommunityEntity> {
     **/
     CommunityEntity locateCommunity(String uid,Map<String,Double> location);
 	
-    /**
-    * @Description: 根据社区id批量查询社区名
-     * @Param: [ids]
-     * @Return: java.util.List<java.util.Map<java.lang.Long,java.lang.String>>
-     * @Author: chq459799974
-     * @Date: 2020/12/16
-    **/
+	/**
+	 * @Description: 根据社区id批量查询社区名
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.Long,java.lang.String>>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/16
+	 **/
 	Map<Long,Map<Long,String>> queryCommunityNameByIdBatch(Collection<Long> ids);
 }

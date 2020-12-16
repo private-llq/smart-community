@@ -1,11 +1,11 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/20
 	**/
-	Page<HouseEntity> queryHousePage(BaseQO<HouseQO> baseQO);
+	PageInfo<HouseEntity> queryHousePage(BaseQO<HouseQO> baseQO);
 	
 	/**
 	* @Description: 新增楼栋(单元/楼层/房间等)

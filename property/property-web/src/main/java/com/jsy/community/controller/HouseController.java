@@ -1,15 +1,13 @@
 package com.jsy.community.controller;
 
-
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -31,15 +29,14 @@ import org.springframework.web.bind.annotation.*;
 @ApiJSYController
 public class HouseController {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IHouseService iHouseService;
 	
 	// 查询子级，后期若要封装层级，HouseQO加查询类型
 	@ApiOperation("【楼栋】查询子级楼栋")
 	@PostMapping("page/sub")
-	public CommonResult<Page<HouseEntity>> queryHousePage(@RequestBody BaseQO<HouseQO> baseQO){
-		Page<HouseEntity> subHousePage = iHouseService.queryHousePage(baseQO);
-		return CommonResult.ok(subHousePage);
+	public CommonResult<PageInfo<HouseEntity>> queryHousePage(@RequestBody BaseQO<HouseQO> baseQO){
+		return CommonResult.ok(iHouseService.queryHousePage(baseQO));
 	}
 	
 	@ApiOperation("【楼栋】新增楼栋信息")

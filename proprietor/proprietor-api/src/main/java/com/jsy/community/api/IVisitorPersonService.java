@@ -1,13 +1,10 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
-import org.springframework.beans.BeanUtils;
-
-import java.util.List;
+import com.jsy.community.utils.PageInfo;
 
 /**
  * <p>
@@ -53,6 +50,6 @@ public interface IVisitorPersonService extends IService<VisitorPersonEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/10
 	**/
-	Page<VisitorPersonEntity> queryVisitorPersonPage(BaseQO<String> baseQO);
+	PageInfo<VisitorPersonEntity> queryVisitorPersonPage(BaseQO<String> baseQO);
 	
 }

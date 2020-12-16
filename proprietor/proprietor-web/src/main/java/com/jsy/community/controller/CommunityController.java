@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityService;
@@ -8,7 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
-import com.jsy.community.utils.JwtUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -39,8 +38,8 @@ public class CommunityController {
 	private ICommunityService iCommunityService;
 	
 	//TODO 和公共接口是否重复？
-	@GetMapping("")
-	public CommonResult<Page<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
+	@PostMapping("page")
+	public CommonResult<PageInfo<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
 		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));
 	}
 

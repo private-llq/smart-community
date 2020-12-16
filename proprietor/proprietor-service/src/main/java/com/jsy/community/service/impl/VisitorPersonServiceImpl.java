@@ -11,6 +11,7 @@ import com.jsy.community.mapper.VisitorPersonMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
 import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,9 +90,12 @@ public class VisitorPersonServiceImpl extends ServiceImpl<VisitorPersonMapper, V
 	 * @Date: 2020/12/10
 	 **/
 	@Override
-	public Page<VisitorPersonEntity> queryVisitorPersonPage(BaseQO<String> baseQO){
+	public PageInfo<VisitorPersonEntity> queryVisitorPersonPage(BaseQO<String> baseQO){
 		Page<VisitorPersonEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
-		return visitorPersonMapper.selectPage(page,new QueryWrapper<VisitorPersonEntity>().select("*").eq("uid",baseQO.getQuery()));
+		Page<VisitorPersonEntity> visitorPersonEntityPage = visitorPersonMapper.selectPage(page, new QueryWrapper<VisitorPersonEntity>().select("*").eq("uid", baseQO.getQuery()));
+		PageInfo<VisitorPersonEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(visitorPersonEntityPage,pageInfo);
+		return pageInfo;
 	}
 }
