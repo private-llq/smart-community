@@ -15,8 +15,10 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.qo.proprietor.VisitorQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -199,7 +201,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Date: 2020/12/16
      **/
     @Override
-    public Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO,String uid){
+    public PageInfo<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO, String uid){
         Page<VisitorEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>().select("*").eq("uid",uid);
@@ -212,7 +214,10 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
                 queryWrapper.eq("contact",visitorQO.getContact());
             }
         }
-        return visitorMapper.selectPage(page, queryWrapper);
+        Page<VisitorEntity> resultPage = visitorMapper.selectPage(page, queryWrapper);
+        PageInfo<VisitorEntity> pageInfo = new PageInfo<>();
+        BeanUtils.copyProperties(resultPage,pageInfo);
+        return pageInfo;
     }
     
     /**

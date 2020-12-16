@@ -14,7 +14,9 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.DistanceUtil;
 import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -36,7 +38,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	private IUserHouseService userHouseService;
 	
 	@Override
-	public Page<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO){
+	public PageInfo<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO){
 		Page<CommunityEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
 		QueryWrapper<CommunityEntity> queryWrapper = new QueryWrapper<CommunityEntity>().select("*");
@@ -78,7 +80,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 				return 0;
 			}
 		});
-		return communityEntityPage;
+		PageInfo<CommunityEntity> PageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(communityEntityPage,PageInfo);
+		return PageInfo;
 	}
 
 	/**
@@ -128,12 +132,12 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	}
 	
 	/**
-	 * @Description: 根据社区id批量查询社区名
+	* @Description: 根据社区id批量查询社区名
 	 * @Param: [ids]
-	 * @Return: java.util.List<java.util.Map<java.lang.Long,java.lang.String>>
+	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.Long,java.lang.String>>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
-	 **/
+	**/
 	@Override
 	public Map<Long,Map<Long,String>> queryCommunityNameByIdBatch(Collection<Long> ids){
 		return communityMapper.queryCommunityNameByIdBatch(ids);

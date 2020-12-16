@@ -1,11 +1,10 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
-import org.springframework.beans.BeanUtils;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.List;
 
@@ -38,13 +37,13 @@ public interface IVisitorPersonService extends IService<VisitorPersonEntity> {
 	boolean updateVisitorPersonById(VisitorPersonQO visitorPersonQO);
 	
 	/**
-	 * @Description: 删除随行人员
-	 * @Param: [id]
+	 * @Description: 批量删除随行人员
+	 * @Param: [ids]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
-	boolean deleteVisitorPersonById(Long id);
+	boolean deleteVisitorPersonById(List<Long> ids);
 	
 	/**
 	* @Description: 随行人员 分页查询
@@ -53,6 +52,6 @@ public interface IVisitorPersonService extends IService<VisitorPersonEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/10
 	**/
-	Page<VisitorPersonEntity> queryVisitorPersonPage(BaseQO<String> baseQO);
+	PageInfo<VisitorPersonEntity> queryVisitorPersonPage(BaseQO<String> baseQO);
 	
 }

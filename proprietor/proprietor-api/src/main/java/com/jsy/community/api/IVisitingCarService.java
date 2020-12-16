@@ -1,12 +1,13 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.List;
+
 
 /**
  * <p>
@@ -37,13 +38,13 @@ public interface IVisitingCarService extends IService<VisitingCarEntity> {
 	boolean updateVisitingCarById(VisitingCarQO visitingCarQO);
 	
 	/**
-	 * @Description: 删除随行车辆
+	* @Description: 批量删除随行车辆
 	 * @Param: [id]
 	 * @Return: boolean
 	 * @Author: chq459799974
-	 * @Date: 2020/11/16
-	 **/
-	boolean deleteVisitingCarById(Long id);
+	 * @Date: 2020/12/16
+	**/
+	boolean deleteVisitingCarById(List<Long> id);
 	
 	/**
 	* @Description: 随行车辆 分页查询
@@ -52,6 +53,6 @@ public interface IVisitingCarService extends IService<VisitingCarEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/10
 	**/
-	Page<VisitingCarEntity> queryVisitingCarPage(BaseQO<String> baseQO);
+	PageInfo<VisitingCarEntity> queryVisitingCarPage(BaseQO<String> baseQO);
 	 
 }

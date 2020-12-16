@@ -11,6 +11,7 @@ import com.jsy.community.mapper.VisitingCarMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
 import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,16 +67,16 @@ public class VisitingCarServiceImpl extends ServiceImpl<VisitingCarMapper, Visit
 	}
 	
 	/**
-	 * @Description: 删除随行车辆
+	 * @Description: 批量删除随行车辆
 	 * @Param: [id]
 	 * @Return: boolean
 	 * @Author: chq459799974
-	 * @Date: 2020/11/16
+	 * @Date: 2020/12/16
 	 **/
 	@Override
-	public boolean deleteVisitingCarById(Long id){
-		int result = visitingCarMapper.deleteById(id);
-		if(result == 1){
+	public boolean deleteVisitingCarById(List<Long> ids){
+		int result = visitingCarMapper.deleteBatchIds(ids);
+		if(result > 0){
 			return true;
 		}
 		return false;
@@ -89,13 +90,15 @@ public class VisitingCarServiceImpl extends ServiceImpl<VisitingCarMapper, Visit
 	 * @Date: 2020/12/10
 	**/
 	@Override
-	public Page<VisitingCarEntity> queryVisitingCarPage(BaseQO<String> baseQO){
+	public PageInfo<VisitingCarEntity> queryVisitingCarPage(BaseQO<String> baseQO){
 		Page<VisitingCarEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
 		Page<VisitingCarEntity> visitingCarpage = visitingCarMapper.selectPage(page, new QueryWrapper<VisitingCarEntity>().select("*").eq("uid", baseQO.getQuery()));
 		for(VisitingCarEntity visitingCarEntity : visitingCarpage.getRecords()){
 			visitingCarEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.carTypeMap.get(visitingCarEntity.getCarType()));
 		}
-		return visitingCarpage;
+		PageInfo<VisitingCarEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(visitingCarpage,pageInfo);
+		return pageInfo;
 	}
 }

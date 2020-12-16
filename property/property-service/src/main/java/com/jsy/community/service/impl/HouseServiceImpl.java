@@ -11,7 +11,9 @@ import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
@@ -25,7 +27,7 @@ import java.util.*;
  * @author qq459799974
  * @since 2020-11-20
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_property)
 public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> implements IHouseService {
 
 	@Autowired
@@ -34,11 +36,11 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	/**
 	 * @Description: 查询子级楼栋(单元/楼层/房间等)
 	 * @Param: [baseQO]
-	 * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.HouseEntity>
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>>
 	 * @Author: chq459799974
 	 * @Date: 2020/11/20
 	 **/
-	public Page<HouseEntity> queryHousePage(BaseQO<HouseQO> baseQO){
+	public PageInfo<HouseEntity> queryHousePage(BaseQO<HouseQO> baseQO){
 		Page<HouseEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
 		QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
@@ -49,7 +51,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		}
 		queryWrapper.eq("pid",query.getId());
 //		queryWrapper.eq("community_id",query.getCommunityId());
-		return houseMapper.selectPage(page, queryWrapper);
+		Page<HouseEntity> houseEntityPage = houseMapper.selectPage(page, queryWrapper);
+		PageInfo<HouseEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(houseEntityPage,pageInfo);
+		return pageInfo;
 	}
 	
 	/**

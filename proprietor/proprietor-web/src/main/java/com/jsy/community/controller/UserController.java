@@ -140,6 +140,13 @@ public class UserController {
         return CommonResult.ok(userInfoVo);
     }
     
+    /**
+    * @Description: 查询业主所有社区的房屋
+     * @Param: []
+     * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.UserHouseEntity>>
+     * @Author: chq459799974
+     * @Date: 2020/12/16
+    **/
     @Login
     @ApiOperation("查询业主所有社区的房屋")
     @GetMapping("houseList")

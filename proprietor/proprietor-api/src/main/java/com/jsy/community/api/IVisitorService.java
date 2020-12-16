@@ -1,12 +1,10 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.*;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.VisitorPersonQO;
 import com.jsy.community.qo.proprietor.VisitorQO;
-import com.jsy.community.qo.proprietor.VisitingCarQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.VisitorEntryVO;
 
 import java.util.List;
@@ -82,7 +80,7 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @Author: chq459799974
      * @Date: 2020/12/16
     **/
-    Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO, String uid);
+    PageInfo<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO, String uid);
     
     /**
     * @Description: 根据ID单查访客
