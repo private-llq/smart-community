@@ -30,10 +30,10 @@ import java.util.List;
  * @author chq459799974
  * @since 2020-11-23
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_proprietor)
 public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, HouseMemberEntity> implements IHouseMemberService {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IUserHouseService iUserHouseService;
 	
 	@Autowired

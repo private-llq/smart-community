@@ -64,12 +64,4 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 **/
 	Boolean removeUserHouse(Long id);
 	
-	/**
-	* @Description: 检查用户是否是房主
-	 * @Param: [uid, houseId]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2020/12/1
-	**/
-	boolean checkHouseHolder(Long uid, Long houseId);
 }

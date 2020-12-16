@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.HouseMapper">
+
+	<!-- 查询 -->
+	<select id="queryUserHouses" resultType="com.jsy.community.entity.UserHouseEntity">
+		select community_id,id as houseId,concat(building,unit,floor,door) as address
+		from t_house
+		where type = 4 and id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+
+</mapper>

@@ -137,7 +137,7 @@ public class VisitorController {
 	@ApiOperation("【访客】分页查询")
 	@PostMapping("page")
 	public CommonResult<Page> query(@RequestBody BaseQO<VisitorQO> baseQO) {
-		return CommonResult.ok(iVisitorService.queryByPage(baseQO));
+		return CommonResult.ok(iVisitorService.queryByPage(baseQO,UserUtils.getUserId()));
 	}
 	
 	/**

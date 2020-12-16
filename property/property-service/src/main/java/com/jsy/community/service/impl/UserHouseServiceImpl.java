@@ -33,7 +33,7 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-25
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_property)
 public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouseEntity> implements IUserHouseService {
 	
 	@Autowired
@@ -146,20 +146,5 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		int count = userHouseMapper.deleteById(id);
 		return count != 0;
 	}
-	
-	/**
-	 * @Description: 检查用户是否是房主
-	 * @Param: [uid, houseId]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2020/12/1
-	 **/
-	@Override
-	public boolean checkHouseHolder(Long uid, Long houseId) {
-		Integer integer = userHouseMapper.selectCount(new QueryWrapper<UserHouseEntity>().eq("uid", uid).eq("house_id", houseId));
-		if (integer == 1) {
-			return true;
-		}
-		return false;
-	}
+
 }

@@ -1,7 +1,5 @@
 package com.jsy.community.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,17 +12,13 @@ import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.VisitingCarQO;
-import com.jsy.community.qo.proprietor.VisitorPersonQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 
@@ -46,13 +40,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     private VisitorMapper visitorMapper;
     
     @Autowired
-    private VisitorPersonMapper visitorPersonMapper;
-    
-    @Autowired
     private VisitorPersonRecordMapper visitorPersonRecordMapper;
-    
-    @Autowired
-    private VisitingCarMapper visitingCarMapper;
     
     @Autowired
     private VisitingCarRecordMapper visitingCarRecordMapper;
@@ -205,16 +193,16 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     
     /**
      * @Description: 分页查询
-     * @Param: [BaseQO<VisitorQO>]
+     * @Param: [baseQO, uid]
      * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.VisitorEntity>
      * @Author: chq459799974
-     * @Date: 2020/11/11
+     * @Date: 2020/12/16
      **/
     @Override
-    public Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO){
+    public Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO,String uid){
         Page<VisitorEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
-        QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>().select("*");
+        QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>().select("*").eq("uid",uid);
         VisitorQO visitorQO = baseQO.getQuery();
         if(visitorQO != null){
             if(!StringUtils.isEmpty(visitorQO.getName())){
@@ -236,7 +224,10 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     **/
     @Override
     public VisitorEntity selectOneById(Long id){
-        return visitorMapper.selectOne(new QueryWrapper<VisitorEntity>().select("*").eq("id",id));
+        VisitorEntity VisitorEntity = visitorMapper.selectOne(new QueryWrapper<VisitorEntity>().select("*").eq("id", id));
+        VisitorEntity.setReasonStr(BusinessEnum.VisitReasonEnum.visitReasonMap.get(VisitorEntity.getReason()));
+        VisitorEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.carTypeMap.get(VisitorEntity.getCarType()));
+        return VisitorEntity;
     }
     
     /**

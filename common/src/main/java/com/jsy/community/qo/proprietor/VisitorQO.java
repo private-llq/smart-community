@@ -19,6 +19,9 @@ public class VisitorQO extends BaseQO {
 	@ApiModelProperty(value = "ID")
 	private Long id;
 	
+	@ApiModelProperty(value = "业主ID", hidden = true)
+	private String uid;
+	
 	@ApiModelProperty(value = "来访人姓名")
 	private String name;
 	

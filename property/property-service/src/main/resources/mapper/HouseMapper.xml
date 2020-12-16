@@ -3,6 +3,7 @@
  
 <mapper namespace="com.jsy.community.mapper.HouseMapper">
 
+	<!-- 查询下级house -->
 	<select id="getSubIdList" parameterType="java.util.List" resultType="Long">
 		select id from t_house
 		where pid in
@@ -11,6 +12,7 @@
 		</foreach>
 	</select>
 
+	<!-- 添加house -->
 	<insert id="addHouse">
 		insert into t_house (code,community_id,building,unit,floor,door,pid,type,comment)
 		select #{houseEntity.code},#{houseEntity.communityId},#{houseEntity.building},#{houseEntity.unit},#{houseEntity.floor},#{houseEntity.door},#{houseEntity.pid},#{houseEntity.type},#{houseEntity.comment} from dual

@@ -36,7 +36,7 @@ public class VisitingCarRecordEntity extends BaseEntity implements Serializable 
     @NotNull(groups = {addCarValidatedGroup.class})
     private Integer carType;
     
-    @ApiModelProperty(value = "随行车辆类型名")
+    @ApiModelProperty(value = "随行车辆类型名", hidden = true)
     private String carTypeStr;
     
     /**

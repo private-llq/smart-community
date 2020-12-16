@@ -77,12 +77,12 @@ public interface IVisitorService extends IService<VisitorEntity> {
 
     /**
     * @Description: 分页查询
-     * @Param: [BaseQO<VisitorQO>]
+     * @Param: [baseQO, uid]
      * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.VisitorEntity>
      * @Author: chq459799974
-     * @Date: 2020/11/11
+     * @Date: 2020/12/16
     **/
-    Page<VisitorEntity> queryByPage(BaseQO<com.jsy.community.qo.proprietor.VisitorQO> baseQO);
+    Page<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO, String uid);
     
     /**
     * @Description: 根据ID单查访客

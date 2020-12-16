@@ -19,8 +19,22 @@ import java.util.Map;
  */
 public interface HouseMapper extends BaseMapper<HouseEntity> {
 	
+	/**
+	* @Description: 查询下级house
+	 * @Param: [list]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/16
+	**/
 	List<Long> getSubIdList(List<Long> list);
 	
+	/**
+	* @Description: 新增house
+	 * @Param: [houseEntity]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2020/12/16
+	**/
 	int addHouse(@Param("houseEntity") HouseEntity houseEntity);
 
 	/**

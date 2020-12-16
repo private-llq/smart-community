@@ -2,25 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jsy.community.mapper.CommunityMapper">
-        <!-- 社区根据name 和城市id 模糊搜索查询 -->
-        <select id="getCommunityByName" resultType="com.jsy.community.entity.CommunityEntity">
-            select id,name,detail_address,lon,lat,house_level_mode as houseLevelMode from t_community where name like concat('%',#{name},'%') and city_id = #{cityId}
-        </select>
+    <!-- 社区根据name 和城市id 模糊搜索查询 -->
+    <select id="getCommunityByName" resultType="com.jsy.community.entity.CommunityEntity">
+        select id,name,detail_address,lon,lat,house_level_mode as houseLevelMode from t_community where name like concat('%',#{name},'%') and city_id = #{cityId}
+    </select>
 
-        <!-- 小区定位 -->
-        <select id="locateCommunity" parameterType="java.util.List" resultType="com.jsy.community.entity.CommunityEntity">
-            select * from t_community
-            <if test="ids != null and ids.size != 0">
-                where id in
-                <foreach collection="ids" item="item" separator="," open="(" close=")">
-                    #{item}
-                </foreach>
-            </if>
-            order by
-            <choose>
-                <when test="location.lon != null and location.lat != null">get_distance(#{location.lon},#{location.lat},lon,lat)</when>
-                <otherwise>rand()</otherwise>
-            </choose>
-            limit 1
-        </select>
+    <!-- 小区定位 -->
+    <select id="locateCommunity" parameterType="java.util.List" resultType="com.jsy.community.entity.CommunityEntity">
+        select * from t_community
+        <if test="ids != null and ids.size != 0">
+            where id in
+            <foreach collection="ids" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by
+        <choose>
+            <when test="location.lon != null and location.lat != null">get_distance(#{location.lon},#{location.lat},lon,lat)</when>
+            <otherwise>rand()</otherwise>
+        </choose>
+        limit 1
+    </select>
+
+    <!-- 根据社区id批量查询社区名 -->
+    <select id="queryCommunityNameByIdBatch" resultType="Map">
+        select id,name from t_community
+        where id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

@@ -35,7 +35,7 @@ import java.util.List;
 //@Login
 public class HouseMemberController {
 	
-//	@DubboReference(version = Const.version, group = Const.group, check = false)
+//	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 //	private IHouseMemberService iHouseMemberService;
 	
 //	@ApiOperation("【房间成员】邀请")

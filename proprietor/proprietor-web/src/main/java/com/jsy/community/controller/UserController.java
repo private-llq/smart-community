@@ -10,6 +10,7 @@ import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
@@ -22,6 +23,8 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -136,6 +139,12 @@ public class UserController {
         UserInfoVo userInfoVo = userService.proprietorQuery(userId);
         return CommonResult.ok(userInfoVo);
     }
-
-
+    
+    @Login
+    @ApiOperation("查询业主所有社区的房屋")
+    @GetMapping("houseList")
+    public CommonResult<List<UserHouseEntity>> queryUserHouseList(){
+        return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
+    }
+    
 }

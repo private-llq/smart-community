@@ -38,7 +38,7 @@ public class VisitingCarEntity extends BaseEntity implements Serializable {
     @NotNull(groups = {addCarValidatedGroup.class, updateCarValidatedGroup.class}, message = "缺少随行车辆类型")
     private Integer carType;
     
-    @ApiModelProperty(value = "随行车辆类型名")
+    @ApiModelProperty(value = "随行车辆类型名", hidden = true)
     private String carTypeStr;
     
     /**

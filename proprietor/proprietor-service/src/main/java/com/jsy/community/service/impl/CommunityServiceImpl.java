@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.mapper.CommunityMapper;
@@ -17,10 +18,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -35,7 +33,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	private CommunityMapper communityMapper;
 	
 	@Autowired
-	private UserHouseMapper userHouseMapper;
+	private IUserHouseService userHouseService;
 	
 	@Override
 	public Page<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO){
@@ -125,8 +123,20 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	@Override
 	public CommunityEntity locateCommunity(String uid,Map<String,Double> location){
 		// 查业主房屋所属社区id
-		List<Long> communityIds = userHouseMapper.queryUserCommunityId(uid);
+		List<Long> communityIds = userHouseService.queryUserCommunityIds(uid);
 		return communityMapper.locateCommunity(communityIds,location);
 	}
-
+	
+	/**
+	 * @Description: 根据社区id批量查询社区名
+	 * @Param: [ids]
+	 * @Return: java.util.List<java.util.Map<java.lang.Long,java.lang.String>>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/16
+	 **/
+	@Override
+	public Map<String,Map<String,String>> queryCommunityNameByIdBatch(Collection<Long> ids){
+		return communityMapper.queryCommunityNameByIdBatch(ids);
+	}
+	
 }

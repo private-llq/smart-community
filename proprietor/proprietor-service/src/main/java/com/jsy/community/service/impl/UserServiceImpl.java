@@ -11,6 +11,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
@@ -27,11 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -66,8 +66,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
     private long expire = 60*60*24*7; //暂时
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @Autowired
     private IUserHouseService userHouseService;
+    
+    @Autowired
+    private IHouseService houseService;
+    
+    @Autowired
+    private ICommunityService communityService;
 
     @Override
     public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo){
@@ -188,5 +194,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId);
         userInfoVo.setProprietorMembers(houseMemberEntities);
         return userInfoVo;
+    }
+    
+    /**
+    * @Description: 查询业主所有小区的房屋
+     * @Param: [uid]
+     * @Return: java.util.List<com.jsy.community.entity.UserHouseEntity>
+     * @Author: chq459799974
+     * @Date: 2020/12/16
+    **/
+    @Override
+    public List<UserHouseEntity> queryUserHouseList(String uid){
+        List<Long> houseIds = userHouseService.queryUserHouseIds(uid);
+        if(CollectionUtils.isEmpty(houseIds)){
+            return null;
+        }
+        List<UserHouseEntity> houses = houseService.queryUserHouses(houseIds);
+        HashSet<Long> communityIdSet = new HashSet<>();
+        for(UserHouseEntity userHouseEntity : houses){
+            communityIdSet.add(userHouseEntity.getCommunityId());
+        }
+        Map<String, Map<String,String>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
+        for(UserHouseEntity userHouseEntity : houses){
+            Map<String, String> stringStringMap1 = communityMap.get(1L);
+            Map<String, String> stringStringMap2 = communityMap.get("1");
+            Map<String, String> stringStringMap = communityMap.get(String.valueOf(userHouseEntity.getCommunityId()));
+            userHouseEntity.setCommunityName(communityMap.get(String.valueOf(userHouseEntity.getCommunityId())).get("name"));
+        }
+        return houses;
     }
 }

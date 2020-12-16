@@ -6,6 +6,7 @@ import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -41,4 +42,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
      * @Date: 2020/11/25
     **/
     CommunityEntity locateCommunity(String uid,Map<String,Double> location);
+	
+    /**
+    * @Description: 根据社区id批量查询社区名
+     * @Param: [ids]
+     * @Return: java.util.List<java.util.Map<java.lang.Long,java.lang.String>>
+     * @Author: chq459799974
+     * @Date: 2020/12/16
+    **/
+	Map<String,Map<String,String>> queryCommunityNameByIdBatch(Collection<Long> ids);
 }

@@ -100,6 +100,9 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "来访车辆类型", hidden = true)
     private Integer carType;
     
+    @ApiModelProperty(value = "来访车辆类型名", hidden = true)
+    private String carTypeStr;
+    
     @JsonIgnore
     @ApiModelProperty(value = "审核方式，1业主审核，2物业审核")
     private Integer checkType;
