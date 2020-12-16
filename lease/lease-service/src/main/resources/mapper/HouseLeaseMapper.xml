@@ -3,60 +3,87 @@
 
 <mapper namespace="com.jsy.lease.mapper.HouseLeaseMapper">
 
-    <!-- 房屋租赁常量获取 -->
-    <select id="getAllHouseConstForDatabases" resultType="com.jsy.community.entity.HouseLeaseConstEntity">
-        select id,house_const_name,house_const_value,house_const_type,annotation from t_house_const
-    </select>
-
 
     <!-- 保存房屋租售信息 -->
     <insert id="insertHouseLease">
         insert into t_house_lease (id,uid,house_title,house_city_id,house_area_id,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_leasedeposit_id
         ,house_type_id,house_floor,house_direction,house_has_elevator,house_style_id,house_year,house_usage_id,house_kind_id
-        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_sourcetype_id
+        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_sourcetype_id,house_contact
         )
         values
         (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAreaId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseUnit},#{houseSquareMeter},#{houseLeasedepositId}
         ,#{houseTypeId},#{houseFloor},#{houseDirection},#{houseHasElevator},#{houseStyleId},#{houseYear},#{houseUsageId},#{houseKindId}
-        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeaseymodeId},#{houseSourcetypeId}
+        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeaseymodeId},#{houseSourcetypeId},#{houseContact}
         )
     </insert>
 
 
     <!-- 插入房屋优势标签ID至中间库 -->
     <insert id="insertHouseAdvantage" >
-        insert into t_house_leasesale_const(house_const_id,house_lease_id)
+        insert into t_house_leasesale_const(const_id,field_id,hid)
         values
         <foreach collection="houseLeaseQO.houseAdvantage" item="item" separator=",">
-            (#{item},#{houseLeaseQO.houseAdvantageId})
+            (#{item},#{houseLeaseQO.houseAdvantageId},#{houseLeaseQO.id})
         </foreach>
     </insert>
 
 
     <!-- 插入房屋图片至中间库 -->
     <insert id="insertHouseImages" >
-        insert into t_house_leasesale_const(house_img_url,house_lease_id)
+        insert into t_house_leasesale_const(img_url,field_id,hid)
         values
         <foreach collection="houseLeaseQO.houseImage" item="item" separator=",">
-            (#{item},#{houseLeaseQO.houseImageId})
+            (#{item},#{houseLeaseQO.houseImageId},#{houseLeaseQO.id})
         </foreach>
     </insert>
 
 
-    <!-- 删除用户中间表信息 -->
-    <delete id="delUserMiddleInfo">
-        delete from t_house_leasesale_const where guid_id = #{guid_id}
-    </delete>
-
 
     <!-- 删除用户t_house_lease表中的数据 -->
     <delete id="delHouseLeaseInfo">
-        delete from t_house_lease where row_guid = #{guid_id}
+        delete from t_house_lease where id = #{id}
     </delete>
 
     <!-- 按列表查询房屋出租信息 -->
     <select id="queryHouseLeaseByList" resultType="com.jsy.community.qo.proprietor.HouseLeaseQO">
-        select house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id from t_house_lease limit #{houseLeaseQO.page},#{houseLeaseQO.size}
+        select house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id from t_house_lease
+         <where>
+            <!-- 如果查询筛选增加了市条件 -->
+            <if test="houseLeaseQO.query.houseCityId != null and houseLeaseQO.query.houseCityId != '' and houseLeaseQO.query.houseCityId &gt; 0">
+                    house_city_id = #{houseLeaseQO.query.houseCityId}
+            </if>
+             <!-- 如果增加了租金筛选条件 大于最小租金 小于最大租金 -->
+             <if test="houseLeaseQO.query.housePriceMin != null and houseLeaseQO.query.housePriceMin != '' and houseLeaseQO.query.housePriceMin &gt; 0
+                and houseLeaseQO.query.housePriceMax != null and houseLeaseQO.query.housePriceMax != '' and houseLeaseQO.query.housePriceMax &gt; 0">
+                 and house_price &gt; #{houseLeaseQO.query.housePriceMin} and house_price &lt; #{houseLeaseQO.query.housePriceMax}
+             </if>
+             <!-- 如果增加了房屋面积筛选条件 大于最小房屋面积 小于最大房屋面积 -->
+             <if test="houseLeaseQO.query.houseSquareMeterMin != null and houseLeaseQO.query.houseSquareMeterMin != '' and houseLeaseQO.query.houseSquareMeterMin &gt; 0
+                and houseLeaseQO.query.houseSquareMeterMax != null and houseLeaseQO.query.houseSquareMeterMax != '' and houseLeaseQO.query.houseSquareMeterMax &gt; 0">
+                 and house_square_meter &gt; #{houseLeaseQO.query.housePriceMin} and house_square_meter &lt; #{houseLeaseQO.query.housePriceMax}
+             </if>
+             <!-- 如果查询筛选增加了户型条件 几室几厅之类 -->
+             <if test="houseLeaseQO.query.houseTypeId != null and houseLeaseQO.query.houseTypeId != '' and houseLeaseQO.query.houseTypeId &gt; 0">
+                 and house_type_id = #{houseLeaseQO.query.houseTypeId}
+             </if>
+             <!-- 如果查询筛选增加了房屋类型条件 住宅、别墅、公寓之类 -->
+             <if test="houseLeaseQO.query.houseLeasetypeId != null and houseLeaseQO.query.houseLeasetypeId != '' and houseLeaseQO.query.houseLeasetypeId &gt; 0">
+                 and house_leasetype_id = #{houseLeaseQO.query.houseLeasetypeId}
+             </if>
+             <!-- 如果查询筛选增加了出租方式条件 整租、合租之类 -->
+             <if test="houseLeaseQO.query.houseLeaseymodeId != null and houseLeaseQO.query.houseLeaseymodeId != '' and houseLeaseQO.query.houseLeaseymodeId &gt; 0">
+                 and house_leasemode_id = #{houseLeaseQO.query.houseLeaseymodeId}
+             </if>
+             <!-- 如果查询筛选增加了房源类型条件  精装修、邻地铁之类 -->
+             <if test="houseLeaseQO.query.houseSourcetypeId != null and houseLeaseQO.query.houseSourcetypeId != '' and houseLeaseQO.query.houseSourcetypeId &gt; 0">
+                 and house_sourcetype_id = #{houseLeaseQO.query.houseSourcetypeId}
+             </if>
+             <!-- 如果查询筛选增加了房屋来源条件 个人、经纪人之类 -->
+             <if test="houseLeaseQO.query.houseSourceId != null and houseLeaseQO.query.houseSourceId != '' and houseLeaseQO.query.houseSourceId &gt; 0">
+                 and house_source_id = #{houseLeaseQO.query.houseSourceId}
+             </if>
+         </where>
+         limit #{houseLeaseQO.page},#{houseLeaseQO.size}
     </select>
 
 

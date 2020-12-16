@@ -26,10 +26,10 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
 
     /**
      * 根据用户id和 rowGuid 删除出租房源数据
-     * @param rowGuid       业务主键
+     * @param id            业务主键
      * @param userId        用户id
      */
-    boolean delLeaseHouse(Long rowGuid, String userId);
+    boolean delLeaseHouse(Long id, String userId);
 
     /**
      * 根据参数对象条件查询 出租房屋数据

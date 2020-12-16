@@ -6,6 +6,7 @@ import com.jsy.community.entity.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.vo.HouseLeaseVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -19,10 +20,6 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
 
 
-    /**
-     * 从t_house_const获取所有房屋常量
-     */
-    List<HouseLeaseConstEntity> getAllHouseConstForDatabases();
 
 
     /**
@@ -47,10 +44,11 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
     /**
      * 删除用户中间表关联的相关信息
-     * @param guid_id        t_house_lease数据唯一标识
+     * @param id             t_house_lease数据唯一标识
      * @return               影响行数
      */
-    int delUserMiddleInfo(@Param("guid_id") Long guid_id);
+    @Delete("delete from t_house_leasesale_const where hid = #{id}")
+    int delUserMiddleInfo(@Param("id") Long id);
 
 
     /**
@@ -58,7 +56,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param guid_id   数据唯一标识业务主键 暂定
      * @return          返回影响行数
      */
-    int delHouseLeaseInfo(@Param("guid_id") Long guid_id);
+    int delHouseLeaseInfo(@Param("id") Long guid_id);
 
 
     /**
@@ -68,5 +66,11 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      */
     List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> houseLeaseQO);
 
+
+    /**
+     * 查询房屋常量 通过id列表
+     * @param houseAvatarsIds       id列表
+     * @return                      返回常量id集合
+     */
     List<Integer> queryHouseLeaseConstByIds(List<String> houseAvatarsIds);
 }

@@ -50,16 +50,16 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
 
     /**
      * 根据用户id和 rowGuid 删除出租房源数据
-     * @param rowGuid       业务主键
+     * @param id            业务主键
      * @param userId        用户id
      */
     @Transactional
     @Override
-    public boolean delLeaseHouse(Long rowGuid, String userId) {
+    public boolean delLeaseHouse(Long id, String userId) {
         //删除中间表 关于 这个用户关联的所有信息
-        houseLeaseMapper.delUserMiddleInfo(rowGuid);
+        houseLeaseMapper.delUserMiddleInfo(id);
         //删除 t_house_lease 信息
-        return  houseLeaseMapper.delHouseLeaseInfo(rowGuid)> 0 ;
+        return  houseLeaseMapper.delHouseLeaseInfo(id)> 0 ;
     }
 
 
@@ -70,8 +70,11 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
      */
     @Override
     public List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> houseLeaseQO) {
+        //1.通过存在的条件 查出符合条件的分页所有房屋数据
         List<HouseLeaseVO> houseLeaseVOS = houseLeaseMapper.queryHouseLeaseByList(houseLeaseQO);
+        //2.遍历每一个数据 查询 字段列 一对多的数据，
         List<String> houseAvatarsIds = new ArrayList<>(houseLeaseVOS.size());
+        //房屋标签 如 邻地铁、可短租、之类
         for(HouseLeaseVO houseLeaseVO : houseLeaseVOS){
             houseAvatarsIds.add(houseLeaseVO.getHouseAdvantageId());
         }

@@ -28,10 +28,9 @@ public class HouseLeaseController {
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseLeaseService iHouseLeaseService;
 
-
+    @Login
     @ApiOperation("新增房屋租售")
     @PostMapping()//addHouseLease
-    @Login
     public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQO) {
         //新增参数常规效验
         ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.addLeaseSaleHouse.class);
@@ -54,17 +53,17 @@ public class HouseLeaseController {
         return CommonResult.ok();
     }
 
+    @Login
     @ApiOperation("删除房屋租售")
     @DeleteMapping()//delHouseLease
-    @Login
-    public CommonResult<Boolean> delLeaseHouse(@RequestParam Long rowGuid) {
-        return iHouseLeaseService.delLeaseHouse(rowGuid, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(1, "数据不存在");
+    public CommonResult<Boolean> delLeaseHouse(@RequestParam Long id) {
+        return iHouseLeaseService.delLeaseHouse(id, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(1, "数据不存在");
     }
 
 
+    @Login
     @ApiOperation("查询房屋出租数据")
     @GetMapping()//queryHouseLeaseByList
-    @Login
     public CommonResult<Boolean> queryHouseLeaseByList(@RequestParam BaseQO<HouseLeaseQO> houseLeaseQO) {
         //验证 分页参数合法性
         ValidatorUtils.validatePageParam(houseLeaseQO);

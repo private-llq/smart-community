@@ -2,6 +2,7 @@ package com.jsy.lease.task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.HouseLeaseConstEntity;
+import com.jsy.lease.mapper.HouseConstMapper;
 import com.jsy.lease.mapper.HouseLeaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class SourceConstExecutor {
     public RedisTemplate<String, Object> redisTemplate;
 
     @Resource
-    private HouseLeaseMapper houseLeaseMapper;
+    private HouseConstMapper houseConstMapper;
 
     @PostConstruct
     public void initSourceConst(){
@@ -46,7 +47,7 @@ public class SourceConstExecutor {
      * 从数据库获取所有t_house_const 常量
      */
     private List<HouseLeaseConstEntity> getAllHouseConstForDatabases(){
-        return houseLeaseMapper.getAllHouseConstForDatabases();
+        return houseConstMapper.getAllHouseConstForDatabases();
     }
 
     private void setRedisForHouseConst(List<HouseLeaseConstEntity> list){
