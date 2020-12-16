@@ -6,6 +6,7 @@ public interface Const {
 	String group = "dev";
 	String group_property = "property"; //物业端
 	String group_proprietor = "proprietor"; //业主端
+	String group_lease = "lease"; //房屋租售端
 	
 	interface HouseMemberConsts {
 		Integer UNJOIN = 0;//未加入
