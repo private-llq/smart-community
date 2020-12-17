@@ -2,7 +2,7 @@ package com.jsy.community.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.admin.SysUserEntity;
+import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.NameAndCreatorQO;
 

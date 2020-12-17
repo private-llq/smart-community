@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.code.kaptcha.Producer;
-import com.jsy.community.entity.admin.SysCaptchaEntity;
+import com.jsy.community.entity.sys.SysCaptchaEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.SysCaptchaMapper;
 import com.jsy.community.service.ISysCaptchaService;

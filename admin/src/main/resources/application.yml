@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: admin-community
+    name: sys-community
   profiles:
     active: dev
   # jackson时间格式化

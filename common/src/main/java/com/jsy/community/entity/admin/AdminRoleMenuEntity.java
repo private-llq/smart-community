@@ -13,7 +13,7 @@ import java.util.List;
  **/
 @Data
 @TableName("t_sys_role_menu")
-public class SysRoleMenuEntity {
+public class AdminRoleMenuEntity {
 	
 	@NotNull(message = "缺少角色ID")
 	private Long roleId;//角色ID

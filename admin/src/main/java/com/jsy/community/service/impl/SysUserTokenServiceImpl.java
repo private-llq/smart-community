@@ -1,8 +1,8 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.entity.admin.SysUserEntity;
-import com.jsy.community.entity.admin.SysUserTokenEntity;
+import com.jsy.community.entity.sys.SysUserEntity;
+import com.jsy.community.entity.sys.SysUserTokenEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.SysUserTokenMapper;

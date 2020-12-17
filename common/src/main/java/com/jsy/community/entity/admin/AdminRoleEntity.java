@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
  **/
 @Data
 @TableName("t_sys_role")
-public class SysRoleEntity extends BaseEntity {
+public class AdminRoleEntity extends BaseEntity {
 	
 	@NotBlank(message = "角色名不能为空")
 	private String name;//角色名

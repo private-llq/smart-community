@@ -1,4 +1,4 @@
-package com.jsy.community.entity.admin;
+package com.jsy.community.entity.sys;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -1,7 +1,7 @@
 package com.jsy.community.service;
 
-import com.jsy.community.entity.admin.SysMenuEntity;
-import com.jsy.community.entity.admin.SysRoleEntity;
+import com.jsy.community.entity.sys.SysMenuEntity;
+import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.qo.admin.SysMenuQO;
 import com.jsy.community.qo.admin.SysRoleQO;
 
@@ -45,7 +45,7 @@ public interface ISysConfigService {
 	/**
 	 * @Description: 菜单列表
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
@@ -82,7 +82,7 @@ public interface ISysConfigService {
 	/**
 	* @Description: 角色列表
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.admin.SysRoleEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.SysRoleEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
@@ -103,7 +103,7 @@ public interface ISysConfigService {
 	/**
 	* @Description: 查询用户菜单权限
 	 * @Param: [uid]
-	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/

@@ -1,8 +1,8 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.io.IoUtil;
-import com.jsy.community.entity.admin.SysMenuEntity;
-import com.jsy.community.entity.admin.SysUserEntity;
+import com.jsy.community.entity.sys.SysMenuEntity;
+import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.qo.admin.SysLoginQO;
 import com.jsy.community.service.ISysCaptchaService;
 import com.jsy.community.service.ISysConfigService;
@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 登录相关

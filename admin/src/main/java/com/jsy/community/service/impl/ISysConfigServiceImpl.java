@@ -3,8 +3,8 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jsy.community.entity.admin.SysMenuEntity;
-import com.jsy.community.entity.admin.SysRoleEntity;
+import com.jsy.community.entity.sys.SysMenuEntity;
+import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.mapper.SysMenuMapper;
 import com.jsy.community.mapper.SysRoleMapper;
 import com.jsy.community.qo.admin.SysMenuQO;
@@ -56,7 +56,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	/**
 	* @Description: 查询大后台菜单
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
@@ -114,7 +114,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	}
 	
 	//寻找顶级菜单ID
-//	private void setBelongTo(SysMenuEntity sysMenuEntity,SysMenuEntity parent){
+//	private void setBelongTo(AdminMenuEntity sysMenuEntity,AdminMenuEntity parent){
 //		if(0L != parent.getPid()){ //要新增的菜单非顶级
 //			parent = sysMenuMapper.findParent(parent.getPid());//寻找父节点
 //			if(parent.getPid() == 0){ //顶级节点
@@ -179,7 +179,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	/**
 	* @Description: 菜单列表
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
@@ -249,7 +249,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	/**
 	 * @Description: 角色列表
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.admin.SysRoleEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.SysRoleEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
@@ -294,7 +294,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	/**
 	* @Description: 查询用户菜单权限
 	 * @Param: [uid]
-	 * @Return: java.util.List<com.jsy.community.entity.admin.SysMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/

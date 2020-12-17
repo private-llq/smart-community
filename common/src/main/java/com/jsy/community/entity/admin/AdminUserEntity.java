@@ -16,7 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("t_sys_user")
-public class SysUserEntity extends BaseEntity {
+public class AdminUserEntity extends BaseEntity {
 	
 	/**
 	 * 用户名
@@ -67,7 +67,7 @@ public class SysUserEntity extends BaseEntity {
 	 * 用户菜单列表
 	 */
 	@TableField(exist = false)
-	private List<SysMenuEntity> menuList;
+	private List<AdminMenuEntity> menuList;
 	
 	/**
 	 * 创建者ID

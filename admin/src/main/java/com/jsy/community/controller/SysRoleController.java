@@ -1,7 +1,7 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.entity.admin.SysRoleEntity;
-import com.jsy.community.entity.admin.SysRoleMenuEntity;
+import com.jsy.community.entity.sys.SysRoleEntity;
+import com.jsy.community.entity.sys.SysRoleMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.SysRoleQO;
 import com.jsy.community.service.ISysConfigService;
@@ -68,7 +68,7 @@ public class SysRoleController {
 	/**
 	* @Description: 角色列表
 	 * @Param: []
-	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.admin.SysRoleEntity>>
+	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.sys.SysRoleEntity>>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/

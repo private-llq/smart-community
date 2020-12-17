@@ -14,7 +14,7 @@ import java.util.List;
  **/
 @Data
 @TableName("t_sys_user_role")
-public class SysUserRoleEntity extends BaseEntity {
+public class AdminUserRoleEntity extends BaseEntity {
 	
 	@NotNull(message = "缺少用户ID")
 	private Long userId;//用户ID
