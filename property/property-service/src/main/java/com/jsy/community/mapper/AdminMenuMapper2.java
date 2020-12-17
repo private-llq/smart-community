@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.sys.SysMenuEntity;
+import com.jsy.community.entity.AdminMenuEntity;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,46 +15,46 @@ import java.util.List;
  * @since 2020-12-14 10:27
  **/
 @Mapper
-public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
+public interface AdminMenuMapper2 extends BaseMapper<AdminMenuEntity> {
 	
 	/**
-	* @Description: 添加菜单
-	 * @Param: [sysMenuEntity]
+	 * @Description: 添加菜单
+	 * @Param: [adminMenuEntity]
 	 * @Return: int
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
-	**/
-	@Insert("insert into t_sys_menu(icon,name,url,pid,sort)" +
-		"select #{entity.icon},#{entity.name},#{entity.url},#{entity.pid},max(sort)+1 from t_sys_menu where pid = #{entity.pid}")
-	int addMenu(@Param("entity") SysMenuEntity sysMenuEntity);
+	 **/
+	@Insert("insert into t_admin_menu(icon,name,url,pid,sort)" +
+		"select #{entity.icon},#{entity.name},#{entity.url},#{entity.pid},max(sort)+1 from t_admin_menu where pid = #{entity.pid}")
+	int addMenu(@Param("entity") AdminMenuEntity adminMenuEntity);
 	
 	/**
-	* @Description: 寻找父节点
+	 * @Description: 寻找父节点
 	 * @Param: [pid]
 	 * @Return: java.lang.Long
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
-	**/
-	@Select("select id,pid,belong_to from t_sys_menu where id = #{pid}")
-	SysMenuEntity findParent(Long pid);
+	 **/
+	@Select("select id,pid,belong_to from t_admin_menu where id = #{pid}")
+	AdminMenuEntity findParent(Long pid);
 	
 	/**
-	* @Description: 获取子菜单列表
+	 * @Description: 获取子菜单列表
 	 * @Param: [id]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.SysMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
-	**/
-	@Select("select * from t_sys_menu where pid = #{id}")
-	List<SysMenuEntity> getChildrenList(Long id);
+	 **/
+	@Select("select * from t_admin_menu where pid = #{id}")
+	List<AdminMenuEntity> getChildrenList(Long id);
 	
 	/**
-	* @Description: 批量获取子菜单id列表(查询pid)
+	 * @Description: 批量获取子菜单id列表(查询pid)
 	 * @Param: [ids]
 	 * @Return: java.util.List<java.lang.Long>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
-	**/
+	 **/
 //	List<Long> getSubIdList(List<Long> ids);
 	
 	/**
@@ -67,12 +67,12 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
 	List<Long> getIdBelongList(List<Long> ids);
 	
 	/**
-	* @Description: 查询用户菜单
+	 * @Description: 查询用户菜单
 	 * @Param: [uid]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.SysMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
-	**/
-	List<SysMenuEntity> queryUserMenu(Long uid);
-
+	 **/
+	List<AdminMenuEntity> queryUserMenu(Long uid);
+	
 }
