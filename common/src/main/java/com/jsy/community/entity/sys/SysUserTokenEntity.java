@@ -1,7 +1,5 @@
-package com.jsy.community.entity.admin;
+package com.jsy.community.entity.sys;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;

@@ -8,10 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.entity.UserAuthEntity;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.LoginQO;
@@ -200,25 +197,55 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
     * @Description: 查询业主所有小区的房屋
      * @Param: [uid]
-     * @Return: java.util.List<com.jsy.community.entity.UserHouseEntity>
+     * @Return: java.util.List<com.jsy.community.entity.HouseEntity>
      * @Author: chq459799974
      * @Date: 2020/12/16
     **/
     @Override
-    public List<UserHouseEntity> queryUserHouseList(String uid){
-        List<Long> houseIds = userHouseService.queryUserHouseIds(uid);
-        if(CollectionUtils.isEmpty(houseIds)){
+    public List<HouseEntity> queryUserHouseList(String uid){
+        
+        //步骤一
+        /* t_user_house */
+        List<UserHouseEntity> userHouseList = userHouseService.queryUserHouses(uid);
+        if(CollectionUtils.isEmpty(userHouseList)){
             return null;
         }
-        List<UserHouseEntity> houses = houseService.queryUserHouses(houseIds);
         HashSet<Long> communityIdSet = new HashSet<>();
-        for(UserHouseEntity userHouseEntity : houses){
+        LinkedList<Long> houseIdList = new LinkedList<>();
+        for(UserHouseEntity userHouseEntity : userHouseList){
             communityIdSet.add(userHouseEntity.getCommunityId());
+            houseIdList.add(userHouseEntity.getHouseId());
         }
+        
+        //步骤二
+        //查社区id,房间id,楼栋id,地址拼接
+        //补buildingId如果pid!=0 继续往上查
+        /* t_house */
+        List<HouseEntity> houses = houseService.queryHouses(houseIdList);
+        //组装buildingId
+        for(HouseEntity tempEntity : houses){
+            //递归查父节点，组装楼栋级节点id进buildingId
+            setBuildingId(tempEntity);
+        }
+        
+        //步骤三
+        //查小区名
+        /* t_community */
         Map<Long, Map<Long,String>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
-        for(UserHouseEntity userHouseEntity : houses){
+        for(HouseEntity userHouseEntity : houses){
             userHouseEntity.setCommunityName(communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId())).get("name"));
         }
         return houses;
+    }
+    
+    private HouseEntity setBuildingId(HouseEntity tempEntity){
+        Long pid = 0L; //id和pid相同的问题数据导致死循环
+        HouseEntity parent = houseService.getParent(tempEntity);
+        if(parent != null && parent.getPid() != 0 && pid != parent.getPid()){
+            pid = tempEntity.getPid();
+            HouseEntity houseEntity = setBuildingId(parent);
+            tempEntity.setBuildingId(houseEntity.getBuildingId());
+        }
+        return parent;
     }
 }

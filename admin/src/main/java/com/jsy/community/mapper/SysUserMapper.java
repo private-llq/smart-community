@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.admin.SysUserEntity;
+import com.jsy.community.entity.sys.SysUserEntity;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

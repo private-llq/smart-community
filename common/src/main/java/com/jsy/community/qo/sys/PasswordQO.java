@@ -1,4 +1,4 @@
-package com.jsy.community.qo.admin;
+package com.jsy.community.qo.sys;
 
 import lombok.Data;
 

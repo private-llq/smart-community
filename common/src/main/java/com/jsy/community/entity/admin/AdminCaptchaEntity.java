@@ -3,7 +3,6 @@ package com.jsy.community.entity.admin;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @TableName("t_sys_captcha")
-public class SysCaptchaEntity implements Serializable {
+public class AdminCaptchaEntity implements Serializable {
 	@TableId
 	private Long id;
 	

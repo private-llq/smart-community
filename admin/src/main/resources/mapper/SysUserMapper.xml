@@ -28,13 +28,13 @@
 		where ur.user_id = #{userId}
 	</select>
 	
-	<select id="queryByUserName" resultType="com.jsy.community.entity.admin.SysUserEntity">
+	<select id="queryByUserName" resultType="com.jsy.community.entity.sys.SysUserEntity">
 		select *
 		from t_sys_user
 		where username = #{username}
 	</select>
 
-	<select id="queryByEmail" resultType="com.jsy.community.entity.admin.SysUserEntity">
+	<select id="queryByEmail" resultType="com.jsy.community.entity.sys.SysUserEntity">
 		select *
 		from t_sys_user
 		where email = #{email}

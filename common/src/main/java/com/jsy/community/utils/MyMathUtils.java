@@ -40,7 +40,7 @@ public class MyMathUtils {
 			typeScale = 30;
 		}
 		List<Long> codes = new ArrayList<>();
-		for(int i=0;i<typeScale;i++) {
+		for(int i=0;i<=typeScale;i++) {
 			if((typeCode & 1<<i) != 0){
 				codes.add(typeCode & 1<<i);
 			}

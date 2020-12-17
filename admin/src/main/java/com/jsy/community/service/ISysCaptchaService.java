@@ -1,7 +1,7 @@
 package com.jsy.community.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.admin.SysCaptchaEntity;
+import com.jsy.community.entity.sys.SysCaptchaEntity;
 
 import java.awt.image.BufferedImage;
 

@@ -2,7 +2,7 @@ package com.jsy.community.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.entity.admin.SysUserEntity;
+import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
@@ -46,7 +46,7 @@ public class RedisUtils {
 	/**
 	* @Description: 从redis获取用户信息
 	 * @Param: [loginToken]
-	 * @Return: com.jsy.community.entity.admin.SysUserEntity
+	 * @Return: com.jsy.community.entity.sys.SysUserEntity
 	 * @Author: chq459799974
 	 * @Date: 2020/12/12
 	**/

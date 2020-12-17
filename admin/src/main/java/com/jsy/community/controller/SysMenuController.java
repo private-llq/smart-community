@@ -1,8 +1,8 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.entity.admin.SysMenuEntity;
+import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.qo.admin.SysMenuQO;
+import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -66,7 +66,7 @@ public class SysMenuController {
 	/**
 	* @Description: 查询
 	 * @Param: []
-	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.admin.SysMenuEntity>>
+	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/

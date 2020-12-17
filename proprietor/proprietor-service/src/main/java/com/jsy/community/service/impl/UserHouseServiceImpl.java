@@ -65,15 +65,15 @@ public class UserHouseServiceImpl implements IUserHouseService {
 	}
 	
 	/**
-	 * @Description: 查询业主拥有的所有房屋id
+	* @Description: 查询业主房屋及所属社区
 	 * @Param: [uid]
-	 * @Return: java.util.List<java.lang.Long>
+	 * @Return: java.util.List<com.jsy.community.entity.UserHouseEntity>
 	 * @Author: chq459799974
-	 * @Date: 2020/12/16
-	 **/
+	 * @Date: 2020/12/17
+	**/
 	@Override
-	public List<Long> queryUserHouseIds(String uid){
-		return userHouseMapper.queryUserHouseIds(uid);
+	public List<UserHouseEntity> queryUserHouses(String uid){
+		return userHouseMapper.queryUserHouses(uid);
 	}
 	
 	/**
