@@ -59,7 +59,7 @@ public class HouseLeaseController {
 
 
     @Login
-    @GetMapping()
+    @GetMapping("/details")
     @ApiOperation("查询房屋出租数据单条详情")
     public CommonResult<HouseLeaseVO> houseLeaseDetails(@RequestParam Long houseId) {
         return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId));
