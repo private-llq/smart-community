@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.ProprietorQO;
@@ -68,9 +69,9 @@ public interface IUserService extends IService<UserEntity> {
     /**
     * @Description: 查询业主所有社区的房屋
      * @Param: [uid]
-     * @Return: java.util.List<com.jsy.community.entity.UserHouseEntity>
+     * @Return: java.util.List<com.jsy.community.entity.HouseEntity>
      * @Author: chq459799974
      * @Date: 2020/12/16
     **/
-	List<UserHouseEntity> queryUserHouseList(String uid);
+	List<HouseEntity> queryUserHouseList(String uid);
 }

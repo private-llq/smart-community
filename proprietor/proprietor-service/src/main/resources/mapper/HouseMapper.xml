@@ -4,8 +4,8 @@
 <mapper namespace="com.jsy.community.mapper.HouseMapper">
 
 	<!-- 查询 -->
-	<select id="queryUserHouses" resultType="com.jsy.community.entity.UserHouseEntity">
-		select community_id,id as houseId,concat(building,unit,floor,door) as address
+	<select id="queryHouses" resultType="com.jsy.community.entity.HouseEntity">
+		select community_id,id,pid,concat(building,unit,floor,door) as address
 		from t_house
 		where type = 4 and id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
@@ -13,4 +13,12 @@
 		</foreach>
 	</select>
 
+	<!-- 查询父节点 -->
+<!--	<select id="getParent">-->
+<!--		select id,pid,#{subId} from t_house -->
+<!--		where id in-->
+<!--		<foreach collection="list" item="pid" open="(" close=")" separator=",">-->
+<!--			#{pid}-->
+<!--		</foreach>-->
+<!--	</select>-->
 </mapper>

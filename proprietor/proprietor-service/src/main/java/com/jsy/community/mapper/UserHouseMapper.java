@@ -24,13 +24,13 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	List<Long> queryUserCommunityIds(String uid);
 	
 	/**
-	* @Description: 查询业主房屋id
+	* @Description: 查询业主房屋及所属社区
 	 * @Param: [uid]
-	 * @Return: java.util.List<java.lang.Long>
+	 * @Return: java.util.List<com.jsy.community.entity.UserHouseEntity>
 	 * @Author: chq459799974
-	 * @Date: 2020/12/16
+	 * @Date: 2020/12/17
 	**/
-	@Select("select house_id from t_user_house where check_status = 1 and uid = #{uid}")
-	List<Long> queryUserHouseIds(String uid);
+	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid}")
+	List<UserHouseEntity> queryUserHouses(String uid);
 	
 }

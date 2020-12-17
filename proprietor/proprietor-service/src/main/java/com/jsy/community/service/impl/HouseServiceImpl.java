@@ -2,11 +2,13 @@ package com.jsy.community.service.impl;
 
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.HouseMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,8 +23,13 @@ public class HouseServiceImpl implements IHouseService {
 	private HouseMapper houseMapper;
 	
 	@Override
-	public List<UserHouseEntity> queryUserHouses(List<Long> list){
-		return houseMapper.queryUserHouses(list);
+	public List<HouseEntity> queryHouses(Collection<Long> list){
+		return houseMapper.queryHouses(list);
+	}
+	
+	@Override
+	public HouseEntity getParent(HouseEntity tempEntity){
+		return houseMapper.getParent(tempEntity);
 	}
 	
 }

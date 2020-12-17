@@ -9,6 +9,7 @@ import com.jsy.community.api.IUserService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYError;
@@ -150,7 +151,7 @@ public class UserController {
     @Login
     @ApiOperation("查询业主所有社区的房屋")
     @GetMapping("houseList")
-    public CommonResult<List<UserHouseEntity>> queryUserHouseList(){
+    public CommonResult<List<HouseEntity>> queryUserHouseList(){
         return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
     }
     

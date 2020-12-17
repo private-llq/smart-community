@@ -1,8 +1,9 @@
 package com.jsy.community.api;
 
-import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.UserHouseEntity;
 
+import com.jsy.community.entity.HouseEntity;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -12,6 +13,8 @@ import java.util.List;
  **/
 public interface IHouseService {
 	
-	List<UserHouseEntity> queryUserHouses(List<Long> list);
+	List<HouseEntity> queryHouses(Collection<Long> list);
+	
+	HouseEntity getParent(HouseEntity tempEntity);
 	
 }

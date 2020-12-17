@@ -3,7 +3,10 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -13,6 +16,9 @@ import java.util.List;
  **/
 public interface HouseMapper extends BaseMapper<HouseEntity> {
 	
-	List<UserHouseEntity> queryUserHouses(List<Long> list);
+	List<HouseEntity> queryHouses(Collection<Long> list);
+	
+	@Select("select pid,id as buildingId,#{tempEntity.id} as id,#{tempEntity.communityId} as communityId,#{tempEntity.address} as address from t_house where id = #{tempEntity.pid}")
+	HouseEntity getParent(@Param("tempEntity") HouseEntity tempEntity);
 	
 }

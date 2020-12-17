@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -50,6 +51,18 @@ public class HouseEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "备注")
     private String comment;
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "社区名称", hidden = true)
+    private String communityName;
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "房间地址拼接", hidden = true)
+    private String address;
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "顶级父节点id(楼栋/单元之类)", hidden = true)
+    private Long buildingId;
     
     /**
      * 新增house验证组
