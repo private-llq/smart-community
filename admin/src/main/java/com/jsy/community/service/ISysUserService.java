@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.admin.NameAndCreatorQO;
+import com.jsy.community.qo.sys.NameAndCreatorQO;
 
 import java.util.List;
 import java.util.Map;

@@ -3,7 +3,7 @@ package com.jsy.community.controller;
 import cn.hutool.core.io.IoUtil;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.entity.sys.SysUserEntity;
-import com.jsy.community.qo.admin.SysLoginQO;
+import com.jsy.community.qo.sys.SysLoginQO;
 import com.jsy.community.service.ISysCaptchaService;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.service.ISysUserService;

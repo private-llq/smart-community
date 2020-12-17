@@ -9,7 +9,7 @@ import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.SysUserMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.admin.NameAndCreatorQO;
+import com.jsy.community.qo.sys.NameAndCreatorQO;
 import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.Constant;
 import com.jsy.community.utils.Query;

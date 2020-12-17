@@ -2,7 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.qo.admin.SysMenuQO;
+import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;

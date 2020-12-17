@@ -2,8 +2,8 @@ package com.jsy.community.service;
 
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.entity.sys.SysRoleEntity;
-import com.jsy.community.qo.admin.SysMenuQO;
-import com.jsy.community.qo.admin.SysRoleQO;
+import com.jsy.community.qo.sys.SysMenuQO;
+import com.jsy.community.qo.sys.SysRoleQO;
 
 import java.util.List;
 
