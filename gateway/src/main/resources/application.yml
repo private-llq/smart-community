@@ -2,11 +2,15 @@ server:
   port: 9527
 spring:
   application:
-    name: cao-gateway
+    name: server-gateway
   cloud:
     nacos:
       server-addr: 127.0.0.1:8848
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
       routes:
         # 跳转URL
         - id: property
@@ -21,3 +25,20 @@ spring:
             - Path=/proprietor/**
           filters:
             - PrefixPath=/api/v1
+dubbo:
+  registry:
+    address: nacos://127.0.0.1:8848
+    use-as-metadata-center: false
+  protocol:
+    name: dubbo
+    port: -1
+  application:
+    name: ${spring.application.name}
+  cloud:
+    subscribed-services: server-gateway
+  consumer:
+    retries: 0
+    timeout: 99999
+  provider:
+    retries: 0
+    timeout: 99999
