@@ -24,6 +24,7 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
     Boolean addLeaseSaleHouse(HouseLeaseQO houseLeaseQO);
 
 
+
     /**
      * 根据用户id和 rowGuid 删除出租房源数据
      * @param id            业务主键
@@ -37,4 +38,12 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @return                  返回数据集合
      */
     List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> houseLeaseQO);
+
+
+    /**
+     * 根据id查询房屋详情单条数据
+     * @param houseId       房屋id
+     * @return              返回这条数据的详情
+     */
+    HouseLeaseVO queryHouseLeaseOne(Long houseId);
 }

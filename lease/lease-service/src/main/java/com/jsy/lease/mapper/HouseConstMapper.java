@@ -22,7 +22,7 @@ public interface HouseConstMapper extends BaseMapper<HouseLeaseConstEntity> {
     /**
      * 从t_house_const获取所有房屋常量
      */
-    @Select("select id,house_const_name,house_const_value,house_const_type,annotation from t_house_const")
+    @Select("select house_const_code,house_const_name,house_const_value,house_const_type,annotation from t_house_const")
     List<HouseLeaseConstEntity> getAllHouseConstForDatabases();
 
 }

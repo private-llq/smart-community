@@ -21,54 +21,48 @@ import java.util.List;
 @Slf4j
 @ApiJSYController
 @RestController
-@RequestMapping("/house")
 @Api(tags = "房屋租售控制器")
+@RequestMapping("/house")
 public class HouseLeaseController {
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseLeaseService iHouseLeaseService;
 
+
     @Login
+    @PostMapping()
     @ApiOperation("新增房屋租售")
-    @PostMapping()//addHouseLease
     public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQO) {
         //新增参数常规效验
         ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.addLeaseSaleHouse.class);
         houseLeaseQO.setUid(UserUtils.getUserId());
-        //房屋常量数值有效性边界效验
-        //1.验证房屋出租类型id 数值是否在可取范围之内 数据库内 type = 10 的就是租房类型  普通住宅还是别墅 之类...
-        //ValidatorUtils.validFieldVal(iCommonService.getHouseConstListByType("10"), "houseConstType", houseLeaseQO.getHouseLeasetypeId());
-        //2.验证房屋出租方式id 数值是否在可取范围之内 数据库内 type = 11 的就是租房方式  整租还是合租之类...
-        //ValidatorUtils.validFieldVal(iCommonService.getHouseConstListByType("11"), "houseConstType", houseLeaseQO.getHouseLeaseymodeId());
-        //3.验证房屋出租押金方式id 数值是否在可取范围之内 数据库内 type = 1  的就是租房押金  押一付一 还是 押一付三之类...
-        //ValidatorUtils.validFieldVal(iCommonService.getHouseConstListByType("1"), "houseConstType", houseLeaseQO.getHouseLeasedepositId());
-        //4.验证房屋类型id 数值是否在可取范围之内 数据库内 type = 2  的就是租房押金  五室二厅一卫 还是 三室二厅一卫...
-        //ValidatorUtils.validFieldVal(iCommonService.getHouseConstListByType("2"), "houseConstType", houseLeaseQO.getHouseTypeId());
-        //5.验证房屋装修方式id 数值是否在可取范围之内 数据库内 type = 3  的就是装修风格  简约、欧美、古典...
-        //ValidatorUtils.validFieldVal(iCommonService.getHouseConstListByType("3"), "houseConstType", houseLeaseQO.getHouseStyleId());
-        //5.验证房屋房源类型id 数值是否在可取范围之内 数据库内 type = 12   73不限(默认) 74可短租 75邻地铁  76压一付一  77配套齐全  78精装修 79南北通透  80有阳台...
-        //ValidatorUtils.validFieldVal(iCommonService.getHouseConstListByType("12"), "houseConstType", houseLeaseQO.getHouseStyleId());
         //参数效验完成 新增
         iHouseLeaseService.addLeaseSaleHouse(houseLeaseQO);
         return CommonResult.ok();
     }
 
     @Login
-    @ApiOperation("删除房屋租售")
     @DeleteMapping()//delHouseLease
+    @ApiOperation("删除房屋租售")
     public CommonResult<Boolean> delLeaseHouse(@RequestParam Long id) {
         return iHouseLeaseService.delLeaseHouse(id, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(1, "数据不存在");
     }
 
 
     @Login
+    @GetMapping()
     @ApiOperation("查询房屋出租数据")
-    @GetMapping()//queryHouseLeaseByList
-    public CommonResult<Boolean> queryHouseLeaseByList(@RequestParam BaseQO<HouseLeaseQO> houseLeaseQO) {
-        //验证 分页参数合法性
-        ValidatorUtils.validatePageParam(houseLeaseQO);
-        List<HouseLeaseVO> res = iHouseLeaseService.queryHouseLeaseByList(houseLeaseQO);
-        return null;
+    public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
+        ValidatorUtils.validatePageParam(baseQO);
+        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseByList(baseQO));
+    }
+
+
+    @Login
+    @GetMapping()
+    @ApiOperation("查询房屋出租数据单条详情")
+    public CommonResult<HouseLeaseVO> houseLeaseDetails(@RequestParam Long houseId) {
+        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId));
     }
 
 
