@@ -27,6 +27,7 @@
         <!-- 公共 -->
         <module>common</module>
         <module>gateway</module>
+        <module>rabbitmq</module>
     </modules>
     
     <properties>
@@ -249,6 +250,7 @@
                 <artifactId>spring-security-test</artifactId>
                 <scope>test</scope>
             </dependency>
+
     
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>

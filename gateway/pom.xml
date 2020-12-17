@@ -32,15 +32,20 @@
             <version>2.2.3.RELEASE</version>
 <!--                        <exclusions>-->
 <!--                            <exclusion>-->
-<!--                                <artifactId>spring-boot-starter-web</artifactId>-->
+<!--                                <artifactId>spring-boot-starter-hateoas</artifactId>-->
 <!--                                <groupId>org.springframework.boot</groupId>-->
 <!--                            </exclusion>-->
 <!--                            <exclusion>-->
 <!--                                <artifactId>spring-boot-starter-webflux</artifactId>-->
 <!--                                <groupId>org.springframework.boot</groupId>-->
 <!--                            </exclusion>-->
+<!--                            <exclusion>-->
+<!--                                <artifactId>spring-boot-starter-web</artifactId>-->
+<!--                                <groupId>org.springframework.boot</groupId>-->
+<!--                            </exclusion>-->
 <!--                        </exclusions>-->
         </dependency>
+        <!-- 在线文档 -->
     </dependencies>
 
 
