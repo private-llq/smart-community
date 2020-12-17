@@ -67,7 +67,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 用户菜单列表
 	 */
 	@TableField(exist = false)
-	private List<AdminMenuEntity> menuList;
+	private List<AdminMenuEntity2> menuList;
 	
 	/**
 	 * 创建者ID
