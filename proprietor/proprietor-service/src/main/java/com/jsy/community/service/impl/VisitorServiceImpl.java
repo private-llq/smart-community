@@ -232,6 +232,8 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         VisitorEntity VisitorEntity = visitorMapper.selectOne(new QueryWrapper<VisitorEntity>().select("*").eq("id", id));
         VisitorEntity.setReasonStr(BusinessEnum.VisitReasonEnum.visitReasonMap.get(VisitorEntity.getReason()));
         VisitorEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.carTypeMap.get(VisitorEntity.getCarType()));
+        VisitorEntity.setIsCommunityAccessStr(BusinessEnum.CommunityAccessEnum.communityAccessMap.get(VisitorEntity.getIsCommunityAccess()));
+        VisitorEntity.setIsBuildingAccessStr(BusinessEnum.BuildingAccessEnum.buildingAccessMap.get(VisitorEntity.getIsBuildingAccess()));
         return VisitorEntity;
     }
     

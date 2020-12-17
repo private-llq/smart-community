@@ -89,9 +89,15 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @Range(min = 0,max = 2, message = "社区门禁授权选择出错")
     private Integer isCommunityAccess;
     
+    @ApiModelProperty(value = "是否授予来访人社区门禁权限 文字描述", hidden = true)
+    private String isCommunityAccessStr;
+    
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1二维码通行证，2可视对讲")
     @Range(min = 0,max = 2, message = "楼栋门禁授权选择出错")
     private Integer isBuildingAccess;
+    
+    @ApiModelProperty(value = "是否授予来访人楼栋门禁权限 文字描述", hidden = true)
+    private String isBuildingAccessStr;
     
     @ApiModelProperty(value = "来访车辆车牌", hidden = true)
     @Pattern(regexp = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$", message = "请输入一个正确的车牌号!")

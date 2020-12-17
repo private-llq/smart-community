@@ -151,7 +151,6 @@ public class VisitorController {
 		if (visitorEntity == null) {
 			return CommonResult.ok(null);
 		}
-		visitorEntity.setReasonStr(BusinessEnum.VisitReasonEnum.visitReasonMap.get(visitorEntity.getReason()));
 		visitorEntity.setVisitorPersonRecordList(iVisitorService.queryPersonRecordList(visitorEntity.getId()));
 		visitorEntity.setVisitingCarRecordList(iVisitorService.queryCarRecordList(visitorEntity.getId()));
 		return CommonResult.ok(visitorEntity);
