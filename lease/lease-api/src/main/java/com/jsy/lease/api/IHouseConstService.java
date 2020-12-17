@@ -2,10 +2,6 @@ package com.jsy.lease.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseLeaseConstEntity;
-import com.jsy.community.entity.HouseLeaseEntity;
-import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.HouseLeaseQO;
-import com.jsy.community.vo.HouseLeaseVO;
 
 import java.util.List;
 
@@ -24,5 +20,13 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @return					返回这个类型对应的List
      */
     List<HouseLeaseConstEntity> getHouseConstListByType(String type);
-
+    
+    /**
+     * @return java.util.List<com.jsy.community.entity.HouseLeaseConstEntity>
+     * @Author lihao
+     * @Description 根据发布源类型获取其标签
+     * @Date 2020/12/17 10:58
+     * @Param [id]
+     **/
+    List<HouseLeaseConstEntity> getTag(Integer id);
 }

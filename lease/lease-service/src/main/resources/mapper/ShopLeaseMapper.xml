@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.lease.mapper.ShopLeaseMapper">
+    <insert id="insertMiddle">
+        insert into t_shop_const (shop_lease_id,house_const_id) values
+        <foreach collection="tagIds" item="tagId" separator=",">
+            (#{id},#{tagId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteTags">
+        delete from t_shop_const where house_const_id in
+        <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
+            #{tagId}
+        </foreach>
+    </delete>
+
+
+
+<!--    <select id="selectTags" resultType="java.util.Arrays">-->
+<!--        select house_const_id from t_shop_const where shop_lease_id = #{shopId}-->
+<!--    </select>-->
+</mapper>

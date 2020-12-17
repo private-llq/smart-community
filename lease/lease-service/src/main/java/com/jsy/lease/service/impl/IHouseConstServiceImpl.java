@@ -1,29 +1,19 @@
 package com.jsy.lease.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
-import com.jsy.community.entity.HouseLeaseEntity;
-import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.HouseLeaseQO;
-import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.HouseLeaseVO;
 import com.jsy.lease.api.IHouseConstService;
-import com.jsy.lease.api.IHouseLeaseService;
 import com.jsy.lease.mapper.HouseConstMapper;
-import com.jsy.lease.mapper.HouseLeaseMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author YuLF
@@ -62,7 +52,14 @@ public class IHouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseL
         }
         return houseLeaseConstEntityList;
     }
-
+    
+    @Override
+    public List<HouseLeaseConstEntity> getTag(Integer id) {
+        QueryWrapper<HouseLeaseConstEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("house_const_type",id);
+        return houseConstMapper.selectList(wrapper);
+    }
+    
     private boolean isEmpty(String str){
         return str == null || str.trim().equals("") || "null".equals(str) || "undefined".equals(str);
     }

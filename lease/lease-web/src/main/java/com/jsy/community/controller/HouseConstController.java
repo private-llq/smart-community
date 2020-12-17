@@ -7,6 +7,7 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.lease.api.IHouseConstService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -44,9 +45,23 @@ public class HouseConstController {
         return CommonResult.ok(map);
     }
 
-
-
-
-
-
+    /**
+     * @return com.jsy.community.vo.CommonResult
+     * @Author lihao
+     * @Description 根据发布源类型获取其标签
+     * @Date 2020/12/17 10:57
+     * @Param [id]
+     **/
+    @GetMapping("/getTag")
+    @ApiOperation("根据发布源类型获取其标签")
+    public CommonResult getTag(@ApiParam("发布源类型") Integer id){
+        List<HouseLeaseConstEntity> list = houseConstService.getTag(id);
+        return CommonResult.ok(list);
+    }
+    
+    
+    
+    
+    
+    
 }
