@@ -14,7 +14,7 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-24
  */
-public interface IAdminMenuService extends IService<AppMenuEntity> {
+public interface IAppMenuService extends IService<AppMenuEntity> {
 	
 	/**
 	 * @return java.util.List<com.jsy.community.entity.AppMenuEntity>

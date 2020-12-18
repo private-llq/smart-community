@@ -2,7 +2,7 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.entity.AppMenuEntity;
-import com.jsy.community.service.IAdminMenuService;
+import com.jsy.community.service.IAppMenuService;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -30,10 +30,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/community/adminMenu")
-public class AdminMenuController {
+public class AppMenuController {
 	
 	@Autowired
-	private IAdminMenuService adminMenuService;
+	private IAppMenuService adminMenuService;
 	
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;

@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2020-11-24
  */
 @Mapper
-public interface AdminMenuMapper extends BaseMapper<AppMenuEntity> {
+public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 
 }
