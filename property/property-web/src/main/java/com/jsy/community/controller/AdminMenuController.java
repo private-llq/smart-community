@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminMenuEntity2;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminMenuQO;

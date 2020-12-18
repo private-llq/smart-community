@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("t_admin_menu")
+@TableName("t_app_menu")
 @ApiModel(value="AdminMenu对象", description="菜单")
 public class AppMenuEntity extends BaseEntity {
 
