@@ -41,18 +41,18 @@ public class AdminLoginController {
 	/**
 	 * 验证码
 	 */
-	@GetMapping("captcha.jpg")
-	public void captcha(HttpServletResponse response, String uuid) throws IOException {
-		response.setHeader("Cache-Control", "no-store, no-cache");
-		response.setContentType("image/jpeg");
-		
-		//获取图片验证码
-		BufferedImage image = adminCaptchaService.getCaptcha(uuid);
-		
-		ServletOutputStream out = response.getOutputStream();
-		ImageIO.write(image, "jpg", out);
-		IoUtil.close(out);
-	}
+//	@GetMapping("captcha.jpg")
+//	public void captcha(HttpServletResponse response, String uuid) throws IOException {
+//		response.setHeader("Cache-Control", "no-store, no-cache");
+//		response.setContentType("image/jpeg");
+//
+//		//获取图片验证码
+//		BufferedImage image = adminCaptchaService.getCaptcha(uuid);
+//
+//		ServletOutputStream out = response.getOutputStream();
+//		ImageIO.write(image, "jpg", out);
+//		IoUtil.close(out);
+//	}
 	
 	/**
 	 * 登录
