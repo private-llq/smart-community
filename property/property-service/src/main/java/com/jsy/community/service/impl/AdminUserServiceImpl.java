@@ -33,8 +33,8 @@ import java.util.concurrent.TimeUnit;
 @DubboService(version = Const.version, group = Const.group_property)
 public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUserEntity> implements IAdminUserService {
 	
-	@Value("${email.linkExpiretime}")
-	public long emailLinkExpiretime;
+//	@Value("${email.linkExpiretime}")
+	public long emailLinkExpiretime = 24;
 	
 	@Autowired
 	private SimpleMailSender simpleMailSender;

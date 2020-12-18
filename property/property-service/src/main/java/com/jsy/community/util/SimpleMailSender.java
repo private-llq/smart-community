@@ -23,14 +23,14 @@ import javax.mail.internet.MimeMessage;
 @Service
 public class SimpleMailSender {
 	
-	@Value("${email.host}")
-	private String host;
+//	@Value("${email.host}")
+	private String host = "smtp.qq.com";
 	
-	@Value("${email.baseAccount}")
-	private String from;
+//	@Value("${email.baseAccount}")
+	private String from = "459799974@qq.com";
 	
-	@Value("${email.authPass}")
-	private String authPass;
+//	@Value("${email.authPass}")
+	private String authPass = "nfezhwyeduksbjjh";
 	
 	private JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 	
