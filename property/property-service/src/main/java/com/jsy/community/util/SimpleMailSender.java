@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -20,7 +21,7 @@ import javax.mail.internet.MimeMessage;
  * @since 2020-11-26 16:43
  **/
 @Slf4j
-@Service
+@Component
 public class SimpleMailSender {
 	
 //	@Value("${email.host}")

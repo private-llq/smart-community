@@ -3,6 +3,7 @@ package com.jsy.community.config;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Properties;
@@ -13,6 +14,7 @@ import java.util.Properties;
  * @since 2020-11-24 10:43
  **/
 @Configuration
+@ComponentScan(basePackages = "com.jsy.community.config")
 public class KaptchaConfig {
 	@Bean
 	public DefaultKaptcha producer() {

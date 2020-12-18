@@ -13,7 +13,7 @@ public interface IAdminCaptchaService extends IService<AdminCaptchaEntity> {
 	/**
 	 * 获取图片验证码
 	 */
-//	BufferedImage getCaptcha(String uuid);
+	BufferedImage getCaptcha(String uuid);
 	
 	/**
 	 * 验证码效验
