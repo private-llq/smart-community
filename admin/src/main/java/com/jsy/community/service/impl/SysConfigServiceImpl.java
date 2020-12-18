@@ -29,7 +29,7 @@ import java.util.List;
  **/
 @Slf4j
 @Service
-public class ISysConfigServiceImpl implements ISysConfigService {
+public class SysConfigServiceImpl implements ISysConfigService {
 	
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -50,7 +50,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	**/
 	@PostConstruct
 	private void cacheMenuToRedis(){
-		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(queryMenu()));
+		stringRedisTemplate.opsForValue().set("Sys:Menu", JSON.toJSONString(queryMenu()));
 	}
 	
 	/**
@@ -187,7 +187,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	public List<SysMenuEntity> listOfMenu() {
 		List<SysMenuEntity> list = null;
 		try{
-			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
+			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Sys:Menu"),List.class);
 		}catch (Exception e){
 			log.error("redis获取菜单失败");
 			return queryMenu();//从mysql获取

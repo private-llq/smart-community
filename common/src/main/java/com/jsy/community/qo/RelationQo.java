@@ -17,8 +17,10 @@ public class RelationQo implements Serializable {
     private Integer sex;
     @ApiModelProperty("电话")
     private String phoneTel;
-
-    @ApiModelProperty(value = "身份证号码",required = true)
+    
+    @ApiModelProperty(value = "证件类型1.身份证 2.护照",required = true)
+    private Integer identificationType;
+    @ApiModelProperty(value = "身份证号码/护照号码",required = true)
     private String idNumber;
 
     @ApiModelProperty(hidden = true)

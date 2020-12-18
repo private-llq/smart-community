@@ -24,41 +24,27 @@ public class HouseMemberEntity extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "社区ID")
-    @NotNull(groups = {addHouseMemberValidatedGroup.class}, message = "缺少社区ID")
     private Long communityId;
 
     @ApiModelProperty(value = "房间ID")
-    @NotNull(groups = {addHouseMemberValidatedGroup.class}, message = "缺少房间ID")
     private Long houseId;
 
     @ApiModelProperty(value = "房主ID")
-    @NotNull(groups = {updateHouseMemberValidatedGroup.class}, message = "缺少社区ID")
     private String householderId;
 
     @ApiModelProperty(value = "家属名称")
-    @NotNull(groups = {addHouseMemberValidatedGroup.class}, message = "缺少家属名称")
     private String name;
     @ApiModelProperty(value = "家属性别")
     private Integer sex;
     @ApiModelProperty(value = "家属电话")
     private String mobile;
-    @ApiModelProperty(value = "家属身份证号码")
-    @NotNull(groups = {addHouseMemberValidatedGroup.class}, message = "缺少家属身份证号码")
+    
+    @ApiModelProperty(value = "证件类型1.身份证 2.护照",required = true)
+    private Integer identificationType;
+    @ApiModelProperty(value = "家属身份证号码/护照号码")
     private String idCard;
+    
     @ApiModelProperty(value = "与业主关系 1.夫妻 2.父子 3.母子 4.父女 5.母女 6.亲属")
     private Integer relation;
-
-
-    /**
-     * 新增访客验证组
-     */
-    public interface addHouseMemberValidatedGroup {
-    }
-
-    /**
-     * 修改访客验证组
-     */
-    public interface updateHouseMemberValidatedGroup {
-    }
 
 }
