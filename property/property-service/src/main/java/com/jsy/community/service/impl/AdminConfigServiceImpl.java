@@ -20,8 +20,10 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author chq459799974
@@ -275,17 +277,28 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			List<Long> idBelongList = adminMenuMapper.getIdBelongList(menuIds);
 			menuIds.addAll(idBelongList);
 		}
+		//去重
+		Set<Long> menuIdsSet = new HashSet<>(menuIds);
 		//备份
-		List<Long> userRoles = adminRoleMapper.getRoleMenu(roleId);
+		List<Long> menuBackup = adminRoleMapper.getRoleMenu(roleId);
 		//清空
 		adminRoleMapper.clearRoleMenu(roleId);
 		//新增
-		int rows = adminRoleMapper.addRoleMenuBatch(menuIds, roleId);
-		//还原
-		if(rows != menuIds.size()){
-			log.error("设置角色菜单出错：" + roleId,"成功条数：" + rows);
+		int rows = 0;
+		try{
+			rows = adminRoleMapper.addRoleMenuBatch(menuIdsSet, roleId);
+		}catch (Exception e){
+			//还原
+			log.error("设置角色菜单出错：" + roleId + "成功条数：" + rows);
 			adminRoleMapper.clearRoleMenu(roleId);
-			adminRoleMapper.addRoleMenuBatch(userRoles, roleId);
+			adminRoleMapper.addRoleMenuBatch(new HashSet<>(menuBackup), roleId);
+			return false;
+		}
+		//还原
+		if(rows != menuIdsSet.size()){
+			log.error("设置角色菜单异常：" + roleId + "成功条数：" + rows);
+			adminRoleMapper.clearRoleMenu(roleId);
+			adminRoleMapper.addRoleMenuBatch(new HashSet<>(menuBackup), roleId);
 			return false;
 		}
 		return true;

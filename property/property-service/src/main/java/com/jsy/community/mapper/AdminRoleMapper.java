@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author chq459799974
@@ -43,5 +44,5 @@ public interface AdminRoleMapper extends BaseMapper<AdminRoleEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
-	int addRoleMenuBatch(@Param("list") List<Long> list, @Param("roleId") Long roleId);
+	int addRoleMenuBatch(@Param("collection") Set<Long> menuIdsSet, @Param("roleId") Long roleId);
 }
