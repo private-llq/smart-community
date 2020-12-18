@@ -1,6 +1,7 @@
 package com.jsy.lease.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
@@ -79,6 +80,11 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
     @Override
     public List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> houseLeaseQO) {
         houseLeaseQO.setPage((houseLeaseQO.getPage() - 1)*houseLeaseQO.getSize());
+        //如果在查询时 用户筛选条件房屋优势标签为多选
+        if ( houseLeaseQO.getQuery().getHouseAdvantage() != null && !houseLeaseQO.getQuery().getHouseAdvantage().isEmpty() ){
+            long typeCode = MyMathUtils.getTypeCode(houseLeaseQO.getQuery().getHouseAdvantage());
+            houseLeaseQO.getQuery().setHouseAdvantageId(typeCode);
+        }
         //1.通过存在的条件 查出符合条件的分页所有房屋数据
         List<HouseLeaseVO> vos = houseLeaseMapper.queryHouseLeaseByList(houseLeaseQO);
         //根据数据字段id 查询 一对多的 房屋标签name和id 如 邻地铁、可短租、临街商铺等多标签、之类
@@ -130,6 +136,10 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
         if( !furnitureId.isEmpty() ){
             vo.setHouseFurniture(houseLeaseMapper.queryHouseConstNameByFurnitureId(furnitureId, 13L));
         }
+        //1.6查出该条数据所有图片
+        vo.setHouseImage(houseLeaseMapper.queryHouseAllImgById(vo.getHouseImageId()));
+        //1.7查出房屋朝向
+        vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirection()));
         return vo;
     }
 

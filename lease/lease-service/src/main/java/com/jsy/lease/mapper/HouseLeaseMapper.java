@@ -105,7 +105,16 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @return              返回这条数据的详情
      */
     @Select("select " +
-            "house_image_id,house_price,house_unit,house_leasedeposit_id,house_leasemode_id,house_title,house_type_id,house_square_meter,house_floor,house_direction,house_advantage_id,house_introduce,house_furniture_id,house_lat,house_lon " +
+            "house_contact,house_image_id,house_price,house_unit,house_leasedeposit_id,house_leasemode_id,house_title,house_type_id,house_square_meter,house_floor,house_direction,house_advantage_id,house_introduce,house_furniture_id,house_lat,house_lon " +
             "from t_house_lease where id = #{houseId}")
     HouseLeaseVO queryHouseLeaseOne(@Param("houseId") Long houseId);
+
+
+    /**
+     * 按图片id查出所有图片
+     * @param houseImageId      图片id
+     * @return                  返回List数据
+     */
+    @Select("select img_url from t_house_image where field_id = #{houseImageId}")
+    List<String> queryHouseAllImgById(@Param("houseImageId") String houseImageId);
 }

@@ -37,7 +37,7 @@
 
     <!-- 按列表查询房屋出租信息 -->
     <select id="queryHouseLeaseByList" resultType="com.jsy.community.vo.HouseLeaseVO">
-        select id,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_id,house_lon,house_lat from t_house_lease
+        select id,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_id,house_lon,house_lat,house_furniture_id from t_house_lease
          <where>
             <!-- 如果查询筛选增加了市条件 -->
             <if test="query.houseAreaId != null and query.houseAreaId != &quot;&quot; and query.houseAreaId &gt; 0">
@@ -69,12 +69,9 @@
              <if test="query.houseSourceId != null and query.houseSourceId != &quot;&quot; and query.houseSourceId &gt; 0">
                  and house_source_id = #{query.houseSourceId}
              </if>
-             <!-- 如果查询筛选增加了房源类型条件  精装修、邻地铁之类 -->
-             <if test="query.houseAdvantage != null">
-                 and house_advantage_id in
-                 <foreach collection="query.houseAdvantage" item="houseConstCode" separator="," open="(" close=")">
-                     #{houseConstCode}
-                 </foreach>
+             <!-- 如果查询筛选增加了房源类型条件  精装修、邻地铁之类 使用或运算 判断 存储的进制位是否包含 这个标签code -->
+             <if test="query.houseAdvantageId != null">
+                and #{query.houseAdvantageId} | house_advantage_id = house_advantage_id
              </if>
          </where>
          limit #{page},#{size}
