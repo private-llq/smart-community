@@ -5,9 +5,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.admin.AdminMenuEntity2;
+import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
-import com.jsy.community.mapper.AdminMenuMapper2;
+import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.mapper.AdminRoleMapper;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
@@ -36,7 +36,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	private StringRedisTemplate stringRedisTemplate;
 	
 	@Resource
-	private AdminMenuMapper2 adminMenuMapper;
+	private AdminMenuMapper adminMenuMapper;
 	
 	@Resource
 	private AdminRoleMapper adminRoleMapper;
@@ -61,19 +61,19 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
-	public List<AdminMenuEntity2> queryMenu(){
-		List<AdminMenuEntity2> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity2>().select("*").eq("pid", 0));
-		setChildren(menuList,new LinkedList<AdminMenuEntity2>());
+	public List<AdminMenuEntity> queryMenu(){
+		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*").eq("pid", 0));
+		setChildren(menuList,new LinkedList<AdminMenuEntity>());
 		return menuList;
 	}
 	
 	//组装子菜单
-	private void setChildren(List<AdminMenuEntity2> parentList,List<AdminMenuEntity2> childrenList){
+	private void setChildren(List<AdminMenuEntity> parentList, List<AdminMenuEntity> childrenList){
 		if(!CollectionUtils.isEmpty(parentList)){
-			for(AdminMenuEntity2 adminMenuEntity : parentList){
+			for(AdminMenuEntity adminMenuEntity : parentList){
 				childrenList = adminMenuMapper.getChildrenList(adminMenuEntity.getId());
 				adminMenuEntity.setChildrenList(childrenList);
-				setChildren(childrenList,new LinkedList<AdminMenuEntity2>());
+				setChildren(childrenList,new LinkedList<AdminMenuEntity>());
 			}
 		}
 	}
@@ -86,9 +86,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public boolean addMenu(AdminMenuEntity2 adminMenuEntity){
+	public boolean addMenu(AdminMenuEntity adminMenuEntity){
 		if(adminMenuEntity.getPid() != null && adminMenuEntity.getPid() != 0){ //①非顶级节点，查找父节点，确保数据严密性
-			AdminMenuEntity2 parent = adminMenuMapper.findParent(adminMenuEntity.getPid());
+			AdminMenuEntity parent = adminMenuMapper.findParent(adminMenuEntity.getPid());
 			if(parent == null){
 				return false;
 			}
@@ -141,7 +141,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //		setDeleteIds(idList, subIdList);
 //		int result = sysMenuMapper.deleteBatchIds(idList);
 		int result = adminMenuMapper.deleteById(id);
-		adminMenuMapper.delete(new QueryWrapper<AdminMenuEntity2>().eq("belong_to",id));
+		adminMenuMapper.delete(new QueryWrapper<AdminMenuEntity>().eq("belong_to",id));
 		if(result == 1){
 			cacheMenuToRedis(); //刷新redis
 			return true;
@@ -167,7 +167,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	**/
 	@Override
 	public boolean updateMenu(AdminMenuQO sysMenuQO){
-		AdminMenuEntity2 entity = new AdminMenuEntity2();
+		AdminMenuEntity entity = new AdminMenuEntity();
 		BeanUtils.copyProperties(sysMenuQO,entity);
 		int result = adminMenuMapper.updateById(entity);
 		if(result == 1){
@@ -185,8 +185,8 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public List<AdminMenuEntity2> listOfMenu() {
-		List<AdminMenuEntity2> list = null;
+	public List<AdminMenuEntity> listOfMenu() {
+		List<AdminMenuEntity> list = null;
 		try{
 			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
 		}catch (Exception e){
@@ -300,7 +300,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/15
 	**/
 	@Override
-	public List<AdminMenuEntity2> queryUserMenu(Long uid){
+	public List<AdminMenuEntity> queryUserMenu(Long uid){
 		return adminMenuMapper.queryUserMenu(uid);
 	}
 	

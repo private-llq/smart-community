@@ -15,7 +15,7 @@ import java.util.List;
  **/
 @Data
 @TableName("t_admin_menu")
-public class AdminMenuEntity2 extends BaseEntity {
+public class AdminMenuEntity extends BaseEntity {
 	
 	private String icon;//菜单图标
 	
@@ -26,7 +26,7 @@ public class AdminMenuEntity2 extends BaseEntity {
 	private Long pid;//父级id
 	@JsonIgnore
 	private Long belongTo;//顶级菜单id
-	private List<AdminMenuEntity2> childrenList;//子菜单
+	private List<AdminMenuEntity> childrenList;//子菜单
 	
 	private Long createBy;//创建人
 	private Long updateBy;//修改人

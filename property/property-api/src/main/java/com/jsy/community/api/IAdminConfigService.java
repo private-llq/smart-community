@@ -1,7 +1,7 @@
 package com.jsy.community.api;
 
 
-import com.jsy.community.entity.admin.AdminMenuEntity2;
+import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
@@ -23,7 +23,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
-	boolean addMenu(AdminMenuEntity2 adminMenuEntity);
+	boolean addMenu(AdminMenuEntity adminMenuEntity);
 	
 	/**
 	* @Description: 级联删除
@@ -50,7 +50,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
-	List<AdminMenuEntity2> listOfMenu();
+	List<AdminMenuEntity> listOfMenu();
 	
 	//==================================================== Role角色 ===============================================================
 	/**
@@ -108,5 +108,5 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
-	List<AdminMenuEntity2> queryUserMenu(Long uid);
+	List<AdminMenuEntity> queryUserMenu(Long uid);
 }

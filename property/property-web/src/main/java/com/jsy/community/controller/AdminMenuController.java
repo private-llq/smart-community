@@ -2,7 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.admin.AdminMenuEntity2;
+import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.utils.ValidatorUtils;
@@ -32,7 +32,7 @@ public class AdminMenuController {
 	 * @Date: 2020/12/14
 	**/
 	@PostMapping("")
-	public CommonResult addMenu(@RequestBody AdminMenuEntity2 adminMenuEntity){
+	public CommonResult addMenu(@RequestBody AdminMenuEntity adminMenuEntity){
 		ValidatorUtils.validateEntity(adminMenuEntity);
 		boolean b = adminConfigService.addMenu(adminMenuEntity);
 		return b? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"添加失败");
@@ -72,7 +72,7 @@ public class AdminMenuController {
 	 * @Date: 2020/12/14
 	**/
 	@GetMapping("")
-	public CommonResult<List<AdminMenuEntity2>> listOfMenu(){
+	public CommonResult<List<AdminMenuEntity>> listOfMenu(){
 		return CommonResult.ok(adminConfigService.listOfMenu());
 	}
 }

@@ -1,27 +1,20 @@
 package com.jsy.community.controller;
 
-import cn.hutool.core.io.IoUtil;
 import com.jsy.community.api.IAdminCaptchaService;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IAdminUserTokenService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.admin.AdminMenuEntity2;
+import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.shiro.crypto.hash.Sha256Hash;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -86,7 +79,7 @@ public class AdminLoginController {
 		String token = adminUserTokenService.createToken(user);
 		user.setToken(token);
 		//查询用户菜单
-		List<AdminMenuEntity2> menuList = adminConfigService.queryUserMenu(user.getId());
+		List<AdminMenuEntity> menuList = adminConfigService.queryUserMenu(user.getId());
 		user.setMenuList(menuList);
 		return CommonResult.ok(user);
 	}
