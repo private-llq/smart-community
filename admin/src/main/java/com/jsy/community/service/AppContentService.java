@@ -1,4 +1,4 @@
-package com.jsy.community.mapper;
+package com.jsy.community.service;
 
 import com.jsy.community.entity.RegionEntity;
 
