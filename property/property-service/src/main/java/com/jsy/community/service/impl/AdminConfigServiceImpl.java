@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IAdminConfigService;
+import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminMenuEntity2;
 import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.mapper.AdminMenuMapper2;
@@ -11,10 +12,10 @@ import com.jsy.community.mapper.AdminRoleMapper;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -28,7 +29,7 @@ import java.util.List;
  * @since 2020-12-14 10:29
  **/
 @Slf4j
-@Service
+@DubboService(version = Const.version, group = Const.group_property)
 public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	@Autowired
@@ -56,7 +57,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	/**
 	* @Description: 查询大后台菜单
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
@@ -114,7 +115,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	}
 	
 	//寻找顶级菜单ID
-//	private void setBelongTo(AppMenuEntity sysMenuEntity,AppMenuEntity parent){
+//	private void setBelongTo(AdminMenuEntity sysMenuEntity,AdminMenuEntity parent){
 //		if(0L != parent.getPid()){ //要新增的菜单非顶级
 //			parent = sysMenuMapper.findParent(parent.getPid());//寻找父节点
 //			if(parent.getPid() == 0){ //顶级节点
@@ -179,7 +180,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	/**
 	* @Description: 菜单列表
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
@@ -294,7 +295,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	/**
 	* @Description: 查询用户菜单权限
 	 * @Param: [uid]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
