@@ -22,7 +22,7 @@ import javax.validation.constraints.NotNull;
 @Accessors(chain = true)
 @TableName("t_admin_menu")
 @ApiModel(value="AdminMenu对象", description="菜单")
-public class AdminMenuEntity extends BaseEntity {
+public class AppMenuEntity extends BaseEntity {
 
     @ApiModelProperty(value = "社区id")
     @NotNull(groups = {addAdmin.class,updateAdmin.class},message = "社区id不能为空")

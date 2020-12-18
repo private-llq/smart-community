@@ -3,15 +3,15 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.IMenuService;
+import com.jsy.community.api.IIndexMenuService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.AdminMenuEntity;
-import com.jsy.community.entity.FrontMenuEntity;
+import com.jsy.community.entity.AppMenuEntity;
+import com.jsy.community.entity.IndexMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.mapper.AdminMenuMapper;
-import com.jsy.community.mapper.MenuMapper;
+import com.jsy.community.mapper.AppMenuMapper;
+import com.jsy.community.mapper.IndexMenuMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.FrontMenuVO;
@@ -36,46 +36,46 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-14
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_property)
 @Slf4j
-public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> implements IMenuService {
+public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenuEntity> implements IIndexMenuService {
 	
 	@Autowired
-	private MenuMapper menuMapper;
+	private IndexMenuMapper indexMenuMapper;
 	
 	@Autowired
-	private AdminMenuMapper adminMenuMapper;
+	private AppMenuMapper appMenuMapper;
 	
 	// TODO 首页展示菜单数量 暂定5个
 	private final Integer INDEXMENUCOUNT = 3;
 	
 	@Override
-	public Integer saveMenu(FrontMenuEntity menuEntity) {
-		return menuMapper.insert(menuEntity);
+	public Integer saveMenu(IndexMenuEntity menuEntity) {
+		return indexMenuMapper.insert(menuEntity);
 	}
 	
 	@Override
 	public Integer updateMenu(Long id, FrontMenuVO frontMenuVO) {
 		String parentName = frontMenuVO.getParentName();
-		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<IndexMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("menu_name", parentName);
-		FrontMenuEntity menuEntity = menuMapper.selectOne(queryWrapper);
+		IndexMenuEntity menuEntity = indexMenuMapper.selectOne(queryWrapper);
 		
-		FrontMenuEntity frontMenuEntity = new FrontMenuEntity();
-		BeanUtils.copyProperties(frontMenuVO, frontMenuEntity);
-		frontMenuEntity.setId(id);
+		IndexMenuEntity indexMenuEntity = new IndexMenuEntity();
+		BeanUtils.copyProperties(frontMenuVO, indexMenuEntity);
+		indexMenuEntity.setId(id);
 		
 		if (menuEntity != null) {
-			frontMenuEntity.setParentId(menuEntity.getId());
-			return menuMapper.updateById(frontMenuEntity);
+			indexMenuEntity.setParentId(menuEntity.getId());
+			return indexMenuMapper.updateById(indexMenuEntity);
 		}
-		return menuMapper.updateById(frontMenuEntity);
+		return indexMenuMapper.updateById(indexMenuEntity);
 	}
 	
 	@Override
-	public List<FrontMenuVO> listFrontMenu(BaseQO<FrontMenuEntity> baseQO) {
-		Page<FrontMenuEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
-		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+	public List<FrontMenuVO> listFrontMenu(BaseQO<IndexMenuEntity> baseQO) {
+		Page<IndexMenuEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
+		QueryWrapper<IndexMenuEntity> wrapper = new QueryWrapper<>();
 		String menuName = baseQO.getQuery().getMenuName();
 		String description = baseQO.getQuery().getDescr();
 		if (!StringUtils.isEmpty(menuName)) {
@@ -84,19 +84,19 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 		if (!StringUtils.isEmpty(description)) {
 			wrapper.like("descr", description);
 		}
-		menuMapper.selectPage(page, wrapper);
+		indexMenuMapper.selectPage(page, wrapper);
 		
 		
 		ArrayList<FrontMenuVO> frontMenuVOS = new ArrayList<>();
 		
-		List<FrontMenuEntity> records = page.getRecords();
-		for (FrontMenuEntity record : records) {
+		List<IndexMenuEntity> records = page.getRecords();
+		for (IndexMenuEntity record : records) {
 			FrontMenuVO menuVo = new FrontMenuVO();
 			BeanUtils.copyProperties(record, menuVo);
 			Long parentId = record.getParentId();
-			QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+			QueryWrapper<IndexMenuEntity> queryWrapper = new QueryWrapper<>();
 			queryWrapper.eq("id", parentId);
-			FrontMenuEntity menuEntity = menuMapper.selectOne(queryWrapper);
+			IndexMenuEntity menuEntity = indexMenuMapper.selectOne(queryWrapper);
 			if (menuEntity != null) {
 				menuVo.setParentName(menuEntity.getMenuName());
 			}
@@ -106,41 +106,41 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
-		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+	public List<IndexMenuEntity> listIndexMenu(Long communityId) {
+		QueryWrapper<IndexMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.ne("parent_id", 0).eq("community_id", communityId)
 			.eq("status", 0).orderByAsc("sort")
 			.last("limit " + INDEXMENUCOUNT);
-		return menuMapper.selectList(wrapper);
+		return indexMenuMapper.selectList(wrapper);
 	}
 	
 	@Override
 	public Integer removeMenu(Long id) {
-		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<IndexMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("parent_id", id);
-		List<FrontMenuEntity> list = menuMapper.selectList(queryWrapper);
+		List<IndexMenuEntity> list = indexMenuMapper.selectList(queryWrapper);
 		if (!CollectionUtils.isEmpty(list)) {
 			log.debug("删除的菜单id：{}", id);
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请先删除子菜单");
 		}
-		return menuMapper.deleteById(id);
+		return indexMenuMapper.deleteById(id);
 	}
 	
 	@Override
-	public List<FrontMenuEntity> listParentMenu() {
-		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+	public List<IndexMenuEntity> listParentMenu() {
+		QueryWrapper<IndexMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("parent_id", 0L);
-		return menuMapper.selectList(wrapper);
+		return indexMenuMapper.selectList(wrapper);
 	}
 	
 	@Override
 	public FrontMenuVO getMenuById(Long id) {
-		FrontMenuEntity menuEntity = menuMapper.selectById(id);
+		IndexMenuEntity menuEntity = indexMenuMapper.selectById(id);
 		FrontMenuVO menuVo = new FrontMenuVO();
 		BeanUtils.copyProperties(menuEntity, menuVo);
 
 //		Long parentId = menuEntity.getParentId();
-//		FrontMenuEntity entity = this.common(parentId);
+//		IndexMenuEntity entity = this.common(parentId);
 //		if (entity != null) {
 //			menuVo.setParentName(entity.getMenuName());
 //			log.info("父菜单名：{}" + menuVo.getParentName());
@@ -154,25 +154,25 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	@Override
 	public Integer removeListMenu(Long[] ids) {
 		for (Long id : ids) {
-			FrontMenuEntity frontMenuEntity = menuMapper.selectById(id);
-			if (frontMenuEntity.getParentId() == 0) {
-				log.debug("删除的菜单id：{}", frontMenuEntity.getId());
+			IndexMenuEntity indexMenuEntity = indexMenuMapper.selectById(id);
+			if (indexMenuEntity.getParentId() == 0) {
+				log.debug("删除的菜单id：{}", indexMenuEntity.getId());
 				throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请先删除子菜单");
 			}
 		}
-		return menuMapper.deleteBatchIds(Arrays.asList(ids));
+		return indexMenuMapper.deleteBatchIds(Arrays.asList(ids));
 	}
 	
 	@Override
 	public List<FrontMenuVO> moreListMenu() {
-		List<FrontMenuEntity> list = menuMapper.selectList(null);
+		List<IndexMenuEntity> list = indexMenuMapper.selectList(null);
 		
 		ArrayList<FrontMenuVO> arrayList = new ArrayList<>();
-		for (FrontMenuEntity frontMenuEntity : list) {
+		for (IndexMenuEntity indexMenuEntity : list) {
 			FrontMenuVO menuVo = new FrontMenuVO();
-			BeanUtils.copyProperties(frontMenuEntity, menuVo);
-			Long parentId = frontMenuEntity.getParentId();
-			FrontMenuEntity menuEntity = this.common(parentId);
+			BeanUtils.copyProperties(indexMenuEntity, menuVo);
+			Long parentId = indexMenuEntity.getParentId();
+			IndexMenuEntity menuEntity = this.common(parentId);
 			if (menuEntity != null) {
 				menuVo.setParentName(menuEntity.getMenuName());
 			}
@@ -185,31 +185,31 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	public List<FrontParentMenu> listAdminMenu(Long communityId) {
 		ArrayList<FrontParentMenu> list = new ArrayList<>();
 		// 1. 查询所有一级分类
-		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<IndexMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("community_id", communityId);
 		queryWrapper.eq("parent_id", 0);
-		List<FrontMenuEntity> parentList = menuMapper.selectList(queryWrapper);
+		List<IndexMenuEntity> parentList = indexMenuMapper.selectList(queryWrapper);
 		if (CollectionUtils.isEmpty(parentList)) {
 			throw new PropertyException("该小区不存在");
 		}
 		
 		//2. 查询所有二级分类
-		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+		QueryWrapper<IndexMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.ne("parent_id", 0);
-		List<FrontMenuEntity> childMenu = menuMapper.selectList(wrapper);
+		List<IndexMenuEntity> childMenu = indexMenuMapper.selectList(wrapper);
 		if (CollectionUtils.isEmpty(childMenu)) {
 			return null;
 		}
 		
 		//3. 封装数据
-		for (FrontMenuEntity frontMenuEntity : parentList) {
+		for (IndexMenuEntity indexMenuEntity : parentList) {
 			FrontParentMenu parentMenu = new FrontParentMenu();
-			BeanUtils.copyProperties(frontMenuEntity, parentMenu);
+			BeanUtils.copyProperties(indexMenuEntity, parentMenu);
 			list.add(parentMenu);
 			
 			ArrayList<FrontChildMenu> childMenus = new ArrayList<>();
-			for (FrontMenuEntity menu : childMenu) {
-				if (menu.getParentId().equals(frontMenuEntity.getId())) {
+			for (IndexMenuEntity menu : childMenu) {
+				if (menu.getParentId().equals(indexMenuEntity.getId())) {
 					FrontChildMenu frontChildMenu = new FrontChildMenu();
 					BeanUtils.copyProperties(menu, frontChildMenu);
 					childMenus.add(frontChildMenu);
@@ -221,42 +221,42 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> im
 	}
 	
 	@Override
-	public Long addParentMenu(AdminMenuEntity adminMenuEntity) {
-		FrontMenuEntity frontMenuEntity = new FrontMenuEntity();
-		QueryWrapper<AdminMenuEntity> queryWrapper = new QueryWrapper<>();
+	public Long addParentMenu(AppMenuEntity appMenuEntity) {
+		IndexMenuEntity indexMenuEntity = new IndexMenuEntity();
+		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("parent_id",0);
-		List<AdminMenuEntity> list = adminMenuMapper.selectList(queryWrapper);
-		for (AdminMenuEntity menuEntity : list) {
-			if (!menuEntity.getMenuName().equals(frontMenuEntity.getMenuName()) ||
-				!menuEntity.getPath().equals(frontMenuEntity.getPath())) {
+		List<AppMenuEntity> list = appMenuMapper.selectList(queryWrapper);
+		for (AppMenuEntity menuEntity : list) {
+			if (!menuEntity.getMenuName().equals(indexMenuEntity.getMenuName()) ||
+				!menuEntity.getPath().equals(indexMenuEntity.getPath())) {
 				throw new PropertyException("您添加的菜单不是父菜单");
 			}
 		}
-		BeanUtils.copyProperties(adminMenuEntity, frontMenuEntity);
-		frontMenuEntity.setId(SnowFlake.nextId());
-		menuMapper.insert(frontMenuEntity);
-		return frontMenuEntity.getId();//返回新增后数据的id
+		BeanUtils.copyProperties(appMenuEntity, indexMenuEntity);
+		indexMenuEntity.setId(SnowFlake.nextId());
+		indexMenuMapper.insert(indexMenuEntity);
+		return indexMenuEntity.getId();//返回新增后数据的id
 	}
 	
 	@Override
-	public void addChildMenu(AdminMenuEntity adminMenuEntity) {
-		FrontMenuEntity entity = new FrontMenuEntity();
-		BeanUtils.copyProperties(adminMenuEntity, entity);
+	public void addChildMenu(AppMenuEntity appMenuEntity) {
+		IndexMenuEntity entity = new IndexMenuEntity();
+		BeanUtils.copyProperties(appMenuEntity, entity);
 		entity.setId(SnowFlake.nextId());
-		menuMapper.insert(entity);
+		indexMenuMapper.insert(entity);
 		
 	}
 	
 	@Override
-	public void updateChildMenu(AdminMenuEntity adminMenuEntity) {
-		FrontMenuEntity entity = new FrontMenuEntity();
-		BeanUtils.copyProperties(adminMenuEntity, entity);
-		menuMapper.updateById(entity);
+	public void updateChildMenu(AppMenuEntity appMenuEntity) {
+		IndexMenuEntity entity = new IndexMenuEntity();
+		BeanUtils.copyProperties(appMenuEntity, entity);
+		indexMenuMapper.updateById(entity);
 	}
 	
-	private FrontMenuEntity common(Long parentId) {
-		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+	private IndexMenuEntity common(Long parentId) {
+		QueryWrapper<IndexMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", parentId);
-		return menuMapper.selectOne(wrapper);
+		return indexMenuMapper.selectOne(wrapper);
 	}
 }

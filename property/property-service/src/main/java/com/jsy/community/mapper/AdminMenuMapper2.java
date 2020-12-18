@@ -1,7 +1,6 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminMenuEntity2;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -42,7 +41,7 @@ public interface AdminMenuMapper2 extends BaseMapper<AdminMenuEntity2> {
 	/**
 	 * @Description: 获取子菜单列表
 	 * @Param: [id]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
@@ -70,7 +69,7 @@ public interface AdminMenuMapper2 extends BaseMapper<AdminMenuEntity2> {
 	/**
 	 * @Description: 查询用户菜单
 	 * @Param: [uid]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/

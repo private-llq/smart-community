@@ -1,9 +1,9 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.AppMenuEntity;
+import com.jsy.community.entity.IndexMenuEntity;
 import com.jsy.community.vo.FrontMenuVO;
-import com.jsy.community.entity.AdminMenuEntity;
-import com.jsy.community.entity.FrontMenuEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.vo.menu.FrontParentMenu;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-14
  */
-public interface IMenuService extends IService<FrontMenuEntity> {
+public interface IIndexMenuService extends IService<IndexMenuEntity> {
 	
 	
 	/**
@@ -27,7 +27,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/14 17:37
 	 * @Param [menuEntity]
 	 **/
-	Integer saveMenu(FrontMenuEntity menuEntity);
+	Integer saveMenu(IndexMenuEntity menuEntity);
 	
 	/**
 	 * @return java.lang.Integer
@@ -39,22 +39,22 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	Integer updateMenu(Long id, FrontMenuVO frontMenuVO);
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.FrontMenuEntity>
+	 * @return java.util.List<com.jsy.community.entity.IndexMenuEntity>
 	 * @Author lihao
 	 * @Description 分页查询所有菜单信息
 	 * @Date 2020/11/14 17:59
 	 * @Param [baseEntity]
 	 **/
-	List<FrontMenuVO> listFrontMenu(BaseQO<FrontMenuEntity> baseQO);
+	List<FrontMenuVO> listFrontMenu(BaseQO<IndexMenuEntity> baseQO);
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.FrontMenuEntity>
+	 * @return java.util.List<com.jsy.community.entity.IndexMenuEntity>
 	 * @Author lihao
 	 * @Description 查询首页展示的菜单选项
 	 * @Date 2020/11/14 21:17
 	 * @Param [number]
 	 **/
-	List<FrontMenuEntity> listIndexMenu(Long communityId);
+	List<IndexMenuEntity> listIndexMenu(Long communityId);
 	
 	/**
 	 * @return java.lang.Integer
@@ -66,16 +66,16 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	Integer removeMenu(Long id);
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.FrontMenuEntity>
+	 * @return java.util.List<com.jsy.community.entity.IndexMenuEntity>
 	 * @Author lihao
 	 * @Description 查询所有父菜单
 	 * @Date 2020/11/14 22:07
 	 * @Param []
 	 **/
-	List<FrontMenuEntity> listParentMenu();
+	List<IndexMenuEntity> listParentMenu();
 	
 	/**
-	 * @return com.jsy.community.entity.FrontMenuEntity
+	 * @return com.jsy.community.entity.IndexMenuEntity
 	 * @Author lihao
 	 * @Description 根据id查询菜单信息
 	 * @Date 2020/11/15 15:00
@@ -93,7 +93,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	Integer removeListMenu(Long[] ids);
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.FrontMenuEntity>
+	 * @return java.util.List<com.jsy.community.entity.IndexMenuEntity>
 	 * @Author lihao
 	 * @Description 更多服务
 	 * @Date 2020/11/16 14:02
@@ -117,7 +117,7 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/23 17:28
 	 * @Param [frontMenuEntity]
 	 **/
-	Long addParentMenu(AdminMenuEntity adminMenuEntity);
+	Long addParentMenu(AppMenuEntity appMenuEntity);
 	
 	/**
 	 * @return void
@@ -126,14 +126,14 @@ public interface IMenuService extends IService<FrontMenuEntity> {
 	 * @Date 2020/11/23 17:32
 	 * @Param [frontMenuEntity]
 	 **/
-	void addChildMenu(AdminMenuEntity adminMenuEntity);
+	void addChildMenu(AppMenuEntity appMenuEntity);
 	
 	/**
 	 * @return void
 	 * @Author lihao
 	 * @Description 修改子菜单
 	 * @Date 2020/11/30 11:31
-	 * @Param [adminMenuEntity]
+	 * @Param [appMenuEntity]
 	 **/
-	void updateChildMenu(AdminMenuEntity adminMenuEntity);
+	void updateChildMenu(AppMenuEntity appMenuEntity);
 }

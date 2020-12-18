@@ -1,7 +1,6 @@
 package com.jsy.community.api;
 
 
-import com.jsy.community.entity.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminMenuEntity2;
 import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.qo.admin.AdminMenuQO;
@@ -47,7 +46,7 @@ public interface IAdminConfigService {
 	/**
 	 * @Description: 菜单列表
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
@@ -105,7 +104,7 @@ public interface IAdminConfigService {
 	/**
 	* @Description: 查询用户菜单权限
 	 * @Param: [uid]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/

@@ -2,10 +2,10 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.IMenuService;
+import com.jsy.community.api.IIndexMenuService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.FrontMenuEntity;
-import com.jsy.community.mapper.MenuMapper;
+import com.jsy.community.entity.IndexMenuEntity;
+import com.jsy.community.mapper.IndexMenuMapper;
 import com.jsy.community.vo.menu.FrontChildMenu;
 import com.jsy.community.vo.menu.FrontParentMenu;
 import lombok.extern.slf4j.Slf4j;
@@ -26,45 +26,45 @@ import java.util.List;
  */
 @DubboService(version = Const.version, group = Const.group_proprietor)
 @Slf4j
-public class MenuServiceImpl extends ServiceImpl<MenuMapper, FrontMenuEntity> implements IMenuService {
+public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenuEntity> implements IIndexMenuService {
 	
 	@Autowired
-	private MenuMapper menuMapper;
+	private IndexMenuMapper indexMenuMapper;
 	
 	// TODO 首页展示菜单数量 暂定3个
 //	@Value(value = "${jsy.menu}")
 	private Integer INDEXMENUCOUNT = 3;
 	
 	@Override
-	public List<FrontMenuEntity> listIndexMenu(Long communityId) {
-		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+	public List<IndexMenuEntity> listIndexMenu(Long communityId) {
+		QueryWrapper<IndexMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.ne("parent_id", 0).eq("community_id", communityId).eq("status", 0).last("limit " + INDEXMENUCOUNT);
-		return menuMapper.selectList(wrapper);
+		return indexMenuMapper.selectList(wrapper);
 	}
 	
 	@Override
 	public List<FrontParentMenu> moreIndexMenu(Long communityId) {
 		ArrayList<FrontParentMenu> list = new ArrayList<>();
 		// 1. 查询所有一级分类
-		QueryWrapper<FrontMenuEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<IndexMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("community_id", communityId);
 		queryWrapper.eq("parent_id", 0);
-		List<FrontMenuEntity> parentList = menuMapper.selectList(queryWrapper);
+		List<IndexMenuEntity> parentList = indexMenuMapper.selectList(queryWrapper);
 		
 		//2. 查询所有二级分类
-		QueryWrapper<FrontMenuEntity> wrapper = new QueryWrapper<>();
+		QueryWrapper<IndexMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.ne("parent_id", 0);
-		List<FrontMenuEntity> childMenu = menuMapper.selectList(wrapper);
+		List<IndexMenuEntity> childMenu = indexMenuMapper.selectList(wrapper);
 		
 		//3. 封装数据
-		for (FrontMenuEntity frontMenuEntity : parentList) {
+		for (IndexMenuEntity indexMenuEntity : parentList) {
 			FrontParentMenu parentMenu = new FrontParentMenu();
-			BeanUtils.copyProperties(frontMenuEntity, parentMenu);
+			BeanUtils.copyProperties(indexMenuEntity, parentMenu);
 			list.add(parentMenu);
 			
 			ArrayList<FrontChildMenu> childMenus = new ArrayList<>();
-			for (FrontMenuEntity menu : childMenu) {
-				if (menu.getParentId().equals(frontMenuEntity.getId())) {
+			for (IndexMenuEntity menu : childMenu) {
+				if (menu.getParentId().equals(indexMenuEntity.getId())) {
 					FrontChildMenu frontChildMenu = new FrontChildMenu();
 					BeanUtils.copyProperties(menu, frontChildMenu);
 					childMenus.add(frontChildMenu);

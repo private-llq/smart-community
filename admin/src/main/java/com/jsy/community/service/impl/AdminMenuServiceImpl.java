@@ -2,7 +2,7 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.entity.AdminMenuEntity;
+import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdminMenuMapper;
@@ -31,7 +31,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenuEntity> implements IAdminMenuService {
+public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AppMenuEntity> implements IAdminMenuService {
 	
 	@Resource
 	private AdminMenuMapper adminMenuMapper;
@@ -43,29 +43,29 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 	public List<FrontParentMenu> listAdminMenu() {
 		ArrayList<FrontParentMenu> list = new ArrayList<>();
 		// 1. 查询所有一级分类
-		QueryWrapper<AdminMenuEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("parent_id", 0);
-		List<AdminMenuEntity> parentList = adminMenuMapper.selectList(queryWrapper);
+		List<AppMenuEntity> parentList = adminMenuMapper.selectList(queryWrapper);
 		if (CollectionUtils.isEmpty(parentList)) {
 			throw new JSYException("该小区不存在");
 		}
 		
 		//2. 查询所有二级分类
-		QueryWrapper<AdminMenuEntity> wrapper = new QueryWrapper<>();
+		QueryWrapper<AppMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.ne("parent_id", 0);
-		List<AdminMenuEntity> childMenu = adminMenuMapper.selectList(wrapper);
+		List<AppMenuEntity> childMenu = adminMenuMapper.selectList(wrapper);
 		if (CollectionUtils.isEmpty(childMenu)) {
 			return null;
 		}
 		
 		//3. 封装数据
-		for (AdminMenuEntity frontMenuEntity : parentList) {
+		for (AppMenuEntity frontMenuEntity : parentList) {
 			FrontParentMenu parentMenu = new FrontParentMenu();
 			BeanUtils.copyProperties(frontMenuEntity, parentMenu);
 			list.add(parentMenu);
 			
 			ArrayList<FrontChildMenu> childMenus = new ArrayList<>();
-			for (AdminMenuEntity menu : childMenu) {
+			for (AppMenuEntity menu : childMenu) {
 				if (menu.getParentId().equals(frontMenuEntity.getId())) {
 					FrontChildMenu frontChildMenu = new FrontChildMenu();
 					BeanUtils.copyProperties(menu, frontChildMenu);
@@ -78,7 +78,7 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 	}
 	
 	@Override
-	public void insertAdminMenu(AdminMenuEntity adminMenu) {
+	public void insertAdminMenu(AppMenuEntity adminMenu) {
 		if (!adminMenu.getParentId().equals(0L)) {
 			throw new JSYException("您添加的不是父菜单");
 		}
@@ -88,9 +88,9 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 	
 	@Override
 	public void removeAdminMenu(Long id) {
-		QueryWrapper<AdminMenuEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("parent_id", id);
-		List<AdminMenuEntity> list = adminMenuMapper.selectList(queryWrapper);
+		List<AppMenuEntity> list = adminMenuMapper.selectList(queryWrapper);
 		if (!CollectionUtils.isEmpty(list)) {
 			log.debug("删除的菜单id：{}", id);
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请先删除子菜单");
@@ -98,7 +98,7 @@ public class AdminMenuServiceImpl extends ServiceImpl<AdminMenuMapper, AdminMenu
 	}
 	
 	@Override
-	public void insertChildMenu(AdminMenuEntity adminMenu) {
+	public void insertChildMenu(AppMenuEntity adminMenu) {
 		String icon = adminMenu.getIcon();// 图片地址
 		if (!StringUtils.isEmpty(icon)) {
 			stringRedisTemplate.opsForSet().add("menu_img_all", icon);// 最终上传时将图片地址再存入redis

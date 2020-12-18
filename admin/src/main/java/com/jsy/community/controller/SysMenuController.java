@@ -66,7 +66,7 @@ public class SysMenuController {
 	/**
 	* @Description: 查询
 	 * @Param: []
-	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>>
+	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.sys.AppMenuEntity>>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/

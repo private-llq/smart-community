@@ -1,7 +1,7 @@
 package com.jsy.community.controller;
 
 
-import com.jsy.community.entity.AdminMenuEntity;
+import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.service.IAdminMenuService;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -49,8 +49,8 @@ public class AdminMenuController {
 	
 	@ApiOperation("新增父菜单")
 	@PostMapping("/insertAdminMenu")
-	public CommonResult insertAdminMenu(@RequestBody AdminMenuEntity adminMenu) {
-		ValidatorUtils.validateEntity(adminMenu,AdminMenuEntity.addAdmin.class);
+	public CommonResult insertAdminMenu(@RequestBody AppMenuEntity adminMenu) {
+		ValidatorUtils.validateEntity(adminMenu, AppMenuEntity.addAdmin.class);
 		adminMenuService.insertAdminMenu(adminMenu);
 		return CommonResult.ok();
 	}
@@ -64,8 +64,8 @@ public class AdminMenuController {
 	
 	@ApiOperation("新增子菜单")
 	@PostMapping("/insertChildMenu")
-	public CommonResult insertChildMenu(@RequestBody AdminMenuEntity adminMenu){
-		ValidatorUtils.validateEntity(adminMenu,AdminMenuEntity.addAdmin.class);
+	public CommonResult insertChildMenu(@RequestBody AppMenuEntity adminMenu){
+		ValidatorUtils.validateEntity(adminMenu, AppMenuEntity.addAdmin.class);
 		adminMenuService.insertChildMenu(adminMenu);
 		return CommonResult.ok();
 	}

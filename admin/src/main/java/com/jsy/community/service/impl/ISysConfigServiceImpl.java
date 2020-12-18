@@ -56,7 +56,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	/**
 	* @Description: 查询大后台菜单
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
@@ -114,7 +114,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	}
 	
 	//寻找顶级菜单ID
-//	private void setBelongTo(AdminMenuEntity sysMenuEntity,AdminMenuEntity parent){
+//	private void setBelongTo(AppMenuEntity sysMenuEntity,AppMenuEntity parent){
 //		if(0L != parent.getPid()){ //要新增的菜单非顶级
 //			parent = sysMenuMapper.findParent(parent.getPid());//寻找父节点
 //			if(parent.getPid() == 0){ //顶级节点
@@ -179,7 +179,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	/**
 	* @Description: 菜单列表
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
@@ -294,7 +294,7 @@ public class ISysConfigServiceImpl implements ISysConfigService {
 	/**
 	* @Description: 查询用户菜单权限
 	 * @Param: [uid]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/

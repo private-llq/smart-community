@@ -1,7 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.FrontMenuEntity;
+import com.jsy.community.entity.IndexMenuEntity;
 import com.jsy.community.vo.menu.FrontParentMenu;
 
 import java.util.List;
@@ -14,16 +14,16 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-14
  */
-public interface IMenuService extends IService<FrontMenuEntity> {
+public interface IIndexMenuService extends IService<IndexMenuEntity> {
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.FrontMenuEntity>
+	 * @return java.util.List<com.jsy.community.entity.IndexMenuEntity>
 	 * @Author lihao
 	 * @Description 查询首页展示的菜单选项
 	 * @Date 2020/11/14 21:17
 	 * @Param [number]
 	 **/
-	List<FrontMenuEntity> listIndexMenu(Long communityId);
+	List<IndexMenuEntity> listIndexMenu(Long communityId);
 	
 	/**
 	 * @return java.util.List<com.jsy.community.vo.menu.FrontParentMenu>

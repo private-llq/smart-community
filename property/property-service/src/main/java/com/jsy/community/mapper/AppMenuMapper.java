@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.AdminMenuEntity;
+import com.jsy.community.entity.AppMenuEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2020-11-24
  */
 @Mapper
-public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
+public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 
 }

@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.FrontMenuEntity;
+import com.jsy.community.entity.IndexMenuEntity;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.jsy.community.entity.FrontMenuEntity;
  * @author lihao
  * @since 2020-11-14
  */
-public interface MenuMapper extends BaseMapper<FrontMenuEntity> {
+public interface IndexMenuMapper extends BaseMapper<IndexMenuEntity> {
 	
 }

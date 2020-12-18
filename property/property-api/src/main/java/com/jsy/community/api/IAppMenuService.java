@@ -1,7 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.AdminMenuEntity;
+import com.jsy.community.entity.AppMenuEntity;
 
 import java.util.List;
 
@@ -13,32 +13,32 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-24
  */
-public interface IAdminMenuService extends IService<AdminMenuEntity> {
+public interface IAppMenuService extends IService<AppMenuEntity> {
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.AdminMenuEntity>
+	 * @return java.util.List<com.jsy.community.entity.AppMenuEntity>
 	 * @Author lihao
 	 * @Description 查询所有父菜单
 	 * @Date 2020/11/24 11:03
 	 * @Param []
 	 **/
-	List<AdminMenuEntity> listParentMenu();
+	List<AppMenuEntity> listParentMenu();
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.AdminMenuEntity>
+	 * @return java.util.List<com.jsy.community.entity.AppMenuEntity>
 	 * @Author lihao
 	 * @Description 查询所有子菜单
 	 * @Date 2020/11/24 11:03
 	 * @Param []
 	 **/
-	List<AdminMenuEntity> listChildMenu();
+	List<AppMenuEntity> listChildMenu();
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.AdminMenuEntity>
+	 * @return java.util.List<com.jsy.community.entity.AppMenuEntity>
 	 * @Author lihao
 	 * @Description 根据父菜单id查询其子菜单
 	 * @Date 2020/11/25 9:10
 	 * @Param [parentId]
 	 **/
-	List<AdminMenuEntity> listChildMenuById(Long parentId);
+	List<AppMenuEntity> listChildMenuById(Long parentId);
 }

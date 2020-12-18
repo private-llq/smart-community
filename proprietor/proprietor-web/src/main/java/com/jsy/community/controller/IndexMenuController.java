@@ -5,9 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.IMenuService;
+import com.jsy.community.api.IIndexMenuService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.FrontMenuEntity;
+import com.jsy.community.entity.IndexMenuEntity;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
@@ -36,10 +36,10 @@ import java.util.List;
 @RequestMapping("/menu")
 @Login(allowAnonymous = true)
 @ApiJSYController
-public class MenuController {
+public class IndexMenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-	private IMenuService menuService;
+	private IIndexMenuService menuService;
 	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
@@ -50,12 +50,12 @@ public class MenuController {
 	                                  @RequestParam(value = "communityId", defaultValue = "1", required = false) Long communityId) {
 		String indexMenuList = redisTemplate.opsForValue().get("indexMenuList");
 		if (StringUtils.isEmpty(indexMenuList)) {
-			List<FrontMenuEntity> list = menuService.listIndexMenu(communityId);
+			List<IndexMenuEntity> list = menuService.listIndexMenu(communityId);
 			redisTemplate.opsForValue().set("indexMenuList", JSON.toJSONString(list));
 			return CommonResult.ok(list);
 		}
-		//List<FrontMenuEntity> list = (List<FrontMenuEntity>) JSON.parse(indexMenuList);  //这种也可以
-		List<FrontMenuEntity> list = JSONArray.parseArray(indexMenuList, FrontMenuEntity.class);
+		//List<IndexMenuEntity> list = (List<IndexMenuEntity>) JSON.parse(indexMenuList);  //这种也可以
+		List<IndexMenuEntity> list = JSONArray.parseArray(indexMenuList, IndexMenuEntity.class);
 		return CommonResult.ok(list);
 		
 	}

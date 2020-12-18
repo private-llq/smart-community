@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @TableName("t_front_menu")
 @ApiModel(value="FrontMenu对象", description="菜单")
-public class FrontMenuEntity extends BaseEntity {
+public class IndexMenuEntity extends BaseEntity {
 
     @ApiModelProperty(value = "菜单名")
     private String menuName;
