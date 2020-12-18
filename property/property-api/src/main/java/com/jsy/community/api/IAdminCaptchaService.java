@@ -3,17 +3,19 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.admin.AdminCaptchaEntity;
 
-import java.awt.image.BufferedImage;
-
 /**
  * 验证码
  */
 public interface IAdminCaptchaService extends IService<AdminCaptchaEntity> {
 	
 	/**
-	 * 获取图片验证码
-	 */
-	BufferedImage getCaptcha(String uuid);
+	* @Description: 保存验证码
+	 * @Param: [captchaEntity]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2020/12/18
+	**/
+	void saveCaptcha(AdminCaptchaEntity captchaEntity);
 	
 	/**
 	 * 验证码效验

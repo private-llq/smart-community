@@ -2,20 +2,16 @@ package com.jsy.community.service.impl;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.code.kaptcha.Producer;
 import com.jsy.community.api.IAdminCaptchaService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminCaptchaEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdminCaptchaMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
-import java.awt.image.BufferedImage;
 import java.util.Date;
 
 /**
@@ -23,29 +19,15 @@ import java.util.Date;
  */
 @DubboService(version = Const.version, group = Const.group_property)
 public class AdminCaptchaServiceImpl extends ServiceImpl<AdminCaptchaMapper, AdminCaptchaEntity> implements IAdminCaptchaService {
-	@Autowired
-	private Producer producer;
-	
+
 	@Resource
 	private AdminCaptchaMapper adminCaptchaMapper;
 	
-	@Override
-	public BufferedImage getCaptcha(String uuid) {
-		if (StrUtil.isBlank(uuid)) {
-			throw new JSYException("uuid不能为空");
-		}
-		// 生成文字验证码
-		String code = producer.createText();
-
-		AdminCaptchaEntity captchaEntity = new AdminCaptchaEntity();
-		captchaEntity.setUuid(uuid);
-		captchaEntity.setCode(code);
-		// 5分钟后过期
+	//保存验证码
+	public void saveCaptcha(AdminCaptchaEntity captchaEntity){
+		//TODO 暂时5小时过期
 		captchaEntity.setExpireTime(DateUtil.offset(new Date(), DateField.HOUR, 5));
 		adminCaptchaMapper.updateCaptcha(captchaEntity);
-//		this.save(captchaEntity);
-		
-		return producer.createImage(code);
 	}
 	
 	@Override
@@ -60,4 +42,6 @@ public class AdminCaptchaServiceImpl extends ServiceImpl<AdminCaptchaMapper, Adm
 		
 		return captchaEntity.getCode().equalsIgnoreCase(code) && captchaEntity.getExpireTime().getTime() >= System.currentTimeMillis();
 	}
+	
+	
 }
