@@ -40,7 +40,7 @@ public class RedisUtils {
 	 * @Date: 2020/12/14
 	**/
 	public void setUserToken(String token, SysUserEntity sysUserEntity){
-		stringRedisTemplate.opsForValue().set("Admin:Login:" + token, JSON.toJSONString(sysUserEntity), loginExpireHour, TimeUnit.HOURS);
+		stringRedisTemplate.opsForValue().set("Sys:Login:" + token, JSON.toJSONString(sysUserEntity), loginExpireHour, TimeUnit.HOURS);
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class RedisUtils {
 		}
 		String str = null;
 		try {
-			str = stringRedisTemplate.opsForValue().get("Admin:Login:" + loginToken);
+			str = stringRedisTemplate.opsForValue().get("Sys:Login:" + loginToken);
 		} catch (Exception e) {
 			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
 		}

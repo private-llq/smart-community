@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("t_sys_user_token")
+@TableName("t_admin_user_token")
 public class AdminUserTokenEntity extends BaseEntity {
 	
 	//用户ID

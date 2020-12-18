@@ -12,7 +12,7 @@ import java.util.Date;
  * 后台系统验证码
  */
 @Data
-@TableName("t_sys_captcha")
+@TableName("t_admin_captcha")
 public class AdminCaptchaEntity implements Serializable {
 	@TableId
 	private Long id;

@@ -12,7 +12,7 @@ import java.util.List;
  * @since 2020-12-14 18:20
  **/
 @Data
-@TableName("t_sys_role_menu")
+@TableName("t_admin_role_menu")
 public class AdminRoleMenuEntity {
 	
 	@NotNull(message = "缺少角色ID")

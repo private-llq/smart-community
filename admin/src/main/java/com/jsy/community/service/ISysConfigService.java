@@ -45,7 +45,7 @@ public interface ISysConfigService {
 	/**
 	 * @Description: 菜单列表
 	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
@@ -103,7 +103,7 @@ public interface ISysConfigService {
 	/**
 	* @Description: 查询用户菜单权限
 	 * @Param: [uid]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/

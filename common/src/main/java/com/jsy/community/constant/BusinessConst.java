@@ -81,4 +81,13 @@ public interface BusinessConst {
 	 * 楼栋门禁-可视对讲
 	 */
 	String ACCESS_BUILDING_COMMUNICATION = "2";
+	
+	/**
+	 * 证件类型-身份证
+	 */
+	Integer IDENTIFICATION_TYPE_IDCARD = 1;
+	/**
+	 * 证件类型-护照
+	 */
+	Integer IDENTIFICATION_TYPE_PASSPORT = 2;
 }

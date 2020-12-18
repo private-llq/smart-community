@@ -21,7 +21,7 @@ import java.util.List;
 public class SysMenuController {
 	
 	@Autowired
-	private ISysConfigService ISysConfigService;
+	private ISysConfigService sysConfigService;
 	
 	/**
 	* @Description: 新增
@@ -33,7 +33,7 @@ public class SysMenuController {
 	@PostMapping("")
 	public CommonResult addMenu(@RequestBody SysMenuEntity sysMenuEntity){
 		ValidatorUtils.validateEntity(sysMenuEntity);
-		boolean b = ISysConfigService.addMenu(sysMenuEntity);
+		boolean b = sysConfigService.addMenu(sysMenuEntity);
 		return b? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"添加失败");
 	}
 	
@@ -46,7 +46,7 @@ public class SysMenuController {
 	**/
 	@DeleteMapping("")
 	public CommonResult delMenu(@RequestParam("id") Long id){
-		boolean b = ISysConfigService.delMenu(id);
+		boolean b = sysConfigService.delMenu(id);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
 	}
 	
@@ -59,19 +59,19 @@ public class SysMenuController {
 	**/
 	@PutMapping("")
 	public CommonResult updateMenu(@RequestBody SysMenuQO sysMenuQO){
-		boolean b = ISysConfigService.updateMenu(sysMenuQO);
+		boolean b = sysConfigService.updateMenu(sysMenuQO);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
 	}
 	
 	/**
 	* @Description: 查询
 	 * @Param: []
-	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>>
+	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.sys.AppMenuEntity>>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
 	@GetMapping("")
 	public CommonResult<List<SysMenuEntity>> listOfMenu(){
-		return CommonResult.ok(ISysConfigService.listOfMenu());
+		return CommonResult.ok(sysConfigService.listOfMenu());
 	}
 }
