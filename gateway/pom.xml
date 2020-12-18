@@ -45,7 +45,16 @@
 <!--                            </exclusion>-->
 <!--                        </exclusions>-->
         </dependency>
-        <!-- 在线文档 -->
+        <dependency>
+            <groupId>com.alibaba.cloud </groupId>
+            <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
+            <version>2.2.3.RELEASE</version>
+        </dependency>
+        <!--sentinel基础依赖-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
     </dependencies>
 
 

@@ -3,9 +3,7 @@ package com.jsy.community.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
-import com.jsy.community.constant.Const;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,7 +12,9 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 /**
@@ -32,6 +32,9 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "所属人ID")
     @JsonIgnore
     private String uid;
+
+    @ApiModelProperty(value = "家属车辆ID")
+    private Long houseMemberId;
 
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;

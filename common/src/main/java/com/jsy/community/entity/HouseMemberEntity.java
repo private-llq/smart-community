@@ -1,14 +1,14 @@
 package com.jsy.community.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author qq459799974
@@ -19,7 +19,23 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @ApiModel(value = "HouseMember对象", description = "房间成员表")
 @TableName("t_house_member")
-public class HouseMemberEntity extends BaseEntity implements Serializable {
+public class HouseMemberEntity implements Serializable {
+
+    @TableId
+    @ApiModelProperty(value = "家属ID")
+    private Long id;
+
+    @TableLogic
+    @ApiModelProperty(hidden = true)
+    private Integer deleted;
+
+    @TableField(fill = FieldFill.INSERT)
+    @ApiModelProperty(hidden = true)
+    private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.UPDATE)
+    @ApiModelProperty(hidden = true)
+    private LocalDateTime updateTime;
 
     private static final long serialVersionUID = 1L;
 

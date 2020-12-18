@@ -17,6 +17,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.GroupVO;
+import com.jsy.community.vo.UserGroupVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -90,6 +91,19 @@ public class LivingPaymentController {
         String userId = UserUtils.getUserId();
         groupQO.setUserID(userId);
         List<GroupVO> voList = livingPaymentService.selectGroup(groupQO);
+        return CommonResult.ok(voList);
+    }
+    /**
+     * 查询当前登录人员自定义的分组
+     * @param
+     * @return
+     */
+    @ApiOperation("查询当前登录人员自定义的分组")
+    @PostMapping("/selectUserGroup")
+    @Login
+    public CommonResult selectGroup(){
+        String userId = UserUtils.getUserId();
+        List<UserGroupVO> voList = livingPaymentService.selectUserGroup(userId);
         return CommonResult.ok(voList);
     }
 

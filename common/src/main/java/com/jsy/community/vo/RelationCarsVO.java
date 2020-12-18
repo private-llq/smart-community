@@ -1,4 +1,4 @@
-package com.jsy.community.qo;
+package com.jsy.community.vo;
 
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
@@ -6,17 +6,16 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("添加车辆信息")
-public class RelationCarsQo extends BaseEntity {
+@ApiModel("放回车辆信息")
+public class RelationCarsVO extends BaseEntity {
     @ApiModelProperty("车牌号")
     private String carId;// 85
     @ApiModelProperty("车辆类型")
     private Integer carType;
+    @ApiModelProperty("车辆类型名称")
+    private String carTypeName;
     @ApiModelProperty("车辆图片")
     private String carImgURL;
-
-    @ApiModelProperty(value = "家属车辆ID",hidden = true)
-    private Long houseMemberId;
 
     //手机号
     @ApiModelProperty(hidden = true)

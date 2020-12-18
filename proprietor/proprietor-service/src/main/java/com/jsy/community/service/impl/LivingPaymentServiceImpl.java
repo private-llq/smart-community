@@ -13,6 +13,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.DefaultHouseOwnerVO;
 import com.jsy.community.vo.GroupVO;
 import com.jsy.community.vo.PaymentRecordsVO;
+import com.jsy.community.vo.UserGroupVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -206,6 +207,17 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         List<DefaultHouseOwnerVO> list=livingPaymentMapper.selectList(userId);
         return list;
     }
+
+    /**
+     * 查询当前登录人员自定义的分组
+     * @param
+     * @return
+     */
+    @Override
+    public List<UserGroupVO> selectUserGroup(String userId) {
+        return payGroupMapper.selectUserGroup(userId);
+    }
+
     /**
      * @Description: 添加订单备注
      * @author: Hu

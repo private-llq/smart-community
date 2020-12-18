@@ -5,6 +5,7 @@ import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.vo.GroupVO;
+import com.jsy.community.vo.UserGroupVO;
 
 import java.util.List;
 import java.util.Map;
@@ -53,4 +54,11 @@ public interface ILivingPaymentService {
      * @return:
      */
     void addRemark(RemarkQO remarkQO);
+
+    /**
+     * 查询当前登录人员自定义的分组
+     * @param
+     * @return
+     */
+    List<UserGroupVO> selectUserGroup(String userId);
 }

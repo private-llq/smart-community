@@ -15,10 +15,10 @@
 </sql>
 <!--  添加车辆  -->
     <insert id="addCars" parameterType="List">
-        insert into t_car(uid,car_image_url,car_type,car_plate,contact,owner,community_id,car_position_id,check_status)
+        insert into t_car(uid,car_image_url,car_type,car_plate,contact,owner,community_id,car_position_id,check_status,house_member_id)
         values
         <foreach collection="cars" item="item" separator=",">
-            (#{item.uid},#{item.carImgURL},#{item.carType},#{item.carId},#{item.phoneTel},#{item.owner},#{item.communityId},#{item.carPosition},#{item.checkStatus})
+            (#{item.uid},#{item.carImgURL},#{item.carType},#{item.carId},#{item.phoneTel},#{item.owner},#{item.communityId},#{item.carPosition},#{item.checkStatus},#{item.houseMemberId})
         </foreach>
     </insert>
     <!--  通过id查询业主家属  -->

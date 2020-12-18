@@ -4,11 +4,13 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.RelationQo;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.RelationVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -51,6 +53,31 @@ public class RelationController {
     public CommonResult upload(@RequestParam("file") MultipartFile file){
         String upload = MinioUtils.upload(file, "aaaa");
         return CommonResult.ok(upload);
+    }
+
+    @ApiOperation("查询一个家属详情")
+    @GetMapping("/selectUserRelationDetails")
+    @Login
+    public CommonResult selectRelationOne(@RequestParam("RelationId") Long RelationId){
+        String userId = UserUtils.getUserId();
+        RelationVO relationVO = relationService.selectOne(RelationId, userId);
+        return CommonResult.ok(relationVO);
+    }
+    @ApiOperation("修改一个家属信息")
+    @PostMapping("/updateByRelationId")
+    @Login
+    public CommonResult updateByRelationId(@RequestBody HouseMemberEntity houseMemberEntity){
+        String userId = UserUtils.getUserId();
+        relationService.updateByRelationId(houseMemberEntity);
+        return CommonResult.ok();
+    }
+    @ApiOperation("修改一个家属信息传入一个家属id做表单回填")
+    @GetMapping("/updateFormBackFillId")
+    @Login
+    public CommonResult updateFormBackFillId(@RequestParam("RelationId") Long RelationId){
+        String userId = UserUtils.getUserId();
+        HouseMemberEntity houseMemberEntity = relationService.updateFormBackFillId(RelationId);
+        return CommonResult.ok();
     }
 
 
