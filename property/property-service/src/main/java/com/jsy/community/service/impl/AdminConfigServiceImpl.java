@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IAdminConfigService;
-import com.jsy.community.entity.AdminMenuEntity;
+import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminMenuEntity2;
 import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.mapper.AdminMenuMapper2;
@@ -12,10 +12,10 @@ import com.jsy.community.mapper.AdminRoleMapper;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -29,7 +29,7 @@ import java.util.List;
  * @since 2020-12-14 10:29
  **/
 @Slf4j
-@Service
+@DubboService(version = Const.version, group = Const.group_property)
 public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	@Autowired

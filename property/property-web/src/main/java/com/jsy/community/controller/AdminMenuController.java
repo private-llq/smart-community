@@ -1,12 +1,14 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.entity.sys.SysMenuEntity;
+import com.jsy.community.api.IAdminConfigService;
+import com.jsy.community.constant.Const;
+import com.jsy.community.entity.AdminMenuEntity;
+import com.jsy.community.entity.admin.AdminMenuEntity2;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.qo.sys.SysMenuQO;
-import com.jsy.community.service.ISysConfigService;
+import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,10 +20,10 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("menu")
-public class SysMenuController {
+public class AdminMenuController {
 	
-	@Autowired
-	private ISysConfigService sysConfigService;
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IAdminConfigService adminConfigService;
 	
 	/**
 	* @Description: 新增
@@ -31,9 +33,9 @@ public class SysMenuController {
 	 * @Date: 2020/12/14
 	**/
 	@PostMapping("")
-	public CommonResult addMenu(@RequestBody SysMenuEntity sysMenuEntity){
-		ValidatorUtils.validateEntity(sysMenuEntity);
-		boolean b = sysConfigService.addMenu(sysMenuEntity);
+	public CommonResult addMenu(@RequestBody AdminMenuEntity2 adminMenuEntity){
+		ValidatorUtils.validateEntity(adminMenuEntity);
+		boolean b = adminConfigService.addMenu(adminMenuEntity);
 		return b? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"添加失败");
 	}
 	
@@ -46,7 +48,7 @@ public class SysMenuController {
 	**/
 	@DeleteMapping("")
 	public CommonResult delMenu(@RequestParam("id") Long id){
-		boolean b = sysConfigService.delMenu(id);
+		boolean b = adminConfigService.delMenu(id);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
 	}
 	
@@ -58,8 +60,8 @@ public class SysMenuController {
 	 * @Date: 2020/12/14
 	**/
 	@PutMapping("")
-	public CommonResult updateMenu(@RequestBody SysMenuQO sysMenuQO){
-		boolean b = sysConfigService.updateMenu(sysMenuQO);
+	public CommonResult updateMenu(@RequestBody AdminMenuQO sysMenuQO){
+		boolean b = adminConfigService.updateMenu(sysMenuQO);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
 	}
 	
@@ -71,7 +73,7 @@ public class SysMenuController {
 	 * @Date: 2020/12/14
 	**/
 	@GetMapping("")
-	public CommonResult<List<SysMenuEntity>> listOfMenu(){
-		return CommonResult.ok(sysConfigService.listOfMenu());
+	public CommonResult<List<AdminMenuEntity2>> listOfMenu(){
+		return CommonResult.ok(adminConfigService.listOfMenu());
 	}
 }

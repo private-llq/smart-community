@@ -1,10 +1,7 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.sys.SysUserEntity;
-import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.sys.NameAndCreatorQO;
+import com.jsy.community.entity.admin.AdminUserEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +10,7 @@ import java.util.Map;
 /**
  * 系统用户
  */
-public interface IAdminUserService extends IService<SysUserEntity> {
+public interface IAdminUserService extends IService<AdminUserEntity> {
 	
 	/**
 	* @Description: 设置用户角色
@@ -24,7 +21,7 @@ public interface IAdminUserService extends IService<SysUserEntity> {
 	**/
 	boolean setUserRoles(List<Long> roleIds, Long userId);
 	
-	IPage<SysUserEntity> queryPage(BaseQO<NameAndCreatorQO> qo);
+//	IPage<AdminUserEntity> queryPage(BaseQO<NameAndCreatorQO> qo);
 	
 	/**
 	 * 查询用户的所有权限
@@ -41,22 +38,22 @@ public interface IAdminUserService extends IService<SysUserEntity> {
 	/**
 	 * 根据用户名，查询系统用户
 	 */
-	SysUserEntity queryByUserName(String username);
+	AdminUserEntity queryByUserName(String username);
 	
 	/**
 	 * 根据邮箱，查询系统用户
 	 */
-	SysUserEntity queryByEmail(String email);
+	AdminUserEntity queryByEmail(String email);
 	
 	/**
 	 * 保存用户
 	 */
-	void saveUser(SysUserEntity user);
+	void saveUser(AdminUserEntity user);
 	
 	/**
 	 * 修改用户
 	 */
-	boolean updateUser(SysUserEntity user);
+	boolean updateUser(AdminUserEntity user);
 	
 	/**
 	 * 删除用户
@@ -79,7 +76,7 @@ public interface IAdminUserService extends IService<SysUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
-	Map<String,String> invitation(SysUserEntity sysUserEntity);
+	Map<String,String> invitation(AdminUserEntity adminUserEntity);
 	
 	/**
 	* @Description: 邮件注册激活确认
@@ -88,7 +85,7 @@ public interface IAdminUserService extends IService<SysUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
-	Map<String,String> activation(SysUserEntity sysUserEntity);
+	Map<String,String> activation(AdminUserEntity adminUserEntity);
 	
 	/**
 	* @Description: 邮件邀请注册后设置用户名
