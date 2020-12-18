@@ -42,7 +42,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 17:12
 	 * @Param [shop]
 	 **/
-	void updateShop(ShopLeaseVo shop,Long shopId);
+	void updateShop(ShopLeaseVo shop, Long shopId);
 	
 	/**
 	 * @return void
@@ -54,7 +54,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	void cancelShop(Long shopId);
 	
 	/**
-	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 * @return java.util.Map<java.lang.String, java.lang.Object>
 	 * @Author lihao
 	 * @Description 查询业主发布的房源列表
 	 * @Date 2020/12/17 20:11

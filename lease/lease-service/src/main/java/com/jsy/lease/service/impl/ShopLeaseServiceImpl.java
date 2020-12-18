@@ -160,20 +160,20 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-	public List<Map<String, Object>>  listShop() {
+	public List<Map<String, Object>> listShop() {
 		String id = "9c6a4813d5ee4079987e2efb7e46c201";
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("uid",id);
+		wrapper.eq("uid", id);
 		List<Map<String, Object>> maps = new ArrayList<>();
 		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
 		for (ShopLeaseEntity shopLeaseEntity : list) {
 			HashMap<String, Object> map = new HashMap<>();
-			map.put("shopLease",shopLeaseEntity);
+			map.put("shopLease", shopLeaseEntity);
 			
 			QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
-			queryWrapper.eq("shop_id",shopLeaseEntity.getId());
+			queryWrapper.eq("shop_id", shopLeaseEntity.getId());
 			List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(queryWrapper);
-			map.put("shopImg",shopImgEntities.get(0).getImgUrl());
+			map.put("shopImg", shopImgEntities.get(0).getImgUrl());
 			
 			maps.add(map);
 		}

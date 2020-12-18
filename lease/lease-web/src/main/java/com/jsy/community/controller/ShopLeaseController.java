@@ -4,6 +4,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.constant.Const;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.shop.ShopLeaseVo;
 import com.jsy.lease.api.IShopLeaseService;
@@ -56,12 +57,12 @@ public class ShopLeaseController {
 	@ApiOperation("商铺发布")
 	@PostMapping("/addShop")
 	public CommonResult addShop(@RequestBody ShopLeaseVo shop) {
+		ValidatorUtils.validateEntity(shop, ShopLeaseVo.addShopValidate.class);
 		shopLeaseService.addShop(shop);
 		return CommonResult.ok();
 	}
 	
-	
-	@ApiOperation("查询业主自己发布的店铺详情")
+	@ApiOperation("查询店铺详情")
 	@GetMapping("/getShop")
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
 		ShopLeaseVo shop = shopLeaseService.getShop(shopId);
@@ -75,7 +76,6 @@ public class ShopLeaseController {
 		shopLeaseService.updateShop(shop, shopId);
 		return CommonResult.ok();
 	}
-	
 	
 	@ApiOperation("下架商铺")
 	@DeleteMapping("/cancelShop")
