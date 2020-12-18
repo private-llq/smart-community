@@ -13,7 +13,7 @@ import java.util.List;
  * @since 2020-12-14 15:59
  **/
 @Data
-@TableName("t_sys_user_role")
+@TableName("t_admin_user_role")
 public class AdminUserRoleEntity extends BaseEntity {
 	
 	@NotNull(message = "缺少用户ID")

@@ -14,7 +14,7 @@ import java.util.List;
  * @since 2020-12-14 10:01
  **/
 @Data
-@TableName("t_sys_menu")
+@TableName("t_admin_menu")
 public class AdminMenuEntity2 extends BaseEntity {
 	
 	private String icon;//菜单图标

@@ -15,7 +15,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("t_sys_user")
+@TableName("t_admin_user")
 public class AdminUserEntity extends BaseEntity {
 	
 	/**

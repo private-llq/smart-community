@@ -20,7 +20,7 @@
 	</select>
 
 	<!-- 用户菜单权限查询 -->
-	<select id="queryUserMenu" resultType="com.jsy.community.entity.admin.AdminMenuEntity">
+	<select id="queryUserMenu" resultType="com.jsy.community.entity.admin.AdminMenuEntity2">
 		select m.* from t_admin_user_role ur
 		join t_admin_role_menu rm on ur.role_id = rm.role_id
 		join t_admin_menu m on m.id = rm.menu_id
