@@ -28,6 +28,8 @@ import java.util.Date;
 @TableName("t_house_const")
 public class HouseLeaseConstEntity extends BaseEntity {
 
+    private Long houseConstCode;
+
     //常量名称
     private String houseConstName;
 
@@ -40,8 +42,8 @@ public class HouseLeaseConstEntity extends BaseEntity {
     //常量注释
     private String annotation;
 
-    public HouseLeaseConstEntity(Long id, String houseConstName, String houseConstType, String annotation){
-        super.setId(id);
+    public HouseLeaseConstEntity(Long houseConstCode, String houseConstName, String houseConstType, String annotation){
+        this.houseConstCode = houseConstCode;
         this.houseConstName = houseConstName;
         this.houseConstType = houseConstType;
         this.annotation = annotation;

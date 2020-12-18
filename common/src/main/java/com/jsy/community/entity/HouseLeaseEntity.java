@@ -99,5 +99,14 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "房屋出租方式ID")
     private Integer houseLeaseymodeId;
 
+    @ApiModelProperty(value = "房屋家具code")
+    private Long house_furniture_id;
+
+    @ApiModelProperty(value = "经度")
+    private BigDecimal lon;
+
+
+    @ApiModelProperty(value = "纬度")
+    private BigDecimal lat;
 
 }

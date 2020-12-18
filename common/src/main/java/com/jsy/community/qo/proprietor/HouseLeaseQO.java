@@ -1,8 +1,8 @@
 package com.jsy.community.qo.proprietor;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,8 +15,10 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 房屋租售数据传输对象
@@ -58,19 +60,40 @@ public class HouseLeaseQO implements Serializable {
     @NotBlank(groups = {addLeaseSaleHouse.class}, message = "未填写房屋租售详细地址")
     private String houseAddress;
 
-    @ApiModelProperty(value = "房屋租售优势标签ID数组")
-    private Short[] houseAdvantage;
 
-    //在把houseAdvantage添加至中间表之后 返回 中间表存储的id
+    @Size(groups = {addLeaseSaleHouse.class}, message = "房屋标签至少需要一个!")
+    @ApiModelProperty(value = "房屋租售优势标签ID数组")
+    private List<Long> houseAdvantage;
+
+
+    @ApiModelProperty(value = "房屋租售优势ID")
     private Long houseAdvantageId;
+
+
+    @NotNull(groups = {addLeaseSaleHouse.class}, message = "经度不能为空!")
+    @ApiModelProperty(value = "经度")
+    private BigDecimal houseLon;
+
+    @NotNull(groups = {addLeaseSaleHouse.class}, message = "纬度不能为空!")
+    @ApiModelProperty(value = "纬度")
+    private BigDecimal houseLat;
+
+    @Size(groups = {addLeaseSaleHouse.class}, min = 1, max = 64,message = "家具至少需要一个!")
+    @ApiModelProperty(value = "房屋家具code")
+    private List<Long> houseFurniture;
+
+    @ApiModelProperty(value = "房屋家具code换算过的id")
+    private Long houseFurnitureId;
 
     @ApiModelProperty(value = "房屋租售价格")
     @Range(groups = {addLeaseSaleHouse.class}, min = 1, max = Integer.MAX_VALUE, message = "价格没有在指定范围之内!")
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未输入价格")
     private BigDecimal housePrice;
 
+    @ApiModelProperty(value = "房屋租售价格最小值")
     private BigDecimal housePriceMin;
 
+    @ApiModelProperty(value = "房屋租售价格最大值")
     private BigDecimal housePriceMax;
 
     @ApiModelProperty(value = "房屋出租单位/年/月/周/日")
@@ -88,8 +111,10 @@ public class HouseLeaseQO implements Serializable {
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未输入房屋面积")
     private BigDecimal houseSquareMeter;
 
+    @ApiModelProperty(value = "房屋租售平方最小值")
     private BigDecimal houseSquareMeterMin;
 
+    @ApiModelProperty(value = "房屋租售平方最大值")
     private BigDecimal houseSquareMeterMax;
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
@@ -121,9 +146,6 @@ public class HouseLeaseQO implements Serializable {
     @ApiModelProperty(value = "房屋装修样式ID、1、精装修2、现代风格、3.古典风格、4.欧美风")
     private Short houseStyleId;
 
-    //值是变动  需要存id至数据库 对应 名称 由后台人员管理
-    @ApiModelProperty(value = "房源类型ID、73不限(默认) 74可短租 75邻地铁  76压一付一  77配套齐全  78精装修 79南北通透  80有阳台")
-    private Short houseSourcetypeId;
 
     @ApiModelProperty(value = "房屋来源类型ID、1.个人 2.经纪人 3.不限")
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "房屋来源类型ID未选择!")
