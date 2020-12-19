@@ -29,6 +29,7 @@ public class TimeTask implements Job {
 		Set<String> car_difference = redisTemplate.opsForSet().difference("car_img_part", "car_img_all");
 		Set<String> banner_difference = redisTemplate.opsForSet().difference("banner_img_part", "banner_img_all");
 		Set<String> repair_difference = redisTemplate.opsForSet().difference("repair_img_part", "repair_img_all");
+		Set<String> shop_difference = redisTemplate.opsForSet().difference("shop_img_part", "shop_img_all");
 		
 		if (menu_difference != null) {
 			// 2. 删除差值图片
@@ -76,6 +77,19 @@ public class TimeTask implements Job {
 					MinioUtils.removeFile(s);
 					redisTemplate.delete("repair_img_all");
 					redisTemplate.delete("repair_img_part"); // 删除redis
+					System.out.println("删除的无用图片：" + s);
+				} catch (Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException("删除失败");
+				}
+			}
+		}
+		if (shop_difference != null) {
+			for (String s : shop_difference) {
+				try {
+					MinioUtils.removeFile(s);
+					redisTemplate.delete("shop_img_all");
+					redisTemplate.delete("shop_img_part"); // 删除redis
 					System.out.println("删除的无用图片：" + s);
 				} catch (Exception e) {
 					e.printStackTrace();
