@@ -1,7 +1,9 @@
 package com.jsy.community.vo;
 
+import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -56,5 +58,11 @@ public class UserInfoVo implements Serializable {
 
 	@ApiModelProperty("业主家属")
 	private List<HouseMemberEntity> proprietorMembers;
+
+	@ApiModelProperty("业主房屋")
+	private List<HouseVo> proprietorHouses;
+
+	@ApiModelProperty("业主车辆")
+	private List<CarEntity> proprietorCars;
 
 }

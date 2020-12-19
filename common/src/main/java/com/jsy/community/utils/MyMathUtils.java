@@ -80,10 +80,20 @@ public class MyMathUtils {
 		for(int i=0;i<63;i++){
 			codes.add(1l<<i);
 		}
-		long typeCode = getTypeCode(codes);
-		System.out.println(typeCode);
-		System.out.println(analysisTypeCode(typeCode, 31));
-		System.out.println(analysisTypeCode(typeCode));
+
+		LinkedList<Long> codes2 = new LinkedList<>(){{
+			add(8L);
+			add(64L);
+		}};
+		LinkedList<Long> codes3 = new LinkedList<>(){{
+			add(8L);
+			add(32L);
+		}};
+		long typeCode1 = getTypeCode(codes2);
+		long typeCode2 = getTypeCode(codes3);
+		System.out.println("前端传的值解析后的："+typeCode1);
+		System.out.println("数据库存的值："+typeCode2);
+		System.out.println(typeCode1 | typeCode2);
 	}
 	
 }

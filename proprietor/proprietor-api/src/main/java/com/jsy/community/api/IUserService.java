@@ -55,9 +55,9 @@ public interface IUserService extends IService<UserEntity> {
 	/**
 	 * 业主信息更新
 	 * @param proprietorQO  更新实体
-	 * @return				返回更新行数
+	 * @return				返回更新布尔值
 	 */
-    Integer proprietorUpdate(ProprietorQO proprietorQO);
+    Boolean proprietorUpdate(ProprietorQO proprietorQO);
 
     /**
      * 根据业主id查询业主信息及业主家属信息
@@ -74,4 +74,15 @@ public interface IUserService extends IService<UserEntity> {
      * @Date: 2020/12/16
     **/
 	List<HouseEntity> queryUserHouseList(String uid);
+
+
+	/**
+	 * 业主详情查看
+	 * @param userId		用户ID
+	 * @Param communityId	社区id
+	 * @author YuLF
+	 * @since  2020/12/18 11:39
+	 * @return			返回业主详情信息
+	 */
+    UserInfoVo proprietorDetails(String userId, Long communityId);
 }

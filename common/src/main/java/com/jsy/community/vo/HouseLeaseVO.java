@@ -45,7 +45,7 @@ public class HouseLeaseVO implements Serializable {
     private Long houseFurnitureId;
 
     @ApiModelProperty(value = "房屋租售优势标签")
-    private List<Map<String, Object>> houseAdvantage;
+    private Map<String, Object> houseAdvantage;
 
     @ApiModelProperty(value = "房屋租售家具标签")
     private List<String> houseFurniture;
@@ -81,15 +81,10 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房屋朝向1.东.2.西 3.南 4.北. 4.东南 5. 东北 6.西北 7.西南")
     private String houseDirection;
 
-    @ApiModelProperty(value = "房屋是否有电梯：1有 0无")
-    private Long houseHasElevator;
 
     @ApiModelProperty(value = "房屋联系人电话")
     private String houseContact;
 
-    //值是变动  需要存id至数据库 对应 名称 由后台人员管理
-    @ApiModelProperty(value = "房屋装修样式ID、1、精装修2、现代风格、3.古典风格、4.欧美风")
-    private Long houseStyleId;
 
     //值是变动  需要存id至数据库 对应 名称 由后台人员管理
     @ApiModelProperty(value = "房源类型ID、73不限(默认) 74可短租 75邻地铁  76压一付一  77配套齐全  78精装修 79南北通透  80有阳台")
@@ -97,14 +92,6 @@ public class HouseLeaseVO implements Serializable {
 
     @ApiModelProperty(value = "房屋年代")
     private String houseYear;
-
-    //非经常变动，值存BusinessEnum
-    @ApiModelProperty(value = "房屋用途ID、1住宅、2工商业、3仓库")
-    private Long houseUsageId;
-
-    //非经常变动，值存BusinessEnum
-    @ApiModelProperty(value = "房屋种类id 1.商品房、2.经济适用房、3.央产房、4.军产房、5.公房、6.小产权房、7.自建住房")
-    private Long houseKindId;
 
     @ApiModelProperty(value = "房屋介绍内容")
     private String houseIntroduce;

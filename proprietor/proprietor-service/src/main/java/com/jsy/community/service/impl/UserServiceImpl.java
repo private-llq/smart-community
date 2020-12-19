@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.system.UserInfo;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -16,8 +17,7 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
-import com.jsy.community.vo.UserAuthVo;
-import com.jsy.community.vo.UserInfoVo;
+import com.jsy.community.vo.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -51,7 +51,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     private ICarService carService;
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserHouseService userHouseService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
+
 
     @Resource
     private UserMapper userMapper;
@@ -64,9 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
     private long expire = 60*60*24*7; //暂时
 
-    @Autowired
-    private IUserHouseService userHouseService;
-    
+
     @Autowired
     private IHouseService houseService;
     
@@ -141,7 +143,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     /**
      * 页面登记 业主信息
-     *
+     * @author YuLF
+     * @since  2020/12/18 11:39
      * @param proprietorQO 登记实体参数
      * @return             返回是否登记成功
      */
@@ -170,12 +173,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * 【用户】业主更新信息
      * @author YuLF
      * @Param proprietorQO        需要更新 实体参数
-     * @return 返回更新成功!
      * @since 2020/11/27 15:03
      */
+    @Transactional
     @Override
-    public Integer proprietorUpdate(ProprietorQO proprietorQO) {
-        return userMapper.proprietorUpdate(proprietorQO);
+    public Boolean proprietorUpdate(ProprietorQO proprietorQO) {
+        //如果有车辆的情况下 更新 车辆信息
+        if(proprietorQO.getHasCar()){
+            carService.updateBatchById(proprietorQO.getCarEntityList());
+        }
+        //更新房屋信息
+        userHouseService.updateBatchById(proprietorQO.getHouseEntityList());
+        //业主信息更新
+        return userMapper.proprietorUpdate(proprietorQO) > 0;
     }
 
     /**
@@ -237,7 +247,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return houses;
     }
-    
+
+    /**
+     * 业主详情查看
+     * @param userId	    用户ID
+     * @param communityId	社区ID
+     * @author YuLF
+     * @since  2020/12/18 11:39
+     * @return			返回业主详情信息
+     */
+    @Transactional
+    @Override
+    public UserInfoVo proprietorDetails(String userId, Long communityId) {
+        //1.查出用户姓名信息
+        UserInfoVo userInfo = userMapper.selectUserInfoById(userId);
+        //2.查出用户房屋信息
+        List<HouseVo> userHouses = userHouseService.queryUserHouseList(userId, communityId);
+        //3.查出用户家属
+        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId);
+        //4.查出用户车辆信息
+        List<CarEntity> carEntities = carService.queryUserCarById(userId);
+        userInfo.setProprietorCars(carEntities);
+        userInfo.setProprietorHouses(userHouses);
+        userInfo.setProprietorMembers(houseMemberEntities);
+        return userInfo;
+    }
+
+
+
     private HouseEntity setBuildingId(HouseEntity tempEntity){
         Long pid = 0L; //id和pid相同的问题数据导致死循环
         HouseEntity parent = houseService.getParent(tempEntity);

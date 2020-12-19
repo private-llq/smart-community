@@ -42,7 +42,7 @@ public class HouseLeaseController {
     }
 
     @Login
-    @DeleteMapping()//delHouseLease
+    @DeleteMapping()
     @ApiOperation("删除房屋租售")
     public CommonResult<Boolean> delLeaseHouse(@RequestParam Long id) {
         return iHouseLeaseService.delLeaseHouse(id, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(1, "数据不存在");
@@ -51,11 +51,22 @@ public class HouseLeaseController {
 
     @Login
     @GetMapping()
-    @ApiOperation("查询房屋出租数据")
+    @ApiOperation("分页查询房屋出租数据")
     public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
         ValidatorUtils.validatePageParam(baseQO);
         return CommonResult.ok(iHouseLeaseService.queryHouseLeaseByList(baseQO));
     }
+
+
+    @Login
+    @PostMapping("/update")
+    @ApiOperation("更新房屋出租数据")
+    public CommonResult<Boolean> houseLeaseUpdate(@RequestBody HouseLeaseQO houseLeaseQO) {
+        ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.updateLeaseSaleHouse.class);
+        houseLeaseQO.setUid(UserUtils.getUserId());
+        return CommonResult.ok(iHouseLeaseService.updateHouseLease(houseLeaseQO));
+    }
+
 
 
     @Login
@@ -65,11 +76,6 @@ public class HouseLeaseController {
         return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId));
     }
 
-
-
-    public static void main(String[] args) {
-        System.out.println(20 | 7);
-    }
 
 
 

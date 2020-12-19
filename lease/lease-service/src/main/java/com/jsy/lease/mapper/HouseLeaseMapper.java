@@ -6,10 +6,7 @@ import com.jsy.community.entity.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.vo.HouseLeaseVO;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectKey;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +36,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     void insertHouseImages(@Param("houseLeaseQO") HouseLeaseQO houseLeaseQO);
 
     /**
-     * 删除用户中间表关联的相关信息
+     * 删除用户中间表关联的image相关信息
      * @param id             t_house_lease数据唯一标识
      * @return               影响行数
      */
@@ -104,9 +101,6 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param houseId       房屋id
      * @return              返回这条数据的详情
      */
-    @Select("select " +
-            "house_contact,house_image_id,house_price,house_unit,house_leasedeposit_id,house_leasemode_id,house_title,house_type_id,house_square_meter,house_floor,house_direction,house_advantage_id,house_introduce,house_furniture_id,house_lat,house_lon " +
-            "from t_house_lease where id = #{houseId}")
     HouseLeaseVO queryHouseLeaseOne(@Param("houseId") Long houseId);
 
 
@@ -117,4 +111,29 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      */
     @Select("select img_url from t_house_image where field_id = #{houseImageId}")
     List<String> queryHouseAllImgById(@Param("houseImageId") String houseImageId);
+
+
+    /**
+     * 按参数对象属性更新房屋出租数据
+     * @param houseLeaseQO          参数对象
+     * @return                      返回更新影响行数
+     */
+    Boolean updateHouseLease(HouseLeaseQO houseLeaseQO);
+
+
+    /**
+     * 按房屋出租id删除所属图片
+     * @param id        房屋数据id
+     */
+    @Delete("delete from t_house_image where hid = #{id}")
+    void deleteImageById(@Param("id") Long id);
+
+
+    /**
+     * 按id保存图片数组地址
+     * @param images                图片地址
+     * @param houseImageId          图片表示id
+     * @param hid                   房屋id
+     */
+    void saveHouseLeaseImageById(@Param("images") String[] images , @Param("houseImageId")Long houseImageId, @Param("hid")Long hid);
 }

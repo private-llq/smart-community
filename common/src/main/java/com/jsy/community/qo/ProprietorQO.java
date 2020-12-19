@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -96,7 +97,7 @@ public class ProprietorQO implements Serializable {
     private List<CarEntity> carEntityList;
 
     @ApiModelProperty("用来存储House的id和社区id")
-    private List<HouseEntity> houseEntityList;
+    private List<UserHouseEntity> houseEntityList;
 
     /**
      * [物业]业主更新效验接口

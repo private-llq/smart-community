@@ -169,28 +169,4 @@ public class CommonServiceImpl implements ICommonService {
         return regionMapper.vagueQueryCity(searchStr);
     }
 
-    /**
-     * 根据常量类型 获取属于这个类型的List数据
-     *
-     * @author YuLF
-     * @Param type                常量类型
-     * @return 返回这个类型对应的List
-     * @since 2020/12/11 11:36
-     */
-    public List<HouseLeaseConstEntity> getHouseConstListByType(String type) {
-        List list = JSON.parseObject(String.valueOf(redisTemplate.opsForValue().get("houseConst:" + type)), List.class);
-        List<HouseLeaseConstEntity> houseLeaseConstEntityList = new ArrayList<>(list.size());
-        for (Object o : list) {
-            JSONObject jsonObject = JSON.parseObject(String.valueOf(o));
-            HouseLeaseConstEntity entity = new HouseLeaseConstEntity(jsonObject.getLong("id"),
-                    jsonObject.getString("houseConstName"),
-                    jsonObject.getString("houseConstType"),
-                    jsonObject.getString("annotation"));
-            if (!Objects.equals(jsonObject.getString("houseConstValue"), "")) {
-                entity.setAnnotation(jsonObject.getString("houseConstValue"));
-            }
-            houseLeaseConstEntityList.add(entity);
-        }
-        return houseLeaseConstEntityList;
-    }
 }

@@ -11,6 +11,7 @@ import com.jsy.community.entity.CarEntity;
 import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
+import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -103,7 +104,30 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public Integer addProprietorCar(List<CarEntity> carEntityList) {
+        //对所有车辆信息 设置默认的id
+        for(CarEntity carEntity : carEntityList ){
+            carEntity.setId(SnowFlake.nextId());
+        }
         return carMapper.addProprietorCar(carEntityList);
+    }
+
+    /**
+     * 按用户id查出用户所有车辆信息
+     * @param userId        用户id
+     * @return              返回业主车辆信息
+     */
+    @Override
+    public List<CarEntity> queryUserCarById(String userId) {
+        return carMapper.queryUserCarById(userId);
+    }
+
+    /**
+     * 批量更新车辆信息
+     * @param carEntityList   更新参数对象，只会取需要的字段 
+     */
+    @Override
+    public void updateProprietorCarBatch(List<CarEntity> carEntityList, String uid) {
+        carMapper.updateProprietorCarBatch(carEntityList, uid);
     }
 
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 房屋租售接口提供类
@@ -20,7 +21,7 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @return					返回这个类型对应的List
      */
     List<HouseLeaseConstEntity> getHouseConstListByType(String type);
-    
+
     /**
      * @return java.util.List<com.jsy.community.entity.HouseLeaseConstEntity>
      * @Author lihao
@@ -29,4 +30,22 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @Param [id]
      **/
     List<HouseLeaseConstEntity> getTag(Integer id);
+
+
+    /**
+     * 通过 常量代码 和常量类型 从缓存中取 名称
+     * @param code          常量标识码
+     * @param type          常量类型
+     * @return              返回常量名称
+     */
+    String getConstNameByConstTypeCode(Long code, Long type);
+
+    /**
+     * 通过 常量代码 和常量类型 从缓存中取 名称 list
+     * @param codes          常量标识码
+     * @param type          常量类型
+     * @return              返回常量名称和常量id
+     */
+    Map<String, Object>  getConstByTypeCodeForList(List<Long> codes, Long type);
+
 }

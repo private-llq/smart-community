@@ -13,7 +13,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YuLF
@@ -52,7 +54,48 @@ public class IHouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseL
         }
         return houseLeaseConstEntityList;
     }
-    
+
+    /**
+     * 通过 常量代码 和常量类型 从缓存中取 名称
+     * @param code          常量标识码
+     * @param type          常量类型
+     * @return              返回常量名称
+     */
+    @Override
+    public String getConstNameByConstTypeCode(Long code, Long type){
+        List<HouseLeaseConstEntity> houseConstListByType = getHouseConstListByType(String.valueOf(type));
+        for( HouseLeaseConstEntity e : houseConstListByType ){
+            if( e.getHouseConstCode().equals(code) ){
+                return e.getHouseConstName();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 通过 常量代码 和常量类型 从缓存中取 名称 list
+     * @param codes         常量标识码
+     * @param type          常量类型
+     * @return              返回常量名称和常量id
+     */
+    @Override
+    public Map<String, Object> getConstByTypeCodeForList(List<Long> codes, Long type) {
+        if( codes == null || codes.isEmpty() ){
+            return  null;
+        }
+        Map<String, Object> maps = new HashMap<>(codes.size());
+        List<HouseLeaseConstEntity> ht = getHouseConstListByType(String.valueOf(type));
+        for( Long code : codes )
+        {
+            for( HouseLeaseConstEntity entity : ht ){
+                if( entity.getHouseConstCode().equals(code) ){
+                    maps.put(entity.getHouseConstName(), entity.getHouseConstCode());
+                }
+            }
+        }
+        return maps;
+    }
+
     @Override
     public List<HouseLeaseConstEntity> getTag(Integer id) {
         QueryWrapper<HouseLeaseConstEntity> wrapper = new QueryWrapper<>();

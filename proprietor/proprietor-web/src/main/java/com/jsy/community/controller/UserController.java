@@ -73,7 +73,7 @@ public class UserController {
      * @return              返回是否登记成功
      */
     @Login
-    @PostMapping("proprietorRegister")
+    @PostMapping("register")
     @ApiOperation("业主信息登记")
     public CommonResult<Boolean> proprietorRegister(@RequestBody  ProprietorQO proprietorQO) {
         String userId = UserUtils.getUserId();
@@ -122,24 +122,42 @@ public class UserController {
      */
     @Login
 	@ApiOperation("业主信息更新")
-    @PutMapping("proprietorUpdate")
+    @PutMapping("update")
     public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO proprietorQO) {
-        //2.参数效验,判断用户能更新的字段 是否都是空 如果都是空，则不进入数据数据访问层
         ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.proprietorUpdateValid.class);
 		//3.更新业主信息
         proprietorQO.setUid(UserUtils.getUserId());
-        return userService.proprietorUpdate(proprietorQO) > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return userService.proprietorUpdate(proprietorQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
 
+    /**
+     * 查询业主及家属信息
+     * @author YuLF
+     * @since  2020/12/18 11:39
+     */
     @Login
     @ApiOperation("业主信息及业主家属信息查询接口")
-    @PostMapping("proprietorQuery")
+    @PostMapping("query")
     public CommonResult<UserInfoVo> proprietorQuery() {
         String userId = UserUtils.getUserId();
         UserInfoVo userInfoVo = userService.proprietorQuery(userId);
         return CommonResult.ok(userInfoVo);
     }
+
+    /**
+     * 业主详情接口
+     * @author YuLF
+     * @since  2020/12/18 11:39
+     */
+    @Login
+    @ApiOperation("业主信息详情查询接口")
+    @PostMapping("details")
+    public CommonResult<UserInfoVo> details(@RequestParam Long communityId) {
+        UserInfoVo userInfoVo = userService.proprietorDetails(UserUtils.getUserId(), communityId);
+        return CommonResult.ok(userInfoVo);
+    }
+
     
     /**
     * @Description: 查询业主所有社区的房屋

@@ -1,12 +1,16 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.HouseVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -19,7 +23,7 @@ import java.util.List;
  * @since 2020-12-16 11:47
  **/
 @DubboService(version = Const.version, group = Const.group_proprietor)
-public class UserHouseServiceImpl implements IUserHouseService {
+public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouseEntity> implements IUserHouseService {
 
 	@Autowired
 	private UserHouseMapper userHouseMapper;
@@ -32,20 +36,19 @@ public class UserHouseServiceImpl implements IUserHouseService {
 	 * @Param [uid, houseEntityList]
 	 **/
 	@Override
-	public Boolean saveUserHouse(String uid, List<HouseEntity> houseEntityList) {
+	public Boolean saveUserHouse(String uid, List<UserHouseEntity> houseEntityList) {
 		if (!CollectionUtils.isEmpty(houseEntityList)) {
-			for (HouseEntity houseEntity : houseEntityList) {
+			for (UserHouseEntity houseEntity : houseEntityList) {
 				Long communityId = houseEntity.getCommunityId();
 				Long id = houseEntity.getId();
+
+				houseEntity.setUid(uid);
+				houseEntity.setCommunityId(communityId);
+				houseEntity.setHouseId(id);
+				houseEntity.setCheckStatus(2);//审核中
+				houseEntity.setId(SnowFlake.nextId());
 				
-				UserHouseEntity userHouseEntity = new UserHouseEntity();
-				userHouseEntity.setUid(uid);
-				userHouseEntity.setCommunityId(communityId);
-				userHouseEntity.setHouseId(id);
-				userHouseEntity.setCheckStatus(2);//审核中
-				userHouseEntity.setId(SnowFlake.nextId());
-				
-				userHouseMapper.insert(userHouseEntity);
+				userHouseMapper.insert(houseEntity);
 			}
 			return true;
 		}
@@ -90,5 +93,30 @@ public class UserHouseServiceImpl implements IUserHouseService {
 			return true;
 		}
 		return false;
+	}
+
+
+	/**
+	 * 批量更新业主房屋认证信息
+	 * @param houseEntityList	参数列表
+	 * @param uid				用户id
+	 * @author YuLF
+	 * @since  2020/12/18 14:18
+	 */
+	@Override
+	public void updateProprietorHouseBatch(List<UserHouseEntity> houseEntityList, String uid) {
+		userHouseMapper.updateProprietorHouseBatch(houseEntityList, uid);
+	}
+
+
+	/**
+	 * 通过用户id和社区id查出用户房屋信息
+	 * @param userId 		用户id
+	 * @param communityId	社区id
+	 * @return				返回房屋信息列表
+	 */
+	@Override
+	public List<HouseVo> queryUserHouseList(String userId, Long communityId) {
+		return userHouseMapper.queryUserHouseList(userId, communityId);
 	}
 }

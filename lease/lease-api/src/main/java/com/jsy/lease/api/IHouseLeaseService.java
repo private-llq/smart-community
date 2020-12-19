@@ -46,4 +46,11 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @return              返回这条数据的详情
      */
     HouseLeaseVO queryHouseLeaseOne(Long houseId);
+
+    /**
+     * 按参数对象属性更新房屋出租数据
+     * @param houseLeaseQO          参数对象
+     * @return                      返回更新影响行数
+     */
+    Boolean updateHouseLease(HouseLeaseQO houseLeaseQO);
 }

@@ -67,20 +67,10 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "房屋朝向")
     private String houseDirection;
 
-    @ApiModelProperty(value = "房屋是否有电梯：1有 0无")
-    private Integer houseHasElevator;
-
-    @ApiModelProperty(value = "房屋装修样式ID、1、精装修2、现代风格、3.古典风格、4.欧美风")
-    private Integer houseStyleId;
 
     @ApiModelProperty(value = "房屋年代")
     private String houseYear;
 
-    @ApiModelProperty(value = "房屋用途ID、1住宅、2工商业、3仓库")
-    private Integer houseUsageId;
-
-    @ApiModelProperty(value = "房屋种类id 1.商品房、2.经济适用房、3.央产房、4.军产房、5.公房、6.小产权房、7.自建住房")
-    private Integer houseKindId;
 
     @ApiModelProperty(value = "房屋介绍内容")
     private String houseIntroduce;

@@ -9,8 +9,10 @@ import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.lease.api.IHouseConstService;
 import com.jsy.lease.api.IHouseLeaseService;
 import com.jsy.lease.mapper.HouseLeaseMapper;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,9 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
 
     @Resource
     private HouseLeaseMapper houseLeaseMapper;
+
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
+    private IHouseConstService houseConstService;
 
     /**
      * 新增出租房屋数据
@@ -92,7 +97,7 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
             List<Long> AdvantageID = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
             if( !AdvantageID.isEmpty() ){
                 //1.房屋优势标签 如 随时入住、电梯楼... 属于该条数据多选的 type = t_house_const 里面的 house_const_type
-                vo.setHouseAdvantage(houseLeaseMapper.queryHouseConstIdName(AdvantageID, 4L));
+                vo.setHouseAdvantage(houseConstService.getConstByTypeCodeForList(AdvantageID, 4L));
             }
             List<Long> FurnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
             if( !FurnitureId.isEmpty() ){
@@ -102,9 +107,9 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
             //2.从中间表查出该出租房屋的 第一张显示图片 用于列表标签展示
             vo.setHouseImage(houseLeaseMapper.queryHouseImgById(vo.getHouseImageId(), vo.getId()));
             //3.通过出租方式id 查出 出租方式文本：如 合租、整租之类
-            vo.setHouseLeaseMode(houseLeaseMapper.queryHouseModeByConstId(vo.getHouseLeasemodeId(), 11L));
+            vo.setHouseLeaseMode(houseConstService.getConstNameByConstTypeCode(vo.getHouseLeasemodeId(), 11L));
             //4.通过户型id 查出 户型id对应的文本：如 四室一厅、三室一厅...
-            vo.setHouseType(houseLeaseMapper.queryHouseModeByConstId(vo.getHouseTypeId(), 2L));
+            vo.setHouseType(houseConstService.getConstNameByConstTypeCode(vo.getHouseTypeId(), 2L));
         }
         return vos;
     }
@@ -119,17 +124,11 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
     public HouseLeaseVO queryHouseLeaseOne(Long houseId) {
         //1.查出单条数据
         HouseLeaseVO vo = houseLeaseMapper.queryHouseLeaseOne(houseId);
-        //1.1查出 押金方式文本
-        vo.setHouseLeaseDeposit(houseLeaseMapper.queryHouseModeByConstId(vo.getHouseLeasedepositId(), 1L));
-        //1.2查出 租房方式文本 整租还是合租还是不限
-        vo.setHouseLeaseMode(houseLeaseMapper.queryHouseModeByConstId(vo.getHouseLeasemodeId(), 11L));
-        //1.3查出 户型文本 三室一厅、四室一厅...
-        vo.setHouseType(houseLeaseMapper.queryHouseModeByConstId(vo.getHouseTypeId(), 2L));
         //1.4查出 房屋标签 ...
         List<Long> AdvantageID = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
         if( !AdvantageID.isEmpty() ){
             //1.房屋优势标签 如 随时入住、电梯楼... 属于该条数据多选的 type = t_house_const 里面的 house_const_type
-            vo.setHouseAdvantage(houseLeaseMapper.queryHouseConstIdName(AdvantageID, 4L));
+            vo.setHouseAdvantage(houseConstService.getConstByTypeCodeForList(AdvantageID, 4L));
         }
         //1.5查出 家具标签
         List<Long> furnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
@@ -141,6 +140,33 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
         //1.7查出房屋朝向
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirection()));
         return vo;
+    }
+
+
+    /**
+     * 按参数对象属性更新房屋出租数据
+     * @param qo                    参数对象
+     * @return                      返回更新影响行数
+     */
+    @Transactional
+    @Override
+    public Boolean updateHouseLease(HouseLeaseQO qo) {
+        //换算优势标签和家具id
+        if( qo.getHouseAdvantage() != null && !qo.getHouseAdvantage().isEmpty() ){
+            qo.setHouseAdvantageId(MyMathUtils.getTypeCode(qo.getHouseAdvantage()));
+        }
+        if( qo.getHouseFurniture() != null && !qo.getHouseFurniture().isEmpty() ){
+            qo.setHouseFurnitureId(MyMathUtils.getTypeCode(qo.getHouseFurniture()));
+        }
+        //图片地址不为空
+        if( qo.getHouseImage() != null && qo.getHouseImage().length > 0 ){
+            //删除旧的图片
+            houseLeaseMapper.deleteImageById(qo.getId());
+            //存储新的图片
+            qo.setHouseImageId(SnowFlake.nextId());
+            houseLeaseMapper.saveHouseLeaseImageById(qo.getHouseImage(), qo.getHouseImageId(), qo.getId());
+        }
+        return houseLeaseMapper.updateHouseLease(qo);
     }
 
 

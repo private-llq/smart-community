@@ -1,6 +1,7 @@
 package com.jsy.community.constant;
 
 import com.jsy.community.entity.HouseLeaseConstEntity;
+import org.springframework.boot.autoconfigure.integration.IntegrationAutoConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -491,25 +492,31 @@ public interface BusinessEnum {
 
 		public static final int max = 8;
 
-		private volatile static Map<String, Integer> kv = null;
+		private volatile static Map<Integer, String> kv = null;
 		/**
 		 * 返回当前常量的Key Val  由于当使用HouseDirectionEnum的时候 不一定会用到kv
 		 * 例：{东南=5, 东北=6, 南=3, 北=4, 西北=7, 西南=8, 东=1, 西=2}
 		 */
-		public static Map<String, Integer> getKv(){
+		public static Map<Integer, String> getKv(){
 			if( kv == null ){
 				synchronized (HouseDirectionEnum.class){
 					if(kv == null){
 						HouseDirectionEnum[] values = values();
 						kv = new HashMap<>(values.length);
 						for(HouseDirectionEnum everyOne : values){
-							kv.put(everyOne.name, everyOne.code);
+							kv.put(everyOne.code, everyOne.name);
 						}
 					}
 				}
 			}
 			return kv;
 		}
+
+		public static String getDirectionName(String code){
+			Map<Integer, String> kv = getKv();
+			return kv.get(Integer.parseInt(code));
+		}
+
 	}
 
 	/**

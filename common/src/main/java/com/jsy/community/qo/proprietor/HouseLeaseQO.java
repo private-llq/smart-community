@@ -2,7 +2,6 @@ package com.jsy.community.qo.proprietor;
 
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
-import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -61,7 +60,7 @@ public class HouseLeaseQO implements Serializable {
     private String houseAddress;
 
 
-    @Size(groups = {addLeaseSaleHouse.class}, message = "房屋标签至少需要一个!")
+    @Size(groups = {addLeaseSaleHouse.class}, min = 1,  message = "房屋标签至少需要一个!")
     @ApiModelProperty(value = "房屋租售优势标签ID数组")
     private List<Long> houseAdvantage;
 
@@ -137,14 +136,6 @@ public class HouseLeaseQO implements Serializable {
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "房屋朝向未选择!")
     private String houseDirection;
 
-    @ApiModelProperty(value = "房屋是否有电梯：1有 0无")
-    @Range(groups = {addLeaseSaleHouse.class}, min = 0, max = 1, message = "电梯选择可用范围不正确")
-    @NotNull(groups = {addLeaseSaleHouse.class}, message = "电梯未选择!")
-    private Short houseHasElevator;
-
-    //值是变动  需要存id至数据库 对应 名称 由后台人员管理
-    @ApiModelProperty(value = "房屋装修样式ID、1、精装修2、现代风格、3.古典风格、4.欧美风")
-    private Short houseStyleId;
 
 
     @ApiModelProperty(value = "房屋来源类型ID、1.个人 2.经纪人 3.不限")
@@ -156,17 +147,6 @@ public class HouseLeaseQO implements Serializable {
     @NotBlank(groups = {addLeaseSaleHouse.class}, message = "房屋年代未选择!")
     private String houseYear;
 
-    //非经常变动，值存BusinessEnum
-    @ApiModelProperty(value = "房屋用途ID、1住宅、2工商业、3仓库")
-    @Range(groups = {addLeaseSaleHouse.class}, min = BusinessEnum.HouseUsageEnum.min, max = BusinessEnum.HouseUsageEnum.max, message = "没有这种房屋用途")
-    @NotNull(groups = {addLeaseSaleHouse.class}, message = "房屋用途未选择")
-    private Short houseUsageId;
-
-    //非经常变动，值存BusinessEnum
-    @ApiModelProperty(value = "房屋种类id 1.商品房、2.经济适用房、3.央产房、4.军产房、5.公房、6.小产权房、7.自建住房")
-    @Range(groups = {addLeaseSaleHouse.class}, min = BusinessEnum.HouseKindEnum.min, max = BusinessEnum.HouseKindEnum.max, message = "房屋种类错误")
-    @NotNull(groups = {addLeaseSaleHouse.class}, message = "房屋类型未选择")
-    private Short houseKindId;
 
     @ApiModelProperty(value = "房屋介绍内容")
     @Length(groups = {addLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_INTRODUCE_CHAR_MAX, message = "房屋介绍内容字符在1~1000之间")
@@ -175,6 +155,7 @@ public class HouseLeaseQO implements Serializable {
 
     @ApiModelProperty(value = "房屋图片数组地址")
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "您的房屋没有图片!请上传至少一张实景")
+    @Size(groups = {addLeaseSaleHouse.class}, min = 1, max = 8, message = "至少需要一张房屋实景图,最大8张!")
     private String[] houseImage;
 
     //t_house_lease  数据库house_image_id保存图片的id

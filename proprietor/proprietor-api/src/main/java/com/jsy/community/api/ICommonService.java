@@ -61,14 +61,6 @@ public interface ICommonService {
 	List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode);
 
 
-	/**
-	 *  根据常量类型 获取属于这个类型的List数据
-	 * @author YuLF
-	 * @since  2020/12/11 11:36
-	 * @Param  type				常量类型
-	 * @return					返回这个类型对应的List
-	 */
-	List<HouseLeaseConstEntity> getHouseConstListByType(String type);
 
 	
 	/**
