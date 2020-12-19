@@ -51,7 +51,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 18:20
 	 * @Param []
 	 **/
-	void cancelShop(Long shopId);
+	void cancelShop(String userId,Long shopId,Long communityId,Long houseId);
 	
 	/**
 	 * @return java.util.Map<java.lang.String, java.lang.Object>
@@ -60,5 +60,5 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 20:11
 	 * @Param []
 	 **/
-	List<Map<String, Object>> listShop();
+	List<Map<String, Object>> listShop(String userId);
 }

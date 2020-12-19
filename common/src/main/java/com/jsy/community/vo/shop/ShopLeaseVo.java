@@ -27,6 +27,14 @@ public class ShopLeaseVo implements Serializable {
 	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "业主id不能为空")
 	private String uid;
 	
+	@ApiModelProperty(value = "社区id")
+	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "社区id不能为空")
+	private Long communityId;
+	
+	@ApiModelProperty(value = "房屋id")
+	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "房屋id不能为空")
+	private Long houseId;
+	
 	@ApiModelProperty(value = "标题")
 	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "标题不能为空")
 	private String title;
@@ -95,6 +103,14 @@ public class ShopLeaseVo implements Serializable {
 	
 	@ApiModelProperty(value = "商铺商业id集合")
 	private Long[] shopBusinessIds;
+	
+	@ApiModelProperty(value = "经度")
+	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "经度不能为空")
+	private BigDecimal lon;
+	
+	@ApiModelProperty(value = "纬度")
+	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "纬度不能为空")
+	private BigDecimal lat;
 	
 	/**
 	 * 添加店铺接口

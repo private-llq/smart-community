@@ -29,6 +29,12 @@ public class ShopLeaseEntity extends BaseEntity {
 
     @ApiModelProperty(value = "业主id")
     private String uid;
+    
+    @ApiModelProperty(value = "社区id")
+    private Long communityId;
+    
+    @ApiModelProperty(value = "房屋id")
+    private Long houseId;
 
     @ApiModelProperty(value = "标题")
     private String title;
@@ -77,5 +83,11 @@ public class ShopLeaseEntity extends BaseEntity {
 
     @ApiModelProperty(value = "状态 0未通过 1已通过")
     private Integer status;
+    
+    @ApiModelProperty(value = "经度")
+    private BigDecimal lon;
+    
+    @ApiModelProperty(value = "纬度")
+    private BigDecimal lat;
 
 }

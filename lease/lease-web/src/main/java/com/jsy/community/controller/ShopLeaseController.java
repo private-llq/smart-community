@@ -2,8 +2,10 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.constant.Const;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.shop.ShopLeaseVo;
@@ -30,6 +32,7 @@ import java.util.Map;
  * @since 2020-12-17
  */
 @Slf4j
+@Login
 @ApiJSYController
 @RestController
 @RequestMapping("/shop")
@@ -44,6 +47,7 @@ public class ShopLeaseController {
 	
 	private static final String BUCKETNAME = "shop-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
+	@Login(allowAnonymous = true)
 	@ApiOperation("商铺图片上传")
 	@PostMapping("/uploadShopImg")
 	public CommonResult addShopImg(@RequestParam("file") MultipartFile[] files) {
@@ -57,6 +61,7 @@ public class ShopLeaseController {
 	@ApiOperation("商铺发布")
 	@PostMapping("/addShop")
 	public CommonResult addShop(@RequestBody ShopLeaseVo shop) {
+		shop.setUid(UserUtils.getUserId());
 		ValidatorUtils.validateEntity(shop, ShopLeaseVo.addShopValidate.class);
 		shopLeaseService.addShop(shop);
 		return CommonResult.ok();
@@ -64,6 +69,7 @@ public class ShopLeaseController {
 	
 	@ApiOperation("查询店铺详情")
 	@GetMapping("/getShop")
+	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
 		ShopLeaseVo shop = shopLeaseService.getShop(shopId);
 		return CommonResult.ok(shop);
@@ -71,24 +77,33 @@ public class ShopLeaseController {
 	
 	@ApiOperation("商铺修改")
 	@PostMapping("/updateShop")
+	@Login
 	public CommonResult updateShop(@RequestBody ShopLeaseVo shop,
 	                               @ApiParam("店铺id") @RequestParam Long shopId) {
+		shop.setUid(UserUtils.getUserId());
 		shopLeaseService.updateShop(shop, shopId);
 		return CommonResult.ok();
 	}
 	
+	
 	@ApiOperation("下架商铺")
 	@DeleteMapping("/cancelShop")
-	public CommonResult cancelShop(@ApiParam("店铺id") @RequestParam Long shopId) {
-		shopLeaseService.cancelShop(shopId);
+	@Login
+	public CommonResult cancelShop(@ApiParam("店铺id") @RequestParam Long shopId,
+	                               @ApiParam("社区id") @RequestParam Long communityId,
+	                               @ApiParam("房屋id") @RequestParam Long houseId) {
+		String userId = UserUtils.getUserId();
+		shopLeaseService.cancelShop(userId,shopId,communityId,houseId);
 		return CommonResult.ok();
 	}
 	
 	
 	@ApiOperation("查询业主发布的房源列表")
 	@GetMapping("/listShop")
+	@Login
 	public CommonResult listShop() {
-		List<Map<String, Object>> map = shopLeaseService.listShop();
+		String userId = UserUtils.getUserId();
+		List<Map<String, Object>> map = shopLeaseService.listShop(userId);
 		return CommonResult.ok(map);
 	}
 

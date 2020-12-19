@@ -7,15 +7,19 @@ import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.shop.ShopLeaseVo;
+import com.jsy.lease.api.IHouseLeaseService;
 import com.jsy.lease.api.IShopLeaseService;
+import com.jsy.lease.api.LeaseException;
 import com.jsy.lease.mapper.ShopImgMapper;
 import com.jsy.lease.mapper.ShopLeaseMapper;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -40,12 +44,20 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Resource
 	private ShopImgMapper shopImgMapper;
 	
+	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	private IHouseLeaseService iHouseLeaseService;
+	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
 	@Override
 	@Transactional
 	public void addShop(ShopLeaseVo shop) {
+		//验证所属社区所属用户房屋是否存在
+		if (!iHouseLeaseService.isExistUserHouse(shop.getUid(), shop.getCommunityId().intValue(), shop.getHouseId().intValue())) {
+			throw new LeaseException("您并未拥有该房屋!");
+		}
+		
 		// 存储店铺基本信息
 		ShopLeaseEntity baseShop = new ShopLeaseEntity();
 		BeanUtils.copyProperties(shop, baseShop);
@@ -64,10 +76,10 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 				list.add(shopImgEntity);
 			}
 			shopImgMapper.insertImg(list);
-
-//			for (String s : imgPath) { // 垃圾图片处理
-//				redisTemplate.opsForSet().add("shop_all_part", s);
-//			}
+			
+			for (String s : imgPath) { // 垃圾图片处理
+				redisTemplate.opsForSet().add("shop_img_all", s);
+			}
 		}
 		
 		// 存储标签
@@ -109,6 +121,11 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Override
 //	@Transactional
 	public void updateShop(ShopLeaseVo shop, Long shopId) {
+		//验证所属社区所属用户房屋是否存在
+		if (!iHouseLeaseService.isExistUserHouse(shop.getUid(), shop.getCommunityId().intValue(), shop.getHouseId().intValue())) {
+			throw new LeaseException("您并未拥有该房屋!");
+		}
+		
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
 		shopLeaseEntity.setId(shopId);
 		BeanUtils.copyProperties(shop, shopLeaseEntity);
@@ -142,7 +159,12 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	
 	@Override
 	@Transactional
-	public void cancelShop(Long shopId) {
+	public void cancelShop(String userId, Long shopId, Long communityId, Long houseId) {
+		//验证所属社区所属用户房屋是否存在
+		if (!iHouseLeaseService.isExistUserHouse(userId, communityId.intValue(), houseId.intValue())) {
+			throw new LeaseException("您并未拥有该房屋!");
+		}
+		
 		shopLeaseMapper.deleteById(shopId); // 删除基本信息
 		
 		// 查询该店铺的图片
@@ -153,17 +175,20 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		for (ShopImgEntity shopImgEntity : shopImgList) {
 			longs.add(shopImgEntity.getId());
 		}
-		shopImgMapper.deleteBatchIds(longs); // 删除图片信息
+		if (!CollectionUtils.isEmpty(longs)) {
+			shopImgMapper.deleteBatchIds(longs); // 删除图片信息
+		}
 		
 		Long[] tags = shopLeaseMapper.selectTags(shopId);
-		shopLeaseMapper.deleteTags(tags); // 查询出该店铺原本有的标签并删除
+		if (tags != null && tags.length > 0) {
+			shopLeaseMapper.deleteTags(tags); // 查询出该店铺原本有的标签并删除
+		}
 	}
 	
 	@Override
-	public List<Map<String, Object>> listShop() {
-		String id = "9c6a4813d5ee4079987e2efb7e46c201";
+	public List<Map<String, Object>> listShop(String userId) {
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("uid", id);
+		wrapper.eq("uid", userId);
 		List<Map<String, Object>> maps = new ArrayList<>();
 		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
 		for (ShopLeaseEntity shopLeaseEntity : list) {
