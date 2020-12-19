@@ -94,24 +94,7 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
         //1.通过存在的条件 查出符合条件的分页所有房屋数据
         List<HouseLeaseVO> vos = houseLeaseMapper.queryHouseLeaseByList(houseLeaseQO);
         //根据数据字段id 查询 一对多的 房屋标签name和id 如 邻地铁、可短租、临街商铺等多标签、之类
-        for(HouseLeaseVO vo : vos){
-            List<Long> AdvantageID = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
-            if( !AdvantageID.isEmpty() ){
-                //1.房屋优势标签 如 随时入住、电梯楼... 属于该条数据多选的 type = t_house_const 里面的 house_const_type
-                vo.setHouseAdvantage(houseConstService.getConstByTypeCodeForList(AdvantageID, 4L));
-            }
-            List<Long> FurnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
-            if( !FurnitureId.isEmpty() ){
-                //房屋家具标签 如 床、沙发... 属于该条数据多选的 type = t_house_const 里面的 house_const_type
-                vo.setHouseFurniture(houseLeaseMapper.queryHouseConstNameByFurnitureId(FurnitureId, 13L));
-            }
-            //2.从中间表查出该出租房屋的 第一张显示图片 用于列表标签展示
-            vo.setHouseImage(houseLeaseMapper.queryHouseImgById(vo.getHouseImageId(), vo.getId()));
-            //3.通过出租方式id 查出 出租方式文本：如 合租、整租之类
-            vo.setHouseLeaseMode(houseConstService.getConstNameByConstTypeCode(vo.getHouseLeasemodeId(), 11L));
-            //4.通过户型id 查出 户型id对应的文本：如 四室一厅、三室一厅...
-            vo.setHouseType(houseConstService.getConstNameByConstTypeCode(vo.getHouseTypeId(), 2L));
-        }
+        getHouseFieldTag(vos);
         return vos;
     }
 
@@ -206,5 +189,43 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
         return houseLeaseMapper.ownerHouse(userId, communityId);
     }
 
+
+
+    /**
+     * [为了后续方便修改、使用单表匹配搜索] 去缓存取标签的方式
+     * 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口
+     * @param text          文本
+     * @return              返回搜索到的列表
+     */
+    @Override
+    public List<HouseLeaseVO> searchLeaseHouse(String text) {
+        List<HouseLeaseVO> vos  =  houseLeaseMapper.searchLeaseHouse(text);
+        getHouseFieldTag(vos);
+        return vos;
+    }
+
+
+    private void getHouseFieldTag(List<HouseLeaseVO> vos){
+        //对字段一对多的标签做处理
+        for(HouseLeaseVO vo : vos){
+            //从数字中解析出 常量的 code
+            List<Long> AdvantageID = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
+            if( !AdvantageID.isEmpty() ){
+                //1.房屋优势标签 如 随时入住、电梯楼... 属于该条数据多选的 type = t_house_const 里面的 house_const_type
+                vo.setHouseAdvantage(houseConstService.getConstByTypeCodeForList(AdvantageID, 4L));
+            }
+            List<Long> FurnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
+            if( !FurnitureId.isEmpty() ){
+                //房屋家具标签 如 床、沙发... 属于该条数据多选的 type = t_house_const 里面的 house_const_type
+                vo.setHouseFurniture(houseLeaseMapper.queryHouseConstNameByFurnitureId(FurnitureId, 13L));
+            }
+            //2.从中间表查出该出租房屋的 第一张显示图片 用于列表标签展示
+            vo.setHouseImage(houseLeaseMapper.queryHouseImgById(vo.getHouseImageId(), vo.getId()));
+            //3.通过出租方式id 查出 出租方式文本：如 合租、整租之类
+            vo.setHouseLeaseMode(houseConstService.getConstNameByConstTypeCode(vo.getHouseLeasemodeId(), 11L));
+            //4.通过户型id 查出 户型id对应的文本：如 四室一厅、三室一厅...
+            vo.setHouseType(houseConstService.getConstNameByConstTypeCode(vo.getHouseTypeId(), 2L));
+        }
+    }
 
 }

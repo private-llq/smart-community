@@ -72,5 +72,8 @@ public class CommunityController {
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
 		return CommonResult.ok(iCommunityService.locateCommunity(UserUtils.getUserId(),location));
 	}
-	
+
+
+
+
 }

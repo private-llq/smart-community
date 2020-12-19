@@ -167,4 +167,12 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      */
     List<HouseVo> ownerHouse(@Param("uid") String userId, @Param("communityId") Long communityId);
 
+
+    /**
+     * [为了后续方便修改、使用单表匹配搜索] 去缓存取标签的方式
+     * 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口
+     * @param text          文本
+     * @return              返回搜索到的列表
+     */
+    List<HouseLeaseVO> searchLeaseHouse(@Param("text") String text);
 }

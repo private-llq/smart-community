@@ -110,4 +110,10 @@ public class HouseLeaseController {
     }
 
 
+    @Login
+    @PostMapping("/search")
+    @ApiOperation("按小区名或标题或地址搜索房屋")
+    public CommonResult<List<HouseLeaseVO>> searchLeaseHouse(@RequestParam String text){
+        return CommonResult.ok(iHouseLeaseService.searchLeaseHouse(text));
+    }
 }

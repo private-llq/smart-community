@@ -80,4 +80,11 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @return                  返回List数据 如果有多条
      */
     List<HouseVo> ownerHouse(String userId, Long communityId);
+
+    /**
+     * 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口
+     * @param text          文本
+     * @return              返回搜索到的列表
+     */
+    List<HouseLeaseVO> searchLeaseHouse(String text);
 }

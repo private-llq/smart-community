@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.community.mapper.UserHouseMapper">
+    <!-- 批量更新房屋认证信息 -->
+    <update id="updateProprietorHouseBatch">
+        <foreach collection="houseList" item="house">
+			<if test="house.houseId != null">
+				update t_user_house
+				<set>
+					house_id = #{house.houseId},check_status = 2
+				</set>
+				<where>
+					id = #{house.id}
+				</where>
+			</if>
+        </foreach>
+    </update>
+</mapper>
