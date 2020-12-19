@@ -20,7 +20,7 @@
 
     <!-- 插入房屋图片至中间库 -->
     <insert id="insertHouseImages">
-        insert into t_house_leasesale_const(img_url,field_id,hid)
+        insert into t_house_image(img_url,field_id,hid)
         values
         <foreach collection="houseLeaseQO.houseImage" item="item" separator=",">
             (#{item},#{houseLeaseQO.houseImageId},#{houseLeaseQO.id})
@@ -248,5 +248,39 @@
 	        AND d.house_const_type = 1
             WHERE
 	        l.id = #{houseId}
+    </select>
+    <!-- 根据用户id和社区id 查出用户在这个社区下面所属的房源 -->
+    <select id="ownerLeaseHouse" resultType="com.jsy.community.vo.HouseLeaseVO">
+            SELECT
+            DISTINCT
+            	l.house_title,
+            	l.house_square_meter,
+            	l.house_address,
+            	l.house_price,
+            	l.house_unit,
+            	i.img_url as houseImage,
+            	t.house_const_name AS houseType
+            FROM
+            	t_house_lease AS l
+            	LEFT JOIN t_house_image AS i ON l.house_image_id = i.field_id
+            	LEFT JOIN t_house_const AS t ON l.house_type_id = t.house_const_code
+            	AND t.house_const_type = 2
+            	WHERE
+            	l.uid = #{uid} and l.house_community_id = #{communityId}
+    </select>
+
+    <!-- 根据用户id 和社区id 查询用户在这个社区的可发布房源 -->
+    <select id="ownerHouse" resultType="com.jsy.community.vo.HouseVo">
+        SELECT
+	        h.id as houseId,
+	        h.building,
+	        h.unit,
+	        h.floor,
+	        h.door
+        FROM
+	        t_user_house AS uh
+	        RIGHT JOIN t_house AS h ON uh.house_id = h.id
+        WHERE
+        uh.check_status = 1 and uh.uid = #{uid} and uh.community_id = #{communityId} and h.type = 4 and uh.deleted = 0
     </select>
 </mapper>

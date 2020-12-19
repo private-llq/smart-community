@@ -3,18 +3,23 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.constant.Const;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.community.vo.HouseVo;
 import com.jsy.lease.api.IHouseLeaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -36,9 +41,12 @@ public class HouseLeaseController {
         //新增参数常规效验
         ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.addLeaseSaleHouse.class);
         houseLeaseQO.setUid(UserUtils.getUserId());
+        //验证所属社区所属用户房屋是否存在
+        if(!iHouseLeaseService.isExistUserHouse(UserUtils.getUserId(), houseLeaseQO.getHouseCommunityId(), houseLeaseQO.getHouseId())){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "您在此处未登记房产!");
+        }
         //参数效验完成 新增
-        iHouseLeaseService.addLeaseSaleHouse(houseLeaseQO);
-        return CommonResult.ok();
+        return iHouseLeaseService.addLeaseSaleHouse(houseLeaseQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     @Login
@@ -77,6 +85,29 @@ public class HouseLeaseController {
     }
 
 
+    @Login
+    @PostMapping("/ownerHouse")
+    @ApiOperation("查询业主当前社区拥有房屋")
+    public CommonResult<List<HouseVo>> ownerHouse(@RequestParam Long communityId){
+        return CommonResult.ok(iHouseLeaseService.ownerHouse(UserUtils.getUserId(), communityId));
+    }
+
+    @Login
+    @PostMapping("/ownerHouseImages")
+    @ApiOperation("房屋图片批量上传接口")
+    public CommonResult<String[]> ownerHouseImages(MultipartFile[] houseImages){
+        if( houseImages == null || houseImages.length == 0 ){
+            throw new JSYException(JSYError.BAD_REQUEST);
+        }
+        return CommonResult.ok(MinioUtils.uploadForBatch(houseImages, "house-lease-img"));
+    }
+
+    @Login
+    @PostMapping("/ownerLeaseHouse")
+    @ApiOperation("查询业主已发布的房源")
+    public CommonResult<List<HouseLeaseVO>> ownerLeaseHouse(@RequestParam Long communityId){
+        return CommonResult.ok(iHouseLeaseService.ownerLeaseHouse(UserUtils.getUserId(), communityId));
+    }
 
 
 }

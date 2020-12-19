@@ -36,6 +36,16 @@ public class HouseLeaseQO implements Serializable {
     @ApiModelProperty(value = "所属人ID")
     private String uid;
 
+    @Range(groups = {addLeaseSaleHouse.class}, min = 1 , message = "社区id不正确")
+    @NotNull(groups = {addLeaseSaleHouse.class}, message = "社区id不能为空!")
+    @ApiModelProperty(value = "社区id")
+    private Integer houseCommunityId;
+
+    @Range(groups = {addLeaseSaleHouse.class}, min = 1 , message = "房屋id不正确")
+    @NotNull(groups = {addLeaseSaleHouse.class}, message = "房屋id不能为空!")
+    @ApiModelProperty(value = "房源id")
+    private Integer houseId;
+
     @ApiModelProperty(value = "房屋租售标题")
     @Length(groups = {addLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_TITLE_CHAR_MAX, message = "标题长度在1~32之间")
     @NotBlank(groups = addLeaseSaleHouse.class, message = "未填写租售标题!")

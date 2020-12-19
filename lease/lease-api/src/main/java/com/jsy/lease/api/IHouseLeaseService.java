@@ -5,6 +5,7 @@ import com.jsy.community.entity.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.community.vo.HouseVo;
 
 import java.util.List;
 
@@ -53,4 +54,30 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @return                      返回更新影响行数
      */
     Boolean updateHouseLease(HouseLeaseQO houseLeaseQO);
+
+    /**
+     * 按用户id和 社区id查询 房主在当前社区出租的房源
+     * @param userId            用户id
+     * @param communityId       社区id
+     * @return                  返回业主拥有的房产
+     */
+    List<HouseLeaseVO> ownerLeaseHouse(String userId, Long communityId);
+
+    /**
+     * 通过用户id社区id房屋id验证用户是否存在此处房产
+     * @param userId                用户id
+     * @param houseCommunityId      社区id
+     * @param houseId               房屋id
+     * @return                      返回是否存在结果
+     */
+    boolean isExistUserHouse(String userId, Integer houseCommunityId, Integer houseId);
+
+
+    /**
+     * 根据用户id 和社区id 查询用户在这个社区的可发布房源
+     * @param userId            用户id
+     * @param communityId       社区id
+     * @return                  返回List数据 如果有多条
+     */
+    List<HouseVo> ownerHouse(String userId, Long communityId);
 }

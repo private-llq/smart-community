@@ -25,8 +25,11 @@ public class HouseLeaseEntity extends BaseEntity {
     @JsonIgnore
     private String uid;
 
-    @ApiModelProperty(value = "标识房屋是租赁还是销售 1.租赁 0.销售")
-    private Short houseIsLease;
+    @ApiModelProperty(value = "社区id")
+    private Integer houseCommunityId;
+
+    @ApiModelProperty(value = "房源id")
+    private Integer houseId;
 
     @ApiModelProperty(value = "房屋租售标题")
     private String houseTitle;

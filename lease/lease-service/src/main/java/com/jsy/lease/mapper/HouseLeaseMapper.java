@@ -6,6 +6,7 @@ import com.jsy.community.entity.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -136,4 +137,34 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param hid                   房屋id
      */
     void saveHouseLeaseImageById(@Param("images") String[] images , @Param("houseImageId")Long houseImageId, @Param("hid")Long hid);
+
+
+    /**
+     * 通过用户id社区id房屋id验证用户是否存在此处房产
+     * @param userId                用户id
+     * @param houseCommunityId      社区id
+     * @param houseId               房屋id
+     * @return                      返回是否存在结果
+     */
+    @Select("select count(*) from t_user_house as uh LEFT JOIN t_house as h on uh.house_id = h.id where uh.uid = #{userId} and uh.check_status = 1 and uh.community_id = #{houseCommunityId} and h.id = #{houseId} and h.type =4")
+    boolean isExistUserHouse(@Param("userId") String userId, @Param("houseCommunityId") Integer houseCommunityId, @Param("houseId") Integer houseId);
+
+
+    /**
+     * 按用户id和 社区id查询 房主在当前社区出租的房源
+     * @param userId            用户id
+     * @param communityId       社区id
+     * @return                  返回业主拥有的房产
+     */
+    List<HouseLeaseVO> ownerLeaseHouse(@Param("uid") String userId, @Param("communityId") Long communityId);
+
+
+    /**
+     * 根据用户id 和社区id 查询用户在这个社区的可发布房源
+     * @param userId            用户id
+     * @param communityId       社区id
+     * @return                  返回List数据 如果有多条
+     */
+    List<HouseVo> ownerHouse(@Param("uid") String userId, @Param("communityId") Long communityId);
+
 }

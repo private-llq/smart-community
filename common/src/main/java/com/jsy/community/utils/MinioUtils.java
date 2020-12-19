@@ -8,6 +8,7 @@ import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -27,6 +28,8 @@ public class MinioUtils {
 	private static String BUCKETNAME = null;
 
 	private static volatile MinioClient minioClient = null;
+
+	private static final String[] allowSuffix = {"jpg","jpeg","png","bmp"};
 
 
 	
@@ -80,7 +83,7 @@ public class MinioUtils {
 
 
 	/**
-	 *  批量上传文件
+	 *  批量上传图片文件
 	 * @author YuLF
 	 * @since  2020/12/9 17:45
 	 * @Param  files		文件数组
@@ -95,7 +98,7 @@ public class MinioUtils {
 			minioClient = getMinioClientInstance();
 			createBucket(bucketName);
 			for( MultipartFile file : files ){
-				if( file != null && !file.isEmpty() ){
+				if( file != null && !file.isEmpty() && isImage(file.getOriginalFilename())){
 					//1.对文件名随机
 					String randomFileName = getRandomFileName(file.getOriginalFilename());
 					//2.存储文件
@@ -112,6 +115,9 @@ public class MinioUtils {
 		return resAddress;
 	}
 
+	private static boolean isImage(String name){
+		return FilenameUtils.isExtension(name, allowSuffix);
+	}
 
 	/**
 	 *  懒加载当用到 MinioClient 时 创建实例，只创建一次

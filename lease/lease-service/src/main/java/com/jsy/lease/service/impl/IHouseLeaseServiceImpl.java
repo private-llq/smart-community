@@ -9,6 +9,7 @@ import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.community.vo.HouseVo;
 import com.jsy.lease.api.IHouseConstService;
 import com.jsy.lease.api.IHouseLeaseService;
 import com.jsy.lease.mapper.HouseLeaseMapper;
@@ -167,6 +168,42 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
             houseLeaseMapper.saveHouseLeaseImageById(qo.getHouseImage(), qo.getHouseImageId(), qo.getId());
         }
         return houseLeaseMapper.updateHouseLease(qo);
+    }
+
+
+    /**
+     * 按用户id和 社区id查询 房主在当前社区出租的房源
+     * @param userId            用户id
+     * @param communityId       社区id
+     * @return                  返回业主拥有的房产
+     */
+    @Override
+    public List<HouseLeaseVO> ownerLeaseHouse(String userId, Long communityId) {
+        return houseLeaseMapper.ownerLeaseHouse(userId, communityId);
+    }
+
+    /**
+     * 通过用户id社区id房屋id验证用户是否存在此处房产
+     * @param userId                用户id
+     * @param houseCommunityId      社区id
+     * @param houseId               房屋id
+     * @return                      返回是否存在结果
+     */
+    @Override
+    public boolean isExistUserHouse(String userId, Integer houseCommunityId, Integer houseId) {
+        return houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId);
+    }
+
+
+    /**
+     * 根据用户id 和社区id 查询用户在这个社区的可发布房源
+     * @param userId            用户id
+     * @param communityId       社区id
+     * @return                  返回List数据 如果有多条
+     */
+    @Override
+    public List<HouseVo> ownerHouse(String userId, Long communityId) {
+        return houseLeaseMapper.ownerHouse(userId, communityId);
     }
 
 
