@@ -72,6 +72,9 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "是否通过审核")
     private Integer checkStatus;
 
+    @ApiModelProperty(value = "行驶证图片地址")
+    private Integer drivingLicenseUrl;
+
     @ApiModelProperty(value = "审核时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone="GMT+8")
     private Date checkTime;

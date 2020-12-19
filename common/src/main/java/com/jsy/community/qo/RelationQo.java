@@ -11,6 +11,10 @@ import java.util.List;
 @Data
 @ApiModel("添加家属")
 public class RelationQo implements Serializable {
+
+    @ApiModelProperty(value = "家属ID",required = true)
+    private Long id;
+
     @ApiModelProperty(value = "家属姓名",required = true)
     private String name;
     @ApiModelProperty("性别")

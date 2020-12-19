@@ -17,5 +17,4 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 
 	@Update("update t_house_member set is_confirm = 1 where id = #{id}")
 	int confirmJoin(@Param("id")Long id);
-	
 }

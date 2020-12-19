@@ -49,4 +49,10 @@ public interface IRelationService {
      * @return
      */
     HouseMemberEntity updateFormBackFillId(Long relationId);
+    /**
+     * 修改一个家属信息和汽车信息
+     * @param relationQo
+     * @return
+     */
+    void updateUserRelationDetails(RelationQo relationQo);
 }

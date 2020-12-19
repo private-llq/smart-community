@@ -25,4 +25,64 @@
     <select id="selectID" resultType="com.jsy.community.entity.HouseMemberEntity" parameterType="String">
         select <include refid="selectId"></include> from t_house_member where householder_id=#{id}
     </select>
+    <update id="updateUserRelationDetails">
+        update t_house_member
+        <set>
+            <if test="name!=null">
+                name=#{relationQo.name},
+            </if>
+            <if test="sex!=null">
+                sex=#{relationQo.sex},
+            </if>
+             <if test="phoneTel!=null">
+                 mobile=#{relationQo.phoneTel},
+            </if>
+            <if test="identificationType!=null">
+                identification_type=#{relationQo.identificationType},
+            </if>
+            <if test="idNumber!=null">
+                id_card=#{relationQo.idNumber},
+            </if>
+            <if test="concern!=null">
+                relation=#{relationQo.concern},
+            </if>
+            <if test="communityId!=null">
+                community_id=#{relationQo.communityId},
+            </if>
+            <if test="houseId!=null">
+                house_id=#{relationQo.houseId}
+            </if>
+            where id=#{relationQo.id}
+        </set>
+    </update>
+    <update id="updateUserRelationCar">
+        <foreach collection="cars" item="car">
+            update t_car
+            <set>
+                <if test="car.carId!=null">
+                    car_plate=#{car.carId},
+                </if>
+                <if test="car.carType!=null">
+                    car_type=#{car.carType},
+                </if>
+                <if test="car.carImgURL!=null">
+                    car_image_url=#{car.carImgURL},
+                </if>
+                <if test="car.drivingLicenseUrl!=null">
+                    driving_license_url=#{car.drivingLicenseUrl},
+                </if>
+                <if test="car.owner!=null">
+                    owner=#{car.owner},
+                </if>
+                <if test="car.communityId!=null">
+                    community_id=#{car.communityId},
+                </if>
+
+                <if test="car.checkStatus!=null">
+                    check_status=#{car.checkStatus},
+                </if>
+                where id=#{car.id}
+            </set>
+        </foreach>
+    </update>
 </mapper>

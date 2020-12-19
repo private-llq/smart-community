@@ -54,6 +54,13 @@ public class RelationController {
         String upload = MinioUtils.upload(file, "aaaa");
         return CommonResult.ok(upload);
     }
+    @ApiOperation("保存行驶证图片")
+    @PostMapping("/uploadDrivingLicenseUrl")
+    @Login
+    public CommonResult uploadDrivingLicenseUrl(@RequestParam("file") MultipartFile file){
+        String upload = MinioUtils.upload(file, "wocao");
+        return CommonResult.ok(upload);
+    }
 
     @ApiOperation("查询一个家属详情")
     @GetMapping("/selectUserRelationDetails")
@@ -63,6 +70,7 @@ public class RelationController {
         RelationVO relationVO = relationService.selectOne(RelationId, userId);
         return CommonResult.ok(relationVO);
     }
+
     @ApiOperation("修改一个家属信息")
     @PostMapping("/updateByRelationId")
     @Login
@@ -71,6 +79,15 @@ public class RelationController {
         relationService.updateByRelationId(houseMemberEntity);
         return CommonResult.ok();
     }
+    @ApiOperation("修改家属信息加汽车信息")
+    @PostMapping("/updateUserRelationDetails")
+    @Login
+    public CommonResult updateByRelationId(@RequestBody RelationQo relationQo){
+        String userId = UserUtils.getUserId();
+        relationService.updateUserRelationDetails(relationQo);
+        return CommonResult.ok();
+    }
+
     @ApiOperation("修改一个家属信息传入一个家属id做表单回填")
     @GetMapping("/updateFormBackFillId")
     @Login

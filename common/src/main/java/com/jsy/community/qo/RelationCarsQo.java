@@ -1,13 +1,18 @@
 package com.jsy.community.qo;
 
-import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @ApiModel("添加车辆信息")
-public class RelationCarsQo extends BaseEntity {
+public class RelationCarsQo implements Serializable {
+
+    @ApiModelProperty("车辆id")
+    private Long Id;// 85
+
     @ApiModelProperty("车牌号")
     private String carId;// 85
     @ApiModelProperty("车辆类型")
@@ -15,7 +20,10 @@ public class RelationCarsQo extends BaseEntity {
     @ApiModelProperty("车辆图片")
     private String carImgURL;
 
-    @ApiModelProperty(value = "家属车辆ID",hidden = true)
+    @ApiModelProperty("行驶证图片地址")
+    private String drivingLicenseUrl;
+
+    @ApiModelProperty(value = "家属ID",hidden = true)
     private Long houseMemberId;
 
     //手机号

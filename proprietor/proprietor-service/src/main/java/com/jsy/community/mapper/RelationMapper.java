@@ -2,6 +2,8 @@ package com.jsy.community.mapper;
 
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.RelationCarsQo;
+import com.jsy.community.qo.RelationQo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,4 +26,22 @@ public interface RelationMapper {
      * @param id
      */
     List<HouseMemberEntity> selectID(String id);
+
+    /**
+     * @Description: 修改家属信息
+     * @author: Hu
+     * @since: 2020/12/19 10:08
+     * @Param:
+     * @return:
+     */
+    void updateUserRelationDetails(@Param("relationQo") RelationQo relationQo);
+
+    /**
+     * @Description: 批量修改车辆信息
+     * @author: Hu
+     * @since: 2020/12/19 10:08
+     * @Param:
+     * @return:
+     */
+    void updateUserRelationCar(@Param("cars") List<RelationCarsQo> cars);
 }

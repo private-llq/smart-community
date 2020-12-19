@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @TableName("t_community_fun")
 public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "社区趣事标题")
-    private String title;
+    private String titleName;
     @ApiModelProperty(value = "社区趣事内容")
     private String content;
     @ApiModelProperty(value = "社区趣事缩略图地址")

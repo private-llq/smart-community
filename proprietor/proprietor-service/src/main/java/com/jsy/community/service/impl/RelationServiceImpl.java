@@ -1,5 +1,4 @@
 package com.jsy.community.service.impl;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.BusinessConst;
@@ -67,6 +66,8 @@ public class RelationServiceImpl implements IRelationService {
         }
 
         HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
+
+
         houseMemberEntity.setId(SnowFlake.nextId());
         houseMemberEntity.setHouseId(relationQo.getHouseId());
         houseMemberEntity.setHouseholderId(relationQo.getUserId());
@@ -76,6 +77,7 @@ public class RelationServiceImpl implements IRelationService {
         houseMemberEntity.setMobile(relationQo.getPhoneTel());
         houseMemberEntity.setRelation(relationQo.getConcern());
         houseMemberEntity.setSex(relationQo.getSex());
+
         houseMemberMapper.insert(houseMemberEntity);
 
         List<RelationCarsQo> cars = relationQo.getCars();
@@ -87,6 +89,7 @@ public class RelationServiceImpl implements IRelationService {
                     car.setOwner(relationQo.getName());
                     car.setPhoneTel(relationQo.getPhoneTel());
                     car.setHouseMemberId(houseMemberEntity.getId());
+                    car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                 }
                 relationMapper.addCars(cars);
             }
@@ -107,7 +110,11 @@ public class RelationServiceImpl implements IRelationService {
         List<HouseMemberEntity> houseMemberEntities = relationMapper.selectID(id);
         return houseMemberEntities;
     }
-
+    /**
+     * 查询业主下面的家属详情
+     * @param RelationId
+     * @return
+     */
     @Override
     public RelationVO selectOne(Long RelationId, String userId) {
         HouseMemberEntity houseMemberEntity = houseMemberMapper.selectById(RelationId);
@@ -141,14 +148,33 @@ public class RelationServiceImpl implements IRelationService {
 
         return relationVO;
     }
-
+    /**
+     * 修改家属信息
+     * @param houseMemberEntity
+     * @return
+     */
     @Override
     public void updateByRelationId(HouseMemberEntity houseMemberEntity) {
         houseMemberMapper.updateById(houseMemberEntity);
     }
-
+    /**
+     * 查询一条表单回填
+     * @param relationId
+     * @return
+     */
     @Override
     public HouseMemberEntity updateFormBackFillId(Long relationId) {
         return houseMemberMapper.selectById(relationId);
+    }
+
+    @Override
+    @Transactional
+    public void updateUserRelationDetails(RelationQo relationQo) {
+
+        relationMapper.updateUserRelationDetails(relationQo);
+
+        relationMapper.updateUserRelationCar(relationQo.getCars());
+
+
     }
 }
