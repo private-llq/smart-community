@@ -216,7 +216,7 @@
         </foreach>
     </insert>
 
-    <!-- query one house lease data -->
+    <!-- 查询出租房屋单条数据 -->
     <select id="queryHouseLeaseOne" resultType="com.jsy.community.vo.HouseLeaseVO">
         SELECT
 	        l.house_contact,

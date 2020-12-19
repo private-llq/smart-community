@@ -51,9 +51,9 @@ public class SourceConstExecutor {
     }
 
     private void setRedisForHouseConst(List<HouseLeaseConstEntity> list){
-        //1.把所有 house_const_type 存入Set去重
+        //1.把所有 house_const_type 存入Set去重 得到所有常量类型
         Set<String>  houseConstType = list.stream().map(HouseLeaseConstEntity::getHouseConstType).collect(Collectors.toSet());
-        //2.遍历所有 house_const_type 类型 存入 redis
+        //2.遍历所有 house_const_type 类型   存入 redis
         for(String constType : houseConstType){//相同类型的数据
             List<HouseLeaseConstEntity> alikeType = new ArrayList<>();
             for(HouseLeaseConstEntity entity : list ){

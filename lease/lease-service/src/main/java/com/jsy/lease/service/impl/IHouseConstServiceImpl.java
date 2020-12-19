@@ -40,6 +40,9 @@ public class IHouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseL
     @Override
     public List<HouseLeaseConstEntity> getHouseConstListByType(String type) {
         var list = JSON.parseObject(String.valueOf(redisTemplate.opsForValue().get("houseConst:" + type)), List.class);
+        if( list == null || list.isEmpty() ){
+            return null;
+        }
         List<HouseLeaseConstEntity> houseLeaseConstEntityList = new ArrayList<>(list.size());
         for (Object o : list) {
             JSONObject jsonObject = JSON.parseObject(String.valueOf(o));
