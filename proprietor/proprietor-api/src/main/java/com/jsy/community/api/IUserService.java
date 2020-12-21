@@ -64,7 +64,7 @@ public interface IUserService extends IService<UserEntity> {
      * @author YuLF
      * @since  2020/12/10 16:25
      */
-    UserInfoVo proprietorQuery(String userId);
+    UserInfoVo proprietorQuery(String userId, Long houseId);
 	
     /**
     * @Description: 查询业主所有社区的房屋
@@ -80,9 +80,10 @@ public interface IUserService extends IService<UserEntity> {
 	 * 业主详情查看
 	 * @param userId		用户ID
 	 * @Param communityId	社区id
+	 * @Param houseId		房屋id
 	 * @author YuLF
 	 * @since  2020/12/18 11:39
 	 * @return			返回业主详情信息
 	 */
-    UserInfoVo proprietorDetails(String userId, Long communityId);
+    UserInfoVo proprietorDetails(String userId, Long communityId, Long houseId);
 }

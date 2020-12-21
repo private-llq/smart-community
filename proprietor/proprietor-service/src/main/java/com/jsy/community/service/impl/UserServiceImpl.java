@@ -194,11 +194,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     @Transactional
     @Override
-    public UserInfoVo proprietorQuery(String userId) {
+    public UserInfoVo proprietorQuery(String userId, Long houseId) {
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",userId).select("real_name,sex,detail_address,avatar_url"));
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(userEntity, userInfoVo);
-        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId);
+        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId, houseId);
         userInfoVo.setProprietorMembers(houseMemberEntities);
         return userInfoVo;
     }
@@ -251,19 +251,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * 业主详情查看
      * @param userId	    用户ID
      * @param communityId	社区ID
+     * @Param houseId       房屋ID
      * @author YuLF
      * @since  2020/12/18 11:39
      * @return			返回业主详情信息
      */
     @Transactional
     @Override
-    public UserInfoVo proprietorDetails(String userId, Long communityId) {
+    public UserInfoVo proprietorDetails(String userId, Long communityId, Long houseId) {
         //1.查出用户姓名信息
         UserInfoVo userInfo = userMapper.selectUserInfoById(userId);
         //2.查出用户房屋信息
         List<HouseVo> userHouses = userHouseService.queryUserHouseList(userId, communityId);
         //3.查出用户家属
-        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId);
+        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId, houseId);
         //4.查出用户车辆信息
         List<CarEntity> carEntities = carService.queryUserCarById(userId);
         userInfo.setProprietorCars(carEntities);

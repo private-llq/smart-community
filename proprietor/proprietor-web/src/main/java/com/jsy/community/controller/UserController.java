@@ -139,9 +139,9 @@ public class UserController {
     @Login
     @ApiOperation("业主信息及业主家属信息查询接口")
     @PostMapping("query")
-    public CommonResult<UserInfoVo> proprietorQuery() {
+    public CommonResult<UserInfoVo> proprietorQuery(@RequestParam Long houseId) {
         String userId = UserUtils.getUserId();
-        UserInfoVo userInfoVo = userService.proprietorQuery(userId);
+        UserInfoVo userInfoVo = userService.proprietorQuery(userId, houseId);
         return CommonResult.ok(userInfoVo);
     }
 
@@ -153,8 +153,8 @@ public class UserController {
     @Login
     @ApiOperation("业主信息详情查询接口")
     @PostMapping("details")
-    public CommonResult<UserInfoVo> details(@RequestParam Long communityId) {
-        UserInfoVo userInfoVo = userService.proprietorDetails(UserUtils.getUserId(), communityId);
+    public CommonResult<UserInfoVo> details(@RequestParam Long communityId, @RequestParam Long houseId) {
+        UserInfoVo userInfoVo = userService.proprietorDetails(UserUtils.getUserId(), communityId, houseId);
         return CommonResult.ok(userInfoVo);
     }
 

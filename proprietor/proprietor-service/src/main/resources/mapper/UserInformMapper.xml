@@ -12,7 +12,7 @@
 
     <!-- 按用户ID查出用户所在社区id列表 -->
     <select id="queryUserAllCommunityId" resultType="java.lang.Long">
-        select community_id from t_user_house where uid = #{userId} limit #{page},#{size}
+        select DISTINCT community_id from t_user_house where uid = #{userId} limit #{page},#{size}
     </select>
 
     <!-- 根据id查询社区相关信息 -->
