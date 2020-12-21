@@ -12,6 +12,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		if(Const.HouseTypeConsts.DOOR.equals(houseEntity.getType())){
 			houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
 		}
+		houseEntity.setId(SnowFlake.nextId());
 		int result = houseMapper.addHouse(houseEntity);
 		if(result == 1){
 			return true;
