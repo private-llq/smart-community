@@ -23,9 +23,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -48,6 +51,10 @@ public class AdminLoginController {
 	
 	@Autowired
 	private MyCaptchaUtil captchaUtil;
+	
+	@Autowired
+	private UserUtils userUtils;
+	
 	/**
 	 * 验证码
 	 */
@@ -115,7 +122,12 @@ public class AdminLoginController {
 	@PostMapping("/sys/logout")
 	@Login
 	public CommonResult<Boolean> logout() {
-		System.out.println(UserUtils.getUserId());
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		String token = request.getHeader("token");
+		if (StrUtil.isBlank(token)) {
+			token = request.getParameter("token");
+		}
+		userUtils.destroyToken("Admin:Login",token);
 		return CommonResult.ok();
 	}
 	

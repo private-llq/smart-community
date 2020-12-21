@@ -75,7 +75,10 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 				return true;
 			}
 		}
-		allowAnonymous(methodAnnotation,classAnnotation);
+		boolean checkPass = allowAnonymous(methodAnnotation,classAnnotation);
+		if(checkPass){
+			return true;
+		}
 		throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
 	}
 	

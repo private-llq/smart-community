@@ -71,11 +71,14 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		if(!StringUtils.isEmpty(token)){
 			AdminInfoVo adminInfoVo = userUtils.getAdminInfo(token);
 			if(adminInfoVo != null){
-				request.setAttribute(UserUtils.USER_KEY, adminInfoVo.getId());
+				request.setAttribute(UserUtils.USER_KEY, adminInfoVo.getUid());
 				return true;
 			}
 		}
-		allowAnonymous(methodAnnotation,classAnnotation);
+		boolean checkPass = allowAnonymous(methodAnnotation, classAnnotation);
+		if(checkPass){
+			return true;
+		}
 		throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
 	}
 	

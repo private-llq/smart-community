@@ -27,7 +27,7 @@ public class AdminInfoVo implements Serializable {
 	/**
 	 * uid
 	 */
-	private Long id;
+	private String uid;
 	
 	/**
 	 * 状态  0：禁用   1：正常

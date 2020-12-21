@@ -9,14 +9,21 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 /**
- * 后台系统用户
+ * 物业端用户
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("t_admin_user")
 public class AdminUserEntity extends BaseEntity {
+	
+	/**
+	 * 用户id
+	 */
+	private String uid;
 	
 	/**
 	 * 用户名

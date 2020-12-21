@@ -98,10 +98,6 @@ public class UserUtils {
 	public static String getUserId() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
-		Long attribute = (Long)request.getAttribute(USER_KEY);
-		System.out.println(attribute);
-		System.out.println(attribute);
-		System.out.println(attribute);
 		return (String) request.getAttribute(USER_KEY);
 	}
 	

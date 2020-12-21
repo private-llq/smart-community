@@ -11,6 +11,8 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
+import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -110,6 +112,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		user.setPassword(new Sha256Hash(user.getPassword(), salt).toHex());
 		user.setSalt(salt);
+		user.setId(SnowFlake.nextId());
+		user.setUid(UserUtils.createUserToken());
 		this.save(user);
 		
 		//检查角色是否越权
@@ -176,7 +180,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			return map;
 		}
 		//TODO token获取uid，查询邀请者姓名invitor
-//		Long userId = JwtUtils.getUserId();
+//		String userId = UserUtils.getUserId();
 		Long userId = 1L;
 		adminUserEntity.setId(userId);
 		String invitor = "张先森";
