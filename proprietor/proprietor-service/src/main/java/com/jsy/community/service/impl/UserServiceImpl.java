@@ -183,6 +183,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         //更新房屋信息
         userHouseService.updateBatchById(proprietorQO.getHouseEntityList());
+
         //业主信息更新
         return userMapper.proprietorUpdate(proprietorQO) > 0;
     }

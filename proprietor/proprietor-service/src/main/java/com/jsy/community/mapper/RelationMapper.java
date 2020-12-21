@@ -43,5 +43,5 @@ public interface RelationMapper {
      * @Param:
      * @return:
      */
-    void updateUserRelationCar(@Param("cars") List<RelationCarsQo> cars);
+    void updateUserRelationCar(RelationCarsQo relationCarsQo);
 }

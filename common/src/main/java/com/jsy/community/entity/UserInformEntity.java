@@ -19,6 +19,9 @@ import lombok.EqualsAndHashCode;
 public class UserInformEntity extends BaseEntity {
     @ApiModelProperty(value = "通知消息ID")
     private Long informId;
+
+    @ApiModelProperty(value = "通默认0社区消息，1表示为系统消息")
+    private Integer sysInform;
     @ApiModelProperty(value = "业主ID")
     private String uid;
     @ApiModelProperty(value = "通知消息是否已读，1表示已读，0表示未读")

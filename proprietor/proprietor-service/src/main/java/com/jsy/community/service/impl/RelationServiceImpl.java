@@ -167,14 +167,21 @@ public class RelationServiceImpl implements IRelationService {
         return houseMemberMapper.selectById(relationId);
     }
 
+    /**
+     * @Description: 修改用户家属和汽车
+     * @author: Hu
+     * @since: 2020/12/21 9:58
+     * @Param:
+     * @return:
+     */
     @Override
     @Transactional
     public void updateUserRelationDetails(RelationQo relationQo) {
-
         relationMapper.updateUserRelationDetails(relationQo);
-
-        relationMapper.updateUserRelationCar(relationQo.getCars());
-
+        List<RelationCarsQo> cars = relationQo.getCars();
+        for (RelationCarsQo relationCarsQo : cars) {
+            relationMapper.updateUserRelationCar(relationCarsQo);
+        }
 
     }
 }

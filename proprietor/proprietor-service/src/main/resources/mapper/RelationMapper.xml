@@ -30,60 +30,57 @@
         update t_house_member
         <set>
             <if test="name!=null">
-                name=#{relationQo.name},
+                name=#{name},
             </if>
             <if test="sex!=null">
-                sex=#{relationQo.sex},
+                sex=#{sex},
             </if>
              <if test="phoneTel!=null">
-                 mobile=#{relationQo.phoneTel},
+                 mobile=#{phoneTel},
             </if>
             <if test="identificationType!=null">
-                identification_type=#{relationQo.identificationType},
+                identification_type=#{identificationType},
             </if>
             <if test="idNumber!=null">
-                id_card=#{relationQo.idNumber},
+                id_card=#{idNumber},
             </if>
             <if test="concern!=null">
-                relation=#{relationQo.concern},
+                relation=#{concern},
             </if>
             <if test="communityId!=null">
-                community_id=#{relationQo.communityId},
+                community_id=#{communityId},
             </if>
             <if test="houseId!=null">
-                house_id=#{relationQo.houseId}
+                house_id=#{houseId}
             </if>
-            where id=#{relationQo.id}
+            where id=#{id}
         </set>
     </update>
-    <update id="updateUserRelationCar" parameterType="List">
-        <foreach collection="cars" item="car">
+    <update id="updateUserRelationCar" parameterType="com.jsy.community.qo.RelationCarsQo">
             update t_car
             <set>
-                <if test="car.carId!=null">
-                    car_plate=#{car.carId},
+                <if test="carId!=null">
+                    car_plate=#{carId},
                 </if>
-                <if test="car.carType!=null">
-                    car_type=#{car.carType},
+                <if test="carType!=null">
+                    car_type=#{carType},
                 </if>
-                <if test="car.carImgURL!=null">
-                    car_image_url=#{car.carImgURL},
+                <if test="carImgURL!=null">
+                    car_image_url=#{carImgURL},
                 </if>
-                <if test="car.drivingLicenseUrl!=null">
-                    driving_license_url=#{car.drivingLicenseUrl},
+                <if test="drivingLicenseUrl!=null">
+                    driving_license_url=#{drivingLicenseUrl},
                 </if>
-                <if test="car.owner!=null">
-                    owner=#{car.owner},
+                <if test="owner!=null">
+                    owner=#{owner},
                 </if>
-                <if test="car.communityId!=null">
-                    community_id=#{car.communityId},
+                <if test="communityId!=null">
+                    community_id=#{communityId},
                 </if>
-
-                <if test="car.checkStatus!=null">
-                    check_status=#{car.checkStatus}
+                <if test="checkStatus!=null">
+                    check_status=#{checkStatus}
                 </if>
-                where id=#{car.id}
             </set>
-        </foreach>
+            where id=#{id}
     </update>
 </mapper>
