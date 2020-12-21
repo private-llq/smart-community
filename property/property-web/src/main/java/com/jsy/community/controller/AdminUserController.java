@@ -10,6 +10,8 @@ import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +73,7 @@ public class AdminUserController {
 		ModelAndView mv = new ModelAndView();
 		// 链接参数有误
 		if(StringUtils.isEmpty(adminUserEntity.getEmail()) || adminUserEntity.getCreateUserId() == null){
-			mv.setViewName("main/error.html");
+			mv.setViewName("mail/error.html");
 			return mv;
 		}
 		Map<String, String> resultMap = adminUserService.activation(adminUserEntity);

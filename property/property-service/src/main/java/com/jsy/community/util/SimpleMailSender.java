@@ -55,16 +55,10 @@ public class SimpleMailSender {
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
 			helper.setFrom(from);
 			helper.setTo(to);
-			helper.setSubject("【智慧社区后台】用户注册");
-			// 根据模板、变量生成内容
-			// 数据模型
-//			List<Pet> pets = new ArrayList<Pet>();
-//			pets.add(new Pet("Polly", "Bird", 2));
-//			pets.add(new Pet("Tom", "Cat", 5));
-//			pets.add(new Pet("Badboy", "Dog", 3));
+			helper.setSubject("【智慧社区物业】用户注册");
 			
+			// 根据模板、变量生成内容
 			Context context = new Context();
-//			context.setVariable("pets", pets);
 			context.setVariable("id", adminUserEntity.getId());
 			context.setVariable("invitor", invitor);
 			context.setVariable("invitee", adminUserEntity.getRealName());

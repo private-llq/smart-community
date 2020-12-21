@@ -2,3 +2,6 @@ server:
   port: 7001
   servlet:
     context-path: /
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/

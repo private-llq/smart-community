@@ -1,0 +1,33 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--<h4 th:text="|Hi, ${customer}, these're your pets|"></h4>-->
+<!--<hr></hr>-->
+
+<!--<table>-->
+<!--  <tr>-->
+<!--    <th>name</th>-->
+<!--    <th>type</th>-->
+<!--    <th>age</th>-->
+<!--  </tr>-->
+<!--  <tr th:each="p : ${pets}">-->
+<!--    <td th:text="a"></td>-->
+<!--    <td th:text="b"></td>-->
+<!--    <td th:text="c"></td>-->
+<!--  </tr>-->
+<!--</table>-->
+<center>
+<h2 th:text="|${invitee}, ${invitor}邀请您加入智慧社区物业管理系统|"></h2>
+<h3>请点击下方链接完成注册</h3>
+<!--<form action="" method="">-->
+<!--  <input th:type="hidden" th:value="一次性凭证"/>-->
+<!--  姓名：<input th:type="text"/>-->
+<!--  手机号：<input th:type="text"/>-->
+<!--  <input th:type="submit" th:value="提交" />-->
+<!--</form>-->
+<a th:href="@{http://localhost:7001/sys/user/activation(email=${email},createUserId=${id})}">点击此处验证</a>
+<!--<a href="'http://localhost:8001/sys/user/activation?email=' + '${email}'">点击此处验证</a>-->
+</center>
+</body>
+</html>
