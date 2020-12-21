@@ -70,7 +70,7 @@ public class SysUserController {
 		ModelAndView mv = new ModelAndView();
 		// 链接参数有误
 		if(StringUtils.isEmpty(sysUserEntity.getEmail()) || sysUserEntity.getCreateUserId() == null){
-			mv.setViewName("main/error.html");
+			mv.setViewName("mail/error.html");
 			return mv;
 		}
 		Map<String, String> resultMap = iSysUserService.activation(sysUserEntity);

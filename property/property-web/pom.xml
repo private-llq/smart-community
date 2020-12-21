@@ -81,6 +81,7 @@
 			<groupId>com.github.axet</groupId>
 			<artifactId>kaptcha</artifactId>
 		</dependency>
+
 	</dependencies>
 
 	<build>
