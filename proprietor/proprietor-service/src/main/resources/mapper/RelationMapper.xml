@@ -22,10 +22,11 @@
         </foreach>
     </insert>
     <!--  通过id查询业主家属  -->
-    <select id="selectID" resultType="com.jsy.community.entity.HouseMemberEntity" parameterType="String">
-        select <include refid="selectId"></include> from t_house_member where householder_id=#{id}
+    <select id="selectID" resultType="com.jsy.community.entity.HouseMemberEntity">
+        select <include refid="selectId"></include> from t_house_member t join t_user_house tu on t.householder_id=tu.uid
+        where t.house_id=tu.house_id and t.householder_id=#{id} and t.house_id=#{houseId}
     </select>
-    <update id="updateUserRelationDetails">
+    <update id="updateUserRelationDetails" parameterType="com.jsy.community.qo.RelationQo">
         update t_house_member
         <set>
             <if test="name!=null">
@@ -79,7 +80,7 @@
                 </if>
 
                 <if test="car.checkStatus!=null">
-                    check_status=#{car.checkStatus},
+                    check_status=#{car.checkStatus}
                 </if>
                 where id=#{car.id}
             </set>

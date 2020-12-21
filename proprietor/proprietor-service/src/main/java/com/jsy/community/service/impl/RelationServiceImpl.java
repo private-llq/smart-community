@@ -106,8 +106,8 @@ public class RelationServiceImpl implements IRelationService {
      * @return
      */
     @Override
-    public List<HouseMemberEntity> selectID(String id) {
-        List<HouseMemberEntity> houseMemberEntities = relationMapper.selectID(id);
+    public List<HouseMemberEntity> selectID(String id,Long houseId) {
+        List<HouseMemberEntity> houseMemberEntities = relationMapper.selectID(id,houseId);
         return houseMemberEntities;
     }
     /**

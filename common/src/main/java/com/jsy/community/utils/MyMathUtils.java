@@ -81,11 +81,11 @@ public class MyMathUtils {
 			codes.add(1l<<i);
 		}
 
-		LinkedList<Long> codes2 = new LinkedList<>(){{
+		LinkedList<Long> codes2 = new LinkedList(){{
 			add(8L);
 			add(64L);
 		}};
-		LinkedList<Long> codes3 = new LinkedList<>(){{
+		LinkedList<Long> codes3 = new LinkedList(){{
 			add(8L);
 			add(32L);
 		}};

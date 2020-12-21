@@ -25,7 +25,7 @@ public interface RelationMapper {
      * 通过业主id查询家属信息
      * @param id
      */
-    List<HouseMemberEntity> selectID(String id);
+    List<HouseMemberEntity> selectID(@Param("id") String id,@Param("houseId") Long houseId);
 
     /**
      * @Description: 修改家属信息
@@ -34,7 +34,7 @@ public interface RelationMapper {
      * @Param:
      * @return:
      */
-    void updateUserRelationDetails(@Param("relationQo") RelationQo relationQo);
+    void updateUserRelationDetails(RelationQo relationQo);
 
     /**
      * @Description: 批量修改车辆信息
