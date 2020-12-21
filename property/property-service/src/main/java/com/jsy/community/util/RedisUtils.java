@@ -5,7 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.intercepter.AuthorizationInterceptor;
+//import com.jsy.community.intercepter.AuthorizationInterceptor;
+import com.jsy.community.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author chq459799974
- * @description 大后台Redis工具类
+ * @description 物业端Redis工具类
  * @since 2020-12-12 15:28
  **/
 @Component
@@ -101,9 +102,9 @@ public class RedisUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/12
 	**/
-	public static String getUid() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (String) request.getAttribute(AuthorizationInterceptor.USER_KEY);
-	}
+//	public static String getUid() {
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (String) request.getAttribute(UserUtils.USER_KEY);
+//	}
 }

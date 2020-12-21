@@ -14,6 +14,7 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.util.MyCaptchaUtil;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.shiro.crypto.hash.Sha256Hash;
@@ -114,7 +115,7 @@ public class AdminLoginController {
 	@PostMapping("/sys/logout")
 	@Login
 	public CommonResult<Boolean> logout() {
-		
+		System.out.println(UserUtils.getUserId());
 		return CommonResult.ok();
 	}
 	

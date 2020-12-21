@@ -1,4 +1,4 @@
-package com.jsy.community.config.web;
+package com.jsy.community.config;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.intercepter.AuthorizationInterceptor;

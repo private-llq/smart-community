@@ -6,7 +6,6 @@ import com.jsy.community.api.IUserLogService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLoginLogEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;

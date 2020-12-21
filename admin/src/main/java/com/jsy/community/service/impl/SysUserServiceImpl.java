@@ -179,7 +179,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 			return map;
 		}
 		//TODO token获取uid，查询邀请者姓名invitor
-//		Long userId = JwtUtils.getUserId();
+//		Long userId = UserUtils.getUserId();
 		Long userId = 1L;
 		sysUserEntity.setId(userId);
 		String invitor = "张先森";

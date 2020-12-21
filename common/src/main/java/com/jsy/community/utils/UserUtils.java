@@ -3,7 +3,6 @@ package com.jsy.community.utils;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.intercepter.AuthorizationInterceptor;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,9 @@ import java.util.concurrent.TimeUnit;
  **/
 @Component
 public class UserUtils {
+	
+	public static final String USER_KEY = "userId";
+	public static final String USER_INFO = "userInfo";
 	
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -83,7 +85,7 @@ public class UserUtils {
 //	public static UserInfoVo getUserInfo() {
 //		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 //			.getRequest();
-//		return (UserInfoVo)request.getAttribute(AuthorizationInterceptor.USER_INFO);
+//		return (UserInfoVo)request.getAttribute(USER_INFO);
 //	}
 	
 	/**
@@ -96,7 +98,11 @@ public class UserUtils {
 	public static String getUserId() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
-		return (String) request.getAttribute(AuthorizationInterceptor.USER_KEY);
+		Long attribute = (Long)request.getAttribute(USER_KEY);
+		System.out.println(attribute);
+		System.out.println(attribute);
+		System.out.println(attribute);
+		return (String) request.getAttribute(USER_KEY);
 	}
 	
 	/**
