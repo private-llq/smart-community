@@ -130,12 +130,22 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         userInformEntity.setInformId(informId);
         userInformEntity.setInformStatus(1);
         userInformEntity.setUid(userId);
+        userInformEntity.setSysInform(0);
         userInformMapper.setInformReadByUser(userInformEntity);
         //社区该消息的浏览量+1
         communityInformMapper.updateCommunityInformBrowseCount(communityId, informId);
         return communityInformEntity;
     }
 
+    /**
+     * 验证社区消息是否存在
+     * @author YuLF
+     * @since  2020/12/21 17:02
+     */
+    @Override
+    public boolean informExist(Long communityId, Long informId) {
+        return communityInformMapper.informExist(communityId, informId);
+    }
 
 
 }

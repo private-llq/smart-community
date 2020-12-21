@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -37,5 +38,11 @@ public interface CommunityInformMapper extends BaseMapper<CommunityInformEntity>
     void updateCommunityInformBrowseCount(@Param("communityId") Long communityId, @Param("informId") Long informId);
 
 
-
+    /**
+     * 验证社区消息是否存在
+     * @author YuLF
+     * @since  2020/12/21 17:02
+     */
+    @Select("select count(*) from t_community_inform where community_id = #{communityId} and id = #{informId}")
+    boolean informExist(@Param("communityId") Long communityId, @Param("informId") Long informId);
 }

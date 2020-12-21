@@ -6,6 +6,7 @@ import com.jsy.community.api.ICommunityInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
@@ -58,6 +59,10 @@ public class CommunityInformController {
     @GetMapping("/details")
     @ApiOperation("用户社区消息详情查看")
     public CommonResult<CommunityInformEntity> detailsCommunityInform(@RequestParam Long communityId, @RequestParam Long informId) {
+        //验证社区消息是否存在
+        if(!communityInformService.informExist(communityId, informId)){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "社区消息不存在!");
+        }
         return CommonResult.ok(communityInformService.detailsCommunityInform(communityId, informId, UserUtils.getUserId()));
     }
 

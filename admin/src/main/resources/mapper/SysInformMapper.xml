@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.SysInformMapper">
+
+	<select id="query" resultType="com.jsy.community.entity.sys.SysInformEntity">
+		SELECT
+			id,
+			title,
+			sub_title,
+			content,
+			enabled,
+			browse_count,
+			create_time
+		FROM
+			t_sys_inform
+		where
+		<trim prefixOverrides="and">
+			<if test="query.title != null and query.title != &quot;&quot;">
+				title like concat('%',#{query.title},'%')
+			</if>
+			<if test="query.subTitle != null and query.subTitle != &quot;&quot;">
+				and sub_title like concat('%',#{query.subTitle},'%')
+			</if>
+			<if test="query.content != null and query.content != &quot;&quot;">
+				and content like concat('%',#{query.content},'%')
+			</if>
+			<if test="query.enabled != null">
+				and enabled = #{query.enabled}
+			</if>
+			and deleted = 0
+		</trim>
+		ORDER BY
+			create_time DESC
+			LIMIT #{page},
+			#{size}
+	</select>
+
+</mapper>
