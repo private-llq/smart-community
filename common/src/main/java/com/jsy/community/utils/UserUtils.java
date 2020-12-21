@@ -5,6 +5,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
 import com.jsy.community.vo.UserInfoVo;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -31,7 +32,7 @@ public class UserUtils {
 	private RedisTemplate redisTemplate;
 	
 	/**
-	* @Description: 通过token获取用户信息
+	* @Description: 通过token获取用户信息(业主端)
 	 * @Param: [loginToken]
 	 * @Return: com.jsy.community.vo.UserInfoVo
 	 * @Author: chq459799974
@@ -52,17 +53,38 @@ public class UserUtils {
 	}
 	
 	/**
+	* @Description: 通过token获取用户信息(物业端)
+	 * @Param: [loginToken]
+	 * @Return: com.jsy.community.vo.admin.AdminInfoVo
+	 * @Author: chq459799974
+	 * @Date: 2020/12/21
+	**/
+	public AdminInfoVo getAdminInfo(String loginToken) {
+		if(StringUtils.isEmpty(loginToken)){
+			return null;
+		}
+		String str = null;
+		try {
+			str = stringRedisTemplate.opsForValue().get("Admin:Login:" + loginToken);
+		} catch (Exception e) {
+			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
+		}
+		AdminInfoVo adminUser = JSONObject.parseObject(str, AdminInfoVo.class);
+		return adminUser;
+	}
+	
+	/**
 	* @Description: 获取request域中用户信息(登录用户自己的信息)
 	 * @Param: []
 	 * @Return: com.jsy.community.vo.UserInfoVo
 	 * @Author: chq459799974
 	 * @Date: 2020/12/3
 	**/
-	public static UserInfoVo getUserInfo() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (UserInfoVo)request.getAttribute(AuthorizationInterceptor.USER_INFO);
-	}
+//	public static UserInfoVo getUserInfo() {
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (UserInfoVo)request.getAttribute(AuthorizationInterceptor.USER_INFO);
+//	}
 	
 	/**
 	* @Description: 获取request域中用户id(登录用户自己的uid)

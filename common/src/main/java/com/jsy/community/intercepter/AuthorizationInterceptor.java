@@ -9,9 +9,11 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.UserInfoVo;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -64,17 +66,37 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		} else {
 			return true;
 		}
-		
+		//业主端token
 		String token = request.getHeader("token");
 		if (StrUtil.isBlank(token)) {
 			token = request.getParameter("token");
 		}
-		UserInfoVo userInfo = userUtils.getUserInfo(token);
-		if(userInfo != null){
-			request.setAttribute(USER_INFO, userInfo);
-			request.setAttribute(USER_KEY, userInfo.getUid());
+		if(!StringUtils.isEmpty(token)){
+			UserInfoVo userInfo = userUtils.getUserInfo(token);
+			if(userInfo != null){
+	//			request.setAttribute(USER_INFO, userInfo);
+				request.setAttribute(USER_KEY, userInfo.getUid());
+				return true;
+			}
+		}else{
+			//物业端token
+			String aToken = request.getHeader("aToken");
+			if (StrUtil.isBlank(aToken)) {
+				aToken = request.getParameter("aToken");
+			}
+			if(!StringUtils.isEmpty(aToken)){
+				AdminInfoVo adminInfoVo = userUtils.getAdminInfo(aToken);
+				if(adminInfoVo != null){
+					request.setAttribute(USER_KEY, adminInfoVo.getId());
+					return true;
+				}
+			}
 		}
-		
+		allowAnonymous(methodAnnotation,classAnnotation);
+		throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
+	}
+	
+	private boolean allowAnonymous(Login methodAnnotation, Login classAnnotation){
 		if (methodAnnotation == null && classAnnotation == null) {
 			// 都没有
 			return true;
@@ -89,12 +111,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			// 注解在类中，并且允许匿名访问
 			return true;
 		}
-		
-		if(userInfo == null){
-			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
-		}
-		
-		return true;
+		return false;
 	}
 	
 	private String readBody(HttpServletRequest request){

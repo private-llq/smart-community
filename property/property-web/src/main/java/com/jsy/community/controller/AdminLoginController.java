@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminCaptchaService;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
@@ -111,6 +112,7 @@ public class AdminLoginController {
 	 * 退出
 	 */
 	@PostMapping("/sys/logout")
+	@Login
 	public CommonResult<Boolean> logout() {
 		
 		return CommonResult.ok();
