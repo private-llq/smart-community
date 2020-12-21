@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminCaptchaService;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
@@ -13,6 +14,7 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.util.MyCaptchaUtil;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.shiro.crypto.hash.Sha256Hash;
@@ -21,9 +23,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -46,6 +51,10 @@ public class AdminLoginController {
 	
 	@Autowired
 	private MyCaptchaUtil captchaUtil;
+	
+	@Autowired
+	private UserUtils userUtils;
+	
 	/**
 	 * 验证码
 	 */
@@ -111,8 +120,14 @@ public class AdminLoginController {
 	 * 退出
 	 */
 	@PostMapping("/sys/logout")
+	@Login
 	public CommonResult<Boolean> logout() {
-		
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		String token = request.getHeader("token");
+		if (StrUtil.isBlank(token)) {
+			token = request.getParameter("token");
+		}
+		userUtils.destroyToken("Admin:Login",token);
 		return CommonResult.ok();
 	}
 	

@@ -3,15 +3,16 @@ package com.jsy.community.intercepter;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.auth.Auth;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.UserInfoVo;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -25,8 +26,6 @@ import java.io.IOException;
  */
 @Component
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
-	public static final String USER_KEY = "userId";
-	public static final String USER_INFO = "userInfo";
 	
 	@Autowired
 	private UserUtils userUtils;
@@ -69,12 +68,21 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		if (StrUtil.isBlank(token)) {
 			token = request.getParameter("token");
 		}
-		UserInfoVo userInfo = userUtils.getUserInfo(token);
-		if(userInfo != null){
-			request.setAttribute(USER_INFO, userInfo);
-			request.setAttribute(USER_KEY, userInfo.getUid());
+		if(!StringUtils.isEmpty(token)){
+			AdminInfoVo adminInfoVo = userUtils.getAdminInfo(token);
+			if(adminInfoVo != null){
+				request.setAttribute(UserUtils.USER_KEY, adminInfoVo.getUid());
+				return true;
+			}
 		}
-		
+		boolean checkPass = allowAnonymous(methodAnnotation, classAnnotation);
+		if(checkPass){
+			return true;
+		}
+		throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
+	}
+	
+	private boolean allowAnonymous(Login methodAnnotation, Login classAnnotation){
 		if (methodAnnotation == null && classAnnotation == null) {
 			// 都没有
 			return true;
@@ -89,12 +97,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			// 注解在类中，并且允许匿名访问
 			return true;
 		}
-		
-		if(userInfo == null){
-			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
-		}
-		
-		return true;
+		return false;
 	}
 	
 	private String readBody(HttpServletRequest request){

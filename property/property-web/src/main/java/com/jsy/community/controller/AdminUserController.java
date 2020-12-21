@@ -1,22 +1,29 @@
 package com.jsy.community.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -32,6 +39,9 @@ public class AdminUserController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;
+	
+	@Autowired
+	private UserUtils userUtils;
 
 	/**
 	* @Description: 设置用户角色
@@ -57,6 +67,14 @@ public class AdminUserController {
 	@PostMapping("invitation")
 	public CommonResult invitation(@RequestBody AdminUserEntity sysUserEntity) {
 		ValidatorUtils.validateEntity(sysUserEntity,AdminUserEntity.inviteUserValidatedGroup.class);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		String token = request.getHeader("token");
+		if (StrUtil.isBlank(token)) {
+			token = request.getParameter("token");
+		}
+		AdminInfoVo adminInfo = userUtils.getAdminInfo(token);
+		sysUserEntity.setCreateUserName(adminInfo.getRealName());//邀请者姓名
+		sysUserEntity.setCreateUserId(UserUtils.getUserId());//邀请者uid
 		Map<String, String> resultMap = adminUserService.invitation(sysUserEntity);
 		return Boolean.parseBoolean(resultMap.get("result")) ? CommonResult.ok() : CommonResult.error(JSYError.REQUEST_PARAM.getCode(),resultMap.get("reason"));
 	}

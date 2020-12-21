@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.intercepter.AuthorizationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,6 +24,9 @@ import java.util.concurrent.TimeUnit;
  **/
 @Component
 public class RedisUtils {
+	
+	public static final String USER_KEY = "userId";
+	public static final String USER_INFO = "userInfo";
 	
 	@Value("${loginExpireHour}")
 	private long loginExpireHour;
@@ -104,6 +106,6 @@ public class RedisUtils {
 	public static String getUid() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
-		return (String) request.getAttribute(AuthorizationInterceptor.USER_KEY);
+		return (String) request.getAttribute(USER_KEY);
 	}
 }

@@ -29,7 +29,7 @@ public class AdminUserTokenServiceImpl extends ServiceImpl<AdminUserTokenMapper,
 		try {
 			redisUtils.setUserToken(token,user);
 		} catch (Exception e){
-			throw new JSYException(JSYError.INTERNAL);
+			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
 		}
 		
 		return token;
