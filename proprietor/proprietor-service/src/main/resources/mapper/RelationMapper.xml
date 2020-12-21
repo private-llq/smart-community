@@ -3,15 +3,15 @@
 <mapper namespace="com.jsy.community.mapper.RelationMapper">
 
 <sql id="selectId">
-        id,
-        householder_id,
-        community_id,
-        house_id,
-        name,
-        sex,
-        mobile,
-        id_card,
-        relation
+        t.id,
+        t.householder_id,
+        t.community_id,
+        t.house_id,
+        t.name,
+        t.sex,
+        t.mobile,
+        t.id_card,
+        t.relation
 </sql>
 <!--  添加车辆  -->
     <insert id="addCars" parameterType="List">
@@ -56,7 +56,7 @@
             where id=#{relationQo.id}
         </set>
     </update>
-    <update id="updateUserRelationCar">
+    <update id="updateUserRelationCar" parameterType="List">
         <foreach collection="cars" item="car">
             update t_car
             <set>
