@@ -30,6 +30,11 @@ public class AdminInfoVo implements Serializable {
 	private String uid;
 	
 	/**
+	 * 昵称
+	 */
+	private String realName;
+	
+	/**
 	 * 状态  0：禁用   1：正常
 	 */
 	private Integer status;

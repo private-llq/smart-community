@@ -160,7 +160,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			return;
 		}
 		//如果不是超级管理员，则需要判断用户的角色是否自己创建
-		if (user.getCreateUserId() == Constant.SUPER_ADMIN) {
+		if (Constant.SUPER_ADMIN.equals(user.getCreateUserId())) {
 			return;
 		}
 	}
@@ -179,15 +179,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			map.put("reason","用户已注册，无需邀请");
 			return map;
 		}
-		//TODO token获取uid，查询邀请者姓名invitor
-//		String userId = UserUtils.getUserId();
-		Long userId = 1L;
-		adminUserEntity.setId(userId);
-		String invitor = "张先森";
 		//redis暂存邮件邀请
 		redisTemplate.opsForValue().set("AdminInvite:" + adminUserEntity.getEmail(),adminUserEntity.getRealName(),emailLinkExpiretime, TimeUnit.HOURS);
 		//发送邀请邮件
-		simpleMailSender.sendRegisterEmail("mail/invite.html",adminUserEntity,invitor);
+		simpleMailSender.sendRegisterEmail("mail/invite.html",adminUserEntity);
 		map.put("result","true");
 		return map;
 	}
@@ -235,7 +230,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		AdminUserEntity noticeEntity = new AdminUserEntity();
 		noticeEntity.setEmail(adminUserEntity.getEmail());
 		noticeEntity.setPassword(password);
-		simpleMailSender.sendRegisterEmail("mail/activation.html",noticeEntity,null);
+		simpleMailSender.sendRegisterEmail("mail/activation.html",noticeEntity);
 		return map;
 	}
 	

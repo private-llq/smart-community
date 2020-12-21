@@ -7,7 +7,7 @@ public class Constant {
 	/**
 	 * 超级管理员ID
 	 */
-	public static final int SUPER_ADMIN = 1;
+	public static final String SUPER_ADMIN = "sys";
 	/**
 	 * 当前页码
 	 */

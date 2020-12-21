@@ -54,6 +54,9 @@ public class AdminUserEntity extends BaseEntity {
 	 */
 	private String mobile;
 	
+	/**
+	 * 昵称
+	 */
 	private String nickname;
 	
 	@NotBlank(groups = {inviteUserValidatedGroup.class}, message = "人员姓名不能为空")
@@ -79,7 +82,13 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 创建者ID
 	 */
-	private Long createUserId;
+	private String createUserId;
+	
+	/**
+	 * 创建者姓名
+	 */
+	@TableField(exist = false)
+	private String createUserName;
 	
 	/**
 	 * token
