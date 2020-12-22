@@ -34,7 +34,7 @@ public class SelectCommunityFunController {
         Map<String, Object> map = selectCommunityFunService.findList(communityFunQO);
         return CommonResult.ok(map);
     }
-    @ApiOperation("查询一条社区趣事详情")
+    @ApiOperation("查询一条社区趣事详情传入id")
     @GetMapping("/findFunOne")
     public CommonResult<CommunityFunEntity> findOne(@RequestParam("id")Long id) {
         CommunityFunEntity communityFunEntity=selectCommunityFunService.findFunOne(id);
