@@ -1,6 +1,5 @@
 package com.jsy.community.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,10 +28,10 @@ public class UserHouseEntity extends BaseEntity {
     @ApiModelProperty(value = "社区id")
     private Long communityId;
     
-    @ApiModelProperty(value = "楼栋(门禁)id", hidden = true)
+    @ApiModelProperty(value = "房间(门禁)id", hidden = true)
     private Long buildingId;
 
-    @ApiModelProperty(value = "房间ID")
+    @ApiModelProperty(value = "房间ID(业主查自己房屋用)")
     private Long houseId;
     
     @ApiModelProperty(value = "是否通过审核 0.否 1.是 2.审核中")

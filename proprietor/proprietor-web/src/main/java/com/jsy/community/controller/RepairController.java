@@ -98,8 +98,6 @@ public class RepairController {
 	@PostMapping("/addRepair")
 	public CommonResult addRepair(@RequestBody RepairEntity repairEntity) {
 		ValidatorUtils.validateEntity(repairEntity, RepairEntity.addRepairValidate.class);
-//		String filePath = repairEntity.getRepairImg();
-//		redisTemplate.opsForSet().add("repair_img_all", filePath);
 		String uid = UserUtils.getUserId();
 		repairService.addRepair(repairEntity, uid);
 		return CommonResult.ok();
