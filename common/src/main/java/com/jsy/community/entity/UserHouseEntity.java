@@ -30,10 +30,10 @@ public class UserHouseEntity extends BaseEntity {
     private Long communityId;
     
     @ApiModelProperty(value = "房间(门禁)id", hidden = true)
+    @TableField(exist = false)
     private Long buildingId;
 
     @ApiModelProperty(value = "房间ID(业主查自己房屋用)")
-    @TableField(exist = false)
     private Long houseId;
     
     @ApiModelProperty(value = "是否通过审核 0.否 1.是 2.审核中")
