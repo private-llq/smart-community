@@ -25,7 +25,7 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
 	**/
-	@Select("select community_id,building_id as houseId from t_user_house where check_status = 1 and uid = #{uid} order by create_time")
+	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid} order by create_time")
 	List<UserHouseEntity> queryUserCommunityIds(String uid);
 	
 	/**
@@ -35,7 +35,7 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/17
 	**/
-	@Select("select community_id,building_id as houseId from t_user_house where check_status = 1 and uid = #{uid}")
+	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid}")
 	List<UserHouseEntity> queryUserHouses(String uid);
 
 
