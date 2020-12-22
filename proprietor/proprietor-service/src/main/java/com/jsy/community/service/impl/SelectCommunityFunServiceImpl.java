@@ -49,4 +49,11 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
         return selectCommunityFunMapper.selectById(id);
 
     }
+
+    @Override
+    public void saveViewCount(Long id) {
+        CommunityFunEntity communityFunEntity = selectCommunityFunMapper.selectById(id);
+        communityFunEntity.setViewCount(communityFunEntity.getViewCount()+1);
+        selectCommunityFunMapper.updateById(communityFunEntity);
+    }
 }

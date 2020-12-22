@@ -40,4 +40,10 @@ public class SelectCommunityFunController {
         CommunityFunEntity communityFunEntity=selectCommunityFunService.findFunOne(id);
         return CommonResult.ok(communityFunEntity);
     }
+    @ApiOperation("社区趣事浏览次数")
+    @GetMapping("/saveViewCount")
+    public CommonResult saveViewCount(@RequestParam("id")Long id) {
+        selectCommunityFunService.saveViewCount(id);
+        return CommonResult.ok();
+    }
 }

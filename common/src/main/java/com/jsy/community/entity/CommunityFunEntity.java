@@ -21,6 +21,10 @@ import java.time.LocalDateTime;
 public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "社区趣事标题")
     private String titleName;
+
+    @ApiModelProperty(value = "社区趣事浏览次数")
+    private Integer viewCount;
+
     @ApiModelProperty(value = "社区趣事内容")
     private String content;
     @ApiModelProperty(value = "社区趣事缩略图地址")
