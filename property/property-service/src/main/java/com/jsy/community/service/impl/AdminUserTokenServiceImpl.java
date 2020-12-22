@@ -2,11 +2,11 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserTokenService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.entity.admin.AdminUserTokenEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdminUserTokenMapper;
 import com.jsy.community.util.RedisUtils;
 import com.jsy.community.util.TokenGenerator;
@@ -29,7 +29,7 @@ public class AdminUserTokenServiceImpl extends ServiceImpl<AdminUserTokenMapper,
 		try {
 			redisUtils.setUserToken(token,user);
 		} catch (Exception e){
-			throw new JSYException(JSYError.INTERNAL);
+			throw new PropertyException(JSYError.INTERNAL.getCode(),"redis超时");
 		}
 		
 		return token;

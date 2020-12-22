@@ -9,14 +9,21 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 /**
- * 后台系统用户
+ * 物业端用户
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("t_admin_user")
 public class AdminUserEntity extends BaseEntity {
+	
+	/**
+	 * 用户id
+	 */
+	private String uid;
 	
 	/**
 	 * 用户名
@@ -47,6 +54,9 @@ public class AdminUserEntity extends BaseEntity {
 	 */
 	private String mobile;
 	
+	/**
+	 * 昵称
+	 */
 	private String nickname;
 	
 	@NotBlank(groups = {inviteUserValidatedGroup.class}, message = "人员姓名不能为空")
@@ -72,7 +82,13 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 创建者ID
 	 */
-	private Long createUserId;
+	private String createUserId;
+	
+	/**
+	 * 创建者姓名
+	 */
+	@TableField(exist = false)
+	private String createUserName;
 	
 	/**
 	 * token

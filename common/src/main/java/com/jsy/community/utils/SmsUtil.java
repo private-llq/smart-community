@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 **/
 @Component
 public class SmsUtil {
+    //TODO 后期重载几个方法 templateName不用传
     public static Map<String,String> sendSms(String phonenumber,String templateName) {
         //TODO templateName模板名待申请
         //TODO signName签名待申请(如有需要)

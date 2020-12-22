@@ -11,6 +11,8 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
+import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -103,6 +105,11 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	}
 	
 	@Override
+	public AdminUserEntity queryByMobile(String mobile) {
+		return baseMapper.queryByMobile(mobile);
+	}
+	
+	@Override
 	@Transactional
 	public void saveUser(AdminUserEntity user) {
 		user.setCreateTime(LocalDateTime.now());
@@ -110,6 +117,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		user.setPassword(new Sha256Hash(user.getPassword(), salt).toHex());
 		user.setSalt(salt);
+		user.setId(SnowFlake.nextId());
+		user.setUid(UserUtils.createUserToken());
 		this.save(user);
 		
 		//检查角色是否越权
@@ -156,7 +165,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			return;
 		}
 		//如果不是超级管理员，则需要判断用户的角色是否自己创建
-		if (user.getCreateUserId() == Constant.SUPER_ADMIN) {
+		if (Constant.SUPER_ADMIN.equals(user.getCreateUserId())) {
 			return;
 		}
 	}
@@ -175,15 +184,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			map.put("reason","用户已注册，无需邀请");
 			return map;
 		}
-		//TODO token获取uid，查询邀请者姓名invitor
-//		Long userId = JwtUtils.getUserId();
-		Long userId = 1L;
-		adminUserEntity.setId(userId);
-		String invitor = "张先森";
 		//redis暂存邮件邀请
 		redisTemplate.opsForValue().set("AdminInvite:" + adminUserEntity.getEmail(),adminUserEntity.getRealName(),emailLinkExpiretime, TimeUnit.HOURS);
 		//发送邀请邮件
-		simpleMailSender.sendRegisterEmail("mail/invite.html",adminUserEntity,invitor);
+		simpleMailSender.sendRegisterEmail("mail/invite.html",adminUserEntity);
 		map.put("result","true");
 		return map;
 	}
@@ -231,7 +235,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		AdminUserEntity noticeEntity = new AdminUserEntity();
 		noticeEntity.setEmail(adminUserEntity.getEmail());
 		noticeEntity.setPassword(password);
-		simpleMailSender.sendRegisterEmail("mail/activation.html",noticeEntity,null);
+		simpleMailSender.sendRegisterEmail("mail/activation.html",noticeEntity);
 		return map;
 	}
 	

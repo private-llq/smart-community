@@ -10,7 +10,6 @@ import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
-import com.jsy.community.utils.JwtUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -43,7 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserAuthService userAuthService;
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
@@ -183,6 +183,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         //更新房屋信息
         userHouseService.updateBatchById(proprietorQO.getHouseEntityList());
+
         //业主信息更新
         return userMapper.proprietorUpdate(proprietorQO) > 0;
     }

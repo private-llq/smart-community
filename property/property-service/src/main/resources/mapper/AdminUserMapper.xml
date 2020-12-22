@@ -39,4 +39,10 @@
 		from t_admin_user
 		where email = #{email}
 	</select>
+
+	<select id="queryByMobile" resultType="com.jsy.community.entity.admin.AdminUserEntity">
+		select *
+		from t_admin_user
+		where mobile = #{mobile}
+	</select>
 </mapper>

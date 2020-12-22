@@ -2,10 +2,12 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserInformEntity;
+import com.jsy.community.entity.sys.SysInformEntity;
 import com.jsy.community.vo.CommunityVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -17,14 +19,15 @@ public interface UserInformMapper extends BaseMapper<UserInformEntity> {
      * @since  2020/12/14 9:35
      * @Param
      */
-    @Select("select inform_id from t_user_inform where community_id = #{communityId} and uid = #{uid} and inform_status = 1")
+    @Select("select inform_id from t_user_inform where community_id = #{communityId} and uid = #{uid} and inform_status = 1 and sys_inform = 0")
     List<Long> queryUserReadCommunityInform(@Param("communityId") Long communityId, @Param("uid") String uid);
 
     /**
-     *  插入一条信息标识用户消息已读
+     *  t_user_inform插入一条信息标识用户 该社区消息已读
      * @author YuLF
      * @since  2020/12/14 9:35
-     * @Param
+     * @Param  userInformEntity     消息实体和用户信息
+     * @Param  sysInform            标识该消息是社区消息还是实体消息
      */
     void setInformReadByUser(UserInformEntity userInformEntity);
 
@@ -76,5 +79,39 @@ public interface UserInformMapper extends BaseMapper<UserInformEntity> {
      * @Param   communityId
      * @return  社区相关信息
      */
-    CommunityVO queryCommunityInform(Long communityId);
+    CommunityVO queryCommunityInform(@Param("communityId") Long communityId);
+
+    /**
+     *  用户系统消息详情数据返回方法
+     * @author YuLF
+     * @since  2020/12/21 14:55
+     */
+    @Select("SELECT id,title,sub_title,content,enabled,browse_count,create_time FROM t_sys_inform WHERE id = #{informId}")
+    SysInformEntity querySysInformById(@Param("informId") Long informId);
+
+
+    /**
+     * 系统消息浏览次数增量+1
+     * @param informId      系统消息id
+     */
+    @Update("update t_sys_inform set browse_count = browse_count+1 where id = #{informId}")
+    void incrementSysInformBrowse(@Param("informId") Long informId);
+
+    /**
+     * 查询该用户已读未读消息表 中 系统已读消息 计数
+     * @param userId        用户id
+     * @return              返回用户已读系统消息的次数
+     */
+    @Select("select count(*) from t_user_inform where uid = #{uid} and sys_inform = 1")
+    Integer querySysReadInform(@Param("uid") String userId);
+
+    //查询最新时间第一条系统消息的标题与时间
+    CommunityVO querySysInform();
+
+    //系统消息总计数
+    @Select("select count(*) from t_sys_inform")
+    Integer querySysInformCount();
+
+    @Select("select count(*) from t_sys_inform where id = #{informId}")
+    Integer sysInformExist(@Param("informId") Long informId);
 }

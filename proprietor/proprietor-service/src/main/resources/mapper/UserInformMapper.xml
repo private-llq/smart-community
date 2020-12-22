@@ -2,25 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.UserInformMapper">
     <!-- 向t_user_inform数据表插入 当前社区消息状态的用户已读信息 记录 -->
-    <select id="setInformReadByUser" >
+    <insert id="setInformReadByUser" >
         insert into t_user_inform
-        (id,inform_id,uid,inform_status,community_id)
-        select #{id},#{informId},#{userId},#{informStatus},#{communityId}
+        (id,inform_id,uid,inform_status,community_id,sys_inform)
+        select #{id},#{informId},#{uid},#{informStatus},#{communityId},#{sysInform}
         from dual where not exists
-        (select id,inform_id,uid,inform_status,community_id from t_user_inform where uid = #{userId} and inform_id = #{informId});
-    </select>
+        (select id,inform_id,uid,inform_status,community_id,sys_inform from t_user_inform where uid = #{uid} and inform_id = #{informId});
+    </insert>
 
     <!-- 按用户ID查出用户所在社区id列表 -->
     <select id="queryUserAllCommunityId" resultType="java.lang.Long">
         select DISTINCT community_id from t_user_house where uid = #{userId} limit #{page},#{size}
     </select>
 
-    <!-- 根据id查询社区相关信息 -->
+    <!-- 根据id查询社区相关消息 -->
     <select id="queryCommunityInform" resultMap="queryCommunityInformMap">
-        select c.id,c.name,c.icon_url,i.title,i.create_time from t_community as c
-        left JOIN t_community_inform as i
-        on c.id = i.community_id
-        where community_id = 1 ORDER BY i.create_time desc LIMIT 1
+        SELECT
+	        c.id,
+	        c.NAME,
+	        c.icon_url,
+	        i.title,
+	        i.create_time
+        FROM
+	        t_community AS c
+	        LEFT JOIN t_community_inform AS i ON c.id = i.community_id
+        WHERE
+	        community_id = #{communityId} ORDER BY i.create_time desc LIMIT 1
     </select>
     <resultMap id="queryCommunityInformMap" type="com.jsy.community.vo.CommunityVO">
         <id column="id" property="id"/>
@@ -29,4 +36,15 @@
         <result column="title" property="unreadInformTitle"/>
         <result column="create_time" property="unreadInformCreateTime"/>
     </resultMap>
+    
+    <!-- 查询最新时间第一条系统消息的标题与时间 -->
+    <select id="querySysInform" resultMap="querySysInformMap">
+        select id,title,create_time from t_sys_inform ORDER BY create_time desc limit 1
+    </select>
+    <resultMap id="querySysInformMap" type="com.jsy.community.vo.CommunityVO">
+        <id column="id" property="id"/>
+        <result column="title" property="unreadInformTitle"/>
+        <result column="create_time" property="unreadInformCreateTime"/>
+    </resultMap>
+
 </mapper>

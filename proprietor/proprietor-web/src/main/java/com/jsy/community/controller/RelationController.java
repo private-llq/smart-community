@@ -83,6 +83,7 @@ public class RelationController {
     @PostMapping("/updateUserRelationDetails")
     @Login
     public CommonResult updateByRelationId(@RequestBody RelationQo relationQo){
+        System.out.println(relationQo);
         String userId = UserUtils.getUserId();
         relationService.updateUserRelationDetails(relationQo);
         return CommonResult.ok();

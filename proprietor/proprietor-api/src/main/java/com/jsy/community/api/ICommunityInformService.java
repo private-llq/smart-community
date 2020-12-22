@@ -60,4 +60,10 @@ public interface ICommunityInformService extends IService<CommunityInformEntity>
     CommunityInformEntity detailsCommunityInform(Long communityId, Long informId ,String userId);
 
 
+    /**
+     * 验证社区消息是否存在
+     * @author YuLF
+     * @since  2020/12/21 17:02
+     */
+    boolean informExist(Long communityId, Long informId);
 }

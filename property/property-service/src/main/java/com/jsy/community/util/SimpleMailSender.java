@@ -38,7 +38,7 @@ public class SimpleMailSender {
 	@Autowired
 	private TemplateEngine templateEngine;
 	
-	public void sendRegisterEmail(String template, AdminUserEntity adminUserEntity, String invitor)  {
+	public void sendRegisterEmail(String template, AdminUserEntity adminUserEntity)  {
 		
 		String to = adminUserEntity.getEmail();
 		
@@ -59,8 +59,8 @@ public class SimpleMailSender {
 			
 			// 根据模板、变量生成内容
 			Context context = new Context();
-			context.setVariable("id", adminUserEntity.getId());
-			context.setVariable("invitor", invitor);
+			context.setVariable("uid", adminUserEntity.getCreateUserId());
+			context.setVariable("invitor", adminUserEntity.getCreateUserName());
 			context.setVariable("invitee", adminUserEntity.getRealName());
 			context.setVariable("email", adminUserEntity.getEmail());
 			context.setVariable("password", adminUserEntity.getPassword());

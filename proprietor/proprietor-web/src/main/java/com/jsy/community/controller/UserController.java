@@ -56,7 +56,7 @@ public class UserController {
     @Auth
     public String test(@RequestBody BaseQO<UserEntity> qo) {
         ValidatorUtils.validateEntity(qo);
-        UserInfoVo userInfo = UserUtils.getUserInfo();
+//        UserInfoVo userInfo = UserUtils.getUserInfo();
         UserUtils.getUserId();
         System.out.println("111111111111....");
         if(true){
