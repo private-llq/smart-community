@@ -14,6 +14,7 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.util.MyCaptchaUtil;
+import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -90,7 +91,9 @@ public class AdminLoginController {
 		
 		//用户信息
 		AdminUserEntity user;
-		if(form.getUsername().contains("@")){
+		if(RegexUtils.isMobile(form.getUsername())){
+			user = adminUserService.queryByMobile(form.getUsername());
+		}else if(RegexUtils.isEmail(form.getUsername())){
 			user = adminUserService.queryByEmail(form.getUsername());
 		}else{
 			user = adminUserService.queryByUserName(form.getUsername());

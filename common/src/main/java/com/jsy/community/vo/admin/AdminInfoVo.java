@@ -30,7 +30,7 @@ public class AdminInfoVo implements Serializable {
 	private String uid;
 	
 	/**
-	 * 昵称
+	 * 姓名
 	 */
 	private String realName;
 	

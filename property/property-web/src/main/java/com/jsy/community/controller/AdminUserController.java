@@ -1,11 +1,15 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.utils.MyMathUtils;
+import com.jsy.community.utils.SmsUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -13,8 +17,10 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -25,6 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author chq459799974
@@ -42,6 +49,12 @@ public class AdminUserController {
 	
 	@Autowired
 	private UserUtils userUtils;
+	
+	@Autowired
+	private SmsUtil smsUtil;
+	
+	@Autowired
+	private StringRedisTemplate stringRedisTemplate;
 
 	/**
 	* @Description: 设置用户角色
@@ -64,8 +77,9 @@ public class AdminUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
-	@PostMapping("invitation")
-	public CommonResult invitation(@RequestBody AdminUserEntity sysUserEntity) {
+	@Login
+	@PostMapping("invitation/email")
+	public CommonResult invitationOfEmail(@RequestBody AdminUserEntity sysUserEntity) {
 		ValidatorUtils.validateEntity(sysUserEntity,AdminUserEntity.inviteUserValidatedGroup.class);
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		String token = request.getHeader("token");
@@ -86,8 +100,8 @@ public class AdminUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
-	@GetMapping("activation")
-	public ModelAndView activation(AdminUserEntity adminUserEntity){
+	@GetMapping("activation/email")
+	public ModelAndView activationOfEmail(AdminUserEntity adminUserEntity){
 		ModelAndView mv = new ModelAndView();
 		// 链接参数有误
 		if(StringUtils.isEmpty(adminUserEntity.getEmail()) || adminUserEntity.getCreateUserId() == null){
@@ -135,5 +149,34 @@ public class AdminUserController {
 		Long uid = 1L;
 		return CommonResult.ok();
 	}
-
+	
+	//手机号邀请用户
+	@GetMapping("invitation/mobile")
+	@Login
+	public CommonResult invitationOfMobile(@RequestParam String mobile){
+		//发短信
+//		smsUtil.sendSms(mobile,"");
+		//redis存验证码
+		String code = MyMathUtils.randomCode(6);
+		stringRedisTemplate.opsForValue().set("Admin:Invit:" + mobile,code);
+		return CommonResult.ok();
+	}
+	
+	//手机号用户注册
+	@GetMapping("activation/mobile")
+	public CommonResult<AdminUserEntity> activationOfMobile(@RequestParam String mobile, @RequestParam String code){
+		//redis验证短信
+		String savedCode = stringRedisTemplate.opsForValue().get("Admin:Invit:" + mobile);
+		//保存用户
+		AdminUserEntity user = new AdminUserEntity();
+		if(code.equals(savedCode)){
+			user.setMobile(mobile);
+			//生成随机初始密码
+			String password = UUID.randomUUID().toString().substring(0, 6);
+			user.setPassword(password);
+			adminUserService.saveUser(user);
+		}
+		return CommonResult.ok(user);
+	}
+	
 }
