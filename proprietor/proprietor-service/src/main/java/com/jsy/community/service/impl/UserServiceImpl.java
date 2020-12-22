@@ -43,7 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserAuthService userAuthService;
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
