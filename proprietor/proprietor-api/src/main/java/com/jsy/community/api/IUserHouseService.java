@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -32,7 +33,7 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
 	**/
-	List<Long> queryUserCommunityIds(String uid);
+	List<UserHouseEntity> queryUserCommunityIds(String uid);
 	
 	/**
 	* @Description: 查询业主房屋及所属社区

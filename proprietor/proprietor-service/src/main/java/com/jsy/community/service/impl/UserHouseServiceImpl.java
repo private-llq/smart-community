@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -63,7 +64,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 * @Date: 2020/12/16
 	 **/
 	@Override
-	public List<Long> queryUserCommunityIds(String uid){
+	public List<UserHouseEntity> queryUserCommunityIds(String uid){
 		return userHouseMapper.queryUserCommunityIds(uid);
 	}
 	

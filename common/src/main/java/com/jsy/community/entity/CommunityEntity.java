@@ -57,7 +57,9 @@ public class CommunityEntity extends BaseEntity {
     private String distanceString;//定位距离(显示用)
     @TableField(exist=false)
     private Integer houseLevelMode;//定位距离(显示用)
-
+    
+    @TableField(exist=false)
+    private Long houseId;//房屋ID 小区定位返回用
 
 
 }

@@ -8,6 +8,7 @@ import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
@@ -126,8 +127,16 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	@Override
 	public CommunityEntity locateCommunity(String uid,Map<String,Double> location){
 		// 查业主房屋所属社区id
-		List<Long> communityIds = userHouseService.queryUserCommunityIds(uid);
-		return communityMapper.locateCommunity(communityIds,location);
+		List<UserHouseEntity> userHouseList = userHouseService.queryUserCommunityIds(uid);
+		List<Long> communityIds = new LinkedList<>();
+		Long userHouseId = null;
+		for(UserHouseEntity userHouseEntity : userHouseList){
+			communityIds.add(userHouseEntity.getCommunityId());
+			userHouseId = userHouseEntity.getHouseId();
+		}
+		CommunityEntity communityEntity = communityMapper.locateCommunity(communityIds, location);
+		communityEntity.setHouseId(userHouseId);
+		return communityEntity;
 	}
 	
 	/**

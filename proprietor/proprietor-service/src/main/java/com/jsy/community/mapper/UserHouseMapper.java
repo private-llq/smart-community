@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.vo.HouseVo;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -23,8 +25,8 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
 	**/
-	@Select("select community_id from t_user_house where check_status = 1 and uid = #{uid}")
-	List<Long> queryUserCommunityIds(String uid);
+	@Select("select community_id,building_id as houseId from t_user_house where check_status = 1 and uid = #{uid} order by create_time")
+	List<UserHouseEntity> queryUserCommunityIds(String uid);
 	
 	/**
 	* @Description: 查询业主房屋及所属社区
