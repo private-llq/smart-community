@@ -88,6 +88,9 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<RepairEntity> condition = new QueryWrapper<>();
 		condition.eq("user_id", userId).eq("id", id);
 		RepairEntity entity = repairMapper.selectOne(condition);
+		if (entity==null) {
+			throw new ProprietorException("该订单不存在");
+		}
 		if (entity.getStatus() == 1) { //处理中  不能取消了
 			throw new ProprietorException("您好,工作人员已经在处理中，不能取消!");
 		}
