@@ -34,7 +34,7 @@ import java.util.Map;
 @RestController
 public class CommunityController {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private ICommunityService iCommunityService;
 	
 	//TODO 和公共接口是否重复？

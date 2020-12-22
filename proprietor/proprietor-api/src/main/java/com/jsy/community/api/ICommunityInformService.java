@@ -23,7 +23,7 @@ public interface ICommunityInformService extends IService<CommunityInformEntity>
      * @param communityEntity  参数实体对象
      * @return                  返回查询分页结果
      */
-    Page<CommunityInformEntity> queryCommunityInform(BaseQO<CommunityInformEntity> communityEntity);
+    List<CommunityInformEntity> queryCommunityInform(BaseQO<CommunityInformEntity> communityEntity);
 
     /**
      * 添加社区消息

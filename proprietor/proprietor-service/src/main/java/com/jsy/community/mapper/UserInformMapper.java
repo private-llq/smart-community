@@ -3,7 +3,9 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.entity.sys.SysInformEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.vo.CommunityVO;
+import com.jsy.community.vo.sys.SysInformVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -19,8 +21,8 @@ public interface UserInformMapper extends BaseMapper<UserInformEntity> {
      * @since  2020/12/14 9:35
      * @Param
      */
-    @Select("select inform_id from t_user_inform where community_id = #{communityId} and uid = #{uid} and inform_status = 1 and sys_inform = 0")
-    List<Long> queryUserReadCommunityInform(@Param("communityId") Long communityId, @Param("uid") String uid);
+    @Select("select inform_id from t_user_inform where community_id = #{communityId} and uid = #{uid} and inform_status = 1 and sys_inform = 0 and create_time > #{lastCreateTime}")
+    List<Long> queryUserReadCommunityInform(@Param("communityId") Long communityId, @Param("uid") String uid, @Param("lastCreateTime") String lastCreateTime);
 
     /**
      *  t_user_inform插入一条信息标识用户 该社区消息已读
@@ -114,4 +116,12 @@ public interface UserInformMapper extends BaseMapper<UserInformEntity> {
 
     @Select("select count(*) from t_sys_inform where id = #{informId}")
     Integer sysInformExist(@Param("informId") Long informId);
+
+    //按分页条件查出系统消息数据
+    @Select("select id,title,sub_title,create_time from t_sys_inform where enabled = 1 ORDER BY create_time DESC limit #{page},#{size}")
+    List<SysInformVO> selectSysInformPage(BaseQO<SysInformVO> baseQO);
+
+    //按用户id和时间查出用户已读的系统消息id
+    @Select("select inform_id from t_user_inform where uid = #{uid} and create_time > #{lastCreateTime}")
+    List<Long> selectUserReadSysInform(@Param("uid") String userId, @Param("lastCreateTime") String lastCreateTime);
 }

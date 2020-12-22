@@ -129,7 +129,24 @@ public class UserInformServiceImpl extends ServiceImpl<UserInformMapper, UserInf
      */
     @Override
     public List<SysInformVO> userSysInformList(BaseQO<SysInformVO> baseQO, String userId) {
+        baseQO.setPage((baseQO.getPage() - 1) * baseQO.getSize());
+        //1.按分页条件查出系统消息数据
+        List<SysInformVO> sysInformVOS = userInformMapper.selectSysInformPage(baseQO);
 
-        return null;
+        if ( sysInformVOS == null || sysInformVOS.isEmpty() ){
+            return null;
+        }
+
+        //取出当前系统消息最后一条的日期  用于查询用户已读的系统消息筛选条件
+        String lastCreateTime = sysInformVOS.get(sysInformVOS.size() - 1).getCreateTime();
+        //2.通过 当前系统消息最后一个的时间 和用户id 查出用户已读的系统消息列表Id
+        List<Long> sysInformIds = userInformMapper.selectUserReadSysInform(userId, lastCreateTime);
+        //3.标识用户已读消息
+        for( SysInformVO vo : sysInformVOS ){
+            if( sysInformIds.contains(vo.getId()) ){
+                vo.setRead(true);
+            }
+        }
+        return sysInformVOS;
     }
 }

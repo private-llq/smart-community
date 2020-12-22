@@ -28,7 +28,7 @@ import java.util.*;
  * @description 社区实现类
  * @since 2020-11-19 16:57
  **/
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_proprietor)
 public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityEntity> implements ICommunityService {
 	
 	@Autowired

@@ -24,6 +24,7 @@ spring:
         # 连接池中的最小空闲连接 默认 0
         min-idle: 8
 
+
 jsy:
   upload:
     type: oss

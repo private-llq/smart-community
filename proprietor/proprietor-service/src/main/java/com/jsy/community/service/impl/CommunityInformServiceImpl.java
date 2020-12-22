@@ -10,7 +10,6 @@ import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.mapper.CommunityInformMapper;
 import com.jsy.community.mapper.UserInformMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -18,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -45,7 +46,8 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      * @return                 返回查询结果
      */
     @Override
-    public Page<CommunityInformEntity> queryCommunityInform(BaseQO<CommunityInformEntity> communityEntity) {
+    public List<CommunityInformEntity> queryCommunityInform(BaseQO<CommunityInformEntity> communityEntity) {
+
         QueryWrapper<CommunityInformEntity>  queryWrapper = new QueryWrapper<>();
         CommunityInformEntity query = communityEntity.getQuery();
         Page<CommunityInformEntity> objectPage = new Page<>(communityEntity.getPage(), communityEntity.getSize());
@@ -54,16 +56,35 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         queryWrapper.eq("community_id", query.getCommunityId());
         queryWrapper.last("ORDER BY create_time desc");
         Page<CommunityInformEntity> communityInformEntityPage = communityInformMapper.selectPage(objectPage, queryWrapper);
+
+        //使用 communityInformEntityPage.getRecords().get(records.size() - 1).getCreateTime() 最后一个元素的时间 去作为条件查询当前社区用户已读信息，避免查询量过大的问题
+        List<CommunityInformEntity> records = communityInformEntityPage.getRecords();
+
+        if ( records == null || records.isEmpty() ){
+            return null;
+        }
+
+        LocalDateTime createTime =records.get(records.size() - 1).getCreateTime();
+        //集合中最后一个 元素的时间字符串
+        String dateTimeAsString = getDateTimeAsString(createTime);
+
         //使用当前用户查询该用户在当前社区已读信息
-        List<Long> integerList = userInformMapper.queryUserReadCommunityInform(query.getCommunityId(), query.getUid());
+        List<Long> integerList = userInformMapper.queryUserReadCommunityInform(query.getCommunityId(), query.getUid(), dateTimeAsString);
+
         //标识用户已读的数据
-        for(CommunityInformEntity communityInformEntity : communityInformEntityPage.getRecords()){
+        for(CommunityInformEntity communityInformEntity : records){
             if(integerList.contains(communityInformEntity.getId())){
                 communityInformEntity.setRead(true);
             }
         }
-        return communityInformEntityPage;
+        return records;
     }
+
+    private String getDateTimeAsString(LocalDateTime localDateTime) {
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+      return localDateTime.format(formatter);
+    }
+
 
     /**
      * 添加社区消息

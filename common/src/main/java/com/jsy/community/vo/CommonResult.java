@@ -29,6 +29,10 @@ public class CommonResult<T> implements Serializable {
 	public static <T> CommonResult<T> ok(T data,String msg) {
 		return new CommonResult<>(0, msg, data);
 	}
+
+	public static <T> CommonResult<T> ok(String msg) {
+		return new CommonResult<>(0, msg, null);
+	}
 	
 	public static CommonResult<Boolean> ok() {
 		return new CommonResult<>(0, "操作成功", true);

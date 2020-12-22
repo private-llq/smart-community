@@ -83,8 +83,7 @@ public class CommunityInformController {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
         communityEntity.getQuery().setUid(UserUtils.getUserId());
-        List<CommunityInformEntity> records = communityInformService.queryCommunityInform(communityEntity).getRecords();
-        return CommonResult.ok(records);
+        return CommonResult.ok(communityInformService.queryCommunityInform(communityEntity),"查询成功!");
     }
 
     /**
@@ -101,7 +100,7 @@ public class CommunityInformController {
         ValidatorUtils.validateEntity(communityInformQO, CommunityInformQO.updateCommunityInformValidate.class);
         //2.修改操作
         Boolean isUpdateSuccess = communityInformService.updateCommunityInform(communityInformQO);
-        return isUpdateSuccess ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return isUpdateSuccess ? CommonResult.ok("修改成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     /**
@@ -114,7 +113,7 @@ public class CommunityInformController {
     @DeleteMapping()
     @ApiOperation("删除社区通知消息")
     public CommonResult<Boolean> deleteInform(@RequestParam Long id) {
-        return communityInformService.delCommunityInform(id) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return communityInformService.delCommunityInform(id) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     /**
@@ -133,7 +132,7 @@ public class CommunityInformController {
         //3.添加当前社区新消息
         try {
             communityInformService.addCommunityInform(communityInformEntity);
-            return CommonResult.ok();
+            return CommonResult.ok("添加成功!");
         } catch (Exception e) {
             log.error("com.jsy.community.controller.CommunityInformController.addInform：{}", e.getMessage());
             return CommonResult.error("添加失败!可能数据重复");
