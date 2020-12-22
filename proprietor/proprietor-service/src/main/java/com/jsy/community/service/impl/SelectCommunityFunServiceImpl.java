@@ -43,4 +43,10 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
         map.put("total",total);
         return map;
     }
+
+    @Override
+    public CommunityFunEntity findFunOne(Long id) {
+        return selectCommunityFunMapper.selectById(id);
+
+    }
 }

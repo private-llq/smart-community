@@ -3,15 +3,13 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ISelectCommunityFunService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.CommunityFunQO;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -35,5 +33,11 @@ public class SelectCommunityFunController {
     public CommonResult<Map> list(@RequestBody CommunityFunQO communityFunQO) {
         Map<String, Object> map = selectCommunityFunService.findList(communityFunQO);
         return CommonResult.ok(map);
+    }
+    @ApiOperation("查询一条社区趣事详情")
+    @GetMapping("/findFunOne")
+    public CommonResult<CommunityFunEntity> findOne(@RequestParam("id")Long id) {
+        CommunityFunEntity communityFunEntity=selectCommunityFunService.findFunOne(id);
+        return CommonResult.ok(communityFunEntity);
     }
 }
