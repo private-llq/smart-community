@@ -121,7 +121,7 @@ public class UserAuthController {
 		
 		//生成带token和用户信息的的UserAuthVo(注册后设置密码用)
 		UserAuthVo userAuthVo = userService.createAuthVoWithToken(userInfoVo);
-		return CommonResult.ok(userAuthVo);
+		return CommonResult.ok(userAuthVo,"注册成功");
 	}
 	
 	@ApiOperation(value = "注册后设置密码", notes = "需要登录")
