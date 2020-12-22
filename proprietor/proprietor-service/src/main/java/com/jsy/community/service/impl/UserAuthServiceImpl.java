@@ -32,7 +32,7 @@ import me.zhyd.oauth.utils.AuthStateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.integration.redis.util.RedisLockRegistry;
+//import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -45,8 +45,8 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	@Resource
 	private AuthRequestFactory factory;
 	
-	@Resource
-	private RedisLockRegistry redisLockRegistry;
+//	@Resource
+//	private RedisLockRegistry redisLockRegistry;
 	
 	@Resource
 	private ICommonService commonService;

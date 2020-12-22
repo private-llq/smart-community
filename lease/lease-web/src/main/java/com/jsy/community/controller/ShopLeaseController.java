@@ -4,7 +4,11 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.shop.ShopLeaseEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.HouseLeaseQO;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -48,6 +52,25 @@ public class ShopLeaseController {
 	private static final String BUCKETNAME = "shop-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
 	@Login(allowAnonymous = true)
+	@ApiOperation("根据筛选条件查询商铺列表")
+	@PostMapping("/getShopByCondition")
+	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO){
+		List<ShopLeaseEntity> list = shopLeaseService.getShopByCondition(baseQO);
+		return CommonResult.ok(list);
+	}
+	
+	@Login(allowAnonymous = true)
+	@ApiOperation("根据查询条件查询商铺列表")
+	@PostMapping("/getShopBySearch")
+	public CommonResult getShopBySearch(@RequestBody BaseQO<ShopLeaseEntity> baseQO,
+	                                    @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
+	                                    @ApiParam("区域id") @RequestParam(required = false,defaultValue = "500103") Integer areaId){
+		PageInfo<ShopLeaseEntity> pageInfo = shopLeaseService.getShopBySearch(baseQO,query,areaId);
+		return CommonResult.ok(pageInfo);
+	}
+	
+	
+	@Login(allowAnonymous = true)
 	@ApiOperation("商铺图片上传")
 	@PostMapping("/uploadShopImg")
 	public CommonResult addShopImg(@RequestParam("file") MultipartFile[] files) {
@@ -71,8 +94,9 @@ public class ShopLeaseController {
 	@GetMapping("/getShop")
 	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
-		ShopLeaseVo shop = shopLeaseService.getShop(shopId);
-		return CommonResult.ok(shop);
+		
+		Map<String, Object> map = shopLeaseService.getShop(shopId);
+		return CommonResult.ok(map);
 	}
 	
 	@ApiOperation("商铺修改")

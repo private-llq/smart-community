@@ -46,6 +46,11 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	AdminUserEntity queryByEmail(String email);
 	
 	/**
+	 * 根据手机号，查询系统用户
+	 */
+	AdminUserEntity queryByMobile(String mobile);
+	
+	/**
 	 * 保存用户
 	 */
 	void saveUser(AdminUserEntity user);

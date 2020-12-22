@@ -63,4 +63,9 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 */
 	AdminUserEntity queryByEmail(String email);
 	
+	/**
+	 * 根据手机号，查询系统用户
+	 */
+	AdminUserEntity queryByMobile(String mobile);
+	
 }

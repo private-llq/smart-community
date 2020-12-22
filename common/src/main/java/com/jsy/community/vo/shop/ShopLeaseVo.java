@@ -101,7 +101,7 @@ public class ShopLeaseVo implements Serializable {
 	@ApiModelProperty(value = "商铺类型id集合")
 	private Long[] shopTypeIds;
 	
-	@ApiModelProperty(value = "商铺商业id集合")
+	@ApiModelProperty(value = "商铺行业id集合")
 	private Long[] shopBusinessIds;
 	
 	@ApiModelProperty(value = "经度")
@@ -111,6 +111,9 @@ public class ShopLeaseVo implements Serializable {
 	@ApiModelProperty(value = "纬度")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "纬度不能为空")
 	private BigDecimal lat;
+	
+	@ApiModelProperty(value = "来源 0个人 1业主 2不限")
+	private Integer source;
 	
 	/**
 	 * 添加店铺接口

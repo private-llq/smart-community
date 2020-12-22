@@ -105,6 +105,11 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	}
 	
 	@Override
+	public AdminUserEntity queryByMobile(String mobile) {
+		return baseMapper.queryByMobile(mobile);
+	}
+	
+	@Override
 	@Transactional
 	public void saveUser(AdminUserEntity user) {
 		user.setCreateTime(LocalDateTime.now());

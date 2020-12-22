@@ -15,9 +15,33 @@
         </foreach>
     </delete>
 
+    <select id="selectMiddle" resultType="long">
+        SELECT DISTINCT shop_lease_id FROM `t_shop_const` where house_const_id in
+        <foreach collection="list" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectTypeTags" resultType="long">
+        SELECT
+		    tsc.house_const_id
+		FROM
+		    t_shop_lease tsl
+		INNER JOIN t_shop_const tsc ON tsl.id = tsc.shop_lease_id
+		INNER JOIN t_house_const thc on thc.id = tsc.house_const_id
+		where tsl.id = #{shopId} and thc.house_const_type = 7
+
+    </select>
 
 
-<!--    <select id="selectTags" resultType="java.util.Arrays">-->
-<!--        select house_const_id from t_shop_const where shop_lease_id = #{shopId}-->
-<!--    </select>-->
+    <select id="selectBusinessTags" resultType="long">
+        SELECT
+		    tsc.house_const_id
+		FROM
+		    t_shop_lease tsl
+		INNER JOIN t_shop_const tsc ON tsl.id = tsc.shop_lease_id
+		INNER JOIN t_house_const thc on thc.id = tsc.house_const_id
+		where tsl.id = #{shopId} and thc.house_const_type = 8
+    </select>
+
 </mapper>

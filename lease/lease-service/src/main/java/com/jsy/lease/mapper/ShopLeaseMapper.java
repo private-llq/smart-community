@@ -5,6 +5,8 @@ import com.jsy.community.entity.shop.ShopLeaseEntity;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 /**
  * <p>
  * Mapper 接口
@@ -29,21 +31,10 @@ public interface ShopLeaseMapper extends BaseMapper<ShopLeaseEntity> {
 	 * @Date 2020/12/17 18:42
 	 * @Param [shopId]
 	 **/
-	@Select("SELECT\n" +
-		"\ttsc.house_const_id \n" +
-		"FROM\n" +
-		"\tt_shop_lease tsl\n" +
-		"\tINNER JOIN t_shop_const tsc ON tsl.id = tsc.shop_lease_id\n" +
-		"\tINNER JOIN t_house_const thc on thc.id = tsc.house_const_id\n" +
-		"where tsl.id = #{shopId} and thc.house_const_type = 7 ")
 	Long[] selectTypeTags(Long shopId);
 	
-	@Select("SELECT\n" +
-		"\ttsc.house_const_id \n" +
-		"FROM\n" +
-		"\tt_shop_lease tsl\n" +
-		"\tINNER JOIN t_shop_const tsc ON tsl.id = tsc.shop_lease_id\n" +
-		"\tINNER JOIN t_house_const thc on thc.id = tsc.house_const_id\n" +
-		"where tsl.id = #{shopId} and thc.house_const_type = 8 ")
-	Long[] selectBusinessTags(Long shopId);
+	Long[] selectBusinessTags(Long shopId);  // 注意：若使用了mybatisPlugin会提示结果类型不匹配
+	
+	
+	List<Long> selectMiddle(List<Long> advantage);
 }
