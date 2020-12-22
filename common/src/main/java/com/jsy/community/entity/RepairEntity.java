@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>
@@ -28,6 +29,10 @@ public class RepairEntity extends BaseEntity {
     
     @ApiModelProperty(value = "业主id")
     private String userId;
+    
+    @ApiModelProperty(value = "社区id")
+    @NotNull(groups = {addRepairValidate.class},message = "社区不能为空")
+    private Long communityId;
 
     @ApiModelProperty(value = "报修地址")
     @NotBlank(groups = {addRepairValidate.class},message = "报修地址不能为空")
@@ -54,6 +59,8 @@ public class RepairEntity extends BaseEntity {
     @ApiModelProperty(value = "图片地址")
     @NotBlank(groups = {addRepairValidate.class},message = "请添加图片")
     private String repairImg;
+    
+    
     
     public interface addRepairValidate {
     }

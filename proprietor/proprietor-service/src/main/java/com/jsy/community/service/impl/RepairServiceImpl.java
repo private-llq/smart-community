@@ -8,7 +8,6 @@ import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.RepairEntity;
 import com.jsy.community.entity.RepairOrderEntity;
-import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.RepairMapper;
 import com.jsy.community.mapper.RepairOrderMapper;
 import com.jsy.community.mapper.UserHouseMapper;
@@ -56,11 +55,6 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addRepair(RepairEntity repairEntity,String uid) {
-		QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
-		QueryWrapper<UserHouseEntity> queryWrapper = wrapper.eq("uid", uid);
-		UserHouseEntity houseEntity = userHouseMapper.selectOne(queryWrapper);
-		
-		
 		repairEntity.setUserId(uid);
 		repairEntity.setId(SnowFlake.nextId());
 		repairMapper.insert(repairEntity); // 1.png;2.png;3.png;   或 1.png;2.png;3.png 都可以            redis 现在存的是  3个 xx.png
@@ -77,7 +71,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		orderEntity.setRepairId(id);
 		orderEntity.setNumber(UUID.randomUUID().toString().replace("-", ""));
 		orderEntity.setOrderTime(new DateTime());
-		orderEntity.setCommunityId(houseEntity.getCommunityId());
+		orderEntity.setCommunityId(repairEntity.getCommunityId());
 		repairOrderMapper.insert(orderEntity);
 	}
 	
