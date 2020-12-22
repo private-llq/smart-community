@@ -2,6 +2,9 @@ package com.jsy.lease.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.HouseLeaseQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.shop.ShopLeaseVo;
 
 import java.util.List;
@@ -33,7 +36,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 17:12
 	 * @Param [shopId]
 	 **/
-	ShopLeaseVo getShop(Long shopId);
+	Map<String, Object> getShop(Long shopId);
 	
 	/**
 	 * @return void
@@ -51,7 +54,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 18:20
 	 * @Param []
 	 **/
-	void cancelShop(String userId,Long shopId,Long communityId,Long houseId);
+	void cancelShop(String userId, Long shopId, Long communityId, Long houseId);
 	
 	/**
 	 * @return java.util.Map<java.lang.String, java.lang.Object>
@@ -61,4 +64,22 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Param []
 	 **/
 	List<Map<String, Object>> listShop(String userId);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.shop.ShopLeaseEntity>
+	 * @Author lihao
+	 * @Description 根据条件查询商铺列表
+	 * @Date 2020/12/21 10:09
+	 * @Param [shopQO]
+	 **/
+	List<ShopLeaseEntity> getShopByCondition(BaseQO<HouseLeaseQO> baseQO);
+	
+	/**
+	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.entity.shop.ShopLeaseEntity>
+	 * @Author lihao
+	 * @Description 根据查询条件查询商铺列表
+	 * @Date 2020/12/21 14:13
+	 * @Param [baseQO]
+	 **/
+	PageInfo<ShopLeaseEntity> getShopBySearch(BaseQO<ShopLeaseEntity> baseQO, String query, Integer areaId);
 }

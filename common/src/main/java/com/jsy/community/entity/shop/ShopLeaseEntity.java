@@ -89,5 +89,8 @@ public class ShopLeaseEntity extends BaseEntity {
     
     @ApiModelProperty(value = "纬度")
     private BigDecimal lat;
+    
+    @ApiModelProperty(value = "来源 0个人 1业主 2不限")
+    private Integer source;
 
 }

@@ -66,6 +66,16 @@
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-redis</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.jsy</groupId>
+            <artifactId>property-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+		<dependency>
+			<groupId>com.jsy</groupId>
+			<artifactId>proprietor-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 
     </dependencies>

@@ -12,5 +12,13 @@ import com.jsy.community.entity.UserEntity;
  * @since 2020-11-25
  */
 public interface IUserService extends IService<UserEntity> {
-
+	
+	/**
+	 * @return com.jsy.community.entity.UserEntity
+	 * @Author lihao
+	 * @Description 根据用户uid查询用户信息
+	 * @Date 2020/12/22 10:26
+	 * @Param [uid]
+	 **/
+	UserEntity selectOne(String uid);
 }

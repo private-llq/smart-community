@@ -9,7 +9,6 @@ import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.mapper.CommunityMapper;
-import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.DistanceUtil;
