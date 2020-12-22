@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ILivingPaymentService;
@@ -117,6 +118,7 @@ public class LivingPaymentController {
     @Login
     public CommonResult selectOrder(@RequestBody PaymentRecordsQO paymentRecordsQO){
         String userId = UserUtils.getUserId();
+        System.out.println(userId);
         paymentRecordsQO.setUserID(userId);
         Map<String, Object> map = livingPaymentService.selectOrder(paymentRecordsQO);
         return CommonResult.ok(map);
@@ -163,5 +165,6 @@ public class LivingPaymentController {
         String upload = MinioUtils.upload(file, "bbbb");
         return CommonResult.ok(upload);
     }
+
 
 }

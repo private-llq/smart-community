@@ -14,4 +14,8 @@ import java.util.Map;
  **/
 public interface ISelectCommunityFunService extends IService<CommunityFunEntity> {
     Map<String, Object> findList(CommunityFunQO communityFunQO);
+
+    CommunityFunEntity findFunOne(Long id);
+
+    void saveViewCount(Long id);
 }
