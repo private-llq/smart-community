@@ -120,10 +120,6 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		return userHouseMapper.queryUserHouseList(userId);
 	}
 
-	@Override
-	public boolean hasHouse(String uid, Long communityId) {
-		return false;
-	}
 
 	/**
 	 * @Description: 查询指定小区内是否有房(是否是业主)
