@@ -16,6 +16,7 @@
                 #{item}
             </foreach>
         </if>
+        where lon is not null and lat is not null
         order by
         <choose>
             <when test="location.lon != null and location.lat != null">get_distance(#{location.lon},#{location.lat},lon,lat)</when>
