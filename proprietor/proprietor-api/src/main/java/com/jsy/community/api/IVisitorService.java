@@ -31,11 +31,11 @@ public interface IVisitorService extends IService<VisitorEntity> {
     /**
     * @Description: 访客门禁验证
      * @Param: [token, type]
-     * @Return: void
+     * @Return: boolean
      * @Author: chq459799974
      * @Date: 2020/12/11
     **/
-    void verifyEntry(String token,Integer type);
+    boolean verifyEntry(String token,Integer type);
     
     /**
      * @Description: 批量添加随行人员

@@ -19,6 +19,10 @@ import org.apache.ibatis.annotations.Update;
 public interface UserMapper extends BaseMapper<UserEntity> {
 	UserEntity queryUserInfoByUid(String uid);
 	
+	@Select("select mobile from t_user where uid = #{uid}")
+	String queryUserMobileByUid(String uid);
+	
+	//TODO user表householder_id字段暂未使用
 	@Update("update t_user set householder_id = #{householderId} where id = #{uid}")
 	int setUserBelongTo(Long householderId,Long uid);
 

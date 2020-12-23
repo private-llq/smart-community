@@ -107,6 +107,8 @@ public class UserAuthController {
 		
 		//生成带token和用户信息的的UserAuthVo
 		UserAuthVo userAuthVo = userService.createAuthVoWithToken(infoVo);
+		//TODO 验证业主 生成不过期门禁
+		
 		return CommonResult.ok(userAuthVo);
 	}
 	

@@ -11,6 +11,7 @@ import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 业主接口
@@ -84,4 +85,14 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return			返回业主详情信息
 	 */
     UserInfoVo proprietorDetails(String userId);
+	
+	/**
+	* @Description: 小区业主/家属获取门禁权限
+	 * @Param: [uid, communityId]
+	 * @Return: java.util.Map<java.lang.String,java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/23
+	**/
+	Map<String,String> getAccess(String uid, Long communityId);
+	
 }

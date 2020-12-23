@@ -55,4 +55,13 @@ public interface IRelationService {
      * @return
      */
     void updateUserRelationDetails(RelationQo relationQo);
+    
+    /**
+    * @Description: 判断是否是指定小区家属
+     * @Param: [mobile, communityId]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/12/23
+    **/
+    boolean isHouseMember(String mobile,Long communityId);
 }
