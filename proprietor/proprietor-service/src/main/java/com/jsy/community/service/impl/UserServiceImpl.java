@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -67,7 +68,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
     private long expire = 60*60*24*7; //暂时
 
-
     @Autowired
     private IHouseService houseService;
     
@@ -92,10 +92,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (user == null || user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");
         }
-
+        
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(user, userInfoVo);
-
         // 刷新省市区
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
         if (user.getProvinceId() != null) {
@@ -247,7 +246,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return houses;
     }
-
+    
+    private HouseEntity setBuildingId(HouseEntity tempEntity){
+        Long pid = 0L; //id和pid相同的问题数据导致死循环
+        HouseEntity parent = houseService.getParent(tempEntity);
+        if(parent != null && parent.getPid() != 0 && pid != parent.getPid()){
+            pid = tempEntity.getPid();
+            HouseEntity houseEntity = setBuildingId(parent);
+            tempEntity.setBuildingId(houseEntity.getBuildingId());
+        }
+        return parent;
+    }
+    
     /**
      * 业主详情查看
      * @param userId	    用户ID
@@ -272,17 +282,46 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //userInfo.setProprietorMembers(houseMemberEntities);
         return userInfo;
     }
-
-
-
-    private HouseEntity setBuildingId(HouseEntity tempEntity){
-        Long pid = 0L; //id和pid相同的问题数据导致死循环
-        HouseEntity parent = houseService.getParent(tempEntity);
-        if(parent != null && parent.getPid() != 0 && pid != parent.getPid()){
-            pid = tempEntity.getPid();
-            HouseEntity houseEntity = setBuildingId(parent);
-            tempEntity.setBuildingId(houseEntity.getBuildingId());
+    
+    /**
+     * @Description: 小区业主/家属获取门禁权限
+     * @Param: [uid, communityId]
+     * @Return: java.util.Map<java.lang.String,java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2020/12/23
+     **/
+    @Override
+    public Map<String,String> getAccess(String uid, Long communityId){
+        Map<String, String> returnMap = new HashMap<>();
+        //获取登录用户手机号
+        String mobile = userMapper.queryUserMobileByUid(uid);
+        //检查身份
+        if(canGetLongAccess(uid,communityId,mobile)){
+            //刷新通用权限并返回最新数据 //TODO 目前是返回一个token 后期根据硬件接口需要修改
+            String access = setUserLongAccess(uid);
+            returnMap.put("access",access);
+        }else{
+            returnMap.put("msg","当前用户不是小区业主或家属");
         }
-        return parent;
+        return returnMap;
     }
+    
+    //查询身份(是不是小区业主或家属)
+    private boolean canGetLongAccess(String uid, Long communityId, String mobile){
+        if(userHouseService.hasHouse(uid,communityId)
+            || relationService.isHouseMember(mobile,communityId)){
+            return true;
+        }
+        return false;
+    }
+    
+    //设置不过期门禁
+    private String setUserLongAccess(String uid){
+        String token = UUID.randomUUID().toString().replace("-", "");
+        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
+        visitorEntryVO.setToken(token);
+        redisTemplate.opsForValue().set("UEntry:" + uid, JSON.toJSONString(visitorEntryVO));
+        return token;
+    }
+    
 }

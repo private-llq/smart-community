@@ -1,5 +1,7 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -51,7 +53,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     private StringRedisTemplate redisTemplate;
     
 //    @Value("${}")
-    private Integer visitorTimeLimit = 60*24; //分
+    private long visitorTimeLimit = 60*24*60; //单位 秒
     
     /**
     * @Description: 访客登记 新增
@@ -83,19 +85,20 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     **/
     private VisitorEntryVO getVisitorEntry(VisitorEntity visitorEntity){
         VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
-        visitorEntryVO.setPassword(MyMathUtils.randomCode(7));
+        visitorEntryVO.setPassword(MyMathUtils.randomCode(7)); //TODO 密码保存与验证方案待定
         visitorEntryVO.setIsCommunityAccess(visitorEntity.getIsCommunityAccess());
         visitorEntryVO.setIsBuildingAccess(visitorEntity.getIsBuildingAccess());
+        visitorEntryVO.setUid(visitorEntity.getUid());
         String token = UUID.randomUUID().toString().replace("-","");
         visitorEntryVO.setToken(token);
         visitorEntryVO.setTimeLimit(visitorTimeLimit);
         //小区门禁权限
         if(visitorEntryVO.getIsCommunityAccess() != null && visitorEntryVO.getIsCommunityAccess() != 0){
-            redisTemplate.opsForValue().set("CEntry:" + token, String.valueOf(visitorEntryVO.getIsCommunityAccess()), visitorTimeLimit, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set("CEntry:" + token, JSON.toJSONString(visitorEntryVO), visitorTimeLimit, TimeUnit.MINUTES);
         }
         //楼栋门禁权限
         if(visitorEntryVO.getIsBuildingAccess() != null && visitorEntryVO.getIsBuildingAccess() != 0){
-            redisTemplate.opsForValue().set("BEntry:" + token, String.valueOf(visitorEntryVO.getIsBuildingAccess()), visitorTimeLimit, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set("BEntry:" + token, JSON.toJSONString(visitorEntryVO), visitorTimeLimit, TimeUnit.MINUTES);
         }
         return visitorEntryVO;
     }
@@ -108,28 +111,41 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Date: 2020/12/11
      **/
     //TODO 后续流程未知，返回值未定
-    public void verifyEntry(String token,Integer type){
-        if(BusinessEnum.EntryTypeEnum.COMMUNITY.getCode().equals(type)){ //小区门禁认证
+    public boolean verifyEntry(String token,Integer type){
+        if(BusinessEnum.EntryTypeEnum.COMMUNITY.getCode().equals(type)){ //小区门禁验证
             String cEntry = redisTemplate.opsForValue().get("CEntry:" + token);
-            switch (cEntry){
+            if(StringUtils.isEmpty(cEntry)){
+                return false;
+            }
+            VisitorEntryVO visitor = JSONObject.parseObject(cEntry, VisitorEntryVO.class);
+            switch (String.valueOf(visitor.getIsCommunityAccess())){
                 case BusinessConst.ACCESS_COMMUNITY_QR_CODE :
                     //TODO 二维码类型
-                    break;
+                    return true;
                 case BusinessConst.ACCESS_COMMUNITY_FACE :
                     //TODO 人脸
-                    break;
+                    return true;
+                default:
+                    return false;
             }
         }else if(BusinessEnum.EntryTypeEnum.BUILDING.getCode().equals(type)){ //楼栋门禁验证
             String bEntry = redisTemplate.opsForValue().get("BEntry:" + token);
-            switch (bEntry){
+            if(StringUtils.isEmpty(bEntry)){
+                return false;
+            }
+            VisitorEntryVO visitor = JSONObject.parseObject(bEntry, VisitorEntryVO.class);
+            switch (String.valueOf(visitor.getIsBuildingAccess())){
                 case BusinessConst.ACCESS_BUILDING_QR_CODE:
                     //TODO 二维码类型
-                    break;
+                    return true;
                 case BusinessConst.ACCESS_BUILDING_COMMUNICATION:
                     //TODO 可视对讲
-                    break;
+                    return true;
+                default:
+                    return false;
             }
         }
+        return false;
     }
     
     /**

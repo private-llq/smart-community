@@ -182,6 +182,18 @@ public class RelationServiceImpl implements IRelationService {
         for (RelationCarsQo relationCarsQo : cars) {
             relationMapper.updateUserRelationCar(relationCarsQo);
         }
-
     }
+    
+    /**
+     * @Description: 判断是否是指定小区家属
+     * @Param: [mobile, communityId]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2020/12/23
+     **/
+    public boolean isHouseMember(String mobile,Long communityId){
+        Integer count = houseMemberMapper.selectCount(new QueryWrapper<HouseMemberEntity>().eq("mobile", mobile).eq("community_id", communityId));
+        return count > 0;
+    }
+    
 }

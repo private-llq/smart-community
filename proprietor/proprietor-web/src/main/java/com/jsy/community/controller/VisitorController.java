@@ -92,8 +92,8 @@ public class VisitorController {
 	@GetMapping("verifyCommunityEntry")
 	@Login(allowAnonymous = true)
 	//TODO 流程未知，参数和返回值待确定
-	public void verifyCommunityEntry(@RequestParam("entryToken") String token){
-		iVisitorService.verifyEntry(token, BusinessEnum.EntryTypeEnum.COMMUNITY.getCode());
+	public boolean verifyCommunityEntry(@RequestParam("entryToken") String token){
+		return iVisitorService.verifyEntry(token, BusinessEnum.EntryTypeEnum.COMMUNITY.getCode());
 	}
 	
 	//三方调用进来
@@ -101,8 +101,8 @@ public class VisitorController {
 	@GetMapping("verifyBuildingEntry")
 	@Login(allowAnonymous = true)
 	//TODO 流程未知，参数和返回值待确定
-	public void verifyBuildingEntry(@RequestParam("entryToken") String token){
-		iVisitorService.verifyEntry(token,BusinessEnum.EntryTypeEnum.BUILDING.getCode());
+	public boolean verifyBuildingEntry(@RequestParam("entryToken") String token){
+		return iVisitorService.verifyEntry(token,BusinessEnum.EntryTypeEnum.BUILDING.getCode());
 	}
 	
 	/**

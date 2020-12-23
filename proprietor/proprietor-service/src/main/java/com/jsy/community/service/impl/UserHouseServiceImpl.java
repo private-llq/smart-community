@@ -119,4 +119,17 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public List<HouseVo> queryUserHouseList(String userId) {
 		return userHouseMapper.queryUserHouseList(userId);
 	}
+	
+	/**
+	 * @Description: 查询指定小区内是否有房(是否是业主)
+	 * @Param: [uid, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/23
+	 **/
+	@Override
+	public boolean hasHouse(String uid,Long communityId){
+		Integer count = userHouseMapper.selectCount(new QueryWrapper<UserHouseEntity>().eq("uid", uid).eq("community_id", communityId));
+		return count > 0;
+	}
 }

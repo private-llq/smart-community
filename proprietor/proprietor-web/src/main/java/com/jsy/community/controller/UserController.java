@@ -26,6 +26,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -65,6 +66,21 @@ public class UserController {
         return "success...";
     }
 
+    /**
+    * @Description: 业主或亲属 获取/刷新 门禁权限
+     * @Param: [communityId]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2020/12/23
+    **/
+    @GetMapping("longAccess")
+    @ApiOperation("业主或亲属 获取/刷新 门禁权限")
+    @Login
+    public CommonResult getLongAccess(@RequestParam("communityId") Long communityId){
+        Map<String, String> returnMap = userService.getAccess(UserUtils.getUserId(), communityId);
+        return returnMap.get("access") != null ? CommonResult.ok(returnMap,"获取成功") : CommonResult.error(JSYError.INTERNAL.getCode(),returnMap.get("msg"));
+    }
+    
     /**
      * 【用户】业主信息登记
      * @param proprietorQO  参数实体
