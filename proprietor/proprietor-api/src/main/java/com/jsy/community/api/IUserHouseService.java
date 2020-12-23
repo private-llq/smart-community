@@ -72,4 +72,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @return				返回房屋信息列表
 	 */
 	List<HouseVo> queryUserHouseList(String userId);
+	
+	/**
+	 * @Description: 查询指定小区内是否有房(是否是业主)
+	 * @Param: [uid, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/23
+	 **/
+	boolean hasHouse(String uid,Long communityId);
 }
