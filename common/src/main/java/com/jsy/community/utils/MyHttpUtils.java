@@ -1,16 +1,21 @@
 package com.jsy.community.utils;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -95,7 +100,30 @@ public class MyHttpUtils {
 		return httpGet;
 	}
 	
-	//TODO 构建HttpPost
+	//构建HttpPost
+	public static HttpPost httpPost(String url, Map<String,String> bodyMap){
+		return httpPost(url,null,bodyMap);
+	}
+	public static HttpPost httpPost(String url, Map<String,String> paramsMap, Map<String,String> bodyMap){
+		URIBuilder uriBuilder = buildURL(url);
+		//设置params
+		if(paramsMap != null){
+			for(Map.Entry<String,String> entry : paramsMap.entrySet()){
+				uriBuilder.setParameter(entry.getKey(),entry.getValue());
+			}
+		}
+		HttpPost httpPost = null;
+		try {
+			httpPost = new HttpPost(uriBuilder.build());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		if(bodyMap != null){
+			String body = JSON.toJSONString(bodyMap);
+			httpPost.setEntity(new StringEntity(body, "utf-8"));
+		}
+		return httpPost;
+	}
 	
 	//获取连接
 	public static CloseableHttpClient getConn() {
@@ -109,8 +137,10 @@ public class MyHttpUtils {
 		try {
 			response = getConn().execute(httpRequestBase);
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error("http执行出错", e.getMessage());
 			httpRequestBase.abort();
+			return "";
 		}
 		int statusCode = response.getStatusLine().getStatusCode();
 		if (HttpStatus.SC_OK == statusCode) {// 如果响应码是 200
@@ -120,10 +150,12 @@ public class MyHttpUtils {
 				logger.error("http解析返回结果出错", e.getMessage());
 			}
 		} else {
+			logger.error(response.toString());
 			logger.error("http错误，返回状态码：" + statusCode);
 			httpRequestBase.abort();
 		}
 		logger.info("http请求返回：", httpResult);
+		logger.info(response.toString());
 		return httpResult;
 	}
 }

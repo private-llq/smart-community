@@ -1,9 +1,9 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * @author YuLF
@@ -21,6 +21,13 @@ public class TestController {
     @GetMapping(params = "test02")
     public String test02(){
         return "test02";
+    }
+    
+    @PostMapping("testPost")
+    public Object testPost(@RequestBody Map<String,Object> map){
+        System.out.println(map.get("lon"));
+        System.out.println(map.get("lat"));
+        return map;
     }
 
 }
