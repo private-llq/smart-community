@@ -28,6 +28,8 @@
         <module>common</module>
         <module>gateway</module>
         <module>rabbitmq</module>
+        <!-- 分布式事务 -->
+        <module>tx-manager</module>
     </modules>
     
     <properties>
