@@ -13,6 +13,7 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.utils.UserUtils;
@@ -127,6 +128,9 @@ public class UserController {
         ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.proprietorUpdateValid.class);
 		//3.更新业主信息
         proprietorQO.setUid(UserUtils.getUserId());
+        if( proprietorQO.getHasCar() == null ){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
+        }
         return userService.proprietorUpdate(proprietorQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 

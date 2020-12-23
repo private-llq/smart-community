@@ -119,4 +119,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public List<HouseVo> queryUserHouseList(String userId) {
 		return userHouseMapper.queryUserHouseList(userId);
 	}
+
+	@Override
+	public boolean hasHouse(String uid, Long communityId) {
+		return false;
+	}
 }

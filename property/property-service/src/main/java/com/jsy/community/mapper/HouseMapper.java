@@ -55,4 +55,14 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @return						返回社区名称和 当前社区所有住户名称，住户uid
 	 */
     List<UserEntity> getCommunityNameAndUserInfo(long communityId);
+
+
+
+	/**
+	 * 通过社区ID查出所有 楼栋、单元、楼层、未被登记的门牌
+	 * @author YuLF
+	 * @since  2020/11/26 9:38
+	 * @Param  communityId	社区ID
+	 */
+    List<HouseEntity> getCommunityArchitecture(@Param("communityId") long communityId);
 }

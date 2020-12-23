@@ -155,8 +155,8 @@ public class ProprietorController {
         validFileSuffix(proprietorExcel, communityId);
         //解析Excel  这里强转Object得保证 importProprietorExcel 实现类返回的类型是UserEntity
         List<UserEntity> userEntityList = ProprietorExcelCommander.importProprietorExcel(proprietorExcel,new HashMap<>(1));
-        //做数据库写入 userEntityList 读出来的数据
-        //todo 数据库信息写入
+        //数据库写入
+
         return CommonResult.ok(userEntityList);
     }
 
@@ -177,6 +177,7 @@ public class ProprietorController {
         Map<String, Object> userInfoParams = ProprietorExcelCommander.getAllUidAndNameForList(userInfoList, "realName", "uid");
         List<UserEntity> userEntityList = ProprietorExcelCommander.importMemberExcel(proprietorExcel, userInfoParams);
         //做数据库写入 userEntityList 读出来的数据
+        iProprietorService.saveUserBatch(userEntityList, communityId);
         //todo 数据库信息写入
         return CommonResult.ok(userEntityList);
     }

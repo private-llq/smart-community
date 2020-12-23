@@ -123,4 +123,21 @@
         </trim>
         where id = #{id}
     </update>
+
+    <select id="getHouseListByCommunityId" resultType="com.jsy.community.entity.HouseEntity">
+        SELECT DISTINCT
+	        h.building,
+	        h.unit,
+	        h.floor,
+	        h.door,
+	        h.id
+        FROM
+	        t_house AS h
+	    LEFT JOIN t_user_house AS uh ON h.id = uh.house_id
+        WHERE
+	        uh.id IS NULL
+	        AND h.deleted = 0
+	        AND h.community_id = #{communityId}
+	        AND h.type = 4
+    </select>
 </mapper>
