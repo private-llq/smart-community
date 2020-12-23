@@ -47,7 +47,7 @@ public class ProprietorController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IProprietorService iProprietorService;
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseService iHouseService;
 
     /**

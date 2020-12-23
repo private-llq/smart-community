@@ -153,8 +153,8 @@ public class UserController {
     @Login
     @ApiOperation("业主信息详情查询接口")
     @PostMapping("details")
-    public CommonResult<UserInfoVo> details(@RequestParam Long communityId, @RequestParam Long houseId) {
-        UserInfoVo userInfoVo = userService.proprietorDetails(UserUtils.getUserId(), communityId, houseId);
+    public CommonResult<UserInfoVo> details() {
+        UserInfoVo userInfoVo = userService.proprietorDetails(UserUtils.getUserId());
         return CommonResult.ok(userInfoVo);
     }
 

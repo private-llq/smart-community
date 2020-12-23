@@ -251,7 +251,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * 业主详情查看
      * @param userId	    用户ID
-     * @param communityId	社区ID
      * @Param houseId       房屋ID
      * @author YuLF
      * @since  2020/12/18 11:39
@@ -259,18 +258,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     @Transactional
     @Override
-    public UserInfoVo proprietorDetails(String userId, Long communityId, Long houseId) {
+    public UserInfoVo proprietorDetails(String userId) {
         //1.查出用户姓名信息
         UserInfoVo userInfo = userMapper.selectUserInfoById(userId);
         //2.查出用户房屋信息
-        List<HouseVo> userHouses = userHouseService.queryUserHouseList(userId, communityId);
+        List<HouseVo> userHouses = userHouseService.queryUserHouseList(userId);
         //3.查出用户家属
-        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId, houseId);
+        //List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId, houseId);
         //4.查出用户车辆信息
         List<CarEntity> carEntities = carService.queryUserCarById(userId);
         userInfo.setProprietorCars(carEntities);
         userInfo.setProprietorHouses(userHouses);
-        userInfo.setProprietorMembers(houseMemberEntities);
+        //userInfo.setProprietorMembers(houseMemberEntities);
         return userInfo;
     }
 

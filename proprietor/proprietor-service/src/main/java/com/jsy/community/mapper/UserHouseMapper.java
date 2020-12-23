@@ -52,10 +52,8 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	/**
 	 * 通过用户id和社区id查出用户房屋信息
 	 * @param userId 		用户id
-	 * @param communityId	社区id
 	 * @return				返回房屋信息列表
 	 */
-	@Select("select h.id,h.community_id,h.house_id,c.name as communityName,s.building,s.unit,s.floor,s.door from t_user_house as h LEFT JOIN t_house as s on h.house_id = s.id LEFT JOIN t_community as c on h.community_id = c.id " +
-			"where h.uid = #{userId} and h.community_id = #{communityId}")
-	List<HouseVo> queryUserHouseList(@Param("userId") String userId,@Param("communityId") Long communityId);
+	@Select("select h.id,h.community_id,h.house_id,c.name as communityName,s.building,s.unit,s.floor,s.door from t_user_house as h LEFT JOIN t_house as s on h.house_id = s.id LEFT JOIN t_community as c on h.community_id = c.id  where h.uid = #{userId} and check_status = 1")
+	List<HouseVo> queryUserHouseList(@Param("userId") String userId);
 }

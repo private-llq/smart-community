@@ -113,11 +113,10 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	/**
 	 * 通过用户id和社区id查出用户房屋信息
 	 * @param userId 		用户id
-	 * @param communityId	社区id
 	 * @return				返回房屋信息列表
 	 */
 	@Override
-	public List<HouseVo> queryUserHouseList(String userId, Long communityId) {
-		return userHouseMapper.queryUserHouseList(userId, communityId);
+	public List<HouseVo> queryUserHouseList(String userId) {
+		return userHouseMapper.queryUserHouseList(userId);
 	}
 }

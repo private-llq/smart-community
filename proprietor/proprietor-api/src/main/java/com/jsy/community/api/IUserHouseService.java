@@ -69,8 +69,7 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @author YuLF
 	 * @since  2020/12/18 14:18
 	 * @param userId 		用户id
-	 * @param communityId	社区id
 	 * @return				返回房屋信息列表
 	 */
-	List<HouseVo> queryUserHouseList(String userId, Long communityId);
+	List<HouseVo> queryUserHouseList(String userId);
 }
