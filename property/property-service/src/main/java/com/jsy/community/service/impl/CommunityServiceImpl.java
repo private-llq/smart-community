@@ -2,12 +2,14 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.mapper.CommunityMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,5 +37,15 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		QueryWrapper<CommunityEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("area_id", areaId);
 		return communityMapper.selectList(queryWrapper);
+	}
+	
+	@Override
+	@LcnTransaction
+	@Transactional
+	public void addCommunityEntity() {
+		CommunityEntity communityEntity = new CommunityEntity();
+		communityEntity.setId(666677888L);
+		communityEntity.setName("测试分布式事物");
+		communityMapper.insert(communityEntity);
 	}
 }

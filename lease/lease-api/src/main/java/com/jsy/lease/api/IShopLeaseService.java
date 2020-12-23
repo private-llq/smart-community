@@ -82,4 +82,14 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Param [baseQO]
 	 **/
 	PageInfo<ShopLeaseEntity> getShopBySearch(BaseQO<ShopLeaseEntity> baseQO, String query, Integer areaId);
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 测试分布式事物
+	 * @Date 2020/12/23 15:22
+	 * @Param []
+	 **/
+	void testTransaction();
+	
 }

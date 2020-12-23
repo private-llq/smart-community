@@ -1,5 +1,6 @@
 package com.jsy.community;
 
+import com.codingapi.txlcn.tc.config.EnableDistributedTransaction;
 import org.apache.dubbo.config.spring.context.annotation.DubboComponentScan;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @MapperScan("com.jsy.community.mapper")
 @PropertySource(value = "classpath:common-service.properties")
+@EnableDistributedTransaction
 public class PropertyServiceApp {
 	public static void main(String[] args) {
 		SpringApplication.run(PropertyServiceApp.class, args);

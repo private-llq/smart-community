@@ -1,13 +1,11 @@
 package com.jsy.community;
 
-import org.apache.dubbo.config.spring.context.annotation.DubboComponentScan;
-import org.mybatis.spring.annotation.MapperScan;
+import com.codingapi.txlcn.tm.config.EnableTransactionManagerServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@DubboComponentScan
-@MapperScan("com.jsy.community.mapper")
+@EnableTransactionManagerServer
 public class TxManagerApplication {
 
 	public static void main(String[] args) {

@@ -3,6 +3,7 @@ package com.jsy.lease.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IUserService;
 import com.jsy.community.constant.Const;
@@ -327,6 +328,24 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			BeanUtils.copyProperties(page, info);
 			return info;
 		}
+	}
+	
+	@Override
+	@Transactional
+	@LcnTransaction
+	public void testTransaction() {
+		// 1. 调用远端服务
+		communityService.addCommunityEntity();
+		
+//		int b =  1/0;
+		
+		// 2. 调用本地服务
+		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
+		shopLeaseEntity.setId(123L);
+		shopLeaseEntity.setTitle("测试分布式事物");
+		shopLeaseMapper.insert(shopLeaseEntity);
+		
+		System.out.println(123);
 	}
 	
 	

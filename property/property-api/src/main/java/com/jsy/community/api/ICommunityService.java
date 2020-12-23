@@ -32,5 +32,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Param [areaId] 
 	 **/
 	List<CommunityEntity> listCommunityByAreaId(Long areaId);
-	
+
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 分布式事物——添加社区测试
+	 * @Date 2020/12/23 15:25
+	 * @Param []
+	 **/
+	void addCommunityEntity();
 }

@@ -130,7 +130,14 @@ public class ShopLeaseController {
 		List<Map<String, Object>> map = shopLeaseService.listShop(userId);
 		return CommonResult.ok(map);
 	}
-
+	
+	@ApiOperation("测试分布式事物")
+	@GetMapping("/testTransaction")
+	@Login(allowAnonymous = true)
+	public CommonResult testTransaction() {
+		shopLeaseService.testTransaction();
+		return CommonResult.ok();
+	}
 
 //	重庆掌上12333 实业登记  若成功  满一年有补贴
 

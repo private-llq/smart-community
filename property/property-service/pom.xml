@@ -121,6 +121,21 @@
             <version>0.0.1-SNAPSHOT</version>
 <!--            <scope>compile</scope>-->
         </dependency>
+
+
+		<!--*************  LCN	*************-->
+		<dependency>
+			<groupId>com.codingapi.txlcn</groupId>
+			<artifactId>txlcn-tc</artifactId>
+			<version>5.0.2.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.codingapi.txlcn</groupId>
+			<artifactId>txlcn-txmsg-netty</artifactId>
+			<version>5.0.2.RELEASE</version>
+		</dependency>
+		<!--*************  LCN	*************-->
     </dependencies>
 
 	<build>

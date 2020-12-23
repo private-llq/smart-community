@@ -50,3 +50,7 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+
+tx-lcn:
+  client:
+    manager-address: localhost:8070

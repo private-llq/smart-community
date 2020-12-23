@@ -36,3 +36,6 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+tx-lcn:
+  manager:
+    port: 8070
