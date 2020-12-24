@@ -25,4 +25,14 @@ public class FrontChildMenu implements Serializable {
 	
 	@ApiModelProperty(value = "菜单名")
 	private String menuName;
+	
+	@ApiModelProperty(value = "路径")
+	private String path;
+	
+	@ApiModelProperty(value = "白天图标地址")
+	private String dayIcon;
+	
+	@ApiModelProperty(value = "夜晚图标地址")
+	private String nightIcon;
+	
 }
