@@ -10,8 +10,10 @@ import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
+import com.jsy.community.utils.WeatherUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -38,6 +40,9 @@ public class CommonServiceImpl implements ICommonService {
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+    
+    @Autowired
+    private WeatherUtils weatherUtils;
 
     @Override
     public void checkVerifyCode(String account, String code) {
@@ -169,4 +174,7 @@ public class CommonServiceImpl implements ICommonService {
         return regionMapper.vagueQueryCity(searchStr);
     }
 
+    public JSONObject getWeatherNow(double lon, double lat){
+        return weatherUtils.getWeatherNow(String.valueOf(lon),String.valueOf(lat));
+    }
 }

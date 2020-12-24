@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
 
@@ -115,4 +116,7 @@ public interface ICommonService {
 	 * @Date: 2020/12/10
 	**/
 	List<RegionEntity> vagueQueryCity(String searchStr);
+	
+	
+	JSONObject getWeatherNow(double lon, double lat);
 }

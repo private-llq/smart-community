@@ -1,8 +1,9 @@
 package com.jsy.community.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -16,21 +17,19 @@ import java.util.Map;
 @Component
 public class WeatherUtils {
 	
+	private static final Logger logger = LoggerFactory.getLogger(WeatherUtils.class);
+	
 	//TODO 三方接口商家待定 暂时用墨迹天气
-	public static boolean getWeatherNow(String lon,String lat){
+	public JSONObject getWeatherNow(String lon,String lat){
 		
 		String appCode = "xxxxxxxxxxxxxxxxxx";
+		appCode = "17e38ac209824aab9d0e82097f59ba11";
 		String url = "http://aliv8.data.moji.com/whapi/json/aliweather/condition";
+		//params参数
 		Map<String, String> paramsMap = new HashMap<>();
 		paramsMap.put("lon", lon);
 		paramsMap.put("lat", lat);
-//		paramsMap.put("token", "c712899b393c7b262dd7984f6eb52657");
-		//设置body参数
-		Map<String, String> bodyMap = new HashMap<>();
-//		bodyMap.put("lon", "116.403874");
-//		bodyMap.put("lat", "39.9148801");
-//		bodyMap.put("token", "c712899b393c7b262dd7984f6eb52657");
-		HttpPost httpPost = MyHttpUtils.httpPost(url,paramsMap,null);
+		HttpPost httpPost = MyHttpUtils.httpPostWithoutBody(url,paramsMap);
 		//设置header
 		Map<String,String> headers = new HashMap<>();
 		headers.put("Authorization","APPCODE " + appCode);
@@ -43,14 +42,21 @@ public class WeatherUtils {
 		String httpResult = MyHttpUtils.exec(httpPost);
 		//解析结果
 		JSONObject result = JSONObject.parseObject(httpResult);
-		System.out.println(result);
-//		if(result != null && "01".equals(result.getString("status"))){
-//			return true;
-//		}
-		return false;
+		if(result != null && "0".equals(result.getString("code"))){
+			try{
+				JSONObject data = result.getJSONObject("data");
+				JSONObject condition = data.getJSONObject("condition");
+				JSONObject city = data.getJSONObject("city");
+				return data;
+			}catch (Exception e){
+				logger.error("天气json解析出错：" + result);
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 	
-	public static void main(String[] args) {
-		getWeatherNow("106.514787","29.622701");
-	}
+//	public static void main(String[] args) {
+//		getWeatherNow("106.514787","29.622701");
+//	}
 }

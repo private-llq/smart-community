@@ -80,7 +80,7 @@ public class MyHttpUtils {
 	}
 	
 	//构建HttpGet
-	public static HttpGet httpGet(String url){
+	public static HttpGet httpGetWithoutParams(String url){
 		return httpGet(url,null);
 	}
 	public static HttpGet httpGet(String url, Map<String,String> paramsMap){
@@ -101,8 +101,11 @@ public class MyHttpUtils {
 	}
 	
 	//构建HttpPost
-	public static HttpPost httpPost(String url, Map<String,String> bodyMap){
+	public static HttpPost httpPostWithoutParams(String url, Map<String,String> bodyMap){
 		return httpPost(url,null,bodyMap);
+	}
+	public static HttpPost httpPostWithoutBody(String url, Map<String,String> paramsMap){
+		return httpPost(url,paramsMap,null);
 	}
 	public static HttpPost httpPost(String url, Map<String,String> paramsMap, Map<String,String> bodyMap){
 		URIBuilder uriBuilder = buildURL(url);
@@ -132,8 +135,8 @@ public class MyHttpUtils {
 	
 	//执行请求，返回结果
 	public static String exec(HttpRequestBase httpRequestBase) {
-		String httpResult = "";
 		HttpResponse response = null;
+		String httpResult = "";
 		try {
 			response = getConn().execute(httpRequestBase);
 		} catch (Exception e) {
@@ -147,15 +150,16 @@ public class MyHttpUtils {
 			try {
 				httpResult = EntityUtils.toString(response.getEntity());
 			} catch (Exception e) {
-				logger.error("http解析返回结果出错", e.getMessage());
+				logger.error("http返回结果解析出错", e.getMessage());
 			}
 		} else {
-			logger.error(response.toString());
+			logger.error("非正常返回结果：" + response.toString());
 			logger.error("http错误，返回状态码：" + statusCode);
 			httpRequestBase.abort();
+			return "";
 		}
-		logger.info("http请求返回：", httpResult);
-		logger.info(response.toString());
+		logger.info("http正常返回response：" + response.toString());
+		logger.info("http正常返回result：" + httpResult);
 		return httpResult;
 	}
 }

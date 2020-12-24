@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
@@ -92,6 +93,14 @@ public class CommonController {
             return CommonResult.error(JSYError.NOT_FOUND);
         }
     }
+    
+    @ApiOperation("根据经纬度查询当前天气")
+    @GetMapping("weatherNow")
+    public CommonResult<JSONObject> getWeatherNow(@RequestParam double lon,@RequestParam double lat){
+        JSONObject weatherNow = commonService.getWeatherNow(lon, lat);
+        return CommonResult.ok(weatherNow);
+    }
+    
     private static void main(String[] args) {
         String s = BusinessEnum.RegionQueryTypeEnum.regionQueryNameMap.get(2);
         System.out.println(s);
