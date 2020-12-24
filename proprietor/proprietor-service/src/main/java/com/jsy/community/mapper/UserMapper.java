@@ -4,11 +4,15 @@ import cn.hutool.system.UserInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.UserInfoVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+
+import java.util.List;
 
 
 /**
@@ -45,4 +49,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 */
 	@Select("select uid,real_name,is_real_auth,sex,id_card from t_user where uid = #{userId}")
 	UserInfoVo selectUserInfoById(@Param("userId") String userId);
+
+	@Select("select c.name as communityName,h.building,h.unit,h.floor,h.door from t_house as h LEFT JOIN t_user_house as uh on h.id = uh.house_id LEFT JOIN t_community as c on uh.community_id = c.id where uh.house_id = #{houseId} and uh.uid = #{uid}  ")
+    List<HouseVo> queryUserHouseById(@Param("uid") String userId,@Param("houseId") Long houseId);
 }

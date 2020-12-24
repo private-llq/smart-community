@@ -198,8 +198,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",userId).select("real_name,sex,detail_address,avatar_url"));
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(userEntity, userInfoVo);
+        //业主家属查询
         List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId, houseId);
         userInfoVo.setProprietorMembers(houseMemberEntities);
+        //业主房屋查询
+        List<HouseVo> houseVos = userMapper.queryUserHouseById(userId, houseId);
+        userInfoVo.setProprietorHouses(houseVos);
         return userInfoVo;
     }
     
