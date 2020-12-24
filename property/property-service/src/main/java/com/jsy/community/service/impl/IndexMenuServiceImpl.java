@@ -109,8 +109,7 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 	public List<IndexMenuEntity> listIndexMenu(Long communityId) {
 		QueryWrapper<IndexMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.ne("parent_id", 0).eq("community_id", communityId)
-			.eq("status", 0).orderByAsc("sort")
-			.last("limit " + INDEXMENUCOUNT);
+			.eq("status", 0).last("limit " + INDEXMENUCOUNT);
 		return indexMenuMapper.selectList(wrapper);
 	}
 	
@@ -224,7 +223,7 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 	public Long addParentMenu(AppMenuEntity appMenuEntity) {
 		IndexMenuEntity indexMenuEntity = new IndexMenuEntity();
 		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("parent_id",0);
+		queryWrapper.eq("parent_id", 0);
 		List<AppMenuEntity> list = appMenuMapper.selectList(queryWrapper);
 		for (AppMenuEntity menuEntity : list) {
 			if (!menuEntity.getMenuName().equals(indexMenuEntity.getMenuName()) ||

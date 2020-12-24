@@ -15,7 +15,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -32,13 +31,13 @@ import java.util.List;
 @Service
 @Slf4j
 public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity> implements IAppMenuService {
-	
+
 	@Resource
 	private AppMenuMapper appMenuMapper;
-	
+
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
-	
+
 	@Override
 	public List<FrontParentMenu> listAdminMenu() {
 		ArrayList<FrontParentMenu> list = new ArrayList<>();
@@ -49,7 +48,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		if (CollectionUtils.isEmpty(parentList)) {
 			throw new JSYException("该小区不存在");
 		}
-		
+
 		//2. 查询所有二级分类
 		QueryWrapper<AppMenuEntity> wrapper = new QueryWrapper<>();
 		wrapper.ne("parent_id", 0);
@@ -57,13 +56,13 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		if (CollectionUtils.isEmpty(childMenu)) {
 			return null;
 		}
-		
+
 		//3. 封装数据
 		for (AppMenuEntity frontMenuEntity : parentList) {
 			FrontParentMenu parentMenu = new FrontParentMenu();
 			BeanUtils.copyProperties(frontMenuEntity, parentMenu);
 			list.add(parentMenu);
-			
+
 			ArrayList<FrontChildMenu> childMenus = new ArrayList<>();
 			for (AppMenuEntity menu : childMenu) {
 				if (menu.getParentId().equals(frontMenuEntity.getId())) {
@@ -76,7 +75,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		}
 		return list;
 	}
-	
+
 	@Override
 	public void insertAdminMenu(AppMenuEntity adminMenu) {
 		if (!adminMenu.getParentId().equals(0L)) {
@@ -85,7 +84,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		adminMenu.setId(SnowFlake.nextId());
 		appMenuMapper.insert(adminMenu);
 	}
-	
+
 	@Override
 	public void removeAdminMenu(Long id) {
 		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
@@ -96,14 +95,14 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请先删除子菜单");
 		}
 	}
-	
+
 	@Override
 	public void insertChildMenu(AppMenuEntity adminMenu) {
-		String icon = adminMenu.getIcon();// 图片地址
-		if (!StringUtils.isEmpty(icon)) {
-			stringRedisTemplate.opsForSet().add("menu_img_all", icon);// 最终上传时将图片地址再存入redis
-		}
-		adminMenu.setId(SnowFlake.nextId());
-		appMenuMapper.insert(adminMenu);
+////		String icon = adminMenu.getIcon();// 图片地址
+//		if (!StringUtils.isEmpty(icon)) {
+//			stringRedisTemplate.opsForSet().add("menu_img_all", icon);// 最终上传时将图片地址再存入redis
+//		}
+//		adminMenu.setId(SnowFlake.nextId());
+//		appMenuMapper.insert(adminMenu);
 	}
 }

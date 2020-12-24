@@ -1,8 +1,6 @@
 package com.jsy.community.controller;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IIndexMenuService;
@@ -16,7 +14,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,14 +46,14 @@ public class IndexMenuController {
 	public CommonResult listIndexMenu(@ApiParam(value = "社区id")
 	                                  @RequestParam(value = "communityId", defaultValue = "1", required = false) Long communityId) {
 		String indexMenuList = redisTemplate.opsForValue().get("indexMenuList");
-		if (StringUtils.isEmpty(indexMenuList)) {
+//		if (StringUtils.isEmpty(indexMenuList)) {
 			List<IndexMenuEntity> list = menuService.listIndexMenu(communityId);
-			redisTemplate.opsForValue().set("indexMenuList", JSON.toJSONString(list));
+//			redisTemplate.opsForValue().set("indexMenuList", JSON.toJSONString(list));
 			return CommonResult.ok(list);
-		}
+//		}
 		//List<IndexMenuEntity> list = (List<IndexMenuEntity>) JSON.parse(indexMenuList);  //这种也可以
-		List<IndexMenuEntity> list = JSONArray.parseArray(indexMenuList, IndexMenuEntity.class);
-		return CommonResult.ok(list);
+//		List<IndexMenuEntity> list = JSONArray.parseArray(indexMenuList, IndexMenuEntity.class);
+//		return CommonResult.ok(list);
 		
 	}
 	
