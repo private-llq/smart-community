@@ -331,7 +331,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	@LcnTransaction
 	public void testTransaction() {
 		// 1. 调用远端服务
@@ -341,11 +341,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		// 2. 调用本地服务
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
-		shopLeaseEntity.setId(123L);
+		shopLeaseEntity.setId(1233L);
 		shopLeaseEntity.setTitle("测试分布式事物");
 		shopLeaseMapper.insert(shopLeaseEntity);
-		
-		System.out.println(123);
 	}
 	
 	

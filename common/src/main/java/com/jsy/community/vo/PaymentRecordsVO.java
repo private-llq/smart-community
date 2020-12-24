@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class PaymentRecordsVO implements Serializable {
 
     @ApiModelProperty(value = "订单id")
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "年份")
     private Integer payYear;

@@ -126,6 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
         userAuth.setUid(uuid);
+        userAuth.setId(SnowFlake.nextId());
         if (RegexUtils.isMobile(qo.getAccount())) { //手机注册
             userAuth.setMobile(qo.getAccount());
             user.setMobile(qo.getAccount());

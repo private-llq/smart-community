@@ -19,12 +19,21 @@ public class WeatherUtils {
 	
 	private static final Logger logger = LoggerFactory.getLogger(WeatherUtils.class);
 	
-	//TODO 三方接口商家待定 暂时用墨迹天气
+	//天气实况
 	public JSONObject getWeatherNow(String lon,String lat){
+		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/condition");
+	}
+	//天气预报
+	public JSONObject getWeatherForDays(String lon,String lat){
+		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/forecast15days");
+	}
+	
+	//TODO 三方接口商家待定 暂时用墨迹天气
+	public JSONObject getWeather(String lon,String lat,String url){
 		
 		String appCode = "xxxxxxxxxxxxxxxxxx";
 		appCode = "17e38ac209824aab9d0e82097f59ba11";
-		String url = "http://aliv8.data.moji.com/whapi/json/aliweather/condition";
+//		String url = "http://aliv8.data.moji.com/whapi/json/aliweather/condition";
 		//params参数
 		Map<String, String> paramsMap = new HashMap<>();
 		paramsMap.put("lon", lon);
@@ -45,11 +54,9 @@ public class WeatherUtils {
 		if(result != null && "0".equals(result.getString("code"))){
 			try{
 				JSONObject data = result.getJSONObject("data");
-				JSONObject condition = data.getJSONObject("condition");
-				JSONObject city = data.getJSONObject("city");
 				return data;
 			}catch (Exception e){
-				logger.error("天气json解析出错：" + result);
+				logger.error("获取天气data出错：" + result);
 				e.printStackTrace();
 			}
 		}
