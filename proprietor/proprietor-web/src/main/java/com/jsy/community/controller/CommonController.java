@@ -97,8 +97,8 @@ public class CommonController {
     @ApiOperation("根据经纬度查询当前天气")
     @GetMapping("weatherNow")
     public CommonResult<JSONObject> getWeatherNow(@RequestParam double lon,@RequestParam double lat){
-        JSONObject weatherNow = commonService.getWeatherNow(lon, lat);
-        return CommonResult.ok(weatherNow);
+        JSONObject weather = commonService.getWeather(lon, lat);
+        return CommonResult.ok(weather);
     }
     
     private static void main(String[] args) {

@@ -117,6 +117,30 @@ public interface ICommonService {
 	**/
 	List<RegionEntity> vagueQueryCity(String searchStr);
 	
+	/**
+	 * @Description: 天气整合接口
+	 * @Param: [lon, lat]
+	 * @Return: com.alibaba.fastjson.JSONObject
+	 * @Author: chq459799974
+	 * @Date: 2020/12/24
+	 **/
+	JSONObject getWeather(double lon, double lat);
 	
+	/**
+	 * @Description: 获取天气实况
+	 * @Param: [lon, lat]
+	 * @Return: com.alibaba.fastjson.JSONObject
+	 * @Author: chq459799974
+	 * @Date: 2020/12/24
+	 **/
 	JSONObject getWeatherNow(double lon, double lat);
+	
+	/**
+	 * @Description: 获取天气预报
+	 * @Param: [lon, lat]
+	 * @Return: com.alibaba.fastjson.JSONObject
+	 * @Author: chq459799974
+	 * @Date: 2020/12/24
+	 **/
+	JSONObject getWeatherForDays(double lon, double lat);
 }

@@ -174,7 +174,52 @@ public class CommonServiceImpl implements ICommonService {
         return regionMapper.vagueQueryCity(searchStr);
     }
 
+    /**
+    * @Description: 天气整合接口
+     * @Param: [lon, lat]
+     * @Return: com.alibaba.fastjson.JSONObject
+     * @Author: chq459799974
+     * @Date: 2020/12/24
+    **/
+    @Override
+    public JSONObject getWeather(double lon, double lat){
+        JSONObject weatherNow = getWeatherNow(lon, lat);
+        JSONObject weatherForDays = getWeatherForDays(lon, lat);
+        try{
+            String cityId1 = weatherNow.getJSONObject("city").getString("cityId");
+            String cityId2 = weatherForDays.getJSONObject("city").getString("cityId");
+            if(cityId1.equals(cityId2)){
+                JSONArray forecast = weatherForDays.getJSONArray("forecast");
+                weatherNow.put("forecast",forecast);
+            }
+        }catch (Exception e){
+            log.error("查询天气 结果解析出错");
+        }
+        return weatherNow;
+    }
+    
+    /**
+    * @Description: 获取天气实况
+     * @Param: [lon, lat]
+     * @Return: com.alibaba.fastjson.JSONObject
+     * @Author: chq459799974
+     * @Date: 2020/12/24
+    **/
+    @Override
     public JSONObject getWeatherNow(double lon, double lat){
         return weatherUtils.getWeatherNow(String.valueOf(lon),String.valueOf(lat));
     }
+    
+    /**
+    * @Description: 获取天气预报
+     * @Param: [lon, lat]
+     * @Return: com.alibaba.fastjson.JSONObject
+     * @Author: chq459799974
+     * @Date: 2020/12/24
+    **/
+    @Override
+    public JSONObject getWeatherForDays(double lon, double lat){
+        return weatherUtils.getWeatherForDays(String.valueOf(lon),String.valueOf(lat));
+    }
+    
 }
