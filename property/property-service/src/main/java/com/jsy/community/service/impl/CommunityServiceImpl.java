@@ -40,11 +40,11 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	}
 	
 	@Override
-	@LcnTransaction
 	@Transactional
+	@LcnTransaction
 	public void addCommunityEntity() {
 		CommunityEntity communityEntity = new CommunityEntity();
-		communityEntity.setId(666677888L);
+		communityEntity.setId(234L);
 		communityEntity.setName("测试分布式事物");
 		communityMapper.insert(communityEntity);
 	}
