@@ -3,33 +3,11 @@
 
 <mapper namespace="com.jsy.community.mapper.CarMapper">
     <!-- 批量新增车辆 -->
-    <insert id="addProprietorCar" parameterType="java.util.List">
+    <insert id="addProprietorCarForList" parameterType="java.util.List">
         insert into t_car(id,uid,community_id,car_plate,contact,owner,car_type,car_image_url)
         values
         <foreach collection="carEntityList" item="item" separator=",">
             (#{item.id},#{item.uid},#{item.communityId},#{item.carPlate},#{item.contact},#{item.owner},#{item.carType},#{item.carImageUrl})
         </foreach>
     </insert>
-    <!-- 批量更新车辆信息 -->
-    <update id="updateProprietorCarBatch" >
-        <foreach collection="carList" item="car" separator=";" >
-            update t_car
-            <set>
-                <trim prefixOverrides=",">
-                    <if test="car.carImageUrl != null">
-                        ,car_image_url = #{car.carImageUrl}
-                    </if>
-                    <if test="car.carPlate != null">
-                        ,car_plate = #{car.carPlate}
-                    </if>
-                    <if test="car.carType != null">
-                        ,car_type = #{car.carType}
-                    </if>
-                </trim>
-            </set>
-            <where>
-                id = #{car.id}
-            </where>
-        </foreach>
-    </update>
 </mapper>

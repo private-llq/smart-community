@@ -39,15 +39,6 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	List<UserHouseEntity> queryUserHouses(String uid);
 
 
-	/**
-	 * 批量更新业主房屋认证信息
-	 * @param houseEntityList	参数列表
-	 * @param uid				用户id
-	 * @author YuLF
-	 * @since  2020/12/18 14:18
-	 */
-    void updateProprietorHouseBatch(@Param("houseList") List<UserHouseEntity> houseEntityList, @Param("uid") String uid);
-
 
 	/**
 	 * 通过用户id和社区id查出用户房屋信息
@@ -56,4 +47,11 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 */
 	@Select("select h.id,h.community_id,h.house_id,c.name as communityName,s.building,s.unit,s.floor,s.door from t_user_house as h LEFT JOIN t_house as s on h.house_id = s.id LEFT JOIN t_community as c on h.community_id = c.id  where h.uid = #{userId} and check_status = 1")
 	List<HouseVo> queryUserHouseList(@Param("userId") String userId);
+
+	/**
+	 * 批量新增房屋信息
+	 * @author YuLF
+	 * @since  2020/12/24 14:07
+	 */
+    void addHouseBatch(@Param("userHouseList") List<UserHouseEntity> any);
 }

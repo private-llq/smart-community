@@ -10,10 +10,13 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -92,6 +95,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
      * @Param  userEntityList           业主信息参数列表
      * @Param  communityId              社区id
      */
+    @Transactional
     @Override
     public void saveUserBatch(List<UserEntity> userEntityList, Long communityId) {
         //1.验证 录入信息 房屋信息是否正确
@@ -104,9 +108,23 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
 
         //1.2 通过社区id 和 社区结构 拿到当前社区 所有未被登记的房屋信息
         List<HouseEntity>  houseEntities = proprietorMapper.getHouseListByCommunityId(communityId, houseLevelMode);
-        //1.3 验证excel录入的每一个房屋信息 是否正确
+        //1.3 验证excel录入的每一个房屋信息 是否正确  目前 TODO: 没有验证 已经被登记过房屋的用户
         validHouseList(userEntityList, houseEntities);
-
+        //2 为所有用户注册
+        //2.1 设置uid 及 id
+        userEntityList.forEach( w -> {
+            w.setUid(UserUtils.createUserToken());
+            w.setId(SnowFlake.nextId());
+            //由物业导入 所有人都是业主 因为家属在另一个导入表里面
+            w.setHouseholderId(1L);
+        });
+        //2.2 批量注册 t_user_auth
+        proprietorMapper.registerBatch(userEntityList);
+        //2.3 批量发送短信告知用户 您的账号已注册 请使用电话号码验证码登录
+        //TODO: 批量发送短信 userEntityList
+        //3 为所有用户 登记信息 t_user
+        proprietorMapper.insertUserBatch(userEntityList);
+        //4.为所有用户 登记房屋 状态都是已审核
 
     }
 
@@ -119,39 +137,25 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
         for( UserEntity userEntity : NotVerified ){
             //每一个 excel 录入的房屋信息
             HouseEntity houseEntity = userEntity.getHouseEntity();
-            if( !verified.contains(houseEntity) ){
-                throw new PropertyException(userEntity.getRealName() + "电话："+userEntity.getMobile() + " 这一行的房屋信息填写错误, 原因：在这个社区并没有能匹配的房屋!");
+            if( !judgeExist(houseEntity, verified) ){
+                throw new PropertyException(userEntity.getRealName() + "电话："+userEntity.getMobile() + " 这一行的房屋信息填写错误, 如果已经登记房屋,请移除它 原因：在这个社区并没有能匹配的房屋!");
             }
         }
     }
 
-    public static void main(String[] args) {
-        List<UserEntity> NotVerified = new ArrayList<>();
-        for( int i = 0; i < 10; i++){
-            UserEntity userEntity  = new UserEntity();
-            userEntity.setRealName("张三"+i);
-            userEntity.setIdCard("513029199910053056");
-            HouseEntity houseEntity = new HouseEntity();
-            houseEntity.setDoor(i+++"-2");
-            houseEntity.setFloor(i+++"层");
-            houseEntity.setUnit(i+++"单元");
-            houseEntity.setBuilding(i+++"栋");
-            userEntity.setHouseEntity(houseEntity);
-            NotVerified.add(userEntity);
-        }
-        List<HouseEntity>  houseEntities = new ArrayList<>();
-        HouseEntity houseEntity = new HouseEntity();
-        houseEntity.setBuilding("1栋");
-        houseEntity.setUnit("1单元");
-        houseEntity.setFloor("1层");
-        houseEntity.setDoor("1-1");
-        houseEntities.add(houseEntity);
-        for( UserEntity userEntity : NotVerified ){
-            //每一个 excel 录入的房屋信息
-            HouseEntity use = userEntity.getHouseEntity();
-            if( !houseEntities.contains(houseEntity) ){
-                throw new PropertyException(userEntity.getRealName() + "电话："+userEntity.getMobile() + " 这一行的房屋信息填写错误, 原因：在这个社区并没有能匹配的房屋!");
-            }
-        }
+
+
+    /**
+     * 通过  houseEntity 中的某些属性 来 houseEntityList匹配是否存在这个对象
+     * @author YuLF
+     * @since  2020/12/24 14:44
+     * @Param  houseEntity          需要验证的房屋对象
+     * @Param  houseEntityList      房屋列表
+     */
+    private boolean judgeExist(HouseEntity houseEntity, List<HouseEntity> houseEntityList){
+        return houseEntityList.stream().anyMatch(w -> String.valueOf(w.getBuilding()).equals(houseEntity.getBuilding())
+                && String.valueOf(w.getDoor()).equals(houseEntity.getDoor())
+                && String.valueOf(w.getUnit()).equals(houseEntity.getUnit())
+                && String.valueOf(w.getFloor()).equals(houseEntity.getFloor()));
     }
 }

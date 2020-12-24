@@ -2,18 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jsy.community.mapper.UserHouseMapper">
-    <!-- 批量更新房屋认证信息 -->
-    <update id="updateProprietorHouseBatch">
-        <foreach collection="houseList" item="house">
-			<if test="house.houseId != null">
-				update t_user_house
-				<set>
-					house_id = #{house.houseId},check_status = 2
-				</set>
-				<where>
-					id = #{house.id}
-				</where>
-			</if>
-        </foreach>
-    </update>
+
+	<!-- 批量新增房屋数据 -->
+	<insert id="addHouseBatch">
+		insert into t_user_house(id,uid,community_id,house_id,check_status)
+		values
+		<foreach collection="userHouseList" item="item" separator=",">
+			(#{item.id},#{item.uid},#{item.communityId},#{item.houseId},2)
+		</foreach>
+	</insert>
 </mapper>

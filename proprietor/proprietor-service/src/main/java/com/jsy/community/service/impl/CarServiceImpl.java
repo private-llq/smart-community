@@ -103,12 +103,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return              返回影响行数
      */
     @Override
-    public Integer addProprietorCar(List<CarEntity> carEntityList) {
+    public Integer addProprietorCarForList(List<CarEntity> carEntityList) {
         //对所有车辆信息 设置默认的id
         for(CarEntity carEntity : carEntityList ){
             carEntity.setId(SnowFlake.nextId());
         }
-        return carMapper.addProprietorCar(carEntityList);
+        return carMapper.addProprietorCarForList(carEntityList);
     }
 
     /**
@@ -121,14 +121,6 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         return carMapper.queryUserCarById(userId);
     }
 
-    /**
-     * 批量更新车辆信息
-     * @param carEntityList   更新参数对象，只会取需要的字段 
-     */
-    @Override
-    public void updateProprietorCarBatch(List<CarEntity> carEntityList, String uid) {
-        carMapper.updateProprietorCarBatch(carEntityList, uid);
-    }
 
 
 }

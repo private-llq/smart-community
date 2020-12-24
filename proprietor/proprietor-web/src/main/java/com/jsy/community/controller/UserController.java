@@ -147,6 +147,9 @@ public class UserController {
         if( proprietorQO.getHasCar() == null ){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
         }
+        if( proprietorQO.getHouseEntityList() == null || proprietorQO.getHouseEntityList().isEmpty() ){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "房屋未指定!");
+        }
         return userService.proprietorUpdate(proprietorQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 

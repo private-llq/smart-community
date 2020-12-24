@@ -54,15 +54,6 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	boolean checkHouseHolder(Long uid, Long houseId);
 
 
-	/**
-	 * 批量更新业主房屋认证信息
-	 * @param houseEntityList	参数列表
-	 * @param uid				用户id
-	 * @author YuLF
-	 * @since  2020/12/18 14:18
-	 */
-    void updateProprietorHouseBatch(List<UserHouseEntity> houseEntityList, String uid);
-
 
 	/**
 	 * 通过用户id和社区id查出用户房屋信息
@@ -81,4 +72,11 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @Date: 2020/12/23
 	 **/
 	boolean hasHouse(String uid,Long communityId);
+
+	/**
+	 * 批量新增房屋信息
+	 * @author YuLF
+	 * @since  2020/12/24 14:07
+	 */
+    void addHouseBatch(List<UserHouseEntity> any);
 }
