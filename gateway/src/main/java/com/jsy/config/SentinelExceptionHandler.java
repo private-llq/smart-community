@@ -33,18 +33,28 @@ public class SentinelExceptionHandler implements BlockRequestHandler {
         }
         //服务降级响应
         else if (throwable instanceof DegradeException) {
-        }
-        //热点参数限流响应
-        else if (throwable instanceof ParamFlowException) {
-        }
-        //触发系统保护规则响应
-        else if (throwable instanceof SystemBlockException) {
             resp.setCode(10002);
             resp.setMessage("提示：系统繁忙，请稍后再试");
             status = 430;
         }
+        //热点参数限流响应
+        else if (throwable instanceof ParamFlowException) {
+            resp.setCode(10003);
+            resp.setMessage("提示：系统繁忙，请稍后再试");
+            status = 431;
+        }
+        //触发系统保护规则响应
+        else if (throwable instanceof SystemBlockException) {
+            resp.setCode(10004);
+            resp.setMessage("提示：系统繁忙，请稍后再试");
+            status = 432;
+        }
         //授权规则不通过响应
         else if (throwable instanceof AuthorityException) {
+            resp.setCode(10005);
+            resp.setMessage("提示：系统繁忙，请稍后再试");
+            status = 433;
+
         }
         //返回固定响应信息
         ServerHttpResponse response = serverWebExchange.getResponse();
