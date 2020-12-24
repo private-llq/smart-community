@@ -7,6 +7,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.vo.ProprietorVO;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -36,5 +37,13 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
      * @param communityId   社区id
      * @return              返回房屋信息列表
      */
-    List<HouseEntity> getHouseListByCommunityId(@Param("communityId") Long communityId);
+    List<HouseEntity> getHouseListByCommunityId(@Param("communityId") Long communityId, @Param("houseLevelMode") Integer houseLevelMode);
+
+    /**
+     * 通过社区id拿到当前社区的 层级结构 房屋层级模式：1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元
+     * @author YuLF
+     * @since  2020/12/24 9:19
+     */
+    @Select("select house_level_mode from t_community where id = #{communityId}")
+    Integer queryHouseLevelModeById(@Param("communityId") Long communityId);
 }

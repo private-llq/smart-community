@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.api.IProprietorService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
@@ -15,6 +16,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,11 +95,17 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
     @Override
     public void saveUserBatch(List<UserEntity> userEntityList, Long communityId) {
         //1.验证 录入信息 房屋信息是否正确
-        //1.1 通过社区id 拿到当前社区 所有未被登记的房屋信息
-        //拿到当前社区结构层级
-        List<HouseEntity>  houseEntities = proprietorMapper.getHouseListByCommunityId(communityId);
-        //1.2 验证excel录入的每一个房屋信息 是否正确
+        //1.1 拿到当前社区结构层级
+        Integer houseLevelMode = proprietorMapper.queryHouseLevelModeById(communityId);
 
+        if( houseLevelMode == null ){
+            throw new PropertyException("没有这个社区!");
+        }
+
+        //1.2 通过社区id 和 社区结构 拿到当前社区 所有未被登记的房屋信息
+        List<HouseEntity>  houseEntities = proprietorMapper.getHouseListByCommunityId(communityId, houseLevelMode);
+        //1.3 验证excel录入的每一个房屋信息 是否正确
+        validHouseList(userEntityList, houseEntities);
 
 
     }
@@ -109,7 +117,41 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
      */
     private void validHouseList(List<UserEntity> NotVerified, List<HouseEntity> verified){
         for( UserEntity userEntity : NotVerified ){
+            //每一个 excel 录入的房屋信息
             HouseEntity houseEntity = userEntity.getHouseEntity();
+            if( !verified.contains(houseEntity) ){
+                throw new PropertyException(userEntity.getRealName() + "电话："+userEntity.getMobile() + " 这一行的房屋信息填写错误, 原因：在这个社区并没有能匹配的房屋!");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        List<UserEntity> NotVerified = new ArrayList<>();
+        for( int i = 0; i < 10; i++){
+            UserEntity userEntity  = new UserEntity();
+            userEntity.setRealName("张三"+i);
+            userEntity.setIdCard("513029199910053056");
+            HouseEntity houseEntity = new HouseEntity();
+            houseEntity.setDoor(i+++"-2");
+            houseEntity.setFloor(i+++"层");
+            houseEntity.setUnit(i+++"单元");
+            houseEntity.setBuilding(i+++"栋");
+            userEntity.setHouseEntity(houseEntity);
+            NotVerified.add(userEntity);
+        }
+        List<HouseEntity>  houseEntities = new ArrayList<>();
+        HouseEntity houseEntity = new HouseEntity();
+        houseEntity.setBuilding("1栋");
+        houseEntity.setUnit("1单元");
+        houseEntity.setFloor("1层");
+        houseEntity.setDoor("1-1");
+        houseEntities.add(houseEntity);
+        for( UserEntity userEntity : NotVerified ){
+            //每一个 excel 录入的房屋信息
+            HouseEntity use = userEntity.getHouseEntity();
+            if( !houseEntities.contains(houseEntity) ){
+                throw new PropertyException(userEntity.getRealName() + "电话："+userEntity.getMobile() + " 这一行的房屋信息填写错误, 原因：在这个社区并没有能匹配的房屋!");
+            }
         }
     }
 }

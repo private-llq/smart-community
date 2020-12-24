@@ -41,11 +41,10 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		if (!CollectionUtils.isEmpty(houseEntityList)) {
 			for (UserHouseEntity houseEntity : houseEntityList) {
 				Long communityId = houseEntity.getCommunityId();
-				Long id = houseEntity.getId();
 
 				houseEntity.setUid(uid);
 				houseEntity.setCommunityId(communityId);
-				houseEntity.setHouseId(id);
+				houseEntity.setHouseId(houseEntity.getHouseId());
 				houseEntity.setCheckStatus(2);//审核中
 				houseEntity.setId(SnowFlake.nextId());
 				

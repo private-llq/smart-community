@@ -124,13 +124,32 @@
         where id = #{id}
     </update>
 
+    <!-- 通过社区id拿到当前社区的 层级结构 房屋层级模式：1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元 -->
     <select id="getHouseListByCommunityId" resultType="com.jsy.community.entity.HouseEntity">
         SELECT DISTINCT
-	        h.building,
-	        h.unit,
-	        h.floor,
-	        h.door,
-	        h.id
+        <choose>
+            <when test="houseLevelMode == 1 || houseLevelMode == 2">
+                    h.building,
+                    h.unit,
+                    h.floor,
+                    h.door,
+                    h.id
+            </when>
+            <when test="houseLevelMode == 3">
+                h.building,
+                h.floor,
+                h.door,
+                h.id
+            </when>
+            <when test="houseLevelMode == 4">
+                h.unit,
+                h.floor,
+                h.door,
+                h.id
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
         FROM
 	        t_house AS h
 	    LEFT JOIN t_user_house AS uh ON h.id = uh.house_id

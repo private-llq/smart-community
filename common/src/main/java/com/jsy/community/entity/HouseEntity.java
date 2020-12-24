@@ -41,6 +41,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "门牌名")
     private String door;
 
+    @ApiModelProperty(value = "房屋id")
+    @TableField(exist = false)
+    private Long houseId;
+
     @ApiModelProperty(value = "父级id")
     @NotNull(groups = {addHouseValidatedGroup.class}, message = "缺少父级ID")
     private Long pid;
