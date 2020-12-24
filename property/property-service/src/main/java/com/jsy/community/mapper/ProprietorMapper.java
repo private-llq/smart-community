@@ -46,4 +46,18 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
      */
     @Select("select house_level_mode from t_community where id = #{communityId}")
     Integer queryHouseLevelModeById(@Param("communityId") Long communityId);
+
+    /**
+     * [excel]批量注册用户t_user_auth
+     * @author YuLF
+     * @since  2020/12/24 15:21
+     */
+    void registerBatch(@Param("userList") List<UserEntity> userEntityList);
+
+
+    /**
+     * [excel]批量登记用户t_user
+     * @param userEntityList        用户登记信息列表
+     */
+    void insertUserBatch(@Param("userEntityList") List<UserEntity> userEntityList);
 }

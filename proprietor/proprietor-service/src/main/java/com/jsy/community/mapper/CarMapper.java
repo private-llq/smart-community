@@ -20,7 +20,7 @@ public interface CarMapper extends BaseMapper<CarEntity> {
      * @param carEntityList 业主车辆信息 列表
      * @return              返回影响行数
      */
-    Integer addProprietorCar(List<CarEntity> carEntityList);
+    Integer addProprietorCarForList(List<CarEntity> carEntityList);
 
 
 
@@ -28,9 +28,4 @@ public interface CarMapper extends BaseMapper<CarEntity> {
     List<CarEntity> queryUserCarById(@Param("userId") String userId);
 
 
-    /**
-     * 批量更新车辆信息
-     * @param carEntityList   更新参数对象，只会取需要的字段
-     */
-    void updateProprietorCarBatch(@Param("carList") List<CarEntity> carEntityList,@Param("uid") String uid);
 }

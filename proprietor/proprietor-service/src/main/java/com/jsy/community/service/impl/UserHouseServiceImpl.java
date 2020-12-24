@@ -96,18 +96,6 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	}
 
 
-	/**
-	 * 批量更新业主房屋认证信息
-	 * @param houseEntityList	参数列表
-	 * @param uid				用户id
-	 * @author YuLF
-	 * @since  2020/12/18 14:18
-	 */
-	@Override
-	public void updateProprietorHouseBatch(List<UserHouseEntity> houseEntityList, String uid) {
-		userHouseMapper.updateProprietorHouseBatch(houseEntityList, uid);
-	}
-
 
 	/**
 	 * 通过用户id和社区id查出用户房屋信息
@@ -131,5 +119,16 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public boolean hasHouse(String uid,Long communityId){
 		Integer count = userHouseMapper.selectCount(new QueryWrapper<UserHouseEntity>().eq("uid", uid).eq("community_id", communityId));
 		return count > 0;
+	}
+
+
+	/**
+	 * 批量新增房屋信息
+	 * @author YuLF
+	 * @since  2020/12/24 14:07
+	 */
+	@Override
+	public void addHouseBatch(List<UserHouseEntity> any) {
+		userHouseMapper.addHouseBatch(any);
 	}
 }

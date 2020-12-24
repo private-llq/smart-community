@@ -28,9 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 业主实现
@@ -160,7 +162,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         //业主登记时有填写车辆信息的情况下，新增车辆
         if (proprietorQO.getHasCar()) {
-            carService.addProprietorCar(proprietorQO.getCarEntityList());
+            carService.addProprietorCarForList(proprietorQO.getCarEntityList());
         }
         //t_user_house 中插入当前这条记录 为了让物业审核
 		userHouseService.saveUserHouse(userEntity.getUid(), proprietorQO.getHouseEntityList());
@@ -169,24 +171,63 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
 
     /**
-     * 【用户】业主更新信息
+     * 【用户】业主更新信息  id等于null 或者 id == 0 表示需要新增的数据
      * @author YuLF
      * @Param proprietorQO        需要更新 实体参数
      * @since 2020/11/27 15:03
      */
     @Transactional
     @Override
-    public Boolean proprietorUpdate(ProprietorQO proprietorQO) {
-        //如果有车辆的情况下 更新 车辆信息
-        if(proprietorQO.getHasCar()){
-            carService.updateBatchById(proprietorQO.getCarEntityList());
+    public Boolean proprietorUpdate(ProprietorQO qo) {
+        //========================================== 业主车辆 =========================================================
+        //如果有车辆的情况下 更新或新增 车辆信息
+        if(qo.getHasCar()){
+            //如果有需要新增的数据 id == null 或者 == 0 就是需要新增 只要有一个条件满足即返回true
+            List<CarEntity> carEntityList = qo.getCarEntityList();
+            boolean b = carEntityList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
+            //新增车辆信息
+            if(b){
+                //从提交的List中取出Id == null 并且ID == 0的数据 重新组成一个List 代表需要新增的数据
+                List<CarEntity> any = carEntityList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                //从更新车辆的集合中 移除 需要 新增的数据
+                carEntityList.removeAll(any);
+                //为新增的车辆信息设置基本信息
+                any.forEach(e ->{
+                    e.setId(SnowFlake.nextId());
+                    e.setOwner(qo.getRealName());
+                    e.setUid(qo.getUid());
+                    e.setCommunityId(qo.getHouseEntityList().get(0).getCommunityId());
+                    e.setContact(qo.getMobile());
+                });
+                //批量新增车辆
+                carService.addProprietorCarForList(any);
+            }
+            //批量更新车辆信息
+            carService.updateBatchById(qo.getCarEntityList());
         }
-        //更新房屋信息
-        userHouseService.updateBatchById(proprietorQO.getHouseEntityList());
-
+        //========================================== 业主房屋 =========================================================
+        List<UserHouseEntity> houseList = qo.getHouseEntityList();
+        //验证房屋信息是否有需要新增的数据
+        boolean b = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
+        //如果存在需要新增的房屋的数据
+        if(b){
+            List<UserHouseEntity> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+            houseList.removeAll(any);
+            //为房屋添加基本信息 uid、id、
+            any.forEach(e -> {
+                e.setId(SnowFlake.nextId());
+                e.setUid(qo.getUid());
+            });
+            //批量新增房屋信息
+            userHouseService.addHouseBatch(any);
+        }
+        //批量更新房屋信息
+        userHouseService.updateBatchById(qo.getHouseEntityList());
+        //========================================== 业主 =========================================================
         //业主信息更新
-        return userMapper.proprietorUpdate(proprietorQO) > 0;
+        return userMapper.proprietorUpdate(qo) > 0;
     }
+
 
     /**
      * 根据业主id查询业主信息及业主家属信息

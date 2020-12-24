@@ -159,4 +159,20 @@
 	        AND h.community_id = #{communityId}
 	        AND h.type = 4
     </select>
+    <!-- 批量注册用户 注意：以下的字段都存在唯一索引的情况下 才使用ignore关键字 如果存在此用户 则不管 -->
+    <insert id="registerBatch">
+        insert IGNORE into t_car(uid,mobile)
+        values
+        <foreach collection="userList" item="item" separator=",">
+            (#{item.uid},#{item.mobile})
+        </foreach>
+    </insert>
+    <!-- 批量登记用户  -->
+    <insert id="registerBatch">
+        insert IGNORE into t_user(id,uid,householder_id,mobile,sex,real_name,id_card,detail_address)
+        values
+        <foreach collection="userList" item="item" separator=",">
+            (#{item.id},#{item.uid},#{item.householderId},#{item.mobile},#{item.sex},#{item.realName},#{item.idCard},#{detailAddress})
+        </foreach>
+    </insert>
 </mapper>

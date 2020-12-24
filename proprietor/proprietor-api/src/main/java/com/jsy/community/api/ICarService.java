@@ -60,7 +60,7 @@ public interface ICarService extends IService<CarEntity> {
      * @param carEntityList   业主车辆信息 列表
      * @return                返回sql插入影响行数
      */
-    Integer addProprietorCar(List<CarEntity> carEntityList);
+    Integer addProprietorCarForList(List<CarEntity> carEntityList);
 
 
     /**
@@ -71,9 +71,4 @@ public interface ICarService extends IService<CarEntity> {
     List<CarEntity> queryUserCarById(String userId);
 
 
-    /**
-     * 批量更新车辆信息
-     * @param carEntityList   更新参数对象，只会取需要的字段
-     */
-    void updateProprietorCarBatch(List<CarEntity> carEntityList, String uid);
 }
