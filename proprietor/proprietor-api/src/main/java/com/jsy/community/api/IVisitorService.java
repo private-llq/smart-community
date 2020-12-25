@@ -38,24 +38,6 @@ public interface IVisitorService extends IService<VisitorEntity> {
     boolean verifyEntry(String token,Integer type);
     
     /**
-     * @Description: 批量添加随行人员
-     * @Param: [personRecordList]
-     * @Return: void
-     * @Author: chq459799974
-     * @Date: 2020/12/10
-     **/
-    void addPersonBatch(List<VisitorPersonRecordEntity> personList);
-    
-    /**
-    * @Description: 批量添加随行车辆
-     * @Param: [carList]
-     * @Return: void
-     * @Author: chq459799974
-     * @Date: 2020/12/10
-    **/
-    void addCarBatch(List<VisitingCarRecordEntity> carRecordList);
-    
-    /**
     * @Description: 根据ID 删除访客登记申请
      * @Param: [id]
      * @Return: boolean

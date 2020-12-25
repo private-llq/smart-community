@@ -18,12 +18,15 @@ import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -62,11 +65,32 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Author: chq459799974
      * @Date: 2020/11/12
     **/
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public VisitorEntryVO addVisitor(VisitorEntity visitorEntity){
+        long visitorId = SnowFlake.nextId();
+        visitorEntity.setId(SnowFlake.nextId());
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
+        }
+        //添加随行人员记录
+        List<VisitorPersonRecordEntity> personRecordList = visitorEntity.getVisitorPersonRecordList();
+        if (!CollectionUtils.isEmpty(personRecordList)) {
+            for (VisitorPersonRecordEntity personRecord : personRecordList) {
+                personRecord.setVisitorId(visitorId);
+                personRecord.setId(SnowFlake.nextId());
+            }
+            addPersonBatch(personRecordList);
+        }
+        //添加随行车辆记录
+        List<VisitingCarRecordEntity> carRecordList = visitorEntity.getVisitingCarRecordList();
+        if (!CollectionUtils.isEmpty(carRecordList)) {
+            for (VisitingCarRecordEntity carRecord : carRecordList) {
+                carRecord.setVisitorId(visitorId);
+                carRecord.setId(SnowFlake.nextId());
+            }
+            addCarBatch(carRecordList);
         }
         //0是无权限 小区和楼栋都是0 则不需要后续操作
         if((visitorEntity.getIsCommunityAccess() != null && visitorEntity.getCommunityId() != 0)
@@ -155,8 +179,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Author: chq459799974
      * @Date: 2020/12/10
      **/
-    @Override
-    public void addPersonBatch(List<VisitorPersonRecordEntity> personRecordList){
+    private void addPersonBatch(List<VisitorPersonRecordEntity> personRecordList){
         int result = visitorPersonRecordMapper.addPersonBatch(personRecordList);
         if(result != personRecordList.size()){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"添加随行人员失败");
@@ -170,8 +193,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @Author: chq459799974
      * @Date: 2020/12/10
      **/
-    @Override
-    public void addCarBatch(List<VisitingCarRecordEntity> carRecordList){
+    private void addCarBatch(List<VisitingCarRecordEntity> carRecordList){
         int result = visitingCarRecordMapper.addCarBatch(carRecordList);
         if(result != carRecordList.size()){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"添加随行车辆失败");

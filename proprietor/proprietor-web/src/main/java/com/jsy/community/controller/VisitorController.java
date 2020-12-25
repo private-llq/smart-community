@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IVisitingCarService;
@@ -25,7 +24,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author chq459799974
@@ -56,35 +54,11 @@ public class VisitorController {
 	 **/
 	//TODO 权限和一次访客登记对应还是和每个随行人员一一对应？
 	@ApiOperation("【访客】新增")
-	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("")
-	public CommonResult save(@RequestBody VisitorEntity visitorEntity) {
+	public CommonResult<VisitorEntryVO> save(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity);
 		visitorEntity.setUid(UserUtils.getUserId());
-		//雪花算法生成ID
-		long visitorId = SnowFlake.nextId();
-		visitorEntity.setId(visitorId);
-		//添加访客
-		VisitorEntryVO visitorEntryVO = iVisitorService.addVisitor(visitorEntity);
-		//添加随行人员
-		List<VisitorPersonRecordEntity> personRecordList = visitorEntity.getVisitorPersonRecordList();
-		if (!CollectionUtils.isEmpty(personRecordList)) {
-			for (VisitorPersonRecordEntity personRecord : personRecordList) {
-				personRecord.setVisitorId(visitorId);
-				personRecord.setId(SnowFlake.nextId());
-			}
-			iVisitorService.addPersonBatch(personRecordList);
-		}
-		//添加随行车辆
-		List<VisitingCarRecordEntity> carRecordList = visitorEntity.getVisitingCarRecordList();
-		if (!CollectionUtils.isEmpty(carRecordList)) {
-			for (VisitingCarRecordEntity carRecord : carRecordList) {
-				carRecord.setVisitorId(visitorId);
-				carRecord.setId(SnowFlake.nextId());
-			}
-			iVisitorService.addCarBatch(carRecordList);
-		}
-		return CommonResult.ok(visitorEntryVO);
+		return CommonResult.ok(iVisitorService.addVisitor(visitorEntity));
 	}
 	
 	//三方调用进来
