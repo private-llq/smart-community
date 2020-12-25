@@ -72,7 +72,6 @@ public class RepairController {
 	
 	@ApiOperation("报修内容图片上传")
 	@PostMapping("/uploadRepairImg")
-	@Login(allowAnonymous = true)
 	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files) {
 		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME);
 		StringBuilder filePath = new StringBuilder();
@@ -97,9 +96,10 @@ public class RepairController {
 	@ApiOperation("发起房屋报修")
 	@PostMapping("/addRepair")
 	public CommonResult addRepair(@RequestBody RepairEntity repairEntity) {
-		ValidatorUtils.validateEntity(repairEntity, RepairEntity.addRepairValidate.class);
 		String uid = UserUtils.getUserId();
-		repairService.addRepair(repairEntity, uid);
+		repairEntity.setUserId(uid);
+		ValidatorUtils.validateEntity(repairEntity, RepairEntity.addRepairValidate.class);
+		repairService.addRepair(repairEntity);
 		return CommonResult.ok();
 	}
 

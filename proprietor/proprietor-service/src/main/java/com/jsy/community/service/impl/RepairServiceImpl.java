@@ -11,6 +11,7 @@ import com.jsy.community.entity.RepairOrderEntity;
 import com.jsy.community.mapper.RepairMapper;
 import com.jsy.community.mapper.RepairOrderMapper;
 import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.repair.RepairVO;
 import lombok.extern.slf4j.Slf4j;
@@ -54,8 +55,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void addRepair(RepairEntity repairEntity,String uid) {
-		repairEntity.setUserId(uid);
+	public void addRepair(RepairEntity repairEntity) {
 		repairEntity.setId(SnowFlake.nextId());
 		repairMapper.insert(repairEntity); // 1.png;2.png;3.png;   或 1.png;2.png;3.png 都可以            redis 现在存的是  3个 xx.png
 		String repairImg = repairEntity.getRepairImg();
@@ -70,6 +70,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		orderEntity.setId(l);
 		orderEntity.setRepairId(id);
 		orderEntity.setNumber(UUID.randomUUID().toString().replace("-", ""));
+		orderEntity.setNumber(MyMathUtils.randomCode(17));
 		orderEntity.setOrderTime(new DateTime());
 		orderEntity.setCommunityId(repairEntity.getCommunityId());
 		repairOrderMapper.insert(orderEntity);
@@ -78,7 +79,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Override
 	public List<RepairEntity> getRepair(String id) {
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("user_id", id);
+		wrapper.eq("user_id", id).orderByAsc("status");
 		return repairMapper.selectList(wrapper);
 	}
 	
@@ -91,8 +92,8 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		if (entity==null) {
 			throw new ProprietorException("该订单不存在");
 		}
-		if (entity.getStatus() == 1) { //处理中  不能取消了
-			throw new ProprietorException("您好,工作人员已经在处理中，不能取消!");
+		if (entity.getStatus() != 0) { //处理中  不能取消了
+			throw new ProprietorException("您好,工作人员已经在处理中或已处理完成，不能取消!");
 		}
 		
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();

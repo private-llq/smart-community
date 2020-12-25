@@ -32,7 +32,7 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/8 12:23
 	 * @Param [repairEntity]
 	 **/
-	void addRepair(RepairEntity repairEntity, String uid);
+	void addRepair(RepairEntity repairEntity);
 	
 	/**
 	 * @return com.jsy.community.entity.RepairEntity

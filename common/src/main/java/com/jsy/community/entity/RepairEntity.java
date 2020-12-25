@@ -28,6 +28,7 @@ public class RepairEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty(value = "业主id")
+    @NotBlank(groups = {addRepairValidate.class},message = "业主id不能为空")
     private String userId;
     
     @ApiModelProperty(value = "社区id")
