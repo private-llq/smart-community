@@ -16,10 +16,10 @@ import java.io.Serializable;
 @ApiModel("选择分组查询下面缴过费的水电气户号")
 public class GroupQO implements Serializable {
     @ApiModelProperty(value = "缴费单位")
-    private String PayCostUnit;
+    private Long PayCostUnit;
 
-    @ApiModelProperty(value = "组号id")
-    private Long group;
+    @ApiModelProperty(value = "组名称")
+    private String groupName;
 
     @ApiModelProperty(value = "用户ID",hidden = true)
     private String userID;

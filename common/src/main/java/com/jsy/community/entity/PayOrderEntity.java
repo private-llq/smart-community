@@ -72,5 +72,8 @@ public class PayOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "缴费类型，如水电气")
     private Long paymentType;
 
+    @ApiModelProperty(value = "缴费地址")
+    private String site;
+
 
 }

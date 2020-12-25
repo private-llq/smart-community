@@ -52,6 +52,9 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     //户主详情
     @Autowired
     private PayUserDetailsMapper payUserDetailsMapper;
+    //缴费类型
+    @Autowired
+    private PayTypeMapper payTypeMapper;
 
     /**
      * @Description: 交费记录
@@ -64,7 +67,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     public void add(LivingPaymentQO livingPaymentQO){
         System.out.println(livingPaymentQO);
         //设置组号
-        PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("type",livingPaymentQO.getTypeGroup()).eq("name",livingPaymentQO.getGroupName()));
+        PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("name",livingPaymentQO.getGroupName()));
 
         Long group_id=0l;
         if (!StringUtils.isEmpty(payGroupEntity)){
@@ -74,7 +77,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
             groupEntity.setId(SnowFlake.nextId());
             groupEntity.setUid(livingPaymentQO.getUserID());
             groupEntity.setName(livingPaymentQO.getGroupName());
-            groupEntity.setType(livingPaymentQO.getTypeGroup());
+            groupEntity.setType(livingPaymentQO.getGroupName()=="我家"?1:livingPaymentQO.getGroupName()=="父母"?2:livingPaymentQO.getGroupName()=="房东"?3:livingPaymentQO.getGroupName()=="朋友"?4:5);
             payGroupMapper.insert(groupEntity);
             group_id=groupEntity.getId();
         }
@@ -92,6 +95,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payOrderEntity.setPayMonth(LocalDateTime.now().getMonthValue());
         payOrderEntity.setGroupId(group_id);
         payOrderEntity.setPaymentType(livingPaymentQO.getType());
+        payOrderEntity.setSite(livingPaymentQO.getSite());
         payOrderMapper.insert(payOrderEntity);
         //添加缴费户号
         PayHouseOwnerEntity payHouseOwnerEntity = new PayHouseOwnerEntity();
@@ -127,17 +131,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      */
     @Override
     public List<GroupVO> selectGroup(GroupQO groupQO) {
-        List<PayHouseOwnerEntity> payHouseOwnerEntities = payHouseOwnerMapper.selectList(new QueryWrapper<PayHouseOwnerEntity>().eq("group_id", groupQO.getGroup()).eq("pay_company", groupQO.getPayCostUnit()));
-        List<GroupVO> list=new ArrayList<>();
-        GroupVO groupVO=null;
-        for (PayHouseOwnerEntity payHouseOwnerEntity : payHouseOwnerEntities) {
-            groupVO=new GroupVO();
-            groupVO.setType(payHouseOwnerEntity.getType());
-            groupVO.setPayCostUnit(payHouseOwnerEntity.getPayCompany());
-            groupVO.setDoorNo(payHouseOwnerEntity.getPayNumber());
-            list.add(groupVO);
-        }
-        return list;
+        return livingPaymentMapper.selectGroup(groupQO);
     }
     /**
      * @Description: 查询每月订单记录
@@ -163,6 +157,9 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         ArrayList<Object> November = new ArrayList<>();
         ArrayList<Object> December = new ArrayList<>();
         Map<String, Object> Map = new HashMap<>();
+        if (paymentRecordsQO.getPayYear()==null&&paymentRecordsQO.getPayYear()==0){
+            paymentRecordsQO.setPayYear(LocalDateTime.now().getYear());
+        }
         List<PaymentRecordsVO> list = livingPaymentMapper.selectOrder(paymentRecordsQO);
         for (PaymentRecordsVO paymentRecordsVO : list) {
             switch (paymentRecordsVO.getPayMonth()){
@@ -181,18 +178,42 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
                 default:break;
             }
         }
-        Map.put("January",January);
-        Map.put("February",February);
-        Map.put("March",March);
-        Map.put("April",April);
-        Map.put("May",May);
-        Map.put("June",June);
-        Map.put("July",July);
-        Map.put("August",August);
-        Map.put("September",September);
-        Map.put("October",October);
-        Map.put("November",November);
-        Map.put("December",December);
+        if (January!=null&&January.size()>0){
+            Map.put("January",January);
+        }
+        if (February!=null&&February.size()>0){
+            Map.put("February",February);
+        }
+        if (March!=null&&March.size()>0){
+            Map.put("March",March);
+        }
+        if (April!=null&&April.size()>0){
+            Map.put("April",April);
+        }
+        if (May!=null&&May.size()>0){
+            Map.put("May",May);
+        }
+        if (June!=null&&June.size()>0){
+            Map.put("June",June);
+        }
+        if (July!=null&&July.size()>0){
+            Map.put("July",July);
+        }
+        if (August!=null&&August.size()>0){
+            Map.put("August",August);
+        }
+        if (September!=null&&September.size()>0){
+            Map.put("September",September);
+        }
+        if (October!=null&&October.size()>0){
+            Map.put("October",October);
+        }
+        if (November!=null&&November.size()>0){
+            Map.put("November",November);
+        }
+        if (December!=null&&December.size()>0){
+            Map.put("December",December);
+        }
         return Map;
     }
     /**

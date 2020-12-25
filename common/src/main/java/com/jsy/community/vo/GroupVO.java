@@ -15,12 +15,14 @@ import java.io.Serializable;
 @Data
 @ApiModel("生活缴费组返回户号")
 public class GroupVO implements Serializable {
-    @ApiModelProperty(value = "水电气类型，0水费，1电费，2燃气费")
-    private Integer type;
-
-    @ApiModelProperty(value = "缴费单位")
-    private String PayCostUnit;
-
+    @ApiModelProperty(value = "组ID")
+    private Long groupID;
+    @ApiModelProperty(value = "组Name")
+    private Long groupName;
+    @ApiModelProperty(value = "缴费类型id")
+    private Long typeID;
+    @ApiModelProperty(value = "缴费类型name")
+    private String typeName;
     @ApiModelProperty(value = "户号")
     private String doorNo;
 }

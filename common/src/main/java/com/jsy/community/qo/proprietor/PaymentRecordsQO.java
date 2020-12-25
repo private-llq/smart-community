@@ -23,10 +23,10 @@ public class PaymentRecordsQO implements Serializable {
     private Long group;
 
     @ApiModelProperty(value = "年份查询")
-    private Long payYear;
+    private Integer payYear;
 
     @ApiModelProperty(value = "月份查询")
-    private Long payMonth;
+    private Integer payMonth;
 
 
     @ApiModelProperty(value = "用户ID",hidden = true)

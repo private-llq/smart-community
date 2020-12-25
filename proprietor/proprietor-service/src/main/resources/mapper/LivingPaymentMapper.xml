@@ -16,7 +16,9 @@
     </sql>
 
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
-        SELECT tp.id as groupId,tp.name as groupName,t.pay_number as payNumber,t.pay_company as payCompany FROM t_pay_house_owner t join t_pay_group tp on t.group_id=tp.id where tp.uid=#{userId}
+        SELECT pg.id as groupId,pg.name as groupName,po.family_id as payNumber,po.unit as payCompany,
+        tt.id as typeID,tt.name as typeName
+        FROM t_pay_order po join t_pay_type tt on po.payment_type=tt.id join t_pay_group pg on po.group_id=pg.id where pg.uid=#{userId}
     </select>
 
 
@@ -32,12 +34,31 @@
         <include refid="query"></include>
         ORDER BY t.order_time desc
     </select>
+    <select id="selectGroup" resultMap="GroupVOMap">
+        SELECT
+        po.family_id as doorNo,pc.id as typeID,pc.name as typeName,pg.id as groupID,pg.name as groupName
+        FROM t_pay_order po
+        join t_pay_type tt on po.payment_type=tt.id
+        join t_pay_group pg on po.group_id=pg.id
+        JOIN t_pay_company pc on po.payment_type=pc.id
+        where pg.uid=#{userID} and gp.name=#{groupName}
+    </select>
+
+    <resultMap id="GroupVOMap" type="com.jsy.community.vo.GroupVO">
+        <result property="typeName" column="typeName"/>
+        <result property="typeID" column="typeID"/>
+        <result property="groupName" column="groupName"/>
+        <result property="doorNo" column="doorNo"/>
+        <result property="groupID" column="groupID"/>
+    </resultMap>
 
     <resultMap id="DefaultHouseOwnerMap" type="com.jsy.community.vo.DefaultHouseOwnerVO">
         <result property="groupId" column="groupId"/>
         <result property="groupName" column="groupName"/>
         <result property="payNumber" column="payNumber"/>
         <result property="payCompany" column="payCompany"/>
+        <result property="typeID" column="typeID"/>
+        <result property="typeName" column="typeName"/>
     </resultMap>
 
     <resultMap id="PaymentRecordsVOMAP" type="com.jsy.community.vo.PaymentRecordsVO">
