@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.LivingPaymentMapper">
     <sql id="query">
-        where tg.uid=#{userID}
-            <if test="doorNo!=null and doorNo!=''">
-                and t.family_id=#{doorNo}
+        where tg.uid=#{query.userID}
+            <if test="query.doorNo!=null and query.doorNo!=''">
+                and t.family_id=#{query.doorNo}
             </if>
-            <if test="payYear!=null and payYear>0">
-                and t.pay_year=#{payYear}
+            <if test="query.payYear!=null and query.payYear>0">
+                and t.pay_year=#{query.payYear}
             </if>
-            <if test="payMonth!=null and payMonth>0">
-                and t.pay_month=#{payMonth}
+            <if test="query.payMonth!=null and query.payMonth>0">
+                and t.pay_month=#{query.payMonth}
             </if>
 
     </sql>
@@ -24,6 +24,7 @@
 
     <select id="selectOrder" resultMap="PaymentRecordsVOMAP">
         SELECT
+        concat(t.pay_year,"年",t.pay_month,"月") as timeGroup,
         t.id as id,t.pay_year as payYear,t.pay_month as payMonth,t.order_num as orderNum,t.unit as unitName,
         t.family_id as familyId,t.order_time as orderTime,t.payment_amount paySum,t.pay_type as payType,
         t.bill_classification as billClassification,t.label as label,t.remark as remark,t.remark_img as remarkImg,

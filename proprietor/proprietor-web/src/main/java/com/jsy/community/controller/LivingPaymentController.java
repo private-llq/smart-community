@@ -18,6 +18,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.GroupVO;
+import com.jsy.community.vo.PaymentRecordsVO;
 import com.jsy.community.vo.UserGroupVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -116,11 +117,11 @@ public class LivingPaymentController {
     @ApiOperation("查询每月的缴费详情")
     @PostMapping("/selectOrder")
     @Login
-    public CommonResult selectOrder(@RequestBody PaymentRecordsQO paymentRecordsQO){
+    public CommonResult selectOrder(@RequestBody BaseQO<PaymentRecordsQO> baseQO){
         String userId = UserUtils.getUserId();
         System.out.println(userId);
-        paymentRecordsQO.setUserID(userId);
-        Map<String, Object> map = livingPaymentService.selectOrder(paymentRecordsQO);
+        baseQO.getQuery().setUserID(userId);
+        Map<String, List<PaymentRecordsVO>> map = livingPaymentService.selectOrder(baseQO);
         return CommonResult.ok(map);
     }
 

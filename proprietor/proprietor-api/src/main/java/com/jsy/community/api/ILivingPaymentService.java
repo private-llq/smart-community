@@ -1,10 +1,12 @@
 package com.jsy.community.api;
 
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.vo.GroupVO;
+import com.jsy.community.vo.PaymentRecordsVO;
 import com.jsy.community.vo.UserGroupVO;
 
 import java.util.List;
@@ -35,10 +37,10 @@ public interface ILivingPaymentService {
 
     /**
      * 查询每月订单详情
-     * @param paymentRecordsQO
+     * @param baseQO
      * @return
      */
-    Map<String, Object> selectOrder(PaymentRecordsQO paymentRecordsQO);
+    Map<String, List<PaymentRecordsVO>> selectOrder(BaseQO<PaymentRecordsQO> baseQO);
 
     /**
      * 默认查询所有缴费信息
