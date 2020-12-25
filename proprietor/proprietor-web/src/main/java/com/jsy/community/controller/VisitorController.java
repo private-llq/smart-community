@@ -19,8 +19,6 @@ import com.jsy.community.vo.VisitorEntryVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -87,14 +85,9 @@ public class VisitorController {
 	 * @Date: 2020/11/12
 	 **/
 	@ApiOperation("【访客】删除")
-	@Transactional(rollbackFor = Exception.class)
 	@DeleteMapping("")
 	public CommonResult delete(@RequestParam("id") Long id) {
 		boolean delResult = iVisitorService.deleteVisitorById(id);
-		if (delResult) {
-			//关联删除
-			iVisitorService.deletePersonAndCar(id);
-		}
 		return delResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "删除失败");
 	}
 	

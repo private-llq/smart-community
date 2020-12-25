@@ -69,7 +69,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     @Override
     public VisitorEntryVO addVisitor(VisitorEntity visitorEntity){
         long visitorId = SnowFlake.nextId();
-        visitorEntity.setId(SnowFlake.nextId());
+        visitorEntity.setId(visitorId);
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
@@ -207,24 +207,25 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
+    @Transactional(rollbackFor = Exception.class)
 	@Override
     public boolean deleteVisitorById(Long id){
 	    int result = visitorMapper.deleteById(id);
 	    if(result == 1){
+            deletePersonAndCar(id);
 	    	return true;
 	    }
 	    return false;
     }
     
     /**
-     * @Description: 关联删除 访客关联数据(随行人员、随行车辆)
+     * @Description: 关联删除 访客关联数据(随行人员记录、随行车辆记录)
      * @Param: [visitorId]
      * @Return: int
      * @Author: chq459799974
      * @Date: 2020/11/12
      **/
-    @Override
-    public void deletePersonAndCar(Long visitorId){
+    private void deletePersonAndCar(Long visitorId){
         Map<String, Object> opMap = new HashMap<>();
         opMap.put("visitor_id",visitorId);
         visitorPersonRecordMapper.deleteByMap(opMap);
