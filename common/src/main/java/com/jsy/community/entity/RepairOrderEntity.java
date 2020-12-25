@@ -42,6 +42,8 @@ public class RepairOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "评价类型 0 好评 1 差评")
     private Integer commentStatus;
     
+    @ApiModelProperty(value = "评价图片")
+    private String imgPath;
 
     @ApiModelProperty(value = "下单时间")
     private Date orderTime;

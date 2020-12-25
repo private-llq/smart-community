@@ -45,6 +45,7 @@ public class RepairController {
 	private StringRedisTemplate redisTemplate;
 	
 	private static final String BUCKETNAME = "repair-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	private static final String BUCKETNAME2 = "repair-comment-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
 	@ApiOperation("房屋报修查询")
 	@GetMapping("/getRepair")
@@ -87,10 +88,24 @@ public class RepairController {
 	@GetMapping("/appraiseRepair")
 	public CommonResult appraiseRepair(@ApiParam(value = "房屋报修id") @RequestParam Long id,
 	                                   @ApiParam(value = "用户评价,100字以内") @RequestParam String appraise,
-	                                   @ApiParam(value = "评价类型") @RequestParam Integer status) {
+	                                   @ApiParam(value = "评价类型") @RequestParam Integer status,
+	                                   @ApiParam(value = "图片地址",required = false) String filePath) {
 		String uid = UserUtils.getUserId();
-		repairService.appraiseRepair(id, appraise, uid, status);
+		repairService.appraiseRepair(id, appraise, uid, status, filePath);
 		return CommonResult.ok();
+	}
+	
+	@ApiOperation("评价图片上传")
+	@PostMapping("/uploadCommentImg")
+	public CommonResult uploadCommentImg(@RequestParam("file") MultipartFile[] files) {
+		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME2);
+		StringBuilder filePath = new StringBuilder();
+		for (String s : filePaths) {
+			redisTemplate.opsForSet().add("repair_comment_img_part", s); // TODO 前端要注意调整 repairImg
+			filePath.append(s);
+			filePath.append(";");
+		}
+		return CommonResult.ok(filePath);
 	}
 	
 	@ApiOperation("发起房屋报修")

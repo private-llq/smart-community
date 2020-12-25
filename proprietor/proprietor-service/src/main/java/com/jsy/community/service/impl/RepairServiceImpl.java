@@ -116,7 +116,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	}
 	
 	@Override
-	public void appraiseRepair(Long id, String appraise, String uid, Integer status) {
+	public void appraiseRepair(Long id, String appraise, String uid, Integer status,String filepath) {
 		QueryWrapper<RepairEntity> entityQueryWrapper = new QueryWrapper<>();
 		entityQueryWrapper.eq("user_id", uid).eq("id",id);
 		RepairEntity repairEntity = repairMapper.selectOne(entityQueryWrapper);
@@ -135,6 +135,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		if (orderEntity != null) {
 			orderEntity.setComment(appraise);
 			orderEntity.setCommentStatus(status);
+			orderEntity.setImgPath(filepath);
 			repairOrderMapper.updateById(orderEntity);
 		}
 	}

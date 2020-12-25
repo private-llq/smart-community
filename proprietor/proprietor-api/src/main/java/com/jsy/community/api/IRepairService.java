@@ -68,7 +68,7 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/9 10:46
 	 * @Param [id, appraise, uid, status]
 	 **/
-	void appraiseRepair(Long id, String appraise, String uid, Integer status);
+	void appraiseRepair(Long id, String appraise, String uid, Integer status,String filePath);
 	
 	/**
 	 * @return com.jsy.community.vo.CommonResult
