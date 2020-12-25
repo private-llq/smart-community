@@ -42,4 +42,7 @@ public class HouseVo implements Serializable {
     @ApiModelProperty(value = "社区名称", hidden = true)
     private String communityName;
 
+    @ApiModelProperty(value = "上述名称合并后的名称", hidden = true)
+    private String mergeName;
+
 }

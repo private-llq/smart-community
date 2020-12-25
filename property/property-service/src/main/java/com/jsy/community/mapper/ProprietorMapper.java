@@ -3,9 +3,12 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.ProprietorVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -52,7 +55,7 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
      * @author YuLF
      * @since  2020/12/24 15:21
      */
-    void registerBatch(@Param("userList") List<UserEntity> userEntityList);
+    void registerBatch(@Param("userEntityList") List<UserEntity> userEntityList);
 
 
     /**
@@ -60,4 +63,41 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
      * @param userEntityList        用户登记信息列表
      */
     void insertUserBatch(@Param("userEntityList") List<UserEntity> userEntityList);
+
+    /**
+     * [excel]批量绑定房屋
+     * @author YuLF
+     * @since  2020/12/24 16:27
+     */
+    void registerHouseBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
+
+
+    /**
+     * 通过当前社区id查出的当前社区所有已登记的房屋
+     * @author YuLF
+     * @since  2020/12/25 11:10
+     * @Param
+     * @return          返回当前社区已经被登记的所有房屋信息
+     */
+    List<HouseVo> queryHouseByCommunityId(@Param("communityId") long communityId, @Param("houseLevelMode") Integer houseLevelMode);
+
+
+
+    /**
+     * 通过社区ID 在t_user_house 拿到所有已审核的房屋id和uid 主要用于 对excel业主家属录入信息 进行核实
+     * @author YuLF
+     * @since  2020/12/25 15:04
+     * @Param
+     */
+    @Select("select uid,house_id  from t_user_house where community_id = #{communityId} and deleted = 0 and check_status = 1")
+    List<UserHouseEntity> queryUserHouseByCommunityId(@Param("communityId") long communityId);
+
+
+    /**
+     * [excel]批量导入业主家属信息
+     * @author YuLF
+     * @since  2020/12/25 16:41
+     * @Param
+     */
+    Integer saveUserMemberBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
 }

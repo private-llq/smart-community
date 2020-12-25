@@ -27,6 +27,7 @@ import java.util.*;
 public class ProprietorMemberProvider implements JSYExcel {
 
 
+
     /**
      * 导入业主家属信息录入表excel
      * @param excel 业主家属信息表.xlsx
@@ -92,8 +93,15 @@ public class ProprietorMemberProvider implements JSYExcel {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的性别!请选择正确的性别");
                                 }
                                 break;
-                            //第4列 家属姓名
+                            //第4列 所属房屋
                             case 3:
+                                if(StringUtils.isBlank(CellValue)){
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 未选择家属所属房屋!");
+                                }
+                                userEntity.getHouseEntity().setAddress(CellValue);
+                                break;
+                            //第5列 家属姓名
+                            case 4:
                                 if (RegexUtils.isRealName(CellValue)) {
                                     userEntity.setRealName(CellValue);
                                 } else {
@@ -101,16 +109,16 @@ public class ProprietorMemberProvider implements JSYExcel {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的中国姓名!");
                                 }
                                 break;
-                            //第5列 家属身份证号码
-                            case 4:
+                            //第6列 家属身份证号码
+                            case 5:
                                 if (RegexUtils.isIDCard(CellValue)) {
                                     userEntity.setIdCard(CellValue);
                                 } else {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的身份证号码!");
                                 }
                                 break;
-                            //第6列 家属手机号
-                            case 5:
+                            //第7列 家属手机号
+                            case 6:
                                 if (RegexUtils.isMobile(CellValue)) {
                                     userEntity.setMobile(CellValue);
                                 } else {
@@ -166,14 +174,17 @@ public class ProprietorMemberProvider implements JSYExcel {
         ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
         //5.创建excel 字段列  (表示具体的数据列字段)
         ProprietorExcelCommander.createExcelField(workbook, sheet, titleField);
-        //添加需要约束数据的列下标   "所属业主",  "与业主关系", "家属性别",
-        int[] arrIndex = new int[]{0, 1, 2};
+        //添加需要约束数据的列下标   "所属业主",  "与业主关系", "家属性别", "所属房屋"
+        int[] arrIndex = new int[]{0, 1, 2, 3};
+        //取出所有的房屋信息
+        Object obj = res.get("communityHouseAddr");
+        List<String> communityHouseAddr = castStrList(obj);
         //表明验证约束 结束行
-        int endRow = entityList.size();
+        int endRow = ProprietorExcelCommander.MEMBER_CONSTRAINT_ROW;
         for (int index : arrIndex) {
             //通过传过来的 约束列constraintColIndex 获得List中的约束数据
             //其中 业主姓名 和 业主uid是关联的 所以需要一起创建对应的Map数据
-            String[] constraintData = getConstraintSet(entityList, index);
+            String[] constraintData = getConstraintSet(entityList, index, communityHouseAddr);
             //创建业主信息登记表与隐藏表的约束字段
             ProprietorExcelCommander.createProprietorConstraintRef(workbook, hiddenSheet, constraintData, endRow, index);
             //绑定验证
@@ -184,16 +195,35 @@ public class ProprietorMemberProvider implements JSYExcel {
         return workbook;
     }
 
+    /**
+     * 把指定的Obj对象转换为对应的List<String>对象
+     * @param obj           List<String>的Object对象
+     *
+     */
+    private List<String> castStrList(Object obj)
+    {
+        List<String> result = new ArrayList<>();
+        if(obj instanceof List<?>)
+        {
+            for (Object o : (List<?>) obj)
+            {
+                result.add((String) o);
+            }
+            return result;
+        }
+        return null;
+    }
 
     /**
      * 对List中的对象字段去重 返回String数组
-     * @param communityArchitecture List数据
+     * @param houseMembers          解析好的用户家属List数据
      * @param colIndex              列类型：表明家属性别、业主姓名、与业主关系 对应列的下标
+     * @Param communityHouseAddr    当前社区所有已登记的房屋信息 如：帆云小区2栋2单元1层1-10
      * @return 返回去重好的字段 String数组
      */
-    private static String[] getConstraintSet(List<?> communityArchitecture, int colIndex) {
-        Set<String> set = new HashSet<>(communityArchitecture.size());
-        for (Object object : communityArchitecture) {
+    private static String[] getConstraintSet(List<?> houseMembers, int colIndex, List<String> communityHouseAddr) {
+        Set<String> set = new HashSet<>(houseMembers.size());
+        for (Object object : houseMembers) {
             UserEntity userEntity = (UserEntity) object;
             switch (colIndex) {
                 //TITLE_FIELD 索引0为 业主姓名
@@ -213,6 +243,10 @@ public class ProprietorMemberProvider implements JSYExcel {
                 case 2:
                     set.add("男");
                     set.add("女");
+                    break;
+                //TITLE_FIELD 索引3为家属所属房屋
+                case 3:
+                    set.addAll(communityHouseAddr);
                     break;
                 default:
                     break;

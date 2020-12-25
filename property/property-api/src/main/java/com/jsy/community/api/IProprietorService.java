@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.ProprietorVO;
 
 import java.util.List;
@@ -46,4 +47,22 @@ public interface IProprietorService extends IService<UserEntity> {
      * @Param  communityId              社区id
      */
     void saveUserBatch(List<UserEntity> userEntityList, Long communityId);
+
+    /**
+     * 通过当前社区id查出的当前社区所有已登记的房屋
+     * @author YuLF
+     * @since  2020/12/25 11:10
+     * @Param
+     * @return          返回当前社区已经被登记的所有房屋信息
+     */
+    List<HouseVo> queryHouseByCommunityId(long communityId);
+
+
+    /**
+     * [excel] 导入业主家属信息
+     * @author YuLF
+     * @since  2020/12/25 14:47
+     * @Param    userEntityList     用户家属信息
+     */
+    Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId);
 }

@@ -13,6 +13,7 @@ import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.ProprietorVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,6 +33,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author YuLF
@@ -90,8 +92,19 @@ public class ProprietorController {
         //获取excel 响应头信息
         MultiValueMap<String, String> multiValueMap = setHeader(userEntityList.get(0).getNickname() + "家属成员登记表.xlsx");
         try {
+            //存储 需要携带的信息
+            Map<String, Object> res = new HashMap<>();
+            //拿到当前社区 已登记的房屋信息List 如：1栋1单元1楼1-1
+            List<HouseVo> houseVos = iProprietorService.queryHouseByCommunityId(communityId);
+            //取出所有的小区房屋地址
+            List<String> communityHouseAddr =  houseVos.stream().map(HouseVo::getMergeName).collect(Collectors.toList());
+
+            res.put("name",userEntityList.get(0).getNickname() + "业主家属成员登记表");
+            res.put("communityId",communityId);
+            res.put("communityHouseAddr", communityHouseAddr);
+
             //获得excel下载模板
-            Workbook workbook = ProprietorExcelCommander.exportProprietorMember(userEntityList);
+            Workbook workbook = ProprietorExcelCommander.exportProprietorMember(userEntityList,res);
             //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
             return new ResponseEntity<>(readWorkbook(workbook) , multiValueMap, HttpStatus.OK );
         } catch (IOException e) {
@@ -155,9 +168,9 @@ public class ProprietorController {
         validFileSuffix(proprietorExcel, communityId);
         //解析Excel  这里强转Object得保证 importProprietorExcel 实现类返回的类型是UserEntity
         List<UserEntity> userEntityList = ProprietorExcelCommander.importProprietorExcel(proprietorExcel,new HashMap<>(1));
-        //数据库写入
-
-        return CommonResult.ok(userEntityList);
+        //做数据库写入 userEntityList 读出来的数据
+        iProprietorService.saveUserBatch(userEntityList, communityId);
+        return CommonResult.ok("导入成功!请检查");
     }
 
     /**
@@ -175,11 +188,11 @@ public class ProprietorController {
         List<UserEntity> userInfoList = getUserInfo(communityId);
         //把List中的 realName 和uid 转换为Map存储
         Map<String, Object> userInfoParams = ProprietorExcelCommander.getAllUidAndNameForList(userInfoList, "realName", "uid");
+        userInfoParams.put("communityId",communityId);
         List<UserEntity> userEntityList = ProprietorExcelCommander.importMemberExcel(proprietorExcel, userInfoParams);
-        //做数据库写入 userEntityList 读出来的数据
-        iProprietorService.saveUserBatch(userEntityList, communityId);
-        //todo 数据库信息写入
-        return CommonResult.ok(userEntityList);
+        //数据库信息写入
+        Integer row = iProprietorService.saveUserMemberBatch(userEntityList, communityId);
+        return CommonResult.ok("本次导入家属信息成功"+ row +"条! 请至管理平台检查");
     }
 
     /**

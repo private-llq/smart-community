@@ -133,19 +133,19 @@
                     h.unit,
                     h.floor,
                     h.door,
-                    h.id
+                    h.id as houseId
             </when>
             <when test="houseLevelMode == 3">
                 h.building,
                 h.floor,
                 h.door,
-                h.id
+                h.id as houseId
             </when>
             <when test="houseLevelMode == 4">
                 h.unit,
                 h.floor,
                 h.door,
-                h.id
+                h.id as houseId
             </when>
             <otherwise>
             </otherwise>
@@ -161,18 +161,70 @@
     </select>
     <!-- 批量注册用户 注意：以下的字段都存在唯一索引的情况下 才使用ignore关键字 如果存在此用户 则不管 -->
     <insert id="registerBatch">
-        insert IGNORE into t_car(uid,mobile)
+        insert IGNORE into t_user_auth(id,uid,mobile,create_time)
         values
-        <foreach collection="userList" item="item" separator=",">
-            (#{item.uid},#{item.mobile})
+        <foreach collection="userEntityList" item="item" separator=",">
+            (#{item.id},#{item.uid},#{item.mobile},now())
         </foreach>
     </insert>
     <!-- 批量登记用户  -->
-    <insert id="registerBatch">
-        insert IGNORE into t_user(id,uid,householder_id,mobile,sex,real_name,id_card,detail_address)
+    <insert id="insertUserBatch">
+        insert IGNORE into t_user(id,uid,householder_id,mobile,sex,real_name,id_card,detail_address,create_time)
         values
-        <foreach collection="userList" item="item" separator=",">
-            (#{item.id},#{item.uid},#{item.householderId},#{item.mobile},#{item.sex},#{item.realName},#{item.idCard},#{detailAddress})
+        <foreach collection="userEntityList" item="item" separator=",">
+            (#{item.id},
+            IF(exists(select uid from t_user_auth where mobile = #{item.mobile}), (select uid from t_user_auth where mobile = #{item.mobile}),#{item.uid})
+            ,#{item.householderId},#{item.mobile},#{item.sex},#{item.realName},#{item.idCard},#{item.detailAddress},now())
+        </foreach>
+    </insert>
+    <!-- 批量登记房屋 -->
+    <insert id="registerHouseBatch">
+        insert into t_user_house (id,uid,community_id,house_id,check_status,create_time)
+        values
+        <foreach collection="userEntityList" item="item" separator=",">
+            (#{item.houseEntity.id},
+            IF(exists(select uid from t_user where mobile = #{item.mobile}), (select uid from t_user_auth where mobile = #{item.mobile}),#{item.uid})
+            ,#{communityId},#{item.houseEntity.houseId},1,now())
+        </foreach>
+    </insert>
+
+    <!-- 通过社区id获得当前社区所有未登记的房屋信息 houseLevelMode = 社区所属层级机构 房屋层级模式：1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元 -->
+    <select id="queryHouseByCommunityId" resultType="com.jsy.community.vo.HouseVo">
+        SELECT
+	        h.id AS houseId,
+	        CONCAT(
+	        <choose>
+                <when test="houseLevelMode == 1 or houseLevelMode == 2">
+                    h.building, h.unit, h.floor, h.door
+                </when>
+                <when test="houseLevelMode == 3">
+                    h.building, h.floor, h.door
+                </when>
+                <when test="houseLevelMode == 4">
+                    h.unit, h.floor, h.door
+                </when>
+                <otherwise>
+                </otherwise>
+            </choose>
+	        ) AS mergeName
+        FROM
+	        t_house AS h
+	        LEFT JOIN t_user_house AS uh ON h.id = uh.house_id
+        WHERE
+	        uh.id IS NOT NULL
+	        AND uh.check_status = 1
+	        AND h.community_id = #{communityId}
+	        AND h.type = 4
+	        AND uh.deleted = 0
+	        AND h.deleted = 0
+    </select>
+    <!-- 批量导入业主家属信息 -->
+    <insert id="saveUserMemberBatch">
+        INSERT IGNORE INTO t_house_member
+        ( id, householder_id, community_id, house_id, NAME, sex, mobile, identification_type, id_card, relation, create_time )
+        VALUES
+        <foreach collection="userEntityList" item="item" separator=",">
+            ( #{item.id}, #{item.uid}, #{communityId}, #{item.houseEntity.houseId}, #{item.realName}, #{item.sex}, #{item.mobile}, 1, #{item.idCard}, #{item.relationCode}, now() )
         </foreach>
     </insert>
 </mapper>

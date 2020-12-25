@@ -7,6 +7,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
 import com.jsy.community.util.excel.impl.ProprietorMemberProvider;
+import com.jsy.community.utils.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -40,12 +41,20 @@ public class ProprietorExcelCommander {
     /**
      * 业主家属信息录入表.xlsx 字段 如果增加字段  需要改变实现类逻辑
      */
-    public static final String[] MEMBER_TITLE_FIELD = {"所属业主", "与业主关系", "家属性别", "家属姓名", "家属身份证号", "家属手机号"};
+    public static final String[] MEMBER_TITLE_FIELD = {"所属业主", "与业主关系", "家属性别", "所属房屋", "家属姓名", "家属身份证号", "家属手机号"};
 
     /**
      * 用户导入文件时 可用后缀
      */
     public static final String[] SUPPORT_EXCEL_EXTENSION = {"xls", "xlsx"};
+
+    /**
+     * 业主家属信息模板下载 需要增加约束的 总行数量
+     * 如果为1000 表明业主家属信息excel 最多同时为1000名家属录入信息
+     * 当然也可以更多 只是超过1000行的单元格 没有和社区 直接关联的数据 直接选择
+     */
+    public static final Integer MEMBER_CONSTRAINT_ROW = 1000;
+
 
     /**
      * 【业主信息录入excel 模板 下载方法】 控制方法
@@ -90,14 +99,12 @@ public class ProprietorExcelCommander {
      * @author YuLF
      * @since  2020/12/7 14:57
      * @Param  userEntityList       社区名称、社区住户名、社区住户uid信息
+     * @Param  解析数据需要携带的数据
      * @return 返回创建好的Workbook
      */
-    public static Workbook exportProprietorMember(List<UserEntity> userEntityList) {
-        //存储 社区名称
-        Map<String, Object> objectObjectHashMap = new HashMap<>(1);
-        objectObjectHashMap.put("name",userEntityList.get(0).getNickname() + "业主家属成员登记表");
+    public static Workbook exportProprietorMember(List<UserEntity> userEntityList, Map<String, Object> res) {
         //调用导出excel 创建模板
-        return new ProprietorMemberProvider().exportProprietorExcel(userEntityList,objectObjectHashMap);
+        return new ProprietorMemberProvider().exportProprietorExcel(userEntityList,res);
     }
 
 
