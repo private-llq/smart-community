@@ -177,6 +177,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
+	@Override
 	public Map<String,String> invitation(AdminUserEntity adminUserEntity){
 		Map<String, String> map = new HashMap<>();
 		if(checkEmailExists(adminUserEntity.getEmail())){
@@ -199,6 +200,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
+	@Override
 	public Map<String,String> activation(AdminUserEntity adminUserEntity){
 		Map<String, String> map = new HashMap<>();
 		map.put("templateName","mail/activation.html");
@@ -261,7 +263,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2020/12/1
 	**/
-	private boolean checkUsernameExists(String username){
+	public boolean checkUsernameExists(String username){
 		Integer count = baseMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("username", username));
 		if(count > 0){
 			return true;

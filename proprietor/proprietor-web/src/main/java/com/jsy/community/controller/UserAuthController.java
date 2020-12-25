@@ -27,7 +27,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -169,7 +168,6 @@ public class UserAuthController {
 	@PutMapping("/reset/mobile")
 	@Auth
 	@Login
-	@Transactional(rollbackFor = Exception.class)
 	public CommonResult changeMobile(@RequestAttribute(value = "body") String body){
 		String newMobile = JSONObject.parseObject(body).getString("account");
 		boolean exists = userAuthService.checkUserExists(newMobile, "mobile");
