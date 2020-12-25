@@ -12,7 +12,6 @@ import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.ThirdPlatformQo;
@@ -20,7 +19,6 @@ import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.ThirdPlatformVo;
 import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +30,7 @@ import me.zhyd.oauth.utils.AuthStateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.transaction.annotation.Transactional;
 //import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
@@ -146,6 +145,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		return updateById(update);
 	}
 	
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public boolean changeMobile(String newMobile,String uid){
 		int result1 = userAuthMapper.changeMobile(newMobile, uid);

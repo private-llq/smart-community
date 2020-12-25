@@ -131,8 +131,18 @@ public class AdminUserController {
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"禁用失败");
 	}
 	
-	//用户名ajax查重
-	
+	/**
+	* @Description: 用户名ajax查重
+	 * @Param: [username]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/25
+	**/
+	@GetMapping("exists")
+	public CommonResult checkUsernameExists(@RequestParam("username") String username){
+		boolean b = adminUserService.checkUsernameExists(username);
+		return b ? CommonResult.error(JSYError.DUPLICATE_KEY.getCode(),"用户名被占用") : CommonResult.ok("用户名可以使用");
+	}
 	
 	//邮箱注册后添加用户名
 	@PutMapping("username")

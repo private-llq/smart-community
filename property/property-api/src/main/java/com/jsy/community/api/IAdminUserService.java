@@ -75,6 +75,15 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	boolean updatePassword(Long userId, String password, String newPassword);
 	
 	/**
+	* @Description: 查询用户名是否已存在
+	 * @Param: [username]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/25
+	**/
+	boolean checkUsernameExists(String username);
+	
+	/**
 	* @Description: 邮件注册邀请
 	 * @Param: [sysUserEntity]
 	 * @Return: java.util.Map<java.lang.String,java.lang.String>
