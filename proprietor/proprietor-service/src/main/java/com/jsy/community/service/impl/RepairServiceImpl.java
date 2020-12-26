@@ -83,7 +83,13 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	public List<RepairEntity> getRepair(String id) {
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_id", id).orderByAsc("status");
-		return repairMapper.selectList(wrapper);
+		List<RepairEntity> list = repairMapper.selectList(wrapper);
+		for (RepairEntity repairEntity : list) {
+			Long type = repairEntity.getType();
+			CommonConst commonConst = commonConstMapper.selectById(type);
+			repairEntity.setTypeName(commonConst.getConstName());
+		}
+		return list;
 	}
 	
 	@Override
@@ -161,7 +167,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<CommonConst> constQueryWrapper = new QueryWrapper<>();
 		constQueryWrapper.eq("id",repairEntity.getType());
 		CommonConst commonConst = commonConstMapper.selectOne(constQueryWrapper);
-		repairVO.setTypeName(commonConst.getConstName());
+		repairEntity.setTypeName(commonConst.getConstName());
 		BeanUtils.copyProperties(repairEntity, repairVO); // 封装报修信息
 		BeanUtils.copyProperties(repairOrderEntity, repairVO); // 封装订单信息
 		

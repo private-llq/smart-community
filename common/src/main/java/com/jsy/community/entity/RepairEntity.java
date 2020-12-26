@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -43,8 +44,11 @@ public class RepairEntity extends BaseEntity {
     private Integer status;
 
     @ApiModelProperty(value = "报修类别id")
-    @NotBlank(groups = {addRepairValidate.class},message = "报修类别不能为空")
+    @NotNull(groups = {addRepairValidate.class},message = "报修类别不能为空")
     private Long type;
+    
+    @TableField(exist = false)
+    private String typeName;
 
     @ApiModelProperty(value = "报修人姓名")
     @NotBlank(groups = {addRepairValidate.class},message = "请输入报修人姓名")
