@@ -1,4 +1,4 @@
-package com.jsy.community.config;
+package com.jsy.community.config.web;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
  * @since 2020-12-26 09:37
  */
 @Configuration
-public class ProprietorCustomConfig {
+public class CommunityWebConfig {
 
     /**
      * Include.Include.ALWAYS 默认

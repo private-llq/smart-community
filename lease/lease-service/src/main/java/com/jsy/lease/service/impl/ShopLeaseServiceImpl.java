@@ -12,7 +12,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.HouseLeaseQO;
+import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.shop.ShopLeaseVo;

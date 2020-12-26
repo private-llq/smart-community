@@ -6,7 +6,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.HouseLeaseQO;
+import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;

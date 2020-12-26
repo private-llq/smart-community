@@ -1,11 +1,10 @@
 package com.jsy.lease.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.HouseLeaseConstEntity;
-import com.jsy.community.entity.HouseLeaseEntity;
+import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.HouseLeaseQO;
-import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.*;
 

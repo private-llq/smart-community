@@ -3,12 +3,12 @@ package com.jsy.lease.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.HouseLeaseEntity;
+import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.HouseLeaseQO;
+import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.lease.api.IHouseConstService;
 import com.jsy.lease.api.IHouseLeaseService;
@@ -42,7 +42,6 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
     @Override
     public Boolean addLeaseSaleHouse(HouseLeaseQO houseLeaseQO) {
         //1.保存房源数据
-        //TODO: 业务主键 生成行标识数据id
         houseLeaseQO.setId(SnowFlake.nextId());
         //保存房屋优势标签至中间表 随时入住、电梯楼、家电齐全等等
         if(houseLeaseQO.getHouseAdvantage() != null){
