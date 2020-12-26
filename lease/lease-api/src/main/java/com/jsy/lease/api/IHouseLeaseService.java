@@ -1,10 +1,10 @@
 package com.jsy.lease.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.HouseLeaseEntity;
+import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.HouseLeaseQO;
-import com.jsy.community.vo.HouseLeaseVO;
+import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 
 import java.util.List;

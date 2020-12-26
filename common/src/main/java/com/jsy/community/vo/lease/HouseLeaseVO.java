@@ -1,4 +1,4 @@
-package com.jsy.community.vo;
+package com.jsy.community.vo.lease;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -55,6 +55,9 @@ public class HouseLeaseVO implements Serializable {
 
     @ApiModelProperty(value = "房屋租售家具标签")
     private List<String> houseFurniture;
+
+    @ApiModelProperty(value = "房屋预约时间")
+    private String houseReserveTime;
 
     @ApiModelProperty(value = "房屋租售价格")
     private BigDecimal housePrice;

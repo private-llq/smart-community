@@ -8,12 +8,12 @@
     <insert id="insertHouseLease">
         insert into t_house_lease (id,uid,house_title,house_city_id,house_area_id,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_leasedeposit_id
         ,house_type_id,house_floor,house_direction,house_year,house_source_id
-        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_furniture_id,house_lon,house_lat,house_id,house_community_id
+        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_furniture_id,house_lon,house_lat,house_id,house_community_id,house_reserve_time
         )
         values
         (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAreaId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseUnit},#{houseSquareMeter},#{houseLeasedepositId}
         ,#{houseTypeId},#{houseFloor},#{houseDirection},#{houseYear},#{houseSourceId}
-        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeaseymodeId},#{houseContact},#{houseFurnitureId},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId}
+        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeaseymodeId},#{houseContact},#{houseFurnitureId},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},#{houseReserveTime}
         )
     </insert>
 
@@ -34,9 +34,9 @@
     </delete>
 
     <!-- 按列表查询房屋出租信息 -->
-    <select id="queryHouseLeaseByList" resultType="com.jsy.community.vo.HouseLeaseVO">
+    <select id="queryHouseLeaseByList" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         select
-        id,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_id,house_lon,house_lat,house_furniture_id
+        id,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_id,house_lon,house_lat,house_furniture_id,house_reserve_time
         from t_house_lease
         <where>
             <!-- 如果查询筛选增加了市条件 -->
@@ -191,6 +191,10 @@
                 <if test="houseIntroduce != null and !houseIntroduce.equals(&apos;&apos;)">
                     ,house_introduce = #{houseIntroduce}
                 </if>
+                <!-- 房屋预约时间内容 -->
+                <if test="houseReserveTime != null and !houseReserveTime.equals(&apos;&apos;)">
+                    ,house_reserve_time = #{houseReserveTime}
+                </if>
                 <!-- 房屋出租类型id  不限 普通住宅 别墅 公寓 -->
                 <if test="houseLeasetypeId != null and houseLeasetypeId &gt; 0">
                     ,house_leasetype_id = #{houseLeasetypeId}
@@ -217,7 +221,7 @@
     </insert>
 
     <!-- 查询出租房屋单条数据 -->
-    <select id="queryHouseLeaseOne" resultType="com.jsy.community.vo.HouseLeaseVO">
+    <select id="queryHouseLeaseOne" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         SELECT
 	        l.house_contact,
 	        l.house_image_id,
@@ -235,6 +239,7 @@
 	        l.house_furniture_id,
 	        l.house_lat,
 	        l.house_lon,
+	        l.house_reserve_time,
 	        c.house_const_name AS houseLeaseMode,
 	        t.house_const_name AS houseType,
 	        d.house_const_name AS houseLeaseDeposit
@@ -250,7 +255,7 @@
 	        l.id = #{houseId}
     </select>
     <!-- 根据用户id和社区id 查出用户在这个社区下面所属的房源 -->
-    <select id="ownerLeaseHouse" resultType="com.jsy.community.vo.HouseLeaseVO">
+    <select id="ownerLeaseHouse" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
             SELECT
             DISTINCT
             	l.house_title,
@@ -285,7 +290,7 @@
     </select>
 
     <!-- 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口 -->
-    <select id="searchLeaseHouse" resultType="com.jsy.community.vo.HouseLeaseVO">
+    <select id="searchLeaseHouse" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         SELECT
             l.id,
             l.house_title,

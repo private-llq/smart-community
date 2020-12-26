@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.lease.mapper.HouseReserveMapper">
+
+    <!-- 取消预约信息 -->
+    <update id="cancel">
+        update t_house_reserve
+        <set>
+            <trim prefixOverrides=",">
+                <if test="reserveMsg != null and !reserveMsg.equals(&quot;&quot;)">
+                    ,reserve_msg = #{reserveMsg}
+                </if>
+                ,reserve_status = 0
+            </trim>
+        </set>
+        <where>
+            id = #{id} and reserve_uid = #{reserveUid}
+        </where>
+    </update>
+
+</mapper>

@@ -1,4 +1,4 @@
-package com.jsy.community.qo.proprietor;
+package com.jsy.community.qo.lease;
 
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
@@ -90,6 +90,10 @@ public class HouseLeaseQO implements Serializable {
     @Size(groups = {addLeaseSaleHouse.class}, min = 1, max = 64,message = "家具至少需要一个!")
     @ApiModelProperty(value = "房屋家具code")
     private List<Long> houseFurniture;
+
+    @NotBlank(groups = {addLeaseSaleHouse.class}, message = "房屋可预约时间未选择!")
+    @ApiModelProperty(value = "房屋预约时间")
+    private String houseReserveTime;
 
     @ApiModelProperty(value = "房屋家具code换算过的id")
     private Long houseFurnitureId;

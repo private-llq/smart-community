@@ -1,18 +1,20 @@
-package com.jsy.community.entity;
+package com.jsy.community.entity.lease;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
 import java.math.BigDecimal;
 
 /**
  * 房屋租售实体对象
  * YuLF
- * 数据访问对象：这个类主要用于对应数据库表t_house_lease_sale的数据字段的映射关系，
+ * 数据访问对象：这个类主要用于对应数据库表t_house_lease的数据字段的映射关系，
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -66,6 +68,9 @@ public class HouseLeaseEntity extends BaseEntity {
 
     @ApiModelProperty(value = "房屋所属楼层")
     private String houseFloor;
+
+    @ApiModelProperty(value = "房屋预约时间")
+    private String houseReserveTime;
 
     @ApiModelProperty(value = "房屋朝向")
     private String houseDirection;
