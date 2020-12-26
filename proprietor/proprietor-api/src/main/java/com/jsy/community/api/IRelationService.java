@@ -64,4 +64,13 @@ public interface IRelationService {
      * @Date: 2020/12/23
     **/
     boolean isHouseMember(String mobile,Long communityId);
+
+   /**
+    * @Description: 删除家属信息
+    * @author: Hu
+    * @since: 2020/12/25 14:46
+    * @Param:
+    * @return:
+    */
+    void deleteHouseMemberCars(Long id);
 }

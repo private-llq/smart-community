@@ -2,26 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.LivingPaymentMapper">
     <sql id="query">
-        where tg.uid=#{userID}
-            <if test="doorNo!=null and doorNo!=''">
-                and t.family_id=#{doorNo}
+        where tg.uid=#{query.userID}
+            <if test="query.doorNo!=null and query.doorNo!=''">
+                and t.family_id=#{query.doorNo}
             </if>
-            <if test="payYear!=null and payYear>0">
-                and t.pay_year=#{payYear}
+            <if test="query.payYear!=null and query.payYear>0">
+                and t.pay_year=#{query.payYear}
             </if>
-            <if test="payMonth!=null and payMonth>0">
-                and t.pay_month=#{payMonth}
+            <if test="query.payMonth!=null and query.payMonth>0">
+                and t.pay_month=#{query.payMonth}
             </if>
 
     </sql>
 
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
-        SELECT tp.id as groupId,tp.name as groupName,t.pay_number as payNumber,t.pay_company as payCompany FROM t_pay_house_owner t join t_pay_group tp on t.group_id=tp.id where tp.uid=#{userId}
+        SELECT pg.id as groupId,pg.name as groupName,po.family_id as payNumber,po.unit as payCompany,
+        tt.id as typeID,tt.name as typeName
+        FROM t_pay_order po join t_pay_type tt on po.payment_type=tt.id join t_pay_group pg on po.group_id=pg.id where pg.uid=#{userId}
     </select>
 
 
     <select id="selectOrder" resultMap="PaymentRecordsVOMAP">
         SELECT
+        concat(t.pay_year,"年",t.pay_month,"月") as timeGroup,
         t.id as id,t.pay_year as payYear,t.pay_month as payMonth,t.order_num as orderNum,t.unit as unitName,
         t.family_id as familyId,t.order_time as orderTime,t.payment_amount paySum,t.pay_type as payType,
         t.bill_classification as billClassification,t.label as label,t.remark as remark,t.remark_img as remarkImg,
@@ -32,12 +35,31 @@
         <include refid="query"></include>
         ORDER BY t.order_time desc
     </select>
+    <select id="selectGroup" resultMap="GroupVOMap">
+        SELECT
+        po.family_id as doorNo,pc.id as typeID,pc.name as typeName,pg.id as groupID,pg.name as groupName
+        FROM t_pay_order po
+        join t_pay_type tt on po.payment_type=tt.id
+        join t_pay_group pg on po.group_id=pg.id
+        JOIN t_pay_company pc on po.payment_type=pc.id
+        where pg.uid=#{userID} and gp.name=#{groupName}
+    </select>
+
+    <resultMap id="GroupVOMap" type="com.jsy.community.vo.GroupVO">
+        <result property="typeName" column="typeName"/>
+        <result property="typeID" column="typeID"/>
+        <result property="groupName" column="groupName"/>
+        <result property="doorNo" column="doorNo"/>
+        <result property="groupID" column="groupID"/>
+    </resultMap>
 
     <resultMap id="DefaultHouseOwnerMap" type="com.jsy.community.vo.DefaultHouseOwnerVO">
         <result property="groupId" column="groupId"/>
         <result property="groupName" column="groupName"/>
         <result property="payNumber" column="payNumber"/>
         <result property="payCompany" column="payCompany"/>
+        <result property="typeID" column="typeID"/>
+        <result property="typeName" column="typeName"/>
     </resultMap>
 
     <resultMap id="PaymentRecordsVOMAP" type="com.jsy.community.vo.PaymentRecordsVO">

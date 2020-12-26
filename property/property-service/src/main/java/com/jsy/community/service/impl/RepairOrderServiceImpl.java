@@ -88,7 +88,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 
 	private RepairEntity commOrder(Long id){
 		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("id",id);
+		queryWrapper.eq("repair_id",id);
 		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(queryWrapper);
 		
 		if (orderEntity==null) {

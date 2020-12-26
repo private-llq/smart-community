@@ -1,14 +1,17 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.ILivingPaymentService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.mapper.*;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
+import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.DefaultHouseOwnerVO;
 import com.jsy.community.vo.GroupVO;
@@ -64,7 +67,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     public void add(LivingPaymentQO livingPaymentQO){
         System.out.println(livingPaymentQO);
         //设置组号
-        PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("type",livingPaymentQO.getTypeGroup()).eq("name",livingPaymentQO.getGroupName()));
+        PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("name",livingPaymentQO.getGroupName()));
 
         Long group_id=0l;
         if (!StringUtils.isEmpty(payGroupEntity)){
@@ -74,7 +77,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
             groupEntity.setId(SnowFlake.nextId());
             groupEntity.setUid(livingPaymentQO.getUserID());
             groupEntity.setName(livingPaymentQO.getGroupName());
-            groupEntity.setType(livingPaymentQO.getTypeGroup());
+            groupEntity.setType(livingPaymentQO.getGroupName()=="我家"?1:livingPaymentQO.getGroupName()=="父母"?2:livingPaymentQO.getGroupName()=="房东"?3:livingPaymentQO.getGroupName()=="朋友"?4:5);
             payGroupMapper.insert(groupEntity);
             group_id=groupEntity.getId();
         }
@@ -127,17 +130,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      */
     @Override
     public List<GroupVO> selectGroup(GroupQO groupQO) {
-        List<PayHouseOwnerEntity> payHouseOwnerEntities = payHouseOwnerMapper.selectList(new QueryWrapper<PayHouseOwnerEntity>().eq("group_id", groupQO.getGroup()).eq("pay_company", groupQO.getPayCostUnit()));
-        List<GroupVO> list=new ArrayList<>();
-        GroupVO groupVO=null;
-        for (PayHouseOwnerEntity payHouseOwnerEntity : payHouseOwnerEntities) {
-            groupVO=new GroupVO();
-            groupVO.setType(payHouseOwnerEntity.getType());
-            groupVO.setPayCostUnit(payHouseOwnerEntity.getPayCompany());
-            groupVO.setDoorNo(payHouseOwnerEntity.getPayNumber());
-            list.add(groupVO);
-        }
-        return list;
+        return livingPaymentMapper.selectGroup(groupQO);
     }
     /**
      * @Description: 查询每月订单记录
@@ -147,53 +140,19 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      * @return:
      */
     @Override
-    public Map<String, Object> selectOrder(PaymentRecordsQO paymentRecordsQO) {
-        String userID = paymentRecordsQO.getUserID();
-//        userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",userID));
-        ArrayList<Object> January = new ArrayList<>();
-        ArrayList<Object> February = new ArrayList<>();
-        ArrayList<Object> March = new ArrayList<>();
-        ArrayList<Object> April = new ArrayList<>();
-        ArrayList<Object> May = new ArrayList<>();
-        ArrayList<Object> June = new ArrayList<>();
-        ArrayList<Object> July = new ArrayList<>();
-        ArrayList<Object> August = new ArrayList<>();
-        ArrayList<Object> September = new ArrayList<>();
-        ArrayList<Object> October = new ArrayList<>();
-        ArrayList<Object> November = new ArrayList<>();
-        ArrayList<Object> December = new ArrayList<>();
-        Map<String, Object> Map = new HashMap<>();
-        List<PaymentRecordsVO> list = livingPaymentMapper.selectOrder(paymentRecordsQO);
-        for (PaymentRecordsVO paymentRecordsVO : list) {
-            switch (paymentRecordsVO.getPayMonth()){
-                case 1 : January.add(paymentRecordsVO); break;
-                case 2 : February.add(paymentRecordsVO); break;
-                case 3 : March.add(paymentRecordsVO); break;
-                case 4 : April.add(paymentRecordsVO); break;
-                case 5 : May.add(paymentRecordsVO); break;
-                case 6 : June.add(paymentRecordsVO); break;
-                case 7 : July.add(paymentRecordsVO); break;
-                case 8 : August.add(paymentRecordsVO); break;
-                case 9 : September.add(paymentRecordsVO); break;
-                case 10 : October.add(paymentRecordsVO); break;
-                case 11 : November.add(paymentRecordsVO); break;
-                case 12 : December.add(paymentRecordsVO); break;
-                default:break;
+    public Map<String, List<PaymentRecordsVO>> selectOrder(BaseQO<PaymentRecordsQO> baseQO) {
+        Page<PaymentRecordsVO> page = new Page<>();
+        MyPageUtils.setPageAndSize(page,baseQO);
+        List<PaymentRecordsVO> recordList = livingPaymentMapper.selectOrder(page,baseQO.getQuery()).getRecords();
+        Map<String, List<PaymentRecordsVO>> returnMap = new HashMap<>();
+        for(PaymentRecordsVO paymentRecordsVO : recordList){
+//            if(!returnMap.keySet().contains(paymentRecordsVO.getTimeGroup())){
+            if(returnMap.get(paymentRecordsVO.getTimeGroup()) == null){
+                returnMap.put(paymentRecordsVO.getTimeGroup(),new ArrayList<>());
             }
+            returnMap.get(paymentRecordsVO.getTimeGroup()).add(paymentRecordsVO);
         }
-        Map.put("January",January);
-        Map.put("February",February);
-        Map.put("March",March);
-        Map.put("April",April);
-        Map.put("May",May);
-        Map.put("June",June);
-        Map.put("July",July);
-        Map.put("August",August);
-        Map.put("September",September);
-        Map.put("October",October);
-        Map.put("November",November);
-        Map.put("December",December);
-        return Map;
+        return returnMap;
     }
     /**
      * @Description: 默认查询所有缴费信息

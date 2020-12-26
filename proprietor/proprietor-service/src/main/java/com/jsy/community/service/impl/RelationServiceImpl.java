@@ -69,6 +69,10 @@ public class RelationServiceImpl implements IRelationService {
 
 
         houseMemberEntity.setId(SnowFlake.nextId());
+        if (relationQo.getIdentificationType()==0&&relationQo.getIdentificationType()==null){
+            relationQo.setIdentificationType(1);
+        }
+        houseMemberEntity.setIdentificationType(relationQo.getIdentificationType());
         houseMemberEntity.setHouseId(relationQo.getHouseId());
         houseMemberEntity.setHouseholderId(relationQo.getUserId());
         houseMemberEntity.setName(relationQo.getName());
@@ -183,7 +187,20 @@ public class RelationServiceImpl implements IRelationService {
             relationMapper.updateUserRelationCar(relationCarsQo);
         }
     }
-    
+    /**
+     * @Description: 删除家属信息
+     * @author: Hu
+     * @since: 2020/12/25 14:46
+     * @Param:
+     * @return:
+     */
+    @Override
+    @Transactional
+    public void deleteHouseMemberCars(Long id) {
+        houseMemberMapper.deleteById(id);
+        carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",id));
+    }
+
     /**
      * @Description: 判断是否是指定小区家属
      * @Param: [mobile, communityId]

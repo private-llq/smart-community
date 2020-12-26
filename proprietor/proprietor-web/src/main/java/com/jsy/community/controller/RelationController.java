@@ -47,6 +47,15 @@ public class RelationController {
     }
 
 
+    @ApiOperation("删除家属信息及其车辆")
+    @PutMapping("/delete")
+    @Login
+    public CommonResult delete(@RequestParam("id") Long id){
+        relationService.deleteHouseMemberCars(id);
+        return CommonResult.ok();
+    }
+
+
     @ApiOperation("保存车辆图片")
     @PostMapping("/upload")
     @Login

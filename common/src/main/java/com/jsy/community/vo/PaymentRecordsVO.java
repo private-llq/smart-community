@@ -65,6 +65,8 @@ public class PaymentRecordsVO implements Serializable {
 
     @ApiModelProperty(value = "所缴费用名称")
     private String typeName;
-
+    
+    @ApiModelProperty(value = "时间组",hidden = true)
+    private String timeGroup;
 
 }

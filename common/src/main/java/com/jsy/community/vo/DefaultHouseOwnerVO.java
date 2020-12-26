@@ -23,4 +23,8 @@ public class DefaultHouseOwnerVO implements Serializable {
     private String payNumber;
     @ApiModelProperty(value = "缴费单位")
     private String payCompany;
+    @ApiModelProperty(value = "缴费类型ID")
+    private Long typeID;
+    @ApiModelProperty(value = "缴费类型name")
+    private String typeName;
 }
