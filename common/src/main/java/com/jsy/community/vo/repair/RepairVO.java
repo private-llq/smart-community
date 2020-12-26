@@ -24,8 +24,14 @@ public class RepairVO implements Serializable {
 	@ApiModelProperty(value = "图片地址")
 	private String repairImg;
 	
-	@ApiModelProperty(value = "报修类别 0 抹灰 1 防水 2 墙面 3 门窗 4 排水")
-	private Integer type;
+	@ApiModelProperty(value = "报修类别id")
+	private Long type;
+	
+	@ApiModelProperty(value = "报修类别名称")
+	private String typeName;
+	
+	@ApiModelProperty(value = "报修标题")
+	private String title;
 	
 	@ApiModelProperty(value = "报修人姓名")
 	private String name;

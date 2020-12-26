@@ -1,7 +1,9 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairEntity;
+import com.jsy.community.qo.proprietor.RepairCommentQO;
 import com.jsy.community.vo.repair.RepairVO;
 
 import java.util.List;
@@ -68,7 +70,7 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/9 10:46
 	 * @Param [id, appraise, uid, status]
 	 **/
-	void appraiseRepair(Long id, String appraise, String uid, Integer status,String filePath);
+	void appraiseRepair(RepairCommentQO repairCommentQO);
 	
 	/**
 	 * @return com.jsy.community.vo.CommonResult
@@ -87,4 +89,13 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Param [userId]
 	 **/
 	void deleteAppraise(Long id);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.CommonConst>
+	 * @Author lihao
+	 * @Description 报修所属类别查询
+	 * @Date 2020/12/26 10:01
+	 * @Param []
+	 **/
+	List<CommonConst> getRepairType();
 }
