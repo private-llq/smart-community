@@ -6,11 +6,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IRepairService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairEntity;
 import com.jsy.community.entity.RepairOrderEntity;
+import com.jsy.community.mapper.CommonConstMapper;
 import com.jsy.community.mapper.RepairMapper;
 import com.jsy.community.mapper.RepairOrderMapper;
-import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.qo.proprietor.RepairCommentQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.repair.RepairVO;
@@ -42,11 +44,12 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Autowired
 	private RepairOrderMapper repairOrderMapper;
 	
-	@Autowired
-	private UserHouseMapper userHouseMapper;
 	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
+	
+	@Autowired
+	private CommonConstMapper commonConstMapper;
 	
 	@Override
 	public List<RepairEntity> testList() {
@@ -116,9 +119,9 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	}
 	
 	@Override
-	public void appraiseRepair(Long id, String appraise, String uid, Integer status,String filepath) {
+	public void appraiseRepair(RepairCommentQO repairCommentQO) {
 		QueryWrapper<RepairEntity> entityQueryWrapper = new QueryWrapper<>();
-		entityQueryWrapper.eq("user_id", uid).eq("id",id);
+		entityQueryWrapper.eq("user_id", repairCommentQO.getUid()).eq("id",repairCommentQO.getId());
 		RepairEntity repairEntity = repairMapper.selectOne(entityQueryWrapper);
 		if (repairEntity==null) {
 			throw new ProprietorException("您好,您选择的订单并不存在,请联系管理员");
@@ -133,9 +136,9 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		queryWrapper.eq("repair_id", repairEntity.getId());
 		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(queryWrapper);
 		if (orderEntity != null) {
-			orderEntity.setComment(appraise);
-			orderEntity.setCommentStatus(status);
-			orderEntity.setImgPath(filepath);
+			orderEntity.setComment(repairCommentQO.getAppraise());
+			orderEntity.setCommentStatus(repairCommentQO.getStatus());
+			orderEntity.setImgPath(repairCommentQO.getFilePath());
 			repairOrderMapper.updateById(orderEntity);
 		}
 	}
@@ -145,12 +148,20 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", id).eq("user_id", userId);
 		RepairEntity repairEntity = repairMapper.selectOne(wrapper);
+		if (repairEntity==null) {
+			throw new ProprietorException("该报修订单不存在");
+		}
 		
 		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("repair_id", id);
 		RepairOrderEntity repairOrderEntity = repairOrderMapper.selectOne(queryWrapper);
 		
 		RepairVO repairVO = new RepairVO();
+		
+		QueryWrapper<CommonConst> constQueryWrapper = new QueryWrapper<>();
+		constQueryWrapper.eq("id",repairEntity.getType());
+		CommonConst commonConst = commonConstMapper.selectOne(constQueryWrapper);
+		repairVO.setTypeName(commonConst.getConstName());
 		BeanUtils.copyProperties(repairEntity, repairVO); // 封装报修信息
 		BeanUtils.copyProperties(repairOrderEntity, repairVO); // 封装订单信息
 		
@@ -164,6 +175,13 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(wrapper);
 		orderEntity.setComment("");  // TODO 因为mybatis-plus动态sql 所以删除评论是对其评论设置的 ""   app前台判断未评价 已评价的时候 要注意赛选条件
 		repairOrderMapper.updateById(orderEntity);
+	}
+	
+	@Override
+	public List<CommonConst> getRepairType() {
+		QueryWrapper<CommonConst> wrapper = new QueryWrapper<>();
+		wrapper.eq("type_id",1).select("const_name","id");
+		return commonConstMapper.selectList(wrapper);
 	}
 	
 }

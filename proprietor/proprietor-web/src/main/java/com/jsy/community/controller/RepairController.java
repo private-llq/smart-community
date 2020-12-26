@@ -5,7 +5,9 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRepairService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairEntity;
+import com.jsy.community.qo.proprietor.RepairCommentQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -71,6 +73,15 @@ public class RepairController {
 		return CommonResult.ok(repairVO);
 	}
 	
+	@ApiOperation("报修所属类别查询")
+	@GetMapping("/getRepairType")
+	@Login(allowAnonymous = true)
+	public CommonResult getRepairType() {
+		List<CommonConst> list = repairService.getRepairType();
+		return CommonResult.ok(list);
+	}
+	
+	
 	@ApiOperation("报修内容图片上传")
 	@PostMapping("/uploadRepairImg")
 	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files) {
@@ -85,13 +96,11 @@ public class RepairController {
 	}
 	
 	@ApiOperation("评价报修")
-	@GetMapping("/appraiseRepair")
-	public CommonResult appraiseRepair(@ApiParam(value = "房屋报修id") @RequestParam Long id,
-	                                   @ApiParam(value = "用户评价,100字以内") @RequestParam String appraise,
-	                                   @ApiParam(value = "评价类型") @RequestParam Integer status,
-	                                   @ApiParam(value = "图片地址",required = false) String filePath) {
+	@PostMapping("/appraiseRepair")
+	public CommonResult appraiseRepair(@RequestBody RepairCommentQO repairCommentQO) {
 		String uid = UserUtils.getUserId();
-		repairService.appraiseRepair(id, appraise, uid, status, filePath);
+		repairCommentQO.setUid(uid);
+		repairService.appraiseRepair(repairCommentQO);
 		return CommonResult.ok();
 	}
 	
@@ -117,6 +126,9 @@ public class RepairController {
 		repairService.addRepair(repairEntity);
 		return CommonResult.ok();
 	}
+	
+	
+	
 
 
 //	@ApiOperation("完成报修")
