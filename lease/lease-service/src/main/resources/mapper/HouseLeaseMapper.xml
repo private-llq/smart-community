@@ -58,16 +58,16 @@
             <if test="query.houseTypeId != null and query.houseTypeId != &quot;&quot; and query.houseTypeId &gt; 0">
                 and house_type_id = #{query.houseTypeId}
             </if>
-            <!-- 如果查询筛选增加了房屋类型条件 住宅、别墅、公寓之类 -->
-            <if test="query.houseLeasetypeId != null and query.houseLeasetypeId != &quot;&quot; and query.houseLeasetypeId &gt; 0">
+            <!-- 如果查询筛选增加了房屋类型条件 住宅、别墅、公寓之类 1是不限的意思 -->
+            <if test="query.houseLeasetypeId != null and query.houseLeasetypeId != &quot;&quot; and query.houseLeasetypeId &gt; 0 and query.houseLeasetypeId != 1">
                 and house_leasetype_id = #{query.houseLeasetypeId}
             </if>
             <!-- 如果查询筛选增加了出租方式条件 整租、合租之类 -->
-            <if test="query.houseLeaseymodeId != null and query.houseLeaseymodeId != &quot;&quot; and query.houseLeaseymodeId &gt; 0">
+            <if test="query.houseLeaseymodeId != null and query.houseLeaseymodeId != &quot;&quot; and query.houseLeaseymodeId &gt; 0 and query.houseLeaseymodeId != 1">
                 and house_leasemode_id = #{query.houseLeaseymodeId}
             </if>
             <!-- 如果查询筛选增加了房屋来源条件 个人、经纪人之类 -->
-            <if test="query.houseSourceId != null and query.houseSourceId != &quot;&quot; and query.houseSourceId &gt; 0">
+            <if test="query.houseSourceId != null and query.houseSourceId != &quot;&quot; and query.houseSourceId &gt; 0 and query.houseSourceId != 1">
                 and house_source_id = #{query.houseSourceId}
             </if>
             <!-- 如果查询筛选增加了房源类型条件  精装修、邻地铁之类 使用或运算 判断 存储的进制位是否包含 这个标签code -->

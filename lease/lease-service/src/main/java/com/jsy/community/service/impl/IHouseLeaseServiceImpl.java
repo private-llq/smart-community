@@ -54,7 +54,6 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
             houseLeaseQO.setHouseFurnitureId(typeCode);
         }
         //保存房屋图片标签
-        //TODO: 验证图片路径有效性
         houseLeaseQO.setHouseImageId(SnowFlake.nextId());
         houseLeaseMapper.insertHouseImages(houseLeaseQO);
         return houseLeaseMapper.insertHouseLease(houseLeaseQO)  > 0;
