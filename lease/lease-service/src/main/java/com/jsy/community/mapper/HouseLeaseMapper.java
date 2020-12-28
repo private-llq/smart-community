@@ -1,9 +1,10 @@
-package com.jsy.lease.mapper;
+package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.qo.lease.HouseReserveQO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.*;
@@ -76,7 +77,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @return                      返回图片
      */
     @Select("select img_url from t_house_image where hid = #{hid} and field_id = #{image_id} ORDER BY create_time LIMIT 1")
-    List<String> queryHouseImgById(@Param("image_id") String houseImageId, @Param("hid") Long rowGuid);
+    List<String> queryHouseImgById(@Param("image_id") Long houseImageId, @Param("hid") Long rowGuid);
 
 
     /**
@@ -110,7 +111,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @return                  返回List数据
      */
     @Select("select img_url from t_house_image where field_id = #{houseImageId}")
-    List<String> queryHouseAllImgById(@Param("houseImageId") String houseImageId);
+    List<String> queryHouseAllImgById(@Param("houseImageId") Long houseImageId);
 
 
     /**
@@ -174,4 +175,6 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @return              返回搜索到的列表
      */
     List<HouseLeaseVO> searchLeaseHouse(@Param("text") String text);
+
+
 }

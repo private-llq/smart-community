@@ -1,4 +1,4 @@
-package com.jsy.lease.service.impl;
+package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
-import com.jsy.lease.api.IHouseConstService;
-import com.jsy.lease.mapper.HouseConstMapper;
+import com.jsy.community.mapper.HouseConstMapper;
+import com.jsy.community.api.IHouseConstService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 

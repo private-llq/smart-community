@@ -1,4 +1,4 @@
-package com.jsy.lease.api;
+package com.jsy.community.api;
 
 import com.jsy.community.constant.ConstError;
 import com.jsy.community.exception.JSYError;

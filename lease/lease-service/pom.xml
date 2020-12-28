@@ -102,8 +102,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<!-- springboot main方法入口 -->
-					<mainClass>com.jsy.lease.LeaseServiceApp</mainClass>
-					<layout>ZIP</layout>
+					<mainClass>com.jsy.community.LeaseServiceApp</mainClass>
 				</configuration>
 				<executions>
 					<execution>

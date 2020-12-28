@@ -1,4 +1,4 @@
-package com.jsy.lease.mapper;
+package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.shop.ShopImgEntity;

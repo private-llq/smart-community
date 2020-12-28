@@ -1,4 +1,4 @@
-package com.jsy.lease.service.impl;
+package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,16 +11,16 @@ import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
+import com.jsy.community.mapper.ShopImgMapper;
+import com.jsy.community.mapper.ShopLeaseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.shop.ShopLeaseVo;
-import com.jsy.lease.api.IHouseLeaseService;
-import com.jsy.lease.api.IShopLeaseService;
-import com.jsy.lease.api.LeaseException;
-import com.jsy.lease.mapper.ShopImgMapper;
-import com.jsy.lease.mapper.ShopLeaseMapper;
+import com.jsy.community.api.IHouseLeaseService;
+import com.jsy.community.api.IShopLeaseService;
+import com.jsy.community.api.LeaseException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;

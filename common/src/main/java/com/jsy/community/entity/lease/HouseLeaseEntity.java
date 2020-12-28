@@ -101,10 +101,10 @@ public class HouseLeaseEntity extends BaseEntity {
     private Long house_furniture_id;
 
     @ApiModelProperty(value = "经度")
-    private BigDecimal lon;
+    private Double lon;
 
 
     @ApiModelProperty(value = "纬度")
-    private BigDecimal lat;
+    private Double lat;
 
 }

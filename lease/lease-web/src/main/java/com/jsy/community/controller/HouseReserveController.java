@@ -10,8 +10,9 @@ import com.jsy.community.qo.lease.HouseReserveQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.lease.api.IHouseConstService;
-import com.jsy.lease.api.IHouseReserveService;
+import com.jsy.community.vo.lease.HouseReserveVO;
+import com.jsy.community.api.IHouseConstService;
+import com.jsy.community.api.IHouseReserveService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -74,16 +75,25 @@ public class HouseReserveController {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.cancel.class);
         qo.setReserveUid(UserUtils.getUserId());
         Boolean cancel = iHouseReserveService.cancel(qo);
-        return CommonResult.ok(cancel ? "取消预约成功!" : "取消预约失败!");
+        return CommonResult.ok( cancel ? "取消预约成功!" : "取消预约失败!数据不存在");
+    }
+
+    @Login
+    @PostMapping("/confirm")
+    @ApiOperation("预约确认接口")
+    public CommonResult<Boolean> confirm( @RequestBody HouseReserveQO qo ) {
+        Boolean confirm = iHouseReserveService.confirm(qo, UserUtils.getUserId());
+        return CommonResult.ok( confirm ? "确认预约成功!" : "确认预约失败!重复提交或数据不存在!");
     }
 
 
     @Login
-    @DeleteMapping("/whole")
+    @PostMapping("/whole")
     @ApiOperation("全部预约接口")
-    public CommonResult<Boolean> whole(@RequestBody BaseQO<HouseReserveQO> qo) {
-        //分为两部分：1. 租客  2.房东
-        return null;
+    public CommonResult<List<HouseReserveVO>> whole(@RequestBody BaseQO<HouseReserveQO> qo) {
+        //预约分为两部分：1. 租客预约我发布的房子  2.我预约其他人发布的房子
+        ValidatorUtils.validatePageParam(qo);
+        return CommonResult.ok(iHouseReserveService.whole(qo, UserUtils.getUserId()));
     }
 
 

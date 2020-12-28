@@ -13,7 +13,7 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
-import com.jsy.lease.api.IHouseLeaseService;
+import com.jsy.community.api.IHouseLeaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +40,7 @@ public class HouseLeaseController {
     public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQO) {
         //新增参数常规效验
         ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.addLeaseSaleHouse.class);
+        ValidatorUtils.validateImages(houseLeaseQO.getHouseImage());
         houseLeaseQO.setUid(UserUtils.getUserId());
         //验证所属社区所属用户房屋是否存在
         if(!iHouseLeaseService.isExistUserHouse(UserUtils.getUserId(), houseLeaseQO.getHouseCommunityId(), houseLeaseQO.getHouseId())){
