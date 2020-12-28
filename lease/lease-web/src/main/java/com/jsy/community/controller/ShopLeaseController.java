@@ -13,7 +13,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.shop.ShopLeaseVo;
-import com.jsy.lease.api.IShopLeaseService;
+import com.jsy.community.api.IShopLeaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

@@ -1,4 +1,4 @@
-package com.jsy.lease.service.impl;
+package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.constant.BusinessEnum;
@@ -10,9 +10,9 @@ import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
-import com.jsy.lease.api.IHouseConstService;
-import com.jsy.lease.api.IHouseLeaseService;
-import com.jsy.lease.mapper.HouseLeaseMapper;
+import com.jsy.community.api.IHouseConstService;
+import com.jsy.community.api.IHouseLeaseService;
+import com.jsy.community.mapper.HouseLeaseMapper;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;

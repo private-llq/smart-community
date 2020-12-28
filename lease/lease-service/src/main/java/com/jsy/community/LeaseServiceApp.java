@@ -1,4 +1,4 @@
-package com.jsy.lease;
+package com.jsy.community;
 
 import com.codingapi.txlcn.tc.config.EnableDistributedTransaction;
 import org.apache.dubbo.config.spring.context.annotation.DubboComponentScan;
@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @DubboComponentScan
 @SpringBootApplication
 @EnableScheduling
-@MapperScan("com.jsy.lease.mapper")
+@MapperScan("com.jsy.community.mapper")
 @PropertySource(value = "classpath:common-service.properties")
 @EnableDistributedTransaction
 public class LeaseServiceApp {

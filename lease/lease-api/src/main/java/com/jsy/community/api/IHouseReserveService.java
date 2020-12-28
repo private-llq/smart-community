@@ -1,9 +1,12 @@
-package com.jsy.lease.api;
+package com.jsy.community.api;
 
+import ch.qos.logback.classic.pattern.MethodOfCallerConverter;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.lease.HouseReserveEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseReserveQO;
+import com.jsy.community.vo.lease.HouseReserveVO;
 
 import java.util.List;
 import java.util.Map;
@@ -31,4 +34,18 @@ public interface IHouseReserveService extends IService<HouseReserveEntity> {
      * @return      返回取消是否成功修改
      */
     Boolean cancel(HouseReserveQO qo);
+
+    /**
+     * 全部预约信息
+     * @author YuLF
+     * @since  2020/12/28 10:22
+     */
+    List<HouseReserveVO> whole(BaseQO<HouseReserveQO> qo, String uid);
+
+    /**
+     * 确认预约信息
+     * @param qo          确认预约 请求参数对象
+     * @return            返回确认是否成功修改
+     */
+    Boolean confirm(HouseReserveQO qo, String uid);
 }

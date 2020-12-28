@@ -4,7 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.lease.api.IHouseConstService;
+import com.jsy.community.api.IHouseConstService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

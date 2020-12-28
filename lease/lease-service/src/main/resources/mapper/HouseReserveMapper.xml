@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.jsy.lease.mapper.HouseReserveMapper">
+<mapper namespace="com.jsy.community.mapper.HouseReserveMapper">
 
     <!-- 取消预约信息 -->
     <update id="cancel">
@@ -19,4 +19,83 @@
         </where>
     </update>
 
+    <!-- 我预约的信息 我预约别人 -->
+    <select id="meReserveHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">
+        SELECT DISTINCT
+	        CONCAT( r.reserve_date, r.reserve_time ) AS reserveDateTime,
+        CASE
+		    r.reserve_status
+		WHEN 0 THEN
+		'已取消预约'
+		WHEN 1 THEN
+		'正在预约中' ELSE '预约成功'
+	    END AS reserveStatusText,
+	        l.id as houseLeaseId,
+	        l.house_title AS houseTitle,
+	        l.house_leasedeposit_id AS houseLeaseDeposit,
+	        l.house_type_id AS houseLeaseType,
+	        l.house_leasemode_id AS houseLeaseMode,
+	        l.house_square_meter AS houseSquareMeter,
+	        l.house_direction AS houseDirection,
+	        l.house_price AS housePrice,
+	        l.house_unit,
+	        l.house_image_id,
+	        r.id,
+	        u.real_name as contactName,
+	        u.avatar_url as contactAvatar,
+	        'false' as proprietor
+        FROM
+	        t_house_reserve AS r
+	    LEFT JOIN t_house_lease AS l ON r.house_lease_id = l.id
+	    LEFT JOIN t_user AS u ON r.reserve_uid = u.uid
+        WHERE
+	        reserve_uid = #{uid}
+	    LIMIT #{qo.page},#{qo.size}
+    </select>
+    <!-- 预约我的信息 别人预约我 -->
+    <select id="reserveMeHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">
+        SELECT
+	        CONCAT( r.reserve_date, r.reserve_time ) AS reserveDateTime,
+        CASE
+		    r.reserve_status
+		WHEN 0 THEN
+		'已取消预约'
+		WHEN 1 THEN
+		'正在预约中' ELSE '预约成功'
+	    END AS reserveStatusText,
+	        l.id as houseLeaseId,
+            l.house_title AS houseTitle,
+            l.house_leasedeposit_id AS houseLeaseDeposit,
+            l.house_type_id AS houseLeaseType,
+            l.house_square_meter AS houseSquareMeter,
+            l.house_direction AS houseDirection,
+            l.house_leasemode_id AS houseLeaseMode,
+            l.house_price AS housePrice,
+            l.house_unit,
+            l.house_image_id,
+            r.id,
+            u.real_name as contactName,
+            u.avatar_url as contactAvatar,
+            'true' as proprietor
+        FROM
+	        t_house_lease AS l
+	        LEFT JOIN t_house_reserve AS r ON l.id = r.house_lease_id
+	        LEFT JOIN t_user AS u ON r.reserve_uid = u.uid
+        WHERE
+            r.id is not null and
+            l.uid = #{uid} and
+            r.reserve_uid != #{uid}
+            LIMIT #{qo.page},
+            #{qo.size}
+    </select>
+    <!-- 预约确认 -->
+    <update id="confirm">
+        update t_house_reserve
+        <set>
+            reserve_status = 2
+        </set>
+        <where>
+            id = #{qo.id}
+        </where>
+    </update>
 </mapper>

@@ -1,9 +1,8 @@
-package com.jsy.lease.task;
+package com.jsy.community.task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.HouseLeaseConstEntity;
-import com.jsy.lease.mapper.HouseConstMapper;
-import com.jsy.lease.mapper.HouseLeaseMapper;
+import com.jsy.community.mapper.HouseConstMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
