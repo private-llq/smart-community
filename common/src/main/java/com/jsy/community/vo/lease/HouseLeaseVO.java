@@ -109,7 +109,7 @@ public class HouseLeaseVO implements Serializable {
     private List<String> houseImage;
 
     //t_house_lease  数据库house_image_id保存图片的id
-    private String houseImageId;
+    private Long houseImageId;
 
     //65不限 66普通住宅 67别墅 68公寓
     @ApiModelProperty(value = "房屋出租类型ID")
@@ -125,10 +125,10 @@ public class HouseLeaseVO implements Serializable {
     private String houseLeaseMode;
 
     @ApiModelProperty(value = "经度")
-    private BigDecimal houseLon;
+    private Double houseLon;
 
     @ApiModelProperty(value = "纬度")
-    private BigDecimal houseLat;
+    private Double houseLat;
 
 
 }

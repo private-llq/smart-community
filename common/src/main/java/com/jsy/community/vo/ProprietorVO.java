@@ -1,24 +1,16 @@
 package com.jsy.community.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.hibernate.validator.constraints.Range;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import lombok.EqualsAndHashCode;
 
 /**
  *  物业端VO业主查询信息返回实体类
  * @author YuLF
  * @since  2020/11/30 11:29
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("业主信息查询信息返回")
 public class ProprietorVO extends BaseVO {

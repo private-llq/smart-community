@@ -81,11 +81,11 @@ public class HouseLeaseQO implements Serializable {
 
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "经度不能为空!")
     @ApiModelProperty(value = "经度")
-    private BigDecimal houseLon;
+    private Double houseLon;
 
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "纬度不能为空!")
     @ApiModelProperty(value = "纬度")
-    private BigDecimal houseLat;
+    private Double houseLat;
 
     @Size(groups = {addLeaseSaleHouse.class}, min = 1, max = 64,message = "家具至少需要一个!")
     @ApiModelProperty(value = "房屋家具code")

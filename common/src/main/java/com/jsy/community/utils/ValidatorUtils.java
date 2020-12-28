@@ -108,5 +108,19 @@ public class ValidatorUtils {
         }
     }
 
+    /**
+     * 验证图片地址格式是否正确
+     * @author YuLF
+     * @since  2020/12/28 15:16
+     * @Param
+     */
+    public static void validateImages(String[] images){
+        for( String image : images ){
+            if( !RegexUtils.isUrl(image) ){
+                throw new JSYException("'" + image + "' 不是一个正确的访问地址!");
+            }
+        }
+    }
+
 
 }
