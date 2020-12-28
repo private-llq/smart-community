@@ -1,11 +1,10 @@
-package com.jsy.community.service.impl;
+package com.jsy.lease.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
-import com.jsy.community.api.ICommunityService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserEntity;
@@ -18,9 +17,6 @@ import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.shop.ShopLeaseVo;
-import com.jsy.community.api.IHouseLeaseService;
-import com.jsy.community.api.IShopLeaseService;
-import com.jsy.community.api.LeaseException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -63,6 +59,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IUserService userService;
+	
+	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	private IHouseConstService houseConstService;
 	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
@@ -132,10 +131,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		String[] imgPath = strings.toArray(new String[strings.size()]);
 		shopLeaseVo.setImgPath(imgPath); // 封装图片信息
 		
-		Long[] shopTypeIds = shopLeaseMapper.selectTypeTags(shopId); // 店铺类型标签
-		Long[] shopBusinessIds = shopLeaseMapper.selectBusinessTags(shopId); // 店铺行业标签
-		shopLeaseVo.setShopTypeIds(shopTypeIds);
-		shopLeaseVo.setShopBusinessIds(shopBusinessIds); // 封装标签
+		Long[] shopTypeIds = shopLeaseMapper.selectTypeTags(shopId);
+		List<String> constTypeName = houseConstService.getConstNameByConstId(shopTypeIds);// 店铺类型标签
+		
+		Long[] shopBusinessIds = shopLeaseMapper.selectBusinessTags(shopId);
+		List<String> constBusinessName = houseConstService.getConstNameByConstId(shopBusinessIds);// 店铺行业标签
+		shopLeaseVo.setShopTypeNames(constTypeName);
+		shopLeaseVo.setShopBusinessNames(constBusinessName); // 封装标签
 		map.put("shop", shopLeaseVo);
 		
 		
@@ -238,20 +240,21 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		Long page = baseQO.getPage();
 		Long size = baseQO.getSize();
 		
-		HouseLeaseQO houseQO = baseQO.getQuery();
-		
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		
-		List<Long> longs = new ArrayList<>(); // 社区id
-		
+		HouseLeaseQO houseQO = baseQO.getQuery();
 		if (houseQO == null) {
 			// 分页
 			Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>(page, size);
 			shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
 			return shopLeaseEntityPage.getRecords();
+			
 		}
 		
-		Long houseAreaId = houseQO.getHouseAreaId(); // 区域id
+		
+		// 区域id
+		List<Long> longs = new ArrayList<>(); // 用于存放社区id
+		Long houseAreaId = houseQO.getHouseAreaId();
 		if (houseAreaId != null) {
 			List<CommunityEntity> list = communityService.listCommunityByAreaId(houseAreaId);
 			if (!CollectionUtils.isEmpty(list)) {
@@ -259,6 +262,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 					longs.add(communityEntity.getId());
 				}
 				wrapper.in("community_Id", longs);
+			} else {
+				wrapper.in("community_Id", 0);
 			}
 		} else {
 			List<CommunityEntity> list = communityService.listCommunityByAreaId(500103L);
@@ -282,12 +287,21 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			wrapper.between("shop_acreage", squareMeterMin, squareMeterMax);
 		}
 		
-		// 更多
+		// 来源
+		Short sourceId = houseQO.getHouseSourceId();
+		if (sourceId != null && sourceId != 3) {
+			wrapper.eq("source", sourceId);
+		}
+		
+		// 更多[标签]
 		List<Long> advantage = houseQO.getHouseAdvantage();
 		if (!CollectionUtils.isEmpty(advantage)) {
 			List<Long> list = shopLeaseMapper.selectMiddle(advantage);
-			wrapper.in("id", list);
+			if (!CollectionUtils.isEmpty(list)) {
+				wrapper.in("id", list);
+			}
 		}
+		
 		
 		// 分页
 		Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>(page, size);
@@ -316,18 +330,17 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
 			BeanUtils.copyProperties(page, pageInfo);
 			return pageInfo;
-		} else {
-			List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());
-			for (CommunityEntity communityEntity : list) {
-				longs.add(communityEntity.getId());
-			}
-			queryWrapper.in("community_id", longs);
-			shopLeaseMapper.selectPage(page, queryWrapper);
-			shopLeaseMapper.selectPage(page, queryWrapper);
-			PageInfo<ShopLeaseEntity> info = new PageInfo<>();
-			BeanUtils.copyProperties(page, info);
-			return info;
 		}
+		List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());
+		for (CommunityEntity communityEntity : list) {
+			longs.add(communityEntity.getId());
+		}
+		queryWrapper.in("community_id", longs);
+		shopLeaseMapper.selectPage(page, queryWrapper);
+		PageInfo<ShopLeaseEntity> info = new PageInfo<>();
+		BeanUtils.copyProperties(page, info);
+		return info;
+		
 	}
 	
 	@Override
@@ -336,7 +349,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	public void testTransaction() {
 		// 1. 调用远端服务
 		communityService.addCommunityEntity();
-		
+
 //		int b =  1/0;
 		
 		// 2. 调用本地服务

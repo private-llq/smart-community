@@ -30,7 +30,6 @@
 		INNER JOIN t_shop_const tsc ON tsl.id = tsc.shop_lease_id
 		INNER JOIN t_house_const thc on thc.id = tsc.house_const_id
 		where tsl.id = #{shopId} and thc.house_const_type = 7
-
     </select>
 
 

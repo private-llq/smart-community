@@ -94,7 +94,6 @@ public class ShopLeaseController {
 	@GetMapping("/getShop")
 	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
-		
 		Map<String, Object> map = shopLeaseService.getShop(shopId);
 		return CommonResult.ok(map);
 	}
@@ -131,7 +130,7 @@ public class ShopLeaseController {
 		return CommonResult.ok(map);
 	}
 	
-	@ApiOperation("测试分布式事物")
+	@ApiOperation("测试分布式事物---暂时先不删。用于测试")
 	@GetMapping("/testTransaction")
 	@Login(allowAnonymous = true)
 	public CommonResult testTransaction() {

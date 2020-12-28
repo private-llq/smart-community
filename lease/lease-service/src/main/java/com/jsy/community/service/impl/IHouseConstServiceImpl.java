@@ -12,10 +12,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author YuLF
@@ -98,12 +95,34 @@ public class IHouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseL
         }
         return maps;
     }
-
+    
     @Override
-    public List<HouseLeaseConstEntity> getTag(Integer id) {
+    public List<String> getConstNameByConstId(Long[] shopTypeIds) {
+        List<Long> list = Arrays.asList(shopTypeIds);
+        List<HouseLeaseConstEntity> houseLeaseConstEntities = houseConstMapper.selectBatchIds(list);
+        List<String> arrayList = new ArrayList<>();
+        for (HouseLeaseConstEntity houseLeaseConstEntity : houseLeaseConstEntities) {
+            arrayList.add(houseLeaseConstEntity.getHouseConstName());
+        }
+        return arrayList;
+    }
+    
+    @Override
+    public Map<String,Object> getTag() {
+        Map<String, Object> map = new HashMap<>();
+    
+        // 封装所属类型标签
         QueryWrapper<HouseLeaseConstEntity> wrapper = new QueryWrapper<>();
-        wrapper.eq("house_const_type",id);
-        return houseConstMapper.selectList(wrapper);
+        wrapper.eq("house_const_type",7).select("id","house_const_name");
+        List<HouseLeaseConstEntity> typeList = houseConstMapper.selectList(wrapper);
+        map.put("type",typeList);
+        // 封装所属行业标签
+        QueryWrapper<HouseLeaseConstEntity> wrapper2 = new QueryWrapper<>();
+        wrapper2.eq("house_const_type",8).select("id","house_const_name");
+        List<HouseLeaseConstEntity> business = houseConstMapper.selectList(wrapper2);
+        map.put("business",business);
+        
+        return map;
     }
     
     private boolean isEmpty(String str){

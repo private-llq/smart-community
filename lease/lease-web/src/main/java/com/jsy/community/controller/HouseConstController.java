@@ -7,10 +7,12 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.api.IHouseConstService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -53,9 +55,9 @@ public class HouseConstController {
      * @Param [id]
      **/
     @GetMapping("/getTag")
-    @ApiOperation("根据发布源类型获取其标签")
-    public CommonResult getTag(@ApiParam("发布源类型") Integer id){
-        List<HouseLeaseConstEntity> list = houseConstService.getTag(id);
+    @ApiOperation("查询商铺标签")
+    public CommonResult getTag(){
+        Map<String,Object> list = houseConstService.getTag();
         return CommonResult.ok(list);
     }
     

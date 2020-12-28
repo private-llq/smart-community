@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -101,8 +102,14 @@ public class ShopLeaseVo implements Serializable {
 	@ApiModelProperty(value = "商铺类型id集合")
 	private Long[] shopTypeIds;
 	
+	@ApiModelProperty(value = "商铺类型名称集合")
+	private List<String> shopTypeNames;
+	
 	@ApiModelProperty(value = "商铺行业id集合")
 	private Long[] shopBusinessIds;
+	
+	@ApiModelProperty(value = "商铺行业名称集合")
+	private List<String> shopBusinessNames;
 	
 	@ApiModelProperty(value = "经度")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "经度不能为空")

@@ -29,7 +29,7 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @Date 2020/12/17 10:58
      * @Param [id]
      **/
-    List<HouseLeaseConstEntity> getTag(Integer id);
+    Map<String,Object> getTag();
 
 
     /**
@@ -47,5 +47,13 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @return              返回常量名称和常量id
      */
     Map<String, Object>  getConstByTypeCodeForList(List<Long> codes, Long type);
-
+    
+    /**
+     * @return java.util.List<java.lang.String>
+     * @Author lihao
+     * @Description 根据常量id集合查询常量名称
+     * @Date 2020/12/28 10:18
+     * @Param [shopTypeIds]
+     **/
+    List<String> getConstNameByConstId(Long[] shopTypeIds);
 }
