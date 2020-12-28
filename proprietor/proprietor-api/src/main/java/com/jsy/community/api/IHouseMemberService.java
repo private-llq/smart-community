@@ -1,12 +1,11 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
+import com.jsy.community.utils.PageInfo;
 
-import java.util.List;
 
 /**
  * <p>
@@ -25,7 +24,7 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/23
 	**/
-	boolean addHouseMember(HouseMemberEntity houseMemberEntity);
+//	boolean addHouseMember(HouseMemberEntity houseMemberEntity);
 	
 	/**
 	* @Description: 删除房间成员/撤销邀请 by批量id
@@ -34,7 +33,7 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/23
 	**/
-	boolean deleteHouseMember(List<Long> ids);
+//	boolean deleteHouseMember(List<Long> ids);
 	
 	/**
 	* @Description: 删除房间成员/撤销邀请 by房主id
@@ -43,7 +42,7 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/28
 	**/
-	boolean deleteHouseMember(Long houseHolderId);
+//	boolean deleteHouseMember(Long houseHolderId);
 	
 	/**
 	* @Description: 成员确认加入房间
@@ -61,7 +60,7 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/23
 	**/
-	Page<HouseMemberEntity> queryHouseMemberPage(BaseQO<HouseMemberQO> baseQO);
+//	Page<HouseMemberEntity> queryHouseMemberPage(BaseQO<HouseMemberQO> baseQO);
 	
 	/**
 	* @Description: 检查是否是房主
@@ -71,5 +70,7 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @Date: 2020/12/1
 	**/
 	boolean checkHouseHolder(Long uid, Long houseId);
+	
+	PageInfo<HouseMemberEntity> getHouseMembers(BaseQO<HouseMemberQO> baseQO);
 
 }

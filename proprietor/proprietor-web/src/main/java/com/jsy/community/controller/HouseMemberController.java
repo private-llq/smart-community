@@ -10,6 +10,8 @@ import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,15 +29,15 @@ import java.util.List;
  * @author qq459799974
  * @since 2020-11-23
  */
-//@Api(tags = "房间成员控制器")
-//@RestController
-//@RequestMapping("houseMember")
-//@ApiJSYController
-//@Login
+@Api(tags = "房间成员控制器")
+@RestController
+@RequestMapping("houseMember")
+@ApiJSYController
+@Login
 public class HouseMemberController {
 	
-//	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-//	private IHouseMemberService iHouseMemberService;
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+	private IHouseMemberService houseMemberService;
 	
 //	@ApiOperation("【房间成员】邀请")
 //	@PostMapping("")
@@ -78,6 +80,13 @@ public class HouseMemberController {
 //		baseQO.getQuery().setUid(JwtUtils.getUserId());
 //		return CommonResult.ok(iHouseMemberService.queryHouseMemberPage(baseQO));
 //	}
+	
+	@ApiOperation("【房间成员】查询")
+	@PostMapping("page")
+		public CommonResult<PageInfo<HouseMemberEntity>> queryHouseMemberPage(@RequestBody BaseQO<HouseMemberQO> baseQO){
+		baseQO.getQuery().setHouseholderId(UserUtils.getUserId());
+		return CommonResult.ok(houseMemberService.getHouseMembers(baseQO));
+	}
 	
 }
 

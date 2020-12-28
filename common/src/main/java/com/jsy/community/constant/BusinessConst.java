@@ -90,4 +90,14 @@ public interface BusinessConst {
 	 * 证件类型-护照
 	 */
 	Integer IDENTIFICATION_TYPE_PASSPORT = 2;
+	
+	/**
+	 * 房间成员类型-亲属
+	 */
+	Integer PERSON_TYPE_RELATIVE = 1;
+	/**
+	 * 房间成员类型-租客
+	 */
+	Integer PERSON_TYPE_TENANT = 2;
+	
 }

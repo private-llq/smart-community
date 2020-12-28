@@ -15,6 +15,6 @@ import org.apache.ibatis.annotations.Update;
  */
 public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 
-	@Update("update t_house_member set is_confirm = 1 where id = #{id}")
-	int confirmJoin(@Param("id")Long id);
+//	@Update("update t_house_member set is_confirm = 1 where id = #{id}")
+//	int confirmJoin(@Param("id")Long id);
 }
