@@ -16,6 +16,7 @@ public class RabbitMQConfig {
 
     public static final String QUEUE_EMAIL = "queue_email";
     public static final String QUEUE_SMS = "queue_sms";
+    public static final String QUEUE_TEST = "queue_test";
     public static final String EXCHANGE_TOPICS = "exchange_topics";
 
 
@@ -29,6 +30,12 @@ public class RabbitMQConfig {
     public Exchange EXCHANGE_TOPICS_INFORM() {
         //durable(true)持久化，消息队列重启后交换机仍然存在
         return ExchangeBuilder.topicExchange(EXCHANGE_TOPICS).durable(true).build();
+    }
+    //声明队列
+    @Bean(QUEUE_TEST)
+    public Queue QUEUE_INFORM_TEST() {
+        Queue queue = new Queue(QUEUE_TEST);
+        return queue;
     }
 
 
@@ -71,6 +78,14 @@ public class RabbitMQConfig {
                                             @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.email").noargs();
     }
+
+    @Bean
+    public Binding BINDING_QUEUE_INFORM_TEST(@Qualifier(QUEUE_TEST) Queue queue,
+                                              @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("queue.test").noargs();
+    }
+
+
 
 
 

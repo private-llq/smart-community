@@ -30,6 +30,12 @@ public class MQTestController {
         amqpTemplate.convertAndSend("exchange_topics","queue.sms","丢雷老母");
         System.out.println("mq发送消息了");
     }
+    @GetMapping("/test")
+    @ApiOperation("测试一")
+    public void test(){
+        amqpTemplate.convertAndSend("exchange_topics","queue.test","凸(艹皿艹 )");
+        System.out.println("mq发送消息了");
+    }
     @GetMapping("/email")
     @ApiOperation("测试二")
     public void email(){
