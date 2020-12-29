@@ -13,7 +13,6 @@ import java.util.Map;
 @ApiJSYController
 @RequestMapping("/test")
 public class TestController {
-
     @GetMapping(params = "test01")
     public String test01(){
         return "test01";

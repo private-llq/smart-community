@@ -138,8 +138,6 @@ public class ShopLeaseController {
 		return CommonResult.ok();
 	}
 
-//	重庆掌上12333 实业登记  若成功  满一年有补贴
-
 	
 }
 
