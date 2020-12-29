@@ -21,7 +21,7 @@ public interface ICommonService {
      * @param id   传入的城市id
      * @return     返回社区集合
      */
-	List<Map<String, Object>> getAllCommunityFormCityId(Integer id,Integer houseLevelMode);
+	List<Map<String, Object>> getAllCommunityFormCityId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize);
 
     /**
      * 根据社区id和社区层级结构 查询下面的所有单元 或 所有楼栋
@@ -31,7 +31,7 @@ public interface ICommonService {
 	 * @param houseLevelMode    社区层级结构id
      * @return      			返回单元或楼栋集合
      */
-    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode);
+    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize);
 
     /**
      * 根据社区层级结构 和 单元id|楼栋id 查询下一级的数据
@@ -41,7 +41,7 @@ public interface ICommonService {
      * @param id    单元id
      * @return      返回楼栋集合
      */
-	List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode);
+	List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode, Integer page, Integer pageSize);
 
 
 	/**
@@ -50,7 +50,7 @@ public interface ICommonService {
 	 * @param houseLevelMode	层级ID
 	 * @return					返回数据List
 	 */
-	List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode);
+	List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize);
 
 
     /**
@@ -59,7 +59,7 @@ public interface ICommonService {
      * @since  2020/12/8 16:39
      * @Param  id   楼层id
      */
-	List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode);
+	List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode, Integer page, Integer pageSize);
 
 
 

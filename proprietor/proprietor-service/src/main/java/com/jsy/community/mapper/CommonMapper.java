@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public interface CommonMapper {
 
-    List<Map<String, Object>> getAllCommunityFormCityId(Integer id);
+    List<Map<String, Object>> getAllCommunityFormCityId(Integer id, Integer page, Integer pageSize);
 
     List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode);
 

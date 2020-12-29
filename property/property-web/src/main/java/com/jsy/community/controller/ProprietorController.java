@@ -168,10 +168,20 @@ public class ProprietorController {
         validFileSuffix(proprietorExcel, communityId);
         //解析Excel  这里强转Object得保证 importProprietorExcel 实现类返回的类型是UserEntity
         List<UserEntity> userEntityList = ProprietorExcelCommander.importProprietorExcel(proprietorExcel,new HashMap<>(1));
+
+        notNull(userEntityList);
+
         //做数据库写入 userEntityList 读出来的数据
         iProprietorService.saveUserBatch(userEntityList, communityId);
         return CommonResult.ok("导入成功!请检查");
     }
+
+    private void notNull(List<UserEntity> list){
+        if( list == null || list.isEmpty() ){
+            throw new JSYException("没有数据可以导入!");
+        }
+    }
+
 
     /**
      * 【业主家属信息导入】
@@ -190,6 +200,9 @@ public class ProprietorController {
         Map<String, Object> userInfoParams = ProprietorExcelCommander.getAllUidAndNameForList(userInfoList, "realName", "uid");
         userInfoParams.put("communityId",communityId);
         List<UserEntity> userEntityList = ProprietorExcelCommander.importMemberExcel(proprietorExcel, userInfoParams);
+
+        notNull(userEntityList);
+
         //数据库信息写入
         Integer row = iProprietorService.saveUserMemberBatch(userEntityList, communityId);
         return CommonResult.ok("本次导入家属信息成功"+ row +"条! 请至管理平台检查");

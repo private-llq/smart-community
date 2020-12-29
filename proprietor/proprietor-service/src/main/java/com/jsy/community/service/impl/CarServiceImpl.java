@@ -82,6 +82,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public Integer addProprietorCar(CarEntity carEntity) {
+        carEntity.setId(SnowFlake.nextId());
         return carMapper.insert(carEntity);
     }
 

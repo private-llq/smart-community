@@ -167,7 +167,7 @@ public class CarController {
 		//4.调用上传服务接口 进行上传文件  返回访问路径
 		String filePath = MinioUtils.upload(carImage, BUCKET_NAME);
 		redisTemplate.opsForSet().add("car_img_part",filePath); // 将图片地址存入redis  用于对比 便于清理无用图片
-		return CommonResult.ok(filePath);
+		return CommonResult.ok(filePath,"上传成功!");
 	}
 
 
@@ -187,7 +187,7 @@ public class CarController {
 				}
 			}
 		}
-		return CommonResult.ok(MinioUtils.uploadForBatch(carImages, BUCKET_NAME));
+		return CommonResult.ok(MinioUtils.uploadForBatch(carImages, BUCKET_NAME),"上传成功!");
 	}
 
 

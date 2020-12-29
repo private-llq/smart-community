@@ -33,9 +33,12 @@ public class ProprietorQO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("数据id")
-    @Length(groups = {propertyUpdateValid.class}, min = 32, max = 32, message = "非法用户id")
+    @Range(groups = {proprietorUpdateValid.class}, min = 1, message = "长度错误!")
     @NotNull(groups = {propertyUpdateValid.class}, message = "用户id为空")
+    @ApiModelProperty("数据id")
+    private Long id;
+
+    @ApiModelProperty("用户id")
     private String uid;
 
     @Range(groups = {propertyUpdateValid.class}, min = 1, max = Integer.MAX_VALUE, message = "非法业主Id")

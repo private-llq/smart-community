@@ -1,12 +1,10 @@
 package com.jsy.community.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
@@ -16,6 +14,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.integration.transformer.MessageTransformingHandler;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -68,34 +67,55 @@ public class CommonServiceImpl implements ICommonService {
      * @since 2020/12/8 16:39
      */
     @Override
-    public List<Map<String, Object>> getAllCommunityFormCityId(Integer id, Integer houseLevelMode) {
-        return commonMapper.getAllCommunityFormCityId(id);
+    public List<Map<String, Object>> getAllCommunityFormCityId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
+        page = (page - 1) * pageSize;
+        return commonMapper.getAllCommunityFormCityId(id, page , pageSize);
     }
 
-    //按社区Id查询下面的楼栋或单元
+    /**
+     * 按社区Id查询下面的楼栋或单元
+     * @author YuLF
+     * @since  2020/12/29 15:08
+     * @Param
+     */
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode) {
+    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
         List<Map<String, Object>> buildingOrUnitByCommunityId = commonMapper.getBuildingOrUnitByCommunityId(id, houseLevelMode);
         return setHouseLevelMode(buildingOrUnitByCommunityId, houseLevelMode);
     }
 
-    //按楼栋Id查询 单元 或 按 单元id查询楼栋 只对 社区结构为 楼栋单元 或单元楼栋有效
+    /**
+     * 按楼栋Id查询 单元 或 按 单元id查询楼栋 只对 社区结构为 楼栋单元 或单元楼栋有效
+     * @author YuLF
+     * @since  2020/12/29 15:08
+     * @Param
+     */
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode) {
+    public List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
         List<Map<String, Object>> buildingOrUnitOrFloorById = commonMapper.getBuildingOrUnitById(id, houseLevelMode);
         return setHouseLevelMode(buildingOrUnitOrFloorById, houseLevelMode);
     }
 
-    //按单元id或楼栋id查询  楼层
+    /**
+     * 按按单元id或楼栋id查询  楼层
+     * @author YuLF
+     * @since  2020/12/29 15:08
+     * @Param
+     */
     @Override
-    public List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode) {
+    public List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
         List<Map<String, Object>> maps = commonMapper.getFloorByBuildingOrUnitId(id, houseLevelMode);
         return setHouseLevelMode(maps, houseLevelMode);
     }
 
-    //按楼层id获取门牌
+    /**
+     * 按楼层id获取门牌
+     * @author YuLF
+     * @since  2020/12/29 15:08
+     * @Param
+     */
     @Override
-    public List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode) {
+    public List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
         List<Map<String, Object>> allDoorFormFloor = commonMapper.getAllDoorFormFloor(id);
         return setHouseLevelMode(allDoorFormFloor, houseLevelMode);
     }

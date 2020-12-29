@@ -33,7 +33,10 @@ public class CommonController {
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
     @Login
-    public CommonResult<?> queryZone(@RequestParam Integer id, @RequestParam Integer houseLevelMode, @RequestParam Integer queryType) {
+    public CommonResult<?> queryZone(@RequestParam Integer id, @RequestParam(required = false, defaultValue = "1") Integer houseLevelMode,
+                                     @RequestParam Integer queryType,
+                                     @RequestParam(required = false, defaultValue = "1")Integer page,
+                                     @RequestParam(required = false, defaultValue = "10")Integer pageSize) {
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);
         //当枚举类并没有这个查询类型时，抛出400请求参数错误异常
@@ -42,16 +45,15 @@ public class CommonController {
         }
         try {
             //调用 用查询类型ID找到的 对应的查询方法
-            Method commonZoneApi = ICommonService.class.getDeclaredMethod(communityType.method(), Integer.class, Integer.class);
+            Method commonZoneApi = ICommonService.class.getDeclaredMethod(communityType.method(), Integer.class, Integer.class, Integer.class, Integer.class);
             //根据社区层级结构id 和 传过来的id 判断用户的社区 具体层级结构
-            Object invoke = commonZoneApi.invoke(commonService, id,houseLevelMode);
+            Object invoke = commonZoneApi.invoke(commonService, id, houseLevelMode, page, pageSize);
             if (invoke == null) {
                 return CommonResult.ok(null);
             }
             return CommonResult.ok((List<Map<String, Object>>) invoke);
         } catch (Exception e) {
             log.error("com.jsy.community.controller.CommonController.queryZone：{}", e.getMessage());
-            e.printStackTrace();
         	//如果出现异常，说明服务并不能调通
             return CommonResult.error(JSYError.NOT_IMPLEMENTED);
         }

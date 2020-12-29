@@ -42,7 +42,7 @@ public class HouseConstController {
             if( houseConstListByType == null || houseConstListByType.isEmpty() ){
                 continue;
             }
-            map.put(houseConstListByType.get(0).getAnnotation(), houseConstListByType);
+            map.put(houseConstListByType.get(0).getHouseConstType(), houseConstListByType);
         }
         return CommonResult.ok(map);
     }

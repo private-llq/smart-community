@@ -185,25 +185,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             //如果有需要新增的数据 id == null 或者 == 0 就是需要新增 只要有一个条件满足即返回true
             List<CarEntity> carEntityList = qo.getCarEntityList();
             boolean b = carEntityList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
+            //为车辆信息设置基本信息
+            carEntityList.forEach(e ->{
+                e.setOwner(qo.getRealName());
+                e.setUid(qo.getUid());
+                e.setCommunityId(qo.getHouseEntityList().get(0).getCommunityId());
+                e.setContact(qo.getMobile());
+            });
             //新增车辆信息
             if(b){
                 //从提交的List中取出Id == null 并且ID == 0的数据 重新组成一个List 代表需要新增的数据
                 List<CarEntity> any = carEntityList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
                 //从更新车辆的集合中 移除 需要 新增的数据
                 carEntityList.removeAll(any);
-                //为新增的车辆信息设置基本信息
-                any.forEach(e ->{
+                //新增数据需要设置id
+                any.forEach( e -> {
                     e.setId(SnowFlake.nextId());
-                    e.setOwner(qo.getRealName());
-                    e.setUid(qo.getUid());
-                    e.setCommunityId(qo.getHouseEntityList().get(0).getCommunityId());
-                    e.setContact(qo.getMobile());
                 });
                 //批量新增车辆
                 carService.addProprietorCarForList(any);
             }
             //批量更新车辆信息
-            carService.updateBatchById(qo.getCarEntityList());
+            carService.updateBatchById(carEntityList);
         }
         //========================================== 业主房屋 =========================================================
         List<UserHouseEntity> houseList = qo.getHouseEntityList();
@@ -222,7 +225,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userHouseService.addHouseBatch(any);
         }
         //批量更新房屋信息
-        userHouseService.updateBatchById(qo.getHouseEntityList());
+        userHouseService.updateBatchById(houseList);
         //========================================== 业主 =========================================================
         //业主信息更新
         return userMapper.proprietorUpdate(qo) > 0;
