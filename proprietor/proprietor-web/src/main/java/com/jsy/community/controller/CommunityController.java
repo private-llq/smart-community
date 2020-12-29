@@ -37,7 +37,13 @@ public class CommunityController {
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private ICommunityService iCommunityService;
 	
-	//TODO 和公共接口是否重复？
+	/**
+	* @Description: 社区分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.CommunityEntity>>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/29
+	**/
 	@PostMapping("page")
 	public CommonResult<PageInfo<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
 		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));

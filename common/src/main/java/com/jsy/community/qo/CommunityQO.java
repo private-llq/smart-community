@@ -41,11 +41,11 @@ public class CommunityQO extends BaseQO {
 
     @NotNull(groups = {GetCommunityByName.class}, message = "经度不能为空!")
     @ApiModelProperty(value = "经度")
-    private Double lon;
+    private BigDecimal lon;
 
     @NotNull(groups = {GetCommunityByName.class}, message = "纬度不能为空!")
     @ApiModelProperty(value = "纬度")
-    private Double lat;
+    private BigDecimal lat;
     
     /**
      * 通过名称查询社区 验证参数接口
