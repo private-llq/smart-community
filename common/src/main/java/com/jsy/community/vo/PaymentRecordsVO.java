@@ -42,8 +42,9 @@ public class PaymentRecordsVO implements Serializable {
     @ApiModelProperty(value = "缴费金额")
     private BigDecimal paySum;
 
-    @ApiModelProperty(value = "缴费类型0水费，1电费，2燃气费")
+    @ApiModelProperty(value = "付款方式1银行卡，2微信支付，3支付宝支付")
     private Integer payType;
+
 
     @ApiModelProperty(value = "住址信息")
     private String address;

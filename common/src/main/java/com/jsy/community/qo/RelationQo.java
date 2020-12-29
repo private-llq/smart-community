@@ -38,6 +38,8 @@ public class RelationQo implements Serializable {
     private Long communityId;
     @ApiModelProperty(value = "所属单元",required = true)
     private Long houseId;
+    @ApiModelProperty(value = "0，其他，1亲属，2租客")
+    private Integer personType;
     @ApiModelProperty("车辆信息集合")
     private List<RelationCarsQo> cars = new ArrayList<>();
 }

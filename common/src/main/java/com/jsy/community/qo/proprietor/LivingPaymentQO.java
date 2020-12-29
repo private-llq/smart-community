@@ -47,7 +47,7 @@ public class LivingPaymentQO implements Serializable {
     private String orderNum;
 
     @ApiModelProperty(value = "缴费地址")
-    private String site;
+    private String address;
 
 
 

@@ -5,9 +5,7 @@ import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
-import com.jsy.community.vo.GroupVO;
-import com.jsy.community.vo.PaymentRecordsVO;
-import com.jsy.community.vo.UserGroupVO;
+import com.jsy.community.vo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +23,7 @@ public interface ILivingPaymentService {
      * @param livingPaymentQO
      * @return
      */
-    void add(LivingPaymentQO livingPaymentQO);
+    PaymentDetailsVO add(LivingPaymentQO livingPaymentQO);
 
     /**
      * 通过组户号查询订单详情
@@ -63,4 +61,13 @@ public interface ILivingPaymentService {
      * @return
      */
     List<UserGroupVO> selectUserGroup(String userId);
+
+    /**
+     * @Description: 缴费凭证
+     * @author: Hu
+     * @since: 2020/12/28 15:53
+     * @Param:
+     * @return:
+     */
+    PayVoucherVO getOrderID(Long id);
 }

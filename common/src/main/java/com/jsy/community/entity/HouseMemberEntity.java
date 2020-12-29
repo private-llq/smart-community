@@ -63,4 +63,7 @@ public class HouseMemberEntity implements Serializable {
     @ApiModelProperty(value = "与业主关系 1.夫妻 2.父子 3.母子 4.父女 5.母女 6.亲属")
     private Integer relation;
 
+    @ApiModelProperty(value = "0，其他，1亲属，2租客")
+    private Integer personType;
+
 }

@@ -16,10 +16,7 @@ import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
-import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.GroupVO;
-import com.jsy.community.vo.PaymentRecordsVO;
-import com.jsy.community.vo.UserGroupVO;
+import com.jsy.community.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -63,6 +60,13 @@ public class LivingPaymentController {
         PageInfo<PayCompanyEntity> pageInfo = payTypeService.getPayCompany(baseQO,type,cityId);
         return CommonResult.ok(pageInfo);
 	}
+
+	@ApiOperation("通过订单id查询缴费凭证")
+	@PostMapping("/getOrderID")
+	public CommonResult getOrderID(@ApiParam("缴费类型id") @RequestParam Long id){
+        PayVoucherVO payVoucherVO=livingPaymentService.getOrderID(id);
+        return CommonResult.ok(payVoucherVO);
+	}
 	
 
     /**
@@ -77,8 +81,8 @@ public class LivingPaymentController {
         String userId = UserUtils.getUserId();
         System.out.println(livingPaymentQO);
         livingPaymentQO.setUserID(userId);
-        livingPaymentService.add(livingPaymentQO);
-        return CommonResult.ok();
+        PaymentDetailsVO paymentDetailsVO=livingPaymentService.add(livingPaymentQO);
+        return CommonResult.ok(paymentDetailsVO);
     }
 
     /**
@@ -111,7 +115,7 @@ public class LivingPaymentController {
 
     /**
      * 通过组户号查询订单详情
-     * @param paymentRecordsQO
+     * @param baseQO
      * @return
      */
     @ApiOperation("查询每月的缴费详情")

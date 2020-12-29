@@ -33,6 +33,9 @@ public class PayOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "缴费单位")
     private String unit;
 
+    @ApiModelProperty(value = "缴费单位ID")
+    private Long unitId;
+
     @ApiModelProperty(value = "缴费金额")
     private BigDecimal paymentAmount;
 
@@ -73,7 +76,7 @@ public class PayOrderEntity extends BaseEntity {
     private Long paymentType;
 
     @ApiModelProperty(value = "缴费地址")
-    private String site;
+    private String address;
 
 
 }

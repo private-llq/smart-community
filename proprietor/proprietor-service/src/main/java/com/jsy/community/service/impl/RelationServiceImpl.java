@@ -81,6 +81,8 @@ public class RelationServiceImpl implements IRelationService {
         houseMemberEntity.setMobile(relationQo.getPhoneTel());
         houseMemberEntity.setRelation(relationQo.getConcern());
         houseMemberEntity.setSex(relationQo.getSex());
+        houseMemberEntity.setPersonType(relationQo.getPersonType());
+
 
         houseMemberMapper.insert(houseMemberEntity);
 

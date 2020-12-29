@@ -18,8 +18,8 @@ spring:
         retry:
           enabled: true
 dubbo:
-  address: nacos://127.0.0.1:8848
   registry:
+    address: nacos://127.0.0.1:8848
     use-as-metadata-center: false
   protocol:
     name: dubbo
@@ -27,7 +27,7 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: proprietor-service
+    subscribed-services: server-mq
   consumer:
     retries: 0
     timeout: 99999
