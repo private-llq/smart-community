@@ -39,7 +39,7 @@ public class SMSListener {
 
     }
     /**
-     * 监听SMS队列
+     * 监听EMAIL队列
      * @param msg
      * @param message
      * @param channel

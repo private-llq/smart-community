@@ -61,7 +61,7 @@ public class RabbitMQConfig {
     @Bean
     public Binding BINDING_QUEUE_INFORM_SMS(@Qualifier(QUEUE_SMS) Queue queue,
                                             @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("queue.#.sms.#").noargs();
+        return BindingBuilder.bind(queue).to(exchange).with("queue.sms").noargs();
     }
 
 
@@ -69,7 +69,7 @@ public class RabbitMQConfig {
     @Bean
     public Binding BINDING_QUEUE_INFORM_EMAIL(@Qualifier(QUEUE_EMAIL) Queue queue,
                                             @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("queue.#.email.#").noargs();
+        return BindingBuilder.bind(queue).to(exchange).with("queue.email").noargs();
     }
 
 

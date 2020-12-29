@@ -23,10 +23,12 @@ public class MQTestController {
     @Autowired
     private AmqpTemplate amqpTemplate;
 
+
     @GetMapping("/sms")
     @ApiOperation("测试一")
     public void sms(){
-        amqpTemplate.convertAndSend("queue.sms","丢雷老母");
+        amqpTemplate.convertAndSend("exchange_topics","queue.sms","丢雷老母");
+        System.out.println("mq发送消息了");
     }
     @GetMapping("/email")
     @ApiOperation("测试二")
@@ -34,6 +36,7 @@ public class MQTestController {
         Map<Object, Object> map = new HashMap<>();
         map.put("wocao","啊啊啊啊啊");
         map.put("aaa","wwwwww");
-        amqpTemplate.convertAndSend("queue.email",map);
+        amqpTemplate.convertAndSend("exchange_topics","queue.email",map);
+        System.out.println("mq发送消息了");
     }
 }
