@@ -10,13 +10,18 @@
     <!-- 小区定位 -->
     <select id="locateCommunity" parameterType="java.util.List" resultType="com.jsy.community.entity.CommunityEntity">
         select * from t_community
-        <if test="ids != null and ids.size != 0">
-            where id in
-            <foreach collection="ids" item="item" separator="," open="(" close=")">
-                #{item}
-            </foreach>
-        </if>
-        where lon is not null and lat is not null
+        <choose>
+            <when test="ids != null and ids.size != 0">
+                where id in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+                and lon is not null and lat is not null
+            </when>
+            <otherwise>
+                where lon is not null and lat is not null
+            </otherwise>
+        </choose>
         order by
         <choose>
             <when test="location.lon != null and location.lat != null">get_distance(#{location.lon},#{location.lat},lon,lat)</when>
