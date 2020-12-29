@@ -7,6 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.BannerEntity;
 import com.jsy.community.mapper.BannerMapper;
 import com.jsy.community.qo.proprietor.BannerQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.BannerVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +40,8 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	**/
 	@Override
 	public boolean addBanner(BannerEntity bannerEntity){
+		bannerEntity.setId(SnowFlake.nextId());
+		bannerEntity.setClick(0);
 		int result = bannerMapper.insert(bannerEntity);
 		return result > 0;
 	}
@@ -90,10 +93,25 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	@Override
 	public boolean deleteBannerBatch(Long[] ids){
 		int result = bannerMapper.deleteBatchIds(Arrays.asList(ids));
-		if(result > 0){
-			return true;
-		}
-		return false;
+		return result > 0;
 	}
 	
+	/**
+	 * @Description: 轮播图 修改跳转路径和描述
+	 * @Param: [bannerQO]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/29
+	 **/
+	@Override
+	public boolean updateBanner(BannerQO bannerQO){
+		BannerEntity bannerEntity = new BannerEntity();
+		bannerEntity.setId(bannerQO.getId());
+		bannerEntity.setPath(bannerQO.getPath());
+		bannerEntity.setDescription(bannerQO.getDescription());
+		int result = bannerMapper.updateById(bannerEntity);
+		return result == 1;
+	}
+
+	//TODO 修改排序
 }

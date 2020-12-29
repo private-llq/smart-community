@@ -49,6 +49,9 @@ public class BannerEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "点击量", hidden = true)
     private Integer click;
     
+    @ApiModelProperty(value = "跳转路径")
+    private String path;
+    
     /**
      * 新增访客验证组
      */

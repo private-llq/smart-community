@@ -4,6 +4,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.vo.BannerVO;
 import com.jsy.community.utils.ValidatorUtils;
@@ -11,10 +12,7 @@ import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,7 +28,7 @@ import java.util.List;
 public class BannerController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-	private IBannerService iBannerService;
+	private IBannerService bannerService;
 	
 	/**
 	 * @Description: 轮播图列表查询
@@ -43,8 +41,16 @@ public class BannerController {
 	@PostMapping("list")
 	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
 		ValidatorUtils.validateEntity(bannerQO, BannerQO.queryBannerValidatedGroup.class);
-		List<BannerVO> returnList = iBannerService.queryBannerList(bannerQO);
+		List<BannerVO> returnList = bannerService.queryBannerList(bannerQO);
 		return CommonResult.ok(returnList);
+	}
+	
+	//TODO 提交MQ任务，批量刷点击量
+	@ApiOperation("【轮播图】点击量+1")
+	@PutMapping("clickUp")
+	public CommonResult clickUp(@RequestParam Long id){
+		boolean b = bannerService.clickUp(id);
+		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"点击量增加失败");
 	}
 	
 }

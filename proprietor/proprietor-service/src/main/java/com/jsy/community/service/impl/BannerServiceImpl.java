@@ -55,4 +55,17 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		return returnList;
 	}
 	
+	/**
+	* @Description: 刷点击量
+	 * @Param: [id]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/29
+	**/
+	@Override
+	public boolean clickUp(Long id){
+		int result = bannerMapper.clickUp(id);
+		return result == 1;
+	}
+	
 }
