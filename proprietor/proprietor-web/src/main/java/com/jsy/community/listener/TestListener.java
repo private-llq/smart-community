@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * @program: com.jsy.community
@@ -24,7 +25,7 @@ public class TestListener {
      */
     @RabbitListener(queues = {"queue_test"})
     public void receive_sms (String msg, Message message, Channel channel)throws IOException {
-
+        System.out.println(new Date());
         System.out.println(msg);
         System.out.println(message.getBody());
         System.out.println(channel);

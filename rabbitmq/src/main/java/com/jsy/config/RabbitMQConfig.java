@@ -4,6 +4,10 @@ import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @Description: babbitmq配置文件
  * @author: Hu
@@ -18,6 +22,7 @@ public class RabbitMQConfig {
     public static final String QUEUE_SMS = "queue_sms";
     public static final String QUEUE_TEST = "queue_test";
     public static final String EXCHANGE_TOPICS = "exchange_topics";
+    public static final String EXCHANGE_DELAY = "exchange_delay";
 
 
     /**
@@ -31,6 +36,23 @@ public class RabbitMQConfig {
         //durable(true)持久化，消息队列重启后交换机仍然存在
         return ExchangeBuilder.topicExchange(EXCHANGE_TOPICS).durable(true).build();
     }
+
+    /**
+     * @Description: 延时队列
+     * @author: Hu
+     * @since: 2020/12/29 14:30
+     * @Param:
+     * @return:
+     */
+    @Bean(EXCHANGE_DELAY)
+    public CustomExchange delayExchange() {
+        Map<String, Object> args = new HashMap<String, Object>();
+        args.put("x-delayed-type", "direct");
+        return new CustomExchange(EXCHANGE_DELAY, "x-delayed-message", true, false, args);
+    }
+
+
+
     //声明队列
     @Bean(QUEUE_TEST)
     public Queue QUEUE_INFORM_TEST() {
@@ -79,9 +101,16 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queue).to(exchange).with("queue.email").noargs();
     }
 
+    /**
+     * @Description: 延时队列
+     * @author: Hu
+     * @since: 2020/12/29 14:30
+     * @Param:
+     * @return:
+     */
     @Bean
     public Binding BINDING_QUEUE_INFORM_TEST(@Qualifier(QUEUE_TEST) Queue queue,
-                                              @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
+                                              @Qualifier(EXCHANGE_DELAY) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.test").noargs();
     }
 

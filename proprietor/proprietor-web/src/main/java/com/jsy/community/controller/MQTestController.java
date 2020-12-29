@@ -2,11 +2,15 @@ package com.jsy.community.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,10 +34,18 @@ public class MQTestController {
         amqpTemplate.convertAndSend("exchange_topics","queue.sms","丢雷老母");
         System.out.println("mq发送消息了");
     }
+    //延迟消息测试
     @GetMapping("/test")
-    @ApiOperation("测试一")
+    @ApiOperation("测试三")
     public void test(){
-        amqpTemplate.convertAndSend("exchange_topics","queue.test","凸(艹皿艹 )");
+        System.out.println(new Date());
+        amqpTemplate.convertAndSend("exchange_delay", "queue.test", "凸(艹皿艹 )", new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                message.getMessageProperties().setHeader("x-delay",30000);
+                return message;
+            }
+        });
         System.out.println("mq发送消息了");
     }
     @GetMapping("/email")
