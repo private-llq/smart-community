@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Data
 @ApiModel("店铺")
-public class ShopLeaseVo implements Serializable {
+public class ShopLeaseVO implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
