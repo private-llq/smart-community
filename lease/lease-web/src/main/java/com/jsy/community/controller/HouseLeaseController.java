@@ -58,10 +58,13 @@ public class HouseLeaseController {
 
 
     @Login
-    @GetMapping()
+    @PostMapping("/page")
     @ApiOperation("分页查询房屋出租数据")
     public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
         ValidatorUtils.validatePageParam(baseQO);
+        if( baseQO.getQuery() == null ){
+            baseQO.setQuery(new HouseLeaseQO());
+        }
         return CommonResult.ok(iHouseLeaseService.queryHouseLeaseByList(baseQO));
     }
 

@@ -30,6 +30,10 @@ public class HouseFavoriteEntity extends BaseEntity {
     private Long favoriteId;
 
     @ApiModelProperty(value = "收藏类型：1.商铺 2.租房")
-    private Integer favoriteType;
+    private Short favoriteType;
+
+    public static HouseFavoriteEntity getInstance(){
+        return new HouseFavoriteEntity();
+    }
 
 }
