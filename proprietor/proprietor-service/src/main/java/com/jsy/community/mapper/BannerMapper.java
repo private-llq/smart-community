@@ -2,7 +2,10 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.BannerEntity;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
+
+import java.util.Map;
 
 /**
  * banner轮播图 Mapper 接口
@@ -13,13 +16,12 @@ import org.apache.ibatis.annotations.Update;
 public interface BannerMapper extends BaseMapper<BannerEntity> {
 	
 	/**
-	* @Description: 点击量+1
-	 * @Param: [id]
-	 * @Return: int
+	* @Description: 刷新点击量
+	 * @Param: [map]
+	 * @Return: void
 	 * @Author: chq459799974
-	 * @Date: 2020/12/29
+	 * @Date: 2020/12/30
 	**/
-	@Update("update t_banner set click = click + 1 where id = #{id}")
-	int clickUp(Long id);
+	void refreshClickCount(@Param("map") Map<Long,Long> map);
 	
 }
