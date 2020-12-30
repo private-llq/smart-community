@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IShopLeaseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
@@ -12,8 +13,8 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
-import com.jsy.community.api.IShopLeaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -65,7 +66,7 @@ public class ShopLeaseController {
 	public CommonResult getShopBySearch(@RequestBody BaseQO<ShopLeaseEntity> baseQO,
 	                                    @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
 	                                    @ApiParam("区域id") @RequestParam(required = false,defaultValue = "500103") Integer areaId){
-		PageInfo<ShopLeaseEntity> pageInfo = shopLeaseService.getShopBySearch(baseQO,query,areaId);
+		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopBySearch(baseQO,query,areaId);
 		return CommonResult.ok(pageInfo);
 	}
 	

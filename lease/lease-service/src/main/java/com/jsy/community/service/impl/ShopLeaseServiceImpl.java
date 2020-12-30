@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +16,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -309,37 +311,78 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-	public PageInfo<ShopLeaseEntity> getShopBySearch(BaseQO<ShopLeaseEntity> baseQO, String query, Integer areaId) {
+	public PageInfo<IndexShopVO> getShopBySearch(BaseQO<ShopLeaseEntity> baseQO, String query, Integer areaId) {
 		Page<ShopLeaseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
-		
 		QueryWrapper<ShopLeaseEntity> queryWrapper = new QueryWrapper<>();
 		
 		List<Long> longs = new ArrayList<>();
-		if (!StringUtils.isEmpty(query)) {//有搜索条件的时候
-//			QueryWrapper<CommunityEntity> wrapper = new QueryWrapper<>();
-//			wrapper.like("name", communityName);
-//			List<CommunityEntity> list = communityService.list1(wrapper);  // 这样调会报错   2020年12月21日16:43:57
-			
+		IndexShopVO indexShopVO = new IndexShopVO();
+		List<IndexShopVO> shopVOS = new ArrayList<>();
+		// 如果有条件
+		if (!StringUtils.isEmpty(query)) {
 			List<CommunityEntity> list = communityService.listCommunityByName(query, areaId);
 			for (CommunityEntity communityEntity : list) {
 				longs.add(communityEntity.getId());
 			}
 			queryWrapper.in("community_id", longs);
 			shopLeaseMapper.selectPage(page, queryWrapper);
-			PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
+			
+			List<ShopLeaseEntity> records = page.getRecords();
+			for (ShopLeaseEntity record : records) {
+				
+				Long id = record.getId();
+				
+				// 封装图片
+				QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
+				wrapper.eq("shop_id", id).last("limit 1");
+				ShopImgEntity shopImgEntity = shopImgMapper.selectOne(wrapper);
+				indexShopVO.setImgPath(shopImgEntity.getImgUrl());
+				
+				// 封装标签集合
+				Long[] tags = shopLeaseMapper.selectTags(id);
+				List<String> constNameByConstId = houseConstService.getConstNameByConstId(tags);
+				indexShopVO.setTags(constNameByConstId);
+				
+				BeanUtils.copyProperties(record, indexShopVO);
+				shopVOS.add(indexShopVO);
+			}
+			
+			PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
 			BeanUtils.copyProperties(page, pageInfo);
+			pageInfo.setRecords(shopVOS);
 			return pageInfo;
 		}
+		
+		// 如果没条件
 		List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());
 		for (CommunityEntity communityEntity : list) {
 			longs.add(communityEntity.getId());
 		}
 		queryWrapper.in("community_id", longs);
 		shopLeaseMapper.selectPage(page, queryWrapper);
-		PageInfo<ShopLeaseEntity> info = new PageInfo<>();
-		BeanUtils.copyProperties(page, info);
-		return info;
+		List<ShopLeaseEntity> records = page.getRecords();
+		for (ShopLeaseEntity record : records) {
+			BeanUtils.copyProperties(record,indexShopVO);
+			
+			Long id = record.getId();
+			
+			// 封装图片
+			QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
+			wrapper.eq("shop_id", id).last("limit 1");
+			ShopImgEntity shopImgEntity = shopImgMapper.selectOne(wrapper);
+			indexShopVO.setImgPath(shopImgEntity.getImgUrl());
+			
+			// 封装标签集合
+			Long[] tags = shopLeaseMapper.selectTags(id);
+			List<String> constNameByConstId = houseConstService.getConstNameByConstId(tags);
+			indexShopVO.setTags(constNameByConstId);
+			shopVOS.add(indexShopVO);
+		}
 		
+		PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(page, pageInfo);
+		pageInfo.setRecords(shopVOS);
+		return pageInfo;
 	}
 	
 	@Override

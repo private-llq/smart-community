@@ -5,6 +5,7 @@ import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
 
 import java.util.List;
@@ -81,7 +82,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/21 14:13
 	 * @Param [baseQO]
 	 **/
-	PageInfo<ShopLeaseEntity> getShopBySearch(BaseQO<ShopLeaseEntity> baseQO, String query, Integer areaId);
+	PageInfo<IndexShopVO> getShopBySearch(BaseQO<ShopLeaseEntity> baseQO, String query, Integer areaId);
 	
 	/**
 	 * @return void
