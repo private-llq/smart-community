@@ -5,7 +5,7 @@ import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.vo.shop.ShopLeaseVo;
+import com.jsy.community.vo.shop.ShopLeaseVO;
 
 import java.util.List;
 import java.util.Map;
@@ -27,10 +27,10 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 10:49
 	 * @Param []
 	 **/
-	void addShop(ShopLeaseVo shop);
+	void addShop(ShopLeaseVO shop);
 	
 	/**
-	 * @return com.jsy.community.vo.shop.ShopLeaseVo
+	 * @return com.jsy.community.vo.shop.ShopLeaseVO
 	 * @Author lihao
 	 * @Description 根据店铺id查询发布的店铺详情
 	 * @Date 2020/12/17 17:12
@@ -45,7 +45,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 17:12
 	 * @Param [shop]
 	 **/
-	void updateShop(ShopLeaseVo shop, Long shopId);
+	void updateShop(ShopLeaseVO shop, Long shopId);
 	
 	/**
 	 * @return void

@@ -15,7 +15,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.shop.ShopLeaseVo;
+import com.jsy.community.vo.shop.ShopLeaseVO;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -67,7 +67,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	
 	@Override
 	@Transactional
-	public void addShop(ShopLeaseVo shop) {
+	public void addShop(ShopLeaseVO shop) {
 		//验证所属社区所属用户房屋是否存在
 		if (!iHouseLeaseService.isExistUserHouse(shop.getUid(), shop.getCommunityId().intValue(), shop.getHouseId().intValue())) {
 			throw new LeaseException("您并未拥有该房屋!");
@@ -112,7 +112,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		wrapper.eq("id", shopId);
 		ShopLeaseEntity shop = shopLeaseMapper.selectOne(wrapper);
 		
-		ShopLeaseVo shopLeaseVo = new ShopLeaseVo();
+		ShopLeaseVO shopLeaseVo = new ShopLeaseVO();
 		BeanUtils.copyProperties(shop, shopLeaseVo); // 封装基本信息
 		
 		
@@ -149,7 +149,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	
 	@Override
 //	@Transactional
-	public void updateShop(ShopLeaseVo shop, Long shopId) {
+	public void updateShop(ShopLeaseVO shop, Long shopId) {
 		//验证所属社区所属用户房屋是否存在
 		if (!iHouseLeaseService.isExistUserHouse(shop.getUid(), shop.getCommunityId().intValue(), shop.getHouseId().intValue())) {
 			throw new LeaseException("您并未拥有该房屋!");

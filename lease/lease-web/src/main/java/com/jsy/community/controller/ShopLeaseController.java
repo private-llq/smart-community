@@ -12,7 +12,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.shop.ShopLeaseVo;
+import com.jsy.community.vo.shop.ShopLeaseVO;
 import com.jsy.community.api.IShopLeaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -83,9 +83,9 @@ public class ShopLeaseController {
 	
 	@ApiOperation("商铺发布")
 	@PostMapping("/addShop")
-	public CommonResult addShop(@RequestBody ShopLeaseVo shop) {
+	public CommonResult addShop(@RequestBody ShopLeaseVO shop) {
 		shop.setUid(UserUtils.getUserId());
-		ValidatorUtils.validateEntity(shop, ShopLeaseVo.addShopValidate.class);
+		ValidatorUtils.validateEntity(shop, ShopLeaseVO.addShopValidate.class);
 		shopLeaseService.addShop(shop);
 		return CommonResult.ok();
 	}
@@ -101,7 +101,7 @@ public class ShopLeaseController {
 	@ApiOperation("商铺修改")
 	@PostMapping("/updateShop")
 	@Login
-	public CommonResult updateShop(@RequestBody ShopLeaseVo shop,
+	public CommonResult updateShop(@RequestBody ShopLeaseVO shop,
 	                               @ApiParam("店铺id") @RequestParam Long shopId) {
 		shop.setUid(UserUtils.getUserId());
 		shopLeaseService.updateShop(shop, shopId);
