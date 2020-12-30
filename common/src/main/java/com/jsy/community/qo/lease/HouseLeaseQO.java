@@ -186,7 +186,7 @@ public class HouseLeaseQO implements Serializable {
     @ApiModelProperty(value = "房屋出租方式ID")
     //业务层效验 值有效性
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未填写出租方式!")
-    private Integer houseLeaseymodeId;
+    private Integer houseLeasemodeId;
 
     /**
      * 新增房屋租售验证接口参数验证

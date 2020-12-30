@@ -8,12 +8,12 @@
     <insert id="insertHouseLease">
         insert into t_house_lease (id,uid,house_title,house_city_id,house_area_id,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_leasedeposit_id
         ,house_type_id,house_floor,house_direction,house_year,house_source_id
-        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_furniture_id,house_lon,house_lat,house_id,house_community_id,house_reserve_time
+        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_furniture_id,house_lon,house_lat,house_id,house_community_id,house_reserve_time,create_time
         )
         values
         (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAreaId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseUnit},#{houseSquareMeter},#{houseLeasedepositId}
         ,#{houseTypeId},#{houseFloor},#{houseDirection},#{houseYear},#{houseSourceId}
-        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeaseymodeId},#{houseContact},#{houseFurnitureId},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},#{houseReserveTime}
+        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseFurnitureId},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},#{houseReserveTime},now()
         )
     </insert>
 
@@ -63,8 +63,8 @@
                 and house_leasetype_id = #{query.houseLeasetypeId}
             </if>
             <!-- 如果查询筛选增加了出租方式条件 整租、合租之类 -->
-            <if test="query.houseLeaseymodeId != null and query.houseLeaseymodeId != &quot;&quot; and query.houseLeaseymodeId &gt; 0 and query.houseLeaseymodeId != 1">
-                and house_leasemode_id = #{query.houseLeaseymodeId}
+            <if test="query.houseLeasemodeId != null and query.houseLeasemodeId != &quot;&quot; and query.houseLeasemodeId &gt; 0 and query.houseLeasemodeId != 1">
+                and house_leasemode_id = #{query.houseLeasemodeId}
             </if>
             <!-- 如果查询筛选增加了房屋来源条件 个人、经纪人之类 -->
             <if test="query.houseSourceId != null and query.houseSourceId != &quot;&quot; and query.houseSourceId &gt; 0 and query.houseSourceId != 1">
@@ -200,8 +200,8 @@
                     ,house_leasetype_id = #{houseLeasetypeId}
                 </if>
                 <!-- 房屋出租方式id  1不限(默认) 2整租，4合租 -->
-                <if test="houseLeaseymodeId != null and houseLeaseymodeId &gt; 0">
-                    ,house_leasemode_id = #{houseLeaseymodeId}
+                <if test="houseLeasemodeId != null and houseLeasemodeId &gt; 0">
+                    ,house_leasemode_id = #{houseLeasemodeId}
                 </if>
             </trim>
         </set>
@@ -258,6 +258,7 @@
     <select id="ownerLeaseHouse" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
             SELECT
             DISTINCT
+                l.id,
             	l.house_title,
             	l.house_square_meter,
             	l.house_address,

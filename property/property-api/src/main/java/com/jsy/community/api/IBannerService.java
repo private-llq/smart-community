@@ -41,4 +41,14 @@ public interface IBannerService extends IService<BannerEntity> {
 	 * @Date: 2020/11/16
 	**/
 	boolean deleteBannerBatch(Long[] ids);
+	
+	/**
+	* @Description: 轮播图 修改跳转路径和描述
+	 * @Param: [bannerQO]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/12/29
+	**/
+	boolean updateBanner(BannerQO bannerQO);
+
 }

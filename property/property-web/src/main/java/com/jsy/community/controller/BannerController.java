@@ -32,10 +32,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/banner")
 @ApiJSYController
+@Login
 public class BannerController {
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
-	private IBannerService iBannerService;
+	private IBannerService bannerService;
 	
 	private static final String BUCKETNAME = "bannner-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
@@ -53,7 +54,7 @@ public class BannerController {
 	@ApiOperation("【轮播图】列表查询")
 	@PostMapping("/list")
 	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
-		List<BannerVO> returnList = iBannerService.queryBannerList(bannerQO);
+		List<BannerVO> returnList = bannerService.queryBannerList(bannerQO);
 		return CommonResult.ok(returnList);
 	}
 
@@ -65,13 +66,11 @@ public class BannerController {
 	 * @Date: 2020/11/16
 	**/
 	@ApiOperation("【轮播图基本信息】上传")
-	@Login
 	@PostMapping("upload")
 	public CommonResult upload(@RequestBody BannerEntity bannerEntity){
 		ValidatorUtils.validateEntity(bannerEntity, BannerEntity.addBannerValidatedGroup.class);
-		//TODO 调CommonService方法，文件上传到fastdfs。url暂时写死
 		//写库
-		boolean b = iBannerService.addBanner(bannerEntity);
+		boolean b = bannerService.addBanner(bannerEntity);
 		String filePath = bannerEntity.getUrl();
 		if (!StringUtils.isEmpty(filePath)) {
 			redisTemplate.opsForSet().add("banner_img_all",filePath);
@@ -105,14 +104,24 @@ public class BannerController {
 	 * @Date: 2020/11/16
 	**/
 	@ApiOperation("【轮播图】批量删除")
-//	@Login
 	@DeleteMapping("")
 	public CommonResult deleteBanner(@RequestBody Long[] ids){
 		if(ids.length == 0){
-			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),JSYError.REQUEST_PARAM.getMessage());
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"缺少ID");
 		}
-		boolean result = iBannerService.deleteBannerBatch(ids);
+		boolean result = bannerService.deleteBannerBatch(ids);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),JSYError.INTERNAL.getMessage());
 	}
+	
+	@ApiOperation("【轮播图】修改跳转路径和描述")
+	@PutMapping("")
+	public CommonResult updateBanner(@RequestBody BannerQO bannerQO){
+		if(bannerQO.getId() == null){
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"缺少ID");
+		}
+		boolean b = bannerService.updateBanner(bannerQO);
+		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改轮播图信息失败");
+	}
+	
 }
 

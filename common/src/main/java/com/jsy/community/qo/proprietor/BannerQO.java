@@ -16,6 +16,8 @@ import java.util.List;
 @Data
 @ApiModel(description="轮播图")
 public class BannerQO implements Serializable {
+	@ApiModelProperty(value = "ID")
+	private Long id;
 	
 	@ApiModelProperty(value = "社区ID")
 	@NotNull(groups = {queryBannerValidatedGroup.class}, message = "缺少社区ID")
@@ -30,6 +32,12 @@ public class BannerQO implements Serializable {
 	
 	@ApiModelProperty(value = "点击量排序 1.升序 -1.降序")
 	private int clickOrder;
+	
+	@ApiModelProperty(value = "跳转路径")
+	private String path;
+	
+	@ApiModelProperty(value = "描述")
+	private String description;
 	
 	/**
 	 * APP端查询轮播图验证组

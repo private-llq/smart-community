@@ -6,7 +6,7 @@
     <sql id="tableNameAndCondition">from t_house where</sql>
     <!-- 【社区查询】查询所有小区 queryType = 1 -->
     <select id="getAllCommunityFormCityId" parameterType="java.lang.Integer" resultType="java.util.HashMap">
-        select id,name,house_level_mode as houseLevelMode from t_community where city_id = #{id}
+        select id,name,house_level_mode as houseLevelMode from t_community where city_id = #{id} limit #{page},#{pageSize}
     </select>
     <!-- 【单元或者楼栋查询】根据社区id来查询下一级的数据 queryType = 2-->
     <select id="getBuildingOrUnitByCommunityId" parameterType="java.lang.Integer" resultType="java.util.HashMap">

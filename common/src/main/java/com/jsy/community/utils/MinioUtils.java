@@ -12,7 +12,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+
+import static java.nio.charset.StandardCharsets.*;
 
 @Slf4j
 public class MinioUtils {
@@ -60,6 +66,42 @@ public class MinioUtils {
 	private static  String getRandomFileName(String fileName){
 		return UUID.randomUUID().toString() + "-" + fileName;
 	}
+	/**
+	 * 利用java原生的类实现SHA256加密
+	 * @param str 加密后的报文
+	 */
+	public static String getSHA256(String str)  {
+		MessageDigest messageDigest;
+		String encodestr = "";
+		try {
+			messageDigest = MessageDigest.getInstance("SHA-256");
+			messageDigest.update(str.getBytes(UTF_8));
+			encodestr = byte2Hex(messageDigest.digest());
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return encodestr;
+	}
+
+	/**
+	 * 将byte转为16进制
+	 */
+	private static String byte2Hex(byte[] bytes) {
+		StringBuilder stringBuffer = new StringBuilder();
+		String temp = null;
+		for (byte aByte : bytes) {
+			temp = Integer.toHexString(aByte & 0xFF);
+			if (temp.length() == 1) {
+				// 1得到一位的进行补0操作
+				stringBuffer.append("0");
+			}
+			stringBuffer.append(temp);
+		}
+		return stringBuffer.toString();
+	}
+
+
+
 
 	/**
 	 * 根据存储名称创建存储桶目录
@@ -100,7 +142,7 @@ public class MinioUtils {
 			for( MultipartFile file : files ){
 				if( file != null && !file.isEmpty() && isImage(file.getOriginalFilename())){
 					//1.对文件名随机
-					String randomFileName = getRandomFileName(file.getOriginalFilename());
+					String randomFileName = getSHA256(file.getOriginalFilename());
 					//2.存储文件
 					minioClient.putObject(bucketName, randomFileName, file.getInputStream(), file.getContentType());
 					//3.获得文件访问路径

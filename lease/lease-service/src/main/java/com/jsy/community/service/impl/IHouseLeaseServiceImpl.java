@@ -83,7 +83,7 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
     @Transactional
     @Override
     public List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> houseLeaseQO) {
-        houseLeaseQO.setPage((houseLeaseQO.getPage() - 1)*houseLeaseQO.getSize());
+        houseLeaseQO.setPage((houseLeaseQO.getPage() - 1) * houseLeaseQO.getSize());
         //如果在查询时 用户筛选条件房屋优势标签为多选
         if ( houseLeaseQO.getQuery().getHouseAdvantage() != null && !houseLeaseQO.getQuery().getHouseAdvantage().isEmpty() ){
             long typeCode = MyMathUtils.getTypeCode(houseLeaseQO.getQuery().getHouseAdvantage());

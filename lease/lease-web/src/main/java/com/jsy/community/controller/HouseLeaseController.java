@@ -40,7 +40,6 @@ public class HouseLeaseController {
     public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQO) {
         //新增参数常规效验
         ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.addLeaseSaleHouse.class);
-        ValidatorUtils.validateImages(houseLeaseQO.getHouseImage());
         houseLeaseQO.setUid(UserUtils.getUserId());
         //验证所属社区所属用户房屋是否存在
         if(!iHouseLeaseService.isExistUserHouse(UserUtils.getUserId(), houseLeaseQO.getHouseCommunityId(), houseLeaseQO.getHouseId())){
@@ -73,7 +72,7 @@ public class HouseLeaseController {
     public CommonResult<Boolean> houseLeaseUpdate(@RequestBody HouseLeaseQO houseLeaseQO) {
         ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.updateLeaseSaleHouse.class);
         houseLeaseQO.setUid(UserUtils.getUserId());
-        return CommonResult.ok(iHouseLeaseService.updateHouseLease(houseLeaseQO));
+        return CommonResult.ok(iHouseLeaseService.updateHouseLease(houseLeaseQO),"更新成功!");
     }
 
 

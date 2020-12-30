@@ -1,7 +1,5 @@
 package com.jsy.community.utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
