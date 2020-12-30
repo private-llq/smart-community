@@ -14,10 +14,10 @@ target/
 
 ### IntelliJ IDEA ###
 .idea
+.txlcn
 *.iws
 *.iml
 *.ipr
-.txlcn
 
 ### NetBeans ###
 /nbproject/private/
