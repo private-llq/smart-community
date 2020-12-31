@@ -27,12 +27,12 @@ public interface IBannerService extends IService<BannerEntity> {
 	List<BannerVO> queryBannerList(BannerQO bannerQO);
 	
 	/**
-	* @Description: 刷点击量
+	* @Description: 添加点击量到redis
 	 * @Param: [id]
-	 * @Return: boolean
+	 * @Return: void
 	 * @Author: chq459799974
-	 * @Date: 2020/12/29
+	 * @Date: 2020/12/30
 	**/
-	boolean clickUp(Long id);
+	void clickUp(Long id);
 	
 }

@@ -8,12 +8,15 @@ import com.jsy.community.entity.BannerEntity;
 import com.jsy.community.mapper.BannerMapper;
 import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.vo.BannerVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * <p>
@@ -23,11 +26,15 @@ import java.util.List;
  * @author chq459799974
  * @since 2020-11-16
  */
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> implements IBannerService {
 	
 	@Autowired
 	private BannerMapper bannerMapper;
+	
+	@Autowired
+	private RedisTemplate redisTemplate;
 	
 	/**
 	 * @Description: 轮播图 列表查询
@@ -56,16 +63,30 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	}
 	
 	/**
-	* @Description: 刷点击量
+	 * @Description: 添加点击量到redis
 	 * @Param: [id]
-	 * @Return: boolean
+	 * @Return: void
 	 * @Author: chq459799974
-	 * @Date: 2020/12/29
-	**/
+	 * @Date: 2020/12/30
+	 **/
 	@Override
-	public boolean clickUp(Long id){
-		int result = bannerMapper.clickUp(id);
-		return result == 1;
+	public void clickUp(Long id){
+		redisTemplate.opsForHash().increment("Banner:clickCount",String.valueOf(id),1);
 	}
+	/**
+	* @Description: 每5分组刷点击量到mysql
+	 * @Param: []
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2020/12/30
+	**/
+	@Scheduled(cron = "0 */5 * * * ?")
+	public void refreshClickCount(){
+		log.info("轮播图刷新点击量定时任务执行"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
+		Map<Long,Long> entries = redisTemplate.opsForHash().entries("Banner:clickCount");
+		redisTemplate.opsForHash().delete("Banner:clickCount",redisTemplate.opsForHash().keys("Banner:clickCount").toArray());
+		bannerMapper.refreshClickCount(entries);
+	}
+	
 	
 }

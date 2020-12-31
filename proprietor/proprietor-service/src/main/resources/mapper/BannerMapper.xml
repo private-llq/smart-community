@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.community.mapper.BannerMapper">
+    <!-- 批量刷新点击量 -->
+    <update id="refreshClickCount" parameterType="java.util.Map">
+        update t_banner
+        set click = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then click + #{value}
+        </foreach>
+        end
+        where id in
+        <foreach collection="map.entrySet()" index="key" separator="," open="(" close=")">
+            #{key}
+        </foreach>
+    </update>
+</mapper>

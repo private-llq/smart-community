@@ -45,12 +45,18 @@ public class BannerController {
 		return CommonResult.ok(returnList);
 	}
 	
-	//TODO 提交MQ任务，批量刷点击量
+	/**
+	* @Description: 轮播图添加点击量到redis
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/12/30
+	**/
 	@ApiOperation("【轮播图】点击量+1")
 	@PutMapping("clickUp")
 	public CommonResult clickUp(@RequestParam Long id){
-		boolean b = bannerService.clickUp(id);
-		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"点击量增加失败");
+		bannerService.clickUp(id);
+		return CommonResult.ok();
 	}
 	
 }
