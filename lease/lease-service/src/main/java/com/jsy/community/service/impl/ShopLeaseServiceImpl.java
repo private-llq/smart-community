@@ -316,10 +316,10 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		QueryWrapper<ShopLeaseEntity> queryWrapper = new QueryWrapper<>();
 		
 		List<Long> longs = new ArrayList<>();
-		IndexShopVO indexShopVO = new IndexShopVO();
 		List<IndexShopVO> shopVOS = new ArrayList<>();
 		// 如果有条件
 		if (!StringUtils.isEmpty(query)) {
+			
 			List<CommunityEntity> list = communityService.listCommunityByName(query, areaId);
 			for (CommunityEntity communityEntity : list) {
 				longs.add(communityEntity.getId());
@@ -329,7 +329,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			List<ShopLeaseEntity> records = page.getRecords();
 			for (ShopLeaseEntity record : records) {
-				
+				IndexShopVO indexShopVO = new IndexShopVO();
 				Long id = record.getId();
 				
 				// 封装图片
@@ -354,14 +354,17 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		}
 		
 		// 如果没条件
-		List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());
+		List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());// 查出该区域有哪些小区
 		for (CommunityEntity communityEntity : list) {
 			longs.add(communityEntity.getId());
 		}
 		queryWrapper.in("community_id", longs);
 		shopLeaseMapper.selectPage(page, queryWrapper);
-		List<ShopLeaseEntity> records = page.getRecords();
+		List<ShopLeaseEntity> records = page.getRecords();// 分页查出这些小区的商铺
+		
+		// 封装小区商铺
 		for (ShopLeaseEntity record : records) {
+			IndexShopVO indexShopVO = new IndexShopVO();
 			BeanUtils.copyProperties(record,indexShopVO);
 			
 			Long id = record.getId();
@@ -376,6 +379,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Long[] tags = shopLeaseMapper.selectTags(id);
 			List<String> constNameByConstId = houseConstService.getConstNameByConstId(tags);
 			indexShopVO.setTags(constNameByConstId);
+			
 			shopVOS.add(indexShopVO);
 		}
 		
