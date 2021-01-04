@@ -60,7 +60,8 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		Page<CommunityEntity> communityEntityPage = communityMapper.selectPage(page, queryWrapper);
 		//根据经纬度设置距离
 		for(CommunityEntity communityEntity : communityEntityPage.getRecords()){
-			if(query.getLon() != null && query.getLat() != null
+			if(query != null
+				&& query.getLon() != null && query.getLat() != null
 				&& communityEntity.getLon() !=null && communityEntity.getLat() != null){
 				Map<String, Object> distanceMap = DistanceUtil.getDistance(query.getLon().doubleValue(), query.getLat().doubleValue(),
 					communityEntity.getLon().doubleValue(), communityEntity.getLat().doubleValue());

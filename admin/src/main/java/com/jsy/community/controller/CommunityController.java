@@ -84,9 +84,9 @@ public class CommunityController {
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.vo.CommonResult<com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.CommunityEntity>>
 	 * @Author: chq459799974
-	 * @Date: 2020/12/14
+	 * @Date: 2021/1/4
 	**/
-	@GetMapping("")
+	@PostMapping("page")
 	public CommonResult<Page<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
 		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));
 	}

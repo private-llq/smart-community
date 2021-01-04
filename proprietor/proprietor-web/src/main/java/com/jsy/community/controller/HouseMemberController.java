@@ -84,6 +84,9 @@ public class HouseMemberController {
 	@ApiOperation("【房间成员】查询")
 	@PostMapping("page")
 		public CommonResult<PageInfo<HouseMemberEntity>> queryHouseMemberPage(@RequestBody BaseQO<HouseMemberQO> baseQO){
+		if( baseQO.getQuery() == null ){
+			baseQO.setQuery(new HouseMemberQO());
+		}
 		baseQO.getQuery().setHouseholderId(UserUtils.getUserId());
 		return CommonResult.ok(houseMemberService.getHouseMembers(baseQO));
 	}
