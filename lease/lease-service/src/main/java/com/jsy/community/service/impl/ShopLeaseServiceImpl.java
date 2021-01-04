@@ -133,12 +133,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		shopLeaseVo.setImgPath(imgPath); // 封装图片信息
 		
 		Long[] shopTypeIds = shopLeaseMapper.selectTypeTags(shopId);
-		List<String> constTypeName = houseConstService.getConstNameByConstId(shopTypeIds);// 店铺类型标签
-		
-		Long[] shopBusinessIds = shopLeaseMapper.selectBusinessTags(shopId);
-		List<String> constBusinessName = houseConstService.getConstNameByConstId(shopBusinessIds);// 店铺行业标签
-		shopLeaseVo.setShopTypeNames(constTypeName);
-		shopLeaseVo.setShopBusinessNames(constBusinessName); // 封装标签
+		if (shopTypeIds != null && shopTypeIds.length > 0) {
+			List<String> constTypeName = houseConstService.getConstNameByConstId(shopTypeIds);// 店铺类型标签
+			Long[] shopBusinessIds = shopLeaseMapper.selectBusinessTags(shopId);
+			List<String> constBusinessName = houseConstService.getConstNameByConstId(shopBusinessIds);// 店铺行业标签
+			shopLeaseVo.setShopTypeNames(constTypeName);
+			shopLeaseVo.setShopBusinessNames(constBusinessName); // 封装标签
+		}
 		map.put("shop", shopLeaseVo);
 		
 		
@@ -249,7 +250,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>(page, size);
 			shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
 			PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
-			BeanUtils.copyProperties(shopLeaseEntityPage,pageInfo);
+			BeanUtils.copyProperties(shopLeaseEntityPage, pageInfo);
 			return pageInfo;
 			
 		}
@@ -310,7 +311,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>(page, size);
 		shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
 		PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(shopLeaseEntityPage,pageInfo);
+		BeanUtils.copyProperties(shopLeaseEntityPage, pageInfo);
 		return pageInfo;
 	}
 	
@@ -371,7 +372,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 封装小区商铺
 		for (ShopLeaseEntity record : records) {
 			IndexShopVO indexShopVO = new IndexShopVO();
-			BeanUtils.copyProperties(record,indexShopVO);
+			BeanUtils.copyProperties(record, indexShopVO);
 			
 			Long id = record.getId();
 			
@@ -379,13 +380,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
 			wrapper.eq("shop_id", id).last("limit 1");
 			ShopImgEntity shopImgEntity = shopImgMapper.selectOne(wrapper);
-			indexShopVO.setImgPath(shopImgEntity.getImgUrl());
+			if (shopImgEntity != null) {
+				indexShopVO.setImgPath(shopImgEntity.getImgUrl());
+			}
 			
 			// 封装标签集合
 			Long[] tags = shopLeaseMapper.selectTags(id);
-			List<String> constNameByConstId = houseConstService.getConstNameByConstId(tags);
-			indexShopVO.setTags(constNameByConstId);
-			
+			if (tags != null && tags.length > 0) {
+				List<String> constNameByConstId = houseConstService.getConstNameByConstId(tags);
+				indexShopVO.setTags(constNameByConstId);
+			}
 			shopVOS.add(indexShopVO);
 		}
 		

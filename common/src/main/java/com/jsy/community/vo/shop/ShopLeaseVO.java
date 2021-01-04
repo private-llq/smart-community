@@ -126,6 +126,9 @@ public class ShopLeaseVO implements Serializable {
 	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "店铺地址不能为空")
 	private String address;
 	
+	@ApiModelProperty(value = "月租金  字符串形式")
+	private String MonthMoneyString;
+	
 	/**
 	 * 添加店铺接口
 	 */

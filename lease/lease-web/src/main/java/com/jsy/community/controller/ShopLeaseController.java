@@ -25,6 +25,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -67,18 +68,24 @@ public class ShopLeaseController {
 	                                    @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
 	                                    @ApiParam("区域id") @RequestParam(required = false, defaultValue = "500103") Integer areaId) {
 		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopBySearch(baseQO, query, areaId);
+		
+		// 当月租金大于10000变成XX.XX万元
 		List<IndexShopVO> records = pageInfo.getRecords();
 		for (IndexShopVO record : records) {
 			if (record.getMonthMoney().doubleValue() > 10000d) {
 				String s = String.format("%.2f", record.getMonthMoney().doubleValue() / 10000) + "万";
 				record.setMonthMoneyString(s);
+			} else if (record.getMonthMoney().compareTo(new BigDecimal(0.00)) == 0) {
+				String s = "面议";
+				record.setMonthMoneyString(s);
 			} else {
-				String s = ""+record.getMonthMoney();
+				String s = "" + record.getMonthMoney();
 				int i = s.lastIndexOf(".");
-				String substring = s.substring(0, i)+"元";
+				String substring = s.substring(0, i) + "元";
 				record.setMonthMoneyString(substring);
 			}
 		}
+		// 当月租金大于10000变成XX.XX万元
 		return CommonResult.ok(pageInfo);
 	}
 	
@@ -108,6 +115,23 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
 		Map<String, Object> map = shopLeaseService.getShop(shopId);
+		
+		// 当月租金大于10000变成XX.XX万元
+		ShopLeaseVO shop = (ShopLeaseVO) map.get("shop");
+		BigDecimal monthMoney = shop.getMonthMoney();
+		if (monthMoney.doubleValue() > 10000d) {
+			String s = String.format("%.2f", monthMoney.doubleValue() / 10000) + "万";
+			shop.setMonthMoneyString(s);
+		} else if (monthMoney.compareTo(new BigDecimal(0.00))==0) {
+			String s = "面议";
+			shop.setMonthMoneyString(s);
+		} else {
+			String s = "" + shop.getMonthMoney();
+			int i = s.lastIndexOf(".");
+			String substring = s.substring(0, i) + "元";
+			shop.setMonthMoneyString(substring);
+		}
+		// 当月租金大于10000变成XX.XX万元
 		return CommonResult.ok(map);
 	}
 	
