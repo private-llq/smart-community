@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRelationService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.exception.JSYError;
@@ -43,6 +44,7 @@ public class RelationController {
         String userId = UserUtils.getUserId();
         System.out.println(userId);
         relationQo.setUserId(userId);
+        relationQo.setPersonType(BusinessConst.PERSON_TYPE_RELATIVE);
         return relationService.addRelation(relationQo)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
     }
 
