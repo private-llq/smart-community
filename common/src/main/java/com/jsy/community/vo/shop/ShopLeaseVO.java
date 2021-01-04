@@ -123,6 +123,7 @@ public class ShopLeaseVO implements Serializable {
 	private Integer source;
 	
 	@ApiModelProperty(value = "店铺地址")
+	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "店铺地址不能为空")
 	private String address;
 	
 	/**

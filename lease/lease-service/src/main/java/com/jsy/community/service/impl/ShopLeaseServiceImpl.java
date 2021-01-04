@@ -328,8 +328,10 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			for (CommunityEntity communityEntity : list) {
 				longs.add(communityEntity.getId());
 			}
-			queryWrapper.in("community_id", longs);
-			shopLeaseMapper.selectPage(page, queryWrapper);
+			if (!CollectionUtils.isEmpty(longs)) {
+				queryWrapper.in("community_id", longs);
+				shopLeaseMapper.selectPage(page, queryWrapper);
+			}
 			
 			List<ShopLeaseEntity> records = page.getRecords();
 			for (ShopLeaseEntity record : records) {

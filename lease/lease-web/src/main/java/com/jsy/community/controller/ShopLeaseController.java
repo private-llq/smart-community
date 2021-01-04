@@ -55,7 +55,7 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")
 	@PostMapping("/getShopByCondition")
-	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO){
+	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
 		PageInfo<ShopLeaseEntity> pageInfo = shopLeaseService.getShopByCondition(baseQO);
 		return CommonResult.ok(pageInfo);
 	}
@@ -65,8 +65,20 @@ public class ShopLeaseController {
 	@PostMapping("/getShopBySearch")
 	public CommonResult getShopBySearch(@RequestBody BaseQO<ShopLeaseEntity> baseQO,
 	                                    @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
-	                                    @ApiParam("区域id") @RequestParam(required = false,defaultValue = "500103") Integer areaId){
-		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopBySearch(baseQO,query,areaId);
+	                                    @ApiParam("区域id") @RequestParam(required = false, defaultValue = "500103") Integer areaId) {
+		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopBySearch(baseQO, query, areaId);
+		List<IndexShopVO> records = pageInfo.getRecords();
+		for (IndexShopVO record : records) {
+			if (record.getMonthMoney().doubleValue() > 10000d) {
+				String s = String.format("%.2f", record.getMonthMoney().doubleValue() / 10000) + "万";
+				record.setMonthMoneyString(s);
+			} else {
+				String s = ""+record.getMonthMoney();
+				int i = s.lastIndexOf(".");
+				String substring = s.substring(0, i)+"元";
+				record.setMonthMoneyString(substring);
+			}
+		}
 		return CommonResult.ok(pageInfo);
 	}
 	
@@ -117,7 +129,7 @@ public class ShopLeaseController {
 	                               @ApiParam("社区id") @RequestParam Long communityId,
 	                               @ApiParam("房屋id") @RequestParam Long houseId) {
 		String userId = UserUtils.getUserId();
-		shopLeaseService.cancelShop(userId,shopId,communityId,houseId);
+		shopLeaseService.cancelShop(userId, shopId, communityId, houseId);
 		return CommonResult.ok();
 	}
 	
@@ -138,7 +150,7 @@ public class ShopLeaseController {
 		shopLeaseService.testTransaction();
 		return CommonResult.ok();
 	}
-
+	
 	
 }
 

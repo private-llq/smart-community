@@ -47,4 +47,7 @@ public class IndexShopVO implements Serializable {
 	
 	@ApiModelProperty(value = "店铺地址")
 	private String address;
+	
+	@ApiModelProperty(value = "月租金  字符串形式")
+	private String monthMoneyString;
 }
