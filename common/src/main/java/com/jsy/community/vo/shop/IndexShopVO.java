@@ -44,4 +44,7 @@ public class IndexShopVO implements Serializable {
 	
 	@ApiModelProperty(value = "标签集合")
 	private List<String> tags;
+	
+	@ApiModelProperty(value = "店铺地址")
+	private String address;
 }

@@ -92,5 +92,8 @@ public class ShopLeaseEntity extends BaseEntity {
     
     @ApiModelProperty(value = "来源 0个人 1业主 2不限")
     private Integer source;
+    
+    @ApiModelProperty(value = "店铺地址")
+    private String address;
 
 }

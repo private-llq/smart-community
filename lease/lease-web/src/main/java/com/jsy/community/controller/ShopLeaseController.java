@@ -56,8 +56,8 @@ public class ShopLeaseController {
 	@ApiOperation("根据筛选条件查询商铺列表")
 	@PostMapping("/getShopByCondition")
 	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO){
-		List<ShopLeaseEntity> list = shopLeaseService.getShopByCondition(baseQO);
-		return CommonResult.ok(list);
+		PageInfo<ShopLeaseEntity> pageInfo = shopLeaseService.getShopByCondition(baseQO);
+		return CommonResult.ok(pageInfo);
 	}
 	
 	@Login(allowAnonymous = true)

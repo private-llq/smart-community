@@ -237,7 +237,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-	public List<ShopLeaseEntity> getShopByCondition(BaseQO<HouseLeaseQO> baseQO) {
+	public PageInfo<ShopLeaseEntity> getShopByCondition(BaseQO<HouseLeaseQO> baseQO) {
 		Long page = baseQO.getPage();
 		Long size = baseQO.getSize();
 		
@@ -248,7 +248,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 分页
 			Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>(page, size);
 			shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
-			return shopLeaseEntityPage.getRecords();
+			PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
+			BeanUtils.copyProperties(shopLeaseEntityPage,pageInfo);
+			return pageInfo;
 			
 		}
 		
@@ -307,7 +309,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 分页
 		Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>(page, size);
 		shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
-		return shopLeaseEntityPage.getRecords();
+		PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(shopLeaseEntityPage,pageInfo);
+		return pageInfo;
 	}
 	
 	@Override

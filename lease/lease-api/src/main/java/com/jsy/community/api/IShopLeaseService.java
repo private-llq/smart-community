@@ -73,7 +73,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/21 10:09
 	 * @Param [shopQO]
 	 **/
-	List<ShopLeaseEntity> getShopByCondition(BaseQO<HouseLeaseQO> baseQO);
+	PageInfo<ShopLeaseEntity> getShopByCondition(BaseQO<HouseLeaseQO> baseQO);
 	
 	/**
 	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.entity.shop.ShopLeaseEntity>
