@@ -24,7 +24,6 @@ public class BannerQO implements Serializable {
 	private Long communityId;
 	
 	@ApiModelProperty(value = "Banner位置1.顶部 2.底部")
-	@NotNull(groups = {queryBannerValidatedGroup.class}, message = "缺少Banner位置")
 	private Integer position;
 	
 	@ApiModelProperty(value = "轮播图类型1.非广告 2.广告")

@@ -25,7 +25,6 @@ public class BannerEntity extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "社区ID")
-    @NotNull(groups = {addBannerValidatedGroup.class}, message = "缺少社区ID")
     private Long communityId;
 
     @ApiModelProperty(value = "文件路径", hidden = true)
@@ -40,7 +39,6 @@ public class BannerEntity extends BaseEntity implements Serializable {
     private Integer sort;
 
     @ApiModelProperty(value = "Banner位置1.顶部 2.底部")
-    @NotNull(groups = {addBannerValidatedGroup.class}, message = "缺少Banner位置")
     private Integer position;
     
     @ApiModelProperty(value = "轮播图类型1.非广告 2.广告")

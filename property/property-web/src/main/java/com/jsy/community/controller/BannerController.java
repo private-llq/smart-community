@@ -30,7 +30,7 @@ import java.util.List;
  **/
 @Api(tags = "轮播图控制器")
 @RestController
-@RequestMapping("/banner")
+@RequestMapping("banner")
 @ApiJSYController
 @Login
 public class BannerController {
@@ -52,21 +52,21 @@ public class BannerController {
 	 * @Date: 2020/11/16
 	 **/
 	@ApiOperation("【轮播图】列表查询")
-	@PostMapping("/list")
+	@PostMapping("list")
 	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
 		List<BannerVO> returnList = bannerService.queryBannerList(bannerQO);
 		return CommonResult.ok(returnList);
 	}
 
 	/**
-	* @Description: 轮播图 上传
+	* @Description: 轮播图 新增
 	 * @Param: [file, bannerEntity]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	**/
-	@ApiOperation("【轮播图基本信息】上传")
-	@PostMapping("upload")
+	@ApiOperation("【轮播图基本信息】新增")
+	@PostMapping("")
 	public CommonResult upload(@RequestBody BannerEntity bannerEntity){
 		ValidatorUtils.validateEntity(bannerEntity, BannerEntity.addBannerValidatedGroup.class);
 		//写库
