@@ -45,6 +45,10 @@ public class HouseLeaseController {
         if(iHouseLeaseService.existUserHouse(UserUtils.getUserId(), houseLeaseQO.getHouseCommunityId(), houseLeaseQO.getHouseId())){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "您在此处未登记房产!");
         }
+        //验证所属房屋是否已被发布
+        if(iHouseLeaseService.alreadyPublish(houseLeaseQO.getHouseId())){
+            throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), "房屋已经被发布!");
+        }
         //参数效验完成 新增
         return iHouseLeaseService.addLeaseSaleHouse(houseLeaseQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }

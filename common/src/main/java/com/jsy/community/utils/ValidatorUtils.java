@@ -3,14 +3,14 @@ package com.jsy.community.utils;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.lease.HouseLeaseQO;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -87,7 +87,7 @@ public class ValidatorUtils {
      * @since 2020/12/11 14:48
      */
     public static void validFieldVal(Collection<?> list, String field, Object clientVal) {
-    	boolean exist = false;
+        boolean exist = false;
         try {
             //获取List中对象属性 的 get方法 方便下面取值
             String FieldMethod = "get" + field.substring(0, 1).toUpperCase() + field.substring(1);
@@ -96,7 +96,7 @@ public class ValidatorUtils {
                 Class<?> aClass = t.getClass();
                 //如果客户端传递的参数在可用参数列表中存在 则提前结束验证
                 if (Objects.equals(String.valueOf(aClass.getDeclaredMethod(FieldMethod).invoke(t)), clientVal)) {
-					exist = true;
+                    exist = true;
                 }
             }
         } catch (Exception e) {
@@ -109,5 +109,32 @@ public class ValidatorUtils {
     }
 
 
+    /**
+     * 排除 exclude属性字段   查看obj对象其他属性是否为空
+     *
+     * @param exclude 需要被排除的字段
+     * @param obj     验证对象
+     * @author YuLF
+     * @since 2021/1/5 10:48
+     */
+    public static boolean fieldIsNull(Object obj, List<String> exclude) {
+        if (obj == null || exclude == null || exclude.isEmpty()) {
+            return true;
+        }
+        Field[] fs = obj.getClass().getDeclaredFields();
+        boolean flag = true;
+        try {
+            for (Field f : fs) {
+                f.setAccessible(true);
+                if (!exclude.contains(f.getName()) && f.get(obj) != null && !"".equals(String.valueOf(f.get(obj)))){
+                    flag = false;
+                    break;
+                }
+            }
+        } catch (IllegalAccessException e) {
+            return true;
+        }
+        return flag;
+    }
 
 }

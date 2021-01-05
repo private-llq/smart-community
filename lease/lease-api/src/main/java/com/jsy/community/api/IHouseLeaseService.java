@@ -70,7 +70,7 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param houseId               房屋id
      * @return                      返回是否存在结果
      */
-    boolean existUserHouse(String userId, Integer houseCommunityId, Integer houseId);
+    boolean existUserHouse(String userId, Long houseCommunityId, Long houseId);
 
 
     /**
@@ -87,4 +87,9 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @return              返回搜索到的列表
      */
     List<HouseLeaseVO> searchLeaseHouse(String text);
+
+    /**
+     * 验证houseId是否已经发布
+     */
+    boolean alreadyPublish(Long houseId);
 }

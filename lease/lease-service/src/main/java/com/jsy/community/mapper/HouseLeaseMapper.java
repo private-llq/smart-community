@@ -47,7 +47,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param guid_id   数据唯一标识业务主键 暂定
      * @return          返回影响行数
      */
-    int delHouseLeaseInfo(@Param("id") Long guid_id);
+    int delHouseLeaseInfo(@Param("id") Long guid_id, @Param("uid")String uid);
 
 
     /**
@@ -129,8 +129,8 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param houseId               房屋id
      * @return                      返回是否存在结果
      */
-    @Select("select count(*) from t_user_house as uh LEFT JOIN t_house as h on uh.house_id = h.id where uh.uid = #{userId} and uh.check_status = 1 and uh.community_id = #{houseCommunityId} and h.id = #{houseId} and h.type =4")
-    Integer isExistUserHouse(@Param("userId") String userId, @Param("houseCommunityId") Integer houseCommunityId, @Param("houseId") Integer houseId);
+    @Select("select count(*) from t_user_house as uh LEFT JOIN t_house as h on uh.house_id = h.id where uh.uid = #{userId} and uh.check_status = 1 and uh.community_id = #{houseCommunityId} and uh.deleted = 0 and h.id = #{houseId} and h.type =4 and h.deleted = 0")
+    Integer isExistUserHouse(@Param("userId") String userId, @Param("houseCommunityId") Long houseCommunityId, @Param("houseId") Long houseId);
 
 
     /**
@@ -166,4 +166,11 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      */
     @Select("select count(*) from t_house_favorite where favorite_id =#{houseId}  and uid = #{uid}")
     Integer isFavorite(@Param("houseId") Long houseId, @Param("uid") String uid);
+
+
+    /**
+     * 验证houseId是否已经发布
+     */
+    @Select("select count(*) from t_house_lease where house_id = #{houseId}")
+    boolean alreadyPublish(@Param("houseId") Long houseId);
 }

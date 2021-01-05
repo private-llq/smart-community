@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.LeaseException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -8,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.api.IHouseConstService;
@@ -18,6 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -69,10 +72,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     @Transactional
     @Override
     public boolean delLeaseHouse(Long id, String userId) {
-        //删除中间表 关于 这个用户关联的所有信息
+        //删除中间表 关于 这个用户关联的所有图片地址信息
         houseLeaseMapper.delUserMiddleInfo(id);
         //删除 t_house_lease 信息
-        return houseLeaseMapper.delHouseLeaseInfo(id) > 0;
+        return houseLeaseMapper.delHouseLeaseInfo(id, userId) > 0;
     }
 
 
@@ -145,6 +148,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     @Transactional
     @Override
     public Boolean updateHouseLease(HouseLeaseQO qo) {
+        //排除id的情况下 验证其他属性字段是否为Null 如果为Null则不进入dao层
+        if(ValidatorUtils.fieldIsNull(qo, Arrays.asList("id", "uid"))){
+            throw new LeaseException("没有需要被更新的数据!");
+        }
         //换算优势标签和家具id
         if (qo.getHouseAdvantage() != null && !qo.getHouseAdvantage().isEmpty()) {
             qo.setHouseAdvantageId(MyMathUtils.getTypeCode(qo.getHouseAdvantage()));
@@ -185,7 +192,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @return 返回是否存在结果
      */
     @Override
-    public boolean existUserHouse(String userId, Integer houseCommunityId, Integer houseId) {
+    public boolean existUserHouse(String userId, Long houseCommunityId, Long houseId) {
         return houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId) <= 0;
     }
 
@@ -216,6 +223,18 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         getHouseFieldTag(vos);
         return vos;
     }
+
+
+
+    /**
+     * 验证houseId是否已经发布
+     */
+    @Override
+    public boolean alreadyPublish(Long houseId) {
+        return houseLeaseMapper.alreadyPublish(houseId);
+    }
+
+
 
     /**
      * @author YuLF

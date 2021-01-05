@@ -30,7 +30,7 @@
 
     <!-- 删除用户t_house_lease表中的数据 -->
     <delete id="delHouseLeaseInfo">
-        delete from t_house_lease where id = #{id}
+        delete from t_house_lease where id = #{id} and uid = #{uid}
     </delete>
 
     <!-- 按列表查询房屋出租信息 -->
