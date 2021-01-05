@@ -240,16 +240,14 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	
 	@Override
 	public PageInfo<ShopLeaseEntity> getShopByCondition(BaseQO<HouseLeaseQO> baseQO) {
-		Long page = baseQO.getPage();
-		Long size = baseQO.getSize();
 		
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		
+		// 分页
+		Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>();
+		MyPageUtils.setPageAndSize(shopLeaseEntityPage,baseQO);
 		HouseLeaseQO houseQO = baseQO.getQuery();
 		if (houseQO == null) {
-			// 分页
-			Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>();
-			MyPageUtils.setPageAndSize(shopLeaseEntityPage,baseQO);
 			shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
 			PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
 			BeanUtils.copyProperties(shopLeaseEntityPage, pageInfo);
@@ -308,9 +306,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 		}
 		
-		
-		// 分页
-		Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>(page, size);
 		shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
 		PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(shopLeaseEntityPage, pageInfo);
@@ -319,7 +314,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	
 	@Override
 	public PageInfo<IndexShopVO> getShopBySearch(BaseQO<ShopLeaseEntity> baseQO, String query, Integer areaId) {
-		Page<ShopLeaseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
+		Page<ShopLeaseEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
 		QueryWrapper<ShopLeaseEntity> queryWrapper = new QueryWrapper<>();
 		
 		List<Long> longs = new ArrayList<>();
