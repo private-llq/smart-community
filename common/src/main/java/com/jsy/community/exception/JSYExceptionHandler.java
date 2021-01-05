@@ -47,25 +47,25 @@ public class JSYExceptionHandler {
 		return CommonResult.error(JSYError.NOT_FOUND);
 	}
 	
-	@ExceptionHandler(DuplicateKeyException.class)
-	public CommonResult<Boolean> handleDuplicateKeyException(DuplicateKeyException e) {
-		log.error(e.getMessage(), e);
-		return CommonResult.error(JSYError.DUPLICATE_KEY);
-	}
+//	@ExceptionHandler(DuplicateKeyException.class)
+////	public CommonResult<Boolean> handleDuplicateKeyException(DuplicateKeyException e) {
+////		log.error(e.getMessage(), e);
+////		return CommonResult.error(JSYError.DUPLICATE_KEY);
+////	}
 
 	/**
 	 * 业务层抛出的运行时异常
 	 * @param e		异常对象
 	 * @return		返回指定的错误信息
 	 */
-	@ExceptionHandler(RuntimeException.class)
-	public CommonResult<Boolean> handleRuntimeException(RuntimeException e) {
-		log.error(e.getMessage(),e);
-		//唯一索引 数据重复异常
-		if(e.getMessage().contains("DuplicateKeyException")){
-			return CommonResult.error(JSYError.DUPLICATE_KEY);
-		}
-		return CommonResult.error(JSYError.INTERNAL);
-
-	}
+//	@ExceptionHandler(RuntimeException.class)
+//	public CommonResult<Boolean> handleRuntimeException(RuntimeException e) {
+//		log.error(e.getMessage(),e);
+//		//唯一索引 数据重复异常
+//		if(e.getMessage().contains("DuplicateKeyException")){
+//			return CommonResult.error(JSYError.DUPLICATE_KEY);
+//		}
+//		return CommonResult.error(JSYError.INTERNAL);
+//
+//	}
 }

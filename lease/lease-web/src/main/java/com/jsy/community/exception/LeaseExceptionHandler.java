@@ -3,6 +3,7 @@ package com.jsy.community.exception;
 import com.jsy.community.api.LeaseException;
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,7 +37,15 @@ public class LeaseExceptionHandler extends JSYExceptionHandler {
 		if (e instanceof LeaseException) {
 			return CommonResult.error(((LeaseException) e).getCode(), e.getMessage());
 		}
+		if(e.getMessage().contains("DuplicateKeyException")){
+			return CommonResult.error(JSYError.DUPLICATE_KEY);
+		}
 		return CommonResult.error(JSYError.INTERNAL);
 	}
-
+	
+//	@ExceptionHandler(DuplicateKeyException.class)
+//	public CommonResult<Boolean> handleDuplicateKeyException(DuplicateKeyException e) {
+//		log.error(e.getMessage(), e);
+//		return CommonResult.error(JSYError.DUPLICATE_KEY);
+//	}
 }
