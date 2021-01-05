@@ -14,6 +14,7 @@ import com.jsy.community.mapper.ShopImgMapper;
 import com.jsy.community.mapper.ShopLeaseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.shop.IndexShopVO;
@@ -247,7 +248,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		HouseLeaseQO houseQO = baseQO.getQuery();
 		if (houseQO == null) {
 			// 分页
-			Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>(page, size);
+			Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>();
+			MyPageUtils.setPageAndSize(shopLeaseEntityPage,baseQO);
 			shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
 			PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
 			BeanUtils.copyProperties(shopLeaseEntityPage, pageInfo);
