@@ -49,7 +49,7 @@ public class CarController {
 	private static final String BUCKET_NAME = "car-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
 	@Resource
-	private StringRedisTemplate redisTemplate;
+	private StringRedisTemplate stringRedisTemplate;
 	
 	
 	/**
@@ -69,7 +69,7 @@ public class CarController {
 		Integer integer = carService.addProprietorCar(carEntity);
 		String filePath = carEntity.getCarImageUrl();
 		if (!StringUtils.isEmpty(filePath)) {
-			redisTemplate.opsForSet().add("car_img_all",filePath); // 将图片地址存入redis 用于对比 便于清理无用图片
+			stringRedisTemplate.opsForSet().add("car_img_all",filePath); // 将图片地址存入redis 用于对比 便于清理无用图片
 		}
 		//3.登记新增车辆操作
 		return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
@@ -165,7 +165,7 @@ public class CarController {
 		}
 		//4.调用上传服务接口 进行上传文件  返回访问路径
 		String filePath = MinioUtils.upload(carImage, BUCKET_NAME);
-		redisTemplate.opsForSet().add("car_img_part",filePath); // 将图片地址存入redis  用于对比 便于清理无用图片
+		stringRedisTemplate.opsForSet().add("car_img_part",filePath); // 将图片地址存入redis  用于对比 便于清理无用图片
 		return CommonResult.ok(filePath,"上传成功!");
 	}
 

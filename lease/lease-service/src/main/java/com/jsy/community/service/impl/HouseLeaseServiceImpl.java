@@ -114,9 +114,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //1.查出单条数据
         HouseLeaseVO vo = houseLeaseMapper.queryHouseLeaseOne(houseId);
 
-        if( vo == null ){
+        /*if( vo == null ){
             return null;
-        }
+        }*/
 
         //1.4查出 房屋标签 ...
         List<Long> AdvantageID = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
