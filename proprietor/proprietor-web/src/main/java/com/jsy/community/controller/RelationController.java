@@ -118,7 +118,20 @@ public class RelationController {
     @PostMapping("/updateUserRelationDetails")
     @Login
     public CommonResult updateByRelationId(@RequestBody RelationQo relationQo){
-        System.out.println(relationQo);
+        if (relationQo.getCommunityId()==null&&relationQo.getCommunityId()>0&&relationQo.getHouseId()==null&&relationQo.getHouseId()>0) {
+            return CommonResult.error("请填写正确的社区或者房间！");
+        }
+        if ("".equals(relationQo.getName())&&relationQo.getName()==null){
+            return CommonResult.error("姓名不能为空！");
+        }
+        if (!relationQo.getPhoneTel().matches(REGEX_MOBILE)){
+            return CommonResult.error("请填写正确的手机号！");
+        }
+        if (relationQo.getIdentificationType()==1){
+            if (!relationQo.getIdNumber().matches(ID_NUMBER)){
+                return CommonResult.error("请填写正确的身份证号码！");
+            }
+        }
         String userId = UserUtils.getUserId();
         relationService.updateUserRelationDetails(relationQo);
         return CommonResult.ok();
