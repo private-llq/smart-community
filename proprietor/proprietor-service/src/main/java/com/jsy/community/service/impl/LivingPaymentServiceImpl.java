@@ -65,14 +65,19 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     public PaymentDetailsVO add(LivingPaymentQO livingPaymentQO){
         //如果组名为空   默认我家
         Long group_id=0l;
-        if(livingPaymentQO.getGroupName().equals(null)&&livingPaymentQO.getGroupName()!=null){
-            PayGroupEntity groupEntity = new PayGroupEntity();
-            groupEntity.setId(SnowFlake.nextId());
-            groupEntity.setUid(livingPaymentQO.getUserID());
-            groupEntity.setName(livingPaymentQO.getGroupName());
-            groupEntity.setType(livingPaymentQO.getGroupName()=="我家"?1:livingPaymentQO.getGroupName()=="父母"?2:livingPaymentQO.getGroupName()=="房东"?3:livingPaymentQO.getGroupName()=="朋友"?4:5);
-            payGroupMapper.insert(groupEntity);
-            group_id=groupEntity.getId();
+        if("".equals(livingPaymentQO.getGroupName())&&livingPaymentQO.getGroupName()!=null){
+            PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("name","我家"));
+            if (!StringUtils.isEmpty(payGroupEntity)){
+                group_id=payGroupEntity.getId();
+            }else {
+                PayGroupEntity groupEntity = new PayGroupEntity();
+                groupEntity.setId(SnowFlake.nextId());
+                groupEntity.setUid(livingPaymentQO.getUserID());
+                groupEntity.setName("我家");
+                groupEntity.setType(1);
+                payGroupMapper.insert(groupEntity);
+                group_id=groupEntity.getId();
+            }
         }else {
             //如果不为空就获取id为空就新增一条
             //设置组号
@@ -107,18 +112,26 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payOrderEntity.setPayMonth(LocalDateTime.now().getMonthValue());
         payOrderEntity.setGroupId(group_id);
         payOrderEntity.setPaymentType(livingPaymentQO.getType());
+        payOrderEntity.setAddress(livingPaymentQO.getAddress());
+        payOrderEntity.setUnitId(livingPaymentQO.getPayCostUnitId());
+        payOrderEntity.setPayBalance(livingPaymentQO.getPayBalance());
         payOrderMapper.insert(payOrderEntity);
-        //添加缴费户号
-        PayHouseOwnerEntity payHouseOwnerEntity = new PayHouseOwnerEntity();
-        payHouseOwnerEntity.setId(SnowFlake.nextId());
-        payHouseOwnerEntity.setGroupId(group_id);
-        payHouseOwnerEntity.setPayBalance(livingPaymentQO.getPayBalance());
-        payHouseOwnerEntity.setPayCompany(livingPaymentQO.getPayCostUnit());
-        payHouseOwnerEntity.setPayExpen(livingPaymentQO.getPayNum());
-        payHouseOwnerEntity.setPayNumber(livingPaymentQO.getDoorNo());
-        payHouseOwnerEntity.setPayTime(LocalDateTime.now());
-        payHouseOwnerEntity.setType(1);
-        payHouseOwnerMapper.insert(payHouseOwnerEntity);
+        PayHouseOwnerEntity ownerEntity = payHouseOwnerMapper.selectOne(new QueryWrapper<PayHouseOwnerEntity>()
+                .eq("uid", livingPaymentQO.getUserID())
+                .eq("pay_number", livingPaymentQO.getDoorNo())
+                .eq("pay_company", livingPaymentQO.getPayCostUnitId())
+        );
+        if (StringUtils.isEmpty(ownerEntity)){
+            //添加缴费户号
+            PayHouseOwnerEntity payHouseOwnerEntity = new PayHouseOwnerEntity();
+            payHouseOwnerEntity.setId(SnowFlake.nextId());
+            payHouseOwnerEntity.setGroupId(group_id);
+            payHouseOwnerEntity.setPayCompany(livingPaymentQO.getPayCostUnitId());
+            payHouseOwnerEntity.setPayNumber(livingPaymentQO.getDoorNo());
+            payHouseOwnerEntity.setType(livingPaymentQO.getType());
+            payHouseOwnerEntity.setUid(livingPaymentQO.getUserID());
+            payHouseOwnerMapper.insert(payHouseOwnerEntity);
+        }
         //添加户主详情
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",livingPaymentQO.getUserID()));
         userEntity.setId(SnowFlake.nextId());
@@ -130,14 +143,18 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payUserDetailsEntity.setSex(userEntity.getSex());
         payUserDetailsMapper.insert(payUserDetailsEntity);
 
+        //返回缴费详情
         PaymentDetailsVO paymentDetailsVO = new PaymentDetailsVO();
         paymentDetailsVO.setId(payOrderEntity.getId());
         paymentDetailsVO.setUnitName(livingPaymentQO.getPayCostUnit());
         paymentDetailsVO.setFamilyId(livingPaymentQO.getDoorNo());
         paymentDetailsVO.setOrderTime(LocalDateTime.now());
-        paymentDetailsVO.setAccountingTime(null);
+        paymentDetailsVO.setAccountingTime(LocalDateTime.now());
         paymentDetailsVO.setPaySum(livingPaymentQO.getPayNum());
         paymentDetailsVO.setAddress(livingPaymentQO.getAddress());
+
+        //假数据默认返回已到账
+        paymentDetailsVO.setStatus(2);
         return paymentDetailsVO;
     }
 
@@ -201,6 +218,12 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         List<DefaultHouseOwnerVO> list=livingPaymentMapper.selectList(userId);
         return list;
     }
+
+    @Override
+    public List<GroupVO> selectGroupAll(String userId) {
+        return livingPaymentMapper.selectGroupAll(userId);
+    }
+
     /**
      * @Description: 缴费凭证
      * @author: Hu

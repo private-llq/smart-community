@@ -31,6 +31,9 @@ public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "缴费单位")
     private String PayCostUnit;
 
+    @ApiModelProperty(value = "缴费单位ID")
+    private Long PayCostUnitId;
+
     @ApiModelProperty(value = "用户ID",hidden = true)
     private String userID;
 
@@ -43,8 +46,8 @@ public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "付款金额")
     private BigDecimal payNum;
 
-    @ApiModelProperty(value = "订单号")
-    private String orderNum;
+//    @ApiModelProperty(value = "订单号")
+//    private String orderNum;
 
     @ApiModelProperty(value = "缴费地址")
     private String address;

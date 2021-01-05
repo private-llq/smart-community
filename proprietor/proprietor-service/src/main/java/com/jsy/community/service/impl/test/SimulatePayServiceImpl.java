@@ -1,14 +1,20 @@
 package com.jsy.community.service.impl.test;
 
+import cn.hutool.core.util.RandomUtil;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.api.test.ISimulatePayService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.PayCompanyEntity;
 import com.jsy.community.entity.test.PayData;
 import com.jsy.community.entity.test.SimulateTypeEntity;
+import com.jsy.community.mapper.PayCompanyMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author lihao
@@ -20,6 +26,9 @@ import java.math.BigDecimal;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class SimulatePayServiceImpl implements ISimulatePayService {
+
+	@Autowired
+	private PayCompanyMapper payCompanyMapper;
 	
 	@Override
 	public PayData getPayData(String number, Integer id) {
@@ -58,7 +67,22 @@ public class SimulatePayServiceImpl implements ISimulatePayService {
 		}
 		throw new ProprietorException("您的查询不存在");
 	}
-	
+
+
+
+	@Override
+	public Map getPayDetails(String number, Long id) {
+		PayCompanyEntity entity = payCompanyMapper.selectById(id);
+		Map map = new HashMap();
+		map.put("username","测试户名");
+		map.put("doorNo",number);
+		map.put("typeID",entity.getId());
+		map.put("typeName",entity.getName());
+		map.put("balance",RandomUtil.randomInt(-500,500));
+		map.put("address","天王星b座1810");
+		return map;
+	}
+
 	private PayData getData(String number, SimulateTypeEntity type) {
 		PayData payData = new PayData();
 		Integer id = Integer.parseInt(number);

@@ -70,4 +70,11 @@ public interface ILivingPaymentService {
      * @return:
      */
     PayVoucherVO getOrderID(Long id);
+
+    /**
+     * 选择分组查询下面缴过费的水电气户号
+     * @param
+     * @return
+     */
+    List<GroupVO> selectGroupAll(String userId);
 }

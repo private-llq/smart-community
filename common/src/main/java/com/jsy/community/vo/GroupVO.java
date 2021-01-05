@@ -18,11 +18,15 @@ public class GroupVO implements Serializable {
     @ApiModelProperty(value = "组ID")
     private Long groupID;
     @ApiModelProperty(value = "组Name")
-    private Long groupName;
-    @ApiModelProperty(value = "缴费类型id")
+    private String groupName;
+    @ApiModelProperty(value = "缴费单位id")
     private Long typeID;
-    @ApiModelProperty(value = "缴费类型name")
+    @ApiModelProperty(value = "缴费单位name")
     private String typeName;
+    @ApiModelProperty(value = "缴费类型id")
+    private Long payTypeID;
+    @ApiModelProperty(value = "缴费类型name")
+    private String payTypeName;
     @ApiModelProperty(value = "户号")
     private String doorNo;
 }

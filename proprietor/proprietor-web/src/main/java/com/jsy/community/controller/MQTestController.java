@@ -42,12 +42,14 @@ public class MQTestController {
         amqpTemplate.convertAndSend("exchange_delay", "queue.test", "凸(艹皿艹 )", new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
-                message.getMessageProperties().setHeader("x-delay",30000);
+                message.getMessageProperties().setHeader("x-delay",60000);
                 return message;
             }
         });
         System.out.println("mq发送消息了");
     }
+
+
     @GetMapping("/email")
     @ApiOperation("测试二")
     public void email(){

@@ -7,9 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 /**
  * <p>
  * 缴费户号
@@ -34,19 +31,13 @@ public class PayHouseOwnerEntity extends BaseEntity {
     private String payNumber;
 
     @ApiModelProperty(value = "缴费单位")
-    private String payCompany;
+    private Long payCompany;
 
-    @ApiModelProperty(value = "缴费时间")
-    private LocalDateTime payTime;
-
-    @ApiModelProperty(value = "缴费金额")
-    private BigDecimal payExpen;
-
-    @ApiModelProperty(value = "户主余额")
-    private BigDecimal payBalance;
+    @ApiModelProperty(value = "缴费单位")
+    private String uid;
 
     @ApiModelProperty(value = "缴费类型 0 水费 1 电费 2燃气费")
-    private Integer type;
+    private Long type;
 
 
 }

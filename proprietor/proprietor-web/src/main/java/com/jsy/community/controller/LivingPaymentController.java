@@ -100,6 +100,19 @@ public class LivingPaymentController {
         return CommonResult.ok(voList);
     }
     /**
+     * 选择分组查询下面缴过费的水电气户号
+     * @param
+     * @return
+     */
+    @ApiOperation("查询缴过费的全部户号")
+    @GetMapping("/selectGroupAll")
+    @Login
+    public CommonResult selectGroupAll(){
+        String userId = UserUtils.getUserId();
+        List<GroupVO> voList = livingPaymentService.selectGroupAll(userId);
+        return CommonResult.ok(voList);
+    }
+    /**
      * 查询当前登录人员自定义的分组
      * @param
      * @return

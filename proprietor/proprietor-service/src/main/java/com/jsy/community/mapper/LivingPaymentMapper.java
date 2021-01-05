@@ -1,15 +1,14 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.vo.DefaultHouseOwnerVO;
+import com.jsy.community.vo.GroupVO;
 import com.jsy.community.vo.PaymentRecordsVO;
 import org.apache.ibatis.annotations.Param;
-import com.jsy.community.qo.proprietor.GroupQO;
-import com.jsy.community.vo.GroupVO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -45,4 +44,12 @@ public interface LivingPaymentMapper {
      * @return:
      */
     List<GroupVO> selectGroup(GroupQO groupQO);
+    /**
+     * @Description: 查询已经缴过费全部的户号
+     * @author: Hu
+     * @since: 2020/12/12 10:15
+     * @Param:
+     * @return:
+     */
+    List<GroupVO> selectGroupAll(String userId);
 }

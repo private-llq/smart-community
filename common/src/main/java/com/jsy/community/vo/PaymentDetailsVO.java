@@ -39,5 +39,8 @@ public class PaymentDetailsVO implements Serializable {
     @ApiModelProperty(value = "住址信息")
     private String address;
 
+    @ApiModelProperty(value = "缴费状态 0 未到账 1处理中，2已到账")
+    private Integer status;
+
 
 }

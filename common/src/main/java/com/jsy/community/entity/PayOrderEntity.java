@@ -78,5 +78,8 @@ public class PayOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "缴费地址")
     private String address;
 
+    @ApiModelProperty(value = "户主余额")
+    private BigDecimal payBalance;
+
 
 }

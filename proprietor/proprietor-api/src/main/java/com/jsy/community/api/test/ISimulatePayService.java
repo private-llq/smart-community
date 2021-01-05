@@ -2,6 +2,8 @@ package com.jsy.community.api.test;
 
 import com.jsy.community.entity.test.PayData;
 
+import java.util.Map;
+
 /**
  * @ClassName：ISimulatePayService
  * @Description：TODO
@@ -12,4 +14,6 @@ import com.jsy.community.entity.test.PayData;
 public interface ISimulatePayService {
 	
 	PayData getPayData(String number,Integer id);
+
+	Map getPayDetails(String number, Long id);
 }

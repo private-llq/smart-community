@@ -12,7 +12,6 @@
             <if test="query.payMonth!=null and query.payMonth>0">
                 and t.pay_month=#{query.payMonth}
             </if>
-
     </sql>
 
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
@@ -28,7 +27,7 @@
         t.id as id,t.pay_year as payYear,t.pay_month as payMonth,t.order_num as orderNum,t.unit as unitName,
         t.family_id as familyId,t.order_time as orderTime,t.payment_amount paySum,t.pay_type as payType,
         t.bill_classification as billClassification,t.label as label,t.remark as remark,t.remark_img as remarkImg,
-        tpt.id as typeID,tpt.name as typeName
+        tpt.id as typeID,tpt.name as typeName,t.address as address
         FROM t_pay_order t
         join t_pay_group tg on t.group_id=tg.id
         join t_pay_type tpt on t.payment_type=tpt.id
@@ -44,6 +43,18 @@
         JOIN t_pay_company pc on po.payment_type=pc.id
         where pg.uid=#{userID} and gp.name=#{groupName}
     </select>
+    <select id="selectGroupAll" resultMap="GroupVOMap">
+        SELECT
+        ph.pay_number as doorNo,
+		pc.id as typeID,
+		pc.name as typeName,
+        pt.id as payTypeID,
+		pt.name as payTypeName
+        FROM t_pay_house_owner ph
+		JOIN t_pay_company pc on ph.pay_company=pc.id
+		JOIN t_pay_type pt on ph.type=pt.id
+        where ph.uid=#{userID}
+    </select>
 
     <resultMap id="GroupVOMap" type="com.jsy.community.vo.GroupVO">
         <result property="typeName" column="typeName"/>
@@ -51,6 +62,8 @@
         <result property="groupName" column="groupName"/>
         <result property="doorNo" column="doorNo"/>
         <result property="groupID" column="groupID"/>
+        <result property="payTypeID" column="payTypeID"/>
+        <result property="payTypeName" column="payTypeName"/>
     </resultMap>
 
     <resultMap id="DefaultHouseOwnerMap" type="com.jsy.community.vo.DefaultHouseOwnerVO">
@@ -69,7 +82,7 @@
         <result column="payType" property="payType"/>
         <result column="paySum" property="paySum"/>
         <result column="unitName" property="unitName"/>
-<!--        <result column="address" property="address"/>-->
+        <result column="address" property="address"/>
         <result column="familyId" property="familyId"/>
         <result column="orderNum" property="orderNum"/>
         <result column="orderTime" property="orderTime"/>

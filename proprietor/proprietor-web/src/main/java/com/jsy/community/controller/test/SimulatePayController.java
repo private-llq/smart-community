@@ -10,7 +10,10 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * @author lihao
@@ -33,5 +36,10 @@ public class SimulatePayController {
 	@ApiOperation("根据户号得到其缴费信息")
 	public PayData getPayData(String number,Integer id){
 		return simulatePayService.getPayData(number,id);
+	}
+	@PostMapping("/getPayDetails")
+	@ApiOperation("户号和缴费单位ID生成假账单")
+	public Map getPayDetails(@RequestParam("number")String number, @RequestParam("id")Long id){
+		return simulatePayService.getPayDetails(number,id);
 	}
 }
