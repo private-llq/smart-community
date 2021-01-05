@@ -110,7 +110,7 @@ public class BannerController {
 			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"缺少ID");
 		}
 		boolean result = bannerService.deleteBannerBatch(ids);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),JSYError.INTERNAL.getMessage());
+		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"轮播图删除失败");
 	}
 	
 	@ApiOperation("【轮播图】修改跳转路径和描述")
