@@ -37,15 +37,7 @@ public class LeaseExceptionHandler extends JSYExceptionHandler {
 		if (e instanceof LeaseException) {
 			return CommonResult.error(((LeaseException) e).getCode(), e.getMessage());
 		}
-		if(e.getMessage().contains("DuplicateKeyException")){
-			return CommonResult.error(JSYError.DUPLICATE_KEY);
-		}
 		return CommonResult.error(JSYError.INTERNAL);
 	}
 	
-//	@ExceptionHandler(DuplicateKeyException.class)
-//	public CommonResult<Boolean> handleDuplicateKeyException(DuplicateKeyException e) {
-//		log.error(e.getMessage(), e);
-//		return CommonResult.error(JSYError.DUPLICATE_KEY);
-//	}
 }
