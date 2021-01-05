@@ -60,6 +60,6 @@ public class HouseReserveEntity extends BaseEntity {
     /**
      * 提交预约信息验证接口
      */
-    public interface add{};
+    public interface add{}
 
 }

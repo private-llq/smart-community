@@ -42,7 +42,7 @@ public class HouseLeaseController {
         ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.addLeaseSaleHouse.class);
         houseLeaseQO.setUid(UserUtils.getUserId());
         //验证所属社区所属用户房屋是否存在
-        if(!iHouseLeaseService.isExistUserHouse(UserUtils.getUserId(), houseLeaseQO.getHouseCommunityId(), houseLeaseQO.getHouseId())){
+        if(iHouseLeaseService.existUserHouse(UserUtils.getUserId(), houseLeaseQO.getHouseCommunityId(), houseLeaseQO.getHouseId())){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "您在此处未登记房产!");
         }
         //参数效验完成 新增
@@ -84,7 +84,7 @@ public class HouseLeaseController {
     @GetMapping("/details")
     @ApiOperation("查询房屋出租数据单条详情")
     public CommonResult<HouseLeaseVO> houseLeaseDetails(@RequestParam Long houseId) {
-        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId));
+        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId, UserUtils.getUserId()),"查询成功!");
     }
 
 

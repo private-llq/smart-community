@@ -89,12 +89,11 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
     /**
      * 添加社区消息
      * @param communityInformEntity    接收社区消息参数的实体
-     * @return                          返回是否添加成功
      */
     @Override
-    public Boolean addCommunityInform(CommunityInformEntity communityInformEntity){
+    public void addCommunityInform(CommunityInformEntity communityInformEntity){
             communityInformEntity.setId(SnowFlake.nextId());
-            return communityInformMapper.insert(communityInformEntity) > 0;
+        communityInformMapper.insert(communityInformEntity);
     }
 
     /**

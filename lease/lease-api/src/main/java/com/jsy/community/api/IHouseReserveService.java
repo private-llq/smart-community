@@ -1,15 +1,12 @@
 package com.jsy.community.api;
 
-import ch.qos.logback.classic.pattern.MethodOfCallerConverter;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.lease.HouseReserveEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseReserveQO;
 import com.jsy.community.vo.lease.HouseReserveVO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 房屋预约接口提供类

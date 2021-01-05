@@ -4,13 +4,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
-import com.jsy.community.qo.lease.HouseReserveQO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 房屋租售 Mapper 接口
@@ -39,10 +37,9 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     /**
      * 删除用户中间表关联的image相关信息
      * @param id             t_house_lease数据唯一标识
-     * @return               影响行数
      */
     @Delete("delete from t_house_image where hid = #{id}")
-    int delUserMiddleInfo(@Param("id") Long id);
+    void delUserMiddleInfo(@Param("id") Long id);
 
 
     /**
@@ -62,13 +59,6 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
 
 
-    /**
-     * 通过 常量id集合 查询 常量名称
-     * @param constIdList       常量id集合
-     * @param type              表示当前常量id集合 为什么类型
-     * @return                  返回id，name
-     */
-    List<Map<String, Object>> queryHouseConstIdName(List<Long> constIdList, Long type);
 
     /**
      * 通过imgId 和 数据标识行ID 查出 该数据最早插入的一张图片
@@ -80,13 +70,6 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     List<String> queryHouseImgById(@Param("image_id") Long houseImageId, @Param("hid") Long rowGuid);
 
 
-    /**
-     * 通过常量Id 查询出常量名称
-     * @param ConstId       常量ID
-     * @return              返回常量名称
-     */
-    @Select("select house_const_name from t_house_const where house_const_code = #{constId} and house_const_type = #{type}")
-    String queryHouseModeByConstId(@Param("constId") Long ConstId, @Param("type")Long type);
 
     /**
      * 用家具ID 查出所有 家具名称
@@ -147,7 +130,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @return                      返回是否存在结果
      */
     @Select("select count(*) from t_user_house as uh LEFT JOIN t_house as h on uh.house_id = h.id where uh.uid = #{userId} and uh.check_status = 1 and uh.community_id = #{houseCommunityId} and h.id = #{houseId} and h.type =4")
-    boolean isExistUserHouse(@Param("userId") String userId, @Param("houseCommunityId") Integer houseCommunityId, @Param("houseId") Integer houseId);
+    Integer isExistUserHouse(@Param("userId") String userId, @Param("houseCommunityId") Integer houseCommunityId, @Param("houseId") Integer houseId);
 
 
     /**
@@ -176,5 +159,11 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      */
     List<HouseLeaseVO> searchLeaseHouse(@Param("text") String text);
 
-
+    /**
+     * 根据房屋id和uid在t_house_favorite查出该数据是否被收藏
+     * @param houseId       房屋id
+     * @param uid           uid
+     */
+    @Select("select count(*) from t_house_favorite where favorite_id =#{houseId}  and uid = #{uid}")
+    Integer isFavorite(@Param("houseId") Long houseId, @Param("uid") String uid);
 }

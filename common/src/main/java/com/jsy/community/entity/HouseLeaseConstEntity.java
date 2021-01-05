@@ -1,21 +1,9 @@
 package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jsy.community.constant.BusinessEnum;
-import com.jsy.community.utils.RegexUtils;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.Range;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.util.Date;
 
 /**
  * 房屋租售常量实体对象
@@ -42,7 +30,8 @@ public class HouseLeaseConstEntity extends BaseEntity {
     //常量注释
     private String annotation;
 
-    public HouseLeaseConstEntity(Long houseConstCode, String houseConstName, String houseConstType, String annotation){
+    public HouseLeaseConstEntity(Long id, Long houseConstCode, String houseConstName, String houseConstType, String annotation){
+        super.setId(id);
         this.houseConstCode = houseConstCode;
         this.houseConstName = houseConstName;
         this.houseConstType = houseConstType;

@@ -18,9 +18,8 @@ public interface CarMapper extends BaseMapper<CarEntity> {
     /**
      * 列表添加车辆信息方式
      * @param carEntityList 业主车辆信息 列表
-     * @return              返回影响行数
      */
-    Integer addProprietorCarForList(List<CarEntity> carEntityList);
+    void addProprietorCarForList(List<CarEntity> carEntityList);
 
 
 

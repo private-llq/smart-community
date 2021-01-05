@@ -39,6 +39,6 @@ public class HouseReserveQO implements Serializable {
     /**
      * 取消预约信息参数验证接口
      */
-    public interface cancel{};
+    public interface cancel{}
 
 }

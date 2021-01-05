@@ -58,9 +58,8 @@ public interface ICarService extends IService<CarEntity> {
     /**
      * 业主登记时，调用车辆登记接口登记业主的车辆
      * @param carEntityList   业主车辆信息 列表
-     * @return                返回sql插入影响行数
      */
-    Integer addProprietorCarForList(List<CarEntity> carEntityList);
+    void addProprietorCarForList(List<CarEntity> carEntityList);
 
 
     /**

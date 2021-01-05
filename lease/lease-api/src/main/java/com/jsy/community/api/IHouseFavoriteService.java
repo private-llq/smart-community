@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.lease.HouseFavoriteEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseFavoriteQO;
-import com.jsy.community.vo.shop.ShopLeaseVO;
+import com.jsy.community.vo.lease.HouseFavoriteVO;
 
 import java.util.List;
 
@@ -39,14 +39,14 @@ public interface IHouseFavoriteService extends IService<HouseFavoriteEntity> {
      * @since  2020/12/30 11:29
      * @Param  qo           参数对象
      */
-    List<ShopLeaseVO> leaseFavorite(BaseQO<HouseFavoriteQO> qo);
+    List<HouseFavoriteVO> leaseFavorite(BaseQO<HouseFavoriteQO> qo);
 
 
     /**
      * 查询我的商铺收藏列表
      * @author YuLF
      * @since  2020/12/30 11:29
-     * @Param  qo           参数对象
+    * @Param  qo           参数对象
      */
-    List<ShopLeaseVO> shopFavorite(BaseQO<HouseFavoriteQO> qo);
+    List<HouseFavoriteVO > shopFavorite(BaseQO<HouseFavoriteQO> qo);
 }

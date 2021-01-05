@@ -130,5 +130,8 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "纬度")
     private Double houseLat;
 
+    @ApiModelProperty(value = "是否被当前用户已收藏")
+    private Boolean favorite;
+
 
 }

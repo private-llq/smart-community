@@ -36,7 +36,7 @@ public class HouseFavoriteQO implements Serializable {
     /**
      * 新增房屋租售收藏验证接口参数验证
      */
-    public interface addFavorite{};
+    public interface addFavorite{}
 
 
 }

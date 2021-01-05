@@ -48,10 +48,6 @@ public class SysInformQO implements Serializable {
      */
     public interface addSysInformValidate{}
 
-    /**
-     * 修改系统消息接口
-     */
-    public interface updateSysInformValidate{}
 
 
 }

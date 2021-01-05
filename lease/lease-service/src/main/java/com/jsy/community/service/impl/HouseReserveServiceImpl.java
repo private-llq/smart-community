@@ -26,7 +26,7 @@ import java.util.List;
  * @since 2020-12-26 14:22
  */
 @DubboService(version = Const.version, group = Const.group_lease)
-public class IHouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, HouseReserveEntity> implements IHouseReserveService {
+public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, HouseReserveEntity> implements IHouseReserveService {
 
     @Resource
     private HouseReserveMapper houseReserveMapper;
@@ -123,9 +123,6 @@ public class IHouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Ho
             throw new LeaseException("您无权对此预约信息进行确认!");
         }
         Integer row = houseReserveMapper.confirm(qo);
-        if( row > 0 ){
-            //TODO: 消息推送给 租客 说您已预约成功!
-        }
         return row > 0;
     }
 }

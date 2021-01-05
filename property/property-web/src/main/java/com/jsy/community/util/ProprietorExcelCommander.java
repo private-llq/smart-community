@@ -7,7 +7,6 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
 import com.jsy.community.util.excel.impl.ProprietorMemberProvider;
-import com.jsy.community.utils.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;

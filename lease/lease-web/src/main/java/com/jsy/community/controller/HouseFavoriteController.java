@@ -9,7 +9,7 @@ import com.jsy.community.qo.lease.HouseFavoriteQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.shop.ShopLeaseVO;
+import com.jsy.community.vo.lease.HouseFavoriteVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class HouseFavoriteController {
     @Login
     @PostMapping("/shop")
     @ApiOperation("商铺收藏列表")
-    public CommonResult<List<ShopLeaseVO>> shopFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
+    public CommonResult<List<HouseFavoriteVO >> shopFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
         ValidatorUtils.validatePageParam(qo);
         if( qo.getQuery() == null ){
             qo.setQuery(new HouseFavoriteQO());
@@ -58,9 +58,9 @@ public class HouseFavoriteController {
 
 
     @Login
-    @PostMapping("/lease")
+    @PostMapping("/house")
     @ApiOperation("租房收藏列表")
-    public CommonResult<List<ShopLeaseVO>> leaseFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
+    public CommonResult<List<HouseFavoriteVO>> leaseFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
         ValidatorUtils.validatePageParam(qo);
         if( qo.getQuery() == null ){
             qo.setQuery(new HouseFavoriteQO());

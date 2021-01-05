@@ -223,6 +223,7 @@
     <!-- 查询出租房屋单条数据 -->
     <select id="queryHouseLeaseOne" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         SELECT
+            l.id,
 	        l.house_contact,
 	        l.house_image_id,
 	        l.house_price,

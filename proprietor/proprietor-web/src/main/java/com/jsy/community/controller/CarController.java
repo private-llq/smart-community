@@ -19,12 +19,12 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -45,13 +45,10 @@ public class CarController {
 	
 	//允许上传的文件后缀种类，临时，后续从Spring配置文件中取值
 	private final String[] carImageAllowSuffix = new String[]{"jpg", "jpeg", "png"};
-	
-	//允许上传的文件大小，临时，后续从配置文件中取值 由Spring控制
-	private final int carImageMaxSizeKB = 500;
-	
+
 	private static final String BUCKET_NAME = "car-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	
-	@Autowired
+	@Resource
 	private StringRedisTemplate redisTemplate;
 	
 	
@@ -151,6 +148,8 @@ public class CarController {
 		}
 		//2.文件大小验证
 		long fileSizeForKB = carImage.getSize() / 1024;
+		//允许上传的文件大小，临时，后续从配置文件中取值 由Spring控制
+		int carImageMaxSizeKB = 500;
 		if (fileSizeForKB > carImageMaxSizeKB) {
 			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件太大了,最大：" + carImageMaxSizeKB + "KB");
 		}

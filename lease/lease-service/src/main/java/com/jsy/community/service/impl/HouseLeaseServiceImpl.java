@@ -25,7 +25,7 @@ import java.util.List;
  * @since 2020-12-11 09:22
  */
 @DubboService(version = Const.version, group = Const.group_lease)
-public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLeaseEntity> implements IHouseLeaseService {
+public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLeaseEntity> implements IHouseLeaseService {
 
     @Resource
     private HouseLeaseMapper houseLeaseMapper;
@@ -107,9 +107,14 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
      * @return 返回这条数据的详情
      */
     @Override
-    public HouseLeaseVO queryHouseLeaseOne(Long houseId) {
+    public HouseLeaseVO queryHouseLeaseOne(Long houseId, String uid) {
         //1.查出单条数据
         HouseLeaseVO vo = houseLeaseMapper.queryHouseLeaseOne(houseId);
+
+        if( vo == null ){
+            return null;
+        }
+
         //1.4查出 房屋标签 ...
         List<Long> AdvantageID = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
         if (!AdvantageID.isEmpty()) {
@@ -125,6 +130,8 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
         vo.setHouseImage(houseLeaseMapper.queryHouseAllImgById(vo.getHouseImageId()));
         //1.7查出房屋朝向
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirection()));
+        //1.8 查出房屋是否是被当前用户已收藏
+        vo.setFavorite(houseLeaseMapper.isFavorite(houseId, uid) > 0);
         return vo;
     }
 
@@ -178,8 +185,8 @@ public class IHouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseL
      * @return 返回是否存在结果
      */
     @Override
-    public boolean isExistUserHouse(String userId, Integer houseCommunityId, Integer houseId) {
-        return houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId);
+    public boolean existUserHouse(String userId, Integer houseCommunityId, Integer houseId) {
+        return houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId) <= 0;
     }
 
 

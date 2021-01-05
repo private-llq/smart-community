@@ -19,7 +19,7 @@ import java.util.*;
  * @since 2020-12-11 09:22
  */
 @DubboService(version = Const.version, group = Const.group_lease)
-public class IHouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLeaseConstEntity> implements IHouseConstService {
+public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLeaseConstEntity> implements IHouseConstService {
 
     @Resource
     private HouseConstMapper houseConstMapper;
@@ -43,7 +43,8 @@ public class IHouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseL
         List<HouseLeaseConstEntity> houseLeaseConstEntityList = new ArrayList<>(list.size());
         for (Object o : list) {
             JSONObject jsonObject = JSON.parseObject(String.valueOf(o));
-            HouseLeaseConstEntity entity = new HouseLeaseConstEntity(jsonObject.getLong("houseConstCode"),
+            HouseLeaseConstEntity entity = new HouseLeaseConstEntity(jsonObject.getLong("id"),
+                    jsonObject.getLong("houseConstCode"),
                     jsonObject.getString("houseConstName"),
                     jsonObject.getString("houseConstType"),
                     jsonObject.getString("annotation"));

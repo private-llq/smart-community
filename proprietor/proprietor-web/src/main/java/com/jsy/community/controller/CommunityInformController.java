@@ -8,7 +8,6 @@ import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -20,7 +19,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 /**
@@ -125,7 +123,7 @@ public class CommunityInformController {
     @Login
     @PostMapping()
     @ApiOperation("添加社区通知消息")
-    public CommonResult<Boolean> addInform(@RequestBody CommunityInformEntity communityInformEntity) throws DuplicateKeyException, SQLIntegrityConstraintViolationException {
+    public CommonResult<Boolean> addInform(@RequestBody CommunityInformEntity communityInformEntity) throws DuplicateKeyException {
         //1.效验用户是否是一个管理员
         //2.验证参数实体效验
         ValidatorUtils.validateEntity(communityInformEntity, CommunityInformEntity.addCommunityInformValidate.class);

@@ -132,6 +132,7 @@ public class HouseLeaseQO implements Serializable {
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
     @ApiModelProperty(value = "房屋出租方式id /1.压一付一/2.压一付三/3.压一付六")
+    @NotNull(groups = {addLeaseSaleHouse.class}, message = "押金方式是必须选择的")
     private Short houseLeasedepositId;
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
@@ -191,11 +192,11 @@ public class HouseLeaseQO implements Serializable {
     /**
      * 新增房屋租售验证接口参数验证
      */
-    public interface addLeaseSaleHouse{};
+    public interface addLeaseSaleHouse{}
 
     /**
      * 修改房屋参数验证接口
      */
-    public interface updateLeaseSaleHouse{};
+    public interface updateLeaseSaleHouse{}
 
 }

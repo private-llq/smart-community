@@ -46,7 +46,7 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param houseId       房屋id
      * @return              返回这条数据的详情
      */
-    HouseLeaseVO queryHouseLeaseOne(Long houseId);
+    HouseLeaseVO queryHouseLeaseOne(Long houseId, String uid);
 
     /**
      * 按参数对象属性更新房屋出租数据
@@ -70,7 +70,7 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param houseId               房屋id
      * @return                      返回是否存在结果
      */
-    boolean isExistUserHouse(String userId, Integer houseCommunityId, Integer houseId);
+    boolean existUserHouse(String userId, Integer houseCommunityId, Integer houseId);
 
 
     /**

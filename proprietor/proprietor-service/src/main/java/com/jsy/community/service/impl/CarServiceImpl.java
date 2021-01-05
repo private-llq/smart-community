@@ -101,15 +101,14 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     /**
      * 列表添加车辆信息方式
      * @param carEntityList 业主车辆信息 列表
-     * @return              返回影响行数
      */
     @Override
-    public Integer addProprietorCarForList(List<CarEntity> carEntityList) {
+    public void addProprietorCarForList(List<CarEntity> carEntityList) {
         //对所有车辆信息 设置默认的id
         for(CarEntity carEntity : carEntityList ){
             carEntity.setId(SnowFlake.nextId());
         }
-        return carMapper.addProprietorCarForList(carEntityList);
+        carMapper.addProprietorCarForList(carEntityList);
     }
 
     /**
