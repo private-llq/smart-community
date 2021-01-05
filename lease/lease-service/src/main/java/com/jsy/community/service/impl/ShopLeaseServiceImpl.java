@@ -71,7 +71,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Transactional
 	public void addShop(ShopLeaseVO shop) {
 		//验证所属社区所属用户房屋是否存在
-		if (!iHouseLeaseService.isExistUserHouse(shop.getUid(), shop.getCommunityId().intValue(), shop.getHouseId().intValue())) {
+		if (!iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId().intValue(), shop.getHouseId().intValue())) {
 			throw new LeaseException("您并未拥有该房屋!");
 		}
 		
@@ -154,7 +154,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 //	@Transactional
 	public void updateShop(ShopLeaseVO shop, Long shopId) {
 		//验证所属社区所属用户房屋是否存在
-		if (!iHouseLeaseService.isExistUserHouse(shop.getUid(), shop.getCommunityId().intValue(), shop.getHouseId().intValue())) {
+		if (!iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId().intValue(), shop.getHouseId().intValue())) {
 			throw new LeaseException("您并未拥有该房屋!");
 		}
 		
@@ -193,7 +193,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Transactional
 	public void cancelShop(String userId, Long shopId, Long communityId, Long houseId) {
 		//验证所属社区所属用户房屋是否存在
-		if (!iHouseLeaseService.isExistUserHouse(userId, communityId.intValue(), houseId.intValue())) {
+		if (!iHouseLeaseService.existUserHouse(userId, communityId.intValue(), houseId.intValue())) {
 			throw new LeaseException("您并未拥有该房屋!");
 		}
 		
