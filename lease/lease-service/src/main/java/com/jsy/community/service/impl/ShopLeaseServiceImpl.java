@@ -156,7 +156,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-//	@Transactional
+	@Transactional
 	public void updateShop(ShopLeaseVO shop, Long shopId) {
 		//验证所属社区所属用户房屋是否存在
 		if (iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId(), shop.getHouseId())) {
@@ -171,27 +171,35 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("shop_id", shopId);
 		List<ShopImgEntity> shopImgList = shopImgMapper.selectList(wrapper);
-		List<Long> longs = new ArrayList<>();
-		for (ShopImgEntity shopImgEntity : shopImgList) {
-			longs.add(shopImgEntity.getId());
+		if (!CollectionUtils.isEmpty(shopImgList)) {
+			List<Long> longs = new ArrayList<>();
+			for (ShopImgEntity shopImgEntity : shopImgList) {
+				longs.add(shopImgEntity.getId());
+			}
+			shopImgMapper.deleteBatchIds(longs); // 删除图片信息
 		}
-		shopImgMapper.deleteBatchIds(longs); // 删除图片信息
 		
 		String[] imgPath = shop.getImgPath();
-		List<ShopImgEntity> imgList = new ArrayList<>();
-		for (String s : imgPath) {
-			ShopImgEntity entity = new ShopImgEntity();
-			entity.setId(SnowFlake.nextId());
-			entity.setImgUrl(s);
-			entity.setShopId(shopId);
-			imgList.add(entity);
+		if (imgPath != null && imgPath.length > 0) {
+			List<ShopImgEntity> imgList = new ArrayList<>();
+			for (String s : imgPath) {
+				ShopImgEntity entity = new ShopImgEntity();
+				entity.setId(SnowFlake.nextId());
+				entity.setImgUrl(s);
+				entity.setShopId(shopId);
+				imgList.add(entity);
+			}
+			shopImgMapper.insertImg(imgList); // 添加图片信息
 		}
-		shopImgMapper.insertImg(imgList); // 添加图片信息
 		
 		Long[] tags = shopLeaseMapper.selectTags(shopId);
-		shopLeaseMapper.deleteTags(tags); // 查询出该店铺原本有的标签并删除
+		if (tags != null && tags.length > 0) {
+			shopLeaseMapper.deleteTags(tags); // 查询出该店铺原本有的标签并删除
+		}
 		
-		shopLeaseMapper.insertMiddle(shopId, shop.getShopTypeIds()); // 添加标签
+		if (shop.getShopTypeIds() != null && shop.getShopTypeIds().length > 0) {
+			shopLeaseMapper.insertMiddle(shopId, shop.getShopTypeIds()); // 添加标签
+		}
 	}
 	
 	@Override
@@ -208,11 +216,11 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("shop_id", shopId);
 		List<ShopImgEntity> shopImgList = shopImgMapper.selectList(wrapper);
-		List<Long> longs = new ArrayList<>();
-		for (ShopImgEntity shopImgEntity : shopImgList) {
-			longs.add(shopImgEntity.getId());
-		}
-		if (!CollectionUtils.isEmpty(longs)) {
+		if (!CollectionUtils.isEmpty(shopImgList)) {
+			List<Long> longs = new ArrayList<>();
+			for (ShopImgEntity shopImgEntity : shopImgList) {
+				longs.add(shopImgEntity.getId());
+			}
 			shopImgMapper.deleteBatchIds(longs); // 删除图片信息
 		}
 		

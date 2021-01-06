@@ -163,6 +163,7 @@ public class ShopLeaseController {
 	public CommonResult updateShop(@RequestBody ShopLeaseVO shop,
 	                               @ApiParam("店铺id") @RequestParam Long shopId) {
 		shop.setUid(UserUtils.getUserId());
+		ValidatorUtils.validateEntity(shop, ShopLeaseVO.updateShopValidate.class);
 		shopLeaseService.updateShop(shop, shopId);
 		return CommonResult.ok();
 	}
