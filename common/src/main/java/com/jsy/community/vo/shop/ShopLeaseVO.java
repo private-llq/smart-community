@@ -138,7 +138,7 @@ public class ShopLeaseVO implements Serializable {
 	private String address;
 	
 	@ApiModelProperty(value = "月租金  字符串形式")
-	private String MonthMoneyString;
+	private String monthMoneyString;
 	
 	/**
 	 * 添加店铺接口
