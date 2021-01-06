@@ -1,11 +1,14 @@
 package com.jsy.community.vo.shop;
 
+import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,6 +53,7 @@ public class ShopLeaseVO implements Serializable {
 	
 	@ApiModelProperty(value = "押付方式")
 	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "押付方式不能为空")
+	@Pattern(groups = {addShopValidate.class, updateShopValidate.class},regexp = "^押([0-9]{1,2})付([0-9]{1,2})$",message = "请选择正确的押付方式")
 	private String defrayType;
 	
 	@ApiModelProperty(value = "转让费 0.00：面议 ")
@@ -62,6 +66,7 @@ public class ShopLeaseVO implements Serializable {
 	
 	@ApiModelProperty(value = "房型")
 	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "房型不能为空")
+	@Pattern(groups = {addShopValidate.class, updateShopValidate.class},regexp = "^([0-9]{1,2})室([0-9]{1,2})厅$",message = "请选择正确的房型")
 	private String type;
 	
 	@ApiModelProperty(value = "楼层")
@@ -74,26 +79,32 @@ public class ShopLeaseVO implements Serializable {
 	
 	@ApiModelProperty(value = "朝向   0东 1南 2西 3 北 4东南 5 东北 6 西南 7 西北 8 南北 9东西")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "朝向不能为空")
+	@Range(groups = {addShopValidate.class, updateShopValidate.class},min=0,max=9,message="请选择正确的朝向")
 	private Integer orientation;
 	
 	@ApiModelProperty(value = "电梯   0无 1有")
-	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "电梯不能为空")
+	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "是否有电梯不能为空")
+	@Range(groups = {addShopValidate.class, updateShopValidate.class},min=0,max=1,message="你选择的电梯状态不符合")
 	private Integer lift;
 	
 	@ApiModelProperty(value = "装修程度  0毛坯房 1普通装修  2精装修")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "装修程度不能为空")
+	@Range(groups = {addShopValidate.class, updateShopValidate.class},min=0,max=2,message="请选择正确的装修程度")
 	private Integer furnishingStyle;
 	
 	@ApiModelProperty(value = "年代")
 	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "年代不能为空")
+	@Pattern(groups = {addShopValidate.class,updateShopValidate.class}, regexp = RegexUtils.REGEX_YEAR , message = "房屋年代过于久远!")
 	private String year;
 	
 	@ApiModelProperty(value = "用途 0普通住宅 1商业住宅")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "用途不能为空")
+	@Range(groups = {addShopValidate.class, updateShopValidate.class},min=0,max=1,message="请选择正确的用途")
 	private Integer purpose;
 	
 	@ApiModelProperty(value = "权属 0商品房 1学区房 2家住房")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "权属不能为空")
+	@Range(groups = {addShopValidate.class, updateShopValidate.class},min=0,max=2,message="请选择正确的权属")
 	private Integer ownership;
 	
 	@ApiModelProperty(value = "图片地址集合")
