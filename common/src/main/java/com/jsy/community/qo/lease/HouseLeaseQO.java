@@ -153,7 +153,7 @@ public class HouseLeaseQO implements Serializable {
 
 
 
-    @ApiModelProperty(value = "房屋来源类型ID、1.个人 2.经纪人 3.不限")
+    @ApiModelProperty(value = "房屋来源类型ID、1.个人 2.物业 3.不限")
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "房屋来源类型ID未选择!")
     private Short houseSourceId;
 

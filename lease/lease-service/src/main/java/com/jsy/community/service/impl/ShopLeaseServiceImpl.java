@@ -14,7 +14,6 @@ import com.jsy.community.mapper.ShopImgMapper;
 import com.jsy.community.mapper.ShopLeaseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
-import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.shop.IndexShopVO;
@@ -72,7 +71,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Transactional
 	public void addShop(ShopLeaseVO shop) {
 		//验证所属社区所属用户房屋是否存在
-		if (!iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId(), shop.getHouseId())) {
+		if (iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId(), shop.getHouseId())) {
 			throw new LeaseException("您并未拥有该房屋!");
 		}
 		
@@ -137,9 +136,14 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		if (shopTypeIds != null && shopTypeIds.length > 0) {
 			List<String> constTypeName = houseConstService.getConstNameByConstId(shopTypeIds);// 店铺类型标签
 			Long[] shopBusinessIds = shopLeaseMapper.selectBusinessTags(shopId);
-			List<String> constBusinessName = houseConstService.getConstNameByConstId(shopBusinessIds);// 店铺行业标签
-			shopLeaseVo.setShopTypeNames(constTypeName);
-			shopLeaseVo.setShopBusinessNames(constBusinessName); // 封装标签
+			if (shopBusinessIds != null && shopBusinessIds.length > 0) {
+				List<String> constBusinessName = houseConstService.getConstNameByConstId(shopBusinessIds);// 店铺行业标签
+				shopLeaseVo.setShopTypeNames(constTypeName);
+				shopLeaseVo.setShopBusinessNames(constBusinessName); // 封装标签
+			} else {
+				shopLeaseVo.setShopTypeNames(constTypeName);
+				shopLeaseVo.setShopBusinessNames(null); // 封装标签
+			}
 		}
 		map.put("shop", shopLeaseVo);
 		
@@ -155,7 +159,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 //	@Transactional
 	public void updateShop(ShopLeaseVO shop, Long shopId) {
 		//验证所属社区所属用户房屋是否存在
-		if (!iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId(), shop.getHouseId())) {
+		if (iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId(), shop.getHouseId())) {
 			throw new LeaseException("您并未拥有该房屋!");
 		}
 		
@@ -194,7 +198,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Transactional
 	public void cancelShop(String userId, Long shopId, Long communityId, Long houseId) {
 		//验证所属社区所属用户房屋是否存在
-		if (!iHouseLeaseService.existUserHouse(userId, communityId, houseId)) {
+		if (iHouseLeaseService.existUserHouse(userId, communityId, houseId)) {
 			throw new LeaseException("您并未拥有该房屋!");
 		}
 		
@@ -239,83 +243,224 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-	public PageInfo<ShopLeaseEntity> getShopByCondition(BaseQO<HouseLeaseQO> baseQO) {
+	public PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO, String query, Integer areaId) {
+		Page<ShopLeaseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
 		
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		
-		// 分页
-		Page<ShopLeaseEntity> shopLeaseEntityPage = new Page<>();
-		MyPageUtils.setPageAndSize(shopLeaseEntityPage,baseQO);
-		HouseLeaseQO houseQO = baseQO.getQuery();
-		if (houseQO == null) {
-			shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
-			PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
-			BeanUtils.copyProperties(shopLeaseEntityPage, pageInfo);
-			return pageInfo;
-			
+		List<Long> longs = new ArrayList<>();   // 用于接收该区域的小区id集合
+		List<IndexShopVO> shopVOS = new ArrayList<>(); // 用于封装最后数据
+		
+		HouseLeaseQO houseQO = baseQO.getQuery(); // 筛选条件
+		
+		// 搜索条件和筛选条件都不存在   PS：此时区域id这里从url上获取，若没有 默认查渝北区
+		if (houseQO == null && query == null) {
+			// 根据地区id查询该区域所有小区
+			List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());
+			if (CollectionUtils.isEmpty(list)) {
+				return null;
+			}
+			for (CommunityEntity communityEntity : list) {
+				longs.add(communityEntity.getId());
+			}
+			if (!CollectionUtils.isEmpty(longs)) {
+				wrapper.in("community_id", longs);
+				// 分页查询出该区域发布的所有商铺
+				shopLeaseMapper.selectPage(page, wrapper);
+			}
+			return commonCode(page, shopVOS);
 		}
 		
+		// 搜索条件存在但筛选条件不存在   PS：此时区域id这里从url上获取，若没有 默认查渝北区
+		if (houseQO == null && (!StringUtils.isEmpty(query))) {
+			// 根据小区名或地址，地区id查询该区域所有小区
+			List<CommunityEntity> list = communityService.listCommunityByName(query, areaId);
+			if (CollectionUtils.isEmpty(list)) {
+				return null;
+			}
+			for (CommunityEntity communityEntity : list) {
+				longs.add(communityEntity.getId());
+			}
+			if (!CollectionUtils.isEmpty(longs)) {
+				wrapper.in("community_id", longs);
+				// 分页查询出该区域发布的所有商铺
+				shopLeaseMapper.selectPage(page, wrapper);
+			}
+			return commonCode(page, shopVOS);
+		}
 		
-		// 区域id
-		List<Long> longs = new ArrayList<>(); // 用于存放社区id
-		Long houseAreaId = houseQO.getHouseAreaId();
-		if (houseAreaId != null) {
-			List<CommunityEntity> list = communityService.listCommunityByAreaId(houseAreaId);
-			if (!CollectionUtils.isEmpty(list)) {
+		// 搜索条件不存在但筛选条件存在
+		if (houseQO != null && query == null) {
+			// 区域id
+			Long houseAreaId = houseQO.getHouseAreaId();
+			if (houseAreaId != null) {
+				List<CommunityEntity> list = communityService.listCommunityByAreaId(houseAreaId);
+				if (CollectionUtils.isEmpty(list)) {
+					return null;
+				}
+				for (CommunityEntity communityEntity : list) {
+					longs.add(communityEntity.getId());
+				}
+				if (!CollectionUtils.isEmpty(longs)) {
+					wrapper.in("community_id", longs);
+				}
+			} else {
+				List<CommunityEntity> list = communityService.listCommunityByAreaId(500103L);// 若没有选择区域 则查询渝北区
+				if (list == null) {
+					return null;
+				}
 				for (CommunityEntity communityEntity : list) {
 					longs.add(communityEntity.getId());
 				}
 				wrapper.in("community_Id", longs);
+			}
+			
+			// 租金
+			BigDecimal priceMin = houseQO.getHousePriceMin();
+			BigDecimal priceMax = houseQO.getHousePriceMax();
+			if (priceMin != null && priceMax != null) {
+				wrapper.between("month_money", priceMin, priceMax);
+			}
+			
+			// 面积
+			BigDecimal squareMeterMin = houseQO.getHouseSquareMeterMin();
+			BigDecimal squareMeterMax = houseQO.getHouseSquareMeterMax();
+			if (squareMeterMin != null && squareMeterMax != null) {
+				wrapper.between("shop_acreage", squareMeterMin, squareMeterMax);
+			}
+			
+			// 来源
+			Short sourceId = houseQO.getHouseSourceId();
+			if (sourceId != null && sourceId != 3) {
+				wrapper.eq("source", sourceId);
+			}
+			
+			// 更多[标签]
+			List<Long> advantage = houseQO.getHouseAdvantage();
+			if (!CollectionUtils.isEmpty(advantage)) {
+				List<Long> list = shopLeaseMapper.selectMiddle(advantage);
+				if (!CollectionUtils.isEmpty(list)) {
+					wrapper.in("id", list);
+				}
+			}
+			
+			
+			// 分页
+			shopLeaseMapper.selectPage(page, wrapper);
+			return commonCode(page, shopVOS);
+		}
+		
+		// 搜索条件和筛选条件都存在
+		if (houseQO != null && (!StringUtils.isEmpty(query))) {
+			// 区域id
+			Long houseAreaId = houseQO.getHouseAreaId();
+			if (houseAreaId != null) {
+				List<CommunityEntity> list = communityService.listCommunityByName(query, houseAreaId.intValue());
+				if (CollectionUtils.isEmpty(list)) {
+					return null;
+				}
+				for (CommunityEntity communityEntity : list) {
+					longs.add(communityEntity.getId());
+				}
+				if (!CollectionUtils.isEmpty(longs)) {
+					wrapper.in("community_id", longs);
+				}
 			} else {
-				wrapper.in("community_Id", 0);
+				List<CommunityEntity> list = communityService.listCommunityByName(query, 500103);// 若没有选择区域 则查询渝北区
+				if (CollectionUtils.isEmpty(list)) {
+					return null;
+				}
+				for (CommunityEntity communityEntity : list) {
+					longs.add(communityEntity.getId());
+				}
+				if (!CollectionUtils.isEmpty(longs)) {
+					wrapper.in("community_id", longs);
+				}
 			}
-		} else {
-			List<CommunityEntity> list = communityService.listCommunityByAreaId(500103L);
-			for (CommunityEntity communityEntity : list) {
-				longs.add(communityEntity.getId());
+			
+			// 租金
+			BigDecimal priceMin = houseQO.getHousePriceMin();
+			BigDecimal priceMax = houseQO.getHousePriceMax();
+			if (priceMin != null && priceMax != null) {
+				wrapper.between("month_money", priceMin, priceMax);
 			}
-			wrapper.in("community_Id", longs);
-		}
-		
-		// 租金
-		BigDecimal priceMin = houseQO.getHousePriceMin();
-		BigDecimal priceMax = houseQO.getHousePriceMax();
-		if (priceMin != null && priceMax != null) {
-			wrapper.between("month_money", priceMin, priceMax);
-		}
-		
-		// 面积
-		BigDecimal squareMeterMin = houseQO.getHouseSquareMeterMin();
-		BigDecimal squareMeterMax = houseQO.getHouseSquareMeterMax();
-		if (squareMeterMin != null && squareMeterMax != null) {
-			wrapper.between("shop_acreage", squareMeterMin, squareMeterMax);
-		}
-		
-		// 来源
-		Short sourceId = houseQO.getHouseSourceId();
-		if (sourceId != null && sourceId != 3) {
-			wrapper.eq("source", sourceId);
-		}
-		
-		// 更多[标签]
-		List<Long> advantage = houseQO.getHouseAdvantage();
-		if (!CollectionUtils.isEmpty(advantage)) {
-			List<Long> list = shopLeaseMapper.selectMiddle(advantage);
-			if (!CollectionUtils.isEmpty(list)) {
-				wrapper.in("id", list);
+			
+			// 面积
+			BigDecimal squareMeterMin = houseQO.getHouseSquareMeterMin();
+			BigDecimal squareMeterMax = houseQO.getHouseSquareMeterMax();
+			if (squareMeterMin != null && squareMeterMax != null) {
+				wrapper.between("shop_acreage", squareMeterMin, squareMeterMax);
 			}
+			
+			// 来源
+			Short sourceId = houseQO.getHouseSourceId();
+			if (sourceId != null && sourceId != 3) {
+				wrapper.eq("source", sourceId);
+			}
+			
+			// 更多[标签]
+			List<Long> advantage = houseQO.getHouseAdvantage();
+			if (!CollectionUtils.isEmpty(advantage)) {
+				List<Long> list = shopLeaseMapper.selectMiddle(advantage);
+				if (!CollectionUtils.isEmpty(list)) {
+					wrapper.in("id", list);
+				}
+			}
+			
+			// 分页
+			shopLeaseMapper.selectPage(page, wrapper);
+			return commonCode(page, shopVOS);
 		}
 		
-		shopLeaseMapper.selectPage(shopLeaseEntityPage, wrapper);
-		PageInfo<ShopLeaseEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(shopLeaseEntityPage, pageInfo);
+		
+		return null;
+	}
+	
+	/**
+	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.vo.shop.IndexShopVO>
+	 * @Author lihao
+	 * @Description 将shopLeaseEntity封装成IndexShopVO
+	 * @Date 2021/1/5 23:47
+	 * @Param [page, shopVOS]
+	 **/
+	private PageInfo<IndexShopVO> commonCode(Page<ShopLeaseEntity> page, List<IndexShopVO> shopVOS) {
+		List<ShopLeaseEntity> records = page.getRecords();
+		if (CollectionUtils.isEmpty(records)) {
+			return null;
+		}
+		// 将商铺封装成IndexShopVO
+		for (ShopLeaseEntity record : records) {
+			IndexShopVO indexShopVO = new IndexShopVO();
+			BeanUtils.copyProperties(record, indexShopVO);
+			
+			Long id = record.getId(); // 商铺id
+			
+			// 封装图片
+			QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();
+			imgWrapper.eq("shop_id", id).last("limit 1");
+			ShopImgEntity shopImgEntity = shopImgMapper.selectOne(imgWrapper);
+			if (shopImgEntity != null) {
+				indexShopVO.setImgPath(shopImgEntity.getImgUrl());
+			}
+			
+			// 封装标签集合
+			Long[] tags = shopLeaseMapper.selectTags(id);
+			if (tags != null && tags.length > 0) {
+				List<String> constNameByConstId = houseConstService.getConstNameByConstId(tags);
+				indexShopVO.setTags(constNameByConstId);
+			}
+			shopVOS.add(indexShopVO);
+		}
+		
+		PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(page, pageInfo);
+		pageInfo.setRecords(shopVOS);
 		return pageInfo;
 	}
 	
 	@Override
 	public PageInfo<IndexShopVO> getShopBySearch(BaseQO<ShopLeaseEntity> baseQO, String query, Integer areaId) {
-		Page<ShopLeaseEntity> page = new Page<>();
-		MyPageUtils.setPageAndSize(page,baseQO);
+		Page<ShopLeaseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
 		QueryWrapper<ShopLeaseEntity> queryWrapper = new QueryWrapper<>();
 		
 		List<Long> longs = new ArrayList<>();

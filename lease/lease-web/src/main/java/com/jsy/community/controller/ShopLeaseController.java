@@ -56,8 +56,30 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")
 	@PostMapping("/getShopByCondition")
-	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
-		PageInfo<ShopLeaseEntity> pageInfo = shopLeaseService.getShopByCondition(baseQO);
+	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO,
+	                                       @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
+	                                       @ApiParam("区域id") @RequestParam(required = false, defaultValue = "500103") Integer areaId) {
+		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO,query,areaId);
+		if (pageInfo==null) {
+			return CommonResult.ok(null);
+		}
+		// 当月租金大于10000变成XX.XX万元
+		List<IndexShopVO> records = pageInfo.getRecords();
+		for (IndexShopVO record : records) {
+			if (record.getMonthMoney().doubleValue() > 10000d) {
+				String s = String.format("%.2f", record.getMonthMoney().doubleValue() / 10000) + "万";
+				record.setMonthMoneyString(s);
+			} else if (record.getMonthMoney().compareTo(new BigDecimal(0.00)) == 0) {
+				String s = "面议";
+				record.setMonthMoneyString(s);
+			} else {
+				String s = "" + record.getMonthMoney();
+				int i = s.lastIndexOf(".");
+				String substring = s.substring(0, i) + "元";
+				record.setMonthMoneyString(substring);
+			}
+		}
+		// 当月租金大于10000变成XX.XX万元
 		return CommonResult.ok(pageInfo);
 	}
 	
