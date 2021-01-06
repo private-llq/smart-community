@@ -193,7 +193,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      */
     @Override
     public boolean existUserHouse(String userId, Long houseCommunityId, Long houseId) {
-        return houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId) <= 0;
+        return houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId) == 0;
     }
 
 

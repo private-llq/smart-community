@@ -27,7 +27,7 @@
 	        t_community AS c
 	        LEFT JOIN t_community_inform AS i ON c.id = i.community_id
         WHERE
-	        community_id = #{communityId} ORDER BY i.create_time desc LIMIT 1
+	        c.id = #{communityId} ORDER BY i.create_time desc LIMIT 1
     </select>
     <resultMap id="queryCommunityInformMap" type="com.jsy.community.vo.CommunityVO">
         <id column="id" property="id"/>
