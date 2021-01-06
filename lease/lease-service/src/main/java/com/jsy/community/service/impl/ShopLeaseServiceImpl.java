@@ -102,8 +102,11 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 存储标签
 		Long[] typeIds = shop.getShopTypeIds();
 		Long[] businessIds = shop.getShopBusinessIds();
-		Long[] both = (Long[]) ArrayUtils.addAll(typeIds, businessIds);
-		shopLeaseMapper.insertMiddle(baseShop.getId(), both);
+		if ((typeIds != null && typeIds.length > 0) || (businessIds != null && businessIds.length > 0)) {
+			Long[] both = (Long[]) ArrayUtils.addAll(typeIds, businessIds); // 将两个集合合并为一个集合
+			shopLeaseMapper.insertMiddle(baseShop.getId(), both);
+		}
+		
 	}
 	
 	@Override
