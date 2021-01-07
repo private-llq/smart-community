@@ -142,6 +142,10 @@ public class ShopLeaseVO implements Serializable {
 	
 	@ApiModelProperty(value = "转让费  字符串形式")
 	private String transferMoneyString;
+	
+	@ApiModelProperty(value = "详情页总标签")
+	private List<String> tags;
+	
 	/**
 	 * 添加店铺接口
 	 */

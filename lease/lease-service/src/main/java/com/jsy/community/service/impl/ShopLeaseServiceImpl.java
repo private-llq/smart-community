@@ -156,13 +156,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		ArrayList<String> list = new ArrayList<>();
 		shopBusinessNames.addAll(shopTypeNames);
 		list.addAll(shopBusinessNames);
+		shopLeaseVo.setTags(list);
 		
 		
 		// 查询店铺发布人的电话和头像
 		String uid = shop.getUid();
 		UserEntity one = userService.selectOne(uid);
 		map.put("user", one);
-		map.put("tags",list);
 		return map;
 	}
 	
