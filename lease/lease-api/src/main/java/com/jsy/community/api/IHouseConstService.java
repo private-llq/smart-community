@@ -56,4 +56,13 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @Param [shopTypeIds]
      **/
     List<String> getConstNameByConstId(Long[] shopTypeIds);
+    
+    /**
+     * @return java.util.List<java.lang.Long>
+     * @Author lihao
+     * @Description 根据类型查询出常量id
+     * @Date 2021/1/7 10:34
+     * @Param [i]
+     **/
+    List<Long> getConstIdByType(Integer i);
 }

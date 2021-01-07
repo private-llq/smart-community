@@ -18,5 +18,11 @@ public interface HouseConstMapper extends BaseMapper<HouseLeaseConstEntity> {
      */
     @Select("select id,house_const_code,house_const_name,house_const_value,house_const_type,annotation from t_house_const")
     List<HouseLeaseConstEntity> getAllHouseConstForDatabases();
-
+	
+	
+	/**
+	 * 根据常量类型从t_house_const获取所有房屋常量id
+	 */
+	@Select("select id from t_house_const where house_const_type = #{i}")
+	List<Long> getConstIdByType(Integer i);
 }

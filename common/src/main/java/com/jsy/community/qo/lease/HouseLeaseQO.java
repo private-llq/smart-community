@@ -188,6 +188,17 @@ public class HouseLeaseQO implements Serializable {
     //业务层效验 值有效性
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未填写出租方式!")
     private Integer houseLeasemodeId;
+    
+    
+    // 商铺标签
+    
+    // 类型
+    private List<Long> shopTypeIds;
+    
+    // 行业
+    private List<Long> shopBusinessIds;
+    
+    // 商铺标签
 
     /**
      * 新增房屋租售验证接口参数验证

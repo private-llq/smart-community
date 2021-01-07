@@ -345,19 +345,58 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			if (sourceId != null && sourceId != 3) {
 				wrapper.eq("source", sourceId);
 			}
-			
-			// 更多[标签]
-			List<Long> advantage = houseQO.getHouseAdvantage();
-			if (!CollectionUtils.isEmpty(advantage)) {
-				List<Long> list = shopLeaseMapper.selectMiddle(advantage);
-				if (!CollectionUtils.isEmpty(list)) {
-					wrapper.in("id", list);
+
+			// 类型
+			List<Long> shopTypeIds = houseQO.getShopTypeIds();
+			if (!CollectionUtils.isEmpty(shopTypeIds)) {
+				// 用户选择的是不限
+				if (shopTypeIds.contains(42L)) {
+					// 1. 去常量表中查询出该类型对应的所有标签id集合
+					List<Long> ids = houseConstService.getConstIdByType(7);
+					if (!CollectionUtils.isEmpty(ids)) {
+						List<Long> list = shopLeaseMapper.selectMiddle(shopTypeIds);
+						if (!CollectionUtils.isEmpty(list)) {
+							wrapper.in("id", list);
+						}
+					}
+				} else {
+					// 选择的不是不限
+					List<Long> list = shopLeaseMapper.selectMiddle(shopTypeIds);
+					if (!CollectionUtils.isEmpty(list)) {
+						wrapper.in("id", list);
+					} else {
+						return null;
+					}
 				}
 			}
 			
+			// 行业
+			List<Long> shopBusinessIds = houseQO.getShopBusinessIds();
+			if (!CollectionUtils.isEmpty(shopBusinessIds)) {
+				// 用户选择的是不限
+				if (shopBusinessIds.contains(50L)) {
+					// 1. 去常量表中查询出该类型对应的所有标签id集合
+					List<Long> ids = houseConstService.getConstIdByType(8);
+					if (!CollectionUtils.isEmpty(ids)) {
+						List<Long> list = shopLeaseMapper.selectMiddle(ids);
+						if (!CollectionUtils.isEmpty(list)) {
+							wrapper.in("id", list);
+						}
+					}
+				} else {
+					// 选择的不是不限
+					List<Long> list = shopLeaseMapper.selectMiddle(shopBusinessIds);
+					if (!CollectionUtils.isEmpty(list)) {
+						wrapper.in("id", list);
+					} else {
+						return null;
+					}
+				}
+			}
 			
 			// 分页
-			shopLeaseMapper.selectPage(page, wrapper);
+			Page<ShopLeaseEntity> shopLeaseEntityPage = shopLeaseMapper.selectPage(page, wrapper);
+			List<ShopLeaseEntity> records = shopLeaseEntityPage.getRecords();
 			return commonCode(page, shopVOS);
 		}
 		
@@ -409,12 +448,49 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 				wrapper.eq("source", sourceId);
 			}
 			
-			// 更多[标签]
-			List<Long> advantage = houseQO.getHouseAdvantage();
-			if (!CollectionUtils.isEmpty(advantage)) {
-				List<Long> list = shopLeaseMapper.selectMiddle(advantage);
+			// 类型
+			List<Long> shopTypeIds = houseQO.getShopTypeIds();
+			if (!CollectionUtils.isEmpty(shopTypeIds)) {
+				// 用户选择的是不限
+				if (shopTypeIds.contains(42L)) {
+					// 1. 去常量表中查询出该类型对应的所有标签id集合
+					List<Long> ids = houseConstService.getConstIdByType(7);
+					if (!CollectionUtils.isEmpty(ids)) {
+						List<Long> list = shopLeaseMapper.selectMiddle(shopTypeIds);
+						if (!CollectionUtils.isEmpty(list)) {
+							wrapper.in("id", list);
+						}
+					}
+				}
+				// 选择的不是不限
+				List<Long> list = shopLeaseMapper.selectMiddle(shopTypeIds);
 				if (!CollectionUtils.isEmpty(list)) {
 					wrapper.in("id", list);
+				} else {
+					return null;
+				}
+			}
+			
+			// 行业
+			List<Long> shopBusinessIds = houseQO.getShopBusinessIds();
+			if (!CollectionUtils.isEmpty(shopBusinessIds)) {
+				// 用户选择的是不限
+				if (shopBusinessIds.contains(50L)) {
+					// 1. 去常量表中查询出该类型对应的所有标签id集合
+					List<Long> ids = houseConstService.getConstIdByType(8);
+					if (!CollectionUtils.isEmpty(ids)) {
+						List<Long> list = shopLeaseMapper.selectMiddle(shopBusinessIds);
+						if (!CollectionUtils.isEmpty(list)) {
+							wrapper.in("id", list);
+						}
+					}
+				}
+				// 选择的不是不限
+				List<Long> list = shopLeaseMapper.selectMiddle(shopBusinessIds);
+				if (!CollectionUtils.isEmpty(list)) {
+					wrapper.in("id", list);
+				} else {
+					return null;
 				}
 			}
 			
@@ -422,8 +498,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			shopLeaseMapper.selectPage(page, wrapper);
 			return commonCode(page, shopVOS);
 		}
-		
-		
 		return null;
 	}
 	

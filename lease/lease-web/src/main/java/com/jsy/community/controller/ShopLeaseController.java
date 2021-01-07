@@ -59,8 +59,8 @@ public class ShopLeaseController {
 	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO,
 	                                       @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
 	                                       @ApiParam("区域id") @RequestParam(required = false, defaultValue = "500103") Integer areaId) {
-		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO,query,areaId);
-		if (pageInfo==null) {
+		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO, query, areaId);
+		if (pageInfo == null) {
 			return CommonResult.ok(null);
 		}
 		// 当月租金大于10000变成XX.XX万元
@@ -144,7 +144,7 @@ public class ShopLeaseController {
 		if (monthMoney.doubleValue() > 10000d) {
 			String s = String.format("%.2f", monthMoney.doubleValue() / 10000) + "万";
 			shop.setMonthMoneyString(s);
-		} else if (monthMoney.compareTo(new BigDecimal(0.00))==0) {
+		} else if (monthMoney.compareTo(new BigDecimal(0.00)) == 0) {
 			String s = "面议";
 			shop.setMonthMoneyString(s);
 		} else {

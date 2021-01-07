@@ -109,6 +109,11 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
     }
     
     @Override
+    public List<Long> getConstIdByType(Integer i) {
+        return houseConstMapper.getConstIdByType(i);
+    }
+    
+    @Override
     public Map<String,Object> getTag() {
         Map<String, Object> map = new HashMap<>();
     
