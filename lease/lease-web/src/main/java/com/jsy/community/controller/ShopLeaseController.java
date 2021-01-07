@@ -137,6 +137,9 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
 		Map<String, Object> map = shopLeaseService.getShop(shopId);
+		if (map == null) {
+			return CommonResult.ok(null);
+		}
 		
 		// 当月租金大于10000变成XX.XX万元
 		ShopLeaseVO shop = (ShopLeaseVO) map.get("shop");
@@ -154,6 +157,9 @@ public class ShopLeaseController {
 			shop.setMonthMoneyString(substring);
 		}
 		// 当月租金大于10000变成XX.XX万元
+		
+		// 将标签合并成一个  前端需要
+		ShopLeaseVO shopVO = (ShopLeaseVO) map.get("shop");
 		return CommonResult.ok(map);
 	}
 	

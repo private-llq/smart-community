@@ -30,10 +30,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -117,6 +114,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		wrapper.eq("id", shopId);
 		ShopLeaseEntity shop = shopLeaseMapper.selectOne(wrapper);
 		
+		if (shop==null) {
+			return null;
+		}
 		ShopLeaseVO shopLeaseVo = new ShopLeaseVO();
 		BeanUtils.copyProperties(shop, shopLeaseVo); // 封装基本信息
 		
@@ -150,11 +150,19 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		}
 		map.put("shop", shopLeaseVo);
 		
+		// 将标签封装成一个属性 便于前端使用
+		List<String> shopBusinessNames = shopLeaseVo.getShopBusinessNames();
+		List<String> shopTypeNames = shopLeaseVo.getShopTypeNames();
+		ArrayList<String> list = new ArrayList<>();
+		shopBusinessNames.addAll(shopTypeNames);
+		list.addAll(shopBusinessNames);
+		
 		
 		// 查询店铺发布人的电话和头像
 		String uid = shop.getUid();
 		UserEntity one = userService.selectOne(uid);
 		map.put("user", one);
+		map.put("tags",list);
 		return map;
 	}
 	
