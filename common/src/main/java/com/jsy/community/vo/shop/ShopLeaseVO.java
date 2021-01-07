@@ -77,10 +77,10 @@ public class ShopLeaseVO implements Serializable {
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "楼层总数不能为空")
 	private Integer floorCount;
 	
-	@ApiModelProperty(value = "朝向   0东 1南 2西 3 北 4东南 5 东北 6 西南 7 西北 8 南北 9东西")
-	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "朝向不能为空")
-	@Range(groups = {addShopValidate.class, updateShopValidate.class},min=0,max=9,message="请选择正确的朝向")
-	private Integer orientation;
+	@ApiModelProperty(value = "房屋朝向1.东.2.西 3.南 4.北. 4.东南 5. 东北 6.西北 7.西南")
+//	@Range(groups = {addShopValidate.class, updateShopValidate.class}, min = BusinessEnum.HouseDirectionEnum.min, max = BusinessEnum.HouseDirectionEnum.max, message = "房屋朝向未选择正确!可用范围：1.东 2.西 3.南 4.北. 4.东南 5.北 6.西北 7.西南")
+//	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "房屋朝向未选择!")
+	private String orientation;
 	
 	@ApiModelProperty(value = "电梯   0无 1有")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "是否有电梯不能为空")

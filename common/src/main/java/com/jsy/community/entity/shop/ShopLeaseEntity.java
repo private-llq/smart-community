@@ -64,7 +64,7 @@ public class ShopLeaseEntity extends BaseEntity {
     private Integer floorCount;
 
     @ApiModelProperty(value = "朝向   0东 1南 2西 3 北 4东南 5 东北 6 西南 7 西北 8 南北 9东西")
-    private Integer orientation;
+    private String orientation;
 
     @ApiModelProperty(value = "电梯   0无 1有")
     private Integer lift;

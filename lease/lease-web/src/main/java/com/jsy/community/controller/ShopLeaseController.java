@@ -14,12 +14,14 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.shop.IndexShopVO;
+import com.jsy.community.vo.shop.ShopDetailLeaseVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -136,14 +138,23 @@ public class ShopLeaseController {
 	@GetMapping("/getShop")
 	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
-		Map<String, Object> map = shopLeaseService.getShop(shopId);
+		System.out.println(11);
+		Map<String, Object> map = null;
+		try {
+			map = shopLeaseService.getShop(shopId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		if (map == null) {
 			return CommonResult.ok(null);
 		}
 		
 		// 当月租金大于10000变成XX.XX万元
 		ShopLeaseVO shop = (ShopLeaseVO) map.get("shop");
-		BigDecimal monthMoney = shop.getMonthMoney();
+		ShopDetailLeaseVO shopDetailLeaseVO = new ShopDetailLeaseVO();
+		BeanUtils.copyProperties(shop,shopDetailLeaseVO);
+		
+		BigDecimal monthMoney = shopDetailLeaseVO.getMonthMoney();
 		if (monthMoney.doubleValue() > 10000d) {
 			String s = String.format("%.2f", monthMoney.doubleValue() / 10000) + "万";
 			shop.setMonthMoneyString(s);
@@ -159,7 +170,7 @@ public class ShopLeaseController {
 		// 当月租金大于10000变成XX.XX万元
 		
 		// 当转让费大于10000变成XX.XX万元
-		BigDecimal transferMoney = shop.getTransaferMoney();
+		BigDecimal transferMoney = shopDetailLeaseVO.getTransaferMoney();
 		if (transferMoney.doubleValue() > 10000d) {
 			String s = String.format("%.2f", transferMoney.doubleValue() / 10000) + "万";
 			shop.setTransferMoneyString(s);
@@ -174,6 +185,44 @@ public class ShopLeaseController {
 		}
 		// 当转让费大于10000变成XX.XX万元
 		
+		// 封装数据
+		
+		Integer furnishingStyle = shop.getFurnishingStyle(); // 装修程度
+		if (furnishingStyle == 0) {
+			shopDetailLeaseVO.setFurnishingStyle("毛坯房");
+		} else if (furnishingStyle == 1) {
+			shopDetailLeaseVO.setFurnishingStyle("普通装修");
+		} else {
+			shopDetailLeaseVO.setFurnishingStyle("精装修");
+		}
+		
+		
+		Integer purpose = shop.getPurpose(); // 用途
+		if (purpose == 0) {
+			shopDetailLeaseVO.setPurpose("普通住宅");
+		} else {
+			shopDetailLeaseVO.setPurpose("商业住宅");
+		}
+		
+		Integer lift = shop.getLift(); // 电梯
+		if (lift == 0) {
+			shopDetailLeaseVO.setLift("有");
+		} else {
+			shopDetailLeaseVO.setLift("无");
+		}
+		
+		Integer ownership = shop.getOwnership(); // 权属
+		if (ownership==0) {
+			shopDetailLeaseVO.setOwnership("商品房");
+		} else if (ownership == 1) {
+			shopDetailLeaseVO.setOwnership("学区房");
+		} else {
+			shopDetailLeaseVO.setOwnership("家住房");
+		}
+		
+		
+		// 封装数据
+		map.put("shop",shopDetailLeaseVO);
 		return CommonResult.ok(map);
 	}
 	
