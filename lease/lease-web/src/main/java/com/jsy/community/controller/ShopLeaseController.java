@@ -158,8 +158,22 @@ public class ShopLeaseController {
 		}
 		// 当月租金大于10000变成XX.XX万元
 		
-		// 将标签合并成一个  前端需要
-		ShopLeaseVO shopVO = (ShopLeaseVO) map.get("shop");
+		// 当转让费大于10000变成XX.XX万元
+		BigDecimal transferMoney = shop.getTransaferMoney();
+		if (transferMoney.doubleValue() > 10000d) {
+			String s = String.format("%.2f", transferMoney.doubleValue() / 10000) + "万";
+			shop.setTransferMoneyString(s);
+		} else if (transferMoney.compareTo(new BigDecimal(0.00)) == 0) {
+			String s = "面议";
+			shop.setTransferMoneyString(s);
+		} else {
+			String s = "" + shop.getMonthMoney();
+			int i = s.lastIndexOf(".");
+			String substring = s.substring(0, i) + "元";
+			shop.setTransferMoneyString(substring);
+		}
+		// 当转让费大于10000变成XX.XX万元
+		
 		return CommonResult.ok(map);
 	}
 	

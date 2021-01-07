@@ -403,8 +403,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			
 			// 分页
-			Page<ShopLeaseEntity> shopLeaseEntityPage = shopLeaseMapper.selectPage(page, wrapper);
-			List<ShopLeaseEntity> records = shopLeaseEntityPage.getRecords();
+			shopLeaseMapper.selectPage(page, wrapper);
 			return commonCode(page, shopVOS);
 		}
 		

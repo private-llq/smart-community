@@ -140,6 +140,8 @@ public class ShopLeaseVO implements Serializable {
 	@ApiModelProperty(value = "月租金  字符串形式")
 	private String monthMoneyString;
 	
+	@ApiModelProperty(value = "转让费  字符串形式")
+	private String transferMoneyString;
 	/**
 	 * 添加店铺接口
 	 */
