@@ -62,26 +62,6 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	boolean changeMobile(String newMobile,String uid);
 	
 	/**
-	 * 获取三方平台登录信息
-	 */
-	List<ThirdPlatformVo> getThirdPlatformInfo();
-	
-	/**
-	 * 登录
-	 *
-	 * @param oauthType 平台名
-	 */
-	String thirdPlatformLogin(String oauthType);
-	
-	/**
-	 * 请求三方登录
-	 *
-	 * @param oauthType 登录名
-	 * @param callback  回调
-	 */
-	Object thirdPlatformLoginCallback(String oauthType, ThirdPlatformQo callback);
-
-	/**
 	 * 通过用户ID 查询用户手机号码
 	 * @param id 	用户id
 	 * @return		返回消息实体

@@ -68,10 +68,11 @@
 <!--		</dependency>-->
 
 		<!-- 三方登录 -->
-		<dependency>
-			<groupId>com.xkcoding</groupId>
-			<artifactId>justauth-spring-boot-starter</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>me.zhyd.oauth</groupId>-->
+<!--			<artifactId>JustAuth</artifactId>-->
+<!--			<version>1.15.9</version>-->
+<!--		</dependency>-->
 
 		<!-- 坐标测距 -->
 		<dependency>

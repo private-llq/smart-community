@@ -200,31 +200,4 @@ public class UserAuthController {
 	
 	////////////////////////////////////////////////三方登录//////////////////////////////////////////////////////////////
 	
-	/**
-	 * 登录类型
-	 */
-	@GetMapping("/login/type")
-	@ApiOperation("获取三方登录列表")
-	public CommonResult<List<ThirdPlatformVo>> getLoginType() {
-		List<ThirdPlatformVo> list = userAuthService.getThirdPlatformInfo();
-		return CommonResult.ok(list);
-	}
-	
-	
-	/**
-	 * 登录类型
-	 */
-	@GetMapping("/login/{oauthType}")
-	@ApiOperation("三方登录")
-	public CommonResult<String> thirdPlatformLogin(@PathVariable String oauthType) {
-		String url = userAuthService.thirdPlatformLogin(oauthType);
-		return CommonResult.ok(url);
-	}
-	
-	@GetMapping("/login/{oauthType}/callback")
-	@ApiOperation("三方登录回调")
-	public CommonResult<Object> thirdPlatformLoginCallback(@PathVariable String oauthType, @RequestBody ThirdPlatformQo callback) {
-		Object obj = userAuthService.thirdPlatformLoginCallback(oauthType, callback);
-		return CommonResult.ok(obj);
-	}
 }
