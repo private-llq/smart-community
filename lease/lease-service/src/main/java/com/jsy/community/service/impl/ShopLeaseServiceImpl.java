@@ -157,9 +157,12 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		List<String> shopBusinessNames = shopLeaseVo.getShopBusinessNames();
 		List<String> shopTypeNames = shopLeaseVo.getShopTypeNames();
 		ArrayList<String> list = new ArrayList<>();
-		shopBusinessNames.addAll(shopTypeNames);
-		list.addAll(shopBusinessNames);
-		shopLeaseVo.setTags(list);
+		// 将两个集合封装成一个集合
+		if (shopBusinessNames!=null) {
+			list.addAll(shopTypeNames);
+			list.addAll(shopBusinessNames);
+			shopLeaseVo.setTags(list);
+		}
 		
 		
 		// 查询店铺发布人的电话和头像
