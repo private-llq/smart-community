@@ -27,7 +27,7 @@ public class UserAccountRecordQO extends BaseEntity{
 	@NotNull(message = "请确定交易来源")
 	private Integer tradeFrom;
 	
-	@ApiModelProperty(value = "交易类型1.收入2.支出")
+	@ApiModelProperty(value = "交易类型1.支出2.收入")
 	@Range(min = 1,max = 2, message = "非法交易类型")
 	@NotNull(message = "请确定交易类型")
 	private Integer tradeType;
