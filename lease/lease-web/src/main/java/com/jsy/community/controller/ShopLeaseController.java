@@ -138,13 +138,7 @@ public class ShopLeaseController {
 	@GetMapping("/getShop")
 	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
-		System.out.println(11);
-		Map<String, Object> map = null;
-		try {
-			map = shopLeaseService.getShop(shopId);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		Map<String, Object> map = shopLeaseService.getShop(shopId);
 		if (map == null) {
 			return CommonResult.ok(null);
 		}
@@ -157,15 +151,15 @@ public class ShopLeaseController {
 		BigDecimal monthMoney = shopDetailLeaseVO.getMonthMoney();
 		if (monthMoney.doubleValue() > 10000d) {
 			String s = String.format("%.2f", monthMoney.doubleValue() / 10000) + "万";
-			shop.setMonthMoneyString(s);
+			shopDetailLeaseVO.setMonthMoneyString(s);
 		} else if (monthMoney.compareTo(new BigDecimal(0.00)) == 0) {
 			String s = "面议";
-			shop.setMonthMoneyString(s);
+			shopDetailLeaseVO.setMonthMoneyString(s);
 		} else {
 			String s = "" + shop.getMonthMoney();
 			int i = s.lastIndexOf(".");
 			String substring = s.substring(0, i) + "元";
-			shop.setMonthMoneyString(substring);
+			shopDetailLeaseVO.setMonthMoneyString(substring);
 		}
 		// 当月租金大于10000变成XX.XX万元
 		
@@ -173,15 +167,15 @@ public class ShopLeaseController {
 		BigDecimal transferMoney = shopDetailLeaseVO.getTransaferMoney();
 		if (transferMoney.doubleValue() > 10000d) {
 			String s = String.format("%.2f", transferMoney.doubleValue() / 10000) + "万";
-			shop.setTransferMoneyString(s);
+			shopDetailLeaseVO.setTransferMoneyString(s);
 		} else if (transferMoney.compareTo(new BigDecimal(0.00)) == 0) {
 			String s = "面议";
-			shop.setTransferMoneyString(s);
+			shopDetailLeaseVO.setTransferMoneyString(s);
 		} else {
 			String s = "" + shop.getMonthMoney();
 			int i = s.lastIndexOf(".");
 			String substring = s.substring(0, i) + "元";
-			shop.setTransferMoneyString(substring);
+			shopDetailLeaseVO.setTransferMoneyString(substring);
 		}
 		// 当转让费大于10000变成XX.XX万元
 		

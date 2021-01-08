@@ -78,8 +78,8 @@ public class ShopLeaseVO implements Serializable {
 	private Integer floorCount;
 	
 	@ApiModelProperty(value = "房屋朝向1.东.2.西 3.南 4.北. 4.东南 5. 东北 6.西北 7.西南")
-//	@Range(groups = {addShopValidate.class, updateShopValidate.class}, min = BusinessEnum.HouseDirectionEnum.min, max = BusinessEnum.HouseDirectionEnum.max, message = "房屋朝向未选择正确!可用范围：1.东 2.西 3.南 4.北. 4.东南 5.北 6.西北 7.西南")
-//	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "房屋朝向未选择!")
+	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "房屋朝向未选择!")
+	@Pattern(groups = {addShopValidate.class, updateShopValidate.class},regexp = "^[东|南|西|北]{1,2}",message = "请选择正确的朝向")
 	private String orientation;
 	
 	@ApiModelProperty(value = "电梯   0无 1有")
@@ -108,19 +108,8 @@ public class ShopLeaseVO implements Serializable {
 	private Integer ownership;
 	
 	@ApiModelProperty(value = "图片地址集合")
+	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "请至少上传一张图片")
 	private String[] imgPath;
-	
-	@ApiModelProperty(value = "商铺类型id集合")
-	private Long[] shopTypeIds;
-	
-	@ApiModelProperty(value = "商铺类型名称集合")
-	private List<String> shopTypeNames;
-	
-	@ApiModelProperty(value = "商铺行业id集合")
-	private Long[] shopBusinessIds;
-	
-	@ApiModelProperty(value = "商铺行业名称集合")
-	private List<String> shopBusinessNames;
 	
 	@ApiModelProperty(value = "经度")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "经度不能为空")
@@ -130,12 +119,30 @@ public class ShopLeaseVO implements Serializable {
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "纬度不能为空")
 	private BigDecimal lat;
 	
-	@ApiModelProperty(value = "来源 0个人 1业主 2不限")
-	private Integer source;
-	
 	@ApiModelProperty(value = "店铺地址")
 	@NotBlank(groups = {addShopValidate.class, updateShopValidate.class}, message = "店铺地址不能为空")
 	private String address;
+	
+	
+	
+	
+	
+	@ApiModelProperty(value = "商铺类型id集合")
+	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "请至少选择一个类型")
+	private Long[] shopTypeIds;
+	
+	@ApiModelProperty(value = "商铺类型名称集合")
+	private List<String> shopTypeNames;
+	
+	@ApiModelProperty(value = "商铺行业id集合")
+	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "请至少选择一个行业")
+	private Long[] shopBusinessIds;
+	
+	@ApiModelProperty(value = "商铺行业名称集合")
+	private List<String> shopBusinessNames;
+	
+	@ApiModelProperty(value = "来源 0个人 1业主 2不限")
+	private Integer source;
 	
 	@ApiModelProperty(value = "月租金  字符串形式")
 	private String monthMoneyString;
