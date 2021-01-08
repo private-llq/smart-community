@@ -36,9 +36,11 @@ public class AppMenuEntity extends BaseEntity {
     private String menuName;
 
     @ApiModelProperty(value = "黑夜图标地址")
+    @NotBlank(groups = {addAdmin.class,updateAdmin.class},message = "黑夜图标不能为空")
     private String nightIcon;
     
     @ApiModelProperty(value = "白天图标地址")
+    @NotBlank(groups = {addAdmin.class,updateAdmin.class},message = "白天图标不能为空")
     private String daytimeIcon;
     
     @ApiModelProperty(value = "路径地址")
@@ -46,6 +48,9 @@ public class AppMenuEntity extends BaseEntity {
 
     @ApiModelProperty(value = "描述信息")
     private String descr;
+    
+    @ApiModelProperty(value = "是否展示在首页 0 展示 1 不展示")
+    private Integer status;
     
     public interface addAdmin{}
     

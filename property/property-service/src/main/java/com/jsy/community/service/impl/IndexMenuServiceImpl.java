@@ -225,11 +225,13 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("parent_id", 0);
 		List<AppMenuEntity> list = appMenuMapper.selectList(queryWrapper);
+		List<String> strings = new ArrayList<>(); // 用于存储父菜单名
 		for (AppMenuEntity menuEntity : list) {
-			if (!menuEntity.getMenuName().equals(indexMenuEntity.getMenuName()) ||
-				!menuEntity.getPath().equals(indexMenuEntity.getPath())) {
-				throw new PropertyException("您添加的菜单不是父菜单");
-			}
+			String menuName = menuEntity.getMenuName();
+			strings.add(menuName);
+		}
+		if (!strings.contains(appMenuEntity.getMenuName())||appMenuEntity.getParentId()!=0) {
+			throw new PropertyException("您添加的不是父菜单");
 		}
 		BeanUtils.copyProperties(appMenuEntity, indexMenuEntity);
 		indexMenuEntity.setId(SnowFlake.nextId());
@@ -240,10 +242,23 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 	@Override
 	public void addChildMenu(AppMenuEntity appMenuEntity) {
 		IndexMenuEntity entity = new IndexMenuEntity();
+		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.ne("parent_id", 0);
+		List<AppMenuEntity> list = appMenuMapper.selectList(queryWrapper);
+		List<String> strings = new ArrayList<>(); // 用于存储子菜单名
+		List<String> stringList = new ArrayList<>();// 用于存储子菜单跳转路径
+		for (AppMenuEntity menuEntity : list) {
+			String path = menuEntity.getPath();
+			stringList.add(path);
+			String menuName = menuEntity.getMenuName();
+			strings.add(menuName);
+		}
+		if (!strings.contains(appMenuEntity.getMenuName())||!stringList.contains(appMenuEntity.getPath())||appMenuEntity.getParentId()==0) {
+			throw new PropertyException("您添加的不是子菜单");
+		}
 		BeanUtils.copyProperties(appMenuEntity, entity);
 		entity.setId(SnowFlake.nextId());
 		indexMenuMapper.insert(entity);
-		
 	}
 	
 	@Override
