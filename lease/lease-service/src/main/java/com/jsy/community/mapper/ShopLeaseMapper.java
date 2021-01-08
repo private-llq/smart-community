@@ -22,7 +22,7 @@ public interface ShopLeaseMapper extends BaseMapper<ShopLeaseEntity> {
 	@Select("select house_const_id from t_shop_const where shop_lease_id = #{shopId}")
 	Long[] selectTags(Long shopId);
 	
-	void deleteTags(@Param("tagIds") Long[] both);
+	void deleteTags(@Param("shopId") Long shopId);
 	
 	/**
 	 * @return java.lang.Long[]

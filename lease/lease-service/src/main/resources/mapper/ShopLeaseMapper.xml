@@ -9,10 +9,7 @@
     </insert>
 
     <delete id="deleteTags">
-        delete from t_shop_const where house_const_id in
-        <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
-            #{tagId}
-        </foreach>
+        delete from t_shop_const where shop_lease_id  = #{shopId}
     </delete>
 
     <select id="selectMiddle" resultType="long">

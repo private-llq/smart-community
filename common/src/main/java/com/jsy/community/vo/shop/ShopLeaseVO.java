@@ -124,19 +124,18 @@ public class ShopLeaseVO implements Serializable {
 	private String address;
 	
 	
-	
-	
-	
 	@ApiModelProperty(value = "商铺类型id集合")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "请至少选择一个类型")
 	private Long[] shopTypeIds;
 	
-	@ApiModelProperty(value = "商铺类型名称集合")
-	private List<String> shopTypeNames;
-	
 	@ApiModelProperty(value = "商铺行业id集合")
 	@NotNull(groups = {addShopValidate.class, updateShopValidate.class}, message = "请至少选择一个行业")
 	private Long[] shopBusinessIds;
+	
+	
+	
+	@ApiModelProperty(value = "商铺类型名称集合")
+	private List<String> shopTypeNames;
 	
 	@ApiModelProperty(value = "商铺行业名称集合")
 	private List<String> shopBusinessNames;

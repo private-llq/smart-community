@@ -117,7 +117,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		wrapper.eq("id", shopId);
 		ShopLeaseEntity shop = shopLeaseMapper.selectOne(wrapper);
 		
-		if (shop==null) {
+		if (shop == null) {
 			return null;
 		}
 		ShopLeaseVO shopLeaseVo = new ShopLeaseVO();
@@ -206,10 +206,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			shopImgMapper.insertImg(imgList); // 添加图片信息
 		}
 		
-		Long[] tags = shopLeaseMapper.selectTags(shopId);
-		if (tags != null && tags.length > 0) {
-			shopLeaseMapper.deleteTags(tags); // 查询出该店铺原本有的标签并删除
-		}
+		shopLeaseMapper.deleteTags(shopId); // 将原本有的标签并删除
 		
 		if (shop.getShopTypeIds() != null && shop.getShopTypeIds().length > 0) {
 			shopLeaseMapper.insertMiddle(shopId, shop.getShopTypeIds()); // 添加标签
@@ -238,10 +235,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			shopImgMapper.deleteBatchIds(longs); // 删除图片信息
 		}
 		
-		Long[] tags = shopLeaseMapper.selectTags(shopId);
-		if (tags != null && tags.length > 0) {
-			shopLeaseMapper.deleteTags(tags); // 查询出该店铺原本有的标签并删除
-		}
+		shopLeaseMapper.deleteTags(shopId); // 将原本有的标签并删除
 	}
 	
 	@Override
@@ -356,7 +350,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			if (sourceId != null && sourceId != 3) {
 				wrapper.eq("source", sourceId);
 			}
-
+			
 			// 类型
 			List<Long> shopTypeIds = houseQO.getShopTypeIds();
 			if (!CollectionUtils.isEmpty(shopTypeIds)) {
