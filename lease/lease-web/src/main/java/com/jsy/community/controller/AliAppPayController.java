@@ -19,6 +19,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +41,7 @@ public class AliAppPayController {
 	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
 	private AiliAppPayRecordService ailiAppPayRecordService;
 	
-	/*下单*/
+	@ApiOperation("下单")
 	@PostMapping("getOrderStr")
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
 		String sysType = req.getHeader("sysType");
@@ -55,7 +56,7 @@ public class AliAppPayController {
 		aliAppPayQO.setTotalAmount(aliAppPayQO.getTotalAmount().abs());
 		String orderNo = String.valueOf(SnowFlake.nextId());
 		aliAppPayQO.setOutTradeNo(orderNo);
-		aliAppPayQO.setSubject(PaymentEnum.TradeNameEnum.RENT_PAYMENT.getName());
+		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.TRADE_FROM_RENT.getName());
 		//TODO 测试金额 0.01
 		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
 		String orderStr = aliAppPayService.getOrderStr(aliAppPayQO);
@@ -66,8 +67,8 @@ public class AliAppPayController {
 			String uid = UserUtils.getUserId();
 			ailiAppPayRecordEntity.setUserid(uid);
 			ailiAppPayRecordEntity.setTradeAmount(aliAppPayQO.getTotalAmount());
-			ailiAppPayRecordEntity.setTradeName(PaymentEnum.TradeNameEnum.RENT_PAYMENT.getIndex());
-			ailiAppPayRecordEntity.setTradeType(PaymentEnum.TradeTypeEnum.PAYMENT.getIndex());
+			ailiAppPayRecordEntity.setTradeName(PaymentEnum.TradeFromEnum.TRADE_FROM_RENT.getIndex());
+			ailiAppPayRecordEntity.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex());
 			ailiAppPayRecordEntity.setTradeStatus(PaymentEnum.TradeStatusEnum.ORDER_PLACED.getIndex());
 			ailiAppPayRecordEntity.setSysType(Integer.valueOf(sysType));
 			createResult = ailiAppPayRecordService.createAliAppPayRecord(ailiAppPayRecordEntity);

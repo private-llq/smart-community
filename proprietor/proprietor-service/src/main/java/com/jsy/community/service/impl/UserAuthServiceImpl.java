@@ -3,7 +3,6 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,19 +13,11 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
-import com.jsy.community.qo.ThirdPlatformQo;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
-import com.jsy.community.vo.ThirdPlatformVo;
-//import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
-//import me.zhyd.oauth.config.AuthSource;
-//import me.zhyd.oauth.model.AuthCallback;
-//import me.zhyd.oauth.model.AuthResponse;
-//import me.zhyd.oauth.request.AuthRequest;
-//import me.zhyd.oauth.utils.AuthStateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -41,9 +32,7 @@ import java.util.List;
 @Slf4j
 @RefreshScope
 public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEntity> implements IUserAuthService {
-//	@Resource
-//	private AuthRequestFactory factory;
-	
+
 //	@Resource
 //	private RedisLockRegistry redisLockRegistry;
 	

@@ -57,7 +57,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
-
+    
+    @Autowired
+    private IUserAccountService userAccountService;
 
     @Resource
     private UserMapper userMapper;
@@ -112,6 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return userInfoVo;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public String register(RegisterQO qo) {
         commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
@@ -139,6 +142,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         save(user);
         //添加账户(user_auth表)
         userAuthService.save(userAuth);
+        //创建金钱账户
+        userAccountService.createUserAccount(uuid);
         return uuid;
     }
 

@@ -23,14 +23,14 @@ import com.alibaba.fastjson.JSONObject;
 @Slf4j
 @ApiJSYController
 @RestController
-@RequestMapping("callBack/alipay")
+@RequestMapping("callBack")
 public class AliAppPayCallbackController {
 	
 	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
 	private AliAppPayCallbackService aliAppPayCallbackService;
 	
 //	@CrossOrigin
-	@PostMapping("test")
+	@PostMapping("pay")
 	@Transactional(rollbackFor=Exception.class,timeout=3)
 	public String test(HttpServletRequest req){
 		Map<String, String> paramsMap = new HashMap<>();

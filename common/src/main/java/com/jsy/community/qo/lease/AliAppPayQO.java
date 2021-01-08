@@ -6,6 +6,11 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+/**
+* @Description: 支付宝接参
+ * @Author: chq459799974
+ * @Date: 2021/1/8
+**/
 @Data
 public class AliAppPayQO implements Serializable {
 	

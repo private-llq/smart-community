@@ -174,7 +174,7 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 			throw new LeaseException("支付初始化出错");
 		}
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-		request.setNotifyUrl("http://xxxxxxxx:8001/alipayCallBack/test");
+		request.setNotifyUrl("http://xxxxxxxxxxxxx:8001/callBack/pay");
 		request.setBizContent("{" +
 //		"\"timeout_express\":\"90m\"," +
 		"\"total_amount\":"+"\""+ aliAppPayQO.getTotalAmount()+"\""+","+
@@ -270,12 +270,12 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	//处理回调订单
 	public void dealOrder(AiliAppPayRecordEntity order){
 		logger.error("开始处理订单：" + order.getOrderNo());
-		if(PaymentEnum.TradeNameEnum.RENT_PAYMENT.getIndex().equals(order.getTradeType())){  // 充值
+		if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex().equals(order.getTradeType())){  // 充值
 			logger.error("开始处理充值订单");
 			//支付订单修改状态完成
 			boolean completeAliAppPayRecord = ailiAppPayRecordServiceImpl.completeAliAppPayRecord(order.getOrderNo());
 			logger.error("订单状态修改完成" + completeAliAppPayRecord + "订单号：" + order.getOrderNo());
-		}else if(PaymentEnum.TradeNameEnum.RENT_WITHDRAWAL.getIndex().equals(order.getTradeType())){  // 提现
+		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(order.getTradeType())){  // 提现
 			logger.error("开始处理提现订单");
 			logger.error("提现订单处理完成");
 		}
