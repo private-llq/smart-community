@@ -5,14 +5,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityInformService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CommunityInformEntity;
+import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.mapper.CommunityInformMapper;
 import com.jsy.community.mapper.UserInformMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.CommunityInformQO;
+import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,7 @@ import java.util.List;
  */
 @Service
 @DubboService(version = Const.version, group = Const.group)
-public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMapper, CommunityInformEntity> implements ICommunityInformService {
+public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMapper, PushInformEntity> implements ICommunityInformService {
 
     @Resource
     private CommunityInformMapper communityInformMapper;
@@ -41,44 +42,30 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
     private UserInformMapper userInformMapper;
 
     /**
-     * 查询社区消息
-     * @param communityEntity  参数实体
+     * 列表查询社区消息
+     * @param qo               查询参数对象
      * @return                 返回查询结果
      */
+    @Transactional
     @Override
-    public List<CommunityInformEntity> queryCommunityInform(BaseQO<CommunityInformEntity> communityEntity) {
-
-        QueryWrapper<CommunityInformEntity>  queryWrapper = new QueryWrapper<>();
-        CommunityInformEntity query = communityEntity.getQuery();
-        Page<CommunityInformEntity> objectPage = new Page<>(communityEntity.getPage(), communityEntity.getSize());
-        queryWrapper.select("id,create_time,community_id,state,title,sub_title");
-        queryWrapper.eq("enabled",1);
-        queryWrapper.eq("community_id", query.getCommunityId());
+    public List<PushInformEntity> queryCommunityInform(BaseQO<PushInformQO> qo) {
+        //1.查出推送号列表基本列表数据
+        QueryWrapper<PushInformEntity>  queryWrapper = new QueryWrapper<>();
+        PushInformQO query = qo.getQuery();
+        Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
+        queryWrapper.select("id,acct_id,create_time,push_title,push_sub_title");
+        queryWrapper.eq("acct_id", query.getAcctId());
         queryWrapper.last("ORDER BY create_time desc");
-        Page<CommunityInformEntity> communityInformEntityPage = communityInformMapper.selectPage(objectPage, queryWrapper);
-
-        //使用 communityInformEntityPage.getRecords().get(records.size() - 1).getCreateTime() 最后一个元素的时间 去作为条件查询当前社区用户已读信息，避免查询量过大的问题
-        List<CommunityInformEntity> records = communityInformEntityPage.getRecords();
-
-        if ( records == null || records.isEmpty() ){
-            return null;
+        //2.把当前推送号该用户所有未读数据标识为已读 的数据查出
+        List<Long> unreadInformIds = communityInformMapper.selectUnreadInformId(query.getAcctId(), query.getUid());
+        //3.未读消息ID添加至 t_user_inform 标识 消息已读
+        if( unreadInformIds != null && !unreadInformIds.isEmpty() ){
+            communityInformMapper.insertBatchReadInform(unreadInformIds, query.getAcctId(), query.getUid());
         }
-
-        LocalDateTime createTime =records.get(records.size() - 1).getCreateTime();
-        //集合中最后一个 元素的时间字符串
-        String dateTimeAsString = getDateTimeAsString(createTime);
-
-        //使用当前用户查询该用户在当前社区已读信息
-        List<Long> integerList = userInformMapper.queryUserReadCommunityInform(query.getCommunityId(), query.getUid(), dateTimeAsString);
-
-        //标识用户已读的数据
-        for(CommunityInformEntity communityInformEntity : records){
-            if(integerList.contains(communityInformEntity.getId())){
-                communityInformEntity.setRead(true);
-            }
-        }
-        return records;
+        return communityInformMapper.selectPage(objectPage, queryWrapper).getRecords();
     }
+
+
 
     private String getDateTimeAsString(LocalDateTime localDateTime) {
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -86,39 +73,8 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
     }
 
 
-    /**
-     * 添加社区消息
-     * @param communityInformEntity    接收社区消息参数的实体
-     */
-    @Override
-    public void addCommunityInform(CommunityInformEntity communityInformEntity){
-            communityInformEntity.setId(SnowFlake.nextId());
-        communityInformMapper.insert(communityInformEntity);
-    }
 
-    /**
-     * 修改社区消息
-     * @param communityInformQO 参数实体
-     * @return                 返回是否修改成功
-     */
-    @Override
-    public Boolean updateCommunityInform(CommunityInformQO communityInformQO) {
-        return communityInformMapper.updateCommunityInform(communityInformQO) > 0;
-    }
 
-    /**
-     *
-     * 逻辑删除 社区消息
-     * @param id    社区消息id
-     * @return      返回删除成功
-     */
-    @Transactional
-    @Override
-    public Boolean delCommunityInform(Long id) {
-        //物理删除：删除该条社区消息之前 先删除 所有用户已读消息记录
-        userInformMapper.delUserReadInform(id);
-        return communityInformMapper.deleteById(id) > 0;
-    }
 
 
     /**
@@ -127,44 +83,36 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      * @return                       返回消息列表
      */
     @Override
-    public List<CommunityInformEntity> rotationCommunityInform(Integer initialInformCount , Long communityId) {
+    public List<PushInformEntity> rotationCommunityInform(Integer initialInformCount , Long communityId) {
         return communityInformMapper.rotationCommunityInform(initialInformCount, communityId);
     }
 
     /**
-     *  用户社区消息详情查看
+     * 社区推送消息详情查看
+     * @param acctId        推送账号id、可能是社区ID 可能是系统消息ID 可能是其他第三方推送号ID
+     * @param informId      推送消息ID
+     * @param userId        用户ID
+     * @return              返回这条推送消息的详情
      */
     @Transactional
     @Override
-    public CommunityInformEntity detailsCommunityInform(Long communityId, Long informId , String userId) {
+    public PushInformEntity detailsCommunityInform(Long acctId, Long informId , String userId) {
         //根据社区id和消息id查出消息
-        QueryWrapper<CommunityInformEntity> wrapper = new QueryWrapper<>();
-        wrapper.select("title,create_time,update_time,browse_count,content,state");
-        wrapper.eq("community_id", communityId);
+        QueryWrapper<PushInformEntity> wrapper = new QueryWrapper<>();
+        wrapper.select("push_title,create_time,browse_count,push_msg");
         wrapper.eq("id", informId);
-        CommunityInformEntity communityInformEntity = communityInformMapper.selectOne(wrapper);
+        wrapper.eq("acct_id",acctId);
+        PushInformEntity informEntity = communityInformMapper.selectOne(wrapper);
         //标识用户已读该社区消息
         UserInformEntity userInformEntity = new UserInformEntity();
         userInformEntity.setId(SnowFlake.nextId());
-        userInformEntity.setCommunityId(communityId);
+        userInformEntity.setAcctId(acctId);
         userInformEntity.setInformId(informId);
-        userInformEntity.setInformStatus(1);
         userInformEntity.setUid(userId);
-        userInformEntity.setSysInform(0);
         userInformMapper.setInformReadByUser(userInformEntity);
-        //社区该消息的浏览量+1
-        communityInformMapper.updateCommunityInformBrowseCount(communityId, informId);
-        return communityInformEntity;
-    }
-
-    /**
-     * 验证社区消息是否存在
-     * @author YuLF
-     * @since  2020/12/21 17:02
-     */
-    @Override
-    public boolean informExist(Long communityId, Long informId) {
-        return communityInformMapper.informExist(communityId, informId);
+        //该推送消息的浏览量+1
+        communityInformMapper.updatePushInformBrowseCount(acctId, informId);
+        return informEntity;
     }
 
 

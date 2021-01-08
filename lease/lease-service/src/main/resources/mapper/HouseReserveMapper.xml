@@ -95,7 +95,7 @@
             reserve_status = 2
         </set>
         <where>
-            id = #{qo.id}
+            id = #{qo.id} and reserve_status = 1
         </where>
     </update>
 </mapper>

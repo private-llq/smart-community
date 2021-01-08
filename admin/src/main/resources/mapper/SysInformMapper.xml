@@ -3,33 +3,30 @@
  
 <mapper namespace="com.jsy.community.mapper.SysInformMapper">
 
-	<select id="query" resultType="com.jsy.community.entity.sys.SysInformEntity">
+	<select id="query" resultType="com.jsy.community.entity.PushInformEntity">
 		SELECT
 			id,
-			title,
-			sub_title,
-			content,
-			enabled,
+			push_title,
+			push_sub_title,
+			push_msg,
 			browse_count,
 			create_time
 		FROM
-			t_sys_inform
+			t_acct_push_inform
 		where
 		<trim prefixOverrides="and">
-			<if test="query.title != null and query.title != &quot;&quot;">
-				title like concat('%',#{query.title},'%')
+			<if test="query.pushTitle != null and query.pushTitle != &quot;&quot;">
+				push_title like concat('%',#{query.pushTitle},'%')
 			</if>
-			<if test="query.subTitle != null and query.subTitle != &quot;&quot;">
-				and sub_title like concat('%',#{query.subTitle},'%')
+			<if test="query.pushSubTitle != null and query.pushSubTitle != &quot;&quot;">
+				and push_sub_title like concat('%',#{query.pushSubTitle},'%')
 			</if>
-			<if test="query.content != null and query.content != &quot;&quot;">
-				and content like concat('%',#{query.content},'%')
-			</if>
-			<if test="query.enabled != null">
-				and enabled = #{query.enabled}
+			<if test="query.pushMsg != null and query.pushMsg != &quot;&quot;">
+				and push_msg like concat('%',#{query.pushMsg},'%')
 			</if>
 			and deleted = 0
 		</trim>
+		and acct_id = #{query.id}
 		ORDER BY
 			create_time DESC
 			LIMIT #{page},

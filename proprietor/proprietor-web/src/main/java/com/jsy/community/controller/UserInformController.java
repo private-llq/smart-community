@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserInformService;
@@ -14,7 +13,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.CommunityVO;
+import com.jsy.community.vo.InformListVO;
 import com.jsy.community.vo.sys.SysInformVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,40 +53,16 @@ public class UserInformController {
     /**
      * @author YuLF
      * @since  2020/12/21 14:52
+     * 用户社区总消息列表、
+     * 拉取用户总消息列表
      */
     @Login
     @PostMapping("/totalList")
     @ApiOperation("用户社区总未读消息列表查看")
-    public CommonResult<List<CommunityVO>> totalCommunityInformList(@RequestBody BaseQO<?> baseQO){
-        ValidatorUtils.validatePageParam(baseQO);
-        List<CommunityVO> list = userInformService.totalCommunityInformList(UserUtils.getUserId(), baseQO.getPage() , baseQO.getSize());
-        return CommonResult.ok(list);
+    public CommonResult<List<InformListVO>> totalCommunityInformList(){
+        return CommonResult.ok(userInformService.totalCommunityInformList(UserUtils.getUserId()));
     }
 
-    /**
-     * @author YuLF
-     * @since  2020/12/21 14:52
-     */
-    @Login
-    @GetMapping("/sys/details")
-    @ApiOperation("用户系统消息详情查看")
-    public CommonResult<SysInformEntity> totalSysInformList(@RequestParam Long informId){
-        //根据id验证系统消息是否存在
-        if(!userInformService.sysInformExist(informId)){
-            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "系统消息不存在!");
-        }
-        return CommonResult.ok(userInformService.totalSysInformList(informId, UserUtils.getUserId()));
-    }
 
-    @Login
-    @GetMapping("/sys/list")
-    @ApiOperation("系统消息主页列表")
-    public CommonResult<List<SysInformVO>> userSysInformList(@RequestParam Long page, @RequestParam Long size){
-        BaseQO<SysInformVO> baseQO = new BaseQO<>();
-        baseQO.setPage(page);
-        baseQO.setSize(size);
-        ValidatorUtils.validatePageParam(baseQO);
-        return CommonResult.ok(userInformService.userSysInformList(baseQO, UserUtils.getUserId()));
-    }
 
 }

@@ -1,11 +1,11 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.entity.sys.SysInformEntity;
+import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.sys.SysInformQO;
+import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.service.ISysInformService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,20 +38,18 @@ public class SysInformController {
     }
 
 
+    @Value("${jsy.sys.inform-id}")
+    private Long sysInformId;
+
+
     @Login
     @ApiOperation("系统消息新增")
     @PostMapping()
-    public CommonResult<Boolean> add(@RequestBody SysInformQO sysInformQO){
-        ValidatorUtils.validateEntity(sysInformQO, SysInformQO.addSysInformValidate.class);
-        return iSysInformService.add(sysInformQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    public CommonResult<Boolean> add( @RequestBody PushInformQO qo){
+        ValidatorUtils.validateEntity(qo, PushInformQO.addPushInformValidate.class);
+        return iSysInformService.add(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
-    @Login
-    @ApiOperation("系统消息修改")
-    @PutMapping()
-    public CommonResult<Boolean> update(@RequestBody SysInformQO sysInformQO, Long informId){
-        return iSysInformService.update(sysInformQO, informId) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
-    }
 
     @Login
     @ApiOperation("系统消息删除")
@@ -72,12 +71,13 @@ public class SysInformController {
 
     @Login
     @ApiOperation("系统消息列表")
-    @GetMapping()
-    public CommonResult<List<SysInformEntity>> query(@RequestBody BaseQO<SysInformQO> baseQO){
+    @PostMapping("/list")
+    public CommonResult<List<PushInformEntity>> query(@RequestBody BaseQO<PushInformQO> baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         if(baseQO.getQuery() == null){
-            throw new JSYException(JSYError.BAD_REQUEST);
+            baseQO.setQuery(new PushInformQO());
         }
+        baseQO.getQuery().setId(sysInformId);
         return CommonResult.ok(iSysInformService.query(baseQO));
     }
 

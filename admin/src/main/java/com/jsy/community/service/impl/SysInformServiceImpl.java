@@ -1,9 +1,11 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.entity.sys.SysInformEntity;
 import com.jsy.community.mapper.SysInformMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.qo.sys.SysInformQO;
 import com.jsy.community.service.ISysInformService;
 import com.jsy.community.utils.SnowFlake;
@@ -22,27 +24,20 @@ import java.util.List;
  **/
 @Slf4j
 @Service
-public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, SysInformEntity> implements ISysInformService {
+public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInformEntity> implements ISysInformService {
 
 	@Resource
 	private SysInformMapper sysInformMapper;
 
 
 	@Override
-	public boolean add(SysInformQO sysInformQO) {
-		SysInformEntity sysInformEntity = new SysInformEntity();
+	public boolean add(PushInformQO sysInformQO) {
+		PushInformEntity sysInformEntity = PushInformEntity.getInstance();
 		BeanUtils.copyProperties(sysInformQO, sysInformEntity);
 		sysInformEntity.setId(SnowFlake.nextId());
 		return sysInformMapper.insert(sysInformEntity) > 0;
 	}
 
-	@Override
-	public boolean update(SysInformQO sysInformQO, Long informId) {
-		SysInformEntity sysInformEntity = new SysInformEntity();
-		BeanUtils.copyProperties(sysInformQO, sysInformEntity);
-		sysInformEntity.setId(informId);
-		return updateById(sysInformEntity);
-	}
 
 	@Override
 	public boolean delete(Long informId) {
@@ -50,7 +45,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, SysInform
 	}
 
 	@Override
-	public List<SysInformEntity> query(BaseQO<SysInformQO> baseQO) {
+	public List<PushInformEntity> query(BaseQO<PushInformQO> baseQO) {
 		baseQO.setPage((baseQO.getPage() - 1 ) * baseQO.getSize());
 		return sysInformMapper.query(baseQO);
 	}

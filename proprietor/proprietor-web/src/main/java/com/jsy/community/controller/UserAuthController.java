@@ -194,7 +194,7 @@ public class UserAuthController {
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
 	}
 	
-	//TODO 手机丢失更换新手机(旧手机不在线)
+	//TODO 待定-手机丢失更换新手机(旧手机不在线)
 	
 	
 	
