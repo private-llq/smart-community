@@ -2,6 +2,7 @@ package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,6 +11,8 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  * <p>
@@ -56,14 +59,16 @@ public class RepairEntity extends BaseEntity {
 
     @ApiModelProperty(value = "联系电话")
     @NotBlank(groups = {addRepairValidate.class},message = "请输入联系电话")
+    @Pattern(groups = {addRepairValidate.class},regexp = RegexUtils.REGEX_MOBILE,message = "您输入的联系电话不符合要求")
     private String phone;
 
     @ApiModelProperty(value = "报修内容")
-    @NotBlank(groups = {addRepairValidate.class},message = "请输入报修内容")
+    @NotBlank(groups = {addRepairValidate.class},message = "请描述您的报修内容")
+    @Size(groups = {addRepairValidate.class},max = 200,message = "报修内容只允许200字以内")
     private String problem;
 
     @ApiModelProperty(value = "图片地址")
-    @NotBlank(groups = {addRepairValidate.class},message = "请添加图片")
+    @NotBlank(groups = {addRepairValidate.class},message = "请添加图片,以供物业人员审核")
     private String repairImg;
     
     
@@ -71,7 +76,4 @@ public class RepairEntity extends BaseEntity {
     public interface addRepairValidate {
     }
     
-    public interface updateRepairValidate {
-    }
-
 }

@@ -180,7 +180,6 @@ public class ShopLeaseController {
 		// 当转让费大于10000变成XX.XX万元
 		
 		// 封装数据
-		
 		Integer furnishingStyle = shop.getFurnishingStyle(); // 装修程度
 		if (furnishingStyle == 0) {
 			shopDetailLeaseVO.setFurnishingStyle("毛坯房");
@@ -213,8 +212,6 @@ public class ShopLeaseController {
 		} else {
 			shopDetailLeaseVO.setOwnership("家住房");
 		}
-		
-		
 		// 封装数据
 		map.put("shop",shopDetailLeaseVO);
 		return CommonResult.ok(map);
