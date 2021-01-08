@@ -175,7 +175,7 @@ public class UserController {
      */
     @Login
     @ApiOperation("业主信息详情查询接口")
-    @PostMapping("details")
+    @GetMapping("details")
     public CommonResult<UserInfoVo> details() {
         UserInfoVo userInfoVo = userService.proprietorDetails(UserUtils.getUserId());
         return CommonResult.ok(userInfoVo);

@@ -2,8 +2,10 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityInformEntity;
+import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
+import com.jsy.community.qo.proprietor.PushInformQO;
 
 import java.util.List;
 
@@ -12,53 +14,36 @@ import java.util.List;
  * @author YuLF
  * @since 2020-11-16
  */
-public interface ICommunityInformService extends IService<CommunityInformEntity> {
+public interface ICommunityInformService extends IService<PushInformEntity> {
 
     /**
      * 分页查询社区消息服务提供接口
-     * @param communityEntity  参数实体对象
+     * @param qo                参数实体对象
      * @return                  返回查询分页结果
      */
-    List<CommunityInformEntity> queryCommunityInform(BaseQO<CommunityInformEntity> communityEntity);
+    List<PushInformEntity> queryCommunityInform(BaseQO<PushInformQO> qo);
 
-    /**
-     * 添加社区消息
-     * @param communityInformEntity  参数实体
-     */
-    void addCommunityInform(CommunityInformEntity communityInformEntity);
 
-    /**
-     * 更新社区消息
-     * @param communityInformQO     参数实体
-     * @return                      返回更新是否成功
-     */
-    Boolean updateCommunityInform(CommunityInformQO communityInformQO);
 
-    /**
-     * 根据id逻辑删除社区消息
-     * @param id            社区消息id
-     * @return              返回删除是否成功
-     */
-    Boolean delCommunityInform(Long id);
+
+
 
     /**
      * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量
      * @param initialInformCount     初始轮播消息条数
      * @return                       返回消息列表
      */
-    List<CommunityInformEntity> rotationCommunityInform(Integer initialInformCount, Long communityId);
+    List<PushInformEntity> rotationCommunityInform(Integer initialInformCount, Long communityId);
 
 
     /**
-     *  用户社区消息详情查看
+     * 社区推送消息详情查看
+     * @param acctId        推送账号id、可能是社区ID 可能是系统消息ID 可能是其他第三方推送号ID
+     * @param informId      推送消息ID
+     * @param userId        用户ID
+     * @return              返回这条推送消息的详情
      */
-    CommunityInformEntity detailsCommunityInform(Long communityId, Long informId ,String userId);
+    PushInformEntity detailsCommunityInform(Long acctId, Long informId ,String userId);
 
 
-    /**
-     * 验证社区消息是否存在
-     * @author YuLF
-     * @since  2020/12/21 17:02
-     */
-    boolean informExist(Long communityId, Long informId);
 }

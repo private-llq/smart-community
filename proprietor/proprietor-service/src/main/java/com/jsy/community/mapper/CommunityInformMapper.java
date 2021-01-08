@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CommunityInformEntity;
+import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.proprietor.CommunityInformQO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author YuLF
  * @since 2020-11-16
  */
-public interface CommunityInformMapper extends BaseMapper<CommunityInformEntity> {
+public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
 
     Integer updateCommunityInform(CommunityInformQO communityInformQO);
 
@@ -27,22 +28,28 @@ public interface CommunityInformMapper extends BaseMapper<CommunityInformEntity>
      * @param initialInformCount     初始轮播消息条数
      * @return                       返回消息列表
      */
-    List<CommunityInformEntity> rotationCommunityInform(Integer initialInformCount, Long communityId);
+    List<PushInformEntity> rotationCommunityInform(@Param("initialCount") Integer initialInformCount, @Param("acctId") Long communityId);
 
     /**
      * 增加一次该消息的浏览量
-     * @param communityId       社区ID
+     * @param acctId            推送号ID
      * @param informId          消息ID
      */
-    @Update("update t_community_inform set browse_count = browse_count+1 where community_id = #{communityId} and id = #{informId}")
-    void updateCommunityInformBrowseCount(@Param("communityId") Long communityId, @Param("informId") Long informId);
-
+    @Update("update t_acct_push_inform set browse_count = browse_count+1 where acct_id = #{acctId} and id = #{informId}")
+    void updatePushInformBrowseCount(@Param("acctId") Long acctId, @Param("informId") Long informId);
 
     /**
-     * 验证社区消息是否存在
-     * @author YuLF
-     * @since  2020/12/21 17:02
+     * 根据推送帐号id 和 uid 查询用户未读的推送消息id
+     * @param acctId    推送号id
+     * @param uid       用户id
      */
-    @Select("select count(*) from t_community_inform where community_id = #{communityId} and id = #{informId}")
-    boolean informExist(@Param("communityId") Long communityId, @Param("informId") Long informId);
+    List<Long> selectUnreadInformId(@Param("acctId") Long acctId,@Param("uid") String uid);
+
+    /**
+     * 标记未读消息id列表 标记为已读
+     * @param unreadInformIds   当前推送号id 中当前用户未读的消息id
+     * @param acctId            推送号id
+     * @param uid               当前用户id
+     */
+    void insertBatchReadInform(@Param("ids") List<Long> unreadInformIds, @Param("acctId") Long acctId, @Param("uid") String uid);
 }

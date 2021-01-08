@@ -86,7 +86,6 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @param houseLeaseQO 查询参数对象
      * @return 返回数据集合
      */
-    @Transactional
     @Override
     public List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> houseLeaseQO) {
         houseLeaseQO.setPage((houseLeaseQO.getPage() - 1) * houseLeaseQO.getSize());
