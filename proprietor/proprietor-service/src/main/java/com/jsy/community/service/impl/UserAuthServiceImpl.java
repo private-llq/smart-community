@@ -20,13 +20,13 @@ import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.vo.ThirdPlatformVo;
-import com.xkcoding.justauth.AuthRequestFactory;
+//import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
-import me.zhyd.oauth.config.AuthSource;
-import me.zhyd.oauth.model.AuthCallback;
-import me.zhyd.oauth.model.AuthResponse;
-import me.zhyd.oauth.request.AuthRequest;
-import me.zhyd.oauth.utils.AuthStateUtils;
+//import me.zhyd.oauth.config.AuthSource;
+//import me.zhyd.oauth.model.AuthCallback;
+//import me.zhyd.oauth.model.AuthResponse;
+//import me.zhyd.oauth.request.AuthRequest;
+//import me.zhyd.oauth.utils.AuthStateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -41,8 +41,8 @@ import java.util.List;
 @Slf4j
 @RefreshScope
 public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEntity> implements IUserAuthService {
-	@Resource
-	private AuthRequestFactory factory;
+//	@Resource
+//	private AuthRequestFactory factory;
 	
 //	@Resource
 //	private RedisLockRegistry redisLockRegistry;
@@ -156,36 +156,6 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		return false;
 	}
 	
-	@Override
-	public List<ThirdPlatformVo> getThirdPlatformInfo() {
-		List<String> strings = factory.oauthList();
-		List<ThirdPlatformVo> result = new ArrayList<>();
-		for (String type : strings) {
-			result.add(new ThirdPlatformVo(type.toLowerCase(), String.format("%s/login/%s/callback", callbackUrl, type.toLowerCase())));
-		}
-		return result;
-	}
-	
-	@Override
-	public String thirdPlatformLogin(String oauthType) {
-		AuthRequest authRequest = factory.get(getAuthSource(oauthType));
-		return authRequest.authorize(oauthType + "::" + AuthStateUtils.createState());
-	}
-	
-	@Override
-	public Object thirdPlatformLoginCallback(String oauthType, ThirdPlatformQo callback) {
-		AuthRequest authRequest = factory.get(getAuthSource(oauthType));
-		AuthCallback authCallback = new AuthCallback();
-		authCallback.setCode(callback.getCode());
-		authCallback.setAuth_code(callback.getAuthCode());
-		authCallback.setState(callback.getState());
-		authCallback.setAuthorization_code(callback.getAuthorizationCode());
-		
-		AuthResponse<?> response = authRequest.login(authCallback);
-		log.info("【response】= {}", JSONUtil.toJsonStr(response));
-		return response.getData();
-	}
-
 	/**
 	 *  通过用户ID查询 t_user_auth 用户手机号
 	 * @author YuLF
@@ -203,12 +173,5 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		}
 		return userAuthEntity.getMobile();
 	}
-
-	private AuthSource getAuthSource(String type) {
-		if (StrUtil.isNotBlank(type)) {
-			return AuthSource.valueOf(type.toUpperCase());
-		} else {
-			throw new ProprietorException("不支持的登录类型");
-		}
-	}
+	
 }
