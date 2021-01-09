@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -91,5 +92,25 @@ public class HouseMemberController {
 		return CommonResult.ok(houseMemberService.getHouseMembers(baseQO));
 	}
 	
+	@ApiOperation("【房间成员】房屋id查成员")
+	@GetMapping("queryByHouseId")
+	public CommonResult queryByHouseId(@RequestParam Long houseId){
+		return CommonResult.ok(houseMemberService.queryByHouseId(houseId));
+	}
+	
+	@ApiOperation("【房间成员】id查成员")
+	@GetMapping("queryById")
+	public CommonResult queryById(@RequestParam Long id){
+		return CommonResult.ok(houseMemberService.queryById(id));
+	}
+	
+	@ApiOperation("【房间成员】ids批量查成员")
+	@PostMapping("queryByIdBatch")
+	public CommonResult queryByIdBatch(@RequestBody Set<Long> ids){
+		if(ids.size() == 0){
+			return CommonResult.ok();
+		}
+		return CommonResult.ok(houseMemberService.queryByIdBatch(ids));
+	}
 }
 

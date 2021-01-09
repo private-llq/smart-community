@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.HouseMemberMapper">
+
+	<!-- 根据ids批量查询 -->
+	<select id="queryByIdsBatch" resultType="Map">
+		select id,householder_id,community_id,house_id,name,sex,mobile,identification_type,id_card from t_house_member
+		where id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+        and person_type = 1 and deleted = 0
+	</select>
+
+</mapper>

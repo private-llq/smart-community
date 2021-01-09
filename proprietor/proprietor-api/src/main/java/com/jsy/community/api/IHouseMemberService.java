@@ -6,6 +6,10 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
  * <p>
@@ -71,6 +75,40 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	**/
 	boolean checkHouseHolder(Long uid, Long houseId);
 	
+	/**
+	* @Description: 房主亲属 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseMemberEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	**/
 	PageInfo<HouseMemberEntity> getHouseMembers(BaseQO<HouseMemberQO> baseQO);
+	
+	/**
+	* @Description: 房间ID 查 成员List
+	 * @Param: [houseId]
+	 * @Return: java.util.List<com.jsy.community.entity.HouseMemberEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	**/
+	List<HouseMemberEntity> queryByHouseId(Long houseId);
+	
+	/**
+	* @Description: id单查
+	 * @Param: [id]
+	 * @Return: com.jsy.community.entity.HouseMemberEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	**/
+	HouseMemberEntity queryById(Long id);
+	
+	/**
+	* @Description: ids批量查
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long,com.jsy.community.entity.HouseMemberEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	**/
+	Map<Long,HouseMemberEntity> queryByIdBatch(Set<Long> ids);
 
 }

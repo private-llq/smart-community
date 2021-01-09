@@ -17,6 +17,12 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -150,6 +156,13 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 		return iUserHouseService.checkHouseHolder(uid,houseId);
 	}
 	
+	/**
+	* @Description: 房主亲属 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseMemberEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	**/
 	@Override
 	public PageInfo<HouseMemberEntity> getHouseMembers(BaseQO<HouseMemberQO> baseQO){
 		HouseMemberQO query = baseQO.getQuery();
@@ -163,5 +176,41 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 		PageInfo pageInfo = new PageInfo();
 		BeanUtils.copyProperties(pageResult,pageInfo);
 		return pageInfo;
+	}
+	
+	/**
+	 * @Description: 房间ID 查 成员List
+	 * @Param: [houseId]
+	 * @Return: java.util.List<com.jsy.community.entity.HouseMemberEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	 **/
+	@Override
+	public List<HouseMemberEntity> queryByHouseId(Long houseId){
+		return houseMemberMapper.queryByHouseId(houseId);
+	}
+	
+	/**
+	 * @Description: id单查
+	 * @Param: [id]
+	 * @Return: com.jsy.community.entity.HouseMemberEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	 **/
+	@Override
+	public HouseMemberEntity queryById(Long id){
+		return houseMemberMapper.selectById(id);
+	}
+	
+	/**
+	 * @Description: ids批量查
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long,com.jsy.community.entity.HouseMemberEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	 **/
+	@Override
+	public Map<Long,HouseMemberEntity> queryByIdBatch(Set<Long> ids){
+		return houseMemberMapper.queryByIdsBatch(ids);
 	}
 }
