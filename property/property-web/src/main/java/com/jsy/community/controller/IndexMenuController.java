@@ -95,13 +95,5 @@ public class IndexMenuController {
 		return CommonResult.ok();
 	}
 	
-	@ApiOperation("修改子菜单信息")
-	@PutMapping("/updateChildMenu")
-	public CommonResult updateChildMenu(@RequestBody AppMenuEntity appMenuEntity) {
-		ValidatorUtils.validateEntity(appMenuEntity, AppMenuEntity.updateAdmin.class);
-		menuService.updateChildMenu(appMenuEntity);
-		return CommonResult.ok();
-	}
-	
 }
 

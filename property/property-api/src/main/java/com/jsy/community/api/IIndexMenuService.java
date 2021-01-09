@@ -127,13 +127,4 @@ public interface IIndexMenuService extends IService<IndexMenuEntity> {
 	 * @Param [frontMenuEntity]
 	 **/
 	void addChildMenu(AppMenuEntity appMenuEntity);
-	
-	/**
-	 * @return void
-	 * @Author lihao
-	 * @Description 修改子菜单
-	 * @Date 2020/11/30 11:31
-	 * @Param [appMenuEntity]
-	 **/
-	void updateChildMenu(AppMenuEntity appMenuEntity);
 }

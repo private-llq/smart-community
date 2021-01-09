@@ -86,7 +86,6 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 		}
 		indexMenuMapper.selectPage(page, wrapper);
 		
-		
 		ArrayList<FrontMenuVO> frontMenuVOS = new ArrayList<>();
 		
 		List<IndexMenuEntity> records = page.getRecords();
@@ -137,16 +136,6 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 		IndexMenuEntity menuEntity = indexMenuMapper.selectById(id);
 		FrontMenuVO menuVo = new FrontMenuVO();
 		BeanUtils.copyProperties(menuEntity, menuVo);
-
-//		Long parentId = menuEntity.getParentId();
-//		IndexMenuEntity entity = this.common(parentId);
-//		if (entity != null) {
-//			menuVo.setParentName(entity.getMenuName());
-//			log.info("父菜单名：{}" + menuVo.getParentName());
-//			return menuVo;
-//		}
-//		log.info("父菜单名：{}" + menuVo.getParentName());
-//		menuVo.setParentName("");
 		return menuVo;
 	}
 	
@@ -259,13 +248,6 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 		BeanUtils.copyProperties(appMenuEntity, entity);
 		entity.setId(SnowFlake.nextId());
 		indexMenuMapper.insert(entity);
-	}
-	
-	@Override
-	public void updateChildMenu(AppMenuEntity appMenuEntity) {
-		IndexMenuEntity entity = new IndexMenuEntity();
-		BeanUtils.copyProperties(appMenuEntity, entity);
-		indexMenuMapper.updateById(entity);
 	}
 	
 	private IndexMenuEntity common(Long parentId) {
