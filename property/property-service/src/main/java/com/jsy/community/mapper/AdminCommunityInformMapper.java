@@ -1,9 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.entity.PushInformEntity;
-import com.jsy.community.qo.proprietor.CommunityInformQO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,7 +17,6 @@ import java.util.List;
  */
 public interface AdminCommunityInformMapper extends BaseMapper<PushInformEntity> {
 
-    Integer updateCommunityInform(CommunityInformQO communityInformQO);
 
     /**
      * 删除社区消息时 同事物理删除用户已读信息

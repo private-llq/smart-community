@@ -32,6 +32,6 @@
 				,detail_address = #{detailAddress}
 			</if>
 		</trim>
-		where uid = #{uid}
+		where deleted = 0 and uid = #{uid}
 	</update>
 </mapper>

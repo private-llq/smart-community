@@ -84,13 +84,16 @@ public class CommunityInformController {
 
     /**
      * 推送消息号 左滑动 删除
-     * 这种删除
+     * 这种删除 推送号消息 删除之后 第二次及以后 用户拉取消息列表就不会再被拉取、
+     * 当该推送号 有新消息推送时 用户才会再次拉取到
      */
     @Login
     @DeleteMapping("/clear")
     @ApiOperation("社区推送消息推送号删除")
     public CommonResult<Boolean> delPushInformAcct(@RequestParam Long acctId) {
-       return null;
+        communityInformService.delPushInformAcct(acctId, UserUtils.getUserId());
+        //在删除推送号消息时 不需要返回结果 同时即使删除失败 后端不会进行任何操作，也不会影响到前端，
+       return CommonResult.ok();
     }
 
 
@@ -99,10 +102,12 @@ public class CommunityInformController {
      * 推送消息号 标记为已读
      */
     @Login
-    @DeleteMapping("/clear/unread")
+    @PostMapping("/clear/unread")
     @ApiOperation("社区推送号清除未读")
-    public CommonResult<Boolean> clearUnreadInform(@RequestParam Long[] acctIds) {
-        return null;
+    public CommonResult<Boolean> clearUnreadInform(@RequestBody List<Long> acctIds) {
+        communityInformService.clearUnreadInform(acctIds, UserUtils.getUserId());
+        //失败的情况 只有在 数据访问层 出现错误，即交给ExceptionHandler处理
+        return CommonResult.ok("已标记消息为已读!");
     }
 
 

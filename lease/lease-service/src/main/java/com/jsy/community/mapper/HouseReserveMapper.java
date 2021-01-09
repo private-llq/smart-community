@@ -55,7 +55,7 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * @param id        预约信息id
      * @return          返回该预约信息房源的uid
      */
-    @Select("select l.uid from t_house_reserve as r left join t_house_lease as l on r.house_lease_id = l.id where r.id = #{id}")
+    @Select("select l.uid from t_house_reserve as r left join t_house_lease as l on r.house_lease_id = l.id where r.deleted = 0 and r.deleted = 0 and r.id = #{id}")
     String getUidByHouseReserveId(@Param("id") Long id);
 
     /**

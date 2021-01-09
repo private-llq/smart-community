@@ -8,7 +8,6 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.ProprietorVO;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -47,7 +46,7 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
      * @author YuLF
      * @since  2020/12/24 9:19
      */
-    @Select("select house_level_mode from t_community where id = #{communityId}")
+    @Select("select house_level_mode from t_community where id = #{communityId} and deleted = 0")
     Integer queryHouseLevelModeById(@Param("communityId") Long communityId);
 
     /**

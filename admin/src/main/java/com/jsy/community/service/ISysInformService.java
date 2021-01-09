@@ -2,10 +2,8 @@ package com.jsy.community.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.PushInformEntity;
-import com.jsy.community.entity.sys.SysInformEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
-import com.jsy.community.qo.sys.SysInformQO;
 
 import java.util.List;
 

@@ -2,11 +2,9 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.PushInformEntity;
-import com.jsy.community.entity.sys.SysInformEntity;
 import com.jsy.community.mapper.SysInformMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
-import com.jsy.community.qo.sys.SysInformQO;
 import com.jsy.community.service.ISysInformService;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;

@@ -288,7 +288,7 @@
 	        t_user_house AS uh
 	        RIGHT JOIN t_house AS h ON uh.house_id = h.id
         WHERE
-        uh.check_status = 1 and uh.uid = #{uid} and uh.community_id = #{communityId} and h.type = 4 and uh.deleted = 0
+        uh.check_status = 1 and uh.uid = #{uid} and uh.community_id = #{communityId} and uh.deleted = 0 and h.type = 4 and uh.deleted = 0
     </select>
 
     <!-- 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口 -->

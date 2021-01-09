@@ -1,11 +1,8 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.entity.PushInformEntity;
-import com.jsy.community.qo.proprietor.CommunityInformQO;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -20,7 +17,6 @@ import java.util.List;
  */
 public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
 
-    Integer updateCommunityInform(CommunityInformQO communityInformQO);
 
 
     /**
@@ -35,7 +31,7 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      * @param acctId            推送号ID
      * @param informId          消息ID
      */
-    @Update("update t_acct_push_inform set browse_count = browse_count+1 where acct_id = #{acctId} and id = #{informId}")
+    @Update("update t_acct_push_inform set browse_count = browse_count+1 where acct_id = #{acctId} and id = #{informId} and deleted = 0")
     void updatePushInformBrowseCount(@Param("acctId") Long acctId, @Param("informId") Long informId);
 
     /**
@@ -52,4 +48,12 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      * @param uid               当前用户id
      */
     void insertBatchReadInform(@Param("ids") List<Long> unreadInformIds, @Param("acctId") Long acctId, @Param("uid") String uid);
+
+
+    /**
+     * 用户消息列表 左滑动 删除推送号(屏蔽)
+     * @param acctId    推送号ID
+     * @param userId    用户id
+     */
+    void insertClearRecord(@Param("id")Long id, @Param("acctId") Long acctId, @Param("uid") String userId);
 }

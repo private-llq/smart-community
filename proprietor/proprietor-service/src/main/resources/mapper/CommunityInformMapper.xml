@@ -6,7 +6,7 @@
 
     <!-- 社区主页 轮播消息获取 -->
     <select id="rotationCommunityInform" resultType="com.jsy.community.entity.PushInformEntity">
-        select push_title,create_time from t_acct_push_inform where acct_id = #{acctId} ORDER BY create_time desc limit #{initialCount}
+        select push_title,create_time from t_acct_push_inform where deleted = 0 and acct_id = #{acctId} ORDER BY create_time desc limit #{initialCount}
     </select>
 
     <!--根据推送帐号id 和 uid 查询用户未读的推送消息id-->
@@ -26,7 +26,7 @@
 		    AND u.uid = #{uid}
 		    AND u.acct_id = #{acctId}
 	    ) = 0
-	    AND i.acct_id = #{acctId}
+	    AND i.deleted = 0 and i.acct_id = #{acctId}
     </select>
 	<!-- 标记当前用户 已读消息列表 -->
 	<insert id="insertBatchReadInform">
@@ -35,5 +35,9 @@
 		<foreach collection="ids" item="id" separator=",">
 			(${@com.jsy.community.utils.SnowFlake@nextId()},#{acctId},#{id},#{uid},now())
 		</foreach>
+	</insert>
+	<!-- 用户消息列表 左滑动删除 推送号 在t_acct_push_del 表插入一条记录， -->
+	<insert id="insertClearRecord">
+		insert into t_acct_push_del (id,acct_id,uid,create_time) values (#{id},#{acctId},#{uid},now())
 	</insert>
 </mapper>

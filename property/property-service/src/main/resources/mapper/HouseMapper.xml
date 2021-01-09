@@ -6,7 +6,7 @@
 	<!-- 查询下级house -->
 	<select id="getSubIdList" parameterType="java.util.List" resultType="Long">
 		select id from t_house
-		where pid in
+		where deleted = 0 and pid in
 		<foreach collection="list" item="item" separator="," open="(" close=")">
 			#{item}
 		</foreach>
@@ -20,12 +20,12 @@
 	</insert>
 	<!-- 按社区id获取社区名称 和社区 房间数量 -->
 	<select id="getCommunityNameAndUserAmountById"  resultType="java.util.HashMap">
-		select c.name,(SELECT count(*) from t_house where community_id = c.id and type = 4) as communityUserNum from t_community as c where c.id = #{communityId}
+		select c.name,(SELECT count(*) from t_house where community_id = c.id and type = 4) as communityUserNum from t_community as c where  c.deleted = 0 and c.id = #{communityId}
 	</select>
 
 	<!-- 按社区ID获取 社区名称 社区用户名和社区-->
 	<select id="getCommunityNameAndUserInfo"  resultMap="useNameInfoMap">
-		select u.real_name,u.uid,c.name from t_user as u left join t_user_house as h on u.uid = h.uid JOIN t_community as c on h.community_id = c.id where h.community_id = #{communityId}
+		select DISTINCT u.real_name,u.uid,c.name from t_user as u left join t_user_house as h on u.uid = h.uid JOIN t_community as c on h.community_id = c.id where u.deleted = 0 and h.deleted = 0 and c.deleted = 0 and h.community_id = #{communityId}
 	</select>
 	<resultMap id="useNameInfoMap" type="com.jsy.community.entity.UserEntity">
 		<result column="real_name" property="realName"/>
@@ -34,7 +34,7 @@
 		<result column="name" property="nickname"/>
 	</resultMap>
 
-	<!-- 通过社区ID查出所有 楼栋、单元、楼层、未被登记的门牌 -->
+	<!-- 通过社区ID查出所有 楼栋、单元、楼层、门牌、作为excel 下拉选择字符串 -->
 	<select id="getCommunityArchitecture" resultType="com.jsy.community.entity.HouseEntity">
 		SELECT
 			DISTINCT
@@ -48,7 +48,7 @@
 			LEFT JOIN t_user_house AS uh ON h.id = uh.house_id
 		WHERE
 				uh.id is null
-				and h.deleted = 0
+				AND h.deleted = 0 and uh.deleted = 0
 				AND h.community_id = #{communityId}
 	</select>
 </mapper>

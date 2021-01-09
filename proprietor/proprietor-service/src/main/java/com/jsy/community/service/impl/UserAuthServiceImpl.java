@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 //import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 @DubboService(version = Const.version, group = Const.group)
@@ -154,7 +153,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	 */
 	@Override
 	public String selectContactById(String id) {
-		QueryWrapper<UserAuthEntity> eq = new QueryWrapper<UserAuthEntity>().select("mobile").eq("uid", id);
+		QueryWrapper<UserAuthEntity> eq = new QueryWrapper<UserAuthEntity>().select("mobile").eq("uid", id).eq("deleted", 0);
 		UserAuthEntity userAuthEntity = userAuthMapper.selectOne(eq);
 		//未注册直接访问
 		if(userAuthEntity == null){

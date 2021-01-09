@@ -2,27 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jsy.community.mapper.AdminCommunityInformMapper">
-    <!-- 社区消息更新 -->
-    <update id="com.jsy.community.mapper.AdminCommunityInformMapper.updateCommunityInform">
-        update t_community_inform set
-        <trim prefixOverrides=",">
-            <if test="state != null">
-                ,state = #{state}
-            </if>
-            <if test="title != null">
-                ,title = #{title}
-            </if>
-            <if test="subTitle != null">
-                ,sub_title = #{subTitle}
-            </if>
-            <if test="content != null">
-                ,content = #{content}
-            </if>
-            <if test="enabled != null">
-                ,enabled = #{enabled}
-            </if>
-        </trim>
-        where deleted = 0 and id = #{id}
-    </update>
-
+    <!--根据推送帐号id 和 uid 查询用户未读的推送消息id-->
+    <select id="selectUnreadInformId" resultType="java.lang.Long">
+        SELECT
+	        i.id
+        FROM
+	        t_acct_push_inform AS i
+        WHERE
+	    (
+	    SELECT
+		    COUNT( 1 )
+	    FROM
+		    t_user_inform AS u
+	    WHERE
+		    u.inform_id = i.id
+		    AND u.uid = #{uid}
+		    AND u.acct_id = #{acctId}
+	    ) = 0
+	    AND i.acct_id = #{acctId} and i.deleted = 0
+    </select>
+    <!-- 标记当前用户 已读消息列表 -->
+    <insert id="insertBatchReadInform">
+        insert into t_user_inform(id,acct_id,inform_id,uid,create_time)
+        values
+        <foreach collection="ids" item="id" separator=",">
+            (${@com.jsy.community.utils.SnowFlake@nextId()},#{acctId},#{id},#{uid},now())
+        </foreach>
+    </insert>
 </mapper>

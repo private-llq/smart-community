@@ -1,11 +1,8 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.CommunityInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 
 import java.util.List;

@@ -5,11 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.CommunityInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -81,6 +79,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
         queryWrapper.select("id,acct_id,create_time,push_title,push_sub_title");
         queryWrapper.eq("acct_id", query.getAcctId());
+        queryWrapper.eq("deleted", 0);
         queryWrapper.last("ORDER BY create_time desc");
         //2.把当前推送号该用户所有未读数据标识为已读 的数据查出
         List<Long> unreadInformIds = communityInformMapper.selectUnreadInformId(query.getAcctId(), query.getUid());

@@ -17,7 +17,8 @@
 	        t_house_favorite AS f
 	    INNER JOIN t_shop_lease AS l ON f.favorite_id = l.id
         WHERE
-	        f.uid = #{query.uid}
+        	l.deleted = 0
+	    AND f.uid = #{query.uid}
 	    AND favorite_type = 1  limit #{page},#{size}
     </select>
 	<!-- 房屋出租收藏列表 -->

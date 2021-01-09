@@ -15,7 +15,7 @@
             </trim>
         </set>
         <where>
-            id = #{id} and reserve_uid = #{reserveUid}
+            id = #{id} and reserve_uid = #{reserveUid} and deleted = 0
         </where>
     </update>
 
@@ -49,7 +49,9 @@
 	    LEFT JOIN t_house_lease AS l ON r.house_lease_id = l.id
 	    LEFT JOIN t_user AS u ON r.reserve_uid = u.uid
         WHERE
-	        reserve_uid = #{uid}
+	        r.reserve_uid = #{uid}
+	        and r.deleted = 0
+	        and u.deleted = 0
 	    LIMIT #{qo.page},#{qo.size}
     </select>
     <!-- 预约我的信息 别人预约我 -->
@@ -85,6 +87,7 @@
             r.id is not null and
             l.uid = #{uid} and
             r.reserve_uid != #{uid}
+            and r.deleted = 0 and u.deleted = 0
             LIMIT #{qo.page},
             #{qo.size}
     </select>
@@ -95,7 +98,7 @@
             reserve_status = 2
         </set>
         <where>
-            id = #{qo.id} and reserve_status = 1
+            id = #{qo.id} and reserve_status = 1 and deleted = 0
         </where>
     </update>
 </mapper>

@@ -2,10 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserInformEntity;
-import com.jsy.community.entity.sys.SysInformEntity;
-import com.jsy.community.qo.BaseQO;
 import com.jsy.community.vo.InformListVO;
-import com.jsy.community.vo.sys.SysInformVO;
 
 import java.util.List;
 

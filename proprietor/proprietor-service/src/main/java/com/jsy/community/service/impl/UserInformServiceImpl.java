@@ -2,17 +2,11 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserInformService;
-import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserInformEntity;
-import com.jsy.community.entity.sys.SysInformEntity;
 import com.jsy.community.mapper.UserInformMapper;
-import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.InformListVO;
-import com.jsy.community.vo.sys.SysInformVO;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.Transactional;
 

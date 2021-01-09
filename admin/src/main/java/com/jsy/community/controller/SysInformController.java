@@ -54,8 +54,8 @@ public class SysInformController {
     @Login
     @ApiOperation("系统消息删除")
     @DeleteMapping()
-    public CommonResult<Boolean> delete(@RequestParam Long informId){
-        return iSysInformService.delete(informId) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED.getCode(),"数据不存在!");
+    public CommonResult<Boolean> delete(@RequestParam Long id){
+        return iSysInformService.delete(id) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED.getCode(),"数据不存在!");
     }
 
 

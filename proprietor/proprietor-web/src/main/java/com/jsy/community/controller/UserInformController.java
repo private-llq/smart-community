@@ -5,16 +5,11 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserInformEntity;
-import com.jsy.community.entity.sys.SysInformEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
-import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.InformListVO;
-import com.jsy.community.vo.sys.SysInformVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -57,7 +52,7 @@ public class UserInformController {
      * 拉取用户总消息列表
      */
     @Login
-    @PostMapping("/totalList")
+    @GetMapping("/totalList")
     @ApiOperation("用户社区总未读消息列表查看")
     public CommonResult<List<InformListVO>> totalCommunityInformList(){
         return CommonResult.ok(userInformService.totalCommunityInformList(UserUtils.getUserId()));

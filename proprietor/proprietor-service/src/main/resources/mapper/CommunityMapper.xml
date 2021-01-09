@@ -4,7 +4,7 @@
 <mapper namespace="com.jsy.community.mapper.CommunityMapper">
     <!-- 社区根据name 和城市id 模糊搜索查询 -->
     <select id="getCommunityByName" resultType="com.jsy.community.entity.CommunityEntity">
-        select id,name,detail_address,lon,lat,house_level_mode as houseLevelMode from t_community where name like concat('%',#{name},'%') and city_id = #{cityId}
+        select id,name,detail_address,lon,lat,house_level_mode as houseLevelMode from t_community where deleted = 0 and name like concat('%',#{name},'%') and city_id = #{cityId}
     </select>
 
     <!-- 小区定位 -->

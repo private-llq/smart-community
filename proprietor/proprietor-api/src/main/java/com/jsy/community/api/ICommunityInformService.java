@@ -1,10 +1,8 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.CommunityInformEntity;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.CommunityInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 
 import java.util.List;
@@ -45,5 +43,17 @@ public interface ICommunityInformService extends IService<PushInformEntity> {
      */
     PushInformEntity detailsCommunityInform(Long acctId, Long informId ,String userId);
 
+    /**
+     * 用户消息列表 左滑动 删除推送号(屏蔽)
+     * @param acctId    推送号ID
+     * @param userId    用户id
+     */
+    void delPushInformAcct(Long acctId, String userId);
 
+    /**
+     * 通过用户传上来的 推送账号id 标记用户已读
+     * @param acctIds       推送账号id列表
+     * @param uid           用户id
+     */
+    void clearUnreadInform(List<Long> acctIds, String uid);
 }

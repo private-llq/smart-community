@@ -12,7 +12,7 @@
 
     <!-- 按用户ID查出用户所在社区id列表 其中这个社区推送id并没有被当前用户屏蔽、 -->
     <select id="queryUserAllCommunityId" resultType="java.lang.Long">
-        SELECT DISTINCT
+       SELECT DISTINCT
 	        i.acct_id
         FROM
 	        t_acct_push_inform AS i
@@ -20,10 +20,9 @@
 	    AND h.check_status = 1
 	    AND h.deleted = 0
 	    AND i.deleted = 0
-	    JOIN t_acct_push_del AS d ON i.acct_id != d.acct_id
-	    AND d.uid = #{uid}
         WHERE
-	        h.uid = #{uid}
+	    ( SELECT COUNT( 1 ) FROM t_acct_push_del AS d WHERE i.acct_id = d.acct_id AND d.uid = #{uid} ) = 0
+	    AND h.uid = #{uid}
     </select>
 
 
@@ -50,7 +49,7 @@
         FROM
 	        t_acct_push_inform
         WHERE
-	        acct_id = #{id}
+	        acct_id = #{id} and deleted = 0
         ORDER BY
 	        create_time DESC
 	        LIMIT 1
@@ -62,15 +61,6 @@
         <result column="push_title" property="unreadInformTitle"/>
         <result column="create_time" property="unreadInformCreateTime"/>
     </resultMap>
-    
-    <!-- 查询最新时间第一条系统消息的标题与时间 -->
-    <select id="querySysInform" resultMap="querySysInformMap">
-        select title,create_time from t_sys_inform ORDER BY create_time desc limit 1
-    </select>
-    <resultMap id="querySysInformMap" type="com.jsy.community.vo.InformListVO">
-        <id column="id" property="id"/>
-        <result column="title" property="unreadInformTitle"/>
-        <result column="create_time" property="unreadInformCreateTime"/>
-    </resultMap>
+
 
 </mapper>

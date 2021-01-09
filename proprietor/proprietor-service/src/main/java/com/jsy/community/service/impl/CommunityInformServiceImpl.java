@@ -54,13 +54,10 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
         queryWrapper.select("id,acct_id,create_time,push_title,push_sub_title");
         queryWrapper.eq("acct_id", query.getAcctId());
+        queryWrapper.eq("deleted", 0);
         queryWrapper.last("ORDER BY create_time desc");
-        //2.把当前推送号该用户所有未读数据标识为已读 的数据查出
-        List<Long> unreadInformIds = communityInformMapper.selectUnreadInformId(query.getAcctId(), query.getUid());
-        //3.未读消息ID添加至 t_user_inform 标识 消息已读
-        if( unreadInformIds != null && !unreadInformIds.isEmpty() ){
-            communityInformMapper.insertBatchReadInform(unreadInformIds, query.getAcctId(), query.getUid());
-        }
+        //把当前推送账号id 该用户所有未读信息 标记为已读
+        setReadPushInform(query.getAcctId(), query.getUid());
         return communityInformMapper.selectPage(objectPage, queryWrapper).getRecords();
     }
 
@@ -101,6 +98,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         wrapper.select("push_title,create_time,browse_count,push_msg");
         wrapper.eq("id", informId);
         wrapper.eq("acct_id",acctId);
+        wrapper.eq("deleted", 0);
         PushInformEntity informEntity = communityInformMapper.selectOne(wrapper);
         //标识用户已读该社区消息
         UserInformEntity userInformEntity = new UserInformEntity();
@@ -112,6 +110,51 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         //该推送消息的浏览量+1
         communityInformMapper.updatePushInformBrowseCount(acctId, informId);
         return informEntity;
+    }
+
+
+
+    /**
+     * 用户消息列表 左滑动 删除推送号(屏蔽)
+     * @param acctId    推送号ID
+     * @param userId    用户id
+     */
+    @Transactional
+    @Override
+    public void delPushInformAcct(Long acctId, String userId) {
+        //删除(加入屏蔽表)推送号之前 先把 该推送号消息内容 标记为已读
+        setReadPushInform(acctId, userId);
+        communityInformMapper.insertClearRecord(SnowFlake.nextId(), acctId, userId);
+    }
+
+
+    /**
+     * 通过用户传上来的 推送账号id 标记用户已读
+     * @param acctIds       推送账号id列表
+     * @param uid           用户id
+     */
+    @Override
+    public void clearUnreadInform(List<Long> acctIds, String uid) {
+        acctIds.forEach( acctId -> {
+            //标记 当前 用户 在当前推送号 未读的信息 为已读
+            setReadPushInform(acctId, uid);
+        });
+    }
+
+    /**
+     * 通过 推送账号id 和 用户id 把用户在该推送账号未读的信息 标记为已读
+     * @author YuLF
+     * @since  2021/1/9 11:03
+     * @Param  acctId   推送账号id
+     * @Param  uid      用户id
+     */
+    private void setReadPushInform(Long acctId, String uid){
+        //2.把当前推送号该用户所有未读数据标识为已读 的数据查出
+        List<Long> unreadInformIds = communityInformMapper.selectUnreadInformId(acctId, uid);
+        //3.未读消息ID添加至 t_user_inform 标识 消息已读
+        if( unreadInformIds != null && !unreadInformIds.isEmpty() ){
+            communityInformMapper.insertBatchReadInform(unreadInformIds, acctId, uid);
+        }
     }
 
 

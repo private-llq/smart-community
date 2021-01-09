@@ -23,7 +23,7 @@ public interface CarMapper extends BaseMapper<CarEntity> {
 
 
 
-    @Select("select id,car_plate,car_type,car_image_url from t_car where uid = #{userId}")
+    @Select("select id,car_plate,car_type,car_image_url from t_car where uid = #{userId} and deleted = 0")
     List<CarEntity> queryUserCarById(@Param("userId") String userId);
 
 
