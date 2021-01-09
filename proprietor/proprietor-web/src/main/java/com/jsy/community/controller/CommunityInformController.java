@@ -87,7 +87,7 @@ public class CommunityInformController {
      * 这种删除
      */
     @Login
-    @DeleteMapping("/del")
+    @DeleteMapping("/clear")
     @ApiOperation("社区推送消息推送号删除")
     public CommonResult<Boolean> delPushInformAcct(@RequestParam Long acctId) {
        return null;
@@ -95,6 +95,15 @@ public class CommunityInformController {
 
 
 
+    /**
+     * 推送消息号 标记为已读
+     */
+    @Login
+    @DeleteMapping("/clear/unread")
+    @ApiOperation("社区推送号清除未读")
+    public CommonResult<Boolean> clearUnreadInform(@RequestParam Long[] acctIds) {
+        return null;
+    }
 
 
 }

@@ -49,7 +49,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         entity.setId(SnowFlake.nextId());
         //当某个推送号有新消息发布时：用户之前已经删除的 推送号 又会被拉取出来 同时通知有未读消息
         //清除推送消息屏蔽表
-
+        communityInformMapper.clearPushDel(qo.getAcctId());
         return communityInformMapper.insert(entity) > 0;
     }
 
