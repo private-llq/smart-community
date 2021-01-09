@@ -78,8 +78,18 @@ public class CommunityController {
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
 		return CommonResult.ok(iCommunityService.locateCommunity(UserUtils.getUserId(),location));
 	}
-
-
+	
+	@ApiOperation("批量查询社区信息")
+	@PostMapping("getByIds")
+	public CommonResult queryCommunityNameByIdBatch(@RequestBody List<Long> ids){
+		return CommonResult.ok(iCommunityService.queryCommunityNameByIdBatch(ids));
+	}
+	
+	@ApiOperation("id单查查询社区")
+	@GetMapping("getById")
+	public CommonResult queryCommunityById(@RequestParam Long id){
+		return CommonResult.ok(iCommunityService.queryCommunityById(id));
+	}
 
 
 }

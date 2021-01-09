@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -44,6 +45,18 @@ public class HouseServiceImpl implements IHouseService {
 	@Override
 	public HouseEntity getParent(HouseEntity tempEntity){
 		return houseMapper.getParent(tempEntity);
+	}
+	
+	/**
+	* @Description: ids批量查询房屋
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.Object>>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	**/
+	@Override
+	public Map<String, Map<String,Object>> queryHouseByIdBatch(Collection<Long> ids){
+		return houseMapper.queryHouseByIdBatch(ids);
 	}
 	
 }

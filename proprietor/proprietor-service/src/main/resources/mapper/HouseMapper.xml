@@ -21,4 +21,14 @@
 <!--			#{pid}-->
 <!--		</foreach>-->
 <!--	</select>-->
+
+	<!-- 根据ids批量查询house -->
+	<select id="queryHouseByIdBatch" resultType="Map">
+		select id,community_id,building,unit,floor,door from t_house
+		where id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+		and type = 4 and deleted = 0
+	</select>
 </mapper>

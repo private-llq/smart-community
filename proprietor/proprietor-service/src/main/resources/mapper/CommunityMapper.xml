@@ -37,5 +37,6 @@
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
+        and deleted = 0
     </select>
 </mapper>

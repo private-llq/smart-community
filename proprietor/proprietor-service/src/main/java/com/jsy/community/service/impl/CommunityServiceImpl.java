@@ -44,6 +44,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		QueryWrapper<CommunityEntity> queryWrapper = new QueryWrapper<CommunityEntity>().select("*");
 		CommunityQO query = baseQO.getQuery();
 		if(query != null){
+			if(query.getId() != null){
+				queryWrapper.eq("id",query.getId());
+			}
 			if(!StringUtils.isEmpty(query.getName())){
 				queryWrapper.like("name",query.getName());
 			}
@@ -141,15 +144,27 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	}
 	
 	/**
-	* @Description: 根据社区id批量查询社区名
+	 * @Description: 根据社区id批量查询社区名
 	 * @Param: [ids]
-	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.Long,java.lang.String>>
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.Object>>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
-	**/
+	 **/
 	@Override
-	public Map<Long,Map<Long,String>> queryCommunityNameByIdBatch(Collection<Long> ids){
+	public Map<String,Map<String,Object>> queryCommunityNameByIdBatch(Collection<Long> ids){
 		return communityMapper.queryCommunityNameByIdBatch(ids);
+	}
+	
+	/**
+	 * @Description: id单查社区
+	 * @Param: [id]
+	 * @Return: com.jsy.community.entity.CommunityEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	 **/
+	@Override
+	public CommunityEntity queryCommunityById(Long id){
+		return communityMapper.selectById(id);
 	}
 	
 }

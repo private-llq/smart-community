@@ -2,9 +2,11 @@ package com.jsy.community.api;
 
 
 import com.jsy.community.entity.HouseEntity;
+import org.apache.ibatis.annotations.MapKey;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -30,5 +32,14 @@ public interface IHouseService {
 	 * @Date: 2020/12/17
 	 **/
 	HouseEntity getParent(HouseEntity tempEntity);
+	
+	/** 
+	* @Description: ids批量查房屋
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.Object>>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	**/
+	Map<String, Map<String,Object>> queryHouseByIdBatch(Collection<Long> ids);
 	
 }

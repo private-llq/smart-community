@@ -46,9 +46,18 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	/**
 	 * @Description: 根据社区id批量查询社区名
 	 * @Param: [ids]
-	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.Long,java.lang.String>>
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.Object>>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
 	 **/
-	Map<Long,Map<Long,String>> queryCommunityNameByIdBatch(Collection<Long> ids);
+	Map<String,Map<String,Object>> queryCommunityNameByIdBatch(Collection<Long> ids);
+	
+	/**
+	* @Description: id单查社区
+	 * @Param: [id]
+	 * @Return: com.jsy.community.entity.CommunityEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/1/9
+	**/
+	CommunityEntity queryCommunityById(Long id);
 }

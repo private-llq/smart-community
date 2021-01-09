@@ -44,6 +44,6 @@ public interface CommunityMapper extends BaseMapper<CommunityEntity> {
      * @Date: 2020/12/16
     **/
     @MapKey("id")
-    Map<Long,Map<Long,String>> queryCommunityNameByIdBatch(Collection<Long> list);
+    Map<String,Map<String,Object>> queryCommunityNameByIdBatch(Collection<Long> list);
     
 }

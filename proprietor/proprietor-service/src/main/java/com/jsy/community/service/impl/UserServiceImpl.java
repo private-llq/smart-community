@@ -294,9 +294,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //步骤三
         //查小区名
         /* t_community */
-        Map<Long, Map<Long,String>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
+        Map<String, Map<String,Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
         for(HouseEntity userHouseEntity : houses){
-            userHouseEntity.setCommunityName(communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId())).get("name"));
+            userHouseEntity.setCommunityName(String.valueOf(communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId())).get("name")));
         }
         return houses;
     }

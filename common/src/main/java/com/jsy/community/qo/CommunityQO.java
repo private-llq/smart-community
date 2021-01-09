@@ -19,7 +19,8 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @ApiModel(value="Community对象", description="社区")
 public class CommunityQO extends BaseQO {
-
+    
+    @ApiModelProperty(value = "社区id")
     private Long id;
     
     @NotNull(groups = {GetCommunityByName.class}, message = "社区名称未输入!")
