@@ -36,18 +36,6 @@ public class CommunityController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private ICommunityService iCommunityService;
-	
-	/**
-	* @Description: 社区分页查询
-	 * @Param: [baseQO]
-	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.CommunityEntity>>
-	 * @Author: chq459799974
-	 * @Date: 2020/12/29
-	**/
-	@PostMapping("page")
-	public CommonResult<PageInfo<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
-		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));
-	}
 
 	/**
 	 * 通过社区名称和城市id查询相关的社区数据
@@ -78,18 +66,5 @@ public class CommunityController {
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
 		return CommonResult.ok(iCommunityService.locateCommunity(UserUtils.getUserId(),location));
 	}
-	
-	@ApiOperation("批量查询社区信息")
-	@PostMapping("getByIds")
-	public CommonResult queryCommunityNameByIdBatch(@RequestBody List<Long> ids){
-		return CommonResult.ok(iCommunityService.queryCommunityNameByIdBatch(ids));
-	}
-	
-	@ApiOperation("id单查查询社区")
-	@GetMapping("getById")
-	public CommonResult queryCommunityById(@RequestParam Long id){
-		return CommonResult.ok(iCommunityService.queryCommunityById(id));
-	}
-
 
 }

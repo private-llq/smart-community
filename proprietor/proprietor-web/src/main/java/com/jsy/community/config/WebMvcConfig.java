@@ -1,9 +1,11 @@
 package com.jsy.community.config;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.ApiOutController;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -24,10 +26,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	private String name;
 	
 	private String prefix = "/api/v1/";
+	private String prefix2 = "";
 	
 	@PostConstruct
 	public void init() {
 		prefix += name.split("-")[0];
+		prefix2 += prefix + "/out";
 	}
 	
 	@Resource
@@ -36,7 +40,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer
-			.addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class));
+			.addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class))
+			.addPathPrefix(prefix2, c -> c.isAnnotationPresent(ApiOutController.class));
 	}
 	
 	@Override

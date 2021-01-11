@@ -7,6 +7,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
@@ -45,6 +46,15 @@ public class JSYExceptionHandler {
 	public CommonResult<Boolean> handlerNoFoundException(Exception e) {
 		log.error(e.getMessage(), e);
 		return CommonResult.error(JSYError.NOT_FOUND);
+	}
+	
+	/**
+	 * 传参类型错误
+	 */
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public CommonResult<Boolean> handleException(MethodArgumentTypeMismatchException e) {
+		log.error(e.getMessage(), e);
+		return CommonResult.error(JSYError.REQUEST_PARAM);
 	}
 	
 	/**
