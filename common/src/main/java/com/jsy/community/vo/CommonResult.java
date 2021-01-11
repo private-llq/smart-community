@@ -1,5 +1,6 @@
 package com.jsy.community.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jsy.community.constant.ConstError;
 import com.jsy.community.exception.JSYError;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,10 +16,12 @@ import java.io.Serializable;
 public class CommonResult<T> implements Serializable {
 	@ApiModelProperty("接口返回状态码，0表示成功，1表示一般错误")
 	private int code;
-	
+
+	@JsonInclude()
 	@ApiModelProperty("接口错误返回提示信息")
 	private String message;
-	
+
+	@JsonInclude()
 	@ApiModelProperty("具体数据体")
 	private T data;
 	
