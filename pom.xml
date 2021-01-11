@@ -18,22 +18,24 @@
     </parent>
     
     <modules>
+        <!-- 公共 -->
+        <module>common</module>
+        <!-- 分布式事务 -->
+        <module>tx-manager</module>
+        <!-- 管理 -->
+        <module>admin</module>
         <!-- 业主 -->
         <module>proprietor</module>
         <!-- 物业 -->
         <module>property</module>
         <!-- 租房 -->
         <module>lease</module>
+        <!-- 网关 -->
+        <module>gateway</module>
+        <!-- MQ -->
+        <module>rabbitmq</module>
         <!-- 任务 -->
         <module>task</module>
-        <!-- 管理 -->
-        <module>admin</module>
-        <!-- 公共 -->
-        <module>common</module>
-        <module>gateway</module>
-        <module>rabbitmq</module>
-        <!-- 分布式事务 -->
-        <module>tx-manager</module>
     </modules>
     
     <properties>
