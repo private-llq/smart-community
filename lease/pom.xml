@@ -12,7 +12,6 @@
 	</parent>
 
 	<artifactId>lease</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>房屋租售端</name>
 	<description>房屋租售父工程</description>
 

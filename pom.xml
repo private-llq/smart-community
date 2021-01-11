@@ -22,6 +22,10 @@
         <module>proprietor</module>
         <!-- 物业 -->
         <module>property</module>
+        <!-- 租房 -->
+        <module>lease</module>
+        <!-- 任务 -->
+        <module>task</module>
         <!-- 管理 -->
         <module>admin</module>
         <!-- 公共 -->
