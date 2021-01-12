@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.entity.UserThirdPlatformEntity;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.vo.UserAuthVo;
@@ -45,6 +47,24 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return 登录信息
 	 */
 	String register(RegisterQO qo);
+	
+	/**
+	* @Description: 三方登录
+	 * @Param: [userThirdPlatformQO]
+	 * @Return: com.jsy.community.vo.UserAuthVo
+	 * @Author: chq459799974
+	 * @Date: 2021/1/12
+	**/
+	UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO);
+	
+	/**
+	* @Description: 三方绑定手机
+	 * @Param: [userThirdPlatformQO]
+	 * @Return: com.jsy.community.vo.UserAuthVo
+	 * @Author: chq459799974
+	 * @Date: 2021/1/12
+	**/
+	UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO);
 
 	/**
 	 * 业主信息登记

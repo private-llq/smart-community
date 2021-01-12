@@ -11,7 +11,9 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.mapper.UserThirdPlatformMapper;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.utils.RegexUtils;
@@ -26,6 +28,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
@@ -63,6 +66,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Resource
     private UserMapper userMapper;
+    
+    @Resource
+    private UserThirdPlatformMapper userThirdPlatformMapper;
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
@@ -77,6 +83,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
     @Autowired
     private ICommunityService communityService;
+    
+    @Autowired
+    private IAlipayService alipayService;
 
     @Override
     public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo){
@@ -89,14 +98,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return userAuthVo;
     }
     
-    @Override
-    public UserInfoVo login(LoginQO qo) {
-        String uid = userAuthService.checkUser(qo);
+    private UserInfoVo queryUserInfo(String uid){
         UserEntity user = baseMapper.queryUserInfoByUid(uid);
         if (user == null || user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");
         }
-        
+    
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(user, userInfoVo);
         // 刷新省市区
@@ -110,8 +117,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (user.getAreaId() != null) {
             userInfoVo.setArea(ops.get("RegionSingle:" + user.getAreaId().toString()));
         }
-
         return userInfoVo;
+    }
+    
+    @Override
+    public UserInfoVo login(LoginQO qo) {
+        String uid = userAuthService.checkUser(qo);
+        return queryUserInfo(uid);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -146,7 +158,94 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userAccountService.createUserAccount(uuid);
         return uuid;
     }
-
+    
+    //调用三方接口获取会员信息(走后端备用)(返回三方平台唯一id)
+    private String getUserInfoFromThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
+        String thirdUid = null;
+        switch (userThirdPlatformQO.getThirdPlatformType()){
+            case Const.ThirdPlatformConsts.ALIPAY :
+                String accessToken = alipayService.getAccessToken(userThirdPlatformQO.getAuthCode());
+                thirdUid = alipayService.getUserid(accessToken);
+                break;
+            case Const.ThirdPlatformConsts.WECHAT :
+                break;
+            case Const.ThirdPlatformConsts.QQ :
+                break;
+        }
+        if(StringUtils.isEmpty(thirdUid)){
+            throw new ProprietorException("三方平台uid获取失败 三方登录失败");
+        }
+        return thirdUid;
+    }
+    
+    /**
+    * @Description: 三方登录
+     * @Param: [userThirdPlatformQO]
+     * @Return: com.jsy.community.vo.UserAuthVo
+     * @Author: chq459799974
+     * @Date: 2021/1/12
+    **/
+    @Override
+    public UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
+        //只传了authCode 通过后台获取三方uid
+        if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())
+           && !StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
+            String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
+            userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
+        }
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
+            .eq("third_platform_id", userThirdPlatformQO.getThirdPlatformId())
+            .eq("third_platform_type",userThirdPlatformQO.getThirdPlatformType()));
+        if(entity != null){
+            //返回token
+            UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+            return createAuthVoWithToken(userInfoVo);
+        }
+        throw new ProprietorException("尚未绑定手机");
+    }
+    
+    /**
+     * @Description: 三方绑定手机
+     * @Param: [userThirdPlatformQO]
+     * @Return: com.jsy.community.vo.UserAuthVo
+     * @Author: chq459799974
+     * @Date: 2021/1/12
+     **/
+    @Transactional(rollbackFor = Exception.class)
+    public UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
+        //只传了authCode 通过后台获取三方uid
+        if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())
+            && !StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
+            String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
+            userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
+        }
+        //手机验证码验证 不过报错
+        commonService.checkVerifyCode(userThirdPlatformQO.getMobile(), userThirdPlatformQO.getCode());
+        //查询是否注册
+        String userid = userAuthService.queryUserIdByMobile(userThirdPlatformQO.getMobile());
+        //若没有注册 立即注册
+        String uid = null;
+        if(StringUtils.isEmpty(userid)){
+            RegisterQO registerQO = new RegisterQO();
+            registerQO.setAccount(userThirdPlatformQO.getMobile());
+            registerQO.setCode(userThirdPlatformQO.getCode());
+            uid = register(registerQO);
+            
+        }
+        //三方登录表入库
+        UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
+        BeanUtils.copyProperties(userThirdPlatformQO,userThirdPlatformEntity);
+        userThirdPlatformEntity.setId(SnowFlake.nextId());
+        userThirdPlatformEntity.setUid(uid);//把uid设置进三方登录表关联上
+        userThirdPlatformMapper.insert(userThirdPlatformEntity);
+        
+        UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setUid(uid);
+        return createAuthVoWithToken(userInfoVo);
+    }
+    
+    
+    
     /**
      * 页面登记 业主信息
      * @author YuLF

@@ -21,6 +21,9 @@ spring:
         extension-configs[1]:
           data-id: common-service-fixed.yaml
           refresh: true
+        extension-configs[2]:
+          data-id: common.yaml
+          refresh: true
 
 dubbo:
   registry:

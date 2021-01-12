@@ -11,17 +11,21 @@ import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
+import com.jsy.community.entity.UserThirdPlatformEntity;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.mapper.UserThirdPlatformMapper;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 //import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
@@ -50,6 +54,11 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	@Override
 	public List<UserAuthEntity> getList(boolean a) {
 		return list();
+	}
+	
+	@Override
+	public String queryUserIdByMobile(String mobile){
+		return baseMapper.queryUserIdByMobile(mobile);
 	}
 	
 	@Override

@@ -8,8 +8,9 @@ import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
+import com.jsy.community.entity.UserThirdPlatformEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.qo.ThirdPlatformQo;
+import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
@@ -18,7 +19,6 @@ import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.ThirdPlatformVo;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
@@ -27,13 +27,13 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -80,8 +80,6 @@ public class UserAuthController {
 	})
 	public CommonResult<Boolean> sendCode(@RequestParam String account,
 	                                      @RequestParam Integer type) {
-		//TODO 验证type范围
-		
 		boolean b;
 		if (RegexUtils.isMobile(account)) {
 			b = captchaService.sendMobile(account, type);
@@ -107,6 +105,32 @@ public class UserAuthController {
 		//生成带token和用户信息的的UserAuthVo
 		UserAuthVo userAuthVo = userService.createAuthVoWithToken(infoVo);
 		return CommonResult.ok(userAuthVo);
+	}
+	
+	@ApiOperation("三方登录")
+	@PostMapping("/third/login")
+	public CommonResult thirdPlatformLogin(@RequestBody UserThirdPlatformQO userThirdPlatformQO){
+		ValidatorUtils.validateEntity(userThirdPlatformQO);
+		if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())
+		   && StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"三方用户id和authCode不允许同时为空");
+		}
+		return CommonResult.ok(userService.thirdPlatformLogin(userThirdPlatformQO));
+	}
+	
+	@ApiOperation("三方平台绑定手机")
+	@PostMapping("/third/binding")
+	public CommonResult bindingThirdPlatform(@RequestBody UserThirdPlatformQO userThirdPlatformQO){
+		ValidatorUtils.validateEntity(userThirdPlatformQO);
+		if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())
+			&& StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"三方用户id和authCode不允许同时为空");
+		}
+		if(StringUtils.isEmpty(userThirdPlatformQO.getMobile())
+			|| StringUtils.isEmpty(userThirdPlatformQO.getCode())){
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"手机和验证码不能为空");
+		}
+		return CommonResult.ok(userService.bindThirdPlatform(userThirdPlatformQO));
 	}
 	
 	@ApiOperation("注册")

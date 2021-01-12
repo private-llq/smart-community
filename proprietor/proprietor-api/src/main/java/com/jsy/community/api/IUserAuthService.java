@@ -2,11 +2,9 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserAuthEntity;
-import com.jsy.community.qo.ThirdPlatformQo;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
-import com.jsy.community.vo.ThirdPlatformVo;
 
 import java.util.List;
 
@@ -67,4 +65,13 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @return		返回消息实体
 	 */
     String selectContactById(String id);
+	
+    /**
+    * @Description: 手机号查用户ID
+     * @Param: [mobile]
+     * @Return: java.lang.String
+     * @Author: chq459799974
+     * @Date: 2021/1/12
+    **/
+	String queryUserIdByMobile(String mobile);
 }
