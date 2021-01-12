@@ -86,6 +86,9 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
         }
         Map<String, Object> maps = new HashMap<>(codes.size());
         List<HouseLeaseConstEntity> ht = getHouseConstListByType(String.valueOf(type));
+        if( ht == null){
+            return null;
+        }
         for( Long code : codes )
         {
             for( HouseLeaseConstEntity entity : ht ){

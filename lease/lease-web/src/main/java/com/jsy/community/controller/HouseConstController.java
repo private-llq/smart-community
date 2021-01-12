@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,16 @@ public class HouseConstController {
             map.put(houseConstListByType.get(0).getHouseConstType(), houseConstListByType);
         }
         return CommonResult.ok(map);
+    }
+
+    @GetMapping("/test")
+    @ApiOperation("房屋常量查询根据id")
+    public Map<String, Object> ONE() {
+        List<Long> list = new ArrayList<>(){{
+            add(1L);
+            add(4L);
+        }};
+        return houseConstService.getConstByTypeCodeForList(list, 17L);
     }
 
     /**
