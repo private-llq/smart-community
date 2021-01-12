@@ -45,15 +45,6 @@ public class HouseConstController {
         return CommonResult.ok(map);
     }
 
-    @GetMapping("/test")
-    @ApiOperation("房屋常量查询根据id")
-    public Map<String, Object> ONE() {
-        List<Long> list = new ArrayList<>(){{
-            add(1L);
-            add(4L);
-        }};
-        return houseConstService.getConstByTypeCodeForList(list, 17L);
-    }
 
     /**
      * @return com.jsy.community.vo.CommonResult

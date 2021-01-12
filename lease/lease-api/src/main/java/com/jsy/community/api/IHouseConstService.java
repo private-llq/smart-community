@@ -46,7 +46,7 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @param type          常量类型
      * @return              返回常量名称和常量id
      */
-    Map<String, Object>  getConstByTypeCodeForList(List<Long> codes, Long type);
+    Map<Long, Object>  getConstByTypeCodeForList(List<Long> codes, Long type);
     
     /**
      * @return java.util.List<java.lang.String>

@@ -80,11 +80,11 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
      * @return              返回常量名称和常量id
      */
     @Override
-    public Map<String, Object> getConstByTypeCodeForList(List<Long> codes, Long type) {
+    public Map<Long, Object> getConstByTypeCodeForList(List<Long> codes, Long type) {
         if( codes == null || codes.isEmpty() ){
             return  null;
         }
-        Map<String, Object> maps = new HashMap<>(codes.size());
+        Map<Long, Object> maps = new HashMap<>(codes.size());
         List<HouseLeaseConstEntity> ht = getHouseConstListByType(String.valueOf(type));
         if( ht == null){
             return null;
@@ -93,7 +93,7 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
         {
             for( HouseLeaseConstEntity entity : ht ){
                 if( entity.getHouseConstCode().equals(code) ){
-                    maps.put(entity.getHouseConstName(), entity.getHouseConstCode());
+                    maps.put(entity.getHouseConstCode(), entity.getHouseConstName());
                 }
             }
         }
