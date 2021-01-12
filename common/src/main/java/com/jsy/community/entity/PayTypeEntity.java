@@ -26,4 +26,7 @@ public class PayTypeEntity extends BaseEntity {
     @ApiModelProperty(value = "缴费类型")
     private String name;
 
+    @ApiModelProperty(value = "图片地址")
+    private String icon;
+
 }
