@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserInformEntity;
 import com.jsy.community.vo.InformListVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -69,4 +70,19 @@ public interface UserInformMapper extends BaseMapper<UserInformEntity> {
      * @param id       推送号id
      */
     InformListVO queryLatestInform(Long id);
+
+
+    /**
+     * 拿到推送表 小于beforeTime的所有推送消息id
+     * @param beforeTime   用当前时间 - 过期天数得到的时间 只要推送消息的创建时间小于 这个时间 说明该推送消息已经超过过期天数，达到清理条件
+     */
+    @Select("select id from t_acct_push_inform where create_time < #{beforeTime} and deleted = 0")
+    List<Long> getExpireInformId(@Param("beforeTime") String beforeTime);
+
+    /**
+     * 根据消息id删除用户已读表的记录
+     */
+    @Delete("delete from t_user_inform where inform_id = #{id}")
+    void deletedReadInform(@Param("id") Long id);
+
 }

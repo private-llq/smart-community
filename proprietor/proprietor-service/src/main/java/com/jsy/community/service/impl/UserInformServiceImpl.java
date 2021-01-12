@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserInformEntity;
+import com.jsy.community.mapper.CommunityInformMapper;
 import com.jsy.community.mapper.UserInformMapper;
 import com.jsy.community.vo.InformListVO;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -28,6 +29,9 @@ public class UserInformServiceImpl extends ServiceImpl<UserInformMapper, UserInf
     @Resource
     private UserInformMapper userInformMapper;
 
+
+    @Resource
+    private CommunityInformMapper communityInformMapper;
 
 
     /**
@@ -68,6 +72,30 @@ public class UserInformServiceImpl extends ServiceImpl<UserInformMapper, UserInf
     }
 
     /**
+     * @author YuLF
+     * @since  2020/12/14 18:07
+     * 定期清理 推送消息内容
+     * @param beforeTime    为当前时间 - 后台配置的过期清理天数 得到的时间字符串
+     */
+    @Transactional
+    @Override
+    public Integer RegularCleaning(String beforeTime) {
+        //1.获取达成清理条件的 推送id    只要该推送消息id 创建时间 < beforeTime 那说明该消息已经超过过期天数
+        List<Long> informIds = userInformMapper.getExpireInformId(beforeTime);
+        if(informIds == null || informIds.isEmpty()){
+            return 0;
+        }
+        informIds.forEach( id ->  {
+            //2.从已读记录表中 删除每一个消息id 相关的记录
+            userInformMapper.deletedReadInform(id);
+        });
+        //逻辑删除所有达到条件的 推送消息
+        return communityInformMapper.deleteBatchIds(informIds);
+    }
+
+    /**
+     * @author YuLF
+     * @since  2020/12/14 18:07
      * 合并两个List<Long>
      * @param var1  集合1
      * @param var2  集合2

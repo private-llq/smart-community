@@ -23,6 +23,9 @@ public interface IUserInformService extends IService<UserInformEntity> {
      */
     List<InformListVO> totalCommunityInformList(String userId);
 
-
-
+    /**
+     * 定期清理 推送消息内容
+     * @param beforeTime    为当前时间 - 后台配置的过期清理天数 得到的时间字符串
+     */
+    Integer RegularCleaning(String beforeTime);
 }

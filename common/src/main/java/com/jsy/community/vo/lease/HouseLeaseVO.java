@@ -51,7 +51,7 @@ public class HouseLeaseVO implements Serializable {
     private Long houseFurnitureId;
 
     @ApiModelProperty(value = "房屋租售优势标签")
-    private Map<String, Object> houseAdvantage;
+    private Map<Long, Object> houseAdvantage;
 
     @ApiModelProperty(value = "房屋租售家具标签")
     private List<String> houseFurniture;
