@@ -27,7 +27,7 @@
         t.id as id,t.pay_year as payYear,t.pay_month as payMonth,t.order_num as orderNum,t.unit as unitName,
         t.family_id as familyId,t.order_time as orderTime,t.payment_amount paySum,t.pay_type as payType,
         t.bill_classification as billClassification,t.label as label,t.remark as remark,t.remark_img as remarkImg,
-        tpt.id as typeID,tpt.name as typeName,t.address as address
+        tpt.id as typeID,tpt.name as typeName,t.address as address,tpt.icon
         FROM t_pay_order t
         join t_pay_group tg on t.group_id=tg.id
         join t_pay_type tpt on t.payment_type=tpt.id
@@ -82,6 +82,7 @@
         <result column="payType" property="payType"/>
         <result column="paySum" property="paySum"/>
         <result column="unitName" property="unitName"/>
+        <result column="icon" property="icon"/>
         <result column="address" property="address"/>
         <result column="familyId" property="familyId"/>
         <result column="orderNum" property="orderNum"/>

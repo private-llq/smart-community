@@ -61,5 +61,11 @@ public class WeCharUtil {
         return jObject;
     }
 
+    public static String getClientId() {
+        return clientId;
+    }
 
+    public static String getClientSecret() {
+        return clientSecret;
+    }
 }

@@ -61,6 +61,7 @@ public class LivingPaymentController {
         return CommonResult.ok(pageInfo);
 	}
 
+
 	@ApiOperation("通过订单id查询缴费凭证")
 	@PostMapping("/getOrderID")
 	public CommonResult getOrderID(@ApiParam("缴费类型id") @RequestParam Long id){
