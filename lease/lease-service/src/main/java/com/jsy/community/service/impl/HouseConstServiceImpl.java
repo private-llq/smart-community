@@ -77,7 +77,7 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
      * 通过 常量代码 和常量类型 从缓存中取 名称 list
      * @param codes         常量标识码
      * @param type          常量类型
-     * @return              返回常量名称和常量id
+     * @return              返回常量名称和常量id   返回Map key = constCode value = constName
      */
     @Override
     public Map<Long, Object> getConstByTypeCodeForList(List<Long> codes, Long type) {
@@ -99,7 +99,34 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
         }
         return maps;
     }
-    
+
+    /**
+     * 通过 常量代码 和常量类型 从缓存中取 名称 list
+     * @param codes         常量标识码
+     * @param type          常量类型
+     * @return              返回常量名称和常量id  返回list<String> constName
+     */
+    @Override
+    public List<String> getConstByTypeCodeForString(List<Long> codes, Long type) {
+        if( codes == null || codes.isEmpty() ){
+            return  null;
+        }
+        List<String> list = new ArrayList<>(codes.size());
+        List<HouseLeaseConstEntity> ht = getHouseConstListByType(String.valueOf(type));
+        if( ht == null){
+            return null;
+        }
+        for( Long code : codes )
+        {
+            for( HouseLeaseConstEntity entity : ht ){
+                if( entity.getHouseConstCode().equals(code) ){
+                    list.add(entity.getHouseConstName());
+                }
+            }
+        }
+        return list;
+    }
+
     @Override
     public List<String> getConstNameByConstId(Long[] shopTypeIds) {
         List<Long> list = Arrays.asList(shopTypeIds);
