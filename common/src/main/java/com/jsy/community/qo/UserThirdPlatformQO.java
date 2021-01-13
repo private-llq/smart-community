@@ -15,11 +15,14 @@ import java.io.Serializable;
 @Data
 public class UserThirdPlatformQO implements Serializable {
 	
-	@ApiModelProperty(value = "三方平台唯一id")
+	@ApiModelProperty(value = "三方平台唯一id", hidden = true)
 	private String thirdPlatformId;
 	
 	@ApiModelProperty(value = "authCode")
 	private String authCode;
+	
+	@ApiModelProperty(value = "accessToken")
+	private String accessToken;
 	
 	@ApiModelProperty(value = "三方平台类型 1.支付宝 2.微信 3.QQ")
 	@NotNull(message = "缺少三方平台类型")

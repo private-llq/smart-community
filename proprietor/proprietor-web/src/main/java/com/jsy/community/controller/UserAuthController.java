@@ -111,9 +111,9 @@ public class UserAuthController {
 	@PostMapping("/third/login")
 	public CommonResult thirdPlatformLogin(@RequestBody UserThirdPlatformQO userThirdPlatformQO){
 		ValidatorUtils.validateEntity(userThirdPlatformQO);
-		if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())
+		if(StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())
 		   && StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
-			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"三方用户id和authCode不允许同时为空");
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"accessToken和authCode不允许同时为空");
 		}
 		return CommonResult.ok(userService.thirdPlatformLogin(userThirdPlatformQO));
 	}
@@ -122,9 +122,9 @@ public class UserAuthController {
 	@PostMapping("/third/binding")
 	public CommonResult bindingThirdPlatform(@RequestBody UserThirdPlatformQO userThirdPlatformQO){
 		ValidatorUtils.validateEntity(userThirdPlatformQO);
-		if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())
+		if(StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())
 			&& StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
-			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"三方用户id和authCode不允许同时为空");
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"accessToken和authCode不允许同时为空");
 		}
 		if(StringUtils.isEmpty(userThirdPlatformQO.getMobile())
 			|| StringUtils.isEmpty(userThirdPlatformQO.getCode())){

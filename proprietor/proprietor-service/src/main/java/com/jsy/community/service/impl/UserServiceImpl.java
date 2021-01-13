@@ -164,11 +164,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         String thirdUid = null;
         switch (userThirdPlatformQO.getThirdPlatformType()){
             case Const.ThirdPlatformConsts.ALIPAY :
-                String accessToken = alipayService.getAccessToken(userThirdPlatformQO.getAuthCode());
-                if(accessToken == null){
-                    break;
+                //若前端传递了accessToken，尝试取userid
+                if(!StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())){
+                    thirdUid = alipayService.getUserid(userThirdPlatformQO.getAccessToken());
                 }
-                thirdUid = alipayService.getUserid(accessToken);
+                //若前端传递的accessToekn没取到userid，用前端传递的authCode从三方取accessToken再取userid
+                if(StringUtils.isEmpty(thirdUid) && !StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
+                    String accessToken = alipayService.getAccessToken(userThirdPlatformQO.getAuthCode());
+                    if(StringUtils.isEmpty(accessToken)){ //第一步取accessToekn就失败了直接退出
+                        break;
+                    }
+                    thirdUid = alipayService.getUserid(accessToken);
+                }
                 break;
             case Const.ThirdPlatformConsts.WECHAT :
                 break;
@@ -190,12 +197,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     **/
     @Override
     public UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
-        //只传了authCode 通过后台获取三方uid
-        if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())
-           && !StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
-            String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
-            userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
-        }
+        //获取三方uid
+        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
+        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
             .eq("third_platform_id", userThirdPlatformQO.getThirdPlatformId())
             .eq("third_platform_type",userThirdPlatformQO.getThirdPlatformType()));
@@ -216,12 +220,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      **/
     @Transactional(rollbackFor = Exception.class)
     public UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
-        //只传了authCode 通过后台获取三方uid
-        if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())
-            && !StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
-            String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
-            userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
-        }
+        //获取三方uid
+        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
+        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
         //手机验证码验证 不过报错
         commonService.checkVerifyCode(userThirdPlatformQO.getMobile(), userThirdPlatformQO.getCode());
         //查询是否注册

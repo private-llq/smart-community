@@ -10,6 +10,7 @@ import com.jsy.community.utils.AlipayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 /**
  * @author chq459799974
@@ -32,6 +33,9 @@ public class AlipayServiceImpl implements IAlipayService {
 	**/
 	@Override
 	public String getAccessToken(String authCode){
+		if(StringUtils.isEmpty(authCode)){
+			return null;
+		}
 		AlipaySystemOauthTokenRequest alipaySystemOauthTokenRequest = new AlipaySystemOauthTokenRequest(); //创建API对应的request类
 		alipaySystemOauthTokenRequest.setGrantType("authorization_code");
 		alipaySystemOauthTokenRequest.setCode(authCode);
@@ -59,6 +63,9 @@ public class AlipayServiceImpl implements IAlipayService {
 	**/
 	@Override
 	public String getUserid(String accessToken){
+		if(StringUtils.isEmpty(accessToken)){
+			return null;
+		}
 		AlipayUserInfoShareResponse userInfoResponse = null;
 		try {
 			userInfoResponse = alipayUtils.getDefaultCertClient().certificateExecute(AlipayUtils.alipayUserInfoShareRequest,accessToken);
