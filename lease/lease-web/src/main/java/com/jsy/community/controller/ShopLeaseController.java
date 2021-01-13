@@ -54,47 +54,37 @@ public class ShopLeaseController {
 	// 商铺头图
 	//暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	/**
-	 * @return
 	 * @Author lihao
 	 * @Description 头图
 	 * @Date 2021/1/13 15:49
-	 * @Param
 	 **/
 	private static final String BUCKETNAME_HEAD = "shop-head";
 	
 	/**
-	 * @return
 	 * @Author lihao
 	 * @Description 室内图
 	 * @Date 2021/1/13 15:50
-	 * @Param
 	 **/
 	private static final String BUCKETNAME_MIDDLE = "shop-middle";
 	
 	/**
-	 * @return
 	 * @Author lihao
 	 * @Description 其他图
 	 * @Date 2021/1/13 15:50
-	 * @Param
 	 **/
 	private static final String BUCKETNAME_OTHER = "shop-other";
 	
 	/**
-	 * @return
 	 * @Author lihao
 	 * @Description 金额临界值  大于此值变成 XX万
 	 * @Date 2021/1/13 15:55
-	 * @Param
 	 **/
 	private static final double NORM_MONEY = 10000.00;
 	
 	/**
-	 * @return
 	 * @Author lihao
 	 * @Description 金额临界值  等于此值变成 面议
 	 * @Date 2021/1/13 15:55
-	 * @Param
 	 **/
 	private static final double MIN_MONEY = 0.00;
 	

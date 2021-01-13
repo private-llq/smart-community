@@ -623,7 +623,7 @@ public interface BusinessEnum {
 	enum SourceEnum {
 		PROPRIETOR(1,"业主"),
 		PROPERTY(2,"物业" ),
-		UNKNOWN(3,"未知");
+		UNKNOWN(3,"不限");
 		private final String name;
 		private final Integer code;
 		

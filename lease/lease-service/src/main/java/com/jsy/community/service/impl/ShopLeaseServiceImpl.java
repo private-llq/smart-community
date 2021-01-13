@@ -392,8 +392,10 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 来源
 			Short sourceId = houseQO.getHouseSourceId();
-			if (sourceId != null) {
+			if (sourceId != null && sourceId != 3) {
 				wrapper.eq("source", sourceId);
+			} else {
+				wrapper.in("source",1,2,3);
 			}
 			
 			// 类型
