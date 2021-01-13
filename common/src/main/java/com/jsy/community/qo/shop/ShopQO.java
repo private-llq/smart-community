@@ -26,23 +26,23 @@ public class ShopQO implements Serializable {
 	private String uid;
 	
 	@ApiModelProperty(value = "城市id")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "城市id不能为空")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "所在城市不能为空")
 	private Long cityId;
 	
 	@ApiModelProperty(value = "区域id")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "区域id不能为空")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "所在区域不能为空")
 	private Long areaId;
 	
 	@ApiModelProperty(value = "社区id")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "社区id不能为空")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "商铺地址不能为空")
 	private Long communityId;
 	
 	@ApiModelProperty(value = "楼层")
-	@NotBlank(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "楼层不能为空")
+	@NotBlank(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "商铺楼层不能为空")
 	private String floor;
 	
 	@ApiModelProperty(value = "店铺面积  单位：平米")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "店铺面积不能为空")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "建筑面积不能为空")
 	private Double shopAcreage;
 	
 	@ApiModelProperty(value = "面宽")
@@ -86,8 +86,8 @@ public class ShopQO implements Serializable {
 	@Pattern(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class},regexp = "^押([0-9]{1,2})付([0-9]{1,2})$",message = "请选择正确的押付方式")
 	private String defrayType;
 	
-	@ApiModelProperty(value = "店铺状态 0空置中 1经营中")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "店铺状态不能为空")
+	@ApiModelProperty(value = "店铺状态 0空置中 1营业中")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "商铺状态不能为空")
 	private Integer status;
 	
 	@ApiModelProperty(value = "经度")
@@ -125,12 +125,12 @@ public class ShopQO implements Serializable {
 	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少选择一个配套设施")
 	private List<Long> shopFacilityList;
 	
-	@ApiModelProperty(value = "所属商业id")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请选择所属行业")
+	@ApiModelProperty(value = "所属行业id")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "商铺行业不能为空")
 	private Long shopBusinessId;
 	
 	@ApiModelProperty(value = "所属类型id")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请选择所属类型")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "商铺类型不能为空")
 	private Long shopTypeId;
 	
 	/**

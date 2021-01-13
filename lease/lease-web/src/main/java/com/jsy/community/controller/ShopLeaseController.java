@@ -116,7 +116,7 @@ public class ShopLeaseController {
 	@PostMapping("/addShop")
 	public CommonResult addShop(@RequestBody ShopQO shop) {
 		shop.setUid(UserUtils.getUserId());
-		shop.setSource(1);// 个人发布
+		shop.setSource(1);// 业主发布
 		ValidatorUtils.validateEntity(shop, ShopQO.addShopValidate.class);
 		shopLeaseService.addShop(shop);
 		return CommonResult.ok();
@@ -191,7 +191,6 @@ public class ShopLeaseController {
 		shopLeaseService.cancelShop(userId, shopId);
 		return CommonResult.ok();
 	}
-
 
 	@ApiOperation("查询业主发布的房源列表")
 	@GetMapping("/listShop")

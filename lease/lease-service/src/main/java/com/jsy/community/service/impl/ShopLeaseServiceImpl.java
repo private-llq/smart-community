@@ -103,10 +103,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 				list.add(shopImgEntity);
 			}
 			shopImgMapper.insertImg(list);
-			
-			for (String s : imgPath) { // 垃圾图片处理
-				redisTemplate.opsForSet().add("shop_img_all", s);
-			}
 		}
 	}
 	
@@ -150,12 +146,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 封装类型
 		Long shopTypeId = shop.getShopTypeId();
 		CommonConst type = commonConstService.getConstById(shopTypeId);
-		shopLeaseVo.setShopTypeString(type.getConstName());
+		if (type != null) {
+			shopLeaseVo.setShopTypeString(type.getConstName());
+		}
 		
 		// 封装行业
 		Long shopBusinessId = shop.getShopBusinessId();
 		CommonConst business = commonConstService.getConstById(shopBusinessId);
-		shopLeaseVo.setShopBusinessString(business.getConstName());
+		if (business != null) {
+			shopLeaseVo.setShopBusinessString(business.getConstName());
+		}
 		
 		// 封装客流人群
 		Long shopPeople = shop.getShopPeople();
@@ -267,7 +267,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
 			queryWrapper.eq("shop_id", shopLeaseEntity.getId());
 			List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(queryWrapper);
-			map.put("shopImg", shopImgEntities.get(0).getImgUrl());
+			if (!CollectionUtils.isEmpty(shopImgEntities)) {
+				map.put("shopImg", shopImgEntities.get(0).getImgUrl());
+			}
 			
 			maps.add(map);
 		}
@@ -369,7 +371,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 类型
 			Long shopTypeIds = houseQO.getShopTypeId();
-			if (shopTypeIds!=null) {
+			if (shopTypeIds != null) {
 				// 用户选择的商铺类型是不限
 				if (shopTypeIds.equals(1L)) {
 					// 根据类型值 从常量表查询出所有商铺类型id
@@ -380,11 +382,11 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 					wrapper.eq("shop_type_id", shopTypeIds);
 				}
 			}
-
+			
 			
 			// 行业
 			Long shopBusinessIds = houseQO.getShopBusinessId();
-			if (shopBusinessIds!=null) {
+			if (shopBusinessIds != null) {
 				// 用户选择的店铺商业是不限
 				if (shopBusinessIds.equals(9L)) {
 					// 1.  根据类型值 从常量表查询出所有商铺行业id
@@ -453,7 +455,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 类型
 			Long shopTypeIds = houseQO.getShopTypeId();
-			if (shopTypeIds!=null) {
+			if (shopTypeIds != null) {
 				// 用户选择的商铺类型是不限
 				if (shopTypeIds.equals(1L)) {
 					// 根据类型值 从常量表查询出所有商铺类型id
@@ -467,7 +469,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 行业
 			Long shopBusinessIds = houseQO.getShopBusinessId();
-			if (shopBusinessIds!=null) {
+			if (shopBusinessIds != null) {
 				// 用户选择的店铺商业是不限
 				if (shopBusinessIds.equals(9L)) {
 					// 1.  根据类型值 从常量表查询出所有商铺行业id
@@ -561,7 +563,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Long areaId = record.getAreaId();
 			String area = redisTemplate.opsForValue().get("RegionSingle" + ":" + areaId);
 			
-			indexShopVO.setAddress(city+"  "+area);
+			indexShopVO.setAddress(city + "  " + area);
 		}
 		PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(page, pageInfo);
@@ -678,8 +680,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		List<CommonConst> businessList = commonConstService.getBusiness();
 		
 		HashMap<String, Object> map = new HashMap<>();
-		map.put("type",typeList);
-		map.put("business",businessList);
+		map.put("type", typeList);
+		map.put("business", businessList);
 		return map;
 	}
 	
