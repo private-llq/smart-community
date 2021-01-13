@@ -461,6 +461,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return returnMap;
     }
     
+    /**
+     * @Description: 查询用户是否存在
+     * @Param: [uid]
+     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Author: chq459799974
+     * @Date: 2021/1/13
+     **/
+    public Map<String,Object> checkUserAndGetUid(String uid){
+        Map<String, Object> map = new HashMap<>();
+        if(StringUtils.isEmpty(uid)){
+            map.put("exists",false);
+            return map;
+        }
+        Integer count = userMapper.selectCount(new QueryWrapper<UserEntity>().eq("uid", uid));
+        if(count == 1){
+            map.put("exists",true);
+            map.put("uid",uid);
+        }else{
+            map.put("exists",false);
+        }
+        return map;
+    }
+    
     //查询身份(是不是小区业主或家属)
     private boolean canGetLongAccess(String uid, Long communityId, String mobile){
         if(userHouseService.hasHouse(uid,communityId)

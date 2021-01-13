@@ -115,4 +115,13 @@ public interface IUserService extends IService<UserEntity> {
 	**/
 	Map<String,String> getAccess(String uid, Long communityId);
 	
+	/**
+	* @Description: 查询用户是否存在
+	 * @Param: [uid]
+	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/13
+	**/
+	Map<String,Object> checkUserAndGetUid(String uid);
+	
 }

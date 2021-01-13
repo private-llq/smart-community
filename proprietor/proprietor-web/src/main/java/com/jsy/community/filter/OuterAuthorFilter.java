@@ -27,23 +27,27 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author chq459799974
- * @description 处理智慧养老板块对业主端接口的调用
+ * @description 外部访问(非APP)过滤
  * @since 2021-01-11 09:21
  **/
 @Slf4j
 @Component
 //@WebFilter(urlPatterns = {"/api/v1/proprietor/out/pension/*"}, filterName = "pensionAuthorFilter")
 //TODO 所有请求都会进来 urlPatterns失效问题待解决
-@WebFilter(urlPatterns = {"/bbbcdefg"}, filterName = "pensionAuthorFilter")
-public class PensionAuthorFilter implements Filter{
+@WebFilter(urlPatterns = {"/bbbcdefg"}, filterName = "outerAuthorFilter")
+public class OuterAuthorFilter implements Filter{
 	
-	//要校验IP的接口路径
+	//要校验IP的接口路径前缀
 	private static final Set<String> NEED_IP_AUTH_PREFIX_PATHS = Collections.unmodifiableSet(new HashSet<>(
-			Arrays.asList("/api/v1/proprietor/out/pension/")));
+			Arrays.asList("/api/v1/proprietor/out")));
 	
 	//允许IP前缀
 	private static final Set<String> ALLOWED_PREFIX_IP = Collections.unmodifiableSet(new HashSet<>(
 			Arrays.asList("192.168.12")));
+	
+	//允许IP前缀
+	private static final Set<String> ALLOWED_IP = Collections.unmodifiableSet(new HashSet<>(
+		Arrays.asList("222.178.212.29")));
 	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -66,10 +70,14 @@ public class PensionAuthorFilter implements Filter{
 		if(needIp) {
 			String ip = getIpAddr(req);
 			boolean flag = false;
-			for (String prefix : ALLOWED_PREFIX_IP) {
-				if(ip.startsWith(prefix)){
-					flag = true;
-					break;
+			if(ALLOWED_IP.contains(ip)){
+				flag = true;
+			}else{
+				for (String prefix : ALLOWED_PREFIX_IP) {
+					if(ip.startsWith(prefix)){
+						flag = true;
+						break;
+					}
 				}
 			}
 			if(!flag){

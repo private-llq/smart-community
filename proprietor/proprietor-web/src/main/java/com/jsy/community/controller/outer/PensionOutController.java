@@ -20,10 +20,10 @@ import java.util.Set;
 
 /**
  * @author chq459799974
- * @description 智慧养老调用
+ * @description 提供给智慧养老调用
  * @since 2021-01-11 13:23
  **/
-@Api(tags = "智慧养老")
+@Api(tags = "提供给智慧养老调用")
 @ApiOutController
 @RestController
 @RequestMapping("pension")
