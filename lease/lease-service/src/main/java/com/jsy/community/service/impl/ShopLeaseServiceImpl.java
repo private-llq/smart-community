@@ -73,8 +73,22 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
+	/**
+	 * @Author lihao
+	 * @Description 商铺类型为不限
+	 * @Date 2021/1/13 16:04
+	 **/
+	private static final Long SHOP_TYPE = 1L;
+	
+	/**
+	 * @Author lihao
+	 * @Description 商铺行业为不限
+	 * @Date 2021/1/13 16:11
+	 **/
+	private static final Long SHOP_BUSINESS = 9L;
+	
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void addShop(ShopQO shop) {
 		// 存储店铺基本信息
 		ShopLeaseEntity baseShop = new ShopLeaseEntity();
@@ -82,11 +96,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		baseShop.setId(SnowFlake.nextId());
 		
 		List<Long> facilityCodes = shop.getShopFacilityList();
-		long facilityCode = MyMathUtils.getTypeCode(facilityCodes);// 商铺的配套设施Code
+		// 商铺的配套设施Code
+		long facilityCode = MyMathUtils.getTypeCode(facilityCodes);
 		baseShop.setShopFacility(facilityCode);
 		
 		List<Long> peopleTypeCodes = shop.getShopPeoples();
-		long peopleCode = MyMathUtils.getTypeCode(peopleTypeCodes);// 商铺的客流人群Code
+		// 商铺的客流人群Code
+		long peopleCode = MyMathUtils.getTypeCode(peopleTypeCodes);
 		baseShop.setShopPeople(peopleCode);
 		
 		shopLeaseMapper.insert(baseShop);
@@ -118,7 +134,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			return null;
 		}
 		ShopLeaseVO shopLeaseVo = new ShopLeaseVO();
-		BeanUtils.copyProperties(shop, shopLeaseVo); // 封装基本信息
+		// 封装基本信息
+		BeanUtils.copyProperties(shop, shopLeaseVo);
 		
 		
 		QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
@@ -133,7 +150,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		//不能将上述Object[] 转化为String[]，转化的话只能是取出每一个元素再转化。
 		// java中的强制类型转换只是针对单个对象的，想要偷懒将整个数组转换成另外一种类型的数组是不行的，这和数组初始化时需要一个个来也是类似的。
 		String[] imgPath = strings.toArray(new String[strings.size()]);
-		shopLeaseVo.setImgPath(imgPath); // 封装图片信息
+		// 封装图片信息
+		shopLeaseVo.setImgPath(imgPath);
 		
 		// 封装配套设施
 		Long shopFacility = shop.getShopFacility();
@@ -179,7 +197,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		}
 		
 		// 封装来源
-		Integer source = shop.getSource();// 1 2 3
+		Integer source = shop.getSource();
 		Map<Integer, String> kv = BusinessEnum.SourceEnum.getKv();
 		String s = kv.get(source);
 		shopLeaseVo.setSourceString(s);
@@ -204,12 +222,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void updateShop(ShopQO shop, Long shopId) {
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
 		shopLeaseEntity.setId(shopId);
 		BeanUtils.copyProperties(shop, shopLeaseEntity);
-		shopLeaseMapper.updateById(shopLeaseEntity); // 更新基本信息
+		// 更新基本信息
+		shopLeaseMapper.updateById(shopLeaseEntity);
 		
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("shop_id", shopId);
@@ -219,7 +238,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			for (ShopImgEntity shopImgEntity : shopImgList) {
 				longs.add(shopImgEntity.getId());
 			}
-			shopImgMapper.deleteBatchIds(longs); // 删除图片信息
+			// 删除图片信息
+			shopImgMapper.deleteBatchIds(longs);
 		}
 		
 		String[] imgPath = shop.getImgPath();
@@ -232,14 +252,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 				entity.setShopId(shopId);
 				imgList.add(entity);
 			}
-			shopImgMapper.insertImg(imgList); // 添加图片信息
+			// 添加图片信息
+			shopImgMapper.insertImg(imgList);
 		}
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void cancelShop(String userId, Long shopId) {
-		shopLeaseMapper.deleteById(shopId); // 删除基本信息
+		// 删除基本信息
+		shopLeaseMapper.deleteById(shopId);
 		
 		// 查询该店铺的图片
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
@@ -250,7 +272,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			for (ShopImgEntity shopImgEntity : shopImgList) {
 				longs.add(shopImgEntity.getId());
 			}
-			shopImgMapper.deleteBatchIds(longs); // 删除图片信息
+			// 删除图片信息
+			shopImgMapper.deleteBatchIds(longs);
 		}
 	}
 	
@@ -282,10 +305,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		
-		List<Long> longs = new ArrayList<>();   // 用于接收该区域的小区id集合
-		List<IndexShopVO> shopVOS = new ArrayList<>(); // 用于封装最后数据
+		// 用于接收该区域的小区id集合
+		List<Long> longs = new ArrayList<>();
+		// 用于封装最后数据
+		List<IndexShopVO> shopVOS = new ArrayList<>();
 		
-		HouseLeaseQO houseQO = baseQO.getQuery(); // 筛选条件
+		// 筛选条件
+		HouseLeaseQO houseQO = baseQO.getQuery();
 		
 		// 搜索条件和筛选条件都不存在   PS：此时区域id这里从url上获取，若没有 默认查渝北区
 		if (houseQO == null && query == null) {
@@ -339,7 +365,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 					wrapper.in("community_id", longs);
 				}
 			} else {
-				List<CommunityEntity> list = communityService.listCommunityByAreaId(500103L);// 若没有选择区域 则查询渝北区
+				// 若没有选择区域 则查询渝北区
+				List<CommunityEntity> list = communityService.listCommunityByAreaId(500103L);
 				if (list == null) {
 					return null;
 				}
@@ -365,7 +392,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 来源
 			Short sourceId = houseQO.getHouseSourceId();
-			if (sourceId != null && sourceId != 3) {
+			if (sourceId != null) {
 				wrapper.eq("source", sourceId);
 			}
 			
@@ -373,7 +400,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Long shopTypeIds = houseQO.getShopTypeId();
 			if (shopTypeIds != null) {
 				// 用户选择的商铺类型是不限
-				if (shopTypeIds.equals(1L)) {
+				if (shopTypeIds.equals(SHOP_TYPE)) {
 					// 根据类型值 从常量表查询出所有商铺类型id
 					List<Long> typeIds = commonConstService.listByType(2L);
 					wrapper.in("shop_type_id", typeIds);
@@ -388,7 +415,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Long shopBusinessIds = houseQO.getShopBusinessId();
 			if (shopBusinessIds != null) {
 				// 用户选择的店铺商业是不限
-				if (shopBusinessIds.equals(9L)) {
+				if (shopBusinessIds.equals(SHOP_BUSINESS)) {
 					// 1.  根据类型值 从常量表查询出所有商铺行业id
 					List<Long> businessIds = commonConstService.listByType(3L);
 					if (!CollectionUtils.isEmpty(businessIds)) {
@@ -421,7 +448,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 					wrapper.in("community_id", longs);
 				}
 			} else {
-				List<CommunityEntity> list = communityService.listCommunityByName(query, 500103);// 若没有选择区域 则查询渝北区
+				// 若没有选择区域 则查询渝北区
+				List<CommunityEntity> list = communityService.listCommunityByName(query, 500103);
 				if (CollectionUtils.isEmpty(list)) {
 					return null;
 				}
@@ -449,7 +477,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 来源
 			Short sourceId = houseQO.getHouseSourceId();
-			if (sourceId != null && sourceId != 3) {
+			if (sourceId != null) {
 				wrapper.eq("source", sourceId);
 			}
 			
@@ -457,7 +485,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Long shopTypeIds = houseQO.getShopTypeId();
 			if (shopTypeIds != null) {
 				// 用户选择的商铺类型是不限
-				if (shopTypeIds.equals(1L)) {
+				if (shopTypeIds.equals(SHOP_TYPE)) {
 					// 根据类型值 从常量表查询出所有商铺类型id
 					List<Long> typeIds = commonConstService.listByType(2L);
 					wrapper.in("shop_type_id", typeIds);
@@ -471,7 +499,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Long shopBusinessIds = houseQO.getShopBusinessId();
 			if (shopBusinessIds != null) {
 				// 用户选择的店铺商业是不限
-				if (shopBusinessIds.equals(9L)) {
+				if (shopBusinessIds.equals(SHOP_BUSINESS)) {
 					// 1.  根据类型值 从常量表查询出所有商铺行业id
 					List<Long> businessIds = commonConstService.listByType(3L);
 					if (!CollectionUtils.isEmpty(businessIds)) {
@@ -507,7 +535,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			IndexShopVO indexShopVO = new IndexShopVO();
 			BeanUtils.copyProperties(record, indexShopVO);
 			
-			Long id = record.getId(); // 商铺id
+			// 商铺id
+			Long id = record.getId();
 			
 			// 封装图片
 			QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();
@@ -524,11 +553,15 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			
 			// 封装标签集合
-			Long shopFacility = record.getShopFacility(); // 商铺配套设施
-			Long shopPeople = record.getShopPeople(); // 商铺客流人群
+			// 商铺配套设施
+			Long shopFacility = record.getShopFacility();
+			// 商铺客流人群
+			Long shopPeople = record.getShopPeople();
 			
-			List<Long> facilityList = MyMathUtils.analysisTypeCode(shopFacility); // 将商铺配套设施从常量表中解析出来
-			List<Long> facilityCodes = new ArrayList<>(); // 用于存储配套设施Code
+			// 将商铺配套设施从常量表中解析出来
+			List<Long> facilityList = MyMathUtils.analysisTypeCode(shopFacility);
+			// 用于存储配套设施Code
+			List<Long> facilityCodes = new ArrayList<>();
 			if (!CollectionUtils.isEmpty(facilityList)) {
 				for (Long aLong : facilityList) {
 					facilityCodes.add(aLong);
@@ -536,8 +569,10 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			List<String> facilitys = houseConstService.getConstByTypeCodeForString(facilityCodes, 16L);
 			
-			List<Long> peopleList = MyMathUtils.analysisTypeCode(shopPeople);// 将商铺客流人群从常量表中解析出来
-			ArrayList<Long> peopleCodes = new ArrayList<>();// 用于存储客流人群Code
+			// 将商铺客流人群从常量表中解析出来
+			List<Long> peopleList = MyMathUtils.analysisTypeCode(shopPeople);
+			// 用于存储客流人群Code
+			ArrayList<Long> peopleCodes = new ArrayList<>();
 			if (!CollectionUtils.isEmpty(peopleList)) {
 				for (Long aLong : peopleList) {
 					peopleCodes.add(aLong);
@@ -617,13 +652,15 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		}
 		
 		// 如果没条件
-		List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());// 查出该区域有哪些小区
+		// 查出该区域有哪些小区
+		List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());
 		for (CommunityEntity communityEntity : list) {
 			longs.add(communityEntity.getId());
 		}
 		queryWrapper.in("community_id", longs);
 		shopLeaseMapper.selectPage(page, queryWrapper);
-		List<ShopLeaseEntity> records = page.getRecords();// 分页查出这些小区的商铺
+		// 分页查出这些小区的商铺
+		List<ShopLeaseEntity> records = page.getRecords();
 		
 		// 封装小区商铺
 		for (ShopLeaseEntity record : records) {

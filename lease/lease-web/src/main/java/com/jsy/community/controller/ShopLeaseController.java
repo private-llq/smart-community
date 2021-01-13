@@ -52,13 +52,51 @@ public class ShopLeaseController {
 	private StringRedisTemplate redisTemplate;
 	
 	// 商铺头图
-	private static final String BUCKETNAME_HEAD = "shop-head";  //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	//暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	/**
+	 * @return
+	 * @Author lihao
+	 * @Description 头图
+	 * @Date 2021/1/13 15:49
+	 * @Param
+	 **/
+	private static final String BUCKETNAME_HEAD = "shop-head";
 	
-	// 商铺室内图
+	/**
+	 * @return
+	 * @Author lihao
+	 * @Description 室内图
+	 * @Date 2021/1/13 15:50
+	 * @Param
+	 **/
 	private static final String BUCKETNAME_MIDDLE = "shop-middle";
 	
-	// 商铺其他图
+	/**
+	 * @return
+	 * @Author lihao
+	 * @Description 其他图
+	 * @Date 2021/1/13 15:50
+	 * @Param
+	 **/
 	private static final String BUCKETNAME_OTHER = "shop-other";
+	
+	/**
+	 * @return
+	 * @Author lihao
+	 * @Description 金额临界值  大于此值变成 XX万
+	 * @Date 2021/1/13 15:55
+	 * @Param
+	 **/
+	private static final double NORM_MONEY = 10000.00;
+	
+	/**
+	 * @return
+	 * @Author lihao
+	 * @Description 金额临界值  等于此值变成 面议
+	 * @Date 2021/1/13 15:55
+	 * @Param
+	 **/
+	private static final double MIN_MONEY = 0.00;
 	
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")
@@ -71,10 +109,10 @@ public class ShopLeaseController {
 			// 当月租金大于10000变成XX.XX万元
 			List<IndexShopVO> records = pageInfo.getRecords();
 			for (IndexShopVO record : records) {
-				if (record.getMonthMoney().doubleValue() > 10000d) {
-					String s = String.format("%.2f", record.getMonthMoney().doubleValue() / 10000) + "万";
+				if (record.getMonthMoney().doubleValue() > NORM_MONEY) {
+					String s = String.format("%.2f", record.getMonthMoney().doubleValue() / NORM_MONEY) + "万";
 					record.setMonthMoneyString(s);
-				} else if (record.getMonthMoney().compareTo(new BigDecimal(0.00)) == 0) {
+				} else if (record.getMonthMoney().compareTo(new BigDecimal(MIN_MONEY)) == 0) {
 					String s = "面议";
 					record.setMonthMoneyString(s);
 				} else {
@@ -116,7 +154,8 @@ public class ShopLeaseController {
 	@PostMapping("/addShop")
 	public CommonResult addShop(@RequestBody ShopQO shop) {
 		shop.setUid(UserUtils.getUserId());
-		shop.setSource(1);// 业主发布
+		// 业主发布
+		shop.setSource(1);
 		ValidatorUtils.validateEntity(shop, ShopQO.addShopValidate.class);
 		shopLeaseService.addShop(shop);
 		return CommonResult.ok();
@@ -136,10 +175,10 @@ public class ShopLeaseController {
 		ShopLeaseVO shop = (ShopLeaseVO) map.get("shop");
 
 		BigDecimal monthMoney = shop.getMonthMoney();
-		if (monthMoney.doubleValue() > 10000d) {
-			String s = String.format("%.2f", monthMoney.doubleValue() / 10000) + "万";
+		if (monthMoney.doubleValue() > NORM_MONEY) {
+			String s = String.format("%.2f", monthMoney.doubleValue() / NORM_MONEY) + "万";
 			shop.setMonthMoneyString(s);
-		} else if (monthMoney.compareTo(new BigDecimal(0.00)) == 0) {
+		} else if (monthMoney.compareTo(new BigDecimal(MIN_MONEY)) == 0) {
 			String s = "面议";
 			shop.setMonthMoneyString(s);
 		} else {
@@ -152,10 +191,10 @@ public class ShopLeaseController {
 
 		// 当转让费大于10000变成XX.XX万元
 		BigDecimal transferMoney = shop.getTransferMoney();
-		if (transferMoney.doubleValue() > 10000d) {
-			String s = String.format("%.2f", transferMoney.doubleValue() / 10000) + "万";
+		if (transferMoney.doubleValue() > NORM_MONEY) {
+			String s = String.format("%.2f", transferMoney.doubleValue() / NORM_MONEY) + "万";
 			shop.setTransferMoneyString(s);
-		} else if (transferMoney.compareTo(new BigDecimal(0.00)) == 0) {
+		} else if (transferMoney.compareTo(new BigDecimal(MIN_MONEY)) == 0) {
 			String s = "面议";
 			shop.setTransferMoneyString(s);
 		} else {
