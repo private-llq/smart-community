@@ -15,7 +15,7 @@
     </sql>
 
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
-        SELECT pg.id as groupId,
+        SELECT distinct
         pg.name as groupName,
         po.family_id as payNumber,
         po.unit_id as payCompanyId,
