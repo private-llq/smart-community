@@ -58,6 +58,22 @@ public class HouseConstController {
     }
     
     
+    @ApiOperation("商铺类型标签查询")
+    @GetMapping("/getShopType")
+    public CommonResult getShopType() {
+        String type = "7";
+        List<HouseLeaseConstEntity> constEntityList = houseConstService.getHouseConstListByType(type);
+        return CommonResult.ok(constEntityList);
+    }
+    
+    @ApiOperation("商铺行业标签查询")
+    @GetMapping("/getShopBusiness")
+    public CommonResult getShopBusiness() {
+        String type = "8";
+        List<HouseLeaseConstEntity> constEntityList = houseConstService.getHouseConstListByType(type);
+        return CommonResult.ok(constEntityList);
+    }
+    
     
     
     

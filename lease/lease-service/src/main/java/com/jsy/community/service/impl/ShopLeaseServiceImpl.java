@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.shop.ShopImgEntity;
@@ -14,11 +16,12 @@ import com.jsy.community.mapper.ShopImgMapper;
 import com.jsy.community.mapper.ShopLeaseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.qo.shop.ShopQO;
+import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -64,21 +67,28 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
 	private IHouseConstService houseConstService;
 	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private ICommonConstService commonConstService;
+	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
 	@Override
 	@Transactional
-	public void addShop(ShopLeaseVO shop) {
-		//验证所属社区所属用户房屋是否存在
-		if (iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId(), shop.getHouseId())) {
-			throw new LeaseException("您并未拥有该房屋!");
-		}
-		
+	public void addShop(ShopQO shop) {
 		// 存储店铺基本信息
 		ShopLeaseEntity baseShop = new ShopLeaseEntity();
 		BeanUtils.copyProperties(shop, baseShop);
 		baseShop.setId(SnowFlake.nextId());
+		
+		List<Long> facilityCodes = shop.getShopFacilityList();
+		long facilityCode = MyMathUtils.getTypeCode(facilityCodes);// 商铺的配套设施Code
+		baseShop.setShopFacility(facilityCode);
+		
+		List<Long> peopleTypeCodes = shop.getShopPeoples();
+		long peopleCode = MyMathUtils.getTypeCode(peopleTypeCodes);// 商铺的客流人群Code
+		baseShop.setShopPeople(peopleCode);
+		
 		shopLeaseMapper.insert(baseShop);
 		
 		// 存储店铺图片集合
@@ -98,15 +108,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 				redisTemplate.opsForSet().add("shop_img_all", s);
 			}
 		}
-		
-		// 存储标签
-		Long[] typeIds = shop.getShopTypeIds();
-		Long[] businessIds = shop.getShopBusinessIds();
-		if ((typeIds != null && typeIds.length > 0) || (businessIds != null && businessIds.length > 0)) {
-			Long[] both = (Long[]) ArrayUtils.addAll(typeIds, businessIds); // 将两个集合合并为一个集合
-			shopLeaseMapper.insertMiddle(baseShop.getId(), both);
-		}
-		
 	}
 	
 	@Override
@@ -138,48 +139,63 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		String[] imgPath = strings.toArray(new String[strings.size()]);
 		shopLeaseVo.setImgPath(imgPath); // 封装图片信息
 		
-		Long[] shopTypeIds = shopLeaseMapper.selectTypeTags(shopId);
-		if (shopTypeIds != null && shopTypeIds.length > 0) {
-			List<String> constTypeName = houseConstService.getConstNameByConstId(shopTypeIds);// 店铺类型标签
-			Long[] shopBusinessIds = shopLeaseMapper.selectBusinessTags(shopId);
-			if (shopBusinessIds != null && shopBusinessIds.length > 0) {
-				List<String> constBusinessName = houseConstService.getConstNameByConstId(shopBusinessIds);// 店铺行业标签
-				shopLeaseVo.setShopTypeNames(constTypeName);
-				shopLeaseVo.setShopBusinessNames(constBusinessName); // 封装标签
-			} else {
-				shopLeaseVo.setShopTypeNames(constTypeName);
-				shopLeaseVo.setShopBusinessNames(null); // 封装标签
-			}
+		// 封装配套设施
+		Long shopFacility = shop.getShopFacility();
+		List<Long> facilityCode = MyMathUtils.analysisTypeCode(shopFacility);
+		List<String> constByTypeCodeForString = houseConstService.getConstByTypeCodeForString(facilityCode, 16L);
+		if (!CollectionUtils.isEmpty(constByTypeCodeForString)) {
+			shopLeaseVo.setShopFacilityStrings(constByTypeCodeForString);
 		}
+		
+		// 封装客流人群
+		Long shopPeople = shop.getShopPeople();
+		List<Long> peopleCode = MyMathUtils.analysisTypeCode(shopPeople);
+		List<String> constByPeopleCodeForString = houseConstService.getConstByTypeCodeForString(peopleCode, 17L);
+		if (!CollectionUtils.isEmpty(constByPeopleCodeForString)) {
+			shopLeaseVo.setShopPeopleStrings(constByPeopleCodeForString);
+		}
+		
 		map.put("shop", shopLeaseVo);
 		
 		// 将标签封装成一个属性 便于前端使用
-		List<String> shopBusinessNames = shopLeaseVo.getShopBusinessNames();
-		List<String> shopTypeNames = shopLeaseVo.getShopTypeNames();
+		List<String> facilityStrings = shopLeaseVo.getShopFacilityStrings();
+		List<String> peopleStrings = shopLeaseVo.getShopPeopleStrings();
 		ArrayList<String> list = new ArrayList<>();
 		// 将两个集合封装成一个集合
-		if (shopBusinessNames!=null) {
-			list.addAll(shopTypeNames);
-			list.addAll(shopBusinessNames);
+		if (facilityStrings != null) {
+			list.addAll(peopleStrings);
+			list.addAll(facilityStrings);
 			shopLeaseVo.setTags(list);
 		}
 		
+		// 封装来源
+		Integer source = shopLeaseVo.getSource();// 1 2 3
+		Map<Integer, String> kv = BusinessEnum.SourceEnum.getKv();
+		String s = kv.get(source);
+		shopLeaseVo.setSourceString(s);
+		
+		// 封装状态
+		Integer status = shopLeaseVo.getStatus();
+		if (status == 0) {
+			shopLeaseVo.setStatusString("空置中");
+		} else {
+			shopLeaseVo.setStatusString("经营中");
+		}
 		
 		// 查询店铺发布人的电话和头像
 		String uid = shop.getUid();
 		UserEntity one = userService.selectOne(uid);
+		// 详情页展示的业主名称是用户在发布的时候填写的昵称
+		// 详情页展示的电话是用户在发布的时候填写的电话
+		one.setRealName(shop.getNickname());
+		one.setMobile(shop.getMobile());
 		map.put("user", one);
 		return map;
 	}
 	
 	@Override
 	@Transactional
-	public void updateShop(ShopLeaseVO shop, Long shopId) {
-		//验证所属社区所属用户房屋是否存在
-		if (iHouseLeaseService.existUserHouse(shop.getUid(), shop.getCommunityId(), shop.getHouseId())) {
-			throw new LeaseException("您并未拥有该房屋!");
-		}
-		
+	public void updateShop(ShopQO shop, Long shopId) {
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
 		shopLeaseEntity.setId(shopId);
 		BeanUtils.copyProperties(shop, shopLeaseEntity);
@@ -208,22 +224,11 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			shopImgMapper.insertImg(imgList); // 添加图片信息
 		}
-		
-		shopLeaseMapper.deleteTags(shopId); // 将原本有的标签并删除
-		
-		if (shop.getShopTypeIds() != null && shop.getShopTypeIds().length > 0) {
-			shopLeaseMapper.insertMiddle(shopId, shop.getShopTypeIds()); // 添加标签
-		}
 	}
 	
 	@Override
 	@Transactional
-	public void cancelShop(String userId, Long shopId, Long communityId, Long houseId) {
-		//验证所属社区所属用户房屋是否存在
-		if (iHouseLeaseService.existUserHouse(userId, communityId, houseId)) {
-			throw new LeaseException("您并未拥有该房屋!");
-		}
-		
+	public void cancelShop(String userId, Long shopId) {
 		shopLeaseMapper.deleteById(shopId); // 删除基本信息
 		
 		// 查询该店铺的图片
@@ -237,8 +242,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			shopImgMapper.deleteBatchIds(longs); // 删除图片信息
 		}
-		
-		shopLeaseMapper.deleteTags(shopId); // 将原本有的标签并删除
 	}
 	
 	@Override
@@ -355,50 +358,33 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			
 			// 类型
-			List<Long> shopTypeIds = houseQO.getShopTypeIds();
-			if (!CollectionUtils.isEmpty(shopTypeIds)) {
-				// 用户选择的是不限
-				if (shopTypeIds.contains(42L)) {
-					// 1. 去常量表中查询出该类型对应的所有标签id集合
-					List<Long> ids = houseConstService.getConstIdByType(7);
-					if (!CollectionUtils.isEmpty(ids)) {
-						List<Long> list = shopLeaseMapper.selectMiddle(shopTypeIds);
-						if (!CollectionUtils.isEmpty(list)) {
-							wrapper.in("id", list);
-						}
-					}
+			Long shopTypeIds = houseQO.getShopTypeId();
+			if (shopTypeIds!=null) {
+				// 用户选择的商铺类型是不限
+				if (shopTypeIds.equals(1L)) {
+					// 根据类型值 从常量表查询出所有商铺类型id
+					List<Long> typeIds = commonConstService.listByType(2L);
+					wrapper.in("shop_type_id", typeIds);
 				} else {
 					// 选择的不是不限
-					List<Long> list = shopLeaseMapper.selectMiddle(shopTypeIds);
-					if (!CollectionUtils.isEmpty(list)) {
-						wrapper.in("id", list);
-					} else {
-						return null;
-					}
+					wrapper.eq("shop_type_id", shopTypeIds);
 				}
 			}
+
 			
 			// 行业
-			List<Long> shopBusinessIds = houseQO.getShopBusinessIds();
-			if (!CollectionUtils.isEmpty(shopBusinessIds)) {
-				// 用户选择的是不限
-				if (shopBusinessIds.contains(50L)) {
-					// 1. 去常量表中查询出该类型对应的所有标签id集合
-					List<Long> ids = houseConstService.getConstIdByType(8);
-					if (!CollectionUtils.isEmpty(ids)) {
-						List<Long> list = shopLeaseMapper.selectMiddle(ids);
-						if (!CollectionUtils.isEmpty(list)) {
-							wrapper.in("id", list);
-						}
+			Long shopBusinessIds = houseQO.getShopBusinessId();
+			if (shopBusinessIds!=null) {
+				// 用户选择的店铺商业是不限
+				if (shopBusinessIds.equals(9L)) {
+					// 1.  根据类型值 从常量表查询出所有商铺行业id
+					List<Long> businessIds = commonConstService.listByType(3L);
+					if (!CollectionUtils.isEmpty(businessIds)) {
+						wrapper.in("shop_business_id", businessIds);
 					}
 				} else {
 					// 选择的不是不限
-					List<Long> list = shopLeaseMapper.selectMiddle(shopBusinessIds);
-					if (!CollectionUtils.isEmpty(list)) {
-						wrapper.in("id", list);
-					} else {
-						return null;
-					}
+					wrapper.eq("shop_business_id", shopBusinessIds);
 				}
 			}
 			
@@ -456,48 +442,32 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			
 			// 类型
-			List<Long> shopTypeIds = houseQO.getShopTypeIds();
-			if (!CollectionUtils.isEmpty(shopTypeIds)) {
-				// 用户选择的是不限
-				if (shopTypeIds.contains(42L)) {
-					// 1. 去常量表中查询出该类型对应的所有标签id集合
-					List<Long> ids = houseConstService.getConstIdByType(7);
-					if (!CollectionUtils.isEmpty(ids)) {
-						List<Long> list = shopLeaseMapper.selectMiddle(shopTypeIds);
-						if (!CollectionUtils.isEmpty(list)) {
-							wrapper.in("id", list);
-						}
-					}
-				}
-				// 选择的不是不限
-				List<Long> list = shopLeaseMapper.selectMiddle(shopTypeIds);
-				if (!CollectionUtils.isEmpty(list)) {
-					wrapper.in("id", list);
+			Long shopTypeIds = houseQO.getShopTypeId();
+			if (shopTypeIds!=null) {
+				// 用户选择的商铺类型是不限
+				if (shopTypeIds.equals(1L)) {
+					// 根据类型值 从常量表查询出所有商铺类型id
+					List<Long> typeIds = commonConstService.listByType(2L);
+					wrapper.in("shop_type_id", typeIds);
 				} else {
-					return null;
+					// 选择的不是不限
+					wrapper.eq("shop_type_id", shopTypeIds);
 				}
 			}
 			
 			// 行业
-			List<Long> shopBusinessIds = houseQO.getShopBusinessIds();
-			if (!CollectionUtils.isEmpty(shopBusinessIds)) {
-				// 用户选择的是不限
-				if (shopBusinessIds.contains(50L)) {
-					// 1. 去常量表中查询出该类型对应的所有标签id集合
-					List<Long> ids = houseConstService.getConstIdByType(8);
-					if (!CollectionUtils.isEmpty(ids)) {
-						List<Long> list = shopLeaseMapper.selectMiddle(shopBusinessIds);
-						if (!CollectionUtils.isEmpty(list)) {
-							wrapper.in("id", list);
-						}
+			Long shopBusinessIds = houseQO.getShopBusinessId();
+			if (shopBusinessIds!=null) {
+				// 用户选择的店铺商业是不限
+				if (shopBusinessIds.equals(9L)) {
+					// 1.  根据类型值 从常量表查询出所有商铺行业id
+					List<Long> businessIds = commonConstService.listByType(3L);
+					if (!CollectionUtils.isEmpty(businessIds)) {
+						wrapper.in("shop_business_id", businessIds);
 					}
-				}
-				// 选择的不是不限
-				List<Long> list = shopLeaseMapper.selectMiddle(shopBusinessIds);
-				if (!CollectionUtils.isEmpty(list)) {
-					wrapper.in("id", list);
 				} else {
-					return null;
+					// 选择的不是不限
+					wrapper.eq("shop_business_id", shopBusinessIds);
 				}
 			}
 			
@@ -529,21 +499,51 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 封装图片
 			QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();
-			imgWrapper.eq("shop_id", id).last("limit 1");
-			ShopImgEntity shopImgEntity = shopImgMapper.selectOne(imgWrapper);
-			if (shopImgEntity != null) {
-				indexShopVO.setImgPath(shopImgEntity.getImgUrl());
+			imgWrapper.eq("shop_id", id);
+			List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(imgWrapper);
+			if (!CollectionUtils.isEmpty(shopImgEntities)) {
+				for (ShopImgEntity imgEntity : shopImgEntities) {
+					String imgUrl = imgEntity.getImgUrl();
+					if (imgUrl.contains("shop-head")) {
+						indexShopVO.setImgPath(imgUrl);
+					}
+					break;
+				}
 			}
 			
 			// 封装标签集合
-			Long[] tags = shopLeaseMapper.selectTags(id);
-			if (tags != null && tags.length > 0) {
-				List<String> constNameByConstId = houseConstService.getConstNameByConstId(tags);
-				indexShopVO.setTags(constNameByConstId);
+			Long shopFacility = record.getShopFacility(); // 商铺配套设施
+			Long shopPeople = record.getShopPeople(); // 商铺客流人群
+			
+			List<Long> facilityList = MyMathUtils.analysisTypeCode(shopFacility); // 将商铺配套设施从常量表中解析出来
+			List<Long> facilityCodes = new ArrayList<>(); // 用于存储配套设施Code
+			if (!CollectionUtils.isEmpty(facilityList)) {
+				for (Long aLong : facilityList) {
+					facilityCodes.add(aLong);
+				}
+			}
+			List<String> facilitys = houseConstService.getConstByTypeCodeForString(facilityCodes, 16L);
+			
+			List<Long> peopleList = MyMathUtils.analysisTypeCode(shopPeople);// 将商铺客流人群从常量表中解析出来
+			ArrayList<Long> peopleCodes = new ArrayList<>();// 用于存储客流人群Code
+			if (!CollectionUtils.isEmpty(peopleList)) {
+				for (Long aLong : peopleList) {
+					peopleCodes.add(aLong);
+				}
+			}
+			List<String> peoples = houseConstService.getConstByTypeCodeForString(peopleCodes, 17L);
+			
+			// 将2个集合合并为1个集合
+			
+			ArrayList<String> list = new ArrayList<>();
+			// 将两个集合封装成一个集合
+			if (facilitys != null) {
+				list.addAll(peoples);
+				list.addAll(facilitys);
+				indexShopVO.setTags(list);
 			}
 			shopVOS.add(indexShopVO);
 		}
-		
 		PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(page, pageInfo);
 		pageInfo.setRecords(shopVOS);
@@ -650,5 +650,18 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		shopLeaseMapper.insert(shopLeaseEntity);
 	}
 	
+	@Override
+	public Map<String, Object> moreOption() {
+		// 1. 查询所有商铺分类
+		List<CommonConst> typeList = commonConstService.getShopType();
+		
+		// 2. 查询所有商铺商业
+		List<CommonConst> businessList = commonConstService.getBusiness();
+		
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("type",typeList);
+		map.put("business",businessList);
+		return map;
+	}
 	
 }

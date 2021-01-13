@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
  * 公共常量表
  * </p>
  *
- * @author jsy
+ * @author lihao
  * @since 2020-12-25
  */
 @Data

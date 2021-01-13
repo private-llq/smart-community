@@ -144,6 +144,11 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
     }
     
     @Override
+    public List<String> getShopTags(Long shopFacility) {
+        return houseConstMapper.getConstNameByCode(shopFacility);
+    }
+    
+    @Override
     public Map<String,Object> getTag() {
         Map<String, Object> map = new HashMap<>();
     
