@@ -37,7 +37,7 @@ public class IndexShopVO implements Serializable {
 	private BigDecimal monthMoney;
 	
 	@ApiModelProperty(value = "店铺面积  单位：平米")
-	private Integer shopAcreage;
+	private Double shopAcreage;
 	
 	@ApiModelProperty(value = "店铺图片")
 	private String imgPath;

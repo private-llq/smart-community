@@ -1,7 +1,6 @@
 package com.jsy.community.constant;
 
 import com.jsy.community.entity.HouseLeaseConstEntity;
-import org.springframework.boot.autoconfigure.integration.IntegrationAutoConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -611,6 +610,48 @@ public interface BusinessEnum {
 		public static List<HouseLeaseConstEntity> houseLeaseConstEntityList = null;
 
 
+	}
+	
+	
+	
+	/**
+	 * 商铺租售 商铺发布源 常量
+	 * @author lihao
+	 * @since  2020/12/10 10:02
+	 *  1业主、2物业、3未知
+	 */
+	enum SourceEnum {
+		PROPRIETOR(1,"业主"),
+		PROPERTY(2,"物业" ),
+		UNKNOWN(3,"未知");
+		private final String name;
+		private final Integer code;
+		
+		SourceEnum(Integer code,String name) {
+			this.name = name;
+			this.code = code;
+		}
+		
+		public static final int min = 1;
+		
+		public static final int max = 3;
+		
+		private volatile static Map<Integer,String > kv = null;
+		
+		public static Map<Integer,String> getKv(){
+			if( kv == null ){
+				synchronized (HouseDirectionEnum.class){
+					if(kv == null){
+						SourceEnum[] values = values();
+						kv = new HashMap<>(values.length);
+						for(SourceEnum everyOne : values){
+							kv.put(everyOne.code,everyOne.name);
+						}
+					}
+				}
+			}
+			return kv;
+		}
 	}
 
 }

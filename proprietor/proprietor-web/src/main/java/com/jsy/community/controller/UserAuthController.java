@@ -130,7 +130,7 @@ public class UserAuthController {
 			|| StringUtils.isEmpty(userThirdPlatformQO.getCode())){
 			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"手机和验证码不能为空");
 		}
-		return CommonResult.ok(userService.bindThirdPlatform(userThirdPlatformQO));
+		return CommonResult.ok(userService.bindThirdPlatform(userThirdPlatformQO),"绑定成功");
 	}
 	
 	@ApiOperation("注册")

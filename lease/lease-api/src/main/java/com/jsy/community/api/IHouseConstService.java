@@ -74,4 +74,6 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @Param [i]
      **/
     List<Long> getConstIdByType(Integer i);
+    
+    List<String> getShopTags(Long shopFacility);
 }

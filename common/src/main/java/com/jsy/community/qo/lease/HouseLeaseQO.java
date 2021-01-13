@@ -203,10 +203,10 @@ public class HouseLeaseQO implements Serializable {
     // 商铺标签
     
     // 类型
-    private List<Long> shopTypeIds;
+    private Long shopTypeId;
     
     // 行业
-    private List<Long> shopBusinessIds;
+    private Long shopBusinessId;
     
     // 商铺标签
 

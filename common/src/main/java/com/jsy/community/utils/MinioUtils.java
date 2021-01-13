@@ -4,21 +4,16 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidPortException;
 import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
 public class MinioUtils {

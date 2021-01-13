@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.qo.shop.ShopQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.shop.IndexShopVO;
-import com.jsy.community.vo.shop.ShopLeaseVO;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 10:49
 	 * @Param []
 	 **/
-	void addShop(ShopLeaseVO shop);
+	void addShop(ShopQO shop);
 	
 	/**
 	 * @return com.jsy.community.vo.shop.ShopLeaseVO
@@ -46,7 +46,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 17:12
 	 * @Param [shop]
 	 **/
-	void updateShop(ShopLeaseVO shop, Long shopId);
+	void updateShop(ShopQO shop, Long shopId);
 	
 	/**
 	 * @return void
@@ -55,7 +55,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 18:20
 	 * @Param []
 	 **/
-	void cancelShop(String userId, Long shopId, Long communityId, Long houseId);
+	void cancelShop(String userId, Long shopId);
 	
 	/**
 	 * @return java.util.Map<java.lang.String, java.lang.Object>
@@ -93,4 +93,13 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 **/
 	void testTransaction();
 	
+	
+	/**
+	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author lihao
+	 * @Description 更多
+	 * @Date 2021/1/13 9:44
+	 * @Param []
+	 **/
+	Map<String, Object> moreOption();
 }
