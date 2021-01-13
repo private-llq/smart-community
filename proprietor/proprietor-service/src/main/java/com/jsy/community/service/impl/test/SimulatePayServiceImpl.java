@@ -74,7 +74,7 @@ public class SimulatePayServiceImpl implements ISimulatePayService {
 	public Map getPayDetails(String number, Long id) {
 		PayCompanyEntity entity = payCompanyMapper.selectById(id);
 		Map map = new HashMap();
-		map.put("username","测试户名");
+		map.put("username","纵横世纪");
 		map.put("doorNo",number);
 		map.put("typeID",entity.getId());
 		map.put("typeName",entity.getName());

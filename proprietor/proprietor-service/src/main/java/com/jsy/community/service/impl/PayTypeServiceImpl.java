@@ -76,7 +76,15 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayTypeEntity
 			payTypeMapper.insertToMiddle(id, entity.getId()); // 设置关联关系
 		}
 	}
-	
+
+	@Override
+	public List<PayCompanyEntity> selectPayCompany(Long type, Long cityId) {
+		return companyMapper.selectList(new QueryWrapper<PayCompanyEntity>()
+				.eq("region_id",cityId)
+				.eq("type_id",type)
+		);
+	}
+
 	@Override
 	public PageInfo<PayCompanyEntity> getPayCompany(BaseQO<PayCompanyEntity> baseQO, Long type, Long cityId) {
 		String cityName = baseQO.getQuery().getName();

@@ -61,10 +61,18 @@ public class LivingPaymentController {
         return CommonResult.ok(pageInfo);
 	}
 
+	@ApiOperation("城市id加缴费类型id查询缴费单位")
+	@PostMapping("/getPayCompany")
+	public CommonResult selectPayCompany(@ApiParam("缴费类型id") @RequestParam Long type,
+                                         @ApiParam("城市id") @RequestParam Long cityId){
+        List<PayCompanyEntity> payCompany = payTypeService.selectPayCompany(type,cityId);
+        return CommonResult.ok(payCompany);
+	}
+
 
 	@ApiOperation("通过订单id查询缴费凭证")
 	@PostMapping("/getOrderID")
-	public CommonResult getOrderID(@ApiParam("缴费类型id") @RequestParam Long id){
+	public CommonResult getOrderID(@ApiParam("订单id") @RequestParam Long id){
         PayVoucherVO payVoucherVO=livingPaymentService.getOrderID(id);
         return CommonResult.ok(payVoucherVO);
 	}

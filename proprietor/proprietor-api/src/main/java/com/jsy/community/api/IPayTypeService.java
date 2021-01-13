@@ -44,4 +44,6 @@ public interface IPayTypeService extends IService<PayTypeEntity> {
 	 * @Param [company, type, cityId]
 	 **/
 	PageInfo<PayCompanyEntity> getPayCompany(BaseQO<PayCompanyEntity> baseQO, Long type, Long cityId);
+
+	List<PayCompanyEntity> selectPayCompany(Long type, Long cityId);
 }
