@@ -7,6 +7,7 @@ import com.jsy.community.entity.lease.HouseReserveEntity;
 import com.jsy.community.mapper.HouseReserveMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseReserveQO;
+import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.lease.HouseReserveVO;
 import com.jsy.community.api.IHouseConstService;
@@ -98,7 +99,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
             //押金方式
             r.setHouseLeaseDeposit(houseConstService.getConstNameByConstTypeCode(Long.parseLong(r.getHouseLeaseDeposit()), 1L));
             //房型结构：三室一厅、四室一厅...
-            r.setHouseLeaseType(houseConstService.getConstNameByConstTypeCode(Long.parseLong(r.getHouseLeaseType()), 2L));
+            r.setHouseType(HouseHelper.parseHouseType(r.getHouseType()));
             //平方米
             r.setHouseSquareMeter(r.getHouseSquareMeter() + "m²");
             //房屋朝向

@@ -7,12 +7,12 @@
     <!-- 保存房屋租售信息 -->
     <insert id="insertHouseLease">
         insert into t_house_lease (id,uid,house_title,house_city_id,house_area_id,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_leasedeposit_id
-        ,house_type_id,house_floor,house_direction,house_year,house_source_id
+        ,house_type_code,house_floor,house_direction,house_source_id,bedroom_type,appellation
         ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_furniture_id,house_lon,house_lat,house_id,house_community_id,house_reserve_time,create_time
         )
         values
         (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAreaId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseUnit},#{houseSquareMeter},#{houseLeasedepositId}
-        ,#{houseTypeId},#{houseFloor},#{houseDirection},#{houseYear},#{houseSourceId}
+        ,#{houseTypeCode},#{houseFloor},#{houseDirection},#{houseSourceId},#{bedroomType},#{appellation}
         ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseFurnitureId},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},#{houseReserveTime},now()
         )
     </insert>
@@ -36,12 +36,16 @@
     <!-- 按列表查询房屋出租信息 -->
     <select id="queryHouseLeaseByList" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         select
-        id,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_id,house_lon,house_lat,house_furniture_id,house_reserve_time
+        id,bedroom_type,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_code,house_lon,house_lat,house_furniture_id,house_reserve_time
         from t_house_lease
         <where>
+            <!-- 如果查询筛选增加了搜索文本 -->
+            <if test="query.searchText != null and !query.searchText.equals(&apos;&apos;)">
+                house_title like concat('%',#{query.searchText},'%') or house_address like concat('%',#{query.searchText},'%')
+            </if>
             <!-- 如果查询筛选增加了市条件 -->
             <if test="query.houseAreaId != null and query.houseAreaId != &quot;&quot; and query.houseAreaId &gt; 0">
-                house_area_id = #{query.houseAreaId}
+                and house_area_id = #{query.houseAreaId}
             </if>
             <!-- 如果增加了租金筛选条件 大于最小租金 小于最大租金 -->
             <if test="query.housePriceMin != null and query.housePriceMin != &quot;&quot; and query.housePriceMin &gt; 0
@@ -55,8 +59,8 @@
                 #{query.houseSquareMeterMax}
             </if>
             <!-- 如果查询筛选增加了户型条件 几室几厅之类 -->
-            <if test="query.houseTypeId != null and query.houseTypeId != &quot;&quot; and query.houseTypeId &gt; 0">
-                and house_type_id = #{query.houseTypeId}
+            <if test="query.houseTypeCode != null and query.houseTypeCode != &quot;&quot; and query.houseTypeCode &gt; 0">
+                and house_type_code = #{query.houseTypeCode}
             </if>
             <!-- 如果查询筛选增加了房屋类型条件 住宅、别墅、公寓之类 1是不限的意思 -->
             <if test="query.houseLeasetypeId != null and query.houseLeasetypeId != &quot;&quot; and query.houseLeasetypeId &gt; 0 and query.houseLeasetypeId != 1">
@@ -103,6 +107,14 @@
         update t_house_lease
         <set>
             <trim  prefixOverrides=",">
+                <!-- 房屋卧室类型 -->
+                <if test="bedroomType != null and !bedroomType.equals(&apos;&apos;)">
+                    ,bedroom_type = #{bedroomType}
+                </if>
+                <!-- 房屋房主称呼 -->
+                <if test="appellation != null and !appellation.equals(&apos;&apos;)">
+                    ,appellation = #{appellation}
+                </if>
                 <!-- 房屋租售标题 -->
                 <if test="houseTitle != null and !houseTitle.equals(&apos;&apos;)">
                     ,house_title = #{houseTitle}
@@ -164,8 +176,8 @@
                     ,house_leasedeposit_id = #{houseLeasedepositId}
                 </if>
                 <!-- 房屋租售类型id -->
-                <if test="houseTypeId != null and houseTypeId &gt; 0">
-                    ,house_type_id = #{houseTypeId}
+                <if test="houseTypeCode != null and houseTypeCode &gt; 0">
+                    ,house_type_code = #{houseTypeCode}
                 </if>
                 <!-- 房屋楼层 -->
                 <if test="houseFloor != null and !houseFloor.equals(&apos;&apos;)">
@@ -183,7 +195,7 @@
                 <if test="houseYear != null and !houseYear.equals(&apos;&apos;)">
                     ,house_year = #{houseYear}
                 </if>
-                <!-- 房屋介绍内容 -->
+                <!-- 房屋介绍内容 -->appellation
                 <if test="houseIntroduce != null and !houseIntroduce.equals(&apos;&apos;)">
                     ,house_introduce = #{houseIntroduce}
                 </if>
@@ -225,13 +237,14 @@
         SELECT
             l.id,
 	        l.house_contact,
+	        l.appellation,
 	        l.house_image_id,
 	        l.house_price,
 	        l.house_unit,
 	        l.house_leasedeposit_id,
 	        l.house_leasemode_id,
 	        l.house_title,
-	        l.house_type_id,
+	        l.house_type_code,
 	        l.house_square_meter,
 	        l.house_floor,
 	        l.house_direction,
@@ -242,15 +255,12 @@
 	        l.house_lon,
 	        l.house_reserve_time,
 	        c.house_const_name AS houseLeaseMode,
-	        t.house_const_name AS houseType,
 	        d.house_const_name AS houseLeaseDeposit
         FROM
 	        t_house_lease AS l
 	        LEFT JOIN t_house_const AS c ON l.house_leasemode_id = c.house_const_code
 	        AND c.house_const_type = 11
-	        LEFT JOIN t_house_const AS t ON l.house_type_id = t.house_const_code
-	        AND t.house_const_type = 2
-	        LEFT JOIN t_house_const AS d ON l.house_type_id = d.house_const_code
+	        LEFT JOIN t_house_const AS d ON l.house_leasedeposit_id = d.house_const_code
 	        AND d.house_const_type = 1
             WHERE
 	        l.id = #{houseId}
@@ -266,12 +276,11 @@
             	l.house_price,
             	l.house_unit,
             	i.img_url as houseImage,
-            	t.house_const_name AS houseType
+            	l.house_type_code,
+            	l.bedroom_type
             FROM
             	t_house_lease AS l
             	LEFT JOIN t_house_image AS i ON l.house_image_id = i.field_id
-            	LEFT JOIN t_house_const AS t ON l.house_type_id = t.house_const_code
-            	AND t.house_const_type = 2
             	WHERE
             	l.uid = #{uid} and l.house_community_id = #{communityId}
     </select>
@@ -292,7 +301,7 @@
     </select>
 
     <!-- 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口 -->
-    <select id="searchLeaseHouse" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
+    <select id="searchLeaseHouseByText" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         SELECT
             l.id,
             l.house_title,
@@ -302,15 +311,38 @@
             l.house_unit,
             l.house_square_meter,
             l.house_image_id,
-            l.house_type_id,
+            l.house_type_code,
             l.house_lon,
             l.house_lat,
             l.house_furniture_id,
-            l.house_leasemode_id
+            l.house_leasemode_id,
+            l.bedroom_type
         FROM
 	        t_house_lease AS l
         WHERE
-	        l.house_title LIKE concat('%',#{text},'%')
-	    OR  l.house_address LIKE concat('%',#{text},'%')
+	        l.house_title LIKE concat('%',#{query.searchText},'%')
+	    OR  l.house_address LIKE concat('%',#{query.searchText},'%') LIMIT #{page},#{size}
+    </select>
+    <!-- 按租金搜索出租房源匹配接口 -->
+    <select id="searchLeaseHouseByPrice" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
+        SELECT
+            l.id,
+            l.house_title,
+            l.house_address,
+            l.house_advantage_id,
+            l.house_price,
+            l.house_unit,
+            l.house_square_meter,
+            l.house_image_id,
+            l.house_type_code,
+            l.house_lon,
+            l.house_lat,
+            l.house_furniture_id,
+            l.house_leasemode_id,
+            l.bedroom_type
+        FROM
+	        t_house_lease AS l
+        WHERE
+	        l.house_price = #{query.searchText} LIMIT #{page},#{size}
     </select>
 </mapper>

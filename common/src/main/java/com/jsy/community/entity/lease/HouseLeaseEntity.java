@@ -2,7 +2,9 @@ package com.jsy.community.entity.lease;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jsy.community.annotation.FieldValid;
 import com.jsy.community.entity.BaseEntity;
+import com.jsy.community.qo.lease.HouseLeaseQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -64,7 +66,7 @@ public class HouseLeaseEntity extends BaseEntity {
     private String houseLeaseMode;
 
     @ApiModelProperty(value = "房屋类型：四室一厅、二室一厅...")
-    private Integer houseTypeId;
+    private String houseTypeCode;
 
     @ApiModelProperty(value = "房屋所属楼层")
     private String houseFloor;
@@ -75,10 +77,8 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "房屋朝向")
     private String houseDirection;
 
-
-    @ApiModelProperty(value = "房屋年代")
-    private String houseYear;
-
+    @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
+    private String bedroomType;
 
     @ApiModelProperty(value = "房屋介绍内容")
     private String houseIntroduce;
@@ -88,6 +88,9 @@ public class HouseLeaseEntity extends BaseEntity {
 
     @ApiModelProperty(value = "房屋图片id,用于在中间表寻找拥有的图片地址")
     private Long houseImageId;
+
+    @ApiModelProperty(value = "房主称呼")
+    private String appellation;
 
     //65不限 66普通住宅 67别墅 68公寓
     @ApiModelProperty(value = "房屋出租类型ID")

@@ -41,7 +41,7 @@ public class HouseReserveVO implements Serializable {
     private String houseLeaseDeposit;
 
     @ApiModelProperty(value = "出租房屋类型：三室一厅.四室一厅...")
-    private String houseLeaseType;
+    private String houseType;
 
     @ApiModelProperty(value = "出租房屋平方米")
     private String houseSquareMeter;

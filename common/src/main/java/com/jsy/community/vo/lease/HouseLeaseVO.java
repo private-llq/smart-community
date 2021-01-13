@@ -1,5 +1,7 @@
 package com.jsy.community.vo.lease;
 
+import com.jsy.community.annotation.FieldValid;
+import com.jsy.community.qo.lease.HouseLeaseQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -68,6 +70,9 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房屋租售平方米")
     private BigDecimal houseSquareMeter;
 
+    @ApiModelProperty(value = "房主称呼")
+    private String appellation;
+
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
     @ApiModelProperty(value = "房屋出租方式id /1.压一付一/2.压一付三/3.压一付六")
     private Long houseLeasedepositId;
@@ -78,7 +83,7 @@ public class HouseLeaseVO implements Serializable {
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
     @ApiModelProperty(value = "房屋类型id：1.四室一厅、2.二室一厅...")
-    private Long houseTypeId;
+    private String houseTypeCode;
 
     @ApiModelProperty(value = "房屋类型文本：1.四室一厅、2.二室一厅...")
     private String houseType;
@@ -99,8 +104,6 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房源类型ID、73不限(默认) 74可短租 75邻地铁  76压一付一  77配套齐全  78精装修 79南北通透  80有阳台")
     private Long houseSourcetypeId;
 
-    @ApiModelProperty(value = "房屋年代")
-    private String houseYear;
 
     @ApiModelProperty(value = "房屋介绍内容")
     private String houseIntroduce;
@@ -108,12 +111,14 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房屋图片数组地址")
     private List<String> houseImage;
 
-    //t_house_lease  数据库house_image_id保存图片的id
+    @ApiModelProperty(value = "图片id")
     private Long houseImageId;
+
+    @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
+    private String bedroomType;
 
     //65不限 66普通住宅 67别墅 68公寓
     @ApiModelProperty(value = "房屋出租类型ID")
-    //业务层效验值的有效性
     private Integer houseLeasetypeId;
 
 

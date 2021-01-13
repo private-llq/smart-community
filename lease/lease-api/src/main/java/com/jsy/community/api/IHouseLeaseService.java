@@ -86,7 +86,7 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param text          文本
      * @return              返回搜索到的列表
      */
-    List<HouseLeaseVO> searchLeaseHouse(String text);
+    List<HouseLeaseVO> searchLeaseHouse(BaseQO<HouseLeaseQO> qo);
 
     /**
      * 验证houseId是否已经发布

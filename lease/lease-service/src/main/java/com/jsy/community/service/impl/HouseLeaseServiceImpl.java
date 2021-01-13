@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.LeaseException;
 import com.jsy.community.constant.BusinessEnum;
@@ -7,6 +8,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.ValidatorUtils;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author YuLF
@@ -134,6 +137,8 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirection()));
         //1.8 查出房屋是否是被当前用户已收藏
         vo.setFavorite(houseLeaseMapper.isFavorite(houseId, uid) > 0);
+        //1.9 房屋类型 code转换为文本 如 4室2厅1卫
+        vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         return vo;
     }
 
@@ -213,12 +218,27 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * [为了后续方便修改、使用单表匹配搜索] 去缓存取标签的方式
      * 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口
      *
-     * @param text 文本
+     * @param qo 搜索参数
      * @return 返回搜索到的列表
      */
     @Override
-    public List<HouseLeaseVO> searchLeaseHouse(String text) {
-        List<HouseLeaseVO> vos = houseLeaseMapper.searchLeaseHouse(text);
+    public List<HouseLeaseVO> searchLeaseHouse(BaseQO<HouseLeaseQO> qo) {
+        //分页
+        qo.setPage( (qo.getPage() - 1) * qo.getSize() );
+        String searchText = qo.getQuery().getSearchText();
+        //验证 text 如果是纯数字 则按照租金来搜索
+        boolean b = Pattern.compile("^[0-9]*$").matcher(searchText).find();
+        List<HouseLeaseVO> vos;
+        if (b && StrUtil.isNotBlank(searchText)){
+            //按租金搜索
+            vos = houseLeaseMapper.searchLeaseHouseByPrice(qo);
+        } else {
+            //按 地址 标题搜索
+            vos = houseLeaseMapper.searchLeaseHouseByText(qo);
+        }
+        if( vos == null ){
+            return null;
+        }
         getHouseFieldTag(vos);
         return vos;
     }
@@ -254,7 +274,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             //3.通过出租方式id 查出 出租方式文本：如 合租、整租之类
             vo.setHouseLeaseMode(houseConstService.getConstNameByConstTypeCode(vo.getHouseLeasemodeId(), 11L));
             //4.通过户型id 查出 户型id对应的文本：如 四室一厅、三室一厅...
-            vo.setHouseType(houseConstService.getConstNameByConstTypeCode(vo.getHouseTypeId(), 2L));
+            vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         }
     }
 

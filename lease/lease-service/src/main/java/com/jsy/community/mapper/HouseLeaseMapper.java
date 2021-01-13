@@ -154,10 +154,18 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     /**
      * [为了后续方便修改、使用单表匹配搜索] 去缓存取标签的方式
      * 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口
-     * @param text          文本
+     * @param qo            请求参数
      * @return              返回搜索到的列表
      */
-    List<HouseLeaseVO> searchLeaseHouse(@Param("text") String text);
+    List<HouseLeaseVO> searchLeaseHouseByText(BaseQO<HouseLeaseQO> qo);
+
+
+    /**
+     * 按房屋租金搜索匹配接口
+     * @param qo            请求参数
+     * @return              返回搜索到的列表
+     */
+    List<HouseLeaseVO> searchLeaseHouseByPrice(BaseQO<HouseLeaseQO> qo);
 
     /**
      * 根据房屋id和uid在t_house_favorite查出该数据是否被收藏
@@ -173,4 +181,6 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      */
     @Select("select count(*) from t_house_lease where house_id = #{houseId}")
     boolean alreadyPublish(@Param("houseId") Long houseId);
+
+
 }

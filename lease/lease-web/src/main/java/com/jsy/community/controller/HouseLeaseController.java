@@ -18,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -113,10 +114,13 @@ public class HouseLeaseController {
     }
 
 
+    //TODO 分词查询
     @Login
     @PostMapping("/search")
     @ApiOperation("按小区名或标题或地址搜索房屋")
-    public CommonResult<List<HouseLeaseVO>> searchLeaseHouse(@RequestParam String text){
-        return CommonResult.ok(iHouseLeaseService.searchLeaseHouse(text));
+    public CommonResult<List<HouseLeaseVO>> searchLeaseHouse(@RequestBody BaseQO<HouseLeaseQO> qo){
+        ValidatorUtils.validateEntity(qo.getQuery(), HouseLeaseQO.searchLeaseHouse.class);
+        ValidatorUtils.validatePageParam(qo);
+        return CommonResult.ok(iHouseLeaseService.searchLeaseHouse(qo));
     }
 }
