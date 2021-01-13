@@ -80,13 +80,13 @@ public class OuterAuthorFilter implements Filter{
 					}
 				}
 			}
-			if(!flag){
-				log.error("接口" + path + "有非法访问尝试，来自IP：" + ip);
-				response.setCharacterEncoding("UTF-8");
-				PrintWriter out = response.getWriter();
-				out.println(JSONObject.parseObject(JSON.toJSONString(CommonResult.error(JSYError.INTERNAL.getCode(), "别试了别试了，功能已经下线了"))));
-				return;
-			}
+//			if(!flag){
+//				log.error("接口" + path + "有非法访问尝试，来自IP：" + ip);
+//				response.setCharacterEncoding("UTF-8");
+//				PrintWriter out = response.getWriter();
+//				out.println(JSONObject.parseObject(JSON.toJSONString(CommonResult.error(JSYError.INTERNAL.getCode(), "别试了别试了，功能已经下线了"))));
+//				return;
+//			}
 		}
 		chain.doFilter(request, response);
 	}
