@@ -15,9 +15,18 @@
     </sql>
 
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
-        SELECT pg.id as groupId,pg.name as groupName,po.family_id as payNumber,po.unit as payCompany,
-        tt.id as typeID,tt.name as typeName
-        FROM t_pay_order po join t_pay_type tt on po.payment_type=tt.id join t_pay_group pg on po.group_id=pg.id where pg.uid=#{userId}
+        SELECT pg.id as groupId,
+        pg.name as groupName,
+        po.family_id as payNumber,
+        po.unit_id as payCompanyId,
+        po.unit as payCompanyName,
+        tt.icon as icon,
+        tt.id as typeID,
+        tt.name as typeName
+        FROM t_pay_order po
+        join t_pay_type tt on po.payment_type=tt.id
+        join t_pay_group pg on po.group_id=pg.id
+        where pg.uid=#{userId}
     </select>
 
 
@@ -70,9 +79,11 @@
         <result property="groupId" column="groupId"/>
         <result property="groupName" column="groupName"/>
         <result property="payNumber" column="payNumber"/>
-        <result property="payCompany" column="payCompany"/>
+        <result property="payCompanyId" column="payCompanyId"/>
+        <result property="payCompanyName" column="payCompanyName"/>
         <result property="typeID" column="typeID"/>
         <result property="typeName" column="typeName"/>
+        <result property="icon" column="icon"/>
     </resultMap>
 
     <resultMap id="PaymentRecordsVOMAP" type="com.jsy.community.vo.PaymentRecordsVO">

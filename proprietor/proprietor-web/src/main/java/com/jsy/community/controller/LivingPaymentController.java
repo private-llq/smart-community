@@ -62,7 +62,7 @@ public class LivingPaymentController {
 	}
 
 	@ApiOperation("城市id加缴费类型id查询缴费单位")
-	@PostMapping("/getPayCompany")
+	@PostMapping("/selectPayCompany")
 	public CommonResult selectPayCompany(@ApiParam("缴费类型id") @RequestParam Long type,
                                          @ApiParam("城市id") @RequestParam Long cityId){
         List<PayCompanyEntity> payCompany = payTypeService.selectPayCompany(type,cityId);
@@ -161,7 +161,7 @@ public class LivingPaymentController {
     @Login
     public CommonResult selectList(){
         String userId = UserUtils.getUserId();
-        List list = livingPaymentService.selectList(userId);
+        List<DefaultHouseOwnerVO> list = livingPaymentService.selectList(userId);
         return CommonResult.ok(list);
     }
 

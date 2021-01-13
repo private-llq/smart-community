@@ -214,7 +214,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      * @return:
      */
     @Override
-    public List selectList(String userId) {
+    public List<DefaultHouseOwnerVO> selectList(String userId) {
         List<DefaultHouseOwnerVO> list=livingPaymentMapper.selectList(userId);
         return list;
     }
