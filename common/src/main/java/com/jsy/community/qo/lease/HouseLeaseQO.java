@@ -1,5 +1,6 @@
 package com.jsy.community.qo.lease;
 
+import com.jsy.community.annotation.FieldValid;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.utils.RegexUtils;
@@ -131,14 +132,16 @@ public class HouseLeaseQO implements Serializable {
     private BigDecimal houseSquareMeterMax;
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
-    @ApiModelProperty(value = "房屋出租方式id /1.压一付一/2.压一付三/3.压一付六")
+    @ApiModelProperty(value = "房屋出租方式 /1.压一付一/2.压一付三/3.压一付六")
+
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "押金方式是必须选择的")
-    private Short houseLeasedepositId;
+    private String houseLeasedepositId;
 
     //值是变动  需要存id至数据库 对应 名称 有后台人员管理
     @ApiModelProperty(value = "房屋类型id：1.四室一厅、2.二室一厅...")
+    @Pattern(groups = {addLeaseSaleHouse.class}, regexp = "^[0-9]{6}$", message = "房屋类型Code必须为6位数字!")
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未选择房屋类型")
-    private Short houseTypeId;
+    private String houseTypeCode;
 
     @ApiModelProperty(value = "房屋所属楼层")
     @Length(groups = {addLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_FLOOR_CHAR_MAX, message = "楼层字符超过上限")
@@ -157,10 +160,10 @@ public class HouseLeaseQO implements Serializable {
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "房屋来源类型ID未选择!")
     private Short houseSourceId;
 
-    @ApiModelProperty(value = "房屋年代")
-    @Pattern(groups = {addLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_YEAR , message = "房屋年代过于久远!")
-    @NotBlank(groups = {addLeaseSaleHouse.class}, message = "房屋年代未选择!")
-    private String houseYear;
+
+    @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
+    @FieldValid(groups = {addLeaseSaleHouse.class}, value = {"主卧", "次卧", "其他"}, message = "卧室类型错误!")
+    private String bedroomType;
 
 
     @ApiModelProperty(value = "房屋介绍内容")
@@ -173,19 +176,26 @@ public class HouseLeaseQO implements Serializable {
     @Size(groups = {addLeaseSaleHouse.class}, min = 1, max = 8, message = "至少需要一张房屋实景图,最大8张!")
     private String[] houseImage;
 
+    @ApiModelProperty(value = "房主称呼")
+    @Length(groups = {addLeaseSaleHouse.class,updateLeaseSaleHouse.class}, min = 2, max = 4, message = "请输入一个正确的称呼!2~4字符")
+    @NotBlank(groups = {addLeaseSaleHouse.class}, message = "房主称呼不能为空")
+    private String appellation;
+
     //t_house_lease  数据库house_image_id保存图片的id
     private Long houseImageId;
 
+    @ApiModelProperty(value = "房源搜索文本")
+    @Length(groups = {searchLeaseHouse.class}, max = 32, message = "搜索最多32个字符!")
+    private String searchText;
+
     //65不限 66普通住宅 67别墅 68公寓
     @ApiModelProperty(value = "房屋出租类型ID")
-    //业务层效验值的有效性
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未填写出租类型!")
     private Integer houseLeasetypeId;
 
 
     //69不限 70整租，71合租
     @ApiModelProperty(value = "房屋出租方式ID")
-    //业务层效验 值有效性
     @NotNull(groups = {addLeaseSaleHouse.class}, message = "未填写出租方式!")
     private Integer houseLeasemodeId;
     
@@ -204,6 +214,11 @@ public class HouseLeaseQO implements Serializable {
      * 新增房屋租售验证接口参数验证
      */
     public interface addLeaseSaleHouse{}
+
+    /**
+     * 搜索文本参数验证
+     */
+    public interface searchLeaseHouse{}
 
     /**
      * 修改房屋参数验证接口
