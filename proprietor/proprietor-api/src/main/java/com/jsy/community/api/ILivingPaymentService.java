@@ -45,7 +45,7 @@ public interface ILivingPaymentService {
      * @param
      * @return
      */
-    List selectList(String userId);
+    List<DefaultHouseOwnerVO> selectList(String userId);
     /**
      * @Description: 添加订单备注
      * @author: Hu

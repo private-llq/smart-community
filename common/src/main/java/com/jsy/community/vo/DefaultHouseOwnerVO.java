@@ -17,14 +17,18 @@ import java.io.Serializable;
 public class DefaultHouseOwnerVO implements Serializable {
     @ApiModelProperty(value = "户组id")
     private Long groupId;
-    @ApiModelProperty(value = "户组id")
+    @ApiModelProperty(value = "户组name")
     private String groupName;
     @ApiModelProperty(value = "户号")
     private String payNumber;
-    @ApiModelProperty(value = "缴费单位")
-    private String payCompany;
+    @ApiModelProperty(value = "缴费单位ID")
+    private String payCompanyId;
+    @ApiModelProperty(value = "缴费单位name")
+    private String payCompanyName;
     @ApiModelProperty(value = "缴费类型ID")
     private Long typeID;
     @ApiModelProperty(value = "缴费类型name")
     private String typeName;
+    @ApiModelProperty(value = "icon")
+    private String icon;
 }
