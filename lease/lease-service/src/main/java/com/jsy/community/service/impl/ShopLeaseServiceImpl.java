@@ -147,6 +147,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			shopLeaseVo.setShopFacilityStrings(constByTypeCodeForString);
 		}
 		
+		// 封装类型
+		Long shopTypeId = shop.getShopTypeId();
+		CommonConst type = commonConstService.getConstById(shopTypeId);
+		shopLeaseVo.setShopTypeString(type.getConstName());
+		
+		// 封装行业
+		Long shopBusinessId = shop.getShopTypeId();
+		CommonConst business = commonConstService.getConstById(shopBusinessId);
+		shopLeaseVo.setShopBusinessString(business.getConstName());
+		
 		// 封装客流人群
 		Long shopPeople = shop.getShopPeople();
 		List<Long> peopleCode = MyMathUtils.analysisTypeCode(shopPeople);
@@ -169,13 +179,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		}
 		
 		// 封装来源
-		Integer source = shopLeaseVo.getSource();// 1 2 3
+		Integer source = shop.getSource();// 1 2 3
 		Map<Integer, String> kv = BusinessEnum.SourceEnum.getKv();
 		String s = kv.get(source);
 		shopLeaseVo.setSourceString(s);
 		
 		// 封装状态
-		Integer status = shopLeaseVo.getStatus();
+		Integer status = shop.getStatus();
 		if (status == 0) {
 			shopLeaseVo.setStatusString("空置中");
 		} else {

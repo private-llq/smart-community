@@ -71,8 +71,8 @@ public class ShopLeaseVO implements Serializable {
 	@ApiModelProperty(value = "纬度")
 	private BigDecimal lat;
 	
-	@ApiModelProperty(value = "来源 0个人 1物业")
-	private Integer source;
+//	@ApiModelProperty(value = "来源 0个人 1物业")
+//	private Integer source;
 	
 	@ApiModelProperty(value = "来源 0个人 1物业")
 	private String sourceString;
@@ -95,8 +95,8 @@ public class ShopLeaseVO implements Serializable {
 	@ApiModelProperty(value = "起租月数")
 	private Integer startLease;
 	
-	@ApiModelProperty(value = "店铺状态 0空置中 1经营中")
-	private Integer status;
+//	@ApiModelProperty(value = "店铺状态 0空置中 1经营中")
+//	private Integer status;
 	
 	@ApiModelProperty(value = "店铺状态 0空置中 1经营中  字符串形式")
 	private String statusString;
@@ -110,21 +110,27 @@ public class ShopLeaseVO implements Serializable {
 	
 	
 	
-	@ApiModelProperty(value = "客流人群Code")
-	private List<Long> shopPeoples;
+//	@ApiModelProperty(value = "客流人群Code")
+//	private List<Long> shopPeoples;
 	
 	@ApiModelProperty(value = "客流人群Code")
 	private List<String> shopPeopleStrings;
 	
-	@ApiModelProperty(value = "配套设施Code")
-	private List<Long> shopFacilityList;
+//	@ApiModelProperty(value = "配套设施Code")
+//	private List<Long> shopFacilityList;
 	
 	@ApiModelProperty(value = "配套设施名称")
 	private List<String> shopFacilityStrings;
 	
-	@ApiModelProperty(value = "所属商业id")
-	private Long shopBusinessId;
+//	@ApiModelProperty(value = "所属商业id")
+//	private Long shopBusinessId;
 	
-	@ApiModelProperty(value = "所属类型id")
-	private Long shopTypeId;
+	@ApiModelProperty(value = "所属商业字符串")
+	private String shopBusinessString;
+	
+//	@ApiModelProperty(value = "所属类型id")
+//	private Long shopTypeId;
+	
+	@ApiModelProperty(value = "所属类型字符串")
+	private String shopTypeString;
 }

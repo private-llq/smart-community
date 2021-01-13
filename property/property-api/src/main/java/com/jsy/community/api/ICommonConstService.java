@@ -34,4 +34,13 @@ public interface ICommonConstService extends IService<CommonConst> {
 	 * @Param []
 	 **/
 	List<CommonConst> getBusiness();
+	
+	/**
+	 * @return com.jsy.community.entity.CommonConst
+	 * @Author lihao
+	 * @Description 根据id查询常量
+	 * @Date 2021/1/13 11:15
+	 * @Param [shopTypeId]
+	 **/
+	CommonConst getConstById(Long shopTypeId);
 }

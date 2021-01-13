@@ -45,4 +45,11 @@ public class CommonConstServiceImpl extends ServiceImpl<CommonConstMapper, Commo
 		wrapper.eq("type_id",3);
 		return commonConstMapper.selectList(wrapper);
 	}
+	
+	@Override
+	public CommonConst getConstById(Long shopTypeId) {
+		QueryWrapper<CommonConst> commonConstQueryWrapper = new QueryWrapper<>();
+		commonConstQueryWrapper.eq("id",shopTypeId);
+		return commonConstMapper.selectOne(commonConstQueryWrapper);
+	}
 }
