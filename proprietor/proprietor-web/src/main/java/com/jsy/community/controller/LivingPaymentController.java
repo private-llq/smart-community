@@ -93,7 +93,6 @@ public class LivingPaymentController {
         PaymentDetailsVO paymentDetailsVO=livingPaymentService.add(livingPaymentQO);
         return CommonResult.ok(paymentDetailsVO);
     }
-
     /**
      * 选择分组查询下面缴过费的水电气户号
      * @param groupQO

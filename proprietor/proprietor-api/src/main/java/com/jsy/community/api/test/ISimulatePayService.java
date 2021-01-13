@@ -15,5 +15,5 @@ public interface ISimulatePayService {
 	
 	PayData getPayData(String number,Integer id);
 
-	Map getPayDetails(String number, Long id);
+	Map getPayDetails(String doorNo, Long id);
 }

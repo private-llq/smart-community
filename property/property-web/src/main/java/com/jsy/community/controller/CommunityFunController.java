@@ -80,7 +80,7 @@ public class CommunityFunController {
     }
 
     @ApiOperation("查询一条---表单回填")
-    @DeleteMapping("/findOne")
+    @GetMapping("/findOne")
     public CommonResult findOne(@ApiParam("社区趣事id")
                                @RequestParam Long id) {
         CommunityFunEntity communityFunEntity = communityFunService.getById(id);

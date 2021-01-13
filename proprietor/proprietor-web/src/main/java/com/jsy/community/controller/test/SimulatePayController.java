@@ -39,7 +39,7 @@ public class SimulatePayController {
 	}
 	@PostMapping("/getPayDetails")
 	@ApiOperation("户号和缴费单位ID生成假账单")
-	public Map getPayDetails(@RequestParam("number")String number, @RequestParam("id")Long id){
-		return simulatePayService.getPayDetails(number,id);
+	public Map getPayDetails(@RequestParam("doorNo")String doorNo, @RequestParam("id")Long id){
+		return simulatePayService.getPayDetails(doorNo,id);
 	}
 }
