@@ -64,8 +64,9 @@ public class LivingPaymentController {
 	@ApiOperation("城市id加缴费类型id查询缴费单位")
 	@PostMapping("/selectPayCompany")
 	public CommonResult selectPayCompany(@ApiParam("缴费类型id") @RequestParam Long type,
-                                         @ApiParam("城市id") @RequestParam Long cityId){
-        List<PayCompanyEntity> payCompany = payTypeService.selectPayCompany(type,cityId);
+                                         @ApiParam("城市id") @RequestParam Long cityId,
+                                         @ApiParam("城市name") @RequestParam String name){
+        List<PayCompanyEntity> payCompany = payTypeService.selectPayCompany(type,cityId,name);
         return CommonResult.ok(payCompany);
 	}
 

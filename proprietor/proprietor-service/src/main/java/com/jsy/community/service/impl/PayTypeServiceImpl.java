@@ -78,11 +78,15 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayTypeEntity
 	}
 
 	@Override
-	public List<PayCompanyEntity> selectPayCompany(Long type, Long cityId) {
-		return companyMapper.selectList(new QueryWrapper<PayCompanyEntity>()
-				.eq("region_id",cityId)
-				.eq("type_id",type)
-		);
+	public List<PayCompanyEntity> selectPayCompany(Long type, Long cityId,String name) {
+		QueryWrapper<PayCompanyEntity> wrapper = new QueryWrapper<PayCompanyEntity>()
+				.eq("region_id", cityId)
+				.eq("type_id", type);
+		if (name!=null&&!name.equals("")){
+			wrapper.like("name",name);
+		}
+		List<PayCompanyEntity> list = companyMapper.selectList(wrapper);
+		return list;
 	}
 
 	@Override
