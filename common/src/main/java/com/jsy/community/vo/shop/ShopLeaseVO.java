@@ -20,18 +20,18 @@ import java.util.List;
 @ApiModel("店铺详情")
 public class ShopLeaseVO implements Serializable {
 	
-	@ApiModelProperty(value = "业主id")
-	private String uid;
-	
-	@ApiModelProperty(value = "城市id")
-	private Long cityId;
-	
-	@ApiModelProperty(value = "区域id")
-	private Long areaId;
-	
-	@ApiModelProperty(value = "社区id")
-	private Long communityId;
-	
+//	@ApiModelProperty(value = "业主id")
+//	private String uid;
+//
+//	@ApiModelProperty(value = "城市id")
+//	private Long cityId;
+//
+//	@ApiModelProperty(value = "区域id")
+//	private Long areaId;
+//
+//	@ApiModelProperty(value = "社区id")
+//	private Long communityId;
+//
 	@ApiModelProperty(value = "标题")
 	private String title;
 	
@@ -48,7 +48,7 @@ public class ShopLeaseVO implements Serializable {
 	private BigDecimal transferMoney;
 	
 	@ApiModelProperty(value = "店铺面积  单位：平米")
-	private Integer shopAcreage;
+	private Double shopAcreage;
 	
 	@ApiModelProperty(value = "面宽")
 	private Double shopWidth;
@@ -60,7 +60,7 @@ public class ShopLeaseVO implements Serializable {
 	private Double shopHeight;
 	
 	@ApiModelProperty(value = "楼层")
-	private Integer floor;
+	private String floor;
 	
 	@ApiModelProperty(value = "图片地址集合")
 	private String[] imgPath;

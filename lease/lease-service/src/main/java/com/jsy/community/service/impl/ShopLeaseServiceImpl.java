@@ -153,7 +153,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		shopLeaseVo.setShopTypeString(type.getConstName());
 		
 		// 封装行业
-		Long shopBusinessId = shop.getShopTypeId();
+		Long shopBusinessId = shop.getShopBusinessId();
 		CommonConst business = commonConstService.getConstById(shopBusinessId);
 		shopLeaseVo.setShopBusinessString(business.getConstName());
 		
@@ -544,7 +544,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			List<String> peoples = houseConstService.getConstByTypeCodeForString(peopleCodes, 17L);
 			
 			// 将2个集合合并为1个集合
-			
 			ArrayList<String> list = new ArrayList<>();
 			// 将两个集合封装成一个集合
 			if (facilitys != null) {
@@ -553,6 +552,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 				indexShopVO.setTags(list);
 			}
 			shopVOS.add(indexShopVO);
+			
+			
+			// 封装地址
+			Long cityId = record.getCityId();
+			String city = redisTemplate.opsForValue().get("RegionSingle" + ":" + cityId);
+			
+			Long areaId = record.getAreaId();
+			String area = redisTemplate.opsForValue().get("RegionSingle" + ":" + areaId);
+			
+			indexShopVO.setAddress(city+"  "+area);
 		}
 		PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(page, pageInfo);
