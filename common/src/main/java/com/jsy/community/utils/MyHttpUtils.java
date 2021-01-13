@@ -101,13 +101,13 @@ public class MyHttpUtils {
 	}
 	
 	//构建HttpPost
-	public static HttpPost httpPostWithoutParams(String url, Map<String,String> bodyMap){
+	public static HttpPost httpPostWithoutParams(String url, Map<String,Object> bodyMap){
 		return httpPost(url,null,bodyMap);
 	}
 	public static HttpPost httpPostWithoutBody(String url, Map<String,String> paramsMap){
 		return httpPost(url,paramsMap,null);
 	}
-	public static HttpPost httpPost(String url, Map<String,String> paramsMap, Map<String,String> bodyMap){
+	public static HttpPost httpPost(String url, Map<String,String> paramsMap, Map<String,Object> bodyMap){
 		URIBuilder uriBuilder = buildURL(url);
 		//设置params
 		if(paramsMap != null){
