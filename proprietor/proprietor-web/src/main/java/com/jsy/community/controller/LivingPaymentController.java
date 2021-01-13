@@ -191,6 +191,13 @@ public class LivingPaymentController {
         String upload = MinioUtils.upload(file, "bbbb");
         return CommonResult.ok(upload);
     }
+//    @ApiOperation("添加备注图片")
+//    @PostMapping("/addRemarkImgss")
+//    @Login
+//    public CommonResult addRemarkImgss(@RequestParam("file") MultipartFile file){
+//        String upload = MinioUtils.upload(file, "tpye-imgs");
+//        return CommonResult.ok(upload);
+//    }
 
 
 }

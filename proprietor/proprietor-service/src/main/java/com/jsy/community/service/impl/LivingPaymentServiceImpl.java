@@ -127,7 +127,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
             payHouseOwnerEntity.setId(SnowFlake.nextId());
             payHouseOwnerEntity.setGroupId(group_id);
             payHouseOwnerEntity.setPayCompany(livingPaymentQO.getPayCostUnitId());
-            payHouseOwnerEntity.setPayNumber(livingPaymentQO.getDoorNo());
+            payHouseOwnerEntity.setFamilyId(livingPaymentQO.getDoorNo());
             payHouseOwnerEntity.setType(livingPaymentQO.getType());
             payHouseOwnerEntity.setUid(livingPaymentQO.getUserID());
             payHouseOwnerMapper.insert(payHouseOwnerEntity);

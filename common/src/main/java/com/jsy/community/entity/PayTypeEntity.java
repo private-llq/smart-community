@@ -29,4 +29,10 @@ public class PayTypeEntity extends BaseEntity {
     @ApiModelProperty(value = "图片地址")
     private String icon;
 
+    @ApiModelProperty(value = "中号图片地址")
+    private String mediumIcon;
+
+    @ApiModelProperty(value = "大号图片地址")
+    private String largeSizeIcon;
+
 }
