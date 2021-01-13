@@ -165,6 +165,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         switch (userThirdPlatformQO.getThirdPlatformType()){
             case Const.ThirdPlatformConsts.ALIPAY :
                 String accessToken = alipayService.getAccessToken(userThirdPlatformQO.getAuthCode());
+                if(accessToken == null){
+                    break;
+                }
                 thirdUid = alipayService.getUserid(accessToken);
                 break;
             case Const.ThirdPlatformConsts.WECHAT :
@@ -222,15 +225,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //手机验证码验证 不过报错
         commonService.checkVerifyCode(userThirdPlatformQO.getMobile(), userThirdPlatformQO.getCode());
         //查询是否注册
-        String userid = userAuthService.queryUserIdByMobile(userThirdPlatformQO.getMobile());
+        String uid = userAuthService.queryUserIdByMobile(userThirdPlatformQO.getMobile());
         //若没有注册 立即注册
-        String uid = null;
-        if(StringUtils.isEmpty(userid)){
+        if(StringUtils.isEmpty(uid)){
             RegisterQO registerQO = new RegisterQO();
             registerQO.setAccount(userThirdPlatformQO.getMobile());
             registerQO.setCode(userThirdPlatformQO.getCode());
             uid = register(registerQO);
-            
         }
         //三方登录表入库
         UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
