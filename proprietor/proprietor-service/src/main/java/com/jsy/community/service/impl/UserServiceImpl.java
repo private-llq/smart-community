@@ -255,26 +255,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * 页面登记 业主信息
      * @author YuLF
      * @since  2020/12/18 11:39
-     * @param proprietorQO 登记实体参数
+     * @param proprietorQo 登记实体参数
      * @return             返回是否登记成功
      */
     @Transactional(rollbackFor = {Exception.class})
     @Override
-    public Boolean proprietorRegister(ProprietorQO proprietorQO) {
+    public Boolean proprietorRegister(ProprietorQO proprietorQo) {
         //把参数对象里面的值赋值给UserEntity  使用Mybatis plus的insert需要 Entity里面写的表名
         UserEntity userEntity = new UserEntity();
-        BeanUtils.copyProperties(proprietorQO, userEntity);
+        BeanUtils.copyProperties(proprietorQo, userEntity);
         //添加业主信息 由于在注册时会像t_user表插入一条空记录为用户的id，这里直接做更新操作，
-        int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("uid", proprietorQO.getUid()));
+        int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("uid", proprietorQo.getUid()));
         if (count == 0) {
             return false;
         }
         //业主登记时有填写车辆信息的情况下，新增车辆
-        if (proprietorQO.getHasCar()) {
-            carService.addProprietorCarForList(proprietorQO.getCarEntityList());
+        if (proprietorQo.getHasCar()) {
+            carService.addProprietorCarForList(proprietorQo.getCarEntityList());
         }
         //t_user_house 中插入当前这条记录 为了让物业审核
-		userHouseService.saveUserHouse(userEntity.getUid(), proprietorQO.getHouseEntityList());
+		userHouseService.saveUserHouse(userEntity.getUid(), proprietorQo.getHouseEntityList());
         return true;
     }
 
@@ -285,7 +285,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Param proprietorQO        需要更新 实体参数
      * @since 2020/11/27 15:03
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean proprietorUpdate(ProprietorQO qo) {
         //========================================== 业主车辆 =========================================================
@@ -346,7 +346,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @author YuLF
      * @since  2020/12/10 16:25
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserInfoVo proprietorQuery(String userId, Long houseId) {
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",userId).select("real_name,sex,detail_address,avatar_url"));
@@ -424,7 +424,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @since  2020/12/18 11:39
      * @return			返回业主详情信息
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserInfoVo proprietorDetails(String userId) {
         //1.查出用户姓名信息

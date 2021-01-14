@@ -7,10 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -31,12 +33,20 @@ public class CommunityInformCleaner {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserInformService userInformService;
 
+    @Resource
+    public RedisTemplate<String, Object> redisTemplate;
+
     @Value("${jsy.sys.clear.inform.expire}")
     private Integer clearInformExpireDay;
 
     @PostConstruct
     public void initSourceConst(){
         clearPushInform();
+    }
+
+
+    public boolean isStart(){
+        return true;
     }
 
 
@@ -47,6 +57,8 @@ public class CommunityInformCleaner {
      */
     @Scheduled(cron = "0 0 1 ? * mon")
     public void clearPushInform(){
+
+        //向redis 存一把锁 让此模块
         logger.info(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "：清理社区推送消息执行开始:");
         //1.获取 clearInformExpireTime 之前的时间
         String beforeTime = getClearInformExpireTime(clearInformExpireDay);
@@ -54,6 +66,7 @@ public class CommunityInformCleaner {
         Integer delRow = userInformService.RegularCleaning(beforeTime);
         logger.info("本次清理社区推送消息" + beforeTime + "之前的数据共" + delRow + "条!");
         //TODO 分布式模块部署下 只需其中一个模块执行
+
     }
 
     /**

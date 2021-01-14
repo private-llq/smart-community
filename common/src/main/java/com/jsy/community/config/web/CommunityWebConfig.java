@@ -25,7 +25,7 @@ public class CommunityWebConfig {
      * Include.NON_EMPTY 属性为 空（“”） 或者为 NULL 都不序列化
      * Include.NON_NULL 属性为NULL 不序列化
      */
-    @Bean
+    @Bean(name = "mappingJackson2HttpMessageConverter")
     public MappingJackson2HttpMessageConverter getMappingJackson2HttpMessageConverter() {
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         ObjectMapper objectMapper = new ObjectMapper();

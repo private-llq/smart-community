@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * 资源常量执行器：1.负责 t_house_const  常量的 存取
  */
 @Service
-@Order() //最后加载
+@Order()
 public class SourceConstExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(SourceConstExecutor.class);
@@ -53,7 +53,8 @@ public class SourceConstExecutor {
         //1.把所有 house_const_type 存入Set去重 得到所有常量类型
         Set<String>  houseConstType = list.stream().map(HouseLeaseConstEntity::getHouseConstType).collect(Collectors.toSet());
         //2.遍历所有 house_const_type 类型   存入 redis
-        for(String constType : houseConstType){//相同类型的数据
+        //相同类型的数据
+        for(String constType : houseConstType){
             List<HouseLeaseConstEntity> alikeType = new ArrayList<>();
             for(HouseLeaseConstEntity entity : list ){
                 if( entity.getHouseConstType().equals(constType) ){
