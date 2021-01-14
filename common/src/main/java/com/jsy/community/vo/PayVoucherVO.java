@@ -38,7 +38,7 @@ public class PayVoucherVO implements Serializable {
     private Integer status;
 
     @ApiModelProperty(value = "户号")
-    private String familyId;
+    private String doorNo;
 
     @ApiModelProperty(value = "缴费金额")
     private BigDecimal paySum;

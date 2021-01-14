@@ -5,6 +5,7 @@ import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.vo.DefaultHouseOwnerVO;
 import com.jsy.community.vo.GroupVO;
 import com.jsy.community.vo.PaymentRecordsVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface LivingPaymentMapper {
      * @Param:
      * @return:
      */
-    List<DefaultHouseOwnerVO> selectList(String userId);
+    List<DefaultHouseOwnerVO> selectList(@Param("userId") String userId,@Param("page")Integer page,@Param("size")Integer size);
 
     /**
      * @Description: 查询每月订单记录

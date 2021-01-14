@@ -152,7 +152,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         paymentDetailsVO.setId(payOrderEntity.getId());
         paymentDetailsVO.setUnitName(entity.getName());
         paymentDetailsVO.setPayBalance(livingPaymentQO.getPayBalance());
-        paymentDetailsVO.setFamilyId(livingPaymentQO.getDoorNo());
+        paymentDetailsVO.setDoorNo(livingPaymentQO.getDoorNo());
         paymentDetailsVO.setOrderTime(LocalDateTime.now());
         paymentDetailsVO.setFamilyName(livingPaymentQO.getFamilyName());
         paymentDetailsVO.setAccountingTime(LocalDateTime.now());
@@ -221,7 +221,9 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      */
     @Override
     public List<DefaultHouseOwnerVO> selectList(String userId) {
-        List<DefaultHouseOwnerVO> list=livingPaymentMapper.selectList(userId);
+        int page=0;
+        int size=3;
+        List<DefaultHouseOwnerVO> list=livingPaymentMapper.selectList(userId,page,size);
         return list;
     }
 
@@ -248,7 +250,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payVoucherVO.setPayNum("");
         payVoucherVO.setPayType(typeEntity.getName());
         payVoucherVO.setStatus(entity.getStatus());
-        payVoucherVO.setFamilyId(entity.getFamilyId());
+        payVoucherVO.setDoorNo(entity.getFamilyId());
         payVoucherVO.setPaySum(entity.getPaymentAmount());
         payVoucherVO.setAddress(entity.getAddress());
         payVoucherVO.setOrderTime(entity.getOrderTime());

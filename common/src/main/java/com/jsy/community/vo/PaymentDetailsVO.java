@@ -25,7 +25,7 @@ public class PaymentDetailsVO implements Serializable {
     private String unitName;
 
     @ApiModelProperty(value = "户号")
-    private String familyId;
+    private String doorNo;
 
     @ApiModelProperty(value = "户名")
     private String familyName;

@@ -34,7 +34,7 @@ public class PaymentRecordsVO implements Serializable {
     private String unitName;
 
     @ApiModelProperty(value = "户号")
-    private String familyId;
+    private String doorNo;
 
     @ApiModelProperty(value = "缴费时间")
     private LocalDateTime orderTime;
