@@ -17,13 +17,10 @@ import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.logging.log4j.util.PropertiesUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * 业主 服务实现类
@@ -67,12 +64,12 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
     /**
      * 通过传入的参数更新业主信息
      *
-     * @param proprietorQO 更新业主信息参数
+     * @param proprietorQo 更新业主信息参数
      * @return 返回是否更新成功
      */
     @Override
-    public Boolean update(ProprietorQO proprietorQO) {
-        return proprietorMapper.update(proprietorQO) > 0;
+    public Boolean update(ProprietorQO proprietorQo) {
+        return proprietorMapper.update(proprietorQo) > 0;
     }
 
     /**
@@ -100,7 +97,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
      * @Param communityId              社区id
      * @since 2020/12/23 17:35
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public void saveUserBatch(List<UserEntity> userEntityList, Long communityId) {
         //1.验证 录入信息 房屋信息是否正确
@@ -130,9 +127,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
         //3 为所有用户 登记信息 t_user
         proprietorMapper.insertUserBatch(userEntityList);
         //4.为所有用户 登记房屋 状态都是已审核
-        userEntityList.forEach(h -> {
-            h.getHouseEntity().setId(SnowFlake.nextId());
-        });
+        userEntityList.forEach(h -> h.getHouseEntity().setId(SnowFlake.nextId()));
         proprietorMapper.registerHouseBatch(userEntityList, communityId);
     }
 
@@ -160,7 +155,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
      * @Param userEntityList     用户家属信息
      * @since 2020/12/25 14:47
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId) {
         //1.验证所有家属信息 选择的 业主 是否拥有当前房产
@@ -212,11 +207,11 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
     /**
      * [业主信息录入验证]验证用户录入的房屋信息是否能在数据库未登记房屋中 找到
      *
-     * @param NotVerified 未经验证的excel录入数据
+     * @param notVerified 未经验证的excel录入数据
      * @param verified    数据库已存在未登记的房屋信息数据
      */
-    private void validHouseList(List<UserEntity> NotVerified, List<HouseEntity> verified) {
-        for (UserEntity userEntity : NotVerified) {
+    private void validHouseList(List<UserEntity> notVerified, List<HouseEntity> verified) {
+        for (UserEntity userEntity : notVerified) {
             HouseEntity houseEntity = userEntity.getHouseEntity();
             //验证该房屋 是否能在 数据库中有匹配
             if (!judgeExist(houseEntity, verified)) {

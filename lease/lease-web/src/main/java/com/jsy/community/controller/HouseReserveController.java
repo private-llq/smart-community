@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author YuLF
@@ -61,7 +62,7 @@ public class HouseReserveController {
     @ApiOperation("预约提交接口")
     public CommonResult<Boolean> add(@RequestBody HouseReserveEntity qo) {
         //基本参数验证
-        ValidatorUtils.validateEntity(qo, HouseReserveEntity.add.class);
+        ValidatorUtils.validateEntity(qo, HouseReserveEntity.Add.class);
         //2.房屋验证
         qo.setReserveUid(UserUtils.getUserId());
         return CommonResult.ok(iHouseReserveService.add(qo),"提交预约成功!");
@@ -72,11 +73,23 @@ public class HouseReserveController {
     @DeleteMapping("/cancel")
     @ApiOperation("预约取消接口")
     public CommonResult<Boolean> cancel( @RequestBody HouseReserveQO qo) {
-        ValidatorUtils.validateEntity(qo, HouseReserveQO.cancel.class);
+        ValidatorUtils.validateEntity(qo, HouseReserveQO.Cancel.class);
         qo.setReserveUid(UserUtils.getUserId());
         Boolean cancel = iHouseReserveService.cancel(qo);
         return CommonResult.ok( cancel ? "取消预约成功!" : "取消预约失败!数据不存在");
     }
+
+    @Login
+    @DeleteMapping("/reject")
+    @ApiOperation("预约拒绝接口")
+    public CommonResult<Boolean> reject( @RequestBody HouseReserveQO qo) {
+        ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);
+        qo.setReserveUid(UserUtils.getUserId());
+        Boolean cancel = iHouseReserveService.reject(qo);
+        return CommonResult.ok( cancel ? "拒绝预约成功!" : "拒绝预约失败!数据不存在");
+    }
+
+
 
     @Login
     @PostMapping("/confirm")
@@ -108,10 +121,10 @@ public class HouseReserveController {
         SimpleDateFormat sf = new SimpleDateFormat("MM.dd");
         Calendar c = Calendar.getInstance();
         //获取今明天后面的5天
-        for( int i  = 2 ; i < 7; i++){
+        IntStream.range(2, 7).forEach(i -> {
             c.add(Calendar.DAY_OF_MONTH, i);
             list.add(sf.format(c.getTime()) + " " + getWeekOfDate(currentDate, i, c));
-        }
+        });
         return list;
     }
 
@@ -123,6 +136,8 @@ public class HouseReserveController {
      * @return      返回 day天后的周几
      */
     private String getWeekOfDate(Date date, int day, Calendar cal) {
+        //一周的天数
+        int j = 7;
         String[] weekDays = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
         cal.setTime(date);
         //今天周几的下标
@@ -131,7 +146,7 @@ public class HouseReserveController {
             w = 0;
         }
         int i = w + day;
-        if(  i  - 7 < 0 ){
+        if(  i  - j < 0 ){
             return weekDays[i];
         } else {
             return weekDays[i - 7];

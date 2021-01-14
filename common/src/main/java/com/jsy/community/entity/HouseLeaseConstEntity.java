@@ -6,8 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
+ *
+ * @author YuLF
+ * @since  2021/1/13 17:51
  * 房屋租售常量实体对象
- * YuLF
  * 数据访问对象：这个类主要用于对应数据库表t_house_const的数据字段的映射关系，
  */
 @Data
@@ -18,16 +20,24 @@ public class HouseLeaseConstEntity extends BaseEntity {
 
     private Long houseConstCode;
 
-    //常量名称
+    /**
+     * 常量名称
+     */
     private String houseConstName;
 
-    //常量值
+    /**
+     * 常量值
+     */
     private String houseConstValue;
 
-    //常量类型
+    /**
+     * 常量类型
+     */
     private String houseConstType;
 
-    //常量注释
+    /**
+     * 常量注释
+     */
     private String annotation;
 
     public HouseLeaseConstEntity(Long id, Long houseConstCode, String houseConstName, String houseConstType, String annotation){

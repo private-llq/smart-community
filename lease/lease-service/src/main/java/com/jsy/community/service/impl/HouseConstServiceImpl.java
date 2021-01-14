@@ -167,7 +167,7 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
     }
     
     private boolean isEmpty(String str){
-        return str == null || str.trim().equals("") || "null".equals(str) || "undefined".equals(str);
+        return str == null || "".equals(str.trim()) || "null".equals(str) || "undefined".equals(str);
     }
 
 

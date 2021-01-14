@@ -38,7 +38,7 @@ public class HouseFavoriteController {
     @PostMapping()
     @ApiOperation("租房收藏接口")
     public CommonResult<Boolean> houseFavorite(@RequestBody HouseFavoriteQO qo) {
-        ValidatorUtils.validateEntity(qo, HouseFavoriteQO.addFavorite.class);
+        ValidatorUtils.validateEntity(qo, HouseFavoriteQO.AddFavorite.class);
         qo.setUid(UserUtils.getUserId());
         return CommonResult.ok(iHouseFavoriteService.houseFavorite(qo),"收藏成功!");
     }

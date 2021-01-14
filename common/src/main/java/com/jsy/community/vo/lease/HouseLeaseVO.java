@@ -1,7 +1,5 @@
 package com.jsy.community.vo.lease;
 
-import com.jsy.community.annotation.FieldValid;
-import com.jsy.community.qo.lease.HouseLeaseQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,7 +23,7 @@ import java.util.Map;
 public class HouseLeaseVO implements Serializable {
 
     @ApiModelProperty(value = "业务数据唯一标识")
-    private long id;
+    private Long id;
 
     @ApiModelProperty(value = "房屋租售标题")
     private String houseTitle;
@@ -73,7 +71,9 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房主称呼")
     private String appellation;
 
-    //值是变动  需要存id至数据库 对应 名称 有后台人员管理
+    /**
+     * 值是变动  需要存id至数据库 对应 名称 有后台人员管理
+     */
     @ApiModelProperty(value = "房屋出租方式id /1.压一付一/2.压一付三/3.压一付六")
     private Long houseLeasedepositId;
 
@@ -81,8 +81,7 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房屋出租方式文本 /1.压一付一/2.压一付三/3.压一付六")
     private String houseLeaseDeposit;
 
-    //值是变动  需要存id至数据库 对应 名称 有后台人员管理
-    @ApiModelProperty(value = "房屋类型id：1.四室一厅、2.二室一厅...")
+    @ApiModelProperty(value = "房屋类型Code：如040202 表示 4室2厅2卫")
     private String houseTypeCode;
 
     @ApiModelProperty(value = "房屋类型文本：1.四室一厅、2.二室一厅...")
@@ -91,7 +90,9 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房屋所属楼层")
     private String houseFloor;
 
-    //非 经常变动，常量存 BusinessEnum
+    /**
+     * 非 经常变动，常量存 BusinessEnum
+     */
     @ApiModelProperty(value = "房屋朝向1.东.2.西 3.南 4.北. 4.东南 5. 东北 6.西北 7.西南")
     private String houseDirection;
 
@@ -100,7 +101,9 @@ public class HouseLeaseVO implements Serializable {
     private String houseContact;
 
 
-    //值是变动  需要存id至数据库 对应 名称 由后台人员管理
+    /**
+     * 值是变动  需要存id至数据库 对应 名称 由后台人员管理
+     */
     @ApiModelProperty(value = "房源类型ID、73不限(默认) 74可短租 75邻地铁  76压一付一  77配套齐全  78精装修 79南北通透  80有阳台")
     private Long houseSourcetypeId;
 
@@ -117,12 +120,16 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
     private String bedroomType;
 
-    //65不限 66普通住宅 67别墅 68公寓
+    /**
+     * 65不限 66普通住宅 67别墅 68公寓
+     */
     @ApiModelProperty(value = "房屋出租类型ID")
     private Integer houseLeasetypeId;
 
 
-    //69不限 70整租，71合租
+    /**
+     * 69不限 70整租，71合租
+     */
     @ApiModelProperty(value = "房屋出租方式ID")
     private Long houseLeasemodeId;
 

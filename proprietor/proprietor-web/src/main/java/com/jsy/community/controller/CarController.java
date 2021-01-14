@@ -87,7 +87,7 @@ public class CarController {
 	@PutMapping()
 	public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO carQO) {
 		//效验前端新增车辆参数合法性
-		ValidatorUtils.validateEntity(carQO, CarQO.updateCarValidated.class);
+		ValidatorUtils.validateEntity(carQO, CarQO.UpdateCarValidated.class);
 		Integer integer = carService.updateProprietorCar(carQO, UserUtils.getUserId());
 		return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
 	}

@@ -21,8 +21,8 @@ import java.io.Serializable;
 @ApiModel(value="房屋租售预约参数对象", description="主要用于接收前端请求参数")
 public class HouseReserveQO implements Serializable {
 
-    @Range(groups = {cancel.class}, min = 0, message = "id范围错误!")
-    @NotNull(groups = {cancel.class}, message = "预约信息id不能为空!")
+    @Range(groups = {Cancel.class}, min = 0, message = "id范围错误!")
+    @NotNull(groups = {Cancel.class}, message = "预约信息id不能为空!")
     @ApiModelProperty(value = "预约信息ID")
     private Long id;
 
@@ -39,6 +39,11 @@ public class HouseReserveQO implements Serializable {
     /**
      * 取消预约信息参数验证接口
      */
-    public interface cancel{}
+    public interface Cancel {}
+
+    /**
+     * 拒绝预约信息参数验证接口
+     */
+    public interface Reject {}
 
 }

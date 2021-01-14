@@ -27,6 +27,7 @@ public interface ICarService extends IService<CarEntity> {
     /**
      * 通过车辆信息更新车辆方法
      * @param carEntity 车辆对象实体
+     * @param uid       用户id
      * @return          返回修改影响行数
      */
     Integer updateProprietorCar(CarQO carEntity,String uid);

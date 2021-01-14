@@ -5,7 +5,7 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.util.JSYExcel;
+import com.jsy.community.util.ExcelHandler;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.utils.RegexUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.*;
  * 业主信息录入.xlsx 下载模板、excel解析提供类
  */
 @Slf4j
-public class ProprietorInfoProvider implements JSYExcel {
+public class ProprietorInfoProvider implements ExcelHandler {
 
 
     /**
@@ -152,82 +152,82 @@ public class ProprietorInfoProvider implements JSYExcel {
                     //dataRow.getLastCellNum()避免有的列为空，所以 需要检查 9个列的字段 titleField.length
                     for (int z = 0; z < titleField.length; z++) {
                         Cell cell = dataRow.getCell(z);
-                        String CellValue = ProprietorExcelCommander.getCellValForType(cell).toString();
+                        String cellValue = ProprietorExcelCommander.getCellValForType(cell).toString();
                         //列字段效验
                         switch (z) {
                             // 1列 验证是否 是一个 正确的中国姓名
                             case 0:
-                                if (RegexUtils.isRealName(CellValue)) {
-                                    userEntity.setRealName(CellValue);
+                                if (RegexUtils.isRealName(cellValue)) {
+                                    userEntity.setRealName(cellValue);
                                 } else {
                                     //因为 第一行 和第二行 是标题 和字段 所以需要+1        列下标是按0开始的 需要+1
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的中国姓名!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的中国姓名!");
                                 }
                                 break;
                             //第2列 验证是否是一个正确的 男 女
                             case 1:
-                                if (CellValue.equals("男")) {
+                                if ("男".equals(cellValue)) {
                                     userEntity.setSex(1);
-                                } else if (CellValue.equals("女")) {
+                                } else if ("女".equals(cellValue)) {
                                     userEntity.setSex(2);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的性别!请选择正确的性别");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的性别!请选择正确的性别");
                                 }
                                 break;
                             //第3列 楼栋
                             case 2:
-                                if (StringUtils.isNoneBlank(CellValue)) {
-                                    userEntity.getHouseEntity().setBuilding(CellValue);
+                                if (StringUtils.isNoneBlank(cellValue)) {
+                                    userEntity.getHouseEntity().setBuilding(cellValue);
                                 } else {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列未选择楼栋!");
                                 }
                                 break;
                             //第4列 单元
                             case 3:
-                                if (StringUtils.isNoneBlank(CellValue)) {
-                                    userEntity.getHouseEntity().setUnit(CellValue);
+                                if (StringUtils.isNoneBlank(cellValue)) {
+                                    userEntity.getHouseEntity().setUnit(cellValue);
                                 } else {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列未选择单元!");
                                 }
                                 break;
                             //第5列 楼层
                             case 4:
-                                if (StringUtils.isNoneBlank(CellValue)) {
-                                    userEntity.getHouseEntity().setFloor(CellValue);
+                                if (StringUtils.isNoneBlank(cellValue)) {
+                                    userEntity.getHouseEntity().setFloor(cellValue);
                                 } else {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列未选择楼层!");
                                 }
                                 break;
                             //第6列 门牌
                             case 5:
-                                if (StringUtils.isNoneBlank(CellValue)) {
-                                    userEntity.getHouseEntity().setDoor(CellValue);
+                                if (StringUtils.isNoneBlank(cellValue)) {
+                                    userEntity.getHouseEntity().setDoor(cellValue);
                                 } else {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列未选择门房号!");
                                 }
                                 break;
                             // 第7列 身份证 验证
                             case 6:
-                                if (RegexUtils.isIDCard(CellValue)) {
-                                    userEntity.setIdCard(CellValue);
+                                if (RegexUtils.isIDCard(cellValue)) {
+                                    userEntity.setIdCard(cellValue);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的身份证号码!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的身份证号码!");
                                 }
                                 break;
                             // 第8列 手机号码 验证
                             case 7:
-                                if (RegexUtils.isMobile(CellValue)) {
-                                    userEntity.setMobile(CellValue);
+                                if (RegexUtils.isMobile(cellValue)) {
+                                    userEntity.setMobile(cellValue);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的电话号码 电信|联通|移动!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的电话号码 电信|联通|移动!");
                                 }
                                 break;
                             //第9列 详细地址
                             case 8:
-                                if (StringUtils.isNoneBlank(CellValue) && CellValue.length() < 128) {
-                                    userEntity.setDetailAddress(CellValue);
+                                if (StringUtils.isNoneBlank(cellValue) && cellValue.length() < 128) {
+                                    userEntity.setDetailAddress(cellValue);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列  '" + CellValue + "' 详细地址不能为空，且字符不能大于127!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列  '" + cellValue + "' 详细地址不能为空，且字符不能大于127!");
                                 }
                                 break;
                             default:

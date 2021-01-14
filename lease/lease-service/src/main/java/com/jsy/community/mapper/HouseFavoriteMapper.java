@@ -21,9 +21,10 @@ public interface HouseFavoriteMapper extends BaseMapper<HouseFavoriteEntity> {
 
     /**
      * 查询房屋收藏列表
+     * @param qo            请求采纳数
      * @author YuLF
      * @since  2020/12/30 11:29
-     * @Param  qo           参数对象
+     * @return              返回收藏列表
      */
     List<HouseFavoriteVO> leaseFavorite(BaseQO<HouseFavoriteQO> qo);
 

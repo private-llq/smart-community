@@ -46,7 +46,7 @@ public class SysInformController {
     @ApiOperation("系统消息新增")
     @PostMapping()
     public CommonResult<Boolean> add( @RequestBody PushInformQO qo){
-        ValidatorUtils.validateEntity(qo, PushInformQO.addPushInformValidate.class);
+        ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidate.class);
         return iSysInformService.add(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 

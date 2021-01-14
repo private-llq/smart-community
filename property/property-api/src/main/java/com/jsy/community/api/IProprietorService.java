@@ -27,10 +27,10 @@ public interface IProprietorService extends IService<UserEntity> {
 
     /**
      * 通过传入的参数更新业主信息
-     * @param proprietorQO   更新业主信息参数
+     * @param proprietorQo   更新业主信息参数
      * @return              返回是否更新成功
      */
-    Boolean update(ProprietorQO proprietorQO);
+    Boolean update(ProprietorQO proprietorQo);
 
     /**
      * 通过分页参数查询 业主信息
@@ -41,18 +41,16 @@ public interface IProprietorService extends IService<UserEntity> {
 
     /**
      * 录入业主信息业主房屋绑定信息至数据库
-     * @author YuLF
-     * @since  2020/12/23 17:35
-     * @Param  userEntityList           业主信息参数列表
-     * @Param  communityId              社区id
+     * @param userEntityList    用户信息
+     * @param communityId       社区id
      */
     void saveUserBatch(List<UserEntity> userEntityList, Long communityId);
 
     /**
      * 通过当前社区id查出的当前社区所有已登记的房屋
+     * @param communityId   社区id
      * @author YuLF
      * @since  2020/12/25 11:10
-     * @Param
      * @return          返回当前社区已经被登记的所有房屋信息
      */
     List<HouseVo> queryHouseByCommunityId(long communityId);
@@ -60,9 +58,11 @@ public interface IProprietorService extends IService<UserEntity> {
 
     /**
      * [excel] 导入业主家属信息
+     * @param userEntityList    用户信息实体
+     * @param communityId       社区id
      * @author YuLF
      * @since  2020/12/25 14:47
-     * @Param    userEntityList     用户家属信息
+     * @return              返回影响行数
      */
     Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId);
 }

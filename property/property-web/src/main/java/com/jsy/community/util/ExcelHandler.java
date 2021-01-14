@@ -11,12 +11,12 @@ import java.util.Map;
  * @since 2020-11-26 14:59
  * Excel导入导出
  */
-public interface JSYExcel {
+public interface ExcelHandler {
 
     /**
      * 对业主的Excel导入进行处理
      * @param excel     业主信息表.xlsx
-     * @Param map       存放实现类需要传递的数据
+     * @param map       需要携带的传递参数
      * @return          返回解析好的 List<Entity> 数据
      */
     List<?> importProprietorExcel(MultipartFile excel, Map<String, Object> map);

@@ -45,7 +45,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      * @param qo               查询参数对象
      * @return                 返回查询结果
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public List<PushInformEntity> queryCommunityInform(BaseQO<PushInformQO> qo) {
         //1.查出推送号列表基本列表数据
@@ -90,7 +90,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      * @param userId        用户ID
      * @return              返回这条推送消息的详情
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public PushInformEntity detailsCommunityInform(Long acctId, Long informId , String userId) {
         //根据社区id和消息id查出消息
@@ -119,7 +119,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      * @param acctId    推送号ID
      * @param userId    用户id
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public void delPushInformAcct(Long acctId, String userId) {
         //删除(加入屏蔽表)推送号之前 先把 该推送号消息内容 标记为已读

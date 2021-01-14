@@ -13,11 +13,23 @@ import java.util.List;
  */
 public interface ISysInformService extends IService<PushInformEntity> {
 
-    boolean add(PushInformQO sysInformQO);
+    /**
+     * 添加系统推送消息
+     * @author YuLF
+     * @param sysInformQo 系统请求参数
+     * @since  2021/1/13 17:37
+     * @return  返回是否添加成功
+     */
+    boolean add(PushInformQO sysInformQo);
 
+    /**
+     * 根据消息id删除
+     * @param informId   消息id
+     * @return           返回删除成功
+     */
     boolean delete(Long informId);
 
-    List<PushInformEntity> query(BaseQO<PushInformQO> baseQO);
+    List<PushInformEntity> query(BaseQO<PushInformQO> baseQo);
 
     boolean deleteBatchByIds(List<Long> informIds);
 }

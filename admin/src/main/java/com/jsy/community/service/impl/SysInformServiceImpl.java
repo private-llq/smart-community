@@ -29,9 +29,9 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 
 	@Override
-	public boolean add(PushInformQO sysInformQO) {
+	public boolean add(PushInformQO sysInformQo) {
 		PushInformEntity sysInformEntity = PushInformEntity.getInstance();
-		BeanUtils.copyProperties(sysInformQO, sysInformEntity);
+		BeanUtils.copyProperties(sysInformQo, sysInformEntity);
 		sysInformEntity.setId(SnowFlake.nextId());
 		return sysInformMapper.insert(sysInformEntity) > 0;
 	}
@@ -43,9 +43,9 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 	}
 
 	@Override
-	public List<PushInformEntity> query(BaseQO<PushInformQO> baseQO) {
-		baseQO.setPage((baseQO.getPage() - 1 ) * baseQO.getSize());
-		return sysInformMapper.query(baseQO);
+	public List<PushInformEntity> query(BaseQO<PushInformQO> baseQo) {
+		baseQo.setPage((baseQo.getPage() - 1 ) * baseQo.getSize());
+		return sysInformMapper.query(baseQo);
 	}
 
 	@Override

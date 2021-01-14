@@ -18,9 +18,9 @@ public interface IHouseReserveService extends IService<HouseReserveEntity> {
 
     /**
      * 提交预约信息
+     * @param qo        请求参数
      * @author YuLF
      * @since  2020/12/26 16:25
-     * @Param  qo   请求参数对象
      * @return      返回是否预约信息提交成功
      */
     Boolean add(HouseReserveEntity qo);
@@ -34,15 +34,26 @@ public interface IHouseReserveService extends IService<HouseReserveEntity> {
 
     /**
      * 全部预约信息
+     * @param qo    请求参数
+     * @param uid   用户id
      * @author YuLF
      * @since  2020/12/28 10:22
+     * @return      返回用户的全部预约信息
      */
     List<HouseReserveVO> whole(BaseQO<HouseReserveQO> qo, String uid);
 
     /**
      * 确认预约信息
      * @param qo          确认预约 请求参数对象
+     * @param uid         用户id
      * @return            返回确认是否成功修改
      */
     Boolean confirm(HouseReserveQO qo, String uid);
+
+    /**
+     * 拒绝预约信息
+     * @param qo          请求参数对象
+     * @return            返回是否成功修改
+     */
+    Boolean reject(HouseReserveQO qo);
 }

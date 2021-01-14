@@ -18,13 +18,6 @@ import java.util.List;
 public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
 
 
-    /**
-     * 取消预约信息
-     * @param qo   取消预约 接收 参数 对象
-     * @return      返回取消是否成功修改
-     */
-    Integer cancel(HouseReserveQO qo);
-
 
     /**
      * 我的预约信息
@@ -64,4 +57,7 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      */
     @Select("select count(*) from t_house_lease where id = #{houseLeaseId}")
     Integer existHouseLeaseId(@Param("houseLeaseId") Long houseLeaseId);
+
+
+    Integer updateReserveState(HouseReserveQO qo);
 }

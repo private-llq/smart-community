@@ -2,9 +2,7 @@ package com.jsy.community.entity.lease;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jsy.community.annotation.FieldValid;
 import com.jsy.community.entity.BaseEntity;
-import com.jsy.community.qo.lease.HouseLeaseQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,8 +12,10 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 
 /**
+ *
+ * @author YuLF
+ * @since  2021/1/13 17:48
  * 房屋租售实体对象
- * YuLF
  * 数据访问对象：这个类主要用于对应数据库表t_house_lease的数据字段的映射关系，
  */
 @Data
@@ -92,16 +92,20 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "房主称呼")
     private String appellation;
 
-    //65不限 66普通住宅 67别墅 68公寓
+    /**
+     * 65不限 66普通住宅 67别墅 68公寓
+     */
     @ApiModelProperty(value = "房屋出租类型ID")
-    private Integer houseLeaseytypeId;
+    private Integer houseLeasetypeId;
 
-    //69不限 70整租，71合租
+    /**
+     * 69不限 70整租，71合租
+     */
     @ApiModelProperty(value = "房屋出租方式ID")
-    private Integer houseLeaseymodeId;
+    private Integer houseLeasemodeId;
 
     @ApiModelProperty(value = "房屋家具code")
-    private Long house_furniture_id;
+    private Long houseFurnitureId;
 
     @ApiModelProperty(value = "经度")
     private Double lon;

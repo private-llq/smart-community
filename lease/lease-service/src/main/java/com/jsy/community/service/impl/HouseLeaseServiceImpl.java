@@ -76,7 +76,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     @Override
     public boolean delLeaseHouse(Long id, String userId) {
         //删除中间表 关于 这个用户关联的所有图片地址信息
-        houseLeaseMapper.delUserMiddleInfo(id);
+        houseLeaseMapper.deleteImageById(id);
         //删除 t_house_lease 信息
         return houseLeaseMapper.delHouseLeaseInfo(id, userId) > 0;
     }
@@ -178,13 +178,20 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     /**
      * 按用户id和 社区id查询 房主在当前社区出租的房源
      *
-     * @param userId      用户id
-     * @param communityId 社区id
+     * @param qo      包含用户id
      * @return 返回业主拥有的房产
      */
     @Override
-    public List<HouseLeaseVO> ownerLeaseHouse(String userId, Long communityId) {
-        return houseLeaseMapper.ownerLeaseHouse(userId, communityId);
+    public List<HouseLeaseVO> ownerLeaseHouse(BaseQO<HouseLeaseQO> qo) {
+        qo.setPage((qo.getPage() -  1) * qo.getSize());
+        List<HouseLeaseVO> vos = houseLeaseMapper.ownerLeaseHouse(qo);
+        vos.forEach( vo -> {
+            //拿到第一张图片
+            vo.setHouseImage(houseLeaseMapper.queryHouseImgById(vo.getHouseImageId(), vo.getId()));
+            //房屋类型code转换成文本 如 040202 转换为 4室2厅2卫
+            vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
+        });
+        return vos;
     }
 
     /**
@@ -250,7 +257,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      */
     @Override
     public boolean alreadyPublish(Long houseId) {
-        return houseLeaseMapper.alreadyPublish(houseId);
+        return houseLeaseMapper.alreadyPublish(houseId) > 0;
     }
 
 

@@ -240,29 +240,29 @@ public class ProprietorController {
 
     /**
      * 分页查询业主信息
-     * @param proprietorQOBaseQO   查询参数实体
+     * @param baseQo               查询参数实体
      * @return                    返回删除是否成功
      */
     @PostMapping()
     @ApiOperation("分页查询业主信息")
-    public CommonResult<List<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> proprietorQOBaseQO){
+    public CommonResult<List<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> baseQo){
         //1.验证分页 查询参数
-        ValidatorUtils.validatePageParam(proprietorQOBaseQO);
+        ValidatorUtils.validatePageParam(baseQo);
         //2.查询信息返回
-        return CommonResult.ok(iProprietorService.query(proprietorQOBaseQO));
+        return CommonResult.ok(iProprietorService.query(baseQo));
     }
 
     /**
      * 修改业主信息
-     * @param proprietorQO        参数实体
+     * @param qo        参数实体
      * @return                    返回删除是否成功
      */
     @PutMapping()
     @ApiOperation("修改业主信息")
-    public CommonResult<Boolean> update(@RequestBody ProprietorQO proprietorQO){
+    public CommonResult<Boolean> update(@RequestBody ProprietorQO qo){
         //效验id
-        ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.propertyUpdateValid.class);
-        return iProprietorService.update(proprietorQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyUpdateValid.class);
+        return iProprietorService.update(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
 

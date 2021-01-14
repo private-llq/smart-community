@@ -3,7 +3,6 @@ package com.jsy.community.utils;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.lease.HouseLeaseQO;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.ConstraintViolation;
@@ -11,17 +10,19 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.regex.Pattern;
+
+import static java.util.regex.Pattern.*;
 
 /**
- * 参数验证
+ * @author lilin
+ * @since  2020/11/13 18:04
  */
 @Slf4j
 public class ValidatorUtils {
-    private static final Validator validator;
+    private static final Validator VALIDATOR;
 
     static {
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
+        VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     /**
@@ -33,7 +34,7 @@ public class ValidatorUtils {
      */
     public static void validateEntity(Object object, Class<?>... groups)
             throws JSYException {
-        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object, groups);
+        Set<ConstraintViolation<Object>> constraintViolations = VALIDATOR.validate(object, groups);
         if (!constraintViolations.isEmpty()) {
             StringBuilder msg = new StringBuilder();
             for (ConstraintViolation<Object> constraint : constraintViolations) {
@@ -54,7 +55,7 @@ public class ValidatorUtils {
             return false;
         }
         String str = param.toString();
-        boolean matches = Pattern.compile("^[1-9]\\d*$").matcher(str).matches();
+        boolean matches = compile("^[1-9]\\d*$").matcher(str).matches();
         if (!matches) {
             return false;
         }
@@ -65,14 +66,14 @@ public class ValidatorUtils {
     /**
      * 前端分页查询参数[page,pageSize]边界效验，非空效验 如果不合法 则设置默认的分页参数值
      *
-     * @param baseQO 控制层接收参数的实体类
+     * @param baseQo 控制层接收参数的实体类
      */
-    public static void validatePageParam(BaseQO<?> baseQO) {
-        if (!isInteger(baseQO.getPage())) {
-            baseQO.setPage(1L);
+    public static void validatePageParam(BaseQO<?> baseQo) {
+        if (!isInteger(baseQo.getPage())) {
+            baseQo.setPage(1L);
         }
-        if (!isInteger(baseQO.getSize())) {
-            baseQO.setSize(10L);
+        if (!isInteger(baseQo.getSize())) {
+            baseQo.setSize(10L);
         }
     }
 
@@ -90,12 +91,12 @@ public class ValidatorUtils {
         boolean exist = false;
         try {
             //获取List中对象属性 的 get方法 方便下面取值
-            String FieldMethod = "get" + field.substring(0, 1).toUpperCase() + field.substring(1);
+            String fieldMethod = "get" + field.substring(0, 1).toUpperCase() + field.substring(1);
             for (Object t : list) {
                 //拿到当前List中这个对象 并调用他的 get方法 拿到值
                 Class<?> aClass = t.getClass();
                 //如果客户端传递的参数在可用参数列表中存在 则提前结束验证
-                if (Objects.equals(String.valueOf(aClass.getDeclaredMethod(FieldMethod).invoke(t)), clientVal)) {
+                if (Objects.equals(String.valueOf(aClass.getDeclaredMethod(fieldMethod).invoke(t)), clientVal)) {
                     exist = true;
                 }
             }

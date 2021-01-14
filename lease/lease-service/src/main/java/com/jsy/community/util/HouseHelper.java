@@ -18,7 +18,7 @@ public class HouseHelper {
         if (houseTypeCode == null) {
             return "其他类型";
         }
-        if ( houseTypeCode.equals("000000") ){
+        if ( "000000".equals(houseTypeCode) ){
             return "别墅";
         }
         return divisionStr(0, 2 ,houseTypeCode) + "室" + divisionStr(2, 4, houseTypeCode) + "厅" + divisionStr(4, 6 , houseTypeCode) + "卫";

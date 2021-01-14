@@ -77,6 +77,6 @@ public class HouseReserveVO implements Serializable {
     private String reserveDateTime;
 
     @ApiModelProperty(value = "是房东还是租客")
-    private boolean proprietor;
+    private Boolean proprietor;
 
 }

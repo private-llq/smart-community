@@ -42,7 +42,8 @@ public class SysAop {
         qo.setAcctId(this.sysInformId);
         qo.setAcctAvatar(this.sysInformIcon);
         qo.setAcctName(this.sysInformName);
-        qo.setPushTarget(0);//0表示该消息推送至所有社区
+        //0表示该消息推送至所有社区
+        qo.setPushTarget(0);
     }
 
 

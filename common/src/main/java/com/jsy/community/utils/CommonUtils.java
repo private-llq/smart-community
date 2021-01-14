@@ -76,7 +76,7 @@ public class CommonUtils {
 	}
 	
 	public static void main(String[] args) {
-		pushCommunityMSG(1,"1104a8979209ab19cf1","哎呀试一下","这是http调用");
+		pushCommunityMSG(1,"120c83f76087f89f525","测试信息","this is test info");
 	}
 	
 }

@@ -47,7 +47,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
      * @Param qo   请求参数对象
      * @since 2020/12/26 16:25
      */
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @Override
     public Boolean add(HouseReserveEntity qo) {
         Integer integer = houseReserveMapper.existHouseLeaseId(qo.getHouseLeaseId());
@@ -71,7 +71,9 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     @Override
     public Boolean cancel(HouseReserveQO qo) {
         //TODO: 取消预约后 推送消息至业主 告诉他 某某取消了预约
-        return houseReserveMapper.cancel(qo) > 0;
+        //0代表着状态预约已取消
+        qo.setReserveStatus(0);
+        return houseReserveMapper.updateReserveState(qo) > 0;
     }
 
 
@@ -89,10 +91,10 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         //2.查出预约我的信息
         List<HouseReserveVO> reserveMeVos = houseReserveMapper.reserveMeHouse(qo, uid);
         //返回VO
-        List<HouseReserveVO> reserveVOS = new ArrayList<>(meReserveVos.size() + reserveMeVos.size());
-        reserveVOS.addAll(meReserveVos);
-        reserveVOS.addAll(reserveMeVos);
-        reserveVOS.forEach(r -> {
+        List<HouseReserveVO> reserveVos = new ArrayList<>(meReserveVos.size() + reserveMeVos.size());
+        reserveVos.addAll(meReserveVos);
+        reserveVos.addAll(reserveMeVos);
+        reserveVos.forEach(r -> {
             //1.从缓存通过id和类型取出 中文Name
             //整租还是合租
             r.setHouseLeaseMode(houseConstService.getConstNameByConstTypeCode(Long.parseLong(r.getHouseLeaseMode()), 11L));
@@ -107,7 +109,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
             //2. 第一张图片地址
             r.setHouseImageUrl(houseLeaseMapper.queryHouseImgById(r.getHouseImageId(), r.getHouseLeaseId()));
         });
-        return reserveVOS;
+        return reserveVos;
     }
 
 
@@ -125,5 +127,13 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         }
         Integer row = houseReserveMapper.confirm(qo);
         return row > 0;
+    }
+
+    @Override
+    public Boolean reject(HouseReserveQO qo) {
+        //todo 推送通知
+        //3代表着状态预约已拒绝
+        qo.setReserveStatus(3);
+        return houseReserveMapper.updateReserveState(qo) > 0;
     }
 }

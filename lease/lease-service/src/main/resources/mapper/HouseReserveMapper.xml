@@ -3,21 +3,22 @@
 
 <mapper namespace="com.jsy.community.mapper.HouseReserveMapper">
 
-    <!-- 取消预约信息 -->
-    <update id="cancel">
+    <!-- 修改预约状态 -->
+    <update id="updateReserveState">
         update t_house_reserve
         <set>
             <trim prefixOverrides=",">
                 <if test="reserveMsg != null and !reserveMsg.equals(&quot;&quot;)">
                     ,reserve_msg = #{reserveMsg}
                 </if>
-                ,reserve_status = 0
+                ,reserve_status = #{reserveStatus}
             </trim>
         </set>
         <where>
             id = #{id} and reserve_uid = #{reserveUid} and deleted = 0
         </where>
     </update>
+
 
     <!-- 我预约的信息 我预约别人 -->
     <select id="meReserveHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">
@@ -28,7 +29,9 @@
 		WHEN 0 THEN
 		'已取消预约'
 		WHEN 1 THEN
-		'正在预约中' ELSE '预约成功'
+		'正在预约中'
+		WHEN 2 THEN
+		'预约成功' ELSE '预约拒绝'
 	    END AS reserveStatusText,
 	        l.id as houseLeaseId,
 	        l.house_title AS houseTitle,
@@ -63,7 +66,9 @@
 		WHEN 0 THEN
 		'已取消预约'
 		WHEN 1 THEN
-		'正在预约中' ELSE '预约成功'
+		'正在预约中'
+		WHEN 2 THEN
+		'预约成功' ELSE '预约拒绝'
 	    END AS reserveStatusText,
 	        l.id as houseLeaseId,
             l.house_title AS houseTitle,

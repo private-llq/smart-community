@@ -6,7 +6,7 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.util.JSYExcel;
+import com.jsy.community.util.ExcelHandler;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.utils.RegexUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.*;
  * 业主家属成员.xlsx 下载模板 、信息解析类
  */
 @Slf4j
-public class ProprietorMemberProvider implements JSYExcel {
+public class ProprietorMemberProvider implements ExcelHandler {
 
 
 
@@ -56,73 +56,73 @@ public class ProprietorMemberProvider implements JSYExcel {
                     //遍历列
                     for (int z = 0; z < titleField.length; z++) {
                         Cell cell = dataRow.getCell(z);
-                        String CellValue = ProprietorExcelCommander.getCellValForType(cell).toString();
+                        String cellValue = ProprietorExcelCommander.getCellValForType(cell).toString();
                         //列字段效验
                         switch (z) {
                             // 1列 通过业主姓名获取业主的Uid  因为家属需要和业主关联
                             case 0:
-                                if (RegexUtils.isRealName(CellValue)) {
-                                    String uid = String.valueOf(map.get(CellValue));
+                                if (RegexUtils.isRealName(cellValue)) {
+                                    String uid = String.valueOf(map.get(cellValue));
                                     if(ProprietorExcelCommander.isEmpty(uid)){
-                                        throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 在当前社区没有这个业主!");
+                                        throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 在当前社区没有这个业主!");
                                     }
                                     //当前家属所属业主uid
                                     userEntity.setUid(uid);
                                 } else {
                                     //因为 第一行 和第二行 是标题 和字段 所以需要+1        列下标是按0开始的 需要+1
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的中国姓名!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的中国姓名!");
                                 }
                                 break;
                             //第2列 验证业主家属关系
                             case 1:
                                 //获得家属关系code
-                                int relationCode = getRelationCode(CellValue);
+                                int relationCode = getRelationCode(cellValue);
                                 if (relationCode != 0) {
                                     userEntity.setRelationCode(relationCode);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的家属关系!请选择正确的家属关系");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的家属关系!请选择正确的家属关系");
                                 }
                                 break;
                             //第3列 性别
                             case 2:
-                                if (CellValue.equals("男")) {
+                                if ("男".equals(cellValue)) {
                                     userEntity.setSex(1);
-                                } else if (CellValue.equals("女")) {
+                                } else if ("女".equals(cellValue)) {
                                     userEntity.setSex(2);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的性别!请选择正确的性别");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的性别!请选择正确的性别");
                                 }
                                 break;
                             //第4列 所属房屋
                             case 3:
-                                if(StringUtils.isBlank(CellValue)){
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 未选择家属所属房屋!");
+                                if(StringUtils.isBlank(cellValue)){
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 未选择家属所属房屋!");
                                 }
-                                userEntity.getHouseEntity().setAddress(CellValue);
+                                userEntity.getHouseEntity().setAddress(cellValue);
                                 break;
                             //第5列 家属姓名
                             case 4:
-                                if (RegexUtils.isRealName(CellValue)) {
-                                    userEntity.setRealName(CellValue);
+                                if (RegexUtils.isRealName(cellValue)) {
+                                    userEntity.setRealName(cellValue);
                                 } else {
                                     //因为 第一行 和第二行 是标题 和字段 所以需要+1        列下标是按0开始的 需要+1
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的中国姓名!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的中国姓名!");
                                 }
                                 break;
                             //第6列 家属身份证号码
                             case 5:
-                                if (RegexUtils.isIDCard(CellValue)) {
-                                    userEntity.setIdCard(CellValue);
+                                if (RegexUtils.isIDCard(cellValue)) {
+                                    userEntity.setIdCard(cellValue);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的身份证号码!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的身份证号码!");
                                 }
                                 break;
                             //第7列 家属手机号
                             case 6:
-                                if (RegexUtils.isMobile(CellValue)) {
-                                    userEntity.setMobile(CellValue);
+                                if (RegexUtils.isMobile(cellValue)) {
+                                    userEntity.setMobile(cellValue);
                                 } else {
-                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + CellValue + "' 不是一个正确的电话号码 电信|联通|移动!");
+                                    throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的电话号码 电信|联通|移动!");
                                 }
                                 break;
                             default:

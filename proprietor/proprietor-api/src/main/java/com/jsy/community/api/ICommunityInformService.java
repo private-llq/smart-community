@@ -29,6 +29,7 @@ public interface ICommunityInformService extends IService<PushInformEntity> {
     /**
      * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量
      * @param initialInformCount     初始轮播消息条数
+     * @param communityId            社区id
      * @return                       返回消息列表
      */
     List<PushInformEntity> rotationCommunityInform(Integer initialInformCount, Long communityId);

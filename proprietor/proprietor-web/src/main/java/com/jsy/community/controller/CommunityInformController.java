@@ -15,7 +15,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -74,7 +73,7 @@ public class CommunityInformController {
         if (qo.getQuery() == null) {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
-        ValidatorUtils.validateEntity(qo.getQuery(), PushInformQO.communityPushInformValidate.class);
+        ValidatorUtils.validateEntity(qo.getQuery(), PushInformQO.CommunityPushInformValidate.class);
         qo.getQuery().setUid(UserUtils.getUserId());
         return CommonResult.ok(communityInformService.queryCommunityInform(qo), "查询成功!");
     }

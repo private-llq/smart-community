@@ -22,6 +22,7 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
     /**
      * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量
      * @param initialInformCount     初始轮播消息条数
+     * @param communityId            社区id、
      * @return                       返回消息列表
      */
     List<PushInformEntity> rotationCommunityInform(@Param("initialCount") Integer initialInformCount, @Param("acctId") Long communityId);
@@ -38,6 +39,7 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      * 根据推送帐号id 和 uid 查询用户未读的推送消息id
      * @param acctId    推送号id
      * @param uid       用户id
+     * @return          返回未读信息id列表
      */
     List<Long> selectUnreadInformId(@Param("acctId") Long acctId,@Param("uid") String uid);
 
@@ -52,6 +54,7 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
 
     /**
      * 用户消息列表 左滑动 删除推送号(屏蔽)
+     * @param id        消息id
      * @param acctId    推送号ID
      * @param userId    用户id
      */

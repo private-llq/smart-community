@@ -45,22 +45,20 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         wrapper.eq("community_id",query.getCommunityId());
         Page<CarEntity> resultData = carMapper.selectPage(pageCondition, wrapper);
         //按条件查询
-        //...
-        //wrapper.eq("check_status", 0);
         log.info("查询所属人车辆满足条件行数："+resultData.getTotal() + "每页显示条数："+resultData.getSize());
         return resultData;
     }
 
     /**
      * 根据实体类字段 进行更新
-     * @param carQO      车辆修改参数实体对象
+     * @param carQo      车辆修改参数实体对象
      * @param uid        用户id
      * @return           返回修改影响行数
      */
     @Override
-    public Integer updateProprietorCar(CarQO carQO, String uid) {
+    public Integer updateProprietorCar(CarQO carQo, String uid) {
         CarEntity carEntity = new CarEntity();
-        BeanUtil.copyProperties(carQO, carEntity);
+        BeanUtil.copyProperties(carQo, carEntity);
         return carMapper.update(carEntity, new UpdateWrapper<CarEntity>().eq("id",carEntity.getId()).eq("uid", uid).eq("deleted", 0));
     }
 

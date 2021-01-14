@@ -10,9 +10,11 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
+ *
+ * @author YuLF
+ * @since  2021/1/13 18:05
  * 房屋收藏数据返回对象
  * 用于视图层返回显示
- * YuLF
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -21,10 +23,10 @@ import java.math.BigDecimal;
 public class HouseFavoriteVO implements Serializable {
 
     @ApiModelProperty(value = "房屋id")
-    private long houseId;
+    private Long houseId;
 
     @ApiModelProperty(value = "收藏数据id")
-    private long favoriteId;
+    private Long favoriteId;
 
     @ApiModelProperty(value = "房屋租售标题")
     private String houseTitle;

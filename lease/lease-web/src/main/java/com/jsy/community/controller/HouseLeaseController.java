@@ -18,12 +18,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ *
+ * @author YuLF
+ * @since  2021/1/13 17:33
+ */
 @Slf4j
 @ApiJSYController
 @RestController
@@ -38,16 +42,16 @@ public class HouseLeaseController {
     @Login
     @PostMapping()
     @ApiOperation("新增房屋租售")
-    public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQO) {
+    public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
         //新增参数常规效验
-        ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.addLeaseSaleHouse.class);
-        houseLeaseQO.setUid(UserUtils.getUserId());
+        ValidatorUtils.validateEntity(houseLeaseQo, HouseLeaseQO.AddLeaseSaleHouse.class);
+        houseLeaseQo.setUid(UserUtils.getUserId());
         //验证所属社区所属用户房屋是否存在
-        if(iHouseLeaseService.existUserHouse(UserUtils.getUserId(), houseLeaseQO.getHouseCommunityId(), houseLeaseQO.getHouseId())){
+        if(iHouseLeaseService.existUserHouse(UserUtils.getUserId(), houseLeaseQo.getHouseCommunityId(), houseLeaseQo.getHouseId())){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "您在此处未登记房产!");
         }
         //参数效验完成 新增
-        return iHouseLeaseService.addLeaseSaleHouse(houseLeaseQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return iHouseLeaseService.addLeaseSaleHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     @Login
@@ -61,12 +65,12 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/page")
     @ApiOperation("分页查询房屋出租数据")
-    public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
-        ValidatorUtils.validatePageParam(baseQO);
-        if( baseQO.getQuery() == null ){
-            baseQO.setQuery(new HouseLeaseQO());
+    public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQo) {
+        ValidatorUtils.validatePageParam(baseQo);
+        if( baseQo.getQuery() == null ){
+            baseQo.setQuery(new HouseLeaseQO());
         }
-        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseByList(baseQO));
+        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseByList(baseQo));
     }
 
 
@@ -74,7 +78,7 @@ public class HouseLeaseController {
     @PostMapping("/update")
     @ApiOperation("更新房屋出租数据")
     public CommonResult<Boolean> houseLeaseUpdate(@RequestBody HouseLeaseQO houseLeaseQO) {
-        ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.updateLeaseSaleHouse.class);
+        ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.UpdateLeaseSaleHouse.class);
         houseLeaseQO.setUid(UserUtils.getUserId());
         return CommonResult.ok(iHouseLeaseService.updateHouseLease(houseLeaseQO),"更新成功!");
     }
@@ -109,17 +113,24 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/ownerLeaseHouse")
     @ApiOperation("查询业主已发布的房源")
-    public CommonResult<List<HouseLeaseVO>> ownerLeaseHouse(@RequestParam Long communityId){
-        return CommonResult.ok(iHouseLeaseService.ownerLeaseHouse(UserUtils.getUserId(), communityId));
+    public CommonResult<List<HouseLeaseVO>> ownerLeaseHouse(@RequestBody BaseQO<HouseLeaseQO> qo){
+        ValidatorUtils.validatePageParam(qo);
+        if( qo.getQuery() == null ){
+            qo.setQuery(new HouseLeaseQO());
+        }
+        qo.getQuery().setUid(UserUtils.getUserId());
+        return CommonResult.ok(iHouseLeaseService.ownerLeaseHouse(qo));
     }
 
 
-    //TODO 分词查询
+    /**
+     * TODO : 分词查询
+     */
     @Login
     @PostMapping("/search")
     @ApiOperation("按小区名或标题或地址搜索房屋")
     public CommonResult<List<HouseLeaseVO>> searchLeaseHouse(@RequestBody BaseQO<HouseLeaseQO> qo){
-        ValidatorUtils.validateEntity(qo.getQuery(), HouseLeaseQO.searchLeaseHouse.class);
+        ValidatorUtils.validateEntity(qo.getQuery(), HouseLeaseQO.SearchLeaseHouse.class);
         ValidatorUtils.validatePageParam(qo);
         return CommonResult.ok(iHouseLeaseService.searchLeaseHouse(qo));
     }

@@ -49,6 +49,7 @@ public enum CommunityType {
         return resultCommunityType;
     }
 
+    @Override
     public String toString() {
         return Integer.toString(this.value);
     }

@@ -11,7 +11,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -141,7 +140,7 @@ public class UserController {
 	@ApiOperation("业主信息更新")
     @PutMapping("update")
     public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO proprietorQO) {
-        ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.proprietorUpdateValid.class);
+        ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.ProprietorUpdateValid.class);
 		//3.更新业主信息
         proprietorQO.setUid(UserUtils.getUserId());
         if( proprietorQO.getHasCar() == null ){

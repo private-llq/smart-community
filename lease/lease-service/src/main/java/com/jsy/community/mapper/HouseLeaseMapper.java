@@ -21,41 +21,35 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
     /**
      * 插入房源数据
-     * @param houseLeaseQO      参数对象
+     * @param houseLeaseQo      参数对象
      * @return                  返回影响行数
      */
-    int insertHouseLease(HouseLeaseQO houseLeaseQO);
+    int insertHouseLease(HouseLeaseQO houseLeaseQo);
 
 
 
     /**
      * 插入房屋图片至中间库
-     * @param houseLeaseQO  参数对象
+     * @param houseLeaseQo  参数对象
      */
-    void insertHouseImages(@Param("houseLeaseQO") HouseLeaseQO houseLeaseQO);
+    void insertHouseImages(@Param("houseLeaseQO") HouseLeaseQO houseLeaseQo);
 
-    /**
-     * 删除用户中间表关联的image相关信息
-     * @param id             t_house_lease数据唯一标识
-     */
-    @Delete("delete from t_house_image where hid = #{id}")
-    void delUserMiddleInfo(@Param("id") Long id);
 
 
     /**
      * 根据 rowGuid 删除t_house_lease 表中的数据
-     * @param guid_id   数据唯一标识业务主键 暂定
+     * @param id        数据唯一标识业务主键 暂定
      * @return          返回影响行数
      */
-    int delHouseLeaseInfo(@Param("id") Long guid_id, @Param("uid")String uid);
+    int delHouseLeaseInfo(@Param("id") Long id, @Param("uid")String uid);
 
 
     /**
      * 根据参数对象条件查询 出租房屋数据
-     * @param baseQO            查询参数对象
+     * @param baseQo            查询参数对象
      * @return                  返回数据集合
      */
-    List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> baseQO);
+    List<HouseLeaseVO> queryHouseLeaseByList(BaseQO<HouseLeaseQO> baseQo);
 
 
 
@@ -99,10 +93,10 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
     /**
      * 按参数对象属性更新房屋出租数据
-     * @param houseLeaseQO          参数对象
+     * @param houseLeaseQo          参数对象
      * @return                      返回更新影响行数
      */
-    Boolean updateHouseLease(HouseLeaseQO houseLeaseQO);
+    Boolean updateHouseLease(HouseLeaseQO houseLeaseQo);
 
 
     /**
@@ -135,11 +129,10 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
     /**
      * 按用户id和 社区id查询 房主在当前社区出租的房源
-     * @param userId            用户id
-     * @param communityId       社区id
+     * @param qo                包含用户id
      * @return                  返回业主拥有的房产
      */
-    List<HouseLeaseVO> ownerLeaseHouse(@Param("uid") String userId, @Param("communityId") Long communityId);
+    List<HouseLeaseVO> ownerLeaseHouse(BaseQO<HouseLeaseQO> qo);
 
 
     /**
@@ -178,9 +171,11 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
     /**
      * 验证houseId是否已经发布
+     * @param houseId   房屋id
+     * @return          返回是否成功
      */
     @Select("select count(*) from t_house_lease where house_id = #{houseId}")
-    boolean alreadyPublish(@Param("houseId") Long houseId);
+    Integer alreadyPublish(@Param("houseId") Long houseId);
 
 
 }

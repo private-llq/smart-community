@@ -43,7 +43,7 @@ public class AdminCommunityInformController {
     @PostMapping()
     @ApiOperation("添加社区推送通知消息")
     public CommonResult<Boolean> addPushInform(@RequestBody PushInformQO qo) {
-        ValidatorUtils.validateEntity(qo, PushInformQO.addPushInformValidate.class);
+        ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidate.class);
         return communityInformService.addPushInform(qo) ? CommonResult.ok("添加成功!") : CommonResult.error("添加失败!");
     }
 
@@ -76,7 +76,7 @@ public class AdminCommunityInformController {
         if (qo.getQuery() == null) {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
-        ValidatorUtils.validateEntity(qo.getQuery(), PushInformQO.communityPushInformValidate.class);
+        ValidatorUtils.validateEntity(qo.getQuery(), PushInformQO.CommunityPushInformValidate.class);
         qo.getQuery().setUid(UserUtils.getUserId());
         return CommonResult.ok(communityInformService.queryCommunityInform(qo), "查询成功!");
     }

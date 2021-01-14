@@ -129,7 +129,7 @@
                 </if>
                 <!-- 房屋区域id -->
                 <if test="houseAreaId != null and houseAreaId &gt; 0">
-                    ,house_area_id = #{houseCityId}
+                    ,house_area_id = #{houseAreaId}
                 </if>
                 <!-- 房屋地址 -->
                 <if test="houseAddress != null and !houseAddress.equals(&apos;&apos;)">
@@ -167,6 +167,10 @@
                 <if test="houseContact != null and !houseContact.equals(&apos;&apos;)">
                     ,house_contact = #{houseContact}
                 </if>
+                <!-- 房屋图片 -->
+                <if test="houseImageId != null and houseImageId &gt; 0">
+                    ,house_image_id = #{houseImageId}
+                </if>
                 <!-- 房屋租售面积 -->
                 <if test="houseSquareMeter != null and houseSquareMeter &gt; 0">
                     ,house_square_meter = #{houseSquareMeter}
@@ -191,11 +195,7 @@
                 <if test="houseSourceId != null and houseSourceId &gt; 0 and houseSourceId &lt; 4">
                     ,house_source_id = #{houseSourceId}
                 </if>
-                <!-- 房屋年代 -->
-                <if test="houseYear != null and !houseYear.equals(&apos;&apos;)">
-                    ,house_year = #{houseYear}
-                </if>
-                <!-- 房屋介绍内容 -->appellation
+                <!-- 房屋介绍内容 -->
                 <if test="houseIntroduce != null and !houseIntroduce.equals(&apos;&apos;)">
                     ,house_introduce = #{houseIntroduce}
                 </if>
@@ -218,7 +218,7 @@
             </trim>
         </set>
         <where>
-            id = #{id}
+            id = #{id} and uid = #{uid}
         </where>
     </update>
 
@@ -238,6 +238,7 @@
             l.id,
 	        l.house_contact,
 	        l.appellation,
+	        l.house_address,
 	        l.house_image_id,
 	        l.house_price,
 	        l.house_unit,
@@ -267,22 +268,22 @@
     </select>
     <!-- 根据用户id和社区id 查出用户在这个社区下面所属的房源 -->
     <select id="ownerLeaseHouse" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
-            SELECT
-            DISTINCT
-                l.id,
-            	l.house_title,
-            	l.house_square_meter,
-            	l.house_address,
-            	l.house_price,
-            	l.house_unit,
-            	i.img_url as houseImage,
-            	l.house_type_code,
-            	l.bedroom_type
-            FROM
-            	t_house_lease AS l
-            	LEFT JOIN t_house_image AS i ON l.house_image_id = i.field_id
-            	WHERE
-            	l.uid = #{uid} and l.house_community_id = #{communityId}
+        SELECT
+	        l.id,
+	        l.house_title,
+	        l.house_square_meter,
+	        l.house_address,
+	        l.house_price,
+	        l.house_unit,
+	        l.house_image_id,
+	        l.house_type_code,
+	        l.bedroom_type
+        FROM
+	        t_house_lease AS l
+        WHERE
+	        l.uid = #{query.uid}
+	        ORDER BY l.create_time desc
+	        LIMIT #{page},#{size}
     </select>
 
     <!-- 根据用户id 和社区id 查询用户在这个社区的可发布房源 -->

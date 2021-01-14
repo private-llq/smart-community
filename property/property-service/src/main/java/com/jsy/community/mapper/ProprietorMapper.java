@@ -28,29 +28,33 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
     List<ProprietorVO> query(BaseQO<ProprietorQO> queryParam);
 
     /**
-     * [物业]更新业主信息
-     * @param proprietorQO  待更新参数实体
-     * @return              返回sql影响行数
+     * 【物业】更新业主信息
+     * @param proprietorQo  请求参数
+     * @return              返回影响行数
      */
-    int update(ProprietorQO proprietorQO);
+    int update(ProprietorQO proprietorQo);
 
     /**
      * 通过社区id 拿到当前社区 所有未被登记的房屋信息
-     * @param communityId   社区id
-     * @return              返回房屋信息列表
+     * @param communityId           社区id
+     * @param houseLevelMode        社区层级模式
+     * @return                      返回房屋信息列表
      */
     List<HouseEntity> getHouseListByCommunityId(@Param("communityId") Long communityId, @Param("houseLevelMode") Integer houseLevelMode);
 
     /**
      * 通过社区id拿到当前社区的 层级结构 房屋层级模式：1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元
+     * @param communityId       社区id
      * @author YuLF
      * @since  2020/12/24 9:19
+     * @return                  返回影响行数
      */
     @Select("select house_level_mode from t_community where id = #{communityId} and deleted = 0")
     Integer queryHouseLevelModeById(@Param("communityId") Long communityId);
 
     /**
      * [excel]批量注册用户t_user_auth
+     * @param userEntityList        用户信息实体
      * @author YuLF
      * @since  2020/12/24 15:21
      */
@@ -65,6 +69,8 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
 
     /**
      * [excel]批量绑定房屋
+     * @param userEntityList    用户信息实体
+     * @param communityId       社区id
      * @author YuLF
      * @since  2020/12/24 16:27
      */
@@ -73,9 +79,10 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
 
     /**
      * 通过当前社区id查出的当前社区所有已登记的房屋
+     * @param communityId       社区id
+     * @param houseLevelMode    社区层级模式
      * @author YuLF
      * @since  2020/12/25 11:10
-     * @Param
      * @return          返回当前社区已经被登记的所有房屋信息
      */
     List<HouseVo> queryHouseByCommunityId(@Param("communityId") long communityId, @Param("houseLevelMode") Integer houseLevelMode);
@@ -84,9 +91,10 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
 
     /**
      * 通过社区ID 在t_user_house 拿到所有已审核的房屋id和uid 主要用于 对excel业主家属录入信息 进行核实
+     * @param communityId       社区id
      * @author YuLF
      * @since  2020/12/25 15:04
-     * @Param
+     * @return                  返回房屋id和用户uid的查询结果
      */
     @Select("select uid,house_id  from t_user_house where community_id = #{communityId} and deleted = 0 and check_status = 1")
     List<UserHouseEntity> queryUserHouseByCommunityId(@Param("communityId") long communityId);
@@ -94,9 +102,11 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
 
     /**
      * [excel]批量导入业主家属信息
+     * @param userEntityList    用户信息实体
+     * @param communityId       社区id
      * @author YuLF
      * @since  2020/12/25 16:41
-     * @Param
+     * @return                  返回影响行数
      */
     Integer saveUserMemberBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
 }
