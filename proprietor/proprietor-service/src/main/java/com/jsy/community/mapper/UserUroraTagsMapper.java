@@ -12,6 +12,13 @@ import org.apache.ibatis.annotations.Update;
  **/
 public interface UserUroraTagsMapper extends BaseMapper<UserUroraTagsEntity> {
 	
+	/**
+	* @Description: 追加tag
+	 * @Param: [entity]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/1/14
+	**/
 	@Update("update t_user_urora_tags set community_tags = " +
 		"if(" +
 			"find_in_set(#{entity.communityTags},community_tags) = 0," +

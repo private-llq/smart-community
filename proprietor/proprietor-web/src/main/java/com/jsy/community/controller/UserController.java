@@ -195,6 +195,13 @@ public class UserController {
         return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
     }
     
+    /**
+    * @Description: 查询用户极光推送tags
+     * @Param: []
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2021/1/14
+    **/
     @Login
     @ApiOperation("查询用户极光推送tags")
     @GetMapping("urora/tags")

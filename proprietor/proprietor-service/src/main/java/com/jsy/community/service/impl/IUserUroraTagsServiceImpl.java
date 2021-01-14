@@ -25,7 +25,13 @@ public class IUserUroraTagsServiceImpl implements IUserUroraTagsService {
 	@Autowired
 	private UserUroraTagsMapper userUroraTagsMapper;
 	
-	//查询(有前台接口)
+	/**
+	* @Description: 查询(有前台接口)
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.UserUroraTagsEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/1/14
+	**/
 	@Override
 	public UserUroraTagsEntity queryUroraTags(String uid){
 		UserUroraTagsEntity userUroraTagsEntity = userUroraTagsMapper.selectOne(new QueryWrapper<UserUroraTagsEntity>()
@@ -37,13 +43,25 @@ public class IUserUroraTagsServiceImpl implements IUserUroraTagsService {
 		return userUroraTagsMapper.selectOne(new QueryWrapper<UserUroraTagsEntity>().select("community_tags").eq("uid",uid));
 	}
 	
-	//创建极光推送tags(后台调用)
+	/**
+	* @Description: 创建极光推送tags(后台调用)
+	 * @Param: [userUroraTagsEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/1/14
+	**/
 	@Override
 	public boolean createUroraTags(UserUroraTagsEntity userUroraTagsEntity){
 		return userUroraTagsMapper.insert(userUroraTagsEntity) == 1;
 	}
 	
-	//追加(只支持单个)(后台调用)
+	/**
+	* @Description: 追加(只支持单个)(后台调用)
+	 * @Param: [userUroraTagsEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/1/14
+	**/
 	@Override
 	public boolean appendTags(UserUroraTagsEntity userUroraTagsEntity){
 		if(StringUtils.isEmpty(userUroraTagsEntity.getCommunityTags()) || userUroraTagsEntity.getCommunityTags().contains(",")
@@ -53,7 +71,13 @@ public class IUserUroraTagsServiceImpl implements IUserUroraTagsService {
 		return userUroraTagsMapper.appendTags(userUroraTagsEntity) == 1;
 	}
 	
-	//删除(可批量，逗号分隔)(后台调用)
+	/**
+	* @Description: 删除(可批量，逗号分隔)(后台调用)
+	 * @Param: [paramsEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/1/14
+	**/
 	public boolean deleteTags(UserUroraTagsEntity paramsEntity){
 		UserUroraTagsEntity dataEntity = userUroraTagsMapper.selectOne(new QueryWrapper<UserUroraTagsEntity>()
 			.select("community_tags").eq("uid", paramsEntity.getUid()));
@@ -73,7 +97,9 @@ public class IUserUroraTagsServiceImpl implements IUserUroraTagsService {
 		return userUroraTagsMapper.update(paramsEntity,new UpdateWrapper<UserUroraTagsEntity>().eq("uid",uid)) == 1;
 	}
 	
-	//从原本的tags - dataTags 中，剔除要删除的tags - paramTags
+	/**
+	 * 从原本的tags - dataTags 中，剔除要删除的tags - paramTags
+	 */
 	private String dealTags(String paramTags,String dataTags){
 		String[] paramArr = paramTags.split(",");
 		String[] dataArr = dataTags.split(",");
