@@ -3,14 +3,12 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.ICarService;
-import com.jsy.community.api.IUserAuthService;
-import com.jsy.community.api.IUserService;
-import com.jsy.community.api.ProprietorException;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserUroraTagsEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -52,6 +50,8 @@ public class UserController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserAuthService iUserAuthService;
     
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserUroraTagsService userUroraTagsService;
     @PostMapping("test")
 //    @Login
     @Auth
@@ -193,6 +193,13 @@ public class UserController {
     @GetMapping("houseList")
     public CommonResult<List<HouseEntity>> queryUserHouseList(){
         return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
+    }
+    
+    @Login
+    @ApiOperation("查询用户极光推送tags")
+    @GetMapping("urora/tags")
+    public CommonResult queryUroraTags(){
+        return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
     }
     
 }

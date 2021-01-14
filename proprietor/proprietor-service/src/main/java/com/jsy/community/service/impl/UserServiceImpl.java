@@ -31,7 +31,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +45,12 @@ import java.util.stream.Collectors;
 @DubboService(version = Const.version, group = Const.group)
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements IUserService {
 
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
+    
+    @Autowired
+    private UserUtils userUtils;
+    
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserAuthService userAuthService;
 
@@ -69,15 +74,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
     @Resource
     private UserThirdPlatformMapper userThirdPlatformMapper;
-
-    @Resource
-    private RedisTemplate<String, String> redisTemplate;
     
     @Autowired
-    private UserUtils userUtils;
+    private IUserUroraTagsService userUroraTagsService;
     
-    private long expire = 60*60*24*7; //暂时
-
     @Autowired
     private IHouseService houseService;
     
@@ -86,6 +86,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
     @Autowired
     private IAlipayService alipayService;
+    
+    private long expire = 60*60*24*7; //暂时
 
     @Override
     public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo){
@@ -116,6 +118,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         if (user.getAreaId() != null) {
             userInfoVo.setArea(ops.get("RegionSingle:" + user.getAreaId().toString()));
+        }
+        
+        //查询极光推送标签
+        UserUroraTagsEntity userUroraTagsEntity = userUroraTagsService.queryUroraTags(uid);
+        if(userUroraTagsEntity != null){
+            userInfoVo.setUroraTags(userUroraTagsEntity.getUroraTags());
         }
         return userInfoVo;
     }
@@ -157,6 +165,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userAuthService.save(userAuth);
         //创建金钱账户
         userAccountService.createUserAccount(uuid);
+        //创建极光推送tags
+        UserUroraTagsEntity userUroraTagsEntity = new UserUroraTagsEntity();
+        userUroraTagsEntity.setUid(uuid);
+        userUroraTagsService.createUroraTags(userUroraTagsEntity);
         return uuid;
     }
     
