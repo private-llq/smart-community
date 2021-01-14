@@ -122,7 +122,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payOrderMapper.insert(payOrderEntity);
         PayHouseOwnerEntity ownerEntity = payHouseOwnerMapper.selectOne(new QueryWrapper<PayHouseOwnerEntity>()
                 .eq("uid", livingPaymentQO.getUserID())
-                .eq("pay_number", livingPaymentQO.getDoorNo())
+                .eq("family_id", livingPaymentQO.getDoorNo())
                 .eq("pay_company", livingPaymentQO.getPayCostUnitId())
         );
         if (StringUtils.isEmpty(ownerEntity)){
