@@ -23,4 +23,8 @@ public class RegisterQO implements Serializable {
 	@ApiModelProperty("验证码")
 	@NotEmpty(message = "验证码不能为空")
 	private String code;
+	
+	@ApiModelProperty("离线推送id")
+	@NotEmpty(message = "离线推送id不能为空")
+	private String regId;
 }

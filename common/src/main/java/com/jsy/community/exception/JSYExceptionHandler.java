@@ -2,6 +2,7 @@ package com.jsy.community.exception;
 
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -52,7 +53,7 @@ public class JSYExceptionHandler {
 	 * 传参类型错误
 	 */
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-	public CommonResult<Boolean> handleException(MethodArgumentTypeMismatchException e) {
+	public CommonResult<Boolean> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
 		log.error(e.getMessage(), e);
 		return CommonResult.error(JSYError.REQUEST_PARAM);
 	}
@@ -68,6 +69,10 @@ public class JSYExceptionHandler {
 		//唯一索引 数据重复异常
 		if(e.getMessage() != null && e.getMessage().contains("DuplicateKeyException")){
 			return CommonResult.error(JSYError.DUPLICATE_KEY);
+		}
+		//数据完整性冲突异常 如数据库data too long
+		if(e.getMessage() != null && e.getMessage().contains("DataIntegrityViolationException")){
+			return CommonResult.error(JSYError.REQUEST_PARAM);
 		}
 		return CommonResult.error(JSYError.INTERNAL);
 

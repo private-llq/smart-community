@@ -32,7 +32,7 @@ public class ProprietorExceptionHandler extends JSYExceptionHandler {
 	}
 	
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public CommonResult<Boolean> handleException(HttpMessageNotReadableException e) {
+	public CommonResult<Boolean> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
 		log.error(e.getMessage(), e);
 		return CommonResult.error(JSYError.REQUEST_PARAM);
 	}

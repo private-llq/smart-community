@@ -137,6 +137,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity user = new UserEntity();
         user.setUid(uuid);
         user.setId(SnowFlake.nextId());
+        user.setRegId(qo.getRegId());
 
         // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
@@ -159,7 +160,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return uuid;
     }
     
-    //调用三方接口获取会员信息(走后端备用)(返回三方平台唯一id)
+    /**
+     * 调用三方接口获取会员信息(走后端备用)(返回三方平台唯一id)
+     */
     private String getUserInfoFromThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
         String thirdUid = null;
         switch (userThirdPlatformQO.getThirdPlatformType()){

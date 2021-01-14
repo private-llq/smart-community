@@ -1,6 +1,5 @@
 package com.jsy.community.service.impl;
 
-import com.alipay.api.AlipayApiException;
 import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;

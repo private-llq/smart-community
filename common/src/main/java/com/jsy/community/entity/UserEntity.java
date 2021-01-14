@@ -65,6 +65,9 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("详细地址")
 	private String detailAddress;
+	
+	@ApiModelProperty("离线推送id")
+	private String regId;
 
 	@ApiModelProperty("家属关系code")
 	@TableField( exist = false )
