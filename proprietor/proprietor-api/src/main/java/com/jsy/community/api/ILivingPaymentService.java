@@ -1,6 +1,5 @@
 package com.jsy.community.api;
 
-import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
@@ -38,7 +37,7 @@ public interface ILivingPaymentService {
      * @param baseQO
      * @return
      */
-    Map<String, List<PaymentRecordsVO>> selectOrder(BaseQO<PaymentRecordsQO> baseQO);
+    Map<String, List<PaymentRecordsVO>> selectOrder(PaymentRecordsQO paymentRecordsQO);
 
     /**
      * 默认查询所有缴费信息

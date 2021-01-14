@@ -1,17 +1,14 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.ILivingPaymentService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.mapper.*;
-import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
-import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.*;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -53,6 +50,9 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     //缴费类型
     @Autowired
     private PayTypeMapper payTypeMapper;
+    //缴费类型
+    @Autowired
+    private PayCompanyMapper payCompanyMapper;
 
     /**
      * @Description: 交费记录
@@ -94,6 +94,10 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
                 group_id=groupEntity.getId();
             }
         }
+        PayCompanyEntity entity = payCompanyMapper.selectOne(new QueryWrapper<PayCompanyEntity>()
+                .eq("id", livingPaymentQO.getPayCostUnitId())
+        );
+
         //添加订单
         PayOrderEntity payOrderEntity = new PayOrderEntity();
         payOrderEntity.setId(SnowFlake.nextId());
@@ -106,7 +110,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payOrderEntity.setFamilyId(livingPaymentQO.getDoorNo());
         payOrderEntity.setStatus(1);
         payOrderEntity.setOrderTime(LocalDateTime.now());
-        payOrderEntity.setUnit(livingPaymentQO.getPayCostUnit());
+        payOrderEntity.setUnit(entity.getName());
         payOrderEntity.setPaymentAmount(livingPaymentQO.getPayNum());
         payOrderEntity.setPayYear(LocalDateTime.now().getYear());
         payOrderEntity.setPayMonth(LocalDateTime.now().getMonthValue());
@@ -146,7 +150,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         //返回缴费详情
         PaymentDetailsVO paymentDetailsVO = new PaymentDetailsVO();
         paymentDetailsVO.setId(payOrderEntity.getId());
-        paymentDetailsVO.setUnitName(livingPaymentQO.getPayCostUnit());
+        paymentDetailsVO.setUnitName(entity.getName());
         paymentDetailsVO.setFamilyId(livingPaymentQO.getDoorNo());
         paymentDetailsVO.setOrderTime(LocalDateTime.now());
         paymentDetailsVO.setAccountingTime(LocalDateTime.now());
@@ -192,10 +196,8 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      * @return:
      */
     @Override
-    public Map<String, List<PaymentRecordsVO>> selectOrder(BaseQO<PaymentRecordsQO> baseQO) {
-        Page<PaymentRecordsVO> page = new Page<>();
-        MyPageUtils.setPageAndSize(page,baseQO);
-        List<PaymentRecordsVO> recordList = livingPaymentMapper.selectOrder(page,baseQO.getQuery()).getRecords();
+    public Map<String, List<PaymentRecordsVO>> selectOrder(PaymentRecordsQO paymentRecordsQO) {
+        List<PaymentRecordsVO> recordList = livingPaymentMapper.selectOrder(paymentRecordsQO);
         Map<String, List<PaymentRecordsVO>> returnMap = new HashMap<>();
         for(PaymentRecordsVO paymentRecordsVO : recordList){
 //            if(!returnMap.keySet().contains(paymentRecordsVO.getTimeGroup())){

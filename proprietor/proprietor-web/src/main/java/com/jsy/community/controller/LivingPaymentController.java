@@ -143,11 +143,10 @@ public class LivingPaymentController {
     @ApiOperation("查询每月的缴费详情")
     @PostMapping("/selectOrder")
     @Login
-    public CommonResult selectOrder(@RequestBody BaseQO<PaymentRecordsQO> baseQO){
+    public CommonResult selectOrder(@RequestBody PaymentRecordsQO paymentRecordsQO ){
         String userId = UserUtils.getUserId();
         System.out.println(userId);
-        baseQO.getQuery().setUserID(userId);
-        Map<String, List<PaymentRecordsVO>> map = livingPaymentService.selectOrder(baseQO);
+        Map<String, List<PaymentRecordsVO>> map = livingPaymentService.selectOrder(paymentRecordsQO);
         return CommonResult.ok(map);
     }
 
@@ -192,13 +191,13 @@ public class LivingPaymentController {
         String upload = MinioUtils.upload(file, "bbbb");
         return CommonResult.ok(upload);
     }
-//    @ApiOperation("添加备注图片")
-//    @PostMapping("/addRemarkImgss")
-//    @Login
-//    public CommonResult addRemarkImgss(@RequestParam("file") MultipartFile file){
-//        String upload = MinioUtils.upload(file, "tpye-imgs");
-//        return CommonResult.ok(upload);
-//    }
+    @ApiOperation("添加备注图片")
+    @PostMapping("/addRemarkImgss")
+    @Login
+    public CommonResult addRemarkImgss(@RequestParam("file") MultipartFile file){
+        String upload = MinioUtils.upload(file, "shjf");
+        return CommonResult.ok(upload);
+    }
 
 
 }

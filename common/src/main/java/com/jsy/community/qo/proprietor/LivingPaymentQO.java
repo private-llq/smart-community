@@ -25,8 +25,8 @@ public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "户号")
     private String doorNo;
 
-    @ApiModelProperty(value = "缴费单位")
-    private String PayCostUnit;
+//    @ApiModelProperty(value = "缴费单位")
+//    private String PayCostUnit;
 
     @ApiModelProperty(value = "缴费单位ID")
     private Long PayCostUnitId;
