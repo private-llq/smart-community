@@ -168,6 +168,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //创建极光推送tags
         UserUroraTagsEntity userUroraTagsEntity = new UserUroraTagsEntity();
         userUroraTagsEntity.setUid(uuid);
+        userUroraTagsEntity.setCommunityTags("all"); //给所有用户加一个通用tag，用于全体消息推送
         userUroraTagsService.createUroraTags(userUroraTagsEntity);
         return uuid;
     }
