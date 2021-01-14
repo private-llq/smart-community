@@ -151,8 +151,10 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         PaymentDetailsVO paymentDetailsVO = new PaymentDetailsVO();
         paymentDetailsVO.setId(payOrderEntity.getId());
         paymentDetailsVO.setUnitName(entity.getName());
+        paymentDetailsVO.setPayBalance(livingPaymentQO.getPayBalance());
         paymentDetailsVO.setFamilyId(livingPaymentQO.getDoorNo());
         paymentDetailsVO.setOrderTime(LocalDateTime.now());
+        paymentDetailsVO.setFamilyName(livingPaymentQO.getFamilyName());
         paymentDetailsVO.setAccountingTime(LocalDateTime.now());
         paymentDetailsVO.setPaySum(livingPaymentQO.getPayNum());
         paymentDetailsVO.setAddress(livingPaymentQO.getAddress());

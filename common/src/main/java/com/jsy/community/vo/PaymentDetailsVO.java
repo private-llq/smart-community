@@ -27,11 +27,17 @@ public class PaymentDetailsVO implements Serializable {
     @ApiModelProperty(value = "户号")
     private String familyId;
 
+    @ApiModelProperty(value = "户名")
+    private String familyName;
+
     @ApiModelProperty(value = "缴费时间")
     private LocalDateTime orderTime;
 
     @ApiModelProperty(value = "到账时间")
     private LocalDateTime accountingTime;
+
+    @ApiModelProperty(value = "账户余额")
+    private BigDecimal payBalance;
 
     @ApiModelProperty(value = "缴费金额")
     private BigDecimal paySum;
