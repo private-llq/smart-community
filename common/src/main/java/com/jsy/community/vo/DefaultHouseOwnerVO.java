@@ -20,7 +20,7 @@ public class DefaultHouseOwnerVO implements Serializable {
     @ApiModelProperty(value = "户组name")
     private String groupName;
     @ApiModelProperty(value = "户号")
-    private String payNumber;
+    private String doorNo;
     @ApiModelProperty(value = "缴费单位ID")
     private String payCompanyId;
     @ApiModelProperty(value = "缴费单位name")

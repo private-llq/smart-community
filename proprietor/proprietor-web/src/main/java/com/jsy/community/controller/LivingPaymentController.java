@@ -88,6 +88,7 @@ public class LivingPaymentController {
     @PostMapping("/add")
     @Login
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
+
         String userId = UserUtils.getUserId();
         System.out.println(livingPaymentQO);
         livingPaymentQO.setUserID(userId);

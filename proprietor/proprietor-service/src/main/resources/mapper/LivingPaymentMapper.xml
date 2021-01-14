@@ -17,7 +17,7 @@
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
         SELECT distinct
         pg.name as groupName,
-        po.family_id as payNumber,
+        po.family_id as doorNo,
         po.unit_id as payCompanyId,
         po.unit as payCompanyName,
         tt.icon as icon,
@@ -78,7 +78,7 @@
     <resultMap id="DefaultHouseOwnerMap" type="com.jsy.community.vo.DefaultHouseOwnerVO">
         <result property="groupId" column="groupId"/>
         <result property="groupName" column="groupName"/>
-        <result property="payNumber" column="payNumber"/>
+        <result property="doorNo" column="doorNo"/>
         <result property="payCompanyId" column="payCompanyId"/>
         <result property="payCompanyName" column="payCompanyName"/>
         <result property="typeID" column="typeID"/>

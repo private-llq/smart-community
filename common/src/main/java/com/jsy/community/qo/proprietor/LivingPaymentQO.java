@@ -3,6 +3,7 @@ package com.jsy.community.qo.proprietor;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "分组名称")
     private String groupName;
 
+    @Length(max = 12,min = 8,message = "请输入8~12数字")
     @ApiModelProperty(value = "户号")
     private String doorNo;
 
