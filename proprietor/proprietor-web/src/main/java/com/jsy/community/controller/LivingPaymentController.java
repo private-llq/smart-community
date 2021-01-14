@@ -104,6 +104,7 @@ public class LivingPaymentController {
     @Login
     public CommonResult selectGroup(@RequestBody GroupQO groupQO){
         String userId = UserUtils.getUserId();
+        System.out.println(groupQO);
         groupQO.setUserID(userId);
         List<GroupVO> voList = livingPaymentService.selectGroup(groupQO);
         return CommonResult.ok(voList);
@@ -146,6 +147,7 @@ public class LivingPaymentController {
     public CommonResult selectOrder(@RequestBody PaymentRecordsQO paymentRecordsQO){
         String userId = UserUtils.getUserId();
         System.out.println(userId);
+        paymentRecordsQO.setUserID(userId);
         Map<String, List<PaymentRecordsVO>> map = livingPaymentService.selectOrder(paymentRecordsQO);
         return CommonResult.ok(map);
     }
@@ -195,7 +197,7 @@ public class LivingPaymentController {
     @PostMapping("/addRemarkImgss")
     @Login
     public CommonResult addRemarkImgss(@RequestParam("file") MultipartFile file){
-        String upload = MinioUtils.upload(file, "shjf");
+        String upload = MinioUtils.upload(file, "pppp");
         return CommonResult.ok(upload);
     }
 

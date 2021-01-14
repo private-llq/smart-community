@@ -199,7 +199,9 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      */
     @Override
     public Map<String, List<PaymentRecordsVO>> selectOrder(PaymentRecordsQO paymentRecordsQO) {
+        System.out.println(paymentRecordsQO);
         List<PaymentRecordsVO> recordList = livingPaymentMapper.selectOrder(paymentRecordsQO);
+        System.out.println(recordList);
         Map<String, List<PaymentRecordsVO>> returnMap = new HashMap<>();
         for(PaymentRecordsVO paymentRecordsVO : recordList){
 //            if(!returnMap.keySet().contains(paymentRecordsVO.getTimeGroup())){

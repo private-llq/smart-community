@@ -87,7 +87,7 @@
     </resultMap>
 
     <resultMap id="PaymentRecordsVOMAP" type="com.jsy.community.vo.PaymentRecordsVO">
-        <id property="id" column="id"/>
+        <result property="id" column="id"/>
         <result column="payYear" property="payYear"/>
         <result column="payMonth" property="payMonth"/>
         <result column="payType" property="payType"/>
@@ -104,6 +104,7 @@
         <result column="remarkImg" property="remarkImg"/>
         <result column="typeID" property="typeID"/>
         <result column="typeName" property="typeName"/>
+        <result column="timeGroup" property="timeGroup"/>
     </resultMap>
 
 </mapper>
