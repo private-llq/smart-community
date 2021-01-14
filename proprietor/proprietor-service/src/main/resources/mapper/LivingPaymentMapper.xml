@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.LivingPaymentMapper">
     <sql id="query">
-        where tg.uid=#{query.userID}
-            <if test="query.doorNo!=null and query.doorNo!=''">
-                and t.family_id=#{query.doorNo}
+        where tg.uid=#{userID}
+            <if test="doorNo!=null and doorNo!=''">
+                and t.family_id=#{doorNo}
             </if>
-            <if test="query.payYear!=null and query.payYear>0">
-                and t.pay_year=#{query.payYear}
+            <if test="payYear!=null and payYear>0">
+                and t.pay_year=#{payYear}
             </if>
-            <if test="query.payMonth!=null and query.payMonth>0">
-                and t.pay_month=#{query.payMonth}
+            <if test="payMonth!=null and payMonth>0">
+                and t.pay_month=#{payMonth}
             </if>
     </sql>
 

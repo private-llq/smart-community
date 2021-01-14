@@ -19,8 +19,8 @@ public class PaymentRecordsQO implements Serializable {
     @ApiModelProperty(value = "户号")
     private String doorNo;
 
-    @ApiModelProperty(value = "组号id")
-    private Long group;
+//    @ApiModelProperty(value = "组号id")
+//    private Long group;
 
     @ApiModelProperty(value = "年份查询")
     private Integer payYear;

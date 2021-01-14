@@ -137,13 +137,13 @@ public class LivingPaymentController {
 
     /**
      * 通过组户号查询订单详情
-     * @param baseQO
+     * @param
      * @return
      */
     @ApiOperation("查询每月的缴费详情")
     @PostMapping("/selectOrder")
     @Login
-    public CommonResult selectOrder(@RequestBody PaymentRecordsQO paymentRecordsQO ){
+    public CommonResult selectOrder(@RequestBody PaymentRecordsQO paymentRecordsQO){
         String userId = UserUtils.getUserId();
         System.out.println(userId);
         Map<String, List<PaymentRecordsVO>> map = livingPaymentService.selectOrder(paymentRecordsQO);
