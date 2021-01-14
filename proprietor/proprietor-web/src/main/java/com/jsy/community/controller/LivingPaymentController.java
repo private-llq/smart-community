@@ -17,6 +17,7 @@ import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.*;
+import com.jsy.community.vo.shop.PaymentRecordsMapVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -149,7 +149,7 @@ public class LivingPaymentController {
         String userId = UserUtils.getUserId();
         System.out.println(userId);
         paymentRecordsQO.setUserID(userId);
-        Map<String, List<PaymentRecordsVO>> map = livingPaymentService.selectOrder(paymentRecordsQO);
+        PaymentRecordsMapVO map = livingPaymentService.selectOrder(paymentRecordsQO);
         return CommonResult.ok(map);
     }
 

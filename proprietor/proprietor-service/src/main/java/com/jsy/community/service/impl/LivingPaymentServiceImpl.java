@@ -11,6 +11,7 @@ import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.*;
+import com.jsy.community.vo.shop.PaymentRecordsMapVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -198,7 +199,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      * @return:
      */
     @Override
-    public Map<String, List<PaymentRecordsVO>> selectOrder(PaymentRecordsQO paymentRecordsQO) {
+    public PaymentRecordsMapVO selectOrder(PaymentRecordsQO paymentRecordsQO) {
         System.out.println(paymentRecordsQO);
         List<PaymentRecordsVO> recordList = livingPaymentMapper.selectOrder(paymentRecordsQO);
         System.out.println(recordList);
@@ -210,7 +211,9 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
             }
             returnMap.get(paymentRecordsVO.getTimeGroup()).add(paymentRecordsVO);
         }
-        return returnMap;
+        PaymentRecordsMapVO mapVO = new PaymentRecordsMapVO();
+        mapVO.setMap(returnMap);
+        return mapVO;
     }
     /**
      * @Description: 默认查询所有缴费信息

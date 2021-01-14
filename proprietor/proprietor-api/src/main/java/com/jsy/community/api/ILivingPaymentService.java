@@ -5,9 +5,9 @@ import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.vo.*;
+import com.jsy.community.vo.shop.PaymentRecordsMapVO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -37,7 +37,7 @@ public interface ILivingPaymentService {
      * @param baseQO
      * @return
      */
-    Map<String, List<PaymentRecordsVO>> selectOrder(PaymentRecordsQO paymentRecordsQO);
+    PaymentRecordsMapVO selectOrder(PaymentRecordsQO paymentRecordsQO);
 
     /**
      * 默认查询所有缴费信息
