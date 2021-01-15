@@ -29,6 +29,9 @@ public class UserInfoVo implements Serializable {
 	@ApiModelProperty(value = "极光推送全部标签")
 	private String uroraTags;
 	
+	@ApiModelProperty(value = "用户imID")
+	private String imId;
+	
 	@ApiModelProperty("昵称")
 	private String nickname;
 	

@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
+import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.mapper.UserThirdPlatformMapper;
 import com.jsy.community.qo.ProprietorQO;
@@ -87,8 +88,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private IAlipayService alipayService;
     
+    @Autowired
+    private UserIMMapper userIMMapper;
+    
     private long expire = 60*60*24*7; //暂时
-
+    
+    /**
+     * 创建用户token
+     */
     @Override
     public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo){
         Date expireDate = new Date(new Date().getTime() + expire * 1000);
@@ -100,6 +107,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return userAuthVo;
     }
     
+    /**
+     * 查询用户信息
+     */
     private UserInfoVo queryUserInfo(String uid){
         UserEntity user = baseMapper.queryUserInfoByUid(uid);
         if (user == null || user.getDeleted() == 1) {
@@ -119,27 +129,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (user.getAreaId() != null) {
             userInfoVo.setArea(ops.get("RegionSingle:" + user.getAreaId().toString()));
         }
-        
         //查询极光推送标签
         UserUroraTagsEntity userUroraTagsEntity = userUroraTagsService.queryUroraTags(uid);
         if(userUroraTagsEntity != null){
             userInfoVo.setUroraTags(userUroraTagsEntity.getUroraTags());
         }
+        //查询用户imId
+        UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().select("im_id").eq("uid", uid));
+        if(userIMEntity != null){
+            userInfoVo.setImId(userIMEntity.getImId());
+        }
         return userInfoVo;
     }
     
+    /**
+     * 登录
+     */
     @Override
     public UserInfoVo login(LoginQO qo) {
         String uid = userAuthService.checkUser(qo);
         return queryUserInfo(uid);
     }
-
+    
+    /**
+     * 注册
+     */
     @Transactional(rollbackFor = Exception.class)
     @Override
     public String register(RegisterQO qo) {
         commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
     
-        String uuid = UUID.randomUUID().toString().replace("-", "");
+        String uuid = UserUtils.createUserToken();
         
         // 业主数据(user表)
         UserEntity user = new UserEntity();
@@ -170,6 +190,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userUroraTagsEntity.setUid(uuid);
         userUroraTagsEntity.setCommunityTags("all"); //给所有用户加一个通用tag，用于全体消息推送
         userUroraTagsService.createUroraTags(userUroraTagsEntity);
+        //创建imID
+        UserIMEntity userIMEntity = new UserIMEntity();
+        userIMEntity.setUid(uuid);
+        userIMEntity.setImId(UserUtils.createUserToken());
+        userIMMapper.insert(userIMEntity);
         return uuid;
     }
     
@@ -477,6 +502,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return returnMap;
     }
     
+    //查询身份(是不是小区业主或家属)
+    private boolean canGetLongAccess(String uid, Long communityId, String mobile){
+        if(userHouseService.hasHouse(uid,communityId)
+            || relationService.isHouseMember(mobile,communityId)){
+            return true;
+        }
+        return false;
+    }
+    
+    //设置不过期门禁
+    private String setUserLongAccess(String uid){
+        String token = UUID.randomUUID().toString().replace("-", "");
+        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
+        visitorEntryVO.setToken(token);
+        redisTemplate.opsForValue().set("UEntry:" + uid, JSON.toJSONString(visitorEntryVO));
+        return token;
+    }
+    
     /**
      * @Description: 查询用户是否存在
      * @Param: [uid]
@@ -498,24 +541,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             map.put("exists",false);
         }
         return map;
-    }
-    
-    //查询身份(是不是小区业主或家属)
-    private boolean canGetLongAccess(String uid, Long communityId, String mobile){
-        if(userHouseService.hasHouse(uid,communityId)
-            || relationService.isHouseMember(mobile,communityId)){
-            return true;
-        }
-        return false;
-    }
-    
-    //设置不过期门禁
-    private String setUserLongAccess(String uid){
-        String token = UUID.randomUUID().toString().replace("-", "");
-        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
-        visitorEntryVO.setToken(token);
-        redisTemplate.opsForValue().set("UEntry:" + uid, JSON.toJSONString(visitorEntryVO));
-        return token;
     }
     
 }
