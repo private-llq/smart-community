@@ -41,8 +41,8 @@ public class ShopQO implements Serializable {
 	/**
 	 * 匹配文本： 2层/共18层  或者 共18层 或者 1层至3层/共18层 这样的格式字符串
 	 */
-	@Pattern(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, regexp = "^([(-1)-9]{1,2})层/共([0-9]{1,2})层$|^共[1-9]{1,2}层$|^([(-1)-9]{1,2})层至[1-9]{1,2}层/共([0-9]{1,2})层$", message = "请输入正确的楼层文本!")
 	@ApiModelProperty(value = "楼层")
+	@Pattern(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, regexp = "((^-[1-9][0-9]?)|([1-9]{1,2}))层/共([1-9]{1,2})层$|^共[1-9]{1,2}层$|((^-[1-9][0-9]?)|([1-9]{1,2}))层至[1-9]{1,2}层/共([1-9]{1,2})层$", message = "请输入正确的楼层文本!")
 	@NotBlank(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "商铺楼层不能为空")
 	private String floor;
 	
