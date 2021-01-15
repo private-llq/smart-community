@@ -76,4 +76,11 @@ public interface ILivingPaymentService {
      * @return
      */
     List<GroupVO> selectGroupAll(String userId);
+
+    /**
+     * 查询一条订单详情
+     * @param id
+     * @return
+     */
+    PaymentDetailsVO selectPaymentDetailsVO(Long id, String userId);
 }

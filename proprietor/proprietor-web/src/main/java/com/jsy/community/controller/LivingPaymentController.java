@@ -40,47 +40,47 @@ import java.util.List;
 @ApiJSYController
 public class LivingPaymentController {
 
-    private String img[]={"jpg","png","jpeg"};
+    private final String[] img ={"jpg","png","jpeg"};
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ILivingPaymentService livingPaymentService;
-    
+
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IPayTypeService payTypeService;
-    
+
     @ApiOperation("根据城市id查询其支持的缴费类型")
     @GetMapping("/getPayType")
     public CommonResult getPayType(@ApiParam("城市id") @RequestParam Long id){
         List<PayTypeEntity> payType = payTypeService.getPayTypes(id);
         return CommonResult.ok(payType);
     }
-    
-	@ApiOperation("查询支持的缴费单位")
-	@PostMapping("/getPayCompany")
-	public CommonResult<PageInfo<PayCompanyEntity>> getPayCompany(@RequestBody BaseQO<PayCompanyEntity> baseQO,
-                                                @ApiParam("缴费类型id") @RequestParam Long type,
-                                                @ApiParam("城市id") @RequestParam Long cityId){
+
+    @ApiOperation("查询支持的缴费单位")
+    @PostMapping("/getPayCompany")
+    public CommonResult<PageInfo<PayCompanyEntity>> getPayCompany(@RequestBody BaseQO<PayCompanyEntity> baseQO,
+                                                                  @ApiParam("缴费类型id") @RequestParam Long type,
+                                                                  @ApiParam("城市id") @RequestParam Long cityId){
         PageInfo<PayCompanyEntity> pageInfo = payTypeService.getPayCompany(baseQO,type,cityId);
         return CommonResult.ok(pageInfo);
-	}
+    }
 
-	@ApiOperation("城市id加缴费类型id查询缴费单位")
-	@PostMapping("/selectPayCompany")
-	public CommonResult selectPayCompany(@ApiParam("缴费类型id") @RequestParam Long type,
+    @ApiOperation("城市id加缴费类型id查询缴费单位")
+    @PostMapping("/selectPayCompany")
+    public CommonResult selectPayCompany(@ApiParam("缴费类型id") @RequestParam Long type,
                                          @ApiParam("城市id") @RequestParam Long cityId,
                                          @ApiParam("城市name") @RequestParam String name){
         List<PayCompanyEntity> payCompany = payTypeService.selectPayCompany(type,cityId,name);
         return CommonResult.ok(payCompany);
-	}
+    }
 
 
-	@ApiOperation("通过订单id查询缴费凭证")
-	@PostMapping("/getOrderID")
-	public CommonResult getOrderID(@ApiParam("订单id") @RequestParam Long id){
+    @ApiOperation("通过订单id查询缴费凭证")
+    @PostMapping("/getOrderID")
+    public CommonResult getOrderID(@ApiParam("订单id") @RequestParam Long id){
         PayVoucherVO payVoucherVO=livingPaymentService.getOrderID(id);
         return CommonResult.ok(payVoucherVO);
-	}
-	
+    }
+
 
     /**
      * 添加缴费记录
@@ -95,6 +95,19 @@ public class LivingPaymentController {
         String userId = UserUtils.getUserId();
         livingPaymentQO.setUserID(userId);
         PaymentDetailsVO paymentDetailsVO=livingPaymentService.add(livingPaymentQO);
+        return CommonResult.ok(paymentDetailsVO);
+    }
+    /**
+     * 查询一条订单详情
+     * @param id
+     * @return
+     */
+    @ApiOperation("查询一条订单详情")
+    @GetMapping("/selectPaymentDetailsVO")
+    @Login
+    public CommonResult selectPaymentDetailsVO(@RequestParam Long id){
+        String userId = UserUtils.getUserId();
+        PaymentDetailsVO paymentDetailsVO = livingPaymentService.selectPaymentDetailsVO(id,userId);
         return CommonResult.ok(paymentDetailsVO);
     }
     /**

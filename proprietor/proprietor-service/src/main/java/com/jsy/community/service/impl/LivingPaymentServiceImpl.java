@@ -116,6 +116,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payOrderEntity.setPayYear(LocalDateTime.now().getYear());
         payOrderEntity.setPayMonth(LocalDateTime.now().getMonthValue());
         payOrderEntity.setGroupId(group_id);
+        payOrderEntity.setFamilyName(livingPaymentQO.getDoorName());
         payOrderEntity.setPaymentType(livingPaymentQO.getType());
         payOrderEntity.setAddress(livingPaymentQO.getAddress());
         payOrderEntity.setUnitId(livingPaymentQO.getPayCostUnitId());
@@ -155,7 +156,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         paymentDetailsVO.setPayBalance(livingPaymentQO.getPayBalance());
         paymentDetailsVO.setDoorNo(livingPaymentQO.getDoorNo());
         paymentDetailsVO.setOrderTime(LocalDateTime.now());
-        paymentDetailsVO.setFamilyName(livingPaymentQO.getFamilyName());
+        paymentDetailsVO.setDoorName(livingPaymentQO.getDoorName());
         paymentDetailsVO.setAccountingTime(LocalDateTime.now());
         paymentDetailsVO.setPaySum(livingPaymentQO.getPayNum());
         paymentDetailsVO.setAddress(livingPaymentQO.getAddress());
@@ -228,6 +229,18 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         return list;
     }
 
+    /**
+     * @Description: 查询一条缴费详情
+     * @author: Hu
+     * @since: 2021/1/15 15:39
+     * @Param:
+     * @return:
+     */
+    @Override
+    public PaymentDetailsVO selectPaymentDetailsVO(Long id, String userId) {
+        return livingPaymentMapper.selectPaymentDetailsVO(id,userId);
+    }
+
     @Override
     public List<GroupVO> selectGroupAll(String userId) {
         return livingPaymentMapper.selectGroupAll(userId);
@@ -237,8 +250,8 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      * @Description: 缴费凭证
      * @author: Hu
      * @since: 2020/12/28 15:53
-     * @Param: 
-     * @return: 
+     * @Param:
+     * @return:
      */
     @Override
     public PayVoucherVO getOrderID(Long id) {

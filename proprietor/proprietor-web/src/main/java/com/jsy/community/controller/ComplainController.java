@@ -34,7 +34,7 @@ import java.util.List;
 @Login(allowAnonymous = true)
 public class ComplainController {
 
-    private String img[]={"jpg","png","jpeg"};
+    private final String[] img ={"jpg","png","jpeg"};
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IComplainService complainService;

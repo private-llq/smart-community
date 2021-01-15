@@ -4,6 +4,7 @@ import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.vo.DefaultHouseOwnerVO;
 import com.jsy.community.vo.GroupVO;
+import com.jsy.community.vo.PaymentDetailsVO;
 import com.jsy.community.vo.PaymentRecordsVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -51,4 +52,13 @@ public interface LivingPaymentMapper {
      * @return:
      */
     List<GroupVO> selectGroupAll(String userId);
+
+    /**
+     * @Description: 查询一条缴费详情
+     * @author: Hu
+     * @since: 2021/1/15 15:39
+     * @Param:
+     * @return:
+     */
+    PaymentDetailsVO selectPaymentDetailsVO(@Param("id") Long id, @Param("userId")String userId);
 }

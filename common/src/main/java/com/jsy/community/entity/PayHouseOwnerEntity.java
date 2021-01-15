@@ -30,6 +30,9 @@ public class PayHouseOwnerEntity extends BaseEntity {
     @ApiModelProperty(value = "户号")
     private String familyId;
 
+    @ApiModelProperty(value = "户号")
+    private String familyName;
+
     @ApiModelProperty(value = "缴费单位")
     private Long payCompany;
 

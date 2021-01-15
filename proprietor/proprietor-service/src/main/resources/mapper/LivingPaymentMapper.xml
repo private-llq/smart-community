@@ -3,15 +3,15 @@
 <mapper namespace="com.jsy.community.mapper.LivingPaymentMapper">
     <sql id="query">
         where tg.uid=#{userID}
-            <if test="doorNo!=null and doorNo!=''">
-                and t.family_id=#{doorNo}
-            </if>
-            <if test="payYear!=null and payYear>0">
-                and t.pay_year=#{payYear}
-            </if>
-            <if test="payMonth!=null and payMonth>0">
-                and t.pay_month=#{payMonth}
-            </if>
+        <if test="doorNo!=null and doorNo!=''">
+            and t.family_id=#{doorNo}
+        </if>
+        <if test="payYear!=null and payYear>0">
+            and t.pay_year=#{payYear}
+        </if>
+        <if test="payMonth!=null and payMonth>0">
+            and t.pay_month=#{payMonth}
+        </if>
     </sql>
 
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
@@ -64,6 +64,21 @@
 		JOIN t_pay_company pc on ph.pay_company=pc.id
 		JOIN t_pay_type pt on ph.type=pt.id
         where ph.uid=#{userID}
+    </select>
+    <select id="selectPaymentDetailsVO" resultType="com.jsy.community.vo.PaymentDetailsVO">
+        SELECT
+        id,
+        unit as unitName,
+        family_id as doorNo,
+        order_time as orderTime,
+        arrive_time as accountingTime,
+        payment_amount as paySum,
+        pay_balance as payBalance,
+        address as address,
+        status as status,
+        family_name as familyName
+        FROM t_pay_order
+        where id=#{id}
     </select>
 
     <resultMap id="GroupVOMap" type="com.jsy.community.vo.GroupVO">

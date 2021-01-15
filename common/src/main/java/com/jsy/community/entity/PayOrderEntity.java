@@ -45,6 +45,9 @@ public class PayOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "户号")
     private String familyId;
 
+    @ApiModelProperty(value = "户名")
+    private String familyName;
+
     @ApiModelProperty(value = "下单时间")
     private LocalDateTime orderTime;
 

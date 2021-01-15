@@ -31,7 +31,7 @@ import java.util.Arrays;
 @RequestMapping("/relation")
 @ApiJSYController
 public class RelationController {
-    private String img[]={"jpg","png","jpeg"};
+    private final String[] img ={"jpg","png","jpeg"};
 
     private final String REGEX_MOBILE = "^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17[013678])|(18[0,5-9]))\\d{8}$";
     private final String ID_NUMBER = "^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$";
@@ -112,7 +112,7 @@ public class RelationController {
         return CommonResult.ok(relationVO);
     }
 
-//    @ApiOperation("修改一个家属信息")
+    //    @ApiOperation("修改一个家属信息")
 //    @PostMapping("/updateByRelationId")
 //    @Login
 //    public CommonResult updateByRelationId(@RequestBody HouseMemberEntity houseMemberEntity){
