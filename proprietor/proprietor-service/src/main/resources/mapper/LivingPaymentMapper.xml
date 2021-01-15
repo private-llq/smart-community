@@ -36,13 +36,13 @@
         concat(t.pay_year,"年",t.pay_month,"月") as timeGroup,
         t.id as id,t.pay_year as payYear,t.pay_month as payMonth,t.order_num as orderNum,t.unit as unitName,
         t.family_id as doorNo,t.order_time as orderTime,t.payment_amount paySum,t.pay_type as payType,
-        t.bill_classification as billClassification,t.label as label,t.remark as remark,t.remark_img as remarkImg,
+        t.bill_classification as billClassification,t.tally as tally,t.remark as remark,t.remark_img as remarkImg,
         tpt.id as typeID,tpt.name as typeName,t.address as address,tpt.icon
         FROM t_pay_order t
         join t_pay_group tg on t.group_id=tg.id
         join t_pay_type tpt on t.payment_type=tpt.id
         <include refid="query"></include>
-        ORDER BY t.order_time desc
+        ORDER BY orderTime desc
     </select>
     <select id="selectGroup" resultMap="GroupVOMap">
         SELECT
@@ -100,7 +100,7 @@
         <result column="orderNum" property="orderNum"/>
         <result column="orderTime" property="orderTime"/>
         <result column="billClassification" property="billClassification"/>
-        <result column="label" property="label"/>
+        <result column="tally" property="tally"/>
         <result column="remark" property="remark"/>
         <result column="remarkImg" property="remarkImg"/>
         <result column="typeID" property="typeID"/>
