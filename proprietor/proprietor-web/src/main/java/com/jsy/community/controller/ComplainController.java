@@ -12,13 +12,13 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -84,8 +84,8 @@ public class ComplainController {
         for (MultipartFile complainImage : complainImages) {
             String originalFilename = complainImage.getOriginalFilename();
             String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-            if (!FilenameUtils.isExtension(s, img)) {
-                return CommonResult.error("请上传图片！可用后缀"+img);
+            if (!Arrays.asList(img).contains(s)) {
+                return CommonResult.error("您上传的图片中包含非图片文件！请上传图片，可用后缀"+ Arrays.toString(img));
             }
         }
         String[] upload = MinioUtils.uploadForBatch(complainImages, BUCKET_NAME);

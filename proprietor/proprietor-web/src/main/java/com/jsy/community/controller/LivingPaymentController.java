@@ -21,11 +21,11 @@ import com.jsy.community.vo.shop.PaymentRecordsMapVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -193,8 +193,8 @@ public class LivingPaymentController {
     public CommonResult addRemarkImg(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        if (!FilenameUtils.isExtension(s, img)) {
-            return CommonResult.error("请上传图片！可用后缀"+img);
+        if (!Arrays.asList(img).contains(s)) {
+            return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
         }
         String upload = MinioUtils.upload(file, "bbbb");
         return CommonResult.ok(upload);

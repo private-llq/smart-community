@@ -13,10 +13,11 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.RelationVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Arrays;
 
 /**
  * @Description: 添加家属控制器
@@ -79,6 +80,11 @@ public class RelationController {
     @PostMapping("/upload")
     @Login
     public CommonResult upload(@RequestParam("file") MultipartFile file){
+        String originalFilename = file.getOriginalFilename();
+        String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        if (!Arrays.asList(img).contains(s)) {
+            return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
+        }
         String upload = MinioUtils.upload(file, "aaaa");
         return CommonResult.ok(upload);
     }
@@ -90,8 +96,8 @@ public class RelationController {
     public CommonResult uploadDrivingLicenseUrl(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        if (!FilenameUtils.isExtension(s, img)) {
-            return CommonResult.error("请上传图片！可用后缀"+img);
+        if (!Arrays.asList(img).contains(s)) {
+            return CommonResult.error("请上传图片！可用后缀"+Arrays.toString(img));
         }
         String upload = MinioUtils.upload(file, "wocao");
         return CommonResult.ok(upload);
