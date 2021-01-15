@@ -62,7 +62,7 @@ public class SysInformController {
     @Login
     @ApiOperation("批量系统消息删除")
     @DeleteMapping("/batch")
-    public CommonResult<Boolean> delete(@RequestBody List<Long> informIds){
+    public CommonResult<Boolean> deleteBatchByIds(@RequestBody List<Long> informIds){
         if(informIds == null || informIds.isEmpty()){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "没有可以删除的系统消息!");
         }

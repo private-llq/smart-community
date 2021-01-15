@@ -8,7 +8,9 @@ import com.jsy.community.mapper.HouseReserveMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseReserveQO;
 import com.jsy.community.util.HouseHelper;
+import com.jsy.community.utils.CommonUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.lease.HouseReserveVO;
 import com.jsy.community.api.IHouseConstService;
 import com.jsy.community.api.IHouseReserveService;
@@ -19,7 +21,10 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.rmi.dgc.Lease;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -73,7 +78,29 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         //TODO: 取消预约后 推送消息至业主 告诉他 某某取消了预约
         //0代表着状态预约已取消
         qo.setReserveStatus(0);
-        return houseReserveMapper.updateReserveState(qo) > 0;
+        Integer integer = houseReserveMapper.updateReserveState(qo);
+        //[接受者信息] 通房屋id拿到房源出租标题 和 用户的 推送id
+        HouseReserveVO vo = houseReserveMapper.getPushInfo(qo.getId());
+        if( vo == null ){
+            throw new LeaseException("没有可取消预约的信息!");
+        }
+        //[推送者信息]
+        String userNickName = houseReserveMapper.selectNicknameById(qo.getReserveUid());
+
+        //组装推送消息
+        StringBuilder builder = new StringBuilder();
+        builder.append(userNickName);
+        builder.append("在");
+        builder.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        builder.append(" 取消了预约看房 ");
+        builder.append(vo.getHouseTitle());
+
+        //数据库查出的 用户推送id
+        if( integer > 0 ){
+            CommonUtils.pushCommunityMSG(1, vo.getPushId(), "取消预约", builder.toString());
+            return true;
+        }
+        return false;
     }
 
 

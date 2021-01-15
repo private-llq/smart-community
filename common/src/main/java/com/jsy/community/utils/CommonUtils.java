@@ -17,7 +17,7 @@ public class CommonUtils {
 	public static final int PUSH_TYPE_ID = 1;
 	public static final int PUSH_TYPE_TAG = 2;
 	
-	public static final String PUSH_URL = "http://192.168.12.105:20002/imLogsMessage/jPush";
+	public static final String PUSH_URL = "http://192.168.12.54:20002/imLogsMessage/jPush";
 	
 	/**
 	* @Description: 推送社区消息http调用
@@ -51,7 +51,7 @@ public class CommonUtils {
 		bodyMap.put("msgTitle",title); //推送标题
 		bodyMap.put("msgContent",content); //推送内容
 		//组装http请求
-		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(PUSH_URL, bodyMap);
+		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams("http://"+ LanIpResolver.getLanIpByMac("3c-7c-3f-4b-c0-a0") +":20002/imLogsMessage/jPush", bodyMap);
 		//设置header
 		Map<String,String> headers = new HashMap<>();
 		headers.put("Content-Type", "application/json");
@@ -76,7 +76,11 @@ public class CommonUtils {
 	}
 	
 	public static void main(String[] args) {
-		pushCommunityMSG(1,"120c83f76087f89f525","测试信息","this is test info");
+		String houseReserveTitle = "房屋预约信息";
+		String houseReserveContent = "张大锤在1.16号上午10点对您发布的[江北-观音桥 三钢二路8号]进行了预约！请及时回复。";
+		String favoriteNoticeTitle = "您的房屋被收藏啦!";
+		String favoriteNoticeContent = "张大锤在 2021-1-15 10:52:34 收藏您发布的房屋[江北-观音桥 三钢二路8号]";
+		pushCommunityMSG(1,"120c83f76087f89f525",favoriteNoticeTitle,favoriteNoticeContent);
 	}
 	
 }

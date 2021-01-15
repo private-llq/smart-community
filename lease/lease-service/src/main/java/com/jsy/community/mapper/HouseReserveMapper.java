@@ -8,6 +8,7 @@ import com.jsy.community.vo.lease.HouseReserveVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 /**
@@ -60,4 +61,23 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
 
 
     Integer updateReserveState(HouseReserveQO qo);
+
+    /**
+     * 从t_house_lease 表拿到用户的推送信息
+     * @author YuLF
+     * @since  2021/1/15 15:22
+     * @Param  id       房源id
+     * @return          返回用户推送id 房源标题
+     */
+    @Select("select l.house_title,u.reg_id as pushId from t_house_reserve as r LEFT JOIN t_user as u on r.reserve_uid = u.uid join t_house_lease as l on r.house_lease_id = l.id where u.deleted = 0 and r.id = #{id} ")
+    HouseReserveVO getPushInfo(Long id);
+
+
+    /**
+     * 根据uid拿用户nickname
+     * @param reserveUid   用户uid
+     * @return             返回用户nickname
+     */
+    @Select("select nickname from t_user where uid = #{uid} and deleted = 0")
+    String selectNicknameById(@Param("uid") String reserveUid);
 }

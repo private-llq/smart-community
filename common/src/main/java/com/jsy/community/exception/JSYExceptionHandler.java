@@ -4,6 +4,7 @@ import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -49,6 +50,15 @@ public class JSYExceptionHandler {
 		return CommonResult.error(JSYError.NOT_FOUND);
 	}
 	
+	/**
+	 * 请求Content-type类型错误
+	 */
+	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+	public CommonResult<Boolean> handleHttpMediaTypeNotSupportedExceptionException(HttpMediaTypeNotSupportedException e) {
+		log.error(e.getMessage(), e);
+		return CommonResult.error(JSYError.NOT_SUPPORT_REQUEST_METHOD);
+	}
+
 	/**
 	 * 传参类型错误
 	 */

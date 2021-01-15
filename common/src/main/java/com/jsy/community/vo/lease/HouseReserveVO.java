@@ -28,6 +28,9 @@ public class HouseReserveVO implements Serializable {
     @ApiModelProperty(value = "预约所属人ID")
     private String reserveUid;
 
+    @ApiModelProperty(value = "预约所属推送ID")
+    private String pushId;
+
     @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功")
     private Integer reserveStatus;
 

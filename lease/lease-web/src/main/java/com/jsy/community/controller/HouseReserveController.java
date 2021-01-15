@@ -76,7 +76,7 @@ public class HouseReserveController {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Cancel.class);
         qo.setReserveUid(UserUtils.getUserId());
         Boolean cancel = iHouseReserveService.cancel(qo);
-        return CommonResult.ok( cancel ? "取消预约成功!" : "取消预约失败!数据不存在");
+        return CommonResult.ok( cancel ? "取消预约成功!" : "取消预约失败!");
     }
 
     @Login
