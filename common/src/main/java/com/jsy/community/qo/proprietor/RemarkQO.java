@@ -27,7 +27,7 @@ public class RemarkQO implements Serializable {
     private Integer billClassification;
 
     @ApiModelProperty(value = "标签")
-    private String label;
+    private String tally;
 
     @ApiModelProperty(value = "备注")
     private String remark;

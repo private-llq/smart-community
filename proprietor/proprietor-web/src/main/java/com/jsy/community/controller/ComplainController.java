@@ -12,6 +12,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,8 @@ import java.util.List;
 @ApiJSYController
 @Login(allowAnonymous = true)
 public class ComplainController {
+
+    private String img[]={"jpg","png","jpeg"};
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IComplainService complainService;
@@ -78,6 +81,13 @@ public class ComplainController {
     @ApiOperation("投诉建议图片批量上传")
     @PostMapping(value = "/uploadComplainImages")
     public CommonResult uploadComplainImages(@RequestParam("complainImages")MultipartFile[] complainImages, HttpServletRequest request)  {
+        for (MultipartFile complainImage : complainImages) {
+            String originalFilename = complainImage.getOriginalFilename();
+            String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+            if (!FilenameUtils.isExtension(s, img)) {
+                return CommonResult.error("请上传图片！可用后缀"+img);
+            }
+        }
         String[] upload = MinioUtils.uploadForBatch(complainImages, BUCKET_NAME);
         StringBuilder filePath = new StringBuilder();
         for (String s : upload) {

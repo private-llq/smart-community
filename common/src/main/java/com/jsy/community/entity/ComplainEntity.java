@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -24,8 +25,10 @@ import java.time.LocalDateTime;
 public class ComplainEntity implements Serializable {
     @ApiModelProperty(value = "投诉建议id")
     private Long id;
+    @NotNull(message = "类型不能为空")
     @ApiModelProperty(value = "类型，1投诉，2建议")
     private Integer type;
+    @NotNull(message = "类容不能为空")
     @ApiModelProperty(value = "内容")
     private String content;
     @ApiModelProperty(hidden = true)

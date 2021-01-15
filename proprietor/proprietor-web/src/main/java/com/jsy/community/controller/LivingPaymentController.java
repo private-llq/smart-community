@@ -21,6 +21,7 @@ import com.jsy.community.vo.shop.PaymentRecordsMapVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +39,8 @@ import java.util.List;
 @RequestMapping("/livingpayment")
 @ApiJSYController
 public class LivingPaymentController {
+
+    private String img[]={"jpg","png","jpeg"};
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ILivingPaymentService livingPaymentService;
@@ -90,7 +93,6 @@ public class LivingPaymentController {
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
 
         String userId = UserUtils.getUserId();
-        System.out.println(livingPaymentQO);
         livingPaymentQO.setUserID(userId);
         PaymentDetailsVO paymentDetailsVO=livingPaymentService.add(livingPaymentQO);
         return CommonResult.ok(paymentDetailsVO);
@@ -105,7 +107,6 @@ public class LivingPaymentController {
     @Login
     public CommonResult selectGroup(@RequestBody GroupQO groupQO){
         String userId = UserUtils.getUserId();
-        System.out.println(groupQO);
         groupQO.setUserID(userId);
         List<GroupVO> voList = livingPaymentService.selectGroup(groupQO);
         return CommonResult.ok(voList);
@@ -147,7 +148,6 @@ public class LivingPaymentController {
     @Login
     public CommonResult selectOrder(@RequestBody PaymentRecordsQO paymentRecordsQO){
         String userId = UserUtils.getUserId();
-        System.out.println(userId);
         paymentRecordsQO.setUserID(userId);
         PaymentRecordsMapVO map = livingPaymentService.selectOrder(paymentRecordsQO);
         return CommonResult.ok(map);
@@ -191,6 +191,11 @@ public class LivingPaymentController {
     @PostMapping("/addRemarkImg")
     @Login
     public CommonResult addRemarkImg(@RequestParam("file") MultipartFile file){
+        String originalFilename = file.getOriginalFilename();
+        String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        if (!FilenameUtils.isExtension(s, img)) {
+            return CommonResult.error("请上传图片！可用后缀"+img);
+        }
         String upload = MinioUtils.upload(file, "bbbb");
         return CommonResult.ok(upload);
     }

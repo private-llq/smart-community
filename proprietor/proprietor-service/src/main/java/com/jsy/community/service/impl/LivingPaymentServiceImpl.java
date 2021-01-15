@@ -200,9 +200,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      */
     @Override
     public PaymentRecordsMapVO selectOrder(PaymentRecordsQO paymentRecordsQO) {
-        System.out.println(paymentRecordsQO);
         List<PaymentRecordsVO> recordList = livingPaymentMapper.selectOrder(paymentRecordsQO);
-        System.out.println(recordList);
         Map<String, List<PaymentRecordsVO>> returnMap = new HashMap<>();
         for(PaymentRecordsVO paymentRecordsVO : recordList){
 //            if(!returnMap.keySet().contains(paymentRecordsVO.getTimeGroup())){
@@ -282,7 +280,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     public void addRemark(RemarkQO remarkQO) {
         PayOrderEntity payOrderEntity = payOrderMapper.selectById(remarkQO.getId());
         payOrderEntity.setBillClassification(remarkQO.getBillClassification());
-        payOrderEntity.setLabel(remarkQO.getLabel());
+        payOrderEntity.setTally(remarkQO.getTally());
         payOrderEntity.setRemark(remarkQO.getRemark());
         payOrderEntity.setRemarkImg(remarkQO.getRemarkImg());
         payOrderMapper.updateById(payOrderEntity);
