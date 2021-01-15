@@ -86,8 +86,8 @@ public class ShopLeaseVO implements Serializable {
 	@ApiModelProperty(value = "详情页总标签")
 	private List<String> tags;
 	
-	@ApiModelProperty(value = "手机")
-	private String mobile;
+//	@ApiModelProperty(value = "手机")
+//	private String mobile;
 	
 	@ApiModelProperty(value = "免租月数")
 	private Integer freeLease;
@@ -101,11 +101,11 @@ public class ShopLeaseVO implements Serializable {
 	@ApiModelProperty(value = "店铺状态 0空置中 1经营中  字符串形式")
 	private String statusString;
 	
-	@ApiModelProperty(value = "称呼")
-	private String nickname;
+//	@ApiModelProperty(value = "称呼")
+//	private String nickname;
 	
-	@ApiModelProperty(value = "头像")
-	private String userImg;
+//	@ApiModelProperty(value = "头像")
+//	private String userImg;
 	
 	
 	

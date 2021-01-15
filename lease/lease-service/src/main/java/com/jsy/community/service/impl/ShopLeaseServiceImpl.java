@@ -87,6 +87,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	 **/
 	private static final Long SHOP_BUSINESS = 9L;
 	
+	/**
+	 * @Author lihao
+	 * @Description 商铺来源为不限
+	 * @Date 2021/1/14 9:42
+	 **/
+	private static final Short SHOP_SOURCE = 3;
+	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addShop(ShopQO shop) {
@@ -302,7 +309,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Override
 	public PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO, String query, Integer areaId) {
 		Page<ShopLeaseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
-		
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		
 		// 用于接收该区域的小区id集合
@@ -392,7 +398,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 来源
 			Short sourceId = houseQO.getHouseSourceId();
-			if (sourceId != null && sourceId != 3) {
+			if (sourceId != null && !SHOP_SOURCE.equals(sourceId)) {
 				wrapper.eq("source", sourceId);
 			} else {
 				wrapper.in("source",1,2,3);
@@ -479,8 +485,10 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 来源
 			Short sourceId = houseQO.getHouseSourceId();
-			if (sourceId != null) {
+			if (sourceId != null && !SHOP_SOURCE.equals(sourceId)) {
 				wrapper.eq("source", sourceId);
+			} else {
+				wrapper.in("source",1,2,3);
 			}
 			
 			// 类型
@@ -721,6 +729,27 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("type", typeList);
 		map.put("business", businessList);
+		
+		// 3. 来源   后面考虑写到配置文件中
+		HashMap<String, Object> hashMap = new HashMap<>();
+		hashMap.put("id",1);
+		hashMap.put("type","业主");
+		
+		HashMap<String, Object> hashMap2 = new HashMap<>();
+		hashMap2.put("id",2);
+		hashMap2.put("type","物业");
+		
+		HashMap<String, Object> hashMap3 = new HashMap<>();
+		hashMap3.put("id",3);
+		hashMap3.put("type","不限");
+		
+		List<Map<String, Object>> maps = new ArrayList<>();
+		maps.add(hashMap);
+		maps.add(hashMap2);
+		maps.add(hashMap3);
+		map.put("source",maps);
+		
+		
 		return map;
 	}
 	

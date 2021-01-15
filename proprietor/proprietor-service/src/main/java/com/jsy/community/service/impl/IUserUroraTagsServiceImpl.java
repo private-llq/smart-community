@@ -40,7 +40,7 @@ public class IUserUroraTagsServiceImpl implements IUserUroraTagsService {
 			//设置包含全部类型的uroraTags
 			userUroraTagsEntity.setUroraTags(userUroraTagsEntity.getCommunityTags());
 		}
-		return userUroraTagsMapper.selectOne(new QueryWrapper<UserUroraTagsEntity>().select("community_tags").eq("uid",uid));
+		return userUroraTagsEntity;
 	}
 	
 	/**
@@ -105,6 +105,7 @@ public class IUserUroraTagsServiceImpl implements IUserUroraTagsService {
 		String[] dataArr = dataTags.split(",");
 		Set<String> paramSet = new HashSet<>(Arrays.asList(paramArr));
 		Set<String> dataSet = new HashSet<>(Arrays.asList(dataArr));
+		paramSet.remove("all");//不允许删除系统tag all
 		dataSet.removeAll(paramSet);
 		return dataSet.toString().replace("[", "").replace("]", "").replace(", ",",");
 	}
