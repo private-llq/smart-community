@@ -55,7 +55,7 @@
     </select>
     <select id="selectGroupAll" resultMap="GroupVOMap">
         SELECT
-        ph.pay_number as doorNo,
+        ph.family_id as doorNo,
 		pc.id as typeID,
 		pc.name as typeName,
         pt.id as payTypeID,
