@@ -20,7 +20,7 @@ public class UserAccountRecordEntity  extends BaseEntity{
 	@ApiModelProperty(value = "用户ID")
 	private String uid;
 	
-	@ApiModelProperty(value = "交易来源1.充值提现2.商城购物3.水电缴费4.物业管理")
+	@ApiModelProperty(value = "交易来源1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包")
 	private Integer tradeFrom;
 	
 	@ApiModelProperty(value = "交易类型1.收入2.支出")

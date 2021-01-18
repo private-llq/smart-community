@@ -53,9 +53,7 @@ public class CommonUtils {
 		//组装http请求
 		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams("http://"+ LanIpResolver.getLanIpByMac("3c-7c-3f-4b-c0-a0") +":20002/imLogsMessage/jPush", bodyMap);
 		//设置header
-		Map<String,String> headers = new HashMap<>();
-		headers.put("Content-Type", "application/json");
-		MyHttpUtils.setHeader(httpPost,headers);
+		MyHttpUtils.setDefaultHeader(httpPost);
 		//设置默认配置
 		MyHttpUtils.setRequestConfig(httpPost);
 		String httpResult = null;

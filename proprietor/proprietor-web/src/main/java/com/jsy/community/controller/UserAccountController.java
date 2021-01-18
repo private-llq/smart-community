@@ -2,9 +2,13 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IRedbagService;
 import com.jsy.community.api.IUserAccountService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
-import com.jsy.community.qo.proprietor.UserAccountRecordQO;
+import com.jsy.community.constant.PaymentEnum;
+import com.jsy.community.qo.RedbagQO;
+import com.jsy.community.qo.proprietor.UserAccountTradeQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -28,6 +32,9 @@ public class UserAccountController {
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IUserAccountService userAccountService;
 	
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+	private IRedbagService redbagService;
+	
 	/**
 	* @Description: 查询余额
 	 * @Param: []
@@ -43,18 +50,56 @@ public class UserAccountController {
 	
 	/**
 	* @Description: 账户交易
-	 * @Param: [userAccountRecordQO]
+	 * @Param: [userAccountTradeQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2021/1/8
 	**/
 	@ApiOperation("【用户账户】账户交易")
 	@PostMapping("trade")
-	public CommonResult trade(@RequestBody UserAccountRecordQO userAccountRecordQO){
-		ValidatorUtils.validateEntity(userAccountRecordQO);
-		userAccountRecordQO.setUid(UserUtils.getUserId());
-		userAccountService.trade(userAccountRecordQO);
+	public CommonResult trade(@RequestBody UserAccountTradeQO userAccountTradeQO){
+		ValidatorUtils.validateEntity(userAccountTradeQO);
+		userAccountTradeQO.setUid(UserUtils.getUserId());
+		userAccountService.trade(userAccountTradeQO);
 		return CommonResult.ok("交易完成");
+	}
+	
+	/**
+	* @Description: 单发红包
+	 * @Param: [redBagQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/18
+	**/
+	@ApiOperation("【红包】单发红包")
+	@PostMapping("redbag/send/single")
+	public CommonResult sendSingleRedbag(@RequestBody RedbagQO redBagQO){
+		ValidatorUtils.validateEntity(redBagQO, RedbagQO.singleRedbagValidated.class);
+		redBagQO.setFromType(BusinessConst.REDBAG_FROM_TYPE_PERSON);//目前写死个人红包，调用方不用传
+		redBagQO.setType(PaymentEnum.CurrencyEnum.CURRENCY_CNY.getIndex());
+		redBagQO.setGroupUuid(null);
+		redBagQO.setNumber(null);
+		redBagQO.setUserUuid(UserUtils.getUserId());
+		redbagService.sendRedbag(redBagQO);
+		return CommonResult.ok("发送成功");
+	}
+	
+	/**
+	* @Description: 群发红包
+	 * @Param: [redBagQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/18
+	**/
+	@ApiOperation("【红包】群发红包")
+	@PostMapping("redbag/send/group")
+	public CommonResult sendGroupRedbag(@RequestBody RedbagQO redBagQO){
+		ValidatorUtils.validateEntity(redBagQO, RedbagQO.groupRedbagValidated.class);
+		redBagQO.setFromType(BusinessConst.REDBAG_FROM_TYPE_PERSON);//目前写死个人红包，调用方不用传
+		redBagQO.setType(PaymentEnum.CurrencyEnum.CURRENCY_CNY.getIndex());
+		redBagQO.setReceiveUserUuid(null);
+		redbagService.sendRedbag(redBagQO);
+		return CommonResult.ok("发送成功");
 	}
 	
 }
