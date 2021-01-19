@@ -106,6 +106,8 @@
 			<artifactId>alipay-sdk-java</artifactId>
 			<version>4.10.70.ALL</version>
 		</dependency>
+		<!-- 支付宝 -->
+
 
 
     </dependencies>

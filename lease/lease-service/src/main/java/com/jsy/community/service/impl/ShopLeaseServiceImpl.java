@@ -318,7 +318,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		// 筛选条件
 		HouseLeaseQO houseQO = baseQO.getQuery();
-		
 		// 搜索条件和筛选条件都不存在   PS：此时区域id这里从url上获取，若没有 默认查渝北区
 		if (houseQO == null && query == null) {
 			// 根据地区id查询该区域所有小区

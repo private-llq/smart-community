@@ -200,6 +200,12 @@
 			<artifactId>alipay-sdk-java</artifactId>
 			<version>4.10.70.ALL</version>
 		</dependency>
+
+		<!-- aop -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>
