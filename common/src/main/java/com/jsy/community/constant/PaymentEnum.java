@@ -72,7 +72,8 @@ public interface PaymentEnum {
 		TRADE_FROM_LIVING_EXPENSES("水电缴费", 3),
 		TRADE_FROM_MANAGEMENT("物业管理", 4),
 		TRADE_FROM_RENT("房屋租金", 5),
-		TRADE_FROM_REDBAG("红包", 6);
+		TRADE_FROM_REDBAG("红包", 6),
+		TRADE_FROM_REDBAG_BACK("红包退回", 7);
 		private String name;
 		private Integer index;
 		TradeFromEnum(String name, Integer index) {

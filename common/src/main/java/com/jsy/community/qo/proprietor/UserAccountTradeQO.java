@@ -21,7 +21,7 @@ public class UserAccountTradeQO extends BaseEntity{
 	@ApiModelProperty(value = "用户ID",hidden = true)
 	private String uid;
 	
-	@ApiModelProperty(value = "交易来源1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包")
+	@ApiModelProperty(value = "交易来源1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包7.红包退回")
 	@Range(min = 1,max = 5, message = "非法交易来源")
 	@NotNull(message = "请确定交易来源")
 	private Integer tradeFrom;

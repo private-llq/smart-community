@@ -17,6 +17,8 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 /**
  * @author chq459799974
  * @description 用户金钱账户控制器
@@ -75,6 +77,9 @@ public class UserAccountController {
 	@PostMapping("redbag/send/single")
 	public CommonResult sendSingleRedbag(@RequestBody RedbagQO redBagQO){
 		ValidatorUtils.validateEntity(redBagQO, RedbagQO.singleRedbagValidated.class);
+		if(new BigDecimal("0.01").compareTo(redBagQO.getMoney()) == 1){
+			return CommonResult.error("金额过小");
+		}
 		redBagQO.setFromType(BusinessConst.REDBAG_FROM_TYPE_PERSON);//目前写死个人红包，调用方不用传
 		redBagQO.setType(PaymentEnum.CurrencyEnum.CURRENCY_CNY.getIndex());
 		redBagQO.setGroupUuid(null);

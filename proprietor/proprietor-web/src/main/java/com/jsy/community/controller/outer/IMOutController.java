@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiOutController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRedbagService;
 import com.jsy.community.api.IUserService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.RedbagQO;
 import com.jsy.community.utils.UserUtils;
@@ -43,11 +44,10 @@ public class IMOutController {
 	
 	@ApiOperation("【单红包】领取")
 	@PostMapping("redbag/receive/single")
-	public boolean receiveSingleRedbag(@RequestBody RedbagQO redbagQO){
+	public Map<String, Object> receiveSingleRedbag(@RequestBody RedbagQO redbagQO){
 		ValidatorUtils.validateEntity(redbagQO,RedbagQO.receiveSingleValidated.class);
-		redbagQO.setRedbagType(1);
-		redbagService.receiveRedbag(redbagQO);
-		return true;
+		redbagQO.setRedbagType(BusinessConst.REDBAG_TYPE_PRIVATE);
+		return redbagService.receiveRedbag(redbagQO);
 	}
 	
 	@ApiOperation("【群红包】领取")
@@ -57,9 +57,9 @@ public class IMOutController {
 	}
 	
 	@ApiOperation("【红包】退款")
-	@PostMapping("redbag/refund")
-	public boolean redbagRefund(){
-		return false;
+	@PostMapping("redbag/back")
+	public Map<String, Object> sendBackRedbag(@RequestParam String uuid){
+		return redbagService.sendBackRedbag(uuid);
 	}
 	
 }

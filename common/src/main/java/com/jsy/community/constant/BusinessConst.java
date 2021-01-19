@@ -115,6 +115,24 @@ public interface BusinessConst {
 	 */
 	Integer REDBAG_TYPE_GROUP = 2;
 	
+	//========= 红包状态 ==========
+	/**
+	 * 红包状态-未领取
+	 */
+	Integer REDBAG_STATUS_UNCLAIMED = 0;
+	/**
+	 * 红包状态-领取中
+	 */
+	Integer REDBAG_STATUS_RECEIVING = 1;
+	/**
+	 * 红包状态-已领完
+	 */
+	Integer REDBAG_STATUS_FINISHED = 2;
+	/**
+	 * 红包状态-已退回
+	 */
+	Integer REDBAG_STATUS_BACK = -1;
+	
 	//========= 红包来源主体 ==========
 	/**
 	 * 红包来源-个人

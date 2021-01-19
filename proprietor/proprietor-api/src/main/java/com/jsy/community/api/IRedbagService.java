@@ -29,4 +29,13 @@ public interface IRedbagService {
 	**/
 	Map<String,Object> receiveRedbag(RedbagQO redbagQO);
 	
+	/**
+	* @Description: 红包退回
+	 * @Param: [uuid]
+	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/19
+	**/
+	Map<String,Object> sendBackRedbag(String uuid);
+	
 }

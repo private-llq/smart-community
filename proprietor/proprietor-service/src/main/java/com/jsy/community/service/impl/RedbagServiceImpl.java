@@ -66,8 +66,8 @@ public class RedbagServiceImpl implements IRedbagService {
 		userAccountService.trade(tradeQO);
 		//新增红包
 		RedbagEntity redbagEntity = new RedbagEntity();
-		redbagEntity.setId(SnowFlake.nextId());
 		BeanUtils.copyProperties(redbagQO,redbagEntity);
+		redbagEntity.setId(SnowFlake.nextId());
 		redbagEntity.setName(StringUtils.isEmpty(redbagEntity.getName()) ? "恭喜发财" : redbagEntity.getName());
 		int addRedbag = redbagMapper.insert(redbagEntity);
 		if(addRedbag != 1){
@@ -129,23 +129,27 @@ public class RedbagServiceImpl implements IRedbagService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> receiveRedbag(RedbagQO redbagQO){
+		Map<String, Object> returnMap = new HashMap<>();
 		if(BusinessConst.REDBAG_TYPE_PRIVATE.equals(redbagQO.getRedbagType())){ //单领红包
 			//查询
-			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("uuid","receive_user_uuid","money")
+			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("uuid","receive_user_uuid","money","status")
 				.eq("uuid", redbagQO.getUuid())
 				.eq("receive_user_uuid",redbagQO.getReceiveUserUuid()));
 			if(entity == null){
 				throw new ProprietorException("红包不存在");
-			}else if(entity.getMoney().compareTo(BigDecimal.ZERO) == 0){
+			}else if(BusinessConst.REDBAG_STATUS_FINISHED.equals(entity.getStatus())){
 				throw new ProprietorException("红包已经领过了");
+			}else if(BusinessConst.REDBAG_STATUS_BACK.equals(entity.getStatus())){
+				throw new ProprietorException("无法领取已退回红包");
 			}
 			//收取私包
 			RedbagEntity redbagEntity = new RedbagEntity();
 			redbagEntity.setMoney(BigDecimal.ZERO);
+			redbagEntity.setStatus(BusinessConst.REDBAG_STATUS_FINISHED);
 			redbagEntity.setReceivedCount(1);
 			int updateRedbag = redbagMapper.update(redbagEntity, new UpdateWrapper<RedbagEntity>().eq("uuid", entity.getUuid()));
 			if(updateRedbag != 1){
-				throw new ProprietorException("红包领过失败");
+				throw new ProprietorException("红包领取失败");
 			}
 			//增加账户金额
 			UserAccountTradeQO tradeQO = new UserAccountTradeQO();
@@ -154,6 +158,10 @@ public class RedbagServiceImpl implements IRedbagService {
 			tradeQO.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex());
 			tradeQO.setTradeAmount(entity.getMoney());
 			userAccountService.trade(tradeQO);
+			//返回
+			returnMap.put("uuid",entity.getUuid());//红包id
+			returnMap.put("receiveUserUuid",entity.getReceiveUserUuid());//领取人
+			returnMap.put("money",entity.getMoney());//领取金额
 		}else if(BusinessConst.REDBAG_TYPE_GROUP.equals(redbagQO.getRedbagType())){ //群红包
 			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*")
 				.eq("uuid", redbagQO.getUuid())
@@ -162,18 +170,52 @@ public class RedbagServiceImpl implements IRedbagService {
 				throw new ProprietorException("红包已领完");
 			}
 		}
-		return null;
+		return returnMap;
 	}
 	
-	//退红包  入uuid   返money
+	/**
+	* @Description: 红包退回
+	 * @Param: [uuid]
+	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author: chq459799974
+	 * @Date: 2021/1/19
+	**/
+	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> sendBackRedbag(String uuid){
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> returnMap = new HashMap<>();
+		//查询红包
 		RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*").eq("uuid", uuid));
-		if(entity == null || entity.getMoney().compareTo(BigDecimal.ZERO) <= 0){
+		if(entity == null){
 			throw new ProprietorException("红包不见了 请联系管理员");
+		}else if(BusinessConst.REDBAG_STATUS_FINISHED.equals(entity.getStatus())){
+			throw new ProprietorException("红包已被领完 无法退回");
+		}else if(BusinessConst.REDBAG_STATUS_BACK.equals(entity.getStatus())){
+			throw new ProprietorException("红包已经退回 请不要重复退回");
 		}
-		
-		return null;
+		//红包剩余金额
+		BigDecimal money = entity.getMoney();
+		//清空红包金额
+		RedbagEntity redbagEntity = new RedbagEntity();
+		redbagEntity.setMoney(BigDecimal.ZERO);
+		redbagEntity.setStatus(BusinessConst.REDBAG_STATUS_BACK);
+		int updateRedbag = redbagMapper.update(redbagEntity, new UpdateWrapper<RedbagEntity>().eq("uuid", entity.getUuid()));
+		if(updateRedbag != 1){
+			throw new ProprietorException("红包退回失败");
+		}
+		//退回账户
+		//增加账户金额
+		UserAccountTradeQO tradeQO = new UserAccountTradeQO();
+		tradeQO.setUid(entity.getUserUuid());
+		tradeQO.setTradeFrom(PaymentEnum.TradeFromEnum.TRADE_FROM_REDBAG_BACK.getIndex());
+		tradeQO.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex());
+		tradeQO.setTradeAmount(entity.getMoney());
+		userAccountService.trade(tradeQO);
+		//返回
+		returnMap.put("uuid",entity.getUuid());//红包id
+		returnMap.put("uuid",entity.getUserUuid());//退回到人
+		returnMap.put("uuid",entity.getMoney());//退回金额
+		return returnMap;
 	}
 	
 }
