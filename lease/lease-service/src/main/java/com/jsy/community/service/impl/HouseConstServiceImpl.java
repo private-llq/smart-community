@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.IHouseConstService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.mapper.HouseConstMapper;
-import com.jsy.community.api.IHouseConstService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -146,6 +146,25 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
     @Override
     public List<String> getShopTags(Long shopFacility) {
         return houseConstMapper.getConstNameByCode(shopFacility);
+    }
+    
+    @Override
+    public Map<String, Object> getAddShopTags(Integer facilityType,Integer peopleType) {
+        Map<String, Object> map = new HashMap<>();
+        // 获取配套设施
+        QueryWrapper<HouseLeaseConstEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("house_const_type",facilityType);
+        List<HouseLeaseConstEntity> facilityList = houseConstMapper.selectList(wrapper);
+        
+        // 获取客流人群
+        QueryWrapper<HouseLeaseConstEntity> query = new QueryWrapper<>();
+        query.eq("house_const_type",peopleType);
+        List<HouseLeaseConstEntity> peopleList = houseConstMapper.selectList(query);
+        
+        map.put("facility",facilityList);
+        map.put("people",peopleList);
+        
+        return map;
     }
     
     @Override

@@ -401,7 +401,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			if (sourceId != null && !SHOP_SOURCE.equals(sourceId)) {
 				wrapper.eq("source", sourceId);
 			} else {
-				wrapper.in("source",1,2,3);
+				wrapper.in("source", 1, 2, 3);
 			}
 			
 			// 类型
@@ -488,7 +488,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			if (sourceId != null && !SHOP_SOURCE.equals(sourceId)) {
 				wrapper.eq("source", sourceId);
 			} else {
-				wrapper.in("source",1,2,3);
+				wrapper.in("source", 1, 2, 3);
 			}
 			
 			// 类型
@@ -732,22 +732,22 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		// 3. 来源   后面考虑写到配置文件中
 		HashMap<String, Object> hashMap = new HashMap<>();
-		hashMap.put("id",1);
-		hashMap.put("type","业主");
+		hashMap.put("id", 1);
+		hashMap.put("type", "业主");
 		
 		HashMap<String, Object> hashMap2 = new HashMap<>();
-		hashMap2.put("id",2);
-		hashMap2.put("type","物业");
+		hashMap2.put("id", 2);
+		hashMap2.put("type", "物业");
 		
 		HashMap<String, Object> hashMap3 = new HashMap<>();
-		hashMap3.put("id",3);
-		hashMap3.put("type","不限");
+		hashMap3.put("id", 3);
+		hashMap3.put("type", "不限");
 		
 		List<Map<String, Object>> maps = new ArrayList<>();
 		maps.add(hashMap);
 		maps.add(hashMap2);
 		maps.add(hashMap3);
-		map.put("source",maps);
+		map.put("source", maps);
 		
 		
 		return map;

@@ -76,4 +76,14 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
     List<Long> getConstIdByType(Integer i);
     
     List<String> getShopTags(Long shopFacility);
+    
+    /**
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     * @Author lihao
+     * @Description 商铺发布时的配套设施和客流人群选项
+     * @Date 2021/1/18 14:47
+     * @Param []
+     **/
+    Map<String, Object> getAddShopTags(Integer facilityType,Integer peopleType);
+    
 }
