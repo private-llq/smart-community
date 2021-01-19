@@ -41,6 +41,11 @@ public class MyHttpUtils {
         return status;
     }
 
+    //默认Header
+	public static void setDefaultHeader(HttpRequest httpRequest){
+		httpRequest.setHeader("Content-Type", "application/json");
+	}
+ 
 	//设置Header
 	public static void setHeader(HttpRequest httpRequest,Map<String,String> headers) {
 //		httpRequest.setHeader("Content-Type", "application/json;charset=utf-8");

@@ -9,23 +9,23 @@ import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.UserAccountEntity;
 import com.jsy.community.entity.UserAccountRecordEntity;
 import com.jsy.community.mapper.UserAccountMapper;
-import com.jsy.community.qo.proprietor.UserAccountRecordQO;
-import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.qo.proprietor.UserAccountTradeQO;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.UserAccountVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author chq459799974
  * @description 用户账户实现类
  * @since 2021-01-08 11:14
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class UserAccountServiceImpl implements IUserAccountService {
 	
@@ -74,18 +74,18 @@ public class UserAccountServiceImpl implements IUserAccountService {
 	 **/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void trade(UserAccountRecordQO uAccountRecordQO){
+	public void trade(UserAccountTradeQO tradeQO){
 		int updateResult = 0;
 		//处理(加或减)
-		if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(uAccountRecordQO.getTradeType())){ //收入
-			updateResult = userAccountMapper.updateBalance(uAccountRecordQO.getTradeAmount(), uAccountRecordQO.getUid());
-		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex().equals(uAccountRecordQO.getTradeType())){ //支出
-			UserAccountVO userAccountVO = queryBalance(uAccountRecordQO.getUid());
+		if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(tradeQO.getTradeType())){ //收入
+			updateResult = userAccountMapper.updateBalance(tradeQO.getTradeAmount(), tradeQO.getUid());
+		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex().equals(tradeQO.getTradeType())){ //支出
+			UserAccountVO userAccountVO = queryBalance(tradeQO.getUid());
 			BigDecimal balance = userAccountVO.getBalance();
-			if(balance.compareTo(uAccountRecordQO.getTradeAmount()) == -1){
+			if(balance.compareTo(tradeQO.getTradeAmount()) == -1){
 				throw new ProprietorException("余额不足");
 			}
-			updateResult = userAccountMapper.updateBalance(uAccountRecordQO.getTradeAmount().negate(), uAccountRecordQO.getUid());
+			updateResult = userAccountMapper.updateBalance(tradeQO.getTradeAmount().negate(), tradeQO.getUid());
 		} else{
 			throw new ProprietorException("非法交易类型");
 		}
@@ -94,9 +94,9 @@ public class UserAccountServiceImpl implements IUserAccountService {
 		}
 		//写流水
 		UserAccountRecordEntity ucoinRecordEntity = new UserAccountRecordEntity();
-		BeanUtils.copyProperties(uAccountRecordQO, ucoinRecordEntity);
+		BeanUtils.copyProperties(tradeQO, ucoinRecordEntity);
 		ucoinRecordEntity.setId(SnowFlake.nextId());
-		ucoinRecordEntity.setBalance(queryBalance(uAccountRecordQO.getUid()).getBalance());//交易后余额
+		ucoinRecordEntity.setBalance(queryBalance(tradeQO.getUid()).getBalance());//交易后余额
 		boolean b = userAccountRecordService.addUcoinRecord(ucoinRecordEntity);
 		if(!b){
 			throw new ProprietorException("因账户流水记录失败，交易取消");

@@ -26,6 +26,20 @@ public class HouseConstController {
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
+    
+    /**
+     * @Author lihao
+     * @Description 配套设施常量类型
+     * @Date 2021/1/13 15:55
+     **/
+    private static final Integer FACILITY_TYPE = 16;
+    
+    /**
+     * @Author lihao
+     * @Description 客流人群常量类型
+     * @Date 2021/1/13 15:55
+     **/
+    private static final Integer PEOPLE_TYPE = 17;
 
 
     @PostMapping()
@@ -74,7 +88,12 @@ public class HouseConstController {
         return CommonResult.ok(constEntityList);
     }
     
-    
+    @ApiOperation("商铺发布时的配套设施和客流人群选项")
+    @GetMapping("/getShopTags")
+    public CommonResult getAddShopTags(){
+        Map<String, Object> map = houseConstService.getAddShopTags(FACILITY_TYPE,PEOPLE_TYPE);
+        return CommonResult.ok(map);
+    }
     
     
     

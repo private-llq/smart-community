@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
-import com.jsy.community.qo.proprietor.UserAccountRecordQO;
+import com.jsy.community.qo.RedbagQO;
+import com.jsy.community.qo.proprietor.UserAccountTradeQO;
 import com.jsy.community.vo.UserAccountVO;
 
 /**
@@ -35,5 +36,6 @@ public interface IUserAccountService {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/8
 	**/
-	void trade(UserAccountRecordQO uAccountRecordQO);
+	void trade(UserAccountTradeQO uAccountRecordQO);
+	
 }

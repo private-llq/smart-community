@@ -71,7 +71,9 @@ public interface PaymentEnum {
 		TRADE_FROM_SHOPPING("商城购物", 2),
 		TRADE_FROM_LIVING_EXPENSES("水电缴费", 3),
 		TRADE_FROM_MANAGEMENT("物业管理", 4),
-		TRADE_FROM_RENT("房屋租金", 5);
+		TRADE_FROM_RENT("房屋租金", 5),
+		TRADE_FROM_REDBAG("红包", 6),
+		TRADE_FROM_REDBAG_BACK("红包退回", 7);
 		private String name;
 		private Integer index;
 		TradeFromEnum(String name, Integer index) {
@@ -193,6 +195,42 @@ public interface PaymentEnum {
 				wAStatusList.add(map);
 				wAStatusMap.put(wAStatusEnum.getIndex(), wAStatusEnum.getName());
 			}
+		}
+	}
+	
+	/**
+	* @Description: 币种
+	 * @Author: chq459799974
+	 * @Date: 2021/1/18
+	**/
+	enum CurrencyEnum {
+		CURRENCY_CNY("CNY", 1);
+		private String name;
+		private Integer index;
+		CurrencyEnum(String name, Integer index) {
+			this.name = name;
+			this.index = index;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public Integer getIndex() {
+			return index;
+		}
+		
+		public void setIndex(Integer index) {
+			this.index = index;
+		}
+		
+		@Override
+		public String toString() {
+			return this.index+"_"+this.name;
 		}
 	}
 	

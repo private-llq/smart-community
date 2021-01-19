@@ -57,6 +57,7 @@ public interface BusinessConst {
 	 */
 	short HOUSE_FLOOR_CHAR_MAX = 10;
 	
+	//========= 小区门禁方式 ============
 	/**
 	 * 小区门禁-无
 	 */
@@ -69,6 +70,8 @@ public interface BusinessConst {
 	 * 小区门禁-人脸识别
 	 */
 	String ACCESS_COMMUNITY_FACE = "2";
+	
+	//========= 楼栋门禁方式 ============
 	/**
 	 * 楼栋门禁-无
 	 */
@@ -82,6 +85,7 @@ public interface BusinessConst {
 	 */
 	String ACCESS_BUILDING_COMMUNICATION = "2";
 	
+	//========= 证件类型 ================
 	/**
 	 * 证件类型-身份证
 	 */
@@ -91,6 +95,7 @@ public interface BusinessConst {
 	 */
 	Integer IDENTIFICATION_TYPE_PASSPORT = 2;
 	
+	//========= 房间成员类型 ===========
 	/**
 	 * 房间成员类型-亲属
 	 */
@@ -104,5 +109,43 @@ public interface BusinessConst {
 	 * 租房异步线程池
 	 */
 	String LEASE_ASYNC_POOL = "leaseAsyncThreadPool";
+	
+	//========= 红包类型 ==========
+	/**
+	 * 红包类型-私包
+	 */
+	Integer REDBAG_TYPE_PRIVATE = 1;
+	/**
+	 * 红包类型-群红包
+	 */
+	Integer REDBAG_TYPE_GROUP = 2;
+	
+	//========= 红包状态 ==========
+	/**
+	 * 红包状态-未领取
+	 */
+	Integer REDBAG_STATUS_UNCLAIMED = 0;
+	/**
+	 * 红包状态-领取中
+	 */
+	Integer REDBAG_STATUS_RECEIVING = 1;
+	/**
+	 * 红包状态-已领完
+	 */
+	Integer REDBAG_STATUS_FINISHED = 2;
+	/**
+	 * 红包状态-已退回
+	 */
+	Integer REDBAG_STATUS_BACK = -1;
+	
+	//========= 红包来源主体 ==========
+	/**
+	 * 红包来源-个人
+	 */
+	Integer REDBAG_FROM_TYPE_PERSON = 1;
+	/**
+	 * 红包来源-官方
+	 */
+	Integer REDBAG_FROM_TYPE_OFFICIAL = 2;
 	
 }
