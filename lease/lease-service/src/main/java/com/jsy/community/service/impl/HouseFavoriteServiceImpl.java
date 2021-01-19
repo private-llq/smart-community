@@ -82,4 +82,16 @@ public class HouseFavoriteServiceImpl extends ServiceImpl<HouseFavoriteMapper, H
         vos.forEach( v -> v.setHouseImage(houseFavoriteMapper.getShopImage(v.getHouseId())));
         return vos;
     }
+
+
+    @Override
+    public boolean hasHouseOrShop(HouseFavoriteQO qo) {
+        //收藏类型：1. 商铺 、2.出租房
+        if(qo.getFavoriteType() == 1){
+            //商铺
+            return houseFavoriteMapper.existShop(qo.getFavoriteId()) > 0;
+        }
+        //出租房
+        return houseFavoriteMapper.existHouse(qo.getFavoriteId()) > 0;
+    }
 }

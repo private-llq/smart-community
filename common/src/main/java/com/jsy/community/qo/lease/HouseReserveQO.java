@@ -21,15 +21,15 @@ import java.io.Serializable;
 @ApiModel(value="房屋租售预约参数对象", description="主要用于接收前端请求参数")
 public class HouseReserveQO implements Serializable {
 
-    @Range(groups = {Cancel.class}, min = 0, message = "id范围错误!")
-    @NotNull(groups = {Cancel.class}, message = "预约信息id不能为空!")
+    @Range(groups = {Cancel.class,Reject.class}, min = 0, message = "id范围错误!")
+    @NotNull(groups = {Cancel.class,Reject.class}, message = "预约信息id不能为空!")
     @ApiModelProperty(value = "预约信息ID")
     private Long id;
 
     @ApiModelProperty(value = "预约所属人ID")
     private String reserveUid;
 
-    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功")
+    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功 3.预约已拒绝")
     private Integer reserveStatus;
 
     @ApiModelProperty(value = "预约信息内容")

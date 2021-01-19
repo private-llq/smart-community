@@ -80,7 +80,8 @@ public class HouseLeaseController {
     public CommonResult<Boolean> houseLeaseUpdate(@RequestBody HouseLeaseQO houseLeaseQO) {
         ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.UpdateLeaseSaleHouse.class);
         houseLeaseQO.setUid(UserUtils.getUserId());
-        return CommonResult.ok(iHouseLeaseService.updateHouseLease(houseLeaseQO),"更新成功!");
+        Boolean success = iHouseLeaseService.updateHouseLease(houseLeaseQO);
+        return success ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");
     }
 
 

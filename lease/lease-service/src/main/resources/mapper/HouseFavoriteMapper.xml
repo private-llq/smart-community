@@ -8,10 +8,9 @@
         SELECT
         	l.id as houseId,
         	f.id as favoriteId,
-        	l.address as houseAddress,
 	        l.title AS houseTitle,
 	        l.month_money AS housePrice,
-	        l.transafer_money AS shopTransferMoney,
+	        l.transfer_money AS shopTransferMoney,
 	        l.shop_acreage AS houseSquareMeter
         FROM
 	        t_house_favorite AS f

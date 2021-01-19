@@ -30,7 +30,7 @@ public class HouseFavoriteQO implements Serializable {
     @ApiModelProperty(value = "所属人ID")
     private String uid;
 
-    @Range(groups = {AddFavorite.class}, min = 1 ,max = 2, message = "社区id不正确")
+    @Range(groups = {AddFavorite.class}, min = 1 ,max = 2, message = "收藏类型范围不正确!")
     @NotNull(groups = {AddFavorite.class}, message = "收藏类型不能为空!")
     @ApiModelProperty(value = "收藏类型：1商铺，2租房")
     private Short favoriteType;

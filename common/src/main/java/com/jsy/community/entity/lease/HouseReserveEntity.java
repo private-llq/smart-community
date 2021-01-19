@@ -41,7 +41,7 @@ public class HouseReserveEntity extends BaseEntity {
     private Long communityId;
 
     @Range(groups = {Add.class}, min = 0, max = 2, message = "预约范围错误! 0已取消 1预约中 2预约成功")
-    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功")
+    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功 3预约已拒绝")
     private Integer reserveStatus;
 
 

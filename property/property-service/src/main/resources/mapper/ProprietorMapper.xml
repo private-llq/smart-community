@@ -19,10 +19,6 @@
                  <if test="query.nickname!=null and !query.nickname.equals(&quot;&quot;)">
                      and nickname like concat('%',#{query.nickname},'%')
                  </if>
-                 <!-- 用户头像地址 -->
-                 <if test="query.avatarUrl!=null and !query.avatarUrl.equals(&quot;&quot;)">
-                     and avatar_url = #{query.avatarUrl}
-                 </if>
                  <!-- 用户手机号码 -->
                  <if test="query.mobile!=null and !query.mobile.equals(&quot;&quot;)">
                      and mobile = #{query.mobile}

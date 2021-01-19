@@ -51,7 +51,7 @@ public class CommonUtils {
 		bodyMap.put("msgTitle",title); //推送标题
 		bodyMap.put("msgContent",content); //推送内容
 		//组装http请求
-		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams("http://"+ LanIpResolver.getLanIpByMac("3c-7c-3f-4b-c0-a0") +":20002/imLogsMessage/jPush", bodyMap);
+		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams("http://"+ LanIpResolver.getLanIpByMac("3c-7c-3f-4b-c0-a0") +":2002/imLogsMessage/jPush", bodyMap);
 		//设置header
 		Map<String,String> headers = new HashMap<>();
 		headers.put("Content-Type", "application/json");

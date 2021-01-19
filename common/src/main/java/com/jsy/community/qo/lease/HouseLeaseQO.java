@@ -39,18 +39,18 @@ public class HouseLeaseQO implements Serializable {
     @ApiModelProperty(value = "所属人ID")
     private String uid;
 
-    @Range(groups = {AddLeaseSaleHouse.class}, min = 1 , message = "社区id不正确")
+    @Range(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1 , message = "社区id不正确")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "社区id不能为空!")
     @ApiModelProperty(value = "社区id")
     private Long houseCommunityId;
 
-    @Range(groups = {AddLeaseSaleHouse.class}, min = 1 , message = "房屋id不正确")
+    @Range(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1 , message = "房屋id不正确")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "房屋id不能为空!")
     @ApiModelProperty(value = "房源id")
     private Long houseId;
 
     @ApiModelProperty(value = "房屋租售标题")
-    @Length(groups = {AddLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_TITLE_CHAR_MAX, message = "标题长度在1~32之间")
+    @Length(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_TITLE_CHAR_MAX, message = "标题长度在1~32之间")
     @NotBlank(groups = AddLeaseSaleHouse.class, message = "未填写租售标题!")
     private String houseTitle;
 
@@ -58,22 +58,22 @@ public class HouseLeaseQO implements Serializable {
     private Long houseProvinceId;
 
     @ApiModelProperty(value = "房屋租售所属城市ID")
-    @Range(groups = {AddLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_ID_RANGE_MAX, message = "请选择一个正确的城市Code!")
+    @Range(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_ID_RANGE_MAX, message = "请选择一个正确的城市Code!")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "城市未选择!")
     private Long houseCityId;
 
     @ApiModelProperty(value = "房屋租售所属区ID")
-    @Range(groups = {AddLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_ID_RANGE_MAX, message = "请选择一个正确的区域Code!")
+    @Range(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_ID_RANGE_MAX, message = "请选择一个正确的区域Code!")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "请选择区域!")
     private Long houseAreaId;
 
     @ApiModelProperty(value = "房屋租售详细地址")
-    @Length(groups = {AddLeaseSaleHouse.class}, min = 1, max =  BusinessConst.HOUSE_ADDRESS_CHAR_MAX, message = "房屋地址长度在1~128之间")
+    @Length(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max =  BusinessConst.HOUSE_ADDRESS_CHAR_MAX, message = "房屋地址长度在1~128之间")
     @NotBlank(groups = {AddLeaseSaleHouse.class}, message = "未填写房屋租售详细地址")
     private String houseAddress;
 
 
-    @Size(groups = {AddLeaseSaleHouse.class}, min = 1,  message = "房屋标签至少需要一个!")
+    @Size(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1,  message = "房屋标签至少需要一个!")
     @ApiModelProperty(value = "房屋租售优势标签ID数组")
     private List<Long> houseAdvantage;
 
@@ -90,7 +90,7 @@ public class HouseLeaseQO implements Serializable {
     @ApiModelProperty(value = "纬度")
     private Double houseLat;
 
-    @Size(groups = {AddLeaseSaleHouse.class}, min = 1, max = 64,message = "家具至少需要一个!")
+    @Size(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max = 64,message = "家具至少需要一个!")
     @ApiModelProperty(value = "房屋家具code")
     private List<Long> houseFurniture;
 
@@ -102,7 +102,7 @@ public class HouseLeaseQO implements Serializable {
     private Long houseFurnitureId;
 
     @ApiModelProperty(value = "房屋租售价格")
-    @Range(groups = {AddLeaseSaleHouse.class}, min = 1, max = Integer.MAX_VALUE, message = "价格没有在指定范围之内!")
+    @Range(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max = Integer.MAX_VALUE, message = "价格没有在指定范围之内!")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "未输入价格")
     private BigDecimal housePrice;
 
@@ -113,17 +113,17 @@ public class HouseLeaseQO implements Serializable {
     private BigDecimal housePriceMax;
 
     @ApiModelProperty(value = "房屋出租单位/年/月/周/日")
-    @Pattern(groups = {AddLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_DATE, message = "指定的日期单位没有在范围之内")
+    @Pattern(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_DATE, message = "指定的日期单位没有在范围之内")
     @NotBlank(groups = {AddLeaseSaleHouse.class}, message = "日期单位错误")
     private String houseUnit;
 
     @ApiModelProperty(value = "房屋联系人电话")
-    @Pattern(groups = {AddLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_MOBILE, message = "手机号不正确! 电信|联通|移动")
+    @Pattern(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, regexp = RegexUtils.REGEX_MOBILE, message = "手机号不正确! 电信|联通|移动")
     @NotBlank(groups = {AddLeaseSaleHouse.class}, message = "手机号不能为空")
     private String houseContact;
 
     @ApiModelProperty(value = "房屋租售平方米")
-    @Range(groups = {AddLeaseSaleHouse.class}, min = 1, max =BusinessConst.HOUSE_SQUARE_METER_MAX, message = "房屋面积请输入一个有效的值")
+    @Range(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max =BusinessConst.HOUSE_SQUARE_METER_MAX, message = "房屋面积请输入一个有效的值")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "未输入房屋面积")
     private BigDecimal houseSquareMeter;
 
@@ -136,7 +136,7 @@ public class HouseLeaseQO implements Serializable {
     /**
      * 值是变动  需要存id至数据库 对应 名称 有后台人员管理
      */
-    @ApiModelProperty(value = "房屋出租方式 /1.压一付一/2.压一付三/3.压一付六")
+    @ApiModelProperty(value = "房屋出租方式 1.押1付1  2.押1付3  4.押1付6 8.押2付3   16.半年付  32.年付")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "押金方式是必须选择的")
     private String houseLeasedepositId;
 
@@ -144,12 +144,12 @@ public class HouseLeaseQO implements Serializable {
      * 值是变动  需要存id至数据库 对应 名称 有后台人员管理
      */
     @ApiModelProperty(value = "房屋类型id：1.四室一厅、2.二室一厅...")
-    @Pattern(groups = {AddLeaseSaleHouse.class}, regexp = "^[0-9]{6}$", message = "房屋类型Code必须为6位数字!")
+    @Pattern(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, regexp = "^[0-9]{6}$", message = "房屋类型Code必须为6位数字!")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "未选择房屋类型")
     private String houseTypeCode;
 
     @ApiModelProperty(value = "房屋所属楼层")
-    @Length(groups = {AddLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_FLOOR_CHAR_MAX, message = "楼层字符超过上限")
+    @Length(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_FLOOR_CHAR_MAX, message = "楼层字符超过上限")
     @NotBlank(groups = {AddLeaseSaleHouse.class}, message = "房屋楼层未填写")
     private String houseFloor;
 
@@ -158,7 +158,7 @@ public class HouseLeaseQO implements Serializable {
      * 非 经常变动，常量存 BusinessEnum
      */
     @ApiModelProperty(value = "房屋朝向1.东.2.西 3.南 4.北. 4.东南 5. 东北 6.西北 7.西南")
-    @Range(groups = {AddLeaseSaleHouse.class}, min = BusinessEnum.HouseDirectionEnum.min, max = BusinessEnum.HouseDirectionEnum.max, message = "房屋朝向未选择正确!可用范围：1.东 2.西 3.南 4.北. 4.东南 5.北 6.西北 7.西南")
+    @Range(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = BusinessEnum.HouseDirectionEnum.min, max = BusinessEnum.HouseDirectionEnum.max, message = "房屋朝向未选择正确!可用范围：1.东 2.西 3.南 4.北. 4.东南 5.北 6.西北 7.西南")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "房屋朝向未选择!")
     private String houseDirection;
 
@@ -170,12 +170,12 @@ public class HouseLeaseQO implements Serializable {
 
 
     @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
-    @FieldValid(groups = {AddLeaseSaleHouse.class}, value = {"主卧", "次卧", "其他"}, message = "卧室类型错误!")
+    @FieldValid(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, value = {"主卧", "次卧", "其他"}, message = "卧室类型错误!")
     private String bedroomType;
 
 
     @ApiModelProperty(value = "房屋介绍内容")
-    @Length(groups = {AddLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_INTRODUCE_CHAR_MAX, message = "房屋介绍内容字符在1~1000之间")
+    @Length(groups = {AddLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 1, max = BusinessConst.HOUSE_INTRODUCE_CHAR_MAX, message = "房屋介绍内容字符在1~1000之间")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "房屋没有介绍!对你的房屋来一句简介")
     private String houseIntroduce;
 
@@ -185,7 +185,7 @@ public class HouseLeaseQO implements Serializable {
     private String[] houseImage;
 
     @ApiModelProperty(value = "房主称呼")
-    @Length(groups = {AddLeaseSaleHouse.class, UpdateLeaseSaleHouse.class}, min = 2, max = 4, message = "请输入一个正确的称呼!2~4字符")
+    @Length(groups = {AddLeaseSaleHouse.class, UpdateLeaseSaleHouse.class,UpdateLeaseSaleHouse.class}, min = 2, max = 4, message = "请输入一个正确的称呼!2~4字符")
     @NotBlank(groups = {AddLeaseSaleHouse.class}, message = "房主称呼不能为空")
     private String appellation;
 
@@ -195,13 +195,13 @@ public class HouseLeaseQO implements Serializable {
     private Long houseImageId;
 
     @ApiModelProperty(value = "房源搜索文本")
-    @Length(groups = {SearchLeaseHouse.class}, max = 32, message = "搜索最多32个字符!")
+    @Length(groups = {SearchLeaseHouse.class,UpdateLeaseSaleHouse.class}, max = 32, message = "搜索最多32个字符!")
     private String searchText;
 
     /**
      * 65不限 66普通住宅 67别墅 68公寓
      */
-    @ApiModelProperty(value = "房屋出租类型ID")
+    @ApiModelProperty(value = "房屋出租类型ID：1不限(默认) 2普通住宅 4别墅 8公寓")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "未填写出租类型!")
     private Integer houseLeasetypeId;
 
@@ -209,7 +209,7 @@ public class HouseLeaseQO implements Serializable {
     /**
      * 69不限 70整租，71合租
      */
-    @ApiModelProperty(value = "房屋出租方式ID")
+    @ApiModelProperty(value = "房屋出租方式ID: 1不限(默认) 2整租，4合租 ")
     @NotNull(groups = {AddLeaseSaleHouse.class}, message = "未填写出租方式!")
     private Integer houseLeasemodeId;
     

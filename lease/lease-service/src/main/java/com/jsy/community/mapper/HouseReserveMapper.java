@@ -7,6 +7,7 @@ import com.jsy.community.qo.lease.HouseReserveQO;
 import com.jsy.community.vo.lease.HouseReserveVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import javax.validation.constraints.Pattern;
 import java.util.List;
@@ -41,7 +42,7 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * @param qo          预约信息id参数对象
      * @return            返回确认是否成功修改
      */
-    Integer confirm(@Param("qo") HouseReserveQO qo);
+    Integer confirm(HouseReserveQO qo);
 
 
     /**
@@ -59,6 +60,23 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
     @Select("select count(*) from t_house_lease where id = #{houseLeaseId}")
     Integer existHouseLeaseId(@Param("houseLeaseId") Long houseLeaseId);
 
+
+    /**
+     * 拒绝预约
+     * 预约状态 0.已取消，1.预约中 2.预约成功 3.预约已拒绝
+     * @param qo   请求参数
+     */
+    @Update("update t_house_reserve set reserve_status = 3 where reserve_status = 1 and id = #{id}")
+    Integer rejectReserve(HouseReserveQO qo);
+
+
+    /**
+     * 取消预约
+     * 预约状态 0.已取消，1.预约中 2.预约成功 3.预约已拒绝
+     * @param qo   请求参数
+     */
+    @Update("update t_house_reserve set reserve_status = 0 where reserve_status = 1 or reserve_status = 2 and id = #{id}")
+    Integer cancelReserveState(HouseReserveQO qo);
 
     Integer updateReserveState(HouseReserveQO qo);
 
@@ -80,4 +98,13 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      */
     @Select("select nickname from t_user where uid = #{uid} and deleted = 0")
     String selectNicknameById(@Param("uid") String reserveUid);
+
+    /**
+     * 插入预约信息
+     * @param qo        请求参数
+     * @return          返回影响行数
+     */
+    Integer insertReserve(HouseReserveEntity qo);
+
+
 }

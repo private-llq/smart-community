@@ -55,6 +55,18 @@ public interface HouseFavoriteMapper extends BaseMapper<HouseFavoriteEntity> {
     /**
      * 删除收藏数据
      */
-    @Delete("delete from t_house_favorite where favorite_id = #{favoriteId} and uid = #{uid}")
-    Integer deleteById(@Param("favoriteId") Long id, @Param("uid") String userId);
+    @Delete("delete from t_house_favorite where id = #{id} and uid = #{uid}")
+    Integer deleteById(@Param("id") Long id, @Param("uid") String userId);
+
+    /**
+     * 是否存在已发布商铺
+     */
+    @Select("select count(1) from  t_shop_lease where id = #{favoriteId} and deleted = 0")
+    Integer existShop(Long favoriteId);
+
+    /**
+     * 是否存在已发布出租房屋
+     */
+    @Select("select count(*) from t_house_lease where id = #{favoriteId} ")
+    Integer existHouse(Long favoriteId);
 }

@@ -65,7 +65,7 @@ public class HouseReserveController {
         ValidatorUtils.validateEntity(qo, HouseReserveEntity.Add.class);
         //2.房屋验证
         qo.setReserveUid(UserUtils.getUserId());
-        return CommonResult.ok(iHouseReserveService.add(qo),"提交预约成功!");
+        return iHouseReserveService.add(qo) ? CommonResult.ok("提交预约成功!") : CommonResult.error("提交预约失败!可能数据已经存在");
     }
 
 

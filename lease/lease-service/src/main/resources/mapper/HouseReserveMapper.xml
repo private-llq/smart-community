@@ -3,6 +3,15 @@
 
 <mapper namespace="com.jsy.community.mapper.HouseReserveMapper">
 
+    <!-- 提交预约 -->
+    <insert id="insertReserve">
+        insert into t_house_reserve
+        (id,house_lease_id,community_id,reserve_status,reserve_uid,reserve_msg,reserve_date,reserve_time,deleted,create_time)
+        select #{id},#{houseLeaseId},#{communityId},#{reserveStatus},#{reserveUid},#{reserveMsg},#{reserveDate},#{reserveTime},0,now()
+        from dual where not exists
+        (select id,house_lease_id,community_id,reserve_status,reserve_uid,reserve_msg,reserve_date,reserve_time,deleted,create_time from t_house_reserve where reserve_uid = #{reserveUid} and house_lease_id = #{houseLeaseId} and reserve_status = #{reserveStatus});
+    </insert>
+
     <!-- 修改预约状态 -->
     <update id="updateReserveState">
         update t_house_reserve
@@ -103,7 +112,7 @@
             reserve_status = 2
         </set>
         <where>
-            id = #{qo.id} and reserve_status = 1 and deleted = 0
+            id = #{id} and reserve_status = 1 and deleted = 0
         </where>
     </update>
 </mapper>

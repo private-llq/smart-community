@@ -99,5 +99,10 @@ public interface BusinessConst {
 	 * 房间成员类型-租客
 	 */
 	Integer PERSON_TYPE_TENANT = 2;
+
+	/**
+	 * 租房异步线程池
+	 */
+	String LEASE_ASYNC_POOL = "leaseAsyncThreadPool";
 	
 }

@@ -346,14 +346,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 //从更新车辆的集合中 移除 需要 新增的数据
                 carEntityList.removeAll(any);
                 //新增数据需要设置id
-                any.forEach( e -> {
-                    e.setId(SnowFlake.nextId());
-                });
+                any.forEach( e -> e.setId(SnowFlake.nextId()));
                 //批量新增车辆
                 carService.addProprietorCarForList(any);
             }
             //批量更新车辆信息
-            carService.updateBatchById(carEntityList);
+            carEntityList.forEach( c -> {
+                //状态 0 表示未审核
+                c.setCheckStatus(0);
+                carService.update(c, new UpdateWrapper<CarEntity>().eq("id", c.getId()).eq("uid", c.getUid()));
+            });
         }
         //========================================== 业主房屋 =========================================================
         List<UserHouseEntity> houseList = qo.getHouseEntityList();
@@ -367,12 +369,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             any.forEach(e -> {
                 e.setId(SnowFlake.nextId());
                 e.setUid(qo.getUid());
+                e.setCheckStatus(2);
             });
             //批量新增房屋信息
             userHouseService.addHouseBatch(any);
         }
         //批量更新房屋信息
-        userHouseService.updateBatchById(houseList);
+        houseList.forEach( h -> {
+            //当用户房屋更新了 重新变为未审核
+            h.setCheckStatus(2);
+            userHouseService.update(h, new UpdateWrapper<UserHouseEntity>().eq("id", h.getId()).eq("uid", qo.getUid()));
+        });
         //========================================== 业主 =========================================================
         //业主信息更新
         return userMapper.proprietorUpdate(qo) > 0;

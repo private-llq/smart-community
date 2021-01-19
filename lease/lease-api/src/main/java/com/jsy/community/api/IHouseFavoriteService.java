@@ -49,4 +49,12 @@ public interface IHouseFavoriteService extends IService<HouseFavoriteEntity> {
     * @Param  qo           参数对象
      */
     List<HouseFavoriteVO > shopFavorite(BaseQO<HouseFavoriteQO> qo);
+
+
+    /**
+     * 通过收藏类型 收藏id  验证房屋是否存在
+     * @param qo            请求参数
+     * @return              返回是否存在
+     */
+    boolean hasHouseOrShop(HouseFavoriteQO qo);
 }

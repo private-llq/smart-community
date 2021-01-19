@@ -65,7 +65,7 @@ public class CarEntity extends BaseEntity {
 
     @Range(groups = { addCarValidated.class,proprietorCarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
     @NotNull(groups = {proprietorCarValidated.class}, message = "车辆类型未选择!")
-    @ApiModelProperty(value = "车辆类型")
+    @ApiModelProperty(value = "车辆类型： 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车")
     private Integer carType;
 
 

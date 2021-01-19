@@ -4,6 +4,8 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IHouseFavoriteService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseFavoriteQO;
 import com.jsy.community.utils.UserUtils;
@@ -39,6 +41,10 @@ public class HouseFavoriteController {
     @ApiOperation("租房收藏接口")
     public CommonResult<Boolean> houseFavorite(@RequestBody HouseFavoriteQO qo) {
         ValidatorUtils.validateEntity(qo, HouseFavoriteQO.AddFavorite.class);
+        //验证数据有效性 如果不存在
+        if(!iHouseFavoriteService.hasHouseOrShop(qo)){
+            throw new JSYException("被收藏房屋不存在!");
+        }
         qo.setUid(UserUtils.getUserId());
         return CommonResult.ok(iHouseFavoriteService.houseFavorite(qo),"收藏成功!");
     }
@@ -74,7 +80,7 @@ public class HouseFavoriteController {
     @DeleteMapping()
     @ApiOperation("删除我的收藏")
     public CommonResult<Boolean> deleteFavorite(@RequestParam Long id) {
-        return CommonResult.ok(iHouseFavoriteService.deleteFavorite(id, UserUtils.getUserId()), "删除成功!");
+        return iHouseFavoriteService.deleteFavorite(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
 }
