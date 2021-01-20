@@ -5,6 +5,28 @@
 	<select id="queryUserInfoByUid" resultType="com.jsy.community.entity.UserEntity">
 		select * from t_user where uid = #{uid}
 	</select>
+	<!-- 查询用户拥有房屋 -->
+	<select id="queryUserHouseById" resultType="com.jsy.community.vo.HouseVo">
+		SELECT
+			c.NAME AS communityName,
+			h.building,
+			h.unit,
+			h.floor,
+			h.door,
+			CASE uh.check_status
+			WHEN 0 THEN '未审核通过'
+			WHEN 1 THEN '审核通过'
+			WHEN 2 THEN '审核中' END as checkStatus
+		FROM
+			t_house AS h
+			LEFT JOIN t_user_house AS uh ON h.id = uh.house_id AND uh.deleted = 0
+			LEFT JOIN t_community AS c ON uh.community_id = c.id
+		WHERE
+			h.deleted = 0
+			AND c.deleted = 0
+			AND uh.house_id = #{houseId}
+			AND uh.uid = #{uid}
+	</select>
 	<!-- 业主信息更新sql -->
 	<update id="com.jsy.community.mapper.UserMapper.proprietorUpdate">
 		update t_user set

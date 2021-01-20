@@ -87,6 +87,7 @@ public class ProprietorController {
      * 下载录入业主家属成员信息excel、模板
      * @return          返回Excel模板
      */
+    @IpLimit(prefix = "excel", second = 60, count = 5, desc = "下载业主家属成员信息录入Excel")
     @GetMapping(params = {"downloadMemberExcel"})
     @ApiOperation("下载业主家属成员信息录入Excel")
     public ResponseEntity<byte[]> downloadMemberExcel(@RequestParam long communityId) {

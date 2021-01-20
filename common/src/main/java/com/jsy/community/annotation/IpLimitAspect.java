@@ -67,7 +67,7 @@ public class IpLimitAspect {
         String ip = getIpAddr(request);
         int limitCount = ipLimit.count();
         int second = ipLimit.second();
-        List<String> keys = Collections.singletonList(ipLimit.prefix() + "_" + ip + method.getName());
+        List<String> keys = Collections.singletonList("ipLimit:"+ipLimit.prefix() + "_" + ip + method.getName());
         RedisScript<Number> redisScript = new DefaultRedisScript<>(redisLuaScript(), Number.class);
         Object count = stringRedisTemplate.execute(redisScript, keys, String.valueOf(limitCount), String.valueOf(second));
         log.info("IP: {} 在[{}]秒内，第{} ，访问描述为 [{}] 的接口", ip, second, getAccessCount(count, limitCount), ipLimit.desc());

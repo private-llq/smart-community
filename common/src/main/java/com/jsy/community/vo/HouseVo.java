@@ -39,6 +39,9 @@ public class HouseVo implements Serializable {
     @ApiModelProperty(value = "门牌名")
     private String door;
 
+    @ApiModelProperty(value = "检查状态")
+    private String checkStatus;
+
     @ApiModelProperty(value = "社区名称", hidden = true)
     private String communityName;
 
