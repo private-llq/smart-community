@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IShopLeaseService;
 import com.jsy.community.constant.Const;
@@ -51,14 +52,28 @@ public class ShopLeaseController {
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
-	// 商铺头图
 	//暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	/**
 	 * @Author lihao
-	 * @Description 头图
+	 * @Description 头图BUCKET
 	 * @Date 2021/1/13 15:49
 	 **/
-	private static final String BUCKETNAME_HEAD = "shop-head";
+	private static final String BUCKET_HEAD = "shop-head-img";
+	
+	/**
+	 * @Author lihao
+	 * @Description 头图redis部分
+	 * @Date 2021/1/20 17:01
+	 **/
+	private static final String REDIS_KEY_PART = "shop_head_img_part";
+	
+	/**
+	 * @Author lihao
+	 * @Description 头图redis全部
+	 * @Date 2021/1/20 17:01
+	 **/
+	private static final String REDIS_KEY_ALL = "shop_head_img_all";
+	
 	
 	/**
 	 * @Author lihao
@@ -119,9 +134,9 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	@ApiOperation("商铺头图上传")
 	@PostMapping("/uploadHeadImg")
-	public CommonResult uploadHeadImg(@RequestParam("file") MultipartFile[] files) {
-		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME_HEAD);
-		return CommonResult.ok(filePaths);
+	@UploadImg(bucketName = BUCKET_HEAD, redisKeyName = REDIS_KEY_PART)
+	public CommonResult uploadHeadImg(@RequestParam("file") MultipartFile[] files, CommonResult commonResult) {
+		return CommonResult.ok(commonResult.getData());
 	}
 	
 	@Login(allowAnonymous = true)
@@ -150,7 +165,7 @@ public class ShopLeaseController {
 		shopLeaseService.addShop(shop);
 		return CommonResult.ok();
 	}
-
+	
 	@ApiOperation("查询店铺详情")
 	@GetMapping("/getShop")
 	@Login(allowAnonymous = true)
@@ -159,11 +174,11 @@ public class ShopLeaseController {
 		if (map == null) {
 			return CommonResult.ok(null);
 		}
-	
-	
+		
+		
 		// 当月租金大于10000变成XX.XX万元
 		ShopLeaseVO shop = (ShopLeaseVO) map.get("shop");
-
+		
 		BigDecimal monthMoney = shop.getMonthMoney();
 		if (monthMoney.doubleValue() > NORM_MONEY) {
 			String s = String.format("%.2f", monthMoney.doubleValue() / NORM_MONEY) + "万";
@@ -178,7 +193,7 @@ public class ShopLeaseController {
 			shop.setMonthMoneyString(substring);
 		}
 		// 当月租金大于10000变成XX.XX万元
-
+		
 		// 当转让费大于10000变成XX.XX万元
 		BigDecimal transferMoney = shop.getTransferMoney();
 		if (transferMoney.doubleValue() > NORM_MONEY) {
@@ -195,8 +210,8 @@ public class ShopLeaseController {
 			shop.setTransferMoneyString(substring);
 		}
 		// 当转让费大于10000变成XX.XX万元
-
-		map.put("shop",shop);
+		
+		map.put("shop", shop);
 		return CommonResult.ok(map);
 	}
 	
@@ -211,8 +226,8 @@ public class ShopLeaseController {
 		shopLeaseService.updateShop(shop, shopId);
 		return CommonResult.ok();
 	}
-
-
+	
+	
 	@ApiOperation("下架商铺")
 	@DeleteMapping("/cancelShop")
 	@Login
@@ -221,7 +236,7 @@ public class ShopLeaseController {
 		shopLeaseService.cancelShop(userId, shopId);
 		return CommonResult.ok();
 	}
-
+	
 	@ApiOperation("查询业主发布的房源列表")
 	@GetMapping("/listShop")
 	@Login
@@ -230,7 +245,7 @@ public class ShopLeaseController {
 		List<Map<String, Object>> map = shopLeaseService.listShop(userId);
 		return CommonResult.ok(map);
 	}
-
+	
 	@ApiOperation("测试分布式事物---暂时先不删。用于测试")
 	@GetMapping("/testTransaction")
 	@Login(allowAnonymous = true)
@@ -243,7 +258,7 @@ public class ShopLeaseController {
 	@GetMapping("/moreOption")
 	@Login(allowAnonymous = true)
 	public CommonResult moreOption() {
-		Map<String,Object> map = shopLeaseService.moreOption();
+		Map<String, Object> map = shopLeaseService.moreOption();
 		return CommonResult.ok(map);
 	}
 

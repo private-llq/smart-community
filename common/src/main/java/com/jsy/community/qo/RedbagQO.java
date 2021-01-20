@@ -2,6 +2,7 @@ package com.jsy.community.qo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -46,9 +47,12 @@ public class RedbagQO implements Serializable {
 	@ApiModelProperty(value = "群id")
 	@NotBlank(groups = {groupRedbagValidated.class}, message = "缺少群ID")
 	private String groupUuid;
+	//===================================群发增加参数==============================================
 	
-	@ApiModelProperty(value = "红包类型 1.私包 2.群红包", hidden = true)
-	private Integer redbagType;
+	@ApiModelProperty(value = "交易类型 1.红包 2.群红包 3.转账", hidden = true)
+	@NotNull(groups = {singleRedbagValidated.class}, message = "缺少交易类型")
+	@Range(groups = {singleRedbagValidated.class}, min = 1, max = 3, message = "交易类型无效")
+	private Integer businessType;
 	
 	@ApiModelProperty(value = "来源类型 1.个人 2.官方", hidden = true)
 	private Integer fromType;

@@ -99,7 +99,7 @@ public class RedbagServiceImpl implements IRedbagService {
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> receiveRedbag(RedbagQO redbagQO){
 		Map<String, Object> returnMap = new HashMap<>();
-		if(BusinessConst.REDBAG_TYPE_PRIVATE.equals(redbagQO.getRedbagType())){ //私包
+		if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())){ //私包
 			//查询
 			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*")
 				.eq("uuid", redbagQO.getUuid())
@@ -126,7 +126,7 @@ public class RedbagServiceImpl implements IRedbagService {
 			returnMap.put("uuid",entity.getUuid());//红包id
 			returnMap.put("receiveUserUuid",entity.getReceiveUserUuid());//领取人
 			returnMap.put("money",entity.getMoney());//领取金额
-		}else if(BusinessConst.REDBAG_TYPE_GROUP.equals(redbagQO.getRedbagType())){ //群红包
+		}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){ //群红包
 			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*")
 				.eq("uuid", redbagQO.getUuid())
 				.gt("money",0)
@@ -209,10 +209,12 @@ public class RedbagServiceImpl implements IRedbagService {
 	 */
 	private boolean sendRedbagByHttp(RedbagQO redbagQO){
 		String url = "";
-		if(BusinessConst.REDBAG_TYPE_PRIVATE.equals(redbagQO.getRedbagType())){  //私包
+		if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())){  //私包
 			url = "http://192.168.12.37:52001/imRedEnvelope/sendRedPacket";
-		}else if(BusinessConst.REDBAG_TYPE_GROUP.equals(redbagQO.getRedbagType())){  //群红包
+		}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){  //群红包
 			url = "http://192.168.12.37:52001/imRedEnvelope/sendGroup";
+		}else if(BusinessConst.BUSINESS_TYPE_TRANSFER.equals(redbagQO.getBusinessType())){  //转账
+			url = "http://192.128.12.37:52001/imTransferAccounts/sendTransferAccount";
 		}else{
 			return false;
 		}
@@ -246,7 +248,7 @@ public class RedbagServiceImpl implements IRedbagService {
 			e.printStackTrace();
 			return false;
 		}
-		System.out.println("返回结果111" + httpResult);
+		System.out.println("返回结果：" + httpResult);
 		return redbagQO.getUuid().equals(httpResult);
 //		if(result != null){
 //			return result.getIntValue("code") == 154;
