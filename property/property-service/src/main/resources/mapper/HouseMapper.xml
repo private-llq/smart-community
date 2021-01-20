@@ -36,19 +36,18 @@
 
 	<!-- 通过社区ID查出所有 楼栋、单元、楼层、门牌、作为excel 下拉选择字符串 -->
 	<select id="getCommunityArchitecture" resultType="com.jsy.community.entity.HouseEntity">
-		SELECT
-			DISTINCT
-				h.building,
-				h.unit,
-				h.floor,
-				h.door,
-				h.id
+		SELECT DISTINCT
+			h.building,
+			h.unit,
+			h.floor,
+			h.door,
+			h.id
 		FROM
-				t_house AS h
-			LEFT JOIN t_user_house AS uh ON h.id = uh.house_id
+			t_house AS h
+		LEFT JOIN t_user_house AS uh ON h.id = uh.house_id and uh.deleted = 0
 		WHERE
-				uh.id is null
-				AND h.deleted = 0 and uh.deleted = 0
-				AND h.community_id = #{communityId}
+			uh.id IS NULL
+		AND h.deleted = 0
+		AND h.community_id = #{communityId}
 	</select>
 </mapper>

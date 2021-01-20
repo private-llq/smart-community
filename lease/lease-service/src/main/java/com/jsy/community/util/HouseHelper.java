@@ -1,6 +1,7 @@
 package com.jsy.community.util;
 
 /**
+ * 租赁 模块的帮助类  用于自定义一些静态调用方法
  * @author YuLF
  * @since 2021-01-12 15:41
  */

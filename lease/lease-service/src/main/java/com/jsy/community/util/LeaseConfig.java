@@ -8,7 +8,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * 租赁配置类
+ * 租赁配置类  用于租赁模块的一些自定义配置
  * @author YuLF
  * @since 2021-01-19 11:36
  */

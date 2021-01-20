@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.Const;
@@ -56,11 +57,12 @@ public class ProprietorController {
      * 下载录入业主信息excel、模板
      * @return          返回Excel模板
      */
+    @IpLimit(prefix = "excel", second = 60, count = 5, desc = "下载业主信息录入Excel")
     @GetMapping(params = {"downloadExcel"})
     @ApiOperation("下载业主信息录入Excel")
     public ResponseEntity<byte[]> downloadExcel(@RequestParam long communityId) {
         //1.设置响应格式  设置响应头
-        //1.1 查出数据库当前communityId对应的小区名和住户数量   返回结果如：name = 花园小区 coummunityUserNum = 54   如果根本没有这个小区，那就提前结束业务
+        //1.1 查出数据库当前communityId对应的小区名和住户数量   返回结果如：name = 花园小区 communityUserNum = 54   如果根本没有这个小区，那就提前结束业务
         Map<String,Object> res = iHouseService.getCommunityNameAndUserAmountById(communityId);
         if(res == null){
             throw new JSYException(JSYError.BAD_REQUEST);
@@ -124,6 +126,7 @@ public class ProprietorController {
         }
         return userEntityList;
     }
+
 
     /**
      * 读取工作簿 返回字节数组

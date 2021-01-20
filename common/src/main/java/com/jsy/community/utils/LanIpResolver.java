@@ -88,6 +88,7 @@ public class LanIpResolver {
                     ipMap.put(mac, getIp(line));
                 }
             }
+            br.close();
         } catch (IOException e) {
             log.info("com.jsy.community.utils.LanIpResolver.getLanIpByMac：获取局域网IP失败：{}", e.getMessage());
             return null;

@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
@@ -32,7 +33,7 @@ import java.util.stream.IntStream;
 @ApiJSYController
 @RestController
 @Api(tags = "出租房屋预约控制器")
-    @RequestMapping("/house/reserve")
+@RequestMapping("/house/reserve")
 public class HouseReserveController {
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
@@ -43,6 +44,7 @@ public class HouseReserveController {
     private IHouseConstService houseConstService;
 
     @Login
+    @IpLimit(prefix = "reserveConst", second = 60, count = 10, desc = "预约时间常量")
     @GetMapping("/datetime")
     @ApiOperation("预约常量时间查询接口")
     public CommonResult<Map<String, List<String>>> datetime() {
