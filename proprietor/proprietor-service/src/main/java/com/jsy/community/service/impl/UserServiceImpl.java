@@ -550,4 +550,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return map;
     }
     
+    /**
+    * @Description: 单表查询用户信息
+     * @Param: [uid]
+     * @Return: com.jsy.community.entity.UserEntity
+     * @Author: chq459799974
+     * @Date: 2021/1/20
+    **/
+    @Override
+    public UserEntity queryUserDetailByUid(String uid){
+        return userMapper.selectOne(new QueryWrapper<UserEntity>().select("mobile,id_card").eq("uid",uid));
+    }
+    
 }

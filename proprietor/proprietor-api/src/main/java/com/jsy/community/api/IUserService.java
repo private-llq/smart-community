@@ -124,4 +124,13 @@ public interface IUserService extends IService<UserEntity> {
 	**/
 	Map<String,Object> checkUserAndGetUid(String uid);
 	
+	/**
+	* @Description: 单表查询用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.UserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/1/20
+	**/
+	UserEntity queryUserDetailByUid(String uid);
+	
 }
