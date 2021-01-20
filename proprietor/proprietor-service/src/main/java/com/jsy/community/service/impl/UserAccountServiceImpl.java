@@ -12,7 +12,6 @@ import com.jsy.community.mapper.UserAccountMapper;
 import com.jsy.community.qo.proprietor.UserAccountTradeQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.UserAccountVO;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import java.math.BigDecimal;
  * @description 用户账户实现类
  * @since 2021-01-08 11:14
  **/
-@Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class UserAccountServiceImpl implements IUserAccountService {
 	

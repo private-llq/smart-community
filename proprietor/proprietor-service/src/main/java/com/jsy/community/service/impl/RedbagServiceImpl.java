@@ -18,6 +18,7 @@ import com.jsy.community.utils.AESOperator;
 import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MyHttpUtils;
 import com.jsy.community.utils.SnowFlake;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.client.methods.HttpPost;
 import org.springframework.beans.BeanUtils;
@@ -26,8 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -35,8 +38,11 @@ import java.util.UUID;
  * @description 红包实现类
  * @since 2021-01-18 14:29
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class RedbagServiceImpl implements IRedbagService {
+	
+	private static final Random random = new Random();
 	
 	@Autowired
 	private RedbagMapper redbagMapper;
@@ -74,49 +80,59 @@ public class RedbagServiceImpl implements IRedbagService {
 			throw new ProprietorException("红包添加失败");
 		}
 		//调用发红包接口
-//		boolean b = sendRedbagByHttp(redbagQO);
-//		if(!b){
-//			throw new ProprietorException("红包发送失败");
-//		}
+		boolean b = sendRedbagByHttp(redbagQO);
+		if(!b){
+			throw new ProprietorException("红包发送失败");
+		}
 	}
 	
 	/**
 	 * http调用发红包接口
 	 */
 	private boolean sendRedbagByHttp(RedbagQO redbagQO){
+		String url = "";
+		if(BusinessConst.REDBAG_TYPE_PRIVATE.equals(redbagQO.getRedbagType())){
+			url = "http://192.168.12.37:52001/imRedEnvelope/sendRedPacket";
+		}else if(BusinessConst.REDBAG_TYPE_GROUP.equals(redbagQO.getRedbagType())){
+			url = "http://192.168.12.37:52001/imRedEnvelope/sendGroup";
+		}else{
+			return false;
+		}
 		//加密data
-		String redbagData = AESOperator.encrypt(JSON.toJSONString(redbagQO));
+//		String redbagData = AESOperator.encrypt(JSON.toJSONString(redbagQO));
 		//获取系统时间
-		Long time = System.currentTimeMillis();
+//		Long time = System.currentTimeMillis();
 		//得到MD5签名
-		String sign = MD5Util.getSign(redbagData, time);
+//		String sign = MD5Util.getSign(redbagData, time);
 		//组装请求body
 		Map<String, Object> bodyMap = new HashMap<>();
 		//添加body参数
-		bodyMap.put("time",time);
-		bodyMap.put("signature",sign);
-		bodyMap.put("operator","");
-		bodyMap.put("data",redbagData);
+//		bodyMap.put("time",time);
+//		bodyMap.put("signature",sign);
+//		bodyMap.put("operator","");
+		bodyMap.put("data",JSON.toJSONString(redbagQO));
 		//组装http请求
-		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams("http://xxxxxxxxxxxx", bodyMap);
+		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyMap);
 		//设置header
 		MyHttpUtils.setDefaultHeader(httpPost);
 		//设置默认配置
 		MyHttpUtils.setRequestConfig(httpPost);
-		String httpResult = null;
 		JSONObject result = null;
-//		try{
-//			//执行请求，解析结果
-//			httpResult = MyHttpUtils.exec(httpPost);
+		String httpResult = null;
+		try{
+			//执行请求，解析结果
+			httpResult = MyHttpUtils.exec(httpPost);
 //			result = JSONObject.parseObject(httpResult);
-//		}catch (Exception e) {
-//			log.error("发红包 - 执行或解析出错，json解析结果" + result);
-//			e.printStackTrace();
-//		}
+		}catch (Exception e) {
+			log.error("发红包 - 执行或解析出错，json解析结果" + result);
+			e.printStackTrace();
+			return false;
+		}
+		return redbagQO.getUuid().equals(httpResult);
 //		if(result != null){
-//			return result.getBooleanValue("success");
+//			return result.getIntValue("code") == 154;
 //		}
-		return false;
+//		return false;
 	}
 	
 	/**
@@ -130,9 +146,9 @@ public class RedbagServiceImpl implements IRedbagService {
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> receiveRedbag(RedbagQO redbagQO){
 		Map<String, Object> returnMap = new HashMap<>();
-		if(BusinessConst.REDBAG_TYPE_PRIVATE.equals(redbagQO.getRedbagType())){ //单领红包
+		if(BusinessConst.REDBAG_TYPE_PRIVATE.equals(redbagQO.getRedbagType())){ //私包
 			//查询
-			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("uuid","receive_user_uuid","money","status")
+			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*")
 				.eq("uuid", redbagQO.getUuid())
 				.eq("receive_user_uuid",redbagQO.getReceiveUserUuid()));
 			if(entity == null){
@@ -169,8 +185,49 @@ public class RedbagServiceImpl implements IRedbagService {
 			if(entity == null){
 				throw new ProprietorException("红包已领完");
 			}
+			//红包里剩余的钱
+			BigDecimal remainMoney = entity.getMoney();
+			//红包剩余量
+			Integer remainSize  = entity.getNumber() - entity.getReceivedCount();
+			if(remainSize == 0){
+				throw new ProprietorException("红包领取异常 请联系管理员");
+			}
+			//随机出的手气红包
+			BigDecimal randomMoney = getRandomMoney(remainSize, remainMoney);
+			//领取红包
+			RedbagEntity redbagEntity = new RedbagEntity();
+			redbagEntity.setMoney(remainMoney.subtract(randomMoney));
+			redbagEntity.setStatus(remainSize == 1 ? BusinessConst.REDBAG_STATUS_FINISHED : BusinessConst.REDBAG_STATUS_RECEIVING);
+			redbagEntity.setReceivedCount(entity.getReceivedCount() + 1);
+			int updateRedbag = redbagMapper.update(redbagEntity, new UpdateWrapper<RedbagEntity>().eq("uuid", entity.getUuid()));
+			//增加账户金额
+			UserAccountTradeQO tradeQO = new UserAccountTradeQO();
+			tradeQO.setUid(redbagQO.getReceiveUserUuid());
+			tradeQO.setTradeFrom(PaymentEnum.TradeFromEnum.TRADE_FROM_REDBAG.getIndex());
+			tradeQO.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex());
+			tradeQO.setTradeAmount(randomMoney);
+			userAccountService.trade(tradeQO);
+			//返回
+			returnMap.put("uuid",entity.getUuid());//红包id
+			returnMap.put("receiveUserUuid",redbagQO.getReceiveUserUuid());//领取人
+			returnMap.put("money",randomMoney);//领取金额
 		}
 		return returnMap;
+	}
+	
+	/**
+	 * 算钱  remainSize 剩余的红包数量, remainMoney 剩余的钱
+	 */
+	public static BigDecimal getRandomMoney(Integer remainSize, BigDecimal remainMoney) {
+		if (remainSize == 1) {
+			return remainMoney;
+		}
+//		Random r = new Random();
+		BigDecimal min   = new BigDecimal("0.01");
+		BigDecimal max   = remainMoney.divide(new BigDecimal(remainSize), 2, RoundingMode.HALF_EVEN).multiply(new BigDecimal("2"));
+		BigDecimal money = max.multiply(new BigDecimal(random.nextDouble())).setScale(2,RoundingMode.HALF_EVEN);
+		money = money.compareTo(min) == -1 ? min : money;
+		return money;
 	}
 	
 	/**
@@ -213,8 +270,8 @@ public class RedbagServiceImpl implements IRedbagService {
 		userAccountService.trade(tradeQO);
 		//返回
 		returnMap.put("uuid",entity.getUuid());//红包id
-		returnMap.put("uuid",entity.getUserUuid());//退回到人
-		returnMap.put("uuid",entity.getMoney());//退回金额
+		returnMap.put("userUuid",entity.getUserUuid());//退回到人
+		returnMap.put("money",entity.getMoney());//退回金额
 		return returnMap;
 	}
 	

@@ -1,5 +1,8 @@
 package com.jsy.community.controller.outer;
 
+import cn.hutool.http.HttpRequest;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiOutController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRedbagService;
@@ -45,21 +48,30 @@ public class IMOutController {
 	@ApiOperation("【单红包】领取")
 	@PostMapping("redbag/receive/single")
 	public Map<String, Object> receiveSingleRedbag(@RequestBody RedbagQO redbagQO){
-		ValidatorUtils.validateEntity(redbagQO,RedbagQO.receiveSingleValidated.class);
-		redbagQO.setRedbagType(BusinessConst.REDBAG_TYPE_PRIVATE);
-		return redbagService.receiveRedbag(redbagQO);
+		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
+		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
+		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
+		redbagQO1.setRedbagType(BusinessConst.REDBAG_TYPE_PRIVATE);
+		return redbagService.receiveRedbag(redbagQO1);
 	}
 	
 	@ApiOperation("【群红包】领取")
 	@PostMapping("redbag/receive/group")
-	public Map<String,Object> receiveGroupRedbag(){
-		return null;
+	public Map<String,Object> receiveGroupRedbag(@RequestBody RedbagQO redbagQO){
+		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
+		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
+		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
+		redbagQO1.setRedbagType(BusinessConst.REDBAG_TYPE_GROUP);
+		return redbagService.receiveRedbag(redbagQO1);
 	}
 	
 	@ApiOperation("【红包】退款")
 	@PostMapping("redbag/back")
-	public Map<String, Object> sendBackRedbag(@RequestParam String uuid){
-		return redbagService.sendBackRedbag(uuid);
+	public Map<String, Object> sendBackRedbag(@RequestBody Map<String,String> map){
+		if(StringUtils.isEmpty(map.get("uuid"))){
+			return null;
+		}
+		return redbagService.sendBackRedbag(map.get("uuid"));
 	}
 	
 }

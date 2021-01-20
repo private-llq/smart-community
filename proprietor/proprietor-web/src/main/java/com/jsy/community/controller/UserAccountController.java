@@ -73,19 +73,21 @@ public class UserAccountController {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/18
 	**/
+	@Login
 	@ApiOperation("【红包】单发红包")
 	@PostMapping("redbag/send/single")
-	public CommonResult sendSingleRedbag(@RequestBody RedbagQO redBagQO){
-		ValidatorUtils.validateEntity(redBagQO, RedbagQO.singleRedbagValidated.class);
-		if(new BigDecimal("0.01").compareTo(redBagQO.getMoney()) == 1){
+	public CommonResult sendSingleRedbag(@RequestBody RedbagQO redbagQO){
+		ValidatorUtils.validateEntity(redbagQO, RedbagQO.singleRedbagValidated.class);
+		if(new BigDecimal("0.01").compareTo(redbagQO.getMoney()) == 1){
 			return CommonResult.error("金额过小");
 		}
-		redBagQO.setFromType(BusinessConst.REDBAG_FROM_TYPE_PERSON);//目前写死个人红包，调用方不用传
-		redBagQO.setType(PaymentEnum.CurrencyEnum.CURRENCY_CNY.getIndex());
-		redBagQO.setGroupUuid(null);
-		redBagQO.setNumber(null);
-		redBagQO.setUserUuid(UserUtils.getUserId());
-		redbagService.sendRedbag(redBagQO);
+		redbagQO.setFromType(BusinessConst.REDBAG_FROM_TYPE_PERSON);//目前写死个人红包，调用方不用传
+		redbagQO.setType(PaymentEnum.CurrencyEnum.CURRENCY_CNY.getIndex());
+		redbagQO.setGroupUuid(null);
+		redbagQO.setNumber(null);
+		redbagQO.setUserUuid(UserUtils.getUserId());
+		redbagQO.setRedbagType(BusinessConst.REDBAG_TYPE_PRIVATE);
+		redbagService.sendRedbag(redbagQO);
 		return CommonResult.ok("发送成功");
 	}
 	
@@ -96,14 +98,20 @@ public class UserAccountController {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/18
 	**/
+	@Login
 	@ApiOperation("【红包】群发红包")
 	@PostMapping("redbag/send/group")
-	public CommonResult sendGroupRedbag(@RequestBody RedbagQO redBagQO){
-		ValidatorUtils.validateEntity(redBagQO, RedbagQO.groupRedbagValidated.class);
-		redBagQO.setFromType(BusinessConst.REDBAG_FROM_TYPE_PERSON);//目前写死个人红包，调用方不用传
-		redBagQO.setType(PaymentEnum.CurrencyEnum.CURRENCY_CNY.getIndex());
-		redBagQO.setReceiveUserUuid(null);
-		redbagService.sendRedbag(redBagQO);
+	public CommonResult sendGroupRedbag(@RequestBody RedbagQO redbagQO){
+		ValidatorUtils.validateEntity(redbagQO, RedbagQO.groupRedbagValidated.class);
+		if(redbagQO.getMoney().doubleValue()/redbagQO.getNumber() < 0.01){
+			return CommonResult.error("人数太多或金额太小");
+		}
+		redbagQO.setFromType(BusinessConst.REDBAG_FROM_TYPE_PERSON);//目前写死群发红包，调用方不用传
+		redbagQO.setType(PaymentEnum.CurrencyEnum.CURRENCY_CNY.getIndex());
+		redbagQO.setReceiveUserUuid(null);
+		redbagQO.setUserUuid(UserUtils.getUserId());
+		redbagQO.setRedbagType(BusinessConst.REDBAG_TYPE_GROUP);
+		redbagService.sendRedbag(redbagQO);
 		return CommonResult.ok("发送成功");
 	}
 	
