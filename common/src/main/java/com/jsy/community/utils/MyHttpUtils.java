@@ -69,8 +69,8 @@ public class MyHttpUtils {
 	// 默认配置
 	private static RequestConfig getDefaultRequestConfig(){
 		return RequestConfig.custom().setConnectTimeout(2000)
-			.setConnectionRequestTimeout(2000)
-			.setSocketTimeout(2000).build();
+			.setConnectionRequestTimeout(1000)
+			.setSocketTimeout(3000).build();
 	}
 	
 	//构建URL

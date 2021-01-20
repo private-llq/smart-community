@@ -84,7 +84,7 @@ public class UserAccountController {
 		redbagQO.setFromType(BusinessConst.REDBAG_FROM_TYPE_PERSON);//目前写死个人红包，调用方不用传
 		redbagQO.setType(PaymentEnum.CurrencyEnum.CURRENCY_CNY.getIndex());
 		redbagQO.setGroupUuid(null);
-		redbagQO.setNumber(null);
+		redbagQO.setNumber(1);
 		redbagQO.setUserUuid(UserUtils.getUserId());
 		redbagQO.setRedbagType(BusinessConst.REDBAG_TYPE_PRIVATE);
 		redbagService.sendRedbag(redbagQO);
