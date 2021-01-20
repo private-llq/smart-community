@@ -15,16 +15,17 @@ import java.math.BigDecimal;
  **/
 @Data
 public class RedbagQO implements Serializable {
+	private String data;
 	
 	@ApiModelProperty(value = "发送人ID")
 	private String userUuid;
 	
 	@ApiModelProperty(value = "接收人ID")
-	@NotBlank(groups = {singleRedbagValidated.class,receiveSingleValidated.class} ,message = "缺少接收人ID")
+	@NotBlank(groups = {singleRedbagValidated.class,receiveSingleValidated.class,receiveGroupValidated.class} ,message = "缺少接收人ID")
 	private String receiveUserUuid;
 	
 	@ApiModelProperty(value = "红包UUID", hidden = true)
-	@NotBlank(groups = {receiveSingleValidated.class}, message = "缺少红包UUID")
+	@NotBlank(groups = {receiveSingleValidated.class,receiveGroupValidated.class}, message = "缺少红包UUID")
 	private String uuid;
 	
 	@ApiModelProperty(value = "红包名称")
@@ -66,4 +67,9 @@ public class RedbagQO implements Serializable {
 	 * 私包领取参数验证
 	 */
 	public interface receiveSingleValidated{}
+	
+	/**
+	 * 群红包领取参数验证
+	 */
+	public interface receiveGroupValidated{}
 }
