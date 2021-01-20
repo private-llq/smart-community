@@ -242,8 +242,18 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     }
 
     @Override
-    public List<GroupVO> selectGroupAll(String userId) {
-        return livingPaymentMapper.selectGroupAll(userId);
+    public PaymentRecordsMapVO selectGroupAll(String userId) {
+        List<GroupVO> list = livingPaymentMapper.selectGroupAll(userId);
+        Map<String,List<GroupVO>> returnMap = new LinkedHashMap<>();
+        for (GroupVO vo : list) {
+            if(returnMap.get(vo.getGroupName()) == null){
+                returnMap.put(vo.getGroupName(),new ArrayList<>());
+            }
+            returnMap.get(vo.getGroupName()).add(vo);
+        }
+        PaymentRecordsMapVO mapVO = new PaymentRecordsMapVO();
+        mapVO.setMap(returnMap);
+        return mapVO;
     }
 
     /**

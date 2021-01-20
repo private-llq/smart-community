@@ -1,12 +1,13 @@
 package com.jsy.community.controller;
 
-
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ILivingPaymentService;
+import com.jsy.community.api.IPayGroupService;
 import com.jsy.community.api.IPayTypeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PayCompanyEntity;
+import com.jsy.community.entity.PayGroupEntity;
 import com.jsy.community.entity.PayTypeEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.GroupQO;
@@ -15,6 +16,7 @@ import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.*;
 import com.jsy.community.vo.shop.PaymentRecordsMapVO;
@@ -48,6 +50,9 @@ public class LivingPaymentController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IPayTypeService payTypeService;
 
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IPayGroupService payGroupService;
+
     @ApiOperation("根据城市id查询其支持的缴费类型")
     @GetMapping("/getPayType")
     public CommonResult getPayType(@ApiParam("城市id") @RequestParam Long id){
@@ -79,6 +84,18 @@ public class LivingPaymentController {
     public CommonResult getOrderID(@ApiParam("订单id") @RequestParam Long id){
         PayVoucherVO payVoucherVO=livingPaymentService.getOrderID(id);
         return CommonResult.ok(payVoucherVO);
+    }
+    @ApiOperation("新增自定义组名")
+    @PostMapping("/saveGroupName")
+    @Login
+    public CommonResult saveGroup(@ApiParam("组名") @RequestParam String name){
+        PayGroupEntity payGroupEntity = new PayGroupEntity();
+        payGroupEntity.setUid(UserUtils.getUserId());
+        payGroupEntity.setName(name);
+        payGroupEntity.setType(5);
+        payGroupEntity.setId(SnowFlake.nextId());
+        payGroupService.save(payGroupEntity);
+        return CommonResult.ok();
     }
 
 
@@ -134,7 +151,7 @@ public class LivingPaymentController {
     @Login
     public CommonResult selectGroupAll(){
         String userId = UserUtils.getUserId();
-        List<GroupVO> voList = livingPaymentService.selectGroupAll(userId);
+        PaymentRecordsMapVO voList = livingPaymentService.selectGroupAll(userId);
         return CommonResult.ok(voList);
     }
     /**
@@ -218,6 +235,7 @@ public class LivingPaymentController {
     public CommonResult addRemarkImgss(@RequestParam("file") MultipartFile file){
         String upload = MinioUtils.upload(file, "pppp");
         return CommonResult.ok(upload);
+
     }
 
 

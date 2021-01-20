@@ -34,7 +34,7 @@ public interface ILivingPaymentService {
 
     /**
      * 查询每月订单详情
-     * @param baseQO
+     * @param paymentRecordsQO
      * @return
      */
     PaymentRecordsMapVO selectOrder(PaymentRecordsQO paymentRecordsQO);
@@ -75,7 +75,7 @@ public interface ILivingPaymentService {
      * @param
      * @return
      */
-    List<GroupVO> selectGroupAll(String userId);
+    PaymentRecordsMapVO selectGroupAll(String userId);
 
     /**
      * 查询一条订单详情

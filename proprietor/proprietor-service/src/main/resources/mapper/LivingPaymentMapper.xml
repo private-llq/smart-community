@@ -45,16 +45,17 @@
         ORDER BY orderTime desc
     </select>
     <select id="selectGroup" resultMap="GroupVOMap">
-        SELECT
+        SELECT distinct
         po.family_id as doorNo,pc.id as typeID,pc.name as typeName,pg.id as groupID,pg.name as groupName
         FROM t_pay_order po
         join t_pay_type tt on po.payment_type=tt.id
         join t_pay_group pg on po.group_id=pg.id
         JOIN t_pay_company pc on po.payment_type=pc.id
-        where pg.uid=#{userID} and gp.name=#{groupName}
+        where pg.uid=#{userID} and pg.name=#{groupName}
     </select>
     <select id="selectGroupAll" resultMap="GroupVOMap">
-        SELECT
+        SELECT distinct
+        tg.name as groupName,
         ph.family_id as doorNo,
 		pc.id as typeID,
 		pc.name as typeName,
@@ -63,6 +64,7 @@
         FROM t_pay_house_owner ph
 		JOIN t_pay_company pc on ph.pay_company=pc.id
 		JOIN t_pay_type pt on ph.type=pt.id
+		join t_pay_group tg on tg.id=ph.group_id
         where ph.uid=#{userID}
     </select>
     <select id="selectPaymentDetailsVO" resultType="com.jsy.community.vo.PaymentDetailsVO">
