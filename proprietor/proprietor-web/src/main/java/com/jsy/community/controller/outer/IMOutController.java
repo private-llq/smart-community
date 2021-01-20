@@ -51,7 +51,7 @@ public class IMOutController {
 		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
 		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
 		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
-		redbagQO1.setRedbagType(BusinessConst.REDBAG_TYPE_PRIVATE);
+		redbagQO1.setBusinessType(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG);
 		return redbagService.receiveRedbag(redbagQO1);
 	}
 	
@@ -61,7 +61,7 @@ public class IMOutController {
 		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
 		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
 		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
-		redbagQO1.setRedbagType(BusinessConst.REDBAG_TYPE_GROUP);
+		redbagQO1.setBusinessType(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG);
 		return redbagService.receiveRedbag(redbagQO1);
 	}
 	

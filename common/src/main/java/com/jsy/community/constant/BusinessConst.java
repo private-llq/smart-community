@@ -110,15 +110,19 @@ public interface BusinessConst {
 	 */
 	String LEASE_ASYNC_POOL = "leaseAsyncThreadPool";
 	
-	//========= 红包类型 ==========
+	//========= 交易类型 ==========
 	/**
-	 * 红包类型-私包
+	 * 交易类型-私包
 	 */
-	Integer REDBAG_TYPE_PRIVATE = 1;
+	Integer BUSINESS_TYPE_PRIVATE_REDBAG = 1;
 	/**
-	 * 红包类型-群红包
+	 * 交易类型-群红包
 	 */
-	Integer REDBAG_TYPE_GROUP = 2;
+	Integer BUSINESS_TYPE_GROUP_REDBAG = 2;
+	/**
+	 * 交易类型-转账
+	 */
+	Integer BUSINESS_TYPE_TRANSFER = 3;
 	
 	//========= 红包状态 ==========
 	/**

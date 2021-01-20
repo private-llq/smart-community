@@ -1,6 +1,7 @@
 package com.jsy.community.controller.outer;
 
 import com.jsy.community.annotation.ApiOutController;
+import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserService;
 import com.jsy.community.constant.Const;
@@ -30,6 +31,7 @@ public class OutCommonController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IUserService userService;
 	
+	@IpLimit(prefix = "userDetail", second = 60, count = 30, desc = "【用户】获取uid和手机号")
 	@Login
 	@ApiOperation("【用户】获取uid和手机号")
 	@GetMapping("user/detail")
