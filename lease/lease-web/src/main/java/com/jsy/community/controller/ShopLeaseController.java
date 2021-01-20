@@ -184,11 +184,12 @@ public class ShopLeaseController {
 		if (transferMoney.doubleValue() > NORM_MONEY) {
 			String s = String.format("%.2f", transferMoney.doubleValue() / NORM_MONEY) + "万";
 			shop.setTransferMoneyString(s);
-		} else if (transferMoney.compareTo(new BigDecimal(MIN_MONEY)) == 0) {
+			
+		} else if (transferMoney.doubleValue() < MIN_MONEY) {
 			String s = "面议";
 			shop.setTransferMoneyString(s);
 		} else {
-			String s = "" + shop.getMonthMoney();
+			String s = "" + shop.getTransferMoney();
 			int i = s.lastIndexOf(".");
 			String substring = s.substring(0, i) + "元";
 			shop.setTransferMoneyString(substring);
