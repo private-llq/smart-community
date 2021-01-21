@@ -106,7 +106,7 @@ public class ShopQO implements Serializable {
 	
 	@ApiModelProperty(value = "押付方式")
 	@NotBlank(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "押付方式不能为空")
-	@Pattern(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class},regexp = "^押([0-9]{1,2})付([0-9]{1,2})$",message = "请选择正确的押付方式")
+	@Pattern(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class},regexp = "^押([0-9]{1,2})付([0-9]{1,2})$|^半年付$|^年付$",message = "请选择正确的押付方式")
 	private String defrayType;
 	
 	@ApiModelProperty(value = "店铺状态 0空置中 1营业中")
