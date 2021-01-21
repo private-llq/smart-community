@@ -32,6 +32,9 @@ public class DepartmentEntity extends BaseEntity {
 	@NotBlank(groups = {addDepartmentValidate.class, updateDepartmentValidate.class}, message = "部门名称不能为空")
 	private String department;
 	
+	@ApiModelProperty(value = "部门图片")
+	private String imgUrl;
+	
 	public interface addDepartmentValidate {
 	}
 	

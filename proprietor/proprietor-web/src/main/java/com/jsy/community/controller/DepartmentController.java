@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @return
@@ -42,10 +45,17 @@ public class DepartmentController {
 	
 	@ApiOperation("查询所有部门信息")
 	@GetMapping("/listDepartment")
-	public CommonResult<List<DepartmentEntity>> listDepartment(@ApiParam(value = "社区id")
+	public CommonResult<List<Map>> listDepartment(@ApiParam(value = "社区id")
 	                                                           @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
 		List<DepartmentEntity> departmentList = departmentService.listDepartment(id);
-		return CommonResult.ok(departmentList);
+		List<Map> strings = new ArrayList<>();
+		for (DepartmentEntity departmentEntity : departmentList) {
+			HashMap<String, String> map = new HashMap<>();
+			map.put("department",departmentEntity.getDepartment());
+			map.put("nightImg",departmentEntity.getImgUrl());
+			strings.add(map);
+		}
+		return CommonResult.ok(strings);
 	}
 	
 	@ApiOperation("根据部门查询联系方式")
