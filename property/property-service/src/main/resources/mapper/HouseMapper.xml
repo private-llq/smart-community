@@ -12,11 +12,17 @@
 		</foreach>
 	</select>
 
-	<!-- 添加house -->
-	<insert id="addHouse">
-		insert into t_house (id,code,community_id,building,unit,floor,door,pid,type,comment)
-		select #{houseEntity.id},#{houseEntity.code},#{houseEntity.communityId},#{houseEntity.building},#{houseEntity.unit},#{houseEntity.floor},#{houseEntity.door},#{houseEntity.pid},#{houseEntity.type},#{houseEntity.comment} from dual
-		where EXISTS (select id from t_house where id = #{houseEntity.pid}) or #{houseEntity.pid} = 0
+	<!-- 添加次级房屋单位 -->
+	<insert id="addSub">
+		insert into t_house(id,code,community_id,building,unit,floor,door,pid,type,comment)
+		select #{houseEntity.id},#{houseEntity.code},community_id,
+		if(building is not null,#{houseEntity.building},building),
+		if(unit is not null,#{houseEntity.unit},unit),
+		if(floor is not null,#{houseEntity.floor},floor),
+		if(door is not null,#{houseEntity.door},door),
+		id,#{houseEntity.type},#{houseEntity.comment}
+		from t_house
+		where id = #{houseEntity.pid}
 	</insert>
 	<!-- 按社区id获取社区名称 和社区 房间数量 -->
 	<select id="getCommunityNameAndUserAmountById"  resultType="java.util.HashMap">

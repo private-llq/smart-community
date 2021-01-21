@@ -29,13 +29,13 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	List<Long> getSubIdList(List<Long> list);
 	
 	/**
-	* @Description: 新增house
+	* @Description: 新增次级楼宇信息
 	 * @Param: [houseEntity]
 	 * @Return: int
 	 * @Author: chq459799974
-	 * @Date: 2020/12/16
+	 * @Date: 2021/1/21
 	**/
-	int addHouse(@Param("houseEntity") HouseEntity houseEntity);
+	int addSub(@Param("houseEntity") HouseEntity houseEntity);
 
 	/**
 	 * 按社区ID获取 社区名称和 当前社区住户房间数量

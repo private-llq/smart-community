@@ -86,8 +86,6 @@ public class RedbagServiceImpl implements IRedbagService {
 		}
 	}
 	
-	
-	
 	/**
 	* @Description: 红包领取
 	 * @Param: [redbagQO]

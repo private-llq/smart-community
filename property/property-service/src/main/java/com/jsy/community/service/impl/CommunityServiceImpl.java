@@ -39,6 +39,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		return communityMapper.selectList(queryWrapper);
 	}
 	
+	/**
+	* @Description: 查询社区模式
+	 * @Param: [id]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/1/21
+	**/
+	@Override
+	public Integer getCommunityMode(Long id){
+		return communityMapper.getCommunityMode(id);
+	}
+	
 	@Override
 	@Transactional
 	@LcnTransaction

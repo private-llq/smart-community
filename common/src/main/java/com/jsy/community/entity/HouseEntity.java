@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -23,10 +24,12 @@ import java.io.Serializable;
 public class HouseEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    
+    @ApiModelProperty(value = "房间code",hidden = true)
     private String code;
 
     @ApiModelProperty(value = "社区ID")
+    @NotNull(groups = {addHouseValidatedGroup.class}, message = "缺少社区ID")
     private Long communityId;
 
     @ApiModelProperty(value = "楼栋名")
@@ -51,6 +54,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "1.楼栋 2.单元 3.楼层 4.门牌")
     @NotNull(groups = {addHouseValidatedGroup.class,updateHouseValidatedGroup.class}, message = "缺少类型")
+    @Range(min = 1, max = 4, message = "楼宇类型错误")
     private Integer type;
 
     @ApiModelProperty(value = "备注")

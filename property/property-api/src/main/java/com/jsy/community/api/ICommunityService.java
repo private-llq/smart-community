@@ -32,7 +32,16 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Param [areaId] 
 	 **/
 	List<CommunityEntity> listCommunityByAreaId(Long areaId);
-
+	
+	/**
+	* @Description: 查询社区模式
+	 * @Param: [id]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/1/21
+	**/
+	Integer getCommunityMode(Long id);
+	
 	/**
 	 * @return void
 	 * @Author lihao

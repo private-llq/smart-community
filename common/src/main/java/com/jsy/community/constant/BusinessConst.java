@@ -152,4 +152,40 @@ public interface BusinessConst {
 	 */
 	Integer REDBAG_FROM_TYPE_OFFICIAL = 2;
 	
+	//========= 社区房屋层级模式 ==========
+	/**
+	 * 社区模式-楼栋单元
+	 */
+	Integer COMMUNITY_MODE_FLOOR_UNIT = 1;
+	/**
+	 * 社区模式-单元楼栋
+	 */
+	Integer COMMUNITY_MODE_FLOOR = 3;
+	/**
+	 * 社区模式-单楼栋
+	 */
+	Integer COMMUNITY_MODE_UNIT = 4;
+	/**
+	 * 社区模式-单单元
+	 */
+	Integer COMMUNITY_MODE_UNIT_FLOOR = 2;
+	
+	//========= 楼宇单位 ==========
+	/**
+	 * 楼栋
+	 */
+	int BUILDING_TYPE_BUILDING = 1;
+	/**
+	 * 单元
+	 */
+	int BUILDING_TYPE_UNIT = 2;
+	/**
+	 * 楼层
+	 */
+	int BUILDING_TYPE_FLOOR = 3;
+	/**
+	 * 房间
+	 */
+	int BUILDING_TYPE_DOOR = 4;
+	
 }

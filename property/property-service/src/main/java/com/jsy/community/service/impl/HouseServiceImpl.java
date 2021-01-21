@@ -3,7 +3,10 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IHouseService;
+import com.jsy.community.api.PropertyException;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
@@ -17,6 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -33,6 +37,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 
 	@Autowired
 	private HouseMapper houseMapper;
+	
+	@Autowired
+	private ICommunityService communityService;
 	
 	/**
 	 * @Description: 查询子级楼栋(单元/楼层/房间等)
@@ -66,15 +73,68 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	 * @Date: 2020/11/20
 	 **/
 	public boolean addHouse(HouseEntity houseEntity){
-		if(Const.HouseTypeConsts.DOOR.equals(houseEntity.getType())){
+		
+		//处理入参
+		dealParams(houseEntity);
+		
+		//查询社区模式
+		Integer communityMode = communityService.getCommunityMode(houseEntity.getCommunityId());
+		if(communityMode == null || communityMode < 0 || communityMode > 4){
+			log.error("社区模式错误：" + String.valueOf(communityMode) + " 社区id：" + houseEntity.getCommunityId());
+			return false;
+		}
+		//根据社区模式判断是否是顶级 如果是顶级pid置为0
+		if(( (BusinessConst.COMMUNITY_MODE_FLOOR_UNIT.equals(communityMode) || BusinessConst.COMMUNITY_MODE_FLOOR.equals(communityMode))
+			&& BusinessConst.BUILDING_TYPE_BUILDING == houseEntity.getType())
+			|| ( (BusinessConst.COMMUNITY_MODE_UNIT_FLOOR.equals(communityMode) || BusinessConst.COMMUNITY_MODE_UNIT.equals(communityMode))
+			&& BusinessConst.BUILDING_TYPE_UNIT == houseEntity.getType())
+		){
+			houseEntity.setPid(0L);
+		}
+		//若类型是房间，生成唯一code
+		if(BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()){
 			houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
 		}
 		houseEntity.setId(SnowFlake.nextId());
-		int result = houseMapper.addHouse(houseEntity);
-		if(result == 1){
-			return true;
+		int result;
+		if(houseEntity.getPid() == 0L){
+			result = houseMapper.insert(houseEntity);
+		}else{
+			result = houseMapper.addSub(houseEntity);
 		}
-		return false;
+		return result == 1;
+	}
+	
+	/**
+	 * 新增楼栋入参处理
+	 */
+	private void dealParams(HouseEntity houseEntity){
+		switch (houseEntity.getType()){
+			case BusinessConst.BUILDING_TYPE_BUILDING :
+				if(StringUtils.isEmpty(houseEntity.getBuilding())){
+					throw new PropertyException("楼栋名称不能为空");
+				}
+				houseEntity.setFloor(null);
+				houseEntity.setDoor(null);
+				break;
+			case BusinessConst.BUILDING_TYPE_UNIT :
+				if(StringUtils.isEmpty(houseEntity.getUnit())){
+					throw new PropertyException("单元名称不能为空");
+				}
+				houseEntity.setFloor(null);
+				houseEntity.setDoor(null);
+				break;
+			case BusinessConst.BUILDING_TYPE_FLOOR :
+				if(StringUtils.isEmpty(houseEntity.getFloor())){
+					throw new PropertyException("楼层名称不能为空");
+				}
+				houseEntity.setDoor(null);
+				break;
+			case BusinessConst.BUILDING_TYPE_DOOR :
+				if(StringUtils.isEmpty(houseEntity.getDoor())){
+					throw new PropertyException("房间名称不能为空");
+				}
+		}
 	}
 	
 	/**
@@ -135,7 +195,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				houseEntity.setFloor(null);
 				break;
 		}
-		int result = houseMapper.update(houseEntity,new QueryWrapper<HouseEntity>().eq("id",houseEntity.getId()).eq("type",houseEntity.getType()));
+		int result = houseMapper.update(houseEntity,new QueryWrapper<HouseEntity>()
+			.eq("id",houseEntity.getId())
+			.eq("type",houseEntity.getType()));
 		if(result == 1){
 			return true;
 		}
