@@ -46,13 +46,14 @@ public class DepartmentController {
 	@ApiOperation("查询所有部门信息")
 	@GetMapping("/listDepartment")
 	public CommonResult<List<Map>> listDepartment(@ApiParam(value = "社区id")
-	                                                           @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
+	                                              @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
 		List<DepartmentEntity> departmentList = departmentService.listDepartment(id);
 		List<Map> strings = new ArrayList<>();
 		for (DepartmentEntity departmentEntity : departmentList) {
-			HashMap<String, String> map = new HashMap<>();
-			map.put("department",departmentEntity.getDepartment());
-			map.put("nightImg",departmentEntity.getImgUrl());
+			HashMap<String, Object> map = new HashMap<>();
+			map.put("id", departmentEntity.getId());
+			map.put("department", departmentEntity.getDepartment());
+			map.put("nightImg", departmentEntity.getImgUrl());
 			strings.add(map);
 		}
 		return CommonResult.ok(strings);
