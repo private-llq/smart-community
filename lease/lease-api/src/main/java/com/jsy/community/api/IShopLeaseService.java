@@ -102,4 +102,6 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Param []
 	 **/
 	Map<String, Object> moreOption();
+	
+	Map<String, Object> getPublishTags();
 }

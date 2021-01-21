@@ -752,4 +752,35 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		return map;
 	}
 	
+	@Override
+	public Map<String, Object> getPublishTags() {
+		// 1. 查询所有商铺分类
+		List<CommonConst> typeList = commonConstService.getShopType();
+		// 排除掉不限选项[添加的时候不允许选择不限]
+		List types = new ArrayList<CommonConst>();
+		for (CommonConst commonConst : typeList) {
+			if (commonConst.getConstName().equals("不限")) {
+				continue;
+			}
+			types.add(commonConst);
+		}
+		
+		// 2. 查询所有商铺商业
+		List<CommonConst> businessList = commonConstService.getBusiness();
+		// 排除掉不限选项[添加的时候不允许选择不限]
+		List business = new ArrayList<CommonConst>();
+		for (CommonConst commonConst : businessList) {
+			if (commonConst.getConstName().equals("不限")) {
+				continue;
+			}
+			business.add(commonConst);
+		}
+		
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("type", types);
+		map.put("business", business);
+		
+		return map;
+	}
+	
 }

@@ -261,6 +261,14 @@ public class ShopLeaseController {
 		Map<String, Object> map = shopLeaseService.moreOption();
 		return CommonResult.ok(map);
 	}
+	
+	@ApiOperation("查询商铺类型和行业[发布的时候添加]")
+	@GetMapping("/getPublishTags")
+	@Login(allowAnonymous = true)
+	public CommonResult getPublishTags(){
+		Map<String, Object> map = shopLeaseService.getPublishTags();
+		return CommonResult.ok(map);
+	}
 
 }
 

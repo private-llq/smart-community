@@ -110,7 +110,8 @@ public class RepairController {
 		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME2);
 		StringBuilder filePath = new StringBuilder();
 		for (String s : filePaths) {
-			redisTemplate.opsForSet().add("repair_comment_img_part", s); // TODO 前端要注意调整 repairImg
+			// TODO 前端要注意调整 repairImg
+			redisTemplate.opsForSet().add("repair_comment_img_part", s);
 			filePath.append(s);
 			filePath.append(";");
 		}
