@@ -66,49 +66,11 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	}
 	
 	/**
-	 * @Description: 新增楼栋(单元/楼层/房间等)
-	 * @Param: [houseEntity]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2020/11/20
-	 **/
-	public boolean addHouse(HouseEntity houseEntity){
-		
-		//处理入参
-		dealParams(houseEntity);
-		
-		//查询社区模式
-		Integer communityMode = communityService.getCommunityMode(houseEntity.getCommunityId());
-		if(communityMode == null || communityMode < 0 || communityMode > 4){
-			log.error("社区模式错误：" + String.valueOf(communityMode) + " 社区id：" + houseEntity.getCommunityId());
-			return false;
-		}
-		//根据社区模式判断是否是顶级 如果是顶级pid置为0
-		if(( (BusinessConst.COMMUNITY_MODE_FLOOR_UNIT.equals(communityMode) || BusinessConst.COMMUNITY_MODE_FLOOR.equals(communityMode))
-			&& BusinessConst.BUILDING_TYPE_BUILDING == houseEntity.getType())
-			|| ( (BusinessConst.COMMUNITY_MODE_UNIT_FLOOR.equals(communityMode) || BusinessConst.COMMUNITY_MODE_UNIT.equals(communityMode))
-			&& BusinessConst.BUILDING_TYPE_UNIT == houseEntity.getType())
-		){
-			houseEntity.setPid(0L);
-		}
-		//若类型是房间，生成唯一code
-		if(BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()){
-			houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
-		}
-		houseEntity.setId(SnowFlake.nextId());
-		int result;
-		if(houseEntity.getPid() == 0L){
-			result = houseMapper.insert(houseEntity);
-		}else{
-			result = houseMapper.addSub(houseEntity);
-		}
-		return result == 1;
-	}
-	
-	/**
-	 * 新增楼栋入参处理
+	 * 新增楼栋入参检查和处理
 	 */
-	private void dealParams(HouseEntity houseEntity){
+	private void checkAndDealParams(HouseEntity houseEntity){
+		
+		//根据type校验参数
 		switch (houseEntity.getType()){
 			case BusinessConst.BUILDING_TYPE_BUILDING :
 				if(StringUtils.isEmpty(houseEntity.getBuilding())){
@@ -135,6 +97,52 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 					throw new PropertyException("房间名称不能为空");
 				}
 		}
+	}
+	
+	/**
+	 * @Description: 新增楼栋(单元/楼层/房间等)
+	 * @Param: [houseEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2020/11/20
+	 **/
+	public boolean addHouse(HouseEntity houseEntity){
+		
+		//查询社区模式
+		Integer communityMode = communityService.getCommunityMode(houseEntity.getCommunityId());
+		if(communityMode == null || communityMode < 1 || communityMode > 4){
+			log.error("社区模式错误：" + String.valueOf(communityMode) + " 社区id：" + houseEntity.getCommunityId());
+			return false;
+		}
+		
+		//检查处理入参
+		checkAndDealParams(houseEntity);
+		
+		//根据社区模式判断是否是顶级 如果是顶级pid置为0
+		if(( (BusinessConst.COMMUNITY_MODE_FLOOR_UNIT.equals(communityMode) || BusinessConst.COMMUNITY_MODE_FLOOR.equals(communityMode))
+			&& BusinessConst.BUILDING_TYPE_BUILDING == houseEntity.getType())
+			|| ( (BusinessConst.COMMUNITY_MODE_UNIT_FLOOR.equals(communityMode) || BusinessConst.COMMUNITY_MODE_UNIT.equals(communityMode))
+			&& BusinessConst.BUILDING_TYPE_UNIT == houseEntity.getType())
+		){
+			houseEntity.setPid(0L);
+		}else if(houseEntity.getPid() == 0){
+			throw new PropertyException("非顶级单位pid不能为0");
+		}
+		
+		//若类型是房间，生成唯一code
+		if(BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()){
+			houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
+		}
+		
+		//设置id和保存
+		houseEntity.setId(SnowFlake.nextId());
+		int result;
+		if(houseEntity.getPid() == 0L){
+			result = houseMapper.insert(houseEntity);
+		}else{
+			result = houseMapper.addSub(houseEntity);
+		}
+		return result == 1;
 	}
 	
 	/**
