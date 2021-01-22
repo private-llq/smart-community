@@ -113,7 +113,7 @@ public class WeatherUtils {
 	
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final SimpleDateFormat sdfForShow = new SimpleDateFormat("MM/dd");  //前端天气展示用格式
-	private static final String[] daysOfWeek = {"周一","周二","周三","周四","周五","周六","周日"};
+	private static final String[] daysOfWeek = {"周日","周一","周二","周三","周四","周五","周六"};
 	
 	//为结果添加星期几
 	private void addDayOfWeek(JSONObject data){
@@ -166,7 +166,8 @@ public class WeatherUtils {
 		try {
 			FileReader fileInputStream;
 			if(System.getProperty("os.name").startsWith("Win")){
-				fileInputStream = new FileReader(new File(getClassesPath() + "/temp_weather.txt"));
+//				fileInputStream = new FileReader(new File(getClassesPath() + "/temp_weather.txt"));
+				fileInputStream = new FileReader(new File("D:/" + "/temp_weather.txt"));
 			}else{
 				fileInputStream = new FileReader(new File(OS_LINUX_PATH + "/temp_weather.txt"));
 			}
