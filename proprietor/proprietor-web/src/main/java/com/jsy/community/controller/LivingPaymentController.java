@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ILivingPaymentService;
+import com.jsy.community.api.IPayCompanyService;
 import com.jsy.community.api.IPayGroupService;
 import com.jsy.community.api.IPayTypeService;
 import com.jsy.community.constant.Const;
@@ -27,6 +28,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,6 +51,9 @@ public class LivingPaymentController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IPayTypeService payTypeService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IPayCompanyService payCompanyService;
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IPayGroupService payGroupService;
@@ -108,6 +113,10 @@ public class LivingPaymentController {
     @PostMapping("/add")
     @Login
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
+
+        if (livingPaymentQO.getPayNum().abs().compareTo(new BigDecimal(50)) != 0) {
+            return CommonResult.error("缴费金额不足");
+        }
 
         String userId = UserUtils.getUserId();
         livingPaymentQO.setUserID(userId);

@@ -1,6 +1,5 @@
 package com.jsy.community.service.impl.test;
 
-import cn.hutool.core.util.RandomUtil;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.api.test.ISimulatePayService;
 import com.jsy.community.constant.Const;
@@ -78,7 +77,7 @@ public class SimulatePayServiceImpl implements ISimulatePayService {
 		map.put("doorNo",number);
 		map.put("typeID",entity.getId());
 		map.put("typeName",entity.getName());
-		map.put("balance",RandomUtil.randomInt(-500,500));
+		map.put("balance",-50);
 		map.put("address","天王星b座1810");
 		return map;
 	}

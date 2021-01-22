@@ -2,8 +2,10 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.ILivingPaymentService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
@@ -64,27 +66,18 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      */
     @Transactional
     public PaymentDetailsVO add(LivingPaymentQO livingPaymentQO){
+        PayCompanyEntity payCompanyEntity = payCompanyMapper.selectOne(new QueryWrapper<PayCompanyEntity>().eq("id", livingPaymentQO.getPayCostUnitId()).eq("type_id", livingPaymentQO.getType()));
+        if (StringUtils.isEmpty(payCompanyEntity)){
+            throw new ProprietorException(JSYError.REQUEST_PARAM);
+        }
         //如果组名为空   默认我家
         Long group_id=0l;
-        if("".equals(livingPaymentQO.getGroupName())&&livingPaymentQO.getGroupName()!=null){
-            PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("name","我家"));
-            if (!StringUtils.isEmpty(payGroupEntity)){
-                group_id=payGroupEntity.getId();
-            }else {
-                PayGroupEntity groupEntity = new PayGroupEntity();
-                groupEntity.setId(SnowFlake.nextId());
-                groupEntity.setUid(livingPaymentQO.getUserID());
-                groupEntity.setName("我家");
-                groupEntity.setType(1);
-                payGroupMapper.insert(groupEntity);
-                group_id=groupEntity.getId();
-            }
-        }else {
-            //如果不为空就获取id为空就新增一条
-            //设置组号
+        if(livingPaymentQO.getGroupName()!=null&&!"".equals(livingPaymentQO.getGroupName())) {
+            //先查没有就新增
             PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("name",livingPaymentQO.getGroupName()));
             if (!StringUtils.isEmpty(payGroupEntity)){
                 group_id=payGroupEntity.getId();
+
             }else {
                 PayGroupEntity groupEntity = new PayGroupEntity();
                 groupEntity.setId(SnowFlake.nextId());
@@ -93,6 +86,20 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
                 groupEntity.setType(livingPaymentQO.getGroupName()=="我家"?1:livingPaymentQO.getGroupName()=="父母"?2:livingPaymentQO.getGroupName()=="房东"?3:livingPaymentQO.getGroupName()=="朋友"?4:5);
                 payGroupMapper.insert(groupEntity);
                 group_id=groupEntity.getId();
+            }
+        }else {
+            //先查没有就新增
+            PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid", livingPaymentQO.getUserID()).eq("name", "我家"));
+            if (!StringUtils.isEmpty(payGroupEntity)) {
+                group_id = payGroupEntity.getId();
+            } else {
+                PayGroupEntity groupEntity = new PayGroupEntity();
+                groupEntity.setId(SnowFlake.nextId());
+                groupEntity.setUid(livingPaymentQO.getUserID());
+                groupEntity.setName("我家");
+                groupEntity.setType(1);
+                payGroupMapper.insert(groupEntity);
+                group_id = groupEntity.getId();
             }
         }
         PayCompanyEntity entity = payCompanyMapper.selectOne(new QueryWrapper<PayCompanyEntity>()
@@ -178,6 +185,13 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
         int s1=(int) (Math.random() * 999999);
         return s+s1;
+    }
+
+    public static void main(String[] args) {
+        SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
+        int s1=(int) (Math.random() * 999999);
+        System.out.println(s + s1);
     }
 
 
