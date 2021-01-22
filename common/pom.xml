@@ -14,6 +14,13 @@
 	<description>工具类、实体类等</description>
 	
 	<dependencies>
+		<!-- redis分布式锁 -->
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson</artifactId>
+			<version>3.14.1</version>
+		</dependency>
+		<!-- lombok注解 -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

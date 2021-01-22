@@ -36,7 +36,7 @@ import java.util.Objects;
 @Component
 @Order()
 @RequiredArgsConstructor
-public class IpLimitAspect {
+public class IpLimitAop {
 
 
     @Resource

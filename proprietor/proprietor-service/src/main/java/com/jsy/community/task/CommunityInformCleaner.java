@@ -1,5 +1,6 @@
 package com.jsy.community.task;
 
+import com.jsy.community.annotation.RedisSingleInstanceLock;
 import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -55,6 +56,7 @@ public class CommunityInformCleaner {
      * @author YuLF
      * @since  2020/1/9 14:19
      */
+    @RedisSingleInstanceLock(lockKey = "communityInform", waitTimout = 50)
     @Scheduled(cron = "0 0 1 ? * mon")
     public void clearPushInform(){
 
@@ -65,8 +67,6 @@ public class CommunityInformCleaner {
         //如果 数据库 推送消息 小于 beforeTime 的都是超过过期时间的消息 都将删除
         Integer delRow = userInformService.RegularCleaning(beforeTime);
         logger.info("本次清理社区推送消息" + beforeTime + "之前的数据共" + delRow + "条!");
-        //TODO 分布式模块部署下 只需其中一个模块执行
-
     }
 
     /**
