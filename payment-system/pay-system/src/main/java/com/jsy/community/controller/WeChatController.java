@@ -5,6 +5,7 @@ import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WehatConfig;
 import com.jsy.community.qo.WeChatPayVO;
 import com.jsy.community.utils.OrderNoUtil;
+import com.jsy.community.vo.CommonResult;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,7 @@ import java.util.Map;
 public class WeChatController {
 
     @PostMapping("/wxPay")
-    public Object wxPay(@RequestBody WeChatPayVO weChatPayVO) throws Exception {
+    public CommonResult wxPay(@RequestBody WeChatPayVO weChatPayVO) throws Exception {
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         Map hashMap = new LinkedHashMap();
         hashMap.put("total",weChatPayVO.getTotal().multiply(new BigDecimal(100)));
@@ -46,13 +47,14 @@ public class WeChatController {
         String prepayId = PublicConfig.V3PayGet("v3/pay/transactions/app", wxPayRequestJsonStr, WehatConfig.MCH_ID, WehatConfig.MCH_SERIAL_NO, WehatConfig.FILE_NAME);
         //第二步获取调起支付的参数
         JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WehatConfig.APPID, WehatConfig.FILE_NAME));
-        return object;
+        return CommonResult.ok(object);
     }
 
     @RequestMapping(value = "/callback", method = {org.springframework.web.bind.annotation.RequestMethod.POST, org.springframework.web.bind.annotation.RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         System.err.println("回调成功");
         String out_trade_no = PublicConfig.notify(request, response, WehatConfig.PRIVATE_KEY);
+
         System.out.println(out_trade_no);
     }
 }
