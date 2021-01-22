@@ -45,33 +45,33 @@ public class IMOutController {
 		return userService.checkUserAndGetUid(uid);
 	}
 	
-	@ApiOperation("【单红包】领取")
-	@PostMapping("redbag/receive/single")
-	public Map<String, Object> receiveSingleRedbag(@RequestBody RedbagQO redbagQO){
-		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
-		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
-		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
-		redbagQO1.setBusinessType(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG);
-		return redbagService.receiveRedbag(redbagQO1);
-	}
-	
-	@ApiOperation("【群红包】领取")
-	@PostMapping("redbag/receive/group")
-	public Map<String,Object> receiveGroupRedbag(@RequestBody RedbagQO redbagQO){
-		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
-		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
-		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
-		redbagQO1.setBusinessType(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG);
-		return redbagService.receiveRedbag(redbagQO1);
-	}
-	
-	@ApiOperation("【红包】退款")
-	@PostMapping("redbag/back")
-	public Map<String, Object> sendBackRedbag(@RequestBody Map<String,String> map){
-		if(StringUtils.isEmpty(map.get("uuid"))){
-			return null;
-		}
-		return redbagService.sendBackRedbag(map.get("uuid"));
-	}
+//	@ApiOperation("【单红包】领取")
+//	@PostMapping("redbag/receive/single")
+//	public Map<String, Object> receiveSingleRedbag(@RequestBody RedbagQO redbagQO){
+//		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
+//		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
+//		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
+//		redbagQO1.setBusinessType(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG);
+//		return redbagService.receiveRedbag(redbagQO1);
+//	}
+//
+//	@ApiOperation("【群红包】领取")
+//	@PostMapping("redbag/receive/group")
+//	public Map<String,Object> receiveGroupRedbag(@RequestBody RedbagQO redbagQO){
+//		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
+//		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
+//		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
+//		redbagQO1.setBusinessType(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG);
+//		return redbagService.receiveRedbag(redbagQO1);
+//	}
+//
+//	@ApiOperation("【红包】退款")
+//	@PostMapping("redbag/back")
+//	public Map<String, Object> sendBackRedbag(@RequestBody Map<String,String> map){
+//		if(StringUtils.isEmpty(map.get("uuid"))){
+//			return null;
+//		}
+//		return redbagService.sendBackRedbag(map.get("uuid"));
+//	}
 	
 }

@@ -66,11 +66,11 @@ public class MyHttpUtils {
 		httpRequest.setConfig(requestConfig);
 	}
 	
-	// 默认配置
+	// 默认配置 (2000 1000 3000)
 	private static RequestConfig getDefaultRequestConfig(){
-		return RequestConfig.custom().setConnectTimeout(2000)
-			.setConnectionRequestTimeout(1000)
-			.setSocketTimeout(3000).build();
+		return RequestConfig.custom().setConnectTimeout(10000)
+			.setConnectionRequestTimeout(10000)
+			.setSocketTimeout(10000).build();
 	}
 	
 	//构建URL

@@ -124,6 +124,12 @@ public class RedbagServiceImpl implements IRedbagService {
 			returnMap.put("uuid",entity.getUuid());//红包id
 			returnMap.put("receiveUserUuid",entity.getReceiveUserUuid());//领取人
 			returnMap.put("money",entity.getMoney());//领取金额
+			//TODO 调用领红包接口
+			redbagQO.setMoney(entity.getMoney());
+			boolean b = sendRedbagByHttp(redbagQO);
+			if(!b){
+				throw new ProprietorException("红包领取失败");
+			}
 		}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){ //群红包
 			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*")
 				.eq("uuid", redbagQO.getUuid())
@@ -153,6 +159,12 @@ public class RedbagServiceImpl implements IRedbagService {
 			returnMap.put("uuid",entity.getUuid());//红包id
 			returnMap.put("receiveUserUuid",redbagQO.getReceiveUserUuid());//领取人
 			returnMap.put("money",randomMoney);//领取金额
+			redbagQO.setMoney(randomMoney);
+			//TODO 调用领红包接口
+			boolean b = sendRedbagByHttp(redbagQO);
+			if(!b){
+				throw new ProprietorException("红包领取失败");
+			}
 		}
 		return returnMap;
 	}
@@ -199,6 +211,16 @@ public class RedbagServiceImpl implements IRedbagService {
 		returnMap.put("uuid",entity.getUuid());//红包id
 		returnMap.put("userUuid",entity.getUserUuid());//退回到人
 		returnMap.put("money",entity.getMoney());//退回金额
+		//TODO 调用红包退回接口
+		RedbagQO redbagQO = new RedbagQO();
+		redbagQO.setUuid(entity.getUuid());
+		redbagQO.setUserUuid(entity.getUserUuid());
+		redbagQO.setMoney(entity.getMoney());
+		redbagQO.setBehavior(BusinessConst.BEHAVIOR_BACK);
+		boolean b = sendRedbagByHttp(redbagQO);
+		if(!b){
+			throw new ProprietorException("红包退回失败");
+		}
 		return returnMap;
 	}
 	
@@ -207,14 +229,28 @@ public class RedbagServiceImpl implements IRedbagService {
 	 */
 	private boolean sendRedbagByHttp(RedbagQO redbagQO){
 		String url = "";
-		if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())){  //私包
-			url = "http://192.168.12.37:52001/imRedEnvelope/sendRedPacket";
-		}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){  //群红包
-			url = "http://192.168.12.37:52001/imRedEnvelope/sendGroup";
-		}else if(BusinessConst.BUSINESS_TYPE_TRANSFER.equals(redbagQO.getBusinessType())){  //转账
-			url = "http://192.128.12.37:52001/imTransferAccounts/sendTransferAccount";
-		}else{
-			return false;
+		if(BusinessConst.BEHAVIOR_SEND.equals(redbagQO.getBehavior())){
+			if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())){  //私包
+				url = "http://192.168.12.37:52002/imRedEnvelope/sendRedPacket";
+			}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){  //群红包
+				url = "http://192.168.12.37:52002/imRedEnvelope/sendGroup";
+			}else if(BusinessConst.BUSINESS_TYPE_TRANSFER.equals(redbagQO.getBusinessType())){  //转账
+				url = "http://192.168.12.37:52002/imTransferAccounts/sendTransferAccount";
+			}else{
+				return false;
+			}
+		}else if(BusinessConst.BEHAVIOR_RECEIVE.equals(redbagQO.getBehavior())){
+			if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())){  //私包
+				url = "http://192.168.12.37:52002/imRedEnvelope/robRedPacket";
+			}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){  //群红包
+				url = "http://192.168.12.37:52002/imRedEnvelope/receiveGroup";
+			}else if(BusinessConst.BUSINESS_TYPE_TRANSFER.equals(redbagQO.getBusinessType())){  //转账
+				url = "http://192.168.12.37:52002/imTransferAccounts/robTransferAccount";
+			}else{
+				return false;
+			}
+		}else if(BusinessConst.BEHAVIOR_BACK.equals(redbagQO.getBehavior())){
+			url = "http://192.168.12.37:52002/imRedEnvelope/refundRedPacket";
 		}
 		//加密data
 //		String redbagData = AESOperator.encrypt(JSON.toJSONString(redbagQO));

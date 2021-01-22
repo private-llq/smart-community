@@ -57,6 +57,9 @@ public class RedbagQO implements Serializable {
 	@ApiModelProperty(value = "来源类型 1.个人 2.官方", hidden = true)
 	private Integer fromType;
 	
+	@ApiModelProperty(value = "交易行为 1.发 2.领 3.退", hidden = true)
+	private Integer behavior;
+	
 	/**
 	 * 单发红包参数验证
 	 */

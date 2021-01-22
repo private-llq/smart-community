@@ -152,6 +152,20 @@ public interface BusinessConst {
 	 */
 	Integer REDBAG_FROM_TYPE_OFFICIAL = 2;
 	
+	//========= 交易行为 ==========
+	/**
+	 * 交易行为-发红包
+	 */
+	Integer BEHAVIOR_SEND = 1;
+	/**
+	 * 交易行为-领红包
+	 */
+	Integer BEHAVIOR_RECEIVE = 2;
+	/**
+	 * 交易行为-退红包
+	 */
+	Integer BEHAVIOR_BACK = 3;
+	
 	//========= 社区房屋层级模式 ==========
 	/**
 	 * 社区模式-楼栋单元
@@ -160,15 +174,15 @@ public interface BusinessConst {
 	/**
 	 * 社区模式-单元楼栋
 	 */
-	Integer COMMUNITY_MODE_FLOOR = 3;
+	Integer COMMUNITY_MODE_UNIT_FLOOR = 2;
 	/**
 	 * 社区模式-单楼栋
 	 */
-	Integer COMMUNITY_MODE_UNIT = 4;
+	Integer COMMUNITY_MODE_FLOOR = 3;
 	/**
 	 * 社区模式-单单元
 	 */
-	Integer COMMUNITY_MODE_UNIT_FLOOR = 2;
+	Integer COMMUNITY_MODE_UNIT = 4;
 	
 	//========= 楼宇单位 ==========
 	/**
