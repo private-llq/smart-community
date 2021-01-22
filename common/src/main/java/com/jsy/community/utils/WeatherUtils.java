@@ -166,8 +166,8 @@ public class WeatherUtils {
 		try {
 			FileReader fileInputStream;
 			if(System.getProperty("os.name").startsWith("Win")){
-//				fileInputStream = new FileReader(new File(getClassesPath() + "/temp_weather.txt"));
-				fileInputStream = new FileReader(new File("D:/" + "/temp_weather.txt"));
+				fileInputStream = new FileReader(new File(getClassesPath() + "/temp_weather.txt"));
+//				fileInputStream = new FileReader(new File("D:/" + "/temp_weather.txt"));
 			}else{
 				fileInputStream = new FileReader(new File(OS_LINUX_PATH + "/temp_weather.txt"));
 			}
