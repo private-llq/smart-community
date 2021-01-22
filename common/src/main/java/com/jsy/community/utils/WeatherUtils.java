@@ -153,10 +153,23 @@ public class WeatherUtils {
 	//假天气数据
 	private static final JSONObject tempWeather = new JSONObject();
 	
+	//项目模块绝对路径
+	public static String getClassesPath() {
+		return WeatherUtils.class.getResource("/").getPath().replaceFirst("/","");
+	}
+	
+	//linux绝对路径
+	private static final String OS_LINUX_PATH = "/mnt/db/smart-community/file";
+	
 	//加载假天气数据
 	static {
 		try {
-			FileReader fileInputStream = new FileReader(new File("/temp_weather.txt"));
+			FileReader fileInputStream;
+			if(System.getProperty("os.name").startsWith("Win")){
+				fileInputStream = new FileReader(new File(getClassesPath() + "/temp_weather.txt"));
+			}else{
+				fileInputStream = new FileReader(new File(OS_LINUX_PATH + "/temp_weather.txt"));
+			}
 			BufferedReader reader = new BufferedReader(fileInputStream);
 			StringBuffer sb = new StringBuffer();
 			String str;
@@ -166,9 +179,9 @@ public class WeatherUtils {
 			JSONObject jsonObject = JSONObject.parseObject(sb.toString());
 			tempWeather.putAll(jsonObject);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 	}
 	
