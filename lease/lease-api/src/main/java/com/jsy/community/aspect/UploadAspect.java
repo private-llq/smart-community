@@ -52,15 +52,6 @@ public class UploadAspect {
 	public void doBefore(JoinPoint joinPoint) throws Throwable {
 		//1. 获取注解上的bucketName 和 redisKeyName
 		MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-		
-		Method method = signature.getMethod();
-		System.out.println(method.getName());
-		Class<?>[] parameterTypes = method.getParameterTypes();
-		
-		Class returnType = signature.getReturnType();
-		System.out.println(returnType);
-		System.out.println(method.getParameterTypes());
-		
 		String declaringTypeName = signature.getDeclaringTypeName();
 		Class<?> cls = Class.forName(declaringTypeName);
 		

@@ -50,13 +50,13 @@ public class LogAspect {
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ");
 			Calendar ca = Calendar.getInstance();
 			String time = df.format(ca.getTime());
-			logger.info("");
-			logger.info("访问时间 : " + time);
-			logger.info("访问路径 : " + request.getRequestURL().toString());
-			logger.info("请求方式 : " + request.getMethod());
-			logger.info("访问方法 : " + joinPoint.getSignature().getName());
-			logger.info("访问IP : " + request.getRemoteAddr());
-			logger.info("方法参数 : " + Arrays.toString(joinPoint.getArgs()));
+//			logger.info("");
+//			logger.info("访问时间 : " + time);
+//			logger.info("访问路径 : " + request.getRequestURL().toString());
+//			logger.info("请求方式 : " + request.getMethod());
+//			logger.info("访问方法 : " + joinPoint.getSignature().getName());
+//			logger.info("访问IP : " + request.getRemoteAddr());
+//			logger.info("方法参数 : " + Arrays.toString(joinPoint.getArgs()));
 		}
 	}
 	
