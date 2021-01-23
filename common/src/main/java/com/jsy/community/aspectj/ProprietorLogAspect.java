@@ -267,7 +267,10 @@ public class ProprietorLogAspect {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.info("异常开始发生了");
+			log.error("异常："+e.getMessage());
+			log.info("异常产生原因：物业端没有打开  记录日志 目前采用的是记录到物业端  若没有打开物业端不会影响正常业务 只是不保存业主操作记录 ");
+//			e.printStackTrace();
 		} finally {
 			try {
 				// 释放资源
