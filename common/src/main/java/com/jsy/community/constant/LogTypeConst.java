@@ -2,29 +2,30 @@ package com.jsy.community.constant;
 
 /**
  * @ClassName：LogConst
- * @Description：TODO
+ * @Description：日志——操作类型常量
  * @author：lihao
  * @date：2021/1/22 12:03
  * @version：1.0
  */
-public enum LogConst {
+public interface LogTypeConst {
+
 	/**
 	 * 其它
 	 */
-	OTHER,
-	
+	String OTHER = "other";
+
 	/**
 	 * 新增
 	 */
-	INSERT,
-	
+	String INSERT = "insert";
+
 	/**
 	 * 修改
 	 */
-	UPDATE,
-	
+	String UPDATE = "update";
+
 	/**
 	 * 删除
 	 */
-	DELETE,
+	String DELETE = "delete";
 }

@@ -1,11 +1,16 @@
 package com.jsy.community.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.Log;
 import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IShopLeaseService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.LogModule;
+import com.jsy.community.constant.LogTypeConst;
+import com.jsy.community.entity.log.ProprietorLog;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.qo.shop.ShopQO;
@@ -21,11 +26,21 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.http.HttpEntity;
+import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -157,6 +172,7 @@ public class ShopLeaseController {
 	
 	@ApiOperation("商铺发布")
 	@PostMapping("/addShop")
+	@Log(operationType = LogTypeConst.INSERT,module = LogModule.LEASE,isSaveRequestData = true)
 	public CommonResult addShop(@RequestBody ShopQO shop) {
 		shop.setUid(UserUtils.getUserId());
 		// 业主发布
@@ -269,7 +285,74 @@ public class ShopLeaseController {
 		Map<String, Object> map = shopLeaseService.getPublishTags();
 		return CommonResult.ok(map);
 	}
+	
+	@ApiOperation("测试httpclient")
+	@PostMapping("/httpclient")
+	@Login(allowAnonymous = true)
+	public CommonResult getHttpclient(@RequestBody ProprietorLog log){
+		System.out.println(log);
+		System.out.println("1");
+		return CommonResult.ok();
+	}
+	
+	/**
+	 * POST---有参测试(对象参数)
+	 *
+	 * @date 2018年7月13日 下午4:18:50
+	 */
+	public static void main(String[] args) {
+		// 获得Http客户端(可以理解为:你得先有一个浏览器;注意:实际上HttpClient与浏览器是不一样的)
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		
+		// 创建Post请求
+		HttpPost httpPost = new HttpPost("http://localhost:8001/api/v1/lease/shop/httpclient");
+		ProprietorLog user = new ProprietorLog();
+		user.setName("潘晓婷");
 
+		// 我这里利用阿里的fastjson，将Object转换为json字符串;
+		// (需要导入com.alibaba.fastjson.JSON包)
+		String jsonString = JSON.toJSONString(user);
+		
+		StringEntity entity = new StringEntity(jsonString, "UTF-8");
+		
+		// post请求是将参数放在请求体里面传过去的;这里将entity放入post请求体中
+		httpPost.setEntity(entity);
+		
+		httpPost.setHeader("Content-Type", "application/json;charset=utf8");
+		
+		// 响应模型
+		CloseableHttpResponse response = null;
+		try {
+			// 由客户端执行(发送)Post请求
+			response = httpClient.execute(httpPost);
+			// 从响应模型中获取响应实体
+			HttpEntity responseEntity = response.getEntity();
+			
+			System.out.println("响应状态为:" + response.getStatusLine());
+			if (responseEntity != null) {
+				System.out.println("响应内容长度为:" + responseEntity.getContentLength());
+				System.out.println("响应内容为:" + EntityUtils.toString(responseEntity));
+			}
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				// 释放资源
+				if (httpClient != null) {
+					httpClient.close();
+				}
+				if (response != null) {
+					response.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
 
 

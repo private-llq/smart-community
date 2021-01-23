@@ -1,41 +1,40 @@
 package com.jsy.community.annotation;
 
-import com.jsy.community.constant.LogConst;
+import com.jsy.community.constant.LogModule;
+import com.jsy.community.constant.LogTypeConst;
+
+import java.lang.annotation.*;
 
 /**
  * @ClassName：Log
- * @Description：自定义日志记录
+ * @Description：业主重要操作日志记录
  * @author：lihao
  * @date：2021/1/22 11:48
  * @version：1.0
  */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface Log {
-	
+
 	/**
-	 * @return BusinessType
-	 * @Author lihao
-	 * @Description 操作类型
-	 * @Date 2021/1/22 11:54 
-	 * @Param [] 
-	 **/
-	LogConst businessType() default LogConst.OTHER;
-	
+	 * 操作类型
+	 */
+	String operationType() default LogTypeConst.OTHER;
+
 	/**
-	 * @return java.lang.String
-	 * @Author lihao
-	 * @Description 备注说明
-	 * @Date 2021/1/22 11:49
-	 * @Param []
-	 **/
-	String remark() default "";
-	
+	 * 操作模块
+	 */
+	String module() default LogModule.OTHER;
+
 	/**
-	 * @return boolean
-	 * @Author lihao
-	 * @Description 是否保存请求参数
-	 * @Date 2021/1/22 11:53
-	 * @Param []
-	 **/
-	boolean isSaveRequestData() default false;
-	
+	 * 功能描述
+	 */
+	String explain() default "";
+
+	/**
+	 * 是否保存请求参数
+	 */
+	boolean isSaveRequestData() default true;
+
 }

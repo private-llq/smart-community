@@ -26,10 +26,10 @@ import java.lang.reflect.Method;
 @Component
 @Aspect
 public class UploadAspect {
-	
+
 	@Autowired
 	private StringRedisTemplate redisTemplate;
-	
+
 	/**
 	 * @return void
 	 * @Author lihao
@@ -40,7 +40,7 @@ public class UploadAspect {
 	@Pointcut("@annotation(com.jsy.community.annotation.UploadImg)")
 	public void imgPoint() {
 	}
-	
+
 	/**
 	 * @return void
 	 * @Author lihao
@@ -54,23 +54,23 @@ public class UploadAspect {
 		MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 		String declaringTypeName = signature.getDeclaringTypeName();
 		Class<?> cls = Class.forName(declaringTypeName);
-		
+
 		Method declaredMethod = cls.getDeclaredMethod(signature.getName(), signature.getParameterTypes());
 		UploadImg annotation = declaredMethod.getAnnotation(UploadImg.class);
 		String bucketName = annotation.bucketName();
 		String redisKeyName = annotation.redisKeyName();
-		
+
 		//2. 对上传的文件进行处理
 		Object[] args = joinPoint.getArgs();
 		MultipartFile[] files = (MultipartFile[]) args[0];
 		if (files != null && files.length > 0) {
 			String[] fileList = MinioUtils.uploadForBatch(files, bucketName);
-			
+
 			// 文件上传之后，需要把文件名存到redis里面
 			for (String s : fileList) {
 				redisTemplate.opsForSet().add(redisKeyName, s);
 			}
-			
+
 			CommonResult result = (CommonResult) args[1];
 			if (result != null) {
 				result.setData(fileList);

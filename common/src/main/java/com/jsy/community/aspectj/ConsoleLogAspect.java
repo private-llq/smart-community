@@ -1,7 +1,6 @@
-package com.jsy.community.aspect;
+package com.jsy.community.aspectj;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,22 +17,25 @@ import java.util.Calendar;
  * @author lihao
  * @ClassName LogAcpect
  * @Date 2021/1/19  15:28
- * @Description 日志切面类
+ * @Description 日志控制台切面类
  * @Version 1.0
  **/
 @Aspect
 @Component
-public class LogAspect {
-	private Logger logger = LoggerFactory.getLogger(LogAspect.class);
-	
+public class ConsoleLogAspect {
+	private Logger logger = LoggerFactory.getLogger(ConsoleLogAspect.class);
+
 	/**
 	 * 定义切入点，切入点为com.jsy.community下的函数
 	 */
 	// com.jsy.community.intercepter  会提示没有intercepter的包  不用管 正常的
-	@Pointcut("execution( * com.jsy.community..*.*(..)) && !execution(* com.jsy.community.intercepter..*.*(..)) && !execution(* com.jsy.community.exception..*.*(..))")
+//	@Pointcut("execution( * com.jsy.community..*.*(..)) && !execution(* com.jsy.community.intercepter..*.*(..)) && !execution(* com.jsy.community.exception..*.*(..))")
+	
+	// 只拦截controller的方法
+	@Pointcut("execution(* com.jsy.community..controller.*.*(..))")
 	public void webLog() {
 	}
-	
+
 	/**
 	 * 前置通知：在连接点之前执行的通知
 	 *
@@ -50,16 +52,16 @@ public class LogAspect {
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ");
 			Calendar ca = Calendar.getInstance();
 			String time = df.format(ca.getTime());
-//			logger.info("");
-//			logger.info("访问时间 : " + time);
-//			logger.info("访问路径 : " + request.getRequestURL().toString());
-//			logger.info("请求方式 : " + request.getMethod());
-//			logger.info("访问方法 : " + joinPoint.getSignature().getName());
-//			logger.info("访问IP : " + request.getRemoteAddr());
-//			logger.info("方法参数 : " + Arrays.toString(joinPoint.getArgs()));
+			logger.info("");
+			logger.info("访问时间 : " + time);
+			logger.info("访问路径 : " + request.getRequestURL().toString());
+			logger.info("请求方式 : " + request.getMethod());
+			logger.info("访问方法 : " + joinPoint.getSignature().getName());
+			logger.info("访问IP : " + request.getRemoteAddr());
+			logger.info("方法参数 : " + Arrays.toString(joinPoint.getArgs()));
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 * @Author lihao
@@ -72,7 +74,7 @@ public class LogAspect {
 		// 处理完请求，返回内容
 		logger.info("返回结果 : " + ret);
 	}
-	
+
 	/**
 	 * @return void
 	 * @Author lihao
