@@ -1,11 +1,11 @@
-package com.jsy.community.annotation;
+package com.jsy.community.aspectj;
 
+import com.jsy.community.annotation.RedisSingleInstanceLock;
 import com.jsy.community.utils.SpringContextUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 @Aspect
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RedisSingleInstanceLockAop {
+public class RedisSingleInstanceLockAop extends BaseAop {
 
     private RedissonClient redissonClient = null;
 
@@ -42,11 +42,9 @@ public class RedisSingleInstanceLockAop {
     @Around("@annotation(com.jsy.community.annotation.RedisSingleInstanceLock)")
     public Object singleInstanceLockAround(ProceedingJoinPoint point) throws Throwable {
         //拿到方法签名
-        Signature signature = point.getSignature();
-        //拿到方法签名
-        MethodSignature methodSignature = (MethodSignature) signature;
+        MethodSignature methodSignature = (MethodSignature) point.getSignature();
         // 获取到方法对象
-        Method method = methodSignature.getMethod();
+        Method method = getMethod(point.getTarget().getClass(), methodSignature);
         RedisSingleInstanceLock annotation = method.getAnnotation(RedisSingleInstanceLock.class);
         String key = annotation.lockKey();
         long lockTime = annotation.lockTime();

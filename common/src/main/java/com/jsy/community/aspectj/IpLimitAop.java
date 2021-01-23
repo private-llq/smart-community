@@ -1,5 +1,6 @@
-package com.jsy.community.annotation;
+package com.jsy.community.aspectj;
 
+import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.exception.JSYException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,15 +14,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -36,7 +34,7 @@ import java.util.Objects;
 @Component
 @Order()
 @RequiredArgsConstructor
-public class IpLimitAop {
+public class IpLimitAop extends BaseAop {
 
 
     @Resource
@@ -58,11 +56,7 @@ public class IpLimitAop {
         HttpServletRequest request = getHttpServletRequest();
         MethodSignature signature = (MethodSignature) point.getSignature();
         Class<?> targetClass = point.getTarget().getClass();
-        Method method = getDeclaredMethod(targetClass, signature.getName(),
-                signature.getMethod().getParameterTypes());
-        if (method == null) {
-            throw new JSYException("无法解析目标方法: " + signature.getMethod().getName());
-        }
+        Method method = getMethod(targetClass, signature);
         IpLimit ipLimit = method.getAnnotation(IpLimit.class);
         String ip = getIpAddr(request);
         int limitCount = ipLimit.count();
@@ -86,12 +80,6 @@ public class IpLimitAop {
         }
     }
 
-    /**
-     * 拿到request
-     */
-    private HttpServletRequest getHttpServletRequest() {
-        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-    }
 
 
     /**
@@ -115,44 +103,5 @@ public class IpLimitAop {
     }
 
 
-    /**
-     * 获取 IP地址
-     * 1.使用了反向代理软件， 不能通过 request.getRemoteAddr()获取 IP地址
-     * 2.如果使用了多级反向代理的话，X-Forwarded-For的值并不止一个，而是一串IP地址，
-     * 3.X-Forwarded-For中第一个非 unknown的有效IP字符串，则为真实IP地址
-     */
-    public static String getIpAddr(HttpServletRequest request) {
-        final String unknown = "unknown";
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
-    }
 
-    /**
-     * 反射拿到类的方法
-     *
-     * @param clazz          类
-     * @param name           类名
-     * @param parameterTypes 方法的参数类型
-     * @return 返回这个类的方法
-     */
-    private Method getDeclaredMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
-        try {
-            return clazz.getDeclaredMethod(name, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            Class<?> superClass = clazz.getSuperclass();
-            if (superClass != null) {
-                return getDeclaredMethod(superClass, name, parameterTypes);
-            }
-        }
-        return null;
-    }
 }

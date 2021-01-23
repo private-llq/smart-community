@@ -1,5 +1,7 @@
 package com.jsy.community.annotation;
 
+import com.jsy.community.aspectj.FieldValidator;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.ElementType;

@@ -233,7 +233,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
         boolean flag = false;
         HouseEntity matchHouse = null;
         for (HouseEntity house : houseEntityList) {
-            if (house.getFloor().equals(houseEntity.getFloor())
+            if (String.valueOf(house.getFloor()).equals(houseEntity.getFloor())
                     && String.valueOf(house.getUnit()).equals(houseEntity.getUnit())
                     && String.valueOf(house.getBuilding()).equals(houseEntity.getBuilding())
                     && house.getDoor().equals(houseEntity.getDoor())) {

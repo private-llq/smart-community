@@ -367,7 +367,7 @@ public class ProprietorExcelCommander {
             String valFieldMethod = "get" + fieldVal.substring(0, 1).toUpperCase() + fieldVal.substring(1);
             for (T t : list) {
                 Class<?> aClass = t.getClass();
-                resMap.put(aClass.getDeclaredMethod(keyFieldMethod).invoke(t).toString(), aClass.getDeclaredMethod(valFieldMethod).invoke(t).toString());
+                resMap.put(String.valueOf(aClass.getDeclaredMethod(keyFieldMethod).invoke(t)), String.valueOf(aClass.getDeclaredMethod(valFieldMethod).invoke(t)));
             }
         } catch (Exception e) {
             e.printStackTrace();

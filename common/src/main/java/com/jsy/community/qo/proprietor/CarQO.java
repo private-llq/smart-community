@@ -27,11 +27,11 @@ public class CarQO implements Serializable {
     @ApiModelProperty(value = "ID")
     private Long id;
 
-    @Range(groups = {UpdateCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "车位id不合法")
+    @Range(groups = {UpdateCarValidated.class}, min = 1,  message = "车位id不合法")
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
-    @Range(groups = {UpdateCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "社区id不合法")
+    @Range(groups = {UpdateCarValidated.class}, min = 1,  message = "社区id不合法")
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
 

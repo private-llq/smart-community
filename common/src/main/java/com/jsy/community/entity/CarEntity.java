@@ -39,7 +39,7 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
-    @Range(groups = {addCarValidated.class}, min = 1, max = Integer.MAX_VALUE, message = "社区id不合法")
+    @Range(groups = {addCarValidated.class}, min = 1, message = "社区id不合法")
     @NotNull(groups = {addCarValidated.class}, message = "社区不能为空")
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
@@ -53,6 +53,12 @@ public class CarEntity extends BaseEntity {
     @NotNull(groups = {addCarValidated.class, proprietorCarValidated.class}, message = "车辆图片地址未提供!")
     @ApiModelProperty(value = "车辆照片访问路径")
     private String carImageUrl;
+
+    public static void main(String[] args) {
+        String regex = "(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]";
+        boolean b = java.util.regex.Pattern.compile(regex).matcher("http://222.178.212.29:9000/car-img/d95b9e72-bf1c-4b9a-adf7-a9fdff329e95-铃兰1.jpg").find();
+        System.out.println(b);
+    }
 
     @Pattern(groups = {addCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     @NotNull(groups = {addCarValidated.class}, message = "手机号码未输入!")

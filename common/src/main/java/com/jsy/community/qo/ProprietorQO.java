@@ -39,7 +39,7 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("用户id")
     private String uid;
 
-    @Range(groups = {PropertyUpdateValid.class}, min = 1, max = Integer.MAX_VALUE, message = "非法业主Id")
+    @Range(groups = {PropertyUpdateValid.class}, min = 1, message = "非法业主Id")
     @ApiModelProperty("业主ID")
     private Long householderId;
 

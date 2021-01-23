@@ -1,4 +1,6 @@
-package com.jsy.community.annotation;
+package com.jsy.community.aspectj;
+
+import com.jsy.community.annotation.FieldValid;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

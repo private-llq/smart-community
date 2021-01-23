@@ -1,6 +1,8 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.Desensitization;
+import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
@@ -248,6 +250,7 @@ public class ProprietorController {
      * @return                    返回删除是否成功
      */
     @PostMapping()
+    @Desensitization(type = {DesensitizationType.ID_CARD, DesensitizationType.PHONE}, field = {"idCard", "mobile"})
     @ApiOperation("分页查询业主信息")
     public CommonResult<List<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> baseQo){
         //1.验证分页 查询参数
