@@ -49,6 +49,6 @@ public class UserHouseVO implements Serializable {
 	private String code;
 	
 	@ApiModelProperty(value = "是否通过审核")
-	private Integer checkStatus;
+	private String checkStatus;
 
 }
