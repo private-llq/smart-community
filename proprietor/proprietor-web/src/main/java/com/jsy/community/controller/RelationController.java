@@ -8,6 +8,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.RelationQo;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.RelationVO;
@@ -33,7 +34,11 @@ import java.util.Arrays;
 public class RelationController {
     private final String[] img ={"jpg","png","jpeg"};
 
+    //手机号验证
     private final String REGEX_MOBILE = "^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17[013678])|(18[0,5-9]))\\d{8}$";
+    //护照验证
+    private final String REG = "^1[45][0-9]{7}$|([P|p|S|s]\\d{7}$)|([S|s|G|g|E|e]\\d{8}$)|([Gg|Tt|Ss|Ll|Qq|Dd|Aa|Ff]\\d{8}$)|([H|h|M|m]\\d{8,10})$";
+    //身份证验证
     private final String ID_NUMBER = "^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$";
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -50,13 +55,19 @@ public class RelationController {
         }
         if ("".equals(relationQo.getName())&&relationQo.getName()==null){
             return CommonResult.error("姓名不能为空！");
+        }else if (!relationQo.getName().matches(RegexUtils.REGEX_REAL_NAME)){
+            return CommonResult.error("姓名不合法！请填写正确的姓名！");
         }
-        if (!relationQo.getPhoneTel().matches(REGEX_MOBILE)){
-            return CommonResult.error("请填写正确的手机号！");
+        if (relationQo.getPhoneTel()!=null&&!"".equals("")){
+            if (!relationQo.getPhoneTel().matches(REGEX_MOBILE)){
+                return CommonResult.error("请填写正确的手机号！");
+            }
         }
         if (relationQo.getIdentificationType()==1){
             if (!relationQo.getIdNumber().matches(ID_NUMBER)){
                 return CommonResult.error("请填写正确的身份证号码！");
+            }else if (!relationQo.getIdNumber().matches(REG)){
+                return CommonResult.error("请填写正确的护照号码！仅支持中国大陆，不包含港澳台！");
             }
         }
         String userId = UserUtils.getUserId();

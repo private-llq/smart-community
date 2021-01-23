@@ -142,7 +142,7 @@ public class PublicConfig {
      *
      * @param request
      * @param response
-     * @param privateKey 32的秘钥
+     * @param privateKey APIv3 32的秘钥
      */
     public static String notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
         Map<String, String> map = new HashMap<>(12);
