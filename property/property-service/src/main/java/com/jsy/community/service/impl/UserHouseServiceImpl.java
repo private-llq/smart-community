@@ -62,6 +62,13 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			
 			// 业主房屋认证信息
 			BeanUtils.copyProperties(userHouseEntity, houseVo);
+			if (userHouseEntity.getCheckStatus().equals(0)) {
+				houseVo.setCheckStatus("否");
+			} else if (userHouseEntity.getCheckStatus().equals(1)) {
+				houseVo.setCheckStatus("是");
+			} else {
+				houseVo.setCheckStatus("审核中");
+			}
 			
 			// 业主名称
 			String uid = userHouseEntity.getUid();
