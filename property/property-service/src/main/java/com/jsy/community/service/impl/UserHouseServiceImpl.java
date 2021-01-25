@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
@@ -48,6 +49,21 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Autowired
 	private HouseMapper houseMapper;
 	
+	/**
+	 * 待审核
+	 **/
+	private static final Integer WAITPASS = 0;
+	
+	/**
+	 * 已通过
+	 **/
+	private static final Integer PASS = 1;
+	
+	/**
+	 * 未通过
+	 **/
+	private static final Integer NOPASS = 2;
+	
 	@Override
 	public PageInfo<UserHouseVO> selectUserHouse(BaseQO<UserHouseEntity> baseQO, Long communityId) {
 		List<UserHouseVO> userHouseVOS = new ArrayList<>();
@@ -57,19 +73,16 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		wrapper.orderByAsc("check_status");
 		Page<UserHouseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
 		List<UserHouseEntity> list = userHouseMapper.selectPage(page, wrapper).getRecords();
+		
+		
 		for (UserHouseEntity userHouseEntity : list) {
 			UserHouseVO houseVo = new UserHouseVO();
 			
 			// 业主房屋认证信息
 			BeanUtils.copyProperties(userHouseEntity, houseVo);
-			if (userHouseEntity.getCheckStatus().equals(0)) {
-				houseVo.setCheckStatus("否");
-			} else if (userHouseEntity.getCheckStatus().equals(1)) {
-				houseVo.setCheckStatus("是");
-			} else {
-				houseVo.setCheckStatus("审核中");
-			}
+
 			
+			// 封装数据
 			// 业主名称
 			String uid = userHouseEntity.getUid();
 			QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
@@ -88,7 +101,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 				Long houseId = userHouseEntity.getHouseId();
 				HouseEntity houseEntity = houseMapper.selectById(houseId);
 				if (houseEntity != null) {
+					// 封装楼栋信息
 					BeanUtils.copyProperties(houseEntity, houseVo);
+					houseVo.setId(userHouseEntity.getId());
 				}
 				userHouseVOS.add(houseVo);
 			}
@@ -97,11 +112,6 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		BeanUtils.copyProperties(page, info);
 		info.setRecords(userHouseVOS);
 		return info;
-
-//		long current = baseQO.getPage();
-//		long size = baseQO.getSize();
-//		long total = list.size();
-//		return PageVoUtils.page(current, total, size, userHouseVOS);
 	}
 	
 	@Override
@@ -115,7 +125,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 				userHouseEntity.setUid(uid);
 				userHouseEntity.setCommunityId(communityId);
 				userHouseEntity.setHouseId(id);
-				userHouseEntity.setCheckStatus(2);//审核中
+				userHouseEntity.setCheckStatus(WAITPASS);//审核中
 				userHouseEntity.setId(SnowFlake.nextId());
 				
 				userHouseMapper.insert(userHouseEntity);
@@ -129,7 +139,10 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public Boolean pass(Long id) {
 		UserHouseEntity houseEntity = userHouseMapper.selectById(id);
 		if (houseEntity != null) {
-			houseEntity.setCheckStatus(1);
+			if (houseEntity.getCheckStatus() != WAITPASS) {
+				throw new PropertyException("您的订单不存在或已经审核完成");
+			}
+			houseEntity.setCheckStatus(PASS);
 			// 修改审核状态    PS：业主与房屋的关系是他们做的  在审核之前就绑定了关系   所以这里审核只是把状态改下  2020年11月30日10:04:18
 			userHouseMapper.updateById(houseEntity);
 			return true;
@@ -141,7 +154,10 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public Boolean notPass(Long id) {
 		UserHouseEntity houseEntity = userHouseMapper.selectById(id);
 		if (houseEntity != null) {
-			houseEntity.setCheckStatus(0);
+			if (houseEntity.getCheckStatus() != WAITPASS) {
+				throw new PropertyException("您的订单不存在或已经审核完成");
+			}
+			houseEntity.setCheckStatus(NOPASS);
 			userHouseMapper.updateById(houseEntity);
 			return true;
 		}
@@ -153,5 +169,5 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		int count = userHouseMapper.deleteById(id);
 		return count != 0;
 	}
-
+	
 }

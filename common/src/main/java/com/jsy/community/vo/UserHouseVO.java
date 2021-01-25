@@ -21,6 +21,9 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 public class UserHouseVO implements Serializable {
 	
+	@ApiModelProperty(value = "房屋id")
+	private Long id;
+	
 	@ApiModelProperty(value = "业主")
 	private String nickname;
 	
@@ -49,6 +52,9 @@ public class UserHouseVO implements Serializable {
 	private String code;
 	
 	@ApiModelProperty(value = "是否通过审核")
-	private String checkStatus;
+	private Integer checkStatus;
+	
+	@ApiModelProperty(value = "是否通过审核")
+	private String checkStatusString;
 
 }
