@@ -31,10 +31,10 @@ import java.util.zip.ZipOutputStream;
 public class DownloadLogController {
 
     //日志的绝对路径 本地
-    private final String LogPath = "D:"+ File.separator+"mnt"+File.separator+"db"+File.separator+"smart-community"+File.separator+"logs" + File.separator;
+    //private final String LogPath = "D:"+ File.separator+"mnt"+File.separator+"db"+File.separator+"smart-community"+File.separator+"logs" + File.separator;
 
     //linux 日志logs目录的绝对路径
-    //private final String LogPath = ""
+    private final String LogPath = File.separator+"mnt"+File.separator+"db"+File.separator+"smart-community"+File.separator+"logs" + File.separator;
 
     @GetMapping("/downloadLog")
     public ResponseEntity<byte[]> downloadLog(@RequestParam(value = "isDirectory", required = false, defaultValue = "true")Boolean isDirectory,
