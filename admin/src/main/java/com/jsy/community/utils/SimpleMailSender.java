@@ -32,7 +32,7 @@ public class SimpleMailSender {
 	@Value("${email.authPass}")
 	private String authPass;
 	
-	private JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+	private final JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 	
 	@Autowired
 	private TemplateEngine templateEngine;

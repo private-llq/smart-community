@@ -247,11 +247,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	**/
 	private boolean checkEmailExists(String email){
 		Integer count = baseMapper.selectCount(new QueryWrapper<SysUserEntity>().eq("email", email));
-		if(count > 0){
-			return true;
-		}
-		return false;
-	}
+        return count > 0;
+    }
 	
 	/**
 	* @Description: 检测用户名是否已存在
@@ -262,11 +259,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	**/
 	private boolean checkUsernameExists(String username){
 		Integer count = baseMapper.selectCount(new QueryWrapper<SysUserEntity>().eq("username", username));
-		if(count > 0){
-			return true;
-		}
-		return false;
-	}
+        return count > 0;
+    }
 	
 	/**
 	* @Description: 邮件邀请注册后设置用户名

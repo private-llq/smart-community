@@ -38,11 +38,8 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	@Override
 	public boolean addCommunity(CommunityEntity communityEntity){
 		int result = communityMapper.insert(communityEntity);
-		if(result == 1){
-			return true;
-		}
-		return false;
-	}
+        return result == 1;
+    }
 	
 	/**
 	 * @Description: 社区删除
@@ -54,11 +51,8 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	@Override
 	public boolean deleteCommunity(Long id){
 		int result = communityMapper.deleteById(id);
-		if(result == 1){
-			return true;
-		}
-		return false;
-	}
+        return result == 1;
+    }
 	
 	/**
 	 * @Description: 社区修改

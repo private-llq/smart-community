@@ -37,7 +37,7 @@
         <!-- 任务 -->
         <module>task</module>
         <module>payment-system</module>
-        <module>wechat-pay</module>
+<!--        <module>wechat-pay</module>-->
     </modules>
     
     <properties>

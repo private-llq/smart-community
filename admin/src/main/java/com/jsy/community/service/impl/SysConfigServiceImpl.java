@@ -206,11 +206,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	@Override
 	public boolean addRole(SysRoleEntity sysRoleEntity){
 		int result = sysRoleMapper.insert(sysRoleEntity);
-		if(result == 1){
-			return true;
-		}
-		return false;
-	}
+        return result == 1;
+    }
 	
 	/**
 	 * @Description: 删除角色
@@ -222,11 +219,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	@Override
 	public boolean delRole(Long id){
 		int result = sysRoleMapper.deleteById(id);
-		if(result == 1){
-			return true;
-		}
-		return false;
-	}
+        return result == 1;
+    }
 	
 	/**
 	 * @Description: 修改角色
@@ -240,11 +234,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		SysRoleEntity entity = new SysRoleEntity();
 		BeanUtils.copyProperties(sysRoleOQ,entity);
 		int result = sysRoleMapper.updateById(entity);
-		if(result == 1){
-			return true;
-		}
-		return false;
-	}
+        return result == 1;
+    }
 	
 	/**
 	 * @Description: 角色列表
