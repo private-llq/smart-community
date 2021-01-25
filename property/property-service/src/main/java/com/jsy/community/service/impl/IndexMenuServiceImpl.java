@@ -47,7 +47,7 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 	private AppMenuMapper appMenuMapper;
 	
 	// TODO 首页展示菜单数量 暂定5个
-	private final Integer INDEXMENUCOUNT = 3;
+	private static final Integer INDEXMENUCOUNT = 3;
 	
 	@Override
 	public Integer saveMenu(IndexMenuEntity menuEntity) {

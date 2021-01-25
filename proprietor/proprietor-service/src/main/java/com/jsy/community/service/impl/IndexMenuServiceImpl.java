@@ -33,7 +33,7 @@ public class IndexMenuServiceImpl extends ServiceImpl<IndexMenuMapper, IndexMenu
 	
 	// TODO 首页展示菜单数量 暂定3个
 //	@Value(value = "${jsy.menu}")
-	private Integer INDEXMENUCOUNT = 3;
+	private static final Integer INDEXMENUCOUNT = 3;
 	
 	@Override
 	public List<IndexMenuEntity> listIndexMenu(Long communityId) {

@@ -1,10 +1,13 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
+import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WehatConfig;
 import com.jsy.community.qo.WeChatPayVO;
 import com.jsy.community.utils.OrderNoUtil;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import net.sf.json.JSONObject;
 import org.springframework.amqp.AmqpException;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,12 +34,14 @@ import java.util.Map;
  * @create: 2021-01-21 17:05
  **/
 @RestController
+@ApiJSYController
 public class WeChatController {
 
     @Autowired
     private AmqpTemplate amqpTemplate;
 
     @PostMapping("/wxPay")
+    @Login
     public CommonResult wxPay(@RequestBody WeChatPayVO weChatPayVO) throws Exception {
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         Map hashMap = new LinkedHashMap();
@@ -49,15 +55,23 @@ public class WeChatController {
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://jsy.free.vipnps.vip/callback");
         map.put("amount",hashMap);
-
+        System.out.println(UserUtils.getUserId());
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
+        System.out.println(wxPayRequestJsonStr);
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("uid",UserUtils.getUserId());
+        msg.put("total",weChatPayVO.getTotal());
+        msg.put("description",weChatPayVO.getDescription());
+        msg.put("orderNo",map.get("out_trade_no"));
+
+
         //mq异步保存账单到数据库
-        amqpTemplate.convertAndSend("exchange_topics_wechat","queue.wechat","卧槽");
+        amqpTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
         //半个小时如果还没支付就自动删除数据库账单
-        amqpTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
+        amqpTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", "曹尼玛", new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
-                message.getMessageProperties().setHeader("x-delay",60000*30);
+                message.getMessageProperties().setHeader("x-delay",60000);
                 return message;
             }
         });

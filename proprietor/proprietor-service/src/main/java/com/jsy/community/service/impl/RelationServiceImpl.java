@@ -1,14 +1,11 @@
 package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IRelationService;
-import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.mapper.CarMapper;
-import com.jsy.community.mapper.HouseMemberMapper;
-import com.jsy.community.mapper.RelationMapper;
-import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.RelationCarsQo;
 import com.jsy.community.qo.RelationQo;
 import com.jsy.community.utils.RealnameAuthUtils;
@@ -47,6 +44,9 @@ public class RelationServiceImpl implements IRelationService {
     private RelationMapper relationMapper;
 
     @Autowired
+    private UserHouseMapper userHouseMapper;
+
+    @Autowired
     private RealnameAuthUtils realnameAuthUtils;
 
 
@@ -58,12 +58,12 @@ public class RelationServiceImpl implements IRelationService {
     @Override
     @Transactional
     public Boolean addRelation(RelationQo relationQo) {
-        //实名认证
-        if(BusinessConst.IDENTIFICATION_TYPE_IDCARD.equals(relationQo.getIdentificationType())){
-            if(!realnameAuthUtils.twoElements(relationQo.getName(), relationQo.getIdNumber())){
-                return false;
-            }
-        }
+//        //实名认证
+//        if(BusinessConst.IDENTIFICATION_TYPE_IDCARD.equals(relationQo.getIdentificationType())){
+//            if(!realnameAuthUtils.twoElements(relationQo.getName(), relationQo.getIdNumber())){
+//                return false;
+//            }
+//        }
 
         HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
 
@@ -189,6 +189,13 @@ public class RelationServiceImpl implements IRelationService {
             relationMapper.updateUserRelationCar(relationCarsQo);
         }
     }
+
+    @Override
+    public UserHouseEntity getHouse(RelationQo relationQo) {
+        UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("uid", relationQo.getUserId()).eq("house_id", relationQo.getHouseId()).eq("community_id", relationQo.getCommunityId()));
+        return entity;
+    }
+
     /**
      * @Description: 删除家属信息
      * @author: Hu
