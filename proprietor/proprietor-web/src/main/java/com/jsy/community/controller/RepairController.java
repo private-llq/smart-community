@@ -35,7 +35,7 @@ import java.util.List;
 @Api(tags = "房屋报修控制器")
 @Slf4j
 @RestController
-@Login(allowAnonymous = false)
+@Login
 @ApiJSYController
 @RequestMapping("/repair")
 public class RepairController {

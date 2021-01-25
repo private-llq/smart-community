@@ -69,6 +69,7 @@ public class RepairEntity extends BaseEntity {
 
     @ApiModelProperty(value = "图片地址")
     @NotBlank(groups = {addRepairValidate.class},message = "请添加图片,以供物业人员审核")
+    @Size(groups = {addRepairValidate.class},max = 500,message = "您的图片文件名过长或您上传的文件太多")
     private String repairImg;
     
     

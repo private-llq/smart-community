@@ -164,7 +164,7 @@ public class ProprietorLogAspect {
 				System.out.println(proprietorLog);
 				
 				//6. 是否有异常
-				if (e!=null) {
+				if (e != null) {
 					proprietorLog.setStatus(FAIL);
 					proprietorLog.setExceptionInfo(e.getMessage());
 				}

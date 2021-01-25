@@ -7,6 +7,7 @@ import io.minio.ObjectStat;
 import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.MessageDigest;
@@ -47,7 +48,11 @@ public class MinioUtils {
 			//创建存储桶
 			createBucket(bucketName);
 			// 文件存储的目录结构
-			String objectName = getRandomFileName(file.getOriginalFilename());
+			if (StringUtils.isEmpty(file.getOriginalFilename())) {
+				throw new JSYException("请上传文件");
+			}
+			String endName = file.getOriginalFilename();
+			String objectName = getRandomFileName(endName);
 			// 存储文件
 			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());
 			//返回路径
@@ -59,8 +64,9 @@ public class MinioUtils {
 	}
 
 	private static  String getRandomFileName(String fileName){
-		return UUID.randomUUID().toString() + "-" + fileName;
+		return UUID.randomUUID().toString();
 	}
+	
 	/**
 	 * 利用java原生的类实现SHA256加密
 	 * @param str 加密后的报文
