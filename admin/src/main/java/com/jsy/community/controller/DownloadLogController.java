@@ -70,6 +70,7 @@ public class DownloadLogController {
             header.set( "Content-type", request.getServletContext().getMimeType( filePath ) );
             return in;
         } catch ( Exception e ) {
+            e.printStackTrace();
             return null;
         }  finally {
             close(fileInputStream);
@@ -95,6 +96,7 @@ public class DownloadLogController {
             delete(moduleZipPath );
             return fileStream;
         } catch ( Exception e ) {
+            e.printStackTrace();
             return null;
         } finally {
             close(fileInputStream);
