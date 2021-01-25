@@ -9,10 +9,11 @@ import java.lang.annotation.Target;
  * 分布式锁注解
  * @author zh_o
  * update for YuLF  2021-1-22 9:29
+ * 注解作用：同一时间 一个方法 只能同一机器 同一模块 同一线程执行
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RedisSingleInstanceLock {
+public @interface DistributedLock {
 
     /**
      * 存入Redis的Key

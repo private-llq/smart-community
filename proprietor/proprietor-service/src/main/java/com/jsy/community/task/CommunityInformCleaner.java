@@ -1,6 +1,6 @@
 package com.jsy.community.task;
 
-import com.jsy.community.annotation.RedisSingleInstanceLock;
+import com.jsy.community.annotation.DistributedLock;
 import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -56,7 +56,7 @@ public class CommunityInformCleaner {
      * @author YuLF
      * @since  2020/1/9 14:19
      */
-    @RedisSingleInstanceLock(lockKey = "communityInform", waitTimout = 50)
+    @DistributedLock(lockKey = "communityInform", waitTimout = 50)
     @Scheduled(cron = "0 0 1 ? * mon")
     public void clearPushInform(){
 

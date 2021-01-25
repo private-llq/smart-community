@@ -240,7 +240,7 @@ public class ProprietorController {
     public CommonResult<Boolean> del(@RequestParam Long uid){
         //从JWT获取业主ID
         //Long uid = 12L;
-        iProprietorService.del(uid);
+        //iProprietorService.del(uid);
         return CommonResult.ok();
     }
 

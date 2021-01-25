@@ -119,6 +119,10 @@ public class ProprietorMemberProvider implements ExcelHandler {
                                 break;
                             //第7列 家属手机号
                             case 6:
+                                //小孩的手机号码可以为空
+                                if( cellValue == null || "".equals(cellValue)){
+                                    break;
+                                }
                                 if (RegexUtils.isMobile(cellValue)) {
                                     userEntity.setMobile(cellValue);
                                 } else {
