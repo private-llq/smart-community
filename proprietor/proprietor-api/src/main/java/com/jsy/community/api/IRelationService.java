@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.RelationQo;
 import com.jsy.community.vo.RelationVO;
 
@@ -73,4 +74,13 @@ public interface IRelationService {
     * @return:
     */
     void deleteHouseMemberCars(Long id);
+
+    /**
+     * @Description: 房间验证
+     * @author: Hu
+     * @since: 2020/12/25 14:46
+     * @Param:
+     * @return:
+     */
+    UserHouseEntity getHouse(RelationQo relationQo);
 }

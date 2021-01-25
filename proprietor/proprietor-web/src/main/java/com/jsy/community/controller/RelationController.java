@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.RelationQo;
 import com.jsy.community.utils.MinioUtils;
@@ -46,33 +47,41 @@ public class RelationController {
 
 
 
+
+
+
     @ApiOperation("添加家属信息")
     @PutMapping("/add")
     @Login
     public CommonResult addRelation(@RequestBody RelationQo relationQo){
-        if (relationQo.getCommunityId()==null&&relationQo.getCommunityId()>0&&relationQo.getHouseId()==null&&relationQo.getHouseId()>0) {
+
+        String userId = UserUtils.getUserId();
+        relationQo.setUserId(userId);
+        UserHouseEntity entity=relationService.getHouse(relationQo);
+        if (entity==null){
             return CommonResult.error("请填写正确的社区或者房间！");
+        }
+        if (entity.getCheckStatus()!=1){
+            return CommonResult.error("当前房屋未认证，请先认证！");
         }
         if ("".equals(relationQo.getName())&&relationQo.getName()==null){
             return CommonResult.error("姓名不能为空！");
         }else if (!relationQo.getName().matches(RegexUtils.REGEX_REAL_NAME)){
             return CommonResult.error("姓名不合法！请填写正确的姓名！");
         }
-        if (relationQo.getPhoneTel()!=null&&!"".equals("")){
+        if (relationQo.getPhoneTel()!=null&&!"".equals(relationQo.getPhoneTel())){
             if (!relationQo.getPhoneTel().matches(REGEX_MOBILE)){
                 return CommonResult.error("请填写正确的手机号！");
             }
         }
-        if (relationQo.getIdentificationType()==1){
-            if (!relationQo.getIdNumber().matches(ID_NUMBER)){
+        if (relationQo.getIdentificationType()==1) {
+            if (!relationQo.getIdNumber().matches(ID_NUMBER)) {
                 return CommonResult.error("请填写正确的身份证号码！");
-            }else if (!relationQo.getIdNumber().matches(REG)){
+            }
+        }else if (!relationQo.getIdNumber().matches(REG)){
                 return CommonResult.error("请填写正确的护照号码！仅支持中国大陆，不包含港澳台！");
             }
-        }
-        String userId = UserUtils.getUserId();
-        System.out.println(userId);
-        relationQo.setUserId(userId);
+
         relationQo.setPersonType(BusinessConst.PERSON_TYPE_RELATIVE);
         return relationService.addRelation(relationQo)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
     }
@@ -135,21 +144,32 @@ public class RelationController {
     @PostMapping("/updateUserRelationDetails")
     @Login
     public CommonResult updateByRelationId(@RequestBody RelationQo relationQo){
-        if (relationQo.getCommunityId()==null&&relationQo.getCommunityId()>0&&relationQo.getHouseId()==null&&relationQo.getHouseId()>0) {
+        String userId = UserUtils.getUserId();
+        relationQo.setUserId(userId);
+        UserHouseEntity entity=relationService.getHouse(relationQo);
+        if (entity==null){
             return CommonResult.error("请填写正确的社区或者房间！");
+        }
+        if (entity.getCheckStatus()!=1){
+            return CommonResult.error("当前房屋未认证，请先认证！");
         }
         if ("".equals(relationQo.getName())&&relationQo.getName()==null){
             return CommonResult.error("姓名不能为空！");
+        }else if (!relationQo.getName().matches(RegexUtils.REGEX_REAL_NAME)){
+            return CommonResult.error("姓名不合法！请填写正确的姓名！");
         }
-        if (!relationQo.getPhoneTel().matches(REGEX_MOBILE)){
-            return CommonResult.error("请填写正确的手机号！");
-        }
-        if (relationQo.getIdentificationType()==1){
-            if (!relationQo.getIdNumber().matches(ID_NUMBER)){
-                return CommonResult.error("请填写正确的身份证号码！");
+        if (relationQo.getPhoneTel()!=null&&!"".equals(relationQo.getPhoneTel())){
+            if (!relationQo.getPhoneTel().matches(REGEX_MOBILE)){
+                return CommonResult.error("请填写正确的手机号！");
             }
         }
-        String userId = UserUtils.getUserId();
+        if (relationQo.getIdentificationType()==1) {
+            if (!relationQo.getIdNumber().matches(ID_NUMBER)) {
+                return CommonResult.error("请填写正确的身份证号码！");
+            }
+        }else if (!relationQo.getIdNumber().matches(REG)){
+            return CommonResult.error("请填写正确的护照号码！仅支持中国大陆，不包含港澳台！");
+        }
         relationService.updateUserRelationDetails(relationQo);
         return CommonResult.ok();
     }

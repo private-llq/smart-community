@@ -15,7 +15,7 @@ import java.util.Date;
  * @create: 2021-01-23 15:38
  **/
 @Component
-public class WeChatListener {
+public class WeChatListener{
     /**
      * 监听wechat队列
      * @param msg  接收的参数，类型自己定义
@@ -24,10 +24,7 @@ public class WeChatListener {
      */
     @RabbitListener(queues = {"queue_wechat"})
     public void receive_queue_wechat (String msg, Message message, Channel channel)throws IOException {
-        System.out.println(new Date());
         System.out.println(msg);
-        System.out.println(message.getBody());
-        System.out.println(channel);
 
         //手动确认
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);

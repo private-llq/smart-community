@@ -12,7 +12,10 @@
     <artifactId>payment-system</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>pay-system</module>
+        <module>pay-system-web</module>
+        <module>pay-system-api</module>
+        <module>pay-system-api</module>
+        <module>pay-system-service</module>
     </modules>
     <dependencies>
         <dependency>
