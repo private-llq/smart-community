@@ -47,6 +47,8 @@ public class RedbagEntity extends BaseEntity{
 	@ApiModelProperty(value = "群id")
 	private String groupUuid;
 	
+	@ApiModelProperty(value = "交易类型 1.红包 2.群红包 3.转账")
+	private Integer businessType;
 	
 	@ApiModelProperty(value = "红包状态 0.未领取 1.领取中 2.已领完 -1.已退回")
 	private Integer status;

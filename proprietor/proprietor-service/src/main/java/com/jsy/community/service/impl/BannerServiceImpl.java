@@ -87,12 +87,13 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	**/
 	@Scheduled(cron = "0 */5 * * * ?")
 	public void refreshClickCount(){
-		log.info("轮播图刷新点击量定时任务执行"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
+		log.info(Thread.currentThread().getId() + " 轮播图刷新点击量定时任务执行"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
 		Map<Long,Long> entries = redisTemplate.opsForHash().entries("Banner:clickCount");
 		if(entries.size() > 0){
 			redisTemplate.opsForHash().delete("Banner:clickCount",redisTemplate.opsForHash().keys("Banner:clickCount").toArray());
 			bannerMapper.refreshClickCount(entries);
 		}
+		log.info(Thread.currentThread().getId() + " 轮播图刷新点击量定时任务执行完成"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
 	}
 	
 	

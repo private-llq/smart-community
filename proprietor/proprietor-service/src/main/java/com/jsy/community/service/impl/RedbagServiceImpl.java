@@ -23,15 +23,14 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.client.methods.HttpPost;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * @author chq459799974
@@ -43,6 +42,10 @@ import java.util.UUID;
 public class RedbagServiceImpl implements IRedbagService {
 	
 	private static final Random random = new Random();
+	
+	private static final String protocolType = "http://";
+	private static final String host = "192.168.12.37";
+	private static final String port = "52002";
 	
 	@Autowired
 	private RedbagMapper redbagMapper;
@@ -82,7 +85,7 @@ public class RedbagServiceImpl implements IRedbagService {
 		//调用发红包接口
 		boolean b = sendRedbagByHttp(redbagQO);
 		if(!b){
-			throw new ProprietorException("红包发送失败");
+			throw new ProprietorException("调用远程服务，红包发送失败");
 		}
 	}
 	
@@ -96,18 +99,21 @@ public class RedbagServiceImpl implements IRedbagService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> receiveRedbag(RedbagQO redbagQO){
+		log.info("开始领取红包：" + redbagQO.getUuid() + "领取人：" + redbagQO.getReceiveUserUuid());
 		Map<String, Object> returnMap = new HashMap<>();
-		if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())){ //私包
+		if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())
+		   || BusinessConst.BUSINESS_TYPE_TRANSFER.equals(redbagQO.getBusinessType())){ //私包 和 转账
 			//查询
 			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*")
 				.eq("uuid", redbagQO.getUuid())
-				.eq("receive_user_uuid",redbagQO.getReceiveUserUuid()));
+				.eq("receive_user_uuid",redbagQO.getReceiveUserUuid())
+				.eq("business_type",redbagQO.getBusinessType()));
 			if(entity == null){
-				throw new ProprietorException("红包不存在");
+				throw new ProprietorException("没有该红包/转账记录");
 			}else if(BusinessConst.REDBAG_STATUS_FINISHED.equals(entity.getStatus())){
-				throw new ProprietorException("红包已经领过了");
+				throw new ProprietorException("已经领过了");
 			}else if(BusinessConst.REDBAG_STATUS_BACK.equals(entity.getStatus())){
-				throw new ProprietorException("无法领取已退回红包");
+				throw new ProprietorException("无法领取已退回的红包/转账");
 			}
 			//收取私包
 			RedbagEntity redbagEntity = new RedbagEntity();
@@ -116,34 +122,34 @@ public class RedbagServiceImpl implements IRedbagService {
 			redbagEntity.setReceivedCount(1);
 			int updateRedbag = redbagMapper.update(redbagEntity, new UpdateWrapper<RedbagEntity>().eq("uuid", entity.getUuid()));
 			if(updateRedbag != 1){
-				throw new ProprietorException("红包领取失败");
+				throw new ProprietorException("领取失败");
 			}
 			//红包入账
 			redbagToUserAccount(entity.getReceiveUserUuid(),entity.getMoney());
 			//返回
-			returnMap.put("uuid",entity.getUuid());//红包id
-			returnMap.put("receiveUserUuid",entity.getReceiveUserUuid());//领取人
+//			returnMap.put("uuid",entity.getUuid());//红包id
+//			returnMap.put("receiveUserUuid",entity.getReceiveUserUuid());//领取人
 			returnMap.put("money",entity.getMoney());//领取金额
-			//TODO 调用领红包接口
+			//调用领取接口
 			redbagQO.setMoney(entity.getMoney());
 			boolean b = sendRedbagByHttp(redbagQO);
 			if(!b){
-				throw new ProprietorException("红包领取失败");
+				throw new ProprietorException("调用远程服务，红包/转账领取失败");
 			}
 		}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){ //群红包
 			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*")
 				.eq("uuid", redbagQO.getUuid())
 				.gt("money",0)
-			    .isNotNull("group_uuid"));
+				.eq("business_type",redbagQO.getBusinessType()));
 			if(entity == null){
 				throw new ProprietorException("红包已领完");
 			}
 			//红包里剩余的钱
 			BigDecimal remainMoney = entity.getMoney();
 			//红包剩余量
-			Integer remainSize  = entity.getNumber() - entity.getReceivedCount();
+			Integer remainSize = entity.getNumber() - entity.getReceivedCount();
 			if(remainSize == 0){
-				throw new ProprietorException("红包领取异常 请联系管理员");
+				throw new ProprietorException("红包数量不够了 请联系管理员");
 			}
 			//随机出的手气红包
 			BigDecimal randomMoney = getRandomMoney(remainSize, remainMoney);
@@ -156,14 +162,14 @@ public class RedbagServiceImpl implements IRedbagService {
 			//红包入账
 			redbagToUserAccount(redbagQO.getReceiveUserUuid(),randomMoney);
 			//返回
-			returnMap.put("uuid",entity.getUuid());//红包id
-			returnMap.put("receiveUserUuid",redbagQO.getReceiveUserUuid());//领取人
+//			returnMap.put("uuid",entity.getUuid());//红包id
+//			returnMap.put("receiveUserUuid",redbagQO.getReceiveUserUuid());//领取人
 			returnMap.put("money",randomMoney);//领取金额
 			redbagQO.setMoney(randomMoney);
-			//TODO 调用领红包接口
+			//调用领取接口
 			boolean b = sendRedbagByHttp(redbagQO);
 			if(!b){
-				throw new ProprietorException("红包领取失败");
+				throw new ProprietorException("调用远程服务，红包领取失败");
 			}
 		}
 		return returnMap;
@@ -179,6 +185,7 @@ public class RedbagServiceImpl implements IRedbagService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> sendBackRedbag(String uuid){
+		log.info("开始退回红包：" + uuid);
 		Map<String, Object> returnMap = new HashMap<>();
 		//查询红包
 		RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*").eq("uuid", uuid));
@@ -208,10 +215,10 @@ public class RedbagServiceImpl implements IRedbagService {
 		tradeQO.setTradeAmount(money);
 		userAccountService.trade(tradeQO);
 		//返回
-		returnMap.put("uuid",entity.getUuid());//红包id
-		returnMap.put("userUuid",entity.getUserUuid());//退回到人
+//		returnMap.put("uuid",entity.getUuid());//红包id
+//		returnMap.put("userUuid",entity.getUserUuid());//退回到人
 		returnMap.put("money",entity.getMoney());//退回金额
-		//TODO 调用红包退回接口
+		//调用退回接口
 		RedbagQO redbagQO = new RedbagQO();
 		redbagQO.setUuid(entity.getUuid());
 		redbagQO.setUserUuid(entity.getUserUuid());
@@ -219,38 +226,38 @@ public class RedbagServiceImpl implements IRedbagService {
 		redbagQO.setBehavior(BusinessConst.BEHAVIOR_BACK);
 		boolean b = sendRedbagByHttp(redbagQO);
 		if(!b){
-			throw new ProprietorException("红包退回失败");
+			throw new ProprietorException("调用远程服务，红包退回失败");
 		}
 		return returnMap;
 	}
 	
 	/**
-	 * http调用发红包接口
+	 * http调用红包/转账接口
 	 */
 	private boolean sendRedbagByHttp(RedbagQO redbagQO){
 		String url = "";
 		if(BusinessConst.BEHAVIOR_SEND.equals(redbagQO.getBehavior())){
 			if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())){  //私包
-				url = "http://192.168.12.37:52002/imRedEnvelope/sendRedPacket";
+				url = protocolType + host + ":" + port + "/imRedEnvelope/sendRedPacket";
 			}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){  //群红包
-				url = "http://192.168.12.37:52002/imRedEnvelope/sendGroup";
+				url = protocolType + host + ":" + port + "/imRedEnvelope/sendGroup";
 			}else if(BusinessConst.BUSINESS_TYPE_TRANSFER.equals(redbagQO.getBusinessType())){  //转账
-				url = "http://192.168.12.37:52002/imTransferAccounts/sendTransferAccount";
+				url = protocolType + host + ":" + port + "/imTransferAccounts/sendTransferAccount";
 			}else{
 				return false;
 			}
 		}else if(BusinessConst.BEHAVIOR_RECEIVE.equals(redbagQO.getBehavior())){
 			if(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())){  //私包
-				url = "http://192.168.12.37:52002/imRedEnvelope/robRedPacket";
+				url = protocolType + host + ":" + port + "/imRedEnvelope/robRedPacket";
 			}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){  //群红包
-				url = "http://192.168.12.37:52002/imRedEnvelope/receiveGroup";
+				url = protocolType + host + ":" + port + "/imRedEnvelope/receiveGroup";
 			}else if(BusinessConst.BUSINESS_TYPE_TRANSFER.equals(redbagQO.getBusinessType())){  //转账
-				url = "http://192.168.12.37:52002/imTransferAccounts/robTransferAccount";
+				url = protocolType + host + ":" + port + "/imTransferAccounts/robTransferAccount";
 			}else{
 				return false;
 			}
-		}else if(BusinessConst.BEHAVIOR_BACK.equals(redbagQO.getBehavior())){
-			url = "http://192.168.12.37:52002/imRedEnvelope/refundRedPacket";
+		}else if(BusinessConst.BEHAVIOR_BACK.equals(redbagQO.getBehavior())){  //退回
+			url = protocolType + host + ":" + port + "/imRedEnvelope/refundRedPacket";
 		}
 		//加密data
 //		String redbagData = AESOperator.encrypt(JSON.toJSONString(redbagQO));
@@ -278,7 +285,7 @@ public class RedbagServiceImpl implements IRedbagService {
 			httpResult = MyHttpUtils.exec(httpPost);
 //			result = JSONObject.parseObject(httpResult);
 		}catch (Exception e) {
-			log.error("发红包 - 执行或解析出错，json解析结果" + result);
+			log.error("红包远程服务 - 执行或解析出错，json解析结果" + result);
 			e.printStackTrace();
 			return false;
 		}
@@ -315,5 +322,23 @@ public class RedbagServiceImpl implements IRedbagService {
 		tradeQO.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex());
 		tradeQO.setTradeAmount(money);
 		userAccountService.trade(tradeQO);
+	}
+	
+	/**
+	 * 定时退回过期红包 10分钟1次
+	 */
+	@Scheduled(cron = "0 */10 * * * ?")
+	public void sendBackExpiredRedbag(){
+		log.info(Thread.currentThread().getId() + " 过期红包扫描定时任务执行"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
+		List<String> expiredRedbags = redbagMapper.queryExpiredRedbag();
+		for(String uuid : expiredRedbags){
+			try{
+				sendBackRedbag(uuid);
+			}catch (ProprietorException e){
+				log.error(e.getMessage());
+				continue;
+			}
+		}
+		log.info(Thread.currentThread().getId() + " 过期红包扫描定时任务执行完成"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
 	}
 }
