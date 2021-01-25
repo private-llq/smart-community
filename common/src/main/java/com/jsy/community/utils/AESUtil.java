@@ -44,10 +44,8 @@ public class AESUtil {
         openParam.setSignature(md5Str);
         return openParam;
     }
-
-//    private static final String HMACKEY = "34aecdaf351f3513d11ed61e6b51f81f5867bc13bb1c9da9cfc975f7ed8229a5";
-
-    public static String AES_cbc_encrypt(String srcData, String key, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+    
+    private static String AES_cbc_encrypt(String srcData, String key, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
         SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, keySpec, new IvParameterSpec(iv.getBytes()));
@@ -55,7 +53,7 @@ public class AESUtil {
         return Base64Encoder.encode(encData);
     }
 
-    public static String AES_cbc_decrypt(String encData, String key, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    private static String AES_cbc_decrypt(String encData, String key, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(iv.getBytes()));
