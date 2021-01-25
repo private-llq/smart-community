@@ -14,10 +14,7 @@ import com.jsy.community.entity.RedbagEntity;
 import com.jsy.community.mapper.RedbagMapper;
 import com.jsy.community.qo.RedbagQO;
 import com.jsy.community.qo.proprietor.UserAccountTradeQO;
-import com.jsy.community.utils.AESOperator;
-import com.jsy.community.utils.MD5Util;
-import com.jsy.community.utils.MyHttpUtils;
-import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.client.methods.HttpPost;
@@ -166,6 +163,7 @@ public class RedbagServiceImpl implements IRedbagService {
 //			returnMap.put("receiveUserUuid",redbagQO.getReceiveUserUuid());//领取人
 			returnMap.put("money",randomMoney);//领取金额
 			redbagQO.setMoney(randomMoney);
+			redbagQO.setGroupUuid(entity.getGroupUuid());
 			//调用领取接口
 			boolean b = sendRedbagByHttp(redbagQO);
 			if(!b){
@@ -259,19 +257,15 @@ public class RedbagServiceImpl implements IRedbagService {
 		}else if(BusinessConst.BEHAVIOR_BACK.equals(redbagQO.getBehavior())){  //退回
 			url = protocolType + host + ":" + port + "/imRedEnvelope/refundRedPacket";
 		}
-		//加密data
-//		String redbagData = AESOperator.encrypt(JSON.toJSONString(redbagQO));
-		//获取系统时间
-//		Long time = System.currentTimeMillis();
-		//得到MD5签名
-//		String sign = MD5Util.getSign(redbagData, time);
+		//获取加密对象
+		OpenParam openParam = AESUtil.returnOpenParam(redbagQO);
+		String data = AESUtil.decrypt(openParam.getData());
+		System.out.println(data);
 		//组装请求body
 		Map<String, Object> bodyMap = new HashMap<>();
 		//添加body参数
-//		bodyMap.put("time",time);
-//		bodyMap.put("signature",sign);
-//		bodyMap.put("operator","");
-		bodyMap.put("data",JSON.toJSONString(redbagQO));
+//		bodyMap.put("data",JSON.toJSONString(redbagQO));
+		bodyMap.put("openParam",openParam);
 		//组装http请求
 		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyMap);
 		//设置header
@@ -328,16 +322,12 @@ public class RedbagServiceImpl implements IRedbagService {
 	 * 定时退回过期红包 10分钟1次
 	 */
 	@Scheduled(cron = "0 */10 * * * ?")
+	@Transactional(rollbackFor = Exception.class)
 	public void sendBackExpiredRedbag(){
 		log.info(Thread.currentThread().getId() + " 过期红包扫描定时任务执行"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
 		List<String> expiredRedbags = redbagMapper.queryExpiredRedbag();
 		for(String uuid : expiredRedbags){
-			try{
-				sendBackRedbag(uuid);
-			}catch (ProprietorException e){
-				log.error(e.getMessage());
-				continue;
-			}
+			sendBackRedbag(uuid);
 		}
 		log.info(Thread.currentThread().getId() + " 过期红包扫描定时任务执行完成"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
 	}
