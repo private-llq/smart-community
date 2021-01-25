@@ -71,14 +71,14 @@ public class UserAccountController {
 	}
 	
 	/**
-	* @Description: 单发红包
+	* @Description: 单发红包、转账
 	 * @Param: [redBagQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2021/1/18
 	**/
 	@Login
-	@ApiOperation("【红包/转账】单发红包/转账")
+	@ApiOperation("【红包/转账】单发")
 	@PostMapping("redbag/send/single")
 	public CommonResult sendSingleRedbag(@RequestBody RedbagQO redbagQO){
 		ValidatorUtils.validateEntity(redbagQO, RedbagQO.singleRedbagValidated.class);
@@ -127,35 +127,55 @@ public class UserAccountController {
 		return CommonResult.ok("发送成功");
 	}
 	
-	@ApiOperation("【单红包】领取")
+	/**
+	* @Description: 领取红包/转账
+	 * @Param: [redbagQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/25
+	**/
+	@ApiOperation("【红包/转账】领取")
 	@PostMapping("redbag/receive/single")
-	public Map<String, Object> receiveSingleRedbag(@RequestBody RedbagQO redbagQO){
-		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
-		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
-		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
-		redbagQO1.setBusinessType(BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG);
-		redbagQO1.setBehavior(BusinessConst.BEHAVIOR_RECEIVE);
-		return redbagService.receiveRedbag(redbagQO1);
+	public CommonResult receiveSingleRedbag(@RequestBody RedbagQO redbagQO){
+		ValidatorUtils.validateEntity(redbagQO,RedbagQO.receiveSingleValidated.class);
+		if(!BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())
+		   && !BusinessConst.BUSINESS_TYPE_TRANSFER.equals(redbagQO.getBusinessType())){
+			return CommonResult.error("请明确领取红包还是转账");
+		}
+		redbagQO.setBehavior(BusinessConst.BEHAVIOR_RECEIVE);
+		return CommonResult.ok(redbagService.receiveRedbag(redbagQO),"领取成功");
 	}
 	
+	/**
+	* @Description: 领取群红包
+	 * @Param: [redbagQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/25
+	**/
 	@ApiOperation("【群红包】领取")
 	@PostMapping("redbag/receive/group")
-	public Map<String,Object> receiveGroupRedbag(@RequestBody RedbagQO redbagQO){
-		System.out.println(JSON.toJSONString(JSON.toJSONString(redbagQO)));
-		RedbagQO redbagQO1 = JSONObject.parseObject(redbagQO.getData(), RedbagQO.class);
-		ValidatorUtils.validateEntity(redbagQO1,RedbagQO.receiveSingleValidated.class);
-		redbagQO1.setBusinessType(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG);
-		redbagQO1.setBehavior(BusinessConst.BEHAVIOR_RECEIVE);
-		return redbagService.receiveRedbag(redbagQO1);
+	public CommonResult receiveGroupRedbag(@RequestBody RedbagQO redbagQO){
+		ValidatorUtils.validateEntity(redbagQO,RedbagQO.receiveSingleValidated.class);
+		redbagQO.setBusinessType(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG);
+		redbagQO.setBehavior(BusinessConst.BEHAVIOR_RECEIVE);
+		return CommonResult.ok(redbagService.receiveRedbag(redbagQO),"领取成功");
 	}
 	
-	@ApiOperation("【红包】退款")
-	@PostMapping("redbag/back")
-	public Map<String, Object> sendBackRedbag(@RequestBody Map<String,String> map){
-		if(StringUtils.isEmpty(map.get("uuid"))){
-			return null;
-		}
-		return redbagService.sendBackRedbag(map.get("uuid"));
-	}
+	/**
+	* @Description: 红包/转账 退款
+	 * @Param: [map]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/25
+	**/
+//	@ApiOperation("【红包/转账】退款")
+//	@PostMapping("redbag/back")
+//	public CommonResult sendBackRedbag(@RequestBody Map<String,String> map){
+//		if(StringUtils.isEmpty(map.get("uuid"))){
+//			return CommonResult.error("缺少退款人");
+//		}
+//		return CommonResult.ok(redbagService.sendBackRedbag(map.get("uuid")),"已退回");
+//	}
 	
 }
