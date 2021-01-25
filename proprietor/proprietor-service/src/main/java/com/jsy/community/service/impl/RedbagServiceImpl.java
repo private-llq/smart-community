@@ -259,36 +259,29 @@ public class RedbagServiceImpl implements IRedbagService {
 		}
 		//获取加密对象
 		OpenParam openParam = AESUtil.returnOpenParam(redbagQO);
-		String data = AESUtil.decrypt(openParam.getData());
-		System.out.println(data);
 		//组装请求body
-		Map<String, Object> bodyMap = new HashMap<>();
-		//添加body参数
-//		bodyMap.put("data",JSON.toJSONString(redbagQO));
-		bodyMap.put("openParam",openParam);
+		Map<String, Object> bodyMap = JSONObject.parseObject(JSON.toJSONString(openParam), Map.class);
 		//组装http请求
 		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyMap);
 		//设置header
 		MyHttpUtils.setDefaultHeader(httpPost);
 		//设置默认配置
 		MyHttpUtils.setRequestConfig(httpPost);
-		JSONObject result = null;
+		OpenParam result = null;
 		String httpResult = null;
+		String data = "";
 		try{
 			//执行请求，解析结果
 			httpResult = MyHttpUtils.exec(httpPost);
-//			result = JSONObject.parseObject(httpResult);
+			result = JSONObject.parseObject(httpResult, OpenParam.class);
+			data = AESUtil.decrypt(result.getData());
 		}catch (Exception e) {
 			log.error("红包远程服务 - 执行或解析出错，json解析结果" + result);
 			e.printStackTrace();
 			return false;
 		}
-		System.out.println("返回结果：" + httpResult);
-		return redbagQO.getUuid().equals(httpResult);
-//		if(result != null){
-//			return result.getIntValue("code") == 154;
-//		}
-//		return false;
+		System.out.println("返回状态码：" + data);
+		return "0".equals(data);
 	}
 	
 	/**
