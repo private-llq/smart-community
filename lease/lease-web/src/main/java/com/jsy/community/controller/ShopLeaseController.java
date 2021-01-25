@@ -172,7 +172,7 @@ public class ShopLeaseController {
 	
 	@ApiOperation("商铺发布")
 	@PostMapping("/addShop")
-	@Log(operationType = LogTypeConst.INSERT,module = LogModule.LEASE,isSaveRequestData = true)
+	@Log(operationType = LogTypeConst.INSERT, module = LogModule.LEASE, isSaveRequestData = true)
 	public CommonResult addShop(@RequestBody ShopQO shop) {
 		shop.setUid(UserUtils.getUserId());
 		// 业主发布
@@ -281,7 +281,7 @@ public class ShopLeaseController {
 	@ApiOperation("查询商铺类型和行业[发布的时候添加]")
 	@GetMapping("/getPublishTags")
 	@Login(allowAnonymous = true)
-	public CommonResult getPublishTags(){
+	public CommonResult getPublishTags() {
 		Map<String, Object> map = shopLeaseService.getPublishTags();
 		return CommonResult.ok(map);
 	}
@@ -289,7 +289,7 @@ public class ShopLeaseController {
 	@ApiOperation("测试httpclient")
 	@PostMapping("/httpclient")
 	@Login(allowAnonymous = true)
-	public CommonResult getHttpclient(@RequestBody ProprietorLog log){
+	public CommonResult getHttpclient(@RequestBody ProprietorLog log) {
 		System.out.println(log);
 		System.out.println("1");
 		return CommonResult.ok();
@@ -308,7 +308,7 @@ public class ShopLeaseController {
 		HttpPost httpPost = new HttpPost("http://localhost:8001/api/v1/lease/shop/httpclient");
 		ProprietorLog user = new ProprietorLog();
 		user.setName("潘晓婷");
-
+		
 		// 我这里利用阿里的fastjson，将Object转换为json字符串;
 		// (需要导入com.alibaba.fastjson.JSON包)
 		String jsonString = JSON.toJSONString(user);

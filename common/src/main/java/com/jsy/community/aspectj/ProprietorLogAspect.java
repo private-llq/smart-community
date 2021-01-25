@@ -78,23 +78,6 @@ public class ProprietorLogAspect {
 	public void doBefore() {
 	}
 	
-//	/**
-//	 * @return void
-//	 * @Author lihao
-//	 * @Description 后置通知
-//	 * @Date 2021/1/22 16:26
-//	 * @Param [joinPoint, res]
-//	 **/
-//	@AfterReturning(pointcut = "logPointCut()", returning = "res")
-//	public void doAfterReturning(JoinPoint joinPoint, Object res) {
-//		// 获取开始时间
-//		Long startTime = System.currentTimeMillis();
-//		// 获取结束时间
-//		long endTime = System.currentTimeMillis();
-//		handleLog(joinPoint, null, startTime, endTime);
-//	}
-	
-	
 	/**
 	 * @return void
 	 * @Author lihao
@@ -267,9 +250,9 @@ public class ProprietorLogAspect {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			log.info("异常开始发生了");
-			log.error("异常："+e.getMessage());
-			log.info("异常产生原因：物业端没有打开  记录日志 目前采用的是记录到物业端  若没有打开物业端不会影响正常业务 只是不保存业主操作记录 ");
+//			log.info("异常开始发生了");
+//			log.error("异常："+e.getMessage());
+//			log.info("异常产生原因：物业端没有打开  记录日志 目前采用的是记录到物业端  若没有打开物业端不会影响正常业务 只是不保存业主操作记录 ");
 //			e.printStackTrace();
 		} finally {
 			try {
