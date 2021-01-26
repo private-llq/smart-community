@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>payment-system-web</artifactId>
+    <artifactId>payment-system</artifactId>
     <packaging>pom</packaging>
     <modules>
         <module>pay-system-web</module>
