@@ -25,6 +25,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -47,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 @Api(tags = "用户认证控制器")
 @RestController
 @ApiJSYController
+@Slf4j
 public class UserAuthController {
 	
 	@Autowired
@@ -99,7 +101,7 @@ public class UserAuthController {
 		if (StrUtil.isEmpty(qo.getCode()) && StrUtil.isEmpty(qo.getPassword())) {
 			throw new ProprietorException("验证码和密码不能同时为空");
 		}
-		
+		log.info(qo.getAccount() + "开始登录");
 		UserInfoVo infoVo = userService.login(qo);
 		
 		//生成带token和用户信息的的UserAuthVo
