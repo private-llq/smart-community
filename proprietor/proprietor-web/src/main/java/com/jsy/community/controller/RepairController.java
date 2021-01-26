@@ -4,6 +4,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRepairService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairEntity;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -85,12 +87,17 @@ public class RepairController {
 	@ApiOperation("报修内容图片上传")
 	@PostMapping("/uploadRepairImg")
 	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files) {
+		if (files.length > 3) {
+			throw new ProprietorException("只能上传3张图片");
+		}
 		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME);
 		StringBuilder filePath = new StringBuilder();
 		for (String s : filePaths) {
-			redisTemplate.opsForSet().add("repair_img_part", s); // TODO 前端要注意调整 repairImg
-			filePath.append(s);
-			filePath.append(";");
+			if (!StringUtils.isEmpty(s)) {
+				redisTemplate.opsForSet().add("repair_img_part", s); // TODO 前端要注意调整 repairImg
+				filePath.append(s);
+				filePath.append(";");
+			}
 		}
 		return CommonResult.ok(filePath);
 	}
@@ -107,13 +114,18 @@ public class RepairController {
 	@ApiOperation("评价图片上传")
 	@PostMapping("/uploadCommentImg")
 	public CommonResult uploadCommentImg(@RequestParam("file") MultipartFile[] files) {
+		if (files.length > 3) {
+			throw new ProprietorException("只能上传3张图片");
+		}
 		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME2);
 		StringBuilder filePath = new StringBuilder();
 		for (String s : filePaths) {
 			// TODO 前端要注意调整 repairImg
-			redisTemplate.opsForSet().add("repair_comment_img_part", s);
-			filePath.append(s);
-			filePath.append(";");
+			if (!StringUtils.isEmpty(s)) {
+				redisTemplate.opsForSet().add("repair_comment_img_part", s);
+				filePath.append(s);
+				filePath.append(";");
+			}
 		}
 		return CommonResult.ok(filePath);
 	}
@@ -128,9 +140,6 @@ public class RepairController {
 		return CommonResult.ok();
 	}
 	
-	
-	
-
 
 //	@ApiOperation("完成报修")
 //	@GetMapping("/completeRepair")

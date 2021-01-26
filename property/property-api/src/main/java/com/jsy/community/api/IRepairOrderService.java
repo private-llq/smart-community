@@ -50,7 +50,7 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Date 2020/12/9 16:42
 	 * @Param [id]
 	 **/
-	String listOrderImg(Long id);
+	String getOrderImg(Long id);
 	
 	/**
 	 * @return void

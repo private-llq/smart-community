@@ -45,13 +45,13 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		Long page = baseQO.getPage();
 		Long size = baseQO.getSize();
 		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("community_id",communityId);
+		queryWrapper.eq("community_id", communityId);
 		
-		Page<RepairOrderEntity> repairOrderEntityPage = new Page<>(page,size);
+		Page<RepairOrderEntity> repairOrderEntityPage = new Page<>(page, size);
 		Page<RepairOrderEntity> selectPage = repairOrderMapper.selectPage(repairOrderEntityPage, queryWrapper);
 		
 		PageInfo<RepairOrderEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(selectPage,pageInfo);
+		BeanUtils.copyProperties(selectPage, pageInfo);
 		return pageInfo;
 	}
 	
@@ -59,6 +59,13 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	@Override
 	public void dealOrder(Long id) {
 		RepairEntity repairEntity = commOrder(id);
+		if (repairEntity==null) {
+			throw new PropertyException("该订单不存在");
+		}
+		Integer status = repairEntity.getStatus();
+		if (!status.equals(0)) {
+			throw new PropertyException("该报修订单已处理");
+		}
 		repairEntity.setStatus(1); // 将状态设置为 处理中
 		repairMapper.updateById(repairEntity); // 更新报修表
 	}
@@ -66,6 +73,10 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	@Override
 	public void successOrder(Long id) {
 		RepairEntity repairEntity = commOrder(id);
+		Integer status = repairEntity.getStatus();
+		if (!status.equals(1)) {
+			throw new PropertyException("该报修订单未曾处理，不能直接完成");
+		}
 		repairEntity.setStatus(2); // 将状态设置为 已处理
 		repairMapper.updateById(repairEntity); // 更新报修表
 	}
@@ -75,29 +86,34 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		RepairEntity repairEntity = commOrder(id);
 		String userId = repairEntity.getUserId();
 		QueryWrapper<UserEntity> entityQueryWrapper = new QueryWrapper<>();
-		entityQueryWrapper.eq("uid",userId);
+		entityQueryWrapper.eq("uid", userId);
 		return userMapper.selectOne(entityQueryWrapper);
 	}
 	
 	@Override
-	public String listOrderImg(Long id) {
-		RepairEntity repairEntity = commOrder(id);
+	public String getOrderImg(Long id) {
+		QueryWrapper<RepairEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id",id);
+		RepairEntity repairEntity = repairMapper.selectOne(queryWrapper);
+		if (repairEntity==null) {
+			throw new PropertyException("该订单不存在");
+		}
 		return repairEntity.getRepairImg();
 	}
 	
-
-	private RepairEntity commOrder(Long id){
+	
+	private RepairEntity commOrder(Long id) {
 		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("repair_id",id);
+		queryWrapper.eq("repair_id", id);
 		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(queryWrapper);
 		
-		if (orderEntity==null) {
+		if (orderEntity == null) {
 			throw new PropertyException("该报修订单不存在");
 		}
 		
 		Long repairId = orderEntity.getRepairId();
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("id",repairId);
+		wrapper.eq("id", repairId);
 		return repairMapper.selectOne(wrapper);
 	}
 }

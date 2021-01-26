@@ -73,8 +73,8 @@ public class RepairOrderController {
 	@ApiOperation("查看图片信息")
 	@GetMapping("/listOrderImg")
 	public CommonResult listOrderImg(@ApiParam("报修订单id") @RequestParam Long id) {
-		String filePath = repairOrderService.listOrderImg(id);
-		return CommonResult.ok(filePath);
+		String img = repairOrderService.getOrderImg(id);
+		return CommonResult.ok(img);
 	}
 	
 	
