@@ -12,13 +12,11 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.MyMathUtils;
-import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.qo.proprietor.VisitorQO;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -78,6 +76,11 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         List<VisitorPersonRecordEntity> personRecordList = visitorEntity.getVisitorPersonRecordList();
         if (!CollectionUtils.isEmpty(personRecordList)) {
             for (VisitorPersonRecordEntity personRecord : personRecordList) {
+                try{
+                    ValidatorUtils.validateEntity(personRecord);
+                }catch (JSYException e){
+                    throw new ProprietorException(e.getCode(),e.getMessage());
+                }
                 personRecord.setVisitorId(visitorId);
                 personRecord.setId(SnowFlake.nextId());
             }
@@ -87,6 +90,11 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         List<VisitingCarRecordEntity> carRecordList = visitorEntity.getVisitingCarRecordList();
         if (!CollectionUtils.isEmpty(carRecordList)) {
             for (VisitingCarRecordEntity carRecord : carRecordList) {
+                try{
+                    ValidatorUtils.validateEntity(carRecord);
+                }catch (JSYException e){
+                    throw new ProprietorException(e.getCode(),e.getMessage());
+                }
                 carRecord.setVisitorId(visitorId);
                 carRecord.setId(SnowFlake.nextId());
             }

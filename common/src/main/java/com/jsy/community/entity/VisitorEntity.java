@@ -104,6 +104,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private String carPlate;
     
     @ApiModelProperty(value = "来访车辆类型", hidden = true)
+    @Range(min = 1, max = 5, message = "车辆类型不正确")
     private Integer carType;
     
     @ApiModelProperty(value = "来访车辆类型名", hidden = true)

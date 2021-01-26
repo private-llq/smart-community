@@ -9,6 +9,7 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitingCarQO;
 import com.jsy.community.qo.proprietor.VisitorPersonQO;
@@ -19,6 +20,7 @@ import com.jsy.community.vo.VisitorEntryVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,6 +58,9 @@ public class VisitorController {
 	public CommonResult<VisitorEntryVO> save(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity);
 		visitorEntity.setUid(UserUtils.getUserId());
+		if(visitorEntity.getCarType() != null && StringUtils.isEmpty(visitorEntity.getCarPlate())){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "填写车辆类型后车牌号不能为空");
+		}
 		return CommonResult.ok(iVisitorService.addVisitor(visitorEntity));
 	}
 	

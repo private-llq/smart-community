@@ -28,16 +28,11 @@ public class VisitorPersonRecordEntity extends BaseEntity implements Serializabl
     private Long visitorId;
 
     @ApiModelProperty(value = "随行人员姓名")
-    @NotBlank(groups = {addPersonValidatedGroup.class}, message = "缺少随行人员姓名")
+    @NotBlank(message = "缺少随行人员姓名")
     private String name;
     
     @ApiModelProperty(value = "随行人员手机号")
-    @Pattern(groups = {addPersonValidatedGroup.class}, regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+    @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     private String mobile;
     
-    /**
-     * 添加随行人员前端参数验证接口
-     */
-    public interface addPersonValidatedGroup{}
-
 }
