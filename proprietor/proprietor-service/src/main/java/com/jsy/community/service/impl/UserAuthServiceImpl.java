@@ -85,6 +85,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	
 	private String checkUserByPassword(LoginQO qo, String field) {
 		UserAuthEntity entity = baseMapper.queryUserByField(qo.getAccount(), field);
+		if(entity == null){
+			throw new ProprietorException("账号不存在，请检查输入是否正确或先注册");
+		}
 		String password = SecureUtil.sha256(qo.getPassword() + entity.getSalt());
 		if (password.equals(entity.getPassword())) {
 			return entity.getUid();
