@@ -10,7 +10,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * @program: com.jsy.community
@@ -30,8 +29,6 @@ public class WeChatListener{
      */
     @RabbitListener(queues = {"queue_wechat"})
     public void receive_queue_wechat (WeChatOrderEntity msg, Message message, Channel channel)throws IOException {
-        System.out.println(weChatService);
-        System.out.println(msg);
         weChatService.insertOrder(msg);
         //手动确认
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
@@ -46,11 +43,13 @@ public class WeChatListener{
      */
     @RabbitListener(queues = {"queue_wechat_delay"})
     public void receive_wechat_delay (String msg, Message message, Channel channel)throws IOException {
-        System.out.println(new Date());
-        System.out.println(msg);
-        System.out.println(message.getBody());
-        System.out.println(channel);
-
+        WeChatOrderEntity one = weChatService.getOrderOne(msg);
+        System.out.println(one);
+        if (one!=null){
+            if (one.getOrderStatus()!=2){
+                weChatService.deleteByOrder(msg);
+            }
+        }
         //手动确认
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 

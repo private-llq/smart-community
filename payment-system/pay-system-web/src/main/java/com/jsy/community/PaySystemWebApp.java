@@ -3,7 +3,6 @@ package com.jsy.community;
 import org.apache.dubbo.config.spring.context.annotation.DubboComponentScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.PropertySource;
 
 /**
@@ -13,7 +12,6 @@ import org.springframework.context.annotation.PropertySource;
  * @create: 2021-01-22 14:00
  **/
 @SpringBootApplication
-@EnableDiscoveryClient
 @DubboComponentScan
 @PropertySource(value = "classpath:common-web.properties")
 public class PaySystemWebApp {

@@ -19,10 +19,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,15 +69,13 @@ public class WeChatController {
         msg.setArriveStatus(1);
 
 
-
-
         //mq异步保存账单到数据库
         amqpTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
         //半个小时如果还没支付就自动删除数据库账单
-        amqpTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", "曹尼玛", new MessagePostProcessor() {
+        amqpTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
-                message.getMessageProperties().setHeader("x-delay",60000);
+                message.getMessageProperties().setHeader("x-delay",20000);
                 return message;
             }
         });
@@ -93,11 +88,31 @@ public class WeChatController {
         return CommonResult.ok(object);
     }
 
+    /**
+     * @Description: 支付成功回调地址
+     * @author: Hu
+     * @since: 2021/1/26 17:08
+     * @Param:
+     * @return:
+     */
     @RequestMapping(value = "/callback", method = {org.springframework.web.bind.annotation.RequestMethod.POST, org.springframework.web.bind.annotation.RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         System.err.println("回调成功");
         String out_trade_no = PublicConfig.notify(request, response, WehatConfig.API_V3_KEY);
 
         System.out.println(out_trade_no);
+    }
+
+
+    /**
+     * @Description:
+     * @author: Hu
+     * @since: 2021/1/26 17:09
+     * @Param:
+     * @return:
+     */
+    @GetMapping(value = "/restCallback")
+    public WeChatOrderEntity callback(@RequestParam("orderId") String orderId) throws Exception {
+        return weChatService.saveOrder(orderId);
     }
 }

@@ -11,4 +11,10 @@ import com.jsy.community.entity.WeChatOrderEntity;
  **/
 public interface IWeChatService extends IService<WeChatOrderEntity> {
     void insertOrder(WeChatOrderEntity msg);
+
+    WeChatOrderEntity getOrderOne(String msg);
+
+    void deleteByOrder(String msg);
+
+    WeChatOrderEntity saveOrder(String orderId);
 }
