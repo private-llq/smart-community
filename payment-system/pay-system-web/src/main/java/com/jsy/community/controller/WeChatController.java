@@ -3,17 +3,21 @@ package com.jsy.community.controller;
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WehatConfig;
+import com.jsy.community.constant.Const;
+import com.jsy.community.entity.WeChatOrderEntity;
 import com.jsy.community.qo.WeChatPayVO;
 import com.jsy.community.utils.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import net.sf.json.JSONObject;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,8 +40,10 @@ import java.util.Map;
 @ApiJSYController
 public class WeChatController {
 
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private IWeChatService weChatService;
     @Autowired
-    private AmqpTemplate amqpTemplate;
+    private RabbitTemplate amqpTemplate;
 
     @PostMapping("/wxPay")
     @Login
@@ -55,14 +60,18 @@ public class WeChatController {
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://jsy.free.vipnps.vip/callback");
         map.put("amount",hashMap);
-        System.out.println(UserUtils.getUserId());
+
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
-        System.out.println(wxPayRequestJsonStr);
-        Map<String, Object> msg = new HashMap<>();
-        msg.put("uid",UserUtils.getUserId());
-        msg.put("total",weChatPayVO.getTotal());
-        msg.put("description",weChatPayVO.getDescription());
-        msg.put("orderNo",map.get("out_trade_no"));
+
+        WeChatOrderEntity msg = new WeChatOrderEntity();
+        msg.setOrderNo((String) map.get("out_trade_no"));
+        msg.setUid(UserUtils.getUserId());
+        msg.setDescription(weChatPayVO.getDescription());
+        msg.setTotal(weChatPayVO.getTotal());
+        msg.setOrderStatus(1);
+        msg.setArriveStatus(1);
+
+
 
 
         //mq异步保存账单到数据库

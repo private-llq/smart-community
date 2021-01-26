@@ -126,6 +126,8 @@ public class RelationServiceImpl implements IRelationService {
         HouseMemberEntity houseMemberEntity = houseMemberMapper.selectById(RelationId);
         List<CarEntity> carEntities = carMapper.selectList(new QueryWrapper<CarEntity>().eq("house_member_id", RelationId));
         RelationVO relationVO = new RelationVO();
+        relationVO.setIdentificationType(houseMemberEntity.getIdentificationType());
+        relationVO.setId(houseMemberEntity.getId());
         relationVO.setPhoneTel(houseMemberEntity.getMobile());
         relationVO.setName(houseMemberEntity.getName());
         relationVO.setIdNumber(houseMemberEntity.getIdCard());
@@ -185,8 +187,10 @@ public class RelationServiceImpl implements IRelationService {
     public void updateUserRelationDetails(RelationQo relationQo) {
         relationMapper.updateUserRelationDetails(relationQo);
         List<RelationCarsQo> cars = relationQo.getCars();
-        for (RelationCarsQo relationCarsQo : cars) {
-            relationMapper.updateUserRelationCar(relationCarsQo);
+        if(cars.size()>0){
+            for (RelationCarsQo relationCarsQo : cars) {
+                relationMapper.updateUserRelationCar(relationCarsQo);
+            }
         }
     }
 

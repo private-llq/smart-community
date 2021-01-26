@@ -7,7 +7,8 @@ public interface Const {
 	String group_property = "property"; //物业端
 	String group_proprietor = "proprietor"; //业主端
 	String group_lease = "lease"; //房屋租售端
-	
+	String group_payment = "payment"; //移动支付端
+
 	interface ThirdPlatformConsts {
 		int ALIPAY = 1;//支付宝
 		int WECHAT = 2;//微信

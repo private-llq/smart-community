@@ -2,7 +2,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: payment-web
+    name: payment-service
   profiles:
     active: dev
   cloud:
@@ -29,7 +29,7 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: payment-web
+    subscribed-services: payment-service
   consumer:
     retries: 0
     timeout: 99999
