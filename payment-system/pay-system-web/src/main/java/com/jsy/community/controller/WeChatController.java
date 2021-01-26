@@ -83,8 +83,6 @@ public class WeChatController {
         String prepayId = PublicConfig.V3PayGet("v3/pay/transactions/app", wxPayRequestJsonStr, WehatConfig.MCH_ID, WehatConfig.MCH_SERIAL_NO, WehatConfig.FILE_NAME);
         //第二步获取调起支付的参数
         JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WehatConfig.APPID, WehatConfig.FILE_NAME));
-
-
         return CommonResult.ok(object);
     }
 
@@ -95,7 +93,7 @@ public class WeChatController {
      * @Param:
      * @return:
      */
-    @RequestMapping(value = "/callback", method = {org.springframework.web.bind.annotation.RequestMethod.POST, org.springframework.web.bind.annotation.RequestMethod.GET})
+    @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         System.err.println("回调成功");
         String out_trade_no = PublicConfig.notify(request, response, WehatConfig.API_V3_KEY);

@@ -44,7 +44,6 @@ public class WeChatListener{
     @RabbitListener(queues = {"queue_wechat_delay"})
     public void receive_wechat_delay (String msg, Message message, Channel channel)throws IOException {
         WeChatOrderEntity one = weChatService.getOrderOne(msg);
-        System.out.println(one);
         if (one!=null){
             if (one.getOrderStatus()!=2){
                 weChatService.deleteByOrder(msg);

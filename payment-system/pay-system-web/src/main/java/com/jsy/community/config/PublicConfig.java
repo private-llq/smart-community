@@ -78,11 +78,9 @@ public class PublicConfig {
         CloseableHttpResponse response = client.execute(httpPost);
         //获取结果实体
         HttpEntity entity = response.getEntity();
-        System.out.println(entity);
         if (entity != null) {
             //按指定编码转换结果实体为String类型
             body = EntityUtils.toString(entity, charset);
-            System.out.println(body);
         }
         EntityUtils.consume(entity);
         //释放链接
