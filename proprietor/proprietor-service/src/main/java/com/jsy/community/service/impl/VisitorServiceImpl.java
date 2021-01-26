@@ -88,12 +88,22 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         }
         //添加随行车辆记录
         List<VisitingCarRecordEntity> carRecordList = visitorEntity.getVisitingCarRecordList();
+        //检查一次来访中的车牌号重复
+        List<String> carPlateList = new ArrayList<>();
+        if(!StringUtils.isEmpty(visitorEntity.getCarPlate())){
+            carPlateList.add(visitorEntity.getCarPlate());
+        }
         if (!CollectionUtils.isEmpty(carRecordList)) {
             for (VisitingCarRecordEntity carRecord : carRecordList) {
                 try{
                     ValidatorUtils.validateEntity(carRecord);
                 }catch (JSYException e){
                     throw new ProprietorException(e.getCode(),e.getMessage());
+                }
+                if(carPlateList.contains(carRecord.getCarPlate())){
+                    throw new ProprietorException("一次访问中不允许有两个以上相同车牌");
+                }else{
+                    carPlateList.add(carRecord.getCarPlate());
                 }
                 carRecord.setVisitorId(visitorId);
                 carRecord.setId(SnowFlake.nextId());
