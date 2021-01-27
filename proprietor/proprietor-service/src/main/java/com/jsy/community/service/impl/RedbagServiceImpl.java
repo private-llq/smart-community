@@ -317,7 +317,7 @@ public class RedbagServiceImpl implements IRedbagService {
 	/**
 	 * 定时退回过期红包 10分钟1次
 	 */
-	@Scheduled(cron = "0 */1 * * * ?")
+	@Scheduled(cron = "0 */10 * * * ?")
 	@Transactional(rollbackFor = Exception.class)
 	public void sendBackExpiredRedbag(){
 		log.info(Thread.currentThread().getId() + " 过期红包扫描定时任务执行"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
