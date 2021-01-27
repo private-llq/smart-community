@@ -82,7 +82,7 @@ public class RedbagServiceImpl implements IRedbagService {
 		//调用发红包接口
 		boolean b = sendRedbagByHttp(redbagQO);
 		if(!b){
-			throw new ProprietorException("调用远程服务，红包发送失败");
+			throw new ProprietorException("调用服务异常，红包发送失败");
 		}
 	}
 	
@@ -131,7 +131,7 @@ public class RedbagServiceImpl implements IRedbagService {
 			redbagQO.setMoney(entity.getMoney());
 			boolean b = sendRedbagByHttp(redbagQO);
 			if(!b){
-				throw new ProprietorException("调用远程服务，红包/转账领取失败");
+				throw new ProprietorException("调用服务异常，红包/转账领取失败");
 			}
 		}else if(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())){ //群红包
 			RedbagEntity entity = redbagMapper.selectOne(new QueryWrapper<RedbagEntity>().select("*")
@@ -167,7 +167,7 @@ public class RedbagServiceImpl implements IRedbagService {
 			//调用领取接口
 			boolean b = sendRedbagByHttp(redbagQO);
 			if(!b){
-				throw new ProprietorException("调用远程服务，红包领取失败");
+				throw new ProprietorException("调用服务异常，红包领取失败");
 			}
 		}
 		return returnMap;
@@ -224,7 +224,7 @@ public class RedbagServiceImpl implements IRedbagService {
 		redbagQO.setBehavior(BusinessConst.BEHAVIOR_BACK);
 		boolean b = sendRedbagByHttp(redbagQO);
 		if(!b){
-			throw new ProprietorException("调用远程服务，红包退回失败");
+			throw new ProprietorException("调用服务异常，红包退回失败");
 		}
 		return returnMap;
 	}
@@ -281,6 +281,9 @@ public class RedbagServiceImpl implements IRedbagService {
 			return false;
 		}
 		System.out.println("返回状态码：" + data);
+		if("164".equals(data)){
+			throw new ProprietorException("已经领过啦");
+		}
 		return "0".equals(data);
 	}
 	
@@ -314,7 +317,7 @@ public class RedbagServiceImpl implements IRedbagService {
 	/**
 	 * 定时退回过期红包 10分钟1次
 	 */
-	@Scheduled(cron = "0 */10 * * * ?")
+	@Scheduled(cron = "0 */1 * * * ?")
 	@Transactional(rollbackFor = Exception.class)
 	public void sendBackExpiredRedbag(){
 		log.info(Thread.currentThread().getId() + " 过期红包扫描定时任务执行"+ LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute());
