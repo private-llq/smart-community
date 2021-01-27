@@ -601,13 +601,17 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			
 			// 封装地址
-			Long cityId = record.getCityId();
-			String city = redisTemplate.opsForValue().get("RegionSingle" + ":" + cityId);
+			// 城市地址
+//			Long cityId = record.getCityId();
+//			String city = redisTemplate.opsForValue().get("RegionSingle" + ":" + cityId);
 			
 			Long areaId = record.getAreaId();
 			String area = redisTemplate.opsForValue().get("RegionSingle" + ":" + areaId);
 			
-			indexShopVO.setAddress(city + "  " + area);
+			Long communityId = record.getCommunityId();
+			CommunityEntity community = communityService.getCommunityNameById(communityId);
+			
+			indexShopVO.setAddress(area+"  "+community.getName());
 		}
 		PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(page, pageInfo);

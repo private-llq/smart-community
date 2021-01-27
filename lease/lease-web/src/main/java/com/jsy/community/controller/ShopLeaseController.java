@@ -266,6 +266,34 @@ public class ShopLeaseController {
 	@Login
 	public CommonResult updateShop(@RequestBody ShopQO shop,
 	                               @ApiParam("店铺id") @RequestParam Long shopId) {
+		String[] imgPath = shop.getImgPath();
+		
+		// 图片名称必须是 shop-head-img 或 shop-middle-img 或 shop-other-img组成的
+		for (String s : imgPath) {
+			boolean b = s.contains("shop-head-img") || s.contains("shop-middle-img") || s.contains("shop-other-img");
+			if (!b) {
+				throw new LeaseException("您添加的图片不符合规范，请重新添加");
+			}
+		}
+		// 必须要至少有一个 shop-head-img 和 shop-middle-img 和 shop-other-img
+		int headCount = 0;
+		int middleCount = 0;
+		int otherCount = 0;
+		for (String s : imgPath) {
+			if (s.contains("shop-head-img")) {
+				headCount+=1;
+			}
+			if (s.contains("shop-middle-img")) {
+				middleCount+=1;
+			}
+			if (s.contains("shop-other-img")) {
+				otherCount+=1;
+			}
+		}
+		if (headCount==0||middleCount==0||otherCount==0) {
+			throw new LeaseException("请添加所有图片");
+		}
+		
 		shop.setUid(UserUtils.getUserId());
 		shop.setSource(1);
 		ValidatorUtils.validateEntity(shop, ShopQO.updateShopValidate.class);

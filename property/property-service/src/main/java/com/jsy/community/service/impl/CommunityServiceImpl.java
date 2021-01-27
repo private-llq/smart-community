@@ -60,4 +60,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		communityEntity.setName("测试分布式事物");
 		communityMapper.insert(communityEntity);
 	}
+	
+	@Override
+	public CommunityEntity getCommunityNameById(Long communityId) {
+		return communityMapper.selectById(communityId);
+	}
 }
