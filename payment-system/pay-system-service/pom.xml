@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>pay-system-service</artifactId>
+    <name>三方支付提供模块</name>
     <dependencies>
         <dependency>
             <groupId>com.jsy</groupId>
@@ -30,7 +31,6 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -44,5 +44,4 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
     </dependencies>
-
 </project>

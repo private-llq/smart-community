@@ -3,6 +3,7 @@ package com.jsy.community.config;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
+import com.jsy.community.MyHttpClient;
 import com.jsy.community.utils.AesUtil;
 import net.sf.json.JSONObject;
 import okhttp3.HttpUrl;
@@ -123,7 +124,7 @@ public class PublicConfig {
         String packageSign = sign(buildSignMessage(list).getBytes(), privateKeyFilePath);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("appId", appId);
-        jsonObject.put("partnerId", WehatConfig.MCH_ID);
+        jsonObject.put("partnerId", WechatConfig.MCH_ID);
         jsonObject.put("prepayId", prepayId);
         jsonObject.put("package", "Sign=WXPay");
         //jsonObject.put("packages", packageStr);
@@ -318,6 +319,42 @@ public class PublicConfig {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    /**
+     * @Description: 关闭订单避免重复支付
+     * @author: Hu
+     * @since: 2021/1/27 11:39
+     * @Param:
+     * @return:
+     */
+    public static void CloseOrder(String order) throws Exception {
+
+        //请求URL
+        HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/pay/transactions/out-trade-no/"+order+"/close");
+        //请求body参数
+        String reqdata ="{\"mchid\": \""+WechatConfig.MCH_ID+"\"}";
+
+        StringEntity entity = new StringEntity(reqdata);
+        entity.setContentType("application/json");
+        httpPost.setEntity(entity);
+        httpPost.setHeader("Accept", "application/json");
+
+        //完成签名并执行请求
+        CloseableHttpResponse response = MyHttpClient.createHttpClient().execute(httpPost);
+        try {
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 200) {
+                System.out.println("success,return body = " + EntityUtils.toString(response.getEntity()));
+            } else if (statusCode == 204) {
+                System.out.println("success");
+            } else {
+                System.out.println("failed,resp code = " + statusCode+ ",return body = " + EntityUtils.toString(response.getEntity()));
+                throw new IOException("request failed");
+            }
+        } finally {
+            response.close();
         }
     }
 }
