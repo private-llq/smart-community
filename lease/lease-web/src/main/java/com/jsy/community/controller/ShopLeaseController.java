@@ -44,7 +44,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -178,10 +177,33 @@ public class ShopLeaseController {
 	@Log(operationType = LogTypeConst.INSERT, module = LogModule.LEASE, isSaveRequestData = true)
 	public CommonResult addShop(@RequestBody ShopQO shop) {
 		String[] imgPath = shop.getImgPath();
-		List<String> strings = Arrays.asList(imgPath);
-		if (!strings.contains("shop-head-img")||!strings.contains("shop-middle-img")||!strings.contains("shop-other-img")) {
+		
+		// 图片名称必须是 shop-head-img 或 shop-middle-img 或 shop-other-img组成的
+		for (String s : imgPath) {
+			boolean b = s.contains("shop-head-img") || s.contains("shop-middle-img") || s.contains("shop-other-img");
+			if (!b) {
+				throw new LeaseException("您添加的图片不符合规范，请重新添加");
+			}
+		}
+		// 必须要至少有一个 shop-head-img 和 shop-middle-img 和 shop-other-img
+		int headCount = 0;
+		int middleCount = 0;
+		int otherCount = 0;
+		for (String s : imgPath) {
+			if (s.contains("shop-head-img")) {
+				headCount+=1;
+			}
+			if (s.contains("shop-middle-img")) {
+				middleCount+=1;
+			}
+			if (s.contains("shop-other-img")) {
+				otherCount+=1;
+			}
+		}
+		if (headCount==0||middleCount==0||otherCount==0) {
 			throw new LeaseException("请添加所有图片");
 		}
+		
 		shop.setUid(UserUtils.getUserId());
 		// 业主发布
 		shop.setSource(1);
@@ -296,7 +318,7 @@ public class ShopLeaseController {
 	
 	@ApiOperation("根据区域id查询小区列表")
 	@GetMapping("/getCommunity")
-	public CommonResult getCommunity(Long areaId){
+	public CommonResult getCommunity(Long areaId) {
 		List<CommunityEntity> communityList = shopLeaseService.getCommunity(areaId);
 		return CommonResult.ok(communityList);
 	}
