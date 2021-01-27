@@ -60,6 +60,14 @@ public class WeChatListener{
 
     }
 
+    public static void main(String[] args) {
+        try {
+            PublicConfig.QueryOrder("202101271743464694218605");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 

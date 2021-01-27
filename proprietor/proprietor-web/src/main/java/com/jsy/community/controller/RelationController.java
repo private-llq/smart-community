@@ -88,7 +88,7 @@ public class RelationController {
 
 
     @ApiOperation("删除家属信息及其车辆")
-    @PutMapping("/delete")
+    @PostMapping("/delete")
     @Login
     public CommonResult delete(@RequestParam("id") Long id){
         relationService.deleteHouseMemberCars(id);
