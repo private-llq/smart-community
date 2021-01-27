@@ -9,7 +9,6 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.UserInfoVo;
-import com.jsy.community.vo.admin.AdminInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -32,7 +31,6 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		
 		//===================================== 需要授权的敏感操作 ========================================
 		Auth authAnnotation;
 		if (handler instanceof HandlerMethod) {

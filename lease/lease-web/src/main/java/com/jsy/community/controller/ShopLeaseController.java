@@ -7,9 +7,11 @@ import com.jsy.community.annotation.Log;
 import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IShopLeaseService;
+import com.jsy.community.api.LeaseException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.LogModule;
 import com.jsy.community.constant.LogTypeConst;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.log.ProprietorLog;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
@@ -42,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -95,14 +98,14 @@ public class ShopLeaseController {
 	 * @Description 室内图
 	 * @Date 2021/1/13 15:50
 	 **/
-	private static final String BUCKETNAME_MIDDLE = "shop-middle";
+	private static final String BUCKETNAME_MIDDLE = "shop-middle-img";
 	
 	/**
 	 * @Author lihao
 	 * @Description 其他图
 	 * @Date 2021/1/13 15:50
 	 **/
-	private static final String BUCKETNAME_OTHER = "shop-other";
+	private static final String BUCKETNAME_OTHER = "shop-other-img";
 	
 	/**
 	 * @Author lihao
@@ -174,6 +177,11 @@ public class ShopLeaseController {
 	@PostMapping("/addShop")
 	@Log(operationType = LogTypeConst.INSERT, module = LogModule.LEASE, isSaveRequestData = true)
 	public CommonResult addShop(@RequestBody ShopQO shop) {
+		String[] imgPath = shop.getImgPath();
+		List<String> strings = Arrays.asList(imgPath);
+		if (!strings.contains("shop-head-img")||!strings.contains("shop-middle-img")||!strings.contains("shop-other-img")) {
+			throw new LeaseException("请添加所有图片");
+		}
 		shop.setUid(UserUtils.getUserId());
 		// 业主发布
 		shop.setSource(1);
@@ -284,6 +292,13 @@ public class ShopLeaseController {
 	public CommonResult getPublishTags() {
 		Map<String, Object> map = shopLeaseService.getPublishTags();
 		return CommonResult.ok(map);
+	}
+	
+	@ApiOperation("根据区域id查询小区列表")
+	@GetMapping("/getCommunity")
+	public CommonResult getCommunity(Long areaId){
+		List<CommunityEntity> communityList = shopLeaseService.getCommunity(areaId);
+		return CommonResult.ok(communityList);
 	}
 	
 	@ApiOperation("测试httpclient")

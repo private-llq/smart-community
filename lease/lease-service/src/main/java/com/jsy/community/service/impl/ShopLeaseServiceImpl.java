@@ -783,4 +783,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		return map;
 	}
 	
+	@Override
+	public List<CommunityEntity> getCommunity(Long areaId) {
+		return communityService.listCommunityByAreaId(areaId);
+	}
+	
 }
