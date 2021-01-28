@@ -14,6 +14,17 @@ import org.apache.ibatis.annotations.Update;
 public interface UserTicketMapper extends BaseMapper<UserTicketEntity> {
 	
 	/**
+	* @Description: 统计用户可用券张数
+	 * @Param: [id]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/1/28
+	**/
+	@Select("select count(1) from t_user_ticket where uid = #{uid}" +
+		" and UNIX_TIMESTAMP(expire_time) >= UNIX_TIMESTAMP(now())")
+	Integer countAvailableTickets(@Param("uid")String uid);
+	
+	/**
 	* @Description: 检查券是否过期
 	 * @Param: [id]
 	 * @Return: int

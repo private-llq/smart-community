@@ -167,6 +167,19 @@ public class UserAccountController {
 	}
 	
 	/**
+	* @Description: 统计用户可用券张数
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/28
+	**/
+	@ApiOperation("【全平台抵用券】统计可用张数")
+	@GetMapping("tickets/count")
+	public CommonResult countAvailableTickets(){
+		return CommonResult.ok(userAccountService.countTicketByUid(UserUtils.getUserId()));
+	}
+	
+	/**
 	* @Description: 查用户拥有的所有券
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.vo.CommonResult

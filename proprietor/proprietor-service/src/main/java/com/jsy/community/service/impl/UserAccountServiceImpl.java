@@ -111,6 +111,17 @@ public class UserAccountServiceImpl implements IUserAccountService {
 	}
 	
 	/**
+	* @Description: 统计用户可用券张数
+	 * @Param: [uid]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/1/28
+	**/
+	public Integer countTicketByUid(String uid){
+		return userTicketMapper.countAvailableTickets(uid);
+	}
+	
+	/**
 	* @Description: 查用户拥有的所有券
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.UserTicketEntity>
