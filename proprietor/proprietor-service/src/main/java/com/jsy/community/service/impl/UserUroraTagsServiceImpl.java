@@ -20,7 +20,7 @@ import java.util.Set;
  * @since 2021-01-14 11:39
  **/
 @DubboService(version = Const.version, group = Const.group_proprietor)
-public class IUserUroraTagsServiceImpl implements IUserUroraTagsService {
+public class UserUroraTagsServiceImpl implements IUserUroraTagsService {
 	
 	@Autowired
 	private UserUroraTagsMapper userUroraTagsMapper;
