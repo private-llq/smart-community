@@ -152,6 +152,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
 		return pageInfo;
 	}
 	
+	//TODO 券相关操作改为支付(账户操作)时抵用 结果由本平台计算 展示项目结束后修改
 	/**
 	* @Description: id单查
 	 * @Param: [id, uid]
@@ -164,6 +165,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
 		return userTicketMapper.selectOne(new QueryWrapper<UserTicketEntity>().select("*").eq("id",id).eq("uid",uid));
 	}
 	
+	//TODO 券相关操作改为支付(账户操作)时抵用 结果由本平台计算 展示项目结束后修改
 	/**
 	* @Description: 使用
 	 * @Param: [id, uid]
@@ -184,6 +186,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
 		return userTicketMapper.useTicket(id,uid) == 1;
 	}
 	
+	//TODO 券相关操作改为支付(账户操作)时抵用 结果由本平台计算 展示项目结束后修改
 	/**
 	* @Description: 退回
 	 * @Param: [id, uid]
