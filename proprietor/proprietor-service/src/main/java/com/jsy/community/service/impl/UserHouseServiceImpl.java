@@ -45,7 +45,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 				houseEntity.setUid(uid);
 				houseEntity.setCommunityId(communityId);
 				houseEntity.setHouseId(houseEntity.getHouseId());
-				houseEntity.setCheckStatus(2);//审核中
+				houseEntity.setCheckStatus(0);//待审核
 				houseEntity.setId(SnowFlake.nextId());
 				
 				userHouseMapper.insert(houseEntity);
