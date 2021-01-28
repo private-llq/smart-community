@@ -35,6 +35,9 @@ public class ProprietorLog extends BaseEntity {
 
     @ApiModelProperty(value = "操作人所在社区")
     private String community;
+    
+    @ApiModelProperty(value = "操作人详细地址")
+    private String detailAddress;
 
     @ApiModelProperty(value = "操作人电话")
     private String phone;

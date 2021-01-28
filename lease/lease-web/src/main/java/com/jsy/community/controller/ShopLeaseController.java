@@ -69,7 +69,7 @@ public class ShopLeaseController {
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
-	//暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	//TODO 暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	/**
 	 * @Author lihao
 	 * @Description 头图BUCKET
@@ -266,6 +266,7 @@ public class ShopLeaseController {
 	@ApiOperation("商铺修改")
 	@PostMapping("/updateShop")
 	@Login
+	@Log(operationType = LogTypeConst.UPDATE, module = LogModule.LEASE, isSaveRequestData = true)
 	public CommonResult updateShop(@RequestBody ShopQO shop,
 	                               @ApiParam("店铺id") @RequestParam Long shopId) {
 		String[] imgPath = shop.getImgPath();

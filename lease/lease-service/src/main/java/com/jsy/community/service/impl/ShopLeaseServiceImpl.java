@@ -572,9 +572,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 用于存储配套设施Code
 			List<Long> facilityCodes = new ArrayList<>();
 			if (!CollectionUtils.isEmpty(facilityList)) {
-				for (Long aLong : facilityList) {
-					facilityCodes.add(aLong);
-				}
+				facilityCodes.addAll(facilityList);
 			}
 			List<String> facilitys = houseConstService.getConstByTypeCodeForString(facilityCodes, 16L);
 			
@@ -583,9 +581,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 用于存储客流人群Code
 			ArrayList<Long> peopleCodes = new ArrayList<>();
 			if (!CollectionUtils.isEmpty(peopleList)) {
-				for (Long aLong : peopleList) {
-					peopleCodes.add(aLong);
-				}
+				peopleCodes.addAll(peopleList);
 			}
 			List<String> peoples = houseConstService.getConstByTypeCodeForString(peopleCodes, 17L);
 			
@@ -761,9 +757,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 1. 查询所有商铺分类
 		List<CommonConst> typeList = commonConstService.getShopType();
 		// 排除掉不限选项[添加的时候不允许选择不限]
-		List types = new ArrayList<CommonConst>();
+		List<CommonConst> types = new ArrayList<>();
 		for (CommonConst commonConst : typeList) {
-			if (commonConst.getConstName().equals("不限")) {
+			if (("不限").equals(commonConst.getConstName())) {
 				continue;
 			}
 			types.add(commonConst);
@@ -772,9 +768,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 2. 查询所有商铺商业
 		List<CommonConst> businessList = commonConstService.getBusiness();
 		// 排除掉不限选项[添加的时候不允许选择不限]
-		List business = new ArrayList<CommonConst>();
+		List<CommonConst> business = new ArrayList<>();
 		for (CommonConst commonConst : businessList) {
-			if (commonConst.getConstName().equals("不限")) {
+			if (("不限").equals(commonConst.getConstName())) {
 				continue;
 			}
 			business.add(commonConst);

@@ -1,9 +1,12 @@
 package com.jsy.community.aspectj;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.jsy.community.annotation.Log;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.log.ProprietorLog;
+import com.jsy.community.utils.UserUtils;
+import com.jsy.community.vo.UserInfoVo;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -20,6 +23,7 @@ import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -38,6 +42,9 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public class ProprietorLogAspect {
+	
+	@Autowired
+	private UserUtils userUtils;
 	
 	private static final Logger log = LoggerFactory.getLogger(ProprietorLogAspect.class);
 	
@@ -133,11 +140,28 @@ public class ProprietorLogAspect {
 				proprietorLog.setIpAddress(ipAddress);
 			}
 			
-			//2. 获取操作人信息[来源方法上的登录注解@Login]
-			//2. 1判断是否有@Login注解
-			Login login = getAnnotationLoginWithMethod(joinPoint);
-			if (login != null) {
-				// 暂时不写  没研究通李欢的代码
+			//2. 获取操作人信息[来源:注解@Login]
+			//2. 1判断方法上是否有@Login注解
+			Login method_login = getAnnotationLoginWithMethod(joinPoint);
+			Login class_login = getAnnotationLoginWithClass(joinPoint);
+			//2. 2判断类上是否有@Login注解      反正只要有助解【不管他的值是true还是false】 就去获取  然后判断是否有  请求头为token
+			if (method_login != null || class_login != null) {
+				if (attributes != null) {
+					HttpServletRequest request = attributes.getRequest();
+					String token = request.getHeader("token");
+					if (!StrUtil.isBlank(token)) {
+						UserInfoVo userInfo = userUtils.getUserInfo(token);
+						if (userInfo != null) {
+							proprietorLog.setName(userInfo.getRealName());
+							proprietorLog.setCity(userInfo.getCity());
+							proprietorLog.setDetailAddress(userInfo.getDetailAddress());
+//                          具体要保存用户哪些信息  还不确定需求
+//						    proprietorLog.setPhone()
+//						    proprietorLog.setCommunity(userInfo.)
+//							..
+						}
+					}
+				}
 			}
 			
 			//3. 获取操作类型 操作模块 功能描述 是否保存请求参数 [来源注解]
@@ -169,7 +193,6 @@ public class ProprietorLogAspect {
 					proprietorLog.setExceptionInfo(e.getMessage());
 				}
 				
-				
 				//7. 保存数据  【目前保存日志是通过物业端来保存的   具体上线的时候保存在哪  到时候再看】
 				saveLog(proprietorLog);
 				
@@ -193,8 +216,21 @@ public class ProprietorLogAspect {
 		return null;
 	}
 	
+	
 	/**
-	 * 方法是否存在Login注解，如果存在就获取
+	 * 判断使用log注解的方法所在类上是否存在Log注解，如果存在就获取
+	 */
+	private Login getAnnotationLoginWithClass(JoinPoint joinPoint) {
+		Signature signature = joinPoint.getSignature();
+		Class declaringType = signature.getDeclaringType();
+		if (declaringType != null) {
+			return (Login) declaringType.getAnnotation(Login.class);
+		}
+		return null;
+	}
+	
+	/**
+	 * 判断使用log注解的方法上是否存在Login注解，如果存在就获取
 	 */
 	private Login getAnnotationLoginWithMethod(JoinPoint joinPoint) throws Exception {
 		Signature signature = joinPoint.getSignature();
