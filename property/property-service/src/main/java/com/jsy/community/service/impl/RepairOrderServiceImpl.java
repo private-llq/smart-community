@@ -73,10 +73,11 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	@Override
 	public void successOrder(Long id) {
 		RepairEntity repairEntity = commOrder(id);
-		Integer status = repairEntity.getStatus();
-		if (!status.equals(1)) {
-			throw new PropertyException("该报修订单未曾处理，不能直接完成");
-		}
+		// 注释的原因  因为需求是  物业可以直接立即完成处理
+//		Integer status = repairEntity.getStatus();
+//		if (!status.equals(1)) {
+//			throw new PropertyException("该报修订单未曾处理，不能直接完成");
+//		}
 		repairEntity.setStatus(2); // 将状态设置为 已处理
 		repairMapper.updateById(repairEntity); // 更新报修表
 	}

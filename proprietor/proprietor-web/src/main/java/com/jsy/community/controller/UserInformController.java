@@ -41,6 +41,7 @@ public class UserInformController {
     @Login
     public CommonResult save(@RequestBody UserInformEntity userInformEntity) {
         String userId = UserUtils.getUserId();
+        userInformEntity.setUid(userId);
         userInformEntity.setId(SnowFlake.nextId());
         return userInformService.save(userInformEntity)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
     }

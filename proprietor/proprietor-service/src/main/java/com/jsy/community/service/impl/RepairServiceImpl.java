@@ -161,6 +161,9 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("repair_id", id);
 		RepairOrderEntity repairOrderEntity = repairOrderMapper.selectOne(queryWrapper);
+		if (repairOrderEntity==null) {
+			throw new ProprietorException("您好，你查询的订单有误，请联系管理员");
+		}
 		
 		RepairVO repairVO = new RepairVO();
 		

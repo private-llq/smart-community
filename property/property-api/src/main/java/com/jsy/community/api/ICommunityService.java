@@ -50,4 +50,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Param []
 	 **/
 	void addCommunityEntity();
+	
+	/**
+	 * @return com.jsy.community.entity.CommunityEntity
+	 * @Author lihao
+	 * @Description 根据小区id查询小区名称
+	 * @Date 2021/1/27 14:39
+	 * @Param [communityId]
+	 **/
+	CommunityEntity getCommunityNameById(Long communityId);
 }

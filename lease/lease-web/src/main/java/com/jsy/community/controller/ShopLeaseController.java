@@ -7,9 +7,11 @@ import com.jsy.community.annotation.Log;
 import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IShopLeaseService;
+import com.jsy.community.api.LeaseException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.LogModule;
 import com.jsy.community.constant.LogTypeConst;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.log.ProprietorLog;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
@@ -67,7 +69,7 @@ public class ShopLeaseController {
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
-	//暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	//TODO 暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	/**
 	 * @Author lihao
 	 * @Description 头图BUCKET
@@ -95,14 +97,14 @@ public class ShopLeaseController {
 	 * @Description 室内图
 	 * @Date 2021/1/13 15:50
 	 **/
-	private static final String BUCKETNAME_MIDDLE = "shop-middle";
+	private static final String BUCKETNAME_MIDDLE = "shop-middle-img";
 	
 	/**
 	 * @Author lihao
 	 * @Description 其他图
 	 * @Date 2021/1/13 15:50
 	 **/
-	private static final String BUCKETNAME_OTHER = "shop-other";
+	private static final String BUCKETNAME_OTHER = "shop-other-img";
 	
 	/**
 	 * @Author lihao
@@ -174,6 +176,36 @@ public class ShopLeaseController {
 	@PostMapping("/addShop")
 	@Log(operationType = LogTypeConst.INSERT, module = LogModule.LEASE, isSaveRequestData = true)
 	public CommonResult addShop(@RequestBody ShopQO shop) {
+		String[] imgPath = shop.getImgPath();
+		if (imgPath == null || imgPath.length <= 0) {
+			throw new LeaseException("请添加所有图片");
+		}
+		// 图片名称必须是 shop-head-img 或 shop-middle-img 或 shop-other-img组成的
+		for (String s : imgPath) {
+			boolean b = s.contains("shop-head-img") || s.contains("shop-middle-img") || s.contains("shop-other-img");
+			if (!b) {
+				throw new LeaseException("您添加的图片不符合规范，请重新添加");
+			}
+		}
+		// 必须要至少有一个 shop-head-img 和 shop-middle-img 和 shop-other-img
+		int headCount = 0;
+		int middleCount = 0;
+		int otherCount = 0;
+		for (String s : imgPath) {
+			if (s.contains("shop-head-img")) {
+				headCount += 1;
+			}
+			if (s.contains("shop-middle-img")) {
+				middleCount += 1;
+			}
+			if (s.contains("shop-other-img")) {
+				otherCount += 1;
+			}
+		}
+		if (headCount == 0 || middleCount == 0 || otherCount == 0) {
+			throw new LeaseException("请添加所有图片");
+		}
+		
 		shop.setUid(UserUtils.getUserId());
 		// 业主发布
 		shop.setSource(1);
@@ -234,8 +266,41 @@ public class ShopLeaseController {
 	@ApiOperation("商铺修改")
 	@PostMapping("/updateShop")
 	@Login
+	@Log(operationType = LogTypeConst.UPDATE, module = LogModule.LEASE, isSaveRequestData = true)
 	public CommonResult updateShop(@RequestBody ShopQO shop,
 	                               @ApiParam("店铺id") @RequestParam Long shopId) {
+		String[] imgPath = shop.getImgPath();
+		
+		if (imgPath == null || imgPath.length <= 0) {
+			throw new LeaseException("请添加所有图片");
+		}
+		
+		// 图片名称必须是 shop-head-img 或 shop-middle-img 或 shop-other-img组成的
+		for (String s : imgPath) {
+			boolean b = s.contains("shop-head-img") || s.contains("shop-middle-img") || s.contains("shop-other-img");
+			if (!b) {
+				throw new LeaseException("您添加的图片不符合规范，请重新添加");
+			}
+		}
+		// 必须要至少有一个 shop-head-img 和 shop-middle-img 和 shop-other-img
+		int headCount = 0;
+		int middleCount = 0;
+		int otherCount = 0;
+		for (String s : imgPath) {
+			if (s.contains("shop-head-img")) {
+				headCount += 1;
+			}
+			if (s.contains("shop-middle-img")) {
+				middleCount += 1;
+			}
+			if (s.contains("shop-other-img")) {
+				otherCount += 1;
+			}
+		}
+		if (headCount == 0 || middleCount == 0 || otherCount == 0) {
+			throw new LeaseException("请添加所有图片");
+		}
+		
 		shop.setUid(UserUtils.getUserId());
 		shop.setSource(1);
 		ValidatorUtils.validateEntity(shop, ShopQO.updateShopValidate.class);
@@ -284,6 +349,13 @@ public class ShopLeaseController {
 	public CommonResult getPublishTags() {
 		Map<String, Object> map = shopLeaseService.getPublishTags();
 		return CommonResult.ok(map);
+	}
+	
+	@ApiOperation("根据区域id查询小区列表")
+	@GetMapping("/getCommunity")
+	public CommonResult getCommunity(Long areaId) {
+		List<CommunityEntity> communityList = shopLeaseService.getCommunity(areaId);
+		return CommonResult.ok(communityList);
 	}
 	
 	@ApiOperation("测试httpclient")

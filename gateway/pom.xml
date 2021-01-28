@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gateway</artifactId>
+    <name>服务网关</name>
     <dependencies>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

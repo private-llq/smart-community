@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
@@ -103,5 +104,21 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 **/
 	Map<String, Object> moreOption();
 	
+	/**
+	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author lihao
+	 * @Description 查询商铺类型和行业[发布的时候添加]
+	 * @Date 2021/1/26 17:10
+	 * @Param []
+	 **/
 	Map<String, Object> getPublishTags();
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.CommunityEntity>
+	 * @Author lihao
+	 * @Description 根据区域id查询小区列表
+	 * @Date 2021/1/26 17:07
+	 * @Param [areaId]
+	 **/
+	List<CommunityEntity> getCommunity(Long areaId);
 }

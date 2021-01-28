@@ -2,11 +2,11 @@ package com.jsy.community.config;
 
 /**
  * @program: wechat-pay
- * @description:
+ * @description:  微信支付参数
  * @author: Hu
  * @create: 2021-01-20 11:05
  **/
-public class WehatConfig {
+public class WechatConfig {
     /**
      * 服务号相关信息
      */

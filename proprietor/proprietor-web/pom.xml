@@ -31,10 +31,6 @@
 			<artifactId>mybatis-plus-extension</artifactId>
 		</dependency>
 
-
-
-
-		
 		<!-- 服务发现 -->
 		<dependency>
 			<groupId>com.alibaba.cloud</groupId>

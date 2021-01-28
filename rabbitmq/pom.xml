@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rabbitmq</artifactId>
+    <name>mq服务端</name>
+    <description>mq中间件父工程</description>
     <dependencies>
 <!--         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-amqp-->
         <dependency>

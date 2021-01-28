@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
@@ -30,4 +31,6 @@ public class WeChatOrderEntity implements Serializable {
     private Integer orderStatus;
     @ApiModelProperty(value = "到账状态，1已到账，2未到账")
     private Integer arriveStatus;
+    @ApiModelProperty(value = "创建时间")
+    private LocalDateTime createTime;
 }

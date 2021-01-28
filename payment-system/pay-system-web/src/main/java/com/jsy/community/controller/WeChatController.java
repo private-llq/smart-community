@@ -5,7 +5,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
-import com.jsy.community.config.WehatConfig;
+import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.WeChatOrderEntity;
 import com.jsy.community.qo.WeChatPayVO;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -51,8 +52,8 @@ public class WeChatController {
         hashMap.put("currency","CNY");
         Map<Object, Object> map = new LinkedHashMap<>();
 
-        map.put("appid", WehatConfig.APPID);
-        map.put("mchid",WehatConfig.MCH_ID);
+        map.put("appid", WechatConfig.APPID);
+        map.put("mchid",WechatConfig.MCH_ID);
         map.put("description",weChatPayVO.getDescription());
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://jsy.free.vipnps.vip/callback");
@@ -67,6 +68,7 @@ public class WeChatController {
         msg.setTotal(weChatPayVO.getTotal());
         msg.setOrderStatus(1);
         msg.setArriveStatus(1);
+        msg.setCreateTime(LocalDateTime.now());
 
 
         //mq异步保存账单到数据库
@@ -75,14 +77,14 @@ public class WeChatController {
         amqpTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
-                message.getMessageProperties().setHeader("x-delay",20000);
+                message.getMessageProperties().setHeader("x-delay",60000*10);
                 return message;
             }
         });
         //第一步获取prepay_id
-        String prepayId = PublicConfig.V3PayGet("v3/pay/transactions/app", wxPayRequestJsonStr, WehatConfig.MCH_ID, WehatConfig.MCH_SERIAL_NO, WehatConfig.FILE_NAME);
+        String prepayId = PublicConfig.V3PayGet("v3/pay/transactions/app", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.FILE_NAME);
         //第二步获取调起支付的参数
-        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WehatConfig.APPID, WehatConfig.FILE_NAME));
+        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.FILE_NAME));
         return CommonResult.ok(object);
     }
 
@@ -96,7 +98,7 @@ public class WeChatController {
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         System.err.println("回调成功");
-        String out_trade_no = PublicConfig.notify(request, response, WehatConfig.API_V3_KEY);
+        String out_trade_no = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
 
         System.out.println(out_trade_no);
     }

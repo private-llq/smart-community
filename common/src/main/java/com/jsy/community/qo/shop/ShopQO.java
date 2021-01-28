@@ -88,7 +88,6 @@ public class ShopQO implements Serializable {
 	
 	@ApiModelProperty(value = "转让费")
 	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "转让费不能为空")
-	@DecimalMin(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class},value = "1.00",message = "转让费最少为1.00")
 	@DecimalMax(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class},value = "9999999.99",message = "转让费最大为9999999.99")
 	private BigDecimal transferMoney;
 	
@@ -138,18 +137,18 @@ public class ShopQO implements Serializable {
 	private String mobile;
 	
 	@ApiModelProperty(value = "图片地址集合")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少上传一张图片")
+	@NotEmpty(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少上传一张图片")
 	private String[] imgPath;
 	
 
 	
 	
 	@ApiModelProperty(value = "客流人群Code")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少选择一个客流人群")
+	@NotEmpty(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少选择一个客流人群")
 	private List<Long> shopPeoples;
 	
 	@ApiModelProperty(value = "配套设施Code")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少选择一个配套设施")
+	@NotEmpty(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少选择一个配套设施")
 	private List<Long> shopFacilityList;
 	
 	@ApiModelProperty(value = "所属行业id")

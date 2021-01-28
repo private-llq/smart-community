@@ -1,6 +1,6 @@
 package com.jsy.community;
 
-import com.jsy.community.task.mqtt.MqttPushClient;
+//import com.jsy.community.task.mqtt.MqttPushClient;
 import org.apache.dubbo.config.spring.context.annotation.DubboComponentScan;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -16,16 +16,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class ProprietorServiceApp {
 	public static void main(String[] args) {
 		SpringApplication.run(ProprietorServiceApp.class, args);
-		test();
+//		initSubScribe();
 	}
 	
-	private static void test(){
-//		MqttPushClient.MQTT_HOST = "tcp://mqtt.com:1883";
-		MqttPushClient.MQTT_HOST = "tcp://127.0.0.1:1883";
-		MqttPushClient.MQTT_CLIENTID = "client";
-		MqttPushClient.MQTT_USERNAME = "admin123";
-		MqttPushClient.MQTT_PASSWORD = "admin123";
-		MqttPushClient client = MqttPushClient.getInstance();
-		client.subscribe("mqtt/face/1467180/#");
-	}
+//	private static void initSubScribe(){
+//		MqttPushClient client = MqttPushClient.getInstance();
+//		client.subscribe("mqtt/face/1467180/#");
+//	}
 }

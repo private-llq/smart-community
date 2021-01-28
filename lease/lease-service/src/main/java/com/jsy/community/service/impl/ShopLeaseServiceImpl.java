@@ -572,9 +572,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 用于存储配套设施Code
 			List<Long> facilityCodes = new ArrayList<>();
 			if (!CollectionUtils.isEmpty(facilityList)) {
-				for (Long aLong : facilityList) {
-					facilityCodes.add(aLong);
-				}
+				facilityCodes.addAll(facilityList);
 			}
 			List<String> facilitys = houseConstService.getConstByTypeCodeForString(facilityCodes, 16L);
 			
@@ -583,9 +581,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 用于存储客流人群Code
 			ArrayList<Long> peopleCodes = new ArrayList<>();
 			if (!CollectionUtils.isEmpty(peopleList)) {
-				for (Long aLong : peopleList) {
-					peopleCodes.add(aLong);
-				}
+				peopleCodes.addAll(peopleList);
 			}
 			List<String> peoples = houseConstService.getConstByTypeCodeForString(peopleCodes, 17L);
 			
@@ -601,13 +597,17 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			
 			// 封装地址
-			Long cityId = record.getCityId();
-			String city = redisTemplate.opsForValue().get("RegionSingle" + ":" + cityId);
+			// 城市地址
+//			Long cityId = record.getCityId();
+//			String city = redisTemplate.opsForValue().get("RegionSingle" + ":" + cityId);
 			
 			Long areaId = record.getAreaId();
 			String area = redisTemplate.opsForValue().get("RegionSingle" + ":" + areaId);
 			
-			indexShopVO.setAddress(city + "  " + area);
+			Long communityId = record.getCommunityId();
+			CommunityEntity community = communityService.getCommunityNameById(communityId);
+			
+			indexShopVO.setAddress(area+"  "+community.getName());
 		}
 		PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(page, pageInfo);
@@ -757,9 +757,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 1. 查询所有商铺分类
 		List<CommonConst> typeList = commonConstService.getShopType();
 		// 排除掉不限选项[添加的时候不允许选择不限]
-		List types = new ArrayList<CommonConst>();
+		List<CommonConst> types = new ArrayList<>();
 		for (CommonConst commonConst : typeList) {
-			if (commonConst.getConstName().equals("不限")) {
+			if (("不限").equals(commonConst.getConstName())) {
 				continue;
 			}
 			types.add(commonConst);
@@ -768,9 +768,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 2. 查询所有商铺商业
 		List<CommonConst> businessList = commonConstService.getBusiness();
 		// 排除掉不限选项[添加的时候不允许选择不限]
-		List business = new ArrayList<CommonConst>();
+		List<CommonConst> business = new ArrayList<>();
 		for (CommonConst commonConst : businessList) {
-			if (commonConst.getConstName().equals("不限")) {
+			if (("不限").equals(commonConst.getConstName())) {
 				continue;
 			}
 			business.add(commonConst);
@@ -781,6 +781,11 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		map.put("business", business);
 		
 		return map;
+	}
+	
+	@Override
+	public List<CommunityEntity> getCommunity(Long areaId) {
+		return communityService.listCommunityByAreaId(areaId);
 	}
 	
 }
