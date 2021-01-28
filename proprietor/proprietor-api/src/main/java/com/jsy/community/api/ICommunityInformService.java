@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 
 import java.util.List;
 
@@ -57,4 +58,12 @@ public interface ICommunityInformService extends IService<PushInformEntity> {
      * @param uid           用户id
      */
     void clearUnreadInform(List<Long> acctIds, String uid);
+
+
+    /**
+     * 社区主页 最新 租赁信息
+     * @param informInitializeCount         初始轮播条数
+     * @return                              返回数据集合
+     */
+    List<HouseLeaseVO> leaseLatestInform(Integer informInitializeCount);
 }

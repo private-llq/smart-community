@@ -3,13 +3,14 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.PicUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -17,7 +18,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
@@ -42,12 +42,8 @@ public class CarController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private ICarService carService;
-	
-	//允许上传的文件后缀种类，临时，后续从Spring配置文件中取值
-	private final String[] carImageAllowSuffix = new String[]{"jpg", "jpeg", "png"};
 
-	private static final String BUCKET_NAME = "car-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
-	
+
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
 	
@@ -69,7 +65,8 @@ public class CarController {
 		Integer integer = carService.addProprietorCar(carEntity);
 		String filePath = carEntity.getCarImageUrl();
 		if (!StringUtils.isEmpty(filePath)) {
-			stringRedisTemplate.opsForSet().add("car_img_all",filePath); // 将图片地址存入redis 用于对比 便于清理无用图片
+			// 将图片地址存入redis 用于对比 便于清理无用图片
+			stringRedisTemplate.opsForSet().add("car_img_all",filePath);
 		}
 		//3.登记新增车辆操作
 		return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
@@ -79,30 +76,30 @@ public class CarController {
 	/**
 	 * 修改业主固定车辆
 	 *
-	 * @param carQO 前端请求参数对象
+	 * @param qo 前端请求参数对象
 	 * @return 返回修改影响行数
 	 */
 	@Login
 	@ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
 	@PutMapping()
-	public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO carQO) {
+	public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO qo) {
 		//效验前端新增车辆参数合法性
-		ValidatorUtils.validateEntity(carQO, CarQO.UpdateCarValidated.class);
-		Integer integer = carService.updateProprietorCar(carQO, UserUtils.getUserId());
+		ValidatorUtils.validateEntity(qo, CarQO.UpdateCarValidated.class);
+		Integer integer = carService.updateProprietorCar(qo, UserUtils.getUserId());
 		return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
 	}
 	
 	@Login
 	@ApiOperation("所属人固定车辆查询方法")
 	@PostMapping(value = "/page", produces = "application/json;charset=utf-8")
-	public CommonResult<?> queryProprietorCar(@RequestBody BaseQO<CarEntity> carEntityBaseQO) {
-		if (null == carEntityBaseQO.getQuery()) {
+	public CommonResult<?> queryProprietorCar(@RequestBody BaseQO<CarEntity> qo) {
+		if (null == qo.getQuery()) {
 			return CommonResult.error("没有选择社区!");
 		}
-		carEntityBaseQO.getQuery().setUid(UserUtils.getUserId());
+		qo.getQuery().setUid(UserUtils.getUserId());
 		//1.查询参数非空数字效验
-		ValidatorUtils.validatePageParam(carEntityBaseQO);
-		List<CarEntity> records = carService.queryProprietorCar(carEntityBaseQO).getRecords();
+		ValidatorUtils.validatePageParam(qo);
+		List<CarEntity> records = carService.queryProprietorCar(qo).getRecords();
 		return CommonResult.ok(records);
 	}
 	
@@ -133,7 +130,6 @@ public class CarController {
 	
 	/**
 	 * 车辆图片上传接口
-	 *
 	 * @param carImage 车辆图片
 	 * @return 返回图片上传成功后的访问路径地址
 	 */
@@ -141,31 +137,12 @@ public class CarController {
 	@ApiOperation("所属人车辆图片上传接口")
 	@ApiImplicitParam(name = "carImage", value = "车辆图片文件")
 	@PostMapping(value = "carImageUpload")
-	public CommonResult<?> carImageUpload(@RequestParam("carImage") MultipartFile carImage, HttpServletRequest request)  {
-		//1.接口非空验证
-		if (null == carImage) {
-			return CommonResult.error(JSYError.BAD_REQUEST);
-		}
-		//2.文件大小验证
-		long fileSizeForKB = carImage.getSize() / 1024;
-		//允许上传的文件大小，临时，后续从配置文件中取值 由Spring控制
-		int carImageMaxSizeKB = 500;
-		if (fileSizeForKB > carImageMaxSizeKB) {
-			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件太大了,最大：" + carImageMaxSizeKB + "KB");
-		}
-		String fileName = carImage.getOriginalFilename();
-		log.info("车辆图片上传文件名：" + fileName + " 车辆图片文件大小：" + fileSizeForKB + "KB");
-		//3.文件后缀验证
-		if (isMobileClient(request.getHeader("user-agent"))) {
-			//如果是PC端访问上传接口 则需要验证文件后缀名
-			boolean extension = FilenameUtils.isExtension(fileName, carImageAllowSuffix);
-			if (!extension) {
-				return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "文件后缀不允许,可用后缀" + Arrays.asList(carImageAllowSuffix));
-			}
-		}
+	public CommonResult<?> carImageUpload(@RequestParam("carImage") MultipartFile carImage)  {
+		PicUtil.imageQualified(carImage);
 		//4.调用上传服务接口 进行上传文件  返回访问路径
-		String filePath = MinioUtils.upload(carImage, BUCKET_NAME);
-		stringRedisTemplate.opsForSet().add("car_img_part",filePath); // 将图片地址存入redis  用于对比 便于清理无用图片
+		String filePath = MinioUtils.upload(carImage, BusinessConst.CAR_IMAGE_BUCKET_NAME);
+		// 将图片地址存入redis  用于对比 便于清理无用图片
+		stringRedisTemplate.opsForSet().add("car_img_part",filePath);
 		return CommonResult.ok(filePath,"上传成功!");
 	}
 
@@ -178,15 +155,10 @@ public class CarController {
 		if (isMobileClient(request.getHeader("user-agent"))) {
 			//如果是PC端访问上传接口 则需要验证文件后缀名
 			for( MultipartFile multipartFile : carImages ){
-				if(multipartFile == null || multipartFile.isEmpty() || Objects.equals(multipartFile.getOriginalFilename(), "")){
-					throw new JSYException(1, "上传的图片不能为空!");
-				}
-				if (!FilenameUtils.isExtension(multipartFile.getOriginalFilename(), carImageAllowSuffix)) {
-					throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "文件后缀不允许,可用后缀" + Arrays.asList(carImageAllowSuffix));
-				}
+				PicUtil.imageQualified(multipartFile);
 			}
 		}
-		return CommonResult.ok(MinioUtils.uploadForBatch(carImages, BUCKET_NAME),"上传成功!");
+		return CommonResult.ok(MinioUtils.uploadForBatch(carImages, BusinessConst.CAR_IMAGE_BUCKET_NAME),"上传成功!");
 	}
 
 

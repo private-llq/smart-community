@@ -2,7 +2,9 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.PushInformEntity;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -59,4 +61,22 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      * @param userId    用户id
      */
     void insertClearRecord(@Param("id")Long id, @Param("acctId") Long acctId, @Param("uid") String userId);
+
+
+    /**
+     * 查询商铺最新的信息条数
+     * @param limit     限制条数
+     * @return          返回信息List
+     */
+    @Select("select id,title as houseTitle,'false' as leaseHouse from t_shop_lease ORDER BY create_time desc limit #{limit}")
+    List<HouseLeaseVO> selectShopLatest(int limit);
+
+
+    /**
+     * 查询租房最新的信息条数
+     * @param limit     限制条数
+     * @return          返回信息List
+     */
+    @Select("select id,house_title as houseTitle,'true' as leaseHouse from t_house_lease ORDER BY create_time desc limit #{limit}")
+    List<HouseLeaseVO> selectLeaseLatest(int limit);
 }

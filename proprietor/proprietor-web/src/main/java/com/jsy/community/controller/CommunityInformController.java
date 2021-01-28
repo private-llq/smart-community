@@ -11,10 +11,13 @@ import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,18 +37,33 @@ public class CommunityInformController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityInformService communityInformService;
 
+    @Value("${jsy.inform.initial.count}")
+    private Integer informInitializeCount;
+
+    @Value("${jsy.inform.lease.initial.count}")
+    private Integer leaseInformInitializeCount;
+
 
     /**
      * 属于社区主页  通知消息轮播的接口 条数有限制
      */
     @Login
     @GetMapping("/rotation")
+    @Cacheable(value = "inform:rotation", key = "#communityId", unless = "#result.data == null or #result.data.size() == 0", condition = "#communityId > 0", cacheManager = "redisCacheManager")
     @ApiOperation("社区轮播消息")
     public CommonResult<List<PushInformEntity>> rotationCommunityInform(@RequestParam Long communityId) {
-        //页面起始页查询社区消息的初始条数 暂定10
-        //@Value("${jsy.community-inform.initial.count}")
-        Integer initialInformCount = 10;
-        return CommonResult.ok(communityInformService.rotationCommunityInform(initialInformCount, communityId));
+        return CommonResult.ok(communityInformService.rotationCommunityInform(informInitializeCount, communityId));
+    }
+
+    /**
+     * 属于社区主页  最新租约消息轮播的接口 条数有限制
+     */
+    @Login
+    @GetMapping("/latest")
+    @Cacheable(value = "inform:latest",  unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
+    @ApiOperation("社区租赁最新消息")
+    public CommonResult<List<HouseLeaseVO>> leaseLatestInform() {
+        return CommonResult.ok(communityInformService.leaseLatestInform(leaseInformInitializeCount));
     }
 
     /**
@@ -108,6 +126,8 @@ public class CommunityInformController {
         //失败的情况 只有在 数据访问层 出现错误，即交给ExceptionHandler处理
         return CommonResult.ok("已标记消息为已读!");
     }
+
+
 
 
 }

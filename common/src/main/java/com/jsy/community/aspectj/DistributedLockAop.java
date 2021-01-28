@@ -12,6 +12,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -27,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DistributedLockAop extends BaseAop {
+
+
 
     private RedissonClient redissonClient = null;
 

@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
  * @since 2021-01-13 10:37
  */
 @Slf4j
-@ConditionalOnProperty(value = "jsy.profiles.active", havingValue = "dev")
 public class LanIpResolver {
 
 

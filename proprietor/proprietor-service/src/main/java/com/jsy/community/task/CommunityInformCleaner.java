@@ -40,15 +40,15 @@ public class CommunityInformCleaner {
     @Value("${jsy.sys.clear.inform.expire}")
     private Integer clearInformExpireDay;
 
+    @Value("${jsy.sys.clear.inform.enable}")
+    private boolean clearInformEnabled;
+
     @PostConstruct
     public void initSourceConst(){
         clearPushInform();
     }
 
 
-    public boolean isStart(){
-        return true;
-    }
 
 
     /**
@@ -59,14 +59,14 @@ public class CommunityInformCleaner {
     @DistributedLock(lockKey = "communityInform", waitTimout = 50)
     @Scheduled(cron = "0 0 1 ? * mon")
     public void clearPushInform(){
-
-        //向redis 存一把锁 让此模块
-        logger.info(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "：清理社区推送消息执行开始:");
-        //1.获取 clearInformExpireTime 之前的时间
-        String beforeTime = getClearInformExpireTime(clearInformExpireDay);
-        //如果 数据库 推送消息 小于 beforeTime 的都是超过过期时间的消息 都将删除
-        Integer delRow = userInformService.RegularCleaning(beforeTime);
-        logger.info("本次清理社区推送消息" + beforeTime + "之前的数据共" + delRow + "条!");
+        if(clearInformEnabled){
+            logger.info(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "：清理社区推送消息执行开始:");
+            //1.获取 clearInformExpireTime 之前的时间
+            String beforeTime = getClearInformExpireTime(clearInformExpireDay);
+            //如果 数据库 推送消息 小于 beforeTime 的都是超过过期时间的消息 都将删除
+            Integer delRow = userInformService.RegularCleaning(beforeTime);
+            logger.info("本次清理社区推送消息" + beforeTime + "之前的数据共" + delRow + "条!");
+        }
     }
 
     /**

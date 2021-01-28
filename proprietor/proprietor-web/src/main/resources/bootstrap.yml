@@ -24,6 +24,7 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
 
+
 dubbo:
   registry:
     address: nacos://127.0.0.1:8848
@@ -41,3 +42,9 @@ dubbo:
   provider:
     retries: 0
     timeout: 99999
+
+jsy:
+  redis:
+    annotation:
+      # 当前模块@Cacheable 缓存的数据的超时时间/s
+      cacheTimeout: 1800

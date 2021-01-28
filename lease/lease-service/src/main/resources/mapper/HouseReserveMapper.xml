@@ -6,7 +6,7 @@
     <!-- 提交预约 -->
     <insert id="insertReserve">
         insert into t_house_reserve
-        (id,house_lease_id,community_id,reserve_status,reserve_uid,reserve_msg,reserve_date,reserve_time,deleted,create_time)
+        (id,house_lease_id,community_id,reserve_status,reserve_uid,reserve_msg,reserve _date,reserve_time,deleted,create_time)
         select #{id},#{houseLeaseId},#{communityId},#{reserveStatus},#{reserveUid},#{reserveMsg},#{reserveDate},#{reserveTime},0,now()
         from dual where not exists
         (select id,house_lease_id,community_id,reserve_status,reserve_uid,reserve_msg,reserve_date,reserve_time,deleted,create_time from t_house_reserve where reserve_uid = #{reserveUid} and house_lease_id = #{houseLeaseId} and reserve_status = #{reserveStatus});

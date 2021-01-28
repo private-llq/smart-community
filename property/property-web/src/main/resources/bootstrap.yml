@@ -39,3 +39,8 @@ dubbo:
   provider:
     retries: 0
     timeout: 99999
+jsy:
+  redis:
+    annotation:
+      # 当前模块@Cacheable 缓存的数据的超时时间/s
+      cacheTimeout: 1800

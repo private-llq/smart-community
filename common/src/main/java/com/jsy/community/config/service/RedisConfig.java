@@ -10,12 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.*;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.*;
 
 import javax.annotation.Resource;
 
 /**
  * Redis配置
+ * @author ling
  */
 @Configuration
 @ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")
@@ -38,6 +39,16 @@ public class RedisConfig {
 	private Integer redisDatabase;
 
 	@Bean
+	public RedissonClient redissonClient(){
+		Config config = new Config();
+		SingleServerConfig singleServerConfig = config.useSingleServer();
+		singleServerConfig.setAddress("redis://"+ redisHost +":" + redisPort);
+		singleServerConfig.setDatabase(redisDatabase);
+		singleServerConfig.setPassword(redisPassword);
+		return Redisson.create(config);
+	}
+
+	@Bean
 	public RedisTemplate<String, Object> redisTemplate() {
 		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setKeySerializer(new StringRedisSerializer());
@@ -48,14 +59,5 @@ public class RedisConfig {
 		return redisTemplate;
 	}
 
-	@Bean
-	public RedissonClient redissonClient(){
-		Config config = new Config();
-		SingleServerConfig singleServerConfig = config.useSingleServer();
-		singleServerConfig.setAddress("redis://"+ redisHost +":" + redisPort);
-		singleServerConfig.setDatabase(redisDatabase);
-		singleServerConfig.setPassword(redisPassword);
-		return Redisson.create(config);
-	}
-	
+
 }

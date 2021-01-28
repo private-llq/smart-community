@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseEntity;
@@ -13,18 +14,23 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.PicUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.AllArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -52,6 +58,8 @@ public class UserController {
     
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserUroraTagsService userUroraTagsService;
+
+
     @PostMapping("test")
 //    @Login
     @Auth
@@ -139,17 +147,25 @@ public class UserController {
     @Login
 	@ApiOperation("业主信息更新")
     @PutMapping("update")
-    public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO proprietorQO) {
-        ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.ProprietorUpdateValid.class);
+    public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO qo) {
+        ValidatorUtils.validateEntity(qo, ProprietorQO.ProprietorUpdateValid.class);
 		//3.更新业主信息
-        proprietorQO.setUid(UserUtils.getUserId());
-        if( proprietorQO.getHasCar() == null ){
+        qo.setUid(UserUtils.getUserId());
+        if( qo.getHasCar() == null ){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
         }
-        if( proprietorQO.getHouseEntityList() == null || proprietorQO.getHouseEntityList().isEmpty() ){
+        if( qo.getHouseEntityList() == null || qo.getHouseEntityList().isEmpty() ){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "房屋未指定!");
         }
-        return userService.proprietorUpdate(proprietorQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    }
+
+    @Login
+    @ApiOperation("业主头像上传")
+    @PostMapping("uploadAvatar")
+    public CommonResult<String> uploadImg(MultipartFile avatar) {
+        PicUtil.imageQualified(avatar);
+        return CommonResult.ok(MinioUtils.upload(avatar, BusinessConst.AVATAR_BUCKET_NAME));
     }
 
 
@@ -194,6 +210,8 @@ public class UserController {
     public CommonResult<List<HouseEntity>> queryUserHouseList(){
         return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
     }
+
+
     
     /**
     * @Description: 查询用户极光推送tags

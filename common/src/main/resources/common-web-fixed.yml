@@ -20,7 +20,6 @@ spring:
         max-wait: -1ms
         max-active: 200
 
-jsy:
   upload:
     type: oss
   oss:

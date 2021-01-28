@@ -201,5 +201,15 @@ public interface BusinessConst {
 	 * 房间
 	 */
 	int BUILDING_TYPE_DOOR = 4;
-	
+
+	//========= 文件上传 文件夹分类名称 ==========
+	/**
+	 * 用户头像 上传 至 文件服务器 的 bucket Name
+	 */
+	String AVATAR_BUCKET_NAME = "user-avatar";
+
+	/**
+	 * 车辆图片 上传 至 文件服务器 的 bucket Name
+	 */
+	String CAR_IMAGE_BUCKET_NAME = "user-avatar";
 }

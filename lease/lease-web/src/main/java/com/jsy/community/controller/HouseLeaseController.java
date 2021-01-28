@@ -18,9 +18,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -37,6 +39,9 @@ public class HouseLeaseController {
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseLeaseService iHouseLeaseService;
+
+    @Resource
+    private  ShopLeaseController shopLeaseController;
 
 
     @Login
@@ -62,8 +67,23 @@ public class HouseLeaseController {
     }
 
 
+    @GetMapping("/latest")
+    @ApiOperation("最新房屋详情")
+    public CommonResult<?> leaseDetails(@RequestParam Long id, @RequestParam Boolean leaseHouse) {
+        if( id == null || leaseHouse == null){
+            throw new JSYException(JSYError.BAD_REQUEST);
+        }
+        if(leaseHouse){
+            //房屋出租详情
+            return houseLeaseDetails(id);
+        }
+        //商铺转让详情
+        return shopLeaseController.getShop(id);
+    }
+
     @Login
     @PostMapping("/page")
+    @Cacheable( value = "lease:house", key = "#baseQo", unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
     @ApiOperation("分页查询房屋出租数据")
     public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQo) {
         ValidatorUtils.validatePageParam(baseQo);
@@ -77,10 +97,10 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/update")
     @ApiOperation("更新房屋出租数据")
-    public CommonResult<Boolean> houseLeaseUpdate(@RequestBody HouseLeaseQO houseLeaseQO) {
-        ValidatorUtils.validateEntity(houseLeaseQO, HouseLeaseQO.UpdateLeaseSaleHouse.class);
-        houseLeaseQO.setUid(UserUtils.getUserId());
-        Boolean success = iHouseLeaseService.updateHouseLease(houseLeaseQO);
+    public CommonResult<Boolean> houseLeaseUpdate(@RequestBody HouseLeaseQO qo) {
+        ValidatorUtils.validateEntity(qo, HouseLeaseQO.UpdateLeaseSaleHouse.class);
+        qo.setUid(UserUtils.getUserId());
+        Boolean success = iHouseLeaseService.updateHouseLease(qo);
         return success ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");
     }
 

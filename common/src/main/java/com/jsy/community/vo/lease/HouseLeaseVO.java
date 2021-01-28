@@ -145,5 +145,7 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "是否被当前用户已收藏")
     private Boolean favorite;
 
+    @ApiModelProperty(value = "是出租房吗/false为商铺")
+    private Boolean leaseHouse;
 
 }

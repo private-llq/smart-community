@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = FieldValidator.class)
 public @interface FieldValid {
 
-    String message() default "{com.jsy.community.annotation.FieldValid.message}";
+    String message() default "字段文本只支持：{value}";
 
     String[] value();
 

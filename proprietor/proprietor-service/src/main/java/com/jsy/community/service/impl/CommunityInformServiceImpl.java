@@ -12,6 +12,8 @@ import com.jsy.community.mapper.UserInformMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.HouseVo;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -140,6 +143,20 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
             setReadPushInform(acctId, uid);
         });
     }
+
+    @Override
+    public List<HouseLeaseVO> leaseLatestInform(Integer informInitializeCount) {
+        int limit = informInitializeCount / 2;
+        //商铺最新信息
+        List<HouseLeaseVO> shopVos = communityInformMapper.selectShopLatest(limit);
+        //出租房最新信息
+        List<HouseLeaseVO> leaseVos = communityInformMapper.selectLeaseLatest(limit);
+        List<HouseLeaseVO> vos = new ArrayList<>();
+        vos.addAll(shopVos);
+        vos.addAll(leaseVos);
+        return vos;
+    }
+
 
     /**
      * 通过 推送账号id 和 用户id 把用户在该推送账号未读的信息 标记为已读

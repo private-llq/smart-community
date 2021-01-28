@@ -307,7 +307,7 @@ public class ProprietorExcelCommander {
         if(cell == null){
             return false;
         }
-        return !cell.getStringCellValue().equals("");
+        return !"".equals(cell.getStringCellValue());
     }
 
     /**
@@ -378,7 +378,7 @@ public class ProprietorExcelCommander {
     }
 
     public static boolean isEmpty(String str){
-        return str == null || str.trim().equals("") || "null".equals(str) || "undefined".equals(str);
+        return str == null || "".equals(str.trim()) || "null".equals(str) || "undefined".equals(str);
     }
 
 }
