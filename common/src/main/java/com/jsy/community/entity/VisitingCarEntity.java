@@ -23,7 +23,7 @@ import java.util.Date;
 @Accessors(chain = true)
 @ApiModel(value="随行车辆", description="随行车辆")
 @TableName("t_visiting_car")
-public class VisitingCarEntity extends BaseEntity implements Serializable {
+public class VisitingCarEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     

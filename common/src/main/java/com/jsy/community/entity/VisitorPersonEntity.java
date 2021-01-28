@@ -21,7 +21,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @ApiModel(value="随行人员", description="随行人员")
 @TableName("t_visitor_person")
-public class VisitorPersonEntity extends BaseEntity implements Serializable {
+public class VisitorPersonEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

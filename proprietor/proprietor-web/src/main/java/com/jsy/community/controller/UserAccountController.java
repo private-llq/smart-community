@@ -9,7 +9,11 @@ import com.jsy.community.api.IUserAccountService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PaymentEnum;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.RedbagQO;
+import com.jsy.community.qo.UserTicketQO;
 import com.jsy.community.qo.proprietor.UserAccountTradeQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -163,19 +167,61 @@ public class UserAccountController {
 	}
 	
 	/**
-	* @Description: 红包/转账 退款
-	 * @Param: [map]
+	* @Description: 查用户拥有的所有券
+	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
-	 * @Date: 2021/1/25
+	 * @Date: 2021/1/28
 	**/
-//	@ApiOperation("【红包/转账】退款")
-//	@PostMapping("redbag/back")
-//	public CommonResult sendBackRedbag(@RequestBody Map<String,String> map){
-//		if(StringUtils.isEmpty(map.get("uuid"))){
-//			return CommonResult.error("缺少退款人");
-//		}
-//		return CommonResult.ok(redbagService.sendBackRedbag(map.get("uuid")),"已退回");
-//	}
+	@ApiOperation("【全平台抵用券】查询")
+	@PostMapping("tickets")
+	public CommonResult queryTickets(@RequestBody BaseQO<UserTicketQO> baseQO){
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new UserTicketQO());
+		}
+		baseQO.getQuery().setUid(UserUtils.getUserId());
+		return CommonResult.ok(userAccountService.queryTickets(baseQO),"查询成功");
+	}
+	
+	/**
+	* @Description: id单查
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/28
+	**/
+	@ApiOperation("【全平台抵用券】id单查")
+	@GetMapping("ticket")
+	public CommonResult queryTicketById(@RequestParam Long id){
+		return CommonResult.ok(userAccountService.queryTicketById(id,UserUtils.getUserId()),"查询成功");
+	}
+	
+	/**
+	* @Description: 使用券
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/28
+	**/
+	@ApiOperation("【全平台抵用券】使用")
+	@PutMapping("ticket/use")
+	public CommonResult useTicket(@RequestParam Long id){
+		boolean b = userAccountService.useTicket(id,UserUtils.getUserId());
+		return b ? CommonResult.ok("使用成功") : CommonResult.error("使用失败");
+	}
+	
+	/**
+	* @Description: 退回券
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/1/28
+	**/
+	@ApiOperation("【全平台抵用券】退回")
+	@PutMapping("ticket/rollback")
+	public CommonResult rollbackTicket(@RequestParam Long id){
+		boolean b = userAccountService.rollbackTicket(id,UserUtils.getUserId());
+		return b ? CommonResult.ok("退回成功") : CommonResult.error("退回失败");
+	}
 	
 }
