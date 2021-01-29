@@ -16,11 +16,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class ProprietorServiceApp {
 	public static void main(String[] args) {
 		SpringApplication.run(ProprietorServiceApp.class, args);
-//		initSubScribe();
 	}
 	
-//	private static void initSubScribe(){
-//		MqttPushClient client = MqttPushClient.getInstance();
-//		client.subscribe("mqtt/face/1467180/#");
-//	}
 }

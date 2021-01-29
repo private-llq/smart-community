@@ -145,6 +145,13 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		return updateById(update);
 	}
 	
+	/**
+	* @Description: 更换手机号
+	 * @Param: [newMobile, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/1/29
+	**/
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public boolean changeMobile(String newMobile,String uid){

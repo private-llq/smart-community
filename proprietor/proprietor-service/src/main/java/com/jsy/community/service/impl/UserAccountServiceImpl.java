@@ -20,6 +20,7 @@ import com.jsy.community.vo.UserAccountVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -197,6 +198,18 @@ public class UserAccountServiceImpl implements IUserAccountService {
 	@Override
 	public boolean rollbackTicket(Long id, String uid){
 		return userTicketMapper.rollbackTicket(id,uid) == 1;
+	}
+	
+	/**
+	* @Description: 清理过期券(超期30天)
+	 * @Param: []
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/1/29
+	**/
+	@Scheduled(cron = "0 0 3 * * ?")
+	public void deleteExpiredTicket(){
+		userTicketMapper.deleteExpiredTicket();
 	}
 	
 }

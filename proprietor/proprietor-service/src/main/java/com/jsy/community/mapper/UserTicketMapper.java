@@ -55,4 +55,15 @@ public interface UserTicketMapper extends BaseMapper<UserTicketEntity> {
 	@Update("update t_user_ticket set status = 0,update_time = now() where id = #{id} and uid = #{uid}")
 	int rollbackTicket(@Param("id")Long id, @Param("uid")String uid);
 	
+	/**
+	* @Description: 清理过期券(过期超30天)
+	 * @Param: []
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/1/29
+	**/
+	@Update("update t_user_ticket set deleted = 1 " +
+		"where UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(expire_time) >= 30*24*60*60 and deleted = 0")
+	void deleteExpiredTicket();
+	
 }

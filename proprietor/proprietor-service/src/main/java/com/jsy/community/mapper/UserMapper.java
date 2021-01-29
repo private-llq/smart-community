@@ -35,6 +35,13 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 */
     int proprietorUpdate(ProprietorQO proprietorQO);
 	
+    /**
+    * @Description: 更换手机号
+     * @Param: [newMobile, uid]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2021/1/29
+    **/
 	@Update("update t_user set mobile = #{newMobile} where uid = #{uid}")
 	int changeMobile(@Param("newMobile")String newMobile, @Param("uid")String uid);
 
