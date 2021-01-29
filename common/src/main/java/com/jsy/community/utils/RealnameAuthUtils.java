@@ -12,7 +12,6 @@ import java.util.Map;
  * @description 实名认证
  * @since 2020-12-11 15:57
  **/
-@Component
 public class RealnameAuthUtils {
 	
 	/**
@@ -23,7 +22,7 @@ public class RealnameAuthUtils {
 	 * @Date: 2020/12/11
 	**/
 	//TODO 三方接口商家待定
-	public boolean twoElements(String name,String idCard){
+	public static boolean twoElements(String name, String idCard){
 		
 		String appCode = "xxxxxxxxxxxxxxxxxxxxx";
 		String url = "https://idcert.market.alicloudapi.com/idcard";
@@ -39,13 +38,25 @@ public class RealnameAuthUtils {
 		//设置默认配置
 		MyHttpUtils.setRequestConfig(httpGet);
 		//执行请求，返回结果
-		String httpResult = MyHttpUtils.exec(httpGet);
+		String httpResult = (String)MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_STR);
 		//解析结果
 		JSONObject result = JSONObject.parseObject(httpResult);
 		if(result != null && "01".equals(result.getString("status"))){
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	* @Description: 实名认证 三要素
+	 * @Param: [name, idCard]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/1/29
+	**/
+	//TODO 三方接口商家待定
+	public static boolean threeElements(String name, String idCard, String faceUrl){
+		return true;
 	}
 	
 }

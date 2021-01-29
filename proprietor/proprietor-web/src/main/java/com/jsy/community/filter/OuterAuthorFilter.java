@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Component
 //@WebFilter(urlPatterns = {"/api/v1/proprietor/out/pension/*"}, filterName = "pensionAuthorFilter")
 //TODO 所有请求都会进来 urlPatterns失效问题待解决
-@WebFilter(urlPatterns = {"/bbbcdefg"}, filterName = "outerAuthorFilter")
+@WebFilter(urlPatterns = {"/*"}, filterName = "outerAuthorFilter")
 public class OuterAuthorFilter implements Filter{
 	
 	//要校验IP的接口路径前缀
@@ -45,7 +45,7 @@ public class OuterAuthorFilter implements Filter{
 	private static final Set<String> ALLOWED_PREFIX_IP = Collections.unmodifiableSet(new HashSet<>(
 			Arrays.asList("192.168.12")));
 	
-	//允许IP前缀
+	//允许固定IP
 	private static final Set<String> ALLOWED_IP = Collections.unmodifiableSet(new HashSet<>(
 		Arrays.asList("222.178.212.29")));
 	
@@ -84,7 +84,7 @@ public class OuterAuthorFilter implements Filter{
 //				log.error("接口" + path + "有非法访问尝试，来自IP：" + ip);
 //				response.setCharacterEncoding("UTF-8");
 //				PrintWriter out = response.getWriter();
-//				out.println(JSONObject.parseObject(JSON.toJSONString(CommonResult.error(JSYError.INTERNAL.getCode(), "别试了别试了，功能已经下线了"))));
+//				out.println(JSONObject.parseObject(JSON.toJSONString(CommonResult.error(JSYError.NOT_FOUND.getCode(), "别试了别试了，功能已经下线了"))));
 //				return;
 //			}
 		}

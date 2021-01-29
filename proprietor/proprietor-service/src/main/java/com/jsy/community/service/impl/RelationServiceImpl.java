@@ -46,10 +46,6 @@ public class RelationServiceImpl implements IRelationService {
     @Autowired
     private UserHouseMapper userHouseMapper;
 
-    @Autowired
-    private RealnameAuthUtils realnameAuthUtils;
-
-
     /**
      * 添加家属
      * @param relationQo
@@ -60,7 +56,7 @@ public class RelationServiceImpl implements IRelationService {
     public Boolean addRelation(RelationQo relationQo) {
 //        //实名认证
 //        if(BusinessConst.IDENTIFICATION_TYPE_IDCARD.equals(relationQo.getIdentificationType())){
-//            if(!realnameAuthUtils.twoElements(relationQo.getName(), relationQo.getIdNumber())){
+//            if(!RealnameAuthUtils.twoElements(relationQo.getName(), relationQo.getIdNumber())){
 //                return false;
 //            }
 //        }

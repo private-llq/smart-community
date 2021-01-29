@@ -29,9 +29,6 @@ import java.util.Map;
 //@ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class SourceController {
 	
-	@Resource
-	private RealnameAuthUtils realnameAuthUtils;
-	
 	//初始化静态代码块
 	@PostConstruct
 	public void initSource(){
@@ -50,8 +47,4 @@ public class SourceController {
 		return CommonResult.ok(BusinessEnum.sourceMap.get(typeName));
 	}
 	
-	@GetMapping("test")
-	public boolean test(){
-		return realnameAuthUtils.twoElements("xxx", "xxxxxxxxxxxxxxx");
-	}
 }

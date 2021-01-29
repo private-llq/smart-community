@@ -1,11 +1,5 @@
 package com.jsy.community.utils;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.alibaba.fastjson.JSON;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -22,14 +16,21 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.util.Map;
+
 /**
-* @Description: Apache HTTP工具类封装 仅适合流行的json请求和返回
+* @Description: Apache HTTP工具类封装
  * @Author: chq459799974
  * @Date: 2020/12/11
 **/
 public class MyHttpUtils {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MyHttpUtils.class);
+	
+	public static final int ANALYZE_TYPE_STR = 1;//返回结果解析类型-String
+	public static final int ANALYZE_TYPE_BYTE = 2;//返回结果解析类型-byte
 	
 	//本地连通性测试
 	public static void main(String[] args) throws Exception {
@@ -139,21 +140,32 @@ public class MyHttpUtils {
 	}
 	
 	//执行请求，返回结果
-	public static String exec(HttpRequestBase httpRequestBase) {
+	public static Object exec(HttpRequestBase httpRequestBase, int analyzeType) {
 		HttpResponse response = null;
-		String httpResult = "";
 		try {
 			response = getConn().execute(httpRequestBase);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("http执行出错", e.getMessage());
 			httpRequestBase.abort();
-			return "";
+			return null;
 		}
 		int statusCode = response.getStatusLine().getStatusCode();
+		String httpResult = "";
+		byte[] data = null;
 		if (HttpStatus.SC_OK == statusCode) {// 如果响应码是 200
 			try {
-				httpResult = EntityUtils.toString(response.getEntity());
+				if(ANALYZE_TYPE_STR == analyzeType){ //解析str
+					httpResult = EntityUtils.toString(response.getEntity());
+					logger.info("http正常返回response：" + response.toString());
+					logger.info("http正常返回result：" + httpResult);
+					return httpResult;
+				}else if(ANALYZE_TYPE_BYTE == analyzeType){  //解析byte
+					data = EntityUtils.toByteArray(response.getEntity());
+					logger.info("http正常返回response：" + response.toString());
+					logger.info("http正常返回byte，数据大小：" + data.length);
+					return data;
+				}
 			} catch (Exception e) {
 				logger.error("http返回结果解析出错", e.getMessage());
 			}
@@ -161,10 +173,9 @@ public class MyHttpUtils {
 			logger.error("非正常返回结果：" + response.toString());
 			logger.error("http错误，返回状态码：" + statusCode);
 			httpRequestBase.abort();
-			return "";
+			return null;
 		}
-		logger.info("http正常返回response：" + response.toString());
-		logger.info("http正常返回result：" + httpResult);
-		return httpResult;
+		return null;
 	}
+	
 }
