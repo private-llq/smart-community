@@ -1,4 +1,4 @@
-package com.jsy.community.qo;
+package com.jsy.community.qo.payment;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,9 +12,9 @@ import java.math.BigDecimal;
  * @create: 2021-01-22 14:12
  **/
 @Data
-public class WeChatPayVO {
+public class WeChatPayQO {
     @ApiModelProperty("支付描述")
     private String description;
     @ApiModelProperty("支付金额")
-    private BigDecimal total;
+    private BigDecimal amount;
 }

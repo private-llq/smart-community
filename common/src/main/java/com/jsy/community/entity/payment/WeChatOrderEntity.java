@@ -1,4 +1,4 @@
-package com.jsy.community.entity;
+package com.jsy.community.entity.payment;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @TableName("t_wechat_order")
 public class WeChatOrderEntity implements Serializable {
     @ApiModelProperty(value = "订单号")
-    private String orderNo;
+    private String id;
     @ApiModelProperty(value = "用户id")
     private String uid;
     @ApiModelProperty(value = "商品描述")

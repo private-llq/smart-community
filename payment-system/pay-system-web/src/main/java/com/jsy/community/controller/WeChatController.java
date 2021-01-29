@@ -1,19 +1,27 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
+import com.jsy.community.MyHttpClient;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.WeChatOrderEntity;
-import com.jsy.community.qo.WeChatPayVO;
+import com.jsy.community.entity.payment.WeChatOrderEntity;
+import com.jsy.community.qo.payment.WeChatPayQO;
+import com.jsy.community.qo.payment.WithdrawalQO;
 import com.jsy.community.utils.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.XmlUtil;
 import com.jsy.community.vo.CommonResult;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
@@ -25,8 +33,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @program: pay
@@ -43,18 +53,20 @@ public class WeChatController {
     @Autowired
     private RabbitTemplate amqpTemplate;
 
+    private HttpClient httpClient;
+
     @PostMapping("/wxPay")
     @Login
-    public CommonResult wxPay(@RequestBody WeChatPayVO weChatPayVO) throws Exception {
+    public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         Map hashMap = new LinkedHashMap();
-        hashMap.put("total",weChatPayVO.getTotal().multiply(new BigDecimal(100)));
+        hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("currency","CNY");
         Map<Object, Object> map = new LinkedHashMap<>();
 
         map.put("appid", WechatConfig.APPID);
         map.put("mchid",WechatConfig.MCH_ID);
-        map.put("description",weChatPayVO.getDescription());
+        map.put("description",weChatPayQO.getDescription());
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://jsy.free.vipnps.vip/callback");
         map.put("amount",hashMap);
@@ -62,10 +74,10 @@ public class WeChatController {
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
 
         WeChatOrderEntity msg = new WeChatOrderEntity();
-        msg.setOrderNo((String) map.get("out_trade_no"));
+        msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
-        msg.setDescription(weChatPayVO.getDescription());
-        msg.setTotal(weChatPayVO.getTotal());
+        msg.setDescription(weChatPayQO.getDescription());
+        msg.setTotal(weChatPayQO.getAmount());
         msg.setOrderStatus(1);
         msg.setArriveStatus(1);
         msg.setCreateTime(LocalDateTime.now());
@@ -115,4 +127,52 @@ public class WeChatController {
     public WeChatOrderEntity callback(@RequestParam("orderId") String orderId) throws Exception {
         return weChatService.saveOrder(orderId);
     }
+
+
+
+    /**
+     * @Description: 提现
+     * @author: Hu
+     * @since: 2021/1/29 14:57
+     * @Param:
+     * @return:
+     */
+    @PostMapping(value = "/withdrawDeposit")
+    public CommonResult withdrawDeposit(@RequestBody WithdrawalQO withdrawalQO) throws Exception {
+        String body=null;
+        Map<String, String> restmap=null;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("mch_appid",WechatConfig.APPID);
+        map.put("mch_id",WechatConfig.MCH_ID);
+        map.put("nonce_str",UUID.randomUUID().toString().replace("-", ""));
+        map.put("partner_trade_no",OrderNoUtil.txOrder());
+        map.put("openid",withdrawalQO.getOpenid());
+        map.put("check_name","NO_CHECK");
+        map.put("amount",withdrawalQO.getAmount().multiply(new BigDecimal(100)));
+        map.put("desc",withdrawalQO.getDesc());
+        map.put("sign",PublicConfig.getSignToken(map,WechatConfig.PRIVATE_KEY));
+
+        String xml = PublicConfig.getXml(map);
+        HttpPost httpPost = new HttpPost(WechatConfig.TRANSFERS_PAY);
+        //装填参数
+        StringEntity s = new StringEntity(xml, "UTF-8");
+        //设置参数到请求对象中
+        httpPost.setEntity(s);
+
+        HttpResponse response = MyHttpClient.getSSLConnectionSocket().execute(httpPost);
+        body = EntityUtils.toString(response.getEntity(), "UTF-8");
+        restmap = XmlUtil.xmlParse(body);
+
+        if (restmap.equals(null) && "SUCCESS".equals(restmap.get("result_code"))){
+            System.out.println("转账成功");
+            System.out.println(restmap.get("result_code"));
+        }else {
+            System.out.println("转账失败");
+            System.out.println(restmap.get("err_code") + ":" + restmap.get("err_code_des"));
+        }
+
+        return null;
+    }
+
+
 }

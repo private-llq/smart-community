@@ -7,11 +7,15 @@ import com.wechat.pay.contrib.apache.httpclient.auth.AutoUpdateCertificatesVerif
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
 import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Credentials;
 import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Validator;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.PrivateKey;
+import javax.net.ssl.SSLContext;
+import java.io.*;
+import java.security.*;
+import java.security.cert.CertificateException;
 
 /**
  * @program: com.jsy.community
@@ -26,6 +30,7 @@ public class MyHttpClient {
         PrivateKey merchantPrivateKey = null;
         try {
             merchantPrivateKey = PublicConfig.getPrivateKey(WechatConfig.FILE_NAME);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,5 +58,68 @@ public class MyHttpClient {
             }
         }
     }
+
+
+    /**
+     * @Description: 带证书请求
+     * @author: Hu
+     * @since: 2021/1/29 17:32
+     * @Param:
+     * @return:
+     */
+    public static CloseableHttpClient getSSLConnectionSocket() {
+        KeyStore keyStore = null;
+        try {
+            keyStore = KeyStore.getInstance("PKCS12");
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+        FileInputStream instream = null;//加载本地的证书进行https加密传输
+        try {
+            instream = new FileInputStream(new File("C:/Users/jsy/Desktop/cert/1605856544_20210120_cert/apiclient_cert.p12"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            try {
+                keyStore.load(instream, WechatConfig.MCH_ID.toCharArray());//设置证书密码
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                instream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }	// Trust own CA and all self-signed certs
+        SSLContext sslcontext = null;	// Allow TLSv1 protocol only
+        try {
+            sslcontext = SSLContexts.custom()
+                    .loadKeyMaterial(keyStore, WechatConfig.MCH_ID.toCharArray())
+                    .build();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        }
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                sslcontext,			new String[]{"TLSv1"},			null,
+                SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+        return httpClient = HttpClients.custom()
+                .setSSLSocketFactory(sslsf)
+                .build();
+    }
+
+
+
 
 }

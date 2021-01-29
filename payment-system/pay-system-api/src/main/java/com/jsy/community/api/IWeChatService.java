@@ -1,7 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.WeChatOrderEntity;
+import com.jsy.community.entity.payment.WeChatOrderEntity;
 
 /**
  * @program: com.jsy.community

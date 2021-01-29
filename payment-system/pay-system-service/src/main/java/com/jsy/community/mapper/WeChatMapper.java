@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.WeChatOrderEntity;
+import com.jsy.community.entity.payment.WeChatOrderEntity;
 
 /**
  * @program: com.jsy.community

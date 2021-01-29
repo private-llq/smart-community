@@ -23,13 +23,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.Signature;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
@@ -205,6 +203,9 @@ public class PublicConfig {
         sign.update(message);
         return Base64.getEncoder().encodeToString(sign.sign());
     }
+
+
+
 
     /**
      * 组装签名加载
@@ -393,4 +394,77 @@ public class PublicConfig {
             response.close();
         }
     }
+
+    /**
+     * Description:MD5工具生成token
+     * @param value
+     * @return
+     */
+    public static String getMD5Value(String value){
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            byte[] md5ValueByteArray = messageDigest.digest(value.getBytes());
+            BigInteger bigInteger = new BigInteger(1 , md5ValueByteArray);
+            return bigInteger.toString(16).toUpperCase();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    /**
+     * 生成签名
+     * @param map
+     * @return
+     */
+    public static String getSignToken(Map<String, Object> map,String apikey) {
+        String result = "";
+        try {
+            List<Map.Entry<String, Object>> infoIds = new ArrayList<Map.Entry<String, Object>>(map.entrySet());
+            // 对所有传入参数按照字段名的 ASCII 码从小到大排序（字典序）
+            Collections.sort(infoIds, new Comparator<Map.Entry<String, Object>>() {
+
+                public int compare(Map.Entry<String, Object> o1, Map.Entry<String, Object> o2) {
+                    return (o1.getKey()).toString().compareTo(o2.getKey());
+                }
+            });
+            // 构造签名键值对的格式
+            StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, Object> item : infoIds) {
+                if (item.getKey() != null || item.getKey() != "") {
+                    String key = item.getKey();
+                    Object val = item.getValue();
+                    if (!(val == "" || val == null)) {
+                        sb.append(key + "=" + val + "&");
+                    }
+                }
+            }
+            sb.append("key="+apikey+"");
+            result = sb.toString();
+            //进行MD5加密
+            result = getMD5Value(result);
+        } catch (Exception e) {
+            return null;
+        }
+
+        return result;
+    }
+
+    public static String getXml(Map<String,Object> map){
+        StringBuilder builder = new StringBuilder();
+        builder.append("<xml>");
+            List<Map.Entry<String, Object>> infoIds = new ArrayList<Map.Entry<String, Object>>(map.entrySet());
+            // 构造签名键值对的格式
+            for (Map.Entry<String, Object> item : infoIds) {
+                if (item.getKey() != null || item.getKey() != "") {
+                    String key = item.getKey();
+                    Object val = item.getValue();
+                    builder.append("<"+key+">");
+                    builder.append(val);
+                    builder.append("</"+key+">");
+                }
+            }
+            builder.append("</xml>");
+        return builder.toString();
+    }
+
+
 }

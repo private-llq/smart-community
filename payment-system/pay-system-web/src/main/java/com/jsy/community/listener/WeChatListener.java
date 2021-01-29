@@ -3,7 +3,7 @@ package com.jsy.community.listener;
 import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.WeChatOrderEntity;
+import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.rabbitmq.client.Channel;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.amqp.core.Message;
@@ -59,15 +59,6 @@ public class WeChatListener{
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 
     }
-
-    public static void main(String[] args) {
-        try {
-            PublicConfig.QueryOrder("202101271743464694218605");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
 
 
