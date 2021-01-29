@@ -150,8 +150,6 @@ public class DownloadLogController {
      * @return 返回读取的字节流
      */
     private byte[] downloadDirectory(String directoryPath, String moduleName, MultiValueMap<String, String> header, HttpServletRequest request) {
-        byte[] fileStream;
-        FileInputStream fileInputStream = null;
         String modulePath = directoryPath + moduleName;
         String moduleZipName = moduleName + ".zip";
         try {

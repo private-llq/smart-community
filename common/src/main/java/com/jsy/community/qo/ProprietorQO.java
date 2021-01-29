@@ -51,6 +51,11 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("头像地址")
     private String avatarUrl;
 
+    @Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_URL, message = "人脸URL地址不正确")
+    @NotBlank(groups = {ProprietorRegister.class}, message = "人脸未上传!")
+    @ApiModelProperty("人脸头像地址")
+    private String faceUrl;
+
     @Pattern(groups = {PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_MOBILE, message = "电话号码错误，只支持电信|联通|移动")
     @ApiModelProperty("电话号码")
     private String mobile;

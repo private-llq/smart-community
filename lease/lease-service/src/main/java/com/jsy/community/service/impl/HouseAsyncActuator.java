@@ -27,14 +27,14 @@ public class HouseAsyncActuator {
     /**
      * 预约消息推送
      * @param sourceUid         发起推送的推送人uid
-     * @param HouseLeaseId      房屋id
+     * @param houseLeaseId      房屋id
      * @param pushTitle         推送标题
      * @param pushMsg           推送信息
      */
     @Async(BusinessConst.LEASE_ASYNC_POOL)
-    public void pushMsg(String sourceUid, Long HouseLeaseId, String pushTitle, String pushMsg){
+    public void pushMsg(String sourceUid, Long houseLeaseId, String pushTitle, String pushMsg){
         //[接受者信息] 通房屋id拿到房源出租标题 和 用户的 推送id
-        HouseReserveVO vo = houseReserveMapper.getPushInfo(HouseLeaseId);
+        HouseReserveVO vo = houseReserveMapper.getPushInfo(houseLeaseId);
         if( vo == null ){
             throw new LeaseException("没有预约相关信息!");
         }

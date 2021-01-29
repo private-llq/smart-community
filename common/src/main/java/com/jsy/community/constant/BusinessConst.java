@@ -209,6 +209,11 @@ public interface BusinessConst {
 	String AVATAR_BUCKET_NAME = "user-avatar";
 
 	/**
+	 * 用户头像 人脸头像
+	 */
+	String FAVE_AVATAR_BUCKET_NAME = "user-face-avatar";
+
+	/**
 	 * 车辆图片 上传 至 文件服务器 的 bucket Name
 	 */
 	String CAR_IMAGE_BUCKET_NAME = "user-avatar";

@@ -35,6 +35,9 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("头像地址")
 	private String avatarUrl;
 
+	@ApiModelProperty("人脸地址")
+	private String faceUrl;
+
 	@ApiModelProperty("电话号码")
 	private String mobile;
 	

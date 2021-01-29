@@ -28,6 +28,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,7 +92,7 @@ public class UserController {
     
     /**
      * 【用户】业主信息登记
-     * @param proprietorQO  参数实体
+     * @param qo  参数实体
      * @author YuLF
      * @since  2020/11/15 11:29
      * @return              返回是否登记成功
@@ -99,41 +100,41 @@ public class UserController {
     @Login
     @PostMapping("register")
     @ApiOperation("业主信息登记")
-    public CommonResult<Boolean> proprietorRegister(@RequestBody  ProprietorQO proprietorQO) {
+    public CommonResult<Boolean> proprietorRegister(@RequestBody  ProprietorQO qo) {
         String userId = UserUtils.getUserId();
         //1.数据填充  新增业主信息时，必须要携带当前用户的uid  业主id首次不需要新增，只有在审核房屋通过时，业主id才会改变
-        proprietorQO.setUid(userId);
-        proprietorQO.setHouseholderId(null);
+        qo.setUid(userId);
+        qo.setHouseholderId(null);
         //2.验证业主信息登记必填项
-        ValidatorUtils.validateEntity(proprietorQO, ProprietorQO.ProprietorRegister.class);
+        ValidatorUtils.validateEntity(qo, ProprietorQO.ProprietorRegister.class);
         //2.1 验证业主信息实体里面的房屋实体id是否为空，如果为空 说明前端并没有选择所属房屋
-        if (proprietorQO.getHouseEntityList() == null || proprietorQO.getHouseEntityList().isEmpty()) {
+        if (qo.getHouseEntityList() == null || qo.getHouseEntityList().isEmpty()) {
             throw new ProprietorException(1, "缺失房屋登记信息!");
         }
         //验证房屋第一个id和社区id参数值是否正确 至少需要登记一个房屋
 
         //3.有填登记车辆信息的情况下
-        if (proprietorQO.getHasCar()) {
-            if (null == proprietorQO.getCarEntityList()  || proprietorQO.getCarEntityList().isEmpty()) {
+        if (qo.getHasCar()) {
+            if (null == qo.getCarEntityList()  || qo.getCarEntityList().isEmpty()) {
                 throw new ProprietorException(1, "缺失车辆登记信息!");
             }
             //通过uid 查询t_user_auth表的用户手机号码
-            String userMobile = iUserAuthService.selectContactById(proprietorQO.getUid());
+            String userMobile = iUserAuthService.selectContactById(qo.getUid());
             //t_user_auth 表中用户没有注册
             if(userMobile == null){
                 throw new ProprietorException(JSYError.FORBIDDEN.getCode(), "用户不存在!");
             }
             //验证所有车辆信息 验证成功没有抛异常 则把当前这个对象的一些社区id 所属人 手机号码 设置进去 方便后续车辆登记
-            for (CarEntity carEntity : proprietorQO.getCarEntityList()){
+            for (CarEntity carEntity : qo.getCarEntityList()){
                 ValidatorUtils.validateEntity(carEntity, CarEntity.proprietorCarValidated.class);
-                carEntity.setCommunityId(proprietorQO.getHouseEntityList().get(0).getCommunityId());
+                carEntity.setCommunityId(qo.getHouseEntityList().get(0).getCommunityId());
                 carEntity.setUid(userId);
-                carEntity.setOwner(proprietorQO.getRealName());
+                carEntity.setOwner(qo.getRealName());
                 carEntity.setContact(userMobile);
             }
         }
         //登记业主相关信息
-        return userService.proprietorRegister(proprietorQO) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return userService.proprietorRegister(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     /**
@@ -163,11 +164,18 @@ public class UserController {
     @Login
     @ApiOperation("业主头像上传")
     @PostMapping("uploadAvatar")
-    public CommonResult<String> uploadImg(MultipartFile avatar) {
+    public CommonResult<String> uploadAvatar(MultipartFile avatar) {
         PicUtil.imageQualified(avatar);
         return CommonResult.ok(MinioUtils.upload(avatar, BusinessConst.AVATAR_BUCKET_NAME));
     }
 
+    @Login
+    @ApiOperation("业主人脸头像上传")
+    @PostMapping("uploadFaceAvatar")
+    public CommonResult<String> uploadFaceAvatar(MultipartFile faceAvatar) {
+        PicUtil.imageQualified(faceAvatar);
+        return CommonResult.ok(MinioUtils.upload(faceAvatar, BusinessConst.FAVE_AVATAR_BUCKET_NAME));
+    }
 
     /**
      * 查询业主及家属信息
