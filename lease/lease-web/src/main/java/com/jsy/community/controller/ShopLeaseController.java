@@ -4,7 +4,6 @@ package com.jsy.community.controller;
 import com.alibaba.fastjson.JSON;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Log;
-import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IShopLeaseService;
 import com.jsy.community.api.LeaseException;
@@ -151,8 +150,12 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	@ApiOperation("商铺头图上传")
 	@PostMapping("/uploadHeadImg")
-	@UploadImg(bucketName = BUCKET_HEAD, redisKeyName = REDIS_KEY_PART)
+//	@UploadImg(bucketName = BUCKET_HEAD, redisKeyName = REDIS_KEY_PART)
 	public CommonResult uploadHeadImg(@RequestParam("file") MultipartFile[] files, CommonResult commonResult) {
+		if (files.length > 3) {
+			return CommonResult.error("门头图最多上传3张图");
+		}
+//		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKET_HEAD);
 		return CommonResult.ok(commonResult.getData());
 	}
 	
@@ -160,6 +163,9 @@ public class ShopLeaseController {
 	@ApiOperation("商铺室内图上传")
 	@PostMapping("/uploadMiddleImg")
 	public CommonResult uploadMiddleImg(@RequestParam("file") MultipartFile[] files) {
+		if (files.length>8) {
+			return CommonResult.error("室内图最多上传8张图");
+		}
 		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME_MIDDLE);
 		return CommonResult.ok(filePaths);
 	}
@@ -168,6 +174,9 @@ public class ShopLeaseController {
 	@ApiOperation("商铺其他图上传")
 	@PostMapping("/uploadOtherImg")
 	public CommonResult uploadOtherImg(@RequestParam("file") MultipartFile[] files) {
+		if (files.length>8) {
+			return CommonResult.error("室内图最多上传8张图");
+		}
 		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME_OTHER);
 		return CommonResult.ok(filePaths);
 	}

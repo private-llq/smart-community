@@ -2,14 +2,16 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRepairService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.UploadBucketConst;
+import com.jsy.community.constant.UploadRedisConst;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairEntity;
 import com.jsy.community.qo.proprietor.RepairCommentQO;
-import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -48,9 +50,6 @@ public class RepairController {
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
-	private static final String BUCKETNAME = "repair-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
-	private static final String BUCKETNAME2 = "repair-comment-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
-	
 	@ApiOperation("房屋报修查询")
 	@GetMapping("/getRepair")
 	public CommonResult getRepair() {
@@ -86,11 +85,12 @@ public class RepairController {
 	
 	@ApiOperation("报修内容图片上传")
 	@PostMapping("/uploadRepairImg")
-	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files) {
+	@UploadImg(bucketName = UploadBucketConst.REPAIR_BUCKET,redisKeyName = UploadRedisConst.REPAIR_IMG_PART)
+	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files,CommonResult commonResult) {
 		if (files.length > 3) {
 			throw new ProprietorException("只能上传3张图片");
 		}
-		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME);
+		String[] filePaths = (String[])commonResult.getData();
 		StringBuilder filePath = new StringBuilder();
 		for (String s : filePaths) {
 			if (!StringUtils.isEmpty(s)) {
@@ -108,21 +108,28 @@ public class RepairController {
 		String uid = UserUtils.getUserId();
 		repairCommentQO.setUid(uid);
 		repairService.appraiseRepair(repairCommentQO);
+		
+		String filePath = repairCommentQO.getFilePath();
+		String[] split = filePath.split(";");
+		for (String path : split) {
+			redisTemplate.opsForSet().add(UploadRedisConst.REPAIR_COMMENT_IMG_ALL, path); // 存入redis
+		}
 		return CommonResult.ok();
 	}
 	
 	@ApiOperation("评价图片上传")
 	@PostMapping("/uploadCommentImg")
-	public CommonResult uploadCommentImg(@RequestParam("file") MultipartFile[] files) {
+	@UploadImg(bucketName = UploadBucketConst.REPAIR_BUCKET,redisKeyName = UploadRedisConst.REPAIR_COMMENT_IMG_PART)
+	public CommonResult uploadCommentImg(@RequestParam("file") MultipartFile[] files,CommonResult commonResult) {
 		if (files.length > 3) {
 			throw new ProprietorException("只能上传3张图片");
 		}
-		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME2);
+		String[] filePaths = (String[]) commonResult.getData();
 		StringBuilder filePath = new StringBuilder();
 		for (String s : filePaths) {
 			// TODO 前端要注意调整 repairImg
 			if (!StringUtils.isEmpty(s)) {
-				redisTemplate.opsForSet().add("repair_comment_img_part", s);
+				redisTemplate.opsForSet().add(UploadRedisConst.REPAIR_COMMENT_IMG_PART, s);
 				filePath.append(s);
 				filePath.append(";");
 			}
@@ -137,6 +144,12 @@ public class RepairController {
 		repairEntity.setUserId(uid);
 		ValidatorUtils.validateEntity(repairEntity, RepairEntity.addRepairValidate.class);
 		repairService.addRepair(repairEntity);
+		
+		String repairImg = repairEntity.getRepairImg();
+		String[] split = repairImg.split(";");
+		for (String filePath : split) {
+			redisTemplate.opsForSet().add(UploadRedisConst.REPAIR_IMG_ALL, filePath); // 存入redis
+		}
 		return CommonResult.ok();
 	}
 	

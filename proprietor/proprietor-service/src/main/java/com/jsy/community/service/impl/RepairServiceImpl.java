@@ -61,11 +61,6 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	public void addRepair(RepairEntity repairEntity) {
 		repairEntity.setId(SnowFlake.nextId());
 		repairMapper.insert(repairEntity); // 1.png;2.png;3.png;   或 1.png;2.png;3.png 都可以            redis 现在存的是  3个 xx.png
-		String repairImg = repairEntity.getRepairImg();
-		String[] split = repairImg.split(";");
-		for (String filePath : split) {
-			redisTemplate.opsForSet().add("repair_img_all", filePath); // 存入redis
-		}
 		Long id = repairEntity.getId();// 得到新添加报修的报修id
 		
 		RepairOrderEntity orderEntity = new RepairOrderEntity(); // 关联订单表

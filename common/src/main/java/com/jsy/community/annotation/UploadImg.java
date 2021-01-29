@@ -13,6 +13,22 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface UploadImg {
-	String bucketName();
+	/**
+	 * @Author lihao
+	 * @Description 存储到服务器的BUCKET名称
+	 **/
+	String bucketName() default "other";
+	
+	/**
+	 * @Author lihao
+	 * @Description 存到redis时的键名
+	 **/
 	String redisKeyName();
+	
+	/**
+	 * @Author lihao
+	 * @Description 实体的哪个属性名是保存的图片地址
+	 **/
+	String attributeName() default "without";
+	
 }
