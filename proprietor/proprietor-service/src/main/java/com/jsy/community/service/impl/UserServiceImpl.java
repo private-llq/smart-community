@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.mapper.UserMapper;
@@ -17,9 +18,8 @@ import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
-import com.jsy.community.utils.RegexUtils;
-import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.*;
+import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.vo.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -299,6 +299,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Transactional(rollbackFor = {Exception.class})
     @Override
     public Boolean proprietorRegister(ProprietorQO proprietorQo) {
+        //人脸验证
+        if(!RealnameAuthUtils.threeElements(proprietorQo.getRealName(),proprietorQo.getIdCard(),proprietorQo.getFaceUrl())){
+            throw new ProprietorException("人脸验证不通过");
+        }
+        //增加门禁等社区硬件权限
+        //TODO 异步 在回调or硬件服务器回调中处理
+        setCommunityHardwareAuth(proprietorQo);
         //把参数对象里面的值赋值给UserEntity  使用Mybatis plus的insert需要 Entity里面写的表名
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(proprietorQo, userEntity);
@@ -314,6 +321,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //t_user_house 中插入当前这条记录 为了让物业审核
 		userHouseService.saveUserHouse(userEntity.getUid(), proprietorQo.getHouseEntityList());
         return true;
+    }
+    
+    /**
+     * 添加社区硬件权限
+     */
+    private void setCommunityHardwareAuth(ProprietorQO proprietorQO){
+        //TODO 根据uid查询所有房屋已审核社区
+//        List<Long> communityIds = xxxxxx.getUserCommunitys(proprietorQO.getUid());
+        //TODO 获取对应社区的硬件服务器id、地址等相关数据 待设计，确认业务登记操作需要增加的权限
+        
+        //执行调用 目前仅测试人脸机器
+        XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
+        xuFaceEditPersonDTO.setCustomId(proprietorQO.getIdCard());
+        xuFaceEditPersonDTO.setName(proprietorQO.getRealName());
+        xuFaceEditPersonDTO.setGender(proprietorQO.getSex());
+        xuFaceEditPersonDTO.setPic(Base64Util.netPicToBase64(proprietorQO.getFaceUrl()));
+        XUFaceUtil.editPerson(xuFaceEditPersonDTO);
     }
 
 

@@ -1,5 +1,7 @@
 package com.jsy.community.utils;
 
+import org.apache.http.client.methods.HttpGet;
+
 import java.io.*;
 import java.util.Base64;
 import java.util.Base64.Decoder;
@@ -81,6 +83,19 @@ public class Base64Util {
 		// 加密
 		Encoder encoder = Base64.getEncoder();
 		return encoder.encodeToString(data);
+	}
+	
+	/**
+	* @Description: 网络图片转Base64
+	 * @Param: [netPicUrl]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/1/29
+	**/
+	public static String netPicToBase64(String netPicUrl){
+		HttpGet httpGet = MyHttpUtils.httpGetWithoutParams(netPicUrl);
+		byte[] data = (byte[]) MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_BYTE);
+		return byteToBase64(data);
 	}
 	
 	public static void main(String[] args) {

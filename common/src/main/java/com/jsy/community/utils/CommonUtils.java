@@ -60,7 +60,7 @@ public class CommonUtils {
 		JSONObject result = null;
 		try{
 			//执行请求，解析结果
-			httpResult = MyHttpUtils.exec(httpPost);
+			httpResult = (String)MyHttpUtils.exec(httpPost,MyHttpUtils.ANALYZE_TYPE_STR);
 			result = JSONObject.parseObject(httpResult);
 		}catch (Exception e) {
 			//http请求结果httpResult工具类已打印这里不再打印

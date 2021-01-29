@@ -51,7 +51,7 @@ public class WeatherUtils {
 		//设置默认配置
 		MyHttpUtils.setRequestConfig(httpPost);
 		//执行请求，返回结果
-		String httpResult = MyHttpUtils.exec(httpPost);
+		String httpResult = (String)MyHttpUtils.exec(httpPost,MyHttpUtils.ANALYZE_TYPE_STR);
 		//解析结果
 		JSONObject result = JSONObject.parseObject(httpResult);
 		if(result != null && "0".equals(result.getString("code"))){

@@ -272,7 +272,7 @@ public class RedbagServiceImpl implements IRedbagService {
 		String data = "";
 		try{
 			//执行请求，解析结果
-			httpResult = MyHttpUtils.exec(httpPost);
+			httpResult = (String)MyHttpUtils.exec(httpPost,MyHttpUtils.ANALYZE_TYPE_STR);
 			result = JSONObject.parseObject(httpResult, OpenParam.class);
 			data = AESUtil.decrypt(result.getData());
 		}catch (Exception e) {
