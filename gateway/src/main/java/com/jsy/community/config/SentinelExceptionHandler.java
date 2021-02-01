@@ -1,4 +1,4 @@
-package com.jsy.config;
+package com.jsy.community.config;
 
 import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.BlockRequestHandler;
 import com.alibaba.csp.sentinel.slots.block.authority.AuthorityException;
@@ -7,7 +7,7 @@ import com.alibaba.csp.sentinel.slots.block.flow.FlowException;
 import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowException;
 import com.alibaba.csp.sentinel.slots.system.SystemBlockException;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.utils.JsonStrUtil;
+import com.jsy.community.utils.JsonStrUtil;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;

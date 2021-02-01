@@ -29,7 +29,7 @@ public class MyHttpClient {
     public static CloseableHttpClient createHttpClient(){
         PrivateKey merchantPrivateKey = null;
         try {
-            merchantPrivateKey = PublicConfig.getPrivateKey(WechatConfig.FILE_NAME);
+            merchantPrivateKey = PublicConfig.getPrivateKey(WechatConfig.APICLIENT_KEY);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,7 +76,7 @@ public class MyHttpClient {
         }
         FileInputStream instream = null;//加载本地的证书进行https加密传输
         try {
-            instream = new FileInputStream(new File("C:/Users/jsy/Desktop/cert/1605856544_20210120_cert/apiclient_cert.p12"));
+            instream = new FileInputStream(new File(WechatConfig.APICLIENT_CRET));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

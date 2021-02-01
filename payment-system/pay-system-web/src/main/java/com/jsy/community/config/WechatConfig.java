@@ -12,12 +12,16 @@ public class WechatConfig {
      */
     // 企业付款
     public static final String TRANSFERS_PAY = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+    //企业查询
     public static final String QUERY_PAY = "https://api.mch.weixin.qq.com/mmpaymkttransfers/gettransferinfo";
-
+    //支付查询
+    public static final String WXPAY_PAY = "https://api.mch.weixin.qq.com/v3/pay/transactions/out-trade-no/";
     //服务号的应用号
     public final static String APPID = "wxe84d22f50370bbda";
     //私钥所在路径
-    public final static String FILE_NAME = "C:/Users/jsy/Desktop/cert/1605856544_20210120_cert/apiclient_key.pem";
+    public final static String APICLIENT_KEY = "C:/Users/jsy/Desktop/cert/1605856544_20210120_cert/apiclient_key.pem";
+    //apiclient_cert.p12所在路劲
+    public final static String APICLIENT_CRET = "C:/Users/jsy/Desktop/cert/1605856544_20210120_cert/apiclient_cert.p12";
     //商户号
     public final static String MCH_ID = "1605856544";
     //APIKEY 32位密钥

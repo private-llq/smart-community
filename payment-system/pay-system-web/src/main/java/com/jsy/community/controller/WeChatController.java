@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
-import com.jsy.community.utils.MyHttpClient;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IWeChatService;
@@ -11,14 +10,18 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
+import com.jsy.community.utils.MyHttpClient;
 import com.jsy.community.utils.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.XmlUtil;
 import com.jsy.community.vo.CommonResult;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -96,9 +99,9 @@ public class WeChatController {
             }
         });
         //第一步获取prepay_id
-        String prepayId = PublicConfig.V3PayGet("v3/pay/transactions/app", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.FILE_NAME);
+        String prepayId = PublicConfig.V3PayGet("v3/pay/transactions/app", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
         //第二步获取调起支付的参数
-        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.FILE_NAME));
+        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
         return CommonResult.ok(object);
     }
 
@@ -178,6 +181,36 @@ public class WeChatController {
         return null;
     }
     /**
+     * @Description:  支付查询
+     * @author: Hu
+     * @since: 2021/2/1 11:14
+     * @Param:
+     * @return:
+     */
+    @GetMapping("/wxPayQuery")
+    public CommonResult wxPayQuery(@RequestParam("orderId")String orderId){
+        String body = "";
+        HttpGet httpGet = new HttpGet(WechatConfig.WXPAY_PAY+orderId+""+"?mchid="+WechatConfig.MCH_ID+"");
+        httpGet.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+        httpGet.setHeader("Accept", "application/json");
+        CloseableHttpResponse execute=null;
+        try {
+            execute = MyHttpClient.createHttpClient().execute(httpGet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HttpEntity entity = execute.getEntity();
+        if (entity!=null){
+            try {
+                body = EntityUtils.toString(entity, "UTF-8");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return CommonResult.ok(body);
+    }
+    /**
      * @Description:  提现查询
      * @author: Hu
      * @since: 2021/2/1 11:14
@@ -219,7 +252,7 @@ public class WeChatController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (restmap!=null&&restmap.get("return_code").equals("SUCCESS")){
+        if (restmap!=null&&"SUCCESS".equals(restmap.get("return_code"))){
             System.out.println("查询成功");
             System.out.println(restmap.get("return_code"));
         }else {
@@ -227,7 +260,7 @@ public class WeChatController {
             System.out.println(restmap.get("return_code"));
             System.out.println(restmap.get("return_msg"));
         }
-        if (restmap.get("result_code").equals("SUCCESS")&&restmap.get("return_code").equals("SUCCESS")){
+        if ("SUCCESS".equals(restmap.get("result_code"))&&"SUCCESS".equals(restmap.get("return_code"))){
             System.out.println(restmap.get("partner_trade_no"));
             System.out.println(restmap.get("detail_id"));
             System.out.println(restmap.get("status"));

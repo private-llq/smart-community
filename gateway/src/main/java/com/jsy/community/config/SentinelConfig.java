@@ -1,4 +1,4 @@
-//package com.jsy.config;
+package com.jsy.community.config;
 //
 //import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.BlockRequestHandler;
 //import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManager;

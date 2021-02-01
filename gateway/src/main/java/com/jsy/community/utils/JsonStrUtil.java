@@ -1,4 +1,4 @@
-package com.jsy.utils;
+package com.jsy.community.utils;
 
 /**
  * @program: com.jsy.community
