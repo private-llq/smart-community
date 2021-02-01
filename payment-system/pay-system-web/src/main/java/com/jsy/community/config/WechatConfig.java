@@ -12,6 +12,7 @@ public class WechatConfig {
      */
     // 企业付款
     public static final String TRANSFERS_PAY = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+    public static final String QUERY_PAY = "https://api.mch.weixin.qq.com/mmpaymkttransfers/gettransferinfo";
 
     //服务号的应用号
     public final static String APPID = "wxe84d22f50370bbda";

@@ -119,7 +119,7 @@ public class WeChatController {
 
 
     /**
-     * @Description:
+     * @Description:  暂时没用
      * @author: Hu
      * @since: 2021/1/26 17:09
      * @Param:
@@ -177,7 +177,14 @@ public class WeChatController {
 
         return null;
     }
-    @PostMapping("/withdrawDepositQuery")
+    /**
+     * @Description:  提现查询
+     * @author: Hu
+     * @since: 2021/2/1 11:14
+     * @Param:
+     * @return:
+     */
+    @GetMapping("/withdrawDepositQuery")
     public CommonResult withdrawDepositQuery(@RequestParam("orderId")String orderId){
         HashMap<String, Object> map = new LinkedHashMap<>();
         map.put("appid",WechatConfig.APPID);
@@ -186,7 +193,7 @@ public class WeChatController {
         map.put("partner_trade_no",orderId);
         map.put("sign",PublicConfig.getSignToken(map,WechatConfig.PRIVATE_KEY));
         String xml = XmlUtil.xmlFormat(map,true);
-        HttpPost httpPost = new HttpPost(WechatConfig.TRANSFERS_PAY);
+        HttpPost httpPost = new HttpPost(WechatConfig.QUERY_PAY);
         //装填参数
         StringEntity s = new StringEntity(xml, "UTF-8");
         //设置参数到请求对象中
@@ -220,7 +227,7 @@ public class WeChatController {
             System.out.println(restmap.get("return_code"));
             System.out.println(restmap.get("return_msg"));
         }
-        if (restmap.get("result_code").equals("SUCCESS")){
+        if (restmap.get("result_code").equals("SUCCESS")&&restmap.get("return_code").equals("SUCCESS")){
             System.out.println(restmap.get("partner_trade_no"));
             System.out.println(restmap.get("detail_id"));
             System.out.println(restmap.get("status"));
