@@ -164,29 +164,36 @@ public class AdminUserController {
 	@GetMapping("invitation/mobile")
 	@Login
 	public CommonResult invitationOfMobile(@RequestParam String mobile){
+		AdminUserEntity adminUserEntity = adminUserService.queryByMobile(mobile);
+		if(adminUserEntity != null){
+			return CommonResult.error("用户已注册，请不要重复邀请");
+		}
 		//发短信
 //		smsUtil.sendSms(mobile,"");
 		//redis存验证码
 		String code = MyMathUtils.randomCode(6);
+		code = "1111";
 		stringRedisTemplate.opsForValue().set("Admin:Invit:" + mobile,code);
 		return CommonResult.ok();
 	}
 	
 	//手机号用户注册
 	@GetMapping("activation/mobile")
-	public CommonResult<AdminUserEntity> activationOfMobile(@RequestParam String mobile, @RequestParam String code){
+	public CommonResult activationOfMobile(@RequestParam String mobile, @RequestParam String code){
 		//redis验证短信
 		String savedCode = stringRedisTemplate.opsForValue().get("Admin:Invit:" + mobile);
 		//保存用户
 		AdminUserEntity user = new AdminUserEntity();
 		if(code.equals(savedCode)){
+			stringRedisTemplate.delete("Admin:Invit:" + mobile);
 			user.setMobile(mobile);
 			//生成随机初始密码
 			String password = UUID.randomUUID().toString().substring(0, 6);
 			user.setPassword(password);
 			adminUserService.saveUser(user);
+			return CommonResult.ok(user,"验证成功，用户已注册");
 		}
-		return CommonResult.ok(user);
+		return CommonResult.error("验证失败");
 	}
 	
 }

@@ -2,7 +2,6 @@ package com.jsy.community.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.xkzhangsan.time.utils.StringUtil;
-import org.apache.commons.lang.StringUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -38,20 +37,20 @@ public class XmlUtil {
 	 * @param isAddCDATA
 	 * @return
 	 */
-	public static String xmlFormat(Map<String, String> parm, boolean isAddCDATA) {
+	public static String xmlFormat(Map<String, Object> parm, boolean isAddCDATA) {
 
 		StringBuffer strbuff = new StringBuffer(PREFIX_XML);
 		if (CollectionUtil.isNotEmpty(parm)) {
-			for (Entry<String, String> entry : parm.entrySet()) {
+			for (Entry<String, Object> entry : parm.entrySet()) {
 				strbuff.append("<").append(entry.getKey()).append(">");
 				if (isAddCDATA) {
 					strbuff.append(PREFIX_CDATA);
-					if (StringUtils.isNotEmpty(entry.getValue())) {
+					if (entry.getValue()!=null) {
 						strbuff.append(entry.getValue());
 					}
 					strbuff.append(SUFFIX_CDATA);
 				} else {
-					if (StringUtil.isNotEmpty(entry.getValue())) {
+					if (entry.getValue()!=null) {
 						strbuff.append(entry.getValue());
 					}
 				}

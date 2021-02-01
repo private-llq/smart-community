@@ -5,7 +5,7 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.jsy.community.api.AiliAppPayRecordService;
 import com.jsy.community.api.AliAppPayCallbackService;
 import com.jsy.community.api.AliAppPayService;
-import com.jsy.community.api.LeaseException;
+import com.jsy.community.api.PaymentException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			signVerified = AlipaySignature.rsaCertCheckV1(paramsMap, "/mnt/db/smart-community/cert/ali_cert/alipayCertPublicKey_RSA2.crt", "utf-8", "RSA2");
 		} catch (AlipayApiException e1) {
 			e1.printStackTrace();
-			throw new LeaseException("验签出错");
+			throw new PaymentException("验签出错");
 		}
 		//支付宝公钥验签
 //		try {

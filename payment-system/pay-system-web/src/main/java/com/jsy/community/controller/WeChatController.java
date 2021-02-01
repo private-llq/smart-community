@@ -1,7 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
-import com.jsy.community.MyHttpClient;
+import com.jsy.community.utils.MyHttpClient;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IWeChatService;
@@ -28,9 +28,11 @@ import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.xmlpull.v1.XmlPullParserException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -117,7 +119,7 @@ public class WeChatController {
 
 
     /**
-     * @Description:
+     * @Description:  暂时没用
      * @author: Hu
      * @since: 2021/1/26 17:09
      * @Param:
@@ -141,7 +143,7 @@ public class WeChatController {
     public CommonResult withdrawDeposit(@RequestBody WithdrawalQO withdrawalQO) throws Exception {
         String body=null;
         Map<String, String> restmap=null;
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("mch_appid",WechatConfig.APPID);
         map.put("mch_id",WechatConfig.MCH_ID);
         map.put("nonce_str",UUID.randomUUID().toString().replace("-", ""));
@@ -151,6 +153,8 @@ public class WeChatController {
         map.put("amount",withdrawalQO.getAmount().multiply(new BigDecimal(100)));
         map.put("desc",withdrawalQO.getDesc());
         map.put("sign",PublicConfig.getSignToken(map,WechatConfig.PRIVATE_KEY));
+
+        //System.out.println(XmlUtil.xmlFormat(map, true));
 
         String xml = PublicConfig.getXml(map);
         HttpPost httpPost = new HttpPost(WechatConfig.TRANSFERS_PAY);
@@ -169,6 +173,71 @@ public class WeChatController {
         }else {
             System.out.println("转账失败");
             System.out.println(restmap.get("err_code") + ":" + restmap.get("err_code_des"));
+        }
+
+        return null;
+    }
+    /**
+     * @Description:  提现查询
+     * @author: Hu
+     * @since: 2021/2/1 11:14
+     * @Param:
+     * @return:
+     */
+    @GetMapping("/withdrawDepositQuery")
+    public CommonResult withdrawDepositQuery(@RequestParam("orderId")String orderId){
+        HashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("appid",WechatConfig.APPID);
+        map.put("mch_id",WechatConfig.MCH_ID);
+        map.put("nonce_str",UUID.randomUUID().toString().replace("-", ""));
+        map.put("partner_trade_no",orderId);
+        map.put("sign",PublicConfig.getSignToken(map,WechatConfig.PRIVATE_KEY));
+        String xml = XmlUtil.xmlFormat(map,true);
+        HttpPost httpPost = new HttpPost(WechatConfig.QUERY_PAY);
+        //装填参数
+        StringEntity s = new StringEntity(xml, "UTF-8");
+        //设置参数到请求对象中
+        httpPost.setEntity(s);
+
+        HttpResponse response = null;
+        try {
+            response = MyHttpClient.getSSLConnectionSocket().execute(httpPost);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String body = null;
+        Map<String, String> restmap =null;
+        try {
+            body = EntityUtils.toString(response.getEntity(), "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            restmap = XmlUtil.xmlParse(body);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (restmap!=null&&restmap.get("return_code").equals("SUCCESS")){
+            System.out.println("查询成功");
+            System.out.println(restmap.get("return_code"));
+        }else {
+            System.out.println("查询失败");
+            System.out.println(restmap.get("return_code"));
+            System.out.println(restmap.get("return_msg"));
+        }
+        if (restmap.get("result_code").equals("SUCCESS")&&restmap.get("return_code").equals("SUCCESS")){
+            System.out.println(restmap.get("partner_trade_no"));
+            System.out.println(restmap.get("detail_id"));
+            System.out.println(restmap.get("status"));
+            System.out.println(restmap.get("reason"));
+            System.out.println(restmap.get("openid"));
+            System.out.println(restmap.get("transfer_name "));
+            System.out.println(restmap.get("payment_amount"));
+        }else {
+            System.out.println(restmap.get("err_code"));
+            System.out.println(restmap.get("err_code_des"));
         }
 
         return null;

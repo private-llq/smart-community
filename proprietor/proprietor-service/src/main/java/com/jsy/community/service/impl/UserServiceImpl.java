@@ -327,7 +327,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * 添加社区硬件权限
      */
     private void setCommunityHardwareAuth(ProprietorQO proprietorQO){
-        //TODO 根据uid查询所有房屋已审核社区
+        //TODO 根据uid查询所有房屋已审核社区 or 一个小区一次认证
 //        List<Long> communityIds = xxxxxx.getUserCommunitys(proprietorQO.getUid());
         //TODO 获取对应社区的硬件服务器id、地址等相关数据 待设计，确认业务登记操作需要增加的权限
         

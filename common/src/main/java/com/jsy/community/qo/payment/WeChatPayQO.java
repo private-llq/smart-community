@@ -17,4 +17,6 @@ public class WeChatPayQO {
     private String description;
     @ApiModelProperty("支付金额")
     private BigDecimal amount;
+    @ApiModelProperty("调起支付的ip")
+    private BigDecimal payerClientIp;
 }

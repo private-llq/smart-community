@@ -1,8 +1,7 @@
 package com.jsy.community.mapper;
 
-import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 
 /**
 * @Description: 支付宝订单记录
