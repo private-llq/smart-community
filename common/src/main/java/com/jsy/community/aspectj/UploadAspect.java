@@ -1,6 +1,7 @@
 package com.jsy.community.aspectj;
 
 import com.jsy.community.annotation.UploadImg;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.vo.CommonResult;
 import org.aspectj.lang.JoinPoint;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * @author lihao
@@ -79,9 +81,13 @@ public class UploadAspect {
 						redisTemplate.opsForSet().add(redisKeyName, s);
 					}
 					
-					CommonResult result = (CommonResult) args[1];
-					if (result != null) {
-						result.setData(fileList);
+					try {
+						CommonResult result = (CommonResult) args[1];
+						if (result != null) {
+							result.setData(fileList);
+						}
+					} catch (Exception e) {
+						throw new JSYException("第二个参数请设置为CommonResult");
 					}
 				}
 			}
@@ -98,7 +104,7 @@ public class UploadAspect {
 			String s1 = declaredField.getGenericType().toString();
 			
 			// 如果GenericType是数组类型
-			if (declaredField.getGenericType().toString().equals("class [Ljava.lang.String;")) {
+			if (("class [Ljava.lang.String;").equals(declaredField.getGenericType().toString())) {
 				// 拿到该属性的gettet方法
 				Method m = (Method) arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
 				String[] val = (String[]) m.invoke(arg);// 调用getter方法获取属性值
@@ -107,16 +113,23 @@ public class UploadAspect {
 						redisTemplate.opsForSet().add(redisKeyName, s);
 					}
 				}
-			}
-			
-			// 如果GenericType是String类型
-			if (declaredField.getGenericType().toString().equals("class java.lang.String")) {
+			} else if (("class java.lang.String").equals(declaredField.getGenericType().toString())) {
 				// 拿到该属性的gettet方法
 				Method m = (Method) arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
 				String val = (String) m.invoke(arg);// 调用getter方法获取属性值
 				if (val != null) {
 					redisTemplate.opsForSet().add(redisKeyName, val);
 				}
+			} else if ("java.util.List<java.lang.String>".equals(declaredField.getGenericType().toString())) {
+				Method m = (Method) arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
+				List<String> val = (List<String>) m.invoke(arg);// 调用getter方法获取属性值
+				if (val != null) {
+					for (String s : val) {
+						redisTemplate.opsForSet().add(redisKeyName, s);
+					}
+				}
+			}else {
+				throw new JSYException("请指定您实体接收图片的属性或您指定的属性不符合要求，支持String，String[],List<String>");
 			}
 		}
 	}
