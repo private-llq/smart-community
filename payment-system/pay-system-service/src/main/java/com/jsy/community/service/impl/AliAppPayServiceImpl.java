@@ -1,17 +1,5 @@
 package com.jsy.community.service.impl;
 
-import com.jsy.community.api.AliAppPayService;
-import com.jsy.community.api.LeaseException;
-import com.jsy.community.constant.Const;
-import com.jsy.community.constant.PaymentEnum;
-import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
-import com.jsy.community.qo.lease.AliAppPayQO;
-import com.jsy.community.utils.SnowFlake;
-import org.apache.dubbo.config.annotation.DubboService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.CertAlipayRequest;
@@ -22,6 +10,17 @@ import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.jsy.community.api.AliAppPayService;
+import com.jsy.community.api.PaymentException;
+import com.jsy.community.constant.Const;
+import com.jsy.community.constant.PaymentEnum;
+import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
+import com.jsy.community.qo.lease.AliAppPayQO;
+import com.jsy.community.utils.SnowFlake;
+import org.apache.dubbo.config.annotation.DubboService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
@@ -30,7 +29,7 @@ import java.math.BigDecimal;
  * @Author: chq459799974
  * @Date: 2021/1/6
 **/
-@DubboService(version = Const.version, group = Const.group_lease)
+@DubboService(version = Const.version, group = Const.group_payment)
 public class AliAppPayServiceImpl implements AliAppPayService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AliAppPayServiceImpl.class);
@@ -65,7 +64,7 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 		try {
 			response = sandBoxCli.sdkExecute(request);
 		} catch (AlipayApiException e) {
-			throw new LeaseException("沙箱支付宝下单异常");
+			throw new PaymentException("沙箱支付宝下单异常");
 		}
 		String body = response.getBody();
 		if(response.isSuccess()){
@@ -171,7 +170,7 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 			alipayClient = new DefaultAlipayClient(certAlipayRequest);
 		} catch (AlipayApiException e1) {
 			e1.printStackTrace();
-			throw new LeaseException("支付初始化出错");
+			throw new PaymentException("支付初始化出错");
 		}
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
 		request.setNotifyUrl("http://xxxxxxxxxxxxx:8001/callBack/pay");

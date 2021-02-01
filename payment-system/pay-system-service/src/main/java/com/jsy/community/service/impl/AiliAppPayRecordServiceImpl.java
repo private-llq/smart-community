@@ -1,14 +1,13 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.jsy.community.api.AiliAppPayRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.mapper.AiliAppPayRecordDao;
 import org.apache.dubbo.config.annotation.DubboService;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 
 import javax.annotation.Resource;
 
@@ -17,7 +16,7 @@ import javax.annotation.Resource;
  * @Author: chq459799974
  * @Date: 2021/1/6
 **/
-@DubboService(version = Const.version, group = Const.group_lease)
+@DubboService(version = Const.version, group = Const.group_payment)
 public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	
 	@Resource

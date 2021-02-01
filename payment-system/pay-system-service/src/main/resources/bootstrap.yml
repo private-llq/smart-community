@@ -36,3 +36,12 @@ dubbo:
   provider:
     retries: 0
     timeout: 99999
+
+#支付宝(后面移到配置中心)
+alipay:
+  #商家id(测试)
+  sellerId: 2088621955028127
+  #商家账号(测试)
+  sellerEmail: dpbwga6615@sandbox.com
+  #appid(测试)
+  appid: 2021000116687297

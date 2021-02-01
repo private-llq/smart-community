@@ -1,15 +1,9 @@
 package com.jsy.community.controller;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.AiliAppPayRecordService;
 import com.jsy.community.api.AliAppPayService;
-import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
@@ -24,9 +18,11 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 
 @Api(tags = "支付宝支付控制器")
 @RestController
@@ -35,14 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("alipay")
 public class AliAppPayController {
 	
-	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AliAppPayService aliAppPayService;
 	
-	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AiliAppPayRecordService ailiAppPayRecordService;
 	
 	@ApiOperation("下单")
-	@PostMapping("getOrderStr")
+	@PostMapping("order")
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
 		String sysType = req.getHeader("sysType");
 //		if(!NumberUtil.isInteger(sysType) || (CommonConsts.SYS_ANDROID != Integer.parseInt(sysType) 
