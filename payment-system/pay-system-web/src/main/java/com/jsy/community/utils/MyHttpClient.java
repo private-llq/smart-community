@@ -1,4 +1,4 @@
-package com.jsy.community;
+package com.jsy.community.utils;
 
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;

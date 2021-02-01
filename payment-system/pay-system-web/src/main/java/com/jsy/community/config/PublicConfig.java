@@ -3,7 +3,7 @@ package com.jsy.community.config;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
-import com.jsy.community.MyHttpClient;
+import com.jsy.community.utils.MyHttpClient;
 import com.jsy.community.utils.AesUtil;
 import net.sf.json.JSONObject;
 import okhttp3.HttpUrl;
