@@ -53,6 +53,7 @@
 			<if test="detailAddress != null and !detailAddress.equals(&quot;&quot;)">
 				,detail_address = #{detailAddress}
 			</if>
+			,update_time = now()
 		</trim>
 		where deleted = 0 and uid = #{uid}
 	</update>

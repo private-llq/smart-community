@@ -174,7 +174,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param houseId   房屋id
      * @return          返回是否成功
      */
-    @Select("select count(*) from t_house_lease where house_id = #{houseId}")
+    @Select("select count(*) from t_house_lease where deleted = 0 and house_id = #{houseId}")
     Integer alreadyPublish(@Param("houseId") Long houseId);
 
 

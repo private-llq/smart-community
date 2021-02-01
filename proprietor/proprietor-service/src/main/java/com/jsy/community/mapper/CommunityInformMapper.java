@@ -34,7 +34,7 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      * @param acctId            推送号ID
      * @param informId          消息ID
      */
-    @Update("update t_acct_push_inform set browse_count = browse_count+1 where acct_id = #{acctId} and id = #{informId} and deleted = 0")
+    @Update("update t_acct_push_inform set browse_count = browse_count+1,update_time = now() where acct_id = #{acctId} and id = #{informId} and deleted = 0")
     void updatePushInformBrowseCount(@Param("acctId") Long acctId, @Param("informId") Long informId);
 
     /**
@@ -77,6 +77,6 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      * @param limit     限制条数
      * @return          返回信息List
      */
-    @Select("select id,house_title as houseTitle,'true' as leaseHouse from t_house_lease ORDER BY create_time desc limit #{limit}")
+    @Select("select id,house_title as houseTitle,'true' as leaseHouse from t_house_lease where deleted = 0  ORDER BY create_time desc limit #{limit}")
     List<HouseLeaseVO> selectLeaseLatest(int limit);
 }

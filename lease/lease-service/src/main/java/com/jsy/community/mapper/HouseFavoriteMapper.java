@@ -48,7 +48,7 @@ public interface HouseFavoriteMapper extends BaseMapper<HouseFavoriteEntity> {
      * 获取t_lease_image 的一张房屋图片地址
      * @param houseId       房屋id
      */
-    @Select("select i.img_url as houseImage from t_house_image as i JOIN t_house_lease as l on l.id = i.hid where l.id = #{houseId} limit 1")
+    @Select("select i.img_url as houseImage from t_house_image as i JOIN t_house_lease as l on l.id = i.hid where l.deleted = 0 and l.id = #{houseId} limit 1")
     String getHouseLeaseImage(@Param("houseId") long houseId);
 
 
@@ -67,6 +67,6 @@ public interface HouseFavoriteMapper extends BaseMapper<HouseFavoriteEntity> {
     /**
      * 是否存在已发布出租房屋
      */
-    @Select("select count(*) from t_house_lease where id = #{favoriteId} ")
+    @Select("select count(*) from t_house_lease where deleted = 0  and id = #{favoriteId} ")
     Integer existHouse(Long favoriteId);
 }

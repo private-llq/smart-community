@@ -33,7 +33,7 @@
 			t_house_favorite AS f
 		JOIN t_house_lease AS l ON f.favorite_id = l.id
 		WHERE
-			f.uid = #{query.uid}
+			f.uid = #{query.uid} and l.deleted = 0
 			AND f.favorite_type = 2  limit #{page},#{size}
 	</select>
 

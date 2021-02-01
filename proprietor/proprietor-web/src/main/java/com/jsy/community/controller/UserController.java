@@ -184,7 +184,7 @@ public class UserController {
      */
     @Login
     @ApiOperation("业主信息及业主家属信息查询接口")
-    @PostMapping("query")
+    @GetMapping("query")
     public CommonResult<UserInfoVo> proprietorQuery(@RequestParam Long houseId) {
         String userId = UserUtils.getUserId();
         UserInfoVo userInfoVo = userService.proprietorQuery(userId, houseId);

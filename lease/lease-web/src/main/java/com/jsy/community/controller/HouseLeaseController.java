@@ -115,7 +115,7 @@ public class HouseLeaseController {
 
 
     @Login
-    @PostMapping("/ownerHouse")
+    @GetMapping("/ownerHouse")
     @ApiOperation("查询业主当前社区拥有房屋")
     public CommonResult<List<HouseVo>> ownerHouse(@RequestParam Long communityId){
         return CommonResult.ok(iHouseLeaseService.ownerHouse(UserUtils.getUserId(), communityId));

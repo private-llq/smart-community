@@ -50,14 +50,14 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * @param id        预约信息id
      * @return          返回该预约信息房源的uid
      */
-    @Select("select l.uid from t_house_reserve as r left join t_house_lease as l on r.house_lease_id = l.id where r.deleted = 0 and r.deleted = 0 and r.id = #{id}")
+    @Select("select l.uid from t_house_reserve as r left join t_house_lease as l on r.house_lease_id = l.id where r.deleted = 0 and l.deleted = 0 and r.deleted = 0 and r.id = #{id}")
     String getUidByHouseReserveId(@Param("id") Long id);
 
     /**
      * 通过房屋id查询房屋是否存在
      * @param houseLeaseId      查询id
      */
-    @Select("select count(*) from t_house_lease where id = #{houseLeaseId}")
+    @Select("select count(*) from t_house_lease where id = #{houseLeaseId} and deleted = 0")
     Integer existHouseLeaseId(@Param("houseLeaseId") Long houseLeaseId);
 
 
@@ -66,7 +66,7 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * 预约状态 0.已取消，1.预约中 2.预约成功 3.预约已拒绝
      * @param qo   请求参数
      */
-    @Update("update t_house_reserve set reserve_status = 3 where reserve_status = 1 and id = #{id}")
+    @Update("update t_house_reserve set reserve_status = 3,update_time = now() where reserve_status = 1 and id = #{id}")
     Integer rejectReserve(HouseReserveQO qo);
 
 
@@ -75,10 +75,9 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * 预约状态 0.已取消，1.预约中 2.预约成功 3.预约已拒绝
      * @param qo   请求参数
      */
-    @Update("update t_house_reserve set reserve_status = 0 where reserve_status = 1 or reserve_status = 2 and id = #{id}")
+    @Update("update t_house_reserve set reserve_status = 0,update_time = now() where reserve_status = 1 or reserve_status = 2 and id = #{id}")
     Integer cancelReserveState(HouseReserveQO qo);
 
-    Integer updateReserveState(HouseReserveQO qo);
 
     /**
      * 从t_house_lease 表拿到用户的推送信息
@@ -87,7 +86,7 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * @Param  id       房源id
      * @return          返回用户推送id 房源标题
      */
-    @Select("select l.house_title,u.reg_id as pushId from t_house_reserve as r LEFT JOIN t_user as u on r.reserve_uid = u.uid join t_house_lease as l on r.house_lease_id = l.id where u.deleted = 0 and r.id = #{id} ")
+    @Select("select l.house_title,u.reg_id as pushId from t_house_reserve as r LEFT JOIN t_user as u on r.reserve_uid = u.uid join t_house_lease as l on r.house_lease_id = l.id where l.deleted = 0 and u.deleted = 0 and r.id = #{id} ")
     HouseReserveVO getPushInfo(Long id);
 
 

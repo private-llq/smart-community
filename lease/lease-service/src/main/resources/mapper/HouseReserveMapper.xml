@@ -21,6 +21,7 @@
                     ,reserve_msg = #{reserveMsg}
                 </if>
                 ,reserve_status = #{reserveStatus}
+                ,update_time = now()
             </trim>
         </set>
         <where>
@@ -63,6 +64,7 @@
         WHERE
 	        r.reserve_uid = #{uid}
 	        and r.deleted = 0
+			and l.deleted = 0
 	        and u.deleted = 0
 	    LIMIT #{qo.page},#{qo.size}
     </select>
@@ -101,7 +103,7 @@
             r.id is not null and
             l.uid = #{uid} and
             r.reserve_uid != #{uid}
-            and r.deleted = 0 and u.deleted = 0
+            and r.deleted = 0 and u.deleted = 0 and l.deleted = 0
             LIMIT #{qo.page},
             #{qo.size}
     </select>
