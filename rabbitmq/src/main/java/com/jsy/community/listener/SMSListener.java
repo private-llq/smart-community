@@ -1,7 +1,7 @@
-package com.jsy.listener;
+package com.jsy.community.listener;
 
 
-import com.jsy.config.RabbitMQConfig;
+import com.jsy.community.config.RabbitMQConfig;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
