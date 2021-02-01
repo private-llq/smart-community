@@ -3,6 +3,7 @@ package com.jsy.community.task;
 import com.jsy.community.annotation.DistributedLock;
 import com.jsy.community.api.IUserInformService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.utils.DateUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,8 @@ import java.util.Date;
 @Service
 @ConditionalOnProperty(value = "jsy.sys.clear.inform.enable", havingValue = "true")
 public class CommunityInformCleaner {
+
+    private static final String CRON = "0 0 1 ? * mon";
 
     private static final Logger logger = LoggerFactory.getLogger(CommunityInformCleaner.class);
 
@@ -57,9 +60,13 @@ public class CommunityInformCleaner {
      * @since  2020/1/9 14:19
      */
     @DistributedLock(lockKey = "communityInform", waitTimout = 50)
-    @Scheduled(cron = "0 0 1 ? * mon")
+    @Scheduled(cron = CRON)
     public void clearPushInform(){
         if(clearInformEnabled){
+            //如果当前执行时间已经超过 指定 执行时间
+            if(DateUtils.notNeedImplemented(CRON)){
+                return;
+            }
             logger.info(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "：清理社区推送消息执行开始:");
             //1.获取 clearInformExpireTime 之前的时间
             String beforeTime = getClearInformExpireTime(clearInformExpireDay);

@@ -1,8 +1,11 @@
 package com.jsy.community.task;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.annotation.DistributedLock;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.mapper.HouseConstMapper;
+import com.jsy.community.utils.DateUtils;
+import org.h2.mvstore.DataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -29,6 +32,8 @@ import java.util.stream.Collectors;
 public class SourceConstExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(SourceConstExecutor.class);
+
+    private static final String CRON = "0 0 4 ? * mon";
 
     @Resource
     public RedisTemplate<String, Object> redisTemplate;
@@ -72,8 +77,13 @@ public class SourceConstExecutor {
      * @author YuLF
      * @since  2020/12/11 14:19
      */
-    @Scheduled(cron = "0 0 4 ? * mon")
+    @Scheduled(cron = CRON)
+    @DistributedLock(lockKey = "houseConst", waitTimout = 30)
     public void updateSourceConst(){
+        //如果当前执行时间已经超过 指定 执行时间
+        if(DateUtils.notNeedImplemented(CRON)){
+            return;
+        }
         logger.info(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "：资源常量定时任务启动：从数据库获取资源更新至Redis!");
         setRedisForHouseConst(getAllHouseConstForDatabases());
     }
