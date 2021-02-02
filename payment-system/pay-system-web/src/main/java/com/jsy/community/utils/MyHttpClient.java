@@ -112,7 +112,9 @@ public class MyHttpClient {
             e.printStackTrace();
         }
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                sslcontext,			new String[]{"TLSv1"},			null,
+                sslcontext,
+                new String[]{"TLSv1"},
+                null,
                 SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
         return httpClient = HttpClients.custom()
                 .setSSLSocketFactory(sslsf)
