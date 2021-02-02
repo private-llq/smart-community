@@ -150,13 +150,12 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	@ApiOperation("商铺头图上传")
 	@PostMapping("/uploadHeadImg")
-//	@UploadImg(bucketName = BUCKET_HEAD, redisKeyName = REDIS_KEY_PART)
-	public CommonResult uploadHeadImg(@RequestParam("file") MultipartFile[] files, CommonResult commonResult) {
+	public CommonResult uploadHeadImg(@RequestParam("file") MultipartFile[] files) {
 		if (files.length > 3) {
 			return CommonResult.error("门头图最多上传3张图");
 		}
-//		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKET_HEAD);
-		return CommonResult.ok(commonResult.getData());
+		String[] strings = MinioUtils.uploadForBatch(files, BUCKET_HEAD);
+		return CommonResult.ok(strings);
 	}
 	
 	@Login(allowAnonymous = true)

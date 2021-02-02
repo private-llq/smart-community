@@ -1,19 +1,19 @@
 package com.jsy.community.controller;
 
 
+import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.service.IAppMenuService;
-import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -33,52 +33,60 @@ public class AppMenuController {
 	@Autowired
 	private IAppMenuService adminMenuService;
 	
-	@Resource
-	private StringRedisTemplate stringRedisTemplate;
-	
-	private static final String BUCKETNAME = "app-menu-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
-	
 	@ApiOperation("后台树形结构查询所有菜单")
 	@GetMapping("/listAdminMenu")
 	public CommonResult<List<FrontParentMenu>> listAdminMenu() {
 		List<FrontParentMenu> parentMenus = adminMenuService.listAdminMenu();
 		return CommonResult.ok(parentMenus);
 	}
-//
-//	@ApiOperation("新增父菜单")
-//	@PostMapping("/insertAdminMenu")
-//	public CommonResult insertAdminMenu(@RequestBody AppMenuEntity adminMenu) {
-//		ValidatorUtils.validateEntity(adminMenu, AppMenuEntity.addAdmin.class);
-//		adminMenuService.insertAdminMenu(adminMenu);
-//		return CommonResult.ok();
-//	}
-//
-//	@ApiOperation("删除菜单信息")
-//	@DeleteMapping("/removeAdminMenu")
-//	public CommonResult removeAdminMenu(@RequestParam("id") Long id) {
-//		adminMenuService.removeAdminMenu(id);
-//		return CommonResult.ok();
-//	}
-//
-//	@ApiOperation("新增子菜单")
-//	@PostMapping("/insertChildMenu")
-//	public CommonResult insertChildMenu(@RequestBody AppMenuEntity adminMenu){
-//		ValidatorUtils.validateEntity(adminMenu, AppMenuEntity.addAdmin.class);
-//		adminMenuService.insertChildMenu(adminMenu);
-//		return CommonResult.ok();
-//	}
-//
-	@ApiOperation("子菜单图片上传")
-	@PostMapping("/uploadMenuImg")
-	public CommonResult uploadMenuImg(@RequestParam("file") MultipartFile file){
-		try {
-			String filePath = MinioUtils.upload(file, BUCKETNAME);
-			stringRedisTemplate.opsForSet().add("menu_img_part",filePath);// 文件上传成功后，将其图片名称存入redis
-			return CommonResult.ok(filePath);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return CommonResult.error("上传失败");
+	
+	@ApiOperation("子菜单白天图片上传")
+	@PostMapping("/uploadDayMenuImg")
+//	@UploadImg(bucketName = UploadBucketConst.APP_MENU_BUCKET,redisKeyName = UploadRedisConst.APP_MENU_IMG_PART)
+	public CommonResult uploadDayMenuImg(@RequestParam("file") MultipartFile file,CommonResult result){
+		return CommonResult.ok(result.getData());
+	}
+	
+	@ApiOperation("子菜单黑夜图片上传")
+	@PostMapping("/uploadNightMenuImg")
+//	@UploadImg(bucketName = UploadBucketConst.APP_MENU_BUCKET,redisKeyName = UploadRedisConst.APP_MENU_IMG_PART)
+	public CommonResult uploadNightMenuImg(@RequestParam("file") MultipartFile file,CommonResult result){
+		return CommonResult.ok(result.getData());
+	}
+	
+	@ApiOperation("新增父菜单")
+	@PostMapping("/insertAdminMenu")
+	public CommonResult insertAdminMenu(@RequestBody AppMenuEntity adminMenu) {
+		if (StringUtils.isEmpty(adminMenu.getMenuName())) {
+			return CommonResult.error("父菜单名不能为空");
 		}
+		adminMenuService.insertAdminMenu(adminMenu);
+		return CommonResult.ok();
+	}
+	
+	@ApiOperation("新增子菜单")
+	@PostMapping("/insertChildMenu")
+	public CommonResult insertChildMenu(@RequestBody AppMenuEntity adminMenu){
+		ValidatorUtils.validateEntity(adminMenu, AppMenuEntity.addAdmin.class);
+		adminMenuService.insertChildMenu(adminMenu);
+		return CommonResult.ok();
+	}
+	
+	@ApiOperation("删除菜单信息")
+	@DeleteMapping("/removeAdminMenu")
+	public CommonResult removeAdminMenu(@RequestParam("id") Long id) {
+		adminMenuService.removeAdminMenu(id);
+		return CommonResult.ok();
+	}
+	
+	@ApiOperation("修改父菜单信息")
+	@PostMapping("/updateAdminMenu")
+	public CommonResult updateAdminMenu(@RequestBody AppMenuEntity adminMenu){
+		if (StringUtils.isEmpty(adminMenu.getMenuName())) {
+			return CommonResult.error("父菜单名不能为空");
+		}
+		adminMenuService.updateAdminMenu(adminMenu);
+		return CommonResult.ok();
 	}
 }
 

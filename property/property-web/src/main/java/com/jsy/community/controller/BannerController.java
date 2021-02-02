@@ -69,6 +69,9 @@ public class BannerController {
 	@PostMapping("")
 	public CommonResult upload(@RequestBody BannerEntity bannerEntity){
 		ValidatorUtils.validateEntity(bannerEntity, BannerEntity.addBannerValidatedGroup.class);
+		if(bannerEntity.getCommunityId().equals(0L)){
+			return CommonResult.error("社区ID不正确");
+		}
 		//写库
 		boolean b = bannerService.addBanner(bannerEntity);
 		String filePath = bannerEntity.getUrl();
@@ -113,6 +116,13 @@ public class BannerController {
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"轮播图删除失败");
 	}
 	
+	/**
+	* @Description: 修改跳转路径和描述
+	 * @Param: [bannerQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/2/2
+	**/
 	@ApiOperation("【轮播图】修改跳转路径和描述")
 	@PutMapping("")
 	public CommonResult updateBanner(@RequestBody BannerQO bannerQO){

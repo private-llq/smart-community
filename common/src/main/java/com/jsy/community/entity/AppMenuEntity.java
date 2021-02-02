@@ -24,11 +24,8 @@ import javax.validation.constraints.NotNull;
 @ApiModel(value="AppMenu对象", description="App菜单")
 public class AppMenuEntity extends BaseEntity {
 
-    @ApiModelProperty(value = "社区id")
-    @NotNull(groups = {addAdmin.class,updateAdmin.class},message = "社区id不能为空")
-    private Long communityId;
-
     @ApiModelProperty(value = "父id 默认0")
+    @NotNull(groups = {addAdmin.class,updateAdmin.class},message = "父id不能为空")
     private Long parentId;
 
     @ApiModelProperty(value = "菜单名")
@@ -44,13 +41,11 @@ public class AppMenuEntity extends BaseEntity {
     private String daytimeIcon;
     
     @ApiModelProperty(value = "路径地址")
+    @NotBlank(groups = {addAdmin.class,updateAdmin.class},message = "路径地址不能为空")
     private String path;
 
     @ApiModelProperty(value = "描述信息")
     private String descr;
-    
-    @ApiModelProperty(value = "是否展示在首页 0 展示 1 不展示")
-    private Integer status;
     
     public interface addAdmin{}
     

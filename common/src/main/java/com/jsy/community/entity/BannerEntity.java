@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ public class BannerEntity extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "社区ID")
+    @NotNull(groups = {addBannerValidatedGroup.class}, message = "缺少社区ID")
     private Long communityId;
 
     @ApiModelProperty(value = "文件路径", hidden = true)
@@ -39,6 +41,7 @@ public class BannerEntity extends BaseEntity implements Serializable {
     private Integer sort;
 
     @ApiModelProperty(value = "Banner位置1.顶部 2.底部")
+    @Range(min = 1, max = 2, message = "轮播图位置错误")
     private Integer position;
     
     @ApiModelProperty(value = "轮播图类型1.非广告 2.广告")

@@ -82,7 +82,7 @@ public class WeChatController {
         msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
         msg.setDescription(weChatPayQO.getDescription());
-        msg.setTotal(weChatPayQO.getAmount());
+        msg.setAmount(weChatPayQO.getAmount());
         msg.setOrderStatus(1);
         msg.setArriveStatus(1);
         msg.setCreateTime(LocalDateTime.now());

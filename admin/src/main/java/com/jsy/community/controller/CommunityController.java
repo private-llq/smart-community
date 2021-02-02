@@ -60,11 +60,11 @@ public class CommunityController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@DeleteMapping("{id}")
-	public CommonResult deleteCommunity(@PathVariable Long id){
-		boolean result = iCommunityService.deleteCommunity(id);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
-	}
+//	@DeleteMapping("{id}")
+//	public CommonResult deleteCommunity(@PathVariable Long id){
+//		boolean result = iCommunityService.deleteCommunity(id);
+//		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
+//	}
 	
 	/**
 	* @Description: 修改社区
