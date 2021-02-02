@@ -59,7 +59,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @NotEmpty(message = "缺少详细地址")
     private String address;
 
-    @ApiModelProperty(value = "来访事由ID")
+    @ApiModelProperty(value = "来访事由ID 1.一般来访 2.应聘来访 3.走亲访友 4.客户来访")
     private Integer reason;
     
     @ApiModelProperty(value = "来访事由名")
@@ -103,7 +103,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @Pattern(regexp = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$", message = "请输入一个正确的车牌号!")
     private String carPlate;
     
-    @ApiModelProperty(value = "来访车辆类型", hidden = true)
+    @ApiModelProperty(value = "来访车辆类型 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车", hidden = true)
     @Range(min = 1, max = 5, message = "车辆类型不正确")
     private Integer carType;
     

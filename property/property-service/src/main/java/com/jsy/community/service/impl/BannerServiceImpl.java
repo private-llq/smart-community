@@ -40,6 +40,9 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	**/
 	@Override
 	public boolean addBanner(BannerEntity bannerEntity){
+		if(bannerEntity.getPosition() == null){
+			bannerEntity.setPosition(1);
+		}
 		bannerEntity.setId(SnowFlake.nextId());
 		bannerEntity.setClick(0);
 		int result = bannerMapper.insert(bannerEntity);
