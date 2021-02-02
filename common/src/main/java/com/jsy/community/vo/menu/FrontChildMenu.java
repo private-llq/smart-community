@@ -30,7 +30,7 @@ public class FrontChildMenu implements Serializable {
 	private String path;
 	
 	@ApiModelProperty(value = "白天图标地址")
-	private String dayIcon;
+	private String daytimeIcon;
 	
 	@ApiModelProperty(value = "夜晚图标地址")
 	private String nightIcon;

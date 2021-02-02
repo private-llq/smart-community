@@ -235,6 +235,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		shopLeaseEntity.setId(shopId);
 		BeanUtils.copyProperties(shop, shopLeaseEntity);
 		// 更新基本信息
+//		shopLeaseEntity.setUpdateTime(null);
 		shopLeaseMapper.updateById(shopLeaseEntity);
 		
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();

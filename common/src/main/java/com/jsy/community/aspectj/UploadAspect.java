@@ -12,6 +12,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Field;
@@ -85,6 +86,25 @@ public class UploadAspect {
 						CommonResult result = (CommonResult) args[1];
 						if (result != null) {
 							result.setData(fileList);
+						}
+					} catch (Exception e) {
+						throw new JSYException("第二个参数请设置为CommonResult");
+					}
+				}
+				// 如果方法的该参数是 StandardMultipartFile  表示上传的是一张图片
+				if ("StandardMultipartFile".equals(typeName)) {
+					MultipartFile file = (MultipartFile) arg;
+					String filePath = MinioUtils.upload(file, bucketName);
+					
+					// 文件上传之后，需要把文件名存到redis里面
+					if (!StringUtils.isEmpty(filePath)) {
+						redisTemplate.opsForSet().add(redisKeyName, filePath);
+					}
+					
+					try {
+						CommonResult result = (CommonResult) args[1];
+						if (result != null) {
+							result.setData(filePath);
 						}
 					} catch (Exception e) {
 						throw new JSYException("第二个参数请设置为CommonResult");

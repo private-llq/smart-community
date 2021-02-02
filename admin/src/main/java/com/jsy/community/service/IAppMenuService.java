@@ -51,4 +51,13 @@ public interface IAppMenuService extends IService<AppMenuEntity> {
 	 * @Param [adminMenu]
 	 **/
 	void insertChildMenu(AppMenuEntity adminMenu);
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 修改父菜单信息
+	 * @Date 2021/2/2 13:45
+	 * @Param [adminMenu]
+	 **/
+	void updateAdminMenu(AppMenuEntity adminMenu);
 }
