@@ -13,13 +13,13 @@ import java.util.Map;
  */
 public interface CommonMapper {
 
-    List<Map<String, Object>> getAllCommunityFormCityId(Integer id, Integer page, Integer pageSize);
+    List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer page, Integer pageSize);
 
-    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode);
+    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer houseLevelMode);
 
-    List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode);
+    List<Map<String, Object>> getBuildingOrUnitById(Long id, Integer houseLevelMode);
 
-    List<Map<String, Object>> getAllDoorFormFloor(Integer id);
+    List<Map<String, Object>> getAllDoorFormFloor(Long id);
 
-    List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode);
+    List<Map<String, Object>> getFloorByBuildingOrUnitId(Long id, Integer houseLevelMode);
 }

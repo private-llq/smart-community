@@ -67,7 +67,7 @@ public class CommonServiceImpl implements ICommonService {
      * @since 2020/12/8 16:39
      */
     @Override
-    public List<Map<String, Object>> getAllCommunityFormCityId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
+    public List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
         page = (page - 1) * pageSize;
         return commonMapper.getAllCommunityFormCityId(id, page , pageSize);
     }
@@ -79,7 +79,7 @@ public class CommonServiceImpl implements ICommonService {
      * @Param
      */
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
+    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
         List<Map<String, Object>> buildingOrUnitByCommunityId = commonMapper.getBuildingOrUnitByCommunityId(id, houseLevelMode);
         return setHouseLevelMode(buildingOrUnitByCommunityId, houseLevelMode);
     }
@@ -91,7 +91,7 @@ public class CommonServiceImpl implements ICommonService {
      * @Param
      */
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitById(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
+    public List<Map<String, Object>> getBuildingOrUnitById(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
         List<Map<String, Object>> buildingOrUnitOrFloorById = commonMapper.getBuildingOrUnitById(id, houseLevelMode);
         return setHouseLevelMode(buildingOrUnitOrFloorById, houseLevelMode);
     }
@@ -103,7 +103,7 @@ public class CommonServiceImpl implements ICommonService {
      * @Param
      */
     @Override
-    public List<Map<String, Object>> getFloorByBuildingOrUnitId(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
+    public List<Map<String, Object>> getFloorByBuildingOrUnitId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
         List<Map<String, Object>> maps = commonMapper.getFloorByBuildingOrUnitId(id, houseLevelMode);
         return setHouseLevelMode(maps, houseLevelMode);
     }
@@ -115,7 +115,7 @@ public class CommonServiceImpl implements ICommonService {
      * @Param
      */
     @Override
-    public List<Map<String, Object>> getAllDoorFormFloor(Integer id, Integer houseLevelMode, Integer page, Integer pageSize) {
+    public List<Map<String, Object>> getAllDoorFormFloor(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
         List<Map<String, Object>> allDoorFormFloor = commonMapper.getAllDoorFormFloor(id);
         return setHouseLevelMode(allDoorFormFloor, houseLevelMode);
     }

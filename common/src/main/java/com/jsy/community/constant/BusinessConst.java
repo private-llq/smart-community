@@ -217,4 +217,22 @@ public interface BusinessConst {
 	 * 车辆图片 上传 至 文件服务器 的 bucket Name
 	 */
 	String CAR_IMAGE_BUCKET_NAME = "user-avatar";
+
+	//Es全文搜索索引名 mq 队列、交换机名称
+	/**
+	 * Es全文搜索索引名称
+	 */
+	String FULL_TEXT_SEARCH_INDEX = "fullTextSearchIndex";
+	/**
+	 * 社区app主页全文搜索交换机名称
+	 */
+	String ES_TOPIC_EXCHANGE_NAME = "elasticsearch_topic_exchange";
+	/**
+	 * 社区app主页全文搜索队列名称
+	 */
+	String ES_QUEUE_NAME = "elasticsearch_topic_queue";
+	/**
+	 * 社区app主页全文搜索路由key名称
+	 */
+	String ES_ROUTE_KEY = "elasticsearch.#";
 }

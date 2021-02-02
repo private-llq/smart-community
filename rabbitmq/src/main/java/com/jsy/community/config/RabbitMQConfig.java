@@ -1,5 +1,6 @@
 package com.jsy.community.config;
 
+import com.jsy.community.constant.BusinessConst;
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,37 @@ public class RabbitMQConfig {
     public static final String EXCHANGE_DELAY = "exchange_delay";
     public static final String EXCHANGE_TOPICS_WECHAT = "exchange_topics_wechat";
     public static final String EXCHANGE_DELAY_WECHAT = "exchange_delay_wechat";
+
+
+
+    /**
+     * 声明ES队列
+     * @return      返回队列
+     */
+    @Bean
+    Queue queue() {
+        return new Queue(BusinessConst.ES_QUEUE_NAME, false);
+    }
+
+    /**
+     * 声明ES交换机类型为模糊匹配交换机
+     * @return      返回声明的交换机  durable 持久化
+     */
+    @Bean
+    TopicExchange exchange() {
+        Exchange build = ExchangeBuilder.topicExchange(BusinessConst.ES_TOPIC_EXCHANGE_NAME).durable(true).build();
+        return (TopicExchange) build;
+    }
+
+    /**
+     * 绑定ES交换机和队列
+     * @param queue         ES队列
+     * @param exchange      ES交换机
+     */
+    @Bean
+    Binding binding(Queue queue, TopicExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(BusinessConst.ES_ROUTE_KEY);
+    }
 
 
     /**
