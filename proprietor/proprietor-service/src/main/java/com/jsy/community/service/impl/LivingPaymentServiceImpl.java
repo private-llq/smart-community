@@ -7,7 +7,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
-import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
@@ -203,8 +202,8 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      * @return:
      */
     @Override
-    public List<GroupVO> selectGroup(GroupQO groupQO) {
-        return livingPaymentMapper.selectGroup(groupQO);
+    public List<GroupVO> selectGroup(String groupName, String userId) {
+        return livingPaymentMapper.selectGroup(groupName,userId);
     }
     /**
      * @Description: 查询每月订单记录
@@ -257,18 +256,32 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
 
     @Override
     public PaymentRecordsMapVO selectGroupAll(String userId) {
+        List<PayGroupEntity> list1=livingPaymentMapper.findGroup(userId);
         List<GroupVO> list = livingPaymentMapper.selectGroupAll(userId);
         Map<String,List<GroupVO>> returnMap = new LinkedHashMap<>();
+        returnMap.put("我家",new ArrayList<GroupVO>());
+        returnMap.put("父母",new ArrayList<GroupVO>());
+        returnMap.put("房东",new ArrayList<GroupVO>());
+        returnMap.put("朋友",new ArrayList<GroupVO>());
+        for (PayGroupEntity entity : list1) {
+            if (entity.getType()==5){
+                returnMap.put(entity.getName(),new ArrayList<GroupVO>());
+            }
+        }
+
         for (GroupVO vo : list) {
             if(returnMap.get(vo.getGroupName()) == null){
-                returnMap.put(vo.getGroupName(),new ArrayList<>());
+                returnMap.put(vo.getGroupName(),new ArrayList<GroupVO>());
             }
             returnMap.get(vo.getGroupName()).add(vo);
+
         }
         PaymentRecordsMapVO mapVO = new PaymentRecordsMapVO();
         mapVO.setMap(returnMap);
         return mapVO;
     }
+
+
 
     /**
      * @Description: 缴费凭证

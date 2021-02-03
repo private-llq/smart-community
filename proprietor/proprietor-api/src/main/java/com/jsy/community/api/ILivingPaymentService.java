@@ -1,6 +1,5 @@
 package com.jsy.community.api;
 
-import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
@@ -26,10 +25,10 @@ public interface ILivingPaymentService {
 
     /**
      * 通过组户号查询订单详情
-     * @param groupQO
+     * @param
      * @return
      */
-    List<GroupVO> selectGroup(GroupQO groupQO);
+    List<GroupVO> selectGroup(String groupName,String userId);
 
 
     /**

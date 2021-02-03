@@ -1,6 +1,6 @@
 package com.jsy.community.mapper;
 
-import com.jsy.community.qo.proprietor.GroupQO;
+import com.jsy.community.entity.PayGroupEntity;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.vo.DefaultHouseOwnerVO;
 import com.jsy.community.vo.GroupVO;
@@ -43,7 +43,7 @@ public interface LivingPaymentMapper {
      * @Param:
      * @return:
      */
-    List<GroupVO> selectGroup(GroupQO groupQO);
+    List<GroupVO> selectGroup(@Param("groupName") String groupName, @Param("userId") String userId);
     /**
      * @Description: 查询已经缴过费全部的户号
      * @author: Hu
@@ -61,4 +61,13 @@ public interface LivingPaymentMapper {
      * @return:
      */
     PaymentDetailsVO selectPaymentDetailsVO(@Param("id") Long id, @Param("userId")String userId);
+
+    /**
+     * @Description: 查询所有组
+     * @author: Hu
+     * @since: 2021/2/3 11:08
+     * @Param:
+     * @return:
+     */
+    List<PayGroupEntity> findGroup(String userId);
 }

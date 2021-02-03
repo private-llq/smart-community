@@ -8,16 +8,13 @@ import com.jsy.community.api.IPayGroupService;
 import com.jsy.community.api.IPayTypeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PayCompanyEntity;
-import com.jsy.community.entity.PayGroupEntity;
 import com.jsy.community.entity.PayTypeEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.GroupQO;
 import com.jsy.community.qo.proprietor.LivingPaymentQO;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.*;
 import com.jsy.community.vo.shop.PaymentRecordsMapVO;
@@ -94,12 +91,17 @@ public class LivingPaymentController {
     @PostMapping("/saveGroupName")
     @Login
     public CommonResult saveGroup(@ApiParam("组名") @RequestParam String name){
-        PayGroupEntity payGroupEntity = new PayGroupEntity();
-        payGroupEntity.setUid(UserUtils.getUserId());
-        payGroupEntity.setName(name);
-        payGroupEntity.setType(5);
-        payGroupEntity.setId(SnowFlake.nextId());
-        payGroupService.save(payGroupEntity);
+        String userId = UserUtils.getUserId();
+        payGroupService.insertGroup(name,userId);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("删除组和相关的户号")
+    @GetMapping("/deleteGroupName")
+    @Login
+    public CommonResult deleteGroupName(@ApiParam("组名") @RequestParam String name){
+        String userId = UserUtils.getUserId();
+        payGroupService.delete(name,userId);
         return CommonResult.ok();
     }
 
@@ -138,16 +140,15 @@ public class LivingPaymentController {
     }
     /**
      * 选择分组查询下面缴过费的水电气户号
-     * @param groupQO
+     * @param
      * @return
      */
     @ApiOperation("选择分组查询缴过费的户号")
-    @PostMapping("/selectGroup")
+    @GetMapping("/selectGroup")
     @Login
-    public CommonResult selectGroup(@RequestBody GroupQO groupQO){
+    public CommonResult selectGroup(@RequestParam("groupName") String groupName){
         String userId = UserUtils.getUserId();
-        groupQO.setUserID(userId);
-        List<GroupVO> voList = livingPaymentService.selectGroup(groupQO);
+        List<GroupVO> voList = livingPaymentService.selectGroup(groupName,userId);
         return CommonResult.ok(voList);
     }
     /**
@@ -238,14 +239,5 @@ public class LivingPaymentController {
         String upload = MinioUtils.upload(file, "bbbb");
         return CommonResult.ok(upload);
     }
-    @ApiOperation("添加备注图片")
-    @PostMapping("/addRemarkImgss")
-    @Login
-    public CommonResult addRemarkImgss(@RequestParam("file") MultipartFile file){
-        String upload = MinioUtils.upload(file, "pppp");
-        return CommonResult.ok(upload);
-
-    }
-
 
 }
