@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityFunService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.mapper.CommunityFunMapper;
@@ -38,7 +39,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         }
         QueryWrapper<CommunityFunEntity> wrapper = new QueryWrapper<CommunityFunEntity>();
         if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
-            wrapper.like("title", communityFunQO.getHeadline());
+            wrapper.like("title_name", communityFunQO.getHeadline());
         }
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(communityFunQO.getPage(), communityFunQO.getSize()),wrapper);
         List<CommunityFunEntity> list = page.getRecords();
@@ -52,6 +53,9 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Override
     public void tapeOut(Long id) {
         CommunityFunEntity entity = communityFunMapper.selectById(id);
+        if (entity.getStatus()==2){
+            throw new PropertyException("该趣事已下线");
+        }
         entity.setStatus(2);
         entity.setStartTime(LocalDateTime.now());
         communityFunMapper.updateById(entity);
@@ -65,7 +69,12 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
 
     @Override
     public void updateOne(CommunityFunEntity communityFunEntity) {
-        communityFunMapper.updateById(communityFunEntity);
+        CommunityFunEntity entity = communityFunMapper.selectById(communityFunEntity.getId());
+        entity.setContent(communityFunEntity.getContent());
+        entity.setCoverImageUrl(communityFunEntity.getCoverImageUrl());
+        entity.setSmallImageUrl(communityFunEntity.getSmallImageUrl());
+        entity.setTitleName(communityFunEntity.getTitleName());
+        communityFunMapper.updateById(entity);
     }
 
     @Override
@@ -81,6 +90,9 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Override
     public void popUpOnline(Long id) {
         CommunityFunEntity entity = communityFunMapper.selectById(id);
+        if (entity.getStatus()==1){
+            throw new PropertyException("该趣事已上线");
+        }
         entity.setStatus(1);
         entity.setStartTime(LocalDateTime.now());
         communityFunMapper.updateById(entity);

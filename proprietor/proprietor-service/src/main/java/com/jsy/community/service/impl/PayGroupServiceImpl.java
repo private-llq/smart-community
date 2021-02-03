@@ -41,8 +41,8 @@ public class PayGroupServiceImpl extends ServiceImpl<PayGroupMapper, PayGroupEnt
                     .eq("uid",userId)
                     .eq("group_id",payGroupEntity.getId())
             );
+            payGroupMapper.deleteById(payGroupEntity.getId());
         }
-        payGroupMapper.deleteById(payGroupEntity.getId());
     }
 
     @Override

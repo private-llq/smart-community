@@ -45,7 +45,19 @@ public class CommunityFunController {
     @ApiOperation("新增")
     @PostMapping("/save")
     public CommonResult save(@RequestBody CommunityFunEntity communityFunEntity) {
-        communityFunEntity.setStatus(1);
+        if (communityFunEntity.getTitleName()==null||"".equals(communityFunEntity.getTitleName())){
+            return  CommonResult.error("标题不能为空");
+        }
+        if (communityFunEntity.getContent()==null||"".equals(communityFunEntity.getContent())){
+            return  CommonResult.error("内容不能为空");
+        }
+        if (communityFunEntity.getCoverImageUrl()==null||"".equals(communityFunEntity.getCoverImageUrl())){
+            return  CommonResult.error("封面不能为空");
+        }
+        if (communityFunEntity.getSmallImageUrl()==null||"".equals(communityFunEntity.getSmallImageUrl())){
+            return  CommonResult.error("缩略图不能为空");
+        }
+        communityFunEntity.setStatus(2);
         communityFunEntity.setId(SnowFlake.nextId());
         communityFunService.insetOne(communityFunEntity);
         return  CommonResult.ok();
@@ -88,8 +100,20 @@ public class CommunityFunController {
     }
 
     @ApiOperation("修改")
-    @PutMapping("/update")
+    @PostMapping("/update")
     public CommonResult update(@RequestBody CommunityFunEntity communityFunEntity) {
+        if (communityFunEntity.getTitleName()==null||"".equals(communityFunEntity.getTitleName())){
+            return  CommonResult.error("标题不能为空");
+        }
+        if (communityFunEntity.getContent()==null||"".equals(communityFunEntity.getContent())){
+            return  CommonResult.error("内容不能为空");
+        }
+        if (communityFunEntity.getCoverImageUrl()==null||"".equals(communityFunEntity.getCoverImageUrl())){
+            return  CommonResult.error("封面不能为空");
+        }
+        if (communityFunEntity.getSmallImageUrl()==null||"".equals(communityFunEntity.getSmallImageUrl())){
+            return  CommonResult.error("缩略图不能为空");
+        }
         communityFunService.updateOne(communityFunEntity);
         return CommonResult.ok();
     }
@@ -97,7 +121,7 @@ public class CommunityFunController {
     @ApiOperation("删除")
     @DeleteMapping("/delete")
     public CommonResult delete(@ApiParam("社区趣事id")
-                               @RequestParam Long id) {
+                               @RequestParam("id") Long id) {
         communityFunService.deleteById(id);
         return CommonResult.ok();
     }
@@ -105,7 +129,7 @@ public class CommunityFunController {
     @ApiOperation("查询一条---表单回填")
     @GetMapping("/findOne")
     public CommonResult findOne(@ApiParam("社区趣事id")
-                                @RequestParam Long id) {
+                                    @RequestParam("id") Long id) {
         CommunityFunEntity communityFunEntity = communityFunService.selectOne(id);
         return  CommonResult.ok(communityFunEntity);
     }
@@ -113,7 +137,7 @@ public class CommunityFunController {
     @ApiOperation("上线")
     @GetMapping("/popUpOnline")
     public CommonResult popUpOnline(@ApiParam("社区趣事id")
-                                    @RequestParam Long id) {
+                                        @RequestParam("id") Long id) {
         communityFunService.popUpOnline(id);
         return  CommonResult.ok();
     }

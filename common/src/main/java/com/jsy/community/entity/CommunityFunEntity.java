@@ -31,7 +31,7 @@ public class CommunityFunEntity extends BaseEntity {
     private String smallImageUrl;
     @ApiModelProperty(value = "社区趣事封面图地址")
     private String coverImageUrl;
-    @ApiModelProperty(value = "社区趣事状态1表示未上线，2二表示已上线")
+    @ApiModelProperty(value = "社区趣事状态1表示已上线，2二表示为上线")
     private Integer status;
     @ApiModelProperty(value = "上线时间")
     private LocalDateTime startTime;
