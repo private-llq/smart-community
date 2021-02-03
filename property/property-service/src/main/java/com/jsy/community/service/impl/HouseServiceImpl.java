@@ -120,9 +120,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		checkAndDealParams(houseEntity);
 		
 		//根据社区模式判断是否是顶级 如果是顶级pid置为0
-		if(( (BusinessConst.COMMUNITY_MODE_FLOOR_UNIT.equals(communityMode) || BusinessConst.COMMUNITY_MODE_FLOOR.equals(communityMode))
+		if(( (BusinessConst.COMMUNITY_MODE_BUILDING_UNIT.equals(communityMode) || BusinessConst.COMMUNITY_MODE_BUILDING.equals(communityMode))
 			&& BusinessConst.BUILDING_TYPE_BUILDING == houseEntity.getType())
-			|| ( (BusinessConst.COMMUNITY_MODE_UNIT_FLOOR.equals(communityMode) || BusinessConst.COMMUNITY_MODE_UNIT.equals(communityMode))
+			|| ( (BusinessConst.COMMUNITY_MODE_UNIT_BUILDING.equals(communityMode) || BusinessConst.COMMUNITY_MODE_UNIT.equals(communityMode))
 			&& BusinessConst.BUILDING_TYPE_UNIT == houseEntity.getType())
 		){
 			houseEntity.setPid(0L);
@@ -142,8 +142,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				throw new PropertyException("父级单位不存在，新增失败");
 			}else if(!houseEntity.getCommunityId().equals(parentHouse.getCommunityId())){
 				throw new PropertyException("父级单位非本小区，新增失败");
-			}else if(houseEntity.getType() - parentHouse.getType() != 1){
-				throw new PropertyException("父级单位与新增对象层级关系不对，新增失败");
+			}else{
+				checkLevelRelation(communityMode,houseEntity.getType(),parentHouse.getType());
 			}
 			//若类型是房间，生成唯一code
 			if(BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()){
@@ -152,6 +152,54 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 			result = houseMapper.addSub(houseEntity);
 		}
 		return result == 1;
+	}
+	
+	/**
+	 * 检查层级关系(不包含顶级)
+	 */
+	private void checkLevelRelation(Integer communityMode, Integer type, Integer pType){
+		//新增房间，直接判断与楼层关系
+		if(BusinessConst.BUILDING_TYPE_DOOR == type){
+			checkCommonType(type,pType);
+			return;
+		}
+		//社区模式
+		switch (communityMode.intValue()){
+			//社区模式1 层级1 2 3 4  直接判断与楼层关系
+			case 1:
+				checkCommonType(type,pType);
+				break;
+			//社区模式2 层级2 1 3 4  除去顶级和末级，只剩层级1 3
+			case 2:
+				if(BusinessConst.BUILDING_TYPE_BUILDING == type){
+					if(pType - type != 1){
+						throw new PropertyException("父级单位与新增对象层级关系不对，新增失败");
+					}
+				}else if(BusinessConst.BUILDING_TYPE_FLOOR == type){
+					if(type - pType != 2){
+						throw new PropertyException("父级单位与新增对象层级关系不对，新增失败");
+					}
+				}
+				break;
+			//社区模式3 层级1 3 4  除去顶级和末级，只剩层级3
+			case 3:
+				if(type - pType != 2){
+					throw new PropertyException("父级单位与新增对象层级关系不对，新增失败");
+				}
+				break;
+			//社区模式4 层级2 3 4  直接判断关系
+			case 4:
+				checkCommonType(type,pType);
+		}
+	}
+	
+	/**
+	 * 新增楼层和房间通用type校检
+	 */
+	private void checkCommonType(Integer type, Integer pType){
+		if(type - pType != 1){
+			throw new PropertyException("父级单位与新增对象层级关系不对，新增失败");
+		}
 	}
 	
 	/**

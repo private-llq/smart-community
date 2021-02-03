@@ -170,15 +170,15 @@ public interface BusinessConst {
 	/**
 	 * 社区模式-楼栋单元
 	 */
-	Integer COMMUNITY_MODE_FLOOR_UNIT = 1;
+	Integer COMMUNITY_MODE_BUILDING_UNIT = 1;
 	/**
 	 * 社区模式-单元楼栋
 	 */
-	Integer COMMUNITY_MODE_UNIT_FLOOR = 2;
+	Integer COMMUNITY_MODE_UNIT_BUILDING = 2;
 	/**
 	 * 社区模式-单楼栋
 	 */
-	Integer COMMUNITY_MODE_FLOOR = 3;
+	Integer COMMUNITY_MODE_BUILDING = 3;
 	/**
 	 * 社区模式-单单元
 	 */
