@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -33,15 +34,19 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private Long communityId;
 
     @ApiModelProperty(value = "楼栋名")
+    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "楼栋名称过长")
     private String building;
 
     @ApiModelProperty(value = "单元名")
+    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "单元名称过长")
     private String unit;
 
     @ApiModelProperty(value = "楼层名")
+    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "楼层名称过长")
     private String floor;
 
     @ApiModelProperty(value = "门牌名")
+    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "门牌名称过长")
     private String door;
 
     @ApiModelProperty(value = "房屋id")

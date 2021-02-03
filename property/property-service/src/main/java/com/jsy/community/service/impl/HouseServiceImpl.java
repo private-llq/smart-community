@@ -142,7 +142,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				throw new PropertyException("父级单位不存在，新增失败");
 			}else if(!houseEntity.getCommunityId().equals(parentHouse.getCommunityId())){
 				throw new PropertyException("父级单位非本小区，新增失败");
-			}else if(parentHouse.getType() - houseEntity.getType() != 1){
+			}else if(houseEntity.getType() - parentHouse.getType() != 1){
 				throw new PropertyException("父级单位与新增对象层级关系不对，新增失败");
 			}
 			//若类型是房间，生成唯一code
