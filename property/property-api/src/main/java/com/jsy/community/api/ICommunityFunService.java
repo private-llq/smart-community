@@ -16,4 +16,57 @@ public interface ICommunityFunService extends IService<CommunityFunEntity> {
     Map<String,Object> findList(CommunityFunQO communityFunQO);
 
 
+    /**
+     * @Description: 下线
+     * @author: Hu
+     * @since: 2021/2/3 15:11
+     * @Param:
+     * @return:
+     */
+    void tapeOut(Long id);
+
+    /**
+     * @Description: 上线
+     * @author: Hu
+     * @since: 2021/2/3 15:15
+     * @Param:
+     * @return:
+     */
+    void popUpOnline(Long id);
+
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/2/3 15:19
+     * @Param:
+     * @return:
+     */
+    CommunityFunEntity selectOne(Long id);
+
+    /**
+     * @Description: 删除
+     * @author: Hu
+     * @since: 2021/2/3 15:21
+     * @Param:
+     * @return:
+     */
+    void deleteById(Long id);
+
+    /**
+     * @Description: 修改
+     * @author: Hu
+     * @since: 2021/2/3 15:22
+     * @Param:
+     * @return:
+     */
+    void updateOne(CommunityFunEntity communityFunEntity);
+
+    /**
+     * @Description: 新增
+     * @author: Hu
+     * @since: 2021/2/3 15:23
+     * @Param:
+     * @return:
+     */
+    void insetOne(CommunityFunEntity communityFunEntity);
 }

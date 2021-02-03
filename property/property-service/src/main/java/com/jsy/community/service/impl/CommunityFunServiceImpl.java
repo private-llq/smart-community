@@ -12,6 +12,7 @@ import com.jsy.community.qo.CommunityFunQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,9 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     public Map<String,Object> findList(CommunityFunQO communityFunQO) {
         Map<String,Object> map = new HashMap<>();
         if (communityFunQO.getSize()==0||communityFunQO.getSize()==null)
+        {
             communityFunQO.setSize(10l);
+        }
         QueryWrapper<CommunityFunEntity> wrapper = new QueryWrapper<CommunityFunEntity>();
         if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
             wrapper.like("title", communityFunQO.getHeadline());
@@ -44,6 +47,43 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         map.put("list",list);
         map.put("total",total);
         return map;
+    }
+
+    @Override
+    public void tapeOut(Long id) {
+        CommunityFunEntity entity = communityFunMapper.selectById(id);
+        entity.setStatus(2);
+        entity.setStartTime(LocalDateTime.now());
+        communityFunMapper.updateById(entity);
+
+    }
+
+    @Override
+    public void insetOne(CommunityFunEntity communityFunEntity) {
+        communityFunMapper.insert(communityFunEntity);
+    }
+
+    @Override
+    public void updateOne(CommunityFunEntity communityFunEntity) {
+        communityFunMapper.updateById(communityFunEntity);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        communityFunMapper.deleteById(id);
+    }
+
+    @Override
+    public CommunityFunEntity selectOne(Long id) {
+        return communityFunMapper.selectById(id);
+    }
+
+    @Override
+    public void popUpOnline(Long id) {
+        CommunityFunEntity entity = communityFunMapper.selectById(id);
+        entity.setStatus(1);
+        entity.setStartTime(LocalDateTime.now());
+        communityFunMapper.updateById(entity);
     }
 
 }
