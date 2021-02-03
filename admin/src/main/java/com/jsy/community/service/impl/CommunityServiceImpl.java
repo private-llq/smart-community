@@ -9,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.service.ICommunityService;
 import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.SnowFlake;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -37,6 +38,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	 **/
 	@Override
 	public boolean addCommunity(CommunityEntity communityEntity){
+		communityEntity.setId(SnowFlake.nextId());
 		int result = communityMapper.insert(communityEntity);
         return result == 1;
     }

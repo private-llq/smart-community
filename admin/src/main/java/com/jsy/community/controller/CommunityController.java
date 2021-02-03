@@ -9,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.service.ICommunityService;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +50,7 @@ public class CommunityController {
 	**/
 	@PostMapping("")
 	public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity){
+		ValidatorUtils.validateEntity(communityEntity);
 		boolean result = iCommunityService.addCommunity(communityEntity);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
 	}

@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -54,6 +55,7 @@ public class CommunityEntity extends BaseEntity {
     @TableField(exist=false)
     private String distanceString;//定位距离(显示用)
     @ApiModelProperty(value = "社区房屋层级模式 1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元")
+    @NotNull(message = "社区房屋层级模式不能为空")
     @Range(min = 1, max = 4, message = "社区房屋层级模式有误")
     private Integer houseLevelMode;
     
