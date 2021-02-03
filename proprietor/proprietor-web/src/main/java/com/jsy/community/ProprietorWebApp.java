@@ -15,6 +15,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.*;
 
 import java.time.Duration;
+
 @EnableCaching
 @SpringBootApplication
 @DubboComponentScan
