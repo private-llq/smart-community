@@ -24,10 +24,10 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-24
  */
-@Api(tags = "APP菜单控制器")
+@Api(tags = "APP大后台菜单控制器")
 @Slf4j
 @RestController
-@RequestMapping("/community/adminMenu")
+@RequestMapping("/admin/adminMenu")
 public class AppMenuController {
 	
 	@Autowired
@@ -43,14 +43,14 @@ public class AppMenuController {
 	@ApiOperation("子菜单白天图片上传")
 	@PostMapping("/uploadDayMenuImg")
 //	@UploadImg(bucketName = UploadBucketConst.APP_MENU_BUCKET,redisKeyName = UploadRedisConst.APP_MENU_IMG_PART)
-	public CommonResult uploadDayMenuImg(@RequestParam("file") MultipartFile file,CommonResult result){
+	public CommonResult uploadDayMenuImg(@RequestParam("file") MultipartFile file, CommonResult result) {
 		return CommonResult.ok(result.getData());
 	}
 	
 	@ApiOperation("子菜单黑夜图片上传")
 	@PostMapping("/uploadNightMenuImg")
 //	@UploadImg(bucketName = UploadBucketConst.APP_MENU_BUCKET,redisKeyName = UploadRedisConst.APP_MENU_IMG_PART)
-	public CommonResult uploadNightMenuImg(@RequestParam("file") MultipartFile file,CommonResult result){
+	public CommonResult uploadNightMenuImg(@RequestParam("file") MultipartFile file, CommonResult result) {
 		return CommonResult.ok(result.getData());
 	}
 	
@@ -66,7 +66,7 @@ public class AppMenuController {
 	
 	@ApiOperation("新增子菜单")
 	@PostMapping("/insertChildMenu")
-	public CommonResult insertChildMenu(@RequestBody AppMenuEntity adminMenu){
+	public CommonResult insertChildMenu(@RequestBody AppMenuEntity adminMenu) {
 		ValidatorUtils.validateEntity(adminMenu, AppMenuEntity.addAdmin.class);
 		adminMenuService.insertChildMenu(adminMenu);
 		return CommonResult.ok();
@@ -81,7 +81,7 @@ public class AppMenuController {
 	
 	@ApiOperation("修改父菜单信息")
 	@PostMapping("/updateAdminMenu")
-	public CommonResult updateAdminMenu(@RequestBody AppMenuEntity adminMenu){
+	public CommonResult updateAdminMenu(@RequestBody AppMenuEntity adminMenu) {
 		if (StringUtils.isEmpty(adminMenu.getMenuName())) {
 			return CommonResult.error("父菜单名不能为空");
 		}

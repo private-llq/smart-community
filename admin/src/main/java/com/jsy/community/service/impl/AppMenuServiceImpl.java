@@ -92,6 +92,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		adminMenu.setId(SnowFlake.nextId());
 		adminMenu.setDaytimeIcon(null);
 		adminMenu.setNightIcon(null);
+		adminMenu.setPath(null);
 		appMenuMapper.insert(adminMenu);
 	}
 	
@@ -142,6 +143,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		}
 		adminMenu.setDaytimeIcon(null);
 		adminMenu.setNightIcon(null);
+		adminMenu.setPath(null);
 		appMenuMapper.updateById(adminMenu);
 	}
 }
