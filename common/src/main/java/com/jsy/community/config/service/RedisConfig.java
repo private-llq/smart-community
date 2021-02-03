@@ -22,7 +22,6 @@ import java.time.Duration;
  * @author ling
  */
 @Configuration
-@ConditionalOnProperty(value = "jsy.web.enable",havingValue = "true")
 public class RedisConfig {
 
 	@Resource
