@@ -8,6 +8,7 @@ import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.HouseMapper;
@@ -111,8 +112,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		//查询社区模式
 		Integer communityMode = communityService.getCommunityMode(houseEntity.getCommunityId());
 		if(communityMode == null || communityMode < 1 || communityMode > 4){
-			log.error("社区模式错误：" + String.valueOf(communityMode) + " 社区id：" + houseEntity.getCommunityId());
-			return false;
+			log.error("社区不存在或社区模式错误：" + String.valueOf(communityMode) + " 社区id：" + houseEntity.getCommunityId());
+			throw new PropertyException("社区不存在或社区模式数据有误，请联系管理员");
 		}
 		
 		//检查处理入参
@@ -129,17 +130,25 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 			throw new PropertyException("非顶级单位pid不能为0");
 		}
 		
-		//若类型是房间，生成唯一code
-		if(BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()){
-			houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
-		}
-		
 		//设置id和保存
 		houseEntity.setId(SnowFlake.nextId());
 		int result;
 		if(houseEntity.getPid() == 0L){
 			result = houseMapper.insert(houseEntity);
 		}else{
+			//检查pid是否存在、社区是否相同、层级是否是新增目标上一级
+			HouseEntity parentHouse = houseMapper.selectOne(new QueryWrapper<HouseEntity>().select("community_id,type").eq("id", houseEntity.getPid()));
+			if(parentHouse == null){
+				throw new PropertyException("父级单位不存在，新增失败");
+			}else if(!houseEntity.getCommunityId().equals(parentHouse.getCommunityId())){
+				throw new PropertyException("父级单位非本小区，新增失败");
+			}else if(parentHouse.getType() - houseEntity.getType() != 1){
+				throw new PropertyException("父级单位与新增对象层级关系不对，新增失败");
+			}
+			//若类型是房间，生成唯一code
+			if(BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()){
+				houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
+			}
 			result = houseMapper.addSub(houseEntity);
 		}
 		return result == 1;

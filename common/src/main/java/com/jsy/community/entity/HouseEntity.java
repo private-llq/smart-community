@@ -54,7 +54,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "1.楼栋 2.单元 3.楼层 4.门牌")
     @NotNull(groups = {addHouseValidatedGroup.class,updateHouseValidatedGroup.class}, message = "缺少类型")
-    @Range(min = 1, max = 4, message = "楼宇类型错误")
+    @Range(groups = {addHouseValidatedGroup.class,updateHouseValidatedGroup.class}, min = 1, max = 4, message = "楼宇类型错误")
     private Integer type;
 
     @ApiModelProperty(value = "备注")
