@@ -226,13 +226,13 @@ public interface BusinessConst {
 	/**
 	 * 社区app主页全文搜索交换机名称
 	 */
-	String ES_TOPIC_EXCHANGE_NAME = "elasticsearch_topic_exchange";
+	String APP_SEARCH_EXCHANGE_NAME = "app.search.topic.exchange";
 	/**
 	 * 社区app主页全文搜索队列名称
 	 */
-	String ES_QUEUE_NAME = "elasticsearch_topic_queue";
+	String APP_SEARCH_QUEUE_NAME = "app.search.topic.queue";
 	/**
 	 * 社区app主页全文搜索路由key名称
 	 */
-	String ES_ROUTE_KEY = "elasticsearch.#";
+	String APP_SEARCH_ROUTE_KEY = "appSearchFullText";
 }

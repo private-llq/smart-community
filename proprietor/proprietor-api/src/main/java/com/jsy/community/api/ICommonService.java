@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
 
@@ -143,4 +144,10 @@ public interface ICommonService {
 	 * @Date: 2020/12/24
 	 **/
 	JSONObject getWeatherForDays(double lon, double lat);
+
+	/**
+	 * 全文搜索 数据库 数据导入 Elasticsearch
+	 * @return
+	 */
+	List<FullTextSearchEntity> fullTextSearchEntities();
 }

@@ -42,6 +42,7 @@
     
     <properties>
         <java.version>11</java.version>
+        <elasticsearch.version>7.10.2</elasticsearch.version>
         <mybatis-plus.version>3.4.0</mybatis-plus.version>
         <spring-cloud-alibaba.version>2.2.3.RELEASE</spring-cloud-alibaba.version>
         <spring-context.version>2.2.5.RELEASE</spring-context.version>
@@ -57,6 +58,7 @@
         <justauth-spring-boot.version>1.1.0</justauth-spring-boot.version>
         <kaptcha.version>0.0.9</kaptcha.version>
         <aliyun-oss.version>3.10.2</aliyun-oss.version>
+        <spring.rabbitmq.version>2.3.2.RELEASE</spring.rabbitmq.version>
     </properties>
 
     <dependencyManagement>

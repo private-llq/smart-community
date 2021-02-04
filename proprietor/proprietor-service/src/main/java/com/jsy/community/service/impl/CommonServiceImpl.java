@@ -5,10 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.utils.WeatherUtils;
+import com.jsy.community.utils.es.RecordFlag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -241,5 +243,48 @@ public class CommonServiceImpl implements ICommonService {
     public JSONObject getWeatherForDays(double lon, double lat){
         return weatherUtils.getWeatherForDays(String.valueOf(lon),String.valueOf(lat));
     }
-    
+
+    /**
+     * 此方法 不会应用于 业务，
+     * 全文搜索 首次导入数据库 所有数据
+     * @return      返回自定义结构好的 数据
+     */
+    @Override
+    public List<FullTextSearchEntity> fullTextSearchEntities(){
+        //商铺所有数据
+        List<FullTextSearchEntity> shopList = commonMapper.getAllShop();
+        //租赁房屋所有数据
+        List<FullTextSearchEntity> houseList = commonMapper.getAllHouseLease();
+        //社区消息所有数据
+        List<FullTextSearchEntity> informList = commonMapper.getAllInform();
+        //趣事所有数据
+        List<FullTextSearchEntity> funList = commonMapper.getAllFun();
+        List<FullTextSearchEntity> list = new ArrayList<>();
+        list.addAll(shopList);
+        list.addAll(houseList);
+        list.addAll(informList);
+        list.addAll(funList);
+        //查缩略图
+        list.forEach( l -> {
+            switch (l.getFlag()){
+                case LEASE_HOUSE:
+                    l.setPicture(commonMapper.getLeaseHousePicture(l.getId()));
+                    break;
+                case LEASE_SHOP:
+                    l.setPicture(commonMapper.getLeaseShopPicture(l.getId()));
+                    break;
+                case FUN:
+                    l.setPicture(commonMapper.getFunPicture(l.getId()));
+                    break;
+                case INFORM:
+                    l.setPicture(commonMapper.getInformPicture(l.getId()));
+                    break;
+                default:
+                    break;
+            }
+        });
+        return list;
+    }
+
+
 }

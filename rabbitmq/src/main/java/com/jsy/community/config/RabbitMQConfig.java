@@ -19,6 +19,7 @@ import java.util.Map;
 @Configuration
 public class RabbitMQConfig {
 
+
     public static final String QUEUE_EMAIL = "queue_email";
     public static final String QUEUE_SMS = "queue_sms";
     public static final String QUEUE_TEST = "queue_test";
@@ -30,36 +31,32 @@ public class RabbitMQConfig {
     public static final String EXCHANGE_TOPICS_WECHAT = "exchange_topics_wechat";
     public static final String EXCHANGE_DELAY_WECHAT = "exchange_delay_wechat";
 
-
-
     /**
-     * 声明ES队列
-     * @return      返回队列
+     * app 主页 全文搜索 的 队列与交换机
+     * @author YuLF
+     * @since  2021/2/4 10:08
      */
     @Bean
     Queue queue() {
-        return new Queue(BusinessConst.ES_QUEUE_NAME, false);
+        return new Queue(BusinessConst.APP_SEARCH_QUEUE_NAME, true);
     }
 
-    /**
-     * 声明ES交换机类型为模糊匹配交换机
-     * @return      返回声明的交换机  durable 持久化
-     */
+
+
+
     @Bean
     TopicExchange exchange() {
-        Exchange build = ExchangeBuilder.topicExchange(BusinessConst.ES_TOPIC_EXCHANGE_NAME).durable(true).build();
+        Exchange build = ExchangeBuilder.topicExchange(BusinessConst.APP_SEARCH_EXCHANGE_NAME).durable(true).build();
         return (TopicExchange) build;
     }
 
-    /**
-     * 绑定ES交换机和队列
-     * @param queue         ES队列
-     * @param exchange      ES交换机
-     */
+
     @Bean
     Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(BusinessConst.ES_ROUTE_KEY);
+        return BindingBuilder.bind(queue).to(exchange).with("appSearch#");
     }
+    //@author YuLF end
+
 
 
     /**
