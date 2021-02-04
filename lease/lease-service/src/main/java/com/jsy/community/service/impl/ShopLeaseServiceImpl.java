@@ -599,9 +599,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 封装地址
 			// 城市地址
-//			Long cityId = record.getCityId();
-//			String city = redisTemplate.opsForValue().get("RegionSingle" + ":" + cityId);
-			
 			Long areaId = record.getAreaId();
 			String area = redisTemplate.opsForValue().get("RegionSingle" + ":" + areaId);
 			
@@ -706,16 +703,19 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Transactional(rollbackFor = Exception.class)
 	@LcnTransaction
 	public void testTransaction() {
+		
 		// 1. 调用远端服务
 		communityService.addCommunityEntity();
-
-//		int b =  1/0;
-		
+		int b =  1/0;
 		// 2. 调用本地服务
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
-		shopLeaseEntity.setId(1233L);
+		shopLeaseEntity.setId(140L);
 		shopLeaseEntity.setTitle("测试分布式事物");
 		shopLeaseMapper.insert(shopLeaseEntity);
+		
+		System.out.println(11);
+	
+
 	}
 	
 	@Override
