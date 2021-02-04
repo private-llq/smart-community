@@ -1,9 +1,5 @@
 package com.jsy.community.config.service;
 
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
-import org.redisson.config.SingleServerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,21 +40,21 @@ public class RedisConfig {
 	//@Value("${jsy.redis.annotation.cacheTimeout}")
 	private Integer cacheTimeout = 1800;
 
-	@Bean
-	public RedissonClient redissonClient(){
-		Config config = new Config();
-		SingleServerConfig singleServerConfig = config.useSingleServer();
-		singleServerConfig.setAddress("redis://"+ redisHost +":" + redisPort);
-		singleServerConfig.setDatabase(redisDatabase);
-		singleServerConfig.setPassword(redisPassword);
-		singleServerConfig.setConnectTimeout(3000);
-		singleServerConfig.setIdleConnectionTimeout(3000);
-		singleServerConfig.setRetryInterval(1000);
-		singleServerConfig.setConnectionMinimumIdleSize(10);
-		//重连次数
-		singleServerConfig.setRetryAttempts(5);
-		return Redisson.create(config);
-	}
+//	@Bean
+//	public RedissonClient redissonClient(){
+//		Config config = new Config();
+//		SingleServerConfig singleServerConfig = config.useSingleServer();
+//		singleServerConfig.setAddress("redis://"+ redisHost +":" + redisPort);
+//		singleServerConfig.setDatabase(redisDatabase);
+//		singleServerConfig.setPassword(redisPassword);
+//		singleServerConfig.setConnectTimeout(3000);
+//		singleServerConfig.setIdleConnectionTimeout(3000);
+//		singleServerConfig.setRetryInterval(1000);
+//		singleServerConfig.setConnectionMinimumIdleSize(10);
+//		//重连次数
+//		singleServerConfig.setRetryAttempts(5);
+//		return Redisson.create(config);
+//	}
 
 	@Bean()
 	public RedisTemplate<String, Object> redisTemplate() {
