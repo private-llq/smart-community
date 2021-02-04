@@ -25,6 +25,9 @@ public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "社区趣事浏览次数")
     private Integer viewCount;
 
+    @ApiModelProperty(value = "uid创建人")
+    private String uid;
+
     @ApiModelProperty(value = "社区趣事内容")
     private String content;
     @ApiModelProperty(value = "社区趣事缩略图地址")

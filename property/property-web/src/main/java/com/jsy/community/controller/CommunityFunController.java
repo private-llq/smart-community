@@ -1,12 +1,14 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.CommunityFunQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,13 +40,16 @@ public class CommunityFunController {
 
     @ApiOperation("分页查询所有社区趣事")
     @PostMapping("/list")
+    @Login
     public CommonResult<Map> list(@RequestBody CommunityFunQO communityFunQO) {
         Map<String, Object> map = communityFunService.findList(communityFunQO);
         return CommonResult.ok(map);
     }
     @ApiOperation("新增")
     @PostMapping("/save")
+    @Login
     public CommonResult save(@RequestBody CommunityFunEntity communityFunEntity) {
+        String userId = UserUtils.getUserId();
         if (communityFunEntity.getTitleName()==null||"".equals(communityFunEntity.getTitleName())){
             return  CommonResult.error("标题不能为空");
         }
@@ -58,6 +63,7 @@ public class CommunityFunController {
             return  CommonResult.error("缩略图不能为空");
         }
         communityFunEntity.setStatus(2);
+        communityFunEntity.setUid(userId);
         communityFunEntity.setId(SnowFlake.nextId());
         communityFunService.insetOne(communityFunEntity);
         return  CommonResult.ok();
@@ -65,6 +71,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增缩略图")
     @PostMapping("/smallImge")
+    @Login
     public CommonResult upload(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -77,6 +84,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
+    @Login
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -89,6 +97,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增内容图片")
     @PostMapping("/contentImge")
+    @Login
     public CommonResult content(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -101,6 +110,7 @@ public class CommunityFunController {
 
     @ApiOperation("修改")
     @PostMapping("/update")
+    @Login
     public CommonResult update(@RequestBody CommunityFunEntity communityFunEntity) {
         if (communityFunEntity.getTitleName()==null||"".equals(communityFunEntity.getTitleName())){
             return  CommonResult.error("标题不能为空");
@@ -120,6 +130,7 @@ public class CommunityFunController {
 
     @ApiOperation("删除")
     @DeleteMapping("/delete")
+    @Login
     public CommonResult delete(@ApiParam("社区趣事id")
                                @RequestParam("id") Long id) {
         communityFunService.deleteById(id);
@@ -128,6 +139,7 @@ public class CommunityFunController {
 
     @ApiOperation("查询一条---表单回填")
     @GetMapping("/findOne")
+    @Login
     public CommonResult findOne(@ApiParam("社区趣事id")
                                     @RequestParam("id") Long id) {
         CommunityFunEntity communityFunEntity = communityFunService.selectOne(id);
@@ -136,6 +148,7 @@ public class CommunityFunController {
 
     @ApiOperation("上线")
     @GetMapping("/popUpOnline")
+    @Login
     public CommonResult popUpOnline(@ApiParam("社区趣事id")
                                         @RequestParam("id") Long id) {
         communityFunService.popUpOnline(id);
@@ -144,6 +157,7 @@ public class CommunityFunController {
 
     @ApiOperation("下线")
     @GetMapping("/tapeOut")
+    @Login
     public CommonResult tapeOut(@ApiParam("社区趣事id")
                                 @RequestParam Long id) {
         communityFunService.tapeOut(id);

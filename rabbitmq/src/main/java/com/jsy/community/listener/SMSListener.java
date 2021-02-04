@@ -29,7 +29,6 @@ public class SMSListener {
      */
     @RabbitListener(queues = {RabbitMQConfig.QUEUE_SMS})
     public void receive_sms (String msg, Message message, Channel channel)throws IOException {
-
         System.out.println(msg);
         System.out.println(message.getBody());
         System.out.println(channel);
