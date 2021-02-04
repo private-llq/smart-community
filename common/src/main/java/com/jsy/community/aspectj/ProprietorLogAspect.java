@@ -42,27 +42,27 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public class ProprietorLogAspect {
-	
+
 	@Autowired
 	private UserUtils userUtils;
-	
+
 	private static final Logger log = LoggerFactory.getLogger(ProprietorLogAspect.class);
-	
+
 	/**
 	 * 切入点方法执行成功
 	 */
 	private static final int SUCCESS = 0;
-	
+
 	/**
 	 * 切入点方法执行失败
 	 */
 	private static final int FAIL = 1;
-	
+
 	/**
 	 * 远程调用保存日志地址接口
 	 */
 	private static final String SAVELOGADDRESSRPC = "http://localhost:7001/api/v1/property/community/proprietorLog/saveProprietorLog";
-	
+
 	/**
 	 * @return void
 	 * @Author lihao
@@ -73,7 +73,7 @@ public class ProprietorLogAspect {
 	@Pointcut("@annotation(com.jsy.community.annotation.Log)")
 	public void logPointCut() {
 	}
-	
+
 	/**
 	 * @return void
 	 * @Author lihao
@@ -84,7 +84,7 @@ public class ProprietorLogAspect {
 	@Before("logPointCut()")
 	public void doBefore() {
 	}
-	
+
 	/**
 	 * @return void
 	 * @Author lihao
@@ -103,8 +103,8 @@ public class ProprietorLogAspect {
 		handleLog(point, null, startTime, endTime);
 		return proceed;
 	}
-	
-	
+
+
 	@AfterThrowing(pointcut = "logPointCut()", throwing = "ex")
 	public void doAfterThrowing(JoinPoint joinPoint, Exception ex) {
 		// 获取开始时间
@@ -113,7 +113,7 @@ public class ProprietorLogAspect {
 		long endTime = System.currentTimeMillis();
 		handleLog(joinPoint, ex, startTime, endTime);
 	}
-	
+
 	/**
 	 * @return void
 	 * @Author lihao
@@ -127,7 +127,7 @@ public class ProprietorLogAspect {
 			// 获取执行时间
 			long sumTime = endTime - startTime;
 			proprietorLog.setRuntime(sumTime);
-			
+
 			//1. 获取访问路径，访问ip，请求方式
 			ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 			if (attributes != null) {
@@ -139,7 +139,7 @@ public class ProprietorLogAspect {
 				proprietorLog.setRequestMethod(requestMethod);
 				proprietorLog.setIpAddress(ipAddress);
 			}
-			
+
 			//2. 获取操作人信息[来源:注解@Login]
 			//2. 1判断方法上是否有@Login注解
 			Login method_login = getAnnotationLoginWithMethod(joinPoint);
@@ -163,7 +163,7 @@ public class ProprietorLogAspect {
 					}
 				}
 			}
-			
+
 			//3. 获取操作类型 操作模块 功能描述 是否保存请求参数 [来源注解]
 			Log annotationLog = getAnnotationLog(joinPoint);
 			if (annotationLog != null) {
@@ -176,32 +176,32 @@ public class ProprietorLogAspect {
 				// 是否保存请求参数
 				boolean flag = annotationLog.isSaveRequestData();
 				if (flag) {
-					
+
 					//4. 获取请求参数
 					Object[] args = joinPoint.getArgs();
 					String parameter = args.toString();
 					proprietorLog.setParameter(parameter);
 				}
-				
+
 				//5. 获取请求结果[能走到后置通知就说明没有报错]
 				proprietorLog.setStatus(SUCCESS);
 				System.out.println(proprietorLog);
-				
+
 				//6. 是否有异常
 				if (e != null) {
 					proprietorLog.setStatus(FAIL);
 					proprietorLog.setExceptionInfo(e.getMessage());
 				}
-				
+
 				//7. 保存数据  【目前保存日志是通过物业端来保存的   具体上线的时候保存在哪  到时候再看】
 				saveLog(proprietorLog);
-				
+
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 方法上是否存在Log注解，如果存在就获取
 	 */
@@ -209,14 +209,14 @@ public class ProprietorLogAspect {
 		Signature signature = joinPoint.getSignature();
 		MethodSignature methodSignature = (MethodSignature) signature;
 		Method method = methodSignature.getMethod();
-		
+
 		if (method != null) {
 			return method.getAnnotation(Log.class);
 		}
 		return null;
 	}
-	
-	
+
+
 	/**
 	 * 判断使用log注解的方法所在类上是否存在Log注解，如果存在就获取
 	 */
@@ -228,7 +228,7 @@ public class ProprietorLogAspect {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 判断使用log注解的方法上是否存在Login注解，如果存在就获取
 	 */
@@ -236,38 +236,38 @@ public class ProprietorLogAspect {
 		Signature signature = joinPoint.getSignature();
 		MethodSignature methodSignature = (MethodSignature) signature;
 		Method method = methodSignature.getMethod();
-		
+
 		if (method != null) {
 			return method.getAnnotation(Login.class);
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 将日志数据保存到数据库
 	 */
 	private void saveLog(ProprietorLog proprietorLog) {
 		// 获得Http客户端(可以理解为:你得先有一个浏览器;注意:实际上HttpClient与浏览器是不一样的)
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		
+
 		// 创建Post请求
 		HttpPost httpPost = new HttpPost(SAVELOGADDRESSRPC);
-		
+
 		if (httpPost == null) {
 			return;
 		}
-		
+
 		// 我这里利用阿里的fastjson，将Object转换为json字符串;
 		// (需要导入com.alibaba.fastjson.JSON包)
 		String jsonString = JSON.toJSONString(proprietorLog);
-		
+
 		StringEntity entity = new StringEntity(jsonString, "UTF-8");
-		
+
 		// post请求是将参数放在请求体里面传过去的;这里将entity放入post请求体中
 		httpPost.setEntity(entity);
-		
+
 		httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-		
+
 		// 响应模型
 		CloseableHttpResponse response = null;
 		try {
@@ -275,7 +275,7 @@ public class ProprietorLogAspect {
 			response = httpClient.execute(httpPost);
 			// 从响应模型中获取响应实体
 			HttpEntity responseEntity = response.getEntity();
-			
+
 			System.out.println("响应状态为:" + response.getStatusLine());
 			if (responseEntity != null) {
 				System.out.println("响应内容长度为:" + responseEntity.getContentLength());

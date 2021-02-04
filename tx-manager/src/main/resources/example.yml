@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
+#    type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://222.178.212.29:3306/project?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
@@ -36,6 +36,17 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+  redis:
+    port: 6379
+    host: 222.178.212.29
+    password: smart99--
+    database: 0
+#    jedis:
+#      pool:
+#        min-idle: 10
+#        max-idle: 20
+#        max-wait: -1ms
+#        max-active: 200
 tx-lcn:
   manager:
     port: 8070

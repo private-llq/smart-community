@@ -56,7 +56,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	@LcnTransaction
 	public void addCommunityEntity() {
 		CommunityEntity communityEntity = new CommunityEntity();
-		communityEntity.setId(234L);
+		communityEntity.setId(140L);
 		communityEntity.setName("测试分布式事物");
 		communityMapper.insert(communityEntity);
 	}
