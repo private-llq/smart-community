@@ -39,8 +39,8 @@ public class RedisConfig {
 	@Value("${spring.redis.database}")
 	private Integer redisDatabase;
 
-	@Value("${jsy.redis.annotation.cacheTimeout}")
-	private Integer cacheTimeout;
+	//@Value("${jsy.redis.annotation.cacheTimeout}")
+	private Integer cacheTimeout = 1800;
 
 	@Bean
 	public RedissonClient redissonClient(){
