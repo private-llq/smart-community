@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 @Api(tags = "支付宝支付控制器")
 @RestController
 @ApiJSYController
-@Login
+//@Login
 @RequestMapping("alipay")
 public class AliAppPayController {
 	
@@ -60,7 +60,8 @@ public class AliAppPayController {
 		if(!StringUtils.isEmpty(orderStr)){
 			AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
 			ailiAppPayRecordEntity.setOrderNo(orderNo);
-			String uid = UserUtils.getUserId();
+//			String uid = UserUtils.getUserId();
+			String uid = "aliTest";
 			ailiAppPayRecordEntity.setUserid(uid);
 			ailiAppPayRecordEntity.setTradeAmount(aliAppPayQO.getTotalAmount());
 			ailiAppPayRecordEntity.setTradeName(PaymentEnum.TradeFromEnum.TRADE_FROM_RENT.getIndex());

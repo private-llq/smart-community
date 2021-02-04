@@ -16,6 +16,6 @@ public interface IUserAccountRecordService {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/8
 	**/
-	boolean addUcoinRecord(UserAccountRecordEntity userAccountRecordEntity);
+	boolean addAccountRecord(UserAccountRecordEntity userAccountRecordEntity);
 	
 }

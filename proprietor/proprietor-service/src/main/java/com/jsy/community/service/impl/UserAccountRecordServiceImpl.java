@@ -4,6 +4,7 @@ import com.jsy.community.api.IUserAccountRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAccountRecordEntity;
 import com.jsy.community.mapper.UserAccountRecordMapper;
+import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,8 +27,13 @@ public class UserAccountRecordServiceImpl implements IUserAccountRecordService {
 	 * @Date: 2021/1/8
 	**/
 	@Override
-	public boolean addUcoinRecord(UserAccountRecordEntity userAccountRecordEntity){
+	public boolean addAccountRecord(UserAccountRecordEntity userAccountRecordEntity){
 		return userAccountRecordMapper.insert(userAccountRecordEntity) == 1;
+	}
+	
+	//TODO 查询账户流水
+	public PageInfo queryAccountRecord(){
+		return null;
 	}
 	
 }

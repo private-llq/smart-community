@@ -23,6 +23,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -57,6 +59,9 @@ public class VisitorController {
 	@PostMapping("")
 	public CommonResult<VisitorEntryVO> save(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity);
+		if(LocalDate.now().isAfter(visitorEntity.getStartTime())){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "预计来访时间不得早于当前时间");
+		}
 		visitorEntity.setUid(UserUtils.getUserId());
 		if(visitorEntity.getCarType() != null && StringUtils.isEmpty(visitorEntity.getCarPlate())){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "填写车辆类型后车牌号不能为空");
