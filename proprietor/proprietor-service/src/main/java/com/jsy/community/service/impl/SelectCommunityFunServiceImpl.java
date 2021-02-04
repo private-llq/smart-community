@@ -31,7 +31,7 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
         Map<String,Object> map = new HashMap<>();
         if (communityFunQO.getSize()==0||communityFunQO.getSize()==null)
             communityFunQO.setSize(10l);
-        QueryWrapper<CommunityFunEntity> wrapper = new QueryWrapper<CommunityFunEntity>().eq("status",2);
+        QueryWrapper<CommunityFunEntity> wrapper = new QueryWrapper<CommunityFunEntity>().eq("status",1);
         if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
             wrapper.like("title_name", communityFunQO.getHeadline());
         }

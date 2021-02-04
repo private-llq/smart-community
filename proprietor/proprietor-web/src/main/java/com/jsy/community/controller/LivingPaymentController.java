@@ -122,8 +122,8 @@ public class LivingPaymentController {
 
         String userId = UserUtils.getUserId();
         livingPaymentQO.setUserID(userId);
-        PaymentDetailsVO paymentDetailsVO=livingPaymentService.add(livingPaymentQO);
-        return CommonResult.ok(paymentDetailsVO);
+        livingPaymentService.add(livingPaymentQO);
+        return CommonResult.ok();
     }
     /**
      * 查询一条订单详情

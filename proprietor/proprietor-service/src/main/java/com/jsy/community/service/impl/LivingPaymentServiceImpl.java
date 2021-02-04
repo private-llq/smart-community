@@ -64,7 +64,7 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
      * @return:
      */
     @Transactional
-    public PaymentDetailsVO add(LivingPaymentQO livingPaymentQO){
+    public void add(LivingPaymentQO livingPaymentQO){
         PayCompanyEntity payCompanyEntity = payCompanyMapper.selectOne(new QueryWrapper<PayCompanyEntity>().eq("id", livingPaymentQO.getPayCostUnitId()).eq("type_id", livingPaymentQO.getType()));
         if (StringUtils.isEmpty(payCompanyEntity)){
             throw new ProprietorException(JSYError.REQUEST_PARAM);
@@ -155,21 +155,21 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         payUserDetailsEntity.setSex(userEntity.getSex());
         payUserDetailsMapper.insert(payUserDetailsEntity);
 
-        //返回缴费详情
-        PaymentDetailsVO paymentDetailsVO = new PaymentDetailsVO();
-        paymentDetailsVO.setId(payOrderEntity.getId());
-        paymentDetailsVO.setUnitName(entity.getName());
-        paymentDetailsVO.setPayBalance(livingPaymentQO.getPayBalance());
-        paymentDetailsVO.setDoorNo(livingPaymentQO.getDoorNo());
-        paymentDetailsVO.setOrderTime(LocalDateTime.now());
-        paymentDetailsVO.setDoorName(livingPaymentQO.getDoorName());
-        paymentDetailsVO.setAccountingTime(LocalDateTime.now());
-        paymentDetailsVO.setPaySum(livingPaymentQO.getPayNum());
-        paymentDetailsVO.setAddress(livingPaymentQO.getAddress());
-
-        //假数据默认返回已到账
-        paymentDetailsVO.setStatus(2);
-        return paymentDetailsVO;
+//        //返回缴费详情
+//        PaymentDetailsVO paymentDetailsVO = new PaymentDetailsVO();
+//        paymentDetailsVO.setId(payOrderEntity.getId());
+//        paymentDetailsVO.setUnitName(entity.getName());
+//        paymentDetailsVO.setPayBalance(livingPaymentQO.getPayBalance());
+//        paymentDetailsVO.setDoorNo(livingPaymentQO.getDoorNo());
+//        paymentDetailsVO.setOrderTime(LocalDateTime.now());
+//        paymentDetailsVO.setDoorName(livingPaymentQO.getDoorName());
+//        paymentDetailsVO.setAccountingTime(LocalDateTime.now());
+//        paymentDetailsVO.setPaySum(livingPaymentQO.getPayNum());
+//        paymentDetailsVO.setAddress(livingPaymentQO.getAddress());
+//
+//        //假数据默认返回已到账
+//        paymentDetailsVO.setStatus(2);
+//        return paymentDetailsVO;
     }
 
     /**

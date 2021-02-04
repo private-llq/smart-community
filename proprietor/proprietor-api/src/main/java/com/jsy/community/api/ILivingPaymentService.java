@@ -21,7 +21,7 @@ public interface ILivingPaymentService {
      * @param livingPaymentQO
      * @return
      */
-    PaymentDetailsVO add(LivingPaymentQO livingPaymentQO);
+    void add(LivingPaymentQO livingPaymentQO);
 
     /**
      * 通过组户号查询订单详情
