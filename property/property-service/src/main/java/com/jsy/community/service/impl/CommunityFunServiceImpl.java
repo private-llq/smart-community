@@ -70,6 +70,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Override
     public void updateOne(CommunityFunEntity communityFunEntity) {
         CommunityFunEntity entity = communityFunMapper.selectById(communityFunEntity.getId());
+
         entity.setContent(communityFunEntity.getContent());
         entity.setCoverImageUrl(communityFunEntity.getCoverImageUrl());
         entity.setSmallImageUrl(communityFunEntity.getSmallImageUrl());

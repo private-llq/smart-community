@@ -33,5 +33,7 @@ public class WithdrawalOrderEntity implements Serializable {
     private LocalDateTime arrive_time;
     @ApiModelProperty(value = "提现状态,1已到账，2未到账")
     private Integer status;
+    @ApiModelProperty(value = "用户id")
+    private String uid;
 
 }

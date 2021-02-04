@@ -73,7 +73,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description",weChatPayQO.getDescription());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://jsy.free.vipnps.vip/callback");
+        map.put("notify_url","http://huyf.free.vipnps.vip/api/v1/payment/callback");
         map.put("amount",hashMap);
 
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
@@ -81,6 +81,7 @@ public class WeChatController {
         WeChatOrderEntity msg = new WeChatOrderEntity();
         msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
+        msg.setOpenId(weChatPayQO.getOpenId());
         msg.setDescription(weChatPayQO.getDescription());
         msg.setAmount(weChatPayQO.getAmount());
         msg.setOrderStatus(1);
@@ -116,7 +117,6 @@ public class WeChatController {
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         System.err.println("回调成功");
         String out_trade_no = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
-
         System.out.println(out_trade_no);
     }
 
@@ -143,6 +143,7 @@ public class WeChatController {
      * @return:
      */
     @PostMapping(value = "/withdrawDeposit")
+    @Login
     public CommonResult withdrawDeposit(@RequestBody WithdrawalQO withdrawalQO) throws Exception {
         String body=null;
         Map<String, String> restmap=null;
@@ -178,7 +179,7 @@ public class WeChatController {
             System.out.println(restmap.get("err_code") + ":" + restmap.get("err_code_des"));
         }
 
-        return null;
+        return CommonResult.ok(restmap);
     }
     /**
      * @Description:  支付查询
@@ -188,6 +189,7 @@ public class WeChatController {
      * @return:
      */
     @GetMapping("/wxPayQuery")
+    @Login
     public CommonResult wxPayQuery(@RequestParam("orderId")String orderId){
         String body = "";
         HttpGet httpGet = new HttpGet(WechatConfig.WXPAY_PAY+orderId+""+"?mchid="+WechatConfig.MCH_ID+"");
@@ -218,6 +220,7 @@ public class WeChatController {
      * @return:
      */
     @GetMapping("/withdrawDepositQuery")
+    @Login
     public CommonResult withdrawDepositQuery(@RequestParam("orderId")String orderId){
         HashMap<String, Object> map = new LinkedHashMap<>();
         map.put("appid",WechatConfig.APPID);
@@ -273,7 +276,7 @@ public class WeChatController {
             System.out.println(restmap.get("err_code_des"));
         }
 
-        return null;
+        return CommonResult.ok(restmap);
     }
 
 
