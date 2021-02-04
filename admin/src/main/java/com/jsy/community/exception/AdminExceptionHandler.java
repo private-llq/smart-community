@@ -10,6 +10,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -21,6 +23,11 @@ import java.util.Objects;
 @RestControllerAdvice
 @Slf4j
 public class AdminExceptionHandler {
+	
+	private static final Map<String,String> UNI_INDEX_MAP = new HashMap<>();
+	static {
+		UNI_INDEX_MAP.put("'t_community.uni_lon_lat'","社区经纬度重复");
+	}
 
 	@ExceptionHandler(JSYException.class)
 	public CommonResult<Boolean> handlerProprietorException(JSYException e) {
@@ -35,7 +42,10 @@ public class AdminExceptionHandler {
 	
 	@ExceptionHandler(DuplicateKeyException.class)
 	public CommonResult<Boolean> handleException(DuplicateKeyException e) {
-		log.error(e.getMessage(), e);
+		String msg = UNI_INDEX_MAP.get(e.getMessage().substring(e.getMessage().lastIndexOf("key") + 4));
+		if(msg != null){
+			return CommonResult.error(JSYError.DUPLICATE_KEY.getCode(), msg);
+		}
 		return CommonResult.error(JSYError.DUPLICATE_KEY);
 	}
 	

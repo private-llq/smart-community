@@ -13,6 +13,11 @@ import java.util.Map;
 public interface PaymentEnum {
 	
 	/**
+	 * 支付相关询类型大字典
+	 */
+	Map<String,List<Map<String, Object>>> sourceMap = new HashMap<>();
+	
+	/**
 	* @Description: 交易类型
 	 * @Author: chq459799974
 	 * @Date: 2021/1/8
@@ -112,6 +117,7 @@ public interface PaymentEnum {
 				tradeFromList.add(map);
 				tradeFromMap.put(tradeFromEnum.getIndex(), tradeFromEnum.getName());
 			}
+			sourceMap.put("tradeFrom",tradeFromList);
 		}
 	}
 	

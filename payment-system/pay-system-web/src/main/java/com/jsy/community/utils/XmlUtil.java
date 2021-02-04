@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 
 public class XmlUtil {
 
+
 	private static final String PREFIX_XML = "<xml>";
 
 	private static final String SUFFIX_XML = "</xml>";

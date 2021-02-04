@@ -77,21 +77,21 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				if(StringUtils.isEmpty(houseEntity.getBuilding())){
 					throw new PropertyException("楼栋名称不能为空");
 				}
-				houseEntity.setFloor(null);
-				houseEntity.setDoor(null);
+				houseEntity.setFloor("");
+				houseEntity.setDoor("");
 				break;
 			case BusinessConst.BUILDING_TYPE_UNIT :
 				if(StringUtils.isEmpty(houseEntity.getUnit())){
 					throw new PropertyException("单元名称不能为空");
 				}
-				houseEntity.setFloor(null);
-				houseEntity.setDoor(null);
+				houseEntity.setFloor("");
+				houseEntity.setDoor("");
 				break;
 			case BusinessConst.BUILDING_TYPE_FLOOR :
 				if(StringUtils.isEmpty(houseEntity.getFloor())){
 					throw new PropertyException("楼层名称不能为空");
 				}
-				houseEntity.setDoor(null);
+				houseEntity.setDoor("");
 				break;
 			case BusinessConst.BUILDING_TYPE_DOOR :
 				if(StringUtils.isEmpty(houseEntity.getDoor())){

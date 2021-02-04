@@ -16,10 +16,10 @@
 	<insert id="addSub">
 		insert into t_house(id,code,community_id,building,unit,floor,door,pid,type,comment)
 		select #{houseEntity.id},#{houseEntity.code},community_id,
-		if(building is not null,building,#{houseEntity.building}),
-		if(unit is not null,unit,#{houseEntity.unit}),
-		if(floor is not null,floor,#{houseEntity.floor}),
-		if(door is not null,door,#{houseEntity.door}),
+		if(building != '',building,#{houseEntity.building}),
+		if(unit != '',unit,#{houseEntity.unit}),
+		if(floor != '',floor,#{houseEntity.floor}),
+		if(door != '',door,#{houseEntity.door}),
 		id,#{houseEntity.type},#{houseEntity.comment}
 		from t_house
 		where id = #{houseEntity.pid}

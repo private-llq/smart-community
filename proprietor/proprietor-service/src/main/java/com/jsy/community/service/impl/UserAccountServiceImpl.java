@@ -105,7 +105,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
 		BeanUtils.copyProperties(tradeQO, ucoinRecordEntity);
 		ucoinRecordEntity.setId(SnowFlake.nextId());
 		ucoinRecordEntity.setBalance(queryBalance(tradeQO.getUid()).getBalance());//交易后余额
-		boolean b = userAccountRecordService.addUcoinRecord(ucoinRecordEntity);
+		boolean b = userAccountRecordService.addAccountRecord(ucoinRecordEntity);
 		if(!b){
 			throw new ProprietorException("因账户流水记录失败，交易取消");
 		}
