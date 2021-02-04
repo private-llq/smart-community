@@ -54,6 +54,7 @@ public class RedisConfig {
 		singleServerConfig.setConnectTimeout(3000);
 		singleServerConfig.setIdleConnectionTimeout(3000);
 		singleServerConfig.setRetryInterval(1000);
+		singleServerConfig.setConnectionMinimumIdleSize(10);
 		//重连次数
 		singleServerConfig.setRetryAttempts(5);
 		return Redisson.create(config);
