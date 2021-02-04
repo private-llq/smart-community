@@ -12,9 +12,7 @@ import com.jsy.community.qo.CommunityFunQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: com.jsy.community
@@ -29,14 +27,31 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
     @Override
     public Map<String,Object> findList(CommunityFunQO communityFunQO) {
         Map<String,Object> map = new HashMap<>();
-        if (communityFunQO.getSize()==0||communityFunQO.getSize()==null)
-            communityFunQO.setSize(10l);
+        if (communityFunQO.getSize()==0||communityFunQO.getSize()==null){
+            communityFunQO.setSize(10L);
+        }
         QueryWrapper<CommunityFunEntity> wrapper = new QueryWrapper<CommunityFunEntity>().eq("status",1);
         if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
             wrapper.like("title_name", communityFunQO.getHeadline());
         }
+
         IPage<CommunityFunEntity> page = selectCommunityFunMapper.selectPage(new Page<CommunityFunEntity>(communityFunQO.getPage(), communityFunQO.getSize()),wrapper);
         List<CommunityFunEntity> list = page.getRecords();
+//        list.sort(Comparator.comparing(CommunityFunEntity::getCreateTime));
+        Collections.sort(page.getRecords(),new Comparator<CommunityFunEntity>() {
+            @Override
+            public int compare(CommunityFunEntity o1, CommunityFunEntity o2) {
+                if(o1.getCreateTime() != null && o2.getCreateTime() != null){
+                    if(o1.getCreateTime().isAfter(o2.getCreateTime())) {
+                        return -1;
+                    }
+                    return 1;
+                }
+                return 0;
+            }
+        });
+
+
 
         long total = page.getTotal();
         map.put("list",list);
