@@ -143,11 +143,15 @@ public class MinioUtils {
 			for( MultipartFile file : files ){
 				if( file != null && !file.isEmpty() && isImage(file.getOriginalFilename())){
 					//1.对文件名随机
-					String randomFileName = getSHA256(file.getOriginalFilename());
+//					String randomFileName = getSHA256(file.getOriginalFilename());
+					// TODO: 2021/2/4 将上述   getSHA256    命名方式改成   随机命名，   具体后面到底采用随机命名方式还是  SHA256 方式 再说
+					String objectName = getRandomFileName(file.getOriginalFilename());
+					
+					
 					//2.存储文件
-					minioClient.putObject(bucketName, randomFileName, file.getInputStream(), file.getContentType());
+					minioClient.putObject(bucketName, objectName, file.getInputStream(), file.getContentType());
 					//3.获得文件访问路径
-					resAddress[index] = ENDPOINT + ":" + PROT + "/" + bucketName + "/" + randomFileName;
+					resAddress[index] = ENDPOINT + ":" + PROT + "/" + bucketName + "/" + objectName;
 					index++;
 				}
 			}

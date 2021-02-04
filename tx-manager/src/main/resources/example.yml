@@ -41,12 +41,12 @@ spring:
     host: 222.178.212.29
     password: smart99--
     database: 0
-#    jedis:
-#      pool:
-#        min-idle: 10
-#        max-idle: 20
-#        max-wait: -1ms
-#        max-active: 200
+    jedis:
+      pool:
+        min-idle: 10
+        max-idle: 20
+        max-wait: -1ms
+        max-active: 200
 tx-lcn:
   manager:
     port: 8070
