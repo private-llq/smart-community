@@ -36,6 +36,7 @@ public class ConsoleLogAspect {
 	@Autowired
 	private UserUtils userUtils;
 	
+	// TODO: 2021/2/5 这里运行时间  针对并发情况下 没有做处理  没必要
 	private Long mark;
 	
 	/**
