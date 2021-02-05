@@ -46,7 +46,23 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		
 		// 根据菜单id查询所有菜单信息
 		if (CollectionUtils.isEmpty(menuIds)) {
-			return null;
+//			return new ArrayList<AppMenuEntity>();
+			// TODO: 2021/2/5 如果该小区没有菜单，暂时也给他返回小区  原因：现阶段便于测试人员测试
+			List<Long> testmenuIds = appMenuMapper.selectMenuIdByCommunityId(27839755849728L); // 如果传入的小区没有菜单，则返回id为27839755849728L的小区菜单
+			List<AppMenuEntity> list = appMenuMapper.selectBatchIds(testmenuIds);
+			
+			List<AppMenuEntity> menuEntityList = new ArrayList<>();
+			for (AppMenuEntity appMenuEntity : list) {
+				if (PARENT_MARK.equals(appMenuEntity.getParentId())) {
+					continue;
+				}
+				menuEntityList.add(appMenuEntity);
+				if (menuEntityList.size()==3) {
+					break;
+				}
+			}
+			return menuEntityList;
+			// TODO: 2021/2/5
 		}
 		List<AppMenuEntity> list = appMenuMapper.selectBatchIds(menuIds);
 		
