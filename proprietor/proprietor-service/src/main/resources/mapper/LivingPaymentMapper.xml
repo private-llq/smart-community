@@ -21,6 +21,8 @@
         po.unit_id as payCompanyId,
         po.unit as payCompanyName,
         tt.icon as icon,
+        tt.medium_icon as mediumIcon,
+        tt.large_size_icon as largeSizeIcon,
         tt.id as typeID,
         tt.name as typeName,
         po.create_time as timeStart
@@ -105,6 +107,8 @@
         <result property="typeID" column="typeID"/>
         <result property="typeName" column="typeName"/>
         <result property="icon" column="icon"/>
+        <result property="mediumIcon" column="mediumIcon"/>
+        <result property="largeSizeIcon" column="largeSizeIcon"/>
     </resultMap>
 
     <resultMap id="PaymentRecordsVOMAP" type="com.jsy.community.vo.PaymentRecordsVO">

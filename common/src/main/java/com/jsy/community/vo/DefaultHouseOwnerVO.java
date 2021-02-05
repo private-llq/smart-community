@@ -31,4 +31,8 @@ public class DefaultHouseOwnerVO implements Serializable {
     private String typeName;
     @ApiModelProperty(value = "icon")
     private String icon;
+    @ApiModelProperty(value = "中号图片地址")
+    private String mediumIcon;
+    @ApiModelProperty(value = "大号图片地址")
+    private String largeSizeIcon;
 }
