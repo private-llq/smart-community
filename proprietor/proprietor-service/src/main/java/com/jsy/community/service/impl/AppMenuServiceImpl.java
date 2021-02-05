@@ -45,6 +45,9 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		List<Long> menuIds = appMenuMapper.selectMenuIdByCommunityId(communityId);
 		
 		// 根据菜单id查询所有菜单信息
+		if (CollectionUtils.isEmpty(menuIds)) {
+			return null;
+		}
 		List<AppMenuEntity> list = appMenuMapper.selectBatchIds(menuIds);
 		
 		List<AppMenuEntity> menuEntityList = new ArrayList<>();
