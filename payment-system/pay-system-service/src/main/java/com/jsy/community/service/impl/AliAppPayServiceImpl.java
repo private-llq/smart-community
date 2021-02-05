@@ -7,9 +7,11 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.jsy.community.api.AliAppPayService;
 import com.jsy.community.api.PaymentException;
 import com.jsy.community.constant.Const;
@@ -164,6 +166,7 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	}
 	
 	//下单
+	@Override
 	public String getOrderStr(AliAppPayQO aliAppPayQO) {
 		AlipayClient alipayClient = null;
 		try {
@@ -259,6 +262,45 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 		if(response.isSuccess()){
 			System.out.println("调用成功");
 		//return body.substring(body.indexOf('&')+1);
+			return body;
+		} else {
+			System.out.println("调用失败");
+		}
+		return null;
+	}
+	
+	//下单(H5)
+	public String getOrderStrForH5(AliAppPayQO aliAppPayQO) {
+		AlipayClient alipayClient = null;
+		try {
+			alipayClient = new DefaultAlipayClient(certAlipayRequest);
+		} catch (AlipayApiException e1) {
+			e1.printStackTrace();
+			throw new PaymentException("支付初始化出错");
+		}
+		AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
+		request.setNotifyUrl("http://xxxxxxxxxxxxx:8001/callBack/pay");
+		request.setBizContent("{" +
+			"\"total_amount\":"+"\""+ aliAppPayQO.getTotalAmount()+"\""+","+
+			"\"product_code\":\"QUICK_MSECURITY_PAY\"," +
+			"\"subject\":"+"\""+ aliAppPayQO.getSubject()+"\""+","+
+			"\"out_trade_no\":"+"\""+ aliAppPayQO.getOutTradeNo()+"\""+","+
+			"  }");
+		AlipayTradeWapPayResponse response = null;
+		try {
+			response = alipayClient.pageExecute(request);
+		} catch (AlipayApiException e) {
+			e.printStackTrace();
+			return null;
+		}
+		if(response == null){
+			System.out.println("调用失败");
+			return null;
+		}
+		String body = response.getBody();
+		if(response.isSuccess()){
+			System.out.println("调用成功");
+			//return body.substring(body.indexOf('&')+1);
 			return body;
 		} else {
 			System.out.println("调用失败");

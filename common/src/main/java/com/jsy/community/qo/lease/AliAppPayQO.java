@@ -22,4 +22,7 @@ public class AliAppPayQO implements Serializable {
 	
 	@ApiModelProperty(value = "交易金额(RMB)")
 	private BigDecimal totalAmount;
+	
+	@ApiModelProperty(value = "支付类型 1.APP 2.H5")
+	private int payType;
 }

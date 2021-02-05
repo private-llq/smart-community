@@ -55,7 +55,14 @@ public class AliAppPayController {
 		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.TRADE_FROM_RENT.getName());
 		//TODO 测试金额 0.01
 		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
-		String orderStr = aliAppPayService.getOrderStr(aliAppPayQO);
+		String orderStr = null;
+		if(aliAppPayQO.getPayType() == 1){
+			orderStr = aliAppPayService.getOrderStr(aliAppPayQO);
+		}else if(aliAppPayQO.getPayType() == 2){
+			orderStr = aliAppPayService.getOrderStrForH5(aliAppPayQO);
+		}else{
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"支付类型错误");
+		}
 		boolean createResult = false;
 		if(!StringUtils.isEmpty(orderStr)){
 			AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
