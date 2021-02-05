@@ -48,7 +48,46 @@ public class ConsoleLogAspect {
 	@Pointcut("execution(* com.jsy.community..controller.*.*(..))")
 	public void webLog() {
 	}
-
+	
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 异常通知
+	 * @Date 2021/1/19 17:43
+	 * @Param [joinPoint, ex]
+	 **/
+	@AfterThrowing(pointcut = "webLog()", throwing = "ex")
+	public void afterThrowing(JoinPoint joinPoint, Exception ex) {
+		String methodName = joinPoint.getSignature().getName();
+		logger.info("异常信息 : " + methodName + "() 出现了异常——————" + ex.getMessage());
+	}
+	
+	/**
+	 * 判断使用log注解的方法上是否存在Login注解，如果存在就获取
+	 */
+	private Login getAnnotationLoginWithMethod(JoinPoint joinPoint) throws Exception {
+		Signature signature = joinPoint.getSignature();
+		MethodSignature methodSignature = (MethodSignature) signature;
+		Method method = methodSignature.getMethod();
+		
+		if (method != null) {
+			return method.getAnnotation(Login.class);
+		}
+		return null;
+	}
+	/**
+	 * 判断使用log注解的方法所在类上是否存在Log注解，如果存在就获取
+	 */
+	private Login getAnnotationLoginWithClass(JoinPoint joinPoint) {
+		Signature signature = joinPoint.getSignature();
+		Class declaringType = signature.getDeclaringType();
+		if (declaringType != null) {
+			return (Login) declaringType.getAnnotation(Login.class);
+		}
+		return null;
+	}
+	
 	/**
 	 * 前置通知：在连接点之前执行的通知
 	 *
@@ -95,31 +134,6 @@ public class ConsoleLogAspect {
 		}
 	}
 	
-	/**
-	 * 判断使用log注解的方法上是否存在Login注解，如果存在就获取
-	 */
-	private Login getAnnotationLoginWithMethod(JoinPoint joinPoint) throws Exception {
-		Signature signature = joinPoint.getSignature();
-		MethodSignature methodSignature = (MethodSignature) signature;
-		Method method = methodSignature.getMethod();
-		
-		if (method != null) {
-			return method.getAnnotation(Login.class);
-		}
-		return null;
-	}
-	/**
-	 * 判断使用log注解的方法所在类上是否存在Log注解，如果存在就获取
-	 */
-	private Login getAnnotationLoginWithClass(JoinPoint joinPoint) {
-		Signature signature = joinPoint.getSignature();
-		Class declaringType = signature.getDeclaringType();
-		if (declaringType != null) {
-			return (Login) declaringType.getAnnotation(Login.class);
-		}
-		return null;
-	}
-	
 
 	/**
 	 * @return void
@@ -135,18 +149,5 @@ public class ConsoleLogAspect {
 		long end = System.currentTimeMillis();
 		long runTime = end - mark;
 		logger.info("总耗时 : " + runTime+"ms");
-	}
-
-	/**
-	 * @return void
-	 * @Author lihao
-	 * @Description 异常通知
-	 * @Date 2021/1/19 17:43
-	 * @Param [joinPoint, ex]
-	 **/
-	@AfterThrowing(pointcut = "webLog()", throwing = "ex")
-	public void afterThrowing(JoinPoint joinPoint, Exception ex) {
-		String methodName = joinPoint.getSignature().getName();
-		logger.info("异常信息 : " + methodName + "() 出现了异常——————" + ex.getMessage());
 	}
 }
