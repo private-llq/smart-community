@@ -1,9 +1,5 @@
 package com.jsy.community.config.service;
 
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
-import org.redisson.config.SingleServerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,21 +40,21 @@ public class RedisConfig {
 	//@Value("${jsy.redis.annotation.cacheTimeout}")
 	private Integer cacheTimeout = 1800;
 
-	@Bean
-	public RedissonClient redissonClient(){
-		Config config = new Config();
-		SingleServerConfig singleServerConfig = config.useSingleServer();
-		singleServerConfig.setAddress("redis://"+ redisHost +":" + redisPort);
-		singleServerConfig.setDatabase(redisDatabase);
-		singleServerConfig.setPassword(redisPassword);
-		//连接到任何Redis服务器时超时。默认值是10000毫秒。
-		singleServerConfig.setConnectTimeout(300000);
-		//如果一段timeout时间未使用池化连接，并且当前连接量大于最小空闲连接池大小，则它将关闭并从池中删除。 超时（以毫秒为单位）
-		singleServerConfig.setIdleConnectionTimeout(30000);
-		//重连次数
-		singleServerConfig.setRetryAttempts(5);
-		return Redisson.create(config);
-	}
+//	@Bean
+//	public RedissonClient redissonClient(){
+//		Config config = new Config();
+//		SingleServerConfig singleServerConfig = config.useSingleServer();
+//		singleServerConfig.setAddress("redis://"+ redisHost +":" + redisPort);
+//		singleServerConfig.setDatabase(redisDatabase);
+//		singleServerConfig.setPassword(redisPassword);
+//		//连接到任何Redis服务器时超时。默认值是10000毫秒。
+//		singleServerConfig.setConnectTimeout(300000);
+//		//如果一段timeout时间未使用池化连接，并且当前连接量大于最小空闲连接池大小，则它将关闭并从池中删除。 超时（以毫秒为单位）
+//		singleServerConfig.setIdleConnectionTimeout(30000);
+//		//重连次数
+//		singleServerConfig.setRetryAttempts(5);
+//		return Redisson.create(config);
+//	}
 
 	@Bean()
 	public RedisTemplate<String, Object> redisTemplate() {
