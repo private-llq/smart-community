@@ -34,27 +34,28 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
         if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
             wrapper.like("title_name", communityFunQO.getHeadline());
         }
+        wrapper.orderByDesc("start_time");
 
         IPage<CommunityFunEntity> page = selectCommunityFunMapper.selectPage(new Page<CommunityFunEntity>(communityFunQO.getPage(), communityFunQO.getSize()),wrapper);
-        List<CommunityFunEntity> list = page.getRecords();
+//        List<CommunityFunEntity> list = page.getRecords();
 //        list.sort(Comparator.comparing(CommunityFunEntity::getCreateTime));
-        Collections.sort(page.getRecords(),new Comparator<CommunityFunEntity>() {
-            @Override
-            public int compare(CommunityFunEntity o1, CommunityFunEntity o2) {
-                if(o1.getCreateTime() != null && o2.getCreateTime() != null){
-                    if(o1.getCreateTime().isAfter(o2.getCreateTime())) {
-                        return -1;
-                    }
-                    return 1;
-                }
-                return 0;
-            }
-        });
+//        Collections.sort(page.getRecords(),new Comparator<CommunityFunEntity>() {
+//            @Override
+//            public int compare(CommunityFunEntity o1, CommunityFunEntity o2) {
+//                if(o1.getCreateTime() != null && o2.getCreateTime() != null){
+//                    if(o1.getCreateTime().isAfter(o2.getCreateTime())) {
+//                        return -1;
+//                    }
+//                    return 1;
+//                }
+//                return 0;
+//            }
+//        });
 
 
 
         long total = page.getTotal();
-        map.put("list",list);
+        map.put("list",page);
         map.put("total",total);
         return map;
     }
