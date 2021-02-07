@@ -31,7 +31,6 @@ public class VisitingCarRecordEntity extends BaseEntity implements Serializable 
     private Long visitorId;
 
     @ApiModelProperty(value = "随行车辆车牌")
-    @Pattern(regexp = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$", message = "请输入一个正确的车牌号!")
     private String carPlate;
     
     @ApiModelProperty(value = "随行车辆类型ID")

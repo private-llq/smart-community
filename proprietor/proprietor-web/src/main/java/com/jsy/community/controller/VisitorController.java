@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.api.IVisitorService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
@@ -23,7 +24,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -62,10 +62,15 @@ public class VisitorController {
 		if(LocalDate.now().isAfter(visitorEntity.getStartTime())){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "预计来访时间不得早于当前时间");
 		}
-		visitorEntity.setUid(UserUtils.getUserId());
+		if(!StringUtils.isEmpty(visitorEntity.getCarPlate())){
+			if(!visitorEntity.getCarPlate().matches(BusinessConst.REGEX_OF_CAR) && !visitorEntity.getCarPlate().matches(BusinessConst.REGEX_OF_NEW_ENERGY_CAR)){
+				throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "车牌号不合法");
+			}
+		}
 		if(visitorEntity.getCarType() != null && StringUtils.isEmpty(visitorEntity.getCarPlate())){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "填写车辆类型后车牌号不能为空");
 		}
+		visitorEntity.setUid(UserUtils.getUserId());
 		return CommonResult.ok(iVisitorService.addVisitor(visitorEntity));
 	}
 	
