@@ -1,0 +1,41 @@
+justauth:
+  enabled: true
+  type:
+    qq:
+      client-id: 10******85
+      client-secret: 1f7d************************d629e
+      redirect-uri: http://oauth.xkcoding.com/demo/oauth/qq/callback
+    wechat:
+      client-id: wxdcb******4ff4
+      client-secret: b4e9dc************************a08ed6d
+      redirect-uri: http://oauth.xkcoding.com/demo/oauth/wechat/callback
+  cache:
+    type: default
+    prefix: 'SOCIAL::STATE::'
+
+#mybatis
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.jsy.community.entity
+  global-config:
+    #数据库相关配置
+    db-config:
+      #主键类型  AUTO:"数据库ID自增", INPUT:"用户输入ID", ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
+      id-type: NONE
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+    banner: false
+  #原生配置
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+#     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# mybatis:
+#   configuration:
+#     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# logging:
+#   level:
+#     com.jsy.community.mapper: debug
