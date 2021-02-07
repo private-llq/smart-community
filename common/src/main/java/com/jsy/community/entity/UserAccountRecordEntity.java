@@ -41,5 +41,8 @@ public class UserAccountRecordEntity  extends BaseEntity{
 	
 	@ApiModelProperty(value = "商品id")
 	private Long goodsId;
+	
+	@ApiModelProperty(value = "备注")
+	private String comment;
 
 }
