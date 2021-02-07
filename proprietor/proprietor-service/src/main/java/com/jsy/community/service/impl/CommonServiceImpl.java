@@ -10,6 +10,7 @@ import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.utils.WeatherUtils;
+import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;

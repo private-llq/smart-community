@@ -222,7 +222,7 @@ public interface BusinessConst {
 	/**
 	 * Es全文搜索索引名称
 	 */
-	String FULL_TEXT_SEARCH_INDEX = "fullTextSearchIndex";
+	String FULL_TEXT_SEARCH_INDEX = "full-text-search-index";
 	/**
 	 * 社区app主页全文搜索交换机名称
 	 */

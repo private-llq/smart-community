@@ -2,7 +2,6 @@ package com.jsy.community.entity;
 
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
-import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
@@ -15,6 +14,8 @@ import java.io.Serializable;
 @Data
 @ToString
 public class FullTextSearchEntity implements Serializable {
+
+    private static final long serialVersionUID = 3530698217996558817L;
 
     //id（标识数据唯一性）、name（搜索标题）、picture（数据头像，只取一对一的数据头像）、flag（数据标记（租房、商铺、消息、趣事））
     /**

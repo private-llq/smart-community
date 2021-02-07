@@ -55,6 +55,7 @@ public class RedisConfig {
 		singleServerConfig.setConnectTimeout(300000);
 		//如果一段timeout时间未使用池化连接，并且当前连接量大于最小空闲连接池大小，则它将关闭并从池中删除。 超时（以毫秒为单位）
 		singleServerConfig.setIdleConnectionTimeout(30000);
+		singleServerConfig.setConnectionMinimumIdleSize(1);
 		//重连次数
 		singleServerConfig.setRetryAttempts(5);
 		return Redisson.create(config);
