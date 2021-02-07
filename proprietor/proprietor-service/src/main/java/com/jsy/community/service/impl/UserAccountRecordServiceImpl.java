@@ -52,7 +52,8 @@ public class UserAccountRecordServiceImpl implements IUserAccountRecordService {
 		UserAccountRecordQO query = baseQO.getQuery();
 		QueryWrapper<UserAccountRecordEntity> queryWrapper = new QueryWrapper<UserAccountRecordEntity>()
 			.select("*")
-			.eq("uid", query.getUid());
+			.eq("uid", query.getUid())
+			.orderByDesc("create_time");
 		if(query.getTradeType() != null){
 			queryWrapper.eq("trade_type",query.getTradeType());
 		}
@@ -61,7 +62,7 @@ public class UserAccountRecordServiceImpl implements IUserAccountRecordService {
 			userAccountRecordEntity.setTradeTypeStr(PaymentEnum.TradeTypeEnum.tradeTypeMap.get(userAccountRecordEntity.getTradeType()));
 			userAccountRecordEntity.setTradeFromStr(PaymentEnum.TradeFromEnum.tradeFromMap.get(userAccountRecordEntity.getTradeFrom()));
 		}
-		PageInfo<Object> pageInfo = new PageInfo<>();
+		PageInfo<UserAccountRecordEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(resultPage,pageInfo);
 		return pageInfo;
 	}
