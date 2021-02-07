@@ -12,7 +12,6 @@ import com.jsy.community.mapper.UserInformMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Service;
@@ -70,7 +69,6 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
       return localDateTime.format(formatter);
     }
-
 
 
 

@@ -44,16 +44,16 @@ public interface CommonMapper {
 
     /**
      * flag和 RecordFlag.java 中的标记 一致
-     * 所有房屋租赁数据
+     * 所有公共社区消息数据
      * @return  返回所有 消息标题、id、 社区id
      */
-    @Select("select id,push_title as title,acct_id,'INFORM' as flag from t_acct_push_inform where deleted = 0 ")
+    @Select("select id,push_title as title,acct_id,'INFORM' as flag from t_acct_push_inform where deleted = 0 and push_target = 0")
     List<FullTextSearchEntity> getAllInform();
 
 
     /**
      * flag和 RecordFlag.java 中的标记 一致
-     * 所有房屋租赁数据
+     * 所有社区趣事数据
      * @return  返回所有 社区趣事标题、id、
      */
     @Select("select id,title_name as title,small_image_url as picture,'FUN' as flag from t_community_fun where deleted = 0")

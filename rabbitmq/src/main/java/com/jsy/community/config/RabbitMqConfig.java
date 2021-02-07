@@ -1,7 +1,10 @@
 package com.jsy.community.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsy.community.constant.BusinessConst;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,14 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Description: babbitmq配置文件
+ * @Description: rabbitmq配置文件
  * @author: Hu
  * @since: 2020/12/17 16:17
  * @Param:
  * @return:
  */
 @Configuration
-public class RabbitMQConfig {
+public class RabbitMqConfig {
 
 
     public static final String QUEUE_EMAIL = "queue_email";
@@ -66,7 +69,7 @@ public class RabbitMQConfig {
      * @return the exchange
      */
     @Bean(EXCHANGE_TOPICS)
-    public Exchange EXCHANGE_TOPICS_INFORM() {
+    public Exchange exchangeTopicInform() {
         //durable(true)持久化，消息队列重启后交换机仍然存在
         return ExchangeBuilder.topicExchange(EXCHANGE_TOPICS).durable(true).build();
     }
@@ -78,7 +81,7 @@ public class RabbitMQConfig {
      * @return:
      */
     @Bean(EXCHANGE_TOPICS_WECHAT)
-    public Exchange EXCHANGE_TOPICS_INFORM_WECHAT() {
+    public Exchange exchangeTopicInformWechat() {
         //durable(true)持久化，消息队列重启后交换机仍然存在
         return ExchangeBuilder.topicExchange(EXCHANGE_TOPICS_WECHAT).durable(true).build();
     }
@@ -92,7 +95,7 @@ public class RabbitMQConfig {
      */
     @Bean(EXCHANGE_DELAY)
     public CustomExchange delayExchange() {
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>(1);
         args.put("x-delayed-type", "direct");
         return new CustomExchange(EXCHANGE_DELAY, "x-delayed-message", true, false, args);
     }
@@ -106,45 +109,57 @@ public class RabbitMQConfig {
      */
     @Bean(EXCHANGE_DELAY_WECHAT)
     public CustomExchange delayExchangeWeChat() {
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>(1);
         args.put("x-delayed-type", "direct");
         return new CustomExchange(EXCHANGE_DELAY_WECHAT, "x-delayed-message", true, false, args);
     }
 
 
 
-    //声明队列
+    @Bean
+    public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    /**
+     * 声明队列
+     */
     @Bean(QUEUE_TEST)
-    public Queue QUEUE_INFORM_TEST() {
-        Queue queue = new Queue(QUEUE_TEST);
-        return queue;
+    public Queue queueInformTest() {
+        return new Queue(QUEUE_TEST);
     }
-    //声明队列wechat普通队列
+
+    /**
+     * 声明队列weChat普通队列
+     */
     @Bean(QUEUE_WECHAT)
-    public Queue QUEUE_WECHAT() {
-        Queue queue = new Queue(QUEUE_WECHAT);
-        return queue;
+    public Queue queueWeChat() {
+        return new Queue(QUEUE_WECHAT);
     }
-    //声明队列wechat延时队列
+
+    /**
+     * 声明队列weChat延时队列
+     */
     @Bean(QUEUE_WECHAT_DELAY)
-    public Queue QUEUE_WECHAT_DELAY() {
-        Queue queue = new Queue(QUEUE_WECHAT_DELAY);
-        return queue;
+    public Queue queueWeChatDelay() {
+        return new Queue(QUEUE_WECHAT_DELAY);
     }
 
 
-    //声明队列
+    /**
+     * 声明队列
+     */
     @Bean(QUEUE_SMS)
-    public Queue QUEUE_INFORM_SMS() {
-        Queue queue = new Queue(QUEUE_SMS);
-        return queue;
+    public Queue queueInformSms() {
+        return new Queue(QUEUE_SMS);
     }
 
-    //声明队列
+    /**
+     * 声明队列
+     */
     @Bean(QUEUE_EMAIL)
-    public Queue QUEUE_INFORM_EMAIL() {
-        Queue queue = new Queue(QUEUE_EMAIL);
-        return queue;
+    public Queue queueInformEmail() {
+        return new Queue(QUEUE_EMAIL);
     }
 
     /**
@@ -160,7 +175,7 @@ public class RabbitMQConfig {
      * @return the binding
      */
     @Bean
-    public Binding BINDING_QUEUE_INFORM_SMS(@Qualifier(QUEUE_SMS) Queue queue,
+    public Binding bindingQueueInformSms(@Qualifier(QUEUE_SMS) Queue queue,
                                             @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.sms").noargs();
     }
@@ -168,7 +183,7 @@ public class RabbitMQConfig {
 
 
     @Bean
-    public Binding BINDING_QUEUE_INFORM_EMAIL(@Qualifier(QUEUE_EMAIL) Queue queue,
+    public Binding bindingQueueInformEmail(@Qualifier(QUEUE_EMAIL) Queue queue,
                                             @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.email").noargs();
     }
@@ -180,7 +195,7 @@ public class RabbitMQConfig {
      * @return:
      */
     @Bean
-    public Binding BINDING_QUEUE_INFORM_WECHAT(@Qualifier(QUEUE_WECHAT) Queue queue,
+    public Binding bindingQueueInformWeChat(@Qualifier(QUEUE_WECHAT) Queue queue,
                                             @Qualifier(EXCHANGE_TOPICS_WECHAT) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.wechat").noargs();
     }
@@ -193,7 +208,7 @@ public class RabbitMQConfig {
      * @return:
      */
     @Bean
-    public Binding BINDING_QUEUE_INFORM_TEST(@Qualifier(QUEUE_TEST) Queue queue,
+    public Binding bindingQueueInformTest(@Qualifier(QUEUE_TEST) Queue queue,
                                               @Qualifier(EXCHANGE_DELAY) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.test").noargs();
     }
@@ -205,7 +220,7 @@ public class RabbitMQConfig {
      * @return:
      */
     @Bean
-    public Binding BINDING_QUEUE_INFORM_WECHAT_DELAY(@Qualifier(QUEUE_WECHAT_DELAY) Queue queue,
+    public Binding bindingQueueInformWeChatDelay(@Qualifier(QUEUE_WECHAT_DELAY) Queue queue,
                                               @Qualifier(EXCHANGE_DELAY_WECHAT) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.wechat.delay").noargs();
     }

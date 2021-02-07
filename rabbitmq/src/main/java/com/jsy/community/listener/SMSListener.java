@@ -1,7 +1,7 @@
 package com.jsy.community.listener;
 
 
-import com.jsy.community.config.RabbitMQConfig;
+import com.jsy.community.config.RabbitMqConfig;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -27,7 +27,7 @@ public class SMSListener {
      * @param message
      * @param channel
      */
-    @RabbitListener(queues = {RabbitMQConfig.QUEUE_SMS})
+    @RabbitListener(queues = {RabbitMqConfig.QUEUE_SMS})
     public void receive_sms (String msg, Message message, Channel channel)throws IOException {
         System.out.println(msg);
         System.out.println(message.getBody());
@@ -43,7 +43,7 @@ public class SMSListener {
      * @param message
      * @param channel
      */
-    @RabbitListener(queues = {RabbitMQConfig.QUEUE_EMAIL})
+    @RabbitListener(queues = {RabbitMqConfig.QUEUE_EMAIL})
     public void receive_email (Map msg, Message message, Channel channel)throws IOException {
 
         System.out.println(msg);

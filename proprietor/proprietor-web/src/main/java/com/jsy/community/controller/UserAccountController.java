@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRedbagService;
+import com.jsy.community.api.IUserAccountRecordService;
 import com.jsy.community.api.IUserAccountService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
@@ -13,6 +14,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.RedbagQO;
+import com.jsy.community.qo.UserAccountRecordQO;
 import com.jsy.community.qo.UserTicketQO;
 import com.jsy.community.qo.proprietor.UserAccountTradeQO;
 import com.jsy.community.utils.UserUtils;
@@ -41,6 +43,9 @@ public class UserAccountController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IUserAccountService userAccountService;
+	
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+	private IUserAccountRecordService userAccountRecordService;
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IRedbagService redbagService;
@@ -72,6 +77,23 @@ public class UserAccountController {
 		userAccountTradeQO.setUid(UserUtils.getUserId());
 		userAccountService.trade(userAccountTradeQO);
 		return CommonResult.ok("交易完成");
+	}
+	
+	/**
+	* @Description: 查询账户流水
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/2/7
+	**/
+	@ApiOperation("【用户账户】流水查询")
+	@PostMapping("record")
+	public CommonResult queryAccountRecord(@RequestBody  BaseQO<UserAccountRecordQO> baseQO){
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new UserAccountRecordQO());
+		}
+		baseQO.getQuery().setUid(UserUtils.getUserId());
+		return CommonResult.ok(userAccountRecordService.queryAccountRecord(baseQO));
 	}
 	
 	/**

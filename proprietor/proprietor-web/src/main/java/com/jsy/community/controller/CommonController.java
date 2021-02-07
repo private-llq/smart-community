@@ -1,11 +1,15 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
+import com.jsy.community.config.web.ElasticsearchConfig;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.CommunityType;
 import com.jsy.community.vo.CommonResult;
@@ -13,12 +17,25 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author 公共
+ * @since  2021/2/7 9:06
+ */
 @RequestMapping("/common")
 @Api(tags = "公共控制器")
 @Slf4j
@@ -28,6 +45,9 @@ public class CommonController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
+
+    @Resource
+    private RestHighLevelClient elasticsearchClient;
 
     @ApiOperation("社区区域查询接口")
     @GetMapping("/community")
@@ -60,6 +80,25 @@ public class CommonController {
         }
     }
 
+
+    @GetMapping("/search")
+    public CommonResult<List<FullTextSearchEntity>> search(@RequestParam Integer size, @RequestParam String text) throws IOException {
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.indices(BusinessConst.FULL_TEXT_SEARCH_INDEX);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.matchQuery("title", text));
+        searchSourceBuilder.size(size);
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse searchResponse = elasticsearchClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        SearchHit[] hits = searchResponse.getHits().getHits();
+        List<FullTextSearchEntity> list = new ArrayList<>(hits.length);
+        for( SearchHit hit : hits){
+            String sourceAsString = hit.getSourceAsString();
+            FullTextSearchEntity fullTextSearchEntity = JSON.parseObject(sourceAsString, FullTextSearchEntity.class);
+            list.add(fullTextSearchEntity);
+        }
+        return CommonResult.ok(list);
+    }
 
 
 
@@ -104,8 +143,4 @@ public class CommonController {
         return CommonResult.ok(weather);
     }
     
-    private static void main(String[] args) {
-        String s = BusinessEnum.RegionQueryTypeEnum.regionQueryNameMap.get(2);
-        System.out.println(s);
-    }
 }

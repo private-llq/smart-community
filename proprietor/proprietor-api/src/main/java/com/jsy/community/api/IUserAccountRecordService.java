@@ -1,6 +1,9 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.UserAccountRecordEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.UserAccountRecordQO;
+import com.jsy.community.utils.PageInfo;
 
 /**
  * @author chq459799974
@@ -17,5 +20,14 @@ public interface IUserAccountRecordService {
 	 * @Date: 2021/1/8
 	**/
 	boolean addAccountRecord(UserAccountRecordEntity userAccountRecordEntity);
+	
+	/**
+	* @Description: 查询账户流水
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo
+	 * @Author: chq459799974
+	 * @Date: 2021/2/7
+	**/
+	PageInfo queryAccountRecord(BaseQO<UserAccountRecordQO> baseQO);
 	
 }

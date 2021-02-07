@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
  * 分布式锁注解
  * @author zh_o
  * update for YuLF  2021-1-22 9:29
- * 注解作用：同一时间 一个方法 只能同一机器 同一模块 同一线程执行
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -21,13 +20,12 @@ public @interface DistributedLock {
     String lockKey();
 
     /**
-     * 超时时间 是必填的，
-     * 代表在并发的时候，第二个线程最多等待第一个线程持有锁的时间，
-     * 等待超时时间 不要低于业务的执行时间，否则会造成多个线程在同一时间争抢资源
+     * 超时时间 是必填的，秒
      */
     long waitTimout();
 
     /**
+     * 秒
      * 上锁时间
      */
     long lockTime() default 30;

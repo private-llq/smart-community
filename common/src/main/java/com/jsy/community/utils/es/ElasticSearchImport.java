@@ -14,8 +14,10 @@ import org.springframework.lang.Nullable;
  */
 public class ElasticSearchImport {
 
+    private static RabbitTemplate rabbitTemplate;
     /**
      * 往MQ队列里面生产消息，主要为往ES中导入数据
+     * 增删改接口业务最后增加此方法、
      * @author YuLF
      * @since  2021/2/2 15:40
      * @Param recordFlag        数据标记：租赁、商铺、趣事、消息...，用于标识这条数据操作是请求对应接口
@@ -31,12 +33,21 @@ public class ElasticSearchImport {
         fullTextSearchEntity.setOperation(operation);
         fullTextSearchEntity.setTitle(recordTitle);
         fullTextSearchEntity.setPicture(recordPicture);
-        RabbitTemplate rabbitTemplate = (RabbitTemplate) SpringContextUtils.getBean("rabbitTemplate");
+        RabbitTemplate rabbitTemplate = getRabbitTemplate();
         rabbitTemplate.convertAndSend(BusinessConst.APP_SEARCH_EXCHANGE_NAME, BusinessConst.APP_SEARCH_ROUTE_KEY, fullTextSearchEntity);
     }
 
 
-
+    public static RabbitTemplate getRabbitTemplate(){
+        if( rabbitTemplate == null ){
+            synchronized (ElasticSearchImport.class){
+                if( rabbitTemplate == null ){
+                    rabbitTemplate = (RabbitTemplate) SpringContextUtils.getBean("customRabbitTemplate");
+                }
+            }
+        }
+        return rabbitTemplate;
+    }
 
 
 
