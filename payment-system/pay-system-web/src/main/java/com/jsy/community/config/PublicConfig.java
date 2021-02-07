@@ -3,8 +3,8 @@ package com.jsy.community.config;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
-import com.jsy.community.utils.MyHttpClient;
 import com.jsy.community.utils.AesUtil;
+import com.jsy.community.utils.MyHttpClient;
 import net.sf.json.JSONObject;
 import okhttp3.HttpUrl;
 import org.apache.http.HttpEntity;
@@ -40,7 +40,7 @@ import java.util.*;
  **/
 public class PublicConfig {
     //请求网关
-    private static final String url_prex = "https://api.mch.weixin.qq.com/";
+    private static final String url_prex = "https://api.mch.weixin.qq.com";
     //编码
     private static final String charset = "UTF-8";
 
@@ -87,13 +87,13 @@ public class PublicConfig {
         //释放链接
         response.close();
         switch (url) {
-            case "v3/pay/transactions/app"://返回APP支付所需的参数
+            case "/v3/pay/transactions/app"://返回APP支付所需的参数
                 return JSONObject.fromObject(body).getString("prepay_id");
-            case "v3/pay/transactions/jsapi"://返回JSAPI支付所需的参数
+            case "/v3/pay/transactions/jsapi"://返回JSAPI支付所需的参数
                 return JSONObject.fromObject(body).getString("prepay_id");
-            case "v3/pay/transactions/native"://返回native的请求地址
+            case "/v3/pay/transactions/native"://返回native的请求地址
                 return JSONObject.fromObject(body).getString("code_url");
-            case "v3/pay/transactions/h5"://返回h5支付的链接
+            case "/v3/pay/transactions/h5"://返回h5支付的链接
                 return JSONObject.fromObject(body).getString("h5_url");
         }
         return null;
@@ -114,13 +114,14 @@ public class PublicConfig {
     public static JSONObject WxTuneUp(String prepayId, String appId, String privateKeyFilePath) throws Exception {
         String time = System.currentTimeMillis() / 1000 + "";
         String nonceStr = UUID.randomUUID().toString().replace("-", "");
-        String packageStr = "prepay_id=" + prepayId;
+//        String packageStr = "prepay_id=" + prepayId;
         ArrayList<String> list = new ArrayList<>();
         list.add(appId);
         list.add(time);
         list.add(nonceStr);
-        list.add(packageStr);
+        list.add(prepayId);
         //加载签名
+        System.err.println(buildSignMessage(list));
         String packageSign = sign(buildSignMessage(list).getBytes(), privateKeyFilePath);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("appId", appId);
@@ -178,9 +179,15 @@ public class PublicConfig {
      * @throws Exception
      */
     public static String getToken(String method, HttpUrl url, String mercId, String serial_no, String privateKeyFilePath, String body) throws Exception {
+        System.out.println(method);
+        System.out.println(url);
+        System.out.println(mercId);
+        System.out.println(serial_no);
+        System.out.println(body);
         String nonceStr = UUID.randomUUID().toString().replace("-", "");
         long timestamp = System.currentTimeMillis() / 1000;
         String message = buildMessage(method, url, timestamp, nonceStr, body);
+        System.out.println(message);
         String signature = sign(message.getBytes("UTF-8"), privateKeyFilePath);
         return "mchid=\"" + mercId + "\","
                 + "nonce_str=\"" + nonceStr + "\","
@@ -264,6 +271,7 @@ public class PublicConfig {
         StringBuilder sbf = new StringBuilder();
         for (String str : signMessage) {
             sbf.append(str).append("\n");
+
         }
         return sbf.toString();
     }
@@ -324,7 +332,6 @@ public class PublicConfig {
             }
         }
     }
-
     /**
      * @Description: 关闭订单避免重复支付
      * @author: Hu
@@ -334,15 +341,17 @@ public class PublicConfig {
      */
     public static void CloseOrder(String order) throws Exception {
 
+        String postfix="/v3/pay/transactions/out-trade-no/"+order+"/close";
+        System.out.println(postfix);
         //请求URL
-        HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/pay/transactions/out-trade-no/"+order+"/close");
+        HttpPost httpPost = new HttpPost(url_prex+postfix);
         //请求body参数
         String reqdata ="{\"mchid\": \""+WechatConfig.MCH_ID+"\"}";
-
         StringEntity entity = new StringEntity(reqdata);
         entity.setContentType("application/json");
         httpPost.setEntity(entity);
         httpPost.setHeader("Accept", "application/json");
+
 
         //完成签名并执行请求
         CloseableHttpResponse response = MyHttpClient.createHttpClient().execute(httpPost);
