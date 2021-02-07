@@ -22,7 +22,9 @@ public interface UploadBucketConst {
 	
 	/**
 	 * @Author lihao
-	 * @Description 商铺租赁只上传图片时存的redis
+	 * @Description 商铺
 	 **/
-	String SHOP_BUCKET = "shop-img";
+	String SHOP_HEAD_BUCKET = "shop-head-img";
+	String SHOP_MIDDLE_BUCKET = "shop-middle-img";
+	String SHOP_OTHER_BUCKET = "shop-other-img";
 }

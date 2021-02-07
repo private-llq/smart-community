@@ -113,6 +113,52 @@ public class TimeTask implements Job {
 		}
 		
 		
+		Set<String> head_difference = redisTemplate.opsForSet().difference("shop_head_img_part", "shop_head_img_all");
+		Set<String> middle_difference = redisTemplate.opsForSet().difference("shop_middle_img_part", "shop_middle_img_all");
+		Set<String> other_difference = redisTemplate.opsForSet().difference("shop_other_img_part", "shop_other_img_all");
+		if (head_difference != null) {
+			// 2. 删除差值图片
+			for (String s : head_difference) {
+				try {
+					MinioUtils.removeFile(s);
+					redisTemplate.delete("shop_head_img_all");
+					redisTemplate.delete("shop_head_img_part"); // 删除redis
+					System.out.println("删除的无用图片：" + s);
+				} catch (Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException("删除失败");
+				}
+			}
+		}
+		if (middle_difference != null) {
+			// 2. 删除差值图片
+			for (String s : middle_difference) {
+				try {
+					MinioUtils.removeFile(s);
+					redisTemplate.delete("shop_middle_img_all");
+					redisTemplate.delete("shop_middle_img_part"); // 删除redis
+					System.out.println("删除的无用图片：" + s);
+				} catch (Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException("删除失败");
+				}
+			}
+		}
+		if (other_difference != null) {
+			// 2. 删除差值图片
+			for (String s : other_difference) {
+				try {
+					MinioUtils.removeFile(s);
+					redisTemplate.delete("shop_other_img_all");
+					redisTemplate.delete("shop_other_img_part"); // 删除redis
+					System.out.println("删除的无用图片：" + s);
+				} catch (Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException("删除失败");
+				}
+			}
+		}
+		
 		
 		System.out.println("没有可删除的图片");
 	}

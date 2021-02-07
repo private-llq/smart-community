@@ -7,9 +7,7 @@ import com.jsy.community.annotation.Log;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IShopLeaseService;
 import com.jsy.community.api.LeaseException;
-import com.jsy.community.constant.Const;
-import com.jsy.community.constant.LogModule;
-import com.jsy.community.constant.LogTypeConst;
+import com.jsy.community.constant.*;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.log.ProprietorLog;
 import com.jsy.community.qo.BaseQO;
@@ -28,6 +26,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -36,6 +35,15 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.json.JsonXContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +51,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,39 +80,25 @@ public class ShopLeaseController {
 	//TODO 暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	/**
 	 * @Author lihao
-	 * @Description 头图BUCKET
+	 * @Description 头图最大数量
 	 * @Date 2021/1/13 15:49
 	 **/
-	private static final String BUCKET_HEAD = "shop-head-img";
-	
-	/**
-	 * @Author lihao
-	 * @Description 头图redis部分
-	 * @Date 2021/1/20 17:01
-	 **/
-	private static final String REDIS_KEY_PART = "shop_head_img_part";
-	
-	/**
-	 * @Author lihao
-	 * @Description 头图redis全部
-	 * @Date 2021/1/20 17:01
-	 **/
-	private static final String REDIS_KEY_ALL = "shop_head_img_all";
+	private static final Integer HEAD_MAX = 3;
 	
 	
 	/**
 	 * @Author lihao
-	 * @Description 室内图
+	 * @Description 室内图最大数量
 	 * @Date 2021/1/13 15:50
 	 **/
-	private static final String BUCKETNAME_MIDDLE = "shop-middle-img";
+	private static final Integer MIDDLE_MAX = 8;
 	
 	/**
 	 * @Author lihao
-	 * @Description 其他图
+	 * @Description 其他图最大数量
 	 * @Date 2021/1/13 15:50
 	 **/
-	private static final String BUCKETNAME_OTHER = "shop-other-img";
+	private static final Integer OTHER_MAX = 8;
 	
 	/**
 	 * @Author lihao
@@ -118,6 +113,13 @@ public class ShopLeaseController {
 	 * @Date 2021/1/13 15:55
 	 **/
 	private static final double MIN_MONEY = 0.00;
+	
+	/**
+	 * @Author lihao
+	 * @Description 商铺发布图片最大临界值
+	 * @Date 2021/2/7 15:55
+	 **/
+	private static final Integer IMG_MAX = 19;
 	
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")
@@ -151,10 +153,13 @@ public class ShopLeaseController {
 	@ApiOperation("商铺头图上传")
 	@PostMapping("/uploadHeadImg")
 	public CommonResult uploadHeadImg(@RequestParam("file") MultipartFile[] files) {
-		if (files.length > 3) {
-			return CommonResult.error("门头图最多上传3张图");
+		if (files.length > HEAD_MAX) {
+			return CommonResult.error("头图最多上传3张图");
 		}
-		String[] strings = MinioUtils.uploadForBatch(files, BUCKET_HEAD);
+		String[] strings = MinioUtils.uploadForBatch(files, UploadBucketConst.SHOP_HEAD_BUCKET);
+		for (String string : strings) {
+			redisTemplate.opsForSet().add(UploadRedisConst.SHOP_HEAD_IMG_PART, string);
+		}
 		return CommonResult.ok(strings);
 	}
 	
@@ -162,10 +167,13 @@ public class ShopLeaseController {
 	@ApiOperation("商铺室内图上传")
 	@PostMapping("/uploadMiddleImg")
 	public CommonResult uploadMiddleImg(@RequestParam("file") MultipartFile[] files) {
-		if (files.length>8) {
+		if (files.length > MIDDLE_MAX) {
 			return CommonResult.error("室内图最多上传8张图");
 		}
-		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME_MIDDLE);
+		String[] filePaths = MinioUtils.uploadForBatch(files, UploadBucketConst.SHOP_MIDDLE_BUCKET);
+		for (String filePath : filePaths) {
+			redisTemplate.opsForSet().add(UploadRedisConst.SHOP_MIDDLE_IMG_PART, filePath);
+		}
 		return CommonResult.ok(filePaths);
 	}
 	
@@ -173,12 +181,16 @@ public class ShopLeaseController {
 	@ApiOperation("商铺其他图上传")
 	@PostMapping("/uploadOtherImg")
 	public CommonResult uploadOtherImg(@RequestParam("file") MultipartFile[] files) {
-		if (files.length>8) {
-			return CommonResult.error("室内图最多上传8张图");
+		if (files.length > OTHER_MAX) {
+			return CommonResult.error("其他图最多上传8张图");
 		}
-		String[] filePaths = MinioUtils.uploadForBatch(files, BUCKETNAME_OTHER);
+		String[] filePaths = MinioUtils.uploadForBatch(files, UploadBucketConst.SHOP_OTHER_BUCKET);
+		for (String filePath : filePaths) {
+			redisTemplate.opsForSet().add(UploadRedisConst.SHOP_OTHER_IMG_PART, filePath);
+		}
 		return CommonResult.ok(filePaths);
 	}
+	
 	
 	@ApiOperation("商铺发布")
 	@PostMapping("/addShop")
@@ -188,6 +200,9 @@ public class ShopLeaseController {
 		if (imgPath == null || imgPath.length <= 0) {
 			throw new LeaseException("请添加所有图片");
 		}
+		if (imgPath.length > IMG_MAX) {
+			throw new LeaseException("您添加的图片数量过多");
+		}
 		// 图片名称必须是 shop-head-img 或 shop-middle-img 或 shop-other-img组成的
 		for (String s : imgPath) {
 			boolean b = s.contains("shop-head-img") || s.contains("shop-middle-img") || s.contains("shop-other-img");
@@ -195,23 +210,39 @@ public class ShopLeaseController {
 				throw new LeaseException("您添加的图片不符合规范，请重新添加");
 			}
 		}
+		
 		// 必须要至少有一个 shop-head-img 和 shop-middle-img 和 shop-other-img
+		List<String> heads = new ArrayList<>();
+		List<String> middles = new ArrayList<>();
+		List<String> others = new ArrayList<>();
 		int headCount = 0;
 		int middleCount = 0;
 		int otherCount = 0;
 		for (String s : imgPath) {
 			if (s.contains("shop-head-img")) {
+				heads.add(s);
 				headCount += 1;
 			}
 			if (s.contains("shop-middle-img")) {
+				middles.add(s);
 				middleCount += 1;
 			}
 			if (s.contains("shop-other-img")) {
+				others.add(s);
 				otherCount += 1;
 			}
 		}
 		if (headCount == 0 || middleCount == 0 || otherCount == 0) {
 			throw new LeaseException("请添加所有图片");
+		}
+		if (headCount > HEAD_MAX) {
+			throw new LeaseException("头图数量超过规定数量");
+		}
+		if (headCount > MIDDLE_MAX) {
+			throw new LeaseException("室内图数量超过规定数量");
+		}
+		if (headCount > OTHER_MAX) {
+			throw new LeaseException("其他图数量超过规定数量");
 		}
 		
 		shop.setUid(UserUtils.getUserId());
@@ -219,8 +250,21 @@ public class ShopLeaseController {
 		shop.setSource(1);
 		ValidatorUtils.validateEntity(shop, ShopQO.addShopValidate.class);
 		shopLeaseService.addShop(shop);
+		
+		// 对图片进行处理
+		for (String head : heads) {
+			redisTemplate.opsForSet().add(UploadRedisConst.SHOP_HEAD_IMG_ALL, head);
+		}
+		for (String middle : middles) {
+			redisTemplate.opsForSet().add(UploadRedisConst.SHOP_MIDDLE_IMG_ALL, middle);
+		}
+		for (String other : others) {
+			redisTemplate.opsForSet().add(UploadRedisConst.SHOP_OTHER_IMG_ALL, other);
+		}
+		
 		return CommonResult.ok();
 	}
+	
 	
 	@ApiOperation("查询店铺详情")
 	@GetMapping("/getShop")
@@ -332,6 +376,9 @@ public class ShopLeaseController {
 	public CommonResult listShop() {
 		String userId = UserUtils.getUserId();
 		List<Map<String, Object>> map = shopLeaseService.listShop(userId);
+		if (map.size() == 0) {
+			return CommonResult.ok("你还没有发布过房源");
+		}
 		return CommonResult.ok(map);
 	}
 	
@@ -380,7 +427,7 @@ public class ShopLeaseController {
 	 *
 	 * @date 2018年7月13日 下午4:18:50
 	 */
-	public static void main(String[] args) {
+	public static void mai2n(String[] args) {
 		// 获得Http客户端(可以理解为:你得先有一个浏览器;注意:实际上HttpClient与浏览器是不一样的)
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		
@@ -432,6 +479,55 @@ public class ShopLeaseController {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	
+	//********************************
+	public static RestHighLevelClient getClient() {
+		HttpHost httpHost = new HttpHost("127.0.0.1", 9200);
+		RestClientBuilder clientBuilder = RestClient.builder(httpHost);
+		RestHighLevelClient client = new RestHighLevelClient(clientBuilder);
+		return client;
+	}
+	//
+	
+	public static void main3(String[] args) {
+		RestHighLevelClient client = ShopLeaseController.getClient();
+		System.out.println(client);
+	}
+	
+	public static void main(String[] args) throws IOException {
+		//1. 准备关于索引的settings
+		Settings settings = Settings.builder()
+			.put("number_of_shards", 3)
+			.put("number_of_replicas", 1).build();
+		
+		//2. 准备关于索引的结构mappings
+		XContentBuilder mappings = JsonXContent.contentBuilder()
+			.startObject()
+			.startObject("properties")
+			.startObject("name")
+			.field("type", "text")
+			.endObject()
+			.startObject("age")
+			.field("type", "integer")
+			.endObject()
+			.startObject("birthday")
+			.field("type", "date")
+			.field("format", "yyyy-MM-dd")
+			.endObject()
+			.endObject()
+			.endObject();
+		
+		//3. 将settings和mappings封装到一个Request对象
+		CreateIndexRequest request = new CreateIndexRequest("person")
+			.settings(settings)
+			.mapping("man", mappings);
+		
+		//4. 通过client对象去连接ES并执行创建索引
+		RestHighLevelClient client = ShopLeaseController.getClient();
+		CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
+		System.out.println(response.toString());
 	}
 }
 

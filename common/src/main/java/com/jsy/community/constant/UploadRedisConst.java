@@ -11,49 +11,38 @@ public interface UploadRedisConst {
 	
 	/**
 	 * @Author lihao
-	 * @Description 报修只上传图片时存的redis
+	 * @Description 发起报修
 	 **/
 	String REPAIR_IMG_PART = "repair_img_part";
-	
-	/**
-	 * @Author lihao
-	 * @Description 报修整体上传时存的redis
-	 **/
 	String REPAIR_IMG_ALL = "repair_img_all";
 	
 	/**
 	 * @Author lihao
-	 * @Description  报修评价只上传图片时存的redis
+	 * @Description  报修评价
 	 **/
 	String REPAIR_COMMENT_IMG_PART = "repair_comment_img_part";
-	
-	/**
-	 * @Author lihao
-	 * @Description  报修评价整体上传时存的redis
-	 **/
 	String REPAIR_COMMENT_IMG_ALL = "repair_comment_img_all";
 	
 	/**
 	 * @Author lihao
-	 * @Description app菜单只上传图片时存的redis
+	 * @Description app菜单
 	 **/
 	String APP_MENU_IMG_PART = "app_menu_img_part";
-	
-	/**
-	 * @Author lihao
-	 * @Description app菜单整体上传时存的redis
-	 **/
 	String APP_MENU_IMG_ALL = "app_menu_img_all";
 	
 	/**
 	 * @Author lihao
-	 * @Description 商铺租赁只上传图片时存的redis
+	 * @Description 商铺租赁
 	 **/
-	String SHOP_IMG_PART = "shop_img_part";
+	String SHOP_HEAD_IMG_PART = "shop_head_img_part";
+	String SHOP_HEAD_IMG_ALL = "shop_head_img_all";
 	
-	/**
-	 * @Author lihao
-	 * @Description 商铺整体上传时存的redis
-	 **/
-	String SHOP_IMG_ALL = "shop_img_all";
+	String SHOP_MIDDLE_IMG_PART = "shop_middle_img_part";
+	String SHOP_MIDDLE_IMG_ALL = "shop_middle_img_all";
+	
+	String SHOP_OTHER_IMG_PART = "shop_other_img_part";
+	String SHOP_OTHER_IMG_ALL = "shop_other_img_all";
+	
+	
+	
 }
