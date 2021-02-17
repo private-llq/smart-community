@@ -1,19 +1,21 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IHouseLeaseService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.UploadBucketConst;
+import com.jsy.community.constant.UploadRedisConst;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
-import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
-import com.jsy.community.api.IHouseLeaseService;
+import com.jsy.community.vo.lease.HouseLeaseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +49,7 @@ public class HouseLeaseController {
     @Login
     @PostMapping()
     @ApiOperation("新增房屋租售")
+    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
     public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
         //新增参数常规效验
         ValidatorUtils.validateEntity(houseLeaseQo, HouseLeaseQO.AddLeaseSaleHouse.class);
@@ -124,11 +127,13 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/ownerHouseImages")
     @ApiOperation("房屋图片批量上传接口")
-    public CommonResult<String[]> ownerHouseImages(MultipartFile[] houseImages){
+    @UploadImg(bucketName = UploadBucketConst.HOUSE_BUCKET,redisKeyName = UploadRedisConst.HOUSE_IMG_PART)
+    public CommonResult<String[]> ownerHouseImages(MultipartFile[] houseImages,CommonResult commonResult){
         if( houseImages == null || houseImages.length == 0 ){
             throw new JSYException(JSYError.BAD_REQUEST);
         }
-        return CommonResult.ok(MinioUtils.uploadForBatch(houseImages, "house-lease-img"));
+        String[] data = (String[])commonResult.getData();
+        return CommonResult.ok(data);
     }
 
     @Login

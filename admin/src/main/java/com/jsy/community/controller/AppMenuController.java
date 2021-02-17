@@ -1,11 +1,10 @@
 package com.jsy.community.controller;
 
 
-import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.constant.UploadBucketConst;
-import com.jsy.community.constant.UploadRedisConst;
 import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.service.IAppMenuService;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.menu.FrontParentMenu;
@@ -45,16 +44,16 @@ public class AppMenuController {
 	
 	@ApiOperation("子菜单白天图片上传")
 	@PostMapping("/uploadDayMenuImg")
-	@UploadImg(bucketName = UploadBucketConst.APP_MENU_BUCKET,redisKeyName = UploadRedisConst.APP_MENU_IMG_PART)
-	public CommonResult uploadDayMenuImg(@RequestParam("file") MultipartFile file, CommonResult result) {
-		return CommonResult.ok(result.getData());
+	public CommonResult uploadDayMenuImg(@RequestParam("file") MultipartFile file) {
+		String upload = MinioUtils.upload(file, UploadBucketConst.APP_MENU_BUCKET);
+		return CommonResult.ok(upload);
 	}
 	
 	@ApiOperation("子菜单黑夜图片上传")
 	@PostMapping("/uploadNightMenuImg")
-	@UploadImg(bucketName = UploadBucketConst.APP_MENU_BUCKET,redisKeyName = UploadRedisConst.APP_MENU_IMG_PART)
 	public CommonResult uploadNightMenuImg(@RequestParam("file") MultipartFile file, CommonResult result) {
-		return CommonResult.ok(result.getData());
+		String upload = MinioUtils.upload(file, UploadBucketConst.APP_MENU_BUCKET);
+		return CommonResult.ok(upload);
 	}
 	
 	@ApiOperation("新增父菜单")

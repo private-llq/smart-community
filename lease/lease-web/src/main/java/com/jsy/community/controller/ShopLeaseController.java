@@ -77,14 +77,12 @@ public class ShopLeaseController {
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
-	//TODO 暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
 	/**
 	 * @Author lihao
 	 * @Description 头图最大数量
 	 * @Date 2021/1/13 15:49
 	 **/
 	private static final Integer HEAD_MAX = 3;
-	
 	
 	/**
 	 * @Author lihao
@@ -274,7 +272,6 @@ public class ShopLeaseController {
 		if (map == null) {
 			return CommonResult.ok(null);
 		}
-		
 		
 		// 当月租金大于10000变成XX.XX万元
 		ShopLeaseVO shop = (ShopLeaseVO) map.get("shop");

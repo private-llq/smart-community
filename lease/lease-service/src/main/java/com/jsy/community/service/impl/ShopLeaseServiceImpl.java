@@ -293,6 +293,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
 		for (ShopLeaseEntity shopLeaseEntity : list) {
 			HashMap<String, Object> map = new HashMap<>();
+			Integer status = shopLeaseEntity.getStatus();
+			if (0==(status)) {
+				shopLeaseEntity.setStatusString("空置中");
+			}
+			if (1==(status)) {
+				shopLeaseEntity.setStatusString("营业中");
+			}
 			map.put("shopLease", shopLeaseEntity);
 			
 			QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();

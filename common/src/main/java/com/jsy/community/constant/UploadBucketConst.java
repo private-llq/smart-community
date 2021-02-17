@@ -22,9 +22,16 @@ public interface UploadBucketConst {
 	
 	/**
 	 * @Author lihao
-	 * @Description 商铺
+	 * @Description 商铺租赁
 	 **/
 	String SHOP_HEAD_BUCKET = "shop-head-img";
 	String SHOP_MIDDLE_BUCKET = "shop-middle-img";
 	String SHOP_OTHER_BUCKET = "shop-other-img";
+	
+	/**
+	 * @Author lihao
+	 * @Description 房屋租赁
+	 **/
+	String HOUSE_BUCKET = "house-img";
+	
 }

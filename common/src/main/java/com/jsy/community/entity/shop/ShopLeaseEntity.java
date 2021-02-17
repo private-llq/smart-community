@@ -1,5 +1,6 @@
 package com.jsy.community.entity.shop;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
@@ -78,6 +79,10 @@ public class ShopLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "店铺状态 0空置中 1经营中")
     private Integer status;
     
+    @TableField(exist = false)
+    @ApiModelProperty(value = "店铺状态 字符串形式")
+    private String statusString;
+    
     @ApiModelProperty(value = "经度")
     private BigDecimal lon;
     
@@ -93,9 +98,7 @@ public class ShopLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "手机")
     private String mobile;
     
-    
-    
-    
+
     
     
     @ApiModelProperty(value = "客流人群Code")

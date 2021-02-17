@@ -2,7 +2,9 @@ package com.jsy.community.constant;
 
 /**
  * @ClassName：UploudRedisConst
- * @Description：TODO
+ * @Description：
+ * TODO 解决无效图片只针对用户操作，因为用户多  出现无效图片的情况较多。      该功能可有可无，只是针对项目做一个优化，减少服务器的存储压力,不去存储那些没用图片。
+ * TODO 该功能带来的效果是减少存储压力，缺点是要走一次redis，要开销性能。
  * @author：lihao
  * @date：2021/1/29 18:10
  * @version：1.0
@@ -25,13 +27,6 @@ public interface UploadRedisConst {
 	
 	/**
 	 * @Author lihao
-	 * @Description app菜单
-	 **/
-	String APP_MENU_IMG_PART = "app_menu_img_part";
-	String APP_MENU_IMG_ALL = "app_menu_img_all";
-	
-	/**
-	 * @Author lihao
 	 * @Description 商铺租赁
 	 **/
 	String SHOP_HEAD_IMG_PART = "shop_head_img_part";
@@ -43,6 +38,12 @@ public interface UploadRedisConst {
 	String SHOP_OTHER_IMG_PART = "shop_other_img_part";
 	String SHOP_OTHER_IMG_ALL = "shop_other_img_all";
 	
+	/**
+	 * @Author lihao
+	 * @Description 房屋租赁
+	 **/
+	String HOUSE_IMG_PART = "house_img_part";
+	String HOUSE_IMG_ALL = "house_img_all";
 	
 	
 }
