@@ -39,6 +39,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	@Override
 	public boolean addCommunity(CommunityEntity communityEntity){
 		communityEntity.setId(SnowFlake.nextId());
+		if(StringUtils.isEmpty(communityEntity.getPromoter())){
+			communityEntity.setPromoter("system");
+		}
 		int result = communityMapper.insert(communityEntity);
         return result == 1;
     }

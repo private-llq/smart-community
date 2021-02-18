@@ -50,7 +50,7 @@ public class CommunityController {
 	**/
 	@PostMapping("")
 	public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity){
-		ValidatorUtils.validateEntity(communityEntity);
+		ValidatorUtils.validateEntity(communityEntity,CommunityEntity.sysAddValidatedGroup.class);
 		boolean result = iCommunityService.addCommunity(communityEntity);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
 	}

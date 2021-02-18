@@ -84,7 +84,7 @@ public class AdminLoginController {
 	 */
 	@PostMapping("/sys/login")
 	public CommonResult<?> login(@RequestBody AdminLoginQO form) {
-		boolean captcha = adminCaptchaService.validate(form.getUuid(), form.getCaptcha());
+		boolean captcha = adminCaptchaService.validate(form.getUsername(), form.getCaptcha());
 		if (!captcha) {
 			return CommonResult.error("验证码无效");
 		}

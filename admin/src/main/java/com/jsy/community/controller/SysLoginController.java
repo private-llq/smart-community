@@ -58,7 +58,7 @@ public class SysLoginController {
 	 */
 	@PostMapping("/sys/login")
 	public CommonResult<?> login(@RequestBody SysLoginQO form) {
-		boolean captcha = sysCaptchaService.validate(form.getUuid(), form.getCaptcha());
+		boolean captcha = sysCaptchaService.validate(form.getUsername(), form.getCaptcha());
 		if (!captcha) {
 			return CommonResult.error("验证码无效");
 		}
