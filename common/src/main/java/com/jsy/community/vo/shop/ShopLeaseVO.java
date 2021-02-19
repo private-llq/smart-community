@@ -116,8 +116,8 @@ public class ShopLeaseVO implements Serializable {
 	@ApiModelProperty(value = "客流人群Code")
 	private List<String> shopPeopleStrings;
 	
-//	@ApiModelProperty(value = "配套设施Code")
-//	private List<Long> shopFacilityList;
+	@ApiModelProperty(value = "配套设施Code")
+	private Long shopFacility;
 	
 	@ApiModelProperty(value = "配套设施名称")
 	private List<String> shopFacilityStrings;
@@ -133,4 +133,7 @@ public class ShopLeaseVO implements Serializable {
 	
 	@ApiModelProperty(value = "所属类型字符串")
 	private String shopTypeString;
+	
+	@ApiModelProperty(value = "商铺地址")
+	private String shopAddress;
 }

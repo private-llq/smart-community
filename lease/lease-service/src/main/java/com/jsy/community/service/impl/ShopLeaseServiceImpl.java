@@ -217,6 +217,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			shopLeaseVo.setStatusString("经营中");
 		}
 		
+		// 封装详细地址   // TODO: 2021/2/19 详情页并没有这个内容    于林风需要
+		Long areaId = shop.getAreaId();
+		String area = redisTemplate.opsForValue().get("RegionSingle" + ":" + areaId);
+		
+		Long communityId = shop.getCommunityId();
+		CommunityEntity community = communityService.getCommunityNameById(communityId);
+		shopLeaseVo.setShopAddress(area+"  "+community.getName());
+		
+		
+		
 		// 查询店铺发布人的电话和头像
 		String uid = shop.getUid();
 		UserEntity one = userService.selectOne(uid);
