@@ -121,7 +121,6 @@ public class PublicConfig {
         list.add(nonceStr);
         list.add(prepayId);
         //加载签名
-        System.err.println(buildSignMessage(list));
         String packageSign = sign(buildSignMessage(list).getBytes(), privateKeyFilePath);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("appId", appId);
@@ -179,15 +178,9 @@ public class PublicConfig {
      * @throws Exception
      */
     public static String getToken(String method, HttpUrl url, String mercId, String serial_no, String privateKeyFilePath, String body) throws Exception {
-        System.out.println(method);
-        System.out.println(url);
-        System.out.println(mercId);
-        System.out.println(serial_no);
-        System.out.println(body);
         String nonceStr = UUID.randomUUID().toString().replace("-", "");
         long timestamp = System.currentTimeMillis() / 1000;
         String message = buildMessage(method, url, timestamp, nonceStr, body);
-        System.out.println(message);
         String signature = sign(message.getBytes("UTF-8"), privateKeyFilePath);
         return "mchid=\"" + mercId + "\","
                 + "nonce_str=\"" + nonceStr + "\","
@@ -342,7 +335,6 @@ public class PublicConfig {
     public static void CloseOrder(String order) throws Exception {
 
         String postfix="/v3/pay/transactions/out-trade-no/"+order+"/close";
-        System.out.println(postfix);
         //请求URL
         HttpPost httpPost = new HttpPost(url_prex+postfix);
         //请求body参数

@@ -56,7 +56,7 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private IWeChatService weChatService;
     @Autowired
-    private RabbitTemplate amqpTemplate;
+    private RabbitTemplate rabbitTemplate;
 
     private HttpClient httpClient;
 
@@ -67,7 +67,7 @@ public class WeChatController {
         Map hashMap = new LinkedHashMap();
         hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("currency","CNY");
-        LinkedHashMap<Object, Object> map4 = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> map4 = new LinkedHashMap<>();
         map4.put("payer_client_ip",weChatPayQO.getPayerClientIp());
 
         Map<Object, Object> map = new LinkedHashMap<>();
@@ -95,12 +95,12 @@ public class WeChatController {
 
 
         //mq异步保存账单到数据库
-        amqpTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
+        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
         //半个小时如果还没支付就自动删除数据库账单
-        amqpTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
+        rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
-                message.getMessageProperties().setHeader("x-delay",60000*10);
+                    message.getMessageProperties().setHeader("x-delay",60000*30);
                 return message;
             }
         });

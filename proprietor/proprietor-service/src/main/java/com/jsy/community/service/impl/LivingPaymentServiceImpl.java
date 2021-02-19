@@ -186,14 +186,6 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         return s+s1;
     }
 
-    public static void main(String[] args) {
-        SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
-        int s1=(int) (Math.random() * 999999);
-        System.out.println(s + s1);
-    }
-
-
     /**
      * @Description: 查询组下面已经缴过费的户号
      * @author: Hu
