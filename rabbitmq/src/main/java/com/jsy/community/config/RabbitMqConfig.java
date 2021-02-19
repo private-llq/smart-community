@@ -1,10 +1,13 @@
 package com.jsy.community.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsy.community.constant.BusinessConst;
+import com.jsy.community.controller.ReceiverController;
+import com.jsy.community.utils.SpringContextUtils;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,8 +59,22 @@ public class RabbitMqConfig {
 
     @Bean
     Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("appSearch#");
+        return BindingBuilder.bind(queue).to(exchange).with(BusinessConst.APP_SEARCH_ROUTE_KEY);
     }
+
+    /*@Bean
+    public SimpleMessageListenerContainer simpleMessageListenerContainer(ConnectionFactory connectionFactory){
+        SimpleMessageListenerContainer simpleMessageListenerContainer  = new SimpleMessageListenerContainer(connectionFactory);
+        //指定监听队列[字符串数组]
+        simpleMessageListenerContainer.setQueueNames(BusinessConst.APP_SEARCH_QUEUE_NAME);
+        simpleMessageListenerContainer.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        //指定监听方法
+        MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(SpringContextUtils.getBean("receiverController"), new Jackson2JsonMessageConverter());
+        messageListenerAdapter.setDefaultListenerMethod("receiverMessage");
+        simpleMessageListenerContainer.setMessageListener(messageListenerAdapter);
+        return simpleMessageListenerContainer;
+    }*/
+
     //@author YuLF end
 
 
@@ -116,10 +133,6 @@ public class RabbitMqConfig {
 
 
 
-    @Bean
-    public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
-        return new Jackson2JsonMessageConverter(objectMapper);
-    }
 
     /**
      * 声明队列

@@ -42,6 +42,11 @@ public class SysInformController {
     private Long sysInformId;
 
 
+    /**
+     * 注：此方法使用了Aop 类：SysAop.java
+     * @param qo    新增参数
+     * @return      返回结果
+     */
     @Login
     @ApiOperation("系统消息新增")
     @PostMapping()

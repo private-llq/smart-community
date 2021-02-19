@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * 房屋租售数据返回对象
  * 用于视图层返回显示
- * YuLF
+ * @author YuLF
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

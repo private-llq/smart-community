@@ -6,6 +6,11 @@ import com.jsy.community.utils.SpringContextUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.support.MessageBuilder;
+
+import java.util.HashMap;
 
 
 /**
@@ -14,7 +19,7 @@ import org.springframework.lang.Nullable;
  */
 public class ElasticSearchImport {
 
-    private static RabbitTemplate rabbitTemplate;
+    private static RabbitTemplate rabbitTemplate = null;
     /**
      * 往MQ队列里面生产消息，主要为往ES中导入数据
      * 增删改接口业务最后增加此方法、
@@ -33,7 +38,7 @@ public class ElasticSearchImport {
         fullTextSearchEntity.setOperation(operation);
         fullTextSearchEntity.setTitle(recordTitle);
         fullTextSearchEntity.setPicture(recordPicture);
-        RabbitTemplate rabbitTemplate = getRabbitTemplate();
+        rabbitTemplate = getRabbitTemplate();
         rabbitTemplate.convertAndSend(BusinessConst.APP_SEARCH_EXCHANGE_NAME, BusinessConst.APP_SEARCH_ROUTE_KEY, fullTextSearchEntity);
     }
 
@@ -42,7 +47,7 @@ public class ElasticSearchImport {
         if( rabbitTemplate == null ){
             synchronized (ElasticSearchImport.class){
                 if( rabbitTemplate == null ){
-                    rabbitTemplate = (RabbitTemplate) SpringContextUtils.getBean("customRabbitTemplate");
+                    rabbitTemplate = (RabbitTemplate) SpringContextUtils.getBean("rabbitTemplate");
                 }
             }
         }

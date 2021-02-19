@@ -8,7 +8,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * 房屋最近浏览数据 与 数据库映射关系
@@ -20,6 +19,23 @@ import java.util.Date;
 @ApiModel(value="房屋最近浏览", description="房屋最近浏览数据字段实体")
 @TableName("t_house_recent")
 public class HouseRecentEntity implements Serializable {
+
+    public HouseRecentEntity(){}
+
+    public HouseRecentEntity(Long id, Long houseId, String uid, String browseTitle, Integer browseType, String leaseType, Double acreage, String address, String price, String tag, String houseImage, LocalDateTime createTime) {
+        this.id = id;
+        this.houseId = houseId;
+        this.uid = uid;
+        this.browseTitle = browseTitle;
+        this.browseType = browseType;
+        this.leaseType = leaseType;
+        this.acreage = acreage;
+        this.address = address;
+        this.price = price;
+        this.tag = tag;
+        this.houseImage = houseImage;
+        this.createTime = createTime;
+    }
 
     @ApiModelProperty(value = "id")
     private Long id;
@@ -36,6 +52,9 @@ public class HouseRecentEntity implements Serializable {
     @ApiModelProperty(value = "浏览数据类型：0出租房屋、1商铺")
     private Integer browseType;
 
+    @ApiModelProperty(value = "房屋出租方式：合租、整租")
+    private String leaseType;
+
     @ApiModelProperty(value = "租赁面积")
     private Double acreage;
 
@@ -46,7 +65,7 @@ public class HouseRecentEntity implements Serializable {
     private String price;
 
     @ApiModelProperty(value = "房屋标签")
-    private Long tag;
+    private String tag;
 
     @ApiModelProperty(value = "房屋图片")
     private String houseImage;

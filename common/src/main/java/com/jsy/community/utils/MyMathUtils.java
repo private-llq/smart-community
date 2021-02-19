@@ -1,9 +1,6 @@
 package com.jsy.community.utils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author chq459799974
@@ -72,28 +69,8 @@ public class MyMathUtils {
 	}
 	
 	public static void main(String[] args) {
-//		for (int i = 0; i < 20; i++) {
-//			System.out.println(randomCode(7));
-//		}
-		
-		LinkedList<Long> codes = new LinkedList<>();
-		for(int i=0;i<63;i++){
-			codes.add(1l<<i);
-		}
-
-		LinkedList<Long> codes2 = new LinkedList(){{
-			add(8L);
-			add(64L);
-		}};
-		LinkedList<Long> codes3 = new LinkedList(){{
-			add(8L);
-			add(32L);
-		}};
-		long typeCode1 = getTypeCode(codes2);
-		long typeCode2 = getTypeCode(codes3);
-		System.out.println("前端传的值解析后的："+typeCode1);
-		System.out.println("数据库存的值："+typeCode2);
-		System.out.println(typeCode1 | typeCode2);
+		List<Long> longs = analysisTypeCode(117);
+		System.out.println(Arrays.asList(longs));
 	}
 	
 }
