@@ -32,6 +32,9 @@ public class ShopLeaseVO implements Serializable {
 //	@ApiModelProperty(value = "社区id")
 //	private Long communityId;
 //
+	@ApiModelProperty(value = "商铺id")
+	private Long Id;
+	
 	@ApiModelProperty(value = "标题")
 	private String title;
 	
