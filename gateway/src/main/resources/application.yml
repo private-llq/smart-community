@@ -19,15 +19,22 @@ spring:
         - id: property
           uri: lb://property-web
           predicates:
-            - Path=/property/**
-          filters:
-            - PrefixPath=/api/v1
+            - Path=/*/*/property/**
+
         - id: proprietor
           uri: lb://proprietor-web
           predicates:
-            - Path=/proprietor/**
-          filters:
-            - PrefixPath=/api/v1
+            - Path=/*/*/proprietor/**
+
+        - id: payment
+          uri: lb://payment-web
+          predicates:
+            - Path=/*/*/payment/**
+
+        - id: lease
+          uri: lb://lease-web
+          predicates:
+            - Path=/*/*/lease/**
 dubbo:
   registry:
     address: nacos://127.0.0.1:8848
