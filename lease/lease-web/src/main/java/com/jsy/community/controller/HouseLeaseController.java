@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.RequireRecentBrowse;
 import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IHouseLeaseService;
@@ -112,6 +113,7 @@ public class HouseLeaseController {
     @Login
     @GetMapping("/details")
     @ApiOperation("查询房屋出租数据单条详情")
+    @RequireRecentBrowse
     public CommonResult<HouseLeaseVO> houseLeaseDetails(@RequestParam Long houseId) {
         return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId, UserUtils.getUserId()),"查询成功!");
     }

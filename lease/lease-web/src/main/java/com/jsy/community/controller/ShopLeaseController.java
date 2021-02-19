@@ -4,6 +4,7 @@ package com.jsy.community.controller;
 import com.alibaba.fastjson.JSON;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Log;
+import com.jsy.community.annotation.RequireRecentBrowse;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IShopLeaseService;
 import com.jsy.community.api.LeaseException;
@@ -265,6 +266,7 @@ public class ShopLeaseController {
 	
 	
 	@ApiOperation("查询店铺详情")
+	@RequireRecentBrowse
 	@GetMapping("/getShop")
 //	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {

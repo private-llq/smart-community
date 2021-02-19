@@ -15,11 +15,14 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author YuLF
@@ -34,9 +37,11 @@ public class ReceiverController {
 
     private final RestHighLevelClient elasticsearchClient;
 
-    @RabbitListener(queues = {BusinessConst.APP_SEARCH_QUEUE_NAME})
-    public void receiverMessage (FullTextSearchEntity entity, Message message, Channel channel) throws IOException {
-        System.out.println("【ES全文搜索数据】MqTag标签："+message.getMessageProperties().getDeliveryTag() + ":" + entity);
+
+    public void receiverMessage (Message<Object> message, Channel channel) throws IOException {
+        FullTextSearchEntity entity = (FullTextSearchEntity) message.getPayload();
+        Long tag = (Long)message.getHeaders().get(AmqpHeaders.DELIVERY_TAG);
+        System.out.println("【ES全文搜索数据】MqTag标签："+ tag + ":" + entity);
         boolean isConsumerSuccess = false;
         //向es导入数据
         switch (entity.getOperation()){
@@ -53,8 +58,8 @@ public class ReceiverController {
                 break;
         }
         //如果操作 elasticsearch 成功 回复 mq
-        if(isConsumerSuccess){
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        if(tag != null){
+            channel.basicAck(tag,false);
         }
         //进入死信队列
     }

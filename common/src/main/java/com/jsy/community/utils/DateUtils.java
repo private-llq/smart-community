@@ -3,6 +3,8 @@ package com.jsy.community.utils;
 import org.redisson.executor.CronExpression;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -25,6 +27,10 @@ public class DateUtils {
         String cronTime = simpleDateFormat.format(nextValidTimeAfter);
         String currentTime = simpleDateFormat.format(new Date());
         return !cronTime.equals(currentTime);
+    }
+
+    public static String now(){
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
     }
 
 }

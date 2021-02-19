@@ -7,3 +7,23 @@ alipay:
     app-public-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ15R+VEYa74K3asVSOsI9WCXDo4MVqWj4RqvYMe3ThdYumnZAyjwI3d1azh6DYX7H88=
     alipay-public-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ15qbBLdzQJkM7QsnxbgB2Dc/1mbQsqE49BNhdf6kmsHDnA4BI+fU4byotb6SDlsUZ8=
     root-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ17UiK8ZLIVZbCNVejlM24NyTkKoI4y8q+5+FyPuq655yQ==
+rabbitmq:
+  ####连接地址
+  host: 106.13.84.80
+  ####端口号
+  port: 5672
+  username: smart
+  password: smart123
+  ### 地址
+  virtual-host: /
+  listener:
+    simple:
+      retry:
+        ####开启消费者（程序出现异常的情况下会）进行重试
+        enabled: true
+        ####最大重试次数
+        max-attempts: 5
+        ####重试间隔次数
+        initial-interval: 3000
+      ####开启手动ack
+      acknowledge-mode: MANUAL

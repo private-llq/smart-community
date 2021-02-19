@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 通过mac地址获取局域网IP 避免同事的局域网ip因为 自动分配的原因 总是找不到
+ * 通过mac地址获取局域网IP
  * 只在开发环境下生效
  * @author YuLF
  * @since 2021-01-13 10:37

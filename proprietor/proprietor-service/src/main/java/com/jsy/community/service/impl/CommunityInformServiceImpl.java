@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityInformService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.entity.UserInformEntity;
@@ -86,30 +87,31 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
 
     /**
      * 社区推送消息详情查看
-     * @param acctId        推送账号id、可能是社区ID 可能是系统消息ID 可能是其他第三方推送号ID
      * @param informId      推送消息ID
      * @param userId        用户ID
      * @return              返回这条推送消息的详情
      */
     @Transactional(rollbackFor = {Exception.class})
     @Override
-    public PushInformEntity detailsCommunityInform(Long acctId, Long informId , String userId) {
-        //根据社区id和消息id查出消息
+    public PushInformEntity detailsCommunityInform(Long informId , String userId) {
+        //根据消息id查出消息
         QueryWrapper<PushInformEntity> wrapper = new QueryWrapper<>();
-        wrapper.select("push_title,create_time,browse_count,push_msg");
+        wrapper.select("push_title,create_time,browse_count,push_msg,acct_id");
         wrapper.eq("id", informId);
-        wrapper.eq("acct_id",acctId);
         wrapper.eq("deleted", 0);
         PushInformEntity informEntity = communityInformMapper.selectOne(wrapper);
+        if(informEntity == null){
+            throw new ProprietorException("没有找到这条消息!");
+        }
         //标识用户已读该社区消息
         UserInformEntity userInformEntity = new UserInformEntity();
         userInformEntity.setId(SnowFlake.nextId());
-        userInformEntity.setAcctId(acctId);
+        userInformEntity.setAcctId(informEntity.getAcctId());
         userInformEntity.setInformId(informId);
         userInformEntity.setUid(userId);
         userInformMapper.setInformReadByUser(userInformEntity);
         //该推送消息的浏览量+1
-        communityInformMapper.updatePushInformBrowseCount(acctId, informId);
+        communityInformMapper.updatePushInformBrowseCount(informEntity.getAcctId(), informId);
         return informEntity;
     }
 

@@ -38,12 +38,11 @@ public interface ICommunityInformService extends IService<PushInformEntity> {
 
     /**
      * 社区推送消息详情查看
-     * @param acctId        推送账号id、可能是社区ID 可能是系统消息ID 可能是其他第三方推送号ID
      * @param informId      推送消息ID
      * @param userId        用户ID
      * @return              返回这条推送消息的详情
      */
-    PushInformEntity detailsCommunityInform(Long acctId, Long informId ,String userId);
+    PushInformEntity detailsCommunityInform(Long informId ,String userId);
 
     /**
      * 用户消息列表 左滑动 删除推送号(屏蔽)

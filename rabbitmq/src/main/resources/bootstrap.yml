@@ -2,12 +2,12 @@ spring:
   rabbitmq:
     host: 106.13.84.80
     port: 5672
-    username: root
-    password: root
+    username: smart
+    password: smart123
     virtualHost: /
     listener:
       simple:
-        acknowledge-mode: manual
+        acknowledge-mode: MANUAL
         retry:
           enabled: true
   redis:

@@ -10,6 +10,9 @@ import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.es.ElasticSearchImport;
+import com.jsy.community.utils.es.Operation;
+import com.jsy.community.utils.es.RecordFlag;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -39,7 +42,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      * 添加社区推送消息
      * @param qo    接收消息参数的对象
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean addPushInform(PushInformQO qo){
         PushInformEntity entity = PushInformEntity.getInstance();
@@ -48,7 +51,13 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         //当某个推送号有新消息发布时：用户之前已经删除的 推送号 又会被拉取出来 同时通知有未读消息
         //清除推送消息屏蔽表
         communityInformMapper.clearPushDel(qo.getAcctId());
-        return communityInformMapper.insert(entity) > 0;
+        //返回值为冗余
+        boolean b = communityInformMapper.insert(entity) > 0;
+        //1表示推送目标为所有社区
+        if(b && qo.getPushTarget() ==  1){
+            ElasticSearchImport.elasticOperation(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
+        }
+        return b;
     }
 
     /**
@@ -57,11 +66,12 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      * @param id    推送消息id
      * @return      返回删除成功
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean deletePushInform(Long id) {
         //物理删除：删除该条社区消息之前 先删除 所有用户已读消息记录
         communityInformMapper.delUserReadInform(id);
+        ElasticSearchImport.elasticOperation(id, RecordFlag.INFORM, Operation.DELETE, null, null);
         return communityInformMapper.deleteById(id) > 0;
     }
 
@@ -70,7 +80,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      * @param qo               查询参数对象
      * @return                 返回查询结果
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public List<PushInformEntity> queryCommunityInform(BaseQO<PushInformQO> qo) {
         //1.查出推送号列表基本列表数据

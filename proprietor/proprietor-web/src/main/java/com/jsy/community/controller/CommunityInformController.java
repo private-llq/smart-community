@@ -72,8 +72,8 @@ public class CommunityInformController {
     @Login
     @GetMapping("/details")
     @ApiOperation("社区推送消息详情查看")
-    public CommonResult<PushInformEntity> detailsCommunityInform(@RequestParam Long acctId, @RequestParam Long informId) {
-        return CommonResult.ok(communityInformService.detailsCommunityInform(acctId, informId, UserUtils.getUserId()));
+    public CommonResult<PushInformEntity> detailsCommunityInform(@RequestParam Long informId) {
+        return CommonResult.ok(communityInformService.detailsCommunityInform(informId, UserUtils.getUserId()));
     }
 
 
