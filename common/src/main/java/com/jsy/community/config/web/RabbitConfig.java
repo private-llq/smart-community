@@ -1,11 +1,8 @@
 package com.jsy.community.config.web;
 
-import com.jsy.community.constant.BusinessConst;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -44,7 +41,6 @@ public class RabbitConfig {
         cachingConnectionFactory.setPort(port);
         return cachingConnectionFactory;
     }
-
 //
 //    @Bean("customRabbitTemplate")
 //    public RabbitTemplate customRabbitTemplate(ConnectionFactory connectionFactory){

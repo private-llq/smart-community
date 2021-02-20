@@ -54,7 +54,6 @@ public class SentinelExceptionHandler implements BlockRequestHandler {
             resp.setCode(10005);
             resp.setMessage("提示：系统繁忙，请稍后再试");
             status = 433;
-
         }
         //返回固定响应信息
         ServerHttpResponse response = serverWebExchange.getResponse();
