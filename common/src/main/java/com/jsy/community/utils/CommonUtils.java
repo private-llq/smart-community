@@ -80,5 +80,12 @@ public class CommonUtils {
 		String favoriteNoticeContent = "张大锤在 2021-1-15 10:52:34 收藏您发布的房屋[江北-观音桥 三钢二路8号]";
 		pushCommunityMSG(1,"120c83f76087f89f525",favoriteNoticeTitle,favoriteNoticeContent);
 	}
+
+	/**
+	 * 判断数组是否为空
+	 */
+	public static boolean isEmpty(Object[] array) {
+		return array == null || array.length == 0;
+	}
 	
 }

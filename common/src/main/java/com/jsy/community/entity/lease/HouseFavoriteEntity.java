@@ -10,9 +10,10 @@ import lombok.experimental.Accessors;
 
 
 /**
- * 房屋租售收藏实体对象
- * YuLF
- * 数据访问对象：这个类主要用于对应数据库表t_house_favorite的数据字段的映射关系，
+ *  房屋租售收藏实体对象
+ *  数据访问对象：这个类主要用于对应数据库表t_house_favorite的数据字段的映射关系，
+ * @author YuLF
+ * @since  2021/2/20 15:35
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

@@ -130,11 +130,11 @@ public class HouseLeaseController {
     @PostMapping("/ownerHouseImages")
     @ApiOperation("房屋图片批量上传接口")
     @UploadImg(bucketName = UploadBucketConst.HOUSE_BUCKET,redisKeyName = UploadRedisConst.HOUSE_IMG_PART)
-    public CommonResult<String[]> ownerHouseImages(MultipartFile[] houseImages,CommonResult commonResult){
+    public CommonResult<String[]> ownerHouseImages(MultipartFile[] houseImages,CommonResult<String[]> commonResult){
         if( houseImages == null || houseImages.length == 0 ){
             throw new JSYException(JSYError.BAD_REQUEST);
         }
-        String[] data = (String[])commonResult.getData();
+        String[] data = commonResult.getData();
         return CommonResult.ok(data);
     }
 

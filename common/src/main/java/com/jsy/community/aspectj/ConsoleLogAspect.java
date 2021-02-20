@@ -148,7 +148,7 @@ public class ConsoleLogAspect {
 		// 处理完请求，返回内容
 //		logger.info("返回结果 : " + ret);
 		long end = System.currentTimeMillis();
-		long runTime = end - mark;
-		logger.info("总耗时 : " + runTime+"ms");
+		//long runTime = end - mark;
+		logger.info("总耗时 : " + end+"ms");
 	}
 }

@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import javax.validation.constraints.Pattern;
 import java.util.List;
 
 /**
@@ -23,16 +22,22 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
 
     /**
      * 我的预约信息
+     * @param qo        请求参数
+     * @param uid       用户id
      * @author YuLF
      * @since  2020/12/28 10:22
+     * @return          返回预约信息列表
      */
     List<HouseReserveVO> meReserveHouse(@Param("qo") BaseQO<HouseReserveQO> qo, @Param("uid") String uid);
 
 
     /**
      * 预约我的信息
+     * @param qo        请求参数
+     * @param uid       用户id
      * @author YuLF
      * @since  2020/12/28 10:22
+     * @return          返回预约信息列表
      */
     List<HouseReserveVO> reserveMeHouse(@Param("qo") BaseQO<HouseReserveQO> qo, @Param("uid") String uid);
 
@@ -56,6 +61,7 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
     /**
      * 通过房屋id查询房屋是否存在
      * @param houseLeaseId      查询id
+     * @return                  返回sql影响行数
      */
     @Select("select count(*) from t_house_lease where id = #{houseLeaseId} and deleted = 0")
     Integer existHouseLeaseId(@Param("houseLeaseId") Long houseLeaseId);
@@ -65,6 +71,7 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * 拒绝预约
      * 预约状态 0.已取消，1.预约中 2.预约成功 3.预约已拒绝
      * @param qo   请求参数
+     * @return     返回影响行数
      */
     @Update("update t_house_reserve set reserve_status = 3,update_time = now() where reserve_status = 1 and id = #{id}")
     Integer rejectReserve(HouseReserveQO qo);
@@ -74,6 +81,7 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * 取消预约
      * 预约状态 0.已取消，1.预约中 2.预约成功 3.预约已拒绝
      * @param qo   请求参数
+     * @return      影响行数
      */
     @Update("update t_house_reserve set reserve_status = 0,update_time = now() where reserve_status = 1 or reserve_status = 2 and id = #{id}")
     Integer cancelReserveState(HouseReserveQO qo);
@@ -81,9 +89,9 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
 
     /**
      * 从t_house_lease 表拿到用户的推送信息
+     * @param id        预约信息id
      * @author YuLF
      * @since  2021/1/15 15:22
-     * @Param  id       房源id
      * @return          返回用户推送id 房源标题
      */
     @Select("select l.house_title,u.reg_id as pushId from t_house_reserve as r LEFT JOIN t_user as u on r.reserve_uid = u.uid join t_house_lease as l on r.house_lease_id = l.id where l.deleted = 0 and u.deleted = 0 and r.id = #{id} ")

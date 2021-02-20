@@ -10,6 +10,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseRecentEntity;
 import com.jsy.community.mapper.HouseRecentMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.CommonUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.lease.HouseLeaseVO;
@@ -64,7 +65,7 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
             houseRecentEntity = HouseRecentEntity.builder().acreage(vo.getShopAcreage())
                     .address(vo.getShopAddress()).browseTitle(vo.getTitle())
                     .browseType(1).houseId(vo.getId())
-                    .houseImage(isEmpty(vo.getImgPath()) ? null : vo.getImgPath()[0])
+                    .houseImage(CommonUtils.isEmpty(vo.getImgPath()) ? null : vo.getImgPath()[0])
                     .price(vo.getMonthMoney() + "/月")
                     .tag(getTag(vo.getShopFacilityStrings()))
                     .build();
@@ -142,11 +143,6 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
     }
 
 
-    /**
-     * 判断数组是否为空
-     */
-    public static boolean isEmpty(Object[] array) {
-        return array == null || array.length == 0;
-    }
+
 
 }

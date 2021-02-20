@@ -9,7 +9,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserUroraTagsEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -22,16 +21,13 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.AllArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 
 /**
@@ -126,7 +122,7 @@ public class UserController {
             }
             //验证所有车辆信息 验证成功没有抛异常 则把当前这个对象的一些社区id 所属人 手机号码 设置进去 方便后续车辆登记
             for (CarEntity carEntity : qo.getCarEntityList()){
-                ValidatorUtils.validateEntity(carEntity, CarEntity.proprietorCarValidated.class);
+                ValidatorUtils.validateEntity(carEntity, CarEntity.ProprietorCarValidated.class);
                 carEntity.setCommunityId(qo.getHouseEntityList().get(0).getCommunityId());
                 carEntity.setUid(userId);
                 carEntity.setOwner(qo.getRealName());

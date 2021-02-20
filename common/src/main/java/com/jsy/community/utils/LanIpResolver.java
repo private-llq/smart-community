@@ -2,7 +2,6 @@ package com.jsy.community.utils;
 
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.io.BufferedReader;
 import java.io.IOException;

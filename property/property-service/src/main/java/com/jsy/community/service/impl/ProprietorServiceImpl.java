@@ -123,7 +123,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
         //2.2 批量注册 t_user_auth
         proprietorMapper.registerBatch(userEntityList);
         //2.3 批量发送短信告知用户 您的账号已注册 请使用电话号码验证码登录
-        //TODO: 批量发送短信 userEntityList
+        //TODO: 批量发送短信 userEntityList  使用异步线程
         //3 为所有用户 登记信息 t_user
         proprietorMapper.insertUserBatch(userEntityList);
         //4.为所有用户 登记房屋 状态都是已审核

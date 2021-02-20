@@ -11,7 +11,8 @@ import java.util.List;
 
 /**
  * 房屋预约返回值对象
- * YuLF
+ * @author YuLF
+ * @since  2021/2/20 15:46
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

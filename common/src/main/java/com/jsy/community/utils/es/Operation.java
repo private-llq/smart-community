@@ -16,5 +16,5 @@ public enum Operation {
     /**
      * 数据删除
      */
-    DELETE;
+    DELETE
 }

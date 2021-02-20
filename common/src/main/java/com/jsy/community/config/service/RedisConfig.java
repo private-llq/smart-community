@@ -41,9 +41,6 @@ public class RedisConfig {
 	@Value("${spring.redis.database}")
 	private Integer redisDatabase;
 
-	//@Value("${jsy.redis.annotation.cacheTimeout}")
-	private Integer cacheTimeout = 1800;
-
 	@Bean
 	public RedissonClient redissonClient(){
 		Config config = new Config();
@@ -89,11 +86,13 @@ public class RedisConfig {
 		//设置CacheManager的值序列化方式为json序列化
 		RedisSerializer<Object> jsonSerializer = new GenericJackson2JsonRedisSerializer();
 		//设置值的序列化方式
+		//@Value("${jsy.redis.annotation.cacheTimeout}")
+		int cacheTimeout = 1800;
 		RedisCacheConfiguration defaultCacheConfig= RedisCacheConfiguration.defaultCacheConfig()
 				.serializeValuesWith(RedisSerializationContext
 						.SerializationPair
 						.fromSerializer(jsonSerializer)
-				).entryTtl(Duration.ofSeconds(this.cacheTimeout));
+				).entryTtl(Duration.ofSeconds(cacheTimeout));
 		//设置key的序列化方式
 		RedisSerializationContext.SerializationPair<String> stringSerializationPair = RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer());
 		defaultCacheConfig.serializeKeysWith(stringSerializationPair);

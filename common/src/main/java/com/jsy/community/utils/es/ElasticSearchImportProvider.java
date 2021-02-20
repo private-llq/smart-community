@@ -20,7 +20,7 @@ public class ElasticSearchImportProvider {
     /**
      * 往MQ队列里面生产消息，主要为往ES中导入数据
      * 增删改接口业务最后增加此方法、
-     *
+     * app首页全文搜索数据 导入搜索数据
      * @author YuLF
      * @Param recordFlag        数据标记：租赁、商铺、趣事、消息...，用于标识这条数据操作是请求对应接口
      * @Param recordTitle       数据标题：用于ES全文检索

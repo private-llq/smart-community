@@ -18,26 +18,29 @@ public interface IHouseFavoriteService extends IService<HouseFavoriteEntity> {
 
     /**
      * 房屋收藏
+     * @param qo 请求参数
      * @author YuLF
      * @since  2020/12/30 10:51
-     * @Param  qo         请求必要参数：uid（服务端）、收藏id、收藏类型
+     * @return  返回成功与否
      */
     Boolean houseFavorite(HouseFavoriteQO qo);
 
     /**
      * 房屋收藏删除
+     * @param id            收藏id
+     * @param userId        用户id
      * @author YuLF
      * @since  2020/12/30 11:00
-     * @Param   id              收藏id
-     * @Param   userId          用户ID
+     * @return              返回影响行数 > 0
      */
     Boolean deleteFavorite(Long id, String userId);
 
     /**
      * 查询我的出租房屋收藏列表
+     * @param qo           请求参数，带分页参数
      * @author YuLF
      * @since  2020/12/30 11:29
-     * @Param  qo           参数对象
+     * @return              返回数据列表
      */
     List<HouseFavoriteVO> leaseFavorite(BaseQO<HouseFavoriteQO> qo);
 

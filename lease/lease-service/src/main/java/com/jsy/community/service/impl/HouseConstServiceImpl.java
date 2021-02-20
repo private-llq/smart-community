@@ -150,7 +150,7 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
     
     @Override
     public Map<String, Object> getAddShopTags(Integer facilityType,Integer peopleType) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(16);
         // 获取配套设施
         QueryWrapper<HouseLeaseConstEntity> wrapper = new QueryWrapper<>();
         wrapper.eq("house_const_type",facilityType);
@@ -169,7 +169,7 @@ public class HouseConstServiceImpl extends ServiceImpl<HouseConstMapper, HouseLe
     
     @Override
     public Map<String,Object> getTag() {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(32);
     
         // 封装所属类型标签
         QueryWrapper<HouseLeaseConstEntity> wrapper = new QueryWrapper<>();

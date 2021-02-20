@@ -39,18 +39,18 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
-    @Range(groups = {addCarValidated.class}, min = 1, message = "社区id不合法")
-    @NotNull(groups = {addCarValidated.class}, message = "社区不能为空")
+    @Range(groups = {AddCarValidated.class}, min = 1, message = "社区id不合法")
+    @NotNull(groups = {AddCarValidated.class}, message = "社区不能为空")
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
 
-    @Pattern(groups = {addCarValidated.class, proprietorCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
-    @NotNull(groups = {addCarValidated.class, proprietorCarValidated.class}, message = "车牌不能为空!")
+    @Pattern(groups = {AddCarValidated.class, ProprietorCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
+    @NotNull(groups = {AddCarValidated.class, ProprietorCarValidated.class}, message = "车牌不能为空!")
     @ApiModelProperty(value = "车辆牌照")
     private String carPlate;
 
-    @Pattern(groups = {addCarValidated.class, proprietorCarValidated.class}, regexp = RegexUtils.REGEX_URL, message = "请提供一个正确的访问地址!")
-    @NotNull(groups = {addCarValidated.class, proprietorCarValidated.class}, message = "车辆图片地址未提供!")
+    @Pattern(groups = {AddCarValidated.class, ProprietorCarValidated.class}, regexp = RegexUtils.REGEX_URL, message = "请提供一个正确的访问地址!")
+    @NotNull(groups = {AddCarValidated.class, ProprietorCarValidated.class}, message = "车辆图片地址未提供!")
     @ApiModelProperty(value = "车辆照片访问路径")
     private String carImageUrl;
 
@@ -60,17 +60,17 @@ public class CarEntity extends BaseEntity {
         System.out.println(b);
     }
 
-    @Pattern(groups = {addCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
-    @NotNull(groups = {addCarValidated.class}, message = "手机号码未输入!")
+    @Pattern(groups = {AddCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+    @NotNull(groups = {AddCarValidated.class}, message = "手机号码未输入!")
     @ApiModelProperty(value = "车主联系方式")
     private String contact;
 
-    @NotBlank(groups = {addCarValidated.class}, message = "车辆所属人不能为空!")
+    @NotBlank(groups = {AddCarValidated.class}, message = "车辆所属人不能为空!")
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @Range(groups = { addCarValidated.class,proprietorCarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
-    @NotNull(groups = {proprietorCarValidated.class}, message = "车辆类型未选择!")
+    @Range(groups = { AddCarValidated.class, ProprietorCarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
+    @NotNull(groups = {ProprietorCarValidated.class}, message = "车辆类型未选择!")
     @ApiModelProperty(value = "车辆类型： 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车")
     private Integer carType;
 
@@ -93,12 +93,12 @@ public class CarEntity extends BaseEntity {
     /**
      * [业主信息和车辆信息登记]业主登记时的车辆参数验证
      */
-    public interface proprietorCarValidated{}
+    public interface ProprietorCarValidated {}
 
     /**
      * 单独[业主]登记车辆前端参数验证接口
      */
-    public interface addCarValidated{}
+    public interface AddCarValidated {}
 
 
 

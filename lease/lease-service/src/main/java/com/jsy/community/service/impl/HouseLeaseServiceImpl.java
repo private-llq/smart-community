@@ -164,7 +164,8 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     @Override
     public Boolean updateHouseLease(HouseLeaseQO qo) {
         //排除id的情况下 验证其他属性字段是否为Null 如果为Null则不进入dao层
-        if(ValidatorUtils.fieldIsNull(qo, Arrays.asList("id", "uid"))){
+        List<String> list = Arrays.asList("id", "uid");
+        if(ValidatorUtils.fieldIsNull(qo, list)){
             throw new LeaseException("没有需要被更新的数据!");
         }
         //换算优势标签和家具id

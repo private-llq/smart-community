@@ -7,11 +7,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @return
- * @Description 业主通知消息是否已读
- * @Date 2020/12/4 10:06
- * @Param
- **/
+ *  业主通知消息是否已读
+ * @author YuLF
+ * @since  2021/2/20 15:41
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("社区通知消息实体类")

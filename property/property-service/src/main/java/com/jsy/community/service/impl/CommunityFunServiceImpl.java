@@ -85,6 +85,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Override
     public void deleteById(Long id) {
         communityFunMapper.deleteById(id);
+        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
     @Override

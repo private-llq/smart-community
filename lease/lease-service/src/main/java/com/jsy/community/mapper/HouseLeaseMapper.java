@@ -39,6 +39,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     /**
      * 根据 rowGuid 删除t_house_lease 表中的数据
      * @param id        数据唯一标识业务主键 暂定
+     * @param uid       用户id
      * @return          返回影响行数
      */
     int delHouseLeaseInfo(@Param("id") Long id, @Param("uid")String uid);
@@ -164,6 +165,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * 根据房屋id和uid在t_house_favorite查出该数据是否被收藏
      * @param houseId       房屋id
      * @param uid           uid
+     * @return              影响行数
      */
     @Select("select count(*) from t_house_favorite where favorite_id =#{houseId}  and uid = #{uid}")
     Integer isFavorite(@Param("houseId") Long houseId, @Param("uid") String uid);
