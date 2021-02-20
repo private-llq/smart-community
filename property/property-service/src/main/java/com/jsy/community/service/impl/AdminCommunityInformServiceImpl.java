@@ -10,7 +10,7 @@ import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticSearchImport;
+import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -55,7 +55,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         boolean b = communityInformMapper.insert(entity) > 0;
         //1表示推送目标为所有社区
         if(b && qo.getPushTarget() ==  1){
-            ElasticSearchImport.elasticOperation(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
+            ElasticSearchImportProvider.elasticOperation(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
         }
         return b;
     }
@@ -71,7 +71,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
     public Boolean deletePushInform(Long id) {
         //物理删除：删除该条社区消息之前 先删除 所有用户已读消息记录
         communityInformMapper.delUserReadInform(id);
-        ElasticSearchImport.elasticOperation(id, RecordFlag.INFORM, Operation.DELETE, null, null);
+        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.INFORM, Operation.DELETE, null, null);
         return communityInformMapper.deleteById(id) > 0;
     }
 

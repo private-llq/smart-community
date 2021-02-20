@@ -8,7 +8,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.qo.lease.HouseLeaseQO;
-import com.jsy.community.utils.es.ElasticSearchImport;
+import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +60,7 @@ public class LeaseController {
     @PostMapping()
     public String insertLeaseHouse(@RequestBody HouseLeaseQO qo){
         System.out.println("----------------房屋请求数据插入--------------------");
-        ElasticSearchImport.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.INSERT, qo.getHouseTitle(), qo.getHouseImage()[0]);
+        ElasticSearchImportProvider.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.INSERT, qo.getHouseTitle(), qo.getHouseImage()[0]);
         //在操作完成时调用
         return "true";
     }
@@ -69,7 +69,7 @@ public class LeaseController {
     @DeleteMapping()
     public String deleteLeaseHouse(@RequestParam Long id){
         System.out.println("----------------删除数据插入--------------------");
-        ElasticSearchImport.elasticOperation(id, RecordFlag.LEASE_HOUSE, Operation.DELETE, null, null);
+        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.LEASE_HOUSE, Operation.DELETE, null, null);
         //在操作完成时调用
         return "true";
     }
@@ -77,7 +77,7 @@ public class LeaseController {
     @PutMapping()
     public String deleteLeaseHouse(@RequestBody HouseLeaseQO qo){
         System.out.println("----------------更新数据插入--------------------");
-        ElasticSearchImport.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), qo.getHouseImage()[0]);
+        ElasticSearchImportProvider.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), qo.getHouseImage()[0]);
         //在操作完成时调用
         return "true";
     }
@@ -85,7 +85,7 @@ public class LeaseController {
     @GetMapping()
     public String getLeaseHouse(@RequestBody HouseLeaseQO qo){
         System.out.println("----------------更新数据插入--------------------");
-        ElasticSearchImport.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), qo.getHouseImage()[0]);
+        ElasticSearchImportProvider.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), qo.getHouseImage()[0]);
         //在操作完成时调用
         return "true";
     }

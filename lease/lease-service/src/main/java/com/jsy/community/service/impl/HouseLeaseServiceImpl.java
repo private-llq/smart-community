@@ -12,7 +12,7 @@ import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.ValidatorUtils;
-import com.jsy.community.utils.es.ElasticSearchImport;
+import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.lease.HouseLeaseVO;
@@ -70,7 +70,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         boolean b = houseLeaseMapper.insertHouseLease(qo) > 0;
         if(b){
             //导入es
-            ElasticSearchImport.elasticOperation(qo.getId(), RecordFlag.LEASE_HOUSE, Operation.INSERT, qo.getHouseTitle(), qo.getHouseImage()[0]);
+            ElasticSearchImportProvider.elasticOperation(qo.getId(), RecordFlag.LEASE_HOUSE, Operation.INSERT, qo.getHouseTitle(), qo.getHouseImage()[0]);
         }
         return b;
     }
@@ -87,7 +87,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //删除中间表 关于 这个用户关联的所有图片地址信息
         houseLeaseMapper.deleteImageById(id);
         //Es中删除
-        ElasticSearchImport.elasticOperation(id, RecordFlag.LEASE_HOUSE, Operation.DELETE, null, null);
+        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.LEASE_HOUSE, Operation.DELETE, null, null);
         //删除 t_house_lease 信息
         return houseLeaseMapper.delHouseLeaseInfo(id, userId) > 0;
     }
@@ -183,7 +183,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             houseLeaseMapper.saveHouseLeaseImageById(qo.getHouseImage(), qo.getHouseImageId(), qo.getId());
         }
         //Es更新数据
-        ElasticSearchImport.elasticOperation(qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), isEmpty(qo.getHouseImage()) ? null : qo.getHouseImage()[0]);
+        ElasticSearchImportProvider.elasticOperation(qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), isEmpty(qo.getHouseImage()) ? null : qo.getHouseImage()[0]);
         return houseLeaseMapper.updateHouseLease(qo);
     }
 

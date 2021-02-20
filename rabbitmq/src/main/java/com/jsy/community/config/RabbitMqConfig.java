@@ -1,13 +1,10 @@
 package com.jsy.community.config;
 
 import com.jsy.community.constant.BusinessConst;
-import com.jsy.community.controller.ReceiverController;
-import com.jsy.community.utils.SpringContextUtils;
+import com.jsy.community.controller.ElasticsearchImportConsumer;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +34,7 @@ public class RabbitMqConfig {
     public static final String EXCHANGE_TOPICS_WECHAT = "exchange_topics_wechat";
     public static final String EXCHANGE_DELAY_WECHAT = "exchange_delay_wechat";
 
+    //@author YuLF start
     /**
      * app 主页 全文搜索 的 队列与交换机
      * @author YuLF
@@ -62,19 +60,24 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(queue).to(exchange).with(BusinessConst.APP_SEARCH_ROUTE_KEY);
     }
 
-    /*@Bean
-    public SimpleMessageListenerContainer simpleMessageListenerContainer(ConnectionFactory connectionFactory){
-        SimpleMessageListenerContainer simpleMessageListenerContainer  = new SimpleMessageListenerContainer(connectionFactory);
-        //指定监听队列[字符串数组]
+    /**
+     *  监听队列(多个队列)、自动启动、自动声明功能
+     * 设置事务特性、事务管理器、事务属性、事务容量(并发)、是否开启事务、回滚消息等
+     * 设置消费者数量、最小最大数量、批量消费
+     * 设置消息确认和自动确认模式、是否重回队列、异常捕获
+     */
+    @Bean
+    public SimpleMessageListenerContainer simpleMessageListenerContainer(ConnectionFactory connectionFactory, ElasticsearchImportConsumer elasticsearchImportConsumer){
+        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer(connectionFactory);
+        //监听全文搜索队列
         simpleMessageListenerContainer.setQueueNames(BusinessConst.APP_SEARCH_QUEUE_NAME);
+        //手动签收
         simpleMessageListenerContainer.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-        //指定监听方法
-        MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(SpringContextUtils.getBean("receiverController"), new Jackson2JsonMessageConverter());
-        messageListenerAdapter.setDefaultListenerMethod("receiverMessage");
-        simpleMessageListenerContainer.setMessageListener(messageListenerAdapter);
+        //自定义消费者
+        simpleMessageListenerContainer.setMessageListener(elasticsearchImportConsumer);
+        simpleMessageListenerContainer.setDefaultRequeueRejected(false);
         return simpleMessageListenerContainer;
-    }*/
-
+    }
     //@author YuLF end
 
 

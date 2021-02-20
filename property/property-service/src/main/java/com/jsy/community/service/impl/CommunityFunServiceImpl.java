@@ -10,7 +10,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.mapper.CommunityFunMapper;
 import com.jsy.community.qo.CommunityFunQO;
-import com.jsy.community.utils.es.ElasticSearchImport;
+import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -62,7 +62,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setStatus(2);
         entity.setStartTime(LocalDateTime.now());
         communityFunMapper.updateById(entity);
-        ElasticSearchImport.elasticOperation(id, RecordFlag.FUN, Operation.DELETE, null, null);
+        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setSmallImageUrl(communityFunEntity.getSmallImageUrl());
         entity.setTitleName(communityFunEntity.getTitleName());
         communityFunMapper.updateById(entity);
-        ElasticSearchImport.elasticOperation(communityFunEntity.getId(), RecordFlag.FUN, Operation.UPDATE, communityFunEntity.getTitleName(), entity.getSmallImageUrl());
+        ElasticSearchImportProvider.elasticOperation(communityFunEntity.getId(), RecordFlag.FUN, Operation.UPDATE, communityFunEntity.getTitleName(), entity.getSmallImageUrl());
     }
 
     @Override
@@ -101,7 +101,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setStatus(1);
         entity.setStartTime(LocalDateTime.now());
         communityFunMapper.updateById(entity);
-        ElasticSearchImport.elasticOperation(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
+        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
     }
 
 }

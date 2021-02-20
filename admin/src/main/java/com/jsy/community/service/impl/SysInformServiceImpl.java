@@ -7,7 +7,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.service.ISysInformService;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticSearchImport;
+import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 		sysInformEntity.setId(SnowFlake.nextId());
 		boolean b = sysInformMapper.insert(sysInformEntity) > 0;
 		if(b){
-			ElasticSearchImport.elasticOperation(qo.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
+			ElasticSearchImportProvider.elasticOperation(qo.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
 		}
 		return b;
 	}
@@ -46,7 +46,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 	@Override
 	public boolean delete(Long informId) {
-		ElasticSearchImport.elasticOperation(informId, RecordFlag.INFORM, Operation.DELETE, null, null);
+		ElasticSearchImportProvider.elasticOperation(informId, RecordFlag.INFORM, Operation.DELETE, null, null);
 		return sysInformMapper.deleteById(informId) > 0;
 	}
 
@@ -58,7 +58,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 	@Override
 	public boolean deleteBatchByIds(List<Long> informIds) {
-		informIds.forEach( i -> ElasticSearchImport.elasticOperation(i, RecordFlag.INFORM, Operation.DELETE, null, null));
+		informIds.forEach( i -> ElasticSearchImportProvider.elasticOperation(i, RecordFlag.INFORM, Operation.DELETE, null, null));
 		return sysInformMapper.deleteBatchIds(informIds) > 0 ;
 	}
 }
