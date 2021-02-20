@@ -320,11 +320,12 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
     @Override
     @Transactional
     public void addRemark(RemarkQO remarkQO) {
-        PayOrderEntity payOrderEntity = payOrderMapper.selectById(remarkQO.getId());
-        payOrderEntity.setBillClassification(remarkQO.getBillClassification());
-        payOrderEntity.setTally(remarkQO.getTally());
-        payOrderEntity.setRemark(remarkQO.getRemark());
-        payOrderEntity.setRemarkImg(remarkQO.getRemarkImg());
-        payOrderMapper.updateById(payOrderEntity);
+        //PayOrderEntity payOrderEntity = payOrderMapper.selectById(remarkQO.getId());
+        livingPaymentMapper.addRemark(remarkQO);
+//        payOrderEntity.setBillClassification(remarkQO.getBillClassification());
+//        payOrderEntity.setTally(remarkQO.getTally());
+//        payOrderEntity.setRemark(remarkQO.getRemark());
+//        payOrderEntity.setRemarkImg(remarkQO.getRemarkImg());
+//        payOrderMapper.updateById(payOrderEntity);
     }
 }
