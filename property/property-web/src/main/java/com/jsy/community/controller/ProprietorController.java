@@ -98,7 +98,7 @@ public class ProprietorController {
         MultiValueMap<String, String> multiValueMap = setHeader(userEntityList.get(0).getNickname() + "家属成员登记表.xlsx");
         try {
             //存储 需要携带的信息
-            Map<String, Object> res = new HashMap<>();
+            Map<String, Object> res = new HashMap<>(3);
             //拿到当前社区 已登记的房屋信息List 如：1栋1单元1楼1-1
             List<HouseVo> houseVos = iProprietorService.queryHouseByCommunityId(communityId);
             //取出所有的小区房屋地址
@@ -238,9 +238,9 @@ public class ProprietorController {
     @DeleteMapping()
     @ApiOperation("删除业主信息")
     public CommonResult<Boolean> del(@RequestParam Long uid){
-        //从JWT获取业主ID
-        //Long uid = 12L;
-        //iProprietorService.del(uid);
+        /*
+          iProprietorService.del(uid);
+         */
         return CommonResult.ok();
     }
 

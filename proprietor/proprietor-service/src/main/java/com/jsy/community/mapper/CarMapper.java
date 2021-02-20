@@ -22,7 +22,11 @@ public interface CarMapper extends BaseMapper<CarEntity> {
     void addProprietorCarForList(List<CarEntity> carEntityList);
 
 
-
+    /**
+     * 通过用户id查询用户车辆
+     * @param userId        用户id
+     * @return              返回车辆信息列表
+     */
     @Select("select id,car_plate,car_type,car_image_url from t_car where uid = #{userId} and deleted = 0")
     List<CarEntity> queryUserCarById(@Param("userId") String userId);
 

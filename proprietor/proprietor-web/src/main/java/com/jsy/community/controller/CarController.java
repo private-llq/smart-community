@@ -121,7 +121,7 @@ public class CarController {
 			return CommonResult.error(JSYError.REQUEST_PARAM);
 		}
 		//条件参数列表 key=列名  增加删除车辆记录 where条件只改动这里
-		Map<String, Object> params = new HashMap<>();
+		Map<String, Object> params = new HashMap<>(2);
 		params.put("uid", UserUtils.getUserId());
 		params.put("id", id);
 		Integer res = carService.deleteProprietorCar(params);
@@ -152,7 +152,8 @@ public class CarController {
 	@ApiImplicitParam(name = "carImageForBatch", value = "所有车辆图片文件")
 	@PostMapping(value = "carImageBatchUpload")
 	public CommonResult<String[]> carImageUpload(MultipartFile[] carImages, HttpServletRequest request)  {
-		if (isMobileClient(request.getHeader("user-agent"))) {
+		String requestHeader = "user-agent";
+		if (isMobileClient(request.getHeader(requestHeader))) {
 			//如果是PC端访问上传接口 则需要验证文件后缀名
 			for( MultipartFile multipartFile : carImages ){
 				PicUtil.imageQualified(multipartFile);

@@ -35,13 +35,13 @@ public class LeaseConstController {
 
     @ApiOperation("常量修改接口")
     @PutMapping()
-    public CommonResult<Boolean> update(@RequestBody HouseLeaseConstQO houseLeaseConstQO){
+    public CommonResult<Boolean> update(@RequestBody HouseLeaseConstQO qo){
         return null;
     }
 
     @ApiOperation("常量新增接口")
     @PostMapping()
-    public CommonResult<Boolean> save(@RequestBody HouseLeaseConstQO houseLeaseConstQO){
+    public CommonResult<Boolean> save(@RequestBody HouseLeaseConstQO qo){
         return null;
     }
 }

@@ -30,6 +30,7 @@ public interface AdminCommunityInformMapper extends BaseMapper<PushInformEntity>
      * 根据推送帐号id 和 uid 查询用户未读的推送消息id
      * @param acctId    推送号id
      * @param uid       用户id
+     * @return          返回推送消息 id集合
      */
     List<Long> selectUnreadInformId(@Param("acctId") Long acctId, @Param("uid") String uid);
 
@@ -44,6 +45,7 @@ public interface AdminCommunityInformMapper extends BaseMapper<PushInformEntity>
     /**
      * 通过推送号ID 清理在t_acct_push_del 表中 用户手动在消息列表 左滑动删除的推送号记录
      * 主要是用于 在新增推送消息时，重新给用户推送未读信息，在t_acct_push_del存在的推送号账号，拉取用户消息列表时，不会被拉取
+     * @param acctId    推送账号id
      */
     @Delete("delete from t_acct_push_del where acct_id = #{acctId}")
     void clearPushDel(@Param("acctId") Long acctId);

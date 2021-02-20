@@ -126,16 +126,16 @@ public class ProprietorExcelCommander {
         //设置表头名称
         cell.setCellValue(excelTitle);
         //创建一个单元格样式
-        XSSFCellStyle workBook_cellStyle = (XSSFCellStyle) workbook.createCellStyle();
+        XSSFCellStyle workBookCellStyle = (XSSFCellStyle) workbook.createCellStyle();
         //创建单元格字体
         Font workBookFont = workbook.createFont();
         //设置表头字体样式
         workBookFont.setFontHeightInPoints((short) fontSize);
         workBookFont.setFontName(font);
-        workBook_cellStyle.setFont(workBookFont);
+        workBookCellStyle.setFont(workBookFont);
         //设置居中显示
-        workBook_cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        cell.setCellStyle(workBook_cellStyle);
+        workBookCellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cell.setCellStyle(workBookCellStyle);
         //合并单元格
         CellRangeAddress region = new CellRangeAddress(0, 0, 0, mergeCellLength);
         sheet.addMergedRegion(region);
@@ -172,8 +172,9 @@ public class ProprietorExcelCommander {
         fieldCellStyle.setDataFormat(format.getFormat("@"));
         Sheet sheet = workbook.getSheet(sheetName);
         int row;
+        int cellStart = 2;
         //设置单元格为文本格式 避免某些转换 前两行为 标题行 和列字段行 所以从2开始
-        for(row = 2; row <= endRow; row++){
+        for(row = cellStart; row <= endRow; row++){
             for(String cellIndex : setCellField){
                 sheet.createRow(row).createCell(Integer.parseInt(cellIndex)).setCellStyle(fieldCellStyle);
             }
