@@ -2,10 +2,13 @@ package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.api.ICommunityInformService;
+import com.jsy.community.constant.Const;
 import com.jsy.community.utils.WeCharUtil;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +28,9 @@ import java.util.Map;
 @RequestMapping("/WeChat")
 @ApiJSYController
 public class WeChatController {
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICommunityInformService communityInformService;
 
     @ApiOperation("获取秘钥")
     @PostMapping("/getParameter")

@@ -21,4 +21,6 @@ public class WeChatPayQO {
     private String openId;
     @ApiModelProperty("调起支付的ip")
     private String payerClientIp;
+    @ApiModelProperty("iOS, Android, Wap ")
+    private String type;
 }

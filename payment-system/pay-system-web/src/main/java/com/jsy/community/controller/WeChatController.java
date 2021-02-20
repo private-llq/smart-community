@@ -111,6 +111,62 @@ public class WeChatController {
         return CommonResult.ok(object);
     }
 
+    @PostMapping("/wxPayH5")
+    @Login
+    public CommonResult wxPayH5(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+        //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
+        Map hashMap = new LinkedHashMap();
+        hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
+        hashMap.put("currency","CNY");
+
+        Map hashMap1 = new LinkedHashMap();
+        hashMap1.put("payer_client_ip",weChatPayQO.getPayerClientIp());
+        LinkedHashMap hashMap2 = new LinkedHashMap();
+        hashMap2.put("type",weChatPayQO.getType());
+        hashMap1.put("h5_info",hashMap2);
+
+
+        Map<Object, Object> map = new LinkedHashMap<>();
+
+        map.put("appid", WechatConfig.APPID);
+        map.put("mchid",WechatConfig.MCH_ID);
+        map.put("description",weChatPayQO.getDescription());
+        map.put("out_trade_no", OrderNoUtil.getOrder());
+        map.put("notify_url","http://huyf.free.vipnps.vip/api/v1/payment/callback");
+        map.put("amount",hashMap);
+        map.put("scene_info",hashMap1);
+
+
+        String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
+
+        WeChatOrderEntity msg = new WeChatOrderEntity();
+        msg.setId((String) map.get("out_trade_no"));
+        msg.setUid(UserUtils.getUserId());
+        msg.setOpenId(weChatPayQO.getOpenId());
+        msg.setDescription(weChatPayQO.getDescription());
+        msg.setAmount(weChatPayQO.getAmount());
+        msg.setOrderStatus(1);
+        msg.setArriveStatus(1);
+        msg.setCreateTime(LocalDateTime.now());
+
+
+        //mq异步保存账单到数据库
+        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
+        //半个小时如果还没支付就自动删除数据库账单
+        rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                    message.getMessageProperties().setHeader("x-delay",60000*30);
+                return message;
+            }
+        });
+        //第一步获取prepay_id
+        String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/h5", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
+        //第二步获取调起支付的参数
+        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
+        return CommonResult.ok(object);
+    }
+
     /**
      * @Description: 支付成功回调地址
      * @author: Hu

@@ -3,10 +3,7 @@ package com.jsy.community.mapper;
 import com.jsy.community.entity.PayGroupEntity;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
 import com.jsy.community.qo.proprietor.RemarkQO;
-import com.jsy.community.vo.DefaultHouseOwnerVO;
-import com.jsy.community.vo.GroupVO;
-import com.jsy.community.vo.PaymentDetailsVO;
-import com.jsy.community.vo.PaymentRecordsVO;
+import com.jsy.community.vo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -80,4 +77,13 @@ public interface LivingPaymentMapper {
      * @return:
      */
     void addRemark(RemarkQO remarkQO);
+
+    /**
+     * @Description: 查询一条账单详情
+     * @author: Hu
+     * @since: 2021/2/20 16:04
+     * @Param:
+     * @return:
+     */
+    TheBillingDetailsVO selectOrderId(Long id);
 }

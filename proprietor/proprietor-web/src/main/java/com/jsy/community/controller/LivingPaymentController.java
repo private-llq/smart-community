@@ -192,6 +192,18 @@ public class LivingPaymentController {
         PaymentRecordsMapVO map = livingPaymentService.selectOrder(paymentRecordsQO);
         return CommonResult.ok(map);
     }
+    /**
+     * 通过组户号查询订单详情
+     * @param
+     * @return
+     */
+    @ApiOperation("查询一条账单详情")
+    @GetMapping("/selectOrderId")
+    @Login
+    public CommonResult selectOrderId(@RequestParam("id") Long id){
+        TheBillingDetailsVO theBillingDetailsVO = livingPaymentService.selectOrderId(id);
+        return CommonResult.ok(theBillingDetailsVO);
+    }
 
     /**
      * 默认查询所有缴费信息

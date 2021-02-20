@@ -105,6 +105,17 @@
         </set>
         where id=#{id}
     </update>
+    <select id="selectOrderId" resultType="com.jsy.community.vo.TheBillingDetailsVO">
+        SELECT
+        t.id as id,t.pay_type as payType,tp.name as typeName,
+        tp.icon as icon,tp.medium_icon as mediumIcon,
+        tp.large_size_icon as largeSizeIcon,t.unit as unitName,
+        t.payment_amount as paySum,t.status as status,t.family_id as doorNo,
+        t.order_num as orderNum,t.bill_classification as billClassification,
+        t.tally as tally,t.remark as remark,t.remark_img as remarkImg
+        FROM t_pay_order t JOIN t_pay_type tp on t.payment_type=tp.id
+        where t.id=#{id}
+    </select>
 
     <resultMap id="GroupVOMap" type="com.jsy.community.vo.GroupVO">
         <result property="typeName" column="typeName"/>

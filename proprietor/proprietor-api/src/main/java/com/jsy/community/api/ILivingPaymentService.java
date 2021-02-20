@@ -77,9 +77,18 @@ public interface ILivingPaymentService {
     PaymentRecordsMapVO selectGroupAll(String userId);
 
     /**
-     * 查询一条订单详情
+     * 缴费成功后返回的数据，暂时没用
      * @param id
      * @return
      */
     PaymentDetailsVO selectPaymentDetailsVO(Long id, String userId);
+
+    /**
+     * @Description: 查询一条订单详情
+     * @author: Hu
+     * @since: 2021/2/20 16:02
+     * @Param:
+     * @return:
+     */
+    TheBillingDetailsVO selectOrderId(Long id);
 }

@@ -234,6 +234,11 @@ public class LivingPaymentServiceImpl implements ILivingPaymentService {
         return list;
     }
 
+    @Override
+    public TheBillingDetailsVO selectOrderId(Long id) {
+        return livingPaymentMapper.selectOrderId(id);
+    }
+
     /**
      * @Description: 查询一条缴费详情
      * @author: Hu
