@@ -87,6 +87,24 @@
     <select id="findGroup" resultType="com.jsy.community.entity.PayGroupEntity">
         select id,uid,name,type from t_pay_group where deleted=0 and uid=#{userId}
     </select>
+    <update id="addRemark">
+        update t_pay_order
+        <set>
+        <if test="tally!=null and tally!=''">
+            tally=#{tally},
+        </if>
+        <if test="remark!=null and remark!=''">
+            remark=#{remark},
+        </if>
+        <if test="remarkImg!=null and remarkImg!=''">
+            remark_img=#{remarkImg},
+        </if>
+        <if test="billClassification!=null and billClassification!=''">
+            bill_classification=#{billClassification},
+        </if>
+        </set>
+        where id=#{id}
+    </update>
 
     <resultMap id="GroupVOMap" type="com.jsy.community.vo.GroupVO">
         <result property="typeName" column="typeName"/>

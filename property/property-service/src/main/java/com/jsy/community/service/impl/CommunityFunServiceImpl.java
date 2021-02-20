@@ -88,21 +88,21 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
-    @Override
-    public CommunityFunEntity selectOne(Long id) {
-        return communityFunMapper.selectById(id);
-    }
+  @Override
+  public CommunityFunEntity selectOne(Long id) {
+    return communityFunMapper.selectById(id);
+  }
 
-    @Override
-    public void popUpOnline(Long id) {
-        CommunityFunEntity entity = communityFunMapper.selectById(id);
-        if (entity.getStatus()==1){
-            throw new PropertyException("该趣事已上线");
-        }
-        entity.setStatus(1);
-        entity.setStartTime(LocalDateTime.now());
-        communityFunMapper.updateById(entity);
-        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
+  @Override
+  public void popUpOnline(Long id) {
+    CommunityFunEntity entity = communityFunMapper.selectById(id);
+    if (entity.getStatus()==1){
+      throw new PropertyException("该趣事已上线");
     }
+    entity.setStatus(1);
+    entity.setStartTime(LocalDateTime.now());
+    communityFunMapper.updateById(entity);
+    ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
+  }
 
 }

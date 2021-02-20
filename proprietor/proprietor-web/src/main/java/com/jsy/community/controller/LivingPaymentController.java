@@ -82,7 +82,7 @@ public class LivingPaymentController {
 
 
     @ApiOperation("通过订单id查询缴费凭证")
-    @PostMapping("/getOrderID")
+    @GetMapping("/getOrderID")
     public CommonResult getOrderID(@ApiParam("订单id") @RequestParam Long id){
         PayVoucherVO payVoucherVO=livingPaymentService.getOrderID(id);
         return CommonResult.ok(payVoucherVO);

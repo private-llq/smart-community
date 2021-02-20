@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.jsy.community.entity.PayGroupEntity;
 import com.jsy.community.qo.proprietor.PaymentRecordsQO;
+import com.jsy.community.qo.proprietor.RemarkQO;
 import com.jsy.community.vo.DefaultHouseOwnerVO;
 import com.jsy.community.vo.GroupVO;
 import com.jsy.community.vo.PaymentDetailsVO;
@@ -70,4 +71,13 @@ public interface LivingPaymentMapper {
      * @return:
      */
     List<PayGroupEntity> findGroup(String userId);
+
+    /**
+     * @Description: 添加订单备注
+     * @author: Hu
+     * @since: 2021/2/20 14:21
+     * @Param:
+     * @return:
+     */
+    void addRemark(RemarkQO remarkQO);
 }
