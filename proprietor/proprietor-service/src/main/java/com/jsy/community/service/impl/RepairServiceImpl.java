@@ -75,14 +75,45 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	}
 	
 	@Override
-	public List<RepairEntity> getRepair(String id) {
+	public List<RepairEntity> getRepair(String id, Integer status) {
+		if (status == null) {
+			QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
+			wrapper.eq("user_id", id).orderByAsc("status");
+			List<RepairEntity> list = repairMapper.selectList(wrapper);
+			for (RepairEntity repairEntity : list) {
+				Long type = repairEntity.getType();
+				CommonConst commonConst = commonConstMapper.selectById(type);
+				repairEntity.setTypeName(commonConst.getConstName());
+				
+				if (repairEntity.getStatus() == 0) {
+					repairEntity.setStatusString("待处理");
+				}
+				if (repairEntity.getStatus() == 1) {
+					repairEntity.setStatusString("处理中");
+				}
+				if (repairEntity.getStatus() == 2) {
+					repairEntity.setStatusString("已处理");
+				}
+			}
+			return list;
+		}
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("user_id", id).orderByAsc("status");
+		wrapper.eq("user_id", id).eq("status", status);
 		List<RepairEntity> list = repairMapper.selectList(wrapper);
 		for (RepairEntity repairEntity : list) {
 			Long type = repairEntity.getType();
 			CommonConst commonConst = commonConstMapper.selectById(type);
 			repairEntity.setTypeName(commonConst.getConstName());
+			
+			if (repairEntity.getStatus() == 0) {
+				repairEntity.setStatusString("待处理");
+			}
+			if (repairEntity.getStatus() == 1) {
+				repairEntity.setStatusString("处理中");
+			}
+			if (repairEntity.getStatus() == 2) {
+				repairEntity.setStatusString("已处理");
+			}
 		}
 		return list;
 	}
@@ -93,7 +124,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<RepairEntity> condition = new QueryWrapper<>();
 		condition.eq("user_id", userId).eq("id", id);
 		RepairEntity entity = repairMapper.selectOne(condition);
-		if (entity==null) {
+		if (entity == null) {
 			throw new ProprietorException("该订单不存在");
 		}
 		if (entity.getStatus() != 0) { //处理中  不能取消了
@@ -122,14 +153,14 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Override
 	public void appraiseRepair(RepairCommentQO repairCommentQO) {
 		QueryWrapper<RepairEntity> entityQueryWrapper = new QueryWrapper<>();
-		entityQueryWrapper.eq("user_id", repairCommentQO.getUid()).eq("id",repairCommentQO.getId());
+		entityQueryWrapper.eq("user_id", repairCommentQO.getUid()).eq("id", repairCommentQO.getId());
 		RepairEntity repairEntity = repairMapper.selectOne(entityQueryWrapper);
-		if (repairEntity==null) {
+		if (repairEntity == null) {
 			throw new ProprietorException("您好,您选择的订单并不存在,请联系管理员");
 		}
 		Integer flag = repairEntity.getStatus();
-		if (flag!=null && flag!=2) {
-			log.debug("预评价的订单状态类型为："+flag);
+		if (flag != null && flag != 2) {
+			log.debug("预评价的订单状态类型为：" + flag);
 			throw new ProprietorException("您好,该订单尚未处理完成");
 		}
 		
@@ -149,21 +180,21 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", id).eq("user_id", userId);
 		RepairEntity repairEntity = repairMapper.selectOne(wrapper);
-		if (repairEntity==null) {
+		if (repairEntity == null) {
 			throw new ProprietorException("该报修订单不存在");
 		}
 		
 		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("repair_id", id);
 		RepairOrderEntity repairOrderEntity = repairOrderMapper.selectOne(queryWrapper);
-		if (repairOrderEntity==null) {
+		if (repairOrderEntity == null) {
 			throw new ProprietorException("您好，你查询的订单有误，请联系管理员");
 		}
 		
 		RepairVO repairVO = new RepairVO();
 		
 		QueryWrapper<CommonConst> constQueryWrapper = new QueryWrapper<>();
-		constQueryWrapper.eq("id",repairEntity.getType());
+		constQueryWrapper.eq("id", repairEntity.getType());
 		CommonConst commonConst = commonConstMapper.selectOne(constQueryWrapper);
 		repairEntity.setTypeName(commonConst.getConstName());
 		BeanUtils.copyProperties(repairEntity, repairVO); // 封装报修信息
@@ -184,7 +215,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Override
 	public List<CommonConst> getRepairType() {
 		QueryWrapper<CommonConst> wrapper = new QueryWrapper<>();
-		wrapper.eq("type_id",1).select("const_name","id");
+		wrapper.eq("type_id", 1).select("const_name", "id");
 		return commonConstMapper.selectList(wrapper);
 	}
 	
