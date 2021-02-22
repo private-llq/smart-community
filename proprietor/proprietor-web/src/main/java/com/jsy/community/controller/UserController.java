@@ -56,21 +56,6 @@ public class UserController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserUroraTagsService userUroraTagsService;
 
-
-    @PostMapping("test")
-//    @Login
-    @Auth
-    public String test(@RequestBody BaseQO<UserEntity> qo) {
-        ValidatorUtils.validateEntity(qo);
-//        UserInfoVo userInfo = UserUtils.getUserInfo();
-        UserUtils.getUserId();
-        System.out.println("111111111111....");
-        if(true){
-           throw new DuplicateKeyException("测试数据重复异常");
-        }
-        return "success...";
-    }
-
     /**
     * @Description: 业主或亲属 获取/刷新 门禁权限
      * @Param: [communityId]

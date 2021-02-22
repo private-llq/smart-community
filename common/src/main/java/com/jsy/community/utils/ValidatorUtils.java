@@ -46,7 +46,8 @@ public class ValidatorUtils {
 
     /**
      * 判断字符串是否是一个正整数
-     *
+     * @author YuLF
+     * @since 2020/12/11 15:00
      * @param param 字符串
      * @return 返回这个字符串是否是正整数的布尔值
      */
@@ -65,7 +66,8 @@ public class ValidatorUtils {
 
     /**
      * 前端分页查询参数[page,pageSize]边界效验，非空效验 如果不合法 则设置默认的分页参数值
-     *
+     * @author YuLF
+     * @since 2020/12/11 14:55
      * @param baseQo 控制层接收参数的实体类
      */
     public static void validatePageParam(BaseQO<?> baseQo) {

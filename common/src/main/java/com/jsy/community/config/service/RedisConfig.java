@@ -71,6 +71,8 @@ public class RedisConfig {
 
 
 	/**
+	 * @author YuLF
+	 * @since  2021/1/21 11:07
 	 * 此配置用于@Cacheable注解
 	 * RedisSerializer
 	 * 自定义序列化类参照：https://docs.spring.io/spring-data/redis/docs/current/api/

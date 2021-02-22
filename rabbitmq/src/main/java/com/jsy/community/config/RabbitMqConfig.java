@@ -41,7 +41,7 @@ public class RabbitMqConfig {
      * @since  2021/2/4 10:08
      */
     @Bean
-    Queue queue() {
+    Queue appSearchQueue() {
         return new Queue(BusinessConst.APP_SEARCH_QUEUE_NAME, true);
     }
 
@@ -49,15 +49,15 @@ public class RabbitMqConfig {
 
 
     @Bean
-    TopicExchange exchange() {
+    TopicExchange appSearchTopicExchange() {
         Exchange build = ExchangeBuilder.topicExchange(BusinessConst.APP_SEARCH_EXCHANGE_NAME).durable(true).build();
         return (TopicExchange) build;
     }
 
 
     @Bean
-    Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(BusinessConst.APP_SEARCH_ROUTE_KEY);
+    Binding appSearchBinding(Queue appSearchQueue, TopicExchange appSearchTopicExchange) {
+        return BindingBuilder.bind(appSearchQueue).to(appSearchTopicExchange).with(BusinessConst.APP_SEARCH_ROUTE_KEY);
     }
 
     /**

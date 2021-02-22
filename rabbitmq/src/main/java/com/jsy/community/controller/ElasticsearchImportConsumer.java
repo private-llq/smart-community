@@ -41,7 +41,7 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
     public void onMessage(Message message, Channel channel) throws Exception {
         byte[] body = message.getBody();
         FullTextSearchEntity entity = serializationByteToObject(body, FullTextSearchEntity.class);
-        System.out.println("自定义监听【ES全文搜索数据】MqTag标签："+ message.getMessageProperties().getDeliveryTag() + ":" + entity);
+        log.info("自定义监听【ES全文搜索数据】MqTag标签："+ message.getMessageProperties().getDeliveryTag() + ":" + entity);
         boolean isConsumerSuccess = false;
         if(Objects.isNull(entity) ){
             return;
