@@ -52,9 +52,9 @@ public class RepairController {
 	
 	@ApiOperation("房屋报修查询")
 	@GetMapping("/getRepair")
-	public CommonResult getRepair() {
+	public CommonResult getRepair(@ApiParam(value ="订单状态") @RequestParam(required = false) Integer status) {
 		String uid = UserUtils.getUserId();
-		List<RepairEntity> list = repairService.getRepair(uid);
+		List<RepairEntity> list = repairService.getRepair(uid,status);
 		return CommonResult.ok(list);
 	}
 	

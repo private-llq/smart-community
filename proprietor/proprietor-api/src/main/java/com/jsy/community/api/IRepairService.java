@@ -43,7 +43,7 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/8 12:30
 	 * @Param [id]
 	 **/
-	List<RepairEntity> getRepair(String id);
+	List<RepairEntity> getRepair(String id,Integer status);
 	
 	/**
 	 * @return void

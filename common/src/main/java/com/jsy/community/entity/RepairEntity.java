@@ -45,12 +45,18 @@ public class RepairEntity extends BaseEntity {
 
     @ApiModelProperty(value = "报修状态 0 待处理 1 处理中 2 已处理")
     private Integer status;
+    
+    @ApiModelProperty(value = "保修状态字符串形式")
+    @TableField(exist = false)
+    private String statusString;
 
     @ApiModelProperty(value = "报修类别id")
     @NotNull(groups = {addRepairValidate.class},message = "报修类别不能为空")
     private Long type;
     
+    @ApiModelProperty(value = "报修类别字符串形式")
     @TableField(exist = false)
+    @NotNull(groups = {addRepairValidate.class},message = "报修类别不能为空")
     private String typeName;
 
     @ApiModelProperty(value = "报修人姓名")
