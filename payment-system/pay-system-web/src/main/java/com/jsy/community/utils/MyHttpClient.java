@@ -23,7 +23,6 @@ import java.security.cert.CertificateException;
  * @author: Hu
  * @create: 2021-01-27 11:24
  **/
-
 public class MyHttpClient {
     private static CloseableHttpClient httpClient;
     public static CloseableHttpClient createHttpClient(){

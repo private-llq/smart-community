@@ -22,6 +22,19 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
 
     @Autowired
     private ComplainMapper complainMapper;
+
+    /**
+     * @Description: 用户投诉接口
+     * @author: Hu
+     * @since: 2021/2/23 17:35
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void addComplain(ComplainEntity complainEntity) {
+        complainMapper.insert(complainEntity);
+    }
+
     /**
      * @Description: 查询用户所有的投诉建议
      * @author: Hu

@@ -5,12 +5,19 @@ import java.util.Date;
 
 /**
  * @program: pay
- * @description:
+ * @description: 生成唯一订单号
  * @author: Hu
  * @create: 2021-01-22 10:19
  **/
 public class OrderNoUtil {
 
+    /**
+     * @Description: 支付下单订单号
+     * @author: Hu
+     * @since: 2021/2/23 17:52
+     * @Param:
+     * @return:
+     */
     public static String getOrder() {
         SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
@@ -18,6 +25,13 @@ public class OrderNoUtil {
         int s2=(int) (Math.random() * 9);
         return s + s1 + s2;
     }
+    /**
+     * @Description: 企业付款订单号
+     * @author: Hu
+     * @since: 2021/2/23 17:52
+     * @Param:
+     * @return:
+     */
     public static String txOrder() {
         SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
