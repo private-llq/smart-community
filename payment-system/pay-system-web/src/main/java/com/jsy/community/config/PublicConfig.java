@@ -15,8 +15,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,24 +59,28 @@ public class PublicConfig {
         CloseableHttpClient client = HttpClients.createDefault();
         //创建post方式请求对象
         HttpPost httpPost = new HttpPost(url_prex + url);
-        //装填参数
-        StringEntity s = new StringEntity(jsonStr, charset);
-        s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
-                "application/json"));
+        //装填参数  charset
+        StringEntity s = new StringEntity(jsonStr);
+        s.setContentType("application/json");
+//        s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
+//                "application/json"));
         //设置参数到请求对象中
         httpPost.setEntity(s);
-        String post = getToken("POST", HttpUrl.parse(url_prex + url), mercId, serial_no, privateKeyFilePath, jsonStr);
+       // String post = getToken("POST", HttpUrl.parse(url_prex + url), mercId, serial_no, privateKeyFilePath, jsonStr);
+        //System.out.println(post);
         //设置header信息
         //指定报文头【Content-type】、【User-Agent】
         httpPost.setHeader("Content-type", "application/json");
-        httpPost.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+        //httpPost.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
         httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Authorization",
-                "WECHATPAY2-SHA256-RSA2048 " + post);
+//        httpPost.setHeader("Authorization",
+//                "WECHATPAY2-SHA256-RSA2048 " + post);
         //执行请求操作，并拿到结果（同步阻塞）
-        CloseableHttpResponse response = client.execute(httpPost);
+        CloseableHttpResponse response = MyHttpClient.createHttpClient().execute(httpPost);
+
         //获取结果实体
         HttpEntity entity = response.getEntity();
+
         if (entity != null) {
             //按指定编码转换结果实体为String类型
             body = EntityUtils.toString(entity, charset);
@@ -113,6 +115,7 @@ public class PublicConfig {
      */
     public static JSONObject WxTuneUp(String prepayId, String appId, String privateKeyFilePath) throws Exception {
         String time = System.currentTimeMillis() / 1000 + "";
+        System.out.println(time);
         String nonceStr = UUID.randomUUID().toString().replace("-", "");
 //        String packageStr = "prepay_id=" + prepayId;
         ArrayList<String> list = new ArrayList<>();
@@ -122,15 +125,17 @@ public class PublicConfig {
         list.add(prepayId);
         //加载签名
         String packageSign = sign(buildSignMessage(list).getBytes(), privateKeyFilePath);
+        System.out.println(buildSignMessage(list).getBytes().toString());
+
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("appId", appId);
-        jsonObject.put("partnerId", WechatConfig.MCH_ID);
-        jsonObject.put("prepayId", prepayId);
+        jsonObject.put("appid", appId);
+        jsonObject.put("partnerid", WechatConfig.MCH_ID);
+        jsonObject.put("prepayid", prepayId);
         jsonObject.put("package", "Sign=WXPay");
         //jsonObject.put("packages", packageStr);
-        jsonObject.put("nonceStr", nonceStr);
-        jsonObject.put("timeStamp", time);
-        jsonObject.put("signType", "RSA");
+        jsonObject.put("noncestr", nonceStr);
+        jsonObject.put("timestamp", time);
+        //jsonObject.put("signType", "RSA");
         jsonObject.put("sign", packageSign);
         return jsonObject;
     }
@@ -183,9 +188,9 @@ public class PublicConfig {
         String message = buildMessage(method, url, timestamp, nonceStr, body);
         String signature = sign(message.getBytes("UTF-8"), privateKeyFilePath);
         return "mchid=\"" + mercId + "\","
+                + "serial_no=\"" + serial_no + "\","
                 + "nonce_str=\"" + nonceStr + "\","
                 + "timestamp=\"" + timestamp + "\","
-                + "serial_no=\"" + serial_no + "\","
                 + "signature=\"" + signature + "\"";
     }
 
@@ -266,6 +271,7 @@ public class PublicConfig {
             sbf.append(str).append("\n");
 
         }
+        System.out.println(sbf);
         return sbf.toString();
     }
 

@@ -67,8 +67,8 @@ public class WeChatController {
         Map hashMap = new LinkedHashMap();
         hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("currency","CNY");
-        LinkedHashMap<String, Object> map4 = new LinkedHashMap<>();
-        map4.put("payer_client_ip",weChatPayQO.getPayerClientIp());
+//        LinkedHashMap<String, Object> map4 = new LinkedHashMap<>();
+//        map4.put("payer_client_ip",weChatPayQO.getPayerClientIp());
 
         Map<Object, Object> map = new LinkedHashMap<>();
 
@@ -78,7 +78,7 @@ public class WeChatController {
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://huyf.free.vipnps.vip/api/v1/payment/callback");
         map.put("amount",hashMap);
-        map.put("scene_info",map4);
+//        map.put("scene_info",map4);
 
 
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
@@ -115,6 +115,13 @@ public class WeChatController {
     @Login
     public CommonResult wxPayH5(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
+        Map<Object, Object> map = new LinkedHashMap<>();
+
+        map.put("appid", WechatConfig.APPID);
+        map.put("mchid",WechatConfig.MCH_ID);
+        map.put("description",weChatPayQO.getDescription());
+        map.put("out_trade_no", OrderNoUtil.getOrder());
+        map.put("notify_url","http://huyf.free.vipnps.vip/api/v1/payment/callback");
         Map hashMap = new LinkedHashMap();
         hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("currency","CNY");
@@ -124,20 +131,12 @@ public class WeChatController {
         LinkedHashMap hashMap2 = new LinkedHashMap();
         hashMap2.put("type",weChatPayQO.getType());
         hashMap1.put("h5_info",hashMap2);
-
-
-        Map<Object, Object> map = new LinkedHashMap<>();
-
-        map.put("appid", WechatConfig.APPID);
-        map.put("mchid",WechatConfig.MCH_ID);
-        map.put("description",weChatPayQO.getDescription());
-        map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://huyf.free.vipnps.vip/api/v1/payment/callback");
         map.put("amount",hashMap);
         map.put("scene_info",hashMap1);
 
 
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
+        System.out.println(wxPayRequestJsonStr);
 
         WeChatOrderEntity msg = new WeChatOrderEntity();
         msg.setId((String) map.get("out_trade_no"));
@@ -161,10 +160,10 @@ public class WeChatController {
             }
         });
         //第一步获取prepay_id
-        String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/h5", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
+        String h5_url = PublicConfig.V3PayGet("/v3/pay/transactions/h5", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
         //第二步获取调起支付的参数
-        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
-        return CommonResult.ok(object);
+        //JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
+        return CommonResult.ok(h5_url);
     }
 
     /**
