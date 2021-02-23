@@ -87,7 +87,9 @@ public class PublicConfig {
         }
         EntityUtils.consume(entity);
         //释放链接
-        response.close();
+        if (response!=null){
+            response.close();
+        }
         switch (url) {
             case "/v3/pay/transactions/app"://返回APP支付所需的参数
                 return JSONObject.fromObject(body).getString("prepay_id");
