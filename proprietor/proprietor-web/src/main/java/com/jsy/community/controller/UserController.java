@@ -240,8 +240,6 @@ public class UserController {
         return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
     }
 
-
-    
     /**
     * @Description: 查询用户极光推送tags
      * @Param: []
@@ -255,5 +253,7 @@ public class UserController {
     public CommonResult queryUroraTags(){
         return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
     }
+    
+    //TODO 用户实名认证
     
 }

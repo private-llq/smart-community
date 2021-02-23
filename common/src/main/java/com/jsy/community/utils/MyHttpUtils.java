@@ -7,6 +7,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -132,6 +133,34 @@ public class MyHttpUtils {
 			httpPost.setEntity(new StringEntity(body, "utf-8"));
 		}
 		return httpPost;
+	}
+	
+	//构建HttpPut
+	public static HttpPut httpPutWithoutParams(String url, Map<String,Object> bodyMap){
+		return httpPut(url,null,bodyMap);
+	}
+	public static HttpPut httpPutWithoutBody(String url, Map<String,String> paramsMap){
+		return httpPut(url,paramsMap,null);
+	}
+	public static HttpPut httpPut(String url, Map<String,String> paramsMap, Map<String,Object> bodyMap){
+		URIBuilder uriBuilder = buildURL(url);
+		//设置params
+		if(paramsMap != null){
+			for(Map.Entry<String,String> entry : paramsMap.entrySet()){
+				uriBuilder.setParameter(entry.getKey(),entry.getValue());
+			}
+		}
+		HttpPut httpPut = null;
+		try {
+			httpPut = new HttpPut(uriBuilder.build());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		if(bodyMap != null){
+			String body = JSON.toJSONString(bodyMap);
+			httpPut.setEntity(new StringEntity(body, "utf-8"));
+		}
+		return httpPut;
 	}
 	
 	//获取连接

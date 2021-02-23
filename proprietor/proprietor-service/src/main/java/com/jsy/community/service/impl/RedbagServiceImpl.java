@@ -41,7 +41,8 @@ public class RedbagServiceImpl implements IRedbagService {
 	private static final Random random = new Random();
 	
 	private static final String protocolType = "http://";
-	private static final String host = "192.168.12.37";
+//	private static final String host = "192.168.12.37";
+	private static final String host = "222.178.212.29";
 	private static final String port = "52002";
 	
 	@Autowired
