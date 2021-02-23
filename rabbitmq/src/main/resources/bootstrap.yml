@@ -1,9 +1,9 @@
 spring:
   rabbitmq:
-    host: 106.13.84.80
+    host: 222.178.212.29
     port: 5672
-    username: smart
-    password: smart123
+    username: root
+    password: root
     virtualHost: /
     listener:
       simple:
@@ -52,3 +52,8 @@ dubbo:
   provider:
     retries: 0
     timeout: 99999
+jsy:
+  elasticsearch:
+    ip: 222.178.212.29
+    port: 9200
+    protocol: http

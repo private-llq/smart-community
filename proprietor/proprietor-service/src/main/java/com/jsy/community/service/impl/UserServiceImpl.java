@@ -259,6 +259,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Author: chq459799974
      * @Date: 2021/1/12
      **/
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
         //获取三方uid
@@ -487,12 +488,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
     /**
      * 业主详情查看
+     * 新方法 getUserAndMemberInfo
      * @param userId	    用户ID
      * @Param houseId       房屋ID
      * @author YuLF
      * @since  2020/12/18 11:39
      * @return			返回业主详情信息
      */
+    @Deprecated
     @Transactional(rollbackFor = Exception.class)
     @Override
     public UserInfoVo proprietorDetails(String userId) {
@@ -558,6 +561,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Author: chq459799974
      * @Date: 2021/1/13
      **/
+    @Override
     public Map<String,Object> checkUserAndGetUid(String uid){
         Map<String, Object> map = new HashMap<>();
         if(StringUtils.isEmpty(uid)){
@@ -585,5 +589,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public UserEntity queryUserDetailByUid(String uid){
         return userMapper.selectOne(new QueryWrapper<UserEntity>().select("mobile,id_card").eq("uid",uid));
     }
-    
+
+
+    @Override
+    public UserEntity getRealAuthAndHouseId(String uid) {
+        return userMapper.getRealAuthAndHouseId(uid);
+    }
+
+    @Override
+    public UserInfoVo getUserAndMemberInfo(String uid, Long houseId) {
+        //1.查出用户姓名、用户性别、和房屋地址
+        UserInfoVo userInfo = userMapper.selectUserNameAndHouseAddr(uid);
+        //2.拿到房屋地址组成的字符串 如两江新区幸福广场天王星B栋1801
+        userInfo.setDetailAddress(userMapper.selectHouseAddr(houseId));
+        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(uid, houseId);
+        userInfo.setProprietorMembers(houseMemberEntities);
+        return userInfo;
+    }
+
+
 }

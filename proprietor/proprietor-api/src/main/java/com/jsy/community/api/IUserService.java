@@ -55,7 +55,7 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/12
 	**/
-	UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO);
+	UserAuthVo thirdPlatformLogin(UserThirdPlatformQO qo);
 	
 	/**
 	* @Description: 三方绑定手机
@@ -132,5 +132,21 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Date: 2021/1/20
 	**/
 	UserEntity queryUserDetailByUid(String uid);
-	
+
+
+	/**
+	 * 根据id获取用户实名认证信息和最新的房屋id
+	 * @param userId 	用户id
+	 * @return			返回实名认证状态 和 最新的一个房屋id
+	 */
+	UserEntity getRealAuthAndHouseId(String userId);
+
+
+	/**
+	 * 根据用户id 和 房屋id 查出 用户信息和用户家属信息
+	 * @param uid 				用户id
+	 * @param houseId			房屋id
+	 * @return					返回用户信息和用户家属信息
+	 */
+	UserInfoVo getUserAndMemberInfo(String uid, Long houseId);
 }

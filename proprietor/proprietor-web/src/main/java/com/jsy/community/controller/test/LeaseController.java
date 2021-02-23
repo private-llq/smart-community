@@ -19,6 +19,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LeaseController {
 
-    private final RestHighLevelClient elasticsearchClient;
+    private final RestHighLevelClient customElasticsearchClient;
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
@@ -49,45 +50,12 @@ public class LeaseController {
                     .source(JSON.toJSONString(l), XContentType.JSON);
             bulkRequest.add(indexRequest);
         });
-        BulkResponse bulk = elasticsearchClient.bulk(bulkRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        BulkResponse bulk = customElasticsearchClient.bulk(bulkRequest, ElasticsearchConfig.COMMON_OPTIONS);
         if(bulk.status() == RestStatus.OK){
             return "true";
         }
         return "false";
     }
 
-
-    @PostMapping()
-    public String insertLeaseHouse(@RequestBody HouseLeaseQO qo){
-        System.out.println("----------------房屋请求数据插入--------------------");
-        ElasticSearchImportProvider.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.INSERT, qo.getHouseTitle(), qo.getHouseImage()[0]);
-        //在操作完成时调用
-        return "true";
-    }
-
-
-    @DeleteMapping()
-    public String deleteLeaseHouse(@RequestParam Long id){
-        System.out.println("----------------删除数据插入--------------------");
-        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.LEASE_HOUSE, Operation.DELETE, null, null);
-        //在操作完成时调用
-        return "true";
-    }
-
-    @PutMapping()
-    public String deleteLeaseHouse(@RequestBody HouseLeaseQO qo){
-        System.out.println("----------------更新数据插入--------------------");
-        ElasticSearchImportProvider.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), qo.getHouseImage()[0]);
-        //在操作完成时调用
-        return "true";
-    }
-
-    @GetMapping()
-    public String getLeaseHouse(@RequestBody HouseLeaseQO qo){
-        System.out.println("----------------更新数据插入--------------------");
-        ElasticSearchImportProvider.elasticOperation( qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), qo.getHouseImage()[0]);
-        //在操作完成时调用
-        return "true";
-    }
 
 }

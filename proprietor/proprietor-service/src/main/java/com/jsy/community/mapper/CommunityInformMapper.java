@@ -68,7 +68,7 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      * @param limit     限制条数
      * @return          返回信息List
      */
-    @Select("select id,title as houseTitle,'false' as leaseHouse from t_shop_lease ORDER BY create_time desc limit #{limit}")
+    @Select("select id,title as houseTitle,'false' as leaseHouse from t_shop_lease where deleted = 0 ORDER BY create_time desc limit #{limit}")
     List<HouseLeaseVO> selectShopLatest(int limit);
 
 

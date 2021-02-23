@@ -119,7 +119,7 @@ public class ProprietorTaskActuator {
             //1.获取 clearInformExpireTime 之前的时间
             String beforeTime = getClearInformExpireTime(clearInformExpireDay);
             //如果 数据库 推送消息 小于 beforeTime 的都是超过过期时间的消息 都将删除
-            Integer delRow = userInformService.RegularCleaning(beforeTime);
+            Integer delRow = userInformService.regularCleaning(beforeTime);
             logger.info("本次清理社区推送消息" + beforeTime + "之前的数据共" + delRow + "条!");
         }
     }

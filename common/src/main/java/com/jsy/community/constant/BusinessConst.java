@@ -6,6 +6,17 @@ package com.jsy.community.constant;
  * @since 2020-11-28 13:44
  **/
 public interface BusinessConst {
+
+	//============数据库t_user isRealAuth 实名认证状态=============
+	/**
+	 * 已经实名认证
+	 */
+	Integer CERTIFIED = 1;
+	/**
+	 * 未实名认证
+	 */
+	Integer NO_REAL_NAME_AUTH = 0;
+
 	/**
 	 * 房间成员查询类型 - 查询成员
 	 */
@@ -245,4 +256,7 @@ public interface BusinessConst {
 	 * 新能源车
 	 */
 	String REGEX_OF_NEW_ENERGY_CAR = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}(([0-9]{5}[DF])|([DF][A-HJ-NP-Z0-9][0-9]{4}))$";
+
+
+
 }

@@ -9,6 +9,11 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ *
+ * @author YuLF
+ * @since  2021/2/5 17:19
+ */
 @EnableAsync
 @DubboComponentScan
 @SpringBootApplication
