@@ -336,7 +336,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         xuFaceEditPersonDTO.setCustomId(proprietorQO.getIdCard());
         xuFaceEditPersonDTO.setName(proprietorQO.getRealName());
         xuFaceEditPersonDTO.setGender(proprietorQO.getSex());
-        xuFaceEditPersonDTO.setPic(Base64Util.netPicToBase64(proprietorQO.getFaceUrl()));
+        xuFaceEditPersonDTO.setPic(Base64Util.netFileToBase64(proprietorQO.getFaceUrl()));
         XUFaceUtil.editPerson(xuFaceEditPersonDTO);
     }
 
@@ -583,7 +583,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     **/
     @Override
     public UserEntity queryUserDetailByUid(String uid){
-        return userMapper.selectOne(new QueryWrapper<UserEntity>().select("mobile,id_card").eq("uid",uid));
+        return userMapper.selectOne(new QueryWrapper<UserEntity>().select("*").eq("uid",uid));
     }
     
 }
