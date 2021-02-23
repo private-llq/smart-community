@@ -27,13 +27,26 @@ public class SelectCommunityFunController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ISelectCommunityFunService selectCommunityFunService;
 
-
+    /**
+     * @Description: 分页查询所有趣事
+     * @author: Hu
+     * @since: 2021/2/23 17:30
+     * @Param:
+     * @return:
+     */
     @ApiOperation("分页查询社区趣事")
     @PostMapping("/findList")
     public CommonResult<Map> list(@RequestBody CommunityFunQO communityFunQO) {
         Map<String, Object> map = selectCommunityFunService.findList(communityFunQO);
         return CommonResult.ok(map);
     }
+    /**
+     * @Description: 查询一条社区趣事详情，并添加浏览量
+     * @author: Hu
+     * @since: 2021/2/23 17:30
+     * @Param:
+     * @return:
+     */
     @ApiOperation("查询一条社区趣事详情传入id")
     @GetMapping("/findFunOne")
     public CommonResult<CommunityFunEntity> findOne(@RequestParam("id")Long id) {

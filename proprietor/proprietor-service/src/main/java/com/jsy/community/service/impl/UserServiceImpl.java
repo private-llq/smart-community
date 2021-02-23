@@ -300,9 +300,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public Boolean proprietorRegister(ProprietorQO proprietorQo) {
         //人脸验证
-        if(!RealnameAuthUtils.threeElements(proprietorQo.getRealName(),proprietorQo.getIdCard(),proprietorQo.getFaceUrl())){
-            throw new ProprietorException("人脸验证不通过");
-        }
+//        if(!RealnameAuthUtils.threeElements(proprietorQo.getRealName(),proprietorQo.getIdCard(),proprietorQo.getFaceUrl())){
+//            throw new ProprietorException("人脸验证不通过");
+//        }
         //增加门禁等社区硬件权限
         //TODO 异步 在回调or硬件服务器回调中处理
         setCommunityHardwareAuth(proprietorQo);

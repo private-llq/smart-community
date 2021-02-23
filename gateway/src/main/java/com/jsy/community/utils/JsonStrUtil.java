@@ -2,7 +2,7 @@ package com.jsy.community.utils;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description: 限流或者降级返回的数据
  * @author: Hu
  * @create: 2020-12-22 13:26
  **/

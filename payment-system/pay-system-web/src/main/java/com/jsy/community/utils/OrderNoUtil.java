@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * @program: pay
- * @description:
+ * @description: 生成唯一订单号
  * @author: Hu
  * @create: 2021-01-22 10:19
  **/

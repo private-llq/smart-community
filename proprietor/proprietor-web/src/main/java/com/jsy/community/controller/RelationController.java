@@ -44,12 +44,13 @@ public class RelationController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
-
-
-
-
-
-
+    /**
+     * @Description: 添加家属和车辆信息
+     * @author: Hu
+     * @since: 2021/2/23 17:31
+     * @Param:
+     * @return:
+     */
     @ApiOperation("添加家属信息")
     @PutMapping("/add")
     @Login

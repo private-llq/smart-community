@@ -16,7 +16,13 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.web.reactive.function.BodyInserters.fromObject;
-
+/**
+ * @Description: 异常统一返回数据格式
+ * @author: Hu
+ * @since: 2021/2/23 17:47
+ * @Param:
+ * @return:
+ */
 @Component
 public class SentinelExceptionHandler implements BlockRequestHandler {
 

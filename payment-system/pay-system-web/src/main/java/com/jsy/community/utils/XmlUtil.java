@@ -12,14 +12,13 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 /**
- * 创建时间：2016年11月3日 上午11:40:17
- * 
- * @author andy
- * @version 2.2
+ * @Description: xml转换工具类
+ * @author: Hu
+ * @since: 2021/2/23 17:49
+ * @Param:
+ * @return:
  */
-
 public class XmlUtil {
 
 

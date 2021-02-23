@@ -45,7 +45,7 @@ import java.util.UUID;
 
 /**
  * @program: pay
- * @description:
+ * @description:  微信支付控制器
  * @author: Hu
  * @create: 2021-01-21 17:05
  **/

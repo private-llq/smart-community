@@ -11,7 +11,13 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-
+/**
+ * @Description: 加密解密工具类
+ * @author: Hu
+ * @since: 2021/2/23 17:48
+ * @Param:
+ * @return:
+ */
 public class AesUtil {
     static final int KEY_LENGTH_BYTE = 32;
     static final int TAG_LENGTH_BIT = 128;

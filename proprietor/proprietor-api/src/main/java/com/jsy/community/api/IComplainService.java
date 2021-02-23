@@ -20,4 +20,13 @@ public interface IComplainService extends IService<ComplainEntity> {
      * @return:
      */
     List<ComplainEntity> selectUserIdComplain(String userId);
+
+    /**
+     * @Description: 用户投诉接口
+     * @author: Hu
+     * @since: 2020/12/23 11:30
+     * @Param:
+     * @return:
+     */
+    void addComplain(ComplainEntity complainEntity);
 }

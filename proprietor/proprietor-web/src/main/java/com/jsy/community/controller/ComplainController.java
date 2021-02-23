@@ -5,7 +5,6 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IComplainService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ComplainEntity;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
@@ -43,7 +42,7 @@ public class ComplainController {
     private static final String BUCKET_NAME = "complain";
 
     /**
-     * @Description: 新增投诉建议
+     * @Description: 用户投诉接口
      * @author: Hu
      * @since: 2020/12/23 11:30
      * @Param:
@@ -58,7 +57,8 @@ public class ComplainController {
         complainEntity.setStatus(1);
         complainEntity.setId(SnowFlake.nextId());
         complainEntity.setComplainTime(LocalDateTime.now());
-        return complainService.save(complainEntity)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
+        complainService.addComplain(complainEntity);
+        return CommonResult.ok();
     }
     /**
      * @Description: 查询用户所有的投诉建议
@@ -77,6 +77,13 @@ public class ComplainController {
         return CommonResult.ok(complainEntities);
     }
 
+    /**
+     * @Description: 投诉图片
+     * @author: Hu
+     * @since: 2021/2/23 17:32
+     * @Param:
+     * @return:
+     */
     @Login
     @ApiOperation("投诉建议图片批量上传")
     @PostMapping(value = "/uploadComplainImages")
