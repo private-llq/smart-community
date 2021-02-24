@@ -1,8 +1,10 @@
 package com.jsy.community.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.util.EntityUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +26,9 @@ public class PicContentUtil {
 		//新建请求，设置参数
 		Map<String, Object> bodyMap = new HashMap<>();
 		bodyMap.put("image",picBase64);
-		bodyMap.put("configure",type);
+		JSONObject configObject = new JSONObject();
+		configObject.put("side",type);
+		bodyMap.put("configure",configObject);
 		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url,bodyMap);
 		//设置header
 		Map<String,String> headers = new HashMap<>();
