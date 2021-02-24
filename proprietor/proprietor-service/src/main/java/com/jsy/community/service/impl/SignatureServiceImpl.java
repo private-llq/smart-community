@@ -1,26 +1,26 @@
 package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.api.ISignatureService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.signature.SignatureUserDTO;
-import com.jsy.community.entity.RedbagEntity;
 import com.jsy.community.utils.MapBeanUtil;
 import com.jsy.community.utils.MyHttpUtils;
+import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 
-import java.util.Map;
 
 /**
  * @author chq459799974
- * @description 签章相关
+ * @description 签章相关 实现类
  * @since 2021-02-23 17:38
  **/
 @Slf4j
-//@DubboService(version = Const.version, group = Const.group_proprietor)
-public class SignatureServiceImpl {
+@DubboService(version = Const.version, group = Const.group_proprietor)
+public class SignatureServiceImpl implements ISignatureService {
 	
 	private static final String protocolType = "http://";
 		private static final String host = "192.168.12.37";
@@ -28,44 +28,57 @@ public class SignatureServiceImpl {
 	private static final String port = "10005";
 	
 	//POST 新增用户信息
-	public Map<String,Object> insertUser(){
-		return null;
+	@Override
+	public boolean insertUser(SignatureUserDTO signatureUserDTO){
+		return sendRedbagByHttp(1, signatureUserDTO);
 	}
 	
 	//POST 批量新增用户信息(物业端批量导入时)
-	public Map<String,Object> batchInsertUser(){
-		return null;
+	@Override
+	public boolean batchInsertUser(SignatureUserDTO signatureUserDTO){
+		return sendRedbagByHttp(2,signatureUserDTO);
 	}
 	
 	//PUT 实名认证后修改签章用户信息
-	public Map<String,Object> realNameUpdateUser(){
-		return null;
+	@Override
+	public boolean realNameUpdateUser(SignatureUserDTO signatureUserDTO){
+		return sendRedbagByHttp(3,signatureUserDTO);
 	}
 	
 	//PUT 修改用户普通信息
-	public Map<String,Object> updateUser(){
-		return null;
+	@Override
+	public boolean updateUser(SignatureUserDTO signatureUserDTO){
+		return sendRedbagByHttp(4,signatureUserDTO);
 	}
 	
 	/**
-	 * http调用红包/转账接口
+	 * http调用签章接口
 	 */
 	private boolean sendRedbagByHttp(int type, SignatureUserDTO signatureUserDTO){
 		HttpPost httpPost = null;
 		HttpPut httpPut = null;
 		String url = "";
+		long id = SnowFlake.nextId(); //远程服务调用id
 		switch(type){
 			case 1:
 				url = protocolType + host + ":" + port + "/user/insertUser";
+				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_INSERT_USER.getName());
+				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 2:
 				url = protocolType + host + ":" + port + "/user/batchInsertUser";
+				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_BATCH_INSERT_USER.getName());
+				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 3:
 				url = protocolType + host + ":" + port + "/user/RealNameUpdateUser";
+				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_REALNAME_UPDATE_USER.getName());
+				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 4:
 				url = protocolType + host + ":" + port + "/user/updateUser";
+				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_UPDATE_USER.getName());
+				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 		}
 		//获取加密对象
@@ -87,13 +100,37 @@ public class SignatureServiceImpl {
 			//执行请求，解析结果
 			httpResult = (String)MyHttpUtils.exec(httpPost != null ? httpPost : httpPut,MyHttpUtils.ANALYZE_TYPE_STR);
 			result = JSONObject.parseObject(httpResult);
-			System.out.println(result);
-			return true;
+			if(result == null || result.getIntValue("code") != 200){
+				log.error("ID：" + id + "签章用户远程服务 - 调用返回code非200：\n" + httpResult);
+				return false;
+			}
 		}catch (Exception e) {
-			log.error("签章用户远程服务 - 调用或解析出错，json解析结果" + result);
-			e.printStackTrace();
+			log.error("ID：" + id + "签章用户远程服务 - 调用或解析出错，调用返回：\n" + httpResult);
 			return false;
 		}
+		log.error("ID：" + id + "签章用户远程服务 - 调用成功：\n" + httpResult);
+		return true;
 	}
 	
+}
+
+/**
+ * @Description: 签章接口枚举
+ * @Author: chq459799974
+ * @Date: 2020/2/24
+ **/
+enum SignatureBehaveEnum {
+	BEHAVE_INSERT_USER("新增用户", 1),
+	BEHAVE_BATCH_INSERT_USER("批量新增用户", 2),
+	BEHAVE_REALNAME_UPDATE_USER("更新用户实名认证信息",3),
+	BEHAVE_UPDATE_USER("更新用户普通信息",4);
+	private String name;
+	private Integer code;
+	SignatureBehaveEnum(String name, Integer code) {
+		this.name = name;
+		this.code = code;
+	}
+	public String getName() {
+		return name;
+	}
 }

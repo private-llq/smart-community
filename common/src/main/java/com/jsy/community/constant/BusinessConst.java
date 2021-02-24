@@ -215,6 +215,11 @@ public interface BusinessConst {
 
 	//========= 文件上传 文件夹分类名称 ==========
 	/**
+	 * APP用户系统默认头像 上传 至 文件服务器 的 bucket Name
+	 */
+	String APP_SYS_DEFAULT_AVATAR_BUCKET_NAME = "sys-avatar";
+	
+	/**
 	 * 用户头像 上传 至 文件服务器 的 bucket Name
 	 */
 	String AVATAR_BUCKET_NAME = "user-avatar";

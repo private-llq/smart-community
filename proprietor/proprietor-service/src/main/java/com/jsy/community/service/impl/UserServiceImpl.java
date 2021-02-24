@@ -10,7 +10,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
+import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.mapper.UserThirdPlatformMapper;
@@ -91,6 +93,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private UserIMMapper userIMMapper;
     
+    @Autowired
+    private ISignatureService signatureService;
+    
     private long expire = 60*60*24*7; //暂时
     
     /**
@@ -161,13 +166,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
         String uuid = UserUtils.createUserToken();
         
-        // 业主数据(user表)
+        // 组装user表数据
         UserEntity user = new UserEntity();
         user.setUid(uuid);
         user.setId(SnowFlake.nextId());
         user.setRegId(qo.getRegId());
 
-        // 账户数据(user_auth表)
+        // 账户数据(t_user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
         userAuth.setUid(uuid);
         userAuth.setId(SnowFlake.nextId());
@@ -179,22 +184,45 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         } else { //用户名注册
             userAuth.setUsername(qo.getAccount());
         }
-        //添加业主(user表)
+        //添加业主(t_user表)
         save(user);
-        //添加账户(user_auth表)
+        //添加账户(t_user_auth表)
         userAuthService.save(userAuth);
-        //创建金钱账户
-        userAccountService.createUserAccount(uuid);
-        //创建极光推送tags
+        //创建金钱账户(t_user_account表)
+        boolean userAccountResult = userAccountService.createUserAccount(uuid);
+        if(!userAccountResult){
+            log.error("用户账户创建失败，用户创建失败，相关账户：" + qo.getAccount());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
+        //创建极光推送tags(t_user_urora_tags表)
         UserUroraTagsEntity userUroraTagsEntity = new UserUroraTagsEntity();
         userUroraTagsEntity.setUid(uuid);
         userUroraTagsEntity.setCommunityTags("all"); //给所有用户加一个通用tag，用于全体消息推送
-        userUroraTagsService.createUroraTags(userUroraTagsEntity);
-        //创建imID
+        boolean uroraTagsResult = userUroraTagsService.createUroraTags(userUroraTagsEntity);
+        if(!uroraTagsResult){
+            log.error("用户极光推送tags设置失败，用户创建失败，相关账户：" + qo.getAccount());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
+        //创建imID(t_user_im表)
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setUid(uuid);
         userIMEntity.setImId(UserUtils.createUserToken());
         userIMMapper.insert(userIMEntity);
+        //创建签章用户(远程调用)
+        SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
+        signatureUserDTO.setUuid(uuid);
+        if (RegexUtils.isMobile(qo.getAccount())) { //手机注册
+            signatureUserDTO.setTelephone(qo.getAccount());
+        } else if (RegexUtils.isEmail(qo.getAccount())) { // 邮箱注册
+            signatureUserDTO.setEmail(qo.getAccount());
+        }
+        String avatar = ResourceLoadUtil.loadJSONResource("sys_default_content.json").getString("avatar");
+        signatureUserDTO.setImage(avatar);
+        boolean signUserResult = signatureService.insertUser(signatureUserDTO);
+        if(!signUserResult){
+            log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
         return uuid;
     }
     
