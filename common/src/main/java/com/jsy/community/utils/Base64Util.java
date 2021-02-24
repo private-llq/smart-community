@@ -86,22 +86,22 @@ public class Base64Util {
 	}
 	
 	/**
-	* @Description: 网络图片转Base64
+	* @Description: 网络文件转Base64
 	 * @Param: [netPicUrl]
 	 * @Return: java.lang.String
 	 * @Author: chq459799974
 	 * @Date: 2021/1/29
 	**/
-	public static String netPicToBase64(String netPicUrl){
-		HttpGet httpGet = MyHttpUtils.httpGetWithoutParams(netPicUrl);
+	public static String netFileToBase64(String netFileUrl){
+		HttpGet httpGet = MyHttpUtils.httpGetWithoutParams(netFileUrl);
 		byte[] data = (byte[]) MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_BYTE);
 		return byteToBase64(data);
 	}
 	
 	public static void main(String[] args) {
-		String base64Str = imageToBase64Str("E:/face666.jpg");
+		String base64Str = imageToBase64Str("E:/video/VID_20210223_134106.mp4");
 		System.out.println(base64Str);
-		boolean b = base64StrToImage(base64Str, "E:/转出结果.jpg");
+		boolean b = base64StrToImage(base64Str, "E:/video/转出结果.mp4");
 		System.out.println(b);
 	}
 }

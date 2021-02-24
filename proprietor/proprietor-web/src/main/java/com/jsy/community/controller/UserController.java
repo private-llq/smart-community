@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
@@ -11,7 +10,6 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PicUtil;
@@ -22,12 +20,12 @@ import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -56,21 +54,6 @@ public class UserController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserUroraTagsService userUroraTagsService;
 
-
-    @PostMapping("test")
-//    @Login
-    @Auth
-    public String test(@RequestBody BaseQO<UserEntity> qo) {
-        ValidatorUtils.validateEntity(qo);
-//        UserInfoVo userInfo = UserUtils.getUserInfo();
-        UserUtils.getUserId();
-        System.out.println("111111111111....");
-        if(true){
-           throw new DuplicateKeyException("测试数据重复异常");
-        }
-        return "success...";
-    }
-
     /**
     * @Description: 业主或亲属 获取/刷新 门禁权限
      * @Param: [communityId]
@@ -85,8 +68,36 @@ public class UserController {
         Map<String, String> returnMap = userService.getAccess(UserUtils.getUserId(), communityId);
         return returnMap.get("access") != null ? CommonResult.ok(returnMap,"获取成功") : CommonResult.error(JSYError.INTERNAL.getCode(),returnMap.get("msg"));
     }
-    
+
     /**
+     * 用户基本信息 [我的房屋] 点击后的信息
+     * @author YuLF
+     * @since  2021/2/23 17:22
+     */
+    @Login
+    @ApiOperation("我的房屋")
+    @GetMapping("/info")
+    public CommonResult<?> userInfo(){
+        String uid = UserUtils.getUserId();
+        UserEntity userEntity = userService.getRealAuthAndHouseId(uid);
+        //未实名认证
+        if( Objects.isNull(userEntity) || !Objects.equals(userEntity.getIsRealAuth(), BusinessConst.CERTIFIED)){
+            throw new JSYException(JSYError.NO_REAL_NAME_AUTH);
+        }
+        //未认证房屋
+        if( Objects.isNull(userEntity.getHouseholderId()) ){
+            throw new JSYException(JSYError.NO_AUTH_HOUSE);
+        }
+        //根据用户id和房屋id 查出用户姓名、用户地址、和家属信息
+        UserInfoVo userInfoVo = userService.getUserAndMemberInfo(uid, userEntity.getHouseholderId());
+        return CommonResult.ok(userInfoVo);
+    }
+
+
+
+    /**
+     * 2021 2.23此方法已过期
+     * PostMapping("register")
      * 【用户】业主信息登记
      * @param qo  参数实体
      * @author YuLF
@@ -94,7 +105,7 @@ public class UserController {
      * @return              返回是否登记成功
      */
     @Login
-    @PostMapping("register")
+    @Deprecated
     @ApiOperation("业主信息登记")
     public CommonResult<Boolean> proprietorRegister(@RequestBody  ProprietorQO qo) {
         String userId = UserUtils.getUserId();
@@ -157,6 +168,12 @@ public class UserController {
         return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
+
+
+    /**
+     * @author YuLF
+     * @since  2021/2/23 17:23
+     */
     @Login
     @ApiOperation("业主头像上传")
     @PostMapping("uploadAvatar")
@@ -165,6 +182,11 @@ public class UserController {
         return CommonResult.ok(MinioUtils.upload(avatar, BusinessConst.AVATAR_BUCKET_NAME));
     }
 
+
+    /**
+     * @author YuLF
+     * @since  2021/2/23 17:23
+     */
     @Login
     @ApiOperation("业主人脸头像上传")
     @PostMapping("uploadFaceAvatar")
@@ -188,11 +210,14 @@ public class UserController {
     }
 
     /**
+     * 在2021.2.23 此方法已过期
+     * 新的方法参见当前类 com.jsy.community.controller.UserController#userInfo
      * 业主详情接口
      * @author YuLF
      * @since  2020/12/18 11:39
      */
     @Login
+    @Deprecated
     @ApiOperation("业主信息详情查询接口")
     @GetMapping("details")
     public CommonResult<UserInfoVo> details() {
@@ -215,8 +240,6 @@ public class UserController {
         return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
     }
 
-
-    
     /**
     * @Description: 查询用户极光推送tags
      * @Param: []
@@ -230,5 +253,7 @@ public class UserController {
     public CommonResult queryUroraTags(){
         return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
     }
+    
+    //TODO 用户实名认证
     
 }

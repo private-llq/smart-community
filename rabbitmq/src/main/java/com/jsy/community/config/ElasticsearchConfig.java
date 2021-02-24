@@ -1,4 +1,4 @@
-package com.jsy.community.config.web;
+package com.jsy.community.config;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHost;
@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty( value = "jsy.web.enable", havingValue = "true")
 public class ElasticsearchConfig {
 
     @Value("${jsy.elasticsearch.ip}")
@@ -41,7 +40,7 @@ public class ElasticsearchConfig {
 
 
 
-    @Bean(name = "customElasticsearchClient")
+    @Bean
     public RestHighLevelClient elasticsearchClient(){
         return new RestHighLevelClient(
                 RestClient.builder(new HttpHost( elasticsearchIp, elasticsearchPort, elasticsearchProtocol)));

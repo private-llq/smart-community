@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  订单监听队列类
  * @author: Hu
  * @create: 2021-01-23 15:38
  **/

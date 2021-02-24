@@ -42,12 +42,12 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "推送消息头像地址")
     private String acctAvatar;
 
-    @Length(groups = {AddPushInformValidate.class}, min = 1, max = 32, message = "推送消息标题长度在1~32")
+    @Length(groups = {AddPushInformValidate.class}, min = 2, max = 64, message = "推送消息标题长度在2~64")
     @NotBlank(groups = {AddPushInformValidate.class}, message = "推送消息标题不能为空!")
     @ApiModelProperty(value = "推送消息标题")
     private String pushTitle;
 
-    @Length(groups = {AddPushInformValidate.class}, min = 1, max = 64, message = "推送消息副标题长度在1~32")
+    @Length(groups = {AddPushInformValidate.class}, min = 2, max = 64, message = "推送消息副标题长度在2~64")
     @NotBlank(groups = {AddPushInformValidate.class}, message = "推送消息副标题不能为空!")
     @ApiModelProperty(value = "推送消息副标题")
     private String pushSubTitle;

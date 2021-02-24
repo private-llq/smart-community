@@ -119,7 +119,6 @@ public class LivingPaymentController {
         if (livingPaymentQO.getPayNum().abs().compareTo(new BigDecimal(50)) != 0) {
             return CommonResult.error("缴费金额不足");
         }
-
         String userId = UserUtils.getUserId();
         livingPaymentQO.setUserID(userId);
         PaymentDetailsVO paymentDetailsVO = livingPaymentService.add(livingPaymentQO);

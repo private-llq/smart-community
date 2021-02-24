@@ -9,11 +9,11 @@ alipay:
     root-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ17UiK8ZLIVZbCNVejlM24NyTkKoI4y8q+5+FyPuq655yQ==
 rabbitmq:
   ####连接地址
-  host: 106.13.84.80
+  host: 222.178.212.29
   ####端口号
   port: 5672
-  username: smart
-  password: smart123
+  username: root
+  password: root
   ### 地址
   virtual-host: /
   listener:

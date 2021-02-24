@@ -21,4 +21,13 @@ public interface ConstError {
 	int NOT_IMPLEMENTED = 501;
 	int GATEWAY = 502;
 	int DUPLICATE_KEY = 503;
+	//自定义错误
+	/**
+	 * 用户未实名认证
+	 */
+	int NO_REAL_NAME_AUTHENTICATION = 40001;
+	/**
+	 * 用户房屋待认证
+	 */
+	int NO_AUTH_HOUSE = 40002;
 }

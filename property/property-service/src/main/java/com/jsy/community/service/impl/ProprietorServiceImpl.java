@@ -110,14 +110,14 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
 
         //1.2 通过社区id 和 社区结构 拿到当前社区 所有未被登记的房屋信息
         List<HouseEntity> houseEntities = proprietorMapper.getHouseListByCommunityId(communityId, houseLevelMode);
-        //1.3 验证excel录入的每一个房屋信息 是否正确  目前 TODO: 没有验证 已经被登记过房屋的用户
+        //1.3 验证excel录入的每一个房屋信息 是否正确  目前
         validHouseList(userEntityList, houseEntities);
         //2 为所有用户注册
         //2.1 设置uid 及 id
         userEntityList.forEach(w -> {
             w.setUid(UserUtils.createUserToken());
             w.setId(SnowFlake.nextId());
-            //由物业导入 所有人都是业主 因为家属在另一个导入表里面
+            //由物业导入 所有人都是业主 因为家属在另一个导入表里面  householder_id 在数据库表示：业主ID 0.未认证 1.业主 其他.隶属业主ID
             w.setHouseholderId(1L);
         });
         //2.2 批量注册 t_user_auth

@@ -8,7 +8,6 @@ import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.RelationCarsQo;
 import com.jsy.community.qo.RelationQo;
-import com.jsy.community.utils.RealnameAuthUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.RelationCarsVO;
 import com.jsy.community.vo.RelationVO;
@@ -81,7 +80,7 @@ public class RelationServiceImpl implements IRelationService {
 
 
         houseMemberMapper.insert(houseMemberEntity);
-
+        //添加车辆信息
         List<RelationCarsQo> cars = relationQo.getCars();
             if (cars.size()>0) {
                 for (RelationCarsQo car : cars) {
@@ -133,6 +132,7 @@ public class RelationServiceImpl implements IRelationService {
         relationVO.setHouseId(houseMemberEntity.getHouseId());
         relationVO.setUserId(houseMemberEntity.getHouseholderId());
         List<RelationCarsVO> objects = new ArrayList<>();
+        //封装车辆信息
         for (CarEntity carEntity : carEntities) {
             RelationCarsVO relationCarsVO = new RelationCarsVO();
             relationCarsVO.setUid(carEntity.getUid());

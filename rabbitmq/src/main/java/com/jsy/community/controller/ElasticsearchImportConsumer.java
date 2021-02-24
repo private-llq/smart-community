@@ -35,13 +35,13 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ElasticsearchImportConsumer implements ChannelAwareMessageListener {
 
-    private final RestHighLevelClient elasticsearchClient;
+    private final RestHighLevelClient customElasticsearchClient;
 
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
         byte[] body = message.getBody();
         FullTextSearchEntity entity = serializationByteToObject(body, FullTextSearchEntity.class);
-        System.out.println("自定义监听【ES全文搜索数据】MqTag标签："+ message.getMessageProperties().getDeliveryTag() + ":" + entity);
+        log.info("自定义监听【ES全文搜索数据】MqTag标签："+ message.getMessageProperties().getDeliveryTag() + ":" + entity);
         boolean isConsumerSuccess = false;
         if(Objects.isNull(entity) ){
             return;
@@ -88,7 +88,7 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
         //第一个参数为操作索引名称、第二个参数为删除文档的id
         DeleteRequest deleteRequest = new DeleteRequest(
                 BusinessConst.FULL_TEXT_SEARCH_INDEX, entity.getId().toString());
-        DeleteResponse response = elasticsearchClient.delete(deleteRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        DeleteResponse response = customElasticsearchClient.delete(deleteRequest, ElasticsearchConfig.COMMON_OPTIONS);
         DocWriteResponse.Result result = response.getResult();
         //以下两种状态都表示在es中不存在了
         return result == DocWriteResponse.Result.DELETED || result == DocWriteResponse.Result.NOT_FOUND;
@@ -103,7 +103,7 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
         updateRequest.id(entity.getId() + "");
         //转换为json串发给elasticsearch
         updateRequest.doc(JSON.toJSONString(entity), XContentType.JSON);
-        UpdateResponse update = elasticsearchClient.update(updateRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        UpdateResponse update = customElasticsearchClient.update(updateRequest, ElasticsearchConfig.COMMON_OPTIONS);
         DocWriteResponse.Result result = update.getResult();
         return result == DocWriteResponse.Result.UPDATED || result == DocWriteResponse.Result.CREATED;
     }
@@ -115,7 +115,7 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
         //转换为json串发给elasticsearch
         indexRequest.source(JSON.toJSONString(entity), XContentType.JSON);
         //发送保存 第一个参数是构造的请求，第二个参数是请求头需要的一些操作如验证token
-        IndexResponse indexResponse = elasticsearchClient.index(indexRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        IndexResponse indexResponse = customElasticsearchClient.index(indexRequest, ElasticsearchConfig.COMMON_OPTIONS);
         DocWriteResponse.Result result = indexResponse.getResult();
         return result == DocWriteResponse.Result.CREATED || result == DocWriteResponse.Result.UPDATED;
     }

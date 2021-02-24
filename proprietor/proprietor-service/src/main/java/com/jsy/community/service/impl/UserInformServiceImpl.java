@@ -40,7 +40,7 @@ public class UserInformServiceImpl extends ServiceImpl<UserInformMapper, UserInf
      * @param userId        用户ID
      * @return              返回总消息未读列表数据
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public List<InformListVO> totalCommunityInformList(String userId) {
 
@@ -67,7 +67,8 @@ public class UserInformServiceImpl extends ServiceImpl<UserInformMapper, UserInf
             vo.setUnread(totalCount - readCount);
             vos.add(vo);
         });
-
+        //根据发布消息时间进行排序  后发布的在上面
+        vos.sort((o1, o2) -> o2.getUnreadInformCreateTime().compareTo(o1.getUnreadInformCreateTime()));
         return vos;
     }
 
@@ -77,9 +78,9 @@ public class UserInformServiceImpl extends ServiceImpl<UserInformMapper, UserInf
      * 定期清理 推送消息内容
      * @param beforeTime    为当前时间 - 后台配置的过期清理天数 得到的时间字符串
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Integer RegularCleaning(String beforeTime) {
+    public Integer regularCleaning(String beforeTime) {
         //1.获取达成清理条件的 推送id    只要该推送消息id 创建时间 < beforeTime 那说明该消息已经超过过期天数
         List<Long> informIds = userInformMapper.getExpireInformId(beforeTime);
         if(informIds == null || informIds.isEmpty()){

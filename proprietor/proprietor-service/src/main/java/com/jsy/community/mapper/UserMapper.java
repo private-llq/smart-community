@@ -59,6 +59,33 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * 查询用户拥有房屋
 	 * @param userId	用户id
 	 * @param houseId	房屋id
+	 * @return			返回房屋列表
 	 */
     List<HouseVo> queryUserHouseById(@Param("uid") String userId,@Param("houseId") Long houseId);
+
+
+	/**
+	 * 根据id获取用户实名认证信息和最新的房屋id
+	 * @param uid 	用户id
+	 * @return			返回实名认证状态 和 最新的一个房屋id
+	 */
+	@Select("select h.house_id as householderId,u.is_real_auth from t_user as u JOIN t_user_house as h on u.uid = h.uid where u.uid = #{uid} and h.check_status =1  and h.deleted = 0 and u.deleted = 0 ORDER BY h.create_time desc limit 1")
+	UserEntity getRealAuthAndHouseId(String uid);
+
+	/**
+	 * 根据用户id 和 房屋id 查出 用户姓名、性别
+	 * @param uid 				用户id
+	 * @return					返回用户信息和用户家属信息
+	 */
+	@Select("select u.real_name,u.sex from t_user as u  WHERE u.deleted = 0 and u.uid = #{uid}")
+	UserInfoVo selectUserNameAndHouseAddr(String uid);
+
+	/**
+	 * 根据用户id查出 房屋地址
+	 * @param houseId 	房屋id
+	 * @return			返回房屋地址组成的字符串
+	 */
+	@Select("select CONCAT(c.`name`,h.building,h.unit,h.floor,h.door) as detailAddress from t_community as c JOIN t_house as h on c.id = h.community_id where \n" +
+			"c.deleted = 0 and h.deleted = 0 and h.id = #{houseId}")
+	String selectHouseAddr(Long houseId);
 }

@@ -16,6 +16,7 @@ public interface IUserInformService extends IService<UserInformEntity> {
 
 
     /**
+     * 查询用户总消息列表
      * @author YuLF
      * @since  2020/12/14 18:07
      * @param userId        用户ID
@@ -26,6 +27,7 @@ public interface IUserInformService extends IService<UserInformEntity> {
     /**
      * 定期清理 推送消息内容
      * @param beforeTime    为当前时间 - 后台配置的过期清理天数 得到的时间字符串
+     * @return              返回影响行数
      */
-    Integer RegularCleaning(String beforeTime);
+    Integer regularCleaning(String beforeTime);
 }

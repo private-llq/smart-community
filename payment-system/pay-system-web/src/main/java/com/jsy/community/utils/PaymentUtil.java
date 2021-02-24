@@ -1,5 +1,11 @@
 package com.jsy.community.utils;
-
+/**
+ * @Description: 暂时没用
+ * @author: Hu
+ * @since: 2021/2/23 17:49
+ * @Param:
+ * @return:
+ */
 public  class PaymentUtil {
 
     public static String getPayment(Integer type){

@@ -10,7 +10,6 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -42,6 +41,8 @@ public class PicUtil {
 
 
     /**
+     * @author YuLF
+     * @since 2021/2/22 11:21
      * 图片文件是在指定格式 和 指定大小之内的
      */
     public static void imageQualified(MultipartFile file){

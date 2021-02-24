@@ -9,6 +9,9 @@ import com.jsy.community.constant.ConstError;
  * @since 2020-11-11 11:02
  */
 public enum JSYError {
+	/**
+	 * 错误请求
+	 */
 	BAD_REQUEST(ConstError.BAD_REQUEST, "错误的请求"),
 	UNAUTHORIZED(ConstError.UNAUTHORIZED, "未认证"),
 	FORBIDDEN(ConstError.FORBIDDEN, "禁止访问"),
@@ -18,8 +21,9 @@ public enum JSYError {
 	INTERNAL(ConstError.INTERNAL, "服务器错误"),
 	NOT_IMPLEMENTED(ConstError.NOT_IMPLEMENTED, "未实现"),
 	GATEWAY(ConstError.GATEWAY, "网关错误"),
-	DUPLICATE_KEY(ConstError.DUPLICATE_KEY, "数据已存在!请检查重复的数据");
-	
+	DUPLICATE_KEY(ConstError.DUPLICATE_KEY, "数据已存在!请检查重复的数据"),
+	NO_REAL_NAME_AUTH(ConstError.NO_REAL_NAME_AUTHENTICATION, "用户未实名认证!"),
+	NO_AUTH_HOUSE(ConstError.NO_AUTH_HOUSE, "房屋待认证!");
 	
 	private final Integer code;
 	private final String message;
