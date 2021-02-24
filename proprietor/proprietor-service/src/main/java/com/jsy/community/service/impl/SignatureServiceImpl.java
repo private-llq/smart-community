@@ -19,7 +19,7 @@ import java.util.Map;
  * @since 2021-02-23 17:38
  **/
 @Slf4j
-@DubboService(version = Const.version, group = Const.group_proprietor)
+//@DubboService(version = Const.version, group = Const.group_proprietor)
 public class SignatureServiceImpl {
 	
 	private static final String protocolType = "http://";
