@@ -22,6 +22,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -78,7 +79,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	public List<RepairEntity> getRepair(String id, Integer status) {
 		if (status == null) {
 			QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
-			wrapper.eq("user_id", id).orderByAsc("status");
+			wrapper.eq("user_id", id).orderByDesc("create_time").orderByAsc("status");
 			List<RepairEntity> list = repairMapper.selectList(wrapper);
 			for (RepairEntity repairEntity : list) {
 				Long type = repairEntity.getType();
@@ -98,7 +99,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 			return list;
 		}
 		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("user_id", id).eq("status", status);
+		wrapper.eq("user_id", id).orderByDesc("create_time").eq("status", status);
 		List<RepairEntity> list = repairMapper.selectList(wrapper);
 		for (RepairEntity repairEntity : list) {
 			Long type = repairEntity.getType();
@@ -113,6 +114,16 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 			}
 			if (repairEntity.getStatus() == 2) {
 				repairEntity.setStatusString("已处理");
+				// 对已评价的 获取其评价信息，前端通过其判断是否该订单评价过[评价过的不能再次评价]
+				QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
+				queryWrapper.eq("repair_id", repairEntity.getId());
+				RepairOrderEntity order = repairOrderMapper.selectOne(queryWrapper);
+				if (order!=null) {
+					if (!StringUtils.isEmpty(order.getComment())) {
+						repairEntity.setComment(order.getComment());
+						System.out.println(repairEntity.getComment());
+					}
+				}
 			}
 		}
 		return list;

@@ -78,6 +78,10 @@ public class RepairEntity extends BaseEntity {
     @Size(groups = {addRepairValidate.class},max = 500,message = "您的图片文件名过长或您上传的文件太多")
     private String repairImg;
     
+    @ApiModelProperty(value = "评论信息")
+    @TableField(exist = false)
+    private String comment;
+    
     
     
     public interface addRepairValidate {
