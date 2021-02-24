@@ -37,7 +37,6 @@ public class PicContentUtil {
 		String httpResult = (String)MyHttpUtils.exec(httpPost,MyHttpUtils.ANALYZE_TYPE_STR);
 		//解析结果
 		JSONObject result = JSONObject.parseObject(httpResult);
-		System.out.println(result);
 		if(result != null && result.getBooleanValue("success")){
 			Map<String, Object> returnMap = new HashMap<>();
 			if(ID_CARD_PIC_SIDE_FACE.equals(type)){

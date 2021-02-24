@@ -232,7 +232,7 @@ public class UserController {
     public CommonResult distinguishIdCard(MultipartFile file,@RequestParam String type){
     	if(PicContentUtil.ID_CARD_PIC_SIDE_FACE.equals(type) || PicContentUtil.ID_CARD_PIC_SIDE_BACK.equals(type)){
             Map<String, Object> returnMap = PicContentUtil.getIdCardPicContent(Base64Util.fileToBase64Str(file), type);
-            return returnMap != null ? CommonResult.ok(PicContentUtil.getIdCardPicContent(Base64Util.fileToBase64Str(file),type)) : CommonResult.error("识别失败");
+            return returnMap != null ? CommonResult.ok(returnMap) : CommonResult.error("识别失败");
 	    }else{
     		return CommonResult.error("缺少身份证正反面参数");
 	    }
