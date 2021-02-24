@@ -48,6 +48,7 @@ public class PicContentUtil {
 			}else{
 				returnMap.putAll(result);
 			}
+			return returnMap;
 		}
 		return null;
 	}
