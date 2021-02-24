@@ -11,10 +11,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.ProprietorQO;
-import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.PicUtil;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
@@ -252,6 +249,17 @@ public class UserController {
     @GetMapping("urora/tags")
     public CommonResult queryUroraTags(){
         return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
+    }
+    
+    @ApiOperation("身份证照片识别")
+    @PostMapping("idCard/distinguish")
+    public CommonResult distinguishIdCard(MultipartFile file,@RequestParam String type){
+    	if(PicContentUtil.ID_CARD_PIC_SIDE_FACE.equals(type) || PicContentUtil.ID_CARD_PIC_SIDE_BACK.equals(type)){
+            Map<String, Object> returnMap = PicContentUtil.getIdCardPicContent(Base64Util.fileToBase64Str(file), type);
+            return returnMap != null ? CommonResult.ok(PicContentUtil.getIdCardPicContent(Base64Util.fileToBase64Str(file),type)) : CommonResult.error("识别失败");
+	    }else{
+    		return CommonResult.error("缺少身份证正反面参数");
+	    }
     }
     
     //TODO 用户实名认证
