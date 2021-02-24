@@ -54,11 +54,6 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆照片访问路径")
     private String carImageUrl;
 
-    public static void main(String[] args) {
-        String regex = "(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]";
-        boolean b = java.util.regex.Pattern.compile(regex).matcher("http://222.178.212.29:9000/car-img/d95b9e72-bf1c-4b9a-adf7-a9fdff329e95-铃兰1.jpg").find();
-        System.out.println(b);
-    }
 
     @Pattern(groups = {AddCarValidated.class}, regexp = RegexUtils.REGEX_MOBILE, message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     @NotNull(groups = {AddCarValidated.class}, message = "手机号码未输入!")
@@ -69,7 +64,7 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @Range(groups = { AddCarValidated.class, ProprietorCarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
+    @Range(groups = { AddCarValidated.class, ProprietorCarValidated.class}, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
     @NotNull(groups = {ProprietorCarValidated.class}, message = "车辆类型未选择!")
     @ApiModelProperty(value = "车辆类型： 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车")
     private Integer carType;
@@ -88,6 +83,8 @@ public class CarEntity extends BaseEntity {
     public static CarEntity getInstance(){
         return new CarEntity();
     }
+
+
 
 
     /**

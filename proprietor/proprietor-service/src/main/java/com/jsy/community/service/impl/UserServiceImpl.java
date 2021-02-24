@@ -18,8 +18,10 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.mapper.UserThirdPlatformMapper;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
+import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
+import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.vo.*;
@@ -37,6 +39,7 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -50,10 +53,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
-    
+
     @Autowired
     private UserUtils userUtils;
-    
+
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserAuthService userAuthService;
 
@@ -68,36 +71,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
-    
+
     @Autowired
     private IUserAccountService userAccountService;
 
     @Resource
     private UserMapper userMapper;
-    
+
     @Resource
     private UserThirdPlatformMapper userThirdPlatformMapper;
-    
+
     @Autowired
     private IUserUroraTagsService userUroraTagsService;
-    
+
     @Autowired
     private IHouseService houseService;
-    
+
     @Autowired
     private ICommunityService communityService;
-    
+
     @Autowired
     private IAlipayService alipayService;
-    
+
     @Autowired
     private UserIMMapper userIMMapper;
-    
+
+
     @Autowired
     private ISignatureService signatureService;
-    
+
     private long expire = 60*60*24*7; //暂时
-    
+
     /**
      * 创建用户token
      */
@@ -172,7 +176,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         user.setId(SnowFlake.nextId());
         user.setRegId(qo.getRegId());
 
-        // 账户数据(t_user_auth表)
+        // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
         userAuth.setUid(uuid);
         userAuth.setId(SnowFlake.nextId());
@@ -184,9 +188,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         } else { //用户名注册
             userAuth.setUsername(qo.getAccount());
         }
-        //添加业主(t_user表)
+        //添加业主(user表)
         save(user);
-        //添加账户(t_user_auth表)
+        //添加账户(user_auth表)
         userAuthService.save(userAuth);
         //创建金钱账户(t_user_account表)
         boolean userAccountResult = userAccountService.createUserAccount(uuid);
@@ -225,7 +229,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return uuid;
     }
-    
+
     /**
      * 调用三方接口获取会员信息(走后端备用)(返回三方平台唯一id)
      */
@@ -256,22 +260,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return thirdUid;
     }
-    
+
     /**
-    * @Description: 三方登录
+     * @Description: 三方登录
      * @Param: [userThirdPlatformQO]
      * @Return: com.jsy.community.vo.UserAuthVo
      * @Author: chq459799974
      * @Date: 2021/1/12
-    **/
+     **/
     @Override
     public UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
         //获取三方uid
         String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
         userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
-            .eq("third_platform_id", userThirdPlatformQO.getThirdPlatformId())
-            .eq("third_platform_type",userThirdPlatformQO.getThirdPlatformType()));
+                .eq("third_platform_id", userThirdPlatformQO.getThirdPlatformId())
+                .eq("third_platform_type",userThirdPlatformQO.getThirdPlatformType()));
         if(entity != null){
             //返回token
             UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
@@ -279,7 +283,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         throw new ProprietorException("尚未绑定手机");
     }
-    
+
     /**
      * @Description: 三方绑定手机
      * @Param: [userThirdPlatformQO]
@@ -310,48 +314,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userThirdPlatformEntity.setId(SnowFlake.nextId());
         userThirdPlatformEntity.setUid(uid);//把uid设置进三方登录表关联上
         userThirdPlatformMapper.insert(userThirdPlatformEntity);
-        
+
         UserInfoVo userInfoVo = new UserInfoVo();
         userInfoVo.setUid(uid);
         return createAuthVoWithToken(userInfoVo);
     }
-    
-    
-    
-    /**
-     * 页面登记 业主信息
-     * @author YuLF
-     * @since  2020/12/18 11:39
-     * @param proprietorQo 登记实体参数
-     * @return             返回是否登记成功
-     */
-    @Transactional(rollbackFor = {Exception.class})
-    @Override
-    public Boolean proprietorRegister(ProprietorQO proprietorQo) {
-        //人脸验证
-//        if(!RealnameAuthUtils.threeElements(proprietorQo.getRealName(),proprietorQo.getIdCard(),proprietorQo.getFaceUrl())){
-//            throw new ProprietorException("人脸验证不通过");
-//        }
-        //增加门禁等社区硬件权限
-        //TODO 异步 在回调or硬件服务器回调中处理
-        setCommunityHardwareAuth(proprietorQo);
-        //把参数对象里面的值赋值给UserEntity  使用Mybatis plus的insert需要 Entity里面写的表名
-        UserEntity userEntity = new UserEntity();
-        BeanUtils.copyProperties(proprietorQo, userEntity);
-        //添加业主信息 由于在注册时会像t_user表插入一条空记录为用户的id，这里直接做更新操作，
-        int count = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("uid", proprietorQo.getUid()));
-        if (count == 0) {
-            return false;
-        }
-        //业主登记时有填写车辆信息的情况下，新增车辆
-        if (proprietorQo.getHasCar()) {
-            carService.addProprietorCarForList(proprietorQo.getCarEntityList());
-        }
-        //t_user_house 中插入当前这条记录 为了让物业审核
-		userHouseService.saveUserHouse(userEntity.getUid(), proprietorQo.getHouseEntityList());
-        return true;
-    }
-    
+
+
+
+
+
     /**
      * 添加社区硬件权限
      */
@@ -359,7 +331,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //TODO 根据uid查询所有房屋已审核社区 or 一个小区一次认证
 //        List<Long> communityIds = xxxxxx.getUserCommunitys(proprietorQO.getUid());
         //TODO 获取对应社区的硬件服务器id、地址等相关数据 待设计，确认业务登记操作需要增加的权限
-        
+
         //执行调用 目前仅测试人脸机器
         XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
         xuFaceEditPersonDTO.setCustomId(proprietorQO.getIdCard());
@@ -371,7 +343,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
 
     /**
-     * 【用户】业主更新信息  id等于null 或者 id == 0 表示需要新增的数据
+     * 【用户】业主更新房屋认证信息  id等于null 或者 id == 0 表示需要新增的数据
      * @author YuLF
      * @Param proprietorQO        需要更新 实体参数
      * @since 2020/11/27 15:03
@@ -383,59 +355,48 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //如果有车辆的情况下 更新或新增 车辆信息
         if(qo.getHasCar()){
             //如果有需要新增的数据 id == null 或者 == 0 就是需要新增 只要有一个条件满足即返回true
-            List<CarEntity> carEntityList = qo.getCarEntityList();
-            boolean b = carEntityList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
+            List<CarQO> cars = qo.getCars();
+            //用户是否有需要新增的车辆？默认为false
+            AtomicBoolean hasAddCar = new AtomicBoolean(false);
             //为车辆信息设置基本信息
-            carEntityList.forEach(e ->{
-                e.setOwner(qo.getRealName());
-                e.setUid(qo.getUid());
-                e.setCommunityId(qo.getHouseEntityList().get(0).getCommunityId());
-                e.setContact(qo.getMobile());
+            cars.forEach(e ->{
+                //社区id
+                e.setCommunityId(qo.getHouses().get(0).getCommunityId());
+                //如果参数id为null 或者 参数id为0 则表明这条数据是需要新增
+                if( e.getId() == null || e.getId() == 0 ){
+                    //新增数据需要设置id
+                    e.setId(SnowFlake.nextId());
+                    hasAddCar.set(true);
+                }
             });
             //新增车辆信息
-            if(b){
+            if(hasAddCar.get()){
                 //从提交的List中取出Id == null 并且ID == 0的数据 重新组成一个List 代表需要新增的数据
-                List<CarEntity> any = carEntityList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                List<CarQO> any = cars.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
                 //从更新车辆的集合中 移除 需要 新增的数据
-                carEntityList.removeAll(any);
-                //新增数据需要设置id
-                any.forEach( e -> e.setId(SnowFlake.nextId()));
+                cars.removeAll(any);
                 //批量新增车辆
-                carService.addProprietorCarForList(any);
+                carService.addProprietorCarForList(any, qo.getUid());
             }
             //批量更新车辆信息
-            carEntityList.forEach( c -> {
-                //状态 0 表示未审核
-                c.setCheckStatus(0);
-                carService.update(c, new UpdateWrapper<CarEntity>().eq("id", c.getId()).eq("uid", c.getUid()));
-            });
+            cars.forEach( c -> carService.update(c, qo.getUid()));
         }
         //========================================== 业主房屋 =========================================================
-        List<UserHouseEntity> houseList = qo.getHouseEntityList();
+        List<UserHouseQo> houseList = qo.getHouses();
         //验证房屋信息是否有需要新增的数据
-        boolean b = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
+        boolean hasAddHouse = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
         //如果存在需要新增的房屋的数据
-        if(b){
-            List<UserHouseEntity> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+        if(hasAddHouse){
+            List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
             houseList.removeAll(any);
-            //为房屋添加基本信息 uid、id、
-            any.forEach(e -> {
-                e.setId(SnowFlake.nextId());
-                e.setUid(qo.getUid());
-                e.setCheckStatus(2);
-            });
             //批量新增房屋信息
-            userHouseService.addHouseBatch(any);
+            userHouseService.addHouseBatch(any, qo.getUid());
         }
         //批量更新房屋信息
-        houseList.forEach( h -> {
-            //当用户房屋更新了 重新变为未审核
-            h.setCheckStatus(2);
-            userHouseService.update(h, new UpdateWrapper<UserHouseEntity>().eq("id", h.getId()).eq("uid", qo.getUid()));
-        });
+        houseList.forEach( h -> userHouseService.update(h, qo.getUid()));
         //========================================== 业主 =========================================================
-        //业主信息更新
-        return userMapper.proprietorUpdate(qo) > 0;
+        //业主信息更新 userMapper.proprietorUpdate(qo)
+        return true;
     }
 
 
@@ -458,17 +419,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setProprietorHouses(houseVos);
         return userInfoVo;
     }
-    
+
     /**
-    * @Description: 查询业主所有小区的房屋
+     * @Description: 查询业主所有小区的房屋
      * @Param: [uid]
      * @Return: java.util.List<com.jsy.community.entity.HouseEntity>
      * @Author: chq459799974
      * @Date: 2020/12/16
-    **/
+     **/
     @Override
     public List<HouseEntity> queryUserHouseList(String uid){
-        
+
         //步骤一
         /* t_user_house */
         List<UserHouseEntity> userHouseList = userHouseService.queryUserHouses(uid);
@@ -481,7 +442,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             communityIdSet.add(userHouseEntity.getCommunityId());
             houseIdList.add(userHouseEntity.getHouseId());
         }
-        
+
         //步骤二
         //查社区id,房间id,楼栋id,地址拼接
         //补buildingId如果pid!=0 继续往上查
@@ -492,7 +453,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             //递归查父节点，组装楼栋级节点id进buildingId
             setBuildingId(tempEntity);
         }
-        
+
         //步骤三
         //查小区名
         /* t_community */
@@ -502,7 +463,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return houses;
     }
-    
+
     private HouseEntity setBuildingId(HouseEntity tempEntity){
         Long pid = 0L; //id和pid相同的问题数据导致死循环
         HouseEntity parent = houseService.getParent(tempEntity);
@@ -513,9 +474,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return parent;
     }
-    
+
     /**
      * 业主详情查看
+     * 此方法在2021.2.24已过期
      * 新方法 getUserAndMemberInfo
      * @param userId	    用户ID
      * @Param houseId       房屋ID
@@ -540,7 +502,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //userInfo.setProprietorMembers(houseMemberEntities);
         return userInfo;
     }
-    
+
     /**
      * @Description: 小区业主/家属获取门禁权限
      * @Param: [uid, communityId]
@@ -563,16 +525,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return returnMap;
     }
-    
+
     //查询身份(是不是小区业主或家属)
     private boolean canGetLongAccess(String uid, Long communityId, String mobile){
         if(userHouseService.hasHouse(uid,communityId)
-            || relationService.isHouseMember(mobile,communityId)){
+                || relationService.isHouseMember(mobile,communityId)){
             return true;
         }
         return false;
     }
-    
+
     //设置不过期门禁
     private String setUserLongAccess(String uid){
         String token = UUID.randomUUID().toString().replace("-", "");
@@ -581,7 +543,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         redisTemplate.opsForValue().set("UEntry:" + uid, JSON.toJSONString(visitorEntryVO));
         return token;
     }
-    
+
     /**
      * @Description: 查询用户是否存在
      * @Param: [uid]
@@ -605,34 +567,52 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return map;
     }
-    
+
     /**
-    * @Description: 单表查询用户信息
+     * @Description: 单表查询用户信息
      * @Param: [uid]
      * @Return: com.jsy.community.entity.UserEntity
      * @Author: chq459799974
      * @Date: 2021/1/20
-    **/
+     **/
     @Override
     public UserEntity queryUserDetailByUid(String uid){
         return userMapper.selectOne(new QueryWrapper<UserEntity>().select("*").eq("uid",uid));
     }
 
 
+
     @Override
     public UserEntity getRealAuthAndHouseId(String uid) {
-        return userMapper.getRealAuthAndHouseId(uid);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setIsRealAuth(userMapper.getRealAuthStatus(uid));
+        //拿到用户的最新房屋id
+        userEntity.setHouseholderId(userMapper.getLatestHouseId(uid));
+        return userEntity;
     }
 
     @Override
     public UserInfoVo getUserAndMemberInfo(String uid, Long houseId) {
-        //1.查出用户姓名、用户性别、和房屋地址
+        //1.查出用户姓名、用户性别、
         UserInfoVo userInfo = userMapper.selectUserNameAndHouseAddr(uid);
-        //2.拿到房屋地址组成的字符串 如两江新区幸福广场天王星B栋1801
-        userInfo.setDetailAddress(userMapper.selectHouseAddr(houseId));
+        //2.拿到房屋地址组成的字符串 如两江新区幸福广场天王星B栋1801 和 房屋所在社区id
+        UserInfoVo userInfoVo = userMapper.selectHouseAddr(houseId);
+        BeanUtils.copyProperties(userInfoVo, userInfo);
         List<HouseMemberEntity> houseMemberEntities = relationService.selectID(uid, houseId);
-        userInfo.setProprietorMembers(houseMemberEntities);
-        return userInfo;
+        userInfoVo.setProprietorMembers(houseMemberEntities);
+        return userInfoVo;
+    }
+
+    @Override
+    public UserInfoVo userInfoDetails(Long communityId, Long houseId, String userId) {
+        UserInfoVo vo = new UserInfoVo();
+        //1.根据房屋id查出当前房屋信息：
+        HouseVo houseVo = userMapper.getHouseInfoById(houseId);
+        vo.setProprietorHouses(Collections.singletonList(houseVo));
+        //2.根据社区id和用户id查出所有的车辆信息：车牌、车辆类型、行驶证图片
+        List<CarEntity> carEntities = carService.getAllCarById(communityId, userId);
+        vo.setProprietorCars(carEntities);
+        return vo;
     }
 
 

@@ -9,6 +9,7 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseVo;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -98,11 +99,12 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 
 	/**
-	 * 通过用户id和社区id查出用户房屋信息
+	 * 通过用户id查出用户房屋信息
 	 * @param userId 		用户id
 	 * @return				返回房屋信息列表
 	 */
 	@Override
+	@Deprecated
 	public List<HouseVo> queryUserHouseList(String userId) {
 		return userHouseMapper.queryUserHouseList(userId);
 	}
@@ -128,7 +130,13 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 * @since  2020/12/24 14:07
 	 */
 	@Override
-	public void addHouseBatch(List<UserHouseEntity> any) {
-		userHouseMapper.addHouseBatch(any);
+	public void addHouseBatch(List<UserHouseQo> any, String uid) {
+		userHouseMapper.addHouseBatch(any, uid);
+	}
+
+
+	@Override
+	public void update(UserHouseQo h, String uid) {
+		userHouseMapper.update(h, uid);
 	}
 }

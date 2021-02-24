@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -41,17 +42,27 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 
 
 	/**
-	 * 通过用户id和社区id查出用户房屋信息
+	 * 通过用户id查出用户房屋信息
 	 * @param userId 		用户id
 	 * @return				返回房屋信息列表
 	 */
 	@Select("select h.id,h.community_id,h.house_id,c.name as communityName,s.building,s.unit,s.floor,s.door from t_user_house as h LEFT JOIN t_house as s on h.house_id = s.id LEFT JOIN t_community as c on h.community_id = c.id  where h.deleted = 0 and s.deleted = 0 and c.deleted = 0 and h.uid = #{userId} and check_status = 1")
+	@Deprecated
 	List<HouseVo> queryUserHouseList(@Param("userId") String userId);
 
 	/**
 	 * 批量新增房屋信息
+	 * @param any 		需要更新的房屋信息
+	 * @param uid		用户id
 	 * @author YuLF
 	 * @since  2020/12/24 14:07
 	 */
-    void addHouseBatch(@Param("userHouseList") List<UserHouseEntity> any);
+    void addHouseBatch(@Param("anyHouse") List<UserHouseQo> any, @Param("uid") String uid);
+
+	/**
+	 * 更新房屋信息
+	 * @param h 	房屋信息
+	 * @param uid	用户id
+	 */
+	void update(UserHouseQo h, String uid);
 }

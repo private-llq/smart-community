@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.qo.proprietor.CarQO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -17,9 +18,10 @@ public interface CarMapper extends BaseMapper<CarEntity> {
 
     /**
      * 列表添加车辆信息方式
-     * @param carEntityList 业主车辆信息 列表
+     * @param cars 业主车辆信息 列表
+     * @param uid  业主id
      */
-    void addProprietorCarForList(List<CarEntity> carEntityList);
+    void addProprietorCarForList(List<CarQO> cars, String uid);
 
 
     /**
@@ -31,4 +33,10 @@ public interface CarMapper extends BaseMapper<CarEntity> {
     List<CarEntity> queryUserCarById(@Param("userId") String userId);
 
 
+    /**
+     * 手动通过uid和 车辆信息进行更新车辆
+     * @param c             车辆信息
+     * @param uid           用户id
+     */
+    void update(CarQO c, String uid);
 }

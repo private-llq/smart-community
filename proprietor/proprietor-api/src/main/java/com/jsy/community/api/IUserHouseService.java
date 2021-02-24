@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -56,12 +57,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 
 
 	/**
-	 * 通过用户id和社区id查出用户房屋信息
+	 * 通过用户id查出用户房屋信息
 	 * @author YuLF
 	 * @since  2020/12/18 14:18
 	 * @param userId 		用户id
 	 * @return				返回房屋信息列表
 	 */
+	@Deprecated
 	List<HouseVo> queryUserHouseList(String userId);
 	
 	/**
@@ -75,8 +77,18 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 
 	/**
 	 * 批量新增房屋信息
+	 * @param any		房屋信息
+	 * @param uid 		用户id
 	 * @author YuLF
 	 * @since  2020/12/24 14:07
 	 */
-    void addHouseBatch(List<UserHouseEntity> any);
+    void addHouseBatch(List<UserHouseQo> any, String uid);
+
+
+	/**
+	 * 更新房屋信息
+	 * @param h 	房屋信息
+	 * @param uid	用户id
+	 */
+	void update(UserHouseQo h, String uid);
 }

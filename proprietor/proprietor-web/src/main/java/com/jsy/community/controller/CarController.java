@@ -9,16 +9,15 @@ import com.jsy.community.entity.CarEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
-import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.PicUtil;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +49,6 @@ public class CarController {
 	
 	/**
 	 * 新增业主固定车辆
-	 *
 	 * @param carEntity 前端参数对象
 	 * @return 返回新增结果
 	 */
@@ -66,20 +64,54 @@ public class CarController {
 		String filePath = carEntity.getCarImageUrl();
 		if (!StringUtils.isEmpty(filePath)) {
 			// 将图片地址存入redis 用于对比 便于清理无用图片
-			stringRedisTemplate.opsForSet().add("car_img_all",filePath);
+			stringRedisTemplate.opsForSet().add("",filePath);
 		}
 		//3.登记新增车辆操作
 		return integer > 0 ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
 	}
-	
+	public static void main(String[] args) {
+		String host = "https://api08.aliyun.venuscn.com";
+		String path = "/ocr/vehicle-license";
+		String method = "POST";
+		String appcode = "9b53bb7f5f5945fcb4c42ecd79f31642";
+		Map<String, String> headers = new HashMap<String, String>();
+		//最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
+		headers.put("Authorization", "APPCODE " + appcode);
+		//根据API的要求，定义相对应的Content-Type
+		headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+		Map<String, String> querys = new HashMap<String, String>();
+		Map<String, String> bodys = new HashMap<String, String>();
+		bodys.put("pic", "https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20181013%2Fe3a4ec6caada4b799e4573b1164ca72a.jpeg&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1616746909&t=69c8fb00679da4fb9a5bdf23ed71fcb2");
+		bodys.put("type", "1");
+
+
+		try {
+			/**
+			 * 重要提示如下:
+			 * HttpUtils请从
+			 * https://github.com/aliyun/api-gateway-demo-sign-java/blob/master/src/main/java/com/aliyun/api/gateway/demo/util/HttpUtils.java
+			 * 下载
+			 *
+			 * 相应的依赖请参照
+			 * https://github.com/aliyun/api-gateway-demo-sign-java/blob/master/pom.xml
+			 */
+			HttpResponse response = HttpUtils.doPost(host, path, method, headers, querys, bodys);
+			System.out.println(response.toString());
+			//获取response的body
+			System.out.println(EntityUtils.toString(response.getEntity()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * 修改业主固定车辆
-	 *
+	 * 业主端新方法：com.jsy.community.controller.UserController#proprietorUpdate
 	 * @param qo 前端请求参数对象
 	 * @return 返回修改影响行数
 	 */
 	@Login
+	@Deprecated
 	@ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
 	@PutMapping()
 	public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO qo) {
@@ -134,15 +166,15 @@ public class CarController {
 	 * @return 返回图片上传成功后的访问路径地址
 	 */
 	@Login
-	@ApiOperation("所属人车辆图片上传接口")
-	@ApiImplicitParam(name = "carImage", value = "车辆图片文件")
+	@ApiOperation("所属人车辆行驶证图片上传接口")
+	@ApiImplicitParam(name = "carImage", value = "车辆行驶证文件")
 	@PostMapping(value = "carImageUpload")
 	public CommonResult<?> carImageUpload(@RequestParam("carImage") MultipartFile carImage)  {
 		PicUtil.imageQualified(carImage);
 		//4.调用上传服务接口 进行上传文件  返回访问路径
 		String filePath = MinioUtils.upload(carImage, BusinessConst.CAR_IMAGE_BUCKET_NAME);
 		// 将图片地址存入redis  用于对比 便于清理无用图片
-		stringRedisTemplate.opsForSet().add("car_img_part",filePath);
+		stringRedisTemplate.opsForSet().add(BusinessConst.REDIS_CAR_IMAGE_BUCKET_NAME,filePath);
 		return CommonResult.ok(filePath,"上传成功!");
 	}
 

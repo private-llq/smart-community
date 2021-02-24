@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,15 +99,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     /**
      * 列表添加车辆信息方式
-     * @param carEntityList 业主车辆信息 列表
+     * @param cars 业主车辆信息 列表
+     * @param uid  业主id
      */
     @Override
-    public void addProprietorCarForList(List<CarEntity> carEntityList) {
-        //对所有车辆信息 设置默认的id
-        for(CarEntity carEntity : carEntityList ){
-            carEntity.setId(SnowFlake.nextId());
-        }
-        carMapper.addProprietorCarForList(carEntityList);
+    public void addProprietorCarForList(List<CarQO> cars, String uid) {
+        carMapper.addProprietorCarForList(cars, uid);
     }
 
     /**
@@ -119,6 +117,18 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         return carMapper.queryUserCarById(userId);
     }
 
+    @Override
+    public List<CarEntity> getAllCarById(Long communityId, String userId) {
+        Map<String, Object> columnMap = new HashMap<>(2);
+        columnMap.put("uid", userId);
+        columnMap.put("community_id", communityId);
+        return carMapper.selectByMap(columnMap);
+    }
+
+    @Override
+    public void update(CarQO c, String uid) {
+        carMapper.update(c, uid);
+    }
 
 
 }

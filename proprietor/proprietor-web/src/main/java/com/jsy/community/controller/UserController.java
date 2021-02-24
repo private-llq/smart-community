@@ -11,18 +11,19 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.ProprietorQO;
-import com.jsy.community.utils.*;
+import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.PicUtil;
+import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserInfoVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -90,56 +91,25 @@ public class UserController {
         return CommonResult.ok(userInfoVo);
     }
 
-
-
     /**
-     * 2021 2.23此方法已过期
-     * PostMapping("register")
-     * 【用户】业主信息登记
-     * @param qo  参数实体
+     * 用户基本信息 [我的房屋] -> 编辑资料 点击后的信息
      * @author YuLF
-     * @since  2020/11/15 11:29
-     * @return              返回是否登记成功
+     * @Param  cid      社区id
+     * @Param  hid      房屋id
+     * @since  2021/2/23 17:22
      */
     @Login
-    @Deprecated
-    @ApiOperation("业主信息登记")
-    public CommonResult<Boolean> proprietorRegister(@RequestBody  ProprietorQO qo) {
-        String userId = UserUtils.getUserId();
-        //1.数据填充  新增业主信息时，必须要携带当前用户的uid  业主id首次不需要新增，只有在审核房屋通过时，业主id才会改变
-        qo.setUid(userId);
-        qo.setHouseholderId(null);
-        //2.验证业主信息登记必填项
-        ValidatorUtils.validateEntity(qo, ProprietorQO.ProprietorRegister.class);
-        //2.1 验证业主信息实体里面的房屋实体id是否为空，如果为空 说明前端并没有选择所属房屋
-        if (qo.getHouseEntityList() == null || qo.getHouseEntityList().isEmpty()) {
-            throw new ProprietorException(1, "缺失房屋登记信息!");
-        }
-        //验证房屋第一个id和社区id参数值是否正确 至少需要登记一个房屋
-
-        //3.有填登记车辆信息的情况下
-        if (qo.getHasCar()) {
-            if (null == qo.getCarEntityList()  || qo.getCarEntityList().isEmpty()) {
-                throw new ProprietorException(1, "缺失车辆登记信息!");
-            }
-            //通过uid 查询t_user_auth表的用户手机号码
-            String userMobile = iUserAuthService.selectContactById(qo.getUid());
-            //t_user_auth 表中用户没有注册
-            if(userMobile == null){
-                throw new ProprietorException(JSYError.FORBIDDEN.getCode(), "用户不存在!");
-            }
-            //验证所有车辆信息 验证成功没有抛异常 则把当前这个对象的一些社区id 所属人 手机号码 设置进去 方便后续车辆登记
-            for (CarEntity carEntity : qo.getCarEntityList()){
-                ValidatorUtils.validateEntity(carEntity, CarEntity.ProprietorCarValidated.class);
-                carEntity.setCommunityId(qo.getHouseEntityList().get(0).getCommunityId());
-                carEntity.setUid(userId);
-                carEntity.setOwner(qo.getRealName());
-                carEntity.setContact(userMobile);
-            }
-        }
-        //登记业主相关信息
-        return userService.proprietorRegister(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    @ApiOperation("我的房屋详情")
+    @ApiImplicitParams({@ApiImplicitParam(name="cid", value = "社区id", paramType = "query" , dataType="Long", dataTypeClass=Long.class),
+    @ApiImplicitParam( name = "hid", value = "房屋id", paramType = "query", dataType = "Long", dataTypeClass = Long.class)})
+    @GetMapping("/info/details")
+    public CommonResult<UserInfoVo> userInfoDetails(@RequestParam Long cid, @RequestParam Long hid){
+        return CommonResult.ok(userService.userInfoDetails(cid, hid, UserUtils.getUserId()));
     }
+
+
+
+
 
     /**
      * 【用户】业主更新信息
@@ -153,17 +123,23 @@ public class UserController {
 	@ApiOperation("业主信息更新")
     @PutMapping("update")
     public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO qo) {
-        ValidatorUtils.validateEntity(qo, ProprietorQO.ProprietorUpdateValid.class);
-		//3.更新业主信息
+		//3.更新业主房屋信息和车辆信息
         qo.setUid(UserUtils.getUserId());
-        if( qo.getHasCar() == null ){
+        if( Objects.isNull(qo.getHasCar()) ){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
         }
-        if( qo.getHouseEntityList() == null || qo.getHouseEntityList().isEmpty() ){
+        //如果有车 则批量验证车辆信息
+        if( qo.getHasCar() ){
+            qo.getCars().forEach( car ->  ValidatorUtils.validateEntity(car, CarQO.CarValidated.class));
+        }
+        if( CollectionUtils.isEmpty(qo.getHouses()) ){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(), "房屋未指定!");
         }
+        //房屋数据业务唯一id、房屋id、社区id边界有效性验证
+        qo.getHouses().forEach( house -> ValidatorUtils.validateEntity( house, UserHouseQo.UpdateHouse.class ));
         return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
+
 
 
 
@@ -208,7 +184,9 @@ public class UserController {
 
     /**
      * 在2021.2.23 此方法已过期
-     * 新的方法参见当前类 com.jsy.community.controller.UserController#userInfo
+     * 新的方法参见当前类
+     * userInfo()
+     * userInfoDetails()
      * 业主详情接口
      * @author YuLF
      * @since  2020/12/18 11:39
@@ -261,7 +239,7 @@ public class UserController {
     		return CommonResult.error("缺少身份证正反面参数");
 	    }
     }
-    
+
     //TODO 用户实名认证
     
 }

@@ -47,7 +47,7 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return 登录信息
 	 */
 	String register(RegisterQO qo);
-	
+
 	/**
 	* @Description: 三方登录
 	 * @Param: [userThirdPlatformQO]
@@ -64,21 +64,16 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/12
 	**/
-	UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO);
+	UserAuthVo bindThirdPlatform(UserThirdPlatformQO qo);
 
-	/**
-	 * 业主信息登记
-	 * @param proprietorQO	登记实体参数
-	 * @return				返回是否登记成功
-	 */
-	Boolean proprietorRegister(ProprietorQO proprietorQO);
+
 
 	/**
 	 * 业主信息更新
-	 * @param proprietorQO  更新实体
+	 * @param qo  更新实体
 	 * @return				返回更新布尔值
 	 */
-    Boolean proprietorUpdate(ProprietorQO proprietorQO);
+    Boolean proprietorUpdate(ProprietorQO qo);
 
     /**
      * 根据业主id查询业主信息及业主家属信息
@@ -136,7 +131,7 @@ public interface IUserService extends IService<UserEntity> {
 
 	/**
 	 * 根据id获取用户实名认证信息和最新的房屋id
-	 * @param userId 	用户id
+	 * @param userId 		用户id
 	 * @return			返回实名认证状态 和 最新的一个房屋id
 	 */
 	UserEntity getRealAuthAndHouseId(String userId);
@@ -149,4 +144,14 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return					返回用户信息和用户家属信息
 	 */
 	UserInfoVo getUserAndMemberInfo(String uid, Long houseId);
+
+
+	/**
+	 * 根据社区id 和 房屋id 查出用户房屋信息详情
+	 * @param cid 		社区id
+	 * @param hid		房屋id
+	 * @param uid		用户id
+	 * @return			返回基本查询信息
+	 */
+	UserInfoVo userInfoDetails(Long cid, Long hid, String uid);
 }

@@ -58,9 +58,10 @@ public interface ICarService extends IService<CarEntity> {
 
     /**
      * 业主登记时，调用车辆登记接口登记业主的车辆
-     * @param carEntityList   业主车辆信息 列表
+     * @param cars   业主车辆信息 列表
+     * @param uid    用户id
      */
-    void addProprietorCarForList(List<CarEntity> carEntityList);
+    void addProprietorCarForList(List<CarQO> cars, String uid);
 
 
     /**
@@ -71,4 +72,18 @@ public interface ICarService extends IService<CarEntity> {
     List<CarEntity> queryUserCarById(String userId);
 
 
+    /**
+     * 按用户id 和社区id 查询用户的车辆
+     * @param communityId   社区id
+     * @param userId        用户id
+     * @return              返回用户车辆信息
+     */
+    List<CarEntity> getAllCarById(Long communityId, String userId);
+
+    /**
+     * 手动通过uid和 车辆信息进行更新车辆
+     * @param c             车辆信息
+     * @param uid           用户id
+     */
+    void update(CarQO c, String uid);
 }

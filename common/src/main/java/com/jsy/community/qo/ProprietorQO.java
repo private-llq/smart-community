@@ -3,6 +3,8 @@ package com.jsy.community.qo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.qo.proprietor.CarQO;
+import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -31,7 +33,6 @@ public class ProprietorQO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Range(groups = {ProprietorUpdateValid.class}, min = 1, message = "长度错误!")
     @NotNull(groups = {PropertyUpdateValid.class}, message = "用户id为空")
     @ApiModelProperty("数据id")
     private Long id;
@@ -43,11 +44,11 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("业主ID")
     private Long householderId;
 
-    @Length(groups = {PropertyUpdateValid.class, ProprietorUpdateValid.class}, min = 1, max = 32, message = "昵称长度请在1~32之间")
+    @Length(groups = {PropertyUpdateValid.class}, min = 1, max = 32, message = "昵称长度请在1~32之间")
     @ApiModelProperty("昵称")
     private String nickname;
 
-    @Pattern(groups = {PropertyUpdateValid.class, ProprietorUpdateValid.class}, regexp = RegexUtils.REGEX_URL, message = "头像地址不正确")
+    @Pattern(groups = {PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_URL, message = "头像地址不正确")
     @ApiModelProperty("头像地址")
     private String avatarUrl;
 
@@ -60,7 +61,7 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("电话号码")
     private String mobile;
 
-    @Range(groups = {PropertyUpdateValid.class, ProprietorUpdateValid.class, ProprietorRegister.class}, min = 0, max = 2, message = "性别不可用")
+    @Range(groups = {PropertyUpdateValid.class, ProprietorRegister.class}, min = 0, max = 2, message = "性别不可用")
     @NotNull(groups = {ProprietorRegister.class}, message = "性别不能为空")
     @ApiModelProperty("性别，0未知，1男，2女")
     private Integer sex;
@@ -79,19 +80,19 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("是否实名认证")
     private Integer isRealAuth;
 
-    @Range(groups = {PropertyUpdateValid.class, ProprietorUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "省ID不可用")
+    @Range(groups = {PropertyUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "省ID不可用")
     @ApiModelProperty("省ID")
     private Integer provinceId;
 
-    @Range(groups = {PropertyUpdateValid.class, ProprietorUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "市ID不可用")
+    @Range(groups = {PropertyUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "市ID不可用")
     @ApiModelProperty("市ID")
     private Integer cityId;
 
-    @Range(groups = {PropertyUpdateValid.class, ProprietorUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "区ID不可用")
+    @Range(groups = {PropertyUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "区ID不可用")
     @ApiModelProperty("区ID")
     private Integer areaId;
 
-    @Length(groups = {PropertyUpdateValid.class, ProprietorUpdateValid.class}, min = 1, max = 128, message = "详细地址字符长度请在1~128之间")
+    @Length(groups = {PropertyUpdateValid.class}, min = 1, max = 128, message = "详细地址字符长度请在1~128之间")
     @ApiModelProperty("详细地址")
     private String detailAddress;
 
@@ -100,20 +101,16 @@ public class ProprietorQO implements Serializable {
     private Boolean hasCar;
 
     @ApiModelProperty("车辆集合")
-    private List<CarEntity> carEntityList;
+    private List<CarQO> cars;
 
     @ApiModelProperty("用来存储House的id和社区id")
-    private List<UserHouseEntity> houseEntityList;
+    private List<UserHouseQo> houses;
 
     /**
      * [物业]业主更新效验接口
      */
     public interface PropertyUpdateValid {}
 
-    /**
-     * [业主]业主更新效验接口
-     */
-    public interface ProprietorUpdateValid {}
 
     /**
      * [业主] 登记接口

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -43,18 +44,25 @@ public class CarQO implements Serializable {
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @Range(groups = { UpdateCarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
+    @Range(groups = { UpdateCarValidated.class, CarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
+    @NotNull(groups = {CarValidated.class}, message = "车辆类型不能为空!")
     @ApiModelProperty(value = "车辆类型")
     private Integer carType;
 
     @Pattern(groups = {UpdateCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
+    @NotBlank(groups = {CarValidated.class}, message = "车牌号不能为空!")
     @ApiModelProperty(value = "车辆牌照")
     private String carPlate;
 
-    @Pattern(groups = { UpdateCarValidated.class}, regexp = RegexUtils.REGEX_URL, message = "请提供一个正确车辆图片的访问地址!")
-    @ApiModelProperty(value = "车辆照片访问路径")
-    private String carImageUrl;
+    @Pattern(groups = { UpdateCarValidated.class, CarValidated.class}, regexp = RegexUtils.REGEX_URL, message = "请提供一个正确车辆图片的访问地址!")
+    @NotBlank(groups = {CarValidated.class}, message = "车辆访问路径不能为空!")
+    @ApiModelProperty(value = "行驶证照片访问路径")
+    private String drivingLicenseUrl;
 
+    /**
+     * 房屋认证 车辆信息  验证
+     */
+    public interface CarValidated {}
 
     /**
      * 更新车辆前端参数验证接口

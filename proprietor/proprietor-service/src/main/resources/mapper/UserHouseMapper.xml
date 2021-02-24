@@ -7,8 +7,19 @@
 	<insert id="addHouseBatch">
 		insert into t_user_house(id,uid,community_id,house_id,check_status)
 		values
-		<foreach collection="userHouseList" item="item" separator=",">
-			(#{item.id},#{item.uid},#{item.communityId},#{item.houseId},2)
+		<foreach collection="anyHouse" item="item" separator=",">
+			(${@com.jsy.community.utils.SnowFlake@nextId()},#{uid},#{item.communityId},#{item.houseId},2)
 		</foreach>
 	</insert>
+	<!-- 手动按房屋id 和用户id 更新用户房屋信息-->
+	<update id="update">
+		update t_user_house
+		<set>
+			community_id = #{h.communityId},
+			house_id = #{h.houseId}
+		</set>
+		<where>
+			id = #{h.id} and uid = #{uid} and deleted = 0
+		</where>
+	</update>
 </mapper>

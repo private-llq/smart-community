@@ -232,7 +232,12 @@ public interface BusinessConst {
 	/**
 	 * 车辆图片 上传 至 文件服务器 的 bucket Name
 	 */
-	String CAR_IMAGE_BUCKET_NAME = "user-avatar";
+	String CAR_IMAGE_BUCKET_NAME = "user-car-avatar";
+
+	/**
+	 * 车辆图片 redis 的 缓存 bucket Name
+	 */
+	String REDIS_CAR_IMAGE_BUCKET_NAME = "car_img_all";
 
 	//Es全文搜索索引名 mq 队列、交换机名称
 	/**
