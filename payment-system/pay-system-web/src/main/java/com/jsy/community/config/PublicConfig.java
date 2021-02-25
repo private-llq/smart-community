@@ -137,7 +137,7 @@ public class PublicConfig {
         //jsonObject.put("packages", packageStr);
         jsonObject.put("noncestr", nonceStr);
         jsonObject.put("timestamp", time);
-        //jsonObject.put("signType", "RSA");
+        jsonObject.put("sign_type","HMAC-SHA256");
         jsonObject.put("sign", packageSign);
         return jsonObject;
     }

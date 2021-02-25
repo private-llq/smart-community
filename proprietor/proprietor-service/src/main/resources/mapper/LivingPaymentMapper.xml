@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.LivingPaymentMapper">
     <sql id="query">
-        where tg.uid=#{userID}
+        where t.deleted=0 and tg.deleted=0 and tpt.deleted=0 and tg.uid=#{userID}
         <if test="doorNo!=null and doorNo!=''">
             and t.family_id=#{doorNo}
         </if>
@@ -29,7 +29,7 @@
         FROM t_pay_order po
         join t_pay_type tt on po.payment_type=tt.id
         join t_pay_group pg on po.group_id=pg.id
-        where pg.uid=#{userId} ORDER BY timeStart desc limit #{page},#{size}
+        where po.deleted=0 and tt.deleted=0 and pg.deleted=0  pg.uid=#{userId} ORDER BY timeStart desc limit #{page},#{size}
     </select>
 
 
@@ -53,7 +53,7 @@
         join t_pay_type tt on po.payment_type=tt.id
         join t_pay_group pg on po.group_id=pg.id
         JOIN t_pay_company pc on po.payment_type=pc.id
-        where pg.uid=#{userId} and pg.name=#{groupName}
+        where tt.deleted=0 and pg.deleted=0 and pc.deleted=0 and po.deleted=0 and pg.uid=#{userId} and pg.name=#{groupName}
     </select>
     <select id="selectGroupAll" resultMap="GroupVOMap">
         SELECT distinct
@@ -82,7 +82,7 @@
         status as status,
         family_name as familyName
         FROM t_pay_order
-        where id=#{id}
+        where deleted=0 and id=#{id}
     </select>
     <select id="findGroup" resultType="com.jsy.community.entity.PayGroupEntity">
         select id,uid,name,type from t_pay_group where deleted=0 and uid=#{userId}
@@ -114,7 +114,7 @@
         t.order_num as orderNum,t.bill_classification as billClassification,
         t.tally as tally,t.remark as remark,t.remark_img as remarkImg
         FROM t_pay_order t JOIN t_pay_type tp on t.payment_type=tp.id
-        where t.id=#{id}
+        where t.deleted=0 and tp.deleted=0 and t.id=#{id}
     </select>
 
     <resultMap id="GroupVOMap" type="com.jsy.community.vo.GroupVO">

@@ -113,12 +113,15 @@ public class RelationServiceImpl implements IRelationService {
     }
     /**
      * 查询业主下面的家属详情
-     * @param RelationId
+     * @param RelationId 家属id
      * @return
      */
     @Override
     public RelationVO selectOne(Long RelationId, String userId) {
         HouseMemberEntity houseMemberEntity = houseMemberMapper.selectById(RelationId);
+        if (houseMemberEntity==null){
+            return null;
+        }
         List<CarEntity> carEntities = carMapper.selectList(new QueryWrapper<CarEntity>().eq("house_member_id", RelationId));
         RelationVO relationVO = new RelationVO();
         relationVO.setIdentificationType(houseMemberEntity.getIdentificationType());
@@ -149,7 +152,6 @@ public class RelationServiceImpl implements IRelationService {
             objects.add(relationCarsVO);
         }
         relationVO.setCars(objects);
-
         return relationVO;
     }
     /**
