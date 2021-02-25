@@ -2,10 +2,7 @@ package com.jsy.community.constant;
 
 import com.jsy.community.entity.HouseLeaseConstEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author chq459799974
@@ -25,6 +22,9 @@ public interface BusinessEnum {
 	 * @Date: 2020/11/28
 	**/
 	enum RegionQueryTypeEnum {
+		/**
+		 * 省市区查询类型
+		 */
 		SUB("getSubRegion", 1, 1, Integer.class),
 		CITY_MAP("getCityMap", 2, 2, null),
 		HOT_CITY("getHotCityList", 3,2, null),
@@ -96,11 +96,15 @@ public interface BusinessEnum {
 	 * @Date: 2020/11/28
 	**/
 	enum CarTypeEnum {
+		/**
+		 * 车辆枚举
+		 */
 		TINY("微型车", 1),
 		SMALL("小型车", 2),
 		COMPACT("紧凑型车",3),
 		MIDDLE("中型车",4),
-		ML("中大型车",5);
+		ML("中大型车",5),
+		OTHER("其他车型",6);
 		private String name;
 		private Integer code;
 		CarTypeEnum(String name, Integer code) {
@@ -129,22 +133,97 @@ public interface BusinessEnum {
 			return this.code+"_"+this.name;
 		}
 		
-		public static final List<Map<String, Object>> carTypeList = new ArrayList<>();
-		public static final Map<Integer, String> carTypeMap = new HashMap<>();
-		public static  final  int CARTYPE_MAX = 5;
-		public static  final  int CARTYPE_MIN = 1;
+		public static final List<Map<String, Object>> CAR_TYPE_LIST = new ArrayList<>();
+		public static final Map<Integer, String> CAR_TYPE_MAP = new HashMap<>();
+		public static  final  int CAR_TYPE_MAX = 6;
+		public static  final  int CAR_TYPE_MIN = 1;
+
+		public static String getCode(Integer code){
+			CarTypeEnum[] values = CarTypeEnum.values();
+			for(CarTypeEnum c : values){
+				if( c.code.equals(code) ){
+					return c.name;
+				}
+			}
+			return OTHER.name;
+		}
+		/**
+		 * 上述6种类型 含汽车的绝大多数种类
+		 * 拿到包含
+		 * @author YuLF
+		 * @since  2021/2/25 9:42
+		 */
+		public static CarTypeEnum getContainsType(String carType){
+			int matchStrLength = 3;
+			if( Objects.isNull(carType) || carType.length() < matchStrLength ){
+				return CarTypeEnum.OTHER;
+			}
+			CarTypeEnum[] values = CarTypeEnum.values();
+			for( CarTypeEnum carTypeEnum : values ){
+				if( carTypeEnum.name.contains(carType.substring(0, 2)) ){
+					return carTypeEnum;
+				}
+			}
+			return CarTypeEnum.OTHER;
+		}
+
 		static {
 			for(CarTypeEnum regionQueryTypeEnum : CarTypeEnum.values()){
 				HashMap<String, Object> map = new HashMap<>();
 				map.put("code", regionQueryTypeEnum.getCode());
 				map.put("name", regionQueryTypeEnum.getName());
-				carTypeList.add(map);
-				carTypeMap.put(regionQueryTypeEnum.getCode(), regionQueryTypeEnum.getName());
+				CAR_TYPE_LIST.add(map);
+				CAR_TYPE_MAP.put(regionQueryTypeEnum.getCode(), regionQueryTypeEnum.getName());
 			}
-			sourceMap.put("carType",carTypeList);
+			sourceMap.put("carType", CAR_TYPE_LIST);
 		}
 	}
-	
+
+	/**
+	 * 身份证件类型
+	 * @author YuLF
+	 * @since  2021/2/25 11:29
+	 */
+	enum IdentificationType {
+		/**
+		 * 身份证件类型
+		 */
+		ID_CARD("居民身份证",1),
+		PASSPORT("护照",2);
+
+		private final String name;
+		private final Integer code;
+
+		IdentificationType(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		private volatile static Map<Integer, String> kv = null;
+
+		public static Map<Integer, String> getKv(){
+			if( kv == null ){
+				synchronized (IdentificationType.class){
+					if(kv == null){
+						IdentificationType[] values = values();
+						kv = new HashMap<>(values.length);
+						for(IdentificationType everyOne : values){
+							kv.put(everyOne.code, everyOne.name);
+						}
+					}
+				}
+			}
+			return kv;
+		}
+	}
 	/**
 	* @Description: 审核状态枚举
 	 * @Author: chq459799974
