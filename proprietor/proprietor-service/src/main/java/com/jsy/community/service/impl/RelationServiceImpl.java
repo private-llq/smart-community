@@ -1,6 +1,8 @@
 package com.jsy.community.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IRelationService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseMemberEntity;
@@ -148,7 +150,7 @@ public class RelationServiceImpl implements IRelationService {
             relationCarsVO.setCarImgURL(carEntity.getCarImageUrl());
             relationCarsVO.setCarId(carEntity.getCarPlate());
             relationCarsVO.setCommunityId(carEntity.getCommunityId());
-            relationCarsVO.setCarTypeName(carEntity.getCarType()==1?"微型车":carEntity.getCarType()==2?"小型车":carEntity.getCarType()==3?"紧凑型车":carEntity.getCarType()==4?"中型车":"中大型车");
+            relationCarsVO.setCarTypeName(BusinessEnum.CarTypeEnum.getCode(carEntity.getCarType()));
             objects.add(relationCarsVO);
         }
         relationVO.setCars(objects);
