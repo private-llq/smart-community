@@ -1,6 +1,8 @@
 package com.jsy.community.constant;
 
 import com.jsy.community.entity.HouseLeaseConstEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -10,6 +12,8 @@ import java.util.*;
  * @since 2020-11-28 13:47
  **/
 public interface BusinessEnum {
+	
+	Logger log = LoggerFactory.getLogger(BusinessEnum.class);
 	
 	/**
 	 * 资源类查询类型大字典
@@ -540,6 +544,57 @@ public interface BusinessEnum {
 				relationshipMap.put(relationshipEnum.getCode(), relationshipEnum.getName());
 			}
 			sourceMap.put("relationship",relationshipList);
+		}
+	}
+	
+	/**
+	 * @Description: 空气质量枚举
+	 * @Author: chq459799974
+	 * @Date: 2020/2/25
+	 **/
+	enum AQIEnum {
+		LV1("优", 0, 50),
+		LV2("良", 51, 100),
+		LV3("轻度污染", 101, 150),
+		LV4("中度污染", 151, 200),
+		LV5("重度污染", 201, 250),
+		LV6("严重污染", 300, 999);
+		private String name;
+		private int min;
+		private int max;
+		
+		AQIEnum(String name, int min, int max) {
+			this.name = name;
+			this.min = min;
+			this.max = max;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public int getMin() {
+			return min;
+		}
+		public void setMin(int min) {
+			this.min = min;
+		}
+		public int getMax() {
+			return max;
+		}
+		public void setMax(int max) {
+			this.max = max;
+		}
+		
+		public static String getAQIName(int value, Double lon, Double lat, String cityId){
+			for(AQIEnum qQIEnum : AQIEnum.values()){
+				if(value > qQIEnum.min && value < qQIEnum.max){
+					return qQIEnum.getName();
+				}
+			}
+			log.error("空气质量指数异常 value：" + value + " 经度：" + lon + " 纬度：" + lat + " 天气接口城市ID：" + cityId);
+			return "";
 		}
 	}
 
