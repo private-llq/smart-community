@@ -63,7 +63,6 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @param userId 		用户id
 	 * @return				返回房屋信息列表
 	 */
-	@Deprecated
 	List<HouseVo> queryUserHouseList(String userId);
 	
 	/**

@@ -228,12 +228,15 @@ public interface BusinessConst {
 	 * 用户头像 人脸头像
 	 */
 	String FAVE_AVATAR_BUCKET_NAME = "user-face-avatar";
-
+	//车辆存储相关
 	/**
 	 * 车辆图片 上传 至 文件服务器 的 bucket Name
 	 */
-	String CAR_IMAGE_BUCKET_NAME = "user-car-avatar";
-
+	String CAR_IMAGE_BUCKET_NAME = "car-avatar";
+	/**
+	 * 车辆行驶证 存放 文件夹 的文件夹名称
+	 */
+	String CAR_DRIVING_LICENSE_BUCKET_NAME = "car-driving-license";
 	/**
 	 * 车辆图片 redis 的 缓存 bucket Name
 	 */
@@ -256,7 +259,7 @@ public interface BusinessConst {
 	 * 社区app主页全文搜索路由key名称
 	 */
 	String APP_SEARCH_ROUTE_KEY = "appSearchFullText";
-	
+
 	//========= 车辆正则 ==========
 	/**
 	 * 普通机动车
@@ -266,6 +269,7 @@ public interface BusinessConst {
 	 * 新能源车
 	 */
 	String REGEX_OF_NEW_ENERGY_CAR = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}(([0-9]{5}[DF])|([DF][A-HJ-NP-Z0-9][0-9]{4}))$";
+
 
 
 

@@ -7,7 +7,6 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Pattern;
-import java.io.Serializable;
 
 /**
  * @author chq459799974
@@ -22,6 +21,6 @@ public class VisitingCarQO extends BaseEntity {
 	private String carPlate;
 	
 	@ApiModelProperty(value = "来访车辆类型ID")
-	@Range(min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型不合规范")
+	@Range(min = BusinessEnum.CarTypeEnum.CAR_TYPE_MIN, max = BusinessEnum.CarTypeEnum.CAR_TYPE_MAX, message = "车辆类型不合规范")
 	private Integer carType;
 }

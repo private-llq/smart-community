@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
@@ -90,6 +91,8 @@ public class UserController {
     }
 
     /**
+     * 新的方法请调用 我的详情 GetMapping("details")
+     * GetMapping("/info/details")
      * 用户基本信息 [我的房屋] -> 编辑资料 点击后的信息
      * @author YuLF
      * @Param  cid      社区id
@@ -97,10 +100,10 @@ public class UserController {
      * @since  2021/2/23 17:22
      */
     @Login
+    @Deprecated
     @ApiOperation("我的房屋详情")
     @ApiImplicitParams({@ApiImplicitParam(name="cid", value = "社区id", paramType = "query" , dataType="Long", dataTypeClass=Long.class),
     @ApiImplicitParam( name = "hid", value = "房屋id", paramType = "query", dataType = "Long", dataTypeClass = Long.class)})
-    @GetMapping("/info/details")
     public CommonResult<UserInfoVo> userInfoDetails(@RequestParam Long cid, @RequestParam Long hid){
         return CommonResult.ok(userService.userInfoDetails(cid, hid, UserUtils.getUserId()));
     }
@@ -139,7 +142,17 @@ public class UserController {
     }
 
 
-
+    /**
+     * 获取证件类型常量
+     * @author YuLF
+     * @since  2021/2/25 11:42
+     */
+    @Login
+    @ApiOperation("证件类型常量")
+    @GetMapping("/identificationType")
+    public Map<Integer, String> getIdentificationType(){
+        return BusinessEnum.IdentificationType.getKv();
+    }
 
     /**
      * @author YuLF
@@ -181,10 +194,6 @@ public class UserController {
     }
 
     /**
-     * 在2021.2.23 此方法已过期
-     * 新的方法参见当前类
-     * userInfo()
-     * userInfoDetails()
      * 业主详情接口
      * @author YuLF
      * @since  2020/12/18 11:39
@@ -226,10 +235,12 @@ public class UserController {
     public CommonResult queryUroraTags(){
         return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
     }
-    
+
+
     @ApiOperation("身份证照片识别")
     @PostMapping("idCard/distinguish")
     public CommonResult distinguishIdCard(MultipartFile file,@RequestParam String type){
+        PicUtil.imageQualified(file);
     	if(PicContentUtil.ID_CARD_PIC_SIDE_FACE.equals(type) || PicContentUtil.ID_CARD_PIC_SIDE_BACK.equals(type)){
             Map<String, Object> returnMap = PicContentUtil.getIdCardPicContent(Base64Util.fileToBase64Str(file), type);
             return returnMap != null ? CommonResult.ok(returnMap) : CommonResult.error("识别失败");
@@ -239,5 +250,6 @@ public class UserController {
     }
 
     //TODO 用户实名认证
-    
+
+
 }

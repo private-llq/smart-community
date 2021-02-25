@@ -44,7 +44,7 @@ public class CarQO implements Serializable {
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @Range(groups = { UpdateCarValidated.class, CarValidated.class }, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
+    @Range(groups = { UpdateCarValidated.class, CarValidated.class }, min = BusinessEnum.CarTypeEnum.CAR_TYPE_MIN, max = BusinessEnum.CarTypeEnum.CAR_TYPE_MAX, message = "车辆类型选择错误!")
     @NotNull(groups = {CarValidated.class}, message = "车辆类型不能为空!")
     @ApiModelProperty(value = "车辆类型")
     private Integer carType;

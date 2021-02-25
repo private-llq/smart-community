@@ -76,6 +76,9 @@ public class UserEntity extends BaseEntity {
 	@TableField( exist = false )
 	private Integer relationCode;
 
+	@ApiModelProperty("证件类型：1.身份证 2.护照")
+	private Integer identificationType;
+
 	@ApiModelProperty("车辆信息")
 	@TableField( exist = false )
 	private CarEntity carEntity;

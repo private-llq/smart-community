@@ -30,7 +30,7 @@ public class DistributedLockAop extends BaseAop {
 
 
 
-    private RedissonClient redissonClient = null;
+    private volatile static RedissonClient redissonClient = null;
 
     /**
      * 环绕通知
@@ -80,6 +80,6 @@ public class DistributedLockAop extends BaseAop {
                 }
             }
         }
-        return this.redissonClient;
+        return redissonClient;
     }
 }

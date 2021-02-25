@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
@@ -396,6 +397,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         houseList.forEach( h -> userHouseService.update(h, qo.getUid()));
         //========================================== 业主 =========================================================
         //业主信息更新 userMapper.proprietorUpdate(qo)
+        //通常 已经到这一步说明上面的任务没有抛出任何异常 返回值  为冗余字段
         return true;
     }
 
@@ -477,15 +479,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     /**
      * 业主详情查看
-     * 此方法在2021.2.24已过期
-     * 新方法 getUserAndMemberInfo
      * @param userId	    用户ID
      * @Param houseId       房屋ID
      * @author YuLF
      * @since  2020/12/18 11:39
      * @return			返回业主详情信息
      */
-    @Deprecated
     @Transactional(rollbackFor = Exception.class)
     @Override
     public UserInfoVo proprietorDetails(String userId) {
@@ -603,7 +602,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return userInfoVo;
     }
 
+    /**
+     * 新方法：proprietorDetails
+     * @param communityId   社区id
+     * @param houseId       房屋id
+     * @param userId        用户id
+     * @return              返回用户详情信息
+     */
     @Override
+    @Deprecated
     public UserInfoVo userInfoDetails(Long communityId, Long houseId, String userId) {
         UserInfoVo vo = new UserInfoVo();
         //1.根据房屋id查出当前房屋信息：

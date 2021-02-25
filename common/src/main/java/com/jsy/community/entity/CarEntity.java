@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -64,17 +65,20 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @Range(groups = { AddCarValidated.class, ProprietorCarValidated.class}, min = BusinessEnum.CarTypeEnum.CARTYPE_MIN, max = BusinessEnum.CarTypeEnum.CARTYPE_MAX, message = "车辆类型选择错误!")
+    @Range(groups = { AddCarValidated.class, ProprietorCarValidated.class}, min = BusinessEnum.CarTypeEnum.CAR_TYPE_MIN, max = BusinessEnum.CarTypeEnum.CAR_TYPE_MAX, message = "车辆类型选择错误!")
     @NotNull(groups = {ProprietorCarValidated.class}, message = "车辆类型未选择!")
     @ApiModelProperty(value = "车辆类型： 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车")
     private Integer carType;
 
+    @TableField( exist = false)
+    @ApiModelProperty(value = "车辆类型文本")
+    private String carTypeText;
 
     @ApiModelProperty(value = "是否通过审核")
     private Integer checkStatus;
 
     @ApiModelProperty(value = "行驶证图片地址")
-    private Integer drivingLicenseUrl;
+    private String drivingLicenseUrl;
 
     @ApiModelProperty(value = "审核时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone="GMT+8")

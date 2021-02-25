@@ -37,7 +37,7 @@ public class PicUtil {
     /**
      * 图片文件最大kb
      */
-    public static final Integer IMAGE_MAX_SIZE = 500;
+    public static final Integer IMAGE_MAX_SIZE = 5000;
 
 
     /**

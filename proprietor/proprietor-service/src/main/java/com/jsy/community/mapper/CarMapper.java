@@ -29,7 +29,7 @@ public interface CarMapper extends BaseMapper<CarEntity> {
      * @param userId        用户id
      * @return              返回车辆信息列表
      */
-    @Select("select id,car_plate,car_type,car_image_url from t_car where uid = #{userId} and deleted = 0")
+    @Select("select id,car_plate,car_type,driving_license_url from t_car where uid = #{userId} and deleted = 0")
     List<CarEntity> queryUserCarById(@Param("userId") String userId);
 
 

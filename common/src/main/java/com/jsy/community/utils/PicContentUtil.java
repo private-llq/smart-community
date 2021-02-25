@@ -1,6 +1,11 @@
 package com.jsy.community.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.constant.DrivingLicense;
+import com.jsy.community.exception.JSYException;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -15,9 +20,11 @@ import java.util.Map;
  * @since 2021-02-24 15:13
  **/
 public class PicContentUtil {
-	
+
+
 	public static final String ID_CARD_PIC_SIDE_FACE = "face";
 	public static final String ID_CARD_PIC_SIDE_BACK = "back";
+	private static volatile DrivingLicense drivingLicense;
 	
 	//身份证照片内容识别
 	public static Map<String,Object> getIdCardPicContent(String picBase64,String type){
@@ -55,5 +62,67 @@ public class PicContentUtil {
 		}
 		return null;
 	}
-	
+	/**
+	 * 行驶证识别
+	 * @author YuLF
+	 * @since  2021/2/25 10:02
+	 * @Param	drivingLicenseImageUrl	行驶证图片
+	 * @return	返回车牌、车辆类型、行驶证图片
+	 */
+	public static Map<String, Object> getDrivingLicenseContent(String drivingLicenseImageUrl){
+		Map<String, String> headers = new HashMap<>(2);
+		drivingLicense = getDrivingLicenseInstance();
+		headers.put("Authorization", "APPCODE " + drivingLicense.getAppCode());
+		//根据API的要求，定义相对应的Content-Type
+		headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+		Map<String, String> queryParam = new HashMap<>(1);
+		Map<String, String> bodyParam = new HashMap<>(2);
+		//行驶证图片Base64字符串或者URL地址
+		bodyParam.put("pic", drivingLicenseImageUrl);
+		//行驶证正副本（1:正本 2:副本）
+		bodyParam.put("type", "1");
+		try {
+			HttpResponse response = HttpUtils.doPost(drivingLicense.getApi(), drivingLicense.getPath(), drivingLicense.getMethod(), headers, queryParam, bodyParam);
+			//获取response的body
+			HttpEntity entity = response.getEntity();
+			JSONObject jsonObject = JSON.parseObject(EntityUtils.toString(response.getEntity()));
+			Integer retCode = jsonObject.getInteger("ret");
+			//识别失败
+			if(!retCode.equals(DrivingLicense.ErrorCode.IDENTIFY_SUCCESS.getCode())){
+				DrivingLicense.ErrorCode errorCode = DrivingLicense.ErrorCode.valueOf(retCode);
+				throw new JSYException(errorCode.getCode(), errorCode.getMsg());
+			}
+			//识别成功 取值
+			JSONObject dataObj = JSON.parseObject(jsonObject.getString("data"));
+			Map<String, Object> resultMap = new HashMap<>(3);
+			//车牌
+			resultMap.put("carPlate", dataObj.getString("lsnum"));
+			//车辆类型
+			String lsTypeText = dataObj.getString("lstype");
+			BusinessEnum.CarTypeEnum carTypeEnum = BusinessEnum.CarTypeEnum.getContainsType(lsTypeText);
+			HashMap<Object, Object> carTypeMap = new HashMap<>(1);
+			carTypeMap.put(carTypeEnum.getCode(), carTypeEnum.getName());
+			resultMap.put("carType", carTypeMap);
+			//行驶证图片
+			resultMap.put("carImageUrl", drivingLicenseImageUrl);
+			return resultMap;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static DrivingLicense getDrivingLicenseInstance(){
+		if(drivingLicense == null){
+			synchronized (PicContentUtil.class){
+				if(drivingLicense == null){
+					drivingLicense = (DrivingLicense) SpringContextUtils.getBean("drivingLicense");
+				}
+			}
+		}
+		return drivingLicense;
+	}
+
+
+
 }

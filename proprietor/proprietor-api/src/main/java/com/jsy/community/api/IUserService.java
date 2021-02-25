@@ -147,11 +147,13 @@ public interface IUserService extends IService<UserEntity> {
 
 
 	/**
+	 * 新的接口调用 ：proprietorDetails
 	 * 根据社区id 和 房屋id 查出用户房屋信息详情
 	 * @param cid 		社区id
 	 * @param hid		房屋id
 	 * @param uid		用户id
 	 * @return			返回基本查询信息
 	 */
+	@Deprecated
 	UserInfoVo userInfoDetails(Long cid, Long hid, String uid);
 }

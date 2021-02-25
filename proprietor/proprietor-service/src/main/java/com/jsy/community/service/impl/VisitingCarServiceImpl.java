@@ -95,7 +95,7 @@ public class VisitingCarServiceImpl extends ServiceImpl<VisitingCarMapper, Visit
 		MyPageUtils.setPageAndSize(page,baseQO);
 		Page<VisitingCarEntity> visitingCarpage = visitingCarMapper.selectPage(page, new QueryWrapper<VisitingCarEntity>().select("*").eq("uid", baseQO.getQuery()));
 		for(VisitingCarEntity visitingCarEntity : visitingCarpage.getRecords()){
-			visitingCarEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.carTypeMap.get(visitingCarEntity.getCarType()));
+			visitingCarEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.CAR_TYPE_MAP.get(visitingCarEntity.getCarType()));
 		}
 		PageInfo<VisitingCarEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(visitingCarpage,pageInfo);

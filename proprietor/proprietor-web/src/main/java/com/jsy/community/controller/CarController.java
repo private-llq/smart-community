@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.DrivingLicense;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +47,9 @@ public class CarController {
 
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
+
+	@Resource
+	private DrivingLicense drivingLicense;
 	
 	
 	/**
@@ -83,20 +88,8 @@ public class CarController {
 		Map<String, String> bodys = new HashMap<String, String>();
 		bodys.put("pic", "https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20181013%2Fe3a4ec6caada4b799e4573b1164ca72a.jpeg&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1616746909&t=69c8fb00679da4fb9a5bdf23ed71fcb2");
 		bodys.put("type", "1");
-
-
 		try {
-			/**
-			 * 重要提示如下:
-			 * HttpUtils请从
-			 * https://github.com/aliyun/api-gateway-demo-sign-java/blob/master/src/main/java/com/aliyun/api/gateway/demo/util/HttpUtils.java
-			 * 下载
-			 *
-			 * 相应的依赖请参照
-			 * https://github.com/aliyun/api-gateway-demo-sign-java/blob/master/pom.xml
-			 */
 			HttpResponse response = HttpUtils.doPost(host, path, method, headers, querys, bodys);
-			System.out.println(response.toString());
 			//获取response的body
 			System.out.println(EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
@@ -174,7 +167,7 @@ public class CarController {
 		//4.调用上传服务接口 进行上传文件  返回访问路径
 		String filePath = MinioUtils.upload(carImage, BusinessConst.CAR_IMAGE_BUCKET_NAME);
 		// 将图片地址存入redis  用于对比 便于清理无用图片
-		stringRedisTemplate.opsForSet().add(BusinessConst.REDIS_CAR_IMAGE_BUCKET_NAME,filePath);
+		stringRedisTemplate.opsForSet().add(BusinessConst.REDIS_CAR_IMAGE_BUCKET_NAME, filePath);
 		return CommonResult.ok(filePath,"上传成功!");
 	}
 
@@ -194,6 +187,18 @@ public class CarController {
 		return CommonResult.ok(MinioUtils.uploadForBatch(carImages, BusinessConst.CAR_IMAGE_BUCKET_NAME),"上传成功!");
 	}
 
+	@Login
+	@ApiOperation("行驶证识别")
+	@PostMapping("drivingLicenseContent")
+	public CommonResult<Map<String, Object>> getDrivingLicenseContent(MultipartFile drivingLicenseImage){
+		//验证行驶证图片
+		PicUtil.imageQualified(drivingLicenseImage);
+		//上传行驶证
+		String drivingLicenseImagePath = MinioUtils.upload(drivingLicenseImage, BusinessConst.CAR_DRIVING_LICENSE_BUCKET_NAME);
+		//TODO : 用户中途取消操作服务器垃圾图片的更便捷的处理方式
+		//识别行驶证
+		return CommonResult.ok(PicContentUtil.getDrivingLicenseContent(drivingLicenseImagePath));
+	}
 
 	/**
 	 * 判断是否是移动端访问请求
