@@ -60,8 +60,14 @@ public class WeChatController {
 
     private HttpClient httpClient;
 
+    /**
+     * @Description: app下单并返回调起支付参数
+     * @author: Hu
+     * @since: 2021/2/25 14:28
+     * @Param:
+     * @return:
+     */
     @PostMapping("/wxPay")
-    @Login
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         Map hashMap = new LinkedHashMap();
@@ -110,7 +116,27 @@ public class WeChatController {
         JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
         return CommonResult.ok(object);
     }
-
+    @GetMapping("ip")
+    public String getClientIpAddress(HttpServletRequest request) {
+        String clientIp = request.getHeader("x-forwarded-for");
+        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getHeader("Proxy-Client-IP");
+        }
+        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getRemoteAddr();
+        }
+        return clientIp;
+    }
+    /**
+     * @Description: H5下单并返回支付连接
+     * @author: Hu
+     * @since: 2021/2/25 14:28
+     * @Param:
+     * @return:
+     */
     @PostMapping("/wxPayH5")
     public CommonResult wxPayH5(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)

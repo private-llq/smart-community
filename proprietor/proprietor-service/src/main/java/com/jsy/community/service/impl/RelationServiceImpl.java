@@ -2,11 +2,13 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IRelationService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.RelationCarsQo;
 import com.jsy.community.qo.RelationQo;
@@ -122,7 +124,7 @@ public class RelationServiceImpl implements IRelationService {
     public RelationVO selectOne(Long RelationId, String userId) {
         HouseMemberEntity houseMemberEntity = houseMemberMapper.selectById(RelationId);
         if (houseMemberEntity==null){
-            return null;
+            throw new ProprietorException(JSYError.INTERNAL);
         }
         List<CarEntity> carEntities = carMapper.selectList(new QueryWrapper<CarEntity>().eq("house_member_id", RelationId));
         RelationVO relationVO = new RelationVO();
