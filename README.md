@@ -28,6 +28,11 @@
 # 微服务项目 启动顺序
 nacos ==> tx-manager ==> service模块 ==> web模块
 
+# 主要配置
+bootstrap.yml(本地配置∪指定配置中心引用相应文件)
+example.yml(配置中心配置备份，不对项目产生实际影响)
+
+
 
 ## 采用微服务架构开发(最初构想)
 - 注册中心: nacos
