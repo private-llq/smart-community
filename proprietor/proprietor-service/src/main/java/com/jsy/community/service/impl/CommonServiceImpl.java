@@ -236,33 +236,28 @@ public class CommonServiceImpl implements ICommonService {
     **/
     @Override
     public JSONObject getWeatherDetails(double lon, double lat){
-        //接口调用
-        JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
-        JSONObject weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
-        weatherNow.put("forecast",weatherForDays.getJSONArray("forecast"));
-        JSONObject weatherFor24hours = getWeatherFor24hours(lon, lat);  //24h天气预报
-        JSONObject airQuality = getAirQuality(lon, lat);  //空气质量
-        JSONObject livingIndex = getLivingIndex(lon, lat);  //生活指数
-        
-        //处理数据
-        WeatherUtils.addDayOfWeek(weatherNow); //补星期几
-        WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
-        
-        //组装返回
-        weatherNow.put("hourly",weatherFor24hours.getJSONArray("hourly"));
-        weatherNow.put("aqi",airQuality.getJSONObject("aqi"));
-        weatherNow.put("liveIndex",livingIndex.getJSONObject("liveIndex"));
-//        try{
-//            String cityId1 = weatherNow.getJSONObject("city").getString("cityId");
-//            String cityId2 = weatherForDays.getJSONObject("city").getString("cityId");
-//            if(cityId1.equals(cityId2)){
-//                JSONArray forecast = weatherForDays.getJSONArray("forecast");
-//                weatherNow.put("forecast",forecast);
-//            }
-//        }catch (Exception e){
-//            log.error("查询天气 结果解析出错");
-//        }
-        return weatherNow;
+        try {
+            //接口调用
+            JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
+            JSONObject weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
+            weatherNow.put("forecast",weatherForDays.getJSONArray("forecast"));
+            JSONObject weatherFor24hours = getWeatherFor24hours(lon, lat);  //24h天气预报
+            JSONObject airQuality = getAirQuality(lon, lat);  //空气质量
+            JSONObject livingIndex = getLivingIndex(lon, lat);  //生活指数
+            
+            //处理数据
+            WeatherUtils.addDayOfWeek(weatherNow); //补星期几
+            WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
+            
+            //组装返回
+            weatherNow.put("hourly",weatherFor24hours.getJSONArray("hourly"));
+            weatherNow.put("aqi",airQuality.getJSONObject("aqi"));
+            weatherNow.put("liveIndex",livingIndex.getJSONObject("liveIndex"));
+            return weatherNow;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return null;
+        }
     }
     
     /**
@@ -317,7 +312,13 @@ public class CommonServiceImpl implements ICommonService {
      * @Date: 2020/2/25
      **/
     private JSONObject getLivingIndex(double lon, double lat){
-        return weatherUtils.getLivingIndex(String.valueOf(lon),String.valueOf(lat));
+        JSONObject livingIndex = weatherUtils.getLivingIndex(String.valueOf(lon), String.valueOf(lat));
+        Set<String> keys = livingIndex.keySet();
+        for(String key : keys){
+            livingIndex.put("liveIndex",livingIndex.getJSONArray(key));
+        }
+//        return weatherUtils.getLivingIndex(String.valueOf(lon),String.valueOf(lat));
+        return livingIndex;
     }
     
 

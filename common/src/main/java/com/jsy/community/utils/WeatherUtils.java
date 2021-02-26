@@ -92,7 +92,7 @@ public class WeatherUtils {
 	
 	//天气详情假数据
 	public static JSONObject getTempWeatherDetails(){
-		return tempWeatherDetails;
+		return tempWeatherDetails.getJSONObject("data");
 	}
 	
 	//TODO 临时方法 动态修改时间 后期删除
@@ -180,45 +180,46 @@ public class WeatherUtils {
 	}
 	
 	//linux绝对路径
-	private static final String OS_LINUX_PATH = "/mnt/db/smart-community/file";
+	private static final String OS_LINUX_PATH = "/mnt/db/smart-community/file/";
 	
 	//加载假天气数据
 	static {
 		try {
-			FileReader fileInputStream;
-			FileReader fileInputStream2;
+			FileReader fileReader;
+			FileReader fileReader2;
+			log.info("开始读取假天气数据");
 			if(System.getProperty("os.name").startsWith("Win")){
-				fileInputStream = new FileReader(new File(getClassesPath() + "/temp_weather.txt"));
-				fileInputStream2 = new FileReader(new File(getClassesPath() + "/temp_weather_details.txt"));
-//				fileInputStream = new FileReader(new File("D:" + "/temp_weather.txt"));
-//				fileInputStream2 = new FileReader(new File("D:" + "/temp_weather_details.txt"));
+//				fileReader = new FileReader(new File(getClassesPath() + "temp_weather.txt"));
+//				fileReader2 = new FileReader(new File(getClassesPath() + "temp_weather_details.txt"));
+				fileReader = new FileReader(new File("D:/" + "temp_weather.txt"));
+				fileReader2 = new FileReader(new File("D:/" + "temp_weather_details.txt"));
 			}else{
-				fileInputStream = new FileReader(new File(OS_LINUX_PATH + "/temp_weather.txt"));
-//				fileInputStream2 = new FileReader(new File(OS_LINUX_PATH + "/temp_weather_details.txt"));
+				fileReader = new FileReader(new File(OS_LINUX_PATH + "temp_weather.txt"));
+				fileReader2 = new FileReader(new File(OS_LINUX_PATH + "temp_weather_details.txt"));
 			}
+			log.info("读取假天气数据完成");
 			//首页天气
-			BufferedReader reader = new BufferedReader(fileInputStream);
-			StringBuffer sb = new StringBuffer();
-			String str;
-			while((str = reader.readLine()) != null){
-				sb.append(str);
-			}
-			JSONObject jsonObject = JSONObject.parseObject(sb.toString());
+			JSONObject jsonObject = fileReader2JSONObject(fileReader);
 			tempWeather.putAll(jsonObject);
 			//天气详情
-//			BufferedReader reader2 = new BufferedReader(fileInputStream2);
-//			StringBuffer sb2 = new StringBuffer();
-//			String str2;
-//			while((str2 = reader2.readLine()) != null){
-//				sb.append(str2);
-//			}
-//			JSONObject jsonObject2 = JSONObject.parseObject(sb2.toString());
-//			tempWeatherDetails.putAll(jsonObject2);
+			JSONObject jsonObject2 = fileReader2JSONObject(fileReader2);
+			tempWeatherDetails.putAll(jsonObject2);
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+	}
+	
+	private static JSONObject fileReader2JSONObject(FileReader fileReader) throws IOException {
+		BufferedReader reader = new BufferedReader(fileReader);
+		StringBuffer sb = new StringBuffer();
+		String str;
+		JSONObject jsonObject = null;
+		while((str = reader.readLine()) != null){
+			sb.append(str);
+		}
+		return JSONObject.parseObject(sb.toString());
 	}
 	
 //	public static void main(String[] args) {
