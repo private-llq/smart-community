@@ -15,10 +15,10 @@
 </sql>
 <!--  添加车辆  -->
     <insert id="addCars" parameterType="List">
-        insert into t_car(id,uid,car_image_url,car_type,car_plate,contact,owner,community_id,car_position_id,check_status,house_member_id)
+        insert into t_car(id,uid,car_type,car_plate,contact,owner,community_id,house_member_id,driving_license_url)
         values
         <foreach collection="cars" item="item" separator=",">
-            (#{item.id},#{item.uid},#{item.carImgURL},#{item.carType},#{item.carId},#{item.phoneTel},#{item.owner},#{item.communityId},#{item.carPosition},#{item.checkStatus},#{item.houseMemberId})
+            (#{item.id},#{item.uid},#{item.carType},#{item.carPlate},#{item.mobile},#{item.owner},#{item.communityId},#{item.houseMemberId}),#{drivingLicenseUrl}
         </foreach>
     </insert>
     <!--  通过id查询业主家属  -->
@@ -29,28 +29,28 @@
     <update id="updateUserRelationDetails" parameterType="com.jsy.community.qo.RelationQo">
         update t_house_member
         <set>
-            <if test="name!=null">
+            <if test="name!=null and name!=''">
                 name=#{name},
             </if>
-            <if test="sex!=null">
+            <if test="sex!=null and sex>0">
                 sex=#{sex},
             </if>
-             <if test="phoneTel!=null">
-                 mobile=#{phoneTel},
+             <if test="mobile!=null and mobile!=''">
+                 mobile=#{mobile},
             </if>
-            <if test="identificationType!=null">
+            <if test="identificationType!=null and identificationType>0">
                 identification_type=#{identificationType},
             </if>
-            <if test="idNumber!=null">
-                id_card=#{idNumber},
+            <if test="idCard!=null and idCard!=''">
+                id_card=#{idCard},
             </if>
-            <if test="concern!=null">
-                relation=#{concern},
+            <if test="relation!=null and relation>0">
+                relation=#{relation},
             </if>
-            <if test="communityId!=null">
+            <if test="communityId!=null and communityId>0">
                 community_id=#{communityId},
             </if>
-            <if test="houseId!=null">
+            <if test="houseId!=null and houseId>0">
                 house_id=#{houseId}
             </if>
             where id=#{id}
@@ -59,26 +59,20 @@
     <update id="updateUserRelationCar" parameterType="com.jsy.community.qo.RelationCarsQo">
             update t_car
             <set>
-                <if test="carId!=null">
-                    car_plate=#{carId},
+                <if test="carPlate!=null and carPlate!=''">
+                    car_plate=#{carPlate},
                 </if>
-                <if test="carType!=null">
+                <if test="carType!=null and carType!=''">
                     car_type=#{carType},
                 </if>
-                <if test="carImgURL!=null">
-                    car_image_url=#{carImgURL},
-                </if>
-                <if test="drivingLicenseUrl!=null">
+                <if test="drivingLicenseUrl!=null and drivingLicenseUrl!=''">
                     driving_license_url=#{drivingLicenseUrl},
                 </if>
-                <if test="owner!=null">
+                <if test="owner!=null and owner!=''">
                     owner=#{owner},
                 </if>
-                <if test="communityId!=null">
+                <if test="communityId!=null and communityId>0">
                     community_id=#{communityId},
-                </if>
-                <if test="checkStatus!=null">
-                    check_status=#{checkStatus}
                 </if>
             </set>
             where id=#{id}

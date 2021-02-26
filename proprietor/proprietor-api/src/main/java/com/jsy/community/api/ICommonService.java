@@ -118,33 +118,30 @@ public interface ICommonService {
 	**/
 	List<RegionEntity> vagueQueryCity(String searchStr);
 	
+	//天气假数据
+	JSONObject getTempWeather();
+	
+	//天气详情假数据
+	JSONObject getTempWeatherDetails();
+	
 	/**
-	 * @Description: 天气整合接口
+	* @Description: 首页天气
 	 * @Param: [lon, lat]
 	 * @Return: com.alibaba.fastjson.JSONObject
 	 * @Author: chq459799974
-	 * @Date: 2020/12/24
-	 **/
+	 * @Date: 2021/2/25
+	**/
 	JSONObject getWeather(double lon, double lat);
 	
 	/**
-	 * @Description: 获取天气实况
+	 * @Description: 天气详情整合接口
 	 * @Param: [lon, lat]
 	 * @Return: com.alibaba.fastjson.JSONObject
 	 * @Author: chq459799974
-	 * @Date: 2020/12/24
+	 * @Date: 2020/2/25
 	 **/
-	JSONObject getWeatherNow(double lon, double lat);
+	JSONObject getWeatherDetails(double lon, double lat);
 	
-	/**
-	 * @Description: 获取天气预报
-	 * @Param: [lon, lat]
-	 * @Return: com.alibaba.fastjson.JSONObject
-	 * @Author: chq459799974
-	 * @Date: 2020/12/24
-	 **/
-	JSONObject getWeatherForDays(double lon, double lat);
-
 	/**
 	 * 全文搜索 数据库 数据导入 Elasticsearch
 	 * @return

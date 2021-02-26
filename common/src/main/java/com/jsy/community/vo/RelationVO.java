@@ -18,19 +18,21 @@ public class RelationVO implements Serializable {
     @ApiModelProperty("性别")
     private Integer sex;
     @ApiModelProperty("电话")
-    private String phoneTel;
+    private String mobile;
     @ApiModelProperty(value = "证件类型1.身份证 2.护照",required = true)
     private Integer identificationType;
     @ApiModelProperty(value = "身份证号码",required = true)
-    private String idNumber;
+    private String idCard;
     @ApiModelProperty(hidden = true)
     private String userId;
     @ApiModelProperty(value = "与业主关系 1.夫妻 2.父子 3.母子 4.父女 5.母女 6.亲属")
-    private Integer concern;
+    private Integer relation;
     @ApiModelProperty(value = "所属社区",required = true)
     private Long communityId;
     @ApiModelProperty(value = "所属单元",required = true)
     private Long houseId;
+    @ApiModelProperty(value = "0，其他，1亲属，2租客")
+    private Integer personType;
     @ApiModelProperty("车辆信息集合")
     private List<RelationCarsVO> cars = new ArrayList<>();
 }

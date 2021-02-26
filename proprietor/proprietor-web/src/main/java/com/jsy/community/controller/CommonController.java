@@ -136,10 +136,21 @@ public class CommonController {
         }
     }
     
-    @ApiOperation("根据经纬度查询当前天气")
+    @ApiOperation("首页天气")
     @GetMapping("weatherNow")
     public CommonResult<JSONObject> getWeatherNow(@RequestParam double lon,@RequestParam double lat){
-        JSONObject weather = commonService.getWeather(lon, lat);
+//        JSONObject weather = commonService.getWeather(lon, lat);
+        //TODO 天气接口未购买，临时用假数据
+        JSONObject weather = commonService.getTempWeather();
+        return CommonResult.ok(weather);
+    }
+    
+    @ApiOperation("天气详情")
+    @GetMapping("weatherDetails")
+    public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam double lon,@RequestParam double lat){
+//        JSONObject weather = commonService.getWeatherDetails(lon, lat);
+        //TODO 天气接口未购买，临时用假数据
+        JSONObject weather = commonService.getTempWeatherDetails();
         return CommonResult.ok(weather);
     }
     
