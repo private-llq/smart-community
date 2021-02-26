@@ -16,8 +16,17 @@
 # 3.独立项目：
 - admin（大后台）
 
-# 4.公共代码模块：common
+# 4.公共代码模块：
+- common (实体类全部在里面)
 
+# 依赖情况说明
+<h4>租房项目需要先启物业端</h4>
+
+# 打包
+整体打包 com.jsy.community(root) - Lifecycle - package
+
+# 微服务项目 启动顺序
+nacos ==> tx-manager ==> service模块 ==> web模块
 
 
 ## 采用微服务架构开发(最初构想)
