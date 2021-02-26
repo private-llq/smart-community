@@ -72,7 +72,8 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     
 //    @ApiModelProperty(value = "预期来访结束时间")
 //    @JsonFormat(pattern = "yyyy-MM-dd")
-//    private LocalDate endTime;
+    @JsonIgnore
+    private LocalDate endTime;
 
     @ApiModelProperty(value = "来访人联系方式")
     @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
