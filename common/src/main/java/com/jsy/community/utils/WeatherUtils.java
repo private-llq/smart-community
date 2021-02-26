@@ -194,7 +194,7 @@ public class WeatherUtils {
 //				fileInputStream2 = new FileReader(new File("D:" + "/temp_weather_details.txt"));
 			}else{
 				fileInputStream = new FileReader(new File(OS_LINUX_PATH + "/temp_weather.txt"));
-				fileInputStream2 = new FileReader(new File(OS_LINUX_PATH + "/temp_weather_details.txt"));
+//				fileInputStream2 = new FileReader(new File(OS_LINUX_PATH + "/temp_weather_details.txt"));
 			}
 			//首页天气
 			BufferedReader reader = new BufferedReader(fileInputStream);
