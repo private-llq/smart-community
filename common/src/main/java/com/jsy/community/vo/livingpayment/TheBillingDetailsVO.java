@@ -1,4 +1,4 @@
-package com.jsy.community.vo;
+package com.jsy.community.vo.livingpayment;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,13 +27,13 @@ public class TheBillingDetailsVO implements Serializable {
     @ApiModelProperty(value = "大图片")
     private String largeSizeIcon;
     @ApiModelProperty(value = "缴费单位名称")
-    private String unitName;
+    private String companyName;
     @ApiModelProperty(value = "缴费金额")
-    private BigDecimal paySum;
+    private BigDecimal paymentBalance;
     @ApiModelProperty(value = "缴费状态 0 未到账 1处理中，2已到账")
     private Integer status;
     @ApiModelProperty(value = "户号")
-    private String doorNo;
+    private String familyId;
     @ApiModelProperty(value = "订单流水号")
     private String orderNum;
     @ApiModelProperty(value = "账单分类")

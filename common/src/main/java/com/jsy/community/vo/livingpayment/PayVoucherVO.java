@@ -1,4 +1,4 @@
-package com.jsy.community.vo;
+package com.jsy.community.vo.livingpayment;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,26 +22,25 @@ public class PayVoucherVO implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "缴费单位名称")
-    private String unitName;
+    private String companyName;
 
     @ApiModelProperty(value = "流水号")
     private String orderNum;
 
-    @ApiModelProperty(value = "支付账号")
-    private String payNum;
+    @ApiModelProperty(value = "支付方式名称或者账号")
+    private String payTypeName;
 
-
-    @ApiModelProperty(value = "缴费类型")
-    private String payType;
+    @ApiModelProperty(value = "缴费类型Name")
+    private String typeName;
 
     @ApiModelProperty(value = "缴费状态")
     private Integer status;
 
     @ApiModelProperty(value = "户号")
-    private String doorNo;
+    private String familyId;
 
     @ApiModelProperty(value = "缴费金额")
-    private BigDecimal paySum;
+    private BigDecimal paymentBalance;
 
     @ApiModelProperty(value = "住址信息")
     private String address;

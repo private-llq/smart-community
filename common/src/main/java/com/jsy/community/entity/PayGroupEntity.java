@@ -6,21 +6,16 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * <p>
- * 户号组
- * </p>
- *
- * @author lihao
- * @since 2020-12-10
+ * @Description: 生活缴费组实体类
+ * @author: Hu
+ * @since: 2021/2/26 11:24
+ * @Param:
+ * @return:
  */
 @Data
-//@EqualsAndHashCode(callSuper = false)
-//@Accessors(chain = true)
 @TableName("t_pay_group")
 @ApiModel(value="PayGroup对象", description="户号组")
 public class PayGroupEntity extends BaseEntity {
-
-//    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "业主id")
     private String uid;

@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.PayHouseOwnerEntity;
+import com.jsy.community.entity.PayFamilyEntity;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.jsy.community.entity.PayHouseOwnerEntity;
  * @author jsy
  * @since 2020-12-10
  */
-public interface PayHouseOwnerMapper extends BaseMapper<PayHouseOwnerEntity> {
+public interface PayFamilyMapper extends BaseMapper<PayFamilyEntity> {
 
 }

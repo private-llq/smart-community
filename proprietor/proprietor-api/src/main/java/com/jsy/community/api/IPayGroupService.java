@@ -30,4 +30,12 @@ public interface IPayGroupService extends IService<PayGroupEntity> {
      */
     void insertGroup(String name, String userId);
 
+    /**
+     * @Description: 修改自定义组名
+     * @author: Hu
+     * @since: 2021/2/26 16:26
+     * @Param:
+     * @return:
+     */
+    void updateGroup(Long id, String name, String userId);
 }

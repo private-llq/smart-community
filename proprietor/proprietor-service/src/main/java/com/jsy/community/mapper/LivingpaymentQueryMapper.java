@@ -1,21 +1,19 @@
 package com.jsy.community.mapper;
 
 import com.jsy.community.entity.PayGroupEntity;
-import com.jsy.community.qo.proprietor.PaymentRecordsQO;
-import com.jsy.community.qo.proprietor.RemarkQO;
-import com.jsy.community.vo.*;
+import com.jsy.community.qo.livingpayment.PaymentRecordsQO;
+import com.jsy.community.vo.livingpayment.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 /**
  * @program: com.jsy.community
- * @description: 生活缴费mapper层
+ * @description:
  * @author: Hu
- * @create: 2020-12-11 09:31
+ * @create: 2021-02-26 13:59
  **/
-public interface LivingPaymentMapper {
-
+public interface LivingpaymentQueryMapper {
     /**
      * @Description: 默认查询所有缴费信息
      * @author: Hu
@@ -23,7 +21,7 @@ public interface LivingPaymentMapper {
      * @Param:
      * @return:
      */
-    List<DefaultHouseOwnerVO> selectList(@Param("userId") String userId,@Param("page")Integer page,@Param("size")Integer size);
+    List<DefaultHouseOwnerVO> selectList(@Param("userId") String userId, @Param("page")Integer page, @Param("size")Integer size);
 
     /**
      * @Description: 查询每月订单记录
@@ -68,16 +66,6 @@ public interface LivingPaymentMapper {
      * @return:
      */
     List<PayGroupEntity> findGroup(String userId);
-
-    /**
-     * @Description: 添加订单备注
-     * @author: Hu
-     * @since: 2021/2/20 14:21
-     * @Param:
-     * @return:
-     */
-    void addRemark(RemarkQO remarkQO);
-
     /**
      * @Description: 查询一条账单详情
      * @author: Hu

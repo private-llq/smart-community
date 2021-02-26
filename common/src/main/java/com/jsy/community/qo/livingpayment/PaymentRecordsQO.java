@@ -1,4 +1,4 @@
-package com.jsy.community.qo.proprietor;
+package com.jsy.community.qo.livingpayment;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,17 +17,13 @@ import java.io.Serializable;
 public class PaymentRecordsQO implements Serializable {
 
     @ApiModelProperty(value = "户号")
-    private String doorNo;
+    private String familyId;
 
-//    @ApiModelProperty(value = "组号id")
-//    private Long group;
-
-    @ApiModelProperty(value = "年份查询")
+    @ApiModelProperty(value = "付款年份")
     private Integer payYear;
 
-    @ApiModelProperty(value = "月份查询")
+    @ApiModelProperty(value = "付款月份")
     private Integer payMonth;
-
 
     @ApiModelProperty(value = "用户ID",hidden = true)
     private String userID;

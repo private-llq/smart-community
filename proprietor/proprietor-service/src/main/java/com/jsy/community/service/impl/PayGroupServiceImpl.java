@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPayGroupService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.PayFamilyEntity;
 import com.jsy.community.entity.PayGroupEntity;
-import com.jsy.community.entity.PayHouseOwnerEntity;
+import com.jsy.community.mapper.PayFamilyMapper;
 import com.jsy.community.mapper.PayGroupMapper;
-import com.jsy.community.mapper.PayHouseOwnerMapper;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class PayGroupServiceImpl extends ServiceImpl<PayGroupMapper, PayGroupEnt
     @Autowired
     private PayGroupMapper payGroupMapper;
     @Autowired
-    private PayHouseOwnerMapper payHouseOwnerMapper;
+    private PayFamilyMapper payFamilyMapper;
     @Override
     @Transactional
     public void delete(String name,String userId) {
@@ -37,12 +37,19 @@ public class PayGroupServiceImpl extends ServiceImpl<PayGroupMapper, PayGroupEnt
         );
 
         if (payGroupEntity!=null){
-            payHouseOwnerMapper.delete(new QueryWrapper<PayHouseOwnerEntity>()
+            payFamilyMapper.delete(new QueryWrapper<PayFamilyEntity>()
                     .eq("uid",userId)
                     .eq("group_id",payGroupEntity.getId())
             );
             payGroupMapper.deleteById(payGroupEntity.getId());
         }
+    }
+
+    @Override
+    public void updateGroup(Long id, String name, String userId) {
+        PayGroupEntity entity = payGroupMapper.selectById(id);
+        entity.setName(name);
+        payGroupMapper.updateById(entity);
     }
 
     @Override

@@ -12,7 +12,9 @@ import com.jsy.community.mapper.PayCompanyMapper;
 import com.jsy.community.mapper.PayTypeMapper;
 import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.livingpayment.PayCompanyQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.livingpayment.PayCompanyVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,15 +81,24 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayTypeEntity
 	}
 
 	@Override
-	public List<PayCompanyEntity> selectPayCompany(Long type, Long cityId,String name) {
+	public List<PayCompanyVO> selectPayCompany(PayCompanyQO payCompanyQO) {
 		QueryWrapper<PayCompanyEntity> wrapper = new QueryWrapper<PayCompanyEntity>()
-				.eq("region_id", cityId)
-				.eq("type_id", type);
-		if (name!=null&&!name.equals("")){
-			wrapper.like("name",name);
+				.eq("region_id", payCompanyQO.getCityId())
+				.eq("type_id", payCompanyQO.getTypeId());
+		if (payCompanyQO.getCompanyName()!=null&&!payCompanyQO.getCompanyName().equals("")){
+			wrapper.like("name",payCompanyQO.getCompanyName());
 		}
 		List<PayCompanyEntity> list = companyMapper.selectList(wrapper);
-		return list;
+		ArrayList<PayCompanyVO> list1 = new ArrayList<>();
+		for (PayCompanyEntity entity : list) {
+			PayCompanyVO companyVO = new PayCompanyVO();
+			companyVO.setCompanyId(entity.getId());
+			companyVO.setTypeId(entity.getTypeId());
+			companyVO.setRegionId(entity.getRegionId());
+			companyVO.setName(entity.getName());
+			list1.add(companyVO);
+		}
+		return list1;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.jsy.community.vo;
+package com.jsy.community.vo.livingpayment;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -31,20 +31,19 @@ public class PaymentRecordsVO implements Serializable {
     private String orderNum;
 
     @ApiModelProperty(value = "缴费单位名称")
-    private String unitName;
+    private String companyName;
 
     @ApiModelProperty(value = "户号")
-    private String doorNo;
+    private String familyId;
 
     @ApiModelProperty(value = "缴费时间")
     private LocalDateTime orderTime;
 
     @ApiModelProperty(value = "缴费金额")
-    private BigDecimal paySum;
+    private BigDecimal paymentBalance;
 
-    @ApiModelProperty(value = "付款方式1银行卡，2微信支付，3支付宝支付")
+    @ApiModelProperty(value = "付款方式，1微信支付，2支付宝支付，3账户余额，4其他银行卡")
     private Integer payType;
-
 
     @ApiModelProperty(value = "住址信息")
     private String address;
@@ -62,13 +61,17 @@ public class PaymentRecordsVO implements Serializable {
     private String remarkImg;
 
     @ApiModelProperty(value = "所缴费类型id")
-    private String typeID;
+    private String typeId;
 
     @ApiModelProperty(value = "所缴费用名称")
     private String typeName;
 
     @ApiModelProperty(value = "类型图片地址")
     private String icon;
+    @ApiModelProperty(value = "中号图片地址")
+    private String mediumIcon;
+    @ApiModelProperty(value = "大号图片地址")
+    private String largeSizeIcon;
     
     @ApiModelProperty(value = "时间组",hidden = true)
     private String timeGroup;

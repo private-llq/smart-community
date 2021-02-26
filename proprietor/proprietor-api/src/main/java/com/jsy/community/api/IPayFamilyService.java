@@ -1,7 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.PayHouseOwnerEntity;
+import com.jsy.community.entity.PayFamilyEntity;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.jsy.community.entity.PayHouseOwnerEntity;
  * @author jsy
  * @since 2020-12-10
  */
-public interface IPayHouseOwnerService extends IService<PayHouseOwnerEntity> {
+public interface IPayFamilyService extends IService<PayFamilyEntity> {
 
 }

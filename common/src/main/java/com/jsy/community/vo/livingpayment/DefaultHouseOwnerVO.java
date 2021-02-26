@@ -1,4 +1,4 @@
-package com.jsy.community.vo;
+package com.jsy.community.vo.livingpayment;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,13 +20,13 @@ public class DefaultHouseOwnerVO implements Serializable {
     @ApiModelProperty(value = "户组name")
     private String groupName;
     @ApiModelProperty(value = "户号")
-    private String doorNo;
+    private String familyId;
     @ApiModelProperty(value = "缴费单位ID")
-    private String payCompanyId;
+    private String companyId;
     @ApiModelProperty(value = "缴费单位name")
-    private String payCompanyName;
+    private String companyName;
     @ApiModelProperty(value = "缴费类型ID")
-    private Long typeID;
+    private Long typeId;
     @ApiModelProperty(value = "缴费类型name")
     private String typeName;
     @ApiModelProperty(value = "icon")
