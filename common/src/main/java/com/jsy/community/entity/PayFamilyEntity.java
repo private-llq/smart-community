@@ -4,25 +4,18 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
- * <p>
- * 缴费户号
- * </p>
- *
- * @author lihao
- * @since 2020-12-10
+ * @Description: 户号实体类
+ * @author: Hu
+ * @since: 2021/2/26 11:25
+ * @Param:
+ * @return:
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@TableName("t_pay_house_owner")
-@ApiModel(value="PayHouseOwner对象", description="缴费户号")
-public class PayHouseOwnerEntity extends BaseEntity {
-
-    private static final long serialVersionUID = 1L;
+@TableName("t_pay_family")
+@ApiModel(value="PayFamily对象", description="缴费户号")
+public class PayFamilyEntity extends BaseEntity {
 
     @ApiModelProperty(value = "户组id")
     private Long groupId;
@@ -34,13 +27,12 @@ public class PayHouseOwnerEntity extends BaseEntity {
     private String familyName;
 
     @ApiModelProperty(value = "缴费单位")
-    private Long payCompany;
+    private Long companyId;
 
-    @ApiModelProperty(value = "缴费单位")
+    @ApiModelProperty(value = "用户id")
     private String uid;
 
     @ApiModelProperty(value = "缴费类型 0 水费 1 电费 2燃气费")
-    private Long type;
-
+    private Long typeId;
 
 }

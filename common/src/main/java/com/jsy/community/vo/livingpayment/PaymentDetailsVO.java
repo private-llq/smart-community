@@ -1,4 +1,4 @@
-package com.jsy.community.vo;
+package com.jsy.community.vo.livingpayment;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,25 +22,25 @@ public class PaymentDetailsVO implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "缴费单位名称")
-    private String unitName;
+    private String companyName;
 
     @ApiModelProperty(value = "户号")
-    private String doorNo;
+    private String familyId;
 
     @ApiModelProperty(value = "户名")
-    private String doorName;
+    private String familyName;
 
     @ApiModelProperty(value = "缴费时间")
     private LocalDateTime orderTime;
 
     @ApiModelProperty(value = "到账时间")
-    private LocalDateTime accountingTime;
+    private LocalDateTime arriveTime;
 
-    @ApiModelProperty(value = "账户余额")
-    private BigDecimal payBalance;
+    @ApiModelProperty(value = "户主余额")
+    private BigDecimal accountBalance;
 
     @ApiModelProperty(value = "缴费金额")
-    private BigDecimal paySum;
+    private BigDecimal paymentBalance;
 
     @ApiModelProperty(value = "住址信息")
     private String address;

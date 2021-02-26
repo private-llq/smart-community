@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.PayCompanyEntity;
 import com.jsy.community.entity.PayTypeEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.livingpayment.PayCompanyQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.livingpayment.PayCompanyVO;
 
 import java.util.List;
 
@@ -45,5 +47,5 @@ public interface IPayTypeService extends IService<PayTypeEntity> {
 	 **/
 	PageInfo<PayCompanyEntity> getPayCompany(BaseQO<PayCompanyEntity> baseQO, Long type, Long cityId);
 
-	List<PayCompanyEntity> selectPayCompany(Long type, Long cityId,String name);
+	List<PayCompanyVO> selectPayCompany(PayCompanyQO payCompanyQO);
 }

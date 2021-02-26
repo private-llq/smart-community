@@ -2,7 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.PayGroupEntity;
-import com.jsy.community.vo.UserGroupVO;
+import com.jsy.community.vo.livingpayment.UserGroupVO;
 
 import java.util.List;
 

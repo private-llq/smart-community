@@ -1,29 +1,29 @@
-package com.jsy.community.entity;
+package com.jsy.community.vo.livingpayment;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
- * @Description: 缴费单位实体类
+ * @program: com.jsy.community
+ * @description:
  * @author: Hu
- * @since: 2021/2/26 11:25
- * @Param:
- * @return:
- */
+ * @create: 2021-02-26 17:19
+ **/
 @Data
-@TableName("t_pay_company")
-@ApiModel(value="PayCompany对象", description="缴费单位")
-public class PayCompanyEntity extends BaseEntity {
+@ApiModel("生活缴费组返回户号")
+public class PayCompanyVO implements Serializable {
+    @ApiModelProperty(value = "缴费单位id")
+    private Long companyId;
 
     @ApiModelProperty(value = "缴费类型id")
     private Long typeId;
-    
+
     @ApiModelProperty(value = "市区id")
     private Long regionId;
 
     @ApiModelProperty(value = "缴费单位")
     private String name;
-
 }

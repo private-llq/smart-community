@@ -1,4 +1,4 @@
-package com.jsy.community.qo.proprietor;
+package com.jsy.community.qo.livingpayment;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,23 +18,20 @@ import java.math.BigDecimal;
 @ApiModel("生活缴费接收参数对象")
 public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "缴费类型,如水电气")
-    private Long type;
+    private Long typeId;
 
     @ApiModelProperty(value = "分组名称")
     private String groupName;
 
     @Length(max = 12,min = 8,message = "请输入8~12数字")
     @ApiModelProperty(value = "户号")
-    private String doorNo;
+    private String familyId;
 
     @ApiModelProperty(value = "户名")
-    private String doorName;
-
-//    @ApiModelProperty(value = "缴费单位")
-//    private String PayCostUnit;
+    private String familyName;
 
     @ApiModelProperty(value = "缴费单位ID")
-    private Long PayCostUnitId;
+    private Long companyId;
 
     @ApiModelProperty(value = "用户ID",hidden = true)
     private String userID;
@@ -42,11 +39,14 @@ public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "付款方式,1银行卡，2微信支付，3支付宝支付")
     private Integer payTpye;
 
-    @ApiModelProperty(value = "账户余额")
-    private BigDecimal payBalance;
+    @ApiModelProperty(value = "付款方式名称")
+    private String payTypeName;
 
-    @ApiModelProperty(value = "付款金额")
-    private BigDecimal payNum;
+    @ApiModelProperty(value = "户主余额")
+    private BigDecimal accountBalance;
+
+    @ApiModelProperty(value = "缴费金额")
+    private BigDecimal paymentBalance;
 
     @ApiModelProperty(value = "缴费地址")
     private String address;

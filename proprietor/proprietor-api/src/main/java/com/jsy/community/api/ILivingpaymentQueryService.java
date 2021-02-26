@@ -1,34 +1,34 @@
 package com.jsy.community.api;
 
-import com.jsy.community.qo.proprietor.LivingPaymentQO;
-import com.jsy.community.qo.proprietor.PaymentRecordsQO;
-import com.jsy.community.qo.proprietor.RemarkQO;
-import com.jsy.community.vo.*;
+import com.jsy.community.qo.livingpayment.PaymentRecordsQO;
+import com.jsy.community.vo.livingpayment.*;
 import com.jsy.community.vo.shop.PaymentRecordsMapVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
- * @description: 生活缴费service
+ * @description:
  * @author: Hu
- * @create: 2020-12-11 09:30
+ * @create: 2021-02-26 13:58
  **/
-public interface ILivingPaymentService {
-
+public interface ILivingpaymentQueryService {
     /**
-     * 生活缴费生成订单保存数据
-     * @param livingPaymentQO
-     * @return
+     * @Description: 生成假账单
+     * @author: Hu
+     * @since: 2021/2/26 14:35
+     * @Param:
+     * @return:
      */
-    PaymentDetailsVO add(LivingPaymentQO livingPaymentQO);
+    Map getPayDetails(String doorNo, Long id);
 
     /**
      * 通过组户号查询订单详情
      * @param
      * @return
      */
-    List<GroupVO> selectGroup(String groupName,String userId);
+    List<GroupVO> selectGroup(String groupName, String userId);
 
 
     /**
@@ -44,14 +44,6 @@ public interface ILivingPaymentService {
      * @return
      */
     List<DefaultHouseOwnerVO>  selectList(String userId);
-    /**
-     * @Description: 添加订单备注
-     * @author: Hu
-     * @since: 2020/12/12 10:15
-     * @Param:
-     * @return:
-     */
-    void addRemark(RemarkQO remarkQO);
 
     /**
      * 查询当前登录人员自定义的分组

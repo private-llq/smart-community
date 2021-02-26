@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @program: com.jsy.community
@@ -31,15 +31,6 @@ public class WeChatController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityInformService communityInformService;
-
-    @ApiOperation("获取秘钥")
-    @PostMapping("/getParameter")
-    public CommonResult getParameter() {
-        Map<Object, Object> map = new HashMap<>();
-        map.put("clientId", WeCharUtil.getClientId());
-        map.put("clientSecret",WeCharUtil.getClientSecret());
-        return CommonResult.ok(map);
-    }
 
     @ApiOperation("登录")
     @PostMapping("/login")
@@ -61,9 +52,14 @@ public class WeChatController {
         String email = object.getString("email");
         String remark = object.getString("remark");
         String gender = object.getString("gender");
-
         return CommonResult.ok();
     }
+
+    @RequestMapping("/callback")
+    public void callback(HttpServletRequest request, HttpServletResponse response){
+        System.out.println("回调成功");
+    }
+
 
 
 }

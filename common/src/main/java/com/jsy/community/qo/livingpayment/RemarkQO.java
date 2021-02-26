@@ -1,4 +1,4 @@
-package com.jsy.community.qo.proprietor;
+package com.jsy.community.qo.livingpayment;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,8 +23,11 @@ public class RemarkQO implements Serializable {
     @ApiModelProperty(value = "用户ID",hidden = true)
     private String uid;
 
-    @ApiModelProperty(value = "账单类型，1,生活日用，2饮食，3交通出行，4文教娱乐，5服饰美容，6运动健康，7住房缴费，8通讯缴费，9其他消费")
+    @ApiModelProperty(value = "账单类型，1充值缴费，暂时只有这个")
     private Integer billClassification;
+
+    @ApiModelProperty(value = "账单类型，1充值缴费，暂时只有这个")
+    private String billClassificationName;
 
     @ApiModelProperty(value = "标签")
     private String tally;
