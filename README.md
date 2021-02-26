@@ -1,6 +1,26 @@
-# 智慧社区项目
+# 智慧社区项目介绍
+微服务：nacos(注册中心、配置中心) + dubbo
 
-## 采用微服务架构开发
+# 1.主要业务项目：
+- proprietor 业务端 (微服务)
+- property 物业端 (微服务)
+- lease 租房项目 (微服务)
+  
+# 2.数据处理项目：
+- rabbitmq MQ统一处理
+- payment-system 支付统一处理
+- task 自动任务项目
+- gateway 网关
+- tx-manager 分布式事务
+
+# 3.独立项目：
+- admin（大后台）
+
+# 4.公共代码模块：common
+
+
+
+## 采用微服务架构开发(最初构想)
 - 注册中心: nacos
 - 配置中心: nacos
 - 服务调用: dubbo
