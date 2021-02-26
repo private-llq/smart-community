@@ -97,7 +97,7 @@ public class LivingPaymentController {
     }
 
     @ApiOperation("删除组和相关的户号")
-    @GetMapping("/deleteGroupName")
+    @DeleteMapping("/deleteGroupName")
     @Login
     public CommonResult deleteGroupName(@ApiParam("组名") @RequestParam String name){
         String userId = UserUtils.getUserId();
@@ -169,7 +169,7 @@ public class LivingPaymentController {
      * @return
      */
     @ApiOperation("查询当前登录人员自定义的分组")
-    @PostMapping("/selectUserGroup")
+    @GetMapping("/selectUserGroup")
     @Login
     public CommonResult selectGroup(){
         String userId = UserUtils.getUserId();
