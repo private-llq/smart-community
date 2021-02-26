@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.LeaseException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
@@ -277,6 +278,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         return houseLeaseMapper.alreadyPublish(houseId) > 0;
     }
 
+    @Override
+    public List<CommunityEntity> allCommunity(Long cityId, String userId) {
+        return houseLeaseMapper.allCommunity(cityId, userId);
+    }
 
 
     /**

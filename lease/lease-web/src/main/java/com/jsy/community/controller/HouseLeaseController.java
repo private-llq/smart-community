@@ -8,6 +8,7 @@ import com.jsy.community.api.IHouseLeaseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.UploadBucketConst;
 import com.jsy.community.constant.UploadRedisConst;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -45,6 +46,14 @@ public class HouseLeaseController {
 
     @Resource
     private  ShopLeaseController shopLeaseController;
+
+
+    @Login
+    @GetMapping("/allCommunity")
+    @ApiOperation("获取用户所有小区")
+    public CommonResult<List<CommunityEntity>> allCommunity(@RequestParam Long cityid){
+        return CommonResult.ok(iHouseLeaseService.allCommunity( cityid, UserUtils.getUserId() ));
+    }
 
 
     @Login
@@ -119,11 +128,15 @@ public class HouseLeaseController {
     }
 
 
+    /**
+     *
+     * @param cid   社区id
+     */
     @Login
     @GetMapping("/ownerHouse")
     @ApiOperation("查询业主当前社区拥有房屋")
-    public CommonResult<List<HouseVo>> ownerHouse(@RequestParam Long communityId){
-        return CommonResult.ok(iHouseLeaseService.ownerHouse(UserUtils.getUserId(), communityId));
+    public CommonResult<List<HouseVo>> ownerHouse(@RequestParam Long cid){
+        return CommonResult.ok(iHouseLeaseService.ownerHouse(UserUtils.getUserId(), cid));
     }
 
     @Login

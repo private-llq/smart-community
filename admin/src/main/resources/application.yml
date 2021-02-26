@@ -4,7 +4,7 @@ server:
     context-path: /
 rabbitmq:
   ####连接地址
-  host: 106.13.84.80
+  host: 222.178.212.29
   ####端口号
   port: 5672
   username: root
@@ -61,6 +61,8 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 jsy:
+  #是否启用 SmsController.java
+  enable-dev-sms: true
   shiro:
     redis: false
   jwt:
@@ -69,6 +71,12 @@ jsy:
     # token有效时长，7天，单位秒
     expire: 604800
     header: token
+    #行驶证识别相关信息
+  drivinglicense:
+    api: https://api08.aliyun.venuscn.com
+    path: /ocr/vehicle-license
+    method: POST
+    appCode: 9b53bb7f5f5945fcb4c42ecd79f31642
 
 loginExpireHour: 12
 
@@ -77,6 +85,8 @@ email:
   baseAccount: 459799974@qq.com
   authPass: nfezhwyeduksbjjh
   linkExpiretime: 24
+
+
 
 alipay:
   appid: dPHlJ8MTKFM/fTLpyfSzuFWQ8DMH1pOlHzcwcge1NVo=

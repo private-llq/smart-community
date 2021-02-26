@@ -6,6 +6,29 @@ package com.jsy.community.constant;
  * @since 2020-11-28 13:44
  **/
 public interface BusinessConst {
+	//============================ 用户真实姓名 长度边界 =============================
+	/**
+	 * 汉族最小姓名长度
+	 */
+	Integer MIN_REAL_NAME_LENGTH = 2;
+	/**
+	 * 汉族最大姓名长度
+	 */
+	Integer MAX_REAL_NAME_LENGTH = 6;
+
+	//============================ 用户性别 =============================
+	/**
+	 * 未知
+	 */
+	Integer SEX_UNKNOWN = 0;
+	/**
+	 * 男
+	 */
+	Integer SEX_MALE = 1;
+	/**
+	 * 女
+	 */
+	Integer SEX_FEMALE = 2;
 
 	//============数据库t_user isRealAuth 实名认证状态=============
 	/**
@@ -270,7 +293,15 @@ public interface BusinessConst {
 	 */
 	String REGEX_OF_NEW_ENERGY_CAR = "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}(([0-9]{5}[DF])|([DF][A-HJ-NP-Z0-9][0-9]{4}))$";
 
-
+	//============ 国籍id范围 ===============
+	/**
+	 * 范围最小的ID
+	 */
+	Integer COUNTRY_ID_MIN = 1;
+	/**
+	 * 范围最大的ID
+	 */
+	Integer COUNTRY_ID_MAX = 233;
 
 
 }

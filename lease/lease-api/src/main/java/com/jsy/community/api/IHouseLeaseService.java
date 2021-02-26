@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
@@ -95,4 +96,12 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @return          返回是否发布
      */
     boolean alreadyPublish(Long houseId);
+
+    /**
+     * 按用户id获取所有小区名称
+     * @param userId    用户id
+     * @param cityId    城市id
+     * @return          返回小区名称
+     */
+    List<CommunityEntity> allCommunity(Long cityId, String userId);
 }

@@ -56,7 +56,11 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("是否实名认证")
 	private Integer isRealAuth;
-	
+
+	@TableField( exist = false)
+	@ApiModelProperty("国籍ID")
+	private Integer countryId;
+
 	@ApiModelProperty("省ID")
 	private Integer provinceId;
 	
@@ -76,6 +80,7 @@ public class UserEntity extends BaseEntity {
 	@TableField( exist = false )
 	private Integer relationCode;
 
+	@TableField( exist = false)
 	@ApiModelProperty("证件类型：1.身份证 2.护照")
 	private Integer identificationType;
 
