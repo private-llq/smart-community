@@ -191,6 +191,9 @@ public interface BusinessEnum {
 		ID_CARD("居民身份证",1),
 		PASSPORT("护照",2);
 
+		public static final Integer MIN = 1;
+		public static final Integer MAX = 2;
+
 		private final String name;
 		private final Integer code;
 
@@ -230,6 +233,9 @@ public interface BusinessEnum {
 	 * @Date: 2020/11/28
 	**/
 	enum CheckStatusEnum {
+		/**
+		 * 审核状态枚举
+		 */
 		UN_CHECK("未审核", 0),
 		PASS("通过", 1),
 		UNPASS("拒绝", 2);
