@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.RegionEntity;
@@ -12,6 +13,7 @@ import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.utils.WeatherUtils;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
+import com.jsy.community.vo.WeatherLiveIndexVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -243,7 +245,7 @@ public class CommonServiceImpl implements ICommonService {
             weatherNow.put("forecast",weatherForDays.getJSONArray("forecast"));
             JSONObject weatherFor24hours = getWeatherFor24hours(lon, lat);  //24h天气预报
             JSONObject airQuality = getAirQuality(lon, lat);  //空气质量
-            JSONObject livingIndex = getLivingIndex(lon, lat);  //生活指数
+            ArrayList<WeatherLiveIndexVO> livingIndex = getLivingIndex(lon, lat);  //生活指数
             
             //处理数据
             WeatherUtils.addDayOfWeek(weatherNow); //补星期几
@@ -252,7 +254,7 @@ public class CommonServiceImpl implements ICommonService {
             //组装返回
             weatherNow.put("hourly",weatherFor24hours.getJSONArray("hourly"));
             weatherNow.put("aqi",airQuality.getJSONObject("aqi"));
-            weatherNow.put("liveIndex",livingIndex.getJSONObject("liveIndex"));
+            weatherNow.put("liveIndex",livingIndex);
             return weatherNow;
         }catch (Exception e){
             log.error(e.getMessage());
@@ -301,7 +303,12 @@ public class CommonServiceImpl implements ICommonService {
      * @Date: 2020/2/25
      **/
     private JSONObject getAirQuality(double lon, double lat){
-        return weatherUtils.getAirQuality(String.valueOf(lon),String.valueOf(lat));
+        JSONObject airQuality = weatherUtils.getAirQuality(String.valueOf(lon), String.valueOf(lat));
+        JSONObject returnAqi = new JSONObject();
+        returnAqi.put("value",airQuality.getString("value"));
+        returnAqi.put("aqiName", BusinessEnum.AQIEnum.getAQIName(airQuality.getIntValue("value"),null,null,null));
+//        return weatherUtils.getAirQuality(String.valueOf(lon),String.valueOf(lat));
+        return returnAqi;
     }
     
     /**
@@ -311,14 +318,35 @@ public class CommonServiceImpl implements ICommonService {
      * @Author: chq459799974
      * @Date: 2020/2/25
      **/
-    private JSONObject getLivingIndex(double lon, double lat){
+    private ArrayList<WeatherLiveIndexVO> getLivingIndex(double lon, double lat){
         JSONObject livingIndex = weatherUtils.getLivingIndex(String.valueOf(lon), String.valueOf(lat));
         Set<String> keys = livingIndex.keySet();
+        String originKey = "";
         for(String key : keys){
-            livingIndex.put("liveIndex",livingIndex.getJSONArray(key));
+            originKey = key;
         }
-//        return weatherUtils.getLivingIndex(String.valueOf(lon),String.valueOf(lat));
-        return livingIndex;
+        JSONArray jsonArray = livingIndex.getJSONArray(originKey);
+        List<WeatherLiveIndexVO> weatherParamList = jsonArray.toJavaList(WeatherLiveIndexVO.class);
+        //筛选指定数据(code代表相应数据项 0万年历 12感冒 17洗车 20穿衣 21紫外线 26运动 28钓鱼)
+        Integer[] codeArr = {0,12,17,20,21,26,28};
+        ArrayList<Integer> codeList = new ArrayList<>();
+        Collections.addAll(codeList,codeArr);
+        ArrayList<WeatherLiveIndexVO> returnList = new ArrayList<>();
+        //TODO 插入万年历数据
+        for(WeatherLiveIndexVO weatherLiveIndexVO : weatherParamList){
+            if(codeList.contains(weatherLiveIndexVO.getCode())){
+                returnList.add(weatherLiveIndexVO);
+            }
+        }
+        //排序
+        Collections.sort(returnList,new Comparator<WeatherLiveIndexVO>() {
+            @Override
+            public int compare(WeatherLiveIndexVO o1, WeatherLiveIndexVO o2) {
+                return o1.getCode().compareTo(o2.getCode());
+            }
+        });
+//        return livingIndex.getJSONArray(originKey);
+        return returnList;
     }
     
 

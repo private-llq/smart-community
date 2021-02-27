@@ -3,13 +3,11 @@ package com.jsy.community.utils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.vo.WeatherLiveIndexVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpPost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletContext;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -92,7 +90,15 @@ public class WeatherUtils {
 	
 	//天气详情假数据
 	public static JSONObject getTempWeatherDetails(){
-		return tempWeatherDetails.getJSONObject("data");
+		JSONObject data = tempWeatherDetails.getJSONObject("data");
+		
+//		JSONArray hourly = data.getJSONArray("hourly");
+//		JSONObject returnAqi = new JSONObject();
+//		returnAqi.put("value",aqi.getString("value"));
+//		data.put("hourly",returnAqi);
+
+//		return tempWeatherDetails.getJSONObject("data");
+		return data;
 	}
 	
 	//TODO 临时方法 动态修改时间 后期删除
@@ -112,7 +118,7 @@ public class WeatherUtils {
 	public static void dealForecastToAnyDays(JSONObject data,int scale){
 		JSONArray forecast = data.getJSONArray("forecast");
 		if(scale > 15 || scale < 1 ||scale > forecast.size() - 2){
-			log.error("三方接口返回数据有更改，需重新确认调整");
+			log.error("三方接口返回数据有更改，15天天气预报截取{}天出错，需重新确认调整",scale);
 			return;
 		}
 		List<Object> forecastList = new ArrayList<>();
@@ -189,10 +195,10 @@ public class WeatherUtils {
 			FileReader fileReader2;
 			log.info("开始读取假天气数据");
 			if(System.getProperty("os.name").startsWith("Win")){
-//				fileReader = new FileReader(new File(getClassesPath() + "temp_weather.txt"));
-//				fileReader2 = new FileReader(new File(getClassesPath() + "temp_weather_details.txt"));
-				fileReader = new FileReader(new File("D:/" + "temp_weather.txt"));
-				fileReader2 = new FileReader(new File("D:/" + "temp_weather_details.txt"));
+				fileReader = new FileReader(new File(getClassesPath() + "temp_weather.txt"));
+				fileReader2 = new FileReader(new File(getClassesPath() + "temp_weather_details.txt"));
+//				fileReader = new FileReader(new File("D:/" + "temp_weather.txt"));
+//				fileReader2 = new FileReader(new File("D:/" + "temp_weather_details.txt"));
 			}else{
 				fileReader = new FileReader(new File(OS_LINUX_PATH + "temp_weather.txt"));
 				fileReader2 = new FileReader(new File(OS_LINUX_PATH + "temp_weather_details.txt"));
