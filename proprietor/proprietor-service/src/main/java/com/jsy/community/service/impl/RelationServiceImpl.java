@@ -80,7 +80,7 @@ public class RelationServiceImpl implements IRelationService {
                     car.setUid(relationQo.getUserId());
                     car.setCommunityId(relationQo.getCommunityId());
                     car.setOwner(relationQo.getName());
-                    car.setMobile(relationQo.getMobile());
+                    car.setContact(relationQo.getMobile());
                     car.setHouseMemberId(houseMemberEntity.getId());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                 }

@@ -26,7 +26,7 @@ import java.util.Arrays;
  * @author: Hu
  * @create: 2020-12-11 09:28
  **/
-@Api(tags = "生活缴费前端控制器")
+@Api(tags = "生活缴费前端控制器--增删改")
 @RestController
 @RequestMapping("/livingpaymentoperation")
 @ApiJSYController
@@ -40,7 +40,7 @@ public class LivingPaymentOperationController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IPayGroupService payGroupService;
 
-    @ApiOperation("新增自定义组名")
+    @ApiOperation("新增分组")
     @PostMapping("/saveGroupName")
     @Login
     public CommonResult saveGroup(@ApiParam("组名") @RequestParam String name){
@@ -48,7 +48,7 @@ public class LivingPaymentOperationController {
         payGroupService.insertGroup(name,userId);
         return CommonResult.ok();
     }
-    @ApiOperation("修改自定义组名")
+    @ApiOperation("修改组名")
     @PutMapping("/updateGroupName")
     @Login
     public CommonResult updateGroup(@ApiParam("id") @RequestParam Long id,@ApiParam("name") String name){
@@ -57,7 +57,7 @@ public class LivingPaymentOperationController {
         return CommonResult.ok();
     }
 
-    @ApiOperation("删除组和相关的户号")
+    @ApiOperation("删除分组")
     @DeleteMapping("/deleteGroupName")
     @Login
     public CommonResult deleteGroupName(@ApiParam("组名") @RequestParam String name){
@@ -65,7 +65,6 @@ public class LivingPaymentOperationController {
         payGroupService.delete(name,userId);
         return CommonResult.ok();
     }
-
     /**
      * 添加缴费记录
      * @param livingPaymentQO
@@ -75,7 +74,6 @@ public class LivingPaymentOperationController {
     @PostMapping("/add")
     @Login
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
-
         if (livingPaymentQO.getPaymentBalance().abs().compareTo(new BigDecimal(50)) != 0) {
             return CommonResult.error("缴费金额不足");
         }
@@ -90,7 +88,7 @@ public class LivingPaymentOperationController {
      * @param
      * @return
      */
-    @ApiOperation("添加订单备注")
+    @ApiOperation("添加备注")
     @PostMapping("/addRemark")
     @Login
     public CommonResult addRemark(@RequestBody RemarkQO remarkQO){

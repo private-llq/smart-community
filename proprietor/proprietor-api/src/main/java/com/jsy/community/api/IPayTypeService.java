@@ -47,5 +47,12 @@ public interface IPayTypeService extends IService<PayTypeEntity> {
 	 **/
 	PageInfo<PayCompanyEntity> getPayCompany(BaseQO<PayCompanyEntity> baseQO, Long type, Long cityId);
 
+	/**
+	 * @Description: 查询缴费单位
+	 * @author: Hu
+	 * @since: 2021/2/26 17:50
+	 * @Param:
+	 * @return:
+	 */
 	List<PayCompanyVO> selectPayCompany(PayCompanyQO payCompanyQO);
 }

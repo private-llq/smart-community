@@ -69,7 +69,7 @@ public interface ILivingpaymentQueryService {
     PaymentRecordsMapVO selectGroupAll(String userId);
 
     /**
-     * 缴费成功后返回的数据，暂时没用
+     * 缴费详情
      * @param id
      * @return
      */
@@ -83,4 +83,13 @@ public interface ILivingpaymentQueryService {
      * @return:
      */
     TheBillingDetailsVO selectOrderId(Long id);
+
+    /**
+     * @Description: 查询所有户号
+     * @author: Hu
+     * @since: 2021/2/27 16:54
+     * @Param:
+     * @return:
+     */
+    List<FamilyIdVO> selectFamilyId(String uid);
 }

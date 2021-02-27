@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.jsy.community.api.ILivingpaymentQueryService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PayCompanyEntity;
 import com.jsy.community.entity.PayGroupEntity;
@@ -111,6 +112,18 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
     }
 
 
+    /**
+     * @Description: 查询全部户号
+     * @author: Hu
+     * @since: 2021/2/27 16:55
+     * @Param:
+     * @return:
+     */
+    @Override
+    public List<FamilyIdVO> selectFamilyId(String uid) {
+        return livingpaymentQueryMapper.selectFamilyId(uid);
+    }
+
     @Override
     public TheBillingDetailsVO selectOrderId(Long id) {
         return livingpaymentQueryMapper.selectOrderId(id);
@@ -167,12 +180,15 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
     @Override
     public PayVoucherVO getOrderID(Long id) {
         PayOrderEntity entity = payOrderMapper.selectById(id);
+        if (entity==null){
+            throw new ProprietorException("该订单不存在！");
+        }
         PayTypeEntity typeEntity = payTypeMapper.selectById(entity.getTypeId());
         PayVoucherVO payVoucherVO = new PayVoucherVO();
-        payVoucherVO.setId(entity.getId());
+        payVoucherVO.setOrderId(entity.getId());
         payVoucherVO.setCompanyName(entity.getCompanyName());
         payVoucherVO.setOrderNum(entity.getOrderNum());
-        payVoucherVO.setPayTypeName("");
+        payVoucherVO.setPayTypeName(entity.getPayTypeName());
         payVoucherVO.setTypeName(typeEntity.getName());
         payVoucherVO.setStatus(entity.getStatus());
         payVoucherVO.setFamilyId(entity.getFamilyId());

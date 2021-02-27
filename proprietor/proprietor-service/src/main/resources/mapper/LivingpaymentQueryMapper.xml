@@ -16,33 +16,34 @@
 
     <select id="selectList" resultMap="DefaultHouseOwnerMap">
         SELECT distinct
-        pg.name as groupName,
-        po.family_id as familyId,
-        po.unit_id as companyId,
-        po.unit as companyName,
-        tt.icon as icon,
-        tt.medium_icon as mediumIcon,
-        tt.large_size_icon as largeSizeIcon,
-        tt.id as typeID,
-        tt.name as typeName,
-        po.create_time as timeStart
-        FROM t_pay_order po
-        join t_pay_type tt on po.payment_type=tt.id
-        join t_pay_group pg on po.group_id=pg.id
-        where po.deleted=0 and tt.deleted=0 and pg.deleted=0  pg.uid=#{userId} ORDER BY timeStart desc limit #{page},#{size}
+        tpg.id as groupId,
+        tpg.name as groupName,
+        tpf.family_id as familyId,
+        tpc.id as companyId,
+        tpc.name as companyName,
+        tpt.icon as icon,
+        tpt.medium_icon as mediumIcon,
+        tpt.large_size_icon as largeSizeIcon,
+        tpt.id as typeID,
+        tpt.name as typeName,
+        tpf.create_time as timeStart
+        FROM t_pay_order tpf
+        join t_pay_type tpt on tpf.type_id=tpt.id
+        join t_pay_group tpg on tpf.group_id=tpg.id
+        join t_pay_company tpc on tpf.company_id=tpc.id
+        where tpf.deleted=0 and tpt.deleted=0 and tpg.deleted=0 and tpc.deleted=0 and tpf.uid=#{userId} ORDER BY timeStart desc limit #{page},#{size}
     </select>
 
 
     <select id="selectOrder" resultMap="PaymentRecordsVOMAP">
         SELECT
         concat(t.pay_year,"年",t.pay_month,"月") as timeGroup,
-        t.id as id,t.pay_year as payYear,t.pay_month as payMonth,t.order_num as orderNum,t.company_name as companyName,
-        t.family_id as familyId,t.order_time as orderTime,t.payment_balance paymentBalance,t.pay_type as payType,
-        t.bill_classification as billClassification,t.tally as tally,t.remark as remark,t.remark_img as remarkImg,
-        tpt.id as typeId,tpt.name as typeName,t.address as address,tpt.icon as icon,tpt.medium_icon as mediumIcon,tpt.large_size_icon as largeSizeIcon
+        t.id as orderId,t.pay_year as payYear,t.pay_month as payMonth,t.order_num as orderNum,t.company_name as companyName,
+        t.family_id as familyId,t.order_time as orderTime,t.payment_balance paymentBalance,
+        tpt.id as typeId,tpt.name as typeName,tpt.icon as icon,tpt.medium_icon as mediumIcon,tpt.large_size_icon as largeSizeIcon
         FROM t_pay_order t
         join t_pay_group tg on t.group_id=tg.id
-        join t_pay_type tpt on t.payment_type=tpt.id
+        join t_pay_type tpt on t.type_id=tpt.id
         <include refid="query"></include>
         ORDER BY orderTime desc
     </select>
@@ -64,14 +65,14 @@
         pt.id as companyId,
 		pt.name as companyName
         FROM t_pay_family ph
-		JOIN t_pay_company pc on ph.pay_company=pc.id
-		JOIN t_pay_type pt on ph.type=pt.id
+		JOIN t_pay_company pc on ph.company_id=pc.id
+		JOIN t_pay_type pt on ph.type_id=pt.id
 		join t_pay_group tg on tg.id=ph.group_id
         where tg.deleted=0 and ph.deleted=0 and ph.uid=#{userID}
     </select>
     <select id="selectPaymentDetailsVO" resultType="com.jsy.community.vo.livingpayment.PaymentDetailsVO">
         SELECT
-        id,
+        id as orderId,
         company_name as companyName,
         family_id as familyId,
         order_time as orderTime,
@@ -89,15 +90,25 @@
     </select>
     <select id="selectOrderId" resultType="com.jsy.community.vo.livingpayment.TheBillingDetailsVO">
         SELECT
-        t.id as id,t.pay_type as payType,tp.name as typeName,
+        t.id as orderId,t.pay_type as payType,tp.name as typeName,
         tp.icon as icon,tp.medium_icon as mediumIcon,
         tp.large_size_icon as largeSizeIcon,t.company_name as companyName,
         t.payment_balance as paymentBalance,t.status as status,t.family_id as familyId,
-        t.order_num as orderNum,t.bill_classification as billClassification,
+        t.order_num as orderNum,t.bill_classification as billClassification,t.bill_classification_name as billClassificationName,
         t.tally as tally,t.remark as remark,t.remark_img as remarkImg
         FROM t_pay_order t JOIN t_pay_type tp on t.type_id=tp.id
         where t.deleted=0 and tp.deleted=0 and t.id=#{id}
     </select>
+    <select id="selectFamilyId" resultMap="FamilyIdVOMap">
+        select distinct tpt.name as typeName,tpo.company_name as companyName,tpo.family_id as familyId
+        from  t_pay_order tpo join t_pay_type tpt on tpo.type_id=tpt.id
+        where tpo.deleted=0 and tpt.deleted=0 and tpo.uid=#{uid}
+    </select>
+    <resultMap id="FamilyIdVOMap" type="com.jsy.community.vo.livingpayment.FamilyIdVO">
+        <result property="typeName" column="typeName"/>
+        <result property="companyName" column="companyName"/>
+        <result property="familyId" column="familyId"/>
+    </resultMap>
 
     <resultMap id="GroupVOMap" type="com.jsy.community.vo.livingpayment.GroupVO">
         <result property="typeName" column="typeName"/>
@@ -123,23 +134,19 @@
     </resultMap>
 
     <resultMap id="PaymentRecordsVOMAP" type="com.jsy.community.vo.livingpayment.PaymentRecordsVO">
-        <result property="id" column="id"/>
+        <result property="orderId" column="orderId"/>
         <result column="payYear" property="payYear"/>
         <result column="payMonth" property="payMonth"/>
-        <result column="payType" property="payType"/>
         <result column="paymentBalance" property="paymentBalance"/>
         <result column="companyName" property="companyName"/>
-        <result column="icon" property="icon"/>
-        <result column="address" property="address"/>
         <result column="familyId" property="familyId"/>
         <result column="orderNum" property="orderNum"/>
         <result column="orderTime" property="orderTime"/>
-        <result column="billClassification" property="billClassification"/>
-        <result column="tally" property="tally"/>
-        <result column="remark" property="remark"/>
-        <result column="remarkImg" property="remarkImg"/>
         <result column="typeId" property="typeId"/>
         <result column="typeName" property="typeName"/>
+        <result column="icon" property="icon"/>
+        <result column="mediumIcon" property="mediumIcon"/>
+        <result column="largeSizeIcon" property="largeSizeIcon"/>
         <result column="timeGroup" property="timeGroup"/>
     </resultMap>
 </mapper>

@@ -10,16 +10,16 @@ import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
- * @description: 缴费成功后返回订单详情
+ * @description: 缴费详情
  * @author: Hu
  * @create: 2020-12-28 14:40
  **/
 @Data
-@ApiModel("缴费成功后返回的数据")
+@ApiModel("缴费详情")
 public class PaymentDetailsVO implements Serializable {
 
     @ApiModelProperty(value = "订单id")
-    private Long id;
+    private Long orderId;
 
     @ApiModelProperty(value = "缴费单位名称")
     private String companyName;

@@ -112,7 +112,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
 
         payOrderEntity.setPayType(livingPaymentQO.getPayTpye());
         payOrderEntity.setFamilyId(livingPaymentQO.getFamilyId());
-        payOrderEntity.setStatus(1);
+        payOrderEntity.setStatus(3);
         payOrderEntity.setOrderTime(LocalDateTime.now());
         payOrderEntity.setCompanyName(entity.getName());
         payOrderEntity.setPaymentBalance(livingPaymentQO.getPaymentBalance());
@@ -125,6 +125,8 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         payOrderEntity.setAddress(livingPaymentQO.getAddress());
         payOrderEntity.setCompanyId(livingPaymentQO.getCompanyId());
         payOrderEntity.setAccountBalance(livingPaymentQO.getAccountBalance());
+        payOrderEntity.setBillClassification(1);
+        payOrderEntity.setBillClassificationName("充值缴费");
 
 
         //到账时间

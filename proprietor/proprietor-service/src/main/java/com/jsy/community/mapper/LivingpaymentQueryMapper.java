@@ -74,4 +74,13 @@ public interface LivingpaymentQueryMapper {
      * @return:
      */
     TheBillingDetailsVO selectOrderId(Long id);
+
+    /**
+     * @Description: 查询全部户号
+     * @author: Hu
+     * @since: 2021/2/27 16:55
+     * @Param:
+     * @return:
+     */
+    List<FamilyIdVO> selectFamilyId(@Param("uid") String uid);
 }

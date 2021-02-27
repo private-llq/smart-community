@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Data
 public class TheBillingDetailsVO implements Serializable {
     @ApiModelProperty(value = "订单id")
-    private Long id;
+    private Long orderId;
     @ApiModelProperty(value = "付款方式")
     private Integer payType;
     @ApiModelProperty(value = "缴费类型名称")
@@ -37,7 +37,9 @@ public class TheBillingDetailsVO implements Serializable {
     @ApiModelProperty(value = "订单流水号")
     private String orderNum;
     @ApiModelProperty(value = "账单分类")
-    private String billClassification;
+    private Integer billClassification;
+    @ApiModelProperty(value = "账单分类名称")
+    private String billClassificationName;
     @ApiModelProperty(value = "标签")
     private String tally;
     @ApiModelProperty(value = "备注")

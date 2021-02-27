@@ -102,9 +102,9 @@ public class RelationController {
     @ApiOperation("查询一个家属详情")
     @GetMapping("/selectUserRelationDetails")
     @Login
-    public CommonResult selectRelationOne(@RequestParam("RelationId") Long RelationId){
+    public CommonResult selectRelationOne(@RequestParam("id") Long id){
         String userId = UserUtils.getUserId();
-        RelationVO relationVO = relationService.selectOne(RelationId, userId);
+        RelationVO relationVO = relationService.selectOne(id, userId);
         return CommonResult.ok(relationVO);
     }
     @ApiOperation("修改家属信息加汽车信息")

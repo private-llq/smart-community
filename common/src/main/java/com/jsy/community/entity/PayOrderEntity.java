@@ -68,8 +68,12 @@ public class PayOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "分组ID")
     private Long groupId;
 
-    @ApiModelProperty(value = "缴费状态 0 未到账 1已到账")
+    @ApiModelProperty(value = "缴费状态 1 已缴费 2处理中 3已到账")
     private Integer status;
+
+
+    @ApiModelProperty(value = "用户ud")
+    private String uid;
 
 
 

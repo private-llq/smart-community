@@ -18,7 +18,7 @@ public class RemarkQO implements Serializable {
 
 
     @ApiModelProperty(value = "订单id")
-    private Long id;
+    private Long orderId;
 
     @ApiModelProperty(value = "用户ID",hidden = true)
     private String uid;
@@ -26,7 +26,7 @@ public class RemarkQO implements Serializable {
     @ApiModelProperty(value = "账单类型，1充值缴费，暂时只有这个")
     private Integer billClassification;
 
-    @ApiModelProperty(value = "账单类型，1充值缴费，暂时只有这个")
+    @ApiModelProperty(value = "账单类型Name")
     private String billClassificationName;
 
     @ApiModelProperty(value = "标签")

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class PayVoucherVO implements Serializable {
 
     @ApiModelProperty(value = "订单id")
-    private Long id;
+    private Long orderId;
 
     @ApiModelProperty(value = "缴费单位名称")
     private String companyName;
@@ -47,4 +47,6 @@ public class PayVoucherVO implements Serializable {
 
     @ApiModelProperty(value = "缴费时间")
     private LocalDateTime orderTime;
+
+
 }

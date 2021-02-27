@@ -18,7 +18,7 @@
         insert into t_car(id,uid,car_type,car_plate,contact,owner,community_id,house_member_id,driving_license_url)
         values
         <foreach collection="cars" item="item" separator=",">
-            (#{item.id},#{item.uid},#{item.carType},#{item.carPlate},#{item.mobile},#{item.owner},#{item.communityId},#{item.houseMemberId}),#{drivingLicenseUrl}
+            (#{item.id},#{item.uid},#{item.carType},#{item.carPlate},#{item.contact},#{item.owner},#{item.communityId},#{item.houseMemberId},#{item.drivingLicenseUrl})
         </foreach>
     </insert>
     <!--  通过id查询业主家属  -->

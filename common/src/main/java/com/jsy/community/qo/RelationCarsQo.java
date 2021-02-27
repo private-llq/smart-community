@@ -35,7 +35,7 @@ public class RelationCarsQo implements Serializable {
 
     //手机号
     @ApiModelProperty(hidden = true)
-    private String mobile;
+    private String contact;
 
     //用户ID
     @ApiModelProperty(hidden = true)
