@@ -16,7 +16,7 @@ public class RelationCarsVO implements Serializable {
     @ApiModelProperty("车辆类型")
     private Integer carType;
     @ApiModelProperty("车辆类型名称")
-    private String carTypeName;
+    private String carTypeText;
     @ApiModelProperty("行驶证图片")
     private String drivingLicenseUrl;
 

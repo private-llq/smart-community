@@ -128,7 +128,7 @@ public class RelationServiceImpl implements IRelationService {
             relationCarsVO.setCarType(carEntity.getCarType());
             relationCarsVO.setDrivingLicenseUrl(carEntity.getDrivingLicenseUrl());
             relationCarsVO.setCarPlate(carEntity.getCarPlate());
-            relationCarsVO.setCarTypeName(BusinessEnum.CarTypeEnum.getCode(carEntity.getCarType()));
+            relationCarsVO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carEntity.getCarType()));
             objects.add(relationCarsVO);
         }
         relationVO.setCars(objects);
@@ -167,6 +167,15 @@ public class RelationServiceImpl implements IRelationService {
         List<RelationCarsQo> cars = relationQo.getCars();
         if(cars.size()>0){
             for (RelationCarsQo relationCarsQo : cars) {
+                if (relationCarsQo.getId()==null||relationCarsQo.getId()==0){
+                    relationCarsQo.setContact(relationQo.getMobile());
+                    relationCarsQo.setCommunityId(relationQo.getCommunityId());
+                    relationCarsQo.setHouseMemberId(relationQo.getId());
+                    relationCarsQo.setOwner(relationQo.getName());
+                    relationCarsQo.setId(SnowFlake.nextId());
+                    relationCarsQo.setUid(relationQo.getUserId());
+                    relationMapper.insertOne(relationCarsQo);
+                }
                 relationMapper.updateUserRelationCar(relationCarsQo);
             }
         }

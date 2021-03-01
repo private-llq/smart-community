@@ -32,10 +32,8 @@ import java.util.Arrays;
 @RequestMapping("/relation")
 @ApiJSYController
 public class RelationController {
+    //图片上传验证
     private final String[] img ={"jpg","png","jpeg"};
-
-//    //手机号验证
-//    private final String REGEX_MOBILE = "^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17[013678])|(18[0,5-9]))\\d{8}$";
     //护照验证
     private final String REG = "^1[45][0-9]{7}$|([P|p|S|s]\\d{7}$)|([S|s|G|g|E|e]\\d{8}$)|([Gg|Tt|Ss|Ll|Qq|Dd|Aa|Ff]\\d{8}$)|([H|h|M|m]\\d{8,10})$";
     //身份证验证

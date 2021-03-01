@@ -77,4 +77,8 @@
             </set>
             where id=#{id}
     </update>
+    <insert id="insertOne">
+        insert into t_car(id,uid,car_type,car_plate,contact,owner,community_id,house_member_id,driving_license_url)
+        value (#{id},#{uid},#{carType},#{carPlate},#{contact},#{owner},#{communityId},#{houseMemberId},#{drivingLicenseUrl})
+    </insert>
 </mapper>

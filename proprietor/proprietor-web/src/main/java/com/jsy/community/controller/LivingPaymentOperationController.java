@@ -9,6 +9,7 @@ import com.jsy.community.qo.livingpayment.LivingPaymentQO;
 import com.jsy.community.qo.livingpayment.RemarkQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -74,6 +75,7 @@ public class LivingPaymentOperationController {
     @PostMapping("/add")
     @Login
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
+        ValidatorUtils.validateEntity(livingPaymentQO, LivingPaymentQO.LivingPaymentValidated.class);
         if (livingPaymentQO.getPaymentBalance().abs().compareTo(new BigDecimal(50)) != 0) {
             return CommonResult.error("缴费金额不足");
         }

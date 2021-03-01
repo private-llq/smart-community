@@ -44,4 +44,13 @@ public interface RelationMapper {
      * @return:
      */
     void updateUserRelationCar(RelationCarsQo relationCarsQo);
+
+    /**
+     * @Description: 新增一条
+     * @author: Hu
+     * @since: 2021/3/1 10:55
+     * @Param:
+     * @return:
+     */
+    void insertOne(RelationCarsQo relationCarsQo);
 }

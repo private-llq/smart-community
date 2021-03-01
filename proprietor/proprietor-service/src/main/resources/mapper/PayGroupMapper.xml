@@ -3,12 +3,12 @@
 <mapper namespace="com.jsy.community.mapper.PayGroupMapper">
 
     <select id="selectUserGroup" resultType="com.jsy.community.vo.livingpayment.UserGroupVO">
-        select id,name,type from t_pay_group where uid=#{userId} and type=5
+        select id,name from t_pay_group where uid=#{userId} and type=5
     </select>
 
     <resultMap id="UserGroupMap" type="com.jsy.community.vo.livingpayment.UserGroupVO">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
-        <result column="type" property="type"/>
+<!--        <result column="type" property="type"/>-->
     </resultMap>
 </mapper>

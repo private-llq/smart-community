@@ -22,6 +22,6 @@ public class UserGroupVO implements Serializable {
     @ApiModelProperty(value = "户组名")
     private String name;
 
-    @ApiModelProperty(value = "1我家，2父母，3房东，4朋友，5其他")
-    private Integer type;
+//    @ApiModelProperty(value = "1我家，2父母，3房东，4朋友，5其他")
+//    private Integer type;
 }
