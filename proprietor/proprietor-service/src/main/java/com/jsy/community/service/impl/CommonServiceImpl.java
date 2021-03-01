@@ -13,6 +13,8 @@ import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.utils.WeatherUtils;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
+import com.jsy.community.vo.WeatherForecastVO;
+import com.jsy.community.vo.WeatherHourlyVO;
 import com.jsy.community.vo.WeatherLiveIndexVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -219,11 +221,11 @@ public class CommonServiceImpl implements ICommonService {
     public JSONObject getWeather(double lon, double lat){
         //接口调用
         JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
-        JSONObject weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
-        weatherNow.put("forecast",weatherForDays.getJSONArray("forecast"));
+        List<WeatherForecastVO> weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
+        weatherNow.put("forecast",weatherForDays);
         
         //处理数据
-        WeatherUtils.dealForecastToAnyDays(weatherForDays,3);  //截取未来3天天气预报
+        WeatherUtils.dealForecastToAnyDays(weatherNow,3);  //截取未来3天天气预报
         WeatherUtils.addDayOfWeek(weatherNow); //补星期几
         
         return weatherNow;
@@ -241,18 +243,18 @@ public class CommonServiceImpl implements ICommonService {
         try {
             //接口调用
             JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
-            JSONObject weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
-            weatherNow.put("forecast",weatherForDays.getJSONArray("forecast"));
-            JSONObject weatherFor24hours = getWeatherFor24hours(lon, lat);  //24h天气预报
+            List<WeatherForecastVO> weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
+            weatherNow.put("forecast",weatherForDays);
+            List<WeatherHourlyVO> weatherFor24hours = getWeatherFor24hours(lon, lat);  //24h天气预报
             JSONObject airQuality = getAirQuality(lon, lat);  //空气质量
             ArrayList<WeatherLiveIndexVO> livingIndex = getLivingIndex(lon, lat);  //生活指数
             
             //处理数据
             WeatherUtils.addDayOfWeek(weatherNow); //补星期几
-            WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
+//            WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
             
             //组装返回
-            weatherNow.put("hourly",weatherFor24hours.getJSONArray("hourly"));
+            weatherNow.put("hourly",weatherFor24hours);
             weatherNow.put("aqi",airQuality.getJSONObject("aqi"));
             weatherNow.put("liveIndex",livingIndex);
             return weatherNow;
@@ -270,7 +272,15 @@ public class CommonServiceImpl implements ICommonService {
      * @Date: 2020/12/24
     **/
     private JSONObject getWeatherNow(double lon, double lat){
-        return weatherUtils.getWeatherNow(String.valueOf(lon),String.valueOf(lat));
+        JSONObject weatherNow = weatherUtils.getWeatherNow(String.valueOf(lon), String.valueOf(lat));
+        JSONObject condition = weatherNow.getJSONObject("condition");
+        JSONObject returnCondition = new JSONObject();
+        returnCondition.put("condition",condition.getString("condition"));
+        returnCondition.put("temp",condition.getString("temp"));
+        returnCondition.put("tips",condition.getString("tips"));
+        weatherNow.put("condition",returnCondition);
+        return weatherNow;
+//        return weatherUtils.getWeatherNow(String.valueOf(lon),String.valueOf(lat));
     }
     
     /**
@@ -280,8 +290,12 @@ public class CommonServiceImpl implements ICommonService {
      * @Author: chq459799974
      * @Date: 2020/12/24
     **/
-    private JSONObject getWeatherForDays(double lon, double lat){
-        return weatherUtils.getWeatherForDays(String.valueOf(lon),String.valueOf(lat));
+    private List<WeatherForecastVO> getWeatherForDays(double lon, double lat){
+        JSONObject weatherForDays = weatherUtils.getWeatherForDays(String.valueOf(lon), String.valueOf(lat));
+        JSONArray forecast = weatherForDays.getJSONArray("forecast");
+        List<WeatherForecastVO> newForecastList = forecast.toJavaList(WeatherForecastVO.class);
+        return newForecastList;
+//        return weatherUtils.getWeatherForDays(String.valueOf(lon),String.valueOf(lat));
     }
     
     /**
@@ -291,8 +305,12 @@ public class CommonServiceImpl implements ICommonService {
      * @Author: chq459799974
      * @Date: 2020/2/25
      **/
-    private JSONObject getWeatherFor24hours(double lon, double lat){
-        return weatherUtils.getWeatherFor24hours(String.valueOf(lon),String.valueOf(lat));
+    private List<WeatherHourlyVO> getWeatherFor24hours(double lon, double lat){
+        JSONObject weatherFor24hours = weatherUtils.getWeatherFor24hours(String.valueOf(lon), String.valueOf(lat));
+        JSONArray hourly = weatherFor24hours.getJSONArray("hourly");
+        List<WeatherHourlyVO> newHourlyList = hourly.toJavaList(WeatherHourlyVO.class);
+        return newHourlyList;
+//        return weatherUtils.getWeatherFor24hours(String.valueOf(lon),String.valueOf(lat));
     }
     
     /**
@@ -304,9 +322,10 @@ public class CommonServiceImpl implements ICommonService {
      **/
     private JSONObject getAirQuality(double lon, double lat){
         JSONObject airQuality = weatherUtils.getAirQuality(String.valueOf(lon), String.valueOf(lat));
+        JSONObject aqi = airQuality.getJSONObject("aqi");
         JSONObject returnAqi = new JSONObject();
-        returnAqi.put("value",airQuality.getString("value"));
-        returnAqi.put("aqiName", BusinessEnum.AQIEnum.getAQIName(airQuality.getIntValue("value"),null,null,null));
+        returnAqi.put("value",aqi.getString("value"));
+        returnAqi.put("aqiName", BusinessEnum.AQIEnum.getAQIName(aqi.getIntValue("value"),null,null,null));
 //        return weatherUtils.getAirQuality(String.valueOf(lon),String.valueOf(lat));
         return returnAqi;
     }

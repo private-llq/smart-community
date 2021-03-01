@@ -3,6 +3,8 @@ package com.jsy.community.utils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.vo.WeatherForecastVO;
+import com.jsy.community.vo.WeatherHourlyVO;
 import com.jsy.community.vo.WeatherLiveIndexVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpPost;
@@ -46,7 +48,7 @@ public class WeatherUtils {
 	//TODO 三方接口商家待定 暂时用墨迹天气
 	public JSONObject getWeather(String lon,String lat,String url){
 		
-		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		//params参数
 		Map<String, String> paramsMap = new HashMap<>();
 		paramsMap.put("lon", lon);
@@ -90,15 +92,12 @@ public class WeatherUtils {
 	
 	//天气详情假数据
 	public static JSONObject getTempWeatherDetails(){
-		JSONObject data = tempWeatherDetails.getJSONObject("data");
-		
-//		JSONArray hourly = data.getJSONArray("hourly");
-//		JSONObject returnAqi = new JSONObject();
-//		returnAqi.put("value",aqi.getString("value"));
-//		data.put("hourly",returnAqi);
-
-//		return tempWeatherDetails.getJSONObject("data");
-		return data;
+		JSONObject tempData = tempWeatherDetails.getJSONObject("data");
+		//假数据动态修改时间
+		dealDateForTempData(tempData);
+		//补上星期几
+		addDayOfWeek(tempData);
+		return tempData;
 	}
 	
 	//TODO 临时方法 动态修改时间 后期删除
@@ -171,10 +170,10 @@ public class WeatherUtils {
 	}
 	
 	//根据空气质量指数，补充空气质量名称
-	public static void addAQINameByAQIValue(JSONObject data, Double lon, Double lat, String cityId){
-		JSONObject aqiJson = data.getJSONObject("aqi");
-		aqiJson.put("aqiName", BusinessEnum.AQIEnum.getAQIName(aqiJson.getIntValue("value"),lon,lat,cityId));
-	}
+//	public static void addAQINameByAQIValue(JSONObject data, Double lon, Double lat, String cityId){
+//		JSONObject aqiJson = data.getJSONObject("aqi");
+//		aqiJson.put("aqiName", BusinessEnum.AQIEnum.getAQIName(aqiJson.getIntValue("value"),lon,lat,cityId));
+//	}
 	
 	//假天气数据
 	private static final JSONObject tempWeather = new JSONObject();
