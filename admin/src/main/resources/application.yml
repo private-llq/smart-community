@@ -69,6 +69,12 @@ jsy:
     # token有效时长，7天，单位秒
     expire: 604800
     header: token
+  #行驶证识别相关信息
+  drivinglicense:
+    api: https://api08.aliyun.venuscn.com
+    path: /ocr/vehicle-license
+    method: POST
+    appCode: 9b53bb7f5f5945fcb4c42ecd79f31642
 
 loginExpireHour: 12
 

@@ -18,7 +18,7 @@ public interface IRelationService {
      * @Param:
      * @return:
      */
-    Boolean addRelation(RelationQo relationQo);
+    void addRelation(RelationQo relationQo);
 
 
     /**

@@ -291,11 +291,9 @@
     <!-- 根据用户id 和社区id 查询用户在这个社区的可发布房源 -->
     <select id="ownerHouse" resultType="com.jsy.community.vo.HouseVo">
         SELECT
-	        h.id as houseId,
-	        h.building,
-	        h.unit,
-	        h.floor,
-	        h.door
+	        h.id,
+	        concat(h.building,h.unit,h.floor,h.door) as mergeName
+
         FROM
 	        t_user_house AS uh
 	        RIGHT JOIN t_house AS h ON uh.house_id = h.id

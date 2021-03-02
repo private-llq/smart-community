@@ -1,5 +1,6 @@
 package com.jsy.community.config.web;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsy.community.utils.JsySerializerModifier;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ public class CommunityWebConfig {
     public MappingJackson2HttpMessageConverter getMappingJackson2HttpMessageConverter() {
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         JsySerializerModifier.setObjectMapperTime(objectMapper);
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
         return mappingJackson2HttpMessageConverter;

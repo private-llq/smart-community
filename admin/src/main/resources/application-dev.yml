@@ -4,6 +4,7 @@ spring:
     host: 222.178.212.29
     password: smart99--
     database: 0
+    sms-databases: 7
     jedis:
       pool:
         min-idle: 10

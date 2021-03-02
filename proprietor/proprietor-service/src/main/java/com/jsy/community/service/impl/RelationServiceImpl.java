@@ -8,7 +8,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserHouseEntity;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.RelationCarsQo;
 import com.jsy.community.qo.RelationQo;
@@ -56,17 +55,8 @@ public class RelationServiceImpl implements IRelationService {
      */
     @Override
     @Transactional
-    public Boolean addRelation(RelationQo relationQo) {
-//        //实名认证
-//        if(BusinessConst.IDENTIFICATION_TYPE_IDCARD.equals(relationQo.getIdentificationType())){
-//            if(!RealnameAuthUtils.twoElements(relationQo.getName(), relationQo.getIdNumber())){
-//                return false;
-//            }
-//        }
-
+    public void addRelation(RelationQo relationQo) {
         HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
-
-
         houseMemberEntity.setId(SnowFlake.nextId());
         if (relationQo.getIdentificationType()==0&&relationQo.getIdentificationType()==null){
             relationQo.setIdentificationType(1);
@@ -76,13 +66,11 @@ public class RelationServiceImpl implements IRelationService {
         houseMemberEntity.setHouseholderId(relationQo.getUserId());
         houseMemberEntity.setName(relationQo.getName());
         houseMemberEntity.setCommunityId(relationQo.getCommunityId());
-        houseMemberEntity.setIdCard(relationQo.getIdNumber());
-        houseMemberEntity.setMobile(relationQo.getPhoneTel());
-        houseMemberEntity.setRelation(relationQo.getConcern());
+        houseMemberEntity.setIdCard(relationQo.getIdCard());
+        houseMemberEntity.setMobile(relationQo.getMobile());
+        houseMemberEntity.setRelation(relationQo.getRelation());
         houseMemberEntity.setSex(relationQo.getSex());
         houseMemberEntity.setPersonType(relationQo.getPersonType());
-
-
         houseMemberMapper.insert(houseMemberEntity);
         //添加车辆信息
         List<RelationCarsQo> cars = relationQo.getCars();
@@ -92,17 +80,12 @@ public class RelationServiceImpl implements IRelationService {
                     car.setUid(relationQo.getUserId());
                     car.setCommunityId(relationQo.getCommunityId());
                     car.setOwner(relationQo.getName());
-                    car.setPhoneTel(relationQo.getPhoneTel());
+                    car.setContact(relationQo.getMobile());
                     car.setHouseMemberId(houseMemberEntity.getId());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                 }
                 relationMapper.addCars(cars);
             }
-
-            return true;
-
-
-
     }
 
     /**
@@ -124,35 +107,28 @@ public class RelationServiceImpl implements IRelationService {
     public RelationVO selectOne(Long RelationId, String userId) {
         HouseMemberEntity houseMemberEntity = houseMemberMapper.selectById(RelationId);
         if (houseMemberEntity==null){
-            throw new ProprietorException(JSYError.INTERNAL);
+            throw new ProprietorException("数据不存在！");
         }
         List<CarEntity> carEntities = carMapper.selectList(new QueryWrapper<CarEntity>().eq("house_member_id", RelationId));
         RelationVO relationVO = new RelationVO();
         relationVO.setIdentificationType(houseMemberEntity.getIdentificationType());
         relationVO.setId(houseMemberEntity.getId());
-        relationVO.setPhoneTel(houseMemberEntity.getMobile());
+        relationVO.setMobile(houseMemberEntity.getMobile());
         relationVO.setName(houseMemberEntity.getName());
-        relationVO.setIdNumber(houseMemberEntity.getIdCard());
-        relationVO.setConcern(houseMemberEntity.getRelation());
+        relationVO.setIdCard(houseMemberEntity.getIdCard());
+        relationVO.setRelation(houseMemberEntity.getRelation());
         relationVO.setSex(houseMemberEntity.getSex());
         relationVO.setCommunityId(houseMemberEntity.getCommunityId());
         relationVO.setHouseId(houseMemberEntity.getHouseId());
-        relationVO.setUserId(houseMemberEntity.getHouseholderId());
         List<RelationCarsVO> objects = new ArrayList<>();
         //封装车辆信息
         for (CarEntity carEntity : carEntities) {
             RelationCarsVO relationCarsVO = new RelationCarsVO();
-            relationCarsVO.setUid(carEntity.getUid());
-            relationCarsVO.setCarPosition(carEntity.getCarPositionId());
-            relationCarsVO.setCheckStatus(carEntity.getCheckStatus());
-            relationCarsVO.setOwner(carEntity.getOwner());
             relationCarsVO.setId(carEntity.getId());
-            relationCarsVO.setPhoneTel(carEntity.getContact());
             relationCarsVO.setCarType(carEntity.getCarType());
-            relationCarsVO.setCarImgURL(carEntity.getCarImageUrl());
-            relationCarsVO.setCarId(carEntity.getCarPlate());
-            relationCarsVO.setCommunityId(carEntity.getCommunityId());
-            relationCarsVO.setCarTypeName(BusinessEnum.CarTypeEnum.getCode(carEntity.getCarType()));
+            relationCarsVO.setDrivingLicenseUrl(carEntity.getDrivingLicenseUrl());
+            relationCarsVO.setCarPlate(carEntity.getCarPlate());
+            relationCarsVO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carEntity.getCarType()));
             objects.add(relationCarsVO);
         }
         relationVO.setCars(objects);
@@ -191,6 +167,15 @@ public class RelationServiceImpl implements IRelationService {
         List<RelationCarsQo> cars = relationQo.getCars();
         if(cars.size()>0){
             for (RelationCarsQo relationCarsQo : cars) {
+                if (relationCarsQo.getId()==null||relationCarsQo.getId()==0){
+                    relationCarsQo.setContact(relationQo.getMobile());
+                    relationCarsQo.setCommunityId(relationQo.getCommunityId());
+                    relationCarsQo.setHouseMemberId(relationQo.getId());
+                    relationCarsQo.setOwner(relationQo.getName());
+                    relationCarsQo.setId(SnowFlake.nextId());
+                    relationCarsQo.setUid(relationQo.getUserId());
+                    relationMapper.insertOne(relationCarsQo);
+                }
                 relationMapper.updateUserRelationCar(relationCarsQo);
             }
         }

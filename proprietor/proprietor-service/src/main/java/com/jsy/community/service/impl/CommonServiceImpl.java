@@ -4,14 +4,19 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
+import com.jsy.community.utils.LunarCalendarFestivalUtils;
 import com.jsy.community.utils.WeatherUtils;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
+import com.jsy.community.vo.WeatherForecastVO;
+import com.jsy.community.vo.WeatherHourlyVO;
+import com.jsy.community.vo.WeatherLiveIndexVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +25,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.integration.transformer.MessageTransformingHandler;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -197,28 +203,67 @@ public class CommonServiceImpl implements ICommonService {
         return regionMapper.vagueQueryCity(searchStr);
     }
 
+    //天气假数据
+    public JSONObject getTempWeather(){
+        return WeatherUtils.getTempWeather();
+    }
+    
+    //天气详情假数据
+    public JSONObject getTempWeatherDetails(){
+        return WeatherUtils.getTempWeatherDetails();
+    }
+    
     /**
-    * @Description: 天气整合接口
+    * @Description: 首页天气
      * @Param: [lon, lat]
      * @Return: com.alibaba.fastjson.JSONObject
      * @Author: chq459799974
-     * @Date: 2020/12/24
+     * @Date: 2021/2/25
+    **/
+    public JSONObject getWeather(double lon, double lat){
+        //接口调用
+        JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
+        List<WeatherForecastVO> weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
+        weatherNow.put("forecast",weatherForDays);
+        
+        //处理数据
+        WeatherUtils.dealForecastToAnyDays(weatherNow,3);  //截取未来3天天气预报
+        WeatherUtils.addDayOfWeek(weatherNow); //补星期几
+        
+        return weatherNow;
+    }
+    
+    /**
+    * @Description: 天气详情整合接口
+     * @Param: [lon, lat]
+     * @Return: com.alibaba.fastjson.JSONObject
+     * @Author: chq459799974
+     * @Date: 2020/2/25
     **/
     @Override
-    public JSONObject getWeather(double lon, double lat){
-        JSONObject weatherNow = getWeatherNow(lon, lat);
-        JSONObject weatherForDays = getWeatherForDays(lon, lat);
-        try{
-            String cityId1 = weatherNow.getJSONObject("city").getString("cityId");
-            String cityId2 = weatherForDays.getJSONObject("city").getString("cityId");
-            if(cityId1.equals(cityId2)){
-                JSONArray forecast = weatherForDays.getJSONArray("forecast");
-                weatherNow.put("forecast",forecast);
-            }
+    public JSONObject getWeatherDetails(double lon, double lat){
+        try {
+            //接口调用
+            JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
+            List<WeatherForecastVO> weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
+            weatherNow.put("forecast",weatherForDays);
+            List<WeatherHourlyVO> weatherFor24hours = getWeatherFor24hours(lon, lat);  //24h天气预报
+            JSONObject airQuality = getAirQuality(lon, lat);  //空气质量
+            ArrayList<WeatherLiveIndexVO> livingIndex = getLivingIndex(lon, lat);  //生活指数
+            
+            //处理数据
+            WeatherUtils.addDayOfWeek(weatherNow); //补星期几
+//            WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
+            
+            //组装返回
+            weatherNow.put("hourly",weatherFor24hours);
+            weatherNow.put("aqi",airQuality.getJSONObject("aqi"));
+            weatherNow.put("liveIndex",livingIndex);
+            return weatherNow;
         }catch (Exception e){
-            log.error("查询天气 结果解析出错");
+            log.error(e.getMessage());
+            return null;
         }
-        return weatherNow;
     }
     
     /**
@@ -228,22 +273,111 @@ public class CommonServiceImpl implements ICommonService {
      * @Author: chq459799974
      * @Date: 2020/12/24
     **/
-    @Override
-    public JSONObject getWeatherNow(double lon, double lat){
-        return weatherUtils.getWeatherNow(String.valueOf(lon),String.valueOf(lat));
+    private JSONObject getWeatherNow(double lon, double lat){
+        JSONObject weatherNow = weatherUtils.getWeatherNow(String.valueOf(lon), String.valueOf(lat));
+        JSONObject condition = weatherNow.getJSONObject("condition");
+        JSONObject returnCondition = new JSONObject();
+        returnCondition.put("condition",condition.getString("condition"));
+        returnCondition.put("temp",condition.getString("temp"));
+        returnCondition.put("tips",condition.getString("tips"));
+        returnCondition.put("updatetime",condition.getString("updatetime"));
+        weatherNow.put("condition",returnCondition);
+        return weatherNow;
+//        return weatherUtils.getWeatherNow(String.valueOf(lon),String.valueOf(lat));
     }
     
     /**
-    * @Description: 获取天气预报
+    * @Description: 获取天气预报15天
      * @Param: [lon, lat]
      * @Return: com.alibaba.fastjson.JSONObject
      * @Author: chq459799974
      * @Date: 2020/12/24
     **/
-    @Override
-    public JSONObject getWeatherForDays(double lon, double lat){
-        return weatherUtils.getWeatherForDays(String.valueOf(lon),String.valueOf(lat));
+    private List<WeatherForecastVO> getWeatherForDays(double lon, double lat){
+        JSONObject weatherForDays = weatherUtils.getWeatherForDays(String.valueOf(lon), String.valueOf(lat));
+        JSONArray forecast = weatherForDays.getJSONArray("forecast");
+        List<WeatherForecastVO> newForecastList = forecast.toJavaList(WeatherForecastVO.class);
+        return newForecastList;
+//        return weatherUtils.getWeatherForDays(String.valueOf(lon),String.valueOf(lat));
     }
+    
+    /**
+     * @Description: 获取天气预报24h
+     * @Param: [lon, lat]
+     * @Return: com.alibaba.fastjson.JSONObject
+     * @Author: chq459799974
+     * @Date: 2020/2/25
+     **/
+    private List<WeatherHourlyVO> getWeatherFor24hours(double lon, double lat){
+        JSONObject weatherFor24hours = weatherUtils.getWeatherFor24hours(String.valueOf(lon), String.valueOf(lat));
+        JSONArray hourly = weatherFor24hours.getJSONArray("hourly");
+        List<WeatherHourlyVO> newHourlyList = hourly.toJavaList(WeatherHourlyVO.class);
+        return newHourlyList;
+//        return weatherUtils.getWeatherFor24hours(String.valueOf(lon),String.valueOf(lat));
+    }
+    
+    /**
+     * @Description: 获取空气质量
+     * @Param: [lon, lat]
+     * @Return: com.alibaba.fastjson.JSONObject
+     * @Author: chq459799974
+     * @Date: 2020/2/25
+     **/
+    private JSONObject getAirQuality(double lon, double lat){
+        JSONObject airQuality = weatherUtils.getAirQuality(String.valueOf(lon), String.valueOf(lat));
+        JSONObject aqi = airQuality.getJSONObject("aqi");
+        JSONObject returnAqi = new JSONObject();
+        returnAqi.put("value",aqi.getString("value"));
+        returnAqi.put("aqiName", BusinessEnum.AQIEnum.getAQIName(aqi.getIntValue("value"),null,null,null));
+//        return weatherUtils.getAirQuality(String.valueOf(lon),String.valueOf(lat));
+        return returnAqi;
+    }
+    
+    /**
+     * @Description: 获取生活指数
+     * @Param: [lon, lat]
+     * @Return: com.alibaba.fastjson.JSONObject
+     * @Author: chq459799974
+     * @Date: 2020/2/25
+     **/
+    private ArrayList<WeatherLiveIndexVO> getLivingIndex(double lon, double lat){
+        JSONObject livingIndex = weatherUtils.getLivingIndex(String.valueOf(lon), String.valueOf(lat));
+        Set<String> keys = livingIndex.keySet();
+        String originKey = "";
+        for(String key : keys){
+            originKey = key;
+        }
+        JSONArray jsonArray = livingIndex.getJSONArray(originKey);
+        List<WeatherLiveIndexVO> weatherParamList = jsonArray.toJavaList(WeatherLiveIndexVO.class);
+        //筛选指定数据(code代表相应数据项 12感冒 17洗车 20穿衣 21紫外线 26运动 28钓鱼)
+        Integer[] codeArr = {12,17,20,21,26,28};
+        ArrayList<Integer> codeList = new ArrayList<>();
+        Collections.addAll(codeList,codeArr);
+        ArrayList<WeatherLiveIndexVO> returnList = new ArrayList<>();
+        //插入万年历数据
+        LunarCalendarFestivalUtils lunarCalendarUtils = new LunarCalendarFestivalUtils();
+        lunarCalendarUtils.initLunarCalendarInfo(LocalDate.now().toString());
+        WeatherLiveIndexVO lunarCalendar = new WeatherLiveIndexVO();
+        lunarCalendar.setCode(0);
+        lunarCalendar.setName("万年历");
+        lunarCalendar.setStatus(lunarCalendarUtils.getLunarMonth()+"月"+lunarCalendarUtils.getLunarDay());
+        returnList.add(lunarCalendar);
+        for(WeatherLiveIndexVO weatherLiveIndexVO : weatherParamList){
+            if(codeList.contains(weatherLiveIndexVO.getCode())){
+                returnList.add(weatherLiveIndexVO);
+            }
+        }
+        //排序
+        Collections.sort(returnList,new Comparator<WeatherLiveIndexVO>() {
+            @Override
+            public int compare(WeatherLiveIndexVO o1, WeatherLiveIndexVO o2) {
+                return o1.getCode().compareTo(o2.getCode());
+            }
+        });
+//        return livingIndex.getJSONArray(originKey);
+        return returnList;
+    }
+    
 
     /**
      * 此方法 不会应用于 业务，

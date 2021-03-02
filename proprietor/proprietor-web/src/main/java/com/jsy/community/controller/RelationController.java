@@ -3,14 +3,13 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRelationService;
-import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserHouseEntity;
-import com.jsy.community.exception.JSYError;
+import com.jsy.community.qo.RelationCarsQo;
 import com.jsy.community.qo.RelationQo;
 import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.RelationVO;
 import io.swagger.annotations.Api;
@@ -33,10 +32,8 @@ import java.util.Arrays;
 @RequestMapping("/relation")
 @ApiJSYController
 public class RelationController {
+    //图片上传验证
     private final String[] img ={"jpg","png","jpeg"};
-
-    //手机号验证
-    private final String REGEX_MOBILE = "^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17[013678])|(18[0,5-9]))\\d{8}$";
     //护照验证
     private final String REG = "^1[45][0-9]{7}$|([P|p|S|s]\\d{7}$)|([S|s|G|g|E|e]\\d{8}$)|([Gg|Tt|Ss|Ll|Qq|Dd|Aa|Ff]\\d{8}$)|([H|h|M|m]\\d{8,10})$";
     //身份证验证
@@ -44,6 +41,8 @@ public class RelationController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
+
+
     /**
      * @Description: 添加家属和车辆信息
      * @author: Hu
@@ -52,10 +51,11 @@ public class RelationController {
      * @return:
      */
     @ApiOperation("添加家属信息")
-    @PutMapping("/add")
+    @PostMapping("/add")
     @Login
     public CommonResult addRelation(@RequestBody RelationQo relationQo){
-
+        ValidatorUtils.validateEntity(relationQo, RelationQo.RelationValidated.class);
+        relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car,RelationCarsQo.proprietorCarValidated.class) );
         String userId = UserUtils.getUserId();
         relationQo.setUserId(userId);
         UserHouseEntity entity=relationService.getHouse(relationQo);
@@ -65,52 +65,26 @@ public class RelationController {
         if (entity.getCheckStatus()!=1){
             return CommonResult.error("当前房屋未认证，请先认证！");
         }
-        if ("".equals(relationQo.getName())&&relationQo.getName()==null){
-            return CommonResult.error("姓名不能为空！");
-        }else if (!relationQo.getName().matches(RegexUtils.REGEX_REAL_NAME)){
-            return CommonResult.error("姓名不合法！请填写正确的姓名！");
-        }
-        if (relationQo.getPhoneTel()!=null&&!"".equals(relationQo.getPhoneTel())){
-            if (!relationQo.getPhoneTel().matches(REGEX_MOBILE)){
-                return CommonResult.error("请填写正确的手机号！");
+        if (relationQo.getIdentificationType()==1){
+            if (!relationQo.getIdCard().matches(ID_NUMBER)) {
+                return CommonResult.error("身份证错误，请检查重新填写！");
+            }
+        }else {
+            if (!relationQo.getIdCard().matches(REG)) {
+                return CommonResult.error("护照错误，请检查重新填写！");
             }
         }
-        if (relationQo.getIdentificationType()==1) {
-            if (!relationQo.getIdNumber().matches(ID_NUMBER)) {
-                return CommonResult.error("请填写正确的身份证号码！");
-            }
-        }else if (!relationQo.getIdNumber().matches(REG)){
-                return CommonResult.error("请填写正确的护照号码！仅支持中国大陆，不包含港澳台！");
-            }
-
-        relationQo.setPersonType(BusinessConst.PERSON_TYPE_RELATIVE);
-        return relationService.addRelation(relationQo)?CommonResult.ok():CommonResult.error(JSYError.INTERNAL);
+        relationService.addRelation(relationQo);
+        return CommonResult.ok();
     }
-
-
     @ApiOperation("删除家属信息及其车辆")
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     @Login
     public CommonResult delete(@RequestParam("id") Long id){
+        System.out.println(id);
         relationService.deleteHouseMemberCars(id);
         return CommonResult.ok();
     }
-
-
-    @ApiOperation("保存车辆图片")
-    @PostMapping("/upload")
-    @Login
-    public CommonResult upload(@RequestParam("file") MultipartFile file){
-        String originalFilename = file.getOriginalFilename();
-        String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        if (!Arrays.asList(img).contains(s)) {
-            return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
-        }
-        String upload = MinioUtils.upload(file, "aaaa");
-        return CommonResult.ok(upload);
-    }
-
-
     @ApiOperation("保存行驶证图片")
     @PostMapping("/uploadDrivingLicenseUrl")
     @Login
@@ -123,28 +97,20 @@ public class RelationController {
         String upload = MinioUtils.upload(file, "wocao");
         return CommonResult.ok(upload);
     }
-
     @ApiOperation("查询一个家属详情")
     @GetMapping("/selectUserRelationDetails")
     @Login
-    public CommonResult selectRelationOne(@RequestParam("RelationId") Long RelationId){
+    public CommonResult selectRelationOne(@RequestParam("id") Long id){
         String userId = UserUtils.getUserId();
-        RelationVO relationVO = relationService.selectOne(RelationId, userId);
+        RelationVO relationVO = relationService.selectOne(id, userId);
         return CommonResult.ok(relationVO);
     }
-
-    //    @ApiOperation("修改一个家属信息")
-//    @PostMapping("/updateByRelationId")
-//    @Login
-//    public CommonResult updateByRelationId(@RequestBody HouseMemberEntity houseMemberEntity){
-//        String userId = UserUtils.getUserId();
-//        relationService.updateByRelationId(houseMemberEntity);
-//        return CommonResult.ok();
-//    }
     @ApiOperation("修改家属信息加汽车信息")
-    @PostMapping("/updateUserRelationDetails")
+    @PutMapping("/updateUserRelationDetails")
     @Login
     public CommonResult updateByRelationId(@RequestBody RelationQo relationQo){
+        ValidatorUtils.validateEntity(relationQo, RelationQo.RelationValidated.class);
+        relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car,RelationCarsQo.proprietorCarValidated.class) );
         String userId = UserUtils.getUserId();
         relationQo.setUserId(userId);
         UserHouseEntity entity=relationService.getHouse(relationQo);
@@ -154,36 +120,16 @@ public class RelationController {
         if (entity.getCheckStatus()!=1){
             return CommonResult.error("当前房屋未认证，请先认证！");
         }
-        if ("".equals(relationQo.getName())&&relationQo.getName()==null){
-            return CommonResult.error("姓名不能为空！");
-        }else if (!relationQo.getName().matches(RegexUtils.REGEX_REAL_NAME)){
-            return CommonResult.error("姓名不合法！请填写正确的姓名！");
-        }
-        if (relationQo.getPhoneTel()!=null&&!"".equals(relationQo.getPhoneTel())){
-            if (!relationQo.getPhoneTel().matches(REGEX_MOBILE)){
-                return CommonResult.error("请填写正确的手机号！");
+        if (relationQo.getIdentificationType()==1){
+            if (!relationQo.getIdCard().matches(ID_NUMBER)) {
+                return CommonResult.error("身份证错误，请检查重新填写！");
             }
-        }
-        if (relationQo.getIdentificationType()==1) {
-            if (!relationQo.getIdNumber().matches(ID_NUMBER)) {
-                return CommonResult.error("请填写正确的身份证号码！");
+        }else {
+            if (!relationQo.getIdCard().matches(REG)) {
+                return CommonResult.error("护照错误，请检查重新填写！");
             }
-        }else if (!relationQo.getIdNumber().matches(REG)){
-            return CommonResult.error("请填写正确的护照号码！仅支持中国大陆，不包含港澳台！");
         }
         relationService.updateUserRelationDetails(relationQo);
         return CommonResult.ok();
     }
-
-//    @ApiOperation("修改一个家属信息传入一个家属id做表单回填")
-//    @GetMapping("/updateFormBackFillId")
-//    @Login
-//    public CommonResult updateFormBackFillId(@RequestParam("RelationId") Long RelationId){
-//        String userId = UserUtils.getUserId();
-//        HouseMemberEntity houseMemberEntity = relationService.updateFormBackFillId(RelationId);
-//        return CommonResult.ok();
-//    }
-
-
-
 }

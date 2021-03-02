@@ -1,6 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
@@ -180,4 +181,12 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     Integer alreadyPublish(@Param("houseId") Long houseId);
 
 
+    /**
+     * 按用户id获取所有小区名称
+     * @param uid       用户id
+     * @param cityId    城市id
+     * @return          返回小区名称
+     */
+    @Select("select DISTINCT c.id,CONCAT(c.detail_address,c.`name`) as 'name' from t_community as c LEFT JOIN t_user_house as h on h.community_id = c.id where c.deleted = 0 and h.deleted = 0 and h.check_status = 1 and h.uid = #{uid} and c.city_id = #{cityId}")
+    List<CommunityEntity> allCommunity(Long cityId, String uid);
 }

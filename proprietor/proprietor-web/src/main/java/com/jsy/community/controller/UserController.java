@@ -195,11 +195,11 @@ public class UserController {
 
     /**
      * 业主详情接口
+     *
      * @author YuLF
      * @since  2020/12/18 11:39
      */
     @Login
-    @Deprecated
     @ApiOperation("业主信息详情查询接口")
     @GetMapping("details")
     public CommonResult<UserInfoVo> details() {
@@ -250,6 +250,7 @@ public class UserController {
     }
 
     //TODO 用户实名认证
+
 
 
 }

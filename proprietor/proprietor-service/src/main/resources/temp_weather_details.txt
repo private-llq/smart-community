@@ -1,0 +1,329 @@
+{
+    "code": 0,
+    "message": null,
+    "data": {
+        "condition": {
+            "condition": "阴",
+            "temp": "13",
+            "tips": "今天有雨，天冷了，该加衣服了！"
+        },
+        "city": {
+            "counname": "中国",
+            "ianatimezone": "Asia/Shanghai",
+            "secondaryname": "重庆市",
+            "pname": "重庆市",
+            "timezone": "8",
+            "name": "渝北区",
+            "cityId": 86
+        },
+        "aqi": {
+            "aqiName": "优",
+            "value": "42"
+        },
+        "forecast": [
+            {
+                "conditionDay": "多云",
+                "conditionNight": "中雨",
+                "predictDate": "2021-02-24",
+                "tempDay": "27",
+                "tempNight": "15",
+                "windDirDay": "东北风",
+                "windLevelDay": "1"
+            },
+            {
+                "conditionDay": "小雨",
+                "conditionNight": "小雨",
+                "predictDate": "2021-02-25",
+                "tempDay": "17",
+                "tempNight": "13",
+                "windDirDay": "西北风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "阴",
+                "conditionNight": "多云",
+                "predictDate": "2021-02-26",
+                "tempDay": "14",
+                "tempNight": "11",
+                "windDirDay": "东风",
+                "windLevelDay": "1"
+            },
+            {
+                "conditionDay": "多云",
+                "conditionNight": "小雨",
+                "predictDate": "2021-02-27",
+                "tempDay": "15",
+                "tempNight": "9",
+                "windDirDay": "东风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "小雨",
+                "conditionNight": "小雨",
+                "predictDate": "2021-02-28",
+                "tempDay": "13",
+                "tempNight": "9",
+                "windDirDay": "东风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "小雨",
+                "conditionNight": "阴",
+                "predictDate": "2021-03-01",
+                "tempDay": "10",
+                "tempNight": "8",
+                "windDirDay": "西风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "阴",
+                "conditionNight": "多云",
+                "predictDate": "2021-03-02",
+                "tempDay": "11",
+                "tempNight": "9",
+                "windDirDay": "西南风",
+                "windLevelDay": "1"
+            },
+            {
+                "conditionDay": "阴",
+                "conditionNight": "多云",
+                "predictDate": "2021-03-03",
+                "tempDay": "12",
+                "tempNight": "10",
+                "windDirDay": "东北风",
+                "windLevelDay": "1"
+            },
+            {
+                "conditionDay": "多云",
+                "conditionNight": "阴",
+                "predictDate": "2021-03-04",
+                "tempDay": "13",
+                "tempNight": "9",
+                "windDirDay": "西北风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "多云",
+                "conditionNight": "阴",
+                "predictDate": "2021-03-05",
+                "tempDay": "15",
+                "tempNight": "10",
+                "windDirDay": "东北风",
+                "windLevelDay": "1"
+            },
+            {
+                "conditionDay": "阴",
+                "conditionNight": "小雨",
+                "predictDate": "2021-03-06",
+                "tempDay": "15",
+                "tempNight": "10",
+                "windDirDay": "东北风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "小雨",
+                "conditionNight": "小雨",
+                "predictDate": "2021-03-07",
+                "tempDay": "14",
+                "tempNight": "10",
+                "windDirDay": "东北风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "多云",
+                "conditionNight": "小雨",
+                "predictDate": "2021-03-08",
+                "tempDay": "17",
+                "tempNight": "10",
+                "windDirDay": "东北风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "小雨",
+                "conditionNight": "小雨",
+                "predictDate": "2021-03-09",
+                "tempDay": "14",
+                "tempNight": "10",
+                "windDirDay": "东风",
+                "windLevelDay": "2"
+            },
+            {
+                "conditionDay": "阴",
+                "conditionNight": "小雨",
+                "predictDate": "2021-03-10",
+                "tempDay": "11",
+                "tempNight": "9",
+                "windDirDay": "东北风",
+                "windLevelDay": "1"
+            },
+            {
+                "conditionDay": "阴",
+                "conditionNight": "小雨",
+                "predictDate": "2021-03-11",
+                "tempDay": "11",
+                "tempNight": "9",
+                "windDirDay": "东北风",
+                "windLevelDay": "2"
+            }
+        ],
+        "hourly": [
+            {
+                "condition": "阴",
+                "temp": "13",
+                "hour": "16"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "17"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "18"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "19"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "20"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "21"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "22"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "23"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "0"
+            },
+            {
+                "condition": "中雨",
+                "temp": "14",
+                "hour": "1"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "2"
+            },
+            {
+                "condition": "阴",
+                "temp": "13",
+                "hour": "3"
+            },
+            {
+                "condition": "中雨",
+                "temp": "13",
+                "hour": "4"
+            },
+            {
+                "condition": "中雨",
+                "temp": "13",
+                "hour": "5"
+            },
+            {
+                "condition": "中雨",
+                "temp": "13",
+                "hour": "6"
+            },
+            {
+                "condition": "阴",
+                "temp": "13",
+                "hour": "7"
+            },
+            {
+                "condition": "阴",
+                "temp": "13",
+                "hour": "8"
+            },
+            {
+                "condition": "阴",
+                "temp": "12",
+                "hour": "9"
+            },
+            {
+                "condition": "阴",
+                "temp": "12",
+                "hour": "10"
+            },
+            {
+                "condition": "阴",
+                "temp": "12",
+                "hour": "11"
+            },
+            {
+                "condition": "阴",
+                "temp": "13",
+                "hour": "12"
+            },
+            {
+                "condition": "阴",
+                "temp": "12",
+                "hour": "13"
+            },
+            {
+                "condition": "阴",
+                "temp": "13",
+                "hour": "14"
+            },
+            {
+                "condition": "阴",
+                "temp": "13",
+                "hour": "15"
+            },
+            {
+                "condition": "阴",
+                "temp": "14",
+                "hour": "16"
+            }
+        ],
+        "liveIndex": [
+            {
+                "code": 12,
+                "name": "感冒指数",
+                "status": "极易发"
+            },
+            {
+                "code": 17,
+                "name": "洗车指数",
+                "status": "不宜"
+            },
+            {
+                "code": 20,
+                "name": "穿衣指数",
+                "status": "舒适"
+            },
+            {
+                "code": 21,
+                "name": "紫外线指数",
+                "status": "最弱"
+            },
+            {
+                "code": 26,
+                "name": "运动指数",
+                "status": "不适宜"
+            },
+            {
+                "code": 28,
+                "name": "钓鱼指数",
+                "status": "较适宜"
+            }
+        ]
+    }
+}

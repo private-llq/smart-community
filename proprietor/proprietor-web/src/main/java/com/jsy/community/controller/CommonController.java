@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.config.web.ElasticsearchConfig;
@@ -136,10 +137,23 @@ public class CommonController {
         }
     }
     
-    @ApiOperation("根据经纬度查询当前天气")
+    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气")
+    @ApiOperation("首页天气")
     @GetMapping("weatherNow")
     public CommonResult<JSONObject> getWeatherNow(@RequestParam double lon,@RequestParam double lat){
-        JSONObject weather = commonService.getWeather(lon, lat);
+//        JSONObject weather = commonService.getWeather(lon, lat);
+        //TODO 天气接口未购买，临时用假数据
+        JSONObject weather = commonService.getTempWeather();
+        return CommonResult.ok(weather);
+    }
+    
+    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情")
+    @ApiOperation("天气详情")
+    @GetMapping("weatherDetails")
+    public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam double lon,@RequestParam double lat){
+//        JSONObject weather = commonService.getWeatherDetails(lon, lat);
+        //TODO 天气接口未购买，临时用假数据
+        JSONObject weather = commonService.getTempWeatherDetails();
         return CommonResult.ok(weather);
     }
     

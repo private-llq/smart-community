@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -14,18 +15,18 @@ import java.io.Serializable;
 public class RelationCarsQo implements Serializable {
 
     @ApiModelProperty("车辆id")
-    private Long Id;// 85
-
-    @Pattern(groups = {addCarValidated.class, proprietorCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
-    @NotNull(groups = {addCarValidated.class, proprietorCarValidated.class}, message = "车牌不能为空!")
+    private Long Id;
+    @Pattern(groups = {proprietorCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入正确的车牌号!")
+    @NotNull(groups = {proprietorCarValidated.class}, message = "车牌不能为空!")
+    @NotBlank(groups = {proprietorCarValidated.class},message = "车牌不能为空")
     @ApiModelProperty("车牌号")
-    private String carId;// 85
+    private String carPlate;
     @ApiModelProperty("车辆类型")
+    @NotNull(groups = {proprietorCarValidated.class},message = "车辆类型不能为空")
     private Integer carType;
-    @ApiModelProperty("车辆图片")
-    private String carImgURL;
 
-    @NotNull(groups = {addCarValidated.class, proprietorCarValidated.class}, message = "行驶证图片不能为空!")
+    @NotNull(groups = {proprietorCarValidated.class}, message = "行驶证图片不能为空!")
+    @NotBlank(groups = {proprietorCarValidated.class},message = "行驶证图片不能为空")
     @ApiModelProperty("行驶证图片地址")
     private String drivingLicenseUrl;
 
@@ -34,7 +35,7 @@ public class RelationCarsQo implements Serializable {
 
     //手机号
     @ApiModelProperty(hidden = true)
-    private String phoneTel;
+    private String contact;
 
     //用户ID
     @ApiModelProperty(hidden = true)
@@ -48,16 +49,6 @@ public class RelationCarsQo implements Serializable {
     @ApiModelProperty(hidden = true)
     private Long communityId;
 
-    //车辆位置
-    @ApiModelProperty("车辆位置")
-    private Long carPosition;
-
-    //是否通过审核
-    @ApiModelProperty("是否通过审核")
-    private Integer checkStatus;
-
-
-    private interface addCarValidated{}
-    private interface proprietorCarValidated{}
+    public interface proprietorCarValidated{}
 
 }

@@ -14,11 +14,11 @@ import java.io.*;
 public class ResourceLoadUtil {
 	
 	//linux文件绝对路径
-	private static final String OS_LINUX_PATH = "/mnt/db/smart-community/file";
+	private static final String OS_LINUX_PATH = "/mnt/db/smart-community/file/";
 	
 	//项目模块绝对路径
 	public static String getClassesPath() {
-		return WeatherUtils.class.getResource("/").getPath().replaceFirst("/","");
+		return ResourceLoadUtil.class.getResource("/").getPath().replaceFirst("/","");
 	}
 	
 	public static JSONObject loadJSONResource(String templateName){

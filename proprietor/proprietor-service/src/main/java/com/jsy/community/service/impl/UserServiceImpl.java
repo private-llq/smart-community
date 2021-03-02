@@ -221,13 +221,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         } else if (RegexUtils.isEmail(qo.getAccount())) { // 邮箱注册
             signatureUserDTO.setEmail(qo.getAccount());
         }
-        String avatar = ResourceLoadUtil.loadJSONResource("sys_default_content.json").getString("avatar");
+        String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
-        boolean signUserResult = signatureService.insertUser(signatureUserDTO);
-        if(!signUserResult){
-            log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
-            throw new ProprietorException(JSYError.INTERNAL);
-        }
+//        boolean signUserResult = signatureService.insertUser(signatureUserDTO);
+//        if(!signUserResult){
+//            log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
+//            throw new ProprietorException(JSYError.INTERNAL);
+//        }
         return uuid;
     }
 

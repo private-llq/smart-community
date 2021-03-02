@@ -20,7 +20,7 @@ public interface RelationMapper {
      * 添加家属车辆
      * @param cars
      */
-    void addCars(List<RelationCarsQo> cars);
+    void addCars(@Param("cars") List<RelationCarsQo> cars);
     /**
      * 通过业主id查询家属信息
      * @param id
@@ -44,4 +44,13 @@ public interface RelationMapper {
      * @return:
      */
     void updateUserRelationCar(RelationCarsQo relationCarsQo);
+
+    /**
+     * @Description: 新增一条
+     * @author: Hu
+     * @since: 2021/3/1 10:55
+     * @Param:
+     * @return:
+     */
+    void insertOne(RelationCarsQo relationCarsQo);
 }

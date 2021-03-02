@@ -2,16 +2,18 @@ package com.jsy.community.utils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.vo.WeatherForecastVO;
+import com.jsy.community.vo.WeatherHourlyVO;
+import com.jsy.community.vo.WeatherLiveIndexVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpPost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletContext;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -27,16 +29,27 @@ public class WeatherUtils {
 	public JSONObject getWeatherNow(String lon,String lat){
 		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/condition");
 	}
-	//天气预报
+	//天气预报15天
 	public JSONObject getWeatherForDays(String lon,String lat){
 		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/forecast15days");
+	}
+	//天气预报24小时
+	public JSONObject getWeatherFor24hours(String lon,String lat){
+		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/forecast24hours");
+	}
+	//空气质量
+	public JSONObject getAirQuality(String lon,String lat){
+		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/aqi");
+	}
+	//生活指数
+	public JSONObject getLivingIndex(String lon,String lat){
+		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/index");
 	}
 	
 	//TODO 三方接口商家待定 暂时用墨迹天气
 	public JSONObject getWeather(String lon,String lat,String url){
 		
-		String appCode = "xxxxxxxxxxxxxxxxxx";
-//		String url = "http://aliv8.data.moji.com/whapi/json/aliweather/condition";
+		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		//params参数
 		Map<String, String> paramsMap = new HashMap<>();
 		paramsMap.put("lon", lon);
@@ -46,7 +59,6 @@ public class WeatherUtils {
 		Map<String,String> headers = new HashMap<>();
 		headers.put("Authorization","APPCODE " + appCode);
 		headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-//		headers.put("Content-Type", "application/json");
 		MyHttpUtils.setHeader(httpPost,headers);
 		//设置默认配置
 		MyHttpUtils.setRequestConfig(httpPost);
@@ -57,32 +69,48 @@ public class WeatherUtils {
 		if(result != null && "0".equals(result.getString("code"))){
 			try{
 				JSONObject data = result.getJSONObject("data");
-				//处理默认的15天天气预报，只截取未来3天的
-				dealForecastTo3Days(data,3);
-				//补上星期几
-				addDayOfWeek(data);
 				return data;
 			}catch (Exception e){
 				log.error("获取天气data出错：" + result);
 				e.printStackTrace();
 			}
-		}else{
-			//TODO 以下代码后期删除 现在临时展示用
-			//返回天气假数据-临时展示用
-			JSONObject tempData = tempWeather.getJSONObject("data");
-			//处理默认的15天天气预报，只截取未来3天的
-			dealForecastTo3Days(tempData,3);
-			//假数据动态修改时间
-			dealDateForTempData(tempData);
-			//补上星期几
-			addDayOfWeek(tempData);
-			return tempData;
 		}
 		return null;
 	}
 	
+	//首页天气假数据
+	public static JSONObject getTempWeather(){
+		//首页天气假数据-临时展示用
+		JSONObject tempData = tempWeather.getJSONObject("data");
+		//处理默认的15天天气预报，只截取未来3天的
+		dealForecastToAnyDays(tempData,3);
+		//假数据动态修改时间
+		dealDateForTempData(tempData);
+		//补上星期几
+		addDayOfWeek(tempData);
+		return tempData;
+	}
+	
+	//天气详情假数据
+	public static JSONObject getTempWeatherDetails(){
+		JSONObject tempData = tempWeatherDetails.getJSONObject("data");
+		//假数据动态修改时间
+		dealDateForTempData(tempData);
+		//补上星期几
+		addDayOfWeek(tempData);
+		//补万年历
+		LunarCalendarFestivalUtils lunarCalendarUtils = new LunarCalendarFestivalUtils();
+		lunarCalendarUtils.initLunarCalendarInfo(LocalDate.now().toString());
+		WeatherLiveIndexVO lunarCalendar = new WeatherLiveIndexVO();
+		lunarCalendar.setCode(0);
+		lunarCalendar.setName("万年历");
+		lunarCalendar.setStatus(lunarCalendarUtils.getLunarMonth()+"月"+lunarCalendarUtils.getLunarDay());
+		tempData.getJSONArray("liveIndex").add(0,lunarCalendar);
+		return tempData;
+	}
+	
 	//TODO 临时方法 动态修改时间 后期删除
-	private void dealDateForTempData(JSONObject tempData){
+	public static void dealDateForTempData(JSONObject tempData){
 		String updatetimeStr = sdf.format(System.currentTimeMillis());
 		JSONObject conditionJson = tempData.getJSONObject("condition");
 		conditionJson.put("updatetime",updatetimeStr);
@@ -95,14 +123,14 @@ public class WeatherUtils {
 	}
 	
 	//处理默认的15天天气预报，只返回3天的(天气预报返回结果从昨天开始)
-	private void dealForecastTo3Days(JSONObject data,int scale){
+	public static void dealForecastToAnyDays(JSONObject data,int scale){
 		JSONArray forecast = data.getJSONArray("forecast");
 		if(scale > 15 || scale < 1 ||scale > forecast.size() - 2){
-			log.error("三方接口返回数据有更改，需重新确认调整");
+			log.error("三方接口返回数据有更改，15天天气预报截取{}天出错，需重新确认调整",scale);
 			return;
 		}
 		List<Object> forecastList = new ArrayList<>();
-		//截取未来3天天气
+		//截取未来N天天气
 		for(int i=0;i<scale;i++){
 			forecastList.add(forecast.get(i+2));
 		}
@@ -116,7 +144,7 @@ public class WeatherUtils {
 	private static final String[] daysOfWeek = {"周日","周一","周二","周三","周四","周五","周六"};
 	
 	//为结果添加星期几
-	private void addDayOfWeek(JSONObject data){
+	public static void addDayOfWeek(JSONObject data){
 		JSONObject conditionJson = data.getJSONObject("condition");
 		String toDayStr = conditionJson.getString("updatetime");
 		//处理今日结果
@@ -150,8 +178,15 @@ public class WeatherUtils {
 		}
 	}
 	
+	//根据空气质量指数，补充空气质量名称
+//	public static void addAQINameByAQIValue(JSONObject data, Double lon, Double lat, String cityId){
+//		JSONObject aqiJson = data.getJSONObject("aqi");
+//		aqiJson.put("aqiName", BusinessEnum.AQIEnum.getAQIName(aqiJson.getIntValue("value"),lon,lat,cityId));
+//	}
+	
 	//假天气数据
 	private static final JSONObject tempWeather = new JSONObject();
+	private static final JSONObject tempWeatherDetails = new JSONObject();
 	
 	//项目模块绝对路径
 	public static String getClassesPath() {
@@ -159,31 +194,46 @@ public class WeatherUtils {
 	}
 	
 	//linux绝对路径
-	private static final String OS_LINUX_PATH = "/mnt/db/smart-community/file";
+	private static final String OS_LINUX_PATH = "/mnt/db/smart-community/file/";
 	
 	//加载假天气数据
 	static {
 		try {
-			FileReader fileInputStream;
+			FileReader fileReader;
+			FileReader fileReader2;
+			log.info("开始读取假天气数据");
 			if(System.getProperty("os.name").startsWith("Win")){
-				fileInputStream = new FileReader(new File(getClassesPath() + "/temp_weather.txt"));
-//				fileInputStream = new FileReader(new File("D:/" + "/temp_weather.txt"));
+				fileReader = new FileReader(new File(getClassesPath() + "temp_weather.txt"));
+				fileReader2 = new FileReader(new File(getClassesPath() + "temp_weather_details.txt"));
+//				fileReader = new FileReader(new File("D:/" + "temp_weather.txt"));
+//				fileReader2 = new FileReader(new File("D:/" + "temp_weather_details.txt"));
 			}else{
-				fileInputStream = new FileReader(new File(OS_LINUX_PATH + "/temp_weather.txt"));
+				fileReader = new FileReader(new File(OS_LINUX_PATH + "temp_weather.txt"));
+				fileReader2 = new FileReader(new File(OS_LINUX_PATH + "temp_weather_details.txt"));
 			}
-			BufferedReader reader = new BufferedReader(fileInputStream);
-			StringBuffer sb = new StringBuffer();
-			String str;
-			while((str = reader.readLine()) != null){
-				sb.append(str);
-			}
-			JSONObject jsonObject = JSONObject.parseObject(sb.toString());
+			log.info("读取假天气数据完成");
+			//首页天气
+			JSONObject jsonObject = fileReader2JSONObject(fileReader);
 			tempWeather.putAll(jsonObject);
+			//天气详情
+			JSONObject jsonObject2 = fileReader2JSONObject(fileReader2);
+			tempWeatherDetails.putAll(jsonObject2);
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+	}
+	
+	private static JSONObject fileReader2JSONObject(FileReader fileReader) throws IOException {
+		BufferedReader reader = new BufferedReader(fileReader);
+		StringBuffer sb = new StringBuffer();
+		String str;
+		JSONObject jsonObject = null;
+		while((str = reader.readLine()) != null){
+			sb.append(str);
+		}
+		return JSONObject.parseObject(sb.toString());
 	}
 	
 //	public static void main(String[] args) {

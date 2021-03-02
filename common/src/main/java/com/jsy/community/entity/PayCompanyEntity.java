@@ -4,24 +4,18 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
- * @return
- * @Author lihao
- * @Description 缴费单位
- * @Date 2020/12/11 11:01
- * @Param
- **/
+ * @Description: 缴费单位实体类
+ * @author: Hu
+ * @since: 2021/2/26 11:25
+ * @Param:
+ * @return:
+ */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
 @TableName("t_pay_company")
 @ApiModel(value="PayCompany对象", description="缴费单位")
 public class PayCompanyEntity extends BaseEntity {
-
-    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "缴费类型id")
     private Long typeId;
