@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
@@ -11,6 +12,8 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.qo.RealnameBlinkInitQO;
+import com.jsy.community.qo.RealnameBlinkQueryQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
@@ -18,10 +21,16 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.*;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.ContentType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 
@@ -235,8 +244,15 @@ public class UserController {
     public CommonResult queryUroraTags(){
         return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
     }
-
-
+    
+    /**
+    * @Description: 身份证照片识别
+     * @Param: [file, type]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2021/3/2
+    **/
+    @Login
     @ApiOperation("身份证照片识别")
     @PostMapping("idCard/distinguish")
     public CommonResult distinguishIdCard(MultipartFile file,@RequestParam String type){
@@ -249,8 +265,57 @@ public class UserController {
 	    }
     }
 
-    //TODO 用户实名认证
-
-
+    /**
+    * @Description: 眨眼版实人验证初始化
+     * @Param: [realnameBlinkInitQO]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2021/3/2
+    **/
+    @Login
+    @ApiOperation("眨眼版实人验证初始化")
+    @PostMapping("realName/blink/init")
+    public CommonResult initBlink(@RequestBody RealnameBlinkInitQO realnameBlinkInitQO){
+        ValidatorUtils.validateEntity(realnameBlinkInitQO);
+        return CommonResult.ok(RealnameAuthUtils.initBlink(realnameBlinkInitQO));
+    }
+    
+    /**
+    * @Description: 眨眼版实人查询结果
+     * @Param: [realnameBlinkQueryQO]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2021/3/2
+    **/
+    @Login
+    @ApiOperation("眨眼版实人查询结果")
+    @PostMapping("realName/blink/result")
+    public CommonResult getBlinkResult(@RequestBody RealnameBlinkQueryQO realnameBlinkQueryQO){
+        ValidatorUtils.validateEntity(realnameBlinkQueryQO);
+        JSONObject blinkResult = RealnameAuthUtils.getBlinkResult(realnameBlinkQueryQO);
+        if("0000".equals(blinkResult.getString("code"))){
+            if("T".equals(blinkResult.getString("passed"))){
+                //实名认证后修改用户信息
+                UserEntity userEntity = new UserEntity();
+                userEntity.setUid(UserUtils.getUserId());
+                userEntity.setRealName(blinkResult.getString("certName"));
+                userEntity.setIdCard(blinkResult.getString("certNo"));
+                userEntity.setDetailAddress(realnameBlinkQueryQO.getDetailAddress());
+                userEntity.setIsRealAuth(BusinessConst.CERTIFIED);
+                userEntity.setIdentificationType(BusinessConst.IDENTIFICATION_TYPE_IDCARD);
+                //上传人脸url
+                HttpGet httpGet = MyHttpUtils.httpGetWithoutParams(blinkResult.getString("photoUrl"));
+                byte[] byteData = (byte[]) MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_BYTE);
+                String filePath = MinioUtils.upload(byteData,"face_url");
+                userEntity.setFaceUrl(filePath);
+                userService.updateUserAfterRealnameAuth(userEntity);
+            }else{
+                CommonResult.error(JSYError.BAD_REQUEST.getCode(),"实名认证不通过");
+            }
+        }else{
+            CommonResult.error(JSYError.INTERNAL.getCode(),"三方远程服务异常，请联系管理员");
+        }
+        return CommonResult.ok(blinkResult);
+    }
 
 }

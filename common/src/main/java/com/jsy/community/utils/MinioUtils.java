@@ -7,9 +7,14 @@ import io.minio.ObjectStat;
 import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.http.entity.ContentType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -32,8 +37,24 @@ public class MinioUtils {
 	private static volatile MinioClient minioClient = null;
 
 	private static final String[] allowSuffix = {"jpg","jpeg","png","bmp"};
-
-
+	
+	/**
+	* @Description: 文件上传方法重载
+	 * @Param: [file, bucketName]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/3/2
+	**/
+	public static String upload(byte[] byteData, String bucketName){
+		InputStream inputStream = new ByteArrayInputStream(byteData);
+		MultipartFile file = null;
+		try {
+			file = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return upload(file, bucketName);
+	}
 	
 	/**
 	 * 文件上传

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
@@ -96,7 +97,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Autowired
     private UserIMMapper userIMMapper;
-
 
     @Autowired
     private ISignatureService signatureService;
@@ -622,5 +622,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return vo;
     }
 
-
+    /**
+    * @Description: 实名认证后修改用户信息
+     * @Param: [userEntity]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2021/3/2
+    **/
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public int updateUserAfterRealnameAuth(UserEntity userEntity){
+        //改本地库
+        int result = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("uid", userEntity.getUid()));
+        if(result == 1){
+            //通知签章服务
+            SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
+            signatureUserDTO.setUuid(userEntity.getUid());
+            signatureUserDTO.setIdCardName(userEntity.getRealName());
+            signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
+            signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
+            if(!signatureService.realNameUpdateUser(signatureUserDTO)){
+//                throw new ProprietorException(JSYError.INTERNAL.getCode(),"签章服务同步失败");
+            }
+        }
+        return result;
+    }
+    
+    
 }

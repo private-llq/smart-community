@@ -156,4 +156,13 @@ public interface IUserService extends IService<UserEntity> {
 	 */
 	@Deprecated
 	UserInfoVo userInfoDetails(Long cid, Long hid, String uid);
+	
+	/**
+	* @Description: 实名认证后修改用户信息
+	 * @Param: [userEntity]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/2
+	**/
+	int updateUserAfterRealnameAuth(UserEntity userEntity);
 }
