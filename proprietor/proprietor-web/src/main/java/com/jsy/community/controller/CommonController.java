@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.config.web.ElasticsearchConfig;
@@ -136,6 +137,7 @@ public class CommonController {
         }
     }
     
+    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气")
     @ApiOperation("首页天气")
     @GetMapping("weatherNow")
     public CommonResult<JSONObject> getWeatherNow(@RequestParam double lon,@RequestParam double lat){
@@ -145,6 +147,7 @@ public class CommonController {
         return CommonResult.ok(weather);
     }
     
+    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情")
     @ApiOperation("天气详情")
     @GetMapping("weatherDetails")
     public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam double lon,@RequestParam double lat){

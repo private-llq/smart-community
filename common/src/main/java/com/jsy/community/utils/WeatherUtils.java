@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -48,7 +49,7 @@ public class WeatherUtils {
 	//TODO 三方接口商家待定 暂时用墨迹天气
 	public JSONObject getWeather(String lon,String lat,String url){
 		
-		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		//params参数
 		Map<String, String> paramsMap = new HashMap<>();
 		paramsMap.put("lon", lon);
@@ -97,6 +98,14 @@ public class WeatherUtils {
 		dealDateForTempData(tempData);
 		//补上星期几
 		addDayOfWeek(tempData);
+		//补万年历
+		LunarCalendarFestivalUtils lunarCalendarUtils = new LunarCalendarFestivalUtils();
+		lunarCalendarUtils.initLunarCalendarInfo(LocalDate.now().toString());
+		WeatherLiveIndexVO lunarCalendar = new WeatherLiveIndexVO();
+		lunarCalendar.setCode(0);
+		lunarCalendar.setName("万年历");
+		lunarCalendar.setStatus(lunarCalendarUtils.getLunarMonth()+"月"+lunarCalendarUtils.getLunarDay());
+		tempData.getJSONArray("liveIndex").add(0,lunarCalendar);
 		return tempData;
 	}
 	

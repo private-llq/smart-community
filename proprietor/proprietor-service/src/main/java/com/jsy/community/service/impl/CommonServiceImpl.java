@@ -10,6 +10,7 @@ import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
+import com.jsy.community.utils.LunarCalendarFestivalUtils;
 import com.jsy.community.utils.WeatherUtils;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
@@ -24,6 +25,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.integration.transformer.MessageTransformingHandler;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -278,6 +280,7 @@ public class CommonServiceImpl implements ICommonService {
         returnCondition.put("condition",condition.getString("condition"));
         returnCondition.put("temp",condition.getString("temp"));
         returnCondition.put("tips",condition.getString("tips"));
+        returnCondition.put("updatetime",condition.getString("updatetime"));
         weatherNow.put("condition",returnCondition);
         return weatherNow;
 //        return weatherUtils.getWeatherNow(String.valueOf(lon),String.valueOf(lat));
@@ -346,12 +349,19 @@ public class CommonServiceImpl implements ICommonService {
         }
         JSONArray jsonArray = livingIndex.getJSONArray(originKey);
         List<WeatherLiveIndexVO> weatherParamList = jsonArray.toJavaList(WeatherLiveIndexVO.class);
-        //筛选指定数据(code代表相应数据项 0万年历 12感冒 17洗车 20穿衣 21紫外线 26运动 28钓鱼)
-        Integer[] codeArr = {0,12,17,20,21,26,28};
+        //筛选指定数据(code代表相应数据项 12感冒 17洗车 20穿衣 21紫外线 26运动 28钓鱼)
+        Integer[] codeArr = {12,17,20,21,26,28};
         ArrayList<Integer> codeList = new ArrayList<>();
         Collections.addAll(codeList,codeArr);
         ArrayList<WeatherLiveIndexVO> returnList = new ArrayList<>();
-        //TODO 插入万年历数据
+        //插入万年历数据
+        LunarCalendarFestivalUtils lunarCalendarUtils = new LunarCalendarFestivalUtils();
+        lunarCalendarUtils.initLunarCalendarInfo(LocalDate.now().toString());
+        WeatherLiveIndexVO lunarCalendar = new WeatherLiveIndexVO();
+        lunarCalendar.setCode(0);
+        lunarCalendar.setName("万年历");
+        lunarCalendar.setStatus(lunarCalendarUtils.getLunarMonth()+"月"+lunarCalendarUtils.getLunarDay());
+        returnList.add(lunarCalendar);
         for(WeatherLiveIndexVO weatherLiveIndexVO : weatherParamList){
             if(codeList.contains(weatherLiveIndexVO.getCode())){
                 returnList.add(weatherLiveIndexVO);
