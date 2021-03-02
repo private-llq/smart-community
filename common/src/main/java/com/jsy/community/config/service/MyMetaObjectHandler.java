@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 @Slf4j
 @ConditionalOnProperty(value = "jsy.service.enable", havingValue = "true")
 public class MyMetaObjectHandler implements MetaObjectHandler {
+
+	
 	@Override
 	public void insertFill(MetaObject metaObject) {
 		setFieldValByName("createTime", LocalDateTime.now(), metaObject);

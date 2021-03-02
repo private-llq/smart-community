@@ -30,7 +30,7 @@ public class DistributedLockAop extends BaseAop {
 
 
 
-    private volatile static RedissonClient redissonClient = null;
+    private RedissonClient redissonClient = null;
 
     /**
      * 环绕通知
@@ -69,17 +69,17 @@ public class DistributedLockAop extends BaseAop {
             }
         }
          //失败最典型的原因是redis挂了
-         throw new JSYException("加锁失败, 本次操作取消, 请重试! ");
+         throw new JSYException("加锁失败, 本次操作取消, 请重试!");
     }
 
     private RedissonClient getRedissonClient(){
-        if( redissonClient == null ){
-            synchronized (DistributedLockAop.class){
-                if( redissonClient == null ){
-                    redissonClient = (RedissonClient) SpringContextUtils.getBean("redissonClient");
+            if( redissonClient == null ){
+                synchronized (DistributedLockAop.class){
+                    if( redissonClient == null ){
+                        redissonClient = (RedissonClient) SpringContextUtils.getBean("redissonClient");
+                    }
                 }
             }
-        }
-        return redissonClient;
+            return this.redissonClient;
     }
 }
