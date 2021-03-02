@@ -18,6 +18,7 @@
         SELECT distinct
         tpg.id as groupId,
         tpg.name as groupName,
+--         tpf.address as address,
         tpf.family_id as familyId,
         tpc.id as companyId,
         tpc.name as companyName,
@@ -25,13 +26,12 @@
         tpt.medium_icon as mediumIcon,
         tpt.large_size_icon as largeSizeIcon,
         tpt.id as typeID,
-        tpt.name as typeName,
-        tpf.create_time as timeStart
+        tpt.name as typeName
         FROM t_pay_order tpf
         join t_pay_type tpt on tpf.type_id=tpt.id
         join t_pay_group tpg on tpf.group_id=tpg.id
         join t_pay_company tpc on tpf.company_id=tpc.id
-        where tpf.deleted=0 and tpt.deleted=0 and tpg.deleted=0 and tpc.deleted=0 and tpf.uid=#{userId} ORDER BY timeStart desc limit #{page},#{size}
+        where tpf.deleted=0 and tpt.deleted=0 and tpg.deleted=0 and tpc.deleted=0 and tpf.uid=#{userId} ORDER BY tpf.create_time desc limit #{page},#{size}
     </select>
 
 
@@ -121,13 +121,14 @@
     </resultMap>
 
     <resultMap id="DefaultHouseOwnerMap" type="com.jsy.community.vo.livingpayment.DefaultHouseOwnerVO">
-        <result property="groupId" column="groupId"/>
+<!--        <result property="groupId" column="groupId"/>-->
         <result property="groupName" column="groupName"/>
         <result property="familyId" column="familyId"/>
         <result property="companyId" column="companyId"/>
         <result property="companyName" column="companyName"/>
         <result property="typeId" column="typeId"/>
         <result property="typeName" column="typeName"/>
+        <result property="address" column="address"/>
         <result property="icon" column="icon"/>
         <result property="mediumIcon" column="mediumIcon"/>
         <result property="largeSizeIcon" column="largeSizeIcon"/>

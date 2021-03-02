@@ -9,6 +9,7 @@ import com.jsy.community.qo.CommunityFunQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,19 +50,8 @@ public class CommunityFunController {
     @PostMapping("/save")
     @Login
     public CommonResult save(@RequestBody CommunityFunEntity communityFunEntity) {
+        ValidatorUtils.validateEntity(communityFunEntity, CommunityFunEntity.CommunityFunValidated.class);
         String userId = UserUtils.getUserId();
-        if (communityFunEntity.getTitleName()==null||"".equals(communityFunEntity.getTitleName())){
-            return  CommonResult.error("标题不能为空");
-        }
-        if (communityFunEntity.getContent()==null||"".equals(communityFunEntity.getContent())){
-            return  CommonResult.error("内容不能为空");
-        }
-        if (communityFunEntity.getCoverImageUrl()==null||"".equals(communityFunEntity.getCoverImageUrl())){
-            return  CommonResult.error("封面不能为空");
-        }
-        if (communityFunEntity.getSmallImageUrl()==null||"".equals(communityFunEntity.getSmallImageUrl())){
-            return  CommonResult.error("缩略图不能为空");
-        }
         communityFunEntity.setStatus(2);
         communityFunEntity.setUid(userId);
         communityFunEntity.setId(SnowFlake.nextId());
@@ -112,18 +102,7 @@ public class CommunityFunController {
     @PostMapping("/update")
     @Login
     public CommonResult update(@RequestBody CommunityFunEntity communityFunEntity) {
-        if (communityFunEntity.getTitleName()==null||"".equals(communityFunEntity.getTitleName())){
-            return  CommonResult.error("标题不能为空");
-        }
-        if (communityFunEntity.getContent()==null||"".equals(communityFunEntity.getContent())){
-            return  CommonResult.error("内容不能为空");
-        }
-        if (communityFunEntity.getCoverImageUrl()==null||"".equals(communityFunEntity.getCoverImageUrl())){
-            return  CommonResult.error("封面不能为空");
-        }
-        if (communityFunEntity.getSmallImageUrl()==null||"".equals(communityFunEntity.getSmallImageUrl())){
-            return  CommonResult.error("缩略图不能为空");
-        }
+        ValidatorUtils.validateEntity(communityFunEntity, CommunityFunEntity.CommunityFunValidated.class);
         communityFunService.updateOne(communityFunEntity);
         return CommonResult.ok();
     }

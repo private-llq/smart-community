@@ -175,9 +175,12 @@ public class RelationServiceImpl implements IRelationService {
                     relationCarsQo.setId(SnowFlake.nextId());
                     relationCarsQo.setUid(relationQo.getUserId());
                     relationMapper.insertOne(relationCarsQo);
+                }else {
+                    relationMapper.updateUserRelationCar(relationCarsQo);
                 }
-                relationMapper.updateUserRelationCar(relationCarsQo);
             }
+        }else {
+            carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",relationQo.getId()).eq("uid",relationQo.getUserId()));
         }
     }
 

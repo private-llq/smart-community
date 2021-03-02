@@ -56,9 +56,10 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
         Map map = new HashMap();
         map.put("familyName","纵横世纪");
         map.put("familyId",number);
-        map.put("typeId",entity.getId());
-        map.put("typeName",entity.getName());
-        map.put("accountBalance",-50);
+        map.put("companyId",entity.getId());
+        map.put("companyName",entity.getName());
+        map.put("typeId",entity.getTypeId());
+        map.put("accountBalance",-0.01);
         map.put("address","天王星b座1810");
         return map;
     }

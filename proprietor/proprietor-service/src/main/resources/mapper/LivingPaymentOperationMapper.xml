@@ -13,13 +13,13 @@
         <if test="remarkImg!=null and remarkImg!=''">
             remark_img=#{remarkImg},
         </if>
-        <if test="billClassification!=null and billClassification!=''">
+        <if test="billClassification!=null and billClassification>0">
             bill_classification=#{billClassification},
         </if>
-            <if test="billClassificationName!=null and billClassificationName!=''">
+        <if test="billClassificationName!=null and billClassificationName!=''">
             bill_classification_name=#{billClassificationName},
         </if>
         </set>
-        where id=#{id}
+        where id=#{orderId}
     </update>
 </mapper>

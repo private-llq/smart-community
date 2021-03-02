@@ -30,7 +30,7 @@ public class LivingPaymentQO implements Serializable {
     private String familyId;
 
     @ApiModelProperty(value = "户名")
-    @NotNull(groups = {LivingPaymentValidated.class},message = "缴费单位不能为空")
+    @NotNull(groups = {LivingPaymentValidated.class},message = "户名不能为空")
     private String familyName;
 
     @ApiModelProperty(value = "缴费单位ID")
@@ -40,7 +40,7 @@ public class LivingPaymentQO implements Serializable {
     private String userID;
 
     @ApiModelProperty(value = "付款方式，1微信支付，2支付宝支付，3账户余额，4其他银行卡")
-    private Integer payTpye;
+    private Integer payType;
 
     @ApiModelProperty(value = "付款方式名称")
     private String payTypeName;

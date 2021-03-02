@@ -46,8 +46,9 @@ public class LivingpaymentQueryController {
 
     @PostMapping("/getPayDetails")
     @ApiOperation("假账单接口")
-    public Map getPayDetails(@RequestParam("familyId")String familyId, @RequestParam("companyId")Long companyId){
-        return livingpaymentQueryService.getPayDetails(familyId,companyId);
+    public CommonResult getPayDetails(@RequestParam("familyId")String familyId, @RequestParam("companyId")Long companyId){
+        Map payDetails = livingpaymentQueryService.getPayDetails(familyId, companyId);
+        return CommonResult.ok(payDetails);
     }
 
     @ApiOperation("缴费类型")
@@ -85,8 +86,6 @@ public class LivingpaymentQueryController {
         List<UserGroupVO> voList = livingpaymentQueryService.selectUserGroup(userId);
         return CommonResult.ok(voList);
     }
-
-
     /**
      * 默认查询所有缴费信息
      * @param

@@ -110,9 +110,10 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         payOrderEntity.setOrderNum(order());
 
 
-        payOrderEntity.setPayType(livingPaymentQO.getPayTpye());
+        payOrderEntity.setPayType(livingPaymentQO.getPayType());
         payOrderEntity.setFamilyId(livingPaymentQO.getFamilyId());
         payOrderEntity.setStatus(3);
+        payOrderEntity.setUid(livingPaymentQO.getUserID());
         payOrderEntity.setOrderTime(LocalDateTime.now());
         payOrderEntity.setCompanyName(entity.getName());
         payOrderEntity.setPaymentBalance(livingPaymentQO.getPaymentBalance());
