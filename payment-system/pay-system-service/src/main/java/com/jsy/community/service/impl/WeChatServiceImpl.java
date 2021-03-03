@@ -39,9 +39,33 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
         weChatMapper.deleteById(msg);
     }
 
+    /**
+     * @Description: 生活缴费订单状态
+     * @author: Hu
+     * @since: 2021/3/3 14:35
+     * @Param:
+     * @return:
+     */
     @Override
     public void saveStatus(String out_trade_no) {
         iLivingPaymentOperationService.saveStatus(out_trade_no);
+    }
+
+    /**
+     * @Description: 微信支付订单状态
+     * @author: Hu
+     * @since: 2021/3/3 14:35
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void orderStatus(String out_trade_no) {
+        WeChatOrderEntity entity = weChatMapper.selectById(out_trade_no);
+        if (entity!=null){
+            entity.setOrderStatus(2);
+            entity.setArriveStatus(2);
+            weChatMapper.updateById(entity);
+        }
     }
 
     @Override

@@ -19,11 +19,20 @@ public interface IWeChatService extends IService<WeChatOrderEntity> {
     WeChatOrderEntity saveOrder(String orderId);
 
     /**
-     * @Description: 修改订单状态
+     * @Description: 生活缴费修改订单状态
      * @author: Hu
      * @since: 2021/3/3 9:59
      * @Param:
      * @return:
      */
     void saveStatus(String out_trade_no);
+
+    /**
+     * @Description: 微信订单状态
+     * @author: Hu
+     * @since: 2021/3/3 14:32
+     * @Param:
+     * @return:
+     */
+    void orderStatus(String out_trade_no);
 }

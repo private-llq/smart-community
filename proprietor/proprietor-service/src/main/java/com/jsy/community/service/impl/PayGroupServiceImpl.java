@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPayGroupService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PayFamilyEntity;
 import com.jsy.community.entity.PayGroupEntity;
@@ -54,6 +55,10 @@ public class PayGroupServiceImpl extends ServiceImpl<PayGroupMapper, PayGroupEnt
 
     @Override
     public void insertGroup(String name, String userId) {
+        PayGroupEntity entity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("name", name).eq("uid", userId));
+        if (entity!=null){
+            throw new ProprietorException("该组名已存在，请勿重复添加！");
+        }
         PayGroupEntity payGroupEntity = new PayGroupEntity();
         payGroupEntity.setUid(userId);
         payGroupEntity.setName(name);

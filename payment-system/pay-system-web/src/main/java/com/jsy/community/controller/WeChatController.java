@@ -202,6 +202,7 @@ public class WeChatController {
         System.err.println("回调成功");
         String out_trade_no = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
         weChatService.saveStatus(out_trade_no);
+        weChatService.orderStatus(out_trade_no);
         System.out.println(out_trade_no);
     }
 

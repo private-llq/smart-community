@@ -15,6 +15,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,8 +64,8 @@ public class PublicConfig {
         //装填参数  charset
         StringEntity s = new StringEntity(jsonStr);
         s.setContentType("application/json");
-//        s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
-//                "application/json"));
+        s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
+                "application/json"));
         //设置参数到请求对象中
         httpPost.setEntity(s);
        // String post = getToken("POST", HttpUrl.parse(url_prex + url), mercId, serial_no, privateKeyFilePath, jsonStr);
