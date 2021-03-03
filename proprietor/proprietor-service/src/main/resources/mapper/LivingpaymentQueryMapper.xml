@@ -97,7 +97,7 @@
         t.order_num as orderNum,t.bill_classification as billClassification,t.bill_classification_name as billClassificationName,
         t.tally as tally,t.remark as remark,t.remark_img as remarkImg
         FROM t_pay_order t JOIN t_pay_type tp on t.type_id=tp.id
-        where t.deleted=0 and tp.deleted=0 and t.id=#{id}
+        where t.deleted=0 and tp.deleted=0 and t.uid=#{uid} and t.id=#{id}
     </select>
     <select id="selectFamilyId" resultMap="FamilyIdVOMap">
         select distinct tpt.name as typeName,tpo.company_name as companyName,tpo.family_id as familyId

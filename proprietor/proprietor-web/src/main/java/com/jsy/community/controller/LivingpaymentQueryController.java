@@ -110,7 +110,8 @@ public class LivingpaymentQueryController {
     @ApiOperation("缴费凭证")
     @GetMapping("/getOrderID")
     public CommonResult getOrderID(@ApiParam("订单id") @RequestParam("orderId") Long orderId){
-        PayVoucherVO payVoucherVO=livingpaymentQueryService.getOrderID(orderId);
+        String uid = UserUtils.getUserId();
+        PayVoucherVO payVoucherVO=livingpaymentQueryService.getOrderID(orderId,uid);
         return CommonResult.ok(payVoucherVO);
     }
 
@@ -165,7 +166,8 @@ public class LivingpaymentQueryController {
     @GetMapping("/selectOrderId")
     @Login
     public CommonResult selectOrderId(@RequestParam("orderId") Long orderId){
-        TheBillingDetailsVO theBillingDetailsVO = livingpaymentQueryService.selectOrderId(orderId);
+        String uid = UserUtils.getUserId();
+        TheBillingDetailsVO theBillingDetailsVO = livingpaymentQueryService.selectOrderId(orderId,uid);
         return CommonResult.ok(theBillingDetailsVO);
     }
 

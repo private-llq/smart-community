@@ -81,8 +81,8 @@ public class RelationController {
     @DeleteMapping("/delete")
     @Login
     public CommonResult delete(@RequestParam("id") Long id){
-        System.out.println(id);
-        relationService.deleteHouseMemberCars(id);
+        String userId = UserUtils.getUserId();
+        relationService.deleteHouseMemberCars(id,userId);
         return CommonResult.ok();
     }
     @ApiOperation("保存行驶证图片")

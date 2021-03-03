@@ -199,9 +199,9 @@ public class RelationServiceImpl implements IRelationService {
      */
     @Override
     @Transactional
-    public void deleteHouseMemberCars(Long id) {
-        houseMemberMapper.deleteById(id);
-        carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",id));
+    public void deleteHouseMemberCars(Long id,String uid) {
+        houseMemberMapper.delete(new QueryWrapper<HouseMemberEntity>().eq("uid",uid).eq("id",id));
+        carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",id).eq("uid",uid));
     }
 
     /**

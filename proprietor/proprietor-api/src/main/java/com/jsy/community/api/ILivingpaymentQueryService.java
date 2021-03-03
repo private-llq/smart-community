@@ -59,7 +59,7 @@ public interface ILivingpaymentQueryService {
      * @Param:
      * @return:
      */
-    PayVoucherVO getOrderID(Long id);
+    PayVoucherVO getOrderID(Long id,String uid);
 
     /**
      * 选择分组查询下面缴过费的水电气户号
@@ -82,7 +82,7 @@ public interface ILivingpaymentQueryService {
      * @Param:
      * @return:
      */
-    TheBillingDetailsVO selectOrderId(Long id);
+    TheBillingDetailsVO selectOrderId(Long id,String uid);
 
     /**
      * @Description: 查询所有户号

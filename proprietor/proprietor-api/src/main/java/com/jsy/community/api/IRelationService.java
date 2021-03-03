@@ -73,7 +73,7 @@ public interface IRelationService {
     * @Param:
     * @return:
     */
-    void deleteHouseMemberCars(Long id);
+    void deleteHouseMemberCars(Long id,String uid);
 
     /**
      * @Description: 房间验证

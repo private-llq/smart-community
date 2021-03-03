@@ -147,7 +147,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description",weChatPayQO.getDescription());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://huyf.free.vipnps.vip/api/v1/payment/callback");
+        map.put("notify_url","http://hyf.free.vipnps.vip/api/v1/payment/callback");
         Map hashMap = new LinkedHashMap();
         hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("currency","CNY");
@@ -187,17 +187,6 @@ public class WeChatController {
         });
         //第一步获取prepay_id
         String h5_url = PublicConfig.V3PayGet("/v3/pay/transactions/h5", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
-//        CloseableHttpClient client = HttpClients.createDefault();
-//        HttpPost httpPost = new HttpPost(h5_url);
-//        httpPost.setHeader("Content-type", "application/json");
-//        //httpPost.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
-//        httpPost.setHeader("Accept", "application/json");
-//        httpPost.setHeader("referer", "www.zhsj.co");
-//        CloseableHttpResponse response = client.execute(httpPost);
-//        HttpEntity entity = response.getEntity();
-//        String toString = EntityUtils.toString(entity, "UTF-8");
-        //第二步获取调起支付的参数
-        //JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
         return CommonResult.ok(h5_url);
     }
 

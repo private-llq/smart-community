@@ -3,9 +3,11 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ILivingPaymentOperationService;
 import com.jsy.community.api.IWeChatService;
+import com.jsy.community.api.PaymentException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.mapper.WeChatMapper;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEntity> implements IWeChatService {
     @Autowired
     private WeChatMapper weChatMapper;
-    @Autowired
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private ILivingPaymentOperationService iLivingPaymentOperationService;
 
     @Override
@@ -45,8 +47,11 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
     @Override
     public WeChatOrderEntity saveOrder(String orderId) {
         WeChatOrderEntity entity = weChatMapper.selectById(orderId);
-        entity.setOrderStatus(2);
-         weChatMapper.updateById(entity);
-         return entity;
+        if (entity!=null){
+            entity.setOrderStatus(2);
+            weChatMapper.updateById(entity);
+            return entity;
+        }
+        throw new PaymentException("订单不存在！");
     }
 }
