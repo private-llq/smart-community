@@ -117,7 +117,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         payOrderEntity.setId(SnowFlake.nextId());
 
         //生成订单号
-        payOrderEntity.setOrderNum(order());
+        payOrderEntity.setOrderNum(livingPaymentQO.getOrderNum());
 
 
         payOrderEntity.setPayType(livingPaymentQO.getPayType());
