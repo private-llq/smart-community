@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -21,6 +22,11 @@ public class LivingPaymentQO implements Serializable {
     @ApiModelProperty(value = "缴费类型,如水电气")
     @NotNull(groups = {LivingPaymentValidated.class},message = "缴费类型不能为空")
     private Long typeId;
+
+    @ApiModelProperty(value = "订单流水号")
+    @NotNull(groups = {LivingPaymentValidated.class},message = "订单流水号不能为空")
+    @NotBlank(groups = {LivingPaymentValidated.class},message = "订单流水号不能为空")
+    private String orderNum;
 
     @ApiModelProperty(value = "分组名称")
     private String groupName;

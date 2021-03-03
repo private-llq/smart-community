@@ -81,7 +81,7 @@ public class WeChatController {
         map.put("appid", WechatConfig.APPID);
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description",weChatPayQO.getDescription());
-        map.put("out_trade_no", OrderNoUtil.getOrder());
+        map.put("out_trade_no", weChatPayQO.getOrderNum());
         map.put("notify_url","http://hyf.free.vipnps.vip/api/v1/payment/callback");
         map.put("amount",hashMap);
 //        map.put("scene_info",map4);
@@ -130,6 +130,7 @@ public class WeChatController {
         }
         return clientIp;
     }
+
     /**
      * @Description: H5下单并返回支付连接
      * @author: Hu
@@ -211,6 +212,7 @@ public class WeChatController {
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         System.err.println("回调成功");
         String out_trade_no = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
+        weChatService.saveStatus(out_trade_no);
         System.out.println(out_trade_no);
     }
 

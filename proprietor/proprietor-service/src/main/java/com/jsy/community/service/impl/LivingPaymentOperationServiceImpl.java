@@ -53,6 +53,16 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
     @Autowired
     private PayCompanyMapper payCompanyMapper;
 
+    @Override
+    public void saveStatus(String out_trade_no) {
+        PayOrderEntity entity = payOrderMapper.selectOne(new QueryWrapper<PayOrderEntity>().eq("order_num", out_trade_no));
+        if (entity!=null){
+            entity.setStatus(2);
+            entity.setOrderTime(LocalDateTime.now());
+            payOrderMapper.updateById(entity);
+        }
+    }
+
     /**
      * @Description: 交费记录
      * @author: Hu
@@ -112,9 +122,8 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
 
         payOrderEntity.setPayType(livingPaymentQO.getPayType());
         payOrderEntity.setFamilyId(livingPaymentQO.getFamilyId());
-        payOrderEntity.setStatus(3);
+        payOrderEntity.setStatus(0);
         payOrderEntity.setUid(livingPaymentQO.getUserID());
-        payOrderEntity.setOrderTime(LocalDateTime.now());
         payOrderEntity.setCompanyName(entity.getName());
         payOrderEntity.setPaymentBalance(livingPaymentQO.getPaymentBalance());
         payOrderEntity.setPayYear(LocalDateTime.now().getYear());
@@ -131,7 +140,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
 
 
         //到账时间
-        payOrderEntity.setArriveTime(LocalDateTime.now());
+        //payOrderEntity.setArriveTime(LocalDateTime.now());
 
         payOrderMapper.insert(payOrderEntity);
         PayFamilyEntity familyEntity = payFamilyMapper.selectOne(new QueryWrapper<PayFamilyEntity>()

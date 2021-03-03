@@ -10,6 +10,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PayTypeEntity;
 import com.jsy.community.qo.livingpayment.PayCompanyQO;
 import com.jsy.community.qo.livingpayment.PaymentRecordsQO;
+import com.jsy.community.utils.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.livingpayment.*;
@@ -35,6 +36,9 @@ import java.util.Map;
 @ApiJSYController
 public class LivingpaymentQueryController {
 
+    public static void main(String[] args) {
+        System.out.println(OrderNoUtil.getOrder());
+    }
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ILivingpaymentQueryService livingpaymentQueryService;
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -47,7 +51,9 @@ public class LivingpaymentQueryController {
     @PostMapping("/getPayDetails")
     @ApiOperation("假账单接口")
     public CommonResult getPayDetails(@RequestParam("familyId")String familyId, @RequestParam("companyId")Long companyId){
+        String order = OrderNoUtil.getOrder();
         Map payDetails = livingpaymentQueryService.getPayDetails(familyId, companyId);
+        payDetails.put("orderNum",order);
         return CommonResult.ok(payDetails);
     }
 

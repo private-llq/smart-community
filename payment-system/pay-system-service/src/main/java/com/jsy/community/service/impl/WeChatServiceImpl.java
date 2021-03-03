@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ILivingPaymentOperationService;
 import com.jsy.community.api.IWeChatService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEntity> implements IWeChatService {
     @Autowired
     private WeChatMapper weChatMapper;
+    @Autowired
+    private ILivingPaymentOperationService iLivingPaymentOperationService;
 
     @Override
     public void insertOrder(WeChatOrderEntity msg) {
@@ -32,6 +35,11 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
     @Override
     public void deleteByOrder(String msg) {
         weChatMapper.deleteById(msg);
+    }
+
+    @Override
+    public void saveStatus(String out_trade_no) {
+        iLivingPaymentOperationService.saveStatus(out_trade_no);
     }
 
     @Override

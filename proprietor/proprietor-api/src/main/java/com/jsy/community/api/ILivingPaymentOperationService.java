@@ -28,4 +28,12 @@ public interface ILivingPaymentOperationService {
      */
     void addRemark(RemarkQO remarkQO);
 
+    /**
+     * @Description: 修改订单状态
+     * @author: Hu
+     * @since: 2021/3/3 10:02
+     * @Param:
+     * @return:
+     */
+    void saveStatus(String out_trade_no);
 }
