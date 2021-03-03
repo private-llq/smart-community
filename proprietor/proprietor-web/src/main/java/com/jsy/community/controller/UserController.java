@@ -343,4 +343,11 @@ public class UserController {
         return CommonResult.ok(blinkResult);
     }
 
+//    @RequestMapping("/test")
+//    public String test(){
+//        HttpGet httpGet = MyHttpUtils.httpGetWithoutParams("https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF");
+//        byte[] byteData = (byte[]) MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_BYTE);
+//        String filePath = MinioUtils.upload(byteData,"face-url");
+//        return filePath;
+//    }
 }
