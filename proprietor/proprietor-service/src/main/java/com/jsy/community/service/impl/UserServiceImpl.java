@@ -625,27 +625,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
     * @Description: 实名认证后修改用户信息
      * @Param: [userEntity]
-     * @Return: int
+     * @Return: void
      * @Author: chq459799974
      * @Date: 2021/3/2
     **/
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public int updateUserAfterRealnameAuth(UserEntity userEntity){
+    public void updateUserAfterRealnameAuth(UserEntity userEntity){
         //改本地库
         int result = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("uid", userEntity.getUid()));
-        if(result == 1){
-            //通知签章服务
-            SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
-            signatureUserDTO.setUuid(userEntity.getUid());
-            signatureUserDTO.setIdCardName(userEntity.getRealName());
-            signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
-            signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
-            if(!signatureService.realNameUpdateUser(signatureUserDTO)){
-//                throw new ProprietorException(JSYError.INTERNAL.getCode(),"签章服务同步失败");
-            }
+        if(result != 1){
+            log.error("实名信息修改失败，用户：" + userEntity.getUid());
+            throw new ProprietorException(JSYError.INTERNAL);
         }
-        return result;
+        //通知签章服务
+        SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
+        signatureUserDTO.setUuid(userEntity.getUid());
+        signatureUserDTO.setIdCardName(userEntity.getRealName());
+        signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
+        signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
+        if(!signatureService.realNameUpdateUser(signatureUserDTO)){
+            log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
+//                throw new ProprietorException(JSYError.INTERNAL);
+        }
     }
     
     

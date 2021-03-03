@@ -160,9 +160,9 @@ public interface IUserService extends IService<UserEntity> {
 	/**
 	* @Description: 实名认证后修改用户信息
 	 * @Param: [userEntity]
-	 * @Return: int
+	 * @Return: void
 	 * @Author: chq459799974
 	 * @Date: 2021/3/2
 	**/
-	int updateUserAfterRealnameAuth(UserEntity userEntity);
+	void updateUserAfterRealnameAuth(UserEntity userEntity);
 }

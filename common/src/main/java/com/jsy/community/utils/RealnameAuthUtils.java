@@ -60,7 +60,7 @@ public class RealnameAuthUtils {
 	 * @Date: 2021/3/2
 	**/
 	public static JSONObject initBlink(RealnameBlinkInitQO realnameBlinkInitQO){
-		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+		String appCode = "453d3d5bf1364eba89718adabf796f27";
 		String host = "https://ediszim.market.alicloudapi.com";
 		String path = "/zoloz/zim/init";
 		String method = "POST";
@@ -78,6 +78,7 @@ public class RealnameAuthUtils {
 		try {
 			HttpResponse response = HttpUtils.doPost(host, path, method, headers, querys, bodyMap);
 			result = JSONObject.parseObject(EntityUtils.toString(response.getEntity()));
+			System.out.println(result);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -92,7 +93,7 @@ public class RealnameAuthUtils {
 	 * @Date: 2021/3/2
 	**/
 	public static JSONObject getBlinkResult(RealnameBlinkQueryQO realnameBlinkQueryQO){
-		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+		String appCode = "453d3d5bf1364eba89718adabf796f27";
 		String host = "https://ediszim.market.alicloudapi.com";
 		String path = "/zoloz/zim/getResult";
 		String method = "POST";

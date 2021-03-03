@@ -22,15 +22,12 @@ import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.ContentType;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.annotation.Resource;
 import java.util.*;
 
 
@@ -59,6 +56,11 @@ public class UserController {
     
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserUroraTagsService userUroraTagsService;
+    
+    private static final String BUCKETNAME_ID_CARD = "id-card"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+    
+    @Resource
+    private RedisTemplate redisTemplate;
 
     /**
     * @Description: 业主或亲属 获取/刷新 门禁权限
@@ -87,7 +89,7 @@ public class UserController {
         String uid = UserUtils.getUserId();
         UserEntity userEntity = userService.getRealAuthAndHouseId(uid);
         //未实名认证
-        if( Objects.isNull(userEntity) || !Objects.equals(userEntity.getIsRealAuth(), BusinessConst.CERTIFIED)){
+        if( Objects.isNull(userEntity) || Objects.equals(userEntity.getIsRealAuth(), BusinessConst.NO_REAL_NAME_AUTH)){
             throw new JSYException(JSYError.NO_REAL_NAME_AUTH);
         }
         //未认证房屋
@@ -259,7 +261,15 @@ public class UserController {
         PicUtil.imageQualified(file);
     	if(PicContentUtil.ID_CARD_PIC_SIDE_FACE.equals(type) || PicContentUtil.ID_CARD_PIC_SIDE_BACK.equals(type)){
             Map<String, Object> returnMap = PicContentUtil.getIdCardPicContent(Base64Util.fileToBase64Str(file), type);
-            return returnMap != null ? CommonResult.ok(returnMap) : CommonResult.error("识别失败");
+            if(returnMap != null){
+                //上传图片
+                String filePath = MinioUtils.upload(file, BUCKETNAME_ID_CARD);
+                //redis暂存身份证照片，redis-hash     ID_CARD:uid:type(face/back) url
+                redisTemplate.opsForHash().put("ID_CARD:" + UserUtils.getUserId(),type,filePath);
+                return CommonResult.ok(returnMap);
+            }else{
+                return CommonResult.error("识别失败");
+            }
 	    }else{
     		return CommonResult.error("缺少身份证正反面参数");
 	    }
@@ -275,9 +285,13 @@ public class UserController {
     @Login
     @ApiOperation("眨眼版实人验证初始化")
     @PostMapping("realName/blink/init")
-    public CommonResult initBlink(@RequestBody RealnameBlinkInitQO realnameBlinkInitQO){
+    public JSONObject initBlink(@RequestBody RealnameBlinkInitQO realnameBlinkInitQO){
         ValidatorUtils.validateEntity(realnameBlinkInitQO);
-        return CommonResult.ok(RealnameAuthUtils.initBlink(realnameBlinkInitQO));
+        JSONObject jsonObject = RealnameAuthUtils.initBlink(realnameBlinkInitQO);
+        System.out.println("=========1========");
+        System.out.println(jsonObject);
+        System.out.println("==========2=======");
+        return jsonObject;
     }
     
     /**
@@ -293,22 +307,33 @@ public class UserController {
     public CommonResult getBlinkResult(@RequestBody RealnameBlinkQueryQO realnameBlinkQueryQO){
         ValidatorUtils.validateEntity(realnameBlinkQueryQO);
         JSONObject blinkResult = RealnameAuthUtils.getBlinkResult(realnameBlinkQueryQO);
+        System.out.println("=========1========");
+        System.out.println(blinkResult);
+        System.out.println("==========2=======");
         if("0000".equals(blinkResult.getString("code"))){
             if("T".equals(blinkResult.getString("passed"))){
-                //实名认证后修改用户信息
+            //实名认证后修改用户信息
                 UserEntity userEntity = new UserEntity();
                 userEntity.setUid(UserUtils.getUserId());
                 userEntity.setRealName(blinkResult.getString("certName"));
                 userEntity.setIdCard(blinkResult.getString("certNo"));
                 userEntity.setDetailAddress(realnameBlinkQueryQO.getDetailAddress());
-                userEntity.setIsRealAuth(BusinessConst.CERTIFIED);
+                userEntity.setIsRealAuth(BusinessConst.CERTIFIED_FULL);
                 userEntity.setIdentificationType(BusinessConst.IDENTIFICATION_TYPE_IDCARD);
-                //上传人脸url
+                //设置身份证照片
+                Object idCardPicFace = redisTemplate.opsForHash().get("ID_CARD:" + UserUtils.getUserId(), PicContentUtil.ID_CARD_PIC_SIDE_FACE);
+                userEntity.setIdCardPicFace(idCardPicFace != null ? String.valueOf(idCardPicFace) : null);
+                Object idCardPicBack = redisTemplate.opsForHash().get("ID_CARD:" + UserUtils.getUserId(), PicContentUtil.ID_CARD_PIC_SIDE_BACK);
+                userEntity.setIdCardPicBack(idCardPicBack != null ? String.valueOf(idCardPicBack) : null);
+                //上传人脸url并设置
                 HttpGet httpGet = MyHttpUtils.httpGetWithoutParams(blinkResult.getString("photoUrl"));
                 byte[] byteData = (byte[]) MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_BYTE);
-                String filePath = MinioUtils.upload(byteData,"face_url");
+                String filePath = MinioUtils.upload(byteData,"face-url");
                 userEntity.setFaceUrl(filePath);
+                //更新信息
                 userService.updateUserAfterRealnameAuth(userEntity);
+                //删除redis暂存的身份证图片
+                redisTemplate.delete("ID_CARD:" + UserUtils.getUserId());
             }else{
                 CommonResult.error(JSYError.BAD_REQUEST.getCode(),"实名认证不通过");
             }

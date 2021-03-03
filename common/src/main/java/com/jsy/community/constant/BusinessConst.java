@@ -32,9 +32,13 @@ public interface BusinessConst {
 
 	//============数据库t_user isRealAuth 实名认证状态=============
 	/**
-	 * 已经实名认证
+	 * 已完全实名认证 - 三要素 身份证+姓名+实人认证
 	 */
-	Integer CERTIFIED = 1;
+	Integer CERTIFIED_FULL = 2;
+	/**
+	 * 已部分实名认证 - 二要素 身份证+姓名
+	 */
+	Integer CERTIFIED_PART = 1;
 	/**
 	 * 未实名认证
 	 */

@@ -69,11 +69,17 @@ public class MinioUtils {
 			//创建存储桶
 			createBucket(bucketName);
 			// 文件存储的目录结构
-			if (StringUtils.isEmpty(file.getOriginalFilename())) {
+			if(file == null){
 				throw new JSYException("请上传文件");
 			}
-			String endName = file.getOriginalFilename();
-			String objectName = getRandomFileName(endName);
+			String endName;
+			String objectName;
+			if (!StringUtils.isEmpty(file.getOriginalFilename())) {
+				endName = file.getOriginalFilename();
+				objectName = getRandomFileName(endName);
+			}else{
+				objectName = getRandomFileName("");
+			}
 			// 存储文件
 			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());
 			//返回路径
