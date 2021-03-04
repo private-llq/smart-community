@@ -18,6 +18,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 
 /**
@@ -75,9 +77,17 @@ public class LivingPaymentOperationController {
     @Login
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
         ValidatorUtils.validateEntity(livingPaymentQO, LivingPaymentQO.LivingPaymentValidated.class);
-        if (livingPaymentQO.getAccountBalance().abs().compareTo(livingPaymentQO.getPaymentBalance()) != 0) {
-            return CommonResult.error("缴费金额不足");
-        }
+            if (new BigDecimal(livingPaymentQO.getAccountBalance().abs().intValue()).compareTo(livingPaymentQO.getAccountBalance().abs())==0){
+                //整数
+                if (livingPaymentQO.getAccountBalance().abs().compareTo(livingPaymentQO.getPaymentBalance()) != 0) {
+                    return CommonResult.error("缴费金额不足");
+                }
+            }else {
+                //小数
+                if (livingPaymentQO.getAccountBalance().abs().setScale(0, RoundingMode.DOWN).compareTo(livingPaymentQO.getPaymentBalance().subtract(new BigDecimal(1)))!=0) {
+                    return CommonResult.error("缴费金额不足");
+                }
+            }
         String userId = UserUtils.getUserId();
         livingPaymentQO.setUserID(userId);
         livingPaymentOperationService.add(livingPaymentQO);

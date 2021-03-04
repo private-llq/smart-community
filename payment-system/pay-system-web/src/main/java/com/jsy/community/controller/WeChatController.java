@@ -81,7 +81,7 @@ public class WeChatController {
         map.put("appid", WechatConfig.APPID);
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description",weChatPayQO.getDescription());
-        map.put("out_trade_no", weChatPayQO.getOrderNum());
+        map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://hyf.free.vipnps.vip/api/v1/payment/callback");
         map.put("amount",hashMap);
 //        map.put("scene_info",map4);
@@ -90,7 +90,7 @@ public class WeChatController {
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
 
         WeChatOrderEntity msg = new WeChatOrderEntity();
-        msg.setId(weChatPayQO.getOrderNum());
+        msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
         msg.setOpenId(weChatPayQO.getOpenId());
         msg.setDescription(weChatPayQO.getDescription());
@@ -114,6 +114,7 @@ public class WeChatController {
         String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/app", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
         //第二步获取调起支付的参数
         JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
+        object.put("orderNum",map.get("out_trade_no"));
         return CommonResult.ok(object);
     }
 //    @GetMapping("ip")
@@ -149,7 +150,8 @@ public class WeChatController {
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://hyf.free.vipnps.vip/api/v1/payment/callback");
         Map hashMap = new LinkedHashMap();
-        hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
+//        hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
+        hashMap.put("total",1);
         hashMap.put("currency","CNY");
 
         Map hashMap1 = new LinkedHashMap();

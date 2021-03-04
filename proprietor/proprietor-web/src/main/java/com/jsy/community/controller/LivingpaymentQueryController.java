@@ -51,9 +51,7 @@ public class LivingpaymentQueryController {
     @PostMapping("/getPayDetails")
     @ApiOperation("假账单接口")
     public CommonResult getPayDetails(@RequestParam("familyId")String familyId, @RequestParam("companyId")Long companyId){
-        String order = OrderNoUtil.getOrder();
         Map payDetails = livingpaymentQueryService.getPayDetails(familyId, companyId);
-        payDetails.put("orderNum",order);
         return CommonResult.ok(payDetails);
     }
 
