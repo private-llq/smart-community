@@ -163,8 +163,8 @@ public class HouseLeaseQO implements Serializable {
 
 
     @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
-    @FieldValid(groups = {AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class, UpdateWholeLeaseHouse.class}, value = {"主卧", "次卧", "其他"}, message = "卧室类型错误!")
-    @NotBlank( groups = {AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "卧室类型不能为空!")
+    @FieldValid(groups = {AddCombineLeaseHouse.class, UpdateWholeLeaseHouse.class}, value = {"主卧", "次卧", "其他"}, message = "卧室类型错误!")
+    @NotBlank( groups = {AddCombineLeaseHouse.class}, message = "卧室类型不能为空!")
     private String bedroomType;
 
 

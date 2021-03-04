@@ -99,9 +99,8 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param userId                用户id
      * @param houseCommunityId      社区id
      * @param houseId               房屋id
-     * @return                      返回是否存在结果
      */
-    boolean notExistUserHouse(String userId, Long houseCommunityId, Long houseId);
+    void checkHouse(String userId, Long houseCommunityId, Long houseId);
 
 
     /**

@@ -1,5 +1,6 @@
 package com.jsy.community.utils.es;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.utils.SpringContextUtils;
@@ -39,6 +40,15 @@ public class ElasticSearchImportProvider {
         rabbitTemplate = getRabbitTemplate();
         byte[] bytes = serializationObjectToByte(fullTextSearchEntity);
         rabbitTemplate.convertAndSend(BusinessConst.APP_SEARCH_EXCHANGE_NAME, BusinessConst.APP_SEARCH_ROUTE_KEY, bytes);
+    }
+
+    /**
+     * 按JSONObject发送
+     * @param jsonObject        jsonObject 对象
+     */
+    public static void elasticOperation(JSONObject jsonObject) {
+        //以字节数组 传输
+        getRabbitTemplate().convertAndSend(BusinessConst.APP_SEARCH_EXCHANGE_NAME, BusinessConst.APP_SEARCH_ROUTE_KEY, jsonObject.toJSONString().getBytes());
     }
 
 

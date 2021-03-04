@@ -76,7 +76,7 @@ public class MyMathUtils {
 	}
 	
 	public static void main(String[] args) {
-		Long s = null;
+		Long s = 7168L;
 		List<Long> longs = analysisTypeCode(s);
 		System.out.println(Arrays.asList(longs));
 	}

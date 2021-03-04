@@ -306,6 +306,10 @@ public interface BusinessConst {
 	 * 范围最大的ID
 	 */
 	Integer COUNTRY_ID_MAX = 233;
-
+	//============ 租赁相关 ===============
+	/**
+	 * 用户发布房源最大
+	 */
+	Integer USER_PUBLISH_LEASE_MAX = 10;
 
 }

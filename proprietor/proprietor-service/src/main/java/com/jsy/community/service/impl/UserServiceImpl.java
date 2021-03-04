@@ -366,7 +366,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 //如果参数id为null 或者 参数id为0 则表明这条数据是需要新增
                 if( e.getId() == null || e.getId() == 0 ){
                     //新增数据需要设置id
-                    e.setId(SnowFlake.nextId());
                     hasAddCar.set(true);
                 }
             });

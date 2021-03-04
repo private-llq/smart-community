@@ -4,10 +4,10 @@
 <mapper namespace="com.jsy.community.mapper.CarMapper">
     <!-- 批量新增车辆 -->
     <insert id="addProprietorCarForList" parameterType="java.util.List">
-        insert into t_car(id,uid,community_id,car_plate,car_type,driving_license_url)
+        insert into t_car(id,uid,community_id,car_plate,car_type,driving_license_url,create_time)
         values
         <foreach collection="cars" item="item" separator=",">
-            (#{item.id},#{uid},#{item.communityId},#{item.carPlate},#{item.carType},#{item.drivingLicenseUrl})
+            (${@com.jsy.community.utils.SnowFlake@nextId()},#{uid},#{item.communityId},#{item.carPlate},#{item.carType},#{item.drivingLicenseUrl},now())
         </foreach>
     </insert>
     <!-- 通过车辆id 和 用户id更新用户车辆 -->

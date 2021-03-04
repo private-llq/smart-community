@@ -45,7 +45,7 @@ public class RedisConfig {
 	public RedissonClient redissonClient(){
 		Config config = new Config();
 		SingleServerConfig singleServerConfig = config.useSingleServer();
-		singleServerConfig.setAddress("redis://"+ redisHost +":" + redisPort);
+		singleServerConfig.setAddress("redis://"+ redisHost + ":" + redisPort);
 		singleServerConfig.setDatabase(redisDatabase);
 		singleServerConfig.setPassword(redisPassword);
 		//连接到任何Redis服务器时超时。默认值是10000毫秒。
@@ -55,6 +55,7 @@ public class RedisConfig {
 		singleServerConfig.setConnectionMinimumIdleSize(1);
 		//重连次数
 		singleServerConfig.setRetryAttempts(5);
+		singleServerConfig.setRetryInterval(2000);
 		return Redisson.create(config);
 	}
 

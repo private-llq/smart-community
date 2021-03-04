@@ -66,7 +66,7 @@
     </insert>
 
     <!-- 按用户id获取所有小区名称 -->
-    <select id="allCommunity">
+    <select id="allCommunity" resultType="com.jsy.community.entity.CommunityEntity">
         SELECT DISTINCT
 	        c.id,
 	        c.lon,
@@ -101,7 +101,7 @@
     <!-- 按列表查询房屋出租信息 -->
     <select id="queryHouseLeaseByList" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         select
-        id,bedroom_type,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_code,house_lon,house_lat,house_furniture_id,house_reserve_time
+        id,bedroom_type,house_direction_id,decoration_type_id,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_code,house_lon,house_lat,house_furniture_id
         from t_house_lease
         <where>
             <!-- 如果查询筛选增加了搜索文本 -->

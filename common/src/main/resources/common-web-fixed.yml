@@ -19,6 +19,7 @@ spring:
         max-idle: 20
         max-wait: -1ms
         max-active: 200
+
   upload:
     type: oss
   oss:
