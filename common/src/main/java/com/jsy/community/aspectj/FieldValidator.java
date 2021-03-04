@@ -12,7 +12,7 @@ import javax.validation.ConstraintValidatorContext;
  */
 public class FieldValidator implements ConstraintValidator<FieldValid, Object> {
 
-    String[] values;
+    Object[] values;
 
 
     /**
@@ -36,11 +36,9 @@ public class FieldValidator implements ConstraintValidator<FieldValid, Object> {
         if( o == null || "".equals(o)  ){
             return true;
         }
-        if(o instanceof String) {
-            for (String value : values) {
-                if(o.equals(value)){
-                    return true;
-                }
+        for (Object value : values) {
+            if(String.valueOf(o).equals(value)){
+                return true;
             }
         }
         return false;

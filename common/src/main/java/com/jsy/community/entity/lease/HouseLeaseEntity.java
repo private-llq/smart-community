@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  *
@@ -75,7 +76,7 @@ public class HouseLeaseEntity extends BaseEntity {
     private String houseReserveTime;
 
     @ApiModelProperty(value = "房屋朝向")
-    private String houseDirection;
+    private String houseDirectionId;
 
     @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
     private String bedroomType;
@@ -114,4 +115,22 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "纬度")
     private Double lat;
 
+
+    @ApiModelProperty( value = "出租要求位运算后的id")
+    private Long leaseRequireId;
+
+    @ApiModelProperty( value = "公共设施位运算后的id")
+    private Long commonFacilitiesId;
+
+    @ApiModelProperty( value = "房间设施位运算后的id")
+    private Long roomFacilitiesId;
+
+    @ApiModelProperty( value = "装修情况codeId：1.简单装修 2.精装修 4.豪华装修")
+    private Long decorationTypeId;
+
+    @ApiModelProperty( value = "室友期望Code运算后的Id")
+    private Long roommateExpectId;
+
+    @ApiModelProperty( value = "室友性别code: 1.限女生 2.限男生 4.男女不限")
+    private String roommateSex;
 }

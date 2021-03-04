@@ -1,6 +1,7 @@
 package com.jsy.community.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -39,6 +40,7 @@ public class JsySerializerModifier {
         MyBeanSerializerModifier beanSerializerModifier = new MyBeanSerializerModifier(type, s);
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter)SpringContextUtils.getBean("mappingJackson2HttpMessageConverter");
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         setObjectMapperTime(objectMapper);
         objectMapper.setSerializerFactory(objectMapper.getSerializerFactory().withSerializerModifier(beanSerializerModifier));
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);

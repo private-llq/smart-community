@@ -74,7 +74,9 @@ public class ValidatorUtils {
         if (!isInteger(baseQo.getPage())) {
             baseQo.setPage(1L);
         }
-        if (!isInteger(baseQo.getSize())) {
+        //每页显示条数临界值
+        int defaultPageSize = 100;
+        if (!isInteger(baseQo.getSize()) ||  baseQo.getSize() > defaultPageSize ) {
             baseQo.setSize(10L);
         }
     }

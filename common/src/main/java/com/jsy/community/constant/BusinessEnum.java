@@ -652,9 +652,9 @@ public interface BusinessEnum {
 			return kv;
 		}
 
-		public static String getDirectionName(String code){
+		public static String getDirectionName(Integer code){
 			Map<Integer, String> kv = getKv();
-			return kv.get(Integer.parseInt(code));
+			return kv.get(code);
 		}
 
 	}

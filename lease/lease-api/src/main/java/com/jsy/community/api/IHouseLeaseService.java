@@ -19,14 +19,48 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
 
 
     /**
-     * 新增出租房屋数据
+     * 【整租】整租新增出租房屋数据
      * @param houseLeaseQo   请求参数接收对象
      * @return               返回新增是否成功
      */
-    Boolean addLeaseSaleHouse(HouseLeaseQO houseLeaseQo);
+    Boolean addWholeLeaseHouse(HouseLeaseQO houseLeaseQo);
 
 
+    /**
+     * 【单间】单间新增房源
+     * @param houseLeaseQo      请求参数
+     * @return                  返回新增sql影响行数 > 0
+     */
+    boolean addSingleLeaseHouse(HouseLeaseQO houseLeaseQo);
 
+
+    /**
+     * 【合租】新增房源
+     * @param houseLeaseQo      请求参数
+     * @return                  返回新增sql影响行数 > 0
+     */
+    boolean addCombineLeaseHouse(HouseLeaseQO houseLeaseQo);
+
+
+    /**
+     * 【整租】按参数对象属性更新房屋出租数据
+     * @param houseLeaseQo          参数对象
+     * @return                      返回更新影响行数
+     */
+    Boolean updateWholeLease(HouseLeaseQO houseLeaseQo);
+
+    /**
+     * 【单间】按参数对象属性更新房屋出租数据
+     * @param qo                    参数对象
+     * @return                      返回更新影响行数
+     */
+    Boolean updateSingleRoom(HouseLeaseQO qo);
+    /**
+     * 【合租】按参数对象属性更新房屋出租数据
+     * @param qo                    参数对象
+     * @return                      返回更新影响行数
+     */
+    Boolean updateCombineLease(HouseLeaseQO qo);
     /**
      * 根据用户id和 rowGuid 删除出租房源数据
      * @param id            业务主键
@@ -51,12 +85,7 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      */
     HouseLeaseVO queryHouseLeaseOne(Long houseId, String uid);
 
-    /**
-     * 按参数对象属性更新房屋出租数据
-     * @param houseLeaseQo          参数对象
-     * @return                      返回更新影响行数
-     */
-    Boolean updateHouseLease(HouseLeaseQO houseLeaseQo);
+
 
     /**
      * 按用户id和 社区id查询 房主在当前社区出租的房源
@@ -72,7 +101,7 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param houseId               房屋id
      * @return                      返回是否存在结果
      */
-    boolean existUserHouse(String userId, Long houseCommunityId, Long houseId);
+    boolean notExistUserHouse(String userId, Long houseCommunityId, Long houseId);
 
 
     /**
@@ -95,7 +124,7 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param houseId   房屋id
      * @return          返回是否发布
      */
-    boolean alreadyPublish(Long houseId);
+    Boolean alreadyPublish(Long houseId);
 
     /**
      * 按用户id获取所有小区名称
@@ -104,4 +133,15 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @return          返回小区名称
      */
     List<CommunityEntity> allCommunity(Long cityId, String userId);
+
+    /**
+     * 按id查询房屋详情数据
+     * @param houseId       房屋id
+     * @param uid           用户id
+     * @return              返回这条数据的详情
+     */
+    HouseLeaseVO editDetails(Long houseId, String uid);
+
+
+
 }

@@ -104,7 +104,7 @@ public class PicContentUtil {
 			carTypeMap.put(carTypeEnum.getCode(), carTypeEnum.getName());
 			resultMap.put("carType", carTypeMap);
 			//行驶证图片
-			resultMap.put("carImageUrl", drivingLicenseImageUrl);
+			resultMap.put("drivingLicenseImageUrl", drivingLicenseImageUrl);
 			return resultMap;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -31,10 +31,6 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/sms")
 public class SmsController {
 
-    private static final String SMART_MALL_REDIS_PREFIX = "mall:";
-    private static final String DIDA_IM_REDIS_PREFIX = "didaim:";
-    private static final String OPEN_IM_REDIS_PREFIX = "openim:";
-    private static final String SIGN_REDIS_PREFIX = "SIGN:PHONECODE:";
     private static final String HOST = "http://smsbanling.market.alicloudapi.com";
     private static final String PATH = "/smsapis";
     private static final String APP_CODE = "abfc59f0cdbc4c038a2e804f9e9e37de";
@@ -60,8 +56,8 @@ public class SmsController {
         queryParam.put("sign", qo.getSign());
 
         //存入redis
-        adminRedisTemplate.opsForValue().set(SIGN_REDIS_PREFIX + qo.getMobile() , verifyCode);
-        Boolean expire = adminRedisTemplate.expire(SIGN_REDIS_PREFIX + qo.getMobile(), qo.getExpire(), TimeUnit.SECONDS);
+        adminRedisTemplate.opsForValue().set(qo.getRedisPrefix() + qo.getMobile() , verifyCode);
+        Boolean expire = adminRedisTemplate.expire(qo.getRedisPrefix() + qo.getMobile(), qo.getExpire(), TimeUnit.SECONDS);
 
         if( Objects.isNull(expire)  ){
             return CommonResult.error("发送失败!");

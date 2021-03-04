@@ -49,6 +49,13 @@ public class MyMathUtils {
 	public static List<Long> analysisTypeCode(long typeCode){
 		return analysisTypeCode(typeCode,30);
 	}
+
+	public static List<Long> analysisTypeCode(Long typeCode){
+		if(Objects.isNull(typeCode)){
+			return null;
+		}
+		return analysisTypeCode(typeCode,30);
+	}
 	
 	/**
 	* @Description: 对象同时持有多种状态 得到最终的状态表示码
@@ -69,7 +76,8 @@ public class MyMathUtils {
 	}
 	
 	public static void main(String[] args) {
-		List<Long> longs = analysisTypeCode(117);
+		Long s = null;
+		List<Long> longs = analysisTypeCode(s);
 		System.out.println(Arrays.asList(longs));
 	}
 	

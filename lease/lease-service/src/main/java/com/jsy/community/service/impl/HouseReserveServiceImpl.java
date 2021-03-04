@@ -120,7 +120,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
             //平方米
             r.setHouseSquareMeter(r.getHouseSquareMeter() + "m²");
             //房屋朝向
-            r.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(r.getHouseDirection()));
+            r.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(r.getHouseDirectionId()));
             //2. 第一张图片地址
             r.setHouseImageUrl(houseLeaseMapper.queryHouseImgById(r.getHouseImageId(), r.getHouseLeaseId()));
         });

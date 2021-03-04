@@ -48,7 +48,7 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
                     .browseType(0).houseId(vo.getId())
                     .houseImage(CollectionUtils.isEmpty(vo.getHouseImage()) ? null : vo.getHouseImage().get(0))
                     .price(vo.getHousePrice() + "/" + vo.getHouseUnit())
-                    .tag(getTag(vo.getHouseAdvantage()))
+                    .tag(getTag(vo.getHouseAdvantageCode()))
                     .leaseType(vo.getHouseLeaseMode())
                     .build();
         }

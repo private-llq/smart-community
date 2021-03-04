@@ -51,10 +51,10 @@ public class HouseLeaseVO implements Serializable {
     private Long houseFurnitureId;
 
     @ApiModelProperty(value = "房屋租售优势标签")
-    private Map<String, Long> houseAdvantage;
+    private Map<String, Long> houseAdvantageCode;
 
     @ApiModelProperty(value = "房屋租售家具标签")
-    private List<String> houseFurniture;
+    private List<String> houseFurnitureCode;
 
     @ApiModelProperty(value = "房屋预约时间")
     private String houseReserveTime;
@@ -62,8 +62,6 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房屋租售价格")
     private BigDecimal housePrice;
 
-    @ApiModelProperty(value = "房屋出租单位/年/月/周/日")
-    private String houseUnit;
 
     @ApiModelProperty(value = "房屋租售平方米")
     private BigDecimal houseSquareMeter;
@@ -71,24 +69,30 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房主称呼")
     private String appellation;
 
+    @ApiModelProperty(value = "房屋出租单位/年/月/周/日")
+    private String houseUnit;
+
     /**
      * 值是变动  需要存id至数据库 对应 名称 有后台人员管理
      */
     @ApiModelProperty(value = "房屋出租方式id /1.压一付一/2.压一付三/3.压一付六")
-    private Long houseLeasedepositId;
+    private Integer houseLeasedepositId;
 
 
     @ApiModelProperty(value = "房屋出租方式文本 /1.压一付一/2.压一付三/3.压一付六")
     private String houseLeaseDeposit;
 
-    @ApiModelProperty(value = "房屋类型Code：如040202 表示 4室2厅2卫")
+    @ApiModelProperty(value = "房屋户型Code：如040202 表示 4室2厅2卫")
     private String houseTypeCode;
 
-    @ApiModelProperty(value = "房屋类型文本：1.四室一厅、2.二室一厅...")
+    @ApiModelProperty(value = "房屋户型文本：1.四室一厅、2.二室一厅...")
     private String houseType;
 
     @ApiModelProperty(value = "房屋所属楼层")
     private String houseFloor;
+
+    @ApiModelProperty(value = "房屋朝向ID 1.东.2.西 3.南 4.北. 4.东南 5. 东北 6.西北 7.西南")
+    private Integer houseDirectionId;
 
     /**
      * 非 经常变动，常量存 BusinessEnum
@@ -127,6 +131,8 @@ public class HouseLeaseVO implements Serializable {
     private Integer houseLeasetypeId;
 
 
+    @ApiModelProperty(value = "房屋出租类型文本")
+    private String houseLeaseType;
     /**
      * 69不限 70整租，71合租
      */
@@ -147,5 +153,38 @@ public class HouseLeaseVO implements Serializable {
 
     @ApiModelProperty(value = "是出租房吗/false为商铺")
     private Boolean leaseHouse;
+
+    @ApiModelProperty( value = "出租要求Code：1.一家人 2.不养宠物 4.作息正常 8.组合稳定 16.禁烟")
+    private List<Long> leaseRequireCode;
+
+    @ApiModelProperty( value = "出租要求位运算后的id")
+    private Long leaseRequireId;
+
+    @ApiModelProperty( value = "公共设施Code")
+    private Map<String, Long> commonFacilitiesCode;
+
+    @ApiModelProperty( value = "公共设施位运算后的id")
+    private Long commonFacilitiesId;
+
+    @ApiModelProperty( value = "房间设施Code")
+    private Map<String, Long> roomFacilitiesCode;
+
+    @ApiModelProperty( value = "房间设施位运算后的id")
+    private Long roomFacilitiesId;
+
+    @ApiModelProperty( value = "装修情况codeId：1.简单装修 2.精装修 4.豪华装修")
+    private Long decorationTypeId;
+
+    @ApiModelProperty( value = "装修情况文本：1.简单装修 2.精装修 4.豪华装修")
+    private String decorationType;
+
+    @ApiModelProperty( value = "室友期望Code：1.一个人住,2.不养宠物,4.作息正常")
+    private List<Long> roommateExpectCode;
+
+    @ApiModelProperty( value = "室友期望Code运算后的Id")
+    private Long roommateExpectId;
+
+    @ApiModelProperty( value = "室友性别: 1.限女生 2.限男生 4.男女不限")
+    private String roommateSex;
 
 }
