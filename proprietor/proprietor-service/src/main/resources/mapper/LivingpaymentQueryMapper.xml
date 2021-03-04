@@ -18,8 +18,9 @@
         SELECT distinct
         tpg.id as groupId,
         tpg.name as groupName,
---         tpf.address as address,
+        tpf.address as address,
         tpf.family_id as familyId,
+        tpf.family_name as familyName,
         tpc.id as companyId,
         tpc.name as companyName,
         tpt.icon as icon,
@@ -121,9 +122,10 @@
     </resultMap>
 
     <resultMap id="DefaultHouseOwnerMap" type="com.jsy.community.vo.livingpayment.DefaultHouseOwnerVO">
-<!--        <result property="groupId" column="groupId"/>-->
+        <result property="groupId" column="groupId"/>
         <result property="groupName" column="groupName"/>
         <result property="familyId" column="familyId"/>
+        <result property="familyName" column="familyName"/>
         <result property="companyId" column="companyId"/>
         <result property="companyName" column="companyName"/>
         <result property="typeId" column="typeId"/>

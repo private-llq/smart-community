@@ -19,5 +19,4 @@ public class WithdrawalQO {
     private BigDecimal amount;
     @ApiModelProperty(value = "描述")
     private String desc;
-
 }
