@@ -137,7 +137,7 @@ public class CommonController {
         }
     }
     
-    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气")
+//    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气")
     @ApiOperation("首页天气")
     @GetMapping("weatherNow")
     public CommonResult<JSONObject> getWeatherNow(@RequestParam double lon,@RequestParam double lat){
@@ -147,7 +147,7 @@ public class CommonController {
         return CommonResult.ok(weather);
     }
     
-    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情")
+//    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情")
     @ApiOperation("天气详情")
     @GetMapping("weatherDetails")
     public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam double lon,@RequestParam double lat){
