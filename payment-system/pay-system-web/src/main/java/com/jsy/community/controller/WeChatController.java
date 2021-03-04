@@ -90,7 +90,7 @@ public class WeChatController {
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
 
         WeChatOrderEntity msg = new WeChatOrderEntity();
-        msg.setId((String) map.get("out_trade_no"));
+        msg.setId(weChatPayQO.getOrderNum());
         msg.setUid(UserUtils.getUserId());
         msg.setOpenId(weChatPayQO.getOpenId());
         msg.setDescription(weChatPayQO.getDescription());
@@ -116,20 +116,20 @@ public class WeChatController {
         JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
         return CommonResult.ok(object);
     }
-    @GetMapping("ip")
-    public String getClientIpAddress(HttpServletRequest request) {
-        String clientIp = request.getHeader("x-forwarded-for");
-        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-            clientIp = request.getHeader("Proxy-Client-IP");
-        }
-        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-            clientIp = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-            clientIp = request.getRemoteAddr();
-        }
-        return clientIp;
-    }
+//    @GetMapping("ip")
+//    public String getClientIpAddress(HttpServletRequest request) {
+//        String clientIp = request.getHeader("x-forwarded-for");
+//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+//            clientIp = request.getHeader("Proxy-Client-IP");
+//        }
+//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+//            clientIp = request.getHeader("WL-Proxy-Client-IP");
+//        }
+//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+//            clientIp = request.getRemoteAddr();
+//        }
+//        return clientIp;
+//    }
 
     /**
      * @Description: H5下单并返回支付连接
@@ -200,25 +200,12 @@ public class WeChatController {
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         System.err.println("回调成功");
-        String out_trade_no = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
-        weChatService.saveStatus(out_trade_no);
-        weChatService.orderStatus(out_trade_no);
-        System.out.println(out_trade_no);
+        Map<String, String> map = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
+//        weChatService.saveStatus(out_trade_no);
+        System.out.println(map.get("out_trade_no"));
+        System.out.println(map.get("transaction_id"));
+        weChatService.orderStatus(map);
     }
-
-
-    /**
-     * @Description:  暂时没用
-     * @author: Hu
-     * @since: 2021/1/26 17:09
-     * @Param:
-     * @return:
-     */
-    @GetMapping(value = "/restCallback")
-    public WeChatOrderEntity callback(@RequestParam("orderId") String orderId) throws Exception {
-        return weChatService.saveOrder(orderId);
-    }
-
 
 
     /**
@@ -231,6 +218,7 @@ public class WeChatController {
     @PostMapping(value = "/withdrawDeposit")
     @Login
     public CommonResult withdrawDeposit(@RequestBody WithdrawalQO withdrawalQO) throws Exception {
+
         String body=null;
         Map<String, String> restmap=null;
         Map<String, Object> map = new LinkedHashMap<>();

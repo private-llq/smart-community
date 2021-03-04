@@ -62,7 +62,7 @@ public class PublicConfig {
         //创建post方式请求对象
         HttpPost httpPost = new HttpPost(url_prex + url);
         //装填参数  charset
-        StringEntity s = new StringEntity(jsonStr);
+        StringEntity s = new StringEntity(jsonStr,charset);
         s.setContentType("application/json");
         s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
                 "application/json"));
@@ -152,7 +152,7 @@ public class PublicConfig {
      * @param response
      * @param privateKey APIv3 32的秘钥
      */
-    public static String notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
+    public static Map<String, String> notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
         Map<String, String> map = new HashMap<>(12);
         String result = readData(request);
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
@@ -170,7 +170,11 @@ public class PublicConfig {
         response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
         response.flushBuffer();
         String out_trade_no = JSONObject.fromObject(plainText).getString("out_trade_no");
-        return out_trade_no;
+        String transaction_id = JSONObject.fromObject(plainText).getString("transaction_id");
+        Map<String, String> hashMap = new HashMap<>();
+        hashMap.put("out_trade_no",out_trade_no);
+        hashMap.put("transaction_id",transaction_id);
+        return hashMap;
     }
 
 

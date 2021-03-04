@@ -18,7 +18,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 /**
@@ -76,7 +75,7 @@ public class LivingPaymentOperationController {
     @Login
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
         ValidatorUtils.validateEntity(livingPaymentQO, LivingPaymentQO.LivingPaymentValidated.class);
-        if (livingPaymentQO.getPaymentBalance().abs().compareTo(new BigDecimal(50)) != 0) {
+        if (livingPaymentQO.getAccountBalance().abs().compareTo(livingPaymentQO.getPaymentBalance()) != 0) {
             return CommonResult.error("缴费金额不足");
         }
         String userId = UserUtils.getUserId();
