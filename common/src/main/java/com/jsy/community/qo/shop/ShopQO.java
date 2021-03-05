@@ -22,6 +22,11 @@ import java.util.List;
 @Data
 @ApiModel("店铺发布")
 public class ShopQO implements Serializable {
+	
+	@ApiModelProperty(value = "商铺id")
+	@NotBlank(groups = ShopQO.updateShopValidate.class, message = "业主id不能为空")
+	private Long shopId;
+	
 	@ApiModelProperty(value = "业主id")
 	@NotBlank(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "业主id不能为空")
 	private String uid;

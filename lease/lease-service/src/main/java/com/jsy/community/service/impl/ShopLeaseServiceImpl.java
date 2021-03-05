@@ -246,16 +246,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateShop(ShopQO shop, Long shopId) {
+	public void updateShop(ShopQO shop) {
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
-		shopLeaseEntity.setId(shopId);
+		shopLeaseEntity.setId(shop.getShopId());
 		BeanUtils.copyProperties(shop, shopLeaseEntity);
 		// 更新基本信息
 //		shopLeaseEntity.setUpdateTime(null);
 		shopLeaseMapper.updateById(shopLeaseEntity);
 		
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("shop_id", shopId);
+		wrapper.eq("shop_id", shop.getShopId());
 		List<ShopImgEntity> shopImgList = shopImgMapper.selectList(wrapper);
 		if (!CollectionUtils.isEmpty(shopImgList)) {
 			List<Long> longs = new ArrayList<>();
@@ -273,13 +273,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 				ShopImgEntity entity = new ShopImgEntity();
 				entity.setId(SnowFlake.nextId());
 				entity.setImgUrl(s);
-				entity.setShopId(shopId);
+				entity.setShopId(shop.getShopId());
 				imgList.add(entity);
 			}
 			// 添加图片信息
 			shopImgMapper.insertImg(imgList);
 		}
-		ElasticSearchImportProvider.elasticOperation(shopId, RecordFlag.LEASE_SHOP, Operation.UPDATE, shop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
+		ElasticSearchImportProvider.elasticOperation(shop.getShopId(), RecordFlag.LEASE_SHOP, Operation.UPDATE, shop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
 	}
 	
 	@Override

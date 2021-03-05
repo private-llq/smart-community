@@ -318,8 +318,7 @@ public class ShopLeaseController {
 	@PostMapping("/updateShop")
 	@Login
 	@Log(operationType = LogTypeConst.UPDATE, module = LogModule.LEASE, isSaveRequestData = true)
-	public CommonResult updateShop(@RequestBody ShopQO shop,
-	                               @ApiParam("店铺id") @RequestParam Long shopId) {
+	public CommonResult updateShop(@RequestBody ShopQO shop) {
 		String[] imgPath = shop.getImgPath();
 		
 		if (imgPath == null || imgPath.length <= 0) {
@@ -355,7 +354,7 @@ public class ShopLeaseController {
 		shop.setUid(UserUtils.getUserId());
 		shop.setSource(1);
 		ValidatorUtils.validateEntity(shop, ShopQO.updateShopValidate.class);
-		shopLeaseService.updateShop(shop, shopId);
+		shopLeaseService.updateShop(shop);
 		return CommonResult.ok();
 	}
 	
