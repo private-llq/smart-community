@@ -113,7 +113,8 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 //			throw new PaymentException("支付初始化出错");
 //		}
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-		request.setNotifyUrl("http://jsy.free.vipnps.vip/callBack/pay");
+//		request.setNotifyUrl("http://jsy.free.vipnps.vip/callBack/pay");
+		request.setNotifyUrl("http://222.178.212.29:9951/api/v1/payment/callBack/pay");
 		request.setBizContent("{" +
 //		"\"timeout_express\":\"90m\"," +
 		"\"total_amount\":"+"\""+ aliAppPayQO.getTotalAmount()+"\""+","+
