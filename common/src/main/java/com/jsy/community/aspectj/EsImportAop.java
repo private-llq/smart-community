@@ -1,6 +1,5 @@
 package com.jsy.community.aspectj;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.EsImport;
 import com.jsy.community.exception.JSYException;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -84,20 +82,20 @@ public class EsImportAop extends BaseAop {
                 }
                 //在做增改操作后  按返回值 来判断业务方法是否执行成功，  返回值 判断类型： void Integer Boolean  如果业务方法增/改操作  不返回这三种类型 那就不导入es 不做任何操作
                 //1.业务方法返回值为 void
-                if (Objects.isNull(result)) {
-                    return null;
-                }
-                //2.业务方法返回值为Integer/int 返回sql 执行结果行数 == 0  如果是更新在没有异常的情况下 sql 执行结果行数是可能为 0的 增改操作
-                if (result instanceof Integer) {
-                    Integer executeResRow = (Integer) result;
-                    if (executeResRow == 0) {
+                if( Objects.nonNull(result) ){
+                    //2.业务方法返回值为Integer/int 返回sql 执行结果行数 == 0  如果是更新在没有异常的情况下 sql 执行结果行数是可能为 0的 增改操作
+                    if (result instanceof Integer) {
+                        Integer executeResRow = (Integer) result;
+                        if (executeResRow == 0) {
+                            return result;
+                        }
+                    }
+                    //3.业务方法返回值为布尔
+                    if (!Boolean.parseBoolean(result.toString())) {
                         return result;
                     }
                 }
-                //3.业务方法返回值为布尔
-                if (!Boolean.parseBoolean(result.toString())) {
-                    return result;
-                }
+
                 //获得参数对象
                 Object obj = null;
                 //通过类型 拿到 请求参数
@@ -120,6 +118,7 @@ public class EsImportAop extends BaseAop {
         }
         return result;
     }
+
 
     /**
      * 从 参数对象 中 取出调用方 指定的 需要导入es的字段列 组成JSONObject
@@ -180,28 +179,6 @@ public class EsImportAop extends BaseAop {
         return newArray;
     }
 
-    public static void main(String[] args) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("operation", Operation.UPDATE);
-        byte[] bytes = jsonObject.toJSONString().getBytes();
-        String s = new String(bytes, StandardCharsets.UTF_8);
-        JSONObject jsonObject1 = JSON.parseObject(s);
-        String operation = jsonObject1.getString("operation");
-        Operation operation1 = Operation.valueOf(operation);
-        switch (operation1) {
-            case DELETE:
-                System.out.println("删除");
-                break;
-            case UPDATE:
-                System.out.println("更新");
-                break;
-            case INSERT:
-                System.out.println("插入");
-                break;
-            default:
-                break;
-        }
-    }
 
 
 }

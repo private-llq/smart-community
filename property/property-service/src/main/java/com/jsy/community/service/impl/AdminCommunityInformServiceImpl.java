@@ -56,7 +56,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         boolean b = communityInformMapper.insert(entity) > 0;
         //0表示推送目标为所有社区
         if(b && qo.getPushTarget() ==  0){
-            ElasticSearchImportProvider.elasticOperation(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
+            ElasticSearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
         }
         return b;
     }

@@ -11,7 +11,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.mapper.CommunityFunMapper;
 import com.jsy.community.qo.CommunityFunQO;
-import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
@@ -105,7 +104,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     entity.setStatus(1);
     entity.setStartTime(LocalDateTime.now());
     communityFunMapper.updateById(entity);
-    ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
+    ElasticSearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
   }
 
 }

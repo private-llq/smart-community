@@ -33,7 +33,7 @@ public class ElasticSearchImportProvider {
      * @Param recordPicture     数据的列表icon：如果该数据存在
      * @since 2021/2/2 15:40
      */
-    public static void elasticOperation(@NonNull Long id, @NonNull RecordFlag recordFlag, @NonNull Operation operation, @Nullable String searchTitle, @Nullable String recordPicture) {
+    public static void elasticOperationSingle(@NonNull Long id, @NonNull RecordFlag recordFlag, @NonNull Operation operation, @Nullable String searchTitle, @Nullable String recordPicture) {
         FullTextSearchEntity fullTextSearchEntity = new FullTextSearchEntity();
         fullTextSearchEntity.setId(id);
         fullTextSearchEntity.setFlag(recordFlag);

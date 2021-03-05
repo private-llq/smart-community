@@ -1,6 +1,6 @@
 package com.jsy.community.task;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.DistributedLock;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.IUserInformService;
@@ -85,9 +85,12 @@ public class ProprietorTaskActuator {
         List<FullTextSearchEntity> fullTextSearchEntities = commonService.fullTextSearchEntities();
         BulkRequest bulkRequest = new BulkRequest();
         fullTextSearchEntities.forEach( l -> {
+            JSONObject jsonObject = (JSONObject) JSONObject.toJSON(l);
+            jsonObject.put("searchTitle", l.getTitle());
+            jsonObject.put("esId", l.getId());
             IndexRequest indexRequest = new IndexRequest(BusinessConst.FULL_TEXT_SEARCH_INDEX)
                     .id(String.valueOf(l.getId()))
-                    .source(JSON.toJSONString(l), XContentType.JSON);
+                    .source(jsonObject.toJSONString(), XContentType.JSON);
             bulkRequest.add(indexRequest);
         });
         BulkResponse bulk = elasticsearchClient.bulk(bulkRequest, ElasticsearchConfig.COMMON_OPTIONS);

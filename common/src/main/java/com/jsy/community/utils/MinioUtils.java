@@ -117,17 +117,18 @@ public class MinioUtils {
 			// 存储文件
 			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());
 			//返回路径
-			String filePath = ENDPOINT + ":" + PROT + "/" + BUCKETNAME + "/" + objectName;
-			return filePath;
+			return ENDPOINT + ":" + PROT + "/" + BUCKETNAME + "/" + objectName;
 		} catch (Exception e) {
 			throw new JSYException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
 		}
 	}
 
 	private static  String getRandomFileName(String fileName){
-		return UUID.randomUUID().toString();
+		return UUID.randomUUID().toString().replace("-","");
 	}
-	
+
+
+
 	/**
 	 * 利用java原生的类实现SHA256加密
 	 * @param str 加密后的报文
