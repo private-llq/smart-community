@@ -643,10 +643,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         signatureUserDTO.setIdCardName(userEntity.getRealName());
         signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
         signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
-        if(!signatureService.realNameUpdateUser(signatureUserDTO)){
-            log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
+//        if(!signatureService.realNameUpdateUser(signatureUserDTO)){
+//            log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
 //                throw new ProprietorException(JSYError.INTERNAL);
-        }
+//        }
     }
     
     

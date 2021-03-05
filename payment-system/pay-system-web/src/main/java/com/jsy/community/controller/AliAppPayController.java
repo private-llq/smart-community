@@ -59,7 +59,7 @@ public class AliAppPayController {
 		if(aliAppPayQO.getPayType() == 1){
 			orderStr = aliAppPayService.getOrderStr(aliAppPayQO);
 		}else if(aliAppPayQO.getPayType() == 2){
-			orderStr = aliAppPayService.getOrderStrForH5(aliAppPayQO);
+			orderStr = aliAppPayService.getOrderStr(aliAppPayQO);
 		}else{
 			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"支付类型错误");
 		}
@@ -77,6 +77,6 @@ public class AliAppPayController {
 			ailiAppPayRecordEntity.setSysType(Integer.valueOf(sysType));
 			createResult = ailiAppPayRecordService.createAliAppPayRecord(ailiAppPayRecordEntity);
 		}
-		return createResult ? CommonResult.ok(orderStr) : CommonResult.error(JSYError.INTERNAL.getCode(),"下单失败");
+		return createResult ? CommonResult.ok(orderStr, "下单成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"下单失败");
 	}
 }
