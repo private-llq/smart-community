@@ -62,8 +62,8 @@ public class EsImportAop extends BaseAop {
                 //es 删除操作 业务方法 形参 下标位置
                 int businessIdIndex = 0;
                 //通过用户指定的业务id名称 拿到 业务方法请求参数值
-                for( String name : parameterNames ){
-                    if(name.equals(deletedId)){
+                for (String name : parameterNames) {
+                    if (name.equals(deletedId)) {
                         break;
                     }
                     businessIdIndex++;
@@ -78,20 +78,37 @@ public class EsImportAop extends BaseAop {
                 break;
             case INSERT:
             case UPDATE:
-                if( StringUtils.isEmpty(importFields) || StringUtils.isEmpty(searchFields) ){
+                // 如果 在es 操作更新 注解中的 导入列 和 搜索列 为空，抛出异常
+                if (StringUtils.isEmpty(importFields) || StringUtils.isEmpty(searchFields)) {
                     throw new JSYException("Annotation @EsImport parameter importFields or searchFields be not is null!");
+                }
+                //在做增改操作后  按返回值 来判断业务方法是否执行成功，  返回值 判断类型： void Integer Boolean  如果业务方法增/改操作  不返回这三种类型 那就不导入es 不做任何操作
+                //1.业务方法返回值为 void
+                if (Objects.isNull(result)) {
+                    return null;
+                }
+                //2.业务方法返回值为Integer/int 返回sql 执行结果行数 == 0  如果是更新在没有异常的情况下 sql 执行结果行数是可能为 0的 增改操作
+                if (result instanceof Integer) {
+                    Integer executeResRow = (Integer) result;
+                    if (executeResRow == 0) {
+                        return result;
+                    }
+                }
+                //3.业务方法返回值为布尔
+                if (!Boolean.parseBoolean(result.toString())) {
+                    return result;
                 }
                 //获得参数对象
                 Object obj = null;
                 //通过类型 拿到 请求参数
-                for( Object arg : args ){
+                for (Object arg : args) {
                     Class<?> aClass = arg.getClass();
-                    if( aClass.isAssignableFrom(parameterType) ){
+                    if (aClass.isAssignableFrom(parameterType)) {
                         obj = arg;
                         break;
                     }
                 }
-                if( Objects.isNull(obj) ){
+                if (Objects.isNull(obj)) {
                     return result;
                 }
                 //插入 和 更新 都做同样的操作
@@ -106,10 +123,11 @@ public class EsImportAop extends BaseAop {
 
     /**
      * 从 参数对象 中 取出调用方 指定的 需要导入es的字段列 组成JSONObject
-     * @param esImport      注解
-     * @param o             参数对象
+     *
+     * @param esImport 注解
+     * @param o        参数对象
      */
-    private JSONObject getJsonObj(EsImport esImport, Object o){
+    private JSONObject getJsonObj(EsImport esImport, Object o) {
         //把 idKey 添加 到 导入field 数组里面 组成一个新的数组
         String[] strArrays = addArrays(esImport.importField(), esImport.idKey());
         JSONObject jsonObject = JsonUtils.toJsonObject(o, strArrays);
@@ -126,12 +144,13 @@ public class EsImportAop extends BaseAop {
 
     /**
      * 把对象中 需要搜索的内容 以逗号分割 添加至 jsonObject ->searchTitle  最终导入es
-     * @param searchFields      调用方指定 对象中 哪一些字段列作为es搜索条件
-     * @param jsonObject        请求对象  取值的json对象
+     *
+     * @param searchFields 调用方指定 对象中 哪一些字段列作为es搜索条件
+     * @param jsonObject   请求对象  取值的json对象
      */
-    private String mergeField(JSONObject jsonObject, String[] searchFields){
+    private String mergeField(JSONObject jsonObject, String[] searchFields) {
         StringBuilder sb = new StringBuilder();
-        for( String field : searchFields ){
+        for (String field : searchFields) {
             sb.append(jsonObject.getString(field)).append(",");
         }
         return sb.substring(0, sb.length() - 1);
@@ -140,17 +159,18 @@ public class EsImportAop extends BaseAop {
 
     /**
      * 把 param 添加到 original[]
+     *
+     * @return 返回新数组
      * @author YuLF
-     * @since  2021/3/4 15:42
-     * @Param  param            需要添加到original数组的参数
-     * @Param  original         旧数组
-     * @return                  返回新数组
+     * @Param param            需要添加到original数组的参数
+     * @Param original         旧数组
+     * @since 2021/3/4 15:42
      */
-    private static String[] addArrays(String[] original, String...param){
+    private static String[] addArrays(String[] original, String... param) {
         String[] newArray = new String[original.length + param.length];
         int paramIndex = 0;
-        for( int  i = 0; i < newArray.length; i++ ){
-            if( i >= original.length ){
+        for (int i = 0; i < newArray.length; i++) {
+            if (i >= original.length) {
                 newArray[i] = param[paramIndex];
                 paramIndex++;
                 continue;
@@ -166,9 +186,9 @@ public class EsImportAop extends BaseAop {
         byte[] bytes = jsonObject.toJSONString().getBytes();
         String s = new String(bytes, StandardCharsets.UTF_8);
         JSONObject jsonObject1 = JSON.parseObject(s);
-        String operation =  jsonObject1.getString("operation");
+        String operation = jsonObject1.getString("operation");
         Operation operation1 = Operation.valueOf(operation);
-        switch (operation1){
+        switch (operation1) {
             case DELETE:
                 System.out.println("删除");
                 break;

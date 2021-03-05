@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.annotation.EsImport;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PushInformEntity;
@@ -53,8 +54,8 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         communityInformMapper.clearPushDel(qo.getAcctId());
         //返回值为冗余
         boolean b = communityInformMapper.insert(entity) > 0;
-        //1表示推送目标为所有社区
-        if(b && qo.getPushTarget() ==  1){
+        //0表示推送目标为所有社区
+        if(b && qo.getPushTarget() ==  0){
             ElasticSearchImportProvider.elasticOperation(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
         }
         return b;
@@ -66,12 +67,12 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      * @param id    推送消息id
      * @return      返回删除成功
      */
+    @EsImport( operation = Operation.DELETE, recordFlag = RecordFlag.INFORM)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean deletePushInform(Long id) {
         //物理删除：删除该条社区消息之前 先删除 所有用户已读消息记录
         communityInformMapper.delUserReadInform(id);
-        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.INFORM, Operation.DELETE, null, null);
         return communityInformMapper.deleteById(id) > 0;
     }
 

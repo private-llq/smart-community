@@ -67,9 +67,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @param qo 请求参数接收对象
      * @return 返回新增是否成功
      */
-    @EsImport( operation = Operation.INSERT, recordFlag = RecordFlag.LEASE_HOUSE, parameterType = HouseLeaseQO.class, importField = {"houseTitle","houseImage"}, searchField = {"houseTitle"})
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @EsImport( operation = Operation.INSERT, recordFlag = RecordFlag.LEASE_HOUSE, parameterType = HouseLeaseQO.class, importField = {"houseTitle","houseImage"}, searchField = {"houseTitle"})
     public Boolean addWholeLeaseHouse(HouseLeaseQO qo) {
         //1.保存房源数据
         qo.setId(SnowFlake.nextId());
@@ -92,8 +92,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      *
      * @param qo 请求参数
      */
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @EsImport( operation = Operation.INSERT, recordFlag = RecordFlag.LEASE_HOUSE, parameterType = HouseLeaseQO.class, importField = {"houseTitle","houseImage"}, searchField = {"houseTitle"})
     public boolean addSingleLeaseHouse(HouseLeaseQO qo) {
         //单间新增房源 相对于 整租 只是多一个 公共设施 、 房间设施  相当于把整租的家具(houseFurnitureCode) 分成了两部分
         qo.setId(SnowFlake.nextId());
@@ -113,12 +114,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         qo.setHouseAreaId(houseLeaseMapper.selectAreaIdByCommunityId(qo.getHouseCommunityId()));
         //保存房屋图片标签
         saveImage(qo);
-        boolean success = houseLeaseMapper.addSingleLeaseHouse(qo) > 0;
-        if (success) {
-            //导入es
-            ElasticSearchImportProvider.elasticOperation(qo.getId(), RecordFlag.LEASE_HOUSE, Operation.INSERT, qo.getHouseTitle(), qo.getHouseImage()[0]);
-        }
-        return success;
+        return houseLeaseMapper.addSingleLeaseHouse(qo) > 0;
     }
 
     /**
@@ -128,6 +124,8 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @param qo 请求参数
      */
     @Override
+    @Transactional( rollbackFor = Exception.class)
+    @EsImport( operation = Operation.INSERT, recordFlag = RecordFlag.LEASE_HOUSE, parameterType = HouseLeaseQO.class, importField = {"houseTitle","houseImage"}, searchField = {"houseTitle"})
     public boolean addCombineLeaseHouse(HouseLeaseQO qo) {
         qo.setCommonFacilitiesId(null);
         qo.setRoommateExpectId(null);
@@ -149,12 +147,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         qo.setHouseAreaId(houseLeaseMapper.selectAreaIdByCommunityId(qo.getHouseCommunityId()));
         //保存房屋图片标签
         saveImage(qo);
-        boolean success = houseLeaseMapper.addCombineLeaseHouse(qo) > 0;
-        if (success) {
-            //导入es
-            ElasticSearchImportProvider.elasticOperation(qo.getId(), RecordFlag.LEASE_HOUSE, Operation.INSERT, qo.getHouseTitle(), qo.getHouseImage()[0]);
-        }
-        return success;
+        return houseLeaseMapper.addCombineLeaseHouse(qo) > 0;
     }
 
 
@@ -164,9 +157,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @param id     业务主键
      * @param userId 用户id
      */
-    @EsImport( operation = Operation.DELETE, recordFlag = RecordFlag.LEASE_HOUSE)
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @EsImport( operation = Operation.DELETE, recordFlag = RecordFlag.LEASE_HOUSE)
     public boolean delLeaseHouse(Long id, String userId) {
         //删除中间表 关于 这个用户关联的所有图片地址信息
         houseLeaseMapper.deleteImageById(id);
@@ -256,9 +249,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @param qo 参数对象
      * @return 返回更新影响行数
      */
-    @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.LEASE_HOUSE, parameterType = HouseLeaseQO.class, importField = {"houseTitle","houseImage"}, searchField = {"houseTitle"})
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.LEASE_HOUSE, parameterType = HouseLeaseQO.class, importField = {"houseTitle","houseImage"}, searchField = {"houseTitle"})
     public Boolean updateWholeLease(HouseLeaseQO qo) {
         //换算优势标签、和家具id、 出租要求
         if (!CollectionUtils.isEmpty(qo.getHouseAdvantageCode())) {
@@ -272,7 +265,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //出租要求
         setLeaseRequireCode(qo);
         updateHouseImage(qo);
-        return houseLeaseMapper.updateHouseLease(qo);
+        return houseLeaseMapper.updateHouseLease(qo) > 0;
     }
 
 
@@ -283,6 +276,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @return 返回更新影响行数
      */
     @Override
+    @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.LEASE_HOUSE, parameterType = HouseLeaseQO.class, importField = {"houseTitle","houseImage"}, searchField = {"houseTitle"})
     public Boolean updateSingleRoom(HouseLeaseQO qo) {
         //换算优势标签、和公共设施、房间设施id、 出租要求
         if (!CollectionUtils.isEmpty(qo.getHouseAdvantageCode())) {
@@ -300,39 +294,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //出租要求
         setLeaseRequireCode(qo);
         updateHouseImage(qo);
-        //Es更新数据
-        ElasticSearchImportProvider.elasticOperation(qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), isEmpty(qo.getHouseImage()) ? null : qo.getHouseImage()[0]);
-        return houseLeaseMapper.updateHouseLease(qo);
-    }
-
-    /**
-     * 【合租更新】
-     *
-     * @param qo 参数对象
-     * @return 返回更新影响行数
-     */
-    @Override
-    public Boolean updateCombineLease(HouseLeaseQO qo) {
-        //对于整租和单间的值置空
-        qo.setLeaseRequireId(null);
-        qo.setHouseFurnitureId(null);
-        //公共设施 房屋设施
-        if (!CollectionUtils.isEmpty(qo.getCommonFacilitiesCode())) {
-            qo.setCommonFacilitiesId(MyMathUtils.getTypeCode(qo.getCommonFacilitiesCode()));
-        }
-        if (!CollectionUtils.isEmpty(qo.getRoomFacilitiesCode())) {
-            qo.setRoomFacilitiesId(MyMathUtils.getTypeCode(qo.getRoomFacilitiesCode()));
-        }
-        //室友期望
-        if (!CollectionUtils.isEmpty(qo.getRoommateExpectCode())) {
-            qo.setRoommateExpectId(MyMathUtils.getTypeCode(qo.getRoommateExpectCode()));
-        }
-        //保存城市区域id
-        qo.setHouseAreaId(houseLeaseMapper.selectAreaIdByCommunityId(qo.getHouseCommunityId()));
-        updateHouseImage(qo);
-        //Es更新数据
-        ElasticSearchImportProvider.elasticOperation(qo.getId(), RecordFlag.LEASE_HOUSE, Operation.UPDATE, qo.getHouseTitle(), isEmpty(qo.getHouseImage()) ? null : qo.getHouseImage()[0]);
-        return houseLeaseMapper.updateHouseLease(qo);
+        return houseLeaseMapper.updateHouseLease(qo) > 0;
     }
 
     /**
@@ -361,6 +323,35 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         if (!CollectionUtils.isEmpty(qo.getLeaseRequireCode())) {
             qo.setLeaseRequireId(MyMathUtils.getTypeCode(qo.getLeaseRequireCode()));
         }
+    }
+
+    /**
+     * 【合租更新】
+     *
+     * @param qo 参数对象
+     * @return 返回更新影响行数
+     */
+    @Override
+    @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.LEASE_HOUSE, parameterType = HouseLeaseQO.class, importField = {"houseTitle","houseImage"}, searchField = {"houseTitle"})
+    public Boolean updateCombineLease(HouseLeaseQO qo) {
+        //对于整租和单间的值置空
+        qo.setLeaseRequireId(null);
+        qo.setHouseFurnitureId(null);
+        //公共设施 房屋设施
+        if (!CollectionUtils.isEmpty(qo.getCommonFacilitiesCode())) {
+            qo.setCommonFacilitiesId(MyMathUtils.getTypeCode(qo.getCommonFacilitiesCode()));
+        }
+        if (!CollectionUtils.isEmpty(qo.getRoomFacilitiesCode())) {
+            qo.setRoomFacilitiesId(MyMathUtils.getTypeCode(qo.getRoomFacilitiesCode()));
+        }
+        //室友期望
+        if (!CollectionUtils.isEmpty(qo.getRoommateExpectCode())) {
+            qo.setRoommateExpectId(MyMathUtils.getTypeCode(qo.getRoommateExpectCode()));
+        }
+        //保存城市区域id
+        qo.setHouseAreaId(houseLeaseMapper.selectAreaIdByCommunityId(qo.getHouseCommunityId()));
+        updateHouseImage(qo);
+        return houseLeaseMapper.updateHouseLease(qo) > 0;
     }
 
     private boolean isEmpty(Object[] array) {
@@ -392,16 +383,21 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @param userId           用户id
      * @param houseCommunityId 社区id
      * @param houseId          房屋id
+     * @param operation        操作符
      */
     @Override
-    public void checkHouse(String userId, Long houseCommunityId, Long houseId) {
+    public void checkHouse(String userId, Long houseCommunityId, Long houseId, Operation operation) {
         if( houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId) == 0 ){
             throw new LeaseException(JSYError.BAD_REQUEST.getCode(), "您在此处未登记房产!");
         }
-        if( houseLeaseMapper.getPublishLease(userId, houseId) >= BusinessConst.USER_PUBLISH_LEASE_MAX){
-            throw new LeaseException(JSYError.NOT_IMPLEMENTED.getCode(), "您发布的房源已经达到最大发布数量!");
+        if( operation == Operation.INSERT ){
+            Integer publishLeaseRow = houseLeaseMapper.getPublishLease(userId, houseId);
+            if( publishLeaseRow >= BusinessConst.USER_PUBLISH_LEASE_MAX){
+                throw new LeaseException(JSYError.NOT_IMPLEMENTED.getCode(), "您发布的房源已经达到最大发布数量!");
+            }
         }
     }
+
 
 
     /**

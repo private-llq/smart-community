@@ -5,6 +5,7 @@ import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 
@@ -99,8 +100,9 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      * @param userId                用户id
      * @param houseCommunityId      社区id
      * @param houseId               房屋id
+     * @param operation             操作符 更新操作 不需要检查房屋最大数量
      */
-    void checkHouse(String userId, Long houseCommunityId, Long houseId);
+    void checkHouse(String userId, Long houseCommunityId, Long houseId, Operation operation);
 
 
     /**

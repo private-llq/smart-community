@@ -57,7 +57,7 @@ public class HouseValidatorAop extends BaseAop {
         ValidatorUtils.validateEntity(qo, validationInterface);
         qo.setUid(UserUtils.getUserId());
         //验证所属社区所属用户房屋是否存在
-        iHouseLeaseService.checkHouse(UserUtils.getUserId(), qo.getHouseCommunityId(), qo.getHouseId());
+        iHouseLeaseService.checkHouse(UserUtils.getUserId(), qo.getHouseCommunityId(), qo.getHouseId(), annotation.operation());
         return point.proceed();
     }
 

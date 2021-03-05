@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
+import com.jsy.community.annotation.EsImport;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -282,6 +283,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
+	@EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.LEASE_SHOP, deletedId = "shopId")
 	@Transactional(rollbackFor = Exception.class)
 	public void cancelShop(String userId, Long shopId) {
 		// 删除基本信息
@@ -299,7 +301,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 删除图片信息
 			shopImgMapper.deleteBatchIds(longs);
 		}
-		ElasticSearchImportProvider.elasticOperation(shopId, RecordFlag.LEASE_SHOP, Operation.DELETE, null, null);
 	}
 	
 	@Override

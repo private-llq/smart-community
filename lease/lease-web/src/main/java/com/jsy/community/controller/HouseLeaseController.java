@@ -16,6 +16,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.lease.HouseLeaseVO;
@@ -60,7 +61,7 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/wholeLease")
     @ApiOperation("整租新增")
-    @HouseValid( validationInterface = HouseLeaseQO.AddWholeLeaseHouse.class)
+    @HouseValid( validationInterface = HouseLeaseQO.AddWholeLeaseHouse.class, operation = Operation.INSERT)
     @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
     public CommonResult<Boolean> addWholeLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
         return iHouseLeaseService.addWholeLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
@@ -69,7 +70,7 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/singleRoom")
     @ApiOperation("单间新增")
-    @HouseValid( validationInterface = HouseLeaseQO.AddSingleRoomLeaseHouse.class)
+    @HouseValid( validationInterface = HouseLeaseQO.AddSingleRoomLeaseHouse.class, operation = Operation.INSERT)
     @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
     public CommonResult<Boolean> addSingleLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
         return iHouseLeaseService.addSingleLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
@@ -79,7 +80,7 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/combineLease")
     @ApiOperation("合租新增")
-    @HouseValid( validationInterface = HouseLeaseQO.AddCombineLeaseHouse.class)
+    @HouseValid( validationInterface = HouseLeaseQO.AddCombineLeaseHouse.class, operation = Operation.INSERT)
     @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
     public CommonResult<Boolean> addCombineLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
         return iHouseLeaseService.addCombineLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
@@ -88,7 +89,7 @@ public class HouseLeaseController {
 
     @Login
     @PutMapping("/wholeLease")
-    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class)
+    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class, operation = Operation.UPDATE)
     @ApiOperation("整租更新")
     public CommonResult<Boolean> updateWholeLease(@RequestBody HouseLeaseQO qo) {
         return iHouseLeaseService.updateWholeLease(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");
@@ -97,7 +98,7 @@ public class HouseLeaseController {
 
     @Login
     @PutMapping("/singleRoom")
-    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class)
+    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class, operation = Operation.UPDATE)
     @ApiOperation("单间更新")
     public CommonResult<Boolean> updateSingleRoom(@RequestBody HouseLeaseQO qo) {
         return iHouseLeaseService.updateSingleRoom(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");
@@ -105,7 +106,7 @@ public class HouseLeaseController {
 
     @Login
     @PutMapping("/combineLease")
-    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class)
+    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class, operation = Operation.UPDATE)
     @ApiOperation("合租更新")
     public CommonResult<Boolean> updateCombineLease(@RequestBody HouseLeaseQO qo) {
         return iHouseLeaseService.updateCombineLease(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");

@@ -67,8 +67,8 @@ public class RabbitMqConfig {
      * 设置消息确认和自动确认模式、是否重回队列、异常捕获
      */
     @Bean
-    public SimpleMessageListenerContainer simpleMessageListenerContainer(ConnectionFactory connectionFactory, ElasticsearchImportConsumer elasticsearchImportConsumer){
-        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer(connectionFactory);
+    public SimpleMessageListenerContainer simpleMessageListenerContainer(ConnectionFactory remoteConnectionFactory, ElasticsearchImportConsumer elasticsearchImportConsumer){
+        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer(remoteConnectionFactory);
         //监听全文搜索队列
         simpleMessageListenerContainer.setQueueNames(BusinessConst.APP_SEARCH_QUEUE_NAME);
         //手动签收

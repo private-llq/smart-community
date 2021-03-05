@@ -91,7 +91,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param houseLeaseQo          参数对象
      * @return                      返回更新影响行数
      */
-    Boolean updateHouseLease(HouseLeaseQO houseLeaseQo);
+    Integer updateHouseLease(HouseLeaseQO houseLeaseQo);
 
 
     /**

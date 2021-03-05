@@ -89,7 +89,7 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
     private void deleteData(JSONObject jsonObject) throws IOException {
         //第一个参数为操作索引名称、第二个参数为删除文档的id
         DeleteRequest deleteRequest = new DeleteRequest(
-                BusinessConst.FULL_TEXT_SEARCH_INDEX, jsonObject.getString(jsonObject.getString("esId")));
+                BusinessConst.FULL_TEXT_SEARCH_INDEX, jsonObject.getString("esId"));
         DeleteResponse response = customElasticsearchClient.delete(deleteRequest, ElasticsearchConfig.COMMON_OPTIONS);
         DocWriteResponse.Result result = response.getResult();
         //以下两种状态都表示在es中不存在了
@@ -101,7 +101,7 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
         updateRequest.index(BusinessConst.FULL_TEXT_SEARCH_INDEX);
         //docAsUpsert表示 如果文档不存在则创建
         updateRequest.docAsUpsert(true);
-        updateRequest.id(jsonObject.getString(jsonObject.getString("esId")));
+        updateRequest.id(jsonObject.getString("esId"));
         //转换为json串发给elasticsearch
         updateRequest.doc(jsonObject.toJSONString(), XContentType.JSON);
         UpdateResponse update = customElasticsearchClient.update(updateRequest, ElasticsearchConfig.COMMON_OPTIONS);
@@ -111,7 +111,7 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
     private void insertData(JSONObject jsonObject) throws IOException {
         //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
         IndexRequest indexRequest = new IndexRequest(BusinessConst.FULL_TEXT_SEARCH_INDEX);
-        indexRequest.id(jsonObject.getString(jsonObject.getString("esId")));
+        indexRequest.id(jsonObject.getString("esId"));
         //转换为json串发给elasticsearch
         indexRequest.source(jsonObject.toJSONString(), XContentType.JSON);
         //发送保存 第一个参数是构造的请求，第二个参数是请求头需要的一些操作如验证token
