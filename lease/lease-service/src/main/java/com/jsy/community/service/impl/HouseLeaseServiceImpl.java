@@ -15,7 +15,6 @@ import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.lease.HouseLeaseVO;

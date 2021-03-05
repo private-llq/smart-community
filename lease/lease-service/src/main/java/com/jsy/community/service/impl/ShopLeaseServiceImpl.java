@@ -132,7 +132,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			shopImgMapper.insertImg(list);
 		}
-		ElasticSearchImportProvider.elasticOperation(baseShop.getId(), RecordFlag.LEASE_SHOP, Operation.INSERT, baseShop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
+		ElasticSearchImportProvider.elasticOperationSingle(baseShop.getId(), RecordFlag.LEASE_SHOP, Operation.INSERT, baseShop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
 	}
 	
 	@Override
@@ -279,7 +279,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 添加图片信息
 			shopImgMapper.insertImg(imgList);
 		}
-		ElasticSearchImportProvider.elasticOperation(shop.getShopId(), RecordFlag.LEASE_SHOP, Operation.UPDATE, shop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
+		ElasticSearchImportProvider.elasticOperationSingle(shop.getShopId(), RecordFlag.LEASE_SHOP, Operation.UPDATE, shop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
 	}
 	
 	@Override
