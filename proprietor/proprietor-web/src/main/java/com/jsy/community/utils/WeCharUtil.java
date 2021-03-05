@@ -1,8 +1,15 @@
 package com.jsy.community.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.http.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
+import java.io.IOException;
 
 /**
  * @program: wechat
@@ -13,7 +20,12 @@ import org.springframework.web.client.RestTemplate;
 public class WeCharUtil {
 
     private final static String clientId="wxe84d22f50370bbda";
-    private final static String clientSecret="650dae9d01862cfb1385f2fc55038cd2";
+    private final static String clientSecret="e03145398568e0e174e9bd635b889a54";
+
+    @Resource
+    private RestTemplate restTemplate;
+
+
 
 
     /**
@@ -24,20 +36,23 @@ public class WeCharUtil {
      * @return:
      */
     public static JSONObject getAccessToken(String code) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + clientId + "&secret=" + clientSecret + "&code=" + code
-                + "&grant_type=authorization_code";
+        String body=null;
+        HttpClient httpClient = HttpClients.createDefault();
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid="+clientId+"&secret="+clientSecret+"&code="+code+"&grant_type=authorization_code";
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("Content-type", "application/json;charset=UTF-8");
+        try {
+            HttpResponse response = httpClient.execute(httpGet);
+            org.apache.http.HttpEntity entity = response.getEntity();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-        String body = responseEntity.getBody();
-        // 返回结果转换为json对象
-        JSONObject jObject = JSONObject.parseObject(body);
-        String accessToken = jObject.getString("access_token");
-        String openid = jObject.getString("openid");
-        return jObject;
+            body = EntityUtils.toString(entity, "UTF-8");
+
+            JSONObject jObject = JSONObject.parseObject(body);
+            return jObject;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -48,17 +63,23 @@ public class WeCharUtil {
      * @return:
      */
     public static JSONObject getUserInfo(String accessToken, String openid) {
-        RestTemplate restTemplate = new RestTemplate();
+        String body=null;
+        HttpClient httpClient = HttpClients.createDefault();
         String url = "https://api.weixin.qq.com/sns/userinfo?access_token=" + accessToken + "&openid=" + openid + "&lang=zh_CN";
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("Content-type", "application/json;charset=UTF-8");
+        try {
+            HttpResponse response = httpClient.execute(httpGet);
+            org.apache.http.HttpEntity entity = response.getEntity();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-        String body = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
-        // 返回结果转换为json对象
-        JSONObject jObject = JSONObject.parseObject(body);
+            body = EntityUtils.toString(entity, "UTF-8");
 
-        return jObject;
+            JSONObject jObject = JSONObject.parseObject(body);
+            return jObject;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String getClientId() {

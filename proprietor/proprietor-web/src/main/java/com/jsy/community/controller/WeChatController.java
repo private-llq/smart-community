@@ -43,16 +43,15 @@ public class WeChatController {
         String openid = object.getString("openid");
         //获取用户信息
         JSONObject userInfo = WeCharUtil.getUserInfo(accessToken, openid);
-        String uuid = object.getString("uuid");
-        String username = object.getString("username");
-        String nickname = object.getString("nickname");
-        String avatar = object.getString("avatar");
-        String company = object.getString("company");
-        String location = object.getString("location");
-        String email = object.getString("email");
-        String remark = object.getString("remark");
-        String gender = object.getString("gender");
-        return CommonResult.ok();
+        System.out.println(userInfo.getString("nickname"));
+        System.out.println(userInfo.getString("province"));
+        System.out.println(userInfo.getString("city"));
+        System.out.println(userInfo.getString("sex"));
+        System.out.println(userInfo.getString("headimgurl"));
+        System.out.println(userInfo.getString("unionid"));
+        System.out.println(object);
+        System.out.println(userInfo);
+        return CommonResult.ok(userInfo);
     }
 
     @RequestMapping("/callback")
