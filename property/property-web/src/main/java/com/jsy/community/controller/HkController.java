@@ -29,7 +29,7 @@ public class HkController {
 	int lAlarmHandle = -1;//报警布防句柄
 	FMSGCallBack dVRMessageCallBack;
 	
-	@ApiOperation("开启实时比对")
+	@ApiOperation("开启实时人脸比对")
 	@GetMapping("/open")
 	public void openHK(){
 		//1. 初始化
@@ -45,6 +45,25 @@ public class HkController {
 	
 	}
 	
+	@ApiOperation("关闭实时人脸比对")
+	@GetMapping("/close")
+	public void closeHK(){
+		//1. 初始化
+		hCNetSDK.NET_DVR_Init();
+		
+		//2. 用户注册
+		Login();
+		
+		//3. 撤防【关闭人脸比对功能，不是关闭摄像头】
+		if (lAlarmHandle > -1) {
+			if (hCNetSDK.NET_DVR_CloseAlarmChan_V30(lAlarmHandle)) {
+				lAlarmHandle = -1;
+				log.info("已关闭实时人脸比对");
+			}
+		}
+	
+	}
+	
 	public void SetAlarm() {
 		//判断是否布防。——尚未布防,需要布防
 		if (lAlarmHandle < 0){
@@ -53,9 +72,9 @@ public class HkController {
 				dVRMessageCallBack = new FMSGCallBack();
 				Pointer pUser = null;
 				if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V31(dVRMessageCallBack, pUser)) {
-					System.out.println("设置回调函数失败!");
+					log.info("设置回调函数失败!");
 				} else {
-					System.out.println("设置回调函数成功!");
+					log.info("设置回调函数成功!");
 				}
 			}
 			
@@ -69,9 +88,9 @@ public class HkController {
 			// 设置报警布防
 			lAlarmHandle = hCNetSDK.NET_DVR_SetupAlarmChan_V41(lUserID, m_strAlarmInfo);
 			if (lAlarmHandle == -1) {
-				System.out.println("布防失败");
+				log.info("开启人脸比对失败，错误号："+hCNetSDK.NET_DVR_GetLastError());
 			} else {
-				System.out.println("布防成功");
+				log.info("开启人脸比对成功");
 			}
 		}
 	}
@@ -80,9 +99,9 @@ public class HkController {
 		HCNetSDK.NET_DVR_DEVICEINFO_V30 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V30();
 		lUserID = hCNetSDK.NET_DVR_Login_V30("192.168.12.188", (short) 8000, "admin", "root1234", m_strDeviceInfo); // - // - 用户注册设备（NET_DVR_Login_V40）：实现用户的注册功能，注册成功后，返回的用户ID作为其他功能操作的唯一标识，SDK允许最大注册个数为2048个。
 		if (lUserID == -1) {
-			System.out.println("登录失败，错误码为" + hCNetSDK.NET_DVR_GetLastError());
+			log.info("登录失败，错误码为" + hCNetSDK.NET_DVR_GetLastError());
 		} else {
-			System.out.println("登录成功！");
+			log.info("登录成功！");
 		}
 	}
 }
