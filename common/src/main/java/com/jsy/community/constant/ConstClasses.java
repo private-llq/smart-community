@@ -25,9 +25,20 @@ public interface ConstClasses {
 		public static String alipayPublicCertPath;//支付宝公钥证书路径
 		public static String rootCertPath;//支付宝根证书路径
 		
+		public static String sellerId;//商户ID
+		public static String sellerEmail;//商户账号
+		
 		@Value("${alipay.appid}")
 		public void setAppid(String appid) {
 			this.appid = AESOperator.decrypt(appid);
+		}
+		@Value("${alipay.sellerId}")
+		public void setSellerId(String sellerId) {
+			this.sellerId = AESOperator.decrypt(sellerId);
+		}
+		@Value("${alipay.sellerEmail}")
+		public void setSellerEmail(String sellerEmail) {
+			this.sellerEmail = AESOperator.decrypt(sellerEmail);
 		}
 		@Value("${alipay.app-private-key}")
 		public void setPrivateKey(String privateKey) {
