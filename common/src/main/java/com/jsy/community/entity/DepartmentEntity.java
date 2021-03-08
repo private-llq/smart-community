@@ -35,6 +35,10 @@ public class DepartmentEntity extends BaseEntity {
 	@ApiModelProperty(value = "部门图片")
 	private String imgUrl;
 	
+	@ApiModelProperty(value = "部门电话")
+	private String phone;
+	
+	
 	public interface addDepartmentValidate {
 	}
 	
