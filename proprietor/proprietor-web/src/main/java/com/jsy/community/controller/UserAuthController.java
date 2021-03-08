@@ -7,6 +7,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.UserThirdPlatformEntity;
 import com.jsy.community.exception.JSYError;
@@ -16,6 +17,7 @@ import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
+import com.jsy.community.utils.OrderInfoUtil2_0;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -37,6 +39,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -108,6 +111,18 @@ public class UserAuthController {
 		//生成带token和用户信息的的UserAuthVo
 		UserAuthVo userAuthVo = userService.createAuthVoWithToken(infoVo);
 		return CommonResult.ok(userAuthVo);
+	}
+	
+	@ApiOperation("三方登录 - 获取支付宝authInfo")
+	@GetMapping("/third/authInfo")
+	public CommonResult getAuthInfo(){
+		String targetID = "zhsjCommunity";
+//		targetID = UUID.randomUUID().toString().replace("-","");
+		Map<String, String> authInfoMap = OrderInfoUtil2_0.buildAuthInfoMap(ConstClasses.AliPayDataEntity.sellerId, ConstClasses.AliPayDataEntity.appid, targetID, true);
+		String info = OrderInfoUtil2_0.buildOrderParam(authInfoMap);
+		String sign = OrderInfoUtil2_0.getSign(authInfoMap, ConstClasses.AliPayDataEntity.privateKey, true);
+		final String authInfo = info + "&" + sign;
+		return CommonResult.ok(authInfo,"获取成功");
 	}
 	
 	@ApiOperation("三方登录")

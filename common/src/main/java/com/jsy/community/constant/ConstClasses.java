@@ -26,7 +26,8 @@ public interface ConstClasses {
 		public static String rootCertPath;//支付宝根证书路径
 		
 		public static String sellerId;//商户ID
-		public static String sellerEmail;//商户账号
+		public static String sellerEmail;//商户账号(邮箱)
+		public static String sellerPID;//商户账号(PID)
 		
 		@Value("${alipay.appid}")
 		public void setAppid(String appid) {
@@ -40,6 +41,11 @@ public interface ConstClasses {
 		public void setSellerEmail(String sellerEmail) {
 			this.sellerEmail = AESOperator.decrypt(sellerEmail);
 		}
+		@Value("${alipay.sellerPID}")
+		public void setSellerPID(String sellerPID) {
+			this.sellerPID = AESOperator.decrypt(sellerPID);
+		}
+		
 		@Value("${alipay.app-private-key}")
 		public void setPrivateKey(String privateKey) {
 			this.privateKey = AESOperator.decrypt(privateKey);

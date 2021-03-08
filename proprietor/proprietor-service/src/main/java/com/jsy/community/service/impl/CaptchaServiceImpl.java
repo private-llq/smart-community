@@ -52,6 +52,8 @@ public class CaptchaServiceImpl implements ICaptchaService {
 			if (!isExists) {
 				throw new ProprietorException("您还没有注册");
 			}
+		} else if(type == UserAuthEntity.CODE_TYPE_BIND_MOBILE){
+			//三方登录绑定手机 暂不做处理
 		} else{
 			throw new ProprietorException("不支持的验证码类型");
 		}
