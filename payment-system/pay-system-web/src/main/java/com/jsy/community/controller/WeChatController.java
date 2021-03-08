@@ -36,7 +36,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -71,7 +70,8 @@ public class WeChatController {
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         Map hashMap = new LinkedHashMap();
-        hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
+        //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
+        hashMap.put("total",1);
         hashMap.put("currency","CNY");
 //        LinkedHashMap<String, Object> map4 = new LinkedHashMap<>();
 //        map4.put("payer_client_ip",weChatPayQO.getPayerClientIp());
@@ -225,12 +225,13 @@ public class WeChatController {
         Map<String, String> restmap=null;
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("mch_appid",WechatConfig.APPID);
-        map.put("mch_id",WechatConfig.MCH_ID);
+        map.put("mchid",WechatConfig.MCH_ID);
         map.put("nonce_str",UUID.randomUUID().toString().replace("-", ""));
         map.put("partner_trade_no",OrderNoUtil.txOrder());
         map.put("openid",withdrawalQO.getOpenid());
         map.put("check_name","NO_CHECK");
-        map.put("amount",withdrawalQO.getAmount().multiply(new BigDecimal(100)));
+//        map.put("amount",withdrawalQO.getAmount().multiply(new BigDecimal(100)));
+        map.put("amount",1);
         map.put("desc",withdrawalQO.getDesc());
         map.put("sign",PublicConfig.getSignToken(map,WechatConfig.PRIVATE_KEY));
 

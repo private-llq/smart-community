@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserAuthVo implements Serializable {
+
 	@ApiModelProperty("token")
 	private String token;
 	
