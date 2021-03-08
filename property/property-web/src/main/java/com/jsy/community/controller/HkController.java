@@ -30,30 +30,25 @@ public class HkController {
 	FMSGCallBack dVRMessageCallBack;
 	
 	@ApiOperation("开启实时人脸比对")
-	@GetMapping("/open")
-	public void openHK(){
+	@GetMapping("/openFace")
+	public void openFace(){
 		//1. 初始化
 		hCNetSDK.NET_DVR_Init();
-		
 		//2. 用户注册
 		Login();
-		
 		//3. 设置回调函数
 		SetAlarm();
-		
 //		while (true) ;
 	
 	}
 	
 	@ApiOperation("关闭实时人脸比对")
-	@GetMapping("/close")
-	public void closeHK(){
+	@GetMapping("/closeFace")
+	public void closeFace(){
 		//1. 初始化
 		hCNetSDK.NET_DVR_Init();
-		
 		//2. 用户注册
 		Login();
-		
 		//3. 撤防【关闭人脸比对功能，不是关闭摄像头】
 		if (lAlarmHandle > -1) {
 			if (hCNetSDK.NET_DVR_CloseAlarmChan_V30(lAlarmHandle)) {
@@ -61,6 +56,19 @@ public class HkController {
 				log.info("已关闭实时人脸比对");
 			}
 		}
+	
+	}
+	
+	@ApiOperation("开启实时车辆抓拍")
+	@GetMapping("/openCar")
+	public void openHK(){
+		//1. 初始化
+		hCNetSDK.NET_DVR_Init();
+		//2. 用户注册
+		Login();
+		//3. 设置回调函数
+		SetAlarm();
+//		while (true) ;
 	
 	}
 	

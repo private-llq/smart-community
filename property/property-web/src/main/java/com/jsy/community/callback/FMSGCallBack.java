@@ -1,6 +1,7 @@
 package com.jsy.community.callback;
 
 import com.jsy.community.sdk.HCNetSDK;
+import com.jsy.community.utils.HKCarTypeUtils;
 import com.sun.jna.Pointer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +17,7 @@ import java.util.Date;
  * @author lihao
  * @ClassName FMSGCallBack
  * @Date 2021/3/3  15:43
- * @Description TODO
+ * @Description 人脸识别回调函数
  * @Version 1.0
  **/
 @Slf4j
@@ -41,7 +42,7 @@ public class FMSGCallBack implements HCNetSDK.FMSGCallBack_V31 {
 			
 			//lCommand是传的报警类型
 			switch (lCommand) {
-				case HCNetSDK.COMM_UPLOAD_FACESNAP_RESULT:
+				case HCNetSDK.COMM_UPLOAD_FACESNAP_RESULT: //人脸识别结果上传
 					log.info("");
 					log.info("人脸抓拍事件开始触发");
 					//实时人脸抓拍上传
@@ -98,7 +99,7 @@ public class FMSGCallBack implements HCNetSDK.FMSGCallBack_V31 {
 				 * @Date 2021/3/4 9:51
 				 * @Param [lCommand, pAlarmer, pAlarmInfo, dwBufLen, pUser]
 				 **/
-				case HCNetSDK.COMM_SNAP_MATCH_ALARM:
+				case HCNetSDK.COMM_SNAP_MATCH_ALARM:  //人脸比对结果上传
 					log.info("");
 					log.info("人脸名单比对报警事件开始触发");
 					//人脸名单比对报警
@@ -219,6 +220,52 @@ public class FMSGCallBack implements HCNetSDK.FMSGCallBack_V31 {
 						log.info("最匹配该抓拍人脸的人脸模型所在人脸图片ID:" + new String(PIDbytes).trim());
 					}
 					log.info("人脸名单比对报警事件结束");
+					break;
+				
+				case HCNetSDK.COMM_ITS_PLATE_RESULT:  //交通抓拍的终端图片上传
+					HCNetSDK.NET_ITS_PLATE_RESULT strItsPlateResult = new HCNetSDK.NET_ITS_PLATE_RESULT();
+					strItsPlateResult.write();
+					Pointer pItsPlateInfo = strItsPlateResult.getPointer();
+					pItsPlateInfo.write(0, pAlarmInfo.getByteArray(0, strItsPlateResult.size()), 0, strItsPlateResult.size());
+					strItsPlateResult.read();
+					
+					try {
+						// struPlateInfo：车牌信息结构   sLicense：车牌号码，注：中东车牌需求把小字也纳入车牌号码，小字和车牌号中间用空格分隔
+						String srt3 = new String(strItsPlateResult.struPlateInfo.sLicense, "GBK");
+						// byVehicleType：车辆类型，定义详见VTR_RESULT
+						log.info("车辆类型：" + HKCarTypeUtils.getCarType(strItsPlateResult.byVehicleType) + ",交通抓拍上传车牌：" + srt3);
+					} catch (UnsupportedEncodingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					for (int i = 0; i < strItsPlateResult.dwPicNum; i++) {
+						if (strItsPlateResult.struPicInfo[i].dwDataLen > 0) {
+							SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
+							String newName = sf.format(new Date());
+							FileOutputStream fout;
+							try {
+								// sDeviceIP：设备IP地址
+								String filename = System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\pic\\" + new String(pAlarmer.sDeviceIP).trim() + "_"
+									+ newName + "_type[" + strItsPlateResult.struPicInfo[i].byType + "]_ItsPlate.jpg";
+								fout = new FileOutputStream(filename);
+								//将字节写入文件
+								long offset = 0;
+								ByteBuffer buffers = strItsPlateResult.struPicInfo[i].pBuffer.getByteBuffer(offset, strItsPlateResult.struPicInfo[i].dwDataLen);
+								byte[] bytes = new byte[strItsPlateResult.struPicInfo[i].dwDataLen];
+								buffers.rewind();
+								buffers.get(bytes);
+								fout.write(bytes);
+								fout.close();
+							} catch (FileNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}
 					break;
 			}
 	}

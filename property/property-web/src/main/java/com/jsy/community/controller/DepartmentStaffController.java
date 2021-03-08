@@ -72,6 +72,11 @@ public class DepartmentStaffController {
 	public CommonResult poi(@RequestParam("file") MultipartFile file) {
 		try {
 			List<String[]> strings = POIUtils.readExcel(file);
+			for (String[] string : strings) {
+				for (String s : string) {
+					System.out.println(s);
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return CommonResult.error("111");
