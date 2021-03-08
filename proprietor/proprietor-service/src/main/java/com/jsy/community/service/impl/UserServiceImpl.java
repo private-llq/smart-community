@@ -11,6 +11,7 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstError;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
@@ -282,7 +283,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
             return createAuthVoWithToken(userInfoVo);
         }
-        throw new ProprietorException("尚未绑定手机");
+        throw new ProprietorException(ConstError.NORMAL, "尚未绑定手机");
     }
 
     /**
