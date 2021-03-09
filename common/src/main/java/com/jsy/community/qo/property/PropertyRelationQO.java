@@ -13,14 +13,16 @@ import java.io.Serializable;
  **/
 @Data
 public class PropertyRelationQO implements Serializable {
+    @ApiModelProperty("社区id")
+    private Long communityId;
     @ApiModelProperty("家属名称模糊查询")
     private String memberName;
     @ApiModelProperty("业主名称模糊查询")
     private String ownerName;
     @ApiModelProperty("房屋id")
-    private String houseId;
+    private Long houseId;
     @ApiModelProperty("楼栋id")
-    private String buildingId;
+    private Long buildingId;
     @ApiModelProperty("单元id")
-    private String unitId;
+    private Long unitId;
 }

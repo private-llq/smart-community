@@ -32,7 +32,7 @@
         join t_pay_type tpt on tpf.type_id=tpt.id
         join t_pay_group tpg on tpf.group_id=tpg.id
         join t_pay_company tpc on tpf.company_id=tpc.id
-        where tpf.deleted=0 and tpt.deleted=0 and tpg.deleted=0 and tpc.deleted=0 and tpf.uid=#{userId} ORDER BY tpf.create_time desc limit #{page},#{size}
+        where tpf.deleted=0 and tpt.deleted=0 and tpg.deleted=0 and tpc.deleted=0 and tpf.uid=#{userId} limit #{page},#{size}
     </select>
 
 

@@ -15,21 +15,20 @@ import java.io.Serializable;
 public class PropertyRelationVO implements Serializable {
     @ApiModelProperty("房屋")
     private String housing;
-    @ApiModelProperty("业主名称模糊查询")
+    @ApiModelProperty("和业主关系")
     private String relation;
     @ApiModelProperty("家属名称")
     private String memberName;
-//    @ApiModelProperty("家属名称")
-//    private String memberName;
-//    @ApiModelProperty("家属名称")
-//    private String memberName;
-
+    @ApiModelProperty("家属电话")
+    private String mobile;
+    @ApiModelProperty("家属身份证")
+    private String idCard;
+    @ApiModelProperty("业主")
+    private String owner;
     @ApiModelProperty("业主名称")
     private String ownerName;
-    @ApiModelProperty("房屋id")
-    private String houseId;
-    @ApiModelProperty("楼栋id")
-    private String buildingId;
-    @ApiModelProperty("单元id")
-    private String unitId;
+    @ApiModelProperty("业主电话")
+    private String ownerMobile;
+    @ApiModelProperty("业主身份证")
+    private String ownerIdCard;
 }

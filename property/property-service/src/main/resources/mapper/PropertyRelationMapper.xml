@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.PropertyRelationMapper">
+    <sql id="Query">
+        and thm.deleted=0 and tu.deleted=0 and tuh.deleted=0 and th.deleted=0 and thm.community_id=#{query.communityId}
+        <if test="query.memberName!=null and query.memberName!=''">
+             and thm.name like concat('%',#{query.memberName},'%')
+        </if>
+        <if test="query.ownerName!=null and query.ownerName!=''">
+            and th.name like concat('%',#{query.ownerName},'%')
+        </if>
+        <if test="query.houseId!=null and query.houseId>0">
+            and th.id=#{query.houseId}
+        </if>
+        <if test="query.buildingId!=null and query.buildingId>0">
+            and th.id=#{query.buildingId}
+        </if>
+        <if test="query.unitId!=null and query.unitId>0">
+            and th.id=#{query.unitId}
+        </if>
+    </sql>
+
+    <select id="list" resultMap="PropertyRelationMap">
+        SELECT CONCAT(th.building,'-',th.unit,'-',th.floor,'-',th.door) as housing,
+        thm.name as memberName,thm.mobile as mobile,thm.id_card as idCard,thm.relation as relation,
+        tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile
+        FROM t_house_member thm
+        left join t_user tu on tu.uid=thm.householder_id
+        JOIN t_user_house tuh on tu.uid=tuh.uid=tu.uid
+        join t_house th on tuh.house_id=th.id
+        <include refid="Query"></include>
+        limit #{page},#{size}
+    </select>
+    <select id="getTotal" resultType="long">
+        SELECT count(*)
+        FROM t_house_member thm
+        left join t_user tu on tu.uid=thm.householder_id
+        JOIN t_user_house tuh on tu.uid=tuh.uid=tu.uid
+        join t_house th on tuh.house_id=th.id
+        <include refid="Query"></include>
+    </select>
+    <select id="getHouseId" resultMap="HouseTypeMap">
+        select t.id as id,t.number as name from t_house t where t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
+    </select>
+    <select id="getBuildingId" resultMap="HouseTypeMap">
+        select t.id as id,t.building as name from t_house t where t.community_id=#{query.communityId} and t.building like concat("%",#{query.name},"%") limit #{page},#{size}
+    </select>
+    <select id="getUnitId" resultMap="HouseTypeMap">
+        select t.id as id,t.unit as name from t_house t where t.community_id=#{query.communityId} and t.unit like concat("%",#{query.name},"%") limit #{page},#{size}
+    </select>
+
+
+    <resultMap id="PropertyRelationMap" type="com.jsy.community.vo.PropertyRelationVO">
+        <result property="housing" column="housing"/>
+        <result property="memberName" column="memberName"/>
+        <result property="mobile" column="mobile"/>
+        <result property="idCard" column="idCard"/>
+        <result property="relation" column="relation"/>
+        <result property="ownerName" column="ownerName"/>
+        <result property="ownerIdCard" column="ownerIdCard"/>
+        <result property="ownerMobile" column="ownerMobile"/>
+    </resultMap>
+    <resultMap id="HouseTypeMap" type="com.jsy.community.vo.HouseTypeVo">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+</mapper>
