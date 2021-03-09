@@ -10,7 +10,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PayTypeEntity;
 import com.jsy.community.qo.livingpayment.PayCompanyQO;
 import com.jsy.community.qo.livingpayment.PaymentRecordsQO;
-import com.jsy.community.utils.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.livingpayment.*;
@@ -35,10 +34,6 @@ import java.util.Map;
 @RequestMapping("/livingpaymentquery")
 @ApiJSYController
 public class LivingpaymentQueryController {
-
-    public static void main(String[] args) {
-        System.out.println(OrderNoUtil.getOrder());
-    }
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ILivingpaymentQueryService livingpaymentQueryService;
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

@@ -118,19 +118,19 @@ public class WeChatController {
         return CommonResult.ok(object);
     }
 //    @GetMapping("ip")
-//    public String getClientIpAddress(HttpServletRequest request) {
-//        String clientIp = request.getHeader("x-forwarded-for");
-//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-//            clientIp = request.getHeader("Proxy-Client-IP");
-//        }
-//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-//            clientIp = request.getHeader("WL-Proxy-Client-IP");
-//        }
-//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-//            clientIp = request.getRemoteAddr();
-//        }
-//        return clientIp;
-//    }
+    public String getClientIpAddress(HttpServletRequest request) {
+        String clientIp = request.getHeader("x-forwarded-for");
+        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getHeader("Proxy-Client-IP");
+        }
+        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getRemoteAddr();
+        }
+        return clientIp;
+    }
 
     /**
      * @Description: H5下单并返回支付连接
@@ -140,10 +140,11 @@ public class WeChatController {
      * @return:
      */
     @PostMapping("/wxPayH5")
-    public CommonResult wxPayH5(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+    public CommonResult wxPayH5(HttpServletRequest request,@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         Map<Object, Object> map = new LinkedHashMap<>();
 
+        System.out.println(getClientIpAddress(request));
         map.put("appid", WechatConfig.APPID);
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description",weChatPayQO.getDescription());
