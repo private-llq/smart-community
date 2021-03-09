@@ -30,7 +30,7 @@ public class MinioUtils {
 	//ACCESS_KEY
 	private static final String ACCESSKEY = "minio";
 	//SECRET_KEY
-	private static final String SECRETKET = "minioadmin";
+	private static final String SECRETKET = "minimini";
 	//存储桶名称
 	private static String BUCKETNAME = null;
 
