@@ -3,6 +3,7 @@ package com.jsy.community.utils;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.qo.RealnameBlinkInitQO;
 import com.jsy.community.qo.RealnameBlinkQueryQO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -17,6 +18,7 @@ import java.util.UUID;
  * @description 实名认证
  * @since 2020-12-11 15:57
  **/
+@Slf4j
 public class RealnameAuthUtils {
 	
 	/**
@@ -78,7 +80,9 @@ public class RealnameAuthUtils {
 		try {
 			HttpResponse response = HttpUtils.doPost(host, path, method, headers, querys, bodyMap);
 			result = JSONObject.parseObject(EntityUtils.toString(response.getEntity()));
-			System.out.println(result);
+			if(result == null){
+				log.error("实人认证三要素 - 前置接口 三方服务使用次数耗尽");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -109,7 +113,9 @@ public class RealnameAuthUtils {
 		try {
 			HttpResponse response = HttpUtils.doPost(host, path, method, headers, querys, bodyMap);
 			result = JSONObject.parseObject(EntityUtils.toString(response.getEntity()));
-			System.out.println(result);
+			if(result == null){
+				log.error("实人认证三要素 - 获取认证结果 三方服务使用次数耗尽");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
