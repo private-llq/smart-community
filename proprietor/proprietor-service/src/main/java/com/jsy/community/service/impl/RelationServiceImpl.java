@@ -70,7 +70,7 @@ public class RelationServiceImpl implements IRelationService {
         houseMemberEntity.setMobile(relationQo.getMobile());
         houseMemberEntity.setRelation(relationQo.getRelation());
         houseMemberEntity.setSex(relationQo.getSex());
-        houseMemberEntity.setPersonType(relationQo.getPersonType());
+        houseMemberEntity.setPersonType(1);
         houseMemberMapper.insert(houseMemberEntity);
         //添加车辆信息
         List<RelationCarsQo> cars = relationQo.getCars();

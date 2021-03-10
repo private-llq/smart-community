@@ -540,7 +540,16 @@ public interface BusinessEnum {
 		
 		public static final List<Map<String, Object>> relationshipList = new ArrayList<>();
 		public static final Map<Integer, String> relationshipMap = new HashMap<>();
-		
+
+		public static String getCode(Integer code){
+			RelationshipEnum[] values = RelationshipEnum.values();
+			for(RelationshipEnum c : values){
+				if( c.code.equals(code) ){
+					return c.name;
+				}
+			}
+			return RELATIVES.name;
+		}
 		static {
 			for (RelationshipEnum relationshipEnum : RelationshipEnum.values()) {
 				HashMap<String, Object> map = new HashMap<>();

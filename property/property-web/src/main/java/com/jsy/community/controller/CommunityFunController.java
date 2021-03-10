@@ -69,7 +69,7 @@ public class CommunityFunController {
             return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
         }
         String upload = MinioUtils.upload(file, "smallimge");
-        return  CommonResult.ok(upload);
+        return  CommonResult.ok(upload,"上传成功");
     }
 
     @ApiOperation("新增封面图片")
@@ -82,7 +82,7 @@ public class CommunityFunController {
             return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
         }
         String upload = MinioUtils.upload(file, "coverimge");
-        return  CommonResult.ok(upload);
+        return  CommonResult.ok(upload,"上传成功");
     }
 
     @ApiOperation("新增内容图片")
@@ -95,7 +95,7 @@ public class CommunityFunController {
             return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
         }
         String upload = MinioUtils.upload(file, "contentimge");
-        return  CommonResult.ok(upload);
+        return  CommonResult.ok(upload,"上传成功");
     }
 
     @ApiOperation("修改")

@@ -101,7 +101,7 @@ public class ComplainController {
             filePath.append(s);
             filePath.append(",");
         }
-        return CommonResult.ok(filePath);
+        return CommonResult.ok(filePath,"上传成功");
     }
 
 

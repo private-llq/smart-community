@@ -95,7 +95,7 @@ public class RelationController {
             return CommonResult.error("请上传图片！可用后缀"+Arrays.toString(img));
         }
         String upload = MinioUtils.upload(file, "wocao");
-        return CommonResult.ok(upload);
+        return CommonResult.ok(upload,"上传成功");
     }
     @ApiOperation("查询一个家属详情")
     @GetMapping("/selectUserRelationDetails")

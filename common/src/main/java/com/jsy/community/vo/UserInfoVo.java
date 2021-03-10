@@ -2,8 +2,6 @@ package com.jsy.community.vo;
 
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserHouseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,9 +18,12 @@ import java.util.List;
 @Data
 @ApiModel("业主个人信息")
 public class UserInfoVo implements Serializable {
-//	@ApiModelProperty("ID")
-//	private Long id;
-	
+	@ApiModelProperty("ID")
+	private Long weChatId;
+
+	@ApiModelProperty("是否绑定手机1已绑定，0未绑定")
+	private Integer isBindMobile;
+
 	@ApiModelProperty("业主ID")
 	private String uid;
 

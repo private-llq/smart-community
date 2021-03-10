@@ -15,8 +15,8 @@ import java.io.Serializable;
 public class PropertyRelationQO implements Serializable {
     @ApiModelProperty("社区id")
     private Long communityId;
-    @ApiModelProperty("家属名称模糊查询")
-    private String memberName;
+    @ApiModelProperty("租户或者家属名称模糊查询")
+    private String name;
     @ApiModelProperty("业主名称模糊查询")
     private String ownerName;
     @ApiModelProperty("房屋id")
