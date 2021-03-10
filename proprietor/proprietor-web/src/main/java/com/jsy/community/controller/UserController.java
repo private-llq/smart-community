@@ -187,7 +187,7 @@ public class UserController {
     @PostMapping("uploadFaceAvatar")
     public CommonResult<String> uploadFaceAvatar(MultipartFile faceAvatar) {
         PicUtil.imageQualified(faceAvatar);
-        return CommonResult.ok(MinioUtils.upload(faceAvatar, BusinessConst.FAVE_AVATAR_BUCKET_NAME));
+        return CommonResult.ok(MinioUtils.upload(faceAvatar, BusinessConst.FAVE_AVATAR_BUCKET_NAME), "上传成功!");
     }
 
     /**
@@ -201,7 +201,7 @@ public class UserController {
     public CommonResult<UserInfoVo> proprietorQuery(@RequestParam Long houseId) {
         String userId = UserUtils.getUserId();
         UserInfoVo userInfoVo = userService.proprietorQuery(userId, houseId);
-        return CommonResult.ok(userInfoVo);
+        return CommonResult.ok(userInfoVo, "查询成功!");
     }
 
     /**

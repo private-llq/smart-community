@@ -28,9 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author 公共
@@ -92,8 +90,13 @@ public class CommonController {
      * @author YuLF
      * @since  2021/3/9 16:58
      */
+    @Login
+    @ApiOperation("App全文搜索")
     @GetMapping("/search")
     public CommonResult<List<JSONObject>> search(@RequestParam( required = false, defaultValue = "10") Integer size, @RequestParam String text)  {
+        if( Objects.nonNull(text) && text.length() > BusinessConst.HOT_KEY_MAX_NUM  ){
+            throw new JSYException(" 搜索文本太长了! ");
+        }
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(BusinessConst.FULL_TEXT_SEARCH_INDEX);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -117,9 +120,28 @@ public class CommonController {
             String sourceAsString = hit.getSourceAsString();
             list.add(JSON.parseObject(sourceAsString, JSONObject.class));
         }
-        //搜索词添加至
+        //搜索词添加至Redis热词排行里面
+        commonService.addFullTextSearchHotKey( text );
         return CommonResult.ok(list);
     }
+
+    /**
+     * @author YuLF
+     * @since  2021/3/10 14:46
+     */
+    @Login
+    @ApiOperation("App全文搜索热词推荐 热搜榜")
+    @GetMapping("/hotKey")
+    public Set<Object> getHotKey(@RequestParam( required = false, defaultValue = "10")Integer num ){
+        if( num < 1 || num > BusinessConst.HOT_KEY_MAX_NUM){
+            num = 20;
+        }
+        return commonService.getFullTextSearchHotKey(num);
+    }
+
+
+
+
 
 
 

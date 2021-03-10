@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FullTextSearchEntity;
@@ -22,6 +23,8 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.integration.transformer.MessageTransformingHandler;
 
 import javax.annotation.Resource;
@@ -47,14 +50,14 @@ public class CommonServiceImpl implements ICommonService {
     private RegionMapper regionMapper;
 
     @Resource
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
     
     @Autowired
     private WeatherUtils weatherUtils;
 
     @Override
     public void checkVerifyCode(String account, String code) {
-        String oldCode = redisTemplate.opsForValue().get("vCode:" + account);
+        Object oldCode = redisTemplate.opsForValue().get("vCode:" + account);
         if (oldCode == null) {
             throw new ProprietorException("验证码已失效");
         }
@@ -382,6 +385,8 @@ public class CommonServiceImpl implements ICommonService {
     /**
      * 此方法 不会应用于 业务，
      * 全文搜索 首次导入数据库 所有数据
+     * @author YuLF
+     * @since  2021/2/7 14:54
      * @return      返回自定义结构好的 数据
      */
     @Override
@@ -419,6 +424,74 @@ public class CommonServiceImpl implements ICommonService {
             }
         });
         return list;
+    }
+
+
+    /**
+     * 全文搜索 添加热词
+     * @author YuLF
+     * @since  2021/3/10 14:34
+     */
+    @Override
+    public void addFullTextSearchHotKey(String hotKey) {
+        if( Objects.nonNull(hotKey) ){
+            String hotKeyPrefix = BusinessConst.HOT_KEY_PREFIX;
+            ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+            //获得有序集合中key元素的索引index
+            Long index = zSetOperations.rank(hotKeyPrefix, hotKey);
+            if ( Objects.isNull(index) ) {
+                //添加缓存,默认排序值 1
+                zSetOperations.add(hotKeyPrefix, hotKey, 1.0);
+            } else {
+                //已存在 该热词 如果key已存在,则获取排序值并且+1
+                int score = Objects.requireNonNull(zSetOperations.score(hotKeyPrefix, hotKey)).intValue();
+                zSetOperations.incrementScore(hotKeyPrefix, hotKey, 1);
+            }
+            ValueOperations<String, Object> stringObjectValueOperations = redisTemplate.opsForValue();
+            //记录存入 更新存入时间
+            stringObjectValueOperations.getAndSet(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + hotKey, System.currentTimeMillis() + "");
+        }
+
+    }
+
+    /**
+     * 全文搜索热词清理
+     * 超过hotKeyActiveDay天的都得清理掉
+     * @author YuLF
+     * @since  2021/3/10 15:46
+     */
+    @Override
+    public void cleanHotKey(Integer hotKeyActiveDay) {
+        long dayMillisecond = (hotKeyActiveDay * 86400000);
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        Long now = System.currentTimeMillis();
+        ZSetOperations<String, Object> zSet = redisTemplate.opsForZSet();
+        Set<Object> allHotKey = zSet.reverseRange(BusinessConst.HOT_KEY_PREFIX, 0, Integer.MAX_VALUE);
+        if( Objects.isNull(allHotKey) ){
+            return;
+        }
+        allHotKey.forEach( hotKey -> {
+            String word = String.valueOf(hotKey);
+            Long wordTime = Long.valueOf(String.valueOf(valueOperations.get(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + word)));
+            if ((now - wordTime) > dayMillisecond) {
+                zSet.remove(BusinessConst.HOT_KEY_PREFIX, word);
+                valueOperations.getOperations().delete(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + word);
+            }
+        });
+    }
+
+    /**
+     * 全文搜索 获取热词
+     * @author YuLF
+     * @since  2021/3/10 14:55
+     * @Param  num      获取热词数量
+     * @return  返回热词集合
+     */
+    @Override
+    public Set<Object> getFullTextSearchHotKey(Integer num) {
+        //获取从开始到结束的范围内的元素，其中分数介于排序集“高->低”的最小值和最大值之间。
+        return redisTemplate.opsForZSet()
+                .reverseRangeByScore(BusinessConst.HOT_KEY_PREFIX, 0, Integer.MAX_VALUE, 0, num);
     }
 
 

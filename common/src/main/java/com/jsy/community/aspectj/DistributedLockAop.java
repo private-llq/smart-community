@@ -49,7 +49,7 @@ public class DistributedLockAop extends BaseAop {
         try {
             redissonClient = getRedissonClient();
             // 获取锁
-            lock = this.redissonClient.getLock("SingleInstanceLock:"+key);
+            lock = redissonClient.getLock("SingleInstanceLock:"+key);
             // 加锁 最多等待timout秒 lockTime秒后自动解锁
             boolean lockSuccess = lock.tryLock(timout, lockTime, TimeUnit.SECONDS);
             if(lockSuccess){

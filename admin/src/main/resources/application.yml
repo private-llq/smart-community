@@ -61,6 +61,7 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 jsy:
+  enable-dev-sms: true
   shiro:
     redis: false
   jwt:

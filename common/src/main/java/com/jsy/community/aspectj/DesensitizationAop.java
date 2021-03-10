@@ -1,6 +1,5 @@
 package com.jsy.community.aspectj;
 
-import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.Desensitization;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.vo.CommonResult;
@@ -64,7 +63,7 @@ public class DesensitizationAop extends BaseAop {
             List<?> list = (List<?>) proceed;
             convert(list, fields, type);
         } else {
-            //Object类型
+            //Bean类型
             resolverList(proceed, fields, type);
         }
         //加壳
