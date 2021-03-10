@@ -38,7 +38,7 @@ public class ConsoleLogAspect {
 	@Autowired
 	private UserUtils userUtils;
 	
-	private double mark;
+	private static ThreadLocal<Double> mark = new ThreadLocal<>();
 	
 	/**
 	 * 定义切入点，切入点为com.jsy.community下的函数
@@ -132,7 +132,8 @@ public class ConsoleLogAspect {
 					}
 				}
 			}
-			mark = System.currentTimeMillis();
+			double start = System.currentTimeMillis();
+			mark.set(start);
 		}
 	}
 	
@@ -149,7 +150,7 @@ public class ConsoleLogAspect {
 		// 处理完请求，返回内容
 //		logger.info("返回结果 : " + ret);
 		double end = System.currentTimeMillis();
-		//long runTime = end - mark;
-		logger.info("总耗时 : " + (end-mark)/1000+"s");
+		Double start = mark.get();
+		logger.info("总耗时 : " + (end-start)/1000+"s");
 	}
 }
