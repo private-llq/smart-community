@@ -45,13 +45,9 @@ public class UserEntity extends BaseEntity {
 	private Integer sex;
 	
 	@ApiModelProperty("真实姓名")
-	@NotBlank(groups = {ProprietorRegister.class}, message = "姓名未填写!")
-	@Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
 	private String realName;
 	
 	@ApiModelProperty("身份证")
-	@NotBlank(groups = {ProprietorRegister.class}, message = "身份证号码未输入!")
-	@Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "请输入一个正确的身份证号码!")
 	private String idCard;
 	
 	@ApiModelProperty("是否实名认证")
@@ -87,6 +83,15 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("证件照片(反面)")
 	private String idCardPicBack;
+
+	@ApiModelProperty("微信")
+	private String wechat;
+
+	@ApiModelProperty("腾讯qq")
+	private String qq;
+
+	@ApiModelProperty("联系邮箱")
+	private String email;
 
 	@ApiModelProperty("车辆信息")
 	@TableField( exist = false )

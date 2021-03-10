@@ -596,7 +596,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserInfoVo userInfo = userMapper.selectUserNameAndHouseAddr(uid);
         //2.拿到房屋地址组成的字符串 如两江新区幸福广场天王星B栋1801 和 房屋所在社区id
         UserInfoVo userInfoVo = userMapper.selectHouseAddr(houseId);
-        BeanUtils.copyProperties(userInfoVo, userInfo);
+        if( Objects.nonNull(userInfoVo) ){
+            BeanUtils.copyProperties(userInfoVo, userInfo);
+        }
         List<HouseMemberEntity> houseMemberEntities = relationService.selectID(uid, houseId);
         userInfoVo.setProprietorMembers(houseMemberEntities);
         return userInfoVo;

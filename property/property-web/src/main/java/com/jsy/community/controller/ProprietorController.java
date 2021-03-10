@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.api.IHouseService;
@@ -14,6 +15,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.util.ProprietorExcelCommander;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseVo;
@@ -230,19 +232,7 @@ public class ProprietorController {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "只支持excel文件!");
         }
     }
-    /**
-     * TODO  Seata全局事务处理
-     * 根据业主id 删除业主信息、业主关联的房屋、业主的家庭成员、业主的车辆信息
-     * @return          返回删除是否成功
-     */
-    @DeleteMapping()
-    @ApiOperation("删除业主信息")
-    public CommonResult<Boolean> del(@RequestParam Long uid){
-        /*
-          iProprietorService.del(uid);
-         */
-        return CommonResult.ok();
-    }
+
 
     /**
      * 分页查询业主信息
@@ -250,7 +240,6 @@ public class ProprietorController {
      * @return                    返回删除是否成功
      */
     @PostMapping()
-    @Desensitization(type = {DesensitizationType.ID_CARD, DesensitizationType.PHONE}, field = {"idCard", "mobile"})
     @ApiOperation("分页查询业主信息")
     public CommonResult<List<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> baseQo){
         //1.验证分页 查询参数
@@ -259,17 +248,37 @@ public class ProprietorController {
         return CommonResult.ok(iProprietorService.query(baseQo));
     }
 
-    /**
-     * 修改业主信息
-     * @param qo        参数实体
-     * @return                    返回删除是否成功
-     */
+
+    @Login
     @PutMapping()
-    @ApiOperation("修改业主信息")
+    @ApiOperation("更新业主信息")
     public CommonResult<Boolean> update(@RequestBody ProprietorQO qo){
-        //效验id
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyUpdateValid.class);
-        return iProprietorService.update(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return iProprietorService.update(qo, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    }
+
+
+    @Login
+    @PostMapping("/addUser")
+    @ApiOperation("添加业主信息")
+    public CommonResult<Boolean> addUser(@RequestBody ProprietorQO qo){
+        ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyAddValid.class);
+        iProprietorService.addUser(qo, UserUtils.getUserId());
+        return CommonResult.ok("新增成功!");
+    }
+
+
+    /**
+     * 删除业主的房屋认证信息
+     * 实则 只是去除 用户 和 房屋信息的信息解绑
+     */
+    @Login
+    @DeleteMapping()
+    @ApiOperation("删除业主信息")
+    public CommonResult<Boolean> del(@RequestParam Long hid, Long cid){
+        //TODO : 验证物业人员是否具有管理这个社区的权限
+        Boolean isSuccess = iProprietorService.unbindHouse(hid, cid);
+        return isSuccess ? CommonResult.ok("删除成功!") : CommonResult.error("删除失败!");
     }
 
 

@@ -10,11 +10,15 @@ public interface BusinessConst {
 	/**
 	 * 汉族最小姓名长度
 	 */
-	Integer MIN_REAL_NAME_LENGTH = 2;
+	Integer MIN_CHINESE_REAL_NAME_LENGTH = 2;
 	/**
 	 * 汉族最大姓名长度
 	 */
-	Integer MAX_REAL_NAME_LENGTH = 6;
+	Integer MAX_CHINESE_REAL_NAME_LENGTH = 6;
+	/**
+	 * 姓名最大长度
+	 */
+	Integer MAX_REAL_NAME_LENGTH = 20;
 
 	//============================ 用户性别 =============================
 	/**

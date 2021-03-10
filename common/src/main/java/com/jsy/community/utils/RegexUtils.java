@@ -12,6 +12,16 @@ import java.util.regex.Pattern;
 public class RegexUtils {
 
 	/**
+	 * QQ号验证
+	 */
+	public static final String REGEX_QQ = "[1-9][0-9]{4,14}";
+
+	/**
+	 * 微信号验证
+	 */
+	public static final String  REGEX_WE_CHAT = "^[a-zA-Z0-9_-]{5,19}$";
+
+	/**
 	 * 正则表达式：验证只能输入特定的字符
 	 */
 	public static final String REGEX_DATE = "^[年|月|周|日]{1}";
@@ -20,12 +30,11 @@ public class RegexUtils {
 	/**
 	 * 年代正则表达式：匹配用户选择的是否是1930~当前年
 	 */
-	//public static final String REGEX_YEAR = String.format("^(19[3-9]\\d|20[01]\\d|%s)$", new SimpleDateFormat("yyyy").format(new Date()));
 	public static final String REGEX_YEAR = "^[0-9]{4}";
 	/**
 	 * 正则表达式：验证数字性别、参数只能 0-2
 	 */
-	public static final String REGEX_GENDER = "^[0-2]{1}";
+	public static final String REGEX_GENDER = "^[0-2]$";
 
 	/**
 	 * 正则表达式：验证中国姓名
@@ -75,8 +84,6 @@ public class RegexUtils {
 	/**
 	 * 正则表达式：验证URL
 	 */
-	//public static final String REGEX_URL = "http(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";
-	//public static final String REGEX_URL = "(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]";
 	public static final String REGEX_URL = "^http(s)?://.*$";
 
 	/**
@@ -150,7 +157,7 @@ public class RegexUtils {
 	 * @param idCard 身份证号
 	 * @return 校验通过返回true，否则返回false
 	 */
-	public static boolean isIDCard(String idCard) {
+	public static boolean isIdCard(String idCard) {
 		return Pattern.matches(REGEX_ID_CARD, idCard);
 	}
 	
@@ -180,7 +187,7 @@ public class RegexUtils {
 	 * @param ipAddr IP地址
 	 * @return 校验通过返回true，否则返回false
 	 */
-	public static boolean isIPAddr(String ipAddr) {
+	public static boolean isIpAddr(String ipAddr) {
 		return Pattern.matches(REGEX_IP_ADDR, ipAddr);
 	}
 }

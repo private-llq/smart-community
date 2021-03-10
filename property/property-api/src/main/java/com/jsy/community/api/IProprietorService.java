@@ -20,17 +20,20 @@ import java.util.List;
 public interface IProprietorService extends IService<UserEntity> {
 
     /**
-     * 根据ID删除 业主的信息、关联房屋信息、关联车辆信息、关联房屋认证信息
-     * @param id    业主ID
+     * 解绑这个房屋Id关联的业主
+     * @param hid    房屋id
+     * @param cid    社区ID
+     * @return       返回删除影响行数
      */
-    void del(Long id);
+    Boolean unbindHouse(Long hid, Long cid);
 
     /**
      * 通过传入的参数更新业主信息
      * @param proprietorQo   更新业主信息参数
+     * @param adminUid       管理员Uid
      * @return              返回是否更新成功
      */
-    Boolean update(ProprietorQO proprietorQo);
+    Boolean update(ProprietorQO proprietorQo, String adminUid);
 
     /**
      * 通过分页参数查询 业主信息
@@ -65,4 +68,12 @@ public interface IProprietorService extends IService<UserEntity> {
      * @return              返回影响行数
      */
     Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId);
+
+
+    /**
+     * [物业]添加业主信息
+     * @param qo            请求参数
+     * @param adminUid      物业操作用户uid
+     */
+    void addUser(ProprietorQO qo, String adminUid);
 }

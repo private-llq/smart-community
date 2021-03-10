@@ -10,6 +10,7 @@ import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.ProprietorVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -109,4 +110,92 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
      * @return                  返回影响行数
      */
     Integer saveUserMemberBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
+
+
+    /**
+     * 检查已认证房屋是否存在
+     * @param houseId       房屋id
+     * @return              返回查询行数
+     */
+    @Select("select count(house_id) from t_user_house where house_id = #{houseId} and check_status = 1 and deleted = 0 ")
+    Integer checkHouse(Long houseId);
+
+
+    /**
+     * 通过证件号码查询 用户uid
+     * @param idCard     用户证件号码
+     * @return           返回uid
+     */
+    @Select("select uid from t_user where id_card = #{idCard} and deleted = 0")
+    String queryUserByIdCard(String idCard);
+
+
+    /**
+     * 保存用户信息
+     * @param qo    用户信息参数
+     */
+    void saveUser(ProprietorQO qo);
+
+
+    /**
+     * 插入管理员 对用户的操作日志
+     * @param id            数据id
+     * @param createPerson  创建人
+     * @param createTime    创建时间
+     * @param updatePerson  更新人
+     * @param updateTime    更新时间
+     * @param uid           用户id
+     */
+    void insertOperationLog( Long id, String createPerson, String createTime, String updatePerson, String updateTime, String uid );
+
+
+    /**
+     * 通过管理员uid查出 管理员姓名
+     * @param adminUid  管理员uid
+     * @return          返回管理员姓名
+     */
+    String queryAdminNameByUid(String adminUid);
+
+
+    /**
+     * 通过房屋id 判断是否存在 房屋
+     * @param houseId       房屋id
+     * @param communityId   社区id
+     * @return              返回结果行数
+     */
+    Integer existHouse(Long communityId, Long houseId);
+
+    /**
+     * 根据id 拿到用户uid
+     * @param id     数据id
+     * @return       返回uid
+     */
+    @Select("select uid from t_user where id = #{id} and deleted = 0")
+    String selectUidById(Long id);
+
+
+    /**
+     * [物业]解绑房屋信息
+     * @param houseId       房屋id
+     * @param communityId   社区id
+     * @return              返回影响行数
+     */
+    @Update("update t_user_house set deleted = 1 where house_id = #{houseId} and community_id = #{communityId} and deleted = 0")
+    Integer unbindHouse(Long houseId, Long communityId);
+
+    /**
+     * 根据uid 查询 用户 当前记录的创建时间
+     * @param uid       用户id
+     * @return          返回 创建人 / 时间
+     */
+    @Select("select CONCAT(create_person,' / ',create_time) from t_admin_user_log where uid = #{uid} ORDER BY create_time desc limit 1")
+    String queryCreateDateByUid(String uid);
+
+    /**
+     * 根据uid 查询 用户 当前记录的更新时间
+     * @param uid       用户id
+     * @return          返回 更新人 / 时间
+     */
+    @Select("select CONCAT(update_person,' / ',update_time) from t_admin_user_log where uid = #{uid} ORDER BY update_time desc limit 1")
+    String queryUpdateDateByUid(String uid);
 }

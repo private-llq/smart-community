@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,10 +64,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
 
 
 
-    private String getDateTimeAsString(LocalDateTime localDateTime) {
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-      return localDateTime.format(formatter);
-    }
+
 
 
 

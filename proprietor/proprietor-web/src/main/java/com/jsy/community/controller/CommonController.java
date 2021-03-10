@@ -3,15 +3,14 @@ package com.jsy.community.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.config.web.ElasticsearchConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.CommunityType;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -21,7 +20,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +49,10 @@ public class CommonController {
     @Resource
     private RestHighLevelClient elasticsearchClient;
 
+    /**
+     * @author YuLF
+     * @since  2021/11/9 17:58
+     */
     @ApiOperation("社区区域查询接口")
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
@@ -82,21 +85,37 @@ public class CommonController {
     }
 
 
+    /**
+     * app 全文搜索
+     * @param size  搜索离text最相近条数
+     * @param text  搜索文本
+     * @author YuLF
+     * @since  2021/11/9 17:58
+     */
     @GetMapping("/search")
-    public CommonResult<List<FullTextSearchEntity>> search(@RequestParam Integer size, @RequestParam String text) throws IOException {
+    public CommonResult<List<JSONObject>> search(@RequestParam Integer size, @RequestParam String text)  {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(BusinessConst.FULL_TEXT_SEARCH_INDEX);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.matchQuery("title", text));
+        //排除某些字段
+        String[] excludes = {"esId","searchTitle"};
+        String[] includes = {"*"};
+        searchSourceBuilder.fetchSource(includes, excludes);
+        //查询条件
+        searchSourceBuilder.query(QueryBuilders.matchQuery("searchTitle", text));
         searchSourceBuilder.size(size);
         searchRequest.source(searchSourceBuilder);
-        SearchResponse searchResponse = elasticsearchClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        SearchResponse searchResponse;
+        try {
+            searchResponse = elasticsearchClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        } catch (IOException e) {
+            throw new JSYException("没有找到任何数据!");
+        }
         SearchHit[] hits = searchResponse.getHits().getHits();
-        List<FullTextSearchEntity> list = new ArrayList<>(hits.length);
+        List<JSONObject> list = new ArrayList<>(hits.length);
         for( SearchHit hit : hits){
             String sourceAsString = hit.getSourceAsString();
-            FullTextSearchEntity fullTextSearchEntity = JSON.parseObject(sourceAsString, FullTextSearchEntity.class);
-            list.add(fullTextSearchEntity);
+            list.add(JSON.parseObject(sourceAsString, JSONObject.class));
         }
         return CommonResult.ok(list);
     }
@@ -112,12 +131,14 @@ public class CommonController {
         }
         try {
             //调用 用查询类型ID找到的 对应的查询方法
-            Method queryMethod = null;
-            Object invoke = null;
-            if(BusinessEnum.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType) == 2){//不带参
+            Method queryMethod;
+            Object invoke;
+            //不带参
+            if(BusinessEnum.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType) == 2){
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName);
                 invoke = queryMethod.invoke(commonService);
-            }else{//带参
+            }else{
+                //带参
                 Class paramType = BusinessEnum.RegionQueryTypeEnum.regionQueryClassTypeMap.get(queryType);
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,paramType);
                 if(paramType.equals(Integer.class)){
@@ -156,5 +177,7 @@ public class CommonController {
         JSONObject weather = commonService.getTempWeatherDetails();
         return CommonResult.ok(weather);
     }
+
+
     
 }

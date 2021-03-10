@@ -195,20 +195,15 @@ public class HouseLeaseQO implements Serializable {
     @Length(groups = {SearchLeaseHouse.class}, max = 32, message = "搜索最多32个字符!")
     private String searchText;
 
-    /**
-     * 65不限 66普通住宅 67别墅 68公寓
-     */
+
     @ApiModelProperty(value = "房屋出租类型ID：1不限(默认) 2普通住宅 4别墅 8公寓")
     @FieldValid( groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class,  UpdateWholeLeaseHouse.class}, value = {"1", "2", "4", "8"}, message = "房屋出租类型ID不在可用范围内!")
     @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "未填写出租类型!")
     private Integer houseLeasetypeId;
 
 
-    /**
-     * 69不限 70整租，71合租
-     */
-    @ApiModelProperty(value = "房屋出租方式ID: 1不限(默认) 2整租，4合租 ")
-    @FieldValid( groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class,  UpdateWholeLeaseHouse.class}, value = {"1", "2", "4"}, message = "房屋出租方式ID不在可用范围内!")
+    @ApiModelProperty(value = "房屋出租方式ID: 1不限(默认) 2整租，4合租, 8合租 ")
+    @FieldValid( groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class,  UpdateWholeLeaseHouse.class}, value = {"1", "2", "4", "8"}, message = "房屋出租方式ID不在可用范围内!")
     @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "未填写出租方式!")
     private Integer houseLeasemodeId;
 
