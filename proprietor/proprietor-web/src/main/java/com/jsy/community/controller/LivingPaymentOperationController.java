@@ -121,7 +121,7 @@ public class LivingPaymentOperationController {
             return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
         }
         String upload = MinioUtils.upload(file, "bbbb");
-        return CommonResult.ok(upload);
+        return CommonResult.ok(upload,"上传成功");
     }
 
 }

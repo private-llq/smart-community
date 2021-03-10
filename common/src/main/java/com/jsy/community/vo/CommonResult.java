@@ -40,11 +40,16 @@ public class CommonResult<T> implements Serializable {
 	public static CommonResult<Boolean> ok() {
 		return new CommonResult<>(0, "操作成功", true);
 	}
-	
+
+
 	public static CommonResult<Boolean> error(int code, String message) {
 		return new CommonResult<>(code, message, false);
 	}
-	
+
+	public static <T> CommonResult<T> error(int code, T data) {
+		return new CommonResult<>(code, null, data);
+	}
+
 	public static CommonResult<Boolean> error(JSYError error) {
 		return error(error.getCode(), error.getMessage());
 	}
@@ -52,4 +57,6 @@ public class CommonResult<T> implements Serializable {
 	public static CommonResult<Boolean> error(String message) {
 		return error(ConstError.NORMAL, message);
 	}
+
+
 }

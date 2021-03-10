@@ -13,9 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * 身份证、电话号码、姓名、脱敏
@@ -50,10 +48,22 @@ public class DesensitizationAop extends BaseAop {
             msg = getMegByCommonResult(proceed);
             proceed = getDataByCommonResult(proceed);
         }
+        //Map<String,Object> 类型  数据字段key必须为list
+        if( proceed instanceof Map){
+            @SuppressWarnings("unchecked")
+            Map<String,Object> map = (Map<String,Object>)proceed;
+            Object list = map.get("list");
+            if( Objects.nonNull(list) ){
+                List<Object> objects = castList(list);
+                convert(objects, fields, type);
+            }
+        }
+        //List<Bean> 类型
         if (proceed instanceof List<?>) {
-            List<?> list = (ArrayList<?>) proceed;
-            list.forEach(obj -> resolverList(obj, fields, type));
+            List<?> list = (List<?>) proceed;
+            convert(list, fields, type);
         } else {
+            //Bean类型
             resolverList(proceed, fields, type);
         }
         //加壳
@@ -62,6 +72,20 @@ public class DesensitizationAop extends BaseAop {
         }
         return proceed;
     }
+
+    private List<Object> castList(Object obj)
+    {
+        if(obj instanceof List<?>)
+        {
+            return new ArrayList<>((List<?>) obj);
+        }
+        return null;
+    }
+
+    private void convert(List<?> data, String[] fields, DesensitizationType[] type){
+        data.forEach(obj -> resolverList(obj, fields, type));
+    }
+
 
     private Object getDataByCommonResult(Object proceed) {
         if (proceed instanceof CommonResult) {

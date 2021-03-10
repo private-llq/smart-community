@@ -12,18 +12,16 @@ import java.io.Serializable;
  * @create: 2021-03-09 13:56
  **/
 @Data
-public class PropertyRelationVO implements Serializable {
+public class PropertyTenementVO implements Serializable {
     @ApiModelProperty("房屋")
     private String housing;
-    @ApiModelProperty("和业主关系")
-    private Integer relation;
-    @ApiModelProperty("和业主关系")
-    private String relationName;
-    @ApiModelProperty("家属名称")
-    private String memberName;
-    @ApiModelProperty("家属电话")
+    @ApiModelProperty("租期")
+    private String tenancyTerm;
+    @ApiModelProperty("租户名称")
+    private String tenementName;
+    @ApiModelProperty("租户电话")
     private String mobile;
-    @ApiModelProperty("家属身份证")
+    @ApiModelProperty("租户身份证")
     private String idCard;
     @ApiModelProperty("业主")
     private String owner;

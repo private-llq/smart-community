@@ -82,14 +82,14 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
             return CommonResult.ok(createAuthVoWithToken(userInfoVo));
         }
         if (entity!=null){
-            return CommonResult.error(entity.getId()+"");
+            return CommonResult.ok(createBindMobile(entity.getId()));
         }
         UserThirdPlatformEntity platformEntity = new UserThirdPlatformEntity();
         platformEntity.setThirdPlatformId(openid);
         platformEntity.setThirdPlatformType(2);
         platformEntity.setId(SnowFlake.nextId());
         userThirdPlatformMapper.insert(platformEntity);
-        return CommonResult.error(platformEntity.getId()+"");
+        return CommonResult.ok(createBindMobile(platformEntity.getId()));
     }
     @Override
     @Transactional
@@ -123,9 +123,21 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         Date expireDate = new Date(new Date().getTime() + expire * 1000);
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setExpiredTime(LocalDateTimeUtil.of(expireDate));
+        userInfoVo.setIsBindMobile(1);
         userAuthVo.setUserInfo(userInfoVo);
         String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(userInfoVo), expire, TimeUnit.SECONDS);
         userAuthVo.setToken(token);
+        return userAuthVo;
+    }
+    public UserAuthVo createBindMobile(Long id){
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setExpiredTime(null);
+        UserInfoVo vo = new UserInfoVo();
+        vo.setWeChatId(id);
+        vo.setIsBindMobile(0);
+        userAuthVo.setUserInfo(vo);
+//        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
+        userAuthVo.setToken(null);
         return userAuthVo;
     }
 

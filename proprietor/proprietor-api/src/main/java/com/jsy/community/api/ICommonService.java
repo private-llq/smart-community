@@ -1,12 +1,16 @@
 package com.jsy.community.api;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alipay.api.domain.MedicalSvTpCardHeadInfo;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 公共的
@@ -117,7 +121,7 @@ public interface ICommonService {
 	 * @Date: 2020/12/10
 	**/
 	List<RegionEntity> vagueQueryCity(String searchStr);
-	
+
 	//天气假数据
 	JSONObject getTempWeather();
 	
@@ -144,7 +148,36 @@ public interface ICommonService {
 	
 	/**
 	 * 全文搜索 数据库 数据导入 Elasticsearch
-	 * @return
+	 * @return		返回数据集合
 	 */
 	List<FullTextSearchEntity> fullTextSearchEntities();
+
+
+	/**
+	 * 异步添加app全文搜索热词
+	 * @param hotKey 	用户搜索词
+	 * @author YuLF
+	 * @since  2021/3/10 13:48
+	 */
+	@Async(BusinessConst.PROPRIETOR_ASYNC_POOL)
+	void addFullTextSearchHotKey( String hotKey );
+
+	/**
+	 * 清理全文搜索热词
+	 * @param hotKeyActiveDay 	热词保持活跃天数
+	 * @author YuLF
+	 * @since  2021/3/10 15:45
+	 */
+	@Async(BusinessConst.PROPRIETOR_ASYNC_POOL)
+	void cleanHotKey(Integer hotKeyActiveDay);
+
+	/**
+	 * app全文搜索 热词获取
+	 * @param num 获取热词数量
+	 * @return		返回热词数量
+	 */
+	Set<Object> getFullTextSearchHotKey(Integer num);
+
+
+
 }
