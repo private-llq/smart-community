@@ -2,10 +2,10 @@ package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.api.ICommunityInformService;
 import com.jsy.community.api.IWeChatLoginService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.proprietor.BindingMobileQO;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.utils.WeCharUtil;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class WeChatLoginController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-    private ICommunityInformService communityInformService;
-    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IWeChatLoginService weChatLoginService;
 
 
@@ -47,6 +45,7 @@ public class WeChatLoginController {
 
     @PostMapping("/bindingMobile")
     public CommonResult bindingMobile(@RequestBody BindingMobileQO bindingMobileQO){
+        ValidatorUtils.validateEntity(bindingMobileQO, BindingMobileQO.BindingMobileValidated.class);
         UserAuthVo userAuthVo=weChatLoginService.bindingMobile(bindingMobileQO);
         return CommonResult.ok(userAuthVo);
     }
