@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.community.mapper.UserDataMapper">
+
+
+    <select id="selectUserDataOne" parameterType="com.jsy.community.vo.UserDataVO" resultType="com.jsy.community.vo.UserDataVO">
+        select tu.nickname as nickname,tu.avatar_url as avatarUrl,tu.birthday_time as birthdayTime from t_user tu where tu.uid=#{userId}
+    </select>
+    <update id="updateUserData">
+        update t_user
+        <set>
+            <if test="userDataQO.avatarUrl!=null and userDataQO.avatarUrl!=''">
+                avatar_url=#{userDataQO.avatarUrl},
+            </if>
+            <if test="userDataQO.nickname!=null and userDataQO.nickname!=''">
+                nickname=#{userDataQO.nickname},
+            </if>
+            <if test="userDataQO.birthdayTime!=null">
+                birthday_time=#{userDataQO.birthdayTime},
+            </if>
+        </set>
+        where uid=#{userId}
+    </update>
+
+
+</mapper>

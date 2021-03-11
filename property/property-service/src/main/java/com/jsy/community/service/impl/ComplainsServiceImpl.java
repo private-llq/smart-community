@@ -10,6 +10,7 @@ import com.jsy.community.vo.ComplainVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,6 +35,7 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
     public void feedback(ComplainFeedbackQO complainFeedbackQO) {
         ComplainEntity complainEntity = complainsMapper.selectById(complainFeedbackQO.getId());
         complainEntity.setStatus(2);
+        complainEntity.setComplainTime(LocalDateTime.now());
         complainEntity.setFeedback(complainFeedbackQO.getContent());
         complainsMapper.updateById(complainEntity);
     }

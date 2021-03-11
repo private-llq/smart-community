@@ -2,16 +2,12 @@ package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 
 /**
  * @author ling
@@ -43,6 +39,9 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("性别，0未知，1男，2女")
 	private Integer sex;
+
+	@ApiModelProperty("生日")
+	private LocalDateTime birthdayTime;
 	
 	@ApiModelProperty("真实姓名")
 	private String realName;
