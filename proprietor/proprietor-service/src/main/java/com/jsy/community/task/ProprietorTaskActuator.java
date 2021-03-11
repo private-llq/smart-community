@@ -79,7 +79,7 @@ public class ProprietorTaskActuator {
     @PostConstruct
     public void initSourceConst(){
         informActuator();
-        cleanHotKey();
+        //cleanHotKey();
     }
 
 
