@@ -94,6 +94,16 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 				}
 				if (repairEntity.getStatus() == 2) {
 					repairEntity.setStatusString("已处理");
+					// 对已评价的 获取其评价信息，前端通过其判断是否该订单评价过[评价过的不能再次评价]
+					QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
+					queryWrapper.eq("repair_id", repairEntity.getId());
+					RepairOrderEntity order = repairOrderMapper.selectOne(queryWrapper);
+					if (order!=null) {
+						if (!StringUtils.isEmpty(order.getComment())) {
+							repairEntity.setComment(order.getComment());
+							System.out.println(repairEntity.getComment());
+						}
+					}
 				}
 			}
 			return list;
