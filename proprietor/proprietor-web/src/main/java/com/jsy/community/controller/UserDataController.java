@@ -5,16 +5,18 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserDataService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.proprietor.UserDataQO;
+import com.jsy.community.utils.BadWordUtil2;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserDataVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Arrays;
 
 /**
  * @program: com.jsy.community
@@ -28,10 +30,12 @@ import org.springframework.web.bind.annotation.RestController;
 @ApiJSYController
 public class UserDataController {
 
+    private final String[] img ={"jpg","png","jpeg"};
+
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserDataService userDataService;
 
-    @PostMapping("/selectUserDataOne")
+    @GetMapping("/selectUserDataOne")
     @ApiOperation("查询个人信息")
     @Login
     public CommonResult selectUserDataOne(){
@@ -39,10 +43,25 @@ public class UserDataController {
         UserDataVO userDataVO = userDataService.selectUserDataOne(userId);
         return CommonResult.ok(userDataVO);
     }
-    @PostMapping("/updateUserData")
+    @PostMapping("/addAvatar")
+    @ApiOperation("上传头像")
+    @Login
+    public CommonResult avatarUrl(@RequestParam("file") MultipartFile file){
+        String originalFilename = file.getOriginalFilename();
+        String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        if (!Arrays.asList(img).contains(s)) {
+            return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
+        }
+        String upload = MinioUtils.upload(file, "bbbb");
+        return CommonResult.ok(upload,"上传成功");
+    }
+    @PutMapping("/updateUserData")
     @ApiOperation("修改个人信息")
     @Login
     public CommonResult updateUserData(@RequestBody UserDataQO userDataQO){
+        if (BadWordUtil2.isContaintBadWord(userDataQO.getNickname(),BadWordUtil2.minMatchTYpe)){
+            return CommonResult.error("该名称不可用：名称中存在敏感字！");
+        }
         String userId = UserUtils.getUserId();
         userDataService.updateUserData(userDataQO,userId);
         return CommonResult.ok();
