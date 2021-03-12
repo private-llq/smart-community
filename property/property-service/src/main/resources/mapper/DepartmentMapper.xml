@@ -2,4 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.DepartmentMapper">
 
+    <delete id="deleteDepartmentById">
+        update t_department set deleted = 1 where id = #{departmentId} and community_id = #{communityId} and deleted = 0
+    </delete>
 </mapper>

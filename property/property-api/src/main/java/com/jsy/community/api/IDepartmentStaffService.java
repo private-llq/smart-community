@@ -2,12 +2,15 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.DepartmentStaffEntity;
-import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.DepartmentStaffQO;
 import com.jsy.community.utils.PageInfo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author lihao
@@ -22,7 +25,7 @@ public interface IDepartmentStaffService extends IService<DepartmentStaffEntity>
 	 * @Date 2020/11/30 14:57
 	 * @Param [staffEntity]
 	 **/
-	PageInfo<DepartmentStaffEntity> listDepartmentStaff(Long departmentId, BaseQO<DepartmentStaffEntity> staffEntity);
+	PageInfo<DepartmentStaffEntity> listDepartmentStaff(Long departmentId,Long page,Long size);
 	
 	/**
 	 * @return void
@@ -31,7 +34,7 @@ public interface IDepartmentStaffService extends IService<DepartmentStaffEntity>
 	 * @Date 2020/11/30 16:29
 	 * @Param [staffEntity]
 	 **/
-	void addDepartmentStaff(DepartmentStaffEntity staffEntity);
+	void addDepartmentStaff(DepartmentStaffQO staffEntity);
 	
 	/**
 	 * @return void
@@ -40,14 +43,23 @@ public interface IDepartmentStaffService extends IService<DepartmentStaffEntity>
 	 * @Date 2020/11/30 16:31
 	 * @Param [departmentStaffEntity]
 	 **/
-	void updateDepartmentStaff(DepartmentStaffEntity departmentStaffEntity);
+	void updateDepartmentStaff(DepartmentStaffQO departmentStaffEntity);
 	
 	/**
 	 * @return void
 	 * @Author lihao
-	 * @Description 批量删除员工信息
-	 * @Date 2020/11/30 16:35
-	 * @Param [ids]
+	 * @Description 删除员工信息
+	 * @Date 2021/3/10 14:33
+	 * @Param [id, communityId]
 	 **/
-	void deleteStaffByIds(Integer[] ids);
+	void deleteStaffByIds(Long id, Long communityId);
+	
+	/**
+	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author lihao
+	 * @Description 通过Excel添加通讯录
+	 * @Date 2021/3/11 16:23
+	 * @Param [strings]
+	 **/
+	Map<String, Object> addLinkByExcel(List<String[]> strings);
 }

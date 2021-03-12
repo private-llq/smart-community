@@ -5,7 +5,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IDepartmentStaffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentStaffEntity;
-import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.DepartmentStaffQO;
 import com.jsy.community.utils.POIUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.ValidatorUtils;
@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -28,7 +29,7 @@ import java.util.List;
  * @author lihao
  * @since 2020-11-24
  */
-@Api(tags = "部门联系人控制器")
+@Api(tags = "部门员工控制器")
 @RestController
 @RequestMapping("/staff")
 @ApiJSYController
@@ -38,50 +39,48 @@ public class DepartmentStaffController {
 	private IDepartmentStaffService departmentStaffService;
 	
 	@ApiOperation("查询所有员工信息")
-	@PostMapping("/listDepartmentStaff")
-	public CommonResult<PageInfo<DepartmentStaffEntity>> listDepartmentStaff(@ApiParam("departmentId") @RequestParam Long departmentId,
-	                                                                         @RequestBody BaseQO<DepartmentStaffEntity> staffEntity) {
-		PageInfo<DepartmentStaffEntity> page = departmentStaffService.listDepartmentStaff(departmentId, staffEntity);
-		return CommonResult.ok(page);
+	@GetMapping("/listDepartmentStaff")
+	public CommonResult<PageInfo<DepartmentStaffEntity>> listDepartmentStaff(@ApiParam("部门id") @RequestParam Long departmentId,
+	                                                                         @RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "10") Long size) {
+		PageInfo<DepartmentStaffEntity> pageInfo = departmentStaffService.listDepartmentStaff(departmentId, page, size);
+		return CommonResult.ok(pageInfo);
 	}
 	
 	@ApiOperation("添加员工")
 	@PostMapping("/addDepartmentStaff")
-	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffEntity staffEntity) {
-		ValidatorUtils.validateEntity(staffEntity, DepartmentStaffEntity.addStaffValidate.class);
+	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffQO staffEntity) {
+		ValidatorUtils.validateEntity(staffEntity, DepartmentStaffQO.addStaffValidate.class);
 		departmentStaffService.addDepartmentStaff(staffEntity);
 		return CommonResult.ok();
 	}
 	
 	@ApiOperation("修改员工信息")
-	@PutMapping("/updateDepartmentStaff")
-	public CommonResult updateDepartmentStaff(@RequestBody DepartmentStaffEntity departmentStaffEntity) {
-		ValidatorUtils.validateEntity(departmentStaffEntity, DepartmentStaffEntity.updateStaffValidate.class);
+	@PostMapping("/updateDepartmentStaff")
+	public CommonResult updateDepartmentStaff(@RequestBody DepartmentStaffQO departmentStaffEntity) {
+		ValidatorUtils.validateEntity(departmentStaffEntity, DepartmentStaffQO.updateStaffValidate.class);
+		departmentStaffService.updateDepartmentStaff(departmentStaffEntity);
 		return CommonResult.ok();
 	}
 	
-	@ApiOperation("批量删除员工")
-	@PostMapping("/deleteStaffByIds")
-	public CommonResult deleteStaffByIds(@RequestBody Integer[] ids) {
-		departmentStaffService.deleteStaffByIds(ids);
+	@ApiOperation("删除员工")
+	@GetMapping("/deleteDepartmentStaff")
+	public CommonResult deleteStaffByIds(@ApiParam("员工id") Long id, @ApiParam("社区id") Long communityId) {
+		departmentStaffService.deleteStaffByIds(id, communityId);
 		return CommonResult.ok();
 	}
 	
-	@ApiOperation("测试poi")
-	@PostMapping("/poi")
-	public CommonResult poi(@RequestParam("file") MultipartFile file) {
+	@ApiOperation("通过Excel添加通讯录")
+	@PostMapping("/addLinkByExcel")
+	public CommonResult addLinkByExcel(@RequestParam("file") MultipartFile file) {
 		try {
+			// 获取Excel中的数据，每一行数据封装成一个String[]，将一个工作簿里面的每行数据封装成一个List<String[]>
 			List<String[]> strings = POIUtils.readExcel(file);
-			for (String[] string : strings) {
-				for (String s : string) {
-					System.out.println(s);
-				}
-			}
+			Map<String, Object> map = departmentStaffService.addLinkByExcel(strings);
+			return CommonResult.ok(map);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return CommonResult.error("111");
+			return CommonResult.error("添加失败,请联系管理员");
 		}
-		return null;
 	}
 	
 	

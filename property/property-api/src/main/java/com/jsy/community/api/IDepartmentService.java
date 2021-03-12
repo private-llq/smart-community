@@ -1,7 +1,9 @@
 package com.jsy.community.api;
 
-import com.jsy.community.entity.DepartmentEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.DepartmentEntity;
+import com.jsy.community.qo.DepartmentQO;
+import com.jsy.community.vo.DepartmentVO;
 
 import java.util.List;
 
@@ -16,22 +18,13 @@ import java.util.List;
 public interface IDepartmentService extends IService<DepartmentEntity> {
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.DepartmentEntity>
-	 * @Author lihao
-	 * @Description 查询所有部门
-	 * @Date 2020/11/30 14:19
-	 * @Param []
-	 **/
-	List<DepartmentEntity> listDepartment(Long communityId);
-	
-	/**
 	 * @return void
 	 * @Author lihao
 	 * @Description 新增部门
 	 * @Date 2020/11/30 14:19
 	 * @Param [departmentEntity]
 	 **/
-	void addDepartment(DepartmentEntity departmentEntity);
+	void addDepartment(DepartmentQO departmentEntity);
 	
 	/**
 	 * @return void
@@ -40,7 +33,7 @@ public interface IDepartmentService extends IService<DepartmentEntity> {
 	 * @Date 2020/11/30 14:21
 	 * @Param [departmentEntity]
 	 **/
-	void updateDepartment(DepartmentEntity departmentEntity);
+	void updateDepartment(DepartmentQO departmentEntity);
 	
 	/**
 	 * @return void
@@ -49,5 +42,14 @@ public interface IDepartmentService extends IService<DepartmentEntity> {
 	 * @Date 2020/11/30 14:24
 	 * @Param [id]
 	 **/
-	void deleteDepartment(Long id);
+	void deleteDepartment(Long departmentId,Long communityId);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.vo.DepartmentVO>
+	 * @Author lihao
+	 * @Description 树形结构查询部门信息
+	 * @Date 2021/3/11 17:49
+	 * @Param [communityId]
+	 **/
+	List<DepartmentVO> listDepartment(Long communityId);
 }
