@@ -16,6 +16,8 @@ import com.jsy.community.utils.CommunityType;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -53,8 +55,7 @@ public class CommonController {
      * @author YuLF
      * @since  2021/11/9 17:58
      */
-    @Deprecated
-    @ApiOperation("社区区域查询接口")
+    @ApiOperation("社区区域查询接口 社区~楼层")
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
     @Login
@@ -62,9 +63,9 @@ public class CommonController {
                                      @RequestParam Integer queryType,
                                      @RequestParam(required = false, defaultValue = "1")Integer page,
                                      @RequestParam(required = false, defaultValue = "10")Integer size) {
-        BaseQO<?> qo = new BaseQO<>( page.longValue(), size.longValue(), null );
-        ValidatorUtils.validatePageParam(qo);
-        qo.setPage((qo .getPage() - 1) * size);
+        //验证分页参数
+        page = ValidatorUtils.isInteger(page) ? page : 1;
+        size = ValidatorUtils.isInteger(size) ? size : 10;
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);
         //当枚举类并没有这个查询类型时，抛出400请求参数错误异常
@@ -75,7 +76,7 @@ public class CommonController {
             //调用 用查询类型ID找到的 对应的查询方法
             Method commonZoneApi = ICommonService.class.getDeclaredMethod(communityType.method(), Long.class, Integer.class, Integer.class);
             //根据社区层级结构id 和 传过来的id 判断用户的社区 具体层级结构
-            Object invoke = commonZoneApi.invoke(commonService, id, page, size);
+            Object invoke = commonZoneApi.invoke(commonService, id, (page - 1) * size, size);
             if ( Objects.isNull(invoke) ) {
                 return CommonResult.ok(null);
             }
@@ -85,6 +86,16 @@ public class CommonController {
         	//如果出现异常，说明服务并不能调通
             return CommonResult.error(JSYError.NOT_IMPLEMENTED);
         }
+    }
+
+    @Login
+    @GetMapping("/getHouse")
+    @ApiImplicitParams(
+            value = {@ApiImplicitParam(name = "floor", value = "楼层文本"),@ApiImplicitParam( name = "id", value = "单元或楼栋id")}
+    )
+    @ApiOperation("通过楼层文本查下面所有房屋")
+    public CommonResult<List<Map<String, Object>>> getHouseByFloor(@RequestParam Long id, @RequestParam String floor){
+        return CommonResult.ok(commonService.getHouseByFloor( id, floor ));
     }
 
 

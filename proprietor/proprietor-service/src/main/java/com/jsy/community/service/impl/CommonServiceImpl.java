@@ -100,31 +100,36 @@ public class CommonServiceImpl implements ICommonService {
 
 
     @Override
-    public List<Map<String, Object>> getUnitOrHouseById(Long id, Integer page, Integer pageSize) {
+    public List<Map<String, Object>> getUnitOrFloorById(Long id, Integer page, Integer pageSize) {
         //1. 不管他是楼栋id还是单元id、第一种方式先按 他传的楼栋id来查单元
         List<Map<String, Object>> unitList = commonMapper.getUnitByBuildingId(id);
         if( CollectionUtil.isNotEmpty(unitList) ){
             return unitList;
         }
-        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有房屋
-        List<Map<String, Object>> houseList = commonMapper.getHouseByBuildingId(id, page, pageSize);
-        if( CollectionUtil.isNotEmpty(houseList) ){
-            return houseList;
+        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有楼层
+        List<Map<String, Object>> floorByBuildingId = commonMapper.getFloorByBuildingId(id);
+        if( CollectionUtil.isNotEmpty(floorByBuildingId) ){
+            return floorByBuildingId;
         }
-        //3. 如果 上述房屋为空 则按单元 查询 房屋
-        return getDoorByUnitId(id, page,  pageSize);
+        //3. 如果 按 以上id 当做楼栋去查 楼层都为空 那说明传的是一个 单元id 则按单元id查楼层
+        return getFloorByUnitId(id, page, pageSize);
     }
 
 
     /**
-     * 按单元id获取门牌
+     * 按单元id获取楼层
      * @author YuLF
      * @since  2020/12/29 15:08
      * @Param
      */
     @Override
-    public List<Map<String, Object>> getDoorByUnitId(Long id,  Integer page, Integer pageSize) {
-        return commonMapper.getDoorByUnitId(id, page, pageSize);
+    public List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize) {
+        return commonMapper.getFloorByUnitId(id, page, pageSize);
+    }
+
+    @Override
+    public List<Map<String, Object>> getHouseByFloor(Long id, String floor) {
+        return commonMapper.getHouseByFloor( id, floor);
     }
 
 

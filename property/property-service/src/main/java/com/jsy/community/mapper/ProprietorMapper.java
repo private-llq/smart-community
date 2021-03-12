@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
@@ -19,7 +20,7 @@ import java.util.List;
  * @author YuLF
  * @since 2020-11-25
  */
-public interface ProprietorMapper extends BaseMapper<UserEntity> {
+public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
 
     /**
      * [物业]通过分页参数查询 业主信息
@@ -139,14 +140,12 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
 
     /**
      * 插入管理员 对用户的操作日志
-     * @param id            数据id
-     * @param createPerson  创建人
-     * @param createTime    创建时间
-     * @param updatePerson  更新人
-     * @param updateTime    更新时间
-     * @param uid           用户id
+     * @param id                数据id
+     * @param operationPerson   更新人
+     * @param operationTime     更新时间
+     * @param pid               业主id
      */
-    void insertOperationLog( Long id, String createPerson, String createTime, String updatePerson, String updateTime, String uid );
+    void insertOperationLog( Long id,  String operationPerson, String operationTime, Long pid );
 
 
     /**
@@ -175,27 +174,26 @@ public interface ProprietorMapper extends BaseMapper<UserEntity> {
 
 
     /**
-     * [物业]解绑房屋信息
-     * @param houseId       房屋id
-     * @param communityId   社区id
+     * [物业]解绑业主房屋信息
+     * @param id            id
      * @return              返回影响行数
      */
-    @Update("update t_user_house set deleted = 1 where house_id = #{houseId} and community_id = #{communityId} and deleted = 0")
-    Integer unbindHouse(Long houseId, Long communityId);
+    @Update("update t_proprietor set deleted = 1 where id = #{id} and deleted = 0")
+    Integer unbindHouse(Long id);
 
     /**
      * 根据uid 查询 用户 当前记录的创建时间
-     * @param uid       用户id
+     * @param id        用户id
      * @return          返回 创建人 / 时间
      */
-    @Select("select CONCAT(create_person,' / ',create_time) from t_admin_user_log where uid = #{uid} ORDER BY create_time desc limit 1")
-    String queryCreateDateByUid(String uid);
+    @Select("select CONCAT(create_person,' / ',create_time) from t_admin_proprietor_log where pid = #{id} ORDER BY create_time desc limit 1")
+    String queryCreateDateById(Long id);
 
     /**
      * 根据uid 查询 用户 当前记录的更新时间
-     * @param uid       用户id
+     * @param id        用户id
      * @return          返回 更新人 / 时间
      */
-    @Select("select CONCAT(update_person,' / ',update_time) from t_admin_user_log where uid = #{uid} ORDER BY update_time desc limit 1")
-    String queryUpdateDateByUid(String uid);
+    @Select("select CONCAT(update_person,' / ',update_time) from t_admin_proprietor_log where pid = #{id} ORDER BY update_time desc limit 1")
+    String queryUpdateDateById(Long id);
 }

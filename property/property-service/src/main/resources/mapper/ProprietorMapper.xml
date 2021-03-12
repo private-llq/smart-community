@@ -11,15 +11,16 @@
     <!-- 物业查询业主用户信息 -->
     <select id="query" resultType="com.jsy.community.vo.ProprietorVO" >
         SELECT
-            uid,
+            id,
             real_name,
+            house_id,
             mobile,
             id_card,
             wechat,
             qq,
             email
         FROM
-	        t_user
+	        t_proprietor
 	        <if test=" query.searchText != null and !query.searchText.equals(&quot;&quot;) ">
                 <where>
                     real_name like concat('%',#{query.searchText},'%') or id_card like concat('%', #{query.searchText}, '%') or mobile like concat('%', #{query.searchText}, '%')
@@ -162,9 +163,9 @@
     </insert>
     <!-- 插入 物业 人员对 用户数据的 操作日志 -->
     <insert id="insertOperationLog">
-        insert into t_admin_user_log ( id,create_person,create_time,update_person,update_time,uid )
+        insert into t_admin_proprietor_log ( id,operation_person,operation_time,pid )
         values
-        ( #{id},#{createPerson},#{createTime},#{updatePerson},#{updateTime},#{uid} )
+        ( #{id},#{operationPerson},#{operationTime},#{pid} )
     </insert>
     <!-- 查出管理员姓名 -->
     <select id="queryAdminNameByUid" resultType="java.lang.String">

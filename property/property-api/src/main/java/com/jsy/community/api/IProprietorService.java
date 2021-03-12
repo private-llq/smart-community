@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
@@ -17,15 +18,14 @@ import java.util.List;
  * @author YuLF
  * @since 2020-11-25
  */
-public interface IProprietorService extends IService<UserEntity> {
+public interface IProprietorService extends IService<ProprietorEntity> {
 
     /**
      * 解绑这个房屋Id关联的业主
-     * @param hid    房屋id
-     * @param cid    社区ID
+     * @param id     业主信息数据id
      * @return       返回删除影响行数
      */
-    Boolean unbindHouse(Long hid, Long cid);
+    Boolean unbindHouse(Long id);
 
     /**
      * 通过传入的参数更新业主信息

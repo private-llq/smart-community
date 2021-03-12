@@ -3,7 +3,7 @@
 
 <mapper namespace="com.jsy.community.mapper.CommonMapper">
     <!-- 通用sql -->
-    <sql id="tableNameAndCondition">from t_house2 where deleted = 0 and </sql>
+    <sql id="tableNameAndCondition">from t_house where deleted = 0 and </sql>
     <!-- 【社区查询】查询所有小区 queryType = 1 -->
     <select id="getAllCommunityFormCityId"  resultType="java.util.HashMap">
         select id,name from t_community where deleted = 0 and city_id = #{id} limit #{page},#{pageSize}
@@ -23,14 +23,19 @@
     <select id="getUnitByBuildingId" resultType="java.util.HashMap">
         select id,unit,'unit' as type <include refid="tableNameAndCondition"/> pid = #{id} and type = 2
     </select>
-    <!-- 根据 楼栋 id 查所有房屋 queryType = 3  暂不抽取重复代码 方便改动 -->
-    <select id="getHouseByBuildingId" resultType="java.util.HashMap">
-        select id,CONCAT(floor,door) as house <include refid="tableNameAndCondition"/> pid = #{id} and type = 4 limit #{page},#{pageSize}
+    <!-- 根据 楼栋 id 查所有楼层 queryType = 3  暂不抽取重复代码 方便改动 -->
+    <select id="getFloorByBuildingId" resultType="java.util.HashMap">
+        select DISTINCT floor,'floor' as type from t_house where pid = #{id}
     </select>
 
-    <!-- 按单元id查询房屋 queryType = 4 暂不抽取重复代码 方便改动 -->
-    <select id="getDoorByUnitId"  resultType="java.util.HashMap">
-        select id,CONCAT(floor,door) as house <include refid="tableNameAndCondition"/> pid = #{id} and type = 4 limit #{page},#{pageSize}
+    <!-- 按单元id查询楼层 queryType = 4 暂不抽取重复代码 方便改动 -->
+    <select id="getFloorByUnitId"  resultType="java.util.HashMap">
+        select floor,'floor' as type <include refid="tableNameAndCondition"/> pid = #{id}  limit #{page},#{pageSize}
+    </select>
+
+    <!-- 通过 楼栋id或单元id 和 楼层文本查询属于该楼层的房屋 -->
+    <select id="getHouseByFloor" resultType="java.util.HashMap">
+        select  id,door,'door' as door <include refid="tableNameAndCondition"/> pid = #{id} and floor = #{floor} and type = 4
     </select>
 
 </mapper>

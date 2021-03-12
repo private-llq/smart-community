@@ -7,6 +7,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 /**
  * 异常处理
@@ -31,11 +32,10 @@ public class ProprietorExceptionHandler extends JSYExceptionHandler {
 		return CommonResult.error(JSYError.INTERNAL);
 	}
 	
-	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public CommonResult<Boolean> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+	@ExceptionHandler( value = {HttpMessageNotReadableException.class,MissingServletRequestPartException.class})
+	public CommonResult<Boolean> handleHttpMessageNotReadableException(Exception e) {
 		log.error(e.getMessage(), e);
 		return CommonResult.error(JSYError.REQUEST_PARAM);
 	}
-
 
 }
