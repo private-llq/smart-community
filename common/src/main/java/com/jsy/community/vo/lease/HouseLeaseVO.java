@@ -30,13 +30,19 @@ public class HouseLeaseVO implements Serializable {
 
 
     @ApiModelProperty(value = "社区id")
-    private Integer houseCommunityId;
+    private Long houseCommunityId;
+
+    @ApiModelProperty(value = "社区名称")
+    private String houseCommunityName;
 
     @ApiModelProperty(value = "房源id")
-    private Integer houseId;
+    private Long houseId;
 
     @ApiModelProperty(value = "房屋租售所属城市ID")
     private Long houseCityId;
+
+    @ApiModelProperty(value = "房屋所属城市名称")
+    private String houseCityName;
 
     @ApiModelProperty(value = "房屋租售所属区ID")
     private Long houseAreaId;

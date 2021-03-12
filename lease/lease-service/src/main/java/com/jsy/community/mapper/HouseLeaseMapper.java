@@ -10,6 +10,7 @@ import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 房屋租售 Mapper 接口
@@ -226,4 +227,13 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      */
     @Select("select count(*) from t_house_lease where uid = #{userId} and house_id = #{houseId}")
     Integer getPublishLease(String userId, Long houseId);
+
+
+    /**
+     * 根据社区id拿到社区名称 和 房屋具体地址
+     * @param houseCommunityId      社区id
+     * @param houseId               房屋id
+     * @return                      返回社区名称和房屋名称
+     */
+    Map<String, String> getUserAddrById(Long houseCommunityId, Long houseId );
 }

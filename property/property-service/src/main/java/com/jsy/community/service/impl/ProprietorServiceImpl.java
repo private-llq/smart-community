@@ -106,6 +106,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
             //用户记录 最近更新人 / 更新时间
             vo.setUpdateDate( proprietorMapper.queryUpdateDateByUid( vo.getUid() ));
             //TODO : 18-2-10-501 18栋2单元10楼 住宅 查询房屋字符串
+
             //通过身份证获得 用户的 年龄 、性别
             Map<String, Object> sexAndAge = CardUtil.getSexAndAge(vo.getIdCard());
             vo.setAge( sexAndAge.get("age").toString() );

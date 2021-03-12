@@ -17,13 +17,20 @@ public interface CommonMapper {
 
     List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer page, Integer pageSize);
 
-    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer houseLevelMode);
+    /**
+     * 根据社区id 查询 所有的楼栋或单元
+     * @param communityId       社区id
+     * @param type              房屋类型 1楼栋 2单元
+     * @return                  返回所有子集内容
+     */
+    List<Map<String, Object>> getAllBuild(Long communityId, Integer type );
 
-    List<Map<String, Object>> getBuildingOrUnitById(Long id, Integer houseLevelMode);
 
-    List<Map<String, Object>> getAllDoorFormFloor(Long id);
+    List<Map<String, Object>> getUnitByBuildingId(Long id);
 
-    List<Map<String, Object>> getFloorByBuildingOrUnitId(Long id, Integer houseLevelMode);
+    List<Map<String, Object>> getHouseByBuildingId(Long id, Integer page, Integer pageSize);
+
+    List<Map<String, Object>> getDoorByUnitId(Long id, Integer page, Integer pageSize);
 
     //以下为全量导入elasticSearch的数据
     /**
@@ -92,4 +99,6 @@ public interface CommonMapper {
      */
     @Select("select acct_avatar from t_acct_push_inform where id = #{id} limit 1")
     String getInformPicture(Long id);
+
+
 }

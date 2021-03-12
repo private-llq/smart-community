@@ -28,10 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static java.util.regex.Pattern.*;
 
@@ -368,13 +365,14 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         qo.setPage((qo.getPage() - 1) * qo.getSize());
         List<HouseLeaseVO> vos = houseLeaseMapper.ownerLeaseHouse(qo);
         vos.forEach(vo -> {
-            //拿到第一张图片
+            //TODO 待 sql 查询语句 放循环外
             vo.setHouseImage(houseLeaseMapper.queryHouseImgById(vo.getHouseImageId(), vo.getId()));
             //房屋类型code转换成文本 如 040202 转换为 4室2厅2卫
             vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         });
         return vos;
     }
+
 
     /**
      * 通过用户id社区id房屋id验证用户是否存在此处房产
@@ -461,6 +459,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         if (Objects.isNull(vo)) {
             return null;
         }
+        //查出小区名称 和 房屋地址
+        Map<String, String> communityNameAndHouseAddr = houseLeaseMapper.getUserAddrById(vo.getHouseCommunityId(), vo.getHouseId());
+        vo.setHouseCommunityName( communityNameAndHouseAddr.get("communityName") );
+        vo.setHouseAddress( communityNameAndHouseAddr.get("houseAddress") );
         //查出房屋朝向
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirectionId()));
         //房屋类型 code转换为文本 如 4室2厅1卫

@@ -145,6 +145,7 @@
             </if>
             and deleted  = 0
         </where>
+        order by create_time desc
         limit #{page},#{size}
     </select>
 
@@ -295,29 +296,33 @@
 
     <select id="editDetails" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         SELECT
-             l.house_city_id,
-             l.house_community_id,
-             l.house_address,
-             l.house_square_meter,
-             l.house_type_code,
-             l.house_direction_id,
-             l.house_floor,
-             l.house_price,
-             l.house_image_id,
-             l.house_leasedeposit_id,
-             c.house_const_name as houseLeaseDeposit,
-             l.house_leasetype_id,
-             d.house_const_name as houseLeaseType,
-             l.house_title,
-             l.house_introduce,
-             l.appellation,
-             l.house_contact
+            l.id,
+            l.house_id,
+            l.house_city_id,
+            r.`name` as houseCityName,
+            l.house_community_id,
+            l.house_address,
+            l.house_square_meter,
+            l.house_type_code,
+            l.house_direction_id,
+            l.house_floor,
+            l.house_price,
+            l.house_image_id,
+            l.house_leasedeposit_id,
+            c.house_const_name AS houseLeaseDeposit,
+            l.house_leasetype_id,
+            d.house_const_name AS houseLeaseType,
+            l.house_title,
+            l.house_introduce,
+            l.appellation,
+            l.house_contact
         FROM
-	        t_house_lease as l
-	        left join t_house_const as c
-	        on l.house_leasedeposit_id = c.house_const_code  and c.house_const_type = 1
-	        LEFT join t_house_const as d
-	        on l.house_leasetype_id = d.house_const_code  and d.house_const_type = 10
+	        t_house_lease AS l
+	        LEFT JOIN t_house_const AS c ON l.house_leasedeposit_id = c.house_const_code
+	        AND c.house_const_type = 1
+	        LEFT JOIN t_house_const AS d ON l.house_leasetype_id = d.house_const_code
+	        AND d.house_const_type = 10
+	        LEFT JOIN t_region as r on l.house_city_id = r.id
         WHERE
 	        l.id = #{houseId} and uid = #{uid} and l.deleted = 0
     </select>
@@ -381,15 +386,18 @@
         SELECT
 	        l.id,
 	        l.house_title,
-	        l.house_square_meter,
 	        l.house_address,
 	        l.house_price,
 	        l.house_unit,
 	        l.house_image_id,
 	        l.house_type_code,
-	        l.bedroom_type
+	        l.bedroom_type,
+	        c.house_const_name as houseLeaseMode,
+            h.house_const_name as houseLeaseDeposit
         FROM
 	        t_house_lease AS l
+	        left join t_house_const as c on l.house_leasemode_id = c.house_const_code and c.house_const_type = 11 and c.deleted = 0
+	        left join t_house_const as h on l.house_leasedeposit_id = h.house_const_code and h.house_const_type = 1 and c.deleted = 0
         WHERE
 	        l.uid = #{query.uid} and l.deleted = 0
 	        ORDER BY l.create_time desc
@@ -453,5 +461,19 @@
 	        t_house_lease AS l
         WHERE
 	        l.deleted = 0 and l.house_price = #{query.searchText} LIMIT #{page},#{size}
+    </select>
+    <!--  -->
+    <select id="getUserAddrById" resultType="java.util.HashMap">
+        SELECT
+            c.`name` AS communityName,
+            CONCAT( h.building, h.unit, h.floor, h.door ) AS houseAddress
+        FROM
+	        t_community AS c
+	    LEFT JOIN t_house AS h ON c.id = h.community_id
+	        AND c.id = #{houseCommunityId}
+	        AND h.id = #{houseId}
+        WHERE
+            c.deleted = 0
+        AND h.deleted = 0
     </select>
 </mapper>

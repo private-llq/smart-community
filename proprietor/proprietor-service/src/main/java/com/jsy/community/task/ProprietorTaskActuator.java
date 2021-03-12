@@ -19,6 +19,8 @@ import org.elasticsearch.rest.RestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +81,7 @@ public class ProprietorTaskActuator {
     @PostConstruct
     public void initSourceConst(){
         informActuator();
-        //cleanHotKey();
+        cleanHotKey();
     }
 
 
@@ -89,6 +91,7 @@ public class ProprietorTaskActuator {
         /*if(DateUtils.notNeedImplemented(HOT_KEY_CLEAN_TIME)){
             return;
         }*/
+
         commonService.cleanHotKey(hotKeyActiveDay);
     }
 

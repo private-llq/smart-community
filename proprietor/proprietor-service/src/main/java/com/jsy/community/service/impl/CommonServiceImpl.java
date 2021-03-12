@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
@@ -13,8 +14,6 @@ import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.utils.LunarCalendarFestivalUtils;
 import com.jsy.community.utils.WeatherUtils;
-import com.jsy.community.utils.es.Operation;
-import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.WeatherForecastVO;
 import com.jsy.community.vo.WeatherHourlyVO;
 import com.jsy.community.vo.WeatherLiveIndexVO;
@@ -25,7 +24,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.integration.transformer.MessageTransformingHandler;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -79,8 +77,7 @@ public class CommonServiceImpl implements ICommonService {
      * @since 2020/12/8 16:39
      */
     @Override
-    public List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        page = (page - 1) * pageSize;
+    public List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer page, Integer pageSize) {
         return commonMapper.getAllCommunityFormCityId(id, page , pageSize);
     }
 
@@ -91,60 +88,45 @@ public class CommonServiceImpl implements ICommonService {
      * @Param
      */
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        List<Map<String, Object>> buildingOrUnitByCommunityId = commonMapper.getBuildingOrUnitByCommunityId(id, houseLevelMode);
-        return setHouseLevelMode(buildingOrUnitByCommunityId, houseLevelMode);
-    }
-
-    /**
-     * 按楼栋Id查询 单元 或 按 单元id查询楼栋 只对 社区结构为 楼栋单元 或单元楼栋有效
-     * @author YuLF
-     * @since  2020/12/29 15:08
-     * @Param
-     */
-    @Override
-    public List<Map<String, Object>> getBuildingOrUnitById(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        List<Map<String, Object>> buildingOrUnitOrFloorById = commonMapper.getBuildingOrUnitById(id, houseLevelMode);
-        return setHouseLevelMode(buildingOrUnitOrFloorById, houseLevelMode);
-    }
-
-    /**
-     * 按按单元id或楼栋id查询  楼层
-     * @author YuLF
-     * @since  2020/12/29 15:08
-     * @Param
-     */
-    @Override
-    public List<Map<String, Object>> getFloorByBuildingOrUnitId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        List<Map<String, Object>> maps = commonMapper.getFloorByBuildingOrUnitId(id, houseLevelMode);
-        return setHouseLevelMode(maps, houseLevelMode);
-    }
-
-    /**
-     * 按楼层id获取门牌
-     * @author YuLF
-     * @since  2020/12/29 15:08
-     * @Param
-     */
-    @Override
-    public List<Map<String, Object>> getAllDoorFormFloor(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        List<Map<String, Object>> allDoorFormFloor = commonMapper.getAllDoorFormFloor(id);
-        return setHouseLevelMode(allDoorFormFloor, houseLevelMode);
-    }
-
-    /**
-     * 批量设置 返回值得 社区层级结构CODE     方便前端请求接口时调用标识
-     *
-     * @author YuLF
-     * @Param map                        数据库查询结果
-     * @since 2020/12/9 9:30
-     */
-    private List<Map<String, Object>> setHouseLevelMode(List<Map<String, Object>> map, Integer houseLevelId) {
-        for (Map<String, Object> value : map) {
-            value.put("houseLevelMode", houseLevelId);
+    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
+        //按社区id 查询 下面的所有 楼栋
+        List<Map<String, Object>> buildingList = commonMapper.getAllBuild(id, 1);
+        if( CollectionUtil.isNotEmpty(buildingList) ){
+            return buildingList;
         }
-        return map;
+        //按社区id 查询 下面的所有 单元
+        return commonMapper.getAllBuild(id, 2);
     }
+
+
+    @Override
+    public List<Map<String, Object>> getUnitOrHouseById(Long id, Integer page, Integer pageSize) {
+        //1. 不管他是楼栋id还是单元id、第一种方式先按 他传的楼栋id来查单元
+        List<Map<String, Object>> unitList = commonMapper.getUnitByBuildingId(id);
+        if( CollectionUtil.isNotEmpty(unitList) ){
+            return unitList;
+        }
+        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有房屋
+        List<Map<String, Object>> houseList = commonMapper.getHouseByBuildingId(id, page, pageSize);
+        if( CollectionUtil.isNotEmpty(houseList) ){
+            return houseList;
+        }
+        //3. 如果 上述房屋为空 则按单元 查询 房屋
+        return getDoorByUnitId(id, page,  pageSize);
+    }
+
+
+    /**
+     * 按单元id获取门牌
+     * @author YuLF
+     * @since  2020/12/29 15:08
+     * @Param
+     */
+    @Override
+    public List<Map<String, Object>> getDoorByUnitId(Long id,  Integer page, Integer pageSize) {
+        return commonMapper.getDoorByUnitId(id, page, pageSize);
+    }
+
 
     /**
     * @Description: 获取子区域
