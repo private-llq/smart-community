@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @program: com.jsy.community
@@ -56,5 +58,23 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         map.put("list",relationVOS);
         map.put("total",propertyRelationMapper.getTotal(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize()));
         return map;
+    }
+    public static String replaceStr(String str){
+        StringBuffer buf = new StringBuffer();
+
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+
+        Matcher m = p.matcher(str);
+
+        while(m.find()){
+
+            String chinese = m.group();//匹配出的中文
+
+            String pinyin = "";//在你的中文与拼音对应中找到对应拼音。
+
+            m.appendReplacement(buf, pinyin);
+
+        }
+        return m.appendTail(buf).toString();
     }
 }

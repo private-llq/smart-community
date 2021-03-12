@@ -23,7 +23,7 @@
     </sql>
 
     <select id="list" resultMap="PropertyRelationMap">
-        SELECT CONCAT(th.building,'-',th.unit,'-',th.floor,'-',th.door) as housing,
+        SELECT CONCAT(th.building,"-",th.unit,"-",th.floor,"-",th.door) as housing,
         thm.name as memberName,thm.mobile as mobile,thm.id_card as idCard,thm.relation as relation,
         tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile
         FROM t_house_member thm
@@ -41,13 +41,13 @@
         limit #{page},#{size}
     </select>
     <select id="getHouseId" resultMap="HouseTypeMap">
-        select distinct t.id as id,t.number as name from t_house t where t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
+        selec t.id as id,t.number as name from t_house t where t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
     </select>
     <select id="getBuildingId" resultMap="HouseTypeMap">
-        select distinct t.id as id,t.building as name from t_house t where t.community_id=#{query.communityId} and t.building like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,t.building as name from t_house t where t.community_id=#{query.communityId} and t.building like concat("%",#{query.name},"%") limit #{page},#{size}
     </select>
     <select id="getUnitId" resultMap="HouseTypeMap">
-        select distinct t.id as id,t.unit as name from t_house t where t.community_id=#{query.communityId} and t.unit like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,t.unit as name from t_house t where t.community_id=#{query.communityId} and t.unit like concat("%",#{query.name},"%") limit #{page},#{size}
     </select>
 
 
