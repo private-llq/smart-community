@@ -25,4 +25,5 @@ public interface PropertyRelationMapper {
     List<HouseTypeVo> getBuildingId(@Param("query")RelationListQO query, @Param("page")Long page,@Param("size")Long size);
 
     List<HouseTypeVo> getUnitId(@Param("query")RelationListQO query, @Param("page")Long page,@Param("size")Long size);
+
 }

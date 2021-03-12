@@ -16,7 +16,9 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  * @program: com.jsy.community
@@ -31,6 +33,8 @@ import java.util.Arrays;
 public class UserDataController {
 
     private final String[] img ={"jpg","png","jpeg"};
+
+    String regex = "[ _`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]|\n|\r|\t";
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserDataService userDataService;
@@ -52,7 +56,7 @@ public class UserDataController {
         if (!Arrays.asList(img).contains(s)) {
             return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
         }
-        String upload = MinioUtils.upload(file, "bbbb");
+        String upload = MinioUtils.upload(file, "avatar");
         return CommonResult.ok(upload,"上传成功");
     }
     @PutMapping("/updateUserData")
@@ -61,6 +65,18 @@ public class UserDataController {
     public CommonResult updateUserData(@RequestBody UserDataQO userDataQO){
         if (BadWordUtil2.isContaintBadWord(userDataQO.getNickname(),BadWordUtil2.minMatchTYpe)){
             return CommonResult.error("该名称不可用：名称中存在敏感字！");
+        }
+        try {
+            String s = new String(userDataQO.getNickname().getBytes("GBK"));
+            if (s.length()<2||s.length()>16){
+                return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉子！");
+            }
+            Pattern pattern = Pattern.compile(regex);
+            if (pattern.matcher(userDataQO.getNickname()).find()){
+                return CommonResult.error("名称不能包含特殊字符！");
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         String userId = UserUtils.getUserId();
         userDataService.updateUserData(userDataQO,userId);
