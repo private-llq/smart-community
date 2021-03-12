@@ -20,15 +20,25 @@ import java.util.Map;
  */
 public interface IHouseService extends IService<HouseEntity> {
 	
-	/**
-	* @Description: 查询子级楼栋(单元/楼层/房间等)
-	 * @Param: [baseQO]
-	 * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.HouseEntity>
-	 * @Author: chq459799974
-	 * @Date: 2020/11/20
-	**/
-	PageInfo<HouseEntity> queryHousePage(BaseQO<HouseQO> baseQO);
+//	/**
+//	* @Description: 查询子级楼栋(单元/楼层/房间等)
+//	 * @Param: [baseQO]
+//	 * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.HouseEntity>
+//	 * @Author: chq459799974
+//	 * @Date: 2020/11/20
+//	**/
+//	PageInfo<HouseEntity> queryHousePage(BaseQO<HouseQO> baseQO);
 	
+//	/**
+//	* @Description: 删除楼栋(单元/楼层/房间等)
+//	 * @Param: [id]
+//	 * @Return: boolean
+//	 * @Author: chq459799974
+//	 * @Date: 2020/11/20
+//	**/
+//	boolean deleteHouse(Long id);
+	
+	//=========================== 基础增删改查 开始 ==============================
 	/**
 	* @Description: 新增楼栋(单元/楼层/房间等)
 	 * @Param: [houseEntity]
@@ -39,15 +49,6 @@ public interface IHouseService extends IService<HouseEntity> {
 	boolean addHouse(HouseEntity houseEntity);
 	
 	/**
-	* @Description: 删除楼栋(单元/楼层/房间等)
-	 * @Param: [id]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2020/11/20
-	**/
-	boolean deleteHouse(Long id);
-	
-	/**
 	* @Description: 修改楼栋(单元/楼层/房间等)
 	 * @Param: [houseEntity]
 	 * @Return: boolean
@@ -55,6 +56,16 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2020/11/20
 	**/
 	boolean updateHouse(HouseEntity houseEntity);
+	
+	/**
+	* @Description: 查询(单元/楼层/房间等)
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/11
+	**/
+	PageInfo<HouseEntity> queryHouse(BaseQO<HouseQO> baseQO);
+	//=========================== 基础增删改查 结束 ==============================
 
 	/**
 	 * 通过社区ID查出所有 楼栋、单元、楼层、门牌

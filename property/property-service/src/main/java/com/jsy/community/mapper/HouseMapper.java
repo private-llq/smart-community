@@ -5,6 +5,7 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -65,4 +66,57 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Param  communityId	社区ID
 	 */
     List<HouseEntity> getCommunityArchitecture(@Param("communityId") long communityId);
+    
+    //============================================ 物业端产品原型确定后新加的 开始  ===========================================================
+	/**
+	* @Description: 单元绑定楼栋
+	 * @Param: [unitIdList, buildingId]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/8
+	**/
+	int unitBindBuilding(@Param("list") List<Long> unitIdList,@Param("entity") HouseEntity houseEntity);
+	
+	/**
+	* @Description: 单元解绑楼栋
+	 * @Param: [id]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/3/11
+	**/
+	@Update("update t_house set pid = 0,building = '' where pid = #{id} and type = 2")
+	void unitUnBindBuilding(Long id);
+	
+	/**
+	* @Description: 添加房屋
+	 * @Param: [houseEntity]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/9
+	**/
+	int addRoom(@Param("houseEntity") HouseEntity houseEntity);
+	
+	/**
+	* @Description: 根据任意字段查询楼栋、房屋
+	 * @Param: [field, param]
+	 * @Return: com.jsy.community.entity.HouseEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/3/11
+	**/
+	@Select("select * from t_house where ${field} = #{param}")
+	HouseEntity queryHouseByAnyProperty(@Param("field")Object field, @Param("param")Object param);
+	
+	
+	void updateSub(@Param("list")List list, @Param("entity")HouseEntity entity);
+	
+	/**
+	* @Description: 修改楼栋、单元、房屋
+	 * @Param: [entity]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/9
+	**/
+	int updateHouse(@Param("entity") HouseEntity entity);
+	
+	//============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 }
