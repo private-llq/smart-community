@@ -315,6 +315,7 @@
             l.house_title,
             l.house_introduce,
             l.appellation,
+            l.bedroom_type,
             l.house_contact
         FROM
 	        t_house_lease AS l

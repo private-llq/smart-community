@@ -244,6 +244,9 @@ public class ProprietorController {
     public CommonResult<List<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> baseQo){
         //1.验证分页 查询参数
         ValidatorUtils.validatePageParam(baseQo);
+        if (baseQo.getQuery() == null) {
+            baseQo.setQuery(new ProprietorQO());
+        }
         //2.查询信息返回
         return CommonResult.ok(iProprietorService.query(baseQo));
     }
@@ -275,9 +278,9 @@ public class ProprietorController {
     @Login
     @DeleteMapping()
     @ApiOperation("删除业主信息")
-    public CommonResult<Boolean> del(@RequestParam Long hid, Long cid){
+    public CommonResult<Boolean> del(@RequestParam Long id){
         //TODO : 验证物业人员是否具有管理这个社区的权限
-        Boolean isSuccess = iProprietorService.unbindHouse(hid, cid);
+        Boolean isSuccess = iProprietorService.unbindHouse(id);
         return isSuccess ? CommonResult.ok("删除成功!") : CommonResult.error("删除失败!");
     }
 

@@ -61,7 +61,7 @@ public class ValidatorUtils {
             return false;
         }
         //避免出现同位 2147483647 更大的值 如 2147483648
-        return str.length() <= String.valueOf(Integer.MAX_VALUE).length() && Long.parseLong(str) <= Integer.MAX_VALUE;
+        return str.length() <= String.valueOf(Integer.MAX_VALUE).length() && Long.parseLong(str) <= Integer.MAX_VALUE && Long.parseLong(str) > 0;
     }
 
     /**
@@ -80,6 +80,7 @@ public class ValidatorUtils {
             baseQo.setSize(10L);
         }
     }
+
 
     /**
      * 针对数据库常量验证，在QO中 无法设定字段的 正确取值范围

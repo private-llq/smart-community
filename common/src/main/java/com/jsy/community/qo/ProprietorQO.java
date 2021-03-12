@@ -1,6 +1,5 @@
 package com.jsy.community.qo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.RegexUtils;
@@ -60,14 +59,6 @@ public class ProprietorQO implements Serializable {
     private Long houseId;
 
 
-    /**
-     * t_user_house 表的 id
-     */
-    @Range( groups = {PropertyAddValid.class, PropertyUpdateValid.class}, min = 1, message = "房屋认证业务id范围不正确!")
-    @NotNull( groups = {PropertyAddValid.class, PropertyUpdateValid.class}, message = "房屋认证业务Id不能为空!")
-    @ApiModelProperty("房屋认证数据id")
-    private Long userHouseId;
-
 
     @Pattern(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_WE_CHAT, message = "微信号不正确!")
     @ApiModelProperty("微信")
@@ -114,19 +105,17 @@ public class ProprietorQO implements Serializable {
     private String faceUrl;
 
 
-    @ApiModelProperty("性别：0未知、1男、2女")
-    private Integer sex;
-
 
     @ApiModelProperty("标记是否需要登记车辆")
     private Boolean hasCar;
 
+
     @ApiModelProperty("搜索字段")
     private String searchText;
 
+
     @ApiModelProperty("车辆集合")
     private List<CarQO> cars;
-
 
 
     @ApiModelProperty("用来存储House的id和社区id")

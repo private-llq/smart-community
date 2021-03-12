@@ -461,8 +461,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         }
         //查出小区名称 和 房屋地址
         Map<String, String> communityNameAndHouseAddr = houseLeaseMapper.getUserAddrById(vo.getHouseCommunityId(), vo.getHouseId());
-        vo.setHouseCommunityName( communityNameAndHouseAddr.get("communityName") );
-        vo.setHouseAddress( communityNameAndHouseAddr.get("houseAddress") );
+        if( Objects.nonNull( communityNameAndHouseAddr ) ){
+            vo.setHouseCommunityName( communityNameAndHouseAddr.get("communityName") );
+            vo.setHouseAddress( communityNameAndHouseAddr.get("houseAddress") );
+        }
         //查出房屋朝向
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirectionId()));
         //房屋类型 code转换为文本 如 4室2厅1卫

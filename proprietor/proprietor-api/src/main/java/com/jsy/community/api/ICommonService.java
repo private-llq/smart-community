@@ -6,6 +6,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
+import com.jsy.community.vo.CommonResult;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
@@ -42,8 +43,8 @@ public interface ICommonService {
     List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id,  Integer page, Integer pageSize);
 
     /**
-     * 根据 楼栋id | 单元id 查询下一级的数据
-	 * 楼栋id 就是 查下面所有 单元  单元id 就是查下面所有房屋 】
+     * 根据 楼栋id | 查询下一级的数据
+	 * 楼栋id 就是 查下面所有 单元  如果单元列表为空 则按楼栋id查楼层 】
 	 * @author YuLF
 	 * @since  2020/12/8 16:39
      * @param id    			楼栋id 或 单元id
@@ -51,16 +52,16 @@ public interface ICommonService {
 	 * @param pageSize			每页显示条数
 	 * @return      			返回单元 集合 或者 房屋集合
      */
-	List<Map<String, Object>> getUnitOrHouseById(Long id,  Integer page, Integer pageSize);
+	List<Map<String, Object>> getUnitOrFloorById(Long id,  Integer page, Integer pageSize);
 
 
     /**
      * 根据单元id查询所有门牌号
      * @author YuLF
      * @since  2020/12/8 16:39
-     * @Param  id   楼层id
+     * @Param  id   单元id
      */
-	List<Map<String, Object>> getDoorByUnitId(Long id,  Integer page, Integer pageSize);
+	List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize);
 
 
 
@@ -175,5 +176,11 @@ public interface ICommonService {
 	Set<Object> getFullTextSearchHotKey(Integer num);
 
 
-
+	/**
+	 * 通过楼层文本 和 单元id或楼栋id 查下面所有房屋
+	 * @param id 			楼栋id或单元id
+	 * @param floor			楼层文本
+	 * @return				返回属于该楼层的 房屋
+	 */
+    List<Map<String, Object>> getHouseByFloor(Long id, String floor);
 }

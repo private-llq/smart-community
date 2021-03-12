@@ -16,11 +16,11 @@ public enum CommunityType {
     //【查询社区下面的 楼栋或单元动态sql方法】
     COMMUNITY_BUILDING_TYPE(2, "getBuildingOrUnitByCommunityId"),
 
-    //【根据楼栋id 查询 下面所有单元   或者 根据单元id 查询单元下面所有房屋】
-    BUILDING_UNIT_TYPE(3, "getUnitOrHouseById"),
+    //【根据楼栋id 查询 下面所有单元   或者 根据楼栋id查询下面 所有楼层】
+    BUILDING_UNIT_TYPE(3, "getUnitOrFloorById"),
 
-    //【根据单元id 查询下面所有房屋】
-    SINGLE_TYPE(4, "getDoorByUnitId");
+    //【根据单元id 查询下面所有楼层】
+    SINGLE_TYPE(4, "getFloorByUnitId");
 
     private final int value;
     private final String serviceMethod;

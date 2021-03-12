@@ -21,6 +21,9 @@ public class ProprietorVO extends BaseVO {
 	@ApiModelProperty("业主ID")
 	private Long householderId;
 
+	@ApiModelProperty("房屋ID")
+	private Long houseId;
+
 	@ApiModelProperty("昵称")
 	private String nickname;
 

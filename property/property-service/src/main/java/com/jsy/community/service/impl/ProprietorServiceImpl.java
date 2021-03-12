@@ -8,6 +8,7 @@ import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.ProprietorMapper;
@@ -22,6 +23,7 @@ import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -34,7 +36,7 @@ import java.util.*;
  * @since 2020-11-25
  */
 @DubboService(version = Const.version, group = Const.group)
-public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEntity> implements IProprietorService {
+public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, ProprietorEntity> implements IProprietorService {
 
     @Resource
     private ProprietorMapper proprietorMapper;
@@ -50,8 +52,8 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
 
 
     @Override
-    public Boolean unbindHouse( Long houseId, Long communityId ) {
-        return proprietorMapper.unbindHouse( houseId , communityId ) > 0;
+    public Boolean unbindHouse( Long id ) {
+        return proprietorMapper.unbindHouse( id ) > 0;
     }
 
 
@@ -64,24 +66,29 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
     @Transactional( rollbackFor = {Exception.class})
     @Override
     public Boolean update(ProprietorQO qo, String adminUid) {
-        checkHouse(qo.getCommunityId(), qo.getHouseId(), Operation.UPDATE);
-        String uid = getUidById(qo.getId());
-        if( Objects.isNull(uid) ){
-            throw new PropertyException("数据id错误!不存在此用户");
-        }
-        //更新业主房屋认证信息
-        UserHouseEntity userHouse = new UserHouseEntity();
-        userHouse.setCommunityId(qo.getCommunityId());
-        userHouse.setHouseId(qo.getHouseId());
-        userHouse.setCheckStatus(1);
-        iUserHouseService.update(userHouse, new UpdateWrapper<UserHouseEntity>().eq("id", qo.getUserHouseId()).eq("uid",uid));
-
         //管理员姓名
         String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
-        proprietorMapper.insertOperationLog(SnowFlake.nextId(), null, null, adminUserName, DateUtils.now(), uid);
-        return proprietorMapper.update(qo) > 0;
+        ProprietorEntity entity = new ProprietorEntity();
+        BeanUtils.copyProperties( entity, qo );
+        proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), entity.getId());
+        UpdateWrapper<ProprietorEntity> wrapper = new UpdateWrapper<ProprietorEntity>().eq("id", entity.getId());
+        return proprietorMapper.update(entity, wrapper) > 0;
     }
 
+
+
+    @Transactional( rollbackFor = {Exception.class})
+    @Override
+    public void addUser(ProprietorQO qo, String adminUid) {
+        //管理员姓名
+        String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
+        ProprietorEntity entity = new ProprietorEntity();
+        BeanUtils.copyProperties( entity, qo );
+        entity.setId( SnowFlake.nextId() );
+        proprietorMapper.insertOperationLog( SnowFlake.nextId(), adminUserName, DateUtils.now(), entity.getId() );
+        proprietorMapper.insert(entity);
+        //TODO 短信通知业主
+    }
 
 
 
@@ -94,18 +101,14 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
      */
     @Override
     public List<ProprietorVO> query(BaseQO<ProprietorQO> queryParam) {
-        //避免sql 参数为空 执行失败
-        if (queryParam.getQuery() == null) {
-            queryParam.setQuery(new ProprietorQO());
-        }
         queryParam.setPage((queryParam.getPage() - 1) * queryParam.getSize());
         List<ProprietorVO> query = proprietorMapper.query(queryParam);
         query.forEach( vo -> {
             //用户记录 创建人 / 创建时间
-            vo.setCreateDate( proprietorMapper.queryCreateDateByUid( vo.getUid() ));
+            vo.setCreateDate( proprietorMapper.queryCreateDateById( vo.getId() ));
             //用户记录 最近更新人 / 更新时间
-            vo.setUpdateDate( proprietorMapper.queryUpdateDateByUid( vo.getUid() ));
-            //TODO : 18-2-10-501 18栋2单元10楼 住宅 查询房屋字符串
+            vo.setUpdateDate( proprietorMapper.queryUpdateDateById( vo.getId() ));
+            //查询用户  住户  TODO : 18-2-10-501 18栋2单元10楼 住宅 查询房屋字符串
 
             //通过身份证获得 用户的 年龄 、性别
             Map<String, Object> sexAndAge = CardUtil.getSexAndAge(vo.getIdCard());
@@ -116,6 +119,12 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
     }
 
 
+    /**
+     * 通过house id 获取 楼栋+单元+楼层数+房屋类型
+     */
+    public String getHouseText( Long id){
+        return null;
+    }
     /**
      * 录入业主信息业主房屋绑定信息至数据库
      *
@@ -197,50 +206,17 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
     }
 
 
-    @Transactional( rollbackFor = {Exception.class})
-    @Override
-    public void addUser(ProprietorQO qo, String adminUid) {
-        //用户身份证查出 用户信息
-        String uid = proprietorMapper.queryUserByIdCard(qo.getIdCard());
-        String createPerson = null, createTime = null, updatePerson = null, updateTime = null;
-        //管理员姓名
-        String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
-        if( uid == null ){
-            //新增
-            qo.setId(SnowFlake.nextId());
-            qo.setUid(UserUtils.createUserToken());
-            proprietorMapper.saveUser(qo);
-            createTime = DateUtils.now();
-            createPerson = adminUserName;
-        } else {
-            //更新业主 已有数据
-            qo.setUid(uid);
-            proprietorMapper.update(qo);
-            updateTime = DateUtils.now();
-            updatePerson = adminUserName;
-        }
-        proprietorMapper.insertOperationLog( SnowFlake.nextId(), createPerson, createTime, updatePerson, updateTime, uid );
-        //添加房屋认证信息
-        checkHouse(qo.getCommunityId(), qo.getHouseId(), Operation.INSERT);
-        UserHouseEntity useHouse = new UserHouseEntity();
-        useHouse.setId(SnowFlake.nextId());
-        useHouse.setCheckStatus(1);
-        useHouse.setHouseId(qo.getHouseId());
-        useHouse.setUid(qo.getUid());
-        useHouse.setCommunityId(qo.getCommunityId());
-        iUserHouseService.save(useHouse);
-        //TODO 短信通知业主
-    }
-
     /**
      * 通过数据id 拿到uid
      * @param id        数据id
      */
+    @Deprecated
     public String getUidById(Long id){
         return proprietorMapper.selectUidById(id);
     }
 
 
+    @Deprecated
     private void checkHouse(Long communityId, Long houseId, Operation operation) {
         Integer resRow = proprietorMapper.existHouse(communityId, houseId);
         if ( resRow == 0 ){
