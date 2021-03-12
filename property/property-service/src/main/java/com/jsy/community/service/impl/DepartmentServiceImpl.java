@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -148,6 +150,10 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 				parents.add(entity);
 			}
 		}
+		
+		// 根据sort字段进行排序
+		Collections.sort(parents,order());
+		
 		// 为根节点设置子节点，getClild是递归调用的
 		for (DepartmentVO departmentVO : parents) {
 			//获取根节点下的所有子节点 使用getChild方法
@@ -188,11 +194,32 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		for (DepartmentVO nav : childList) {
 			nav.setChildren(getChild(nav.getId(), allDepartment));
 		}
+		
+		//排序
+		Collections.sort(childList,order());
+		
 		//如果节点下没有子节点，返回一个空List（递归退出）
 		if (childList.size() == 0) {
 			return new ArrayList<DepartmentVO>();
 		}
 		return childList;
+	}
+	
+	
+	/*
+	 * 排序,根据sort排序
+	 */
+	public Comparator<DepartmentVO> order(){
+		Comparator<DepartmentVO> comparator = new Comparator<DepartmentVO>() {
+			@Override
+			public int compare(DepartmentVO o1, DepartmentVO o2) {
+				if(o1.getSort() != o2.getSort()){
+					return o1.getSort() - o2.getSort();
+				}
+				return 0;
+			}
+		};
+		return comparator;
 	}
 	
 	
