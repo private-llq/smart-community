@@ -69,6 +69,8 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("qq")
     private String qq;
 
+    @ApiModelProperty("性别")
+    private Integer sex;
 
     @Pattern(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_EMAIL, message = "邮箱号不正确!")
     @ApiModelProperty("邮箱")
