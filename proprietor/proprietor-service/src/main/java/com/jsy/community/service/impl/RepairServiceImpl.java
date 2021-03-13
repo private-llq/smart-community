@@ -60,6 +60,11 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addRepair(RepairEntity repairEntity) {
+		
+		// 判断报修类别id与报修类别是否一致
+		Long typeId = repairEntity.getType();
+		
+		
 		repairEntity.setId(SnowFlake.nextId());
 		repairMapper.insert(repairEntity); // 1.png;2.png;3.png;   或 1.png;2.png;3.png 都可以            redis 现在存的是  3个 xx.png
 		Long id = repairEntity.getId();// 得到新添加报修的报修id
