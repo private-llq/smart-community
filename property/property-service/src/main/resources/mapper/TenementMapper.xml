@@ -25,7 +25,9 @@
     <select id="list" resultMap="PropertyRelationMap">
         SELECT CONCAT(th.building,'-',th.unit,'-',th.floor,'-',th.door) as housing,
         thm.name as tenementName,thm.mobile as mobile,thm.id_card as idCard,
-        tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile
+        tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile,
+        thm.lease_over_time as leaseOverTime,thm.lease_start_time as leaseStartTime,
+        th.unit as unit,th.floor as floor,th.house_type as houseType
         FROM t_house_member thm
         join t_user tu on tu.uid=thm.householder_id
         join t_house th on thm.house_id=th.id
@@ -53,7 +55,11 @@
 
     <resultMap id="PropertyRelationMap" type="com.jsy.community.vo.PropertyTenementVO">
         <result property="housing" column="housing"/>
-        <result property="tenancyTerm" column="tenancyTerm"/>
+        <result property="building" column="building"/>
+        <result property="unit" column="unit"/>
+        <result property="floor" column="floor"/>
+        <result property="leaseOverTime" column="leaseOverTime"/>
+        <result property="leaseStartTime" column="leaseStartTime"/>
         <result property="mobile" column="mobile"/>
         <result property="idCard" column="idCard"/>
         <result property="tenementName" column="tenementName"/>

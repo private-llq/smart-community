@@ -15,6 +15,16 @@ import java.io.Serializable;
 public class PropertyRelationVO implements Serializable {
     @ApiModelProperty("房屋")
     private String housing;
+    @ApiModelProperty("楼栋名")
+    private String building;
+    @ApiModelProperty("单元名")
+    private String unit;
+    @ApiModelProperty("门牌")
+    private String floor;
+    @ApiModelProperty("房屋类型")
+    private Integer houseType;
+    @ApiModelProperty("房屋类型名称")
+    private String houseTypeName;
     @ApiModelProperty("和业主关系")
     private Integer relation;
     @ApiModelProperty("和业主关系")

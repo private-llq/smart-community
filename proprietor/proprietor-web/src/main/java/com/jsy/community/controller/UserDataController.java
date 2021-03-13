@@ -68,8 +68,10 @@ public class UserDataController {
         }
         try {
             String s = new String(userDataQO.getNickname().getBytes("GBK"));
-            if (s.length()<2||s.length()>16){
-                return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉子！");
+            if(!"".equals(userDataQO.getNickname())&&userDataQO.getNickname()!=null){
+                if (s.length()<2||s.length()>16){
+                    return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉子！");
+                }
             }
             Pattern pattern = Pattern.compile(regex);
             if (pattern.matcher(userDataQO.getNickname()).find()){
