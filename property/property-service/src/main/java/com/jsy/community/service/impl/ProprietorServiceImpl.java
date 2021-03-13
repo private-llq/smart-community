@@ -1,6 +1,5 @@
 package com.jsy.community.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.api.IProprietorService;
@@ -68,10 +67,8 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
     public Boolean update(ProprietorQO qo, String adminUid) {
         //管理员姓名
         String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
-        ProprietorEntity entity = new ProprietorEntity();
-        BeanUtils.copyProperties( qo, entity );
-        proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), entity.getId(), 2);
-        return proprietorMapper.updateById(entity) > 0;
+        proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), qo.getId(), 2);
+        return proprietorMapper.update(qo) > 0;
     }
 
 

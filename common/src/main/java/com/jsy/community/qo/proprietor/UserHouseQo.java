@@ -1,13 +1,9 @@
 package com.jsy.community.qo.proprietor;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -20,7 +16,6 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
 @ApiModel(value="UserHouse请求对象", description="房屋认证信息")
 public class UserHouseQo implements Serializable {
 
@@ -28,18 +23,28 @@ public class UserHouseQo implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "社区id")
-    @Range(groups = {UpdateHouse.class}, min = 1, message = "社区id不在有效范围")
+    @Range(groups = {UpdateHouse.class,UpdateHouseImprover.class}, min = 1, message = "社区id不在有效范围")
     @NotNull(groups = {UpdateHouse.class}, message = "社区id不能为空!")
     private Long communityId;
     
     @ApiModelProperty(value = "房间ID")
-    @Range(groups = {UpdateHouse.class}, min = 1, message = "房屋id不在有效范围")
+    @Range(groups = {UpdateHouse.class,UpdateHouseImprover.class}, min = 1, message = "房屋id不在有效范围")
     @NotNull(groups = {UpdateHouse.class}, message = "房屋id不能为空!")
     private Long houseId;
-    
+
+
+    @ApiModelProperty(value = "房屋地址")
+    private String houseAddress;
 
     /**
      * 房屋信息 更新/新增  验证
+     * 最新验证为 UpdateHouseImprover
      */
+    @Deprecated
     public interface UpdateHouse {}
+
+    /**
+     * 房屋信息 更新/新增 验证
+     */
+    public interface UpdateHouseImprover {}
 }

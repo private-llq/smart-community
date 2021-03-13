@@ -125,13 +125,14 @@ public class UserController {
 
     /**
      * 【用户】业主更新信息
-     *  用户操作更新 非所有字段 只能更新 [昵称、头像地址、性别、用户所在省份ID、用户所在城市ID、用户所在区ID、用户所在详细地址]
+     *  用户操作更新  新方法至 -> updateImprover
      * @author YuLF
      * @Param userEntity        需要更新 实体参数
      * @return 返回更新成功!
      * @since 2020/11/27 15:03
      */
     @Login
+    @Deprecated
 	@ApiOperation("业主信息更新")
     @PutMapping("update")
     public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO qo) {
@@ -150,6 +151,27 @@ public class UserController {
         //房屋数据业务唯一id、房屋id、社区id边界有效性验证
         qo.getHouses().forEach( house -> ValidatorUtils.validateEntity( house, UserHouseQo.UpdateHouse.class ));
         return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    }
+
+
+    @Login
+    @ApiOperation("业主信息更新")
+    @PutMapping("/info/update")
+    public CommonResult<Boolean> updateImprover(@RequestBody ProprietorQO qo) {
+        //3.更新业主房屋信息和车辆信息
+        qo.setUid(UserUtils.getUserId());
+        if( Objects.isNull(qo.getHasCar()) ){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
+        }
+        //如果有车 则批量验证车辆信息
+        if( qo.getHasCar() ){
+            qo.getCars().forEach( car ->  ValidatorUtils.validateEntity(car, CarQO.CarValidated.class));
+        }
+        if( !CollectionUtils.isEmpty(qo.getHouses()) ){
+            //房屋数据业务唯一id、房屋id、社区id边界有效性验证
+            qo.getHouses().forEach( house -> ValidatorUtils.validateEntity( house, UserHouseQo.UpdateHouseImprover.class ));
+        }
+        return userService.updateImprover(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
 

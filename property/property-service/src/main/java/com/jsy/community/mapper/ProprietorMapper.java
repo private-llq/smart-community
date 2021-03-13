@@ -34,7 +34,7 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @param proprietorQo  请求参数
      * @return              返回影响行数
      */
-    int update(ProprietorQO proprietorQo);
+    Integer update(ProprietorQO proprietorQo);
 
     /**
      * 通过社区id 拿到当前社区 所有未被登记的房屋信息
@@ -197,4 +197,6 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      */
     @Select("select CONCAT(update_person,' / ',update_time) from t_admin_proprietor_log where pid = #{id} ORDER BY update_time desc limit 1")
     String queryUpdateDateById(Long id);
+
+
 }

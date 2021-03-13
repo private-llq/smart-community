@@ -27,34 +27,8 @@
 			AND uh.house_id = #{houseId}
 			AND uh.uid = #{uid}
 	</select>
-	<!-- 业主信息更新sql -->
-	<update id="com.jsy.community.mapper.UserMapper.proprietorUpdate">
-		update t_user set
-		<!-- 去除多余的前缀 , -->
-		<trim  prefixOverrides=",">
-			<if test="nickname != null  and !nickname.equals(&quot;&quot;)">
-				,nickname = #{nickname}
-			</if>
-			<if test="avatarUrl != null  and !avatarUrl.equals(&quot;&quot;)">
-				,avatar_url = #{avatarUrl}
-			</if>
-			<if test="sex != null">
-				,sex = #{sex}
-			</if>
-			<if test="provinceId != null">
-				,province_id = #{provinceId}
-			</if>
-			<if test="cityId != null">
-				,city_id = #{cityId}
-			</if>
-			<if test="areaId != null">
-				,area_id = #{areaId}
-			</if>
-			<if test="detailAddress != null and !detailAddress.equals(&quot;&quot;)">
-				,detail_address = #{detailAddress}
-			</if>
-			,update_time = now()
-		</trim>
-		where deleted = 0 and uid = #{uid}
-	</update>
+	<!-- 根据业主身份证 获取 业主表 所有房屋id + 社区id -->
+	<select id="getProprietorInfo" resultType="com.jsy.community.qo.proprietor.UserHouseQo">
+		select community_id,house_id from t_proprietor where id_card = #{idCard} and deleted = 0
+	</select>
 </mapper>

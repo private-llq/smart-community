@@ -31,7 +31,7 @@
 
     <!--物业端更新业主信息-->
     <update id="update">
-        update t_user set
+        update t_proprietor set
         <trim prefixOverrides=",">
             <if test="mobile != null and !mobile.equals(&quot;&quot;)">
                 ,mobile = #{mobile}

@@ -10,6 +10,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseRecentEntity;
 import com.jsy.community.mapper.HouseRecentMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.CommonUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
@@ -49,6 +50,7 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
                     .houseImage(CollectionUtils.isEmpty(vo.getHouseImage()) ? null : vo.getHouseImage().get(0))
                     .price(vo.getHousePrice() + "/" + vo.getHouseUnit())
                     .tag(getTag(vo.getHouseAdvantageCode()))
+                    .houseTypeCode(HouseHelper.parseHouseType(vo.getHouseTypeCode()) )
                     .leaseType(vo.getHouseLeaseMode())
                     .build();
         }
@@ -129,9 +131,10 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
     @Override
     public List<HouseRecentEntity> recentBrowseList(Integer leaseType, BaseQO<Object> qo, String uid) {
         QueryWrapper<HouseRecentEntity> wrapper = new QueryWrapper<>();
-        wrapper.select("house_id","browse_title","acreage","address","price","house_image","lease_type","create_time","tag");
+        wrapper.select("house_id","browse_title","acreage","address","price","house_image","lease_type","create_time","tag","house_type_code");
         wrapper.eq("uid", uid);
         wrapper.eq("browse_type", leaseType);
+        wrapper.orderByDesc("create_time");
         Page<HouseRecentEntity> pageCondition = new Page<>( qo.getPage(), qo.getSize() );
         Page<HouseRecentEntity> resultData = houseRecentMapper.selectPage(pageCondition, wrapper);
         return resultData.getRecords();

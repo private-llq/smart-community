@@ -8,7 +8,7 @@
 		insert into t_user_house(id,uid,community_id,house_id,check_status)
 		values
 		<foreach collection="anyHouse" item="item" separator=",">
-			(${@com.jsy.community.utils.SnowFlake@nextId()},#{uid},#{item.communityId},#{item.houseId},2)
+			(${@com.jsy.community.utils.SnowFlake@nextId()},#{uid},#{item.communityId},#{item.houseId},1)
 		</foreach>
 	</insert>
 	<!-- 手动按房屋id 和用户id 更新用户房屋信息-->
@@ -22,4 +22,29 @@
 			id = #{h.id} and uid = #{uid} and deleted = 0
 		</where>
 	</update>
+	<!-- 通过用户id查出用户房屋信息 -->
+	<select id="queryUserHouseList" resultType="com.jsy.community.vo.HouseVo">
+		SELECT
+			h.id,
+			h.community_id,
+			h.house_id,
+			c.NAME AS communityName,
+			r.id as cityId,
+			r.`name` as cityName,
+			s.building,
+			s.unit,
+			s.floor,
+			s.door
+		FROM
+			t_user_house AS h
+			LEFT JOIN t_house AS s ON h.house_id = s.id
+			LEFT JOIN t_community AS c ON h.community_id = c.id
+			LEFT JOIN t_region as r on c.city_id = r.id
+		WHERE
+			h.deleted = 0
+		AND s.deleted = 0
+		AND c.deleted = 0
+		AND h.uid = #{userId}
+		AND check_status = 1
+	</select>
 </mapper>

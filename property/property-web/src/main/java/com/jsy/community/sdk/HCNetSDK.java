@@ -6709,7 +6709,7 @@ DVR实现巡航数据结构
 	}
 	
 	//事件搜索条件
-	public static class NET_DVR_SEARCH_EVENT_PARAM extends Structure {
+    class NET_DVR_SEARCH_EVENT_PARAM extends Structure {
 		public short wMajorType;        //0-移动侦测，1-报警输入, 2-智能事件 5-pos录像 7-门禁事件, 8-非视频联动事件
 		public short wMinorType;       //搜索次类型- 根据主类型变化，0xffff表示全部
 		public NET_DVR_TIME struStartTime = new NET_DVR_TIME();    //搜索的开始时间，停止时间: 同时为(0, 0) 表示从最早的时间开始，到最后，最前面的4000个事件
@@ -6720,13 +6720,13 @@ DVR实现巡航数据结构
 		public UNION_EVENT_PARAM uSeniorParam = new UNION_EVENT_PARAM();
 	}
 	
-	public static class UNION_EVENT_PARAM extends Union {
+	class UNION_EVENT_PARAM extends Union {
 		public byte[] byLen = new byte[SEARCH_EVENT_INFO_LEN];
 		public EVENT_INQUESTPARAM struInquestParam = new EVENT_INQUESTPARAM();
 	}
 	
 	//审讯事件搜索条件
-	public static class EVENT_INQUESTPARAM extends Structure {
+    class EVENT_INQUESTPARAM extends Structure {
 		public byte byRoomIndex;    //审讯室编号,按值表示，从1开始
 		public byte[] byRes1 = new byte[3];
 		public byte[] sInquestInfo = new byte[INQUEST_CASE_LEN];
@@ -6734,7 +6734,7 @@ DVR实现巡航数据结构
 	}
 	
 	//事件搜索条件
-	public static class NET_DVR_SEARCH_EVENT_PARAM_V50 extends Structure {
+    class NET_DVR_SEARCH_EVENT_PARAM_V50 extends Structure {
 		public short wMajorType;            //0-移动侦测，1-报警输入, 2-智能事件 5-pos录像 7-门禁事件, 8-非视频联动事件
 		public short wMinorType;            //搜索次类型- 根据主类型变化，0xffff表示全部
 		public NET_DVR_TIME_SEARCH_COND struStartTime = new NET_DVR_TIME_SEARCH_COND();    //搜索的开始时间，停止时间: 同时为(0, 0) 表示从最早的时间开始，到最后，最前面的4000个事件
@@ -6745,7 +6745,7 @@ DVR实现巡航数据结构
 		public UNION_EVENT_PARAM_V50 uSeniorParam = new UNION_EVENT_PARAM_V50();
 	}
 	
-	public static class UNION_EVENT_PARAM_V50 extends Union {
+	class UNION_EVENT_PARAM_V50 extends Union {
 		public byte[] byLen = new byte[SEARCH_EVENT_INFO_LEN_V40/*800*/];
 		public EVENT_ALARMPARAM_V50 struAlarmParam = new EVENT_ALARMPARAM_V50();
 		public EVENT_MOTIONPARAM_V50 struMotionParam = new EVENT_MOTIONPARAM_V50();
@@ -6759,21 +6759,21 @@ DVR实现巡航数据结构
 		public EVENT_IOTPARAM_V50 struIOTAlarm = new EVENT_IOTPARAM_V50();
 	}
 	
-	public static class EVENT_ALARMPARAM_V50 extends Structure {
+	class EVENT_ALARMPARAM_V50 extends Structure {
 		/*报警输入号，按值表示,采用紧凑型排列，0xffff表示后续无效*/
 		public short[] wAlarmInNo = new short[128];
 		public byte[] byRes = new byte[544]; //保留
 	}
 	
 	//移动侦测
-	public static class EVENT_MOTIONPARAM_V50 extends Structure {
+    class EVENT_MOTIONPARAM_V50 extends Structure {
 		/* 移动侦测通道，按值表示 ,采用紧凑型排列，0xffff表示后续无效*/
 		public short[] wMotDetChanNo = new short[MAX_CHANNUM_V30];
 		public byte[] byRes = new byte[672];                /*保留*/
 	}
 	
 	//行为分析
-	public static class EVENT_VCAPARAM_V50 extends Structure {
+    class EVENT_VCAPARAM_V50 extends Structure {
 		//行为分析对应的通道，按值表示,采用紧凑型排列，0xffff表示后续无效
 		public short[] wChanNo = new short[MAX_CHANNUM_V30];
 		public byte byRuleID;      //行为分析类型，规则0xff表示全部，从0开始
@@ -6785,13 +6785,13 @@ DVR实现巡航数据结构
 	}
 	
 	//审讯事件搜索条件
-	public static class EVENT_INQUESTPARAM_V50 extends Structure {
+    class EVENT_INQUESTPARAM_V50 extends Structure {
 		public byte byRoomIndex;    //审讯室编号,从1开始
 		public byte[] byRes = new byte[799];     //保留
 	}
 	
 	//智能侦测查找条件 ，通道号按值表示
-	public static class EVENT_VCADETECTPARAM_V50 extends Structure {
+    class EVENT_VCADETECTPARAM_V50 extends Structure {
 		public byte byAll;  //查找全部通道，0-否，此时dwChanNo参数有效，
 		//1-查找全部通道，此时dwChanNo参数无效。
 		public byte[] byRes1 = new byte[3];
@@ -6799,7 +6799,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[668];
 	}
 	
-	public static class EVENT_STREAMIDPARAM_V50 extends Structure {
+	class EVENT_STREAMIDPARAM_V50 extends Structure {
 		public NET_DVR_STREAM_INFO struIDInfo = new NET_DVR_STREAM_INFO(); // 流id信息，72字节长
 		public int dwCmdType;  // 外部触发类型，NVR接入云存储使用
 		public byte byBackupVolumeNum; //存档卷号，CVR使用
@@ -6809,7 +6809,7 @@ DVR实现巡航数据结构
 	}
 	
 	//pos录像
-	public static class EVENT_POSPARAM_V50 extends Structure {
+    class EVENT_POSPARAM_V50 extends Structure {
 		public short[] wChannel = new short[MAX_CHANNUM_V30];        //通道，按值表示,紧凑型排列，遇到0xffff时表示数组后续值无效
 		public byte byAllChan;        //是否查找全部通道，0-否，此时wChannel有效，1-全部通道，此时wChannel无效
 		public byte byCaseSensitive;      //0-不区分大小写， 1-区分大小写
@@ -6820,7 +6820,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[284];          //保留
 	}
 	
-	public static class EVENT_TRIALPARAM_V50 extends Structure {
+	class EVENT_TRIALPARAM_V50 extends Structure {
 		public byte[] byCaseNo = new byte[SEARCH_CASE_NO_LEN];
 		public byte[] byCaseName = new byte[SEARCH_CASE_NAME_LEN];
 		public byte[] byLitigant1 = new byte[SEARCH_LITIGANT_LEN];
@@ -6831,7 +6831,7 @@ DVR实现巡航数据结构
 	}
 	
 	//门禁事件搜索条件
-	public static class EVENT_ACSPARAM_V50 extends Structure {
+    class EVENT_ACSPARAM_V50 extends Structure {
 		public int dwMajor; //报警主类型（与事件上传主类型一致，0代表全部）
 		public int dwMinor; //报警次类型（与事件上传主类型一致，0代表全部）
 		public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //卡号
@@ -6841,7 +6841,7 @@ DVR实现巡航数据结构
 	}
 	
 	//非视频联动事件搜索条件
-	public static class EVENT_IOTPARAM_V50 extends Structure {
+    class EVENT_IOTPARAM_V50 extends Structure {
 		public short wDeviceType;            //设备类型,0-海康门禁主机，1-海康可视对讲设备, 2-海康报警主机（预留） 3-GJD报警主机 4-Luminite报警主机, 5-OPTEX报警主机,6-cameraDetector模拟相机传感器设备
 		public short wEventType;            //搜索次类型- 根据主类型变化，0xffff表示全部
 		public short[] wChannel = new short[MAX_CHANNUM_V30/*64*/];        //通道号，按值表示,紧凑型排列，遇到0xffff时表示数组后续值无效
@@ -6855,7 +6855,7 @@ DVR实现巡航数据结构
 	}
 	
 	//查找返回结果
-	public static class NET_DVR_SEARCH_EVENT_RET extends Structure {
+    class NET_DVR_SEARCH_EVENT_RET extends Structure {
 		public short wMajorType;            //主类型
 		public short wMinorType;            //次类型
 		public NET_DVR_TIME struStartTime = new NET_DVR_TIME();    //事件开始的时间
@@ -6866,21 +6866,21 @@ DVR实现巡航数据结构
 		public UNION_EVENT_RET uSeniorRet = new UNION_EVENT_RET();
 	}
 	
-	public static class UNION_EVENT_RET extends Union {
+	class UNION_EVENT_RET extends Union {
 		public byte[] byLen = new byte[304];
 		public EVENT_ALARMSTRET struAlarmRet = new EVENT_ALARMSTRET();
 		public EVENT_INQUESTRET struInquestRet = new EVENT_INQUESTRET();
 	}
 	
 	//报警输入结果
-	public static class EVENT_ALARMSTRET extends Structure {
+    class EVENT_ALARMSTRET extends Structure {
 		
 		public int dwAlarmInNo;     //报警输入号
 		public byte[] byRes = new byte[SEARCH_EVENT_INFO_LEN];
 	}
 	
 	//审讯事件
-	public static class EVENT_INQUESTRET extends Structure {
+    class EVENT_INQUESTRET extends Structure {
 		public byte byRoomIndex;     //审讯室编号,从1开始
 		public byte byDriveIndex;    //刻录机编号,从1开始
 		public byte[] byRes1 = new byte[6];       //保留
@@ -6897,7 +6897,7 @@ DVR实现巡航数据结构
 	}
 	
 	//查找返回结果
-	public static class NET_DVR_SEARCH_EVENT_RET_V50 extends Structure {
+    class NET_DVR_SEARCH_EVENT_RET_V50 extends Structure {
 		public short wMajorType;            //主类型
 		public short wMinorType;            //次类型
 		public NET_DVR_TIME_SEARCH struStartTime = new NET_DVR_TIME_SEARCH();    //事件开始的时间
@@ -6908,7 +6908,7 @@ DVR实现巡航数据结构
 		public UNION_EVENT_RET_V50 uSeniorRet = new UNION_EVENT_RET_V50();
 	}
 	
-	public static class UNION_EVENT_RET_V50 extends Union {
+	class UNION_EVENT_RET_V50 extends Union {
 		public byte[] byLen = new byte[800];
 		public EVENT_ALARMRET_V50 struAlarmRet = new EVENT_ALARMRET_V50();
 		public EVENT_MOTIONRET_V50 struMotionRet = new EVENT_MOTIONRET_V50();
@@ -6921,19 +6921,19 @@ DVR实现巡航数据结构
 	}
 	
 	//报警输入结果
-	public static class EVENT_ALARMRET_V50 extends Structure {
+    class EVENT_ALARMRET_V50 extends Structure {
 		public int dwAlarmInNo;     //报警输入号
 		public byte[] byRes = new byte[796];
 	}
 	
 	//移动侦测结果
-	public static class EVENT_MOTIONRET_V50 extends Structure {
+    class EVENT_MOTIONRET_V50 extends Structure {
 		public int dwMotDetNo;    //移动侦测通道
 		public byte[] byRes = new byte[796];
 	}
 	
 	//行为分析结果
-	public static class EVENT_VCARET_V50 extends Structure {
+    class EVENT_VCARET_V50 extends Structure {
 		public int dwChanNo;                    //触发事件的通道号
 		public byte byRuleID;                    //规则ID
 		public byte[] byRes1 = new byte[3];                    //保留
@@ -6943,7 +6943,7 @@ DVR实现巡航数据结构
 	}
 	
 	//审讯事件
-	public static class EVENT_INQUESTRET_V50 extends Structure {
+    class EVENT_INQUESTRET_V50 extends Structure {
 		public byte byRoomIndex;     //审讯室编号,从1开始
 		public byte byDriveIndex;    //刻录机编号,从1开始
 		public byte[] byRes1 = new byte[6];       //保留
@@ -6954,7 +6954,7 @@ DVR实现巡航数据结构
 	}
 	
 	//流id录像查询结果
-	public static class EVENT_STREAMIDRET_V50 extends Structure {
+    class EVENT_STREAMIDRET_V50 extends Structure {
 		public int dwRecordType;    //录像类型 0-定时录像 1-移动侦测 2-报警录像 3-报警|移动侦测 4-报警&移动侦测 5-命令触发 6-手动录像 7-震动报警 8-环境触发 9-智能报警 10-回传录像
 		public int dwRecordLength;    //录像大小
 		public byte byLockFlag;    // 锁定标志 0：没锁定 1：锁定
@@ -6969,12 +6969,12 @@ DVR实现巡航数据结构
 	}
 	
 	//POS录像查询结果
-	public static class EVENT_POSRET_V50 extends Structure {
+    class EVENT_POSRET_V50 extends Structure {
 		public int dwChanNo;        //触发产生pos事件的通道
 		public byte[] byRes = new byte[796];
 	}
 	
-	public static class EVENT_TRIALRET_V50 extends Structure {
+	class EVENT_TRIALRET_V50 extends Structure {
 		public byte byRoomIndex;     //审讯室编号,从1开始
 		public byte byDriveIndex;    //刻录机编号,从1开始
 		public short wSegmetSize;     //本片断的大小, 单位M
@@ -6991,12 +6991,12 @@ DVR实现巡航数据结构
 	}
 	
 	//非视频通道查询结果
-	public static class EVENT_IOTRET_V50 extends Structure {
+    class EVENT_IOTRET_V50 extends Structure {
 		public int dwChanNo;        //触发产生事件的通道号（事件源通道）
 		public byte[] byRes = new byte[796];
 	}
 	
-	public static class NET_DVR_INQUEST_RESUME_SEGMENT extends Structure {
+	class NET_DVR_INQUEST_RESUME_SEGMENT extends Structure {
 		public NET_DVR_TIME struStartTime = new NET_DVR_TIME(); //事件起始时间
 		public NET_DVR_TIME struStopTime = new NET_DVR_TIME();  //事件终止时间
 		public byte byRoomIndex;         //审讯室编号,从1开始
@@ -7006,7 +7006,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[24];           //保留
 	}
 	
-	public static class NET_DVR_INQUEST_RESUME_EVENT extends Structure {
+	class NET_DVR_INQUEST_RESUME_EVENT extends Structure {
 		public int dwResumeNum;       //需恢复的事件个数
 		public NET_DVR_INQUEST_RESUME_SEGMENT[] struResumeSegment = new NET_DVR_INQUEST_RESUME_SEGMENT[MAX_RESUME_SEGMENT];
 		public byte byResumeMode;        //恢复模式，0-单光盘恢复，1-双光盘恢复
@@ -7014,7 +7014,7 @@ DVR实现巡航数据结构
 	}
 	
 	//报警信息查询条件结构体
-	public static class NET_DVR_ALARM_SEARCH_COND extends Structure {
+    class NET_DVR_ALARM_SEARCH_COND extends Structure {
 		public int dwSize;
 		public NET_DVR_TIME_SEARCH_COND strStartTime; //开始时间,时间为空则代表不通过时间筛选。
 		public NET_DVR_TIME_SEARCH_COND strStopTime;  //结束时间, 时间为空则代表不通过时间筛选。
@@ -7030,7 +7030,7 @@ DVR实现巡航数据结构
 	}
 	
 	//报警信息查询结果结构体
-	public static class NET_DVR_ALARM_SEARCH_RESULT extends Structure {
+    class NET_DVR_ALARM_SEARCH_RESULT extends Structure {
 		public int dwSize;
 		/*
   	报警命令，该字段值与报警布防类型相同，目前支持：
@@ -7051,7 +7051,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[128];
 	}
 	
-	public static class NET_DVR_ALARM_ISAPI_INFO extends Structure {
+	class NET_DVR_ALARM_ISAPI_INFO extends Structure {
 		public Pointer pAlarmData;           // 报警数据（参见下表）
 		public int dwAlarmDataLen;   // 报警数据长度
 		public byte byDataType;        // 0-invalid,1-xml,2-json
@@ -7062,7 +7062,7 @@ DVR实现巡航数据结构
 		public byte[] byRes1 = new byte[32];
 	}
 	
-	public static class NET_DVR_LOCAL_GENERAL_CFG extends Structure {
+	class NET_DVR_LOCAL_GENERAL_CFG extends Structure {
 		public byte byExceptionCbDirectly;    //0-通过线程池异常回调，1-直接异常回调给上层
 		public byte byNotSplitRecordFile;     //回放和预览中保存到本地录像文件不切片 0-默认切片，1-不切片
 		public byte byResumeUpgradeEnable;    //断网续传升级使能，0-关闭（默认），1-开启
@@ -7074,22 +7074,22 @@ DVR实现巡航数据结构
 		
 	}
 	
-	public static class NET_DVR_LOCAL_TCP_PORT_BIND_CFG extends Structure {
+	class NET_DVR_LOCAL_TCP_PORT_BIND_CFG extends Structure {
 		public short wLocalBindTcpMinPort;            //本地绑定Tcp最小端口
 		public short wLocalBindTcpMaxPort;            //本地绑定Tcp最大端口
 		public byte[] byRes = new byte[60];                        //保留
 	}
 	
 	
-	public static class NET_DVR_LOCAL_CHECK_DEV extends Structure {
+	class NET_DVR_LOCAL_CHECK_DEV extends Structure {
 		public int dwCheckOnlineTimeout;     //巡检时间间隔，单位ms  最小值为30s，最大值120s。为0时，表示用默认值(120s)
 		public int dwCheckOnlineNetFailMax;  //由于网络原因失败的最大累加次数；超过该值SDK才回调用户异常，为0时，表示使用默认值1
 		public byte[] byRes = new byte[256];
 	}
 	
-	public static final int MAX_FILE_PATH_LEN = 256; //文件路径长度
+	int MAX_FILE_PATH_LEN = 256; //文件路径长度
 	
-	public static class NET_DVR_ALARM_ISAPI_PICDATA extends Structure {
+	class NET_DVR_ALARM_ISAPI_PICDATA extends Structure {
 		public int dwPicLen;
 		public byte byPicType;  //图片格式: 1- jpg
 		public byte[] byRes = new byte[3];
@@ -7097,7 +7097,7 @@ DVR实现巡航数据结构
 		public Pointer pPicData; // 图片数据
 	}
 	
-	public static class NET_DVR_FOCUSMODE_CFG extends Structure {
+	class NET_DVR_FOCUSMODE_CFG extends Structure {
 		public int dwSize;
 		public byte byFocusMode;  /* 聚焦模式，0-自动，1-手动，2-半自动 */
 		public byte byAutoFocusMode; /* 自动聚焦模式，0-关，1-模式A，2-模式B，3-模式AB，4-模式C 自动聚焦模式，需要在聚焦模式为自动时才显示*/
@@ -7115,7 +7115,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[48];
 	}
 	
-	public static class NET_DVR_SERIALSTART_V40 extends Structure {
+	class NET_DVR_SERIALSTART_V40 extends Structure {
 		public int dwSize;         //结构体大小
 		public int dwSerialType;    //串口号（1-232串口，2-485串口）
 		public byte bySerialNum;   //串口编号
@@ -7124,7 +7124,7 @@ DVR实现巡航数据结构
 		
 	}
 	
-	public static class NET_DVR_PRESET_NAME extends Structure {
+	class NET_DVR_PRESET_NAME extends Structure {
 		public int dwSize;
 		public short wPresetNum;   //预置点编号
 		public byte[] byRes1 = new byte[2]; //字节对齐
@@ -7136,7 +7136,7 @@ DVR实现巡航数据结构
 	}
 	
 	//Sensor信息
-	public static class NET_DVR_SENSOR_PARAM extends Structure {
+    class NET_DVR_SENSOR_PARAM extends Structure {
 		public byte bySensorType;//SensorType:0-CCD,1-CMOS
 		public byte[] byRes = new byte[31];
 		public float fHorWidth;//水平宽度 精确到小数点后两位 *10000
@@ -7145,14 +7145,14 @@ DVR实现巡航数据结构
 	}
 	
 	//球机位置信息
-	public static class NET_DVR_PTZPOS_PARAM extends Structure {
+    class NET_DVR_PTZPOS_PARAM extends Structure {
 		public float fPanPos;//水平参数，精确到小数点后1位
 		public float fTiltPos;//垂直参数，精确到小数点后1位
 		public float fZoomPos;//变倍参数，精确到小数点后1位
 		public byte[] byRes = new byte[16];
 	}
 	
-	public static class NET_DVR_LLI_PARAM extends Structure {
+	class NET_DVR_LLI_PARAM extends Structure {
 		public float fSec;//秒[0.000000,60.000000]
 		public byte byDegree;//度:纬度[0,90] 经度[0,180]
 		public byte byMinute;//分[0,59]
@@ -7160,7 +7160,7 @@ DVR实现巡航数据结构
 	}
 	
 	//GIS信息上传
-	public static class NET_DVR_GIS_UPLOADINFO extends Structure {
+    class NET_DVR_GIS_UPLOADINFO extends Structure {
 		public int dwSize;//结构体大小
 		public int dwRelativeTime; //相对时标
 		public int dwAbsTime; //绝对时标
@@ -7180,7 +7180,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[256];
 	}
 	
-	public static class NET_DVR_DAYTIME extends Structure {
+	class NET_DVR_DAYTIME extends Structure {
 		public byte byHour;//0~24
 		public byte byMinute;//0~60
 		public byte bySecond;//0~60
@@ -7189,12 +7189,12 @@ DVR实现巡航数据结构
 		public byte[] byRes1 = new byte[2];
 	}
 	
-	public static class NET_DVR_SCHEDULE_DAYTIME extends Structure {
+	class NET_DVR_SCHEDULE_DAYTIME extends Structure {
 		public NET_DVR_DAYTIME struStartTime; //开始时间
 		public NET_DVR_DAYTIME struStopTime; //结束时间
 	}
 	
-	public static class NET_DVR_BUILTIN_SUPPLEMENTLIGHT extends Structure {
+	class NET_DVR_BUILTIN_SUPPLEMENTLIGHT extends Structure {
 		public int dwSize;//结构体大小
 		public byte byMode;//补光灯模式 0-定时，1-开启，2-关闭，3-自动（非光敏，算法画面识别）
 		public byte byBrightnessLimit;//亮度限制[0,100]
@@ -7210,7 +7210,7 @@ DVR实现巡航数据结构
 		public byte[] byRes1 = new byte[254];
 	}
 	
-	public static class NET_DVR_HANDLEEXCEPTION_V41 extends Structure {
+	class NET_DVR_HANDLEEXCEPTION_V41 extends Structure {
 		public int dwHandleType;        //异常处理,异常处理方式的"或"结果
 		/*0x00: 无响应*/
 		/*0x01: 监视器上警告*/
@@ -7230,22 +7230,22 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[64];           //保留
 	}
 	
-	public static class NET_DVR_PRESETCHAN_INFO extends Structure {
+	class NET_DVR_PRESETCHAN_INFO extends Structure {
 		public int dwEnablePresetChan;    /*启用预置点的通道, 0xfffffff表示不调用预置点*/
 		public int dwPresetPointNo;        /*调用预置点通道对应的预置点序号, 0xfffffff表示不调用预置点。*/
 	}
 	
-	public static class NET_DVR_CRUISECHAN_INFO extends Structure {
+	class NET_DVR_CRUISECHAN_INFO extends Structure {
 		public int dwEnableCruiseChan;    /*启用巡航的通道*/
 		public int dwCruiseNo;        /*巡航通道对应的巡航编号, 0xfffffff表示无效*/
 	}
 	
-	public static class NET_DVR_PTZTRACKCHAN_INFO extends Structure {
+	class NET_DVR_PTZTRACKCHAN_INFO extends Structure {
 		public int dwEnablePtzTrackChan;    /*启用云台轨迹的通道*/
 		public int dwPtzTrackNo;        /*云台轨迹通道对应的编号, 0xfffffff表示无效*/
 	}
 	
-	public static class NET_DVR_EVENT_TRIGGER extends Structure {
+	class NET_DVR_EVENT_TRIGGER extends Structure {
 		public int dwSize;//结构体大小
 		public NET_DVR_HANDLEEXCEPTION_V41 struHandleException;     //异常处理方式
 		public int[] dwRelRecordChan = new int[MAX_CHANNUM_V40]; //实际触发录像通道，按值表示，采用紧凑型排列，从下标0开始顺序读取，中间遇到0xffffffff则后续无效。
@@ -7256,7 +7256,7 @@ DVR实现巡航数据结构
 		public byte[] byRes2 = new byte[255];
 	}
 	
-	public static class NET_DVR_FACELIB_GUARD_COND extends Structure {
+	class NET_DVR_FACELIB_GUARD_COND extends Structure {
 		public int dwSize;
 		public int dwChannel;  //通道号
 		public byte[] szFDID = new byte[68];//人脸库的ID
@@ -7264,7 +7264,7 @@ DVR实现巡航数据结构
 	}
 	
 	//导入人脸数据条件
-	public static class NET_DVR_FACELIB_COND extends Structure {
+    class NET_DVR_FACELIB_COND extends Structure {
 		public int dwSize;
 		public byte[] szFDID = new byte[NET_SDK_MAX_FDID_LEN/*256*/];//人脸库ID
 		public byte byConcurrent;//设备并发处理 0-不开启，1-开始
@@ -7275,7 +7275,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[60];
 	}
 	
-	public static class NET_DVR_SEND_PARAM_IN extends Structure {
+	class NET_DVR_SEND_PARAM_IN extends Structure {
 		public Pointer pSendData;             //发送的缓冲区,PicURL == 1 的时候，内存中存储的是 URL 字符串,byUploadModeling == 1 的时候，内存中存储的是 建模base64加密数据
 		public int dwSendDataLen;         //发送数据长度,PicURL == 1 的时候，表示的 URL 字符串的长度,byUploadModeling == 1 的时候，表示为建模数据base64后的加密长度
 		public NET_DVR_TIME_V30 struTime = new NET_DVR_TIME_V30();   //图片时间
@@ -7296,13 +7296,13 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[192];
 	}
 	
-	public static class NET_DVR_INQUEST_ROOM extends Structure {
+	class NET_DVR_INQUEST_ROOM extends Structure {
 		public byte byRoomIndex;     //审讯室编号
 		public byte byFileType;        //0-审讯文件，1-开庭上传文件
 		public byte[] byRes = new byte[22];       //保留
 	}
 	
-	public static class NET_DVR_INQUEST_CDRW_CFG extends Structure {
+	class NET_DVR_INQUEST_CDRW_CFG extends Structure {
 		public int dwSize;
 		public int dwNum;                       //刻录机的数量
 		public int[] dwRwSelectPara = new int[MAX_CHANNUM_V30];// 是否选中该光驱
@@ -7314,7 +7314,7 @@ DVR实现巡航数据结构
 		public byte[] sLable = new byte[64];                  //光盘名称
 	}
 	
-	public static class NET_DVR_INQUEST_CDRW_STATUS extends Structure {
+	class NET_DVR_INQUEST_CDRW_STATUS extends Structure {
 		/*运行状态：0-审讯开始，
      1-审讯过程中刻录，2-审讯停止，
      3-刻录审讯文件,
@@ -7328,7 +7328,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[16];             //保留
 	}
 	
-	public static class NET_DVR_INQUEST_CDRW extends Structure {
+	class NET_DVR_INQUEST_CDRW extends Structure {
 		public int dwEnable;            //刻录机状态是否有效,0-无效,1-有效
 		public int dwStatus;            /*当dwType=0时， 0-光盘正常，1-无光盘或光盘异常,
                                                             当dwType=1或2时，0-刻录正常，1-无光盘或光盘异常，2-光盘已封盘(81不支持)，3-光盘空间不足， 4-异常导致审讯终止(81不支持)
@@ -7344,7 +7344,7 @@ DVR实现巡航数据结构
 	}
 	
 	//实时温度检测条件参数
-	public static class NET_DVR_REALTIME_THERMOMETRY_COND extends Structure {
+    class NET_DVR_REALTIME_THERMOMETRY_COND extends Structure {
 		public int dwSize; /*结构体大小*/
 		public int dwChan; /*通道号，从1开始，0xffffffff代表获取全部通道*/
 		public byte byRuleID;/*规则ID，0代表获取全部规则，具体规则ID从1开始*/
@@ -7353,14 +7353,14 @@ DVR实现巡航数据结构
 	}
 	
 	//点测温实时信息
-	public static class NET_DVR_POINT_THERM_CFG extends Structure {
+    class NET_DVR_POINT_THERM_CFG extends Structure {
 		public float fTemperature;
 		public NET_VCA_POINT struPoint;
 		public byte[] byRes = new byte[120];
 	}
 	
 	//框/线测温实时信息
-	public static class NET_DVR_LINEPOLYGON_THERM_CFG extends Structure {
+    class NET_DVR_LINEPOLYGON_THERM_CFG extends Structure {
 		public float fMaxTemperature;
 		public float fMinTemperature;
 		public float fAverageTemperature;
@@ -7370,7 +7370,7 @@ DVR实现巡航数据结构
 	}
 	
 	//实时温度信息
-	public static class NET_DVR_THERMOMETRY_UPLOAD extends Structure {
+    class NET_DVR_THERMOMETRY_UPLOAD extends Structure {
 		public int dwSize; /* 结构体大小 */
 		public int dwRelativeTime;
 		public int dwAbsTime;
@@ -7393,7 +7393,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[95];
 	}
 	
-	public static class NET_PTZ_INFO extends Structure {
+	class NET_PTZ_INFO extends Structure {
 		public float fPan;
 		public float fTilt;
 		public float fZoom;
@@ -7402,21 +7402,21 @@ DVR实现巡航数据结构
 	}
 	
 	//测温模式配置
-	public static class NET_DVR_THERMOMETRY_MODE extends Structure {
+    class NET_DVR_THERMOMETRY_MODE extends Structure {
 		public int dwSize;//结构体大小
 		public byte byMode;//测温模式，0~普通模式，1~专家模式
 		public byte byThermometryROIEnabled; //测温ROI使能 0-保留 1-不开启 2-开启（基于互斥兼容考虑）
 		public byte[] byRes = new byte[62];
 	}
 	
-	public static class NET_DVR_THERMOMETRY_COND extends Structure {
+	class NET_DVR_THERMOMETRY_COND extends Structure {
 		public int dwSize;//结构体大小
 		public int dwChannel;
 		public short wPresetNo;//0-保留
 		public byte[] byRes = new byte[62];
 	}
 	
-	public static class NET_DVR_THERMOMETRY_PRESETINFO_PARAM extends Structure {
+	class NET_DVR_THERMOMETRY_PRESETINFO_PARAM extends Structure {
 		public byte byEnabled;  //是否使能：0- 否，1- 是
 		public byte byRuleID;//规则ID 0-表示无效，从1开始 （list内部判断数据有效性）
 		public short wDistance;//距离(m)[0, 10000]
@@ -7433,7 +7433,7 @@ DVR实现巡航数据结构
 		public NET_VCA_POLYGON struRegion = new NET_VCA_POLYGON();//区域、线（当规则标定类型为"框"或者"线"的时候生效）
 	}
 	
-	public static class NET_DVR_THERMOMETRY_PRESETINFO extends Structure {
+	class NET_DVR_THERMOMETRY_PRESETINFO extends Structure {
 		public int dwSize;//结构体大小
 		public short wPresetNo;//0-保留
 		public byte[] byRes = new byte[2];
@@ -7441,7 +7441,7 @@ DVR实现巡航数据结构
 	}
 	
 	//温度报警（检测温度和配置温度比较报警）
-	public static class NET_DVR_THERMOMETRY_ALARM extends Structure {
+    class NET_DVR_THERMOMETRY_ALARM extends Structure {
 		public int dwSize;
 		public int dwChannel;//通道号
 		public byte byRuleID;//规则ID
@@ -7472,13 +7472,13 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[39];
 	}
 	
-	public static class NET_DVR_ARRAY_LIST extends Structure {
+	class NET_DVR_ARRAY_LIST extends Structure {
 		public int dwSize;     // 结构体大小
 		public int dwCount;    // 阵列个数
 		public NET_DVR_ARRAY_INFO[] struArrayInfo = new NET_DVR_ARRAY_INFO[SUPPORT_ARRAY_NUM];
 	}
 	
-	public static class NET_DVR_BGA_INFO extends Structure {
+	class NET_DVR_BGA_INFO extends Structure {
 		public byte byBga;  // 后台任务及类型
 		public byte byBgaState;           /*函数返回值--后台任务状态*/
 		public short wBgaPercentage;     /*函数返回值--后台任务执行百分比*/
@@ -7486,7 +7486,7 @@ DVR实现巡航数据结构
 	}
 	
 	// 阵列信息
-	public static class NET_DVR_ARRAY_INFO extends Structure {
+    class NET_DVR_ARRAY_INFO extends Structure {
 		public short wArrayID; // 阵列ID
 		public byte byRaidMode; // raid模式  参照RAID_MODE
 		public byte byStatus;  // 0-在线 1-磁盘丢失 2-下线 3-降级 4-异常 5-次正常 6-外来盘  7-已删除 8-SMART状态异常 0xff-不存在
@@ -7507,7 +7507,7 @@ DVR实现巡航数据结构
 	}
 	
 	//物理磁盘
-	public static class NET_DVR_PHY_DISK_INFO extends Structure {
+    class NET_DVR_PHY_DISK_INFO extends Structure {
 		public short wPhySlot;         // 硬盘槽位
 		public byte byType;         // 硬盘信息；0 普通，1全局热备，2-阵列热备 3-阵列盘
 		public byte byStatus;       // 硬盘状态；  0-正常 1-降级 2-已删除 3-磁盘丢失 4-下线 5-次正常 6-外来 7-异常 8-SMART状态异常 9-休眠 10-有坏块 0xff-不存在
@@ -7520,7 +7520,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[101];         // 保留字节
 	}
 	
-	public static class NET_DVR_WORKSTATE_V40 extends Structure {
+	class NET_DVR_WORKSTATE_V40 extends Structure {
 		public int dwSize;            //结构体大小
 		public int dwDeviceStatic;      //设备的状态,0-正常,1-CPU占用率太高,超过85%,2-硬件错误,例如串口死掉
 		public NET_DVR_DISKSTATE[] struHardDiskStatic = new NET_DVR_DISKSTATE[MAX_DISKNUM_V30];   //硬盘状态,一次最多只能获取33个硬盘信息
@@ -7535,7 +7535,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[116];                 //保留
 	}
 	
-	public static class NET_DVR_GETWORKSTATE_COND extends Structure {
+	class NET_DVR_GETWORKSTATE_COND extends Structure {
 		public int dwSize;  //结构体长度
 		public byte byFindHardByCond; /*0-查找全部磁盘(但一次最多只能查找33个)，此时dwFindHardStatusNum无效*/
 		public byte byFindChanByCond;  /*0-查找全部通道，此时dwFindChanNum无效*/
@@ -7546,17 +7546,17 @@ DVR实现巡航数据结构
 	}
 	
 	//多边型结构体
-	public static class NET_ITC_POLYGON extends Structure {
+    class NET_ITC_POLYGON extends Structure {
 		public int dwPointNum; //有效点 大于等于3，若是3点在一条线上认为是无效区域，线交叉认为是无效区域
 		public NET_VCA_POINT[] struPos = new NET_VCA_POINT[ITC_MAX_POLYGON_POINT_NUM]; //多边形边界点,最多20个
 	}
 	
-	public static class CUSTOM_uRegion extends Union {
+	class CUSTOM_uRegion extends Union {
 		public NET_VCA_RECT struRect = new NET_VCA_RECT();
 		public NET_ITC_POLYGON struPolygon = new NET_ITC_POLYGON();
 	}
 	
-	public static class NET_ITC_PLATE_RECOG_REGION_PARAM extends Structure {
+	class NET_ITC_PLATE_RECOG_REGION_PARAM extends Structure {
 		public byte byMode; //区域类型，0-矩形，1-多边形
 		public byte[] byRes1 = new byte[3];
 		public CUSTOM_uRegion uRegion = new CUSTOM_uRegion();
@@ -7564,7 +7564,7 @@ DVR实现巡航数据结构
 	}
 	
 	//单组IO测速参数
-	public static class NET_ITC_SINGLE_IOSPEED_PARAM extends Structure {
+    class NET_ITC_SINGLE_IOSPEED_PARAM extends Structure {
 		public byte byEnable; //是否启用，0-不启用，1-启用
 		public byte byTrigCoil1; //第一线圈关联IO，0-IO1,1-IO2,2-IO3,3-IO4,4-IO5,5-IO6
 		public byte byCoil1IOStatus;//第一线圈IO输入口状态，0-下降沿（默认），1-上升沿，2-上升沿和下降沿，3-高电平，4-低电平
@@ -7601,7 +7601,7 @@ DVR实现巡航数据结构
 	}
 	
 	//牌识参数
-	public static class NET_ITC_PLATE_RECOG_PARAM extends Structure {
+    class NET_ITC_PLATE_RECOG_PARAM extends Structure {
 		public byte[] byDefaultCHN = new byte[MAX_CHJC_NUM]; /*设备运行省份的汉字简写*/
 		public byte byEnable; //是否启用该区域牌识，0-否，1-是
 		public int dwRecogMode;
@@ -7645,25 +7645,25 @@ DVR实现巡航数据结构
 	}
 	
 	//卡口IO测速参数
-	public static class NET_ITC_POST_IOSPEED_PARAM extends Structure {
+    class NET_ITC_POST_IOSPEED_PARAM extends Structure {
 		public NET_ITC_PLATE_RECOG_PARAM struPlateRecog; //牌识参数
 		public NET_ITC_SINGLE_IOSPEED_PARAM[] struSingleIOSpeed = new NET_ITC_SINGLE_IOSPEED_PARAM[MAX_IOSPEED_GROUP_NUM]; //单个IO测速组参数
 		public byte[] byRes = new byte[32];
 	}
 	
-	public static class NET_DVR_GEOGLOCATION extends Structure {
+	class NET_DVR_GEOGLOCATION extends Structure {
 		public int[] iRes = new int[2]; /*保留*/
 		public int dwCity; /*城市，详见PROVINCE_CITY_IDX */
 	}
 	
-	public static class NET_ITC_INTERVAL_PARAM extends Structure {
+	class NET_ITC_INTERVAL_PARAM extends Structure {
 		public byte byIntervalType;    //间隔类型（默认按时间），0-时间起效,1-距离起效
 		public byte[] byRes1 = new byte[3];
 		public short[] wInterval = new short[MAX_INTERVAL_NUM];//连拍间隔时间（单位ms）或连拍间隔距离（单位分米），当byIntervalType为0时，表示间隔时间，当byIntervalType为1时，表示距离
 		public byte[] byRes = new byte[8];
 	}
 	
-	public static class NET_ITC_VTLANE_PARAM extends Structure {
+	class NET_ITC_VTLANE_PARAM extends Structure {
 		public byte byRelatedDriveWay;//关联的车道号
 		public byte bySpeedCapEn; //是否启用超速抓拍，0-否，1-是
 		public byte bySignSpeed;//标志限速，单位km/h
@@ -7684,7 +7684,7 @@ DVR实现巡航数据结构
 		public NET_VCA_LINE struLine = new NET_VCA_LINE(); //车道线
 	}
 	
-	public static class NET_ITC_VTCOIL_INFO extends Structure {
+	class NET_ITC_VTCOIL_INFO extends Structure {
 		public NET_VCA_RECT struLaneRect = new NET_VCA_RECT();  /*虚拟线圈区域*/
 		public byte byTrigFlag; //触发标志，0-车头触发；1-车尾触发；2-车头/车尾都触发
 		public byte byTrigSensitive;  //触发灵敏度，1-100
@@ -7700,7 +7700,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[30];
 	}
 	
-	public static class NET_ITC_RADAR_PARAM extends Structure {
+	class NET_ITC_RADAR_PARAM extends Structure {
 		public byte byRadarType;    //雷达类型，0-无雷达,1-安道雷雷达，2-奥利维亚，3-川速微波4,雷达接IO扩展盒(此参数在卡口虚拟线圈、混行卡口界面中使用，卡口RS485雷达不使用),0xff-其它类型
 		public byte byLevelAngle;   //与水平线所成角度,默认为25°(0到90度)
 		public short wRadarSensitivity; //雷达灵敏度
@@ -7712,7 +7712,7 @@ DVR实现巡航数据结构
 	}
 	
 	//卡口虚拟线圈触发参数
-	public static class NET_ITC_POST_VTCOIL_PARAM extends Structure {
+    class NET_ITC_POST_VTCOIL_PARAM extends Structure {
 		public byte byRelatedLaneNum;//关联的车道个数
 		public byte byIsDisplay; //视频中是否显示虚拟线圈，0-不显示，1-显示
 		public byte byLoopPos; //晚间触发线圈的偏向（默认10）
@@ -7749,7 +7749,7 @@ DVR实现巡航数据结构
 	}
 	
 	//车道属性参数结构
-	public static class NET_ITC_LANE_LOGIC_PARAM extends Structure {
+    class NET_ITC_LANE_LOGIC_PARAM extends Structure {
 		public byte byUseageType;     //车道用途类型，详见ITC_LANE_USEAGE_TYPE
 		public byte byDirectionType;  //车道方向类型，详见ITC_LANE_DIRECTION_TYPE
 		public byte byCarDriveDirect; //车辆行驶方向，详见ITC_LANE_CAR_DRIVE_DIRECT
@@ -7757,13 +7757,13 @@ DVR实现巡航数据结构
 	}
 	
 	//视频电警线结构
-	public static class NET_ITC_LINE extends Structure {
+    class NET_ITC_LINE extends Structure {
 		public NET_VCA_LINE struLine = new NET_VCA_LINE(); //线参数
 		public byte byLineType; //线类型，详见ITC_LINE_TYPE
 		public byte[] byRes = new byte[7];
 	}
 	
-	public static class NET_ITC_SNAPMODE_PARAM extends Structure {
+	class NET_ITC_SNAPMODE_PARAM extends Structure {
 		public byte byVehicleCapMode;//机动车抓拍模式，0-频闪模式；1-爆闪模式
 		public byte byNoVehicleCapMode;//非机动车抓拍模式，0-频闪模式；1-爆闪模式
 		public byte byPasserCapMode;//行人抓拍模式，0-频闪模式；1-爆闪模式
@@ -7771,7 +7771,7 @@ DVR实现巡航数据结构
 	}
 	
 	//size = 128
-	public static class NET_ITC_HVT_EC_PARAM extends Structure {
+    class NET_ITC_HVT_EC_PARAM extends Structure {
 		public int dwCapShutter;            //抓拍快门0~65535
 		public short wCapGain;            //抓拍增益0～100
 		public byte[] byRes = new byte[2];
@@ -7782,7 +7782,7 @@ DVR实现巡航数据结构
 		public byte[] byRes1 = new byte[108];
 	}
 	
-	public static class NET_ITC_LANE_HVT_PARAM extends Structure {
+	class NET_ITC_LANE_HVT_PARAM extends Structure {
 		public byte byLaneNO; //关联的车道号 1~255（用于叠加和上传）
 		public byte bySignSpeed;    //标志限速，单位km/h 0～255  70
 		public byte bySpeedLimit;    //限速值，单位km/h 0～255    80 实际起效
@@ -7810,7 +7810,7 @@ DVR实现巡航数据结构
 		public byte[] byRes4 = new byte[60];
 	}
 	
-	public static class NET_ITC_POST_HVT_PARAM extends Structure {
+	class NET_ITC_POST_HVT_PARAM extends Structure {
 		public byte byLaneNum;//识别的车道个数，1-6
 		public byte bySceneMode;//0-未知1-城区道路；2-小区出入口
 		public byte byRoadExpBright;//路面期望亮度（视频曝光参数调整的依据之一。在无机动车时，依据此亮度期望值，调整视频曝光参数）
@@ -7825,7 +7825,7 @@ DVR实现巡航数据结构
 	}
 	
 	//抓拍机4.0新增
-	public static class NET_ITC_LANE_HVT_PARAM_V50 extends Structure {
+    class NET_ITC_LANE_HVT_PARAM_V50 extends Structure {
 		public byte byLaneNO;        //关联的车道号1～255(用于叠加和上传)
 		public byte byFlashMode;    //闪光灯闪烁模式，0-同时闪，1-轮流闪
 		public byte bySignSpeed;    //小车标志限高速，单位km/h
@@ -7862,7 +7862,7 @@ DVR实现巡航数据结构
 		public byte[] byRes2 = new byte[280];
 	}
 	
-	public static class NET_ITC_POST_HVT_PARAM_V50 extends Structure {
+	class NET_ITC_POST_HVT_PARAM_V50 extends Structure {
 		public byte byLaneNum;    //识别的车道个数，1-6
 		public byte byCapType;        //抓拍类型，0-机、非、人（默认），1-机动车
 		public byte byCapMode;    //抓拍方式，0-视频抽帧，1-打断抓拍，2-混合模式，
@@ -7881,7 +7881,7 @@ DVR实现巡航数据结构
 	}
 	
 	
-	public static class NET_ITC_LANE_PARAM extends Structure {
+	class NET_ITC_LANE_PARAM extends Structure {
 		public byte byEnable; //是否启用该车道，0-不启用，1-启用
 		public byte byRelatedDriveWay;//关联的车道号
 		public short wDistance; //线圈距离，计算速度
@@ -7912,7 +7912,7 @@ DVR实现巡航数据结构
 	}
 	
 	//卡口RS485车检器触发参数
-	public static class NET_ITC_POST_RS485_PARAM extends Structure {
+    class NET_ITC_POST_RS485_PARAM extends Structure {
 		public byte byRelatedLaneNum;//关联的车道个数
 		public byte byTriggerSpareMode; //触发备用模式，0-默认，1-卡口虚拟线圈模式,2-卡口混合车道模式
 		public byte byFaultToleranceTime;//容错时间(单位:分钟)，用于检测车检器是否正常的最大时间
@@ -7923,7 +7923,7 @@ DVR实现巡航数据结构
 	}
 	
 	//卡口RS485雷达触发参数
-	public static class NET_ITC_POST_RS485_RADAR_PARAM extends Structure {
+    class NET_ITC_POST_RS485_RADAR_PARAM extends Structure {
 		public byte byRelatedLaneNum;//关联的车道个数
 		public byte[] byRes1 = new byte[3];
 		public NET_ITC_PLATE_RECOG_PARAM struPlateRecog = new NET_ITC_PLATE_RECOG_PARAM(); //牌识参数
@@ -7932,7 +7932,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[32];
 	}
 	
-	public static class NET_ITC_TRIGGER_PARAM_UNION extends Union {
+	class NET_ITC_TRIGGER_PARAM_UNION extends Union {
 		public int[] uLen = new int[1070];            //参数
 		public NET_ITC_POST_IOSPEED_PARAM struIOSpeed = new NET_ITC_POST_IOSPEED_PARAM();    //（卡口）IO测速参数
 		//	public NET_ITC_POST_SINGLEIO_PARAM     struSingleIO = new NET_ITC_POST_SINGLEIO_PARAM();   //（卡口）单IO参数
@@ -7955,7 +7955,7 @@ DVR实现巡航数据结构
 	}
 	
 	//单个触发参数结构
-	public static class NET_ITC_SINGLE_TRIGGERCFG extends Structure {
+    class NET_ITC_SINGLE_TRIGGERCFG extends Structure {
 		public byte byEnable;    //是否启用该触发模式，0-否，1-是
 		public byte[] byRes1 = new byte[3];
 		public int dwTriggerType; //触发类型，详见ITC_TRIGGERMODE_TYPE
@@ -7964,14 +7964,14 @@ DVR实现巡航数据结构
 	}
 	
 	//触发参数结构
-	public static class NET_ITC_TRIGGERCFG extends Structure {
+    class NET_ITC_TRIGGERCFG extends Structure {
 		public int dwSize;            //结构长度
 		public NET_ITC_SINGLE_TRIGGERCFG struTriggerParam;  //单个触发参数
 		public byte[] byRes = new byte[32];
 	}
 	
 	//单个IO接入信号灯参数
-	public static class NET_ITC_SINGLE_IO_LIGHT_PARAM extends Structure {
+    class NET_ITC_SINGLE_IO_LIGHT_PARAM extends Structure {
 		public byte byLightType; //交通灯导向类型,0-左转灯,1-直行灯,2-右转灯
 		public byte byRelatedIO; //关联的IO口号
 		public byte byRedLightState; //红灯电平状态，0-高电平红灯，1-低电平红灯
@@ -7979,13 +7979,13 @@ DVR实现巡航数据结构
 	}
 	
 	//IO接入信号灯参数
-	public static class NET_ITC_IO_LIGHT_PARAM extends Structure {
+    class NET_ITC_IO_LIGHT_PARAM extends Structure {
 		public NET_ITC_SINGLE_IO_LIGHT_PARAM[] struIOLight = new NET_ITC_SINGLE_IO_LIGHT_PARAM[MAX_LIGHT_NUM]; //单个IO接入信号灯参数
 		public byte[] byRes = new byte[8];
 	}
 	
 	//单个485接入信号灯参数
-	public static class NET_ITC_SINGLE_RS485_LIGHT_PARAM extends Structure {
+    class NET_ITC_SINGLE_RS485_LIGHT_PARAM extends Structure {
 		public byte byLightType; //交通灯导向类型，0-左转灯，1-直行灯，2-右转灯
 		public byte byRelatedLightChan; //关联的红绿灯检测器通道号
 		public byte byInputLight;    //接入的信号灯类型，0-接红灯，1-接绿灯
@@ -7994,12 +7994,12 @@ DVR实现巡航数据结构
 	}
 	
 	//485接入信号灯参数
-	public static class NET_ITC_RS485_LIGHT_PARAM extends Structure {
+    class NET_ITC_RS485_LIGHT_PARAM extends Structure {
 		public NET_ITC_SINGLE_RS485_LIGHT_PARAM[] struRS485Light = new NET_ITC_SINGLE_RS485_LIGHT_PARAM[MAX_LIGHT_NUM]; //单个485接入信号灯参数
 		public byte[] byRes = new byte[8];
 	}
 	
-	public static class NET_POS_PARAM extends Structure {
+	class NET_POS_PARAM extends Structure {
 		public short wLeft;
 		public short wTop;
 		public short wRight;
@@ -8007,7 +8007,7 @@ DVR实现巡航数据结构
 	}
 	
 	//单组视频检测交通信号灯参数结构
-	public static class NET_ITC_SINGLE_VIDEO_DETECT_LIGHT_PARAM extends Structure {
+    class NET_ITC_SINGLE_VIDEO_DETECT_LIGHT_PARAM extends Structure {
 		public byte byLightNum; //交通灯个数
 		public byte byStraightLight; //是否有直行标志灯，0-否 ，1-是
 		public byte byLeftLight; //是否有左转标志灯，0-否，1-是
@@ -8021,13 +8021,13 @@ DVR实现巡航数据结构
 	}
 	
 	//视频检测交通信号灯参数结构(最大可有12个区域检测，488字节)
-	public static class NET_ITC_VIDEO_DETECT_LIGHT_PARAM extends Structure {
+    class NET_ITC_VIDEO_DETECT_LIGHT_PARAM extends Structure {
 		public NET_ITC_SINGLE_VIDEO_DETECT_LIGHT_PARAM[] struTrafficLight = new NET_ITC_SINGLE_VIDEO_DETECT_LIGHT_PARAM[MAX_VIDEO_DETECT_LIGHT_NUM]; //单个视频检测信号灯参数
 		public byte[] byRes = new byte[8];
 	}
 	
 	//交通信号灯接入参数
-	public static class NET_ITC_LIGHT_ACCESSPARAM_UNION extends Union {
+    class NET_ITC_LIGHT_ACCESSPARAM_UNION extends Union {
 		public int[] uLen = new int[122];
 		public NET_ITC_IO_LIGHT_PARAM struIOLight; //IO接入信号灯参数
 		public NET_ITC_RS485_LIGHT_PARAM struRS485Light; //485接入信号灯参数
@@ -8035,7 +8035,7 @@ DVR实现巡航数据结构
 	}
 	
 	//交通信号灯参数结构
-	public static class NET_ITC_TRAFFIC_LIGHT_PARAM extends Structure {
+    class NET_ITC_TRAFFIC_LIGHT_PARAM extends Structure {
 		public byte bySource; //交通信号灯接入源，0-IO接入，1-RS485接入
 		public byte[] byRes1 = new byte[3];
 		public NET_ITC_LIGHT_ACCESSPARAM_UNION struLightAccess = new NET_ITC_LIGHT_ACCESSPARAM_UNION();//信号灯接入参数
@@ -8043,7 +8043,7 @@ DVR实现巡航数据结构
 	}
 	
 	//违规检测参数结构
-	public static class NET_ITC_VIOLATION_DETECT_PARAM extends Structure {
+    class NET_ITC_VIOLATION_DETECT_PARAM extends Structure {
 		public int dwVioDetectType; //违规检测类型, 按位表示, 详见ITC_VIOLATION_DETECT_TYPE ,0-不启用,1-启用
 		public byte byDriveLineSnapTimes; //压车道线抓拍张数,2-3
 		public byte byReverseSnapTimes; //逆行抓拍,2-3
@@ -8063,7 +8063,7 @@ DVR实现巡航数据结构
 	}
 	
 	//违规检测线参数结构
-	public static class NET_ITC_VIOLATION_DETECT_LINE extends Structure {
+    class NET_ITC_VIOLATION_DETECT_LINE extends Structure {
 		public NET_ITC_LINE struLaneLine = new NET_ITC_LINE(); //车道线参数
 		public NET_ITC_LINE struStopLine = new NET_ITC_LINE(); //停止线参数
 		public NET_ITC_LINE struRedLightLine = new NET_ITC_LINE(); //闯红灯触发线参数
@@ -8073,7 +8073,7 @@ DVR实现巡航数据结构
 	}
 	
 	//单个车道视频电警触发参数结构
-	public static class NET_ITC_LANE_VIDEO_EPOLICE_PARAM extends Structure {
+    class NET_ITC_LANE_VIDEO_EPOLICE_PARAM extends Structure {
 		public byte byLaneNO; //关联的车道号
 		public byte bySensitivity; //线圈灵敏度，[1,100]
 		public byte byEnableRadar;//启用雷达测试0-不启用，1-启用
@@ -8097,7 +8097,7 @@ DVR实现巡航数据结构
 	}
 	
 	//视频电警触发参数结构
-	public static class NET_ITC_VIDEO_EPOLICE_PARAM extends Structure {
+    class NET_ITC_VIDEO_EPOLICE_PARAM extends Structure {
 		public byte byEnable;    //是否启用，0-不启用，1-启用
 		public byte byLaneNum; //识别的车道个数
 		public byte byLogicJudge;//闯红灯违规判断逻辑，设置值为：0-按方向，1-按车道
@@ -8113,32 +8113,32 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[32];
 	}
 	
-	public static class NET_DVR_CURTRIGGERMODE extends Structure {
+	class NET_DVR_CURTRIGGERMODE extends Structure {
 		public int dwSize;
 		public int dwTriggerType; //触发类型，详见ITC_TRIGGERMODE_TYPE
 		public byte[] byRes = new byte[24];
 	}
 	
-	public static class NET_ITC_VIDEO_TRIGGER_COND extends Structure {
+	class NET_ITC_VIDEO_TRIGGER_COND extends Structure {
 		public int dwSize;
 		public int dwChannel;
 		public int dwTriggerMode; //视频触发模式类型，详见ITC_TRIGGERMODE_TYPE
 		public byte[] byRes = new byte[16];
 	}
 	
-	public static class NET_ITC_VIDEO_TRIGGER_PARAM_UNION extends Union {
+	class NET_ITC_VIDEO_TRIGGER_PARAM_UNION extends Union {
 		public int[] uLen = new int[1150];
 		public NET_ITC_VIDEO_EPOLICE_PARAM struVideoEP = new NET_ITC_VIDEO_EPOLICE_PARAM(); //视频电警参数
 	}
 	
-	public static class NET_ITC_VIDEO_TRIGGER_PARAM extends Structure {
+	class NET_ITC_VIDEO_TRIGGER_PARAM extends Structure {
 		public int dwSize;
 		public int dwMode; //触发模式，详见ITC_TRIGGERMODE_TYPE
 		public NET_ITC_VIDEO_TRIGGER_PARAM_UNION uVideoTrigger = new NET_ITC_VIDEO_TRIGGER_PARAM_UNION(); //触发模式参数
 		public byte[] byRes = new byte[32];
 	}
 	
-	public static class NET_DVR_CMS_PARAM extends Structure {
+	class NET_DVR_CMS_PARAM extends Structure {
 		public int dwSize;
 		public NET_DVR_IPADDR struAddr = new NET_DVR_IPADDR();                    // 平台服务器IP
 		public short wServerPort;                   // 平台服务器侦听端口，
@@ -8159,13 +8159,13 @@ DVR实现巡航数据结构
 	}
 	
 	//设置完全获取出厂值
-	public static class NET_DVR_COMPLETE_RESTORE_INFO extends Structure {
+    class NET_DVR_COMPLETE_RESTORE_INFO extends Structure {
 		public int dwSize; //结构体长度
 		public int dwChannel; //通道号
 		public byte[] byRes = new byte[64];
 	}
 	
-	public static class NET_DVR_STD_ABILITY extends Structure {
+	class NET_DVR_STD_ABILITY extends Structure {
 		public Pointer lpCondBuffer;    //[in]条件参数(码字格式),例如通道号等.可以为NULL
 		public int dwCondSize;        //[in] dwCondSize指向的内存大小
 		public Pointer lpOutBuffer;    //[out]输出参数(XML格式),不为NULL
@@ -8176,7 +8176,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[32];        //保留字节
 	}
 	
-	public static class NET_DVR_STD_CONFIG extends Structure {
+	class NET_DVR_STD_CONFIG extends Structure {
 		public Pointer lpCondBuffer;        //[in]条件参数(结构体格式),例如通道号等.可以为NULL
 		public int dwCondSize;            //[in] lpCondBuffer指向的内存大小
 		public Pointer lpInBuffer;            //[in]输入参数(结构体格式),设置时不为NULL，获取时为NULL
@@ -8191,14 +8191,14 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[23];
 	}
 	
-	public static final int NET_SDK_MAX_FILE_PATH = 256;//路径长度
+	int NET_SDK_MAX_FILE_PATH = 256;//路径长度
 	
-	public static class NET_DVR_LOCAL_SDK_PATH extends Structure {
+	class NET_DVR_LOCAL_SDK_PATH extends Structure {
 		public byte[] sPath = new byte[NET_SDK_MAX_FILE_PATH];//组件库地址
 		public byte[] byRes = new byte[128];
 	}
 	
-	public static class BYTE_ARRAY extends Structure {
+	class BYTE_ARRAY extends Structure {
 		public byte[] byValue;
 		
 		public BYTE_ARRAY(int iLen) {
@@ -8206,7 +8206,7 @@ DVR实现巡航数据结构
 		}
 	}
 	
-	public static class NET_DVR_JSON_DATA_CFG extends Structure {
+	class NET_DVR_JSON_DATA_CFG extends Structure {
 		public int dwSize;                        //结构体大小
 		public Pointer lpJsonData;                //JSON报文
 		public int dwJsonDataSize;                //JSON报文大小
@@ -8217,7 +8217,7 @@ DVR实现巡航数据结构
 		public byte[] byRes = new byte[248];
 	}
 	
-	public static class CallBack_USER extends Structure {
+	class CallBack_USER extends Structure {
 		public byte[] byDeviceID = new byte[16];
 		public byte[] byCardNo = new byte[32];
 		public byte[] byDevIP = new byte[16];
@@ -8225,57 +8225,57 @@ DVR实现巡航数据结构
 	
 	
 	/***API函数声明,详细说明见API手册***/
-	public static interface FRealDataCallBack_V30 extends StdCallCallback {
-		public void invoke(int lRealHandle, int dwDataType,
-		                   ByteByReference pBuffer, int dwBufSize, Pointer pUser);
+    interface FRealDataCallBack_V30 extends StdCallCallback {
+		void invoke(int lRealHandle, int dwDataType,
+                    ByteByReference pBuffer, int dwBufSize, Pointer pUser);
 	}
 	
-	public static interface FMSGCallBack extends StdCallCallback {
-		public void invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
+	interface FMSGCallBack extends StdCallCallback {
+		void invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
 	}
 	
-	public static interface FMSGCallBack_V31 extends StdCallCallback {
-		public boolean invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
+	interface FMSGCallBack_V31 extends StdCallCallback {
+		boolean invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
 	}
 	
-	public static interface FMessCallBack extends StdCallCallback {
-		public boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen);
+	interface FMessCallBack extends StdCallCallback {
+		boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen);
 	}
 	
-	public static interface FMessCallBack_EX extends StdCallCallback {
-		public boolean invoke(int lCommand, int lUserID, String pBuf, int dwBufLen);
+	interface FMessCallBack_EX extends StdCallCallback {
+		boolean invoke(int lCommand, int lUserID, String pBuf, int dwBufLen);
 	}
 	
-	public static interface FMessCallBack_NEW extends StdCallCallback {
-		public boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen, short dwLinkDVRPort);
+	interface FMessCallBack_NEW extends StdCallCallback {
+		boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen, short dwLinkDVRPort);
 	}
 	
-	public static interface FMessageCallBack extends StdCallCallback {
-		public boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen, int dwUser);
+	interface FMessageCallBack extends StdCallCallback {
+		boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen, int dwUser);
 	}
 	
-	public static interface FExceptionCallBack extends StdCallCallback {
-		public void invoke(int dwType, int lUserID, int lHandle, Pointer pUser);
+	interface FExceptionCallBack extends StdCallCallback {
+		void invoke(int dwType, int lUserID, int lHandle, Pointer pUser);
 	}
 	
-	public static interface FDrawFun extends StdCallCallback {
-		public void invoke(int lRealHandle, W32API.HDC hDc, int dwUser);
+	interface FDrawFun extends StdCallCallback {
+		void invoke(int lRealHandle, W32API.HDC hDc, int dwUser);
 	}
 	
-	public static interface FStdDataCallBack extends StdCallCallback {
-		public void invoke(int lRealHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser);
+	interface FStdDataCallBack extends StdCallCallback {
+		void invoke(int lRealHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser);
 	}
 	
-	public static interface FPlayDataCallBack extends StdCallCallback {
-		public void invoke(int lPlayHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser);
+	interface FPlayDataCallBack extends StdCallCallback {
+		void invoke(int lPlayHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser);
 	}
 	
-	public static interface FPlayESCallBack extends StdCallCallback {
-		public void invoke(int lPlayHandle, NET_DVR_PACKET_INFO_EX struPackInfo, Pointer pUser);
+	interface FPlayESCallBack extends StdCallCallback {
+		void invoke(int lPlayHandle, NET_DVR_PACKET_INFO_EX struPackInfo, Pointer pUser);
 	}
 	
-	public static interface FVoiceDataCallBack extends StdCallCallback {
-		public void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
+	interface FVoiceDataCallBack extends StdCallCallback {
+		void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
 	}
 	
 	interface FVoiceDataCallBack_V30 extends StdCallCallback {
