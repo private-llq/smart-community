@@ -51,7 +51,7 @@ public class RepairEntity extends BaseEntity {
     private String statusString;
 
     @ApiModelProperty(value = "报修类别id")
-    @NotNull(groups = {addRepairValidate.class},message = "报修类别不能为空")
+    @NotNull(groups = {addRepairValidate.class},message = "报修类别id不能为空")
     private Long type;
     
     @ApiModelProperty(value = "报修类别字符串形式")
