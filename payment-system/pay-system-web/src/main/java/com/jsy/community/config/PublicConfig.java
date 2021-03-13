@@ -119,7 +119,6 @@ public class PublicConfig {
      */
     public static JSONObject WxTuneUp(String prepayId, String appId, String privateKeyFilePath) throws Exception {
         String time = System.currentTimeMillis() / 1000 + "";
-        System.out.println(time);
         String nonceStr = UUID.randomUUID().toString().replace("-", "");
 //        String packageStr = "prepay_id=" + prepayId;
         ArrayList<String> list = new ArrayList<>();
@@ -129,7 +128,6 @@ public class PublicConfig {
         list.add(prepayId);
         //加载签名
         String packageSign = sign(buildSignMessage(list).getBytes(), privateKeyFilePath);
-        System.out.println(buildSignMessage(list).getBytes().toString());
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("appid", appId);
@@ -279,7 +277,6 @@ public class PublicConfig {
             sbf.append(str).append("\n");
 
         }
-        System.out.println(sbf);
         return sbf.toString();
     }
 

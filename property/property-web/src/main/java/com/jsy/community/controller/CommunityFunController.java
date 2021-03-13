@@ -6,19 +6,23 @@ import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.CommunityFunQO;
-import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.io.IOUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,7 +37,7 @@ import java.util.Map;
 @ApiJSYController
 public class CommunityFunController {
 
-    private final String[] img ={"jpg","png","jpeg","gif"};
+    private final String[] img ={"jpg","png","jpeg"};
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICommunityFunService communityFunService;
@@ -75,27 +79,48 @@ public class CommunityFunController {
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
     @Login
-    public CommonResult coverImge(@RequestParam("file") MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        if (!Arrays.asList(img).contains(s)) {
-            return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
+    public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
+        if (PicUtil.isPic(file)){
+            String originalFilename = file.getOriginalFilename();
+            String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+            File tempFile = new File(file.getOriginalFilename());
+            try {
+                Thumbnails.of(file.getInputStream())
+                        .scale(0.25f)
+                        .toFile(tempFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (!Arrays.asList(img).contains(s)) {
+                return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
+            }
+            String upload = MinioUtils.upload(file, "coverimge");
+            FileInputStream input = new FileInputStream(tempFile);
+            MultipartFile multipartFile =new MockMultipartFile("file", tempFile.getName(), "image/png", IOUtils.toByteArray(input));
+            String upload2 = MinioUtils.upload(multipartFile, "coverimge");
+            Map<String, String> map = new HashMap<>();
+            map.put("coverImge",upload);
+            map.put("smallImge",upload2);
+            return  CommonResult.ok(map,"上传成功");
         }
-        String upload = MinioUtils.upload(file, "coverimge");
-        return  CommonResult.ok(upload,"上传成功");
+        return CommonResult.error("上传失败");
+
     }
 
     @ApiOperation("新增内容图片")
     @PostMapping("/contentImge")
     @Login
-    public CommonResult content(@RequestParam("file") MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        if (!Arrays.asList(img).contains(s)) {
-            return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
+    public CommonResult content(@RequestParam("file") MultipartFile file) throws IOException {
+        if (PicUtil.isPic(file)){
+            String originalFilename = file.getOriginalFilename();
+            String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+            if (!Arrays.asList(img).contains(s)) {
+                return CommonResult.error("请上传图片！可用后缀"+ Arrays.toString(img));
+            }
+            String upload = MinioUtils.upload(file, "contentimge");
+            return  CommonResult.ok(upload,"上传成功");
         }
-        String upload = MinioUtils.upload(file, "contentimge");
-        return  CommonResult.ok(upload,"上传成功");
+        return  CommonResult.error("上传失败");
     }
 
     @ApiOperation("修改")

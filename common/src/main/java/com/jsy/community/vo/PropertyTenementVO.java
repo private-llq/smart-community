@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * @program: com.jsy.community
@@ -15,8 +16,20 @@ import java.io.Serializable;
 public class PropertyTenementVO implements Serializable {
     @ApiModelProperty("房屋")
     private String housing;
-    @ApiModelProperty("租期")
-    private String tenancyTerm;
+    @ApiModelProperty("楼栋名")
+    private String building;
+    @ApiModelProperty("单元名")
+    private String unit;
+    @ApiModelProperty("门牌")
+    private String floor;
+    @ApiModelProperty("房屋类型")
+    private Integer houseType;
+    @ApiModelProperty("房屋类型名称")
+    private String houseTypeName;
+    @ApiModelProperty(value = "租期结束时间")
+    private LocalDate leaseOverTime;
+    @ApiModelProperty(value = "租期开始时间")
+    private LocalDate leaseStartTime;
     @ApiModelProperty("租户名称")
     private String tenementName;
     @ApiModelProperty("租户电话")

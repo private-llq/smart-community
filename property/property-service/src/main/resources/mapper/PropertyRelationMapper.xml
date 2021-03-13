@@ -25,7 +25,8 @@
     <select id="list" resultMap="PropertyRelationMap">
         SELECT CONCAT(th.building,"-",th.unit,"-",th.floor,"-",th.door) as housing,
         thm.name as memberName,thm.mobile as mobile,thm.id_card as idCard,thm.relation as relation,
-        tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile
+        tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile,
+        th.building as building,th.unit as unit,th.floor as floor,th.house_type as houseType
         FROM t_house_member thm
         join t_user tu on tu.uid=thm.householder_id
         join t_house th on thm.house_id=th.id
@@ -54,6 +55,10 @@
     <resultMap id="PropertyRelationMap" type="com.jsy.community.vo.PropertyRelationVO">
         <result property="housing" column="housing"/>
         <result property="memberName" column="memberName"/>
+        <result property="houseType" column="houseType"/>
+        <result property="floor" column="floor"/>
+        <result property="unit" column="unit"/>
+        <result property="building" column="building"/>
         <result property="mobile" column="mobile"/>
         <result property="idCard" column="idCard"/>
         <result property="relation" column="relation"/>

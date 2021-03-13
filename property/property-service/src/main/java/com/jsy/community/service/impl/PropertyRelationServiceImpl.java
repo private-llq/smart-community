@@ -32,16 +32,25 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 
     @Override
     public List<HouseTypeVo> getHouseId(BaseQO<RelationListQO> baseQO) {
+        if (baseQO.getSize()==null||baseQO.getSize()==0){
+            baseQO.setSize(10L);
+        }
         return propertyRelationMapper.getHouseId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
     }
 
     @Override
     public List getBuildingId(BaseQO<RelationListQO> baseQO) {
+        if (baseQO.getSize()==null||baseQO.getSize()==0){
+            baseQO.setSize(10L);
+        }
         return propertyRelationMapper.getBuildingId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
     }
 
     @Override
     public List getUnitId(BaseQO<RelationListQO> baseQO) {
+        if (baseQO.getSize()==null||baseQO.getSize()==0){
+            baseQO.setSize(10L);
+        }
         return propertyRelationMapper.getUnitId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
     }
 
@@ -53,7 +62,10 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         List<PropertyRelationVO> relationVOS = propertyRelationMapper.list(baseQO.getQuery(), baseQO.getPage(), baseQO.getSize());
         for (PropertyRelationVO relationVO : relationVOS) {
             relationVO.setRelationName(BusinessEnum.RelationshipEnum.getCode(relationVO.getRelation()));
+            relationVO.setHousing(replaceStr(relationVO.getHousing()));
+            relationVO.setHouseTypeName(relationVO.getHouseType()==1?"商铺":relationVO.getHouseType()==2?"住宅":"");
         }
+
         Map map = new HashMap<>();
         map.put("list",relationVOS);
         map.put("total",propertyRelationMapper.getTotal(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize()));
@@ -61,19 +73,12 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     }
     public static String replaceStr(String str){
         StringBuffer buf = new StringBuffer();
-
         Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
-
         Matcher m = p.matcher(str);
-
         while(m.find()){
-
             String chinese = m.group();//匹配出的中文
-
             String pinyin = "";//在你的中文与拼音对应中找到对应拼音。
-
             m.appendReplacement(buf, pinyin);
-
         }
         return m.appendTail(buf).toString();
     }
