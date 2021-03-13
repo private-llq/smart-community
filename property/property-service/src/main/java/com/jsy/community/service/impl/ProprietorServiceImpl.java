@@ -30,7 +30,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 /**
- * 业主 服务实现类
+ * 业主 服务实现类。
  *
  * @author YuLF
  * @since 2020-11-25
@@ -69,11 +69,12 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         //管理员姓名
         String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
         ProprietorEntity entity = new ProprietorEntity();
-        BeanUtils.copyProperties( entity, qo );
-        proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), entity.getId());
-        UpdateWrapper<ProprietorEntity> wrapper = new UpdateWrapper<ProprietorEntity>().eq("id", entity.getId());
-        return proprietorMapper.update(entity, wrapper) > 0;
+        BeanUtils.copyProperties( qo, entity );
+        proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), entity.getId(), 2);
+        return proprietorMapper.updateById(entity) > 0;
     }
+
+
 
 
 
@@ -83,9 +84,9 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         //管理员姓名
         String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
         ProprietorEntity entity = new ProprietorEntity();
-        BeanUtils.copyProperties( entity, qo );
+        BeanUtils.copyProperties( qo, entity );
         entity.setId( SnowFlake.nextId() );
-        proprietorMapper.insertOperationLog( SnowFlake.nextId(), adminUserName, DateUtils.now(), entity.getId() );
+        proprietorMapper.insertOperationLog( SnowFlake.nextId(), adminUserName, DateUtils.now(), entity.getId(), 1 );
         proprietorMapper.insert(entity);
         //TODO 短信通知业主
     }

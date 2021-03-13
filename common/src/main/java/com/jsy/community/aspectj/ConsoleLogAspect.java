@@ -33,12 +33,12 @@ import java.util.Calendar;
 @Component
 @Scope(value = "prototype")
 public class ConsoleLogAspect {
-	private Logger logger = LoggerFactory.getLogger(ConsoleLogAspect.class);
+	private final Logger logger = LoggerFactory.getLogger(ConsoleLogAspect.class);
 	
 	@Autowired
 	private UserUtils userUtils;
 	
-	private static ThreadLocal<Double> mark = new ThreadLocal<>();
+	private static final ThreadLocal<Double> mark = new ThreadLocal<>();
 	
 	/**
 	 * 定义切入点，切入点为com.jsy.community下的函数

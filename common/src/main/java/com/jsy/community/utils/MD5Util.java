@@ -1,6 +1,7 @@
 package com.jsy.community.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -23,13 +24,11 @@ public class MD5Util {
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             md5.reset();
-            md5.update(str.getBytes("UTF-8"));
+            md5.update(str.getBytes(StandardCharsets.UTF_8));
             byte[] digest = md5.digest();
             String hexStr = byteArray2HexStr(digest);
             return hexStr.toLowerCase();
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return null;

@@ -48,11 +48,8 @@ public class RealnameAuthUtils {
 		String httpResult = (String)MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_STR);
 		//解析结果
 		JSONObject result = JSONObject.parseObject(httpResult);
-		if(result != null && "01".equals(result.getString("status"))){
-			return true;
-		}
-		return false;
-	}
+        return result != null && "01".equals(result.getString("status"));
+    }
 	
 	/**
 	* @Description: 实名认证 三要素 (眨眼版) 前置接口

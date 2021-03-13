@@ -23,16 +23,16 @@ public class AlipayUtils {
 	public static final AlipayUserInfoShareRequest alipayUserInfoShareRequest =  new  AlipayUserInfoShareRequest();
 	
 	//appid
-	private static String appid = ConstClasses.AliPayDataEntity.appid;
+	private static final String appid = ConstClasses.AliPayDataEntity.appid;
 	//秘钥
-	private static String privateKey = ConstClasses.AliPayDataEntity.privateKey;
+	private static final String privateKey = ConstClasses.AliPayDataEntity.privateKey;
 	
 	//应用公钥证书路径
-	private static String certPath = ConstClasses.AliPayDataEntity.certPath;
+	private static final String certPath = ConstClasses.AliPayDataEntity.certPath;
 	//支付宝公钥证书路径
-	private static String alipayPublicCertPath = ConstClasses.AliPayDataEntity.alipayPublicCertPath;
+	private static final String alipayPublicCertPath = ConstClasses.AliPayDataEntity.alipayPublicCertPath;
 	//支付宝根证书路径
-	private static String rootCertPath = ConstClasses.AliPayDataEntity.rootCertPath;
+	private static final String rootCertPath = ConstClasses.AliPayDataEntity.rootCertPath;
 	
 	//支付宝证书方式请求
 	private static final CertAlipayRequest certAlipayRequest = new CertAlipayRequest();

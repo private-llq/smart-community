@@ -2,6 +2,7 @@ package com.jsy.community.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -127,12 +128,8 @@ public class OrderInfoUtil2_0 {
 		sb.append(key);
 		sb.append("=");
 		if (isEncode) {
-			try {
-				sb.append(URLEncoder.encode(value, "UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				sb.append(value);
-			}
-		} else {
+            sb.append(URLEncoder.encode(value, StandardCharsets.UTF_8));
+        } else {
 			sb.append(value);
 		}
 		return sb.toString();
@@ -166,12 +163,8 @@ public class OrderInfoUtil2_0 {
 		String oriSign = SignUtils.sign(authInfo.toString(), rsaKey, rsa2);
 		String encodedSign = "";
 
-		try {
-			encodedSign = URLEncoder.encode(oriSign, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return "sign=" + encodedSign;
+        encodedSign = URLEncoder.encode(oriSign, StandardCharsets.UTF_8);
+        return "sign=" + encodedSign;
 	}
 
 	/**

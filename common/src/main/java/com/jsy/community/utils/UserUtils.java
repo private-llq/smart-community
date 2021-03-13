@@ -159,10 +159,7 @@ public class UserUtils {
 	public boolean destroyToken(String typeName,String token){
 		Boolean result1 = redisTemplate.delete(typeName + ":" + token);
 		Boolean result2 = stringRedisTemplate.delete(typeName + ":" + token);
-		if(result1 || result2){
-			return true;
-		}
-		return false;
-	}
+        return result1 || result2;
+    }
 	
 }

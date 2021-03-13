@@ -8278,44 +8278,44 @@ DVR实现巡航数据结构
 		public void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
 	}
 	
-	public static interface FVoiceDataCallBack_V30 extends StdCallCallback {
-		public void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser);
+	interface FVoiceDataCallBack_V30 extends StdCallCallback {
+		void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser);
 	}
 	
-	public static interface FVoiceDataCallBack_MR extends StdCallCallback {
-		public void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
+	interface FVoiceDataCallBack_MR extends StdCallCallback {
+		void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
 	}
 	
-	public static interface FVoiceDataCallBack_MR_V30 extends StdCallCallback {
-		public void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser);
+	interface FVoiceDataCallBack_MR_V30 extends StdCallCallback {
+		void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser);
 	}
 	
-	public static interface FVoiceDataCallBack2 extends StdCallCallback {
-		public void invoke(String pRecvDataBuffer, int dwBufSize, Pointer pUser);
+	interface FVoiceDataCallBack2 extends StdCallCallback {
+		void invoke(String pRecvDataBuffer, int dwBufSize, Pointer pUser);
 	}
 	
-	public static interface FSerialDataCallBack extends StdCallCallback {
-		public void invoke(int lSerialHandle, String pRecvDataBuffer, int dwBufSize, int dwUser);
+	interface FSerialDataCallBack extends StdCallCallback {
+		void invoke(int lSerialHandle, String pRecvDataBuffer, int dwBufSize, int dwUser);
 	}
 	
-	public static interface FRowDataCallBack extends StdCallCallback {
-		public void invoke(int lUserID, String sIPAddr, int lRowAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
+	interface FRowDataCallBack extends StdCallCallback {
+		void invoke(int lUserID, String sIPAddr, int lRowAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
 	}
 	
-	public static interface FColLocalDataCallBack extends StdCallCallback {
-		public void invoke(int lUserID, String sIPAddr, int lColumnAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
+	interface FColLocalDataCallBack extends StdCallCallback {
+		void invoke(int lUserID, String sIPAddr, int lColumnAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
 	}
 	
-	public static interface FColGlobalDataCallBack extends StdCallCallback {
-		public void invoke(int lUserID, String sIPAddr, int lColumnAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
+	interface FColGlobalDataCallBack extends StdCallCallback {
+		void invoke(int lUserID, String sIPAddr, int lColumnAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
 	}
 	
-	public static interface FJpegdataCallBack extends StdCallCallback {
-		public int invoke(int lCommand, int lUserID, String sDVRIP, String sJpegName, String pJpegBuf, int dwBufLen, int dwUser);
+	interface FJpegdataCallBack extends StdCallCallback {
+		int invoke(int lCommand, int lUserID, String sDVRIP, String sJpegName, String pJpegBuf, int dwBufLen, int dwUser);
 	}
 	
-	public static interface FPostMessageCallBack extends StdCallCallback {
-		public int invoke(int dwType, int lIndex);
+	interface FPostMessageCallBack extends StdCallCallback {
+		int invoke(int dwType, int lIndex);
 	}
 	
 	boolean NET_DVR_Init();
@@ -8618,8 +8618,8 @@ DVR实现巡航数据结构
 //透明通道设置
 	int NET_DVR_SerialStart(int lUserID, int lSerialPort, FSerialDataCallBack fSerialDataCallBack, int dwUser);
 	
-	public static interface FSerialDataCallBack_V40 extends StdCallCallback {
-		public void invoke(int lSerialHandle, int lCHannel, byte[] pRecvDataBuffer, int dwBufSize, Pointer pUser);
+	interface FSerialDataCallBack_V40 extends StdCallCallback {
+		void invoke(int lSerialHandle, int lCHannel, byte[] pRecvDataBuffer, int dwBufSize, Pointer pUser);
 	}
 	
 	int NET_DVR_SerialStart_V40(int lUserID, Pointer lpInBuffer, int dwInBufferSize, FSerialDataCallBack_V40 fSerialDataCallBack_V40, Pointer pUser);
@@ -8921,8 +8921,8 @@ DVR实现巡航数据结构
 	
 	boolean NET_DVR_ManualSnap(int lUserID, NET_DVR_MANUALSNAP lpInter, NET_DVR_PLATE_RESULT lpOuter);
 	
-	public static interface FRemoteConfigCallBack extends StdCallCallback {
-		public void invoke(int dwType, Pointer lpBuffer, int dwBufLen, Pointer pUserData);
+	interface FRemoteConfigCallBack extends StdCallCallback {
+		void invoke(int dwType, Pointer lpBuffer, int dwBufLen, Pointer pUserData);
 	}
 	
 	int NET_DVR_StartRemoteConfig(int lUserID, int dwCommand, Pointer lpInBuffer, int dwInBufferLen, FRemoteConfigCallBack cbStateCallBack, Pointer pUserData);
@@ -8972,7 +8972,7 @@ DVR实现巡航数据结构
 	boolean NET_DVR_UploadClose(int lUploadHandle);
 	
 	//gps相关结构定义
-	public static class TimeSegParam extends Structure {
+    class TimeSegParam extends Structure {
 		//GPS数据查找起始时间
 		public NET_DVR_TIME struBeginTime;
 		//GPS数据查找结束时间
@@ -8984,14 +8984,14 @@ DVR实现巡航数据结构
 	}
 	
 	//按时间点查询
-	public static class TimePointParam extends Structure {
+    class TimePointParam extends Structure {
 		//GPS数据查找时间点
 		public NET_DVR_TIME struTimePoint;
 		//保留
 		public byte[] byRes = new byte[104];
 	}
 	
-	public static class GpsDataParamUion extends Union {
+	class GpsDataParamUion extends Union {
 		//按时间段查询
 		public TimeSegParam timeSeg = new TimeSegParam();
 		//按时间点查询
@@ -8999,7 +8999,7 @@ DVR实现巡航数据结构
 	}
 	
 	//gps查询参数定义
-	public static class NET_DVR_GET_GPS_DATA_PARAM extends Structure {
+    class NET_DVR_GET_GPS_DATA_PARAM extends Structure {
 		//查找方式：0- 按时间段查找GPS数据，1- 按时间点查找GPS数据
 		public int dwCmdType;
 		public GpsDataParamUion gpsDataParam;
@@ -9026,7 +9026,7 @@ DVR实现巡航数据结构
 	}
 	
 	//gps数据结构定义
-	public static class NET_DVR_GPS_INFO extends Structure {
+    class NET_DVR_GPS_INFO extends Structure {
 		public byte[] byDirection = new byte[2];
 		public byte bySvs;
 		public byte byLocateMode;
@@ -9040,14 +9040,14 @@ DVR实现巡航数据结构
 	}
 	
 	//gps返回数据结构定义
-	public static class NET_DVR_GPS_DATA extends Structure {
+    class NET_DVR_GPS_DATA extends Structure {
 		public NET_DVR_GPS_INFO struGPSInfo;
 		public NET_DVR_TIME struTime;
 		public byte[] byRes = new byte[12];
 	}
 	
-	public static interface fGPSDataCallback extends StdCallCallback {
-		public void invoke(int nHandle, int dwState, Pointer lpBuffer, int dwBufLen, Pointer pUser);
+	interface fGPSDataCallback extends StdCallCallback {
+		void invoke(int nHandle, int dwState, Pointer lpBuffer, int dwBufLen, Pointer pUser);
 	}
 	
 	int NET_DVR_GetVehicleGpsInfo(int lUserID, NET_DVR_GET_GPS_DATA_PARAM lpGPSDataParam, fGPSDataCallback cbGPSDataCallBack, Pointer pUser);

@@ -163,9 +163,9 @@
     </insert>
     <!-- 插入 物业 人员对 用户数据的 操作日志 -->
     <insert id="insertOperationLog">
-        insert into t_admin_proprietor_log ( id,operation_person,operation_time,pid )
+        insert into t_admin_proprietor_log ( id,operation_person,operation_time,pid,operation_type )
         values
-        ( #{id},#{operationPerson},#{operationTime},#{pid} )
+        ( #{id},#{operationPerson},#{operationTime},#{pid},#{operationType})
     </insert>
     <!-- 查出管理员姓名 -->
     <select id="queryAdminNameByUid" resultType="java.lang.String">

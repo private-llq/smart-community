@@ -3,6 +3,7 @@ package com.jsy.community.utils;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
@@ -14,8 +15,8 @@ public class AESOperator {
 	/*
 	 * 加密用的Key 可以用26个字母和数字组成 此处使用AES-128-CBC加密模式，key需要为16位。
 	 */
-	private static String sKey = "community0123456";
-	private static String ivParameter = "0123456community";
+	private static final String sKey = "community0123456";
+	private static final String ivParameter = "0123456community";
 	
 	// 加密
 	public static String encrypt(String sSrc){
@@ -27,7 +28,7 @@ public class AESOperator {
 			SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
 			IvParameterSpec iv = new IvParameterSpec(ivParameter.getBytes());// 使用CBC模式，需要一个向量iv，可增加加密算法的强度
 			cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
-			byte[] encrypted = cipher.doFinal(sSrc.getBytes("utf-8"));
+			byte[] encrypted = cipher.doFinal(sSrc.getBytes(StandardCharsets.UTF_8));
 			// 此处使用BASE64做转码。
 			result = Base64.getEncoder().encodeToString(encrypted);
 		} catch (Exception e) {
@@ -40,14 +41,14 @@ public class AESOperator {
 	// 解密
 	public static String decrypt(String sSrc){
 		try {
-			byte[] raw = sKey.getBytes("ASCII");
+			byte[] raw = sKey.getBytes(StandardCharsets.US_ASCII);
 			SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			IvParameterSpec iv = new IvParameterSpec(ivParameter.getBytes());
 			cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
 			byte[] encrypted1 = Base64.getDecoder().decode(sSrc);// 先用base64解密
 			byte[] original = cipher.doFinal(encrypted1);
-			String originalString = new String(original, "utf-8");
+			String originalString = new String(original, StandardCharsets.UTF_8);
 			return originalString;
 		} catch (Exception ex) {
 			ex.printStackTrace();

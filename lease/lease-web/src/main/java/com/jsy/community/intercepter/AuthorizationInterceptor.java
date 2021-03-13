@@ -91,13 +91,10 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			// 方法注解允许匿名访问
 			return true;
 		}
-		
-		if (methodAnnotation == null && classAnnotation.allowAnonymous()) {
-			// 注解在类中，并且允许匿名访问
-			return true;
-		}
-		return false;
-	}
+
+        // 注解在类中，并且允许匿名访问
+        return methodAnnotation == null && classAnnotation.allowAnonymous();
+    }
 	
 	private String readBody(HttpServletRequest request){
 		StringBuilder sb = new StringBuilder();

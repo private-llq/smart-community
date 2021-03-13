@@ -155,7 +155,7 @@ public class LunarCalendarFestivalUtils {
 		{5.4055,20.12,3.87,18.73,5.63,20.646,4.81,20.1,5.52,21.04,5.678,21.37,7.108,22.83,7.5,23.13,7.646,23.042,8.318,23.438,7.438,22.36,7.18,21.94}
 	};
 	//农历月份
-	final static String lunarNumber[] = { "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" };
+	final static String[] lunarNumber = { "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" };
 	//农历年
 	final static  String[] lunarYears = new String[]{"零", "一", "二", "三", "四", "五", "六", "七", "八", "九"};
 	final static  String[] chineseTen = new String[]{"初", "十", "廿", "卅"};
@@ -299,7 +299,7 @@ public class LunarCalendarFestivalUtils {
 				y = y-1;//步骤2
 			}
 		}
-		dateNum = (int)(y*D+centuryValue)-(int)(y/4);//步骤3，使用公式[Y*D+C]-L计算
+		dateNum = (int)(y*D+centuryValue)- (y/4);//步骤3，使用公式[Y*D+C]-L计算
 		dateNum += specialYearOffset(year,n);//步骤4，加上特殊的年分的节气偏移量
 		return dateNum;
 	}

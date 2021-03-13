@@ -144,8 +144,9 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @param operationPerson   更新人
      * @param operationTime     更新时间
      * @param pid               业主id
+     * @param operationType     操作类型 1创建 2更新
      */
-    void insertOperationLog( Long id,  String operationPerson, String operationTime, Long pid );
+    void insertOperationLog( Long id,  String operationPerson, String operationTime, Long pid , Integer operationType);
 
 
     /**
