@@ -68,7 +68,9 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         //管理员姓名
         String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
         proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), qo.getId(), 2);
-        return proprietorMapper.update(qo) > 0;
+        ProprietorEntity entity = new ProprietorEntity();
+        BeanUtils.copyProperties( qo, entity );
+        return proprietorMapper.updateById(entity) > 0;
     }
 
 
@@ -102,12 +104,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         queryParam.setPage((queryParam.getPage() - 1) * queryParam.getSize());
         List<ProprietorVO> query = proprietorMapper.query(queryParam);
         query.forEach( vo -> {
-            //用户记录 创建人 / 创建时间
-            vo.setCreateDate( proprietorMapper.queryCreateDateById( vo.getId() ));
-            //用户记录 最近更新人 / 更新时间
-            vo.setUpdateDate( proprietorMapper.queryUpdateDateById( vo.getId() ));
-            //查询用户  住户  TODO : 18-2-10-501 18栋2单元10楼 住宅 查询房屋字符串
-
             //通过身份证获得 用户的 年龄 、性别
             Map<String, Object> sexAndAge = CardUtil.getSexAndAge(vo.getIdCard());
             vo.setAge( sexAndAge.get("age").toString() );
@@ -115,6 +111,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         });
         return query;
     }
+
 
 
     /**

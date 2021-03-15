@@ -9,8 +9,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
-import com.jsy.community.constant.BusinessConst;
-import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstError;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
@@ -665,7 +663,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity userEntity = new UserEntity();
         userEntity.setIsRealAuth(userMapper.getRealAuthStatus(uid));
         //拿到用户的最新房屋id
-        userEntity.setHouseholderId(userMapper.getLatestHouseId(uid));
+        userEntity.setHouseId(userMapper.getLatestHouseId(uid));
         return userEntity;
     }
 
@@ -678,10 +676,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (Objects.nonNull(userInfoVo)) {
             userInfo.setDetailAddress(userInfoVo.getDetailAddress());
             userInfo.setCommunityId(userInfoVo.getCommunityId());
+            userInfo.setHouseId(houseId);
         }
         List<HouseMemberEntity> houseMemberEntities = relationService.selectID(uid, houseId);
         userInfo.setProprietorMembers(houseMemberEntities);
-
         return userInfo;
     }
 
@@ -733,6 +731,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //                throw new ProprietorException(JSYError.INTERNAL);
 //        }
     }
+
 
 
 }

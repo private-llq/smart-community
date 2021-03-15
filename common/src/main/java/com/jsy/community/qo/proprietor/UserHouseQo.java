@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * 业主房屋信息请求对象
@@ -35,6 +36,8 @@ public class UserHouseQo implements Serializable {
 
     @ApiModelProperty(value = "房屋地址")
     private String houseAddress;
+
+
 
     /**
      * 房屋信息 更新/新增  验证

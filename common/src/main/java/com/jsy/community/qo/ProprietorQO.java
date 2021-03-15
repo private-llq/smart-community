@@ -50,14 +50,20 @@ public class ProprietorQO implements Serializable {
     private String uid;
 
 
-    /**
-     * t_house 的 id
-     */
-    @Range( groups = {PropertyAddValid.class, PropertyUpdateValid.class}, min = 1, message = "房屋id范围不正确!")
+    @Range( groups = {PropertyAddValid.class, PropertyUpdateValid.class, PropertySearchValid.class}, min = 1, message = "房屋id范围不正确!")
     @NotNull( groups = {PropertyAddValid.class, PropertyUpdateValid.class}, message = "房屋未选择!房屋Id为空")
     @ApiModelProperty("房屋id")
     private Long houseId;
 
+
+    @Range( groups = {PropertySearchValid.class}, min = 1, message = "楼栋id范围不正确!")
+    @ApiModelProperty("楼栋id")
+    private Long buildingId;
+
+
+    @Range( groups = {PropertySearchValid.class}, min = 1, message = "单元id范围不正确!")
+    @ApiModelProperty("单元id")
+    private Long unitId;
 
 
     @Pattern(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_WE_CHAT, message = "微信号不正确!")
@@ -69,8 +75,10 @@ public class ProprietorQO implements Serializable {
     @ApiModelProperty("qq")
     private String qq;
 
+
     @ApiModelProperty("性别")
     private Integer sex;
+
 
     @Pattern(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_EMAIL, message = "邮箱号不正确!")
     @ApiModelProperty("邮箱")
@@ -107,7 +115,6 @@ public class ProprietorQO implements Serializable {
     private String faceUrl;
 
 
-
     @ApiModelProperty("标记是否需要登记车辆")
     private Boolean hasCar;
 
@@ -122,6 +129,12 @@ public class ProprietorQO implements Serializable {
 
     @ApiModelProperty("用来存储House的id和社区id")
     private List<UserHouseQo> houses;
+
+
+    /**
+     * [物业]业主查询效验接口
+     */
+    public interface PropertySearchValid {}
 
     /**
      * [物业]业主更新效验接口

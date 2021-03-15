@@ -27,6 +27,9 @@ public class UserInfoVo implements Serializable {
 	@ApiModelProperty("业主ID")
 	private String uid;
 
+	@ApiModelProperty("房屋ID")
+	private Long houseId;
+
 	@ApiModelProperty("业主社区ID")
 	private String communityId;
 

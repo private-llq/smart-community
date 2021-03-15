@@ -87,8 +87,11 @@ public interface IUserService extends IService<UserEntity> {
 	Boolean updateImprover(ProprietorQO qo);
     /**
      * 根据业主id查询业主信息及业主家属信息
-     * @author YuLF
+     * @param userId  		用户id
+	 * @param houseId		房屋id
+	 * @author YuLF
      * @since  2020/12/10 16:25
+	 * @return				房屋业主信息 和 家属信息
      */
     UserInfoVo proprietorQuery(String userId, Long houseId);
 	

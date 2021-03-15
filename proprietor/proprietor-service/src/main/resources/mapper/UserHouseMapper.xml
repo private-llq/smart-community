@@ -16,7 +16,8 @@
 		update t_user_house
 		<set>
 			community_id = #{h.communityId},
-			house_id = #{h.houseId}
+			house_id = #{h.houseId},
+			update_time = now()
 		</set>
 		<where>
 			id = #{h.id} and uid = #{uid} and deleted = 0

@@ -29,12 +29,6 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      */
     List<ProprietorVO> query(BaseQO<ProprietorQO> queryParam);
 
-    /**
-     * 【物业】更新业主信息
-     * @param proprietorQo  请求参数
-     * @return              返回影响行数
-     */
-    Integer update(ProprietorQO proprietorQo);
 
     /**
      * 通过社区id 拿到当前社区 所有未被登记的房屋信息
@@ -184,19 +178,13 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
 
     /**
      * 根据uid 查询 用户 当前记录的创建时间
-     * @param id        用户id
-     * @return          返回 创建人 / 时间
+     * @param id                用户id
+     * @param operationType     操作类型 1创建 2更新
+     * @return                  返回 创建人 / 时间
      */
-    @Select("select CONCAT(create_person,' / ',create_time) from t_admin_proprietor_log where pid = #{id} ORDER BY create_time desc limit 1")
-    String queryCreateDateById(Long id);
+    @Select("select CONCAT(operation_person,' / ',operation_time) from t_admin_proprietor_log where pid = #{id} and operation_type = #{operationType} ORDER BY create_time desc limit 1")
+    String queryOperationDate(Long id, Integer operationType);
 
-    /**
-     * 根据uid 查询 用户 当前记录的更新时间
-     * @param id        用户id
-     * @return          返回 更新人 / 时间
-     */
-    @Select("select CONCAT(update_person,' / ',update_time) from t_admin_proprietor_log where pid = #{id} ORDER BY update_time desc limit 1")
-    String queryUpdateDateById(Long id);
 
 
 }

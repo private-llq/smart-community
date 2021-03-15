@@ -81,11 +81,17 @@ public class ProprietorVO extends BaseVO {
 	@ApiModelProperty("区名")
 	private String areaName;
 
-	@ApiModelProperty("创建人 / 创建时间")
-	private String createDate;
+	@ApiModelProperty("创建时间")
+	private String createTime;
 
-	@ApiModelProperty("最近更新人 / 最近更新时间")
-	private String updateDate;
+	@ApiModelProperty("创建人")
+	private String createBy;
+
+	@ApiModelProperty("最近更新时间")
+	private String updateTime;
+
+	@ApiModelProperty("更新人")
+	private String updateBy;
 
 	@ApiModelProperty("房屋合并后的字符串")
 	private String houseMergeName;

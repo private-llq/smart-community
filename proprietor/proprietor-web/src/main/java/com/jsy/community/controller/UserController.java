@@ -93,13 +93,14 @@ public class UserController {
             throw new JSYException(JSYError.NO_REAL_NAME_AUTH);
         }
         //未认证房屋
-        if( Objects.isNull(userEntity.getHouseholderId()) ){
+        if( Objects.isNull(userEntity.getHouseId()) ){
             throw new JSYException(JSYError.NO_AUTH_HOUSE);
         }
         //根据用户id和房屋id 查出用户姓名、用户地址、和家属信息
-        UserInfoVo userInfoVo = userService.getUserAndMemberInfo(uid, userEntity.getHouseholderId());
+        UserInfoVo userInfoVo = userService.getUserAndMemberInfo(uid, userEntity.getHouseId());
         return CommonResult.ok(userInfoVo);
     }
+
 
     /**
      * 新的方法请调用 我的详情 GetMapping("details")
@@ -183,8 +184,8 @@ public class UserController {
     @Login
     @ApiOperation("证件类型常量")
     @GetMapping("/identificationType")
-    public Map<Integer, String> getIdentificationType(){
-        return BusinessEnum.IdentificationType.getKv();
+    public CommonResult<Map<Integer, String>> getIdentificationType(){
+        return CommonResult.ok(BusinessEnum.IdentificationType.getKv());
     }
 
     /**
@@ -221,9 +222,7 @@ public class UserController {
     @ApiOperation("业主信息及业主家属信息查询接口")
     @GetMapping("query")
     public CommonResult<UserInfoVo> proprietorQuery(@RequestParam Long houseId) {
-        String userId = UserUtils.getUserId();
-        UserInfoVo userInfoVo = userService.proprietorQuery(userId, houseId);
-        return CommonResult.ok(userInfoVo, "查询成功!");
+        return CommonResult.ok(userService.proprietorQuery( UserUtils.getUserId(), houseId), "查询成功!");
     }
 
     /**
@@ -236,8 +235,19 @@ public class UserController {
     @ApiOperation("业主信息详情查询接口")
     @GetMapping("details")
     public CommonResult<UserInfoVo> details() {
-        UserInfoVo userInfoVo = userService.proprietorDetails(UserUtils.getUserId());
-        return CommonResult.ok(userInfoVo);
+        return CommonResult.ok(userService.proprietorDetails(UserUtils.getUserId()));
+    }
+
+
+    /**
+     * @author YuLF
+     * @since  2021/3/15 14:34
+     */
+    @Login
+    @ApiOperation("切换房屋选择房屋业主信息及业主家属信息查询接口")
+    @GetMapping("switchHouse")
+    public CommonResult<UserInfoVo> switchHouse(@RequestParam Long houseId) {
+        return CommonResult.ok(userService.proprietorQuery(UserUtils.getUserId(), houseId));
     }
 
     

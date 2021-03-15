@@ -24,7 +24,12 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("业主ID")
 	private Long householderId;
-	
+
+	@ApiModelProperty("房屋id")
+	@TableField( exist = false)
+	private Long houseId;
+
+
 	@ApiModelProperty("昵称")
 	private String nickname;
 	
