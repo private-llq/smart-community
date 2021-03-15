@@ -82,7 +82,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description",weChatPayQO.getDescription());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://hyf.free.vipnps.vip/api/v1/payment/callback");
+        map.put("notify_url","http://222.178.212.29:9951/api/v1/payment/callback");
         map.put("amount",hashMap);
 //        map.put("scene_info",map4);
 
