@@ -45,7 +45,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -387,10 +386,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             List<CarQO> cars = qo.getCars();
             //用户是否有需要新增的车辆？默认为false
             AtomicBoolean hasAddCar = new AtomicBoolean(false);
-            //为车辆信息设置基本信息
             cars.forEach(e -> {
-                //社区id
-                e.setCommunityId(qo.getHouses().get(0).getCommunityId());
                 //如果参数id为null 或者 参数id为0 则表明这条数据是需要新增
                 if (e.getId() == null || e.getId() == 0) {
                     //新增数据需要设置id
@@ -416,15 +412,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public Boolean updateImprover(ProprietorQO qo) {
         //========================================== 1.业主房屋 =========================================================
         List<UserHouseQo> houseList = qo.getHouses();
+        //用户提交的房屋信息不为空
         if (CollectionUtil.isNotEmpty(houseList)) {
             //用来找用户提交的房屋信息 和 物业用户所属的房屋信息 差集的集合
-            List<UserHouseQo> userHouseQos = new ArrayList<>(houseList.size());
-            houseList.forEach( house -> {
-                UserHouseQo userHouseQo = new UserHouseQo();
-                userHouseQo.setCommunityId(house.getCommunityId());
-                userHouseQo.setHouseId(house.getHouseId());
-                userHouseQos.add(userHouseQo);
-            });
+            List<UserHouseQo> tmpQos = new ArrayList<>(houseList);
             //1.通过uid拿到业主的身份证
             UserEntity userEntity = queryUserDetailByUid(qo.getUid());
             //通过 业主身份证 拿到 业主表的 该业主的所有 房屋id + 社区id
@@ -432,10 +423,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             if( CollectionUtil.isEmpty(resHouseList) ){
                 throw new ProprietorException("物业没有添加您的房屋信息!");
             }
-            //TODO 获取 userHouseQos 差集 验证
-            userHouseQos.removeAll(resHouseList);
-            //userHouseQos.stream().filter( qo -> resHouseList.stream(). )
-            if( CollectionUtil.isEmpty(userHouseQos) ){
+            //取出 业主房屋信息 和 物业信息的差异集合  如果 differenceList 不为空 业主提交了 物业没有认证的房屋信息
+            List<UserHouseQo> differenceList = differenceSet( tmpQos, resHouseList );
+            if( CollectionUtil.isEmpty(differenceList) ){
                 //操作用户所在房屋
                 //id==null || id == 0 就是需要新增的 验证房屋信息是否有需要新增的数据
                 boolean hasAddHouse = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
@@ -449,7 +439,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 houseList.forEach(h -> userHouseService.update(h, qo.getUid()));
             } else {
                 //存在差集 用户提交了 在业主表中他没有的房子
-                List<String> houseAddressNames = userHouseQos.stream().map(UserHouseQo::getHouseAddress).collect(Collectors.toList());
+                List<String> houseAddressNames = differenceList.stream().map(UserHouseQo::getHouseAddress).collect(Collectors.toList());
                 throw new ProprietorException( "物业没有给您认证该房屋：" + houseAddressNames );
             }
         }
@@ -458,27 +448,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
-    public static void main(String[] args) {
-        List<UserHouseQo> list = new ArrayList<>();
-        List<UserHouseQo> list1 = new ArrayList<>();
-        UserHouseQo userHouseQo = new UserHouseQo();
-        userHouseQo.setHouseId(1L);
-        userHouseQo.setCommunityId(12L);
-        userHouseQo.setHouseAddress("重庆渝中与大礼堂34号");
-        UserHouseQo userHouseQo1 = new UserHouseQo();
-        userHouseQo1.setHouseId(1L);
-        userHouseQo1.setCommunityId(16L);
-        userHouseQo1.setHouseAddress("重庆渝中与大礼堂35号");
-
-        UserHouseQo userHouseQo2 = new UserHouseQo();
-        userHouseQo2.setHouseId(1L);
-        userHouseQo2.setCommunityId(12L);
-        list.add(userHouseQo);
-        list.add(userHouseQo1);
-        list1.add(userHouseQo2);
 
 
-        System.out.println(list);
+    /**
+     * 根据两个集合的两个属性 对比 差异 并取出 有差异的对象
+     * 通过 社区 id 和 房屋id 对比两个集合中的差集
+     * @param source    源集合
+     * @param target    目标集合
+     * @return          返回差异集合
+     */
+    private static List<UserHouseQo> differenceSet(List<UserHouseQo> source, List<UserHouseQo> target) {
+        List<UserHouseQo> list = new ArrayList<>(8);
+        source.forEach( so ->{
+            AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+            for( UserHouseQo ta : target ){
+                if( Objects.equals( so.getCommunityId(), ta.getCommunityId() ) && Objects.equals( so.getHouseId(), ta.getHouseId() ) ){
+                    atomicBoolean.set(true);
+                    break;
+                }
+            }
+            if( atomicBoolean.get() == Boolean.FALSE ){
+                list.add(so);
+            }
+        });
+        return list;
     }
 
     /**
