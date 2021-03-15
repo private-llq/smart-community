@@ -30,14 +30,14 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	**/
 	List<Long> getSubIdList(List<Long> list);
 	
-	/**
-	* @Description: 新增次级楼宇信息
-	 * @Param: [houseEntity]
-	 * @Return: int
-	 * @Author: chq459799974
-	 * @Date: 2021/1/21
-	**/
-	int addSub(@Param("houseEntity") HouseEntity houseEntity);
+//	/**
+//	* @Description: 新增次级楼宇信息
+//	 * @Param: [houseEntity]
+//	 * @Return: int
+//	 * @Author: chq459799974
+//	 * @Date: 2021/1/21
+//	**/
+//	int addSub(@Param("houseEntity") HouseEntity houseEntity);
 
 	/**
 	 * 按社区ID获取 社区名称和 当前社区住户房间数量
@@ -134,6 +134,22 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	**/
 	@MapKey("pid")
 	Map<Long,Map<String,Long>> queryBindUnitCountBatch(@Param("list")List<Long> ids);
+	
+	/**
+	* @Description: 验证是否有房屋关联数据
+	 * @Param: [id]
+	 * @Return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/15
+	**/
+	@Select("select 'proprietor' as item,count(0) as count from t_proprietor where house_id = #{id}\n" +
+		"union all\n" +
+		"select 'userHouse' as item,count(0) as count from t_user_house where house_id = #{id}\n" +
+		"union all\n" +
+		"select 'houseMember' as item,count(0) as count from t_house_member where house_id = #{id}\n" +
+		"union all\n" +
+		"select 'houseLease' as item,count(0) as count from t_house_lease where house_id = #{id}")
+	List<Map<String,Object>> verifyRelevance(Long id);
 	
 	//============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 }
