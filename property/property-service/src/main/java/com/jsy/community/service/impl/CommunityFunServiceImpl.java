@@ -10,7 +10,9 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.mapper.CommunityFunMapper;
+import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
@@ -18,6 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +70,19 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     }
 
     @Override
-    public void insetOne(CommunityFunEntity communityFunEntity) {
-        communityFunMapper.insert(communityFunEntity);
+    public void insetOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
+        CommunityFunEntity entity = new CommunityFunEntity();
+        entity.setTitleName(communityFunOperationQO.getTitleName());
+        entity.setViewCount(communityFunOperationQO.getViewCount());
+        entity.setUid(communityFunOperationQO.getUid());
+        entity.setContent(communityFunOperationQO.getContent());
+        entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
+        entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
+        entity.setStatus(0);
+        String tallys = Arrays.toString(communityFunOperationQO.getTallys());
+        entity.setTallys(tallys.substring(1, tallys.length() - 1));
+        entity.setId(SnowFlake.nextId());
+        communityFunMapper.insert(entity);
     }
 
 

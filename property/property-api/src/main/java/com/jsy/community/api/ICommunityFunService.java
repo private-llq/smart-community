@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityFunEntity;
+import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.CommunityFunQO;
 
 import java.util.Map;
@@ -68,5 +69,5 @@ public interface ICommunityFunService extends IService<CommunityFunEntity> {
      * @Param:
      * @return:
      */
-    void insetOne(CommunityFunEntity communityFunEntity);
+    void insetOne(CommunityFunOperationQO communityFunOperationQO,String uid);
 }
