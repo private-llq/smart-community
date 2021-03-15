@@ -115,5 +115,14 @@
 		</set>
 		where id = #{entity.id}
 	</update>
+
+	<!-- 批量查询楼栋已绑定单元数 -->
+	<select id="queryBindUnitCountBatch" resultType="Map">
+		select pid,count(0) as count from t_house where type = 2 and pid in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		group by pid
+	</select>
 	<!-- ============================================ 物业端产品原型确定后新加的 结束  =========================================================== -->
 </mapper>

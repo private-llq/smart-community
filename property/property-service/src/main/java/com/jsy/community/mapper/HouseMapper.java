@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -106,7 +107,13 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	@Select("select * from t_house where ${field} = #{param}")
 	HouseEntity queryHouseByAnyProperty(@Param("field")Object field, @Param("param")Object param);
 	
-	
+	/**
+	* @Description: 修改子节点
+	 * @Param: [list, entity]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/3/13
+	**/
 	void updateSub(@Param("list")List list, @Param("entity")HouseEntity entity);
 	
 	/**
@@ -117,6 +124,16 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Date: 2021/3/9
 	**/
 	int updateHouse(@Param("entity") HouseEntity entity);
+	
+	/**
+	* @Description: 批量查询楼栋已绑定单元数
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.String,java.lang.Long>>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/13
+	**/
+	@MapKey("pid")
+	Map<Long,Map<String,Long>> queryBindUnitCountBatch(@Param("list")List<Long> ids);
 	
 	//============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 }

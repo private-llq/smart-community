@@ -107,7 +107,7 @@ public class UserAuthController {
 		}
 		log.info(qo.getAccount() + "开始登录");
 		UserInfoVo infoVo = userService.login(qo);
-		
+		infoVo.setIdCard(null);
 		//生成带token和用户信息的的UserAuthVo
 		UserAuthVo userAuthVo = userService.createAuthVoWithToken(infoVo);
 		return CommonResult.ok(userAuthVo);

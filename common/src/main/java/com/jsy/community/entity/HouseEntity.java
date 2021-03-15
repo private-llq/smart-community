@@ -45,6 +45,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     
     @ApiModelProperty(value = "名称")
     @TableField(exist = false)
+    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "名称过长")
     @NotBlank(groups = {addHouseValidatedGroup.class}, message = "缺少名称")
     private String name;
     
@@ -143,6 +144,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @TableField(exist = false)
     @ApiModelProperty(value = "单元ID列表")
     private List<Long> unitIdList;
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "已绑定单元数")
+    private Long bindUnitCount;
     
     /**
      * 新增house验证组
