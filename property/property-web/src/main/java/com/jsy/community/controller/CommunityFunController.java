@@ -55,7 +55,7 @@ public class CommunityFunController {
     @PostMapping("/save")
     @Login
     public CommonResult save(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
-        ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunEntity.CommunityFunValidated.class);
+        ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
         String userId = UserUtils.getUserId();
         communityFunService.insetOne(communityFunOperationQO,userId);
         return  CommonResult.ok();
@@ -124,9 +124,10 @@ public class CommunityFunController {
     @ApiOperation("修改")
     @PostMapping("/update")
     @Login
-    public CommonResult update(@RequestBody CommunityFunEntity communityFunEntity) {
-        ValidatorUtils.validateEntity(communityFunEntity, CommunityFunEntity.CommunityFunValidated.class);
-        communityFunService.updateOne(communityFunEntity);
+    public CommonResult update(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
+        ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
+        String userId = UserUtils.getUserId();
+        communityFunService.updateOne(communityFunOperationQO,userId);
         return CommonResult.ok();
     }
 

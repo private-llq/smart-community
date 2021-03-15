@@ -16,9 +16,13 @@ import java.time.LocalDateTime;
  **/
 @Data
 public class CommunityFunOperationQO implements Serializable {
+
+    @ApiModelProperty(value = "id")
+    private Long id;
+
     @ApiModelProperty(value = "社区趣事标题")
-    @NotNull(groups = {CommunityFunValidated.class},message = "标题不能为空！")
-    @NotBlank(groups = {CommunityFunValidated.class},message = "标题不能为空！")
+    @NotNull(groups = {CommunityFunOperationValidated.class},message = "标题不能为空！")
+    @NotBlank(groups = {CommunityFunOperationValidated.class},message = "标题不能为空！")
     private String titleName;
 
     @ApiModelProperty(value = "社区趣事浏览次数")
@@ -28,16 +32,16 @@ public class CommunityFunOperationQO implements Serializable {
     private String uid;
 
     @ApiModelProperty(value = "社区趣事内容")
-    @NotNull(groups = {CommunityFunValidated.class},message = "内容不能为空！")
-    @NotBlank(groups = {CommunityFunValidated.class},message = "内容不能为空！")
+    @NotNull(groups = {CommunityFunOperationValidated.class},message = "内容不能为空！")
+    @NotBlank(groups = {CommunityFunOperationValidated.class},message = "内容不能为空！")
     private String content;
     @ApiModelProperty(value = "社区趣事缩略图地址")
-    @NotNull(groups = {CommunityFunValidated.class},message = "缩略图不能为空！")
-    @NotBlank(groups = {CommunityFunValidated.class},message = "缩略图不能为空！")
+    @NotNull(groups = {CommunityFunOperationValidated.class},message = "缩略图不能为空！")
+    @NotBlank(groups = {CommunityFunOperationValidated.class},message = "缩略图不能为空！")
     private String smallImageUrl;
     @ApiModelProperty(value = "社区趣事封面图地址")
-    @NotNull(groups = {CommunityFunValidated.class},message = "封面图不能为空！")
-    @NotBlank(groups = {CommunityFunValidated.class},message = "封面图不能为空！")
+    @NotNull(groups = {CommunityFunOperationValidated.class},message = "封面图不能为空！")
+    @NotBlank(groups = {CommunityFunOperationValidated.class},message = "封面图不能为空！")
     private String coverImageUrl;
     @ApiModelProperty(value = "社区趣事状态1表示已上线，2二表示为上线")
     private Integer status;
@@ -48,5 +52,5 @@ public class CommunityFunOperationQO implements Serializable {
     @ApiModelProperty(value = "标签")
     private String[] tallys;
 
-    public interface CommunityFunValidated{}
+    public interface CommunityFunOperationValidated{}
 }

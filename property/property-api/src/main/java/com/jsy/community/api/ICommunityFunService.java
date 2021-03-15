@@ -60,7 +60,7 @@ public interface ICommunityFunService extends IService<CommunityFunEntity> {
      * @Param:
      * @return:
      */
-    void updateOne(CommunityFunEntity communityFunEntity);
+    void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid);
 
     /**
      * @Description: 新增

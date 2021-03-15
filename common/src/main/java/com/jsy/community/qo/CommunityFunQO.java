@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * @program: com.jsy.community
@@ -24,5 +25,17 @@ public class CommunityFunQO implements Serializable {
 
     @ApiModelProperty("社区趣事标题模糊查询")
     private String headline;
+
+    @ApiModelProperty("创建时间")
+    private LocalDate creatrTimeStart;
+
+    @ApiModelProperty("创建时间")
+    private LocalDate creatrTimeOut;
+
+    @ApiModelProperty("社区趣事标题模糊查询")
+    private LocalDate issueTimeStart;
+
+    @ApiModelProperty("社区趣事标题模糊查询")
+    private LocalDate issueTimeOut;
 
 }

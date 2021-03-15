@@ -88,13 +88,13 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
 
     @Override
     @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.FUN, parameterType = CommunityFunEntity.class, importField = {"titleName","smallImageUrl"}, searchField = {"titleName"})
-    public void updateOne(CommunityFunEntity communityFunEntity) {
-        CommunityFunEntity entity = communityFunMapper.selectById(communityFunEntity.getId());
+    public void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
+        CommunityFunEntity entity = communityFunMapper.selectById(communityFunOperationQO.getId());
 
-        entity.setContent(communityFunEntity.getContent());
-        entity.setCoverImageUrl(communityFunEntity.getCoverImageUrl());
-        entity.setSmallImageUrl(communityFunEntity.getSmallImageUrl());
-        entity.setTitleName(communityFunEntity.getTitleName());
+        entity.setContent(communityFunOperationQO.getContent());
+        entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
+        entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
+        entity.setTitleName(communityFunOperationQO.getTitleName());
         communityFunMapper.updateById(entity);
     }
 
