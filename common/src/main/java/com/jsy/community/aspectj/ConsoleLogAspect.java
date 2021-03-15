@@ -151,6 +151,6 @@ public class ConsoleLogAspect {
 //		logger.info("返回结果 : " + ret);
 		double end = System.currentTimeMillis();
 		Double start = mark.get();
-		logger.info("总耗时 : " + (end-start)/1000+"s");
+		logger.info("总耗时 : " + (end-start)+"ms");
 	}
 }
