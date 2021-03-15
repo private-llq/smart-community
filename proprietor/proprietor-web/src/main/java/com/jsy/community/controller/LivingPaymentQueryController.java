@@ -33,7 +33,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/livingpaymentquery")
 @ApiJSYController
-public class LivingpaymentQueryController {
+public class LivingPaymentQueryController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ILivingpaymentQueryService livingpaymentQueryService;
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
