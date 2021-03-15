@@ -65,6 +65,15 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021/3/11
 	**/
 	PageInfo<HouseEntity> queryHouse(BaseQO<HouseQO> baseQO);
+	
+	/**
+	* @Description: 删除楼栋/单元/房屋
+	 * @Param: [id]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/15
+	**/
+	boolean deleteHouse(Long id);
 	//=========================== 基础增删改查 结束 ==============================
 
 	/**

@@ -41,6 +41,13 @@ import java.util.*;
 @DubboService(version = Const.version, group = Const.group_property)
 public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> implements IHouseService {
 
+	private static final Map<String,String> RELATION_MSG_MAP = new HashMap<>(){{
+		put("proprietor","业主信息");
+		put("userHouse","APP业主房屋板块");
+		put("houseMember","房间成员");
+		put("houseLease","APP租房板块");
+	}};
+	
 	@Autowired
 	private HouseMapper houseMapper;
 	
@@ -483,27 +490,39 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		houseEntity.setHouseTypeCodeStr(bedRoom.concat(livingRoom).concat(kitchen).concat(toilet));
 	}
 	
-	//删除
+	/**
+	* @Description: 删除楼栋/单元/房屋
+	 * @Param: [id]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/15
+	**/
 	public boolean deleteHouse(Long id){
 		HouseEntity entity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id",id));
 		if(entity == null){
 			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"数据不存在");
 		}
-		switch (entity.getType()){
-			case BusinessConst.BUILDING_TYPE_BUILDING :
-			//删除楼栋(有单元依赖不允许删除)
-				
-				return false;
-			case BusinessConst.BUILDING_TYPE_UNIT :
-			//删除单元(有房屋依赖不允许删除)
-				
-				return false;
-			case BusinessConst.BUILDING_TYPE_DOOR :
-			//删除房屋(有依赖数据不允许删除)(select count = 0 and delete = 0)
-				
-				return false;
+		//删除楼栋/单元(有下级依赖不允许删除)
+		//删除房屋(有依赖数据不允许删除)
+		if(BusinessConst.BUILDING_TYPE_BUILDING == entity.getType()
+			|| BusinessConst.BUILDING_TYPE_UNIT == entity.getType()){
+			Integer count = houseMapper.selectCount(new QueryWrapper<HouseEntity>().eq("pid", id));
+			if(count > 0){
+				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"存在下级单元或房屋，不允许删除");
+			}
+		}else if(BusinessConst.BUILDING_TYPE_DOOR == entity.getType()){
+			List<Map<String,Object>> countList = houseMapper.verifyRelevance(id);
+			List<String> errorList = new ArrayList<>(countList.size());
+			for(Map<String,Object> map : countList){
+					if(Integer.valueOf(map.get("count").toString()) > 0){
+						errorList.add(RELATION_MSG_MAP.get(map.get("item")));
+					}
+				}
+			if(errorList.size() > 0){
+				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),errorList + " 存在关联数据，不允许删除");
+			}
 		}
-		return false;
+		return houseMapper.deleteById(id) == 1;
 	}
 	//========================================= 基础增删改查 结束 ========================================================
 	

@@ -1,26 +1,21 @@
-package com.jsy.community.entity;
+package com.jsy.community.qo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
  * @description:
  * @author: Hu
- * @create: 2020-12-09 10:22
+ * @create: 2021-03-15 14:01
  **/
-@EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel("业主实体类")
-@TableName("t_community_fun")
-public class CommunityFunEntity extends BaseEntity {
+public class CommunityFunOperationQO implements Serializable {
     @ApiModelProperty(value = "社区趣事标题")
     @NotNull(groups = {CommunityFunValidated.class},message = "标题不能为空！")
     @NotBlank(groups = {CommunityFunValidated.class},message = "标题不能为空！")
@@ -51,9 +46,7 @@ public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "下线时间")
     private LocalDateTime outTime;
     @ApiModelProperty(value = "标签")
-    private String tallys;
+    private String[] tallys;
 
     public interface CommunityFunValidated{}
-
-
 }

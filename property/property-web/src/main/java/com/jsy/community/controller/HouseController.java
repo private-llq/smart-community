@@ -111,6 +111,12 @@ public class HouseController {
 		}
 		return CommonResult.ok(houseService.queryHouse(baseQO));
 	}
+	
+	@ApiOperation("【楼宇房屋】删除")
+	@DeleteMapping("")
+	public CommonResult deleteHouse(@RequestParam Long id){
+		return houseService.deleteHouse(id) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
+	}
 	// ============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 	
 }

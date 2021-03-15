@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
+import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.CommunityFunQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
@@ -53,13 +54,10 @@ public class CommunityFunController {
     @ApiOperation("新增")
     @PostMapping("/save")
     @Login
-    public CommonResult save(@RequestBody CommunityFunEntity communityFunEntity) {
-        ValidatorUtils.validateEntity(communityFunEntity, CommunityFunEntity.CommunityFunValidated.class);
+    public CommonResult save(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
+        ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunEntity.CommunityFunValidated.class);
         String userId = UserUtils.getUserId();
-        communityFunEntity.setStatus(2);
-        communityFunEntity.setUid(userId);
-        communityFunEntity.setId(SnowFlake.nextId());
-        communityFunService.insetOne(communityFunEntity);
+        communityFunService.insetOne(communityFunOperationQO,userId);
         return  CommonResult.ok();
     }
 
