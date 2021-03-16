@@ -73,19 +73,22 @@ public class UserDataController {
     @Login
     public CommonResult updateUserNickName(@RequestParam("nickname") String nickname){
         try {
+            String s = new String(nickname.getBytes("GBK"));
             if(!"".equals(nickname)&&nickname!=null){
-            if (BadWordUtil2.isContaintBadWord(nickname,BadWordUtil2.minMatchTYpe)){
-                return CommonResult.error("该名称不可用：名称中存在敏感字！");
-            }
-                String s = new String(nickname.getBytes("GBK"));
                 if (s.length()<2||s.length()>16){
                     return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉子！");
                 }
+                if (BadWordUtil2.isContaintBadWord(nickname,BadWordUtil2.minMatchTYpe)){
+                    return CommonResult.error("该名称不可用：名称中存在敏感字！");
+                }
+                Pattern pattern = Pattern.compile(regex);
+                if (pattern.matcher(nickname).find()){
+                    return CommonResult.error("名称不能包含特殊字符！");
+                }
+            }else {
+                return CommonResult.error("名称不能为空");
             }
-            Pattern pattern = Pattern.compile(regex);
-            if (pattern.matcher(nickname).find()){
-                return CommonResult.error("名称不能包含特殊字符！");
-            }
+
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
