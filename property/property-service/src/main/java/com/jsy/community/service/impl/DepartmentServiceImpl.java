@@ -6,13 +6,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IDepartmentService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.DepartmentEntity;
 import com.jsy.community.entity.DepartmentStaffEntity;
+import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.DepartmentMapper;
 import com.jsy.community.mapper.DepartmentStaffMapper;
 import com.jsy.community.qo.DepartmentQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.DepartmentVO;
+import com.jsy.community.vo.TreeCommunityVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,9 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	
 	@Autowired
 	private DepartmentStaffMapper departmentStaffMapper;
+	
+	@Autowired
+	private CommunityMapper communityMapper;
 	
 	@Override
 	public void addDepartment(DepartmentQO departmentEntity) {
@@ -71,6 +77,20 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	
 	@Override
 	public void updateDepartment(DepartmentQO departmentEntity) {
+		// 不可选择自己或自己的子集成为自己的父级
+		QueryWrapper<DepartmentEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("pid", departmentEntity.getId());
+		List<DepartmentEntity> childList = departmentMapper.selectList(queryWrapper);
+		
+		if (!CollectionUtils.isEmpty(childList)) {
+			for (DepartmentEntity child : childList) {
+				if (child.getId().equals(departmentEntity.getPid())||departmentEntity.getPid().equals(departmentEntity.getId())) {
+					throw new PropertyException("不可选择自己或自己的子集成为自己的父级");
+				}
+			}
+		}
+		
+		// 判断是否有同名
 		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", departmentEntity.getId()).eq("community_id", departmentEntity.getCommunityId());
 		DepartmentEntity one = departmentMapper.selectOne(wrapper);
@@ -110,20 +130,20 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		departmentQuery.eq("pid", departmentId).eq("community_id", communityId);
 		List<DepartmentEntity> childList = departmentMapper.selectList(departmentQuery);
 		if (childList != null && childList.size() > 0) {
-			throw new PropertyException("\"" + entity.getDepartment() + "\"已有下级节点，不可删除");
+			throw new PropertyException("\"" + entity.getDepartment() + "\""+"已有下级节点，不可删除");
 		}
 		
 		QueryWrapper<DepartmentStaffEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("department_id", departmentId);
+		queryWrapper.eq("department_id", departmentId).eq("community_id",communityId);
 		List<DepartmentStaffEntity> staffEntities = departmentStaffMapper.selectList(queryWrapper);
 		if (!CollectionUtils.isEmpty(staffEntities)) {
-			throw new PropertyException("请先删除部门下的员工");
+			throw new PropertyException("\"" + entity.getDepartment() + "\""+"请先删除部门下的员工");
 		}
-		departmentMapper.deleteDepartmentById(departmentId, communityId);
+		departmentMapper.deleteById(departmentId);
 	}
 	
 	@Override
-	public List<DepartmentVO> listDepartment(Long communityId) {
+	public TreeCommunityVO listDepartment(Long communityId) {
 		//1. 查询所有部门
 		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("community_id", communityId);
@@ -162,7 +182,33 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 			departmentVO.setChildren(childList);
 		}
 		
-		return parents;
+		CommunityEntity entity = communityMapper.selectById(communityId);
+		return new TreeCommunityVO().setCommunityId(communityId).setCommunityName(entity.getName()).setDepartmentVOList(parents);
+	}
+	
+	@Override
+	public DepartmentEntity getDepartmentById(Long departmentId, Long communityId) {
+		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("id",departmentId).eq("community_id",communityId);
+		DepartmentEntity departmentEntity = departmentMapper.selectOne(wrapper);
+		if (departmentEntity==null) {
+			return new DepartmentEntity();
+		}
+		
+		// 根据父id获取节点名称
+		Long pid = departmentEntity.getPid();
+		QueryWrapper<DepartmentEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id", pid).eq("community_id", communityId);
+		DepartmentEntity parent = departmentMapper.selectOne(queryWrapper);
+		
+		if (parent != null) {
+			departmentEntity.setParentName(parent.getDepartment());
+		} else {
+			// 如果他没有父节点，那么父节点就展示他的社区名
+			CommunityEntity communityEntity = communityMapper.selectById(communityId);
+			departmentEntity.setParentName(communityEntity.getName());
+		}
+		return departmentEntity;
 	}
 	
 	

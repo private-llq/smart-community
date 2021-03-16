@@ -125,6 +125,7 @@ public class RelationServiceImpl implements IRelationService {
         relationVO.setName(houseMemberEntity.getName());
         relationVO.setIdCard(houseMemberEntity.getIdCard());
         relationVO.setRelation(houseMemberEntity.getRelation());
+        relationVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(houseMemberEntity.getRelation()));
         relationVO.setSex(houseMemberEntity.getSex());
         relationVO.setRelationText( BusinessEnum.RelationshipEnum.getCode(houseMemberEntity.getRelation()) );
         relationVO.setCommunityId(houseMemberEntity.getCommunityId());

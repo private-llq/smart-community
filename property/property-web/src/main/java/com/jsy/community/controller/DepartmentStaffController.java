@@ -31,8 +31,8 @@ import java.util.Map;
  */
 @Api(tags = "部门员工控制器")
 @RestController
-@RequestMapping("/staff")
 @ApiJSYController
+@RequestMapping("/staff")
 public class DepartmentStaffController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -44,6 +44,13 @@ public class DepartmentStaffController {
 	                                                                         @RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "10") Long size) {
 		PageInfo<DepartmentStaffEntity> pageInfo = departmentStaffService.listDepartmentStaff(departmentId, page, size);
 		return CommonResult.ok(pageInfo);
+	}
+	
+	@ApiOperation("根据id查询员工信息")
+	@GetMapping("/getDepartmentStaffById")
+	public CommonResult getDepartmentStaffById(@ApiParam("员工id") Long id) {
+		DepartmentStaffEntity staffEntity = departmentStaffService.getDepartmentStaffById(id);
+		return CommonResult.ok(staffEntity);
 	}
 	
 	@ApiOperation("添加员工")

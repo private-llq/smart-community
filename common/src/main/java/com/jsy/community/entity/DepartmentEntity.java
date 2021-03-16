@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,6 +24,10 @@ public class DepartmentEntity extends BaseEntity {
 	
 	@ApiModelProperty(value = "父id")
 	private Long pid;
+	
+	@TableField(exist = false)
+	@ApiModelProperty(value = "数据库没有该字段")
+	private String parentName;
 	
 	@ApiModelProperty(value = "社区id")
 	private Long communityId;

@@ -1,5 +1,6 @@
 package com.jsy.community.qo.admin;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,7 +12,13 @@ import java.io.Serializable;
  **/
 @Data
 public class AdminRoleQO implements Serializable {
-	private Long id;//ID
-	private String name;//角色名
-	private String remark;//备注
+	
+	@ApiModelProperty(value = "ID")
+	private Long id;
+	
+	@ApiModelProperty(value = "角色名")
+	private String name;
+	
+	@ApiModelProperty(value = "备注")
+	private String remark;
 }
