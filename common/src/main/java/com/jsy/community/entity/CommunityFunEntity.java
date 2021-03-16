@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
 @TableName("t_community_fun")
 public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "社区趣事标题")
-    @NotNull(groups = {CommunityFunValidated.class},message = "标题不能为空！")
     @NotBlank(groups = {CommunityFunValidated.class},message = "标题不能为空！")
     private String titleName;
 
@@ -32,16 +30,19 @@ public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "uid创建人")
     private String uid;
 
+    @ApiModelProperty(value = "uid修改人")
+    private String updateUid;
+
+    @ApiModelProperty(value = "发布人uid")
+    private String startUid;
+
     @ApiModelProperty(value = "社区趣事内容")
-    @NotNull(groups = {CommunityFunValidated.class},message = "内容不能为空！")
     @NotBlank(groups = {CommunityFunValidated.class},message = "内容不能为空！")
     private String content;
     @ApiModelProperty(value = "社区趣事缩略图地址")
-    @NotNull(groups = {CommunityFunValidated.class},message = "缩略图不能为空！")
     @NotBlank(groups = {CommunityFunValidated.class},message = "缩略图不能为空！")
     private String smallImageUrl;
     @ApiModelProperty(value = "社区趣事封面图地址")
-    @NotNull(groups = {CommunityFunValidated.class},message = "封面图不能为空！")
     @NotBlank(groups = {CommunityFunValidated.class},message = "封面图不能为空！")
     private String coverImageUrl;
     @ApiModelProperty(value = "社区趣事状态1表示已上线，2二表示为上线")

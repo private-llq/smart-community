@@ -10,6 +10,7 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.mapper.CommunityFunMapper;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.CommunityFunQO;
 import com.jsy.community.utils.SnowFlake;
@@ -38,17 +39,33 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     private CommunityFunMapper communityFunMapper;
 
     @Override
-    public Map<String,Object> findList(CommunityFunQO communityFunQO) {
+    public Map<String,Object> findList(BaseQO<CommunityFunQO> baseQO) {
+        CommunityFunQO communityFunQO = baseQO.getQuery();
         Map<String,Object> map = new HashMap<>();
-        if (communityFunQO.getSize()==0||communityFunQO.getSize()==null)
+        if (baseQO.getSize()==0||baseQO.getSize()==null)
         {
-            communityFunQO.setSize(10l);
+            baseQO.setSize(10L);
         }
         QueryWrapper<CommunityFunEntity> wrapper = new QueryWrapper<CommunityFunEntity>();
-        if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
+        if (!"".equals(communityFunQO.getHeadline())&&communityFunQO.getHeadline()!=null) {
             wrapper.like("title_name", communityFunQO.getHeadline());
         }
-        IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(communityFunQO.getPage(), communityFunQO.getSize()),wrapper);
+        if (!"".equals(communityFunQO.getTallys())&&communityFunQO.getTallys()!=null){
+            wrapper.like("tallys",communityFunQO.getTallys());
+        }
+        if (!"".equals(communityFunQO.getCreatrTimeStart())&&communityFunQO.getCreatrTimeStart()!=null){
+            wrapper.ge("create_time",communityFunQO.getCreatrTimeStart());
+        }
+        if (!"".equals(communityFunQO.getCreatrTimeOut())&&communityFunQO.getCreatrTimeOut()!=null){
+            wrapper.le("create_time",communityFunQO.getCreatrTimeOut());
+        }
+        if (!"".equals(communityFunQO.getIssueTimeStart())&&communityFunQO.getIssueTimeStart()!=null){
+            wrapper.ge("start_time",communityFunQO.getIssueTimeStart());
+        }
+        if (!"".equals(communityFunQO.getIssueTimeOut())&&communityFunQO.getIssueTimeOut()!=null){
+            wrapper.le("start_time",communityFunQO.getCreatrTimeStart());
+        }
+        IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
         List<CommunityFunEntity> list = page.getRecords();
 
         long total = page.getTotal();
@@ -90,7 +107,9 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.FUN, parameterType = CommunityFunEntity.class, importField = {"titleName","smallImageUrl"}, searchField = {"titleName"})
     public void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
         CommunityFunEntity entity = communityFunMapper.selectById(communityFunOperationQO.getId());
-
+        entity.setUpdateUid(uid);
+        String tallys = Arrays.toString(communityFunOperationQO.getTallys());
+        entity.setTallys(tallys.substring(1, tallys.length() - 1));
         entity.setContent(communityFunOperationQO.getContent());
         entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
         entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
@@ -110,12 +129,13 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
   }
 
   @Override
-  public void popUpOnline(Long id) {
+  public void popUpOnline(Long id,String uid) {
     CommunityFunEntity entity = communityFunMapper.selectById(id);
     if (entity.getStatus()==1){
       throw new PropertyException("该趣事已上线");
     }
     entity.setStatus(1);
+    entity.setStartUid(uid);
     entity.setStartTime(LocalDateTime.now());
     communityFunMapper.updateById(entity);
     ElasticSearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());

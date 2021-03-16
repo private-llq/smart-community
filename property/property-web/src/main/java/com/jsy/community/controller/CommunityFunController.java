@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.CommunityFunQO;
 import com.jsy.community.utils.*;
@@ -47,8 +48,8 @@ public class CommunityFunController {
     @ApiOperation("分页查询所有社区趣事")
     @PostMapping("/list")
     @Login
-    public CommonResult<Map> list(@RequestBody CommunityFunQO communityFunQO) {
-        Map<String, Object> map = communityFunService.findList(communityFunQO);
+    public CommonResult<Map> list(@RequestBody BaseQO<CommunityFunQO> baseQO) {
+        Map<String, Object> map = communityFunService.findList(baseQO);
         return CommonResult.ok(map);
     }
     @ApiOperation("新增")
@@ -154,7 +155,8 @@ public class CommunityFunController {
     @Login
     public CommonResult popUpOnline(@ApiParam("社区趣事id")
                                         @RequestParam("id") Long id) {
-        communityFunService.popUpOnline(id);
+        String userId = UserUtils.getUserId();
+        communityFunService.popUpOnline(id,userId);
         return  CommonResult.ok();
     }
 

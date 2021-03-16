@@ -86,7 +86,7 @@ public class UserDataController {
                     return CommonResult.error("名称不能包含特殊字符！");
                 }
             }else {
-                return CommonResult.error("名称不能为空");
+                return CommonResult.error("名称不能为空！");
             }
 
         } catch (UnsupportedEncodingException e) {
