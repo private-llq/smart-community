@@ -71,10 +71,9 @@ public class DepartmentController {
 	
 	@ApiOperation("删除部门")
 	@GetMapping("/deleteDepartment")
-	public CommonResult deleteDepartment(Long departmentId, Long communityId) {
+	public CommonResult deleteDepartment(@RequestParam Long departmentId, @RequestParam Long communityId) {
 		departmentService.deleteDepartment(departmentId, communityId);
 		return CommonResult.ok();
 	}
-	
 }
 

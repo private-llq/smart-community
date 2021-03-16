@@ -90,6 +90,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 			}
 		}
 		
+		// 判断是否有同名
 		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", departmentEntity.getId()).eq("community_id", departmentEntity.getCommunityId());
 		DepartmentEntity one = departmentMapper.selectOne(wrapper);
@@ -138,7 +139,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		if (!CollectionUtils.isEmpty(staffEntities)) {
 			throw new PropertyException("\"" + entity.getDepartment() + "\""+"请先删除部门下的员工");
 		}
-		departmentMapper.deleteDepartmentById(departmentId, communityId);
+		departmentMapper.deleteById(departmentId);
 	}
 	
 	@Override

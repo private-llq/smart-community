@@ -46,6 +46,13 @@ public class DepartmentStaffController {
 		return CommonResult.ok(pageInfo);
 	}
 	
+	@ApiOperation("根据id查询员工信息")
+	@GetMapping("/getDepartmentStaffById")
+	public CommonResult getDepartmentStaffById(@ApiParam("员工id") Long id) {
+		DepartmentStaffEntity staffEntity = departmentStaffService.getDepartmentStaffById(id);
+		return CommonResult.ok(staffEntity);
+	}
+	
 	@ApiOperation("添加员工")
 	@PostMapping("/addDepartmentStaff")
 	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffQO staffEntity) {
