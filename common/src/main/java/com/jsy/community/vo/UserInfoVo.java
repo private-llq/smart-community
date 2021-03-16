@@ -70,7 +70,7 @@ public class UserInfoVo implements Serializable {
 	private String detailAddress;
 
 	@ApiModelProperty("业主家属")
-	private List<HouseMemberEntity> proprietorMembers;
+	private List<RelationVO> proprietorMembers;
 
 	@ApiModelProperty("业主房屋")
 	private List<HouseVo> proprietorHouses;

@@ -58,6 +58,7 @@ public class ProprietorController {
     private IHouseService iHouseService;
 
     /**
+     * TODO: 根据物业端下载模板需求更改
      * 下载录入业主信息excel、模板
      * @return          返回Excel模板
      */
@@ -72,11 +73,11 @@ public class ProprietorController {
             throw new JSYException(JSYError.BAD_REQUEST);
         }
         //1.2 设置响应头
-        MultiValueMap<String, String> multiValueMap = setHeader(res.get("name") + "业主登记表.xlsx");
+        MultiValueMap<String, String> multiValueMap = setHeader(res.get("name") + "业主导入模板.xlsx");
         //2.生成Excel模板
         try {
-            //2.1 查出数据库当前社区的所有楼栋、单元、楼层、门牌 用于excel模板录入业主信息选择
-            List<HouseEntity> communityArchitecture = iHouseService.getCommunityArchitecture(communityId);
+            //2.1 查出数据库当前社区的所有房屋编号 用于excel模板录入业主信息选择
+            List<HouseEntity> communityArchitecture = iHouseService.getCommunityHouseNumber(communityId);
             //2.2 生成Excel 业主信息录入模板
             Workbook workbook = ProprietorExcelCommander.exportProprietorInfo(communityArchitecture, res);
             return new ResponseEntity<>(readWorkbook(workbook) , multiValueMap, HttpStatus.OK );
@@ -88,6 +89,7 @@ public class ProprietorController {
     }
 
     /**
+     * TODO: 根据物业端下载模板需求更改
      * 下载录入业主家属成员信息excel、模板
      * @return          返回Excel模板
      */

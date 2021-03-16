@@ -26,7 +26,7 @@
 <!--	</insert>-->
 	<!-- 按社区id获取社区名称 和社区 房间数量 -->
 	<select id="getCommunityNameAndUserAmountById"  resultType="java.util.HashMap">
-		select c.name,(SELECT count(*) from t_house where community_id = c.id and type = 4) as communityUserNum from t_community as c where  c.deleted = 0 and c.id = #{communityId}
+		select c.name,(SELECT count(*) from t_house where community_id = c.id and type = 4 and deleted = 0) as communityUserNum from t_community as c where  c.deleted = 0 and c.id = #{communityId}
 	</select>
 
 	<!-- 按社区ID获取 社区名称 社区用户名和社区-->
@@ -40,13 +40,10 @@
 		<result column="name" property="nickname"/>
 	</resultMap>
 
-	<!-- 通过社区ID查出所有 楼栋、单元、楼层、门牌、作为excel 下拉选择字符串 -->
-	<select id="getCommunityArchitecture" resultType="com.jsy.community.entity.HouseEntity">
+	<!-- 通过社区ID查出所有 房屋编号、作为excel 下拉选择字符串 -->
+	<select id="getCommunityHouseNumber" resultType="com.jsy.community.entity.HouseEntity">
 		SELECT DISTINCT
-			h.building,
-			h.unit,
-			h.floor,
-			h.door,
+			h.number,
 			h.id
 		FROM
 			t_house AS h

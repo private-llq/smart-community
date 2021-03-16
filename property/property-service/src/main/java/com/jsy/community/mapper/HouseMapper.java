@@ -41,9 +41,9 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 
 	/**
 	 * 按社区ID获取 社区名称和 当前社区住户房间数量
+	 * @param communityId 		社区id
 	 * @author YuLF
 	 * @since  2020/12/3 11:06
-	 * @Param  communityId   社区id
 	 * @return				 返回社区名称和 当前社区住户房间数量
 	 */
     Map<String, Object> getCommunityNameAndUserAmountById(long communityId);
@@ -62,11 +62,12 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 
 	/**
 	 * 通过社区ID查出所有 楼栋、单元、楼层、未被登记的门牌
+	 * @param communityId 	社区id
 	 * @author YuLF
 	 * @since  2020/11/26 9:38
-	 * @Param  communityId	社区ID
+	 * @return				返回该社区所有的房屋编号
 	 */
-    List<HouseEntity> getCommunityArchitecture(@Param("communityId") long communityId);
+    List<HouseEntity> getCommunityHouseNumber(@Param("communityId") long communityId);
     
     //============================================ 物业端产品原型确定后新加的 开始  ===========================================================
 	/**
