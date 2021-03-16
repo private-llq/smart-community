@@ -15,6 +15,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.RelationCarsVO;
 import com.jsy.community.vo.RelationVO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,9 +95,16 @@ public class RelationServiceImpl implements IRelationService {
      * @return
      */
     @Override
-    public List<HouseMemberEntity> selectID(String id,Long houseId) {
+    public List<RelationVO> selectID(String id,Long houseId) {
         List<HouseMemberEntity> houseMemberEntities = relationMapper.selectID(id,houseId);
-        return houseMemberEntities;
+        List<RelationVO> list = new ArrayList<>();
+        for (HouseMemberEntity houseMemberEntity : houseMemberEntities) {
+            RelationVO relationVO = new RelationVO();
+            BeanUtils.copyProperties(houseMemberEntity,relationVO);
+            relationVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(houseMemberEntity.getRelation()));
+            list.add(relationVO);
+        }
+        return list;
     }
     /**
      * 查询业主下面的家属详情

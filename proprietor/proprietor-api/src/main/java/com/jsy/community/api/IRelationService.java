@@ -28,7 +28,7 @@ public interface IRelationService {
      * @Param:
      * @return:
      */
-    List<HouseMemberEntity> selectID(String id,Long houseId);
+    List<RelationVO> selectID(String id,Long houseId);
     /**
      * 查询业主下面的家属详情
      * @param RelationId
