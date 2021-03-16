@@ -533,8 +533,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	 * @Param  communityId	社区ID
 	 */
 	@Override
-	public List<HouseEntity> getCommunityArchitecture(long communityId) {
-		return houseMapper.getCommunityArchitecture(communityId);
+	public List<HouseEntity> getCommunityHouseNumber(long communityId) {
+		return houseMapper.getCommunityHouseNumber(communityId);
 	}
 	
 	
