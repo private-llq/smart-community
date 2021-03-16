@@ -26,10 +26,7 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
-import com.jsy.community.vo.HouseVo;
-import com.jsy.community.vo.UserAuthVo;
-import com.jsy.community.vo.UserInfoVo;
-import com.jsy.community.vo.VisitorEntryVO;
+import com.jsy.community.vo.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -490,7 +487,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(userEntity, userInfoVo);
         //业主家属查询
-        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId, houseId);
+        List<RelationVO> houseMemberEntities = relationService.selectID(userId, houseId);
         userInfoVo.setProprietorMembers(houseMemberEntities);
         //业主房屋查询
         List<HouseVo> houseVos = userMapper.queryUserHouseById(userId, houseId);
@@ -678,7 +675,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userInfo.setCommunityId(userInfoVo.getCommunityId());
             userInfo.setHouseId(houseId);
         }
-        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(uid, houseId);
+        List<RelationVO> houseMemberEntities = relationService.selectID(uid, houseId);
         userInfo.setProprietorMembers(houseMemberEntities);
         return userInfo;
     }
