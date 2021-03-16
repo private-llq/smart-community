@@ -52,23 +52,23 @@ public class OrganizationController {
 	
 	@ApiOperation("删除组织机构")
 	@GetMapping("/deleteOrganization")
-	public CommonResult deleteOrganization(Long id, Long communityId) {
+	public CommonResult deleteOrganization(@RequestParam Long id, @RequestParam Long communityId) {
 		organizationService.deleteOrganization(id, communityId);
 		return CommonResult.ok();
 	}
 	
 	@ApiOperation("根据id查询组织机构")
 	@GetMapping("/getOrganizationById")
-	public CommonResult getOrganizationById(Long id, Long communityId) {
+	public CommonResult getOrganizationById(@RequestParam Long id, @RequestParam Long communityId) {
 		OrganizationEntity organization = organizationService.getOrganizationById(id, communityId);
 		return CommonResult.ok(organization);
 	}
 	
 	
 	@ApiOperation("修改组织机构")
-	@GetMapping("/updateOrganization")
-	public CommonResult updateOrganization(OrganizationEntity organization) {
-		ValidatorUtils.validateEntity(organization, OrganizationEntity.addOrganizationValidate.class);
+	@PostMapping("/updateOrganization")
+	public CommonResult updateOrganization(@RequestBody OrganizationEntity organization) {
+		ValidatorUtils.validateEntity(organization, OrganizationEntity.updateOrganizationValidate.class);
 		if (organization.getSort() > 99 || organization.getSort() < 0) {
 			throw new PropertyException("你输入的排序序号不符要求,请重新输入!");
 		}

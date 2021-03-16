@@ -98,11 +98,16 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	
 	@Override
 	public void deleteOrganization(Long id, Long communityId) {
+		QueryWrapper<OrganizationEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id", id).eq("community_id", communityId);
+		OrganizationEntity entity = organizationMapper.selectOne(queryWrapper);
+		if (entity == null) {
+			throw new PropertyException("您要删除的组织不存在，请重新选择");
+		}
+		
 		QueryWrapper<OrganizationEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("pid", id).eq("community_id", communityId);
 		List<OrganizationEntity> list = organizationMapper.selectList(wrapper);
-		
-		OrganizationEntity entity = organizationMapper.selectById(id);
 		if (!CollectionUtils.isEmpty(list)) {
 			throw new PropertyException("\'" + entity.getName() + "\'" + "已有下级节点,不可删除");
 		}
@@ -118,6 +123,9 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		QueryWrapper<OrganizationEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", id).eq("community_id", communityId);
 		OrganizationEntity one = organizationMapper.selectOne(wrapper);
+		if (one==null) {
+			return new OrganizationEntity();
+		}
 		
 		// 根据父id获取节点名称
 		Long pid = one.getPid();
@@ -127,6 +135,10 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		
 		if (parent != null) {
 			one.setParentName(parent.getName());
+		} else {
+			// 如果他没有父节点，那么父节点就展示他的社区名
+			CommunityEntity communityEntity = communityMapper.selectById(communityId);
+			one.setParentName(communityEntity.getName());
 		}
 		
 		return one;
@@ -148,6 +160,17 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 			}
 		}
 		
+		// 2. 判断是否有同名
+		QueryWrapper<OrganizationEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id", organization.getId()).eq("community_id", organization.getCommunityId());
+		OrganizationEntity one = organizationMapper.selectOne(queryWrapper);
+		if (one == null) {
+			throw new PropertyException("该小区没有此组织");
+		}
+		
+		if (organization.getName().equals(one.getName())) {
+			throw new PropertyException("您小区已存在同名组织，请重新修改");
+		}
 		organizationMapper.updateById(organization);
 	}
 	
