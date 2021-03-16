@@ -1,10 +1,11 @@
 package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsy.community.config.web.ElasticsearchConfig;
 import com.jsy.community.constant.BusinessConst;
-import com.jsy.community.entity.FullTextSearchEntity;
+import com.jsy.community.utils.es.Operation;
 import com.rabbitmq.client.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Objects;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author YuLF
@@ -39,23 +40,23 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
 
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
-        byte[] body = message.getBody();
-        FullTextSearchEntity entity = serializationByteToObject(body, FullTextSearchEntity.class);
-        log.info("自定义监听【ES全文搜索数据】MqTag标签："+ message.getMessageProperties().getDeliveryTag() + ":" + entity);
+        //传过来的 字节数组 为json字符串 字节数组
+        String jsonStr = new String(message.getBody(), StandardCharsets.UTF_8);
+        JSONObject jsonObject = JSON.parseObject(jsonStr);
+        String operation =  jsonObject.getString("operation");
+        Operation operation1 = Operation.valueOf(operation);
+        log.info("自定义监听【ES全文搜索数据】MqTag标签："+ message.getMessageProperties().getDeliveryTag() + ":" + jsonObject);
         boolean isConsumerSuccess = false;
-        if(Objects.isNull(entity) ){
-            return;
-        }
         //向es导入数据
-        switch (entity.getOperation()){
+        switch (operation1){
             case INSERT:
-                isConsumerSuccess = insertData(entity);
+                insertData(jsonObject);
                 break;
             case UPDATE:
-                isConsumerSuccess = updateData(entity);
+                updateData(jsonObject);
                 break;
             case DELETE:
-                isConsumerSuccess = deleteData(entity);
+                deleteData(jsonObject);
                 break;
             default:
                 break;
@@ -64,6 +65,7 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
         //如果操作 elasticsearch 成功 回复 mq
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
     }
+
 
     /**
      * 字节数组序列化为对象
@@ -84,39 +86,36 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
         return null;
     }
 
-    private boolean deleteData(FullTextSearchEntity entity) throws IOException {
+    private void deleteData(JSONObject jsonObject) throws IOException {
         //第一个参数为操作索引名称、第二个参数为删除文档的id
         DeleteRequest deleteRequest = new DeleteRequest(
-                BusinessConst.FULL_TEXT_SEARCH_INDEX, entity.getId().toString());
+                BusinessConst.FULL_TEXT_SEARCH_INDEX, jsonObject.getString("esId"));
         DeleteResponse response = customElasticsearchClient.delete(deleteRequest, ElasticsearchConfig.COMMON_OPTIONS);
         DocWriteResponse.Result result = response.getResult();
         //以下两种状态都表示在es中不存在了
-        return result == DocWriteResponse.Result.DELETED || result == DocWriteResponse.Result.NOT_FOUND;
     }
 
-    private boolean updateData(FullTextSearchEntity entity) throws IOException {
+    private void updateData(JSONObject jsonObject) throws IOException {
         //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
         UpdateRequest updateRequest = new UpdateRequest();
         updateRequest.index(BusinessConst.FULL_TEXT_SEARCH_INDEX);
         //docAsUpsert表示 如果文档不存在则创建
         updateRequest.docAsUpsert(true);
-        updateRequest.id(entity.getId() + "");
+        updateRequest.id(jsonObject.getString("esId"));
         //转换为json串发给elasticsearch
-        updateRequest.doc(JSON.toJSONString(entity), XContentType.JSON);
+        updateRequest.doc(jsonObject.toJSONString(), XContentType.JSON);
         UpdateResponse update = customElasticsearchClient.update(updateRequest, ElasticsearchConfig.COMMON_OPTIONS);
         DocWriteResponse.Result result = update.getResult();
-        return result == DocWriteResponse.Result.UPDATED || result == DocWriteResponse.Result.CREATED;
     }
 
-    private boolean insertData(FullTextSearchEntity entity) throws IOException {
+    private void insertData(JSONObject jsonObject) throws IOException {
         //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
         IndexRequest indexRequest = new IndexRequest(BusinessConst.FULL_TEXT_SEARCH_INDEX);
-        indexRequest.id(String.valueOf(entity.getId()));
+        indexRequest.id(jsonObject.getString("esId"));
         //转换为json串发给elasticsearch
-        indexRequest.source(JSON.toJSONString(entity), XContentType.JSON);
+        indexRequest.source(jsonObject.toJSONString(), XContentType.JSON);
         //发送保存 第一个参数是构造的请求，第二个参数是请求头需要的一些操作如验证token
         IndexResponse indexResponse = customElasticsearchClient.index(indexRequest, ElasticsearchConfig.COMMON_OPTIONS);
         DocWriteResponse.Result result = indexResponse.getResult();
-        return result == DocWriteResponse.Result.CREATED || result == DocWriteResponse.Result.UPDATED;
     }
 }

@@ -1,124 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.ProprietorMapper">
+
+    <!-- 物业添加新增业主 -->
+    <insert id="saveUser">
+        insert into t_user ( id,real_name,uid,wechat,qq,email,mobile,id_card,identification_type )
+        values
+        ( #{id},#{realName},#{uid},#{wechat},#{qq},#{email},#{mobile},#{idCard},#{identificationType})
+    </insert>
     <!-- 物业查询业主用户信息 -->
-    <select id="query" resultMap="proprietorMap"  >
-        select
-        u.id,u.householder_id,u.mobile,u.nickname,u.avatar_url,u.sex,u.real_name,u.id_card,u.is_real_auth,u.province_id,u.city_id,u.area_id,u.detail_address,u.create_time,u.update_time
-        ,(select name from t_region  where u.province_id = id) as provinceName
-        ,(select name from t_region  where u.city_id = id) as cityName
-        ,(select name from t_region  where u.area_id = id) as areaName
-         from t_user as u
-         <!-- 查询条件 -->
-         <where>
-                <!-- 业主id > 0 就作为条件 -->
-                 <if test="query.householderId != null and query.householderId &gt; 0">
-                     householder_id=#{query.householderId}
-                 </if>
-                 <!-- 用户昵称 不等于空 并且 用户名称 不为"" -->
-                 <if test="query.nickname!=null and !query.nickname.equals(&quot;&quot;)">
-                     and nickname like concat('%',#{query.nickname},'%')
-                 </if>
-                 <!-- 用户手机号码 -->
-                 <if test="query.mobile!=null and !query.mobile.equals(&quot;&quot;)">
-                     and mobile = #{query.mobile}
-                 </if>
-                 <!-- 性别 不等于空 并且 大于 -1 并且 小于3   0未知 1男 2女 -->
-                 <if test="query.sex!=null and query.sex &gt; -1 and query.sex &lt; 3 ">
-                     and sex = #{query.sex}
-                 </if>
-                 <!-- 真实姓名 -->
-                 <if test="query.realName!=null and !query.realName.equals(&quot;&quot;)">
-                     and real_name  like concat('%',#{query.realName},'%')
-                 </if>
-                 <!-- 身份证 -->
-                 <if test="query.idCard!=null and !query.idCard.equals(&quot;&quot;)">
-                     and id_card = #{query.idCard}
-                 </if>
-                 <!-- 实名认证 不等于空 并且 实名认证数字 大于-1 小于2     0未实名 1已实名-->
-                 <if test="query.isRealAuth!=null and query.isRealAuth &gt; -1 and query.isRealAuth &lt; 2">
-                     and is_real_auth = #{query.isRealAuth}
-                 </if>
-                 <!-- 省 -->
-                 <if test="query.provinceId!=null and query.provinceId &lt; 0">
-                     and province_id = #{query.provinceId}
-                 </if>
-                 <!-- 市 -->
-                 <if test="query.cityId!=null and query.cityId &lt; 0">
-                     and city_id = #{query.cityId}
-                 </if>
-                 <!-- 区 -->
-                 <if test="query.areaId!=null and query.areaId &lt; 0">
-                     and area_id = #{query.areaId}
-                 </if>
-                 <!-- 详细地址 -->
-                 <if test="query.detailAddress!=null and !query.detailAddress.equals(&quot;&quot;)">
-                     and detail_address  like concat('%',#{query.detailAddress},'%')
-                 </if>
-         </where>
-        limit #{page},#{size}
+    <select id="query" resultType="com.jsy.community.vo.ProprietorVO" >
+        SELECT
+	        p.id,
+	        p.real_name,
+	        p.house_id,
+	        CONCAT(
+		    h.number,
+		    ' ',
+		    h.building,
+		    h.unit,
+		    ' ',
+	    CASE
+			h.house_type
+			WHEN 1 THEN
+			'商铺' ELSE '住宅'
+		END
+		    ) AS houseMergeName,
+	        p.mobile,
+	        p.id_card,
+	        p.create_time,
+	        p.update_time,
+	        p.create_by,
+	        p.update_by,
+	        p.wechat,
+	        p.qq,
+	        p.email
+	    FROM
+		    t_proprietor AS p
+		    LEFT JOIN t_house AS h ON p.house_id = h.id
+		    <where>
+                AND p.deleted = 0
+                AND h.deleted = 0
+                /* 如果房屋id不为空 就直接按房屋id查询业主 */
+                <if test="query.houseId != null and query.houseId &gt; 0 ">
+                    AND p.house_id = #{query.houseId}
+                </if>
+                /* [单楼栋]如果房屋id为空 并且 楼栋id 不为空 并且 单元id为空 那就按 房屋 父级id 为楼栋id的查  */
+                <if test="query.houseId == null and query.buildingId != null and query.unitId == null">
+                    AND h.pid = #{query.buildingId} and type = 4
+                </if>
+                /* [楼栋单元]如果房屋id为空 并且 楼栋id 不为空 并且 单元id也不为空 那就按 房屋 父级id 为单元id的查  */
+                <if test="query.houseId == null and query.buildingId != null and query.unitId != null">
+                    AND h.pid = #{query.unitId} and type = 4
+                </if>
+                /* [单单元]如果房屋id为空 并且 楼栋id 为空 并且 单元id不为空 那就按 房屋 父级id 为单元id的查  */
+                <if test="query.houseId == null and query.buildingId == null and query.unitId != null">
+                    AND h.pid = #{query.unitId} and type = 4
+                </if>
+                /* 搜索文本不为空 则按 真实姓名/证件号码/手机号码 来匹配 */
+                <if test="query.searchText != null and !query.searchText.equals(&quot;&quot;)">
+                    AND p.real_name like concat('%',#{query.searchText},'%') or p.id_card like concat('%', #{query.searchText}, '%') or p.mobile like concat('%', #{query.searchText}, '%')
+                </if>
+            </where>
+            LIMIT #{page},#{size}
     </select>
-    <resultMap id="proprietorMap" type="com.jsy.community.vo.ProprietorVO">
-        <id property="id" column="id" />
-        <result property="householderId" column="householder_id" />
-        <result property="mobile" column="mobile" />
-        <result property="nickname" column="nickname" />
-        <result property="avatarUrl" column="avatar_url" />
-        <result property="sex" column="sex" />
-        <result property="realName" column="real_name" />
-        <result property="idCard" column="id_card" />
-        <result property="isRealAuth" column="is_real_auth" />
-        <result property="provinceId" column="province_id" />
-        <result property="cityId" column="city_id" />
-        <result property="areaId" column="area_id" />
-        <result property="detailAddress" column="detail_address" />
-        <result property="provinceName" column="provinceName" />
-        <result property="cityName" column="cityName" />
-        <result property="areaName" column="areaName" />
-    </resultMap>
-    <!--物业端更新业主信息-->
-    <update id="update">
-        update t_user set
-        <trim prefixOverrides=",">
-            <if test="nickname != null and !nickname.equals(&quot;&quot;)">
-                ,nickname = #{nickname}
-            </if>
-            <if test="householderId != null and householderId &gt; 0">
-                ,householder_id = #{householderId}
-            </if>
-            <if test="avatarUrl != null and !avatarUrl.equals(&quot;&quot;)">
-                ,avatar_url = #{avatarUrl}
-            </if>
-            <if test="mobile != null and !mobile.equals(&quot;&quot;)">
-                ,mobile = #{mobile}
-            </if>
-            <if test="sex != null and !sex.equals(&quot;&quot;)">
-                ,sex = #{sex}
-            </if>
-            <if test="realName != null and !realName.equals(&quot;&quot;)">
-                ,real_name = #{realName}
-            </if>
-            <if test="idCard != null and !idCard.equals(&quot;&quot;)">
-                ,id_card = #{idCard}
-            </if>
-            <if test="isRealAuth != null and !isRealAuth.equals(&quot;&quot;)">
-                ,is_real_auth = #{isRealAuth}
-            </if>
-            <if test="provinceId != null and provinceId &gt; 0">
-                ,province_id = #{provinceId}
-            </if>
-            <if test="cityId != null and cityId &gt; 0">
-                ,city_id = #{cityId}
-            </if>
-            <if test="areaId != null and areaId &gt; 0">
-                ,area_id = #{areaId}
-            </if>
-            <if test="detailAddress != null and !detailAddress.equals(&quot;&quot;)">
-                ,detail_address = #{detailAddress}
-            </if>
-        </trim>
-        where id = #{id}
-    </update>
+
 
     <!-- 通过社区id拿到当前社区的 层级结构 房屋层级模式：1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元 -->
     <select id="getHouseListByCommunityId" resultType="com.jsy.community.entity.HouseEntity">
@@ -223,4 +169,18 @@
             ( #{item.id}, #{item.uid}, #{communityId}, #{item.houseEntity.houseId}, #{item.realName}, #{item.sex}, #{item.mobile}, 1, #{item.idCard}, #{item.relationCode}, now() )
         </foreach>
     </insert>
+    <!-- 插入 物业 人员对 用户数据的 操作日志 -->
+    <insert id="insertOperationLog">
+        insert into t_admin_proprietor_log ( id,operation_by,operation_time,pid,operation_type )
+        values
+        ( #{id},#{operationPerson},#{operationTime},#{pid},#{operationType})
+    </insert>
+    <!-- 查出管理员姓名 -->
+    <select id="queryAdminNameByUid" resultType="java.lang.String">
+        select real_name from t_admin_user where uid = #{adminUid} and deleted = 0
+    </select>
+    <!-- 通过houseId 查询 t_house表是否存在 -->
+    <select id="existHouse" resultType="java.lang.Integer">
+        select count(*) from t_house where id = #{houseId} and community_id = #{communityId} and deleted = 0
+    </select>
 </mapper>

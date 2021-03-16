@@ -21,6 +21,12 @@ public class HouseVo implements Serializable {
 
     private Long id;
 
+    @ApiModelProperty(value = "城市id")
+    private Integer cityId;
+
+    @ApiModelProperty(value = "城市名称")
+    private String cityName;
+
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
 

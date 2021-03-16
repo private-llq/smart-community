@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.HouseValid;
 import com.jsy.community.annotation.RequireRecentBrowse;
 import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
@@ -15,6 +16,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.lease.HouseLeaseVO;
@@ -57,20 +59,71 @@ public class HouseLeaseController {
 
 
     @Login
-    @PostMapping()
-    @ApiOperation("新增房屋租售")
+    @PostMapping("/wholeLease")
+    @ApiOperation("整租新增")
+    @HouseValid( validationInterface = HouseLeaseQO.AddWholeLeaseHouse.class, operation = Operation.INSERT)
     @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
-    public CommonResult<Boolean> addLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
-        //新增参数常规效验
-        ValidatorUtils.validateEntity(houseLeaseQo, HouseLeaseQO.AddLeaseSaleHouse.class);
-        houseLeaseQo.setUid(UserUtils.getUserId());
-        //验证所属社区所属用户房屋是否存在
-        if(iHouseLeaseService.existUserHouse(UserUtils.getUserId(), houseLeaseQo.getHouseCommunityId(), houseLeaseQo.getHouseId())){
-            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "您在此处未登记房产!");
-        }
-        //参数效验完成 新增
-        return iHouseLeaseService.addLeaseSaleHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    public CommonResult<Boolean> addWholeLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
+        return iHouseLeaseService.addWholeLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
+
+    @Login
+    @PostMapping("/singleRoom")
+    @ApiOperation("单间新增")
+    @HouseValid( validationInterface = HouseLeaseQO.AddSingleRoomLeaseHouse.class, operation = Operation.INSERT)
+    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
+    public CommonResult<Boolean> addSingleLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
+        return iHouseLeaseService.addSingleLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    }
+
+
+    @Login
+    @PostMapping("/combineLease")
+    @ApiOperation("合租新增")
+    @HouseValid( validationInterface = HouseLeaseQO.AddCombineLeaseHouse.class, operation = Operation.INSERT)
+    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
+    public CommonResult<Boolean> addCombineLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
+        return iHouseLeaseService.addCombineLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    }
+
+
+    @Login
+    @PutMapping("/wholeLease")
+    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class, operation = Operation.UPDATE)
+    @ApiOperation("整租更新")
+    public CommonResult<Boolean> updateWholeLease(@RequestBody HouseLeaseQO qo) {
+        return iHouseLeaseService.updateWholeLease(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");
+    }
+
+
+    @Login
+    @PutMapping("/singleRoom")
+    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class, operation = Operation.UPDATE)
+    @ApiOperation("单间更新")
+    public CommonResult<Boolean> updateSingleRoom(@RequestBody HouseLeaseQO qo) {
+        return iHouseLeaseService.updateSingleRoom(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");
+    }
+
+    @Login
+    @PutMapping("/combineLease")
+    @HouseValid(validationInterface = HouseLeaseQO.UpdateWholeLeaseHouse.class, operation = Operation.UPDATE)
+    @ApiOperation("合租更新")
+    public CommonResult<Boolean> updateCombineLease(@RequestBody HouseLeaseQO qo) {
+        return iHouseLeaseService.updateCombineLease(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");
+    }
+
+
+    /**
+     * 在用户点击编辑房屋时，回显数据接口
+     * @param houseId       房屋id
+     */
+    @Login
+    @GetMapping("/editDetails")
+    @ApiOperation("编辑房屋详情")
+    public CommonResult<HouseLeaseVO> editDetails(@RequestParam Long houseId) {
+        return CommonResult.ok(iHouseLeaseService.editDetails(houseId, UserUtils.getUserId()));
+    }
+
 
     @Login
     @DeleteMapping()
@@ -94,6 +147,7 @@ public class HouseLeaseController {
         return shopLeaseController.getShop(id);
     }
 
+
     @Login
     @PostMapping("/page")
     @Cacheable( value = "lease:house", key = "#baseQo", unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
@@ -107,15 +161,6 @@ public class HouseLeaseController {
     }
 
 
-    @Login
-    @PostMapping("/update")
-    @ApiOperation("更新房屋出租数据")
-    public CommonResult<Boolean> houseLeaseUpdate(@RequestBody HouseLeaseQO qo) {
-        ValidatorUtils.validateEntity(qo, HouseLeaseQO.UpdateLeaseSaleHouse.class);
-        qo.setUid(UserUtils.getUserId());
-        Boolean success = iHouseLeaseService.updateHouseLease(qo);
-        return success ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败!");
-    }
 
 
 
@@ -139,6 +184,7 @@ public class HouseLeaseController {
         return CommonResult.ok(iHouseLeaseService.ownerHouse(UserUtils.getUserId(), cid));
     }
 
+
     @Login
     @PostMapping("/ownerHouseImages")
     @ApiOperation("房屋图片批量上传接口")
@@ -151,6 +197,7 @@ public class HouseLeaseController {
         return CommonResult.ok(data);
     }
 
+
     @Login
     @PostMapping("/ownerLeaseHouse")
     @ApiOperation("查询业主已发布的房源")
@@ -162,6 +209,7 @@ public class HouseLeaseController {
         qo.getQuery().setUid(UserUtils.getUserId());
         return CommonResult.ok(iHouseLeaseService.ownerLeaseHouse(qo));
     }
+
 
 
     /**

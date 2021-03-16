@@ -43,8 +43,10 @@ public class ComplainEntity implements Serializable {
     private String uid;
     @ApiModelProperty(value = "投诉时间")
     private LocalDateTime complainTime;
-    @ApiModelProperty(value = "投诉状态")
+    @ApiModelProperty(value = "1，已回复，0未回复")
     private Integer status;
     @ApiModelProperty(value = "反馈内容")
     private String feedback;
+    @ApiModelProperty(value = "反馈时间")
+    private LocalDateTime feedbackTime;
 }

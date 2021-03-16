@@ -15,6 +15,7 @@
 	<name>业主端服务消费模块</name>
 	
 	<dependencies>
+
 		<dependency>
 			<groupId>com.jsy</groupId>
 			<artifactId>proprietor-api</artifactId>

@@ -111,7 +111,7 @@ public class ProprietorMemberProvider implements ExcelHandler {
                                 break;
                             //第6列 家属身份证号码
                             case 5:
-                                if (RegexUtils.isIDCard(cellValue)) {
+                                if (RegexUtils.isIdCard(cellValue)) {
                                     userEntity.setIdCard(cellValue);
                                 } else {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的身份证号码!");

@@ -10,6 +10,7 @@ import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 房屋租售 Mapper 接口
@@ -19,13 +20,6 @@ import java.util.List;
 public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
 
-
-    /**
-     * 插入房源数据
-     * @param houseLeaseQo      参数对象
-     * @return                  返回影响行数
-     */
-    int insertHouseLease(HouseLeaseQO houseLeaseQo);
 
 
 
@@ -94,11 +88,11 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
 
 
     /**
-     * 按参数对象属性更新房屋出租数据
+     * 【整租、合租、单间】参数对象属性更新房屋出租数据
      * @param houseLeaseQo          参数对象
      * @return                      返回更新影响行数
      */
-    Boolean updateHouseLease(HouseLeaseQO houseLeaseQo);
+    Integer updateHouseLease(HouseLeaseQO houseLeaseQo);
 
 
     /**
@@ -187,6 +181,59 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param cityId    城市id
      * @return          返回小区名称
      */
-    @Select("select DISTINCT c.id,CONCAT(c.detail_address,c.`name`) as 'name' from t_community as c LEFT JOIN t_user_house as h on h.community_id = c.id where c.deleted = 0 and h.deleted = 0 and h.check_status = 1 and h.uid = #{uid} and c.city_id = #{cityId}")
     List<CommunityEntity> allCommunity(Long cityId, String uid);
+
+    /**
+     * 按id查询房屋详情数据
+     * @param houseId       房屋id
+     * @param uid           用户id
+     * @return              返回这条数据的详情
+     */
+    HouseLeaseVO editDetails(Long houseId, String uid);
+
+    /**
+     * 整租插入房源数据
+     * @param houseLeaseQo      参数对象
+     * @return                  返回影响行数
+     */
+    Integer addWholeLeaseHouse(HouseLeaseQO houseLeaseQo);
+    /**
+     * 单间新增房源
+     * @param qo                请求参数
+     * @return                  返回新增sql影响行数
+     */
+    Integer addSingleLeaseHouse(HouseLeaseQO qo);
+
+    /**
+     * 合租新增房源
+     * @param qo                请求参数
+     * @return                  返回新增sql影响行数
+     */
+    Integer addCombineLeaseHouse(HouseLeaseQO qo);
+
+    /**
+     * 通过社区id 查出 社区所在区域id
+     * @param houseCommunityId  社区id
+     * @return                  社区所在城市区域id
+     */
+    @Select("select area_id from t_community where id = #{houseCommunityId}")
+    Long selectAreaIdByCommunityId(Long houseCommunityId);
+
+    /**
+     * 按用户id 和 房屋id 查询已发布 房源数量
+     * @param userId        用户id
+     * @param houseId       用户id
+     * @return              返回已发布数量
+     */
+    @Select("select count(*) from t_house_lease where uid = #{userId} and house_id = #{houseId}")
+    Integer getPublishLease(String userId, Long houseId);
+
+
+    /**
+     * 根据社区id拿到社区名称 和 房屋具体地址
+     * @param houseCommunityId      社区id
+     * @param houseId               房屋id
+     * @return                      返回社区名称和房屋名称
+     */
+    Map<String, String> getUserAddrById(Long houseCommunityId, Long houseId );
 }

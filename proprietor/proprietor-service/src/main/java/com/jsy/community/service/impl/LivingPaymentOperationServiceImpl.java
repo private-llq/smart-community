@@ -53,6 +53,16 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
     @Autowired
     private PayCompanyMapper payCompanyMapper;
 
+    @Override
+    public void saveStatus(String out_trade_no) {
+        PayOrderEntity entity = payOrderMapper.selectOne(new QueryWrapper<PayOrderEntity>().eq("order_num", out_trade_no));
+        if (entity!=null){
+            entity.setStatus(2);
+            entity.setOrderTime(LocalDateTime.now());
+            payOrderMapper.updateById(entity);
+        }
+    }
+
     /**
      * @Description: 交费记录
      * @author: Hu
@@ -107,17 +117,18 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         payOrderEntity.setId(SnowFlake.nextId());
 
         //生成订单号
-        payOrderEntity.setOrderNum(order());
+        payOrderEntity.setOrderNum(livingPaymentQO.getOrderNum());
 
 
-        payOrderEntity.setPayType(livingPaymentQO.getPayTpye());
+        payOrderEntity.setPayType(livingPaymentQO.getPayType());
         payOrderEntity.setFamilyId(livingPaymentQO.getFamilyId());
-        payOrderEntity.setStatus(3);
-        payOrderEntity.setOrderTime(LocalDateTime.now());
+        payOrderEntity.setStatus(2);
+        payOrderEntity.setUid(livingPaymentQO.getUserID());
         payOrderEntity.setCompanyName(entity.getName());
         payOrderEntity.setPaymentBalance(livingPaymentQO.getPaymentBalance());
         payOrderEntity.setPayYear(LocalDateTime.now().getYear());
         payOrderEntity.setPayMonth(LocalDateTime.now().getMonthValue());
+        payOrderEntity.setOrderTime(LocalDateTime.now());
         payOrderEntity.setGroupId(group_id);
         payOrderEntity.setPayTypeName(livingPaymentQO.getPayTypeName());
         payOrderEntity.setFamilyName(livingPaymentQO.getFamilyName());
@@ -130,7 +141,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
 
 
         //到账时间
-        payOrderEntity.setArriveTime(LocalDateTime.now());
+        //payOrderEntity.setArriveTime(LocalDateTime.now());
 
         payOrderMapper.insert(payOrderEntity);
         PayFamilyEntity familyEntity = payFamilyMapper.selectOne(new QueryWrapper<PayFamilyEntity>()

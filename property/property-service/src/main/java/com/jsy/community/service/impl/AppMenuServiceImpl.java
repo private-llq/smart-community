@@ -126,13 +126,12 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		
 		// 判断添加的菜单是否为父菜单
 		Long parentId = menuEntity.getParentId();
-		if (PARENT_MARK.equals(parentId)) {
+		if (PARENT_MARK.equals(parentId)||!menuEntity.getMenuName().equals(appMenuEntity.getMenuName())) {
 			throw new PropertyException("您添加的不是子菜单");
 		}
 		
 		// 保存到中间表
 		appMenuMapper.addParentMenu(appMenuEntity.getId(),communityId);
-		
 	}
 	
 	@Override

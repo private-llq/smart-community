@@ -15,6 +15,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.RelationCarsVO;
 import com.jsy.community.vo.RelationVO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,7 +71,7 @@ public class RelationServiceImpl implements IRelationService {
         houseMemberEntity.setMobile(relationQo.getMobile());
         houseMemberEntity.setRelation(relationQo.getRelation());
         houseMemberEntity.setSex(relationQo.getSex());
-        houseMemberEntity.setPersonType(relationQo.getPersonType());
+        houseMemberEntity.setPersonType(1);
         houseMemberMapper.insert(houseMemberEntity);
         //添加车辆信息
         List<RelationCarsQo> cars = relationQo.getCars();
@@ -94,9 +95,16 @@ public class RelationServiceImpl implements IRelationService {
      * @return
      */
     @Override
-    public List<HouseMemberEntity> selectID(String id,Long houseId) {
+    public List<RelationVO> selectID(String id,Long houseId) {
         List<HouseMemberEntity> houseMemberEntities = relationMapper.selectID(id,houseId);
-        return houseMemberEntities;
+        List<RelationVO> list = new ArrayList<>();
+        for (HouseMemberEntity houseMemberEntity : houseMemberEntities) {
+            RelationVO relationVO = new RelationVO();
+            BeanUtils.copyProperties(houseMemberEntity,relationVO);
+            relationVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(houseMemberEntity.getRelation()));
+            list.add(relationVO);
+        }
+        return list;
     }
     /**
      * 查询业主下面的家属详情
@@ -175,9 +183,12 @@ public class RelationServiceImpl implements IRelationService {
                     relationCarsQo.setId(SnowFlake.nextId());
                     relationCarsQo.setUid(relationQo.getUserId());
                     relationMapper.insertOne(relationCarsQo);
+                }else {
+                    relationMapper.updateUserRelationCar(relationCarsQo);
                 }
-                relationMapper.updateUserRelationCar(relationCarsQo);
             }
+        }else {
+            carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",relationQo.getId()).eq("uid",relationQo.getUserId()));
         }
     }
 
@@ -196,9 +207,9 @@ public class RelationServiceImpl implements IRelationService {
      */
     @Override
     @Transactional
-    public void deleteHouseMemberCars(Long id) {
-        houseMemberMapper.deleteById(id);
-        carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",id));
+    public void deleteHouseMemberCars(Long id,String uid) {
+        houseMemberMapper.delete(new QueryWrapper<HouseMemberEntity>().eq("uid",uid).eq("id",id));
+        carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",id).eq("uid",uid));
     }
 
     /**

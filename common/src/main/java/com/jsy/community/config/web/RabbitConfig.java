@@ -1,7 +1,10 @@
 package com.jsy.community.config.web;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,16 +31,16 @@ public class RabbitConfig {
     @Value("${rabbitmq.virtual-host}")
     private String virtualHost;
 
-//    @Bean
-//    public ConnectionFactory connectionFactory(){
-//        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();
-//        cachingConnectionFactory.setPassword(password);
-//        cachingConnectionFactory.setUsername(username);
-//        cachingConnectionFactory.setVirtualHost(virtualHost);
-//        cachingConnectionFactory.setHost(host);
-//        cachingConnectionFactory.setPort(port);
-//        return cachingConnectionFactory;
-//    }
+    @Bean
+    public ConnectionFactory remoteConnectionFactory(){
+        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();
+        cachingConnectionFactory.setPassword(password);
+        cachingConnectionFactory.setUsername(username);
+        cachingConnectionFactory.setVirtualHost(virtualHost);
+        cachingConnectionFactory.setHost(host);
+        cachingConnectionFactory.setPort(port);
+        return cachingConnectionFactory;
+    }
 //
 //    @Bean("customRabbitTemplate")
 //    public RabbitTemplate customRabbitTemplate(ConnectionFactory connectionFactory){

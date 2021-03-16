@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,11 +126,15 @@ public class CommonExcelHelper {
      */
     private static MultiValueMap<String, String> setHeader(String fileFullName){
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
-        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileFullName + ".xlsx", StandardCharsets.UTF_8));
+        fileFullName = new String((fileFullName + ".xlsx").getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + fileFullName);
         multiValueMap.set("Content-type", "application/vnd.ms-excel");
         return multiValueMap;
     }
 
+    public static void main(String[] args) {
+        System.out.println(new String("订单内容".getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+    }
     /**
      * 读取工作簿 返回字节数组
      * @param workbook      excel工作簿

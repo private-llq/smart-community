@@ -2,6 +2,7 @@ package com.jsy.community.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -267,7 +268,7 @@ public class HttpUtils {
 					sbQuery.append(query.getKey());
 					if (query.getValue() != null && !"".equals(query.getValue().trim())) {
 						sbQuery.append("=");
-						sbQuery.append(URLEncoder.encode(query.getValue(), "utf-8"));
+						sbQuery.append(URLEncoder.encode(query.getValue(), StandardCharsets.UTF_8));
 					}
 				}
 			}

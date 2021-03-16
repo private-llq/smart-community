@@ -7,9 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 /**
  * @return
  * @Author lihao
@@ -27,20 +24,20 @@ public class DepartmentStaffEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "部门id")
-    @NotNull(groups = {DepartmentStaffEntity.addStaffValidate.class, DepartmentStaffEntity.updateStaffValidate.class}, message = "部门id不能为空")
     private Long departmentId;
+    
+    @ApiModelProperty(value = "社区id")
+    private Long communityId;
 
-    @ApiModelProperty(value = "联系人")
-    @NotBlank(groups = {DepartmentStaffEntity.addStaffValidate.class, DepartmentStaffEntity.updateStaffValidate.class},message = "联系人不能为空")
+    @ApiModelProperty(value = "员工")
     private String person;
 
     @ApiModelProperty(value = "联系电话")
-    @NotBlank(groups = {DepartmentStaffEntity.addStaffValidate.class, DepartmentStaffEntity.updateStaffValidate.class},message = "联系电话不能为空")
     private String phone;
     
-    public interface addStaffValidate {
-    }
+    @ApiModelProperty(value = "职务")
+    private String duty;
     
-    public interface updateStaffValidate {
-    }
+    @ApiModelProperty(value = "邮箱")
+    private String email;
 }

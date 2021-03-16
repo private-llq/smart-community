@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
+import com.jsy.community.annotation.EsImport;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -131,7 +132,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			shopImgMapper.insertImg(list);
 		}
-		ElasticSearchImportProvider.elasticOperation(baseShop.getId(), RecordFlag.LEASE_SHOP, Operation.INSERT, baseShop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
+		ElasticSearchImportProvider.elasticOperationSingle(baseShop.getId(), RecordFlag.LEASE_SHOP, Operation.INSERT, baseShop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
 	}
 	
 	@Override
@@ -245,16 +246,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateShop(ShopQO shop, Long shopId) {
+	public void updateShop(ShopQO shop) {
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
-		shopLeaseEntity.setId(shopId);
+		shopLeaseEntity.setId(shop.getShopId());
 		BeanUtils.copyProperties(shop, shopLeaseEntity);
 		// 更新基本信息
 //		shopLeaseEntity.setUpdateTime(null);
 		shopLeaseMapper.updateById(shopLeaseEntity);
 		
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("shop_id", shopId);
+		wrapper.eq("shop_id", shop.getShopId());
 		List<ShopImgEntity> shopImgList = shopImgMapper.selectList(wrapper);
 		if (!CollectionUtils.isEmpty(shopImgList)) {
 			List<Long> longs = new ArrayList<>();
@@ -272,16 +273,17 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 				ShopImgEntity entity = new ShopImgEntity();
 				entity.setId(SnowFlake.nextId());
 				entity.setImgUrl(s);
-				entity.setShopId(shopId);
+				entity.setShopId(shop.getShopId());
 				imgList.add(entity);
 			}
 			// 添加图片信息
 			shopImgMapper.insertImg(imgList);
 		}
-		ElasticSearchImportProvider.elasticOperation(shopId, RecordFlag.LEASE_SHOP, Operation.UPDATE, shop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
+		ElasticSearchImportProvider.elasticOperationSingle(shop.getShopId(), RecordFlag.LEASE_SHOP, Operation.UPDATE, shop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
 	}
 	
 	@Override
+	@EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.LEASE_SHOP, deletedId = "shopId")
 	@Transactional(rollbackFor = Exception.class)
 	public void cancelShop(String userId, Long shopId) {
 		// 删除基本信息
@@ -299,7 +301,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 删除图片信息
 			shopImgMapper.deleteBatchIds(longs);
 		}
-		ElasticSearchImportProvider.elasticOperation(shopId, RecordFlag.LEASE_SHOP, Operation.DELETE, null, null);
 	}
 	
 	@Override

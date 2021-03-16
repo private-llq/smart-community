@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.jsy.community.api.ILivingpaymentQueryService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -54,11 +56,13 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
     public Map getPayDetails(String number, Long id) {
         PayCompanyEntity entity = payCompanyMapper.selectById(id);
         Map map = new HashMap();
+
         map.put("familyName","纵横世纪");
         map.put("familyId",number);
-        map.put("typeId",entity.getId());
-        map.put("typeName",entity.getName());
-        map.put("accountBalance",-50);
+        map.put("companyId",entity.getId());
+        map.put("companyName",entity.getName());
+        map.put("typeId",entity.getTypeId());
+        map.put("accountBalance", RandomUtil.randomDouble(-500,1,2, RoundingMode.CEILING));
         map.put("address","天王星b座1810");
         return map;
     }
@@ -125,8 +129,8 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
     }
 
     @Override
-    public TheBillingDetailsVO selectOrderId(Long id) {
-        return livingpaymentQueryMapper.selectOrderId(id);
+    public TheBillingDetailsVO selectOrderId(Long id,String uid) {
+        return livingpaymentQueryMapper.selectOrderId(id,uid);
     }
 
     /**
@@ -150,18 +154,21 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
         returnMap.put("父母",new ArrayList<GroupVO>());
         returnMap.put("房东",new ArrayList<GroupVO>());
         returnMap.put("朋友",new ArrayList<GroupVO>());
-        for (PayGroupEntity entity : list1) {
-            if (entity.getType()==5){
-                returnMap.put(entity.getName(),new ArrayList<GroupVO>());
+        if (list1!=null){
+            for (PayGroupEntity entity : list1) {
+                if (entity.getType()==5){
+                    returnMap.put(entity.getName(),new ArrayList<GroupVO>());
+                }
             }
         }
+        if (list!=null){
+            for (GroupVO vo : list) {
+                if(returnMap.get(vo.getGroupName()) == null){
+                    returnMap.put(vo.getGroupName(),new ArrayList<GroupVO>());
+                }
+                returnMap.get(vo.getGroupName()).add(vo);
 
-        for (GroupVO vo : list) {
-            if(returnMap.get(vo.getGroupName()) == null){
-                returnMap.put(vo.getGroupName(),new ArrayList<GroupVO>());
             }
-            returnMap.get(vo.getGroupName()).add(vo);
-
         }
         PaymentRecordsMapVO mapVO = new PaymentRecordsMapVO();
         mapVO.setMap(returnMap);
@@ -178,7 +185,7 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
      * @return:
      */
     @Override
-    public PayVoucherVO getOrderID(Long id) {
+    public PayVoucherVO getOrderID(Long id,String uid) {
         PayOrderEntity entity = payOrderMapper.selectById(id);
         if (entity==null){
             throw new ProprietorException("该订单不存在！");

@@ -2,10 +2,10 @@ jsy:
   mobileCodeExpiredTime: 10
   #行驶证识别相关信息
   drivinglicense:
-   api: https://api08.aliyun.venuscn.com
-   path: /ocr/vehicle-license
-   method: POST
-   appCode: 9b53bb7f5f5945fcb4c42ecd79f31642
+    api: https://api08.aliyun.venuscn.com
+    path: /ocr/vehicle-license
+    method: POST
+    appCode: 9b53bb7f5f5945fcb4c42ecd79f31642
 #阿里支付相关信息
 alipay:
   appid: dPHlJ8MTKFM/fTLpyfSzuFWQ8DMH1pOlHzcwcge1NVo=

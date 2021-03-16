@@ -3,6 +3,8 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 
+import java.util.Map;
+
 /**
  * @program: com.jsy.community
  * @description:  微信支付
@@ -16,5 +18,23 @@ public interface IWeChatService extends IService<WeChatOrderEntity> {
 
     void deleteByOrder(String msg);
 
-    WeChatOrderEntity saveOrder(String orderId);
+//    WeChatOrderEntity saveOrder(String orderId);
+
+    /**
+     * @Description: 生活缴费修改订单状态
+     * @author: Hu
+     * @since: 2021/3/3 9:59
+     * @Param:
+     * @return:
+     */
+    void saveStatus(String out_trade_no);
+
+    /**
+     * @Description: 微信订单状态
+     * @author: Hu
+     * @since: 2021/3/3 14:32
+     * @Param:
+     * @return:
+     */
+    void orderStatus(Map<String,String> map);
 }

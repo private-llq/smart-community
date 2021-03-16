@@ -15,6 +15,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,10 +62,10 @@ public class PublicConfig {
         //创建post方式请求对象
         HttpPost httpPost = new HttpPost(url_prex + url);
         //装填参数  charset
-        StringEntity s = new StringEntity(jsonStr);
+        StringEntity s = new StringEntity(jsonStr,charset);
         s.setContentType("application/json");
-//        s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
-//                "application/json"));
+        s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
+                "application/json"));
         //设置参数到请求对象中
         httpPost.setEntity(s);
        // String post = getToken("POST", HttpUrl.parse(url_prex + url), mercId, serial_no, privateKeyFilePath, jsonStr);
@@ -117,7 +119,6 @@ public class PublicConfig {
      */
     public static JSONObject WxTuneUp(String prepayId, String appId, String privateKeyFilePath) throws Exception {
         String time = System.currentTimeMillis() / 1000 + "";
-        System.out.println(time);
         String nonceStr = UUID.randomUUID().toString().replace("-", "");
 //        String packageStr = "prepay_id=" + prepayId;
         ArrayList<String> list = new ArrayList<>();
@@ -127,7 +128,6 @@ public class PublicConfig {
         list.add(prepayId);
         //加载签名
         String packageSign = sign(buildSignMessage(list).getBytes(), privateKeyFilePath);
-        System.out.println(buildSignMessage(list).getBytes().toString());
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("appid", appId);
@@ -137,7 +137,7 @@ public class PublicConfig {
         //jsonObject.put("packages", packageStr);
         jsonObject.put("noncestr", nonceStr);
         jsonObject.put("timestamp", time);
-        jsonObject.put("sign_type","HMAC-SHA256");
+//        jsonObject.put("sign_type","HMAC-SHA256");
         jsonObject.put("sign", packageSign);
         return jsonObject;
     }
@@ -150,7 +150,7 @@ public class PublicConfig {
      * @param response
      * @param privateKey APIv3 32的秘钥
      */
-    public static String notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
+    public static Map<String, String> notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
         Map<String, String> map = new HashMap<>(12);
         String result = readData(request);
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
@@ -168,7 +168,11 @@ public class PublicConfig {
         response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
         response.flushBuffer();
         String out_trade_no = JSONObject.fromObject(plainText).getString("out_trade_no");
-        return out_trade_no;
+        String transaction_id = JSONObject.fromObject(plainText).getString("transaction_id");
+        Map<String, String> hashMap = new HashMap<>();
+        hashMap.put("out_trade_no",out_trade_no);
+        hashMap.put("transaction_id",transaction_id);
+        return hashMap;
     }
 
 
@@ -273,7 +277,6 @@ public class PublicConfig {
             sbf.append(str).append("\n");
 
         }
-        System.out.println(sbf);
         return sbf.toString();
     }
 

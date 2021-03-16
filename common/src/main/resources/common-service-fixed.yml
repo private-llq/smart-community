@@ -1,3 +1,7 @@
+spring:
+  elasticsearch:
+    rest:
+      uris: ["http://222.178.212.29:9200"]
 justauth:
   enabled: true
   type:

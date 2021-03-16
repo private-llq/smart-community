@@ -22,7 +22,7 @@ public class HouseRecentEntity implements Serializable {
 
     public HouseRecentEntity(){}
 
-    public HouseRecentEntity(Long id, Long houseId, String uid, String browseTitle, Integer browseType, String leaseType, Double acreage, String address, String price, String tag, String houseImage, LocalDateTime createTime) {
+    public HouseRecentEntity(Long id, Long houseId, String uid, String browseTitle, Integer browseType, String leaseType, Double acreage, String address, String price, String tag, String houseImage, String houseTypeCode, LocalDateTime createTime) {
         this.id = id;
         this.houseId = houseId;
         this.uid = uid;
@@ -34,6 +34,7 @@ public class HouseRecentEntity implements Serializable {
         this.price = price;
         this.tag = tag;
         this.houseImage = houseImage;
+        this.houseTypeCode = houseTypeCode;
         this.createTime = createTime;
     }
 
@@ -69,6 +70,9 @@ public class HouseRecentEntity implements Serializable {
 
     @ApiModelProperty(value = "房屋图片")
     private String houseImage;
+
+    @ApiModelProperty(value = "房屋户型")
+    private String houseTypeCode;
 
     private LocalDateTime createTime;
 

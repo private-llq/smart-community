@@ -33,7 +33,11 @@
                     <artifactId>mybatis-plus-boot-starter</artifactId>
                 </exclusion>
             </exclusions>
-
+        </dependency>
+        <dependency>
+            <groupId>com.jsy</groupId>
+            <artifactId>proprietor-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

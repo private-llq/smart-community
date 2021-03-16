@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.annotation.EsImport;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.mapper.SysInformMapper;
 import com.jsy.community.qo.BaseQO;
@@ -32,21 +33,18 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 
 	@Override
+	@EsImport(operation = Operation.INSERT, recordFlag = RecordFlag.INFORM, parameterType = PushInformQO.class, importField = {"acctName","pushTitle","acctId"}, searchField = {"acctName","pushTitle","pushSubTitle"})
 	public boolean add(PushInformQO qo) {
 		PushInformEntity sysInformEntity = PushInformEntity.getInstance();
 		BeanUtils.copyProperties(qo, sysInformEntity);
 		sysInformEntity.setId(SnowFlake.nextId());
-		boolean b = sysInformMapper.insert(sysInformEntity) > 0;
-		if(b){
-			ElasticSearchImportProvider.elasticOperation(qo.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
-		}
-		return b;
+		return sysInformMapper.insert(sysInformEntity) > 0;
 	}
 
 
 	@Override
+	@EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.INFORM, deletedId = "informId")
 	public boolean delete(Long informId) {
-		ElasticSearchImportProvider.elasticOperation(informId, RecordFlag.INFORM, Operation.DELETE, null, null);
 		return sysInformMapper.deleteById(informId) > 0;
 	}
 
@@ -58,7 +56,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 	@Override
 	public boolean deleteBatchByIds(List<Long> informIds) {
-		informIds.forEach( i -> ElasticSearchImportProvider.elasticOperation(i, RecordFlag.INFORM, Operation.DELETE, null, null));
+		informIds.forEach( i -> ElasticSearchImportProvider.elasticOperationSingle(i, RecordFlag.INFORM, Operation.DELETE, null, null));
 		return sysInformMapper.deleteBatchIds(informIds) > 0 ;
 	}
 }

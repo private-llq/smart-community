@@ -8,6 +8,7 @@ import com.jsy.community.constant.Const;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,8 +27,8 @@ public class AliAppPayCallbackController {
 	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
 	private AliAppPayCallbackService aliAppPayCallbackService;
 	
-//	@CrossOrigin
-	@PostMapping("pay")
+	@CrossOrigin
+	@RequestMapping("pay")
 	@Transactional(rollbackFor=Exception.class,timeout=3)
 	public String test(HttpServletRequest req){
 		Map<String, String> paramsMap = new HashMap<>();
@@ -47,7 +48,7 @@ public class AliAppPayCallbackController {
         }
         log.error("==========收到回调参数Map==============");
 		log.error(String.valueOf(paramsMap));
-        JSONObject parseObject = JSONObject.parseObject(JSON.toJSONString(paramsMap));
+//        JSONObject parseObject = JSONObject.parseObject(JSON.toJSONString(paramsMap));
 		log.error("==========收到回调参数Map==============");
 		return aliAppPayCallbackService.dealCallBack(paramsMap);
 	}

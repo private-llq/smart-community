@@ -1,12 +1,17 @@
 package com.jsy.community.api;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alipay.api.domain.MedicalSvTpCardHeadInfo;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.RegionEntity;
+import com.jsy.community.vo.CommonResult;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 公共的
@@ -20,47 +25,43 @@ public interface ICommonService {
 	 * @author YuLF
 	 * @since  2020/12/8 16:39
      * @param id   传入的城市id
-     * @return     返回社区集合
+     * @param page     当前页
+	 * @param pageSize 页码
+	 * @return     返回社区集合
      */
-	List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer houseLevelMode, Integer page, Integer pageSize);
+	List<Map<String, Object>> getAllCommunityFormCityId(Long id,  Integer page, Integer pageSize);
 
     /**
-     * 根据社区id和社区层级结构 查询下面的所有单元 或 所有楼栋
+     * 根据社区id 查询下面的所有单元 或 所有楼栋
 	 * @author YuLF
 	 * @since  2020/12/8 16:39
      * @param id                社区id
-	 * @param houseLevelMode    社区层级结构id
-     * @return      			返回单元或楼栋集合
+     * @param page              当前页
+	 * @param pageSize			当前分页最大条数
+	 * @return      			返回单元或楼栋集合
      */
-    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer houseLevelMode, Integer page, Integer pageSize);
+    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id,  Integer page, Integer pageSize);
 
     /**
-     * 根据社区层级结构 和 单元id|楼栋id 查询下一级的数据
-	 * 比如 层级结构 为单元楼栋 那就是根据单元id查询下面所有楼栋  如果是楼栋单元 那就是根据楼栋id查询下面的所有单元 】
+     * 根据 楼栋id | 查询下一级的数据
+	 * 楼栋id 就是 查下面所有 单元  如果单元列表为空 则按楼栋id查楼层 】
 	 * @author YuLF
 	 * @since  2020/12/8 16:39
-     * @param id    单元id
-     * @return      返回楼栋集合
+     * @param id    			楼栋id 或 单元id
+	 * @param page				当前页
+	 * @param pageSize			每页显示条数
+	 * @return      			返回单元 集合 或者 房屋集合
      */
-	List<Map<String, Object>> getBuildingOrUnitById(Long id, Integer houseLevelMode, Integer page, Integer pageSize);
-
-
-	/**
-	 * 按单元或楼栋id查询楼层
-	 * @param id				单元或楼栋id
-	 * @param houseLevelMode	层级ID
-	 * @return					返回数据List
-	 */
-	List<Map<String, Object>> getFloorByBuildingOrUnitId(Long id, Integer houseLevelMode, Integer page, Integer pageSize);
+	List<Map<String, Object>> getUnitOrFloorById(Long id,  Integer page, Integer pageSize);
 
 
     /**
-     * 根据楼层id查询所有门牌号
+     * 根据单元id查询所有门牌号
      * @author YuLF
      * @since  2020/12/8 16:39
-     * @Param  id   楼层id
+     * @Param  id   单元id
      */
-	List<Map<String, Object>> getAllDoorFormFloor(Long id, Integer houseLevelMode, Integer page, Integer pageSize);
+	List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize);
 
 
 
@@ -117,7 +118,7 @@ public interface ICommonService {
 	 * @Date: 2020/12/10
 	**/
 	List<RegionEntity> vagueQueryCity(String searchStr);
-	
+
 	//天气假数据
 	JSONObject getTempWeather();
 	
@@ -144,7 +145,42 @@ public interface ICommonService {
 	
 	/**
 	 * 全文搜索 数据库 数据导入 Elasticsearch
-	 * @return
+	 * @return		返回数据集合
 	 */
 	List<FullTextSearchEntity> fullTextSearchEntities();
+
+
+	/**
+	 * 异步添加app全文搜索热词
+	 * @param hotKey 	用户搜索词
+	 * @author YuLF
+	 * @since  2021/3/10 13:48
+	 */
+	@Async(BusinessConst.PROPRIETOR_ASYNC_POOL)
+	void addFullTextSearchHotKey( String hotKey );
+
+	/**
+	 * 清理全文搜索热词
+	 * @param hotKeyActiveDay 	热词保持活跃天数
+	 * @author YuLF
+	 * @since  2021/3/10 15:45
+	 */
+	@Async(BusinessConst.PROPRIETOR_ASYNC_POOL)
+	void cleanHotKey(Integer hotKeyActiveDay);
+
+	/**
+	 * app全文搜索 热词获取
+	 * @param num 获取热词数量
+	 * @return		返回热词数量
+	 */
+	Set<Object> getFullTextSearchHotKey(Integer num);
+
+
+	/**
+	 * 通过楼层文本 和 单元id或楼栋id 查下面所有房屋
+	 * @param id 			楼栋id或单元id
+	 * @param floor			楼层文本
+	 * @return				返回属于该楼层的 房屋
+	 */
+    List<Map<String, Object>> getHouseByFloor(Long id, String floor);
 }

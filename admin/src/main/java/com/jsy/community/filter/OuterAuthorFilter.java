@@ -1,9 +1,5 @@
 package com.jsy.community.filter;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.exception.JSYError;
-import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +7,6 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -32,12 +27,12 @@ public class OuterAuthorFilter implements Filter{
 	/**
 	 * 要校验IP的接口路径前缀
 	 */
-	private static final Set<String> NEED_IP_AUTH_PREFIX_PATHS = Set.of("/sms");
+	private static final Set<String> NEED_IP_AUTH_PREFIX_PATHS = Set.of("");
 
 	/**
 	 * 允许IP前缀
 	 */
-	private static final Set<String> ALLOWED_PREFIX_IP = Set.of("192.168.34");
+	private static final Set<String> ALLOWED_PREFIX_IP = Set.of("192.168.12 ");
 
 	/**
 	 * 允许固定IP

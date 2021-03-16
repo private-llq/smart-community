@@ -208,7 +208,7 @@ public class ProprietorInfoProvider implements ExcelHandler {
                                 break;
                             // 第7列 身份证 验证
                             case 6:
-                                if (RegexUtils.isIDCard(cellValue)) {
+                                if (RegexUtils.isIdCard(cellValue)) {
                                     userEntity.setIdCard(cellValue);
                                 } else {
                                     throw new JSYException(1, "：第" + (j + 1) + "行,第" + (z + 1) + "列 '" + cellValue + "' 不是一个正确的身份证号码!");

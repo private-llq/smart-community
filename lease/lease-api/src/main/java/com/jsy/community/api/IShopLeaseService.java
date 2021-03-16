@@ -47,7 +47,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2020/12/17 17:12
 	 * @Param [shop]
 	 **/
-	void updateShop(ShopQO shop, Long shopId);
+	void updateShop(ShopQO shop);
 	
 	/**
 	 * @return void

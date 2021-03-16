@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.UserInfoVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,13 +29,6 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	@Update("update t_user set householder_id = #{householderId} where id = #{uid}")
 	int setUserBelongTo(Long householderId,Long uid);
 
-	/**
-	 * 【用户】业主信息更新接口、
-	 * @param proprietorQO 参数实体
-	 * @return			 返回更新行数
-	 */
-    int proprietorUpdate(ProprietorQO proprietorQO);
-	
     /**
     * @Description: 更换手机号
      * @Param: [newMobile, uid]
@@ -94,7 +88,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @param uid 				用户id
 	 * @return			返回最新的用户房屋id 可能为空
 	 */
-	@Select("select house_id as householderId from t_user_house  where check_status = 1 and deleted = 0 and uid = #{uid} ORDER BY create_time limit 1")
+	@Select("select house_id as householderId from t_user_house  where check_status = 1 and deleted = 0 and uid = #{uid} ORDER BY create_time DESC limit 1")
 	Long getLatestHouseId(String uid);
 
 
@@ -106,4 +100,12 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	@Select("select h.id,h.community_id,c.name as communityName,h.building,h.unit,h.floor,h.door,CONCAT(c.`name`,h.building,h.unit,h.floor,h.door) as mergeName from t_community as c LEFT JOIN t_house as h on c.id = h.community_id where\n" +
 			"h.id = #{houseId} and c.deleted = 0 and h.deleted = 0 ")
     HouseVo getHouseInfoById(Long houseId);
+
+
+	/**
+	 * 根据业主身份证 获取 业主表 所有房屋id + 社区id
+	 * @param idCard 		证件号码
+	 * @return				返回房屋id + 社区 id 集合列表
+	 */
+	List<UserHouseQo> getProprietorInfo(String idCard);
 }

@@ -1,9 +1,11 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FullTextSearchEntity;
@@ -12,8 +14,6 @@ import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.utils.LunarCalendarFestivalUtils;
 import com.jsy.community.utils.WeatherUtils;
-import com.jsy.community.utils.es.Operation;
-import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.WeatherForecastVO;
 import com.jsy.community.vo.WeatherHourlyVO;
 import com.jsy.community.vo.WeatherLiveIndexVO;
@@ -22,7 +22,8 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.integration.transformer.MessageTransformingHandler;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -47,14 +48,14 @@ public class CommonServiceImpl implements ICommonService {
     private RegionMapper regionMapper;
 
     @Resource
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
     
     @Autowired
     private WeatherUtils weatherUtils;
 
     @Override
     public void checkVerifyCode(String account, String code) {
-        String oldCode = redisTemplate.opsForValue().get("vCode:" + account);
+        Object oldCode = redisTemplate.opsForValue().get("vCode:" + account);
         if (oldCode == null) {
             throw new ProprietorException("验证码已失效");
         }
@@ -76,8 +77,7 @@ public class CommonServiceImpl implements ICommonService {
      * @since 2020/12/8 16:39
      */
     @Override
-    public List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        page = (page - 1) * pageSize;
+    public List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer page, Integer pageSize) {
         return commonMapper.getAllCommunityFormCityId(id, page , pageSize);
     }
 
@@ -88,60 +88,50 @@ public class CommonServiceImpl implements ICommonService {
      * @Param
      */
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        List<Map<String, Object>> buildingOrUnitByCommunityId = commonMapper.getBuildingOrUnitByCommunityId(id, houseLevelMode);
-        return setHouseLevelMode(buildingOrUnitByCommunityId, houseLevelMode);
-    }
-
-    /**
-     * 按楼栋Id查询 单元 或 按 单元id查询楼栋 只对 社区结构为 楼栋单元 或单元楼栋有效
-     * @author YuLF
-     * @since  2020/12/29 15:08
-     * @Param
-     */
-    @Override
-    public List<Map<String, Object>> getBuildingOrUnitById(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        List<Map<String, Object>> buildingOrUnitOrFloorById = commonMapper.getBuildingOrUnitById(id, houseLevelMode);
-        return setHouseLevelMode(buildingOrUnitOrFloorById, houseLevelMode);
-    }
-
-    /**
-     * 按按单元id或楼栋id查询  楼层
-     * @author YuLF
-     * @since  2020/12/29 15:08
-     * @Param
-     */
-    @Override
-    public List<Map<String, Object>> getFloorByBuildingOrUnitId(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        List<Map<String, Object>> maps = commonMapper.getFloorByBuildingOrUnitId(id, houseLevelMode);
-        return setHouseLevelMode(maps, houseLevelMode);
-    }
-
-    /**
-     * 按楼层id获取门牌
-     * @author YuLF
-     * @since  2020/12/29 15:08
-     * @Param
-     */
-    @Override
-    public List<Map<String, Object>> getAllDoorFormFloor(Long id, Integer houseLevelMode, Integer page, Integer pageSize) {
-        List<Map<String, Object>> allDoorFormFloor = commonMapper.getAllDoorFormFloor(id);
-        return setHouseLevelMode(allDoorFormFloor, houseLevelMode);
-    }
-
-    /**
-     * 批量设置 返回值得 社区层级结构CODE     方便前端请求接口时调用标识
-     *
-     * @author YuLF
-     * @Param map                        数据库查询结果
-     * @since 2020/12/9 9:30
-     */
-    private List<Map<String, Object>> setHouseLevelMode(List<Map<String, Object>> map, Integer houseLevelId) {
-        for (Map<String, Object> value : map) {
-            value.put("houseLevelMode", houseLevelId);
+    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
+        //按社区id 查询 下面的所有 楼栋
+        List<Map<String, Object>> buildingList = commonMapper.getAllBuild(id, 1);
+        if( CollectionUtil.isNotEmpty(buildingList) ){
+            return buildingList;
         }
-        return map;
+        //按社区id 查询 下面的所有 单元
+        return commonMapper.getAllBuild(id, 2);
     }
+
+
+    @Override
+    public List<Map<String, Object>> getUnitOrFloorById(Long id, Integer page, Integer pageSize) {
+        //1. 不管他是楼栋id还是单元id、第一种方式先按 他传的楼栋id来查单元
+        List<Map<String, Object>> unitList = commonMapper.getUnitByBuildingId(id);
+        if( CollectionUtil.isNotEmpty(unitList) ){
+            return unitList;
+        }
+        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有楼层
+        List<Map<String, Object>> floorByBuildingId = commonMapper.getFloorByBuildingId(id);
+        if( CollectionUtil.isNotEmpty(floorByBuildingId) ){
+            return floorByBuildingId;
+        }
+        //3. 如果 按 以上id 当做楼栋去查 楼层都为空 那说明传的是一个 单元id 则按单元id查楼层
+        return getFloorByUnitId(id, page, pageSize);
+    }
+
+
+    /**
+     * 按单元id获取楼层
+     * @author YuLF
+     * @since  2020/12/29 15:08
+     * @Param
+     */
+    @Override
+    public List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize) {
+        return commonMapper.getFloorByUnitId(id, page, pageSize);
+    }
+
+    @Override
+    public List<Map<String, Object>> getHouseByFloor(Long id, String floor) {
+        return commonMapper.getHouseByFloor( id, floor);
+    }
+
 
     /**
     * @Description: 获取子区域
@@ -382,6 +372,8 @@ public class CommonServiceImpl implements ICommonService {
     /**
      * 此方法 不会应用于 业务，
      * 全文搜索 首次导入数据库 所有数据
+     * @author YuLF
+     * @since  2021/2/7 14:54
      * @return      返回自定义结构好的 数据
      */
     @Override
@@ -419,6 +411,74 @@ public class CommonServiceImpl implements ICommonService {
             }
         });
         return list;
+    }
+
+
+    /**
+     * 全文搜索 添加热词
+     * @author YuLF
+     * @since  2021/3/10 14:34
+     */
+    @Override
+    public void addFullTextSearchHotKey(String hotKey) {
+        if( Objects.nonNull(hotKey) ){
+            String hotKeyPrefix = BusinessConst.HOT_KEY_PREFIX;
+            ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+            //获得有序集合中key元素的索引index
+            Long index = zSetOperations.rank(hotKeyPrefix, hotKey);
+            if ( Objects.isNull(index) ) {
+                //添加缓存,默认排序值 1
+                zSetOperations.add(hotKeyPrefix, hotKey, 1.0);
+            } else {
+                //已存在 该热词 如果key已存在,则获取排序值并且+1
+                int score = Objects.requireNonNull(zSetOperations.score(hotKeyPrefix, hotKey)).intValue();
+                zSetOperations.incrementScore(hotKeyPrefix, hotKey, 1);
+            }
+            ValueOperations<String, Object> stringObjectValueOperations = redisTemplate.opsForValue();
+            //记录存入 更新存入时间
+            stringObjectValueOperations.getAndSet(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + hotKey, System.currentTimeMillis() + "");
+        }
+
+    }
+
+    /**
+     * 全文搜索热词清理
+     * 超过hotKeyActiveDay天的都得清理掉
+     * @author YuLF
+     * @since  2021/3/10 15:46
+     */
+    @Override
+    public void cleanHotKey(Integer hotKeyActiveDay) {
+        long dayMillisecond = (hotKeyActiveDay * 86400000);
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        Long now = System.currentTimeMillis();
+        ZSetOperations<String, Object> zSet = redisTemplate.opsForZSet();
+        Set<Object> allHotKey = zSet.reverseRange(BusinessConst.HOT_KEY_PREFIX, 0, Integer.MAX_VALUE);
+        if( Objects.isNull(allHotKey) ){
+            return;
+        }
+        allHotKey.forEach( hotKey -> {
+            String word = String.valueOf(hotKey);
+            Long wordTime = Long.valueOf(String.valueOf(valueOperations.get(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + word)));
+            if ((now - wordTime) > dayMillisecond) {
+                zSet.remove(BusinessConst.HOT_KEY_PREFIX, word);
+                valueOperations.getOperations().delete(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + word);
+            }
+        });
+    }
+
+    /**
+     * 全文搜索 获取热词
+     * @author YuLF
+     * @since  2021/3/10 14:55
+     * @Param  num      获取热词数量
+     * @return  返回热词集合
+     */
+    @Override
+    public Set<Object> getFullTextSearchHotKey(Integer num) {
+        //获取从开始到结束的范围内的元素，其中分数介于排序集“高->低”的最小值和最大值之间。
+        return redisTemplate.opsForZSet()
+                .reverseRangeByScore(BusinessConst.HOT_KEY_PREFIX, 0, Integer.MAX_VALUE, 0, num);
     }
 
 

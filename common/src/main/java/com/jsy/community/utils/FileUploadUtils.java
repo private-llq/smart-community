@@ -29,7 +29,7 @@ public class FileUploadUtils {
 	@Value("${jsy.upload.type:dfs}")
 	private String uploadType;
 	
-	private static Map<Integer, String> paths = new HashMap<>(16);
+	private static final Map<Integer, String> paths = new HashMap<>(16);
 	
 	static {
 		paths.put(1, "/avatar/");

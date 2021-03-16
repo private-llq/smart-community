@@ -15,8 +15,14 @@ import lombok.EqualsAndHashCode;
 @ApiModel("业主信息查询信息返回")
 public class ProprietorVO extends BaseVO {
 
+	@ApiModelProperty("用户ID")
+	private String uid;
+
 	@ApiModelProperty("业主ID")
 	private Long householderId;
+
+	@ApiModelProperty("房屋ID")
+	private Long houseId;
 
 	@ApiModelProperty("昵称")
 	private String nickname;
@@ -30,11 +36,26 @@ public class ProprietorVO extends BaseVO {
 	@ApiModelProperty("性别，0未知，1男，2女")
 	private Integer sex;
 
+	@ApiModelProperty("性别，未知，男，女")
+	private String gender;
+
+	@ApiModelProperty("年龄")
+	private String age;
+
 	@ApiModelProperty("真实姓名")
 	private String realName;
 
 	@ApiModelProperty("身份证")
 	private String idCard;
+
+	@ApiModelProperty("微信")
+	private String wechat;
+
+	@ApiModelProperty("腾讯qq")
+	private String qq;
+
+	@ApiModelProperty("联系邮箱")
+	private String email;
 
 	@ApiModelProperty("是否实名认证")
 	private Integer isRealAuth;
@@ -59,5 +80,20 @@ public class ProprietorVO extends BaseVO {
 
 	@ApiModelProperty("区名")
 	private String areaName;
+
+	@ApiModelProperty("创建时间")
+	private String createTime;
+
+	@ApiModelProperty("创建人")
+	private String createBy;
+
+	@ApiModelProperty("最近更新时间")
+	private String updateTime;
+
+	@ApiModelProperty("更新人")
+	private String updateBy;
+
+	@ApiModelProperty("房屋合并后的字符串")
+	private String houseMergeName;
 
 }

@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.annotation.EsImport;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.mapper.CommunityFunMapper;
+import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
@@ -17,6 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +58,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     }
 
     @Override
+    @EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.FUN)
     public void tapeOut(Long id) {
         CommunityFunEntity entity = communityFunMapper.selectById(id);
         if (entity.getStatus()==2){
@@ -62,30 +67,41 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setStatus(2);
         entity.setStartTime(LocalDateTime.now());
         communityFunMapper.updateById(entity);
-        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
     @Override
-    public void insetOne(CommunityFunEntity communityFunEntity) {
-        communityFunMapper.insert(communityFunEntity);
+    public void insetOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
+        CommunityFunEntity entity = new CommunityFunEntity();
+        entity.setTitleName(communityFunOperationQO.getTitleName());
+        entity.setViewCount(communityFunOperationQO.getViewCount());
+        entity.setUid(communityFunOperationQO.getUid());
+        entity.setContent(communityFunOperationQO.getContent());
+        entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
+        entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
+        entity.setStatus(0);
+        String tallys = Arrays.toString(communityFunOperationQO.getTallys());
+        entity.setTallys(tallys.substring(1, tallys.length() - 1));
+        entity.setId(SnowFlake.nextId());
+        communityFunMapper.insert(entity);
     }
 
-    @Override
-    public void updateOne(CommunityFunEntity communityFunEntity) {
-        CommunityFunEntity entity = communityFunMapper.selectById(communityFunEntity.getId());
 
-        entity.setContent(communityFunEntity.getContent());
-        entity.setCoverImageUrl(communityFunEntity.getCoverImageUrl());
-        entity.setSmallImageUrl(communityFunEntity.getSmallImageUrl());
-        entity.setTitleName(communityFunEntity.getTitleName());
+    @Override
+    @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.FUN, parameterType = CommunityFunEntity.class, importField = {"titleName","smallImageUrl"}, searchField = {"titleName"})
+    public void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
+        CommunityFunEntity entity = communityFunMapper.selectById(communityFunOperationQO.getId());
+
+        entity.setContent(communityFunOperationQO.getContent());
+        entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
+        entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
+        entity.setTitleName(communityFunOperationQO.getTitleName());
         communityFunMapper.updateById(entity);
-        ElasticSearchImportProvider.elasticOperation(communityFunEntity.getId(), RecordFlag.FUN, Operation.UPDATE, communityFunEntity.getTitleName(), entity.getSmallImageUrl());
     }
 
     @Override
+    @EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.FUN)
     public void deleteById(Long id) {
         communityFunMapper.deleteById(id);
-        ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
   @Override
@@ -102,7 +118,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     entity.setStatus(1);
     entity.setStartTime(LocalDateTime.now());
     communityFunMapper.updateById(entity);
-    ElasticSearchImportProvider.elasticOperation(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
+    ElasticSearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
   }
 
 }

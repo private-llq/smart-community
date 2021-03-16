@@ -6,41 +6,36 @@
     <sql id="tableNameAndCondition">from t_house where deleted = 0 and </sql>
     <!-- 【社区查询】查询所有小区 queryType = 1 -->
     <select id="getAllCommunityFormCityId"  resultType="java.util.HashMap">
-        select id,name,house_level_mode as houseLevelMode from t_community where  deleted = 0 and  city_id = #{id} limit #{page},#{pageSize}
+        select id,name from t_community where deleted = 0 and city_id = #{id} limit #{page},#{pageSize}
     </select>
-    <!-- 【单元或者楼栋查询】根据社区id来查询下一级的数据 queryType = 2-->
-    <select id="getBuildingOrUnitByCommunityId"  resultType="java.util.HashMap">
+    <!-- 根据社区id 查询 楼栋或单元子集 queryType = 2 -->
+    <select id="getAllBuild" resultType="java.util.HashMap">
         select id,
-             <!-- 当房屋级别  =1 或者 =3 该社区 就是楼栋单元 或者 单楼栋 则查询楼栋 type = 1 -->
-            <if test="houseLevelMode == 1 or houseLevelMode == 3">
-                 building <include refid="tableNameAndCondition"/> community_id = #{id} and type = 1
-            </if>
-             <!-- 当房屋级别  = 2 或者 =4 该社区 就是单元楼栋 或者 单单元 则查询单元 type = 2 -->
-            <if test="houseLevelMode == 2 or houseLevelMode == 4">
-                 unit <include refid="tableNameAndCondition"/> community_id = #{id} and type = 2
-            </if>
+         <if test="type==1">
+             building,'building' as type
+         </if>
+        <if test="type==2">
+            unit,'unit' as type
+        </if>
+         <include refid="tableNameAndCondition"/> community_id = #{communityId} and type = #{type}
     </select>
-    <!-- 【变动的层级】 传单元 或者 楼栋 和 社区结构层次id 获取单元 或 楼栋 queryType = 3 -->
-    <select id="getBuildingOrUnitById"  resultType="java.util.HashMap">
-        <choose>
-            <!-- 楼栋单元层级 那就根据楼栋id 查单元 t_user_house  type = 2就表示该数据为单元 -->
-            <when test="houseLevelMode == 1">
-                select id,unit <include refid="tableNameAndCondition"/> pid = #{id} and type = 2
-            </when>
-            <!-- 单元楼栋层级 那就根据单元id 查楼栋 t_user_house  type = 1就表示该数据为楼栋 -->
-            <when test="houseLevelMode == 2">
-                select id,building <include refid="tableNameAndCondition"/> pid = #{id} and type = 1
-            </when>
-            <otherwise>
-            </otherwise>
-        </choose>
+    <!-- 根据 楼栋 id 查所有单元  queryType = 3 -->
+    <select id="getUnitByBuildingId" resultType="java.util.HashMap">
+        select id,unit,'unit' as type <include refid="tableNameAndCondition"/> pid = #{id} and type = 2
     </select>
-    <!-- 按单元或楼栋id查询楼层 -->
-    <select id="getFloorByBuildingOrUnitId"  resultType="java.util.HashMap">
-        select id,floor <include refid="tableNameAndCondition"/> pid = #{id} and type = 3
+    <!-- 根据 楼栋 id 查所有楼层 queryType = 3  暂不抽取重复代码 方便改动 -->
+    <select id="getFloorByBuildingId" resultType="java.util.HashMap">
+        select DISTINCT floor,'floor' as type from t_house where pid = #{id}
     </select>
-    <!-- 查询某楼层#{id}下面的所有门牌 数据库类型 type = 4 门牌 queryType = 5  -->
-    <select id="getAllDoorFormFloor"  resultType="java.util.HashMap">
-        select id,door <include refid="tableNameAndCondition"/> pid = #{id} and type = 4
+
+    <!-- 按单元id查询楼层 queryType = 4 暂不抽取重复代码 方便改动 -->
+    <select id="getFloorByUnitId"  resultType="java.util.HashMap">
+        select DISTINCT floor,'floor' as type <include refid="tableNameAndCondition"/> pid = #{id}  limit #{page},#{pageSize}
     </select>
+
+    <!-- 通过 楼栋id或单元id 和 楼层文本查询属于该楼层的房屋 -->
+    <select id="getHouseByFloor" resultType="java.util.HashMap">
+        select  id,`number` as door,'door' as door <include refid="tableNameAndCondition"/> pid = #{id} and floor = #{floor} and type = 4
+    </select>
+
 </mapper>

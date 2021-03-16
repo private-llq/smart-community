@@ -50,6 +50,9 @@ public class HouseReserveVO implements Serializable {
     @ApiModelProperty(value = "出租房屋平方米")
     private String houseSquareMeter;
 
+    @ApiModelProperty(value = "出租房屋朝向Id")
+    private Integer houseDirectionId;
+
     @ApiModelProperty(value = "出租房屋朝向")
     private String houseDirection;
 

@@ -1,16 +1,16 @@
 package com.jsy.community.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
-
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @Description: 判断图片格式
@@ -123,7 +123,17 @@ public class PicUtil {
      * 判断是否是图片
      */
     public static boolean isPic(MultipartFile[] files) throws IOException{
-        for (MultipartFile file : files) {
+        boolean b;
+        for(MultipartFile file : files){
+            b = isPic(file);
+            if(!b){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isPic(MultipartFile file) throws IOException{
             File tempFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
             FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
             String fileType = getPicType(new FileInputStream(tempFile));
@@ -133,7 +143,6 @@ public class PicUtil {
             if(TYPE_UNKNOWN.equals(fileType)){
                 return false;
             }
-        }
         return true;
     }
 

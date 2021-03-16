@@ -1,5 +1,6 @@
 package com.jsy.community.qo.sys;
 
+import com.jsy.community.annotation.FieldValid;
 import com.jsy.community.utils.RegexUtils;
 import lombok.Data;
 
@@ -30,6 +31,13 @@ public class SmsQO {
      */
     @NotBlank( groups = {SendSmsValid.class}, message = " sign 验证码标题是必须有的!")
     private String  sign;
+    /**
+     * 验证码redis key 存储前缀
+     */
+    @NotBlank( groups = {SendSmsValid.class}, message = " redisPrefix 是必须有的!")
+    @FieldValid( groups = {SendSmsValid.class}, value = {"SIGN:PHONECODE:", "OPENIM:PHONECODE:", "DIDAIM:PHONECODE:", "MALL:PHONECODE:"})
+    private String  redisPrefix;
+
 
     /**
      * 发送短信验证

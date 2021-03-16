@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -8,8 +9,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
-import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstError;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
@@ -25,7 +26,10 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
-import com.jsy.community.vo.*;
+import com.jsy.community.vo.HouseVo;
+import com.jsy.community.vo.UserAuthVo;
+import com.jsy.community.vo.UserInfoVo;
+import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -97,7 +101,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private UserIMMapper userIMMapper;
 
-
     @Autowired
     private ISignatureService signatureService;
 
@@ -116,7 +119,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userAuthVo.setToken(token);
         return userAuthVo;
     }
-    
+
     /**
      * 查询用户信息
      */
@@ -125,7 +128,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (user == null || user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");
         }
-    
+
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(user, userInfoVo);
         // 刷新省市区
@@ -151,7 +154,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return userInfoVo;
     }
-    
+
     /**
      * 登录
      */
@@ -160,7 +163,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         String uid = userAuthService.checkUser(qo);
         return queryUserInfo(uid);
     }
-    
+
     /**
      * 注册
      */
@@ -168,9 +171,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public String register(RegisterQO qo) {
         commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
-    
+
         String uuid = UserUtils.createUserToken();
-        
+
         // 组装user表数据
         UserEntity user = new UserEntity();
         user.setUid(uuid);
@@ -282,7 +285,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
             return createAuthVoWithToken(userInfoVo);
         }
-        throw new ProprietorException("尚未绑定手机");
+        throw new ProprietorException(ConstError.NORMAL, "尚未绑定手机");
     }
 
     /**
@@ -345,6 +348,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     /**
      * 【用户】业主更新房屋认证信息  id等于null 或者 id == 0 表示需要新增的数据
+     * 新方法至 -> updateImprover
+     *
      * @author YuLF
      * @Param proprietorQO        需要更新 实体参数
      * @since 2020/11/27 15:03
@@ -352,6 +357,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean proprietorUpdate(ProprietorQO qo) {
+        updateCar(qo);
+        //========================================== 业主房屋 =========================================================
+        List<UserHouseQo> houseList = qo.getHouses();
+        //验证房屋信息是否有需要新增的数据
+        boolean hasAddHouse = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
+        //如果存在需要新增的房屋的数据
+        if (hasAddHouse) {
+            List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+            houseList.removeAll(any);
+            //批量新增房屋信息
+            userHouseService.addHouseBatch(any, qo.getUid());
+        }
+        //批量更新房屋信息
+        houseList.forEach(h -> userHouseService.update(h, qo.getUid()));
+        //========================================== 业主 =========================================================
+        //业主信息更新 userMapper.proprietorUpdate(qo)
+        //通常 已经到这一步说明上面的任务没有抛出任何异常 返回值  为冗余字段
+        return true;
+    }
+
+    /**
+     * 更新车辆信息 如果 id = 0 | id = null 则新增
+     * @param qo        请求参数
+     */
+    private void updateCar(ProprietorQO qo){
         //========================================== 业主车辆 =========================================================
         //如果有车辆的情况下 更新或新增 车辆信息
         if(qo.getHasCar()){
@@ -359,19 +389,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             List<CarQO> cars = qo.getCars();
             //用户是否有需要新增的车辆？默认为false
             AtomicBoolean hasAddCar = new AtomicBoolean(false);
-            //为车辆信息设置基本信息
-            cars.forEach(e ->{
-                //社区id
-                e.setCommunityId(qo.getHouses().get(0).getCommunityId());
+            cars.forEach(e -> {
                 //如果参数id为null 或者 参数id为0 则表明这条数据是需要新增
                 if( e.getId() == null || e.getId() == 0 ){
                     //新增数据需要设置id
-                    e.setId(SnowFlake.nextId());
                     hasAddCar.set(true);
                 }
             });
             //新增车辆信息
-            if(hasAddCar.get()){
+            if (hasAddCar.get()) {
                 //从提交的List中取出Id == null 并且ID == 0的数据 重新组成一个List 代表需要新增的数据
                 List<CarQO> any = cars.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
                 //从更新车辆的集合中 移除 需要 新增的数据
@@ -382,28 +408,78 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             //批量更新车辆信息
             cars.forEach( c -> carService.update(c, qo.getUid()));
         }
-        //========================================== 业主房屋 =========================================================
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean updateImprover(ProprietorQO qo) {
+        //========================================== 1.业主房屋 =========================================================
         List<UserHouseQo> houseList = qo.getHouses();
-        //验证房屋信息是否有需要新增的数据
-        boolean hasAddHouse = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
-        //如果存在需要新增的房屋的数据
-        if(hasAddHouse){
-            List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
-            houseList.removeAll(any);
-            //批量新增房屋信息
-            userHouseService.addHouseBatch(any, qo.getUid());
+        //用户提交的房屋信息不为空
+        if (CollectionUtil.isNotEmpty(houseList)) {
+            //用来找用户提交的房屋信息 和 物业用户所属的房屋信息 差集的集合
+            List<UserHouseQo> tmpQos = new ArrayList<>(houseList);
+            //1.通过uid拿到业主的身份证
+            UserEntity userEntity = queryUserDetailByUid(qo.getUid());
+            //通过 业主身份证 拿到 业主表的 该业主的所有 房屋id + 社区id
+            List<UserHouseQo> resHouseList = userMapper.getProprietorInfo(userEntity.getIdCard());
+            if( CollectionUtil.isEmpty(resHouseList) ){
+                throw new ProprietorException("物业没有添加您的房屋信息!");
+            }
+            //取出 业主房屋信息 和 物业信息的差异集合  如果 differenceList 不为空 业主提交了 物业没有认证的房屋信息
+            List<UserHouseQo> differenceList = differenceSet( tmpQos, resHouseList );
+            if( CollectionUtil.isEmpty(differenceList) ){
+                //操作用户所在房屋
+                //id==null || id == 0 就是需要新增的 验证房屋信息是否有需要新增的数据
+                boolean hasAddHouse = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
+                if( hasAddHouse ){
+                    List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                    houseList.removeAll(any);
+                    //批量新增房屋信息
+                    userHouseService.addHouseBatch(any, qo.getUid());
+                }
+                //批量更新房屋信息
+                houseList.forEach(h -> userHouseService.update(h, qo.getUid()));
+            } else {
+                //存在差集 用户提交了 在业主表中他没有的房子
+                List<String> houseAddressNames = differenceList.stream().map(UserHouseQo::getHouseAddress).collect(Collectors.toList());
+                throw new ProprietorException( "物业没有给您认证该房屋：" + houseAddressNames );
+            }
         }
-        //批量更新房屋信息
-        houseList.forEach( h -> userHouseService.update(h, qo.getUid()));
-        //========================================== 业主 =========================================================
-        //业主信息更新 userMapper.proprietorUpdate(qo)
-        //通常 已经到这一步说明上面的任务没有抛出任何异常 返回值  为冗余字段
+        updateCar(qo);
         return true;
     }
 
 
+
+
+    /**
+     * 根据两个集合的两个属性 对比 差异 并取出 有差异的对象
+     * 通过 社区 id 和 房屋id 对比两个集合中的差集
+     * @param source    源集合
+     * @param target    目标集合
+     * @return          返回差异集合
+     */
+    private static List<UserHouseQo> differenceSet(List<UserHouseQo> source, List<UserHouseQo> target) {
+        List<UserHouseQo> list = new ArrayList<>(8);
+        source.forEach( so ->{
+            AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+            for( UserHouseQo ta : target ){
+                if( Objects.equals( so.getCommunityId(), ta.getCommunityId() ) && Objects.equals( so.getHouseId(), ta.getHouseId() ) ){
+                    atomicBoolean.set(true);
+                    break;
+                }
+            }
+            if( atomicBoolean.get() == Boolean.FALSE ){
+                list.add(so);
+            }
+        });
+        return list;
+    }
+
     /**
      * 根据业主id查询业主信息及业主家属信息
+     *
      * @author YuLF
      * @since  2020/12/10 16:25
      */
@@ -469,7 +545,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     private HouseEntity setBuildingId(HouseEntity tempEntity){
         Long pid = 0L; //id和pid相同的问题数据导致死循环
         HouseEntity parent = houseService.getParent(tempEntity);
-        if(parent != null && parent.getPid() != 0 && pid != parent.getPid()){
+        if(parent != null && parent.getPid() != null && parent.getPid() != 0 && pid != parent.getPid()){
             pid = tempEntity.getPid();
             HouseEntity houseEntity = setBuildingId(parent);
             tempEntity.setBuildingId(houseEntity.getBuildingId());
@@ -479,11 +555,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     /**
      * 业主详情查看
-     * @param userId	    用户ID
+     *
+     * @param userId 用户ID
      * @Param houseId       房屋ID
      * @author YuLF
-     * @since  2020/12/18 11:39
-     * @return			返回业主详情信息
+     * @return 返回业主详情信息
+     * @since 2020/12/18 11:39
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -586,7 +663,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity userEntity = new UserEntity();
         userEntity.setIsRealAuth(userMapper.getRealAuthStatus(uid));
         //拿到用户的最新房屋id
-        userEntity.setHouseholderId(userMapper.getLatestHouseId(uid));
+        userEntity.setHouseId(userMapper.getLatestHouseId(uid));
         return userEntity;
     }
 
@@ -596,18 +673,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserInfoVo userInfo = userMapper.selectUserNameAndHouseAddr(uid);
         //2.拿到房屋地址组成的字符串 如两江新区幸福广场天王星B栋1801 和 房屋所在社区id
         UserInfoVo userInfoVo = userMapper.selectHouseAddr(houseId);
-        BeanUtils.copyProperties(userInfoVo, userInfo);
+        if (Objects.nonNull(userInfoVo)) {
+            userInfo.setDetailAddress(userInfoVo.getDetailAddress());
+            userInfo.setCommunityId(userInfoVo.getCommunityId());
+            userInfo.setHouseId(houseId);
+        }
         List<HouseMemberEntity> houseMemberEntities = relationService.selectID(uid, houseId);
-        userInfoVo.setProprietorMembers(houseMemberEntities);
-        return userInfoVo;
+        userInfo.setProprietorMembers(houseMemberEntities);
+        return userInfo;
     }
 
     /**
      * 新方法：proprietorDetails
-     * @param communityId   社区id
-     * @param houseId       房屋id
-     * @param userId        用户id
-     * @return              返回用户详情信息
+     *
+     * @param communityId 社区id
+     * @param houseId     房屋id
+     * @param userId      用户id
+     * @return 返回用户详情信息
      */
     @Override
     @Deprecated
@@ -621,6 +703,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         vo.setProprietorCars(carEntities);
         return vo;
     }
+
+    /**
+    * @Description: 实名认证后修改用户信息
+     * @Param: [userEntity]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2021/3/2
+    **/
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateUserAfterRealnameAuth(UserEntity userEntity){
+        //改本地库
+        int result = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("uid", userEntity.getUid()));
+        if(result != 1){
+            log.error("实名信息修改失败，用户：" + userEntity.getUid());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
+        //通知签章服务
+        SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
+        signatureUserDTO.setUuid(userEntity.getUid());
+        signatureUserDTO.setIdCardName(userEntity.getRealName());
+        signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
+        signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
+//        if(!signatureService.realNameUpdateUser(signatureUserDTO)){
+//            log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
+//                throw new ProprietorException(JSYError.INTERNAL);
+//        }
+    }
+
 
 
 }

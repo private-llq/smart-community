@@ -61,22 +61,22 @@ public class SignatureServiceImpl implements ISignatureService {
 		long id = SnowFlake.nextId(); //远程服务调用id
 		switch(type){
 			case 1:
-				url = protocolType + host + ":" + port + "/user/insertUser";
+				url = protocolType + host + ":" + port + "/LongRange/insertUser";
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_INSERT_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 2:
-				url = protocolType + host + ":" + port + "/user/batchInsertUser";
+				url = protocolType + host + ":" + port + "/LongRange/batchInsertUser";
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_BATCH_INSERT_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 3:
-				url = protocolType + host + ":" + port + "/user/RealNameUpdateUser";
+				url = protocolType + host + ":" + port + "/LongRange/RealNameUpdateUser";
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_REALNAME_UPDATE_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 4:
-				url = protocolType + host + ":" + port + "/user/updateUser";
+				url = protocolType + host + ":" + port + "/LongRange/updateUser";
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_UPDATE_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
@@ -108,7 +108,7 @@ public class SignatureServiceImpl implements ISignatureService {
 			log.error("ID：" + id + "签章用户远程服务 - 调用或解析出错，调用返回：\n" + httpResult);
 			return false;
 		}
-		log.error("ID：" + id + "签章用户远程服务 - 调用成功：\n" + httpResult);
+		log.info("ID：" + id + "签章用户远程服务 - 调用成功：\n" + httpResult);
 		return true;
 	}
 	

@@ -3,33 +3,39 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.api.IProprietorService;
+import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.utils.CardUtil;
+import com.jsy.community.utils.DateUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
 
 /**
- * 业主 服务实现类
+ * 业主 服务实现类。
  *
  * @author YuLF
  * @since 2020-11-25
  */
 @DubboService(version = Const.version, group = Const.group)
-public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEntity> implements IProprietorService {
+public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, ProprietorEntity> implements IProprietorService {
 
     @Resource
     private ProprietorMapper proprietorMapper;
@@ -38,39 +44,54 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService iCarService;
 
-    /**
-     * TODO seata 全局事务处理
-     *
-     * @author YuLF
-     * @Param id  - 被删除的业主Id
-     * @since 2020/11/28 9:46
-     */
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IUserHouseService iUserHouseService;
+
+
+
+
     @Override
-    public void del(Long id) {
-        //删除业主车辆信息
-        Map<String, Object> map = new HashMap<>(1);
-        map.put("uid", id);
-        iCarService.deleteProprietorCar(map);
-        //删除业主关联的家庭成员
-
-        //删除业主关联的房屋
-
-        //删除业主信息
-        proprietorMapper.deleteById(id);
-
-
+    public Boolean unbindHouse( Long id ) {
+        return proprietorMapper.unbindHouse( id ) > 0;
     }
+
+
 
     /**
      * 通过传入的参数更新业主信息
-     *
-     * @param proprietorQo 更新业主信息参数
+     * @param qo 更新业主信息参数
      * @return 返回是否更新成功
      */
+    @Transactional( rollbackFor = {Exception.class})
     @Override
-    public Boolean update(ProprietorQO proprietorQo) {
-        return proprietorMapper.update(proprietorQo) > 0;
+    public Boolean update(ProprietorQO qo, String adminUid) {
+        //管理员姓名
+        String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
+        proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), qo.getId(), 2);
+        ProprietorEntity entity = new ProprietorEntity();
+        BeanUtils.copyProperties( qo, entity );
+        return proprietorMapper.updateById(entity) > 0;
     }
+
+
+
+
+
+    @Transactional( rollbackFor = {Exception.class})
+    @Override
+    public void addUser(ProprietorQO qo, String adminUid) {
+        //管理员姓名
+        String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
+        ProprietorEntity entity = new ProprietorEntity();
+        BeanUtils.copyProperties( qo, entity );
+        entity.setId( SnowFlake.nextId() );
+        proprietorMapper.insertOperationLog( SnowFlake.nextId(), adminUserName, DateUtils.now(), entity.getId(), 1 );
+        proprietorMapper.insert(entity);
+        //TODO 短信通知业主
+    }
+
+
+
 
     /**
      * 通过分页参数查询 业主信息
@@ -80,15 +101,25 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
      */
     @Override
     public List<ProprietorVO> query(BaseQO<ProprietorQO> queryParam) {
-        //避免sql 参数为空 执行失败
-        if (queryParam.getQuery() == null) {
-            queryParam.setQuery(new ProprietorQO());
-        }
         queryParam.setPage((queryParam.getPage() - 1) * queryParam.getSize());
-        return proprietorMapper.query(queryParam);
+        List<ProprietorVO> query = proprietorMapper.query(queryParam);
+        query.forEach( vo -> {
+            //通过身份证获得 用户的 年龄 、性别
+            Map<String, Object> sexAndAge = CardUtil.getSexAndAge(vo.getIdCard());
+            vo.setAge( sexAndAge.get("age").toString() );
+            vo.setGender( sexAndAge.get("sex").toString() );
+        });
+        return query;
     }
 
 
+
+    /**
+     * 通过house id 获取 楼栋+单元+楼层数+房屋类型
+     */
+    public String getHouseText( Long id){
+        return null;
+    }
     /**
      * 录入业主信息业主房屋绑定信息至数据库
      *
@@ -168,6 +199,32 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, UserEnt
         //3.录入家属信息至数据库
         return proprietorMapper.saveUserMemberBatch(userEntityList ,communityId);
     }
+
+
+    /**
+     * 通过数据id 拿到uid
+     * @param id        数据id
+     */
+    @Deprecated
+    public String getUidById(Long id){
+        return proprietorMapper.selectUidById(id);
+    }
+
+
+    @Deprecated
+    private void checkHouse(Long communityId, Long houseId, Operation operation) {
+        Integer resRow = proprietorMapper.existHouse(communityId, houseId);
+        if ( resRow == 0 ){
+            throw new PropertyException("房屋不存在!");
+        }
+        if( operation == Operation.INSERT ){
+            Integer resRow1 = proprietorMapper.checkHouse(houseId);
+            if( resRow1 >= 1 ){
+                throw new PropertyException("选择的房屋已被认证!");
+            }
+        }
+    }
+
 
     /**
      * 验证excel 业主家属信息 录入 业主 和 家属所属房屋 是否能在数据库匹配 如果不匹配则选择有误

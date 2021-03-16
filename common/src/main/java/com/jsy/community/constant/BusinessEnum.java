@@ -540,7 +540,16 @@ public interface BusinessEnum {
 		
 		public static final List<Map<String, Object>> relationshipList = new ArrayList<>();
 		public static final Map<Integer, String> relationshipMap = new HashMap<>();
-		
+
+		public static String getCode(Integer code){
+			RelationshipEnum[] values = RelationshipEnum.values();
+			for(RelationshipEnum c : values){
+				if( c.code.equals(code) ){
+					return c.name;
+				}
+			}
+			return RELATIVES.name;
+		}
 		static {
 			for (RelationshipEnum relationshipEnum : RelationshipEnum.values()) {
 				HashMap<String, Object> map = new HashMap<>();
@@ -652,9 +661,9 @@ public interface BusinessEnum {
 			return kv;
 		}
 
-		public static String getDirectionName(String code){
+		public static String getDirectionName(Integer code){
 			Map<Integer, String> kv = getKv();
-			return kv.get(Integer.parseInt(code));
+			return kv.get(code);
 		}
 
 	}

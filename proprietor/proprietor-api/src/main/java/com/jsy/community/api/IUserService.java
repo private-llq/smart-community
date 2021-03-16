@@ -70,15 +70,28 @@ public interface IUserService extends IService<UserEntity> {
 
 	/**
 	 * 业主信息更新
+	 * 新方法至 -> updateImprover
 	 * @param qo  更新实体
 	 * @return				返回更新布尔值
 	 */
+	@Deprecated
     Boolean proprietorUpdate(ProprietorQO qo);
 
+
+
+	/**
+	 * 业主信息更新
+	 * @param qo  更新实体
+	 * @return				返回更新布尔值
+	 */
+	Boolean updateImprover(ProprietorQO qo);
     /**
      * 根据业主id查询业主信息及业主家属信息
-     * @author YuLF
+     * @param userId  		用户id
+	 * @param houseId		房屋id
+	 * @author YuLF
      * @since  2020/12/10 16:25
+	 * @return				房屋业主信息 和 家属信息
      */
     UserInfoVo proprietorQuery(String userId, Long houseId);
 	
@@ -156,4 +169,15 @@ public interface IUserService extends IService<UserEntity> {
 	 */
 	@Deprecated
 	UserInfoVo userInfoDetails(Long cid, Long hid, String uid);
+	
+	/**
+	* @Description: 实名认证后修改用户信息
+	 * @Param: [userEntity]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/3/2
+	**/
+	void updateUserAfterRealnameAuth(UserEntity userEntity);
+
+
 }

@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
@@ -17,20 +18,22 @@ import java.util.List;
  * @author YuLF
  * @since 2020-11-25
  */
-public interface IProprietorService extends IService<UserEntity> {
+public interface IProprietorService extends IService<ProprietorEntity> {
 
     /**
-     * 根据ID删除 业主的信息、关联房屋信息、关联车辆信息、关联房屋认证信息
-     * @param id    业主ID
+     * 解绑这个房屋Id关联的业主
+     * @param id     业主信息数据id
+     * @return       返回删除影响行数
      */
-    void del(Long id);
+    Boolean unbindHouse(Long id);
 
     /**
      * 通过传入的参数更新业主信息
      * @param proprietorQo   更新业主信息参数
+     * @param adminUid       管理员Uid
      * @return              返回是否更新成功
      */
-    Boolean update(ProprietorQO proprietorQo);
+    Boolean update(ProprietorQO proprietorQo, String adminUid);
 
     /**
      * 通过分页参数查询 业主信息
@@ -65,4 +68,12 @@ public interface IProprietorService extends IService<UserEntity> {
      * @return              返回影响行数
      */
     Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId);
+
+
+    /**
+     * [物业]添加业主信息
+     * @param qo            请求参数
+     * @param adminUid      物业操作用户uid
+     */
+    void addUser(ProprietorQO qo, String adminUid);
 }

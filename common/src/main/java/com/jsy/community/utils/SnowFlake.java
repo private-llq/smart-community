@@ -51,8 +51,8 @@ public class SnowFlake {
 		if (machineId > MAX_MACHINE_NUM || machineId < 0) {
 			throw new IllegalArgumentException("machineId can't be greater than MAX_MACHINE_NUM or less than 0");
 		}
-		this.datacenterId = datacenterId;
-		this.machineId = machineId;
+		SnowFlake.datacenterId = datacenterId;
+		SnowFlake.machineId = machineId;
 	}
 	
 	/**
@@ -98,7 +98,7 @@ public class SnowFlake {
 		return System.currentTimeMillis();
 	}
 	
-	private static ThreadPoolExecutor threadpool = new ThreadPoolExecutor(50, 500, 5, TimeUnit.SECONDS,
+	private static final ThreadPoolExecutor threadpool = new ThreadPoolExecutor(50, 500, 5, TimeUnit.SECONDS,
 		new LinkedBlockingQueue<>(100000));
 	
 	private static void main(String[] args) throws InterruptedException {

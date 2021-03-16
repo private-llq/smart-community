@@ -73,7 +73,7 @@ public interface LivingpaymentQueryMapper {
      * @Param:
      * @return:
      */
-    TheBillingDetailsVO selectOrderId(Long id);
+    TheBillingDetailsVO selectOrderId(@Param("id") Long id,@Param("uid") String uid);
 
     /**
      * @Description: 查询全部户号

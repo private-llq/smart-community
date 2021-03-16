@@ -16,6 +16,12 @@
 	<name>物业端服务消费模块</name>
 	
 	<dependencies>
+		<!--	缩略图生成jar包	-->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.8</version>
+		</dependency>
 		<dependency>
 			<groupId>com.jsy</groupId>
 			<artifactId>property-api</artifactId>
@@ -80,6 +86,22 @@
 		<dependency>
 			<groupId>com.github.axet</groupId>
 			<artifactId>kaptcha</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.sun.jna</groupId><!--随便填-->
+			<artifactId>jna</artifactId><!--jar包名字-->
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/lib/jna.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jna</groupId><!--随便填-->
+			<artifactId>examples</artifactId><!--jar包名字-->
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/lib/examples.jar</systemPath>
 		</dependency>
 
 	</dependencies>

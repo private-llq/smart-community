@@ -11,6 +11,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -30,14 +31,14 @@ import java.util.Calendar;
  **/
 @Aspect
 @Component
+@Scope(value = "prototype")
 public class ConsoleLogAspect {
-	private Logger logger = LoggerFactory.getLogger(ConsoleLogAspect.class);
+	private final Logger logger = LoggerFactory.getLogger(ConsoleLogAspect.class);
 	
 	@Autowired
 	private UserUtils userUtils;
 	
-	// TODO: 2021/2/5 这里运行时间  针对并发情况下 没有做处理  没必要
-	private Long mark;
+	private static final ThreadLocal<Double> mark = new ThreadLocal<>();
 	
 	/**
 	 * 定义切入点，切入点为com.jsy.community下的函数
@@ -131,7 +132,8 @@ public class ConsoleLogAspect {
 					}
 				}
 			}
-			mark = System.currentTimeMillis();
+			double start = System.currentTimeMillis();
+			mark.set(start);
 		}
 	}
 	
@@ -147,8 +149,8 @@ public class ConsoleLogAspect {
 	public void doAfterReturning(Object ret) throws Throwable {
 		// 处理完请求，返回内容
 //		logger.info("返回结果 : " + ret);
-		long end = System.currentTimeMillis();
-		//long runTime = end - mark;
-		logger.info("总耗时 : " + end+"ms");
+		double end = System.currentTimeMillis();
+		Double start = mark.get();
+		logger.info("总耗时 : " + (end-start)+"ms");
 	}
 }

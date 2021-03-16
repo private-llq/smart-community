@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -65,5 +66,11 @@ public class HouseMemberEntity implements Serializable {
 
     @ApiModelProperty(value = "0，其他，1亲属，2租客")
     private Integer personType;
+
+    @ApiModelProperty(value = "租期结束时间")
+    private LocalDate leaseOverTime;
+
+    @ApiModelProperty(value = "租期开始时间")
+    private LocalDate leaseStartTime;
 
 }

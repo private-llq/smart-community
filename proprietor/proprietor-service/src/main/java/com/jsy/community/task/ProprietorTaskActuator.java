@@ -1,6 +1,6 @@
 package com.jsy.community.task;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.DistributedLock;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.IUserInformService;
@@ -19,6 +19,8 @@ import org.elasticsearch.rest.RestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author YuLF
@@ -40,16 +43,21 @@ import java.util.List;
 @Service
 public class ProprietorTaskActuator {
     /**
-     * 社区定时清理社区消息 cron 表达式
+     * 【社区消息】社区定时清理社区消息 cron 表达式  周一晚上1点
      */
     private static final String INFORM_CRON = "0 0 1 ? * mon";
     /**
-     * ES全量导入数据 cron 表达式
+     * 【全文搜索】ES全量导入数据 cron 表达式     周一晚上2点
      */
     private static final String ES_IMPORT_CRON = "0 0 2 ? * mon";
+    /**
+     * 【全文搜索】ES 搜索热词 清理时间     每天晚上3点执行检查清理
+     */
+    private static final String HOT_KEY_CLEAN_TIME = "0 0 3 * * ?";
 
 
     private static final Logger logger = LoggerFactory.getLogger(ProprietorTaskActuator.class);
+
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserInformService userInformService;
@@ -67,17 +75,32 @@ public class ProprietorTaskActuator {
     @Value("${jsy.sys.clear.inform.enable}")
     private boolean clearInformEnabled;
 
+    @Value("${jsy.app.full-text-search.hotkey.active.day}")
+    private Integer hotKeyActiveDay;
+
     @PostConstruct
     public void initSourceConst(){
         informActuator();
+        cleanHotKey();
     }
 
 
+    @Scheduled( cron = HOT_KEY_CLEAN_TIME )
+    public void cleanHotKey(){
+        //如果当前执行时间已经超过 指定 执行时间
+        /*if(DateUtils.notNeedImplemented(HOT_KEY_CLEAN_TIME)){
+            return;
+        }*/
+
+        commonService.cleanHotKey(hotKeyActiveDay);
+    }
+
     /**
+     * 【es批量导入数据库数据】
      * 数据库全量导入数据至 elasticsearch 查询的表t_acct_push_inform、t_community_fun、t_house_lease、t_shop_lease
      */
     @Scheduled(cron = ES_IMPORT_CRON)
-    public void esImportActuator() throws IOException {
+    public void esImportActuator()  {
         //如果当前执行时间已经超过 指定 执行时间
         if(DateUtils.notNeedImplemented(ES_IMPORT_CRON)){
             return;
@@ -85,13 +108,21 @@ public class ProprietorTaskActuator {
         List<FullTextSearchEntity> fullTextSearchEntities = commonService.fullTextSearchEntities();
         BulkRequest bulkRequest = new BulkRequest();
         fullTextSearchEntities.forEach( l -> {
+            JSONObject jsonObject = (JSONObject) JSONObject.toJSON(l);
+            jsonObject.put("searchTitle", l.getTitle());
+            jsonObject.put("esId", l.getId());
             IndexRequest indexRequest = new IndexRequest(BusinessConst.FULL_TEXT_SEARCH_INDEX)
                     .id(String.valueOf(l.getId()))
-                    .source(JSON.toJSONString(l), XContentType.JSON);
+                    .source(jsonObject.toJSONString(), XContentType.JSON);
             bulkRequest.add(indexRequest);
         });
-        BulkResponse bulk = elasticsearchClient.bulk(bulkRequest, ElasticsearchConfig.COMMON_OPTIONS);
-        if(bulk.status() == RestStatus.OK){
+        BulkResponse bulk = null;
+        try {
+            bulk = elasticsearchClient.bulk(bulkRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(Objects.requireNonNull(bulk).status() == RestStatus.OK){
             logger.info("全量数据导入数据：t_acct_push_inform、t_community_fun、t_house_lease、t_shop_lease表数据至Elasticsearch成功!");
         } else {
             logger.error("全量数据导入表数据至Elasticsearch失败!");
@@ -101,6 +132,7 @@ public class ProprietorTaskActuator {
 
 
     /**
+     * 【社区消息清理器】
      * 定时清理t_acct_push_inform
      * 根据定义的设置 超出多少天 清理掉旧消息
      * 每周一 凌晨1点执行 定时任务

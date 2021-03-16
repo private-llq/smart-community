@@ -13,17 +13,17 @@
 	</select>
 
 	<!-- 添加次级房屋单位 -->
-	<insert id="addSub">
-		insert into t_house(id,code,community_id,building,unit,floor,door,pid,type,comment)
-		select #{houseEntity.id},#{houseEntity.code},community_id,
-		if(building != '',building,#{houseEntity.building}),
-		if(unit != '',unit,#{houseEntity.unit}),
-		if(floor != '',floor,#{houseEntity.floor}),
-		if(door != '',door,#{houseEntity.door}),
-		id,#{houseEntity.type},#{houseEntity.comment}
-		from t_house
-		where id = #{houseEntity.pid}
-	</insert>
+<!--	<insert id="addSub">-->
+<!--		insert into t_house(id,code,community_id,building,unit,floor,door,pid,type,comment)-->
+<!--		select #{houseEntity.id},#{houseEntity.code},community_id,-->
+<!--		if(building != '',building,#{houseEntity.building}),-->
+<!--		if(unit != '',unit,#{houseEntity.unit}),-->
+<!--		if(floor != '',floor,#{houseEntity.floor}),-->
+<!--		if(door != '',door,#{houseEntity.door}),-->
+<!--		id,#{houseEntity.type},#{houseEntity.comment}-->
+<!--		from t_house-->
+<!--		where id = #{houseEntity.pid}-->
+<!--	</insert>-->
 	<!-- 按社区id获取社区名称 和社区 房间数量 -->
 	<select id="getCommunityNameAndUserAmountById"  resultType="java.util.HashMap">
 		select c.name,(SELECT count(*) from t_house where community_id = c.id and type = 4) as communityUserNum from t_community as c where  c.deleted = 0 and c.id = #{communityId}
@@ -56,4 +56,73 @@
 		AND h.deleted = 0
 		AND h.community_id = #{communityId}
 	</select>
+
+	<!-- ============================================ 物业端产品原型确定后新加的 开始  =========================================================== -->
+	<!-- 批量更新单元到楼栋节点下 -->
+	<update id="unitBindBuilding">
+		update t_house
+		set pid = #{entity.id}, building = #{entity.building}
+		where id in
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!-- 添加房屋 -->
+	<insert id="addRoom">
+		insert into t_house(id,code,community_id,number,build_area,house_type_code,house_type,property_type,building,unit,floor,door,pid,type,comment)
+		select #{houseEntity.id},#{houseEntity.code},community_id,#{houseEntity.number},#{houseEntity.buildArea},#{houseEntity.houseTypeCode},#{houseEntity.houseType},#{houseEntity.propertyType},
+		if(building != '',building,#{houseEntity.building}),
+		if(unit != '',unit,#{houseEntity.unit}),
+		#{houseEntity.floor},
+		if(door != '',door,#{houseEntity.door}),
+		id,#{houseEntity.type},#{houseEntity.comment}
+		from t_house
+		where id = #{houseEntity.pid}
+	</insert>
+
+	<!-- 批量更新次级节点冗余的父级名称 -->
+	<update id="updateSub">
+		update t_house
+		<set>
+			<if test="entity.building != null and entity.building != ''">,building = #{entity.building}</if>
+			<if test="entity.unit != null and entity.unit != ''">,unit = #{entity.unit}</if>
+			where id in
+			<foreach collection="list" item="item" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</set>
+	</update>
+
+	<!-- 更新修改 -->
+	<update id="updateHouse">
+		update t_house h
+		<set>
+			<if test="entity.number != null and entity.number != ''">,h.number = #{entity.number}</if>
+			<if test="entity.buildArea != null and entity.buildArea != 0">,h.build_area = #{entity.buildArea}</if>
+			<if test="entity.totalFloor != null and entity.totalFloor != 0">,h.total_floor = #{entity.totalFloor}</if>
+			<if test="entity.hasElevator != null and entity.hasElevator != 0">,h.has_elevator = #{entity.hasElevator}</if>
+			<if test="entity.building != null and entity.building != ''">,h.building = #{entity.building}</if>
+			<if test="entity.unit != null and entity.unit != ''">,h.unit = #{entity.unit}</if>
+			<if test="entity.door != null and entity.door != ''">,h.door = #{entity.door}</if>
+			<if test="entity.pid != null and entity.pid != 0">,h.pid = #{entity.pid}</if>
+			<if test="entity.houseTypeCode != null and entity.houseTypeCode != ''">,h.house_type_code = #{entity.houseTypeCode}</if>
+			<if test="entity.houseType != null and entity.houseType != 0">,h.house_type = #{entity.houseType}</if>
+			<if test="entity.propertyType != null and entity.propertyType != 0">,h.property_type = #{entity.propertyType}</if>
+			<if test="entity.decoration != null and entity.decoration != 0">,h.decoration = #{entity.decoration}</if>
+			<if test="entity.floor != null and entity.floor != ''">,h.floor = #{entity.floor}</if>
+			,update_time = now()
+		</set>
+		where id = #{entity.id}
+	</update>
+
+	<!-- 批量查询楼栋已绑定单元数 -->
+	<select id="queryBindUnitCountBatch" resultType="Map">
+		select pid,count(0) as count from t_house where type = 2 and pid in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		group by pid
+	</select>
+	<!-- ============================================ 物业端产品原型确定后新加的 结束  =========================================================== -->
 </mapper>

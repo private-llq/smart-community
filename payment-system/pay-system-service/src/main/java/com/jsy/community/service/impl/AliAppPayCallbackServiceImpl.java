@@ -7,6 +7,7 @@ import com.jsy.community.api.AliAppPayCallbackService;
 import com.jsy.community.api.AliAppPayService;
 import com.jsy.community.api.PaymentException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -24,15 +25,6 @@ import java.util.Map;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_lease)
 public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
-	
-	@Value("${alipay.sellerId}")
-	private String aliPaySellerId;
-	
-	@Value("${alipay.sellerEmail}")
-	private String aliPaySellerEmail;
-	
-	@Value("${alipay.appid}")
-	private String aliPayAppid;
 	
 	@Autowired
 	private AliAppPayService aliAppPayService;
@@ -79,16 +71,11 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			if(order != null){ // 订单号正确
 				log.info("订单号验证通过");
 				log.info(totalAmount + ":" + order.getTradeAmount());
-				log.info("比较大小：" + new BigDecimal(totalAmount).compareTo(order.getTradeAmount()));
-//    			if(String.valueOf(Integer.valueOf(totalAmount.substring(0, totalAmount.indexOf("."))))
-//    					.equals(String.valueOf(order.getTradeAmount().toBigInteger()))){ // 订单金额正确
 				if(new BigDecimal(totalAmount).compareTo(order.getTradeAmount()) == 0){
 					log.info("订单金额验证通过");
-					log.info(sellerId + "/" + sellerEmail + ":" + aliPaySellerId + "/" + aliPaySellerEmail);
-					if(aliPaySellerId.equals(sellerId) || aliPaySellerEmail.equals(sellerEmail)){ // 商家账号正确
+					if(ConstClasses.AliPayDataEntity.sellerId.equals(sellerId) || ConstClasses.AliPayDataEntity.sellerEmail.equals(sellerEmail)){ // 商家账号正确
 						log.info("商家验证通过");
-						log.info(appId + ":" + aliPayAppid);
-						if(aliPayAppid.equals(appId)){ // appid正确
+						if(ConstClasses.AliPayDataEntity.appid.equals(appId)){ // appid正确
 							log.info("appid验证通过");
 							//处理订单
 							aliAppPayService.dealOrder(order);

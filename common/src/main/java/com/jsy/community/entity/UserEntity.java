@@ -2,16 +2,12 @@ package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 
 /**
  * @author ling
@@ -28,7 +24,12 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("业主ID")
 	private Long householderId;
-	
+
+	@ApiModelProperty("房屋id")
+	@TableField( exist = false)
+	private Long houseId;
+
+
 	@ApiModelProperty("昵称")
 	private String nickname;
 	
@@ -43,21 +44,19 @@ public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("性别，0未知，1男，2女")
 	private Integer sex;
+
+	@ApiModelProperty("生日")
+	private LocalDateTime birthdayTime;
 	
 	@ApiModelProperty("真实姓名")
-	@NotBlank(groups = {ProprietorRegister.class}, message = "姓名未填写!")
-	@Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
 	private String realName;
 	
 	@ApiModelProperty("身份证")
-	@NotBlank(groups = {ProprietorRegister.class}, message = "身份证号码未输入!")
-	@Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "请输入一个正确的身份证号码!")
 	private String idCard;
 	
 	@ApiModelProperty("是否实名认证")
 	private Integer isRealAuth;
 
-	@TableField( exist = false)
 	@ApiModelProperty("国籍ID")
 	private Integer countryId;
 
@@ -80,9 +79,23 @@ public class UserEntity extends BaseEntity {
 	@TableField( exist = false )
 	private Integer relationCode;
 
-	@TableField( exist = false)
 	@ApiModelProperty("证件类型：1.身份证 2.护照")
 	private Integer identificationType;
+	
+	@ApiModelProperty("证件照片(正面)")
+	private String idCardPicFace;
+	
+	@ApiModelProperty("证件照片(反面)")
+	private String idCardPicBack;
+
+	@ApiModelProperty("微信")
+	private String wechat;
+
+	@ApiModelProperty("腾讯qq")
+	private String qq;
+
+	@ApiModelProperty("联系邮箱")
+	private String email;
 
 	@ApiModelProperty("车辆信息")
 	@TableField( exist = false )

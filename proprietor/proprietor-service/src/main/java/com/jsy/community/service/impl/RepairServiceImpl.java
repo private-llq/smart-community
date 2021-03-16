@@ -60,6 +60,11 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addRepair(RepairEntity repairEntity) {
+		
+		// 判断报修类别id与报修类别是否一致
+		Long typeId = repairEntity.getType();
+		
+		
 		repairEntity.setId(SnowFlake.nextId());
 		repairMapper.insert(repairEntity); // 1.png;2.png;3.png;   或 1.png;2.png;3.png 都可以            redis 现在存的是  3个 xx.png
 		Long id = repairEntity.getId();// 得到新添加报修的报修id
@@ -94,6 +99,16 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 				}
 				if (repairEntity.getStatus() == 2) {
 					repairEntity.setStatusString("已处理");
+					// 对已评价的 获取其评价信息，前端通过其判断是否该订单评价过[评价过的不能再次评价]
+					QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
+					queryWrapper.eq("repair_id", repairEntity.getId());
+					RepairOrderEntity order = repairOrderMapper.selectOne(queryWrapper);
+					if (order!=null) {
+						if (!StringUtils.isEmpty(order.getComment())) {
+							repairEntity.setComment(order.getComment());
+							System.out.println(repairEntity.getComment());
+						}
+					}
 				}
 			}
 			return list;

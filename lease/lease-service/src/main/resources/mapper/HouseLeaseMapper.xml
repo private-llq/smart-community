@@ -4,19 +4,84 @@
 <mapper namespace="com.jsy.community.mapper.HouseLeaseMapper">
 
 
-    <!-- 保存房屋租售信息 -->
-    <insert id="insertHouseLease">
-        insert into t_house_lease (id,uid,house_title,house_city_id,house_area_id,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_leasedeposit_id
-        ,house_type_code,house_floor,house_direction,house_source_id,bedroom_type,appellation
-        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_furniture_id,house_lon,house_lat,house_id,house_community_id,house_reserve_time,create_time
+    <!-- [整租新增]保存房屋租售信息 -->
+    <insert id="addWholeLeaseHouse">
+        insert into t_house_lease (id,uid,house_title,house_city_id,house_address,house_advantage_id,house_price,house_square_meter,house_leasedeposit_id
+        ,house_type_code,house_floor,house_direction_id,appellation
+        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_furniture_id,house_lon,house_lat,house_id,house_community_id,create_time
+        ,lease_require_id,decoration_type_id,house_area_id
         )
         values
-        (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAreaId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseUnit},#{houseSquareMeter},#{houseLeasedepositId}
-        ,#{houseTypeCode},#{houseFloor},#{houseDirection},#{houseSourceId},#{bedroomType},#{appellation}
-        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseFurnitureId},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},#{houseReserveTime},now()
+        (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseSquareMeter},#{houseLeasedepositId}
+        ,#{houseTypeCode},#{houseFloor},#{houseDirectionId},#{appellation}
+        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseFurnitureId},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},now()
+        ,#{leaseRequireId},#{decorationTypeId},#{houseAreaId}
+        )
+    </insert>
+    <!-- [单间新增]保存房屋租售信息 -->
+    <insert id="addSingleLeaseHouse">
+        insert into t_house_lease (id,uid,house_title,house_city_id,house_address,house_advantage_id,house_price,house_square_meter,house_leasedeposit_id
+        ,house_type_code,house_floor,house_direction_id,appellation
+        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_lon,house_lat,house_id,house_community_id,create_time,
+        <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+            common_facilities_id,
+        </if>
+        lease_require_id,room_facilities_id,bedroom_type,decoration_type_id,house_area_id
+        )
+        values
+        (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseSquareMeter},#{houseLeasedepositId}
+        ,#{houseTypeCode},#{houseFloor},#{houseDirectionId},#{appellation}
+        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},now(),
+        <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+            #{commonFacilitiesId},
+        </if>
+        #{leaseRequireId},#{roomFacilitiesId},#{bedroomType},#{decorationTypeId},#{houseAreaId}
+        )
+    </insert>
+    <!-- [合租新增]保存房屋租售信息 -->
+    <insert id="addCombineLeaseHouse">
+        insert into t_house_lease (id,uid,house_title,house_city_id,house_address,house_advantage_id,house_price,house_square_meter,house_leasedeposit_id
+        ,house_type_code,house_floor,house_direction_id,appellation
+        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_lon,house_lat,house_id,house_community_id,create_time,
+        <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+            common_facilities_id,
+        </if>
+        <if test="roommateExpectId != null and roommateExpectId &gt; 0">
+            roommate_expect_id,
+        </if>
+        room_facilities_id,bedroom_type,decoration_type_id,roommate_sex,house_area_id
+        )
+        values
+        (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseSquareMeter},#{houseLeasedepositId}
+        ,#{houseTypeCode},#{houseFloor},#{houseDirectionId},#{appellation}
+        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},now(),
+        <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+            #{commonFacilitiesId},
+        </if>
+        <if test="roommateExpectId != null and roommateExpectId &gt; 0">
+            #{roommateExpectId},
+        </if>
+        #{roomFacilitiesId},#{bedroomType},#{decorationTypeId},#{roommateSex},#{houseAreaId}
         )
     </insert>
 
+    <!-- 按用户id获取所有小区名称 -->
+    <select id="allCommunity" resultType="com.jsy.community.entity.CommunityEntity">
+        SELECT DISTINCT
+	        c.id,
+	        c.lon,
+	        c.lat,
+	    CONCAT( c.detail_address, c.`name` ) AS 'name'
+        FROM
+	        t_community AS c
+	    LEFT JOIN t_user_house AS h ON h.community_id = c.id
+        WHERE
+	        c.deleted = 0
+	        AND h.deleted = 0
+	        AND h.check_status = 1
+	        AND h.uid = #{uid}
+	        AND c.city_id = #{cityId}
+    </select>
 
     <!-- 插入房屋图片至中间库 -->
     <insert id="insertHouseImages">
@@ -36,7 +101,7 @@
     <!-- 按列表查询房屋出租信息 -->
     <select id="queryHouseLeaseByList" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         select
-        id,bedroom_type,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_code,house_lon,house_lat,house_furniture_id,house_reserve_time
+        id,bedroom_type,house_direction_id,decoration_type_id,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_code,house_lon,house_lat,house_furniture_id
         from t_house_lease
         <where>
             <!-- 如果查询筛选增加了搜索文本 -->
@@ -80,6 +145,7 @@
             </if>
             and deleted  = 0
         </where>
+        order by create_time desc
         limit #{page},#{size}
     </select>
 
@@ -103,34 +169,50 @@
         </foreach>
     </select>
 
-    <!-- 按参数对象属性更新房屋出租数据 -->
+    <!-- 【整租、合租、单间】按参数对象属性更新房屋出租数据 -->
     <update id="updateHouseLease">
         update t_house_lease
         <set>
             <trim  prefixOverrides=",">
-                <!-- 房屋卧室类型 -->
+                <!-- 房屋ID -->
+                <if test="houseId != null and houseId &gt; 0">
+                    ,house_id = #{houseId}
+                </if>
+                <!-- 对室友期望 -->
+                <if test="roommateExpectId != null and roommateExpectId &gt; 0">
+                    ,roommate_expect_id = #{roommateExpectId}
+                </if>
+                <!-- 对室友性别要求 -->
+                <if test="roommateSex != null and !roommateSex.equals(&apos;&apos;)">
+                    ,roommate_sex = #{roommateSex}
+                </if>
+                <!-- 公共设施 -->
+                <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+                    ,common_facilities_id = #{commonFacilitiesId}
+                </if>
+                <!-- 卧室类型 -->
                 <if test="bedroomType != null and !bedroomType.equals(&apos;&apos;)">
                     ,bedroom_type = #{bedroomType}
+                </if>
+                <!-- 房屋设施 -->
+                <if test="roomFacilitiesId != null and roomFacilitiesId &gt; 0">
+                    ,room_facilities_id = #{roomFacilitiesId}
                 </if>
                 <!-- 房屋房主称呼 -->
                 <if test="appellation != null and !appellation.equals(&apos;&apos;)">
                     ,appellation = #{appellation}
                 </if>
+                <!-- 社区id -->
+                <if test="houseCommunityId != null and houseCommunityId &gt; 0">
+                    ,house_community_id = #{houseCommunityId}
+                </if>
+                <!-- 城市区域id -->
+                <if test="houseAreaId != null and houseAreaId &gt; 0">
+                    ,house_area_id = #{houseAreaId}
+                </if>
                 <!-- 房屋租售标题 -->
                 <if test="houseTitle != null and !houseTitle.equals(&apos;&apos;)">
                     ,house_title = #{houseTitle}
-                </if>
-                <!-- 房屋省id -->
-                <if test="houseProvinceId != null and houseProvinceId &gt; 0">
-                    ,house_province_id = #{houseProvinceId}
-                </if>
-                <!-- 房屋市id -->
-                <if test="houseCityId != null and houseCityId &gt; 0">
-                    ,house_city_id = #{houseCityId}
-                </if>
-                <!-- 房屋区域id -->
-                <if test="houseAreaId != null and houseAreaId &gt; 0">
-                    ,house_area_id = #{houseAreaId}
                 </if>
                 <!-- 房屋地址 -->
                 <if test="houseAddress != null and !houseAddress.equals(&apos;&apos;)">
@@ -140,7 +222,7 @@
                 <if test="houseAdvantageId != null">
                     ,house_advantage_id = #{houseAdvantageId}
                 </if>
-                <!-- 房屋价格 -->
+                <!-- 房屋租金 -->
                 <if test="housePrice != null and housePrice &gt; 0">
                     ,house_price = #{housePrice}
                 </if>
@@ -152,17 +234,9 @@
                 <if test="houseLat != null and houseLat &gt; 0">
                     ,house_lat = #{houseLat}
                 </if>
-                <!-- 地图纬度 -->
-                <if test="houseLat != null and houseLat &gt; 0">
-                    ,house_lat = #{houseLat}
-                </if>
                 <!-- 房屋家具id -->
-                <if test="houseFurnitureId != null">
+                <if test="houseFurnitureId != null and houseFurnitureId &gt; 0">
                     ,house_furniture_id = #{houseFurnitureId}
-                </if>
-                <!-- 房屋出租单位 -->
-                <if test="houseUnit != null and !houseUnit.equals(&apos;&apos;)">
-                    ,house_unit = #{houseUnit}
                 </if>
                 <!-- 房屋联系人手机号 -->
                 <if test="houseContact != null and !houseContact.equals(&apos;&apos;)">
@@ -176,11 +250,11 @@
                 <if test="houseSquareMeter != null and houseSquareMeter &gt; 0">
                     ,house_square_meter = #{houseSquareMeter}
                 </if>
-                <!-- 房屋租售方式id -->
+                <!-- 房屋押付方式id -->
                 <if test="houseLeasedepositId != null and houseLeasedepositId &gt; 0">
                     ,house_leasedeposit_id = #{houseLeasedepositId}
                 </if>
-                <!-- 房屋租售类型id -->
+                <!-- 房屋租售户型id -->
                 <if test="houseTypeCode != null and houseTypeCode &gt; 0">
                     ,house_type_code = #{houseTypeCode}
                 </if>
@@ -189,24 +263,12 @@
                     ,house_floor = #{houseFloor}
                 </if>
                 <!-- 房屋朝向 -->
-                <if test="houseDirection != null and !houseDirection.equals(&apos;&apos;)">
-                    ,house_direction = #{houseDirection}
-                </if>
-                <!-- 房屋来源类型id   1.个人 2.经纪人 3.不限 -->
-                <if test="houseSourceId != null and houseSourceId &gt; 0 and houseSourceId &lt; 4">
-                    ,house_source_id = #{houseSourceId}
+                <if test="houseDirectionId != null and !houseDirectionId.equals(&apos;&apos;)">
+                    ,house_direction_id = #{houseDirectionId}
                 </if>
                 <!-- 房屋介绍内容 -->
                 <if test="houseIntroduce != null and !houseIntroduce.equals(&apos;&apos;)">
                     ,house_introduce = #{houseIntroduce}
-                </if>
-                <!-- 房屋介绍内容 -->
-                <if test="houseIntroduce != null and !houseIntroduce.equals(&apos;&apos;)">
-                    ,house_introduce = #{houseIntroduce}
-                </if>
-                <!-- 房屋预约时间内容 -->
-                <if test="houseReserveTime != null and !houseReserveTime.equals(&apos;&apos;)">
-                    ,house_reserve_time = #{houseReserveTime}
                 </if>
                 <!-- 房屋出租类型id  不限 普通住宅 别墅 公寓 -->
                 <if test="houseLeasetypeId != null and houseLeasetypeId &gt; 0">
@@ -216,6 +278,14 @@
                 <if test="houseLeasemodeId != null and houseLeasemodeId &gt; 0">
                     ,house_leasemode_id = #{houseLeasemodeId}
                 </if>
+                <!-- 装修情况：装修情况codeId：1.简单装修 2.精装修 4.豪华装修 -->
+                <if test="decorationTypeId != null and decorationTypeId &gt; 0">
+                    ,decoration_type_id = #{decorationTypeId}
+                </if>
+                <!-- 出租要求Code：1.一家人 2.不养宠物 4.作息正常 8.组合稳定 16.禁烟 -->
+                <if test="leaseRequireId != null and leaseRequireId &gt; 0">
+                    ,lease_require_id = #{leaseRequireId}
+                </if>
                 ,update_time = now()
             </trim>
         </set>
@@ -223,6 +293,41 @@
             id = #{id} and uid = #{uid} and deleted = 0
         </where>
     </update>
+
+    <select id="editDetails" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
+        SELECT
+            l.id,
+            l.house_id,
+            l.house_city_id,
+            r.`name` as houseCityName,
+            l.house_community_id,
+            l.house_address,
+            l.house_square_meter,
+            l.house_type_code,
+            l.house_direction_id,
+            l.house_floor,
+            l.house_price,
+            l.house_image_id,
+            l.house_leasedeposit_id,
+            c.house_const_name AS houseLeaseDeposit,
+            l.house_leasetype_id,
+            d.house_const_name AS houseLeaseType,
+            l.house_title,
+            l.house_introduce,
+            l.appellation,
+            l.bedroom_type,
+            l.house_contact
+        FROM
+	        t_house_lease AS l
+	        LEFT JOIN t_house_const AS c ON l.house_leasedeposit_id = c.house_const_code
+	        AND c.house_const_type = 1
+	        LEFT JOIN t_house_const AS d ON l.house_leasetype_id = d.house_const_code
+	        AND d.house_const_type = 10
+	        LEFT JOIN t_region as r on l.house_city_id = r.id
+        WHERE
+	        l.id = #{houseId} and uid = #{uid} and l.deleted = 0
+    </select>
+
 
     <!-- 按id保存图片数组 -->
     <insert id="saveHouseLeaseImageById">
@@ -250,21 +355,30 @@
 	        l.house_type_code,
 	        l.house_square_meter,
 	        l.house_floor,
-	        l.house_direction,
+	        l.house_direction_id,
 	        l.house_advantage_id,
 	        l.house_introduce,
 	        l.house_furniture_id,
 	        l.house_lat,
 	        l.house_lon,
-	        l.house_reserve_time,
+	        l.bedroom_type,
+	        l.lease_require_id,
+	        l.room_facilities_id,
+	        l.common_facilities_id,
+	        l.decoration_type_id,
+	        l.roommate_expect_id,
+	        l.roommate_sex,
 	        c.house_const_name AS houseLeaseMode,
-	        d.house_const_name AS houseLeaseDeposit
+	        d.house_const_name AS houseLeaseDeposit,
+	        e.house_const_name as decorationType
         FROM
 	        t_house_lease AS l
 	        LEFT JOIN t_house_const AS c ON l.house_leasemode_id = c.house_const_code
 	        AND c.house_const_type = 11
 	        LEFT JOIN t_house_const AS d ON l.house_leasedeposit_id = d.house_const_code
 	        AND d.house_const_type = 1
+	        LEFT JOIN t_house_const AS e ON l.decoration_type_id = d.house_const_code
+	        AND d.house_const_type = 18
             WHERE
 	        l.id = #{houseId} and l.deleted = 0
     </select>
@@ -273,15 +387,18 @@
         SELECT
 	        l.id,
 	        l.house_title,
-	        l.house_square_meter,
 	        l.house_address,
 	        l.house_price,
 	        l.house_unit,
 	        l.house_image_id,
 	        l.house_type_code,
-	        l.bedroom_type
+	        l.bedroom_type,
+	        c.house_const_name as houseLeaseMode,
+            h.house_const_name as houseLeaseDeposit
         FROM
 	        t_house_lease AS l
+	        left join t_house_const as c on l.house_leasemode_id = c.house_const_code and c.house_const_type = 11 and c.deleted = 0
+	        left join t_house_const as h on l.house_leasedeposit_id = h.house_const_code and h.house_const_type = 1 and c.deleted = 0
         WHERE
 	        l.uid = #{query.uid} and l.deleted = 0
 	        ORDER BY l.create_time desc
@@ -345,5 +462,19 @@
 	        t_house_lease AS l
         WHERE
 	        l.deleted = 0 and l.house_price = #{query.searchText} LIMIT #{page},#{size}
+    </select>
+    <!--  -->
+    <select id="getUserAddrById" resultType="java.util.HashMap">
+        SELECT
+            c.`name` AS communityName,
+            CONCAT( h.building, h.unit, h.floor, h.door ) AS houseAddress
+        FROM
+	        t_community AS c
+	    LEFT JOIN t_house AS h ON c.id = h.community_id
+	        AND c.id = #{houseCommunityId}
+	        AND h.id = #{houseId}
+        WHERE
+            c.deleted = 0
+        AND h.deleted = 0
     </select>
 </mapper>

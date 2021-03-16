@@ -24,4 +24,5 @@ public class BaseQO<T> implements Serializable {
 	private Long size;
 	
 	private T query;
+
 }

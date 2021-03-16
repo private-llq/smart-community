@@ -1,8 +1,5 @@
 package com.jsy.community.qo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.RegexUtils;
@@ -33,87 +30,120 @@ public class ProprietorQO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(groups = {PropertyUpdateValid.class}, message = "用户id为空")
+    @Range( groups = {PropertyUpdateValid.class}, min = 1, message = "数据id范围不正确!")
+    @NotNull(groups = {PropertyUpdateValid.class}, message = "数据id为空")
     @ApiModelProperty("数据id")
     private Long id;
+
+
+    @Range( groups = {PropertyAddValid.class,PropertyUpdateValid.class}, min = 1, message = "社区id范围不正确!")
+    @NotNull(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, message = "社区id为空")
+    @ApiModelProperty("社区id")
+    private Long communityId;
+
+
+    @ApiModelProperty("业主ID")
+    private Long householderId;
+
 
     @ApiModelProperty("用户id")
     private String uid;
 
-    @Range(groups = {PropertyUpdateValid.class}, min = 1, message = "非法业主Id")
-    @ApiModelProperty("业主ID")
-    private Long householderId;
 
-    @Length(groups = {PropertyUpdateValid.class}, min = 1, max = 32, message = "昵称长度请在1~32之间")
-    @ApiModelProperty("昵称")
-    private String nickname;
+    @Range( groups = {PropertyAddValid.class, PropertyUpdateValid.class, PropertySearchValid.class}, min = 1, message = "房屋id范围不正确!")
+    @NotNull( groups = {PropertyAddValid.class, PropertyUpdateValid.class}, message = "房屋未选择!房屋Id为空")
+    @ApiModelProperty("房屋id")
+    private Long houseId;
 
-    @Pattern(groups = {PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_URL, message = "头像地址不正确")
-    @ApiModelProperty("头像地址")
-    private String avatarUrl;
 
-    @Pattern(groups = {ProprietorRegister.class}, regexp = RegexUtils.REGEX_URL, message = "人脸URL地址不正确")
-    @NotBlank(groups = {ProprietorRegister.class}, message = "人脸未上传!")
-    @ApiModelProperty("人脸头像地址")
-    private String faceUrl;
+    @Range( groups = {PropertySearchValid.class}, min = 1, message = "楼栋id范围不正确!")
+    @ApiModelProperty("楼栋id")
+    private Long buildingId;
 
-    @Pattern(groups = {PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_MOBILE, message = "电话号码错误，只支持电信|联通|移动")
+
+    @Range( groups = {PropertySearchValid.class}, min = 1, message = "单元id范围不正确!")
+    @ApiModelProperty("单元id")
+    private Long unitId;
+
+
+    @Pattern(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_WE_CHAT, message = "微信号不正确!")
+    @ApiModelProperty("微信")
+    private String wechat;
+
+
+    @Pattern(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_QQ, message = "QQ号不正确!")
+    @ApiModelProperty("qq")
+    private String qq;
+
+
+    @ApiModelProperty("性别")
+    private Integer sex;
+
+
+    @Pattern(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_EMAIL, message = "邮箱号不正确!")
+    @ApiModelProperty("邮箱")
+    private String email;
+
+
+    @Pattern(groups = {PropertyUpdateValid.class, PropertyAddValid.class}, regexp = RegexUtils.REGEX_MOBILE, message = "电话号码错误，只支持电信|联通|移动")
+    @NotBlank( groups = {PropertyAddValid.class}, message = "电话号码不能为空!")
     @ApiModelProperty("电话号码")
     private String mobile;
 
-    @Range(groups = {PropertyUpdateValid.class, ProprietorRegister.class}, min = 0, max = 2, message = "性别不可用")
-    @NotNull(groups = {ProprietorRegister.class}, message = "性别不能为空")
-    @ApiModelProperty("性别，0未知，1男，2女")
-    private Integer sex;
 
-    @Pattern(groups = {PropertyUpdateValid.class, ProprietorRegister.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
+    /**
+     * 第一版  只按照汉族的姓名 验证
+     */
+    @Pattern(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
+    @Length( groups = {PropertyAddValid.class, PropertyUpdateValid.class}, min = 2, max = 20, message = "姓名长度不在正常范围之内!")
     @ApiModelProperty("真实姓名")
-    @NotBlank(groups = {ProprietorRegister.class}, message = "姓名未填写!")
+    @NotBlank(groups = {PropertyAddValid.class}, message = "姓名未填写!")
     private String realName;
 
-    @Pattern(groups = {PropertyUpdateValid.class, ProprietorRegister.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "身份证错误")
-    @NotBlank(groups = {ProprietorRegister.class}, message = "身份证号码未输入!")
-    @ApiModelProperty("身份证")
+
+    @Pattern(groups = {PropertyUpdateValid.class, PropertyAddValid.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "身份证错误")
+    @NotBlank(groups = {PropertyAddValid.class}, message = "证件号码未输入!")
+    @ApiModelProperty("证件号码")
     private String idCard;
 
-    @Range(groups = {PropertyUpdateValid.class}, min = 0, max = 1, message = "非法实名认证信息")
-    @ApiModelProperty("是否实名认证")
-    private Integer isRealAuth;
 
-    @Range(groups = {PropertyUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "省ID不可用")
-    @ApiModelProperty("省ID")
-    private Integer provinceId;
+    @ApiModelProperty("证件类型：1.身份证 2.护照")
+    private Integer identificationType = 1;
 
-    @Range(groups = {PropertyUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "市ID不可用")
-    @ApiModelProperty("市ID")
-    private Integer cityId;
 
-    @Range(groups = {PropertyUpdateValid.class}, min = 1 , max = Integer.MAX_VALUE, message = "区ID不可用")
-    @ApiModelProperty("区ID")
-    private Integer areaId;
+    @ApiModelProperty("人脸url")
+    private String faceUrl;
 
-    @Length(groups = {PropertyUpdateValid.class}, min = 1, max = 128, message = "详细地址字符长度请在1~128之间")
-    @ApiModelProperty("详细地址")
-    private String detailAddress;
 
     @ApiModelProperty("标记是否需要登记车辆")
-    @TableField( exist = false )
     private Boolean hasCar;
+
+
+    @ApiModelProperty("搜索字段")
+    private String searchText;
+
 
     @ApiModelProperty("车辆集合")
     private List<CarQO> cars;
 
+
     @ApiModelProperty("用来存储House的id和社区id")
     private List<UserHouseQo> houses;
+
+
+    /**
+     * [物业]业主查询效验接口
+     */
+    public interface PropertySearchValid {}
 
     /**
      * [物业]业主更新效验接口
      */
     public interface PropertyUpdateValid {}
 
-
     /**
-     * [业主] 登记接口
+     * [物业]业主新增效验接口
      */
-    public interface ProprietorRegister{}
+    public interface PropertyAddValid {}
+
 }

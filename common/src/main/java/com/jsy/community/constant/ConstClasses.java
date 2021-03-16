@@ -25,25 +25,42 @@ public interface ConstClasses {
 		public static String alipayPublicCertPath;//支付宝公钥证书路径
 		public static String rootCertPath;//支付宝根证书路径
 		
+		public static String sellerId;//商户ID
+		public static String sellerEmail;//商户账号(邮箱)
+		public static String sellerPID;//商户账号(PID)
+		
 		@Value("${alipay.appid}")
 		public void setAppid(String appid) {
-			this.appid = AESOperator.decrypt(appid);
+			AliPayDataEntity.appid = AESOperator.decrypt(appid);
 		}
+		@Value("${alipay.sellerId}")
+		public void setSellerId(String sellerId) {
+			AliPayDataEntity.sellerId = AESOperator.decrypt(sellerId);
+		}
+		@Value("${alipay.sellerEmail}")
+		public void setSellerEmail(String sellerEmail) {
+			AliPayDataEntity.sellerEmail = AESOperator.decrypt(sellerEmail);
+		}
+		@Value("${alipay.sellerPID}")
+		public void setSellerPID(String sellerPID) {
+			AliPayDataEntity.sellerPID = AESOperator.decrypt(sellerPID);
+		}
+		
 		@Value("${alipay.app-private-key}")
 		public void setPrivateKey(String privateKey) {
-			this.privateKey = AESOperator.decrypt(privateKey);
+			AliPayDataEntity.privateKey = AESOperator.decrypt(privateKey);
 		}
 		@Value("${alipay.cert-path.app-public-cert}")
 		public void setCertPath(String certPath) {
-			this.certPath = AESOperator.decrypt(certPath);
+			AliPayDataEntity.certPath = AESOperator.decrypt(certPath);
 		}
 		@Value("${alipay.cert-path.alipay-public-cert}")
 		public void setAlipayPublicCertPath(String alipayPublicCertPath) {
-			this.alipayPublicCertPath = AESOperator.decrypt(alipayPublicCertPath);
+			AliPayDataEntity.alipayPublicCertPath = AESOperator.decrypt(alipayPublicCertPath);
 		}
 		@Value("${alipay.cert-path.root-cert}")
 		public void setRootCertPath(String rootCertPath) {
-			this.rootCertPath = AESOperator.decrypt(rootCertPath);
+			AliPayDataEntity.rootCertPath = AESOperator.decrypt(rootCertPath);
 		}
 	}
 	

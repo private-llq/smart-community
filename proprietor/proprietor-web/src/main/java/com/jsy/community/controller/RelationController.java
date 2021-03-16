@@ -81,8 +81,8 @@ public class RelationController {
     @DeleteMapping("/delete")
     @Login
     public CommonResult delete(@RequestParam("id") Long id){
-        System.out.println(id);
-        relationService.deleteHouseMemberCars(id);
+        String userId = UserUtils.getUserId();
+        relationService.deleteHouseMemberCars(id,userId);
         return CommonResult.ok();
     }
     @ApiOperation("保存行驶证图片")
@@ -95,7 +95,7 @@ public class RelationController {
             return CommonResult.error("请上传图片！可用后缀"+Arrays.toString(img));
         }
         String upload = MinioUtils.upload(file, "wocao");
-        return CommonResult.ok(upload);
+        return CommonResult.ok(upload,"上传成功");
     }
     @ApiOperation("查询一个家属详情")
     @GetMapping("/selectUserRelationDetails")

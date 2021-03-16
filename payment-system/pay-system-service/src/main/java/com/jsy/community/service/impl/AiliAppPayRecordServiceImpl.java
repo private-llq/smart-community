@@ -30,7 +30,7 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	//查询支付宝订单
 	public AiliAppPayRecordEntity getAliAppPayByOutTradeNo(String outTradeNo){
 		return ailiAppPayRecordDao.selectOne(new QueryWrapper<AiliAppPayRecordEntity>()
-				.select("order_no","userid","trade_amount,trade_type,sys_type")
+				.select("order_no","userid","trade_amount","trade_type","sys_type")
 				.eq("order_no", outTradeNo)
 				.eq("trade_status", 1)
 				);

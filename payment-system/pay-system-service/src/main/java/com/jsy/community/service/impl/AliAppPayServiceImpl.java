@@ -18,6 +18,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.qo.lease.AliAppPayQO;
+import com.jsy.community.utils.AlipayUtils;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
@@ -39,74 +40,8 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	@Autowired
 	private AiliAppPayRecordServiceImpl ailiAppPayRecordServiceImpl;
 	
-	//沙箱测试 初始化
-	public static final AlipayClient sandBoxCli = new DefaultAlipayClient(
-			"https://openapi.alipaydev.com/gateway.do",
-			"2021000116687297",
-			"MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC6E0Dp1sP8XPGwOGP+HEFS5OPfmoFaJA0qloHShVCSBjt8+53+soc3v/RemCMdzWUsugpH/Lzyxo2qV3GpDMqVi5/UJXbI573RZX/SydAvLNhGJXwlqKnM9C4t1NuhQkbzYIzySYPweGK/e6m+s89w/+HXmNeSxRLOW9KJvGGHxJuzYRrshfi81YY1VNpF2CGAjoITXHp8UziEQKotv+cnJt/ZFA1dITt3kuWQzeL1nPFxJfmqXdxyoScr6HFNpnWmGSo0s8mqD4XvF1XGg9cSKF5ekFnjaPUZKuIyOa7ko15JsbdOFeTKwjdqTGkek1xb2fX91EUDlv9ux2RxH5izAgMBAAECggEBALG7yEpTuLop8TV4d5J2XLMYLM0dYKbAPs9KGdEDRBVm3JWiJaTt1BidQobEXO6PjS9uuHlQYQ6oNxLZGZj2vd6gEldqPY7jRD1p7PFjkXYuKJrAHVg/RYmeRynB4tOiYfEAbUDUlbEw3Gm4bkfYqrFtyMPNm0P29+KidHTZunMZ5ybmeqvAxIxHxFJEOeJ4LdQan/+HoH2uhevEqCdLof5jw7ZYi1qUSTHwpMSJ84YMT/sjo60buxWZGUphyojEK98SjwopWOaQK6sLVvrL4xrbARh5cnQLp1u4SK6OJy7edGuTMEAZI1YlTxeSD//ODZzTlR3Mk7sXqrfYJxdT2pECgYEA7/84b174WlMK2tfDJ+xQ4EkKupcxTPvYbJoVCPKW1X4HzkaPXiB6HNKI8VxKAMCUujxF1OQODawxHE5ysKGG8xL8w1wso1O8Li2qPazkHArun3zPGv2zJ2LRTTCoHZ9/a2VivjlFeaWiG7Tt7krq6llfCY8dz/FxFCRLBhmZApkCgYEAxnuU8z3G77JG9Khkk4x2jD8EZfxxMLX8pxubNnZIlOfTtenWM8LwFfx6RQ7vARp+8D5Jf6lGRB1Nbd7VbnI2ar1rXJ1uyLyRQdjc+JofEg3nP3ZwgrlfAo46pbNBRES0TsiEh7K4pPUahmq34fHTgJGiEqKeQed1xqaddx1AESsCgYEAhS0cFPkfWYgBWwUl326MRplhob8qdWy/YSxzhb6QIrJIBJg1EGd3O608nqq2ygoTvfCaU5OllMK7kdiaXheUOiiMKKBqiMt7fiiK8qSRBFqwpcHtby3fD3kPagUZFS8f1umwzJwdSG64MSXKblQWXarwSO6o/W4ecK3fD+h+dukCgYEAlniSD2XCL22kRU50ETfnl6MenoKm/Rq6k6VmIf/CPsERy1OfRFaA1Oo3d6s+nkOMAG34IoQd9P2R+b15aOXFQ16eyfPATQZHyPezbfTJoVJRAde0rCYEVVemNoCS9kJvv1pcvtNLECORHF5DUVOX2FyP1jjaaXQj4Znmvqq6K0kCgYAFNWx1uJsvSSHjuyPcLKVjrmt7/CESSzG6HPhb0osikkdwGjv7d7uOfWDDVIol1I/NEm0MUiwl2VidRl3EH+IOu7GXC53WdUqrmXb11CHynxKaOuHqlh3hQMh15BAxpJVia8qYPkzVI5hyB/lxZUt7EU0/6MCmJ1nRubMpryyBvw==",
-			"json",
-			"utf-8",
-			"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlOskvwmzUUrOxMbECsUhxSMlWWY0uTRquWx290gCvtH5oi92mj6JRek2w4YDZszFyElfjOs9KvX3dHsaDXDS3kwV+rg7Drqwz+LA5tCHPZCaaQPt0ljp4vccmAthdeVWmNd9wBd8LB055bUT9kOJdDagamkAQQLHsoNdQXIW2GdgyzglWIyulJIKtbOVZPOVLP74LuNIVdKjK7TEbU1Axp+6nSC7ymi6c0OHq2Cl9aWFfblWdiLElkpkZ/RhwAp4RQo9kXY6vG29hzCSSby9VD62D0iPgUuuX/OlH74/vIdKntORERmKWlj24GUc9nuamqDLKiJi7bB4CXBVn4teLQIDAQAB",
-			"RSA2"
-			);
-	
-	//沙箱测试 下单
-	public static String getOrderStrDev(AliAppPayQO aliAppPayQO) {
-		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-		request.setNotifyUrl("http://xxxxxxxx:8001/alipayCallBack/test");
-		request.setBizContent("{" +
-//		"\"timeout_express\":\"90m\"," +
-		"\"total_amount\":"+"\""+ aliAppPayQO.getTotalAmount()+"\""+","+
-		"\"product_code\":\"QUICK_MSECURITY_PAY\"," +
-//		"\"body\":\"Iphone6 16G\"," +
-		"\"subject\":"+"\""+ aliAppPayQO.getSubject()+"\""+","+
-		"\"out_trade_no\":"+"\""+ aliAppPayQO.getOutTradeNo()+"\""+","+
-				"  }");
-		AlipayTradeAppPayResponse response;
-		try {
-			response = sandBoxCli.sdkExecute(request);
-		} catch (AlipayApiException e) {
-			throw new PaymentException("沙箱支付宝下单异常");
-		}
-		String body = response.getBody();
-		if(response.isSuccess()){
-			System.out.println("调用成功");
-		//return body.substring(body.indexOf('&')+1);
-		return body;
-		} else {
-			System.out.println("调用失败");
-		}
-		return null;
-	}
-
-	//初始化客户端
-	private static final CertAlipayRequest certAlipayRequest = new CertAlipayRequest();
-	static{
-		certAlipayRequest.setServerUrl("https://openapi.alipay.com/gateway.do");  //gateway:支付宝网关（固定）https://openapi.alipay.com/gateway.do
-		certAlipayRequest.setAppId("2016112203111432");  //APPID 即创建应用后生成,详情见创建应用并获取 APPID
-		certAlipayRequest.setPrivateKey("MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCly2k9k/tI2WTnrpkHE8GFMLyuahHpgKtfZ/klRwjTnZJyKiVjRQamhnLWwB7SB3gM+69R9mdlBXruNjXD4ODorUwF/pYyO8zwSn0lbFRHBLI+aRNa82LDdhAAsUQnupsm7IydOjskr6+qkL1u4B5F2JYrHPvzmQxCh07LULnJGmb5Su/WAtJ2Y/lkH0lZPj14oOzrYQSoVEwHpM7F8oAYRcblewpZDilJ8BVQOe3tQqjnc1SSN0aNyDv28yrzwDX0UEARknwdTEXSNppLEd7LCNSSP3fBCrdykm5aAmEXiI3TibsRHVSD2PeDORW9Mgt9VVSynM7DUDP29mHS6k5LAgMBAAECggEAKNk0JcLXD7zYOqju9Spt7LX0Vvi1TxWvo4MHhKK6zwCsu0odChdQqyjHFJgjP9YtQu2j5YrTMLWn8xcSKh+26j0AVR3Dvb60IKQJr3XAUfsbO3tCFI+Qzt3A1ZrXUv6MCYwQnRBi0AglPN4Kfk3jx4u0fAzZGsyjk6SoyjkqfRyJk6w6EhQeeFDsAPsoWEXcKVA474fhLVpFG5rP1soviTHgrpHrx2Cjr5UYFYLEFMyOEhU03GCzVZ2t+fXeDXDuBL0+jub+JEKsu/asaulszggn5JlR5Q1f1+e6A9gJvLrGQm5CwcwiOVF4lo3EhiLzDGKaSq9g+vg3UMr3O4TC4QKBgQDXDTGEA3NmYrRj5JgKvM3MYa/xq85xD9x5Rb6juHIHFTU7rIlZ/iKAcu5OHeplOvgYL3TL1YqiLN4wU2oHzqArbWoLv1eiYiOc6LKi2QffHzCOUcx9jYIQVFOUgblXQbHbTDLLp/Q/eUDwIcS2S7tyjsCl5UQrHVVGAo0nn4bqEQKBgQDFXSjiG1xAZCwRMftvlAyNc0VasgMZczgY7kLELiVB7Y9A8BFoa1bJSkmOVVHGoWFlynndrN/jTKb01IMg11wjO7a7VZ0trQD5+yu3HXl5nZenQKLRYub83q0qrVXGrhVu5AwpxQnA8VvMuB/mUU2caiOhcr5x/K84dEGHFis2mwKBgElWuII64woRs0810BwpU03WKriSTO8F57x76o3PAyQjOWpGZvkH0CBaEacWUK+BMsacuIojIwo3nvaAG/LZpono4HdtI6e/LEIAoZsjxKl064w9nS1cKvUCrRZCP0DgqJUPIWuOtZ9H7Lt36Kv6m8xvnod07pB9im07xYOzxcDhAoGAQLwlxMQkpho1Og6i4h41X9AHV5A75AUeyU6dJ6vbHJzG+A3GJ/HNLYjoR39Eq1oTkEexYTxq0ys5N+TcfdElr4jOjvOt8mVkhJoV5KIOTg2ayIky3msKSLbhJbZlBB3ledHjC3BNmrOP4L4j+G+CfWNy/GmefdTbxDCdralf0zECgYEAyfTJelg/KzoaEQdQ2eost2aRJQ6ZDrOKsiCq/888xGMfRQe7nuOJddf8V/yvHsgZfstlNkgdYPeAo4BFGMzm+2Pb4I2VSPb3uv0hyLL2U7zWANDVlwx7RuLdjkv+/fSMqrQ04tydY+YIusnzrI+1KpjqsFyd+Pbtd+3kxxVf7LA=");  //开发者应用私钥，由开发者自己生成
-		certAlipayRequest.setFormat("json");  //参数返回格式，只支持 json 格式
-		certAlipayRequest.setCharset("utf-8");  //请求和签名使用的字符编码格式，支持 GBK和 UTF-8
-		certAlipayRequest.setSignType("RSA2");  //商户生成签名字符串所使用的签名算法类型，目前支持 RSA2 和 RSA，推荐商家使用 RSA2。   
-		certAlipayRequest.setCertPath("E:/ali_cert/appCertPublicKey_2021002119679359.crt"); //应用公钥证书路径（app_cert_path 文件绝对路径）
-		certAlipayRequest.setAlipayPublicCertPath("E:/ali_cert/alipayCertPublicKey_RSA2.crt"); //支付宝公钥证书文件路径（alipay_cert_path 文件绝对路径）
-		certAlipayRequest.setRootCertPath("E:/ali_cert/alipayRootCert.crt");  //支付宝CA根证书文件路径（alipay_root_cert_path 文件绝对路径）
-//		certAlipayRequest.setCertPath("/mnt/db/smart-community/cert/ali_cert/appCertPublicKey_2021002119679359.crt"); //应用公钥证书路径（app_cert_path 文件绝对路径）
-//		certAlipayRequest.setAlipayPublicCertPath("/mnt/db/smart-community/cert/ali_cert/alipayCertPublicKey_RSA2.crt"); //支付宝公钥证书文件路径（alipay_cert_path 文件绝对路径）
-//		certAlipayRequest.setRootCertPath("/mnt/db/smart-community/cert/ali_cert/alipayRootCert.crt");  //支付宝CA根证书文件路径（alipay_root_cert_path 文件绝对路径）
-	}
-	
-	public static void main(String[] args) throws AlipayApiException {
-		AliAppPayQO aliAppPayVO = new AliAppPayQO();
-		aliAppPayVO.setOutTradeNo(String.valueOf(SnowFlake.nextId()));
-		aliAppPayVO.setTotalAmount(new BigDecimal(100));
-		aliAppPayVO.setSubject("支付租金");
-//		System.out.println(getOrderStrDev(aliAppPayVO));//测试
-//		transferByCert();
-//		queryBalance();
-//		queryPay();
-//		System.out.println(test111());
-	}
+	@Autowired
+	private AlipayUtils alipayUtils;
 	
 	/*查询*/
 	public static void queryPay() throws AlipayApiException{
@@ -138,8 +73,9 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	}
 	
 	/*转账*/
-	public static void transferByCert() throws AlipayApiException{
-		AlipayClient alipayClient = new DefaultAlipayClient(certAlipayRequest);
+	public void transferByCert() throws AlipayApiException{
+//		AlipayClient alipayClient = new DefaultAlipayClient(certAlipayRequest);
+		AlipayClient alipayClient = alipayUtils.getDefaultCertClient();
 		AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
 		request.setBizContent("{" +
 				"\"out_biz_no\":\"202008040001\"," +
@@ -169,14 +105,16 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	@Override
 	public String getOrderStr(AliAppPayQO aliAppPayQO) {
 		AlipayClient alipayClient = null;
-		try {
-			alipayClient = new DefaultAlipayClient(certAlipayRequest);
-		} catch (AlipayApiException e1) {
-			e1.printStackTrace();
-			throw new PaymentException("支付初始化出错");
-		}
+//		try {
+//			alipayClient = new DefaultAlipayClient(certAlipayRequest);
+			alipayClient = alipayUtils.getDefaultCertClient();
+//		} catch (AlipayApiException e1) {
+//			e1.printStackTrace();
+//			throw new PaymentException("支付初始化出错");
+//		}
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-		request.setNotifyUrl("http://xxxxxxxxxxxxx:8001/callBack/pay");
+//		request.setNotifyUrl("http://jsy.free.vipnps.vip/callBack/pay");
+		request.setNotifyUrl("http://222.178.212.29:9951/api/v1/payment/callBack/pay");
 		request.setBizContent("{" +
 //		"\"timeout_express\":\"90m\"," +
 		"\"total_amount\":"+"\""+ aliAppPayQO.getTotalAmount()+"\""+","+
@@ -272,12 +210,13 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	//下单(H5)
 	public String getOrderStrForH5(AliAppPayQO aliAppPayQO) {
 		AlipayClient alipayClient = null;
-		try {
-			alipayClient = new DefaultAlipayClient(certAlipayRequest);
-		} catch (AlipayApiException e1) {
-			e1.printStackTrace();
-			throw new PaymentException("支付初始化出错");
-		}
+//		try {
+//			alipayClient = new DefaultAlipayClient(certAlipayRequest);
+			alipayClient = alipayUtils.getDefaultCertClient();
+//		} catch (AlipayApiException e1) {
+//			e1.printStackTrace();
+//			throw new PaymentException("支付初始化出错");
+//		}
 		AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
 		request.setNotifyUrl("http://xxxxxxxxxxxxx:8001/callBack/pay");
 		request.setBizContent("{" +

@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseReserveEntity;
@@ -54,14 +55,14 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     @Override
     public Boolean add(HouseReserveEntity qo) {
         Integer integer = houseReserveMapper.existHouseLeaseId(qo.getHouseLeaseId());
-        if( integer < 1){
+        if( integer == 0){
             throw new LeaseException("房屋信息不存在!");
         }
         qo.setId(SnowFlake.nextId());
         qo.setReserveStatus(1);
-        int insert = houseReserveMapper.insertReserve(qo);
+        Integer insert = houseReserveMapper.insertReserve(qo);
         //推送
-        if( insert > 0 ){
+        if( !insert.equals(BusinessConst.ZERO) ){
             houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "预约请求", "预约了您的房子");
             return true;
         }
@@ -84,7 +85,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         qo.setReserveStatus(0);
         Integer integer = houseReserveMapper.cancelReserveState(qo);
         //推送
-        if( integer > 0 ){
+        if(!integer.equals(BusinessConst.ZERO)){
             houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "取消预约", "取消了预约");
             return true;
         }
@@ -120,7 +121,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
             //平方米
             r.setHouseSquareMeter(r.getHouseSquareMeter() + "m²");
             //房屋朝向
-            r.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(r.getHouseDirection()));
+            r.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(r.getHouseDirectionId()));
             //2. 第一张图片地址
             r.setHouseImageUrl(houseLeaseMapper.queryHouseImgById(r.getHouseImageId(), r.getHouseLeaseId()));
         });
@@ -147,7 +148,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     @Override
     public Boolean reject(HouseReserveQO qo) {
         Integer integer = houseReserveMapper.rejectReserve(qo);
-        if( integer > 0 ){
+        if( !integer.equals(BusinessConst.ZERO) ){
             houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "拒绝预约", "不方便预约");
             return true;
         }

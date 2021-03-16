@@ -126,7 +126,7 @@ public class UploadAspect {
 			// 如果GenericType是数组类型
 			if (("class [Ljava.lang.String;").equals(declaredField.getGenericType().toString())) {
 				// 拿到该属性的gettet方法
-				Method m = (Method) arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
+				Method m = arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
 				String[] val = (String[]) m.invoke(arg);// 调用getter方法获取属性值
 				if (val != null) {
 					for (String s : val) {
@@ -135,13 +135,13 @@ public class UploadAspect {
 				}
 			} else if (("class java.lang.String").equals(declaredField.getGenericType().toString())) {
 				// 拿到该属性的gettet方法
-				Method m = (Method) arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
+				Method m = arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
 				String val = (String) m.invoke(arg);// 调用getter方法获取属性值
 				if (val != null) {
 					redisTemplate.opsForSet().add(redisKeyName, val);
 				}
 			} else if ("java.util.List<java.lang.String>".equals(declaredField.getGenericType().toString())) {
-				Method m = (Method) arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
+				Method m = arg.getClass().getMethod("get" + getMethodName(declaredField.getName()));
 				List<String> val = (List<String>) m.invoke(arg);// 调用getter方法获取属性值
 				if (val != null) {
 					for (String s : val) {
