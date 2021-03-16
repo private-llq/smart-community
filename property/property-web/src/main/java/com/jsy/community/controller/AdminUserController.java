@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
@@ -8,6 +9,9 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SmsUtil;
 import com.jsy.community.utils.UserUtils;
@@ -40,6 +44,7 @@ import java.util.UUID;
  **/
 @RequestMapping("sys/user")
 @Api(tags = "系统用户控制器")
+@ApiJSYController
 @Slf4j
 @RestController
 public class AdminUserController {
@@ -196,4 +201,17 @@ public class AdminUserController {
 		return CommonResult.error("验证失败");
 	}
 	
+	//==================================== 物业端（新）begin ====================================
+	
+	@PostMapping("query")
+	public CommonResult queryOperator(@RequestBody BaseQO<AdminUserQO> baseQO){
+		if(baseQO.getQuery() == null || baseQO.getQuery().getCommunityId() == null){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少社区ID");
+		}
+		//TODO 一个手机号可以注册多个社区，根据token取UID查询拥有社区ID数组，验证前端传过来的id是否in 社区ID数组
+		return CommonResult.ok(adminUserService.queryOperator(baseQO),"查询成功");
+	}
+	
+	
+	//==================================== 物业端（新）end ====================================
 }

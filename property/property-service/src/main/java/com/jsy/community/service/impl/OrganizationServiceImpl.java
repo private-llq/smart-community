@@ -17,10 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -143,6 +140,19 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		
 		return one;
 	}
+	
+	/**
+	* @Description: 根据idList批量获取对应组织机构名称
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.Long,java.lang.Object>>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/16
+	**/
+	@Override
+	public Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(List<Long> ids){
+		return organizationMapper.queryOrganizationNameByIdBatch(ids);
+	}
+	
 	
 	@Override
 	public void updateOrganization(OrganizationEntity organization) {

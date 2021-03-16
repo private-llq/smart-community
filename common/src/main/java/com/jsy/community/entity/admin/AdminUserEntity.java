@@ -21,9 +21,19 @@ import java.util.UUID;
 public class AdminUserEntity extends BaseEntity {
 	
 	/**
+	 * 社区ID
+	 */
+	private Long communityId;
+	
+	/**
 	 * 用户id
 	 */
 	private String uid;
+	
+	/**
+	 * 编号
+	 */
+	private String number;
 	
 	/**
 	 * 用户名
@@ -55,17 +65,45 @@ public class AdminUserEntity extends BaseEntity {
 	private String mobile;
 	
 	/**
+	 * 身份证号
+	 */
+	private String idCard;
+	
+	/**
 	 * 昵称
 	 */
 	private String nickname;
 	
+	/**
+	 * 真实姓名
+	 */
 	@NotBlank(groups = {inviteUserValidatedGroup.class}, message = "人员姓名不能为空")
 	private String realName;
 	
 	/**
-	 * 状态  0：禁用   1：正常
+	 * 组织机构名称
+	 */
+	private String orgName;
+	
+	/**
+	 * 状态  0：正常   1：禁用
 	 */
 	private Integer status;
+	
+	/**
+	 * 角色类型(第一版直接放进用户表)  1：超级管理员   2：普通用户
+	 */
+	private Integer roleType;
+	
+	/**
+	 * 组织机构id
+	 */
+	private Long orgId;
+	
+	/**
+	 * 职务
+	 */
+	private String job;
 	
 	/**
 	 * 角色ID列表
@@ -80,15 +118,32 @@ public class AdminUserEntity extends BaseEntity {
 	private List<AdminMenuEntity> menuList;
 	
 	/**
-	 * 创建者ID
+	 * 创建者UID (老功能暂时使用，新接口统一用createBy)
 	 */
+	@TableField(exist = false)
 	private String createUserId;
+	
+	/**
+	 * 创建者UID
+	 */
+	private String createBy;
 	
 	/**
 	 * 创建者姓名
 	 */
 	@TableField(exist = false)
 	private String createUserName;
+	
+	/**
+	 * 最近更新者UID
+	 */
+	private String updateBy;
+	
+	/**
+	 * 最近更新者姓名
+	 */
+	@TableField(exist = false)
+	private String updateUserName;
 	
 	/**
 	 * token

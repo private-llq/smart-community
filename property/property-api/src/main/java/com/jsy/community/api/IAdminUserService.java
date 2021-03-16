@@ -2,6 +2,9 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.admin.AdminUserQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -109,4 +112,19 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2020/12/1
 	**/
 	Map<String,String> setUserName(Long uid, String username);
+	
+	
+	//==================================== 物业端（新）begin ====================================
+	
+	/**
+	* @Description: 操作员条件查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo
+	 * @Author: chq459799974
+	 * @Date: 2021/3/16
+	**/
+	PageInfo queryOperator(BaseQO<AdminUserQO> baseQO);
+	
+	
+	//==================================== 物业端（新）end ====================================
 }

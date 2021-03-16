@@ -3,26 +3,35 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserService;
+import com.jsy.community.api.IOrganizationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminUserMapper;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +54,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	private RedisTemplate redisTemplate;
 	
 	@Resource
-	private AdminUserMapper sysUserMapper;
+	private AdminUserMapper adminUserMapper;
+	
+	@Autowired
+	private IOrganizationService organizationService;
 	
 	/**
 	* @Description: 设置用户角色
@@ -56,16 +68,16 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	public boolean setUserRoles(List<Long> roleIds,Long userId){
 		//备份
-		List<Long> userRoles = sysUserMapper.getUserRole(userId);
+		List<Long> userRoles = adminUserMapper.getUserRole(userId);
 		//清空
-		sysUserMapper.clearUserRole(userId);
+		adminUserMapper.clearUserRole(userId);
 		//新增
-		int rows = sysUserMapper.addUserRoleBatch(roleIds, userId);
+		int rows = adminUserMapper.addUserRoleBatch(roleIds, userId);
 		//还原
 		if(rows != roleIds.size()){
 			log.error("设置用户角色出错：" + userId,"成功条数：" + rows);
-			sysUserMapper.clearUserRole(userId);
-			sysUserMapper.addUserRoleBatch(userRoles, userId);
+			adminUserMapper.clearUserRole(userId);
+			adminUserMapper.addUserRoleBatch(userRoles, userId);
 			return false;
 		}
 		return true;
@@ -306,5 +318,51 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		map.put("result","true");
 		return map;
 	}
+	
+	//==================================== 物业端（新）begin ====================================
+	
+	/**
+	* @Description: 操作员条件查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo
+	 * @Author: chq459799974
+	 * @Date: 2021/3/16
+	**/
+	public PageInfo queryOperator(BaseQO<AdminUserQO> baseQO){
+		AdminUserQO query = baseQO.getQuery();
+		Page<AdminUserEntity> page = new Page();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,number,real_name,mobile,id_card,status,role_type,org_id,job,create_by,create_time,update_by,update_time");
+		queryWrapper.eq("community_id",query.getCommunityId());
+		if(!StringUtils.isEmpty(query.getName())){
+			queryWrapper.and(wrapper -> wrapper.like("number",query.getName())
+				.or().like("real_name",query.getName())
+				.or().like("mobile",query.getName())
+				.or().like("id_card",query.getName())
+			);
+		}
+		if(query.getStatus() != null){
+			queryWrapper.eq("status",query.getStatus());
+		}
+		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
+		//设置组织机构名称
+		if(pageData.getRecords().size() > 0){
+			LinkedList<Long> list = new LinkedList<>();
+			for(AdminUserEntity entity : pageData.getRecords()){
+				list.add(entity.getOrgId());
+			}
+			Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(list);
+			for(AdminUserEntity entity : pageData.getRecords()){
+				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+			}
+		}
+		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData,pageInfo);
+		return pageInfo;
+	}
+	
+	
+	
+	//==================================== 物业端（新）end ====================================
 	
 }

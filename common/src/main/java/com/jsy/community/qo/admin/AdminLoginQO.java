@@ -1,5 +1,6 @@
 package com.jsy.community.qo.admin;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -7,8 +8,14 @@ import lombok.Data;
  */
 @Data
 public class AdminLoginQO {
+	
+	@ApiModelProperty(value = "用户名")
 	private String username;
+	
+	@ApiModelProperty(value = "密码")
 	private String password;
+	
+	@ApiModelProperty(value = "验证码")
 	private String captcha;
 	
 	

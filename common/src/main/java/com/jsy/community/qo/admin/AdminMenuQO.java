@@ -1,5 +1,6 @@
 package com.jsy.community.qo.admin;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,10 +12,22 @@ import java.io.Serializable;
  **/
 @Data
 public class AdminMenuQO implements Serializable {
-	private Long id;//ID
-	private String icon;//菜单图标
-	private String name;//菜单名
-	private String url;//菜单url
-	private Integer sort;//排序
-	private Long pid;//父级id
+	
+	@ApiModelProperty(value = "ID")
+	private Long id;
+	
+	@ApiModelProperty(value = "菜单图标")
+	private String icon;
+	
+	@ApiModelProperty(value = "菜单名")
+	private String name;
+	
+	@ApiModelProperty(value = "菜单url")
+	private String url;
+	
+	@ApiModelProperty(value = "排序")
+	private Integer sort;
+	
+	@ApiModelProperty(value = "父级id")
+	private Long pid;
 }
