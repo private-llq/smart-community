@@ -20,6 +20,7 @@ import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseVo;
+import com.jsy.community.vo.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -560,6 +561,13 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	@Override
 	public List<UserEntity> getCommunityNameAndUserInfo(long communityId) {
 		return houseMapper.getCommunityNameAndUserInfo(communityId);
+	}
+
+
+
+	@Override
+	public List<ProprietorVO> getCommunityHouseById(Long communityId) {
+		return houseMapper.getCommunityHouseById(communityId);
 	}
 
 }

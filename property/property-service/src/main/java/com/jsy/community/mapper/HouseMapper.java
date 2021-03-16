@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.vo.ProprietorVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -58,6 +59,13 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 */
     List<UserEntity> getCommunityNameAndUserInfo(long communityId);
 
+
+	/**
+	 * 通过社区id 获得 社区内未被登记的房屋
+	 * @param communityId 		社区id
+	 * @return					返回 该社区未被登记的房屋编号 + house_id
+	 */
+	List<ProprietorVO> getCommunityHouseById(Long communityId);
 
 
 	/**
@@ -151,6 +159,7 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 		"union all\n" +
 		"select 'houseLease' as item,count(0) as count from t_house_lease where house_id = #{id}")
 	List<Map<String,Object>> verifyRelevance(Long id);
-	
+
+
 	//============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 }

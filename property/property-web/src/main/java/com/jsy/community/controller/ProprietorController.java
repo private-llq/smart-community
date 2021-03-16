@@ -1,14 +1,11 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.Desensitization;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -58,7 +55,7 @@ public class ProprietorController {
     private IHouseService iHouseService;
 
     /**
-     * TODO: 根据物业端下载模板需求更改
+     * [2021.3.16] 根据物业端需求改造完成
      * 下载录入业主信息excel、模板
      * @return          返回Excel模板
      */
@@ -66,20 +63,12 @@ public class ProprietorController {
     @GetMapping(params = {"downloadExcel"})
     @ApiOperation("下载业主信息录入Excel")
     public ResponseEntity<byte[]> downloadExcel(@RequestParam long communityId) {
-        //1.设置响应格式  设置响应头
-        //1.1 查出数据库当前communityId对应的小区名和住户数量   返回结果如：name = 花园小区 communityUserNum = 54   如果根本没有这个小区，那就提前结束业务
-        Map<String,Object> res = iHouseService.getCommunityNameAndUserAmountById(communityId);
-        if(res == null){
-            throw new JSYException(JSYError.BAD_REQUEST);
-        }
-        //1.2 设置响应头
-        MultiValueMap<String, String> multiValueMap = setHeader(res.get("name") + "业主导入模板.xlsx");
+        //1. 设置响应头
+        MultiValueMap<String, String> multiValueMap = setHeader("业主导入模板.xlsx");
         //2.生成Excel模板
         try {
-            //2.1 查出数据库当前社区的所有房屋编号 用于excel模板录入业主信息选择
-            List<HouseEntity> communityArchitecture = iHouseService.getCommunityHouseNumber(communityId);
             //2.2 生成Excel 业主信息录入模板
-            Workbook workbook = ProprietorExcelCommander.exportProprietorInfo(communityArchitecture, res);
+            Workbook workbook = ProprietorExcelCommander.exportProprietorInfo();
             return new ResponseEntity<>(readWorkbook(workbook) , multiValueMap, HttpStatus.OK );
         } catch (IOException e) {
             //已接受。已经接受请求，但未处理完成
@@ -87,6 +76,37 @@ public class ProprietorController {
             return new ResponseEntity<>(null , multiValueMap, HttpStatus.ACCEPTED );
         }
     }
+
+
+    /**
+     * 【业主登记excel 导入】 登记
+     * @param proprietorExcel   用户上传的excel
+     * @param communityId       社区id
+     * @return                  返回效验或登记结果
+     */
+    @PostMapping(params = {"importProprietorExcel"})
+    @ApiOperation("导入业主信息excel")
+    public CommonResult<?> importProprietorExcel(MultipartFile proprietorExcel, Long communityId){
+        //参数验证
+        validFileSuffix(proprietorExcel, communityId);
+        //查询当前社区 未被登记的所有 房屋编号 + house_id
+        List<ProprietorVO> houseList = iHouseService.getCommunityHouseById(communityId);
+        //解析、常规格式效验Excel数据
+        List<UserEntity> userEntityList = ProprietorExcelCommander.importProprietorExcel(proprietorExcel, houseList);
+        notNull(userEntityList);
+        //做数据库写入 userEntityList 读出来的数据
+        iProprietorService.saveUserBatch(userEntityList, communityId);
+        return CommonResult.ok("导入成功!请检查");
+    }
+
+    private void notNull(List<UserEntity> list){
+        if( list == null || list.isEmpty() ){
+            throw new JSYException("没有数据可以导入!");
+        }
+    }
+
+
+
 
     /**
      * TODO: 根据物业端下载模板需求更改
@@ -165,32 +185,7 @@ public class ProprietorController {
         return multiValueMap;
     }
 
-    /**
-     * 【业主登记excel 导入】 登记
-     * @param proprietorExcel   用户上传的excel
-     * @param communityId       社区id
-     * @return                  返回效验或登记结果
-     */
-    @PostMapping(params = {"importProprietorExcel"})
-    @ApiOperation("导入业主信息excel")
-    public CommonResult<?> importProprietorExcel(MultipartFile proprietorExcel, Long communityId){
-        //参数验证
-        validFileSuffix(proprietorExcel, communityId);
-        //解析Excel  这里强转Object得保证 importProprietorExcel 实现类返回的类型是UserEntity
-        List<UserEntity> userEntityList = ProprietorExcelCommander.importProprietorExcel(proprietorExcel,new HashMap<>(1));
 
-        notNull(userEntityList);
-
-        //做数据库写入 userEntityList 读出来的数据
-        iProprietorService.saveUserBatch(userEntityList, communityId);
-        return CommonResult.ok("导入成功!请检查");
-    }
-
-    private void notNull(List<UserEntity> list){
-        if( list == null || list.isEmpty() ){
-            throw new JSYException("没有数据可以导入!");
-        }
-    }
 
 
     /**

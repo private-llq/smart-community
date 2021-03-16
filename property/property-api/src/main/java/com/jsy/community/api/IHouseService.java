@@ -6,6 +6,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.ProprietorVO;
 
 import java.util.List;
 import java.util.Map;
@@ -103,4 +104,12 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @return						返回社区名称和 当前社区所有住户名称，住户uid
 	 */
     List<UserEntity> getCommunityNameAndUserInfo(long communityId);
+
+
+	/**
+	 * 通过社区id 获得 社区内未被登记的房屋
+	 * @param communityId 		社区id
+	 * @return					返回 该社区未被登记的房屋编号 + house_id
+	 */
+	List<ProprietorVO> getCommunityHouseById(Long communityId);
 }

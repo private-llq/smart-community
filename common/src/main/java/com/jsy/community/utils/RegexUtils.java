@@ -101,6 +101,27 @@ public class RegexUtils {
 		return Pattern.matches(REGEX_REAL_NAME, nickName);
 	}
 
+
+	/**
+	 * 校验微信账号
+	 *
+	 * @param weChat 微信帐号
+	 * @return 校验通过返回true，否则返回false
+	 */
+	public static boolean isWeChat(String weChat) {
+		return Pattern.matches(REGEX_WE_CHAT, weChat);
+	}
+
+	/**
+	 * 校验QQ账号
+	 *
+	 * @param qq 		qq帐号
+	 * @return 校验通过返回true，否则返回false
+	 */
+	public static boolean isQQ(String qq) {
+		return Pattern.matches(REGEX_QQ, qq);
+	}
+
 	/**
 	 * 校验用户名
 	 *

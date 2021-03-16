@@ -91,6 +91,19 @@
 		</set>
 	</update>
 
+	<!-- 通过社区id 获得 社区内未被登记的房屋 -->
+	<select id="getCommunityHouseById" resultType="com.jsy.community.vo.ProprietorVO">
+		SELECT
+			h.id,
+			h.number AS houseNumber
+		FROM
+			t_house AS h
+		WHERE
+			( SELECT count( 1 ) AS num FROM t_proprietor AS p WHERE p.deleted = 0 AND h.id = p.house_id ) = 0
+			AND h.deleted = 0
+			AND h.community_id = #{communityId}
+	</select>
+
 	<!-- 更新修改 -->
 	<update id="updateHouse">
 		update t_house h

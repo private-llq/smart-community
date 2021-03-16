@@ -132,9 +132,6 @@ public class CommonExcelHelper {
         return multiValueMap;
     }
 
-    public static void main(String[] args) {
-        System.out.println(new String("订单内容".getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
-    }
     /**
      * 读取工作簿 返回字节数组
      * @param workbook      excel工作簿

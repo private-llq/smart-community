@@ -24,6 +24,9 @@ public class ProprietorVO extends BaseVO {
 	@ApiModelProperty("房屋ID")
 	private Long houseId;
 
+	@ApiModelProperty("房屋编号")
+	private String houseNumber;
+
 	@ApiModelProperty("昵称")
 	private String nickname;
 
@@ -95,5 +98,8 @@ public class ProprietorVO extends BaseVO {
 
 	@ApiModelProperty("房屋合并后的字符串")
 	private String houseMergeName;
+
+	@ApiModelProperty("错误信息备注,方便标记excel导入错误信息的回显")
+	private String remark;
 
 }

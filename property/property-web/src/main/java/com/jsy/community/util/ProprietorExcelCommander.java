@@ -1,12 +1,12 @@
 package com.jsy.community.util;
 
 import com.jsy.community.constant.ConstError;
-import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
 import com.jsy.community.util.excel.impl.ProprietorMemberProvider;
+import com.jsy.community.vo.ProprietorVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -23,9 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * excel中转站
  * @author YuLF
  * @since 2020-11-26 15:54
- * 业主 excel 下载 导入 指定使用具体某个子类的方法  扩展类  业主相关的 调用方法改动只用改动这里，这里是控制器类和excel具体实现类的中枢
+ * 业主 excel 下载 导入 指定使用具体某个子类的方法  ，这里是控制器类和excel具体实现类的中枢
  * 业主 excel 指挥者[提供零件]  负责提供 excel 所需要的各个组件方法  和具体组装好的成品对象
  */
 @Slf4j
@@ -34,8 +35,17 @@ public class ProprietorExcelCommander {
     /**
      * 业主信息录入表.xlsx 字段 如果增加字段  需要改变实现类逻辑
      */
-    public static final String[] PROPRIETOR_TITLE_FIELD = {"姓名", "性别", "楼栋", "单元", "楼层", "门牌", "身份证", "联系方式", "详细地址"};
+    public static final String[] PROPRIETOR_TITLE_FIELD = {"姓名", "身份证号", "联系电话", "房屋编号", "微信", "QQ", "电子邮箱","备注"};
 
+    /**
+     * 业主Sheet名称
+     */
+    public static final String PROPRIETOR_SHEET_NAME = "通讯录";
+
+    /**
+     * 业主excel标题名称
+     */
+    public static final String PROPRIETOR_TITLE_NAME = "业主信息";
 
     /**
      * 业主家属信息录入表.xlsx 字段 如果增加字段  需要改变实现类逻辑
@@ -61,11 +71,10 @@ public class ProprietorExcelCommander {
      * 这里如果需要改变使用另一种下载excel模板的方式， 新建类实现JSYExcelAbstract 的exportProprietorExcel方法 然后在这里替换new ProprietorExcelProvider()
      * @return 返回生成好的excel工作簿 好让控制器直接转换为数据流响应给客户端 下载
      * @author YuLF
-     * @Param list    生成模板 需要用到的数据库数据List，用于excel模板给单元格增加约束，限制单元格只能选择数据库的数据，如录入单元时，让excel录入者只能选择当前社区在数据库已有的单元
      * @since 2020/11/26 16:00
      */
-    public static Workbook exportProprietorInfo(List<HouseEntity> list, Map<String, Object> res) {
-        return new ProprietorInfoProvider().exportProprietorExcel(list, res);
+    public static Workbook exportProprietorInfo() {
+        return new ProprietorInfoProvider().exportProprietorExcel();
     }
 
     /**
@@ -76,8 +85,8 @@ public class ProprietorExcelCommander {
      * @Param proprietorExcel      excel文件
      * @since 2020/11/26 16:55
      */
-    public static List<UserEntity> importProprietorExcel(MultipartFile proprietorExcel, Map<String, Object> map) {
-        return new ProprietorInfoProvider().importProprietorExcel(proprietorExcel, map);
+    public static List<UserEntity> importProprietorExcel(MultipartFile proprietorExcel, List<ProprietorVO> vos) {
+        return new ProprietorInfoProvider().importProprietorExcel(proprietorExcel, vos);
     }
 
     /**
@@ -129,6 +138,8 @@ public class ProprietorExcelCommander {
         XSSFCellStyle workBookCellStyle = (XSSFCellStyle) workbook.createCellStyle();
         //创建单元格字体
         Font workBookFont = workbook.createFont();
+        //设置粗体
+        workBookFont.setBold(true);
         //设置表头字体样式
         workBookFont.setFontHeightInPoints((short) fontSize);
         workBookFont.setFontName(font);
@@ -137,7 +148,7 @@ public class ProprietorExcelCommander {
         workBookCellStyle.setAlignment(HorizontalAlignment.CENTER);
         cell.setCellStyle(workBookCellStyle);
         //合并单元格
-        CellRangeAddress region = new CellRangeAddress(0, 0, 0, mergeCellLength);
+        CellRangeAddress region = new CellRangeAddress(0, 0, 0, mergeCellLength - 1);
         sheet.addMergedRegion(region);
     }
 
@@ -150,10 +161,22 @@ public class ProprietorExcelCommander {
     public static void createExcelField(Workbook workbook, XSSFSheet sheet, String[] fieldData){
         //创建 工作表 字段标题 第二行
         XSSFRow row2 = sheet.createRow(1);
-        //获取粗体样式
-        CellStyle cellStyle = provideBold(workbook);
+        //获取字体样式
+        XSSFCellStyle cellStyle = provideBold(workbook);
+        //水平居中
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        //垂直居中
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        //设置边框
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        row2.setHeight((short)380);
         //创建字段标题头
         for (int i = 0; i < fieldData.length; i++) {
+            //设置列宽
+            sheet.setColumnWidth(i, 256 * 17 );
             XSSFCell cell1 = row2.createCell(i);
             cell1.setCellValue(fieldData[i]);
             cell1.setCellStyle(cellStyle);
@@ -186,11 +209,17 @@ public class ProprietorExcelCommander {
      * @param workbook      工作簿
      * @return              返回设置好的样式
      */
-    public static CellStyle provideBold(Workbook workbook){
-        CellStyle fieldCellStyle = workbook.createCellStyle();
+    public static XSSFCellStyle provideBold(Workbook workbook){
+        XSSFCellStyle fieldCellStyle = (XSSFCellStyle) workbook.createCellStyle();
         //设置粗体
         Font fieldFont = workbook.createFont();
         fieldFont.setBold(true);
+        //设置字体大小
+        fieldFont.setFontHeightInPoints((short)14);
+        //设置字体样式
+        fieldFont.setFontName("宋体");
+        //设置字体高度
+        fieldFont.setFontHeight((short)200);
         fieldCellStyle.setFont(fieldFont);
         return fieldCellStyle;
     }
@@ -296,7 +325,7 @@ public class ProprietorExcelCommander {
     }
 
     /**
-     * 【验证数据行第一列不为空】主要是用来判断用户 第一个单元格是否有值  如果有值 则读取这一行，没有值就不读取这行了，因为在设置门牌单元格格式时 这一行就已经不为空了
+     * 【验证数据行第一列不为空】主要是用来判断用户 第一个单元格是否有值  如果有值 则读取这一行，没有值就不读取这行了，
      * @param dataRow       当前行
      * @return              返回当前行第一列的值是否为空
      */
