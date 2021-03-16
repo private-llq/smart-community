@@ -31,8 +31,8 @@ import java.util.Map;
  */
 @Api(tags = "部门员工控制器")
 @RestController
-@RequestMapping("/staff")
 @ApiJSYController
+@RequestMapping("/staff")
 public class DepartmentStaffController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
