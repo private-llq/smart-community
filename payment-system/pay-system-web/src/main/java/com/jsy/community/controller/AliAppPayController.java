@@ -9,6 +9,7 @@ import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.lease.AliAppPayQO;
+import com.jsy.community.utils.OrderNoUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Api(tags = "支付宝支付控制器")
 @RestController
@@ -50,7 +53,8 @@ public class AliAppPayController {
 		//TODO 系统类型暂时写死
 		sysType = "1";
 		aliAppPayQO.setTotalAmount(aliAppPayQO.getTotalAmount().abs());
-		String orderNo = String.valueOf(SnowFlake.nextId());
+//		String orderNo = String.valueOf(SnowFlake.nextId());
+		String orderNo = OrderNoUtil.getOrder();
 		aliAppPayQO.setOutTradeNo(orderNo);
 		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.TRADE_FROM_RENT.getName());
 		//TODO 测试金额 0.01
@@ -77,6 +81,11 @@ public class AliAppPayController {
 			ailiAppPayRecordEntity.setSysType(Integer.valueOf(sysType));
 			createResult = ailiAppPayRecordService.createAliAppPayRecord(ailiAppPayRecordEntity);
 		}
-		return createResult ? CommonResult.ok(orderStr, "下单成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"下单失败");
+		Map<String, String> returnMap = new HashMap<>(2);
+		if(createResult){
+			returnMap.put("orderStr",orderStr);
+			returnMap.put("orderNum",orderNo);
+		}
+		return createResult ? CommonResult.ok(returnMap, "下单成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"下单失败");
 	}
 }

@@ -153,6 +153,19 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		return organizationMapper.queryOrganizationNameByIdBatch(ids);
 	}
 	
+	/**
+	* @Description: 社区组织机构是否存在
+	 * @Param: [orgId, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/17
+	**/
+	@Override
+	public boolean isExists(Long orgId, Long communityId){
+		Integer count = organizationMapper.selectCount(new QueryWrapper<OrganizationEntity>().eq("id", orgId).eq("community_id", communityId));
+		return count > 0;
+	}
+	
 	
 	@Override
 	public void updateOrganization(OrganizationEntity organization) {

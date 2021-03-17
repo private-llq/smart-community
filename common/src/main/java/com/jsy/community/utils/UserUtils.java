@@ -108,7 +108,7 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/3
 	**/
-	public static String createUserToken(){
+	public static String randomUUID(){
 		return UUID.randomUUID().toString().replace("-", "");
 	}
 	
@@ -120,7 +120,7 @@ public class UserUtils {
 	 * @Date: 2020/12/4
 	**/
 	public String setRedisToken(String typeName,Object o){
-		String userToken = createUserToken();
+		String userToken = randomUUID();
 		redisTemplate.opsForValue().set(typeName + ":" + userToken,o);
 		return userToken;
 	}
@@ -133,7 +133,7 @@ public class UserUtils {
 	 * @Date: 2020/12/4
 	**/
 	public String setRedisTokenWithTime(String typeName,Object o,long time,TimeUnit timeUnit){
-		String userToken = createUserToken();
+		String userToken = randomUUID();
 		redisTemplate.opsForValue().set(typeName + ":" + userToken,o,time,timeUnit);
 		return userToken;
 	}

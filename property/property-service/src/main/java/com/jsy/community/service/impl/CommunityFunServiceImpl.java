@@ -12,7 +12,7 @@ import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.mapper.CommunityFunMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
-import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticSearchImportProvider;
 import com.jsy.community.utils.es.Operation;

@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -23,6 +26,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 社区ID
 	 */
+	@NotNull(groups = addOperatorValidatedGroup.class, message = "缺少社区ID")
 	private Long communityId;
 	
 	/**
@@ -33,18 +37,20 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 编号
 	 */
+	@NotBlank(groups = addOperatorValidatedGroup.class, message = "缺少编号")
+	@Length(groups = addOperatorValidatedGroup.class, max = 20, message = "编号长度超限")
 	private String number;
 	
 	/**
 	 * 用户名
 	 */
-	@NotBlank(message = "用户名不能为空")
+	@NotBlank(groups = loginValidatedGroup.class, message = "用户名不能为空")
 	private String username;
 	
 	/**
 	 * 密码
 	 */
-	@NotBlank(message = "密码不能为空")
+	@NotBlank(groups = loginValidatedGroup.class, message = "密码不能为空")
 	private String password;
 	
 	/**
@@ -62,11 +68,13 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 手机号
 	 */
+	@NotBlank(groups = addOperatorValidatedGroup.class, message = "缺少电话号码")
 	private String mobile;
 	
 	/**
 	 * 身份证号
 	 */
+	@NotBlank(groups = addOperatorValidatedGroup.class, message = "身份证号")
 	private String idCard;
 	
 	/**
@@ -77,7 +85,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 真实姓名
 	 */
-	@NotBlank(groups = {inviteUserValidatedGroup.class}, message = "人员姓名不能为空")
+	@NotBlank(groups = {inviteUserValidatedGroup.class,addOperatorValidatedGroup.class}, message = "人员姓名不能为空")
 	private String realName;
 	
 	/**
@@ -98,11 +106,13 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 组织机构id
 	 */
+	@NotNull(groups = addOperatorValidatedGroup.class, message = "缺少组织机构")
 	private Long orgId;
 	
 	/**
 	 * 职务
 	 */
+	@NotBlank(groups = addOperatorValidatedGroup.class, message = "缺少职务")
 	private String job;
 	
 	/**
@@ -154,5 +164,15 @@ public class AdminUserEntity extends BaseEntity {
 	 * 注册邀请传参验证
 	 */
 	public interface inviteUserValidatedGroup{}
+	
+	/**
+	 * 添加操作员传参验证
+	 */
+	public interface addOperatorValidatedGroup{}
+	
+	/**
+	 * 登录传参验证
+	 */
+	public interface loginValidatedGroup{}
 	
 }

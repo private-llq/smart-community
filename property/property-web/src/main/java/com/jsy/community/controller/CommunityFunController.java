@@ -7,7 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
-import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;

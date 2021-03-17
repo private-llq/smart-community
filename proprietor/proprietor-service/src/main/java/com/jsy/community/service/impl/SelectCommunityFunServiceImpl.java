@@ -8,11 +8,13 @@ import com.jsy.community.api.ISelectCommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.mapper.SelectCommunityFunMapper;
-import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.qo.proprietor.SelectCommunityFunQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -32,7 +34,7 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
      * @return:
      */
     @Override
-    public Map<String,Object> findList(CommunityFunQO communityFunQO) {
+    public Map<String,Object> findList(SelectCommunityFunQO communityFunQO) {
         Map<String,Object> map = new HashMap<>();
         if (communityFunQO.getSize()==0||communityFunQO.getSize()==null){
             communityFunQO.setSize(10L);

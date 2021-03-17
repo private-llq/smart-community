@@ -82,7 +82,7 @@ public class UserAuthController {
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "account", value = "账号，手机号或者邮箱地址", required = true, paramType = "query"),
 		@ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
-			allowableValues = "1,2,3,4", paramType = "query")
+			allowableValues = "1,2,3,4,5", paramType = "query")
 	})
 	public CommonResult<Boolean> sendCode(@RequestParam String account,
 	                                      @RequestParam Integer type) {

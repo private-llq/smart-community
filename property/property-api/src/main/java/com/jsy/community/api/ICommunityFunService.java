@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
-import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.qo.property.CommunityFunQO;
 
 import java.util.Map;
 

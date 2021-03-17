@@ -1,7 +1,9 @@
 package com.jsy.community.utils;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
@@ -11,6 +13,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import org.apache.http.client.methods.HttpGet;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SmsUtil {
     //TODO 后期重载几个方法 templateName不用传
-    public static Map<String,String> sendSms(String phonenumber,String templateName) {
+    public static Map<String,String> sendSmsCode(String phonenumber,String templateName) {
         //TODO templateName模板名待申请
         //TODO signName签名待申请(如有需要)
         String regionId = "";
@@ -60,7 +63,35 @@ public class SmsUtil {
         return resMap;
     }
     
-    private static void main(String[] args) {
-    	//sendSms("15178763584",BusinessConst.SMS_LOGIN);
+    //发送初始密码
+    public static boolean sendSmsPassword(String phonenumber,String password) {
+        String url = "http://smsbanling.market.alicloudapi.com/smsapis";
+        String appCode = "abfc59f0cdbc4c038a2e804f9e9e37de";
+//        String msg = "账号：" + phonenumber +"，登录密码：" + password + "。您的物业管理后台账号已创建，请妥善保管账号资料，可登录系统设置新密码。";
+	    String msg = "账号：" + phonenumber +"，登录密码" + password + "。您的物业管理后台账号已创建，请妥善保管账号资料，可登录系统设置新密码。";
+        Map<String, String> headers = new HashMap<>(1);
+        headers.put("Authorization", "APPCODE " + appCode);
+        Map<String, String> queryParam = new HashMap<>(2);
+        queryParam.put("mobile",phonenumber);
+        queryParam.put("msg",msg);
+        queryParam.put("sign","智慧社区");
+    
+        //发送短信
+        HttpGet httpGet = MyHttpUtils.httpGet(url,queryParam);
+        MyHttpUtils.setHeader(httpGet,headers);
+        String result = (String) MyHttpUtils.exec(httpGet,1);
+        //验证结果
+        if ( Objects.isNull(result) ){
+            return false;
+        }
+        Integer resultCode = JSON.parseObject(result).getInteger("result");
+        if( resultCode != 0 ){
+            return false;
+        }
+        return true;
+    }
+    
+    public static void main(String[] args) {
+        sendSmsPassword("15178763584","abc123456");
 	}
 }

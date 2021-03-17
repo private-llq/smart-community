@@ -169,7 +169,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public String register(RegisterQO qo) {
         commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 
-        String uuid = UserUtils.createUserToken();
+        String uuid = UserUtils.randomUUID();
 
         // 组装user表数据
         UserEntity user = new UserEntity();
@@ -211,7 +211,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //创建imID(t_user_im表)
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setUid(uuid);
-        userIMEntity.setImId(UserUtils.createUserToken());
+        userIMEntity.setImId(UserUtils.randomUUID());
         userIMMapper.insert(userIMEntity);
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
