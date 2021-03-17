@@ -37,7 +37,7 @@ public class FacilityTypeController {
 	@ApiOperation("添加设备分类")
 	@PostMapping("/addFacilityType")
 	public CommonResult addFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
-		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.addFacilityValidate.class);
+		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.addFacilityTypeValidate.class);
 		facilityTypeService.addFacilityType(facilityTypeEntity);
 		return CommonResult.ok();
 	}
@@ -46,7 +46,7 @@ public class FacilityTypeController {
 	@ApiOperation("修改设备分类")
 	@PostMapping("/updateFacilityType")
 	public CommonResult updateFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
-		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.updateFacilityValidate.class);
+		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.updateFacilityTypeValidate.class);
 		facilityTypeService.updateFacilityType(facilityTypeEntity);
 		return CommonResult.ok();
 	}

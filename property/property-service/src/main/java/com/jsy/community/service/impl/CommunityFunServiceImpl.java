@@ -53,6 +53,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         if (!"".equals(communityFunQO.getTallys())&&communityFunQO.getTallys()!=null){
             wrapper.like("tallys",communityFunQO.getTallys());
         }
+
         if (!"".equals(communityFunQO.getCreatrTimeStart())&&communityFunQO.getCreatrTimeStart()!=null){
             wrapper.ge("create_time",communityFunQO.getCreatrTimeStart());
         }
