@@ -125,6 +125,15 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	**/
 	PageInfo queryOperator(BaseQO<AdminUserQO> baseQO);
 	
+	/**
+	* @Description: 添加操作员
+	 * @Param: [adminUserEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/17
+	**/
+	boolean addOperator(AdminUserEntity adminUserEntity);
+	
 	
 	//==================================== 物业端（新）end ====================================
 }

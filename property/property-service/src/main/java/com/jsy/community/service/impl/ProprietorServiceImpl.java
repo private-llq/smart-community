@@ -146,7 +146,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         //2 为所有用户注册
         //2.1 设置uid 及 id
         userEntityList.forEach(w -> {
-            w.setUid(UserUtils.createUserToken());
+            w.setUid(UserUtils.randomUUID());
             w.setId(SnowFlake.nextId());
             //由物业导入 所有人都是业主 因为家属在另一个导入表里面  householder_id 在数据库表示：业主ID 0.未认证 1.业主 其他.隶属业主ID
             w.setHouseholderId(1L);

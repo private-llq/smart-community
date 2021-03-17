@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IOrganizationService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
@@ -15,10 +16,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
-import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -130,7 +128,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		user.setPassword(new Sha256Hash(user.getPassword(), salt).toHex());
 		user.setSalt(salt);
 		user.setId(SnowFlake.nextId());
-		user.setUid(UserUtils.createUserToken());
+		user.setUid(UserUtils.randomUUID());
 		this.save(user);
 		
 		//检查角色是否越权
@@ -344,6 +342,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		if(query.getStatus() != null){
 			queryWrapper.eq("status",query.getStatus());
 		}
+		queryWrapper.orderByAsc("role_type","status");
+		queryWrapper.orderByDesc("create_time");
 		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
 		//设置组织机构名称
 		if(pageData.getRecords().size() > 0){
@@ -361,7 +361,35 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		return pageInfo;
 	}
 	
-	
+	/**
+	* @Description: 添加操作员
+	 * @Param: [adminUserEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/17
+	**/
+	@Transactional(rollbackFor = Exception.class)
+	public boolean addOperator(AdminUserEntity adminUserEntity){
+		//查询组织机构是否存在
+		if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
+		}
+		adminUserEntity.setId(SnowFlake.nextId());
+		adminUserEntity.setUid(UserUtils.randomUUID());
+		//生成随机密码
+		String randomPass = RandomStringUtils.randomAlphanumeric(8);
+		//生成盐值并对密码加密
+		String salt = RandomStringUtils.randomAlphanumeric(20);
+		adminUserEntity.setPassword(new Sha256Hash(randomPass, salt).toHex());
+		adminUserEntity.setSalt(salt);
+		int result = adminUserMapper.addOperator(adminUserEntity);
+		//发短信通知，并发送初始密码
+		boolean b = SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
+//		if(!b){
+//			throw new PropertyException(JSYError.INTERNAL.getCode(),"短信通知失败，用户添加失败");
+//		}
+		return result == 1;
+	}
 	
 	//==================================== 物业端（新）end ====================================
 	

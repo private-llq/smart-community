@@ -63,6 +63,15 @@ public interface IOrganizationService extends IService<OrganizationEntity> {
 	Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(List<Long> ids);
 	
 	/**
+	* @Description: 社区组织机构是否存在
+	 * @Param: [orgId, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/17
+	**/
+	boolean isExists(Long orgId, Long communityId);
+	
+	/**
 	 * @return void
 	 * @Author lihao
 	 * @Description 修改组织机构
