@@ -6,7 +6,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.vo.ProprietorVO;
+import com.jsy.community.vo.property.ProprietorVO;
 
 import java.util.List;
 import java.util.Map;

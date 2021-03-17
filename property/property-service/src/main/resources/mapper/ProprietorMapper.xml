@@ -2,6 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.ProprietorMapper">
 
+    <!-- excel批量导入业主信息 存在则忽略 -->
+    <insert id="saveUserBatch" parameterType="java.util.List">
+        insert ignore into t_proprietor (
+        id,community_id,real_name,house_id,mobile,id_card,identification_type,wechat,qq,email,create_time,create_by
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},#{item.communityId},#{item.realName},#{item.houseId},#{item.mobile},#{item.idCard},#{item.identificationType},#{item.wechat},#{item.qq},#{item.email},#{item.createTime},#{item.createBy}
+            )
+        </foreach>
+    </insert>
+
     <!-- 物业添加新增业主 -->
     <insert id="saveUser">
         insert into t_user ( id,real_name,uid,wechat,qq,email,mobile,id_card,identification_type )
@@ -9,7 +22,7 @@
         ( #{id},#{realName},#{uid},#{wechat},#{qq},#{email},#{mobile},#{idCard},#{identificationType})
     </insert>
     <!-- 物业查询业主用户信息 -->
-    <select id="query" resultType="com.jsy.community.vo.ProprietorVO" >
+    <select id="query" resultType="com.jsy.community.vo.property.ProprietorVO" >
         SELECT
 	        p.id,
 	        p.real_name,

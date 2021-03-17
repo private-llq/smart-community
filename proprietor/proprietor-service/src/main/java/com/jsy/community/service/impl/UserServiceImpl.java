@@ -428,9 +428,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             if( CollectionUtil.isEmpty(differenceList) ){
                 //操作用户所在房屋
                 //id==null || id == 0 就是需要新增的 验证房屋信息是否有需要新增的数据
-                boolean hasAddHouse = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
-                if( hasAddHouse ){
-                    List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                if( CollectionUtil.isNotEmpty(any) ){
                     houseList.removeAll(any);
                     //批量新增房屋信息
                     userHouseService.addHouseBatch(any, qo.getUid());

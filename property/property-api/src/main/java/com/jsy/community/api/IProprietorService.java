@@ -6,7 +6,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.vo.HouseVo;
-import com.jsy.community.vo.ProprietorVO;
+import com.jsy.community.vo.property.ProprietorVO;
 
 import java.util.List;
 
@@ -46,8 +46,9 @@ public interface IProprietorService extends IService<ProprietorEntity> {
      * 录入业主信息业主房屋绑定信息至数据库
      * @param userEntityList    用户信息
      * @param communityId       社区id
+     * @return                  返回影响行数
      */
-    void saveUserBatch(List<UserEntity> userEntityList, Long communityId);
+    Integer saveUserBatch(List<ProprietorEntity> userEntityList, Long communityId);
 
     /**
      * 通过当前社区id查出的当前社区所有已登记的房屋
@@ -76,4 +77,12 @@ public interface IProprietorService extends IService<ProprietorEntity> {
      * @param adminUid      物业操作用户uid
      */
     void addUser(ProprietorQO qo, String adminUid);
+
+
+    /**
+     * 通过管理员uid 获取管理员真实名称
+     * @param adminUid      管理员uid
+     * @return               真实名称
+     */
+    String getAdminRealName(String adminUid);
 }

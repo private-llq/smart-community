@@ -98,10 +98,6 @@ public class UserEntity extends BaseEntity {
 	private String email;
 
 
-	@ApiModelProperty("房屋编号,用于excel导入")
-	@TableField( exist = false)
-	private String number;
-
 	@ApiModelProperty("车辆信息")
 	@TableField( exist = false )
 	private CarEntity carEntity;

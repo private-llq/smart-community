@@ -9,7 +9,6 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PropertyEnum;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
@@ -19,8 +18,7 @@ import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.HouseVo;
-import com.jsy.community.vo.ProprietorVO;
+import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 /**

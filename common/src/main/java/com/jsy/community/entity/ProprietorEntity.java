@@ -1,22 +1,12 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.jsy.community.qo.proprietor.CarQO;
-import com.jsy.community.qo.proprietor.UserHouseQo;
-import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * 业主实体接口 - 业主信息实体
@@ -62,8 +52,20 @@ public class ProprietorEntity extends BaseEntity{
     private String idCard;
 
 
+    @ApiModelProperty("创建人")
+    private String createBy;
+
+
+    @ApiModelProperty("更新人")
+    private String updateBy;
+
+
     @ApiModelProperty("证件类型：1.身份证 2.护照")
     private Integer identificationType = 1;
 
+
+    @ApiModelProperty("房屋编号,用于excel导入")
+    @TableField( exist = false)
+    private String houseNumber;
 
 }

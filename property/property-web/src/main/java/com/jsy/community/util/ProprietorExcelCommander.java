@@ -1,12 +1,13 @@
 package com.jsy.community.util;
 
 import com.jsy.community.constant.ConstError;
+import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
 import com.jsy.community.util.excel.impl.ProprietorMemberProvider;
-import com.jsy.community.vo.ProprietorVO;
+import com.jsy.community.vo.property.ProprietorVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -17,10 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * excel中转站
@@ -31,6 +29,21 @@ import java.util.Map;
  */
 @Slf4j
 public class ProprietorExcelCommander {
+
+    /**
+     * PROPRIETOR_TITLE_FIELD 其他的列宽
+     */
+    private static final int PROPRIETOR_OTHER_WIDTH = 256 * 19;
+
+    /**
+     * PROPRIETOR_TITLE_FIELD 回显 excel 错误信息 备注列 宽度
+     */
+    private static final int PROPRIETOR_REMARK_WIDTH = 256 * 80;
+
+    /**
+     * 错误信息Excel 在 Minio 中存在的bucket名称
+     */
+    public static final String BUCKET_NAME = "proprietor-excel";
 
     /**
      * 业主信息录入表.xlsx 字段 如果增加字段  需要改变实现类逻辑
@@ -74,7 +87,13 @@ public class ProprietorExcelCommander {
      * @since 2020/11/26 16:00
      */
     public static Workbook exportProprietorInfo() {
-        return new ProprietorInfoProvider().exportProprietorExcel();
+        String[] fields = Arrays.copyOf(ProprietorExcelCommander.PROPRIETOR_TITLE_FIELD, ProprietorExcelCommander.PROPRIETOR_TITLE_FIELD.length - 1);
+        return new ProprietorInfoProvider().exportProprietorExcel( fields );
+    }
+
+
+    public static Workbook exportProprietorDefaultInfo(){
+        return new ProprietorInfoProvider().exportProprietorExcel( PROPRIETOR_TITLE_FIELD );
     }
 
     /**
@@ -83,10 +102,11 @@ public class ProprietorExcelCommander {
      * @return 返回解析好的数据
      * @author YuLF
      * @Param proprietorExcel      excel文件
+     * @Param errorVos             解析错误信息集合
      * @since 2020/11/26 16:55
      */
-    public static List<UserEntity> importProprietorExcel(MultipartFile proprietorExcel, List<ProprietorVO> vos) {
-        return new ProprietorInfoProvider().importProprietorExcel(proprietorExcel, vos);
+    public static List<ProprietorEntity> importProprietorExcel(MultipartFile proprietorExcel, List<ProprietorVO> errorVos) {
+        return new ProprietorInfoProvider().importProprietorExcel(proprietorExcel, errorVos);
     }
 
     /**
@@ -175,8 +195,12 @@ public class ProprietorExcelCommander {
         row2.setHeight((short)380);
         //创建字段标题头
         for (int i = 0; i < fieldData.length; i++) {
-            //设置列宽
-            sheet.setColumnWidth(i, 256 * 17 );
+            //设置列宽 普通列
+            sheet.setColumnWidth(i, PROPRIETOR_OTHER_WIDTH );
+            //如果匹配到 备注 这个字段列 最后一列 备注字段列 宽度调宽
+            if( i == ProprietorExcelCommander.PROPRIETOR_TITLE_FIELD.length - 1 ){
+                sheet.setColumnWidth(i, PROPRIETOR_REMARK_WIDTH );
+            }
             XSSFCell cell1 = row2.createCell(i);
             cell1.setCellValue(fieldData[i]);
             cell1.setCellStyle(cellStyle);
@@ -224,6 +248,18 @@ public class ProprietorExcelCommander {
         return fieldCellStyle;
     }
 
+
+    /**
+     * 【提供红色背景样式】
+     * @param workbook  工作薄
+     * @return          返回样式对象
+     */
+    public static XSSFCellStyle provideBackground(Workbook workbook){
+        XSSFCellStyle fieldCellStyle = (XSSFCellStyle) workbook.createCellStyle();
+        fieldCellStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
+        fieldCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        return fieldCellStyle;
+    }
 
     /**
      * 【设置获取列单元格验证提示框】设置 单元格的输入限制，只能从特定的数据选择
@@ -295,11 +331,11 @@ public class ProprietorExcelCommander {
         //坑1：名称管理器的名称不能设置为中文 否则引用不到
         categoryName.setNameName("thisHiddenName" + constraintColIndex);
         //使用当前字段头下标 获取excel头部的英语字符 用来组成以下的引用隐藏表的公式   ColumnEnglishChar 最后的值为 26个英语字母的其中一个
-        char ColumnEnglishChar = (char) ((int) 'A' + constraintColIndex);
+        char columnEnglishChar = (char) ((int) 'A' + constraintColIndex);
         //设置引用公式
         int constraintBeginRow = createCellStartRow + 1;
         //经过变量替代后  例子: hiddenSheet!$A$12:$A$54    表示引用约束  hiddenSheet表的 A12行 到 A54行   数据长度-1  数组是从0开始
-        String constraintFormula = "hiddenSheet!$" + ColumnEnglishChar +"$"+ constraintBeginRow + ":$" + ColumnEnglishChar +"$"+ (constraintBeginRow + createCellEndRow - 1);
+        String constraintFormula = "hiddenSheet!$" + columnEnglishChar +"$"+ constraintBeginRow + ":$" + columnEnglishChar +"$"+ (constraintBeginRow + createCellEndRow - 1);
         categoryName.setRefersToFormula(constraintFormula);
     }
 
@@ -319,7 +355,7 @@ public class ProprietorExcelCommander {
             Cell cell = row.getCell(i);
             //如果标题 字段 列为空 或者 标题列字段 和 titleField 里面对应的下标 列内容不匹配 则抛出异常
             if (cell == null || !row.getCell(i).getStringCellValue().equals(field[i])) {
-                throw new JSYException(ConstError.NORMAL, "字段匹配错误：预期第" + i + "列字段是" + field[i] + "，但发现的是：" + row.getCell(i).getStringCellValue());
+                throw new JSYException(ConstError.NORMAL, "字段匹配错误：预期第" + (i + 1) + "列字段是" + field[i] + "，但发现的是：" + row.getCell(i).getStringCellValue());
             }
         }
     }
@@ -349,34 +385,38 @@ public class ProprietorExcelCommander {
      */
     public static Object getCellValForType(Cell cell)
     {
-        Object CellValue = StringUtils.EMPTY;
+        Object cellValue = StringUtils.EMPTY;
         if(cell != null){
             CellType cellType = cell.getCellType();
             switch (cellType){
-                case NUMERIC: //数字
+                //数字
+                case NUMERIC:
                     //如果是日期类型
                     if (DateUtil.isCellDateFormatted(cell)){
-                        CellValue =   cell.getDateCellValue();
+                        cellValue =   cell.getDateCellValue();
                     }else{
                         //避免poi读入手机号 自动变为 科学计数
                         NumberFormat f=new DecimalFormat("############");
                         f.setMaximumFractionDigits(0);
-                        CellValue= f.format(cell.getNumericCellValue());
+                        cellValue= f.format(cell.getNumericCellValue());
                     }
                     break;
-                case STRING: //字符串
-                    CellValue =   cell.getStringCellValue();
+                //字符串
+                case STRING:
+                    cellValue =   cell.getStringCellValue();
                     break;
-                case BOOLEAN: //Boolean
-                    CellValue =  cell.getBooleanCellValue();
+                //Boolean
+                case BOOLEAN:
+                    cellValue =  cell.getBooleanCellValue();
                     break;
-                case ERROR: //故障
+                //故障
+                case ERROR:
                     break;
                 default:
                     break;
             }
         }
-        return CellValue;
+        return cellValue;
     }
 
     /**

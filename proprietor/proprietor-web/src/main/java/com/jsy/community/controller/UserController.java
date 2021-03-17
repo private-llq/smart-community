@@ -141,6 +141,7 @@ public class UserController {
 
     /**
      * 【用户】业主更新信息
+     * PutMapping("update")
      *  用户操作更新  新方法至 -> updateImprover
      * @author YuLF
      * @Param userEntity        需要更新 实体参数
@@ -150,7 +151,6 @@ public class UserController {
     @Login
     @Deprecated
 	@ApiOperation("业主信息更新")
-    @PutMapping("update")
     public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO qo) {
 		//3.更新业主房屋信息和车辆信息
         qo.setUid(UserUtils.getUserId());
