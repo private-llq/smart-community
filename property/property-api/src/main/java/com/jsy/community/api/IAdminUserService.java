@@ -134,6 +134,8 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	**/
 	boolean addOperator(AdminUserEntity adminUserEntity);
 	
+	boolean updateOperator(AdminUserEntity adminUserEntity);
+	
 	
 	//==================================== 物业端（新）end ====================================
 }

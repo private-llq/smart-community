@@ -74,6 +74,22 @@ public class AdminUserController {
 //		boolean b = adminUserService.setUserRoles(adminUserRoleEntity.getRoleIds(), adminUserRoleEntity.getUserId());
 //		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"设置用户角色失败");
 //	}
+
+//	/**
+//	 * @Description: 禁用账户
+//	 * @Param: [uid]
+//	 * @Return: com.jsy.community.vo.CommonResult
+//	 * @Author: chq459799974
+//	 * @Date: 2020/12/1
+//	 **/
+//	@PutMapping("disable")
+//	public CommonResult disableUser(@RequestParam Long uid){
+//		AdminUserEntity adminUserEntity = new AdminUserEntity();
+//		adminUserEntity.setId(uid);
+//		adminUserEntity.setStatus(1);
+//		boolean b = adminUserService.updateUser(adminUserEntity);
+//		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"禁用失败");
+//	}
 	
 //	/**
 //	* @Description: 邮件注册邀请
@@ -218,21 +234,18 @@ public class AdminUserController {
 		return adminUserService.addOperator(adminUserEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
 	}
 	
-	
 	/**
-	 * @Description: 禁用账户
-	 * @Param: [uid]
+	* @Description: 编辑操作员
+	 * @Param: [adminUserEntity]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
-	 * @Date: 2020/12/1
-	 **/
-	@PutMapping("disable")
-	public CommonResult disableUser(@RequestParam Long uid){
-		AdminUserEntity adminUserEntity = new AdminUserEntity();
-		adminUserEntity.setId(uid);
-		adminUserEntity.setStatus(1);
-		boolean b = adminUserService.updateUser(adminUserEntity);
-		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"禁用失败");
+	 * @Date: 2021/3/17
+	**/
+	@PutMapping("")
+	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
+		//TODO 获取操作员UID验证操作权限(1.是否是超级管理员 2.是否有操作员管理权限)
+		boolean b = adminUserService.updateOperator(adminUserEntity);
+		return b ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
 	//==================================== 物业端（新）end ====================================

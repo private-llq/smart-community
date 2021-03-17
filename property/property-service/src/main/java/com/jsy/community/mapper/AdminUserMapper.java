@@ -68,6 +68,9 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 */
 	AdminUserEntity queryByMobile(String mobile);
 	
+	@Select("select * from t_admin_user where uid = #{uid}")
+	AdminUserEntity queryByUid(String uid);
+	
 	/**
 	* @Description: 添加操作员
 	 * @Param: [entity]
@@ -75,8 +78,17 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	@Insert("insert into t_admin_user(id,uid,community_id,number,password,salt,real_name,mobile,id_card,job,org_id,create_time,role_type) " +
-		"values(#{entity.id},#{entity.uid},#{entity.communityId},#{entity.number},#{entity.password},#{entity.salt},#{entity.realName},#{entity.mobile},#{entity.idCard},#{entity.job},#{entity.orgId},now(),2)")
+	@Insert("insert into t_admin_user(id,uid,community_id,number,password,salt,real_name,status,mobile,id_card,job,org_id,create_time,role_type) " +
+		"values(#{entity.id},#{entity.uid},#{entity.communityId},#{entity.number},#{entity.password},#{entity.salt},#{entity.realName},#{entity.status},#{entity.mobile},#{entity.idCard},#{entity.job},#{entity.orgId},now(),2)")
 	int addOperator(@Param("entity") AdminUserEntity entity);
+	
+	/**
+	* @Description: 编辑操作员
+	 * @Param: [entity]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/17
+	**/
+	int updateOperator(@Param("entity") AdminUserEntity entity);
 	
 }

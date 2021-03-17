@@ -45,4 +45,20 @@
 		from t_admin_user
 		where mobile = #{mobile}
 	</select>
+
+	<!-- 编辑操作员 -->
+	<update id="updateOperator">
+		update t_admin_user u
+		<set>
+			<if test="entity.number != null and entity.number != ''">,u.number = #{entity.number}</if>
+			<if test="entity.realName != null and entity.realName != ''">,u.real_name = #{entity.realName}</if>
+			<if test="entity.mobile != null and entity.mobile != ''">,u.mobile = #{entity.mobile}</if>
+			<if test="entity.idCard != null and entity.idCard != ''">,u.id_card = #{entity.idCard}</if>
+			<if test="entity.job != null and entity.job != ''">,u.job = #{entity.job}</if>
+			<if test="entity.orgId != null and entity.orgId != 0">,u.org_id = #{entity.orgId}</if>
+			<if test="entity.status != null and (entity.status == 0 or entity.status == 1)">,u.status = #{entity.status}</if>
+			,update_time = now()
+		</set>
+		where id = #{entity.id} and community_id = #{entity.communityId}
+	</update>
 </mapper>

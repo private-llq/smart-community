@@ -326,6 +326,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2021/3/16
 	**/
+	@Override
 	public PageInfo queryOperator(BaseQO<AdminUserQO> baseQO){
 		AdminUserQO query = baseQO.getQuery();
 		Page<AdminUserEntity> page = new Page();
@@ -368,10 +369,15 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
+	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean addOperator(AdminUserEntity adminUserEntity){
+		//TODO 查询当前操作人社区ID
+		Long communityId = 2L;
+//		adminUserEntity.setCommunityId(1);
+		adminUserEntity.setCommunityId(communityId);
 		//查询组织机构是否存在
-		if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
+		if(!organizationService.isExists(adminUserEntity.getOrgId(),communityId)){
 			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
 		}
 		adminUserEntity.setId(SnowFlake.nextId());
@@ -389,6 +395,27 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 //			throw new PropertyException(JSYError.INTERNAL.getCode(),"短信通知失败，用户添加失败");
 //		}
 		return result == 1;
+	}
+	
+	/**
+	* @Description: 编辑操作员
+	 * @Param: [adminUserEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/17
+	**/
+	@Override
+	public boolean updateOperator(AdminUserEntity adminUserEntity){
+		//TODO 根据超级管理员id和社区id
+		adminUserEntity.setUpdateBy("在的发生地方");
+		adminUserEntity.setCommunityId(2L);
+		if(adminUserEntity.getOrgId() != null){
+			//查询组织机构是否存在
+			if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
+				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
+			}
+		}
+		return adminUserMapper.updateOperator(adminUserEntity) == 1;
 	}
 	
 	//==================================== 物业端（新）end ====================================
