@@ -234,7 +234,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * 调用三方接口获取会员信息(走后端备用)(返回三方平台唯一id)
      */
-    private String getUserInfoFromThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
+    private String  getUserInfoFromThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
         String thirdUid = null;
         switch (userThirdPlatformQO.getThirdPlatformType()){
             case Const.ThirdPlatformConsts.ALIPAY :
@@ -270,19 +270,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Date: 2021/1/12
      **/
     @Override
-    public UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
+    public Map<String,Object> thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
+        Map<String, Object> returnMap = new HashMap<>();
         //获取三方uid
         String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
         userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
                 .eq("third_platform_id", userThirdPlatformQO.getThirdPlatformId())
                 .eq("third_platform_type",userThirdPlatformQO.getThirdPlatformType()));
-        if(entity != null){
-            //返回token
-            UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
-            return createAuthVoWithToken(userInfoVo);
+        if(entity == null) { //首次授权
+            UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
+            userThirdPlatformEntity.setThirdPlatformType(userThirdPlatformQO.getThirdPlatformType());
+            userThirdPlatformEntity.setThirdPlatformId(thirdPlatformUid);
+            userThirdPlatformEntity.setId(SnowFlake.nextId());
+            userThirdPlatformMapper.insert(userThirdPlatformEntity);
+            returnMap.put("exists",false);
+            returnMap.put("data",userThirdPlatformEntity.getId());
+            return returnMap;
+        }else{
+            if(!StringUtils.isEmpty(entity.getUid())){
+                //登录成功
+                UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+                userInfoVo.setIdCard(null);
+                UserAuthVo userAuthVo = createAuthVoWithToken(userInfoVo);
+                returnMap.put("exists",true);
+                returnMap.put("data",userAuthVo);
+            }else{
+                //继续返回id
+                returnMap.put("exists",false);
+                returnMap.put("data",entity.getId());
+            }
+            return returnMap;
         }
-        throw new ProprietorException(ConstError.NORMAL, "尚未绑定手机");
     }
 
     /**
@@ -295,11 +314,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
-        //获取三方uid
-        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
-        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
         //手机验证码验证 不过报错
         commonService.checkVerifyCode(userThirdPlatformQO.getMobile(), userThirdPlatformQO.getCode());
+        //获取三方uid
+//        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
+//        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("id", userThirdPlatformQO.getId()));
+        if(entity == null){
+            throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"数据不存在，请重新授权登录");
+        }
+        userThirdPlatformQO.setThirdPlatformId(entity.getThirdPlatformId());
         //查询是否注册
         String uid = userAuthService.queryUserIdByMobile(userThirdPlatformQO.getMobile());
         //若没有注册 立即注册
