@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IComplainService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ComplainEntity;
+import com.jsy.community.qo.proprietor.PropertyComplainQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
@@ -54,10 +55,19 @@ public class ComplainController {
     public CommonResult addComplain(@RequestBody ComplainEntity complainEntity){
         String userId = UserUtils.getUserId();
         complainEntity.setUid(userId);
-        complainEntity.setStatus(1);
+        complainEntity.setStatus(0);
         complainEntity.setId(SnowFlake.nextId());
         complainEntity.setComplainTime(LocalDateTime.now());
         complainService.addComplain(complainEntity);
+        return CommonResult.ok();
+    }
+    @Login
+    @ApiOperation("物业投诉接口")
+    @PostMapping("/propertyComplain")
+    public CommonResult propertyComplain(@RequestBody PropertyComplainQO propertyComplainQO){
+        String userId = UserUtils.getUserId();
+        propertyComplainQO.setUid(userId);
+        complainService.propertyComplain(propertyComplainQO);
         return CommonResult.ok();
     }
     /**

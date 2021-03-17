@@ -133,14 +133,16 @@ public class RelationServiceImpl implements IRelationService {
         relationVO.setHouseId(houseMemberEntity.getHouseId());
         List<RelationCarsVO> objects = new ArrayList<>();
         //封装车辆信息
-        for (CarEntity carEntity : carEntities) {
-            RelationCarsVO relationCarsVO = new RelationCarsVO();
-            relationCarsVO.setId(carEntity.getId());
-            relationCarsVO.setCarType(carEntity.getCarType());
-            relationCarsVO.setDrivingLicenseUrl(carEntity.getDrivingLicenseUrl());
-            relationCarsVO.setCarPlate(carEntity.getCarPlate());
-            relationCarsVO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carEntity.getCarType()));
-            objects.add(relationCarsVO);
+        if (objects!=null){
+            for (CarEntity carEntity : carEntities) {
+                RelationCarsVO relationCarsVO = new RelationCarsVO();
+                relationCarsVO.setId(carEntity.getId());
+                relationCarsVO.setCarType(carEntity.getCarType());
+                relationCarsVO.setDrivingLicenseUrl(carEntity.getDrivingLicenseUrl());
+                relationCarsVO.setCarPlate(carEntity.getCarPlate());
+                relationCarsVO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carEntity.getCarType()));
+                objects.add(relationCarsVO);
+            }
         }
         relationVO.setCars(objects);
         return relationVO;

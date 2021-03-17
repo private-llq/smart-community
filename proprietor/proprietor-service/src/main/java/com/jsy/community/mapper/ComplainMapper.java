@@ -10,4 +10,5 @@ import com.jsy.community.entity.ComplainEntity;
  * @create: 2020-12-23 11:15
  **/
 public interface ComplainMapper extends BaseMapper<ComplainEntity> {
+
 }

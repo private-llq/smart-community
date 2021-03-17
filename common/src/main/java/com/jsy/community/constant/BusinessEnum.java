@@ -804,4 +804,75 @@ public interface BusinessEnum {
 		}
 	}
 
+	/**
+	 * @Description: 投诉类型枚举
+	 * @author: Hu
+	 * @since: 2021/3/17 14:22
+	 * @Param:
+	 * @return:
+	 */
+	enum ComplainTypeEnum {
+		QUALITY("质量投诉", 1),
+		MAINTAIN("维修投诉", 2),
+		DISTURBING("扰民投诉", 3),
+		SAFETY("安全投诉", 4),
+		PARK("停车管理投诉", 5),
+		ENVIRONMENT("环境投诉", 6),
+		EQUIPMENT("设备设施", 7),
+		SERVE("服务投诉", 8),
+		COST("费用投诉", 9),
+		OTHER("其他投诉", 10);
+		private String name;
+		private Integer code;
+
+		ComplainTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		public static List toList() {
+			ComplainTypeEnum[] values = ComplainTypeEnum.values();
+			List<Map<String, Object>> list = new ArrayList();
+			Map map=null;
+			for (ComplainTypeEnum value : values) {
+				map=new HashMap();
+				map.put("type", value.code);
+				map.put("typeName", value.name);
+				list.add(map);
+			}
+			return list;
+		}
+
+		public static final List<Map<String, Object>> Complain_TYPE_LIST = new ArrayList<>();
+		public static final Map<Integer, String> Complain_TYPE_MAP = new HashMap<>();
+		public static final int Complain_TYPE_MAX = 10;
+		public static final int Complain_TYPE_MIN = 1;
+
+		public static String getCode(Integer code) {
+			ComplainTypeEnum[] values = ComplainTypeEnum.values();
+			for (ComplainTypeEnum c : values) {
+				if (c.code.equals(code)) {
+					return c.name;
+				}
+			}
+			return OTHER.name;
+		}
+	}
+
 }
