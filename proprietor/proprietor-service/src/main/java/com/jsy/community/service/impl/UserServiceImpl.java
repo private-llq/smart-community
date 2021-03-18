@@ -316,12 +316,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
+        Long id = Long.valueOf(userThirdPlatformQO.getThirdPlatformId());
         //手机验证码验证 不过报错
         commonService.checkVerifyCode(userThirdPlatformQO.getMobile(), userThirdPlatformQO.getCode());
         //获取三方uid
 //        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
 //        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
-        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("id", userThirdPlatformQO.getThirdPlatformId()));
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("id", id));
         if(entity == null){
             throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"数据不存在，请重新授权登录");
         }
@@ -334,13 +335,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             registerQO.setAccount(userThirdPlatformQO.getMobile());
             registerQO.setCode(userThirdPlatformQO.getCode());
             uid = register(registerQO);
+            //三方登录表入库
+            UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
+            BeanUtils.copyProperties(userThirdPlatformQO,userThirdPlatformEntity);
+            userThirdPlatformEntity.setId(SnowFlake.nextId());
+            userThirdPlatformEntity.setUid(uid);//把uid设置进三方登录表关联上
+            userThirdPlatformMapper.insert(userThirdPlatformEntity);
+        }else{
+            //更新uid
+            UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
+            userThirdPlatformEntity.setUid(uid);
+            userThirdPlatformMapper.update(userThirdPlatformEntity,new UpdateWrapper<UserThirdPlatformEntity>().eq("id",id));
         }
-        //三方登录表入库
-        UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
-        BeanUtils.copyProperties(userThirdPlatformQO,userThirdPlatformEntity);
-        userThirdPlatformEntity.setId(SnowFlake.nextId());
-        userThirdPlatformEntity.setUid(uid);//把uid设置进三方登录表关联上
-        userThirdPlatformMapper.insert(userThirdPlatformEntity);
 
         UserInfoVo userInfoVo = new UserInfoVo();
         userInfoVo.setUid(uid);
