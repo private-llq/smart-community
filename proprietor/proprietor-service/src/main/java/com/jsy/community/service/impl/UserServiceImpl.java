@@ -270,8 +270,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Date: 2021/1/12
      **/
     @Override
-    public Map<String,Object> thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
-        Map<String, Object> returnMap = new HashMap<>();
+    public UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
+//        Map<String, Object> returnMap = new HashMap<>();
         //获取三方uid
         String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
         userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
@@ -284,23 +284,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userThirdPlatformEntity.setThirdPlatformId(thirdPlatformUid);
             userThirdPlatformEntity.setId(SnowFlake.nextId());
             userThirdPlatformMapper.insert(userThirdPlatformEntity);
-            returnMap.put("exists",false);
-            returnMap.put("data",userThirdPlatformEntity.getId());
-            return returnMap;
+//            returnMap.put("exists",false);
+//            returnMap.put("data",userThirdPlatformEntity.getId());
+            return createBindMobile(userThirdPlatformEntity.getId());
         }else{
             if(!StringUtils.isEmpty(entity.getUid())){
                 //登录成功
                 UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
                 userInfoVo.setIdCard(null);
                 UserAuthVo userAuthVo = createAuthVoWithToken(userInfoVo);
-                returnMap.put("exists",true);
-                returnMap.put("data",userAuthVo);
+//                returnMap.put("exists",true);
+//                returnMap.put("data",userAuthVo);
+                return userAuthVo;
             }else{
-                //继续返回id
-                returnMap.put("exists",false);
-                returnMap.put("data",entity.getId());
+                  //非首次授权，但未绑定手机
+//                //继续返回id
+//                returnMap.put("exists",false);
+//                returnMap.put("data",entity.getId());
+                return createBindMobile(entity.getId());
             }
-            return returnMap;
+//            return returnMap;
         }
     }
 
@@ -344,8 +347,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setUid(uid);
         return createAuthVoWithToken(userInfoVo);
     }
-
-
+    
+    public UserAuthVo createBindMobile(Long id){
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setExpiredTime(null);
+        UserInfoVo vo = new UserInfoVo();
+        vo.setWeChatId(id);
+        vo.setIsBindMobile(0);
+        userAuthVo.setUserInfo(vo);
+//        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
+        userAuthVo.setToken(null);
+        return userAuthVo;
+    }
 
 
 

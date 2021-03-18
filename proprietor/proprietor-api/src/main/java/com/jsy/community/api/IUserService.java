@@ -55,7 +55,7 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/12
 	**/
-	Map<String,Object> thirdPlatformLogin(UserThirdPlatformQO qo);
+	UserAuthVo thirdPlatformLogin(UserThirdPlatformQO qo);
 	
 	/**
 	* @Description: 三方绑定手机
