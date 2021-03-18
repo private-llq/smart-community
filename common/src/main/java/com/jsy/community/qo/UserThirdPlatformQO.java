@@ -14,8 +14,6 @@ import java.io.Serializable;
  **/
 @Data
 public class UserThirdPlatformQO implements Serializable {
-	@ApiModelProperty(value = "数据id")
-	private Long id;
 	
 	@ApiModelProperty(value = "三方平台唯一id", hidden = true)
 	private String thirdPlatformId;
