@@ -347,9 +347,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userThirdPlatformEntity.setUid(uid);
             userThirdPlatformMapper.update(userThirdPlatformEntity,new UpdateWrapper<UserThirdPlatformEntity>().eq("id",id));
         }
-
-        UserInfoVo userInfoVo = new UserInfoVo();
-        userInfoVo.setUid(uid);
+//        UserInfoVo userInfoVo = new UserInfoVo();
+//        userInfoVo.setUid(uid);
+        //登录成功
+        UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+        userInfoVo.setIdCard(null);
         return createAuthVoWithToken(userInfoVo);
     }
     
