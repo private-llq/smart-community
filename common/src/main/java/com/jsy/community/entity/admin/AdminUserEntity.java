@@ -96,6 +96,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 状态  0：正常   1：禁用
 	 */
+	@Range(groups = addOperatorValidatedGroup.class, min = 1, max = 2, message = "操作员停/启用状态不正确")
 	private Integer status;
 	
 	/**

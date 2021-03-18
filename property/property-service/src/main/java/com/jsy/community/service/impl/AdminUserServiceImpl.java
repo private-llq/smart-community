@@ -373,7 +373,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean addOperator(AdminUserEntity adminUserEntity){
-		//TODO 查询当前操作人社区ID
 		Long communityId = 2L;
 //		adminUserEntity.setCommunityId(1);
 		adminUserEntity.setCommunityId(communityId);
@@ -383,6 +382,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		}
 		adminUserEntity.setId(SnowFlake.nextId());
 		adminUserEntity.setUid(UserUtils.randomUUID());
+		adminUserEntity.setStatus(adminUserEntity.getStatus() != null ? adminUserEntity.getStatus() : 0);
 		//生成随机密码
 		String randomPass = RandomStringUtils.randomAlphanumeric(8);
 		//生成盐值并对密码加密
@@ -407,8 +407,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public boolean updateOperator(AdminUserEntity adminUserEntity){
-		//TODO 根据超级管理员id和社区id
-		adminUserEntity.setUpdateBy("在的发生地方");
+		adminUserEntity.setUpdateBy("1a7a182d711e441fbb24659090daf5cb");
 		adminUserEntity.setCommunityId(2L);
 		if(adminUserEntity.getOrgId() != null){
 			//查询组织机构是否存在
@@ -429,7 +428,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean resetPassword(Long id,String uid){
-		//TODO 验证操作员ID，并获取操作员的社区id
 		Long communityId = 2L;
 		//生成随机密码
 		String randomPass = RandomStringUtils.randomAlphanumeric(8);
