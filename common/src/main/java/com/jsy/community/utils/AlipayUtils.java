@@ -4,7 +4,6 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.jsy.community.constant.ConstClasses;
 import org.springframework.stereotype.Component;
@@ -51,13 +50,13 @@ public class AlipayUtils {
 		//设置签名类型
 		certAlipayRequest.setSignType("RSA2");
 		//设置应用公钥证书路径
-		certAlipayRequest.setCertPath("E:/ali_cert/appCertPublicKey_2021002119679359.crt");
+		certAlipayRequest.setCertPath("D:/ali_cert/appCertPublicKey_2021002119679359.crt");
 //		certAlipayRequest.setCertPath(certPath);
 		//设置支付宝公钥证书路径
-		certAlipayRequest.setAlipayPublicCertPath("E:/ali_cert/alipayCertPublicKey_RSA2.crt");
+		certAlipayRequest.setAlipayPublicCertPath("D:/ali_cert/alipayCertPublicKey_RSA2.crt");
 //		certAlipayRequest.setAlipayPublicCertPath(alipayPublicCertPath);
 		//设置支付宝根证书路径
-		certAlipayRequest.setRootCertPath("E:/ali_cert/alipayRootCert.crt");
+		certAlipayRequest.setRootCertPath("D:/ali_cert/alipayRootCert.crt");
 //		certAlipayRequest.setRootCertPath(rootCertPath);
 	}
 	

@@ -1,7 +1,6 @@
 package com.jsy.community.vo;
 
 import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.HouseMemberEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,7 +18,7 @@ import java.util.List;
 @ApiModel("业主个人信息")
 public class UserInfoVo implements Serializable {
 	@ApiModelProperty("ID")
-	private Long weChatId;
+	private Long thirdPlatformId;
 
 	@ApiModelProperty("是否绑定手机1已绑定，0未绑定")
 	private Integer isBindMobile;

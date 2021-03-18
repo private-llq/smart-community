@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
-import com.jsy.community.constant.ConstError;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
@@ -352,7 +351,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setExpiredTime(null);
         UserInfoVo vo = new UserInfoVo();
-        vo.setWeChatId(id);
+        vo.setThirdPlatformId(id);
         vo.setIsBindMobile(0);
         userAuthVo.setUserInfo(vo);
 //        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
