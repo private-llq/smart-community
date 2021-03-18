@@ -134,7 +134,23 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	**/
 	boolean addOperator(AdminUserEntity adminUserEntity);
 	
+	/**
+	* @Description: 编辑操作员
+	 * @Param: [adminUserEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/18
+	**/
 	boolean updateOperator(AdminUserEntity adminUserEntity);
+	
+	/**
+	* @Description: 重置密码
+	 * @Param: [id, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/18
+	**/
+	boolean resetPassword(Long id,String uid);
 	
 	
 	//==================================== 物业端（新）end ====================================

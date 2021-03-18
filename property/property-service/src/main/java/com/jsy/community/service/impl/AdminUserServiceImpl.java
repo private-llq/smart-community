@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserService;
@@ -416,6 +417,37 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			}
 		}
 		return adminUserMapper.updateOperator(adminUserEntity) == 1;
+	}
+	
+	/**
+	* @Description: 重置密码(随机)
+	 * @Param: [id, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/18
+	**/
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean resetPassword(Long id,String uid){
+		//TODO 验证操作员ID，并获取操作员的社区id
+		Long communityId = 2L;
+		//生成随机密码
+		String randomPass = RandomStringUtils.randomAlphanumeric(8);
+		//生成盐值并对密码加密
+		String salt = RandomStringUtils.randomAlphanumeric(20);
+		String password = new Sha256Hash(randomPass, salt).toHex();
+		//更新
+		AdminUserEntity adminUserEntity = new AdminUserEntity();
+		adminUserEntity.setPassword(password);
+		adminUserEntity.setSalt(salt);
+		adminUserEntity.setUpdateBy(uid);
+		int result = adminUserMapper.update(adminUserEntity, new UpdateWrapper<AdminUserEntity>().eq("id", id).eq("community_id",communityId));
+		//发短信通知初始密码
+		boolean b = SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
+//		if(!b){
+//			throw new PropertyException(JSYError.INTERNAL.getCode(),"短信通知失败，用户添加失败");
+//		}
+		return result == 1;
 	}
 	
 	//==================================== 物业端（新）end ====================================

@@ -228,7 +228,7 @@ public class AdminUserController {
 	**/
 	@PostMapping("")
 	public CommonResult addOperator(@RequestBody AdminUserEntity adminUserEntity){
-		//TODO 获取操作员UID验证操作权限(1.是否是超级管理员 2.是否有操作员管理权限)
+		//TODO 获取操作员UID验证操作权限(1.是否是超级管理员 2.是否有操作员管理权限) ， 操作带上社区id
 		//TODO 数据正则验证 手机号 身份证等
 		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.addOperatorValidatedGroup.class);
 		return adminUserService.addOperator(adminUserEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
@@ -243,9 +243,22 @@ public class AdminUserController {
 	**/
 	@PutMapping("")
 	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
-		//TODO 获取操作员UID验证操作权限(1.是否是超级管理员 2.是否有操作员管理权限)
+		//TODO 获取操作员UID验证操作权限(1.是否是超级管理员 2.是否有操作员管理权限) ， 操作带上社区id
 		boolean b = adminUserService.updateOperator(adminUserEntity);
 		return b ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	
+	/** 
+	* @Description: 重置密码(随机)
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/3/18
+	**/
+	@PutMapping("pass/reset")
+	public CommonResult resetPass(@RequestParam Long id){
+		String uid = "1a7a182d711e441fbb24659090daf5cb";
+		return adminUserService.resetPassword(id,uid) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
 	//==================================== 物业端（新）end ====================================
