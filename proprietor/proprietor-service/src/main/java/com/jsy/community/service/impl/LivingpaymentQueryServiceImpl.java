@@ -145,6 +145,13 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
         return livingpaymentQueryMapper.selectPaymentDetailsVO(id,userId);
     }
 
+    /**
+     * @Description: 户号管理
+     * @author: Hu
+     * @since: 2021/3/18 17:27
+     * @Param:
+     * @return:
+     */
     @Override
     public PaymentRecordsMapVO selectGroupAll(String userId) {
         List<PayGroupEntity> list1=livingpaymentQueryMapper.findGroup(userId);

@@ -130,7 +130,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         payOrderEntity.setPayMonth(LocalDateTime.now().getMonthValue());
         payOrderEntity.setOrderTime(LocalDateTime.now());
         payOrderEntity.setGroupId(group_id);
-        payOrderEntity.setPayTypeName(livingPaymentQO.getPayTypeName());
+        payOrderEntity.setPayTypeName(livingPaymentQO.getPayType()==1?"微信付款":livingPaymentQO.getPayType()==2?"支付宝付款":livingPaymentQO.getPayType()==3?"账户余额":livingPaymentQO.getPayTypeName());
         payOrderEntity.setFamilyName(livingPaymentQO.getFamilyName());
         payOrderEntity.setTypeId(livingPaymentQO.getTypeId());
         payOrderEntity.setAddress(livingPaymentQO.getAddress());
