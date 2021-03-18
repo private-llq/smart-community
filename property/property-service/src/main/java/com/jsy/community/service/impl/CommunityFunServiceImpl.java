@@ -66,7 +66,9 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         if (!"".equals(communityFunQO.getIssueTimeOut())&&communityFunQO.getIssueTimeOut()!=null){
             wrapper.le("start_time",communityFunQO.getCreatrTimeStart());
         }
+        Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
+
         List<CommunityFunEntity> list = page.getRecords();
 
         long total = page.getTotal();

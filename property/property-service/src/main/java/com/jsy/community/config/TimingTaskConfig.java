@@ -1,9 +1,9 @@
 package com.jsy.community.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import com.jsy.community.job.DateTimeJob;
+import org.quartz.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @program: com.jsy.community
@@ -11,21 +11,25 @@ import org.springframework.stereotype.Component;
  * @author: Hu
  * @create: 2021-03-18 09:59
  **/
-@Component
-public class TimingTaskConfig {
+@Configuration
+public class TimingTaskConfig{
 
-    @Autowired
-    private RedisTemplate redisTemplate;
-
-    @Scheduled(cron = "0 0 0 * * ? *")
-    public void scheduledTask1(){
-        redisTemplate.opsForValue().set("complain_serial_number","1");
-        System.out.println("重置complain_serial_number了为1");
+    @Bean
+    public JobDetail printTimeJobDetail(){
+        return JobBuilder.newJob(DateTimeJob.class)//PrintTimeJob我们的业务类
+                .withIdentity("DateTimeJob")//可以给该JobDetail起一个id
+                //每个JobDetail内都有一个Map，包含了关联到这个Job的数据，在Job类中可以通过context获取
+                .usingJobData("msg", "Hello Quartz")//关联键值对
+                .storeDurably()//即使没有Trigger关联时，也不需要删除该JobDetail
+                .build();
     }
-
-    @Scheduled(cron = "0 * * * * ? *")
-    public void scheduledTask2(){
-        redisTemplate.opsForValue().set("complain_serial_number","1");
-        System.out.println("分钟：重置complain_serial_number了为1");
+    @Bean
+    public Trigger printTimeJobTrigger() {
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0 0 * * ? *");
+        return TriggerBuilder.newTrigger()
+                .forJob(printTimeJobDetail())//关联上述的JobDetail
+                .withIdentity("quartzTaskService")//给Trigger起个名字
+                .withSchedule(cronScheduleBuilder)
+                .build();
     }
 }
