@@ -350,7 +350,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //        UserInfoVo userInfoVo = new UserInfoVo();
 //        userInfoVo.setUid(uid);
         //登录成功
-        UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+        UserInfoVo userInfoVo = queryUserInfo(uid);
         userInfoVo.setIdCard(null);
         return createAuthVoWithToken(userInfoVo);
     }
