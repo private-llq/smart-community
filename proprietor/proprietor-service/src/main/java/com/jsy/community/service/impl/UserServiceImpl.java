@@ -321,7 +321,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //获取三方uid
 //        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
 //        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
-        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("id", userThirdPlatformQO.getId()));
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("id", userThirdPlatformQO.getThirdPlatformId()));
         if(entity == null){
             throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"数据不存在，请重新授权登录");
         }
