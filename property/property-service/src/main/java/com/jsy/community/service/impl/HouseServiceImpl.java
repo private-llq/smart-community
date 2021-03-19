@@ -439,6 +439,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				Map<String, Long> countMap = bindMap.get(houseEntity.getId());
 				houseEntity.setBindUnitCount(countMap != null ? countMap.get("count") : null);
 			}
+			//若查详情，查出已绑定单元id
+			if(query.getId() != null){
+				CollectionUtils.firstElement(pageData.getRecords()).setUnitIdList(houseMapper.queryBindUnitList(query.getId()));
+			}
 		}
 		//查询类型为房屋，设置房屋类型、房产类型、装修情况、户型
 		if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
