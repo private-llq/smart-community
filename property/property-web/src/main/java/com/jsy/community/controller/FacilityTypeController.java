@@ -51,7 +51,7 @@ public class FacilityTypeController {
 		return CommonResult.ok();
 	}
 	
-	//完成(没处理设备分类下有设备的)
+	//完成(没测)
 	@ApiOperation("删除设备分类")
 	@GetMapping("/deleteFacilityType")
 	public CommonResult deleteFacilityType(@RequestParam Long id,@RequestParam Long communityId) {
@@ -59,7 +59,7 @@ public class FacilityTypeController {
 		return CommonResult.ok();
 	}
 	
-	//完成(关于设备数没有处理)
+	//完成(没测 数量)
 	@ApiOperation("树形结构查询设备分类")
 	@GetMapping("/listFacilityType")
 	public CommonResult<List<FacilityTypeVO>> listFacilityType(@ApiParam("社区id") @RequestParam Long communityId) {
