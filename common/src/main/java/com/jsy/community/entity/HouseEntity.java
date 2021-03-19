@@ -41,7 +41,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private Long communityId;
     
     @ApiModelProperty(value = "是否有电梯 0.无 1.有")
-    private String hasElevator;
+    private Integer hasElevator;
     
     @ApiModelProperty(value = "名称")
     @TableField(exist = false)

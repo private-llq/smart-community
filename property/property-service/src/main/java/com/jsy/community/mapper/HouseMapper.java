@@ -145,6 +145,16 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	Map<Long,Map<String,Long>> queryBindUnitCountBatch(@Param("list")List<Long> ids);
 	
 	/**
+	* @Description: 查询楼栋已绑定单元id列表
+	 * @Param: [id]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/19
+	**/
+	@Select("select id from t_house where pid = #{id} and type = 2")
+	List<Long> queryBindUnitList(Long id);
+	
+	/**
 	* @Description: 验证是否有房屋关联数据
 	 * @Param: [id]
 	 * @Return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>

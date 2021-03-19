@@ -112,7 +112,7 @@
 			<if test="entity.number != null and entity.number != ''">,h.number = #{entity.number}</if>
 			<if test="entity.buildArea != null and entity.buildArea != 0">,h.build_area = #{entity.buildArea}</if>
 			<if test="entity.totalFloor != null and entity.totalFloor != 0">,h.total_floor = #{entity.totalFloor}</if>
-			<if test="entity.hasElevator != null and entity.hasElevator != 0">,h.has_elevator = #{entity.hasElevator}</if>
+			<if test="entity.hasElevator == 0 or entity.hasElevator == 1">,h.has_elevator = #{entity.hasElevator}</if>
 			<if test="entity.building != null and entity.building != ''">,h.building = #{entity.building}</if>
 			<if test="entity.unit != null and entity.unit != ''">,h.unit = #{entity.unit}</if>
 			<if test="entity.door != null and entity.door != ''">,h.door = #{entity.door}</if>
