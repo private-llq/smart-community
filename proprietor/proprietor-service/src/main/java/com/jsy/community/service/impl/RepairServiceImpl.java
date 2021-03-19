@@ -132,7 +132,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 					repairEntity.setStatusString("处理中");
 				}
 				if (repairEntity.getStatus() == 2) {
-					repairEntity.setStatusString("已处理");
+					repairEntity.setStatusString("已完成");
 					// 对已评价的 获取其评价信息，前端通过其判断是否该订单评价过[评价过的不能再次评价]
 					QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
 					queryWrapper.eq("repair_id", repairEntity.getId());
@@ -165,7 +165,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 				repairEntity.setStatusString("处理中");
 			}
 			if (repairEntity.getStatus() == 2) {
-				repairEntity.setStatusString("已处理");
+				repairEntity.setStatusString("已完成");
 				// 对已评价的 获取其评价信息，前端通过其判断是否该订单评价过[评价过的不能再次评价]
 				QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
 				queryWrapper.eq("repair_id", repairEntity.getId());

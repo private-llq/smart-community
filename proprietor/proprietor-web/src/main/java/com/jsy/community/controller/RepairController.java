@@ -159,7 +159,7 @@ public class RepairController {
 	
 	@Login(allowAnonymous = true)
 	@ApiOperation("查看驳回原因")
-	@PostMapping("/getRejectReason")
+	@GetMapping("/getRejectReason")
 	public CommonResult getRejectReason(@RequestParam() Long id) {
 		String reason = repairService.getRejectReason(id);
 		return CommonResult.ok(reason);

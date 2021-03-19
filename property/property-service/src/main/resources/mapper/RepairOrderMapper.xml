@@ -2,4 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.RepairOrderMapper">
 
+    <select id="listRepairOrder" resultType="com.jsy.community.entity.RepairOrderEntity">
+        select * from t_repair_order
+        <where>
+            <if test="qo.query.name!=null and qo.query.name!=''">
+                name like concat ("%",#{qo.query.name},"%")
+            </if>
+            <if test="qo.query.phone!=null and qo.query.phone!=''">
+                and phone like concat ("%",#{qo.query.phone},"%")
+            </if>
+            <if test="qo.query.number!=null and qo.query.number!=''">
+                and number like concat ("%",#{qo.query.number},"%")
+            </if>
+            <if test="qo.query.problem!=null and qo.query.problem!=''">
+                and problem like concat ("%",#{qo.query.problem},"%")
+            </if>
+            <if test="qo.query.status!=null">
+                and status = #{qo.query.status}
+            </if>
+            <if test="qo.query.repairType!=null">
+                and repair_type = #{qo.query.repairType}
+            </if>
+            <if test="qo.query.type!=null">
+                and type = #{qo.query.type}
+            </if>
+            <if test="qo.query.startTime!=null and qo.query.endTime!=null">
+                and order_time between #{qo.query.startTime} and #{qo.query.endTime}
+            </if>
+            <if test="qo.query.startTime!=null and qo.query.endTime=null">
+                and order_time > #{qo.query.startTime}
+            </if>
+            <if test="qo.query.startTime=null and qo.query.endTime!=null">
+                and order_time &lt;  #{qo.query.startTime}
+            </if>
+            and community_id = #{qo.query.communityId} and deleted = 0
+        </where>
+        order by order_time desc
+    </select>
+
 </mapper>

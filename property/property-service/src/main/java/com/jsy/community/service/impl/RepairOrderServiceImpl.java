@@ -6,17 +6,23 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IRepairOrderService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairEntity;
 import com.jsy.community.entity.RepairOrderEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.mapper.CommonConstMapper;
 import com.jsy.community.mapper.RepairMapper;
 import com.jsy.community.mapper.RepairOrderMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * <p>
@@ -38,25 +44,30 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	@Autowired
 	private UserMapper userMapper;
 	
+	@Autowired
+	private CommonConstMapper constMapper;
+	
+	// 房屋报修事项(个人)
+	private static final int TYPE_PERSON = 1;
+	
+	// 房屋报修事项(公共)
+	private static final int TYPE_COMMON = 4;
 	
 	@Override
-	public PageInfo<RepairOrderEntity> listRepairOrder(Long communityId, BaseQO<RepairOrderEntity> baseQO) {
-		RepairOrderEntity query = baseQO.getQuery();
-		Long page = baseQO.getPage();
-		Long size = baseQO.getSize();
-		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("community_id", communityId);
+	public PageInfo<RepairOrderEntity> listRepairOrder(BaseQO<RepairOrderQO> repairOrderQO) {
+		Page<RepairOrderEntity> info = new Page<>(repairOrderQO.getPage(), repairOrderQO.getSize());
+		List<RepairOrderEntity> orderEntities = repairOrderMapper.listRepairOrder(info,repairOrderQO);
 		
-		Page<RepairOrderEntity> repairOrderEntityPage = new Page<>(page, size);
-		Page<RepairOrderEntity> selectPage = repairOrderMapper.selectPage(repairOrderEntityPage, queryWrapper);
+		PageInfo<RepairOrderEntity> objectPageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(info,objectPageInfo);
 		
-		PageInfo<RepairOrderEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(selectPage, pageInfo);
-		return pageInfo;
+		objectPageInfo.setRecords(orderEntities);
+		return objectPageInfo;
 	}
 	
 	
 	@Override
+	@Transactional
 	public void dealOrder(Long id) {
 		RepairEntity repairEntity = commOrder(id);
 		if (repairEntity==null) {
@@ -68,18 +79,66 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		}
 		repairEntity.setStatus(1); // 将状态设置为 处理中
 		repairMapper.updateById(repairEntity); // 更新报修表
+		
+		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("repair_id", id);
+		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(queryWrapper);
+		
+		if (orderEntity == null) {
+			throw new PropertyException("该报修订单不存在");
+		}
+		orderEntity.setStatus(1); // 将状态设置为 处理中
+		repairOrderMapper.updateById(orderEntity);
 	}
 	
 	@Override
+	@Transactional
 	public void successOrder(Long id) {
 		RepairEntity repairEntity = commOrder(id);
-		// 注释的原因  因为需求是  物业可以直接立即完成处理
-//		Integer status = repairEntity.getStatus();
-//		if (!status.equals(1)) {
-//			throw new PropertyException("该报修订单未曾处理，不能直接完成");
-//		}
+		if (repairEntity==null) {
+			throw new PropertyException("该订单不存在");
+		}
+		Integer status = repairEntity.getStatus();
+		if (!status.equals(1)) {
+			throw new PropertyException("该报修订单未曾处理，不能直接完成");
+		}
 		repairEntity.setStatus(2); // 将状态设置为 已处理
 		repairMapper.updateById(repairEntity); // 更新报修表
+		
+		
+		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("repair_id", id);
+		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(queryWrapper);
+		
+		if (orderEntity == null) {
+			throw new PropertyException("该报修订单不存在");
+		}
+		orderEntity.setStatus(2); // 将状态设置为 处理中
+		repairOrderMapper.updateById(orderEntity);
+		
+		
+	}
+	
+	@Override
+	public List<CommonConst> listRepairType(Integer typeId) {
+		List<CommonConst> commonConstList = null;
+		QueryWrapper<CommonConst> wrapper = new QueryWrapper<>();
+		if (typeId == null) {
+			wrapper.eq("type_id", TYPE_PERSON).or().eq("type_id", TYPE_COMMON);
+			commonConstList = constMapper.selectList(wrapper);
+		} else if (typeId == 0) {
+			wrapper.eq("type_id", TYPE_PERSON);
+			commonConstList = constMapper.selectList(wrapper);
+		} else {
+			wrapper.eq("type_id", TYPE_COMMON);
+			commonConstList = constMapper.selectList(wrapper);
+		}
+		return commonConstList;
+	}
+	
+	@Override
+	public RepairOrderEntity getRepairById(Long id) {
+		return repairOrderMapper.selectById(id);
 	}
 	
 	@Override
