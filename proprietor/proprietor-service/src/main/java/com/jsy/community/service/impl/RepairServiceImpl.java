@@ -1,9 +1,9 @@
 package com.jsy.community.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IRepairService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommonConst;
@@ -12,6 +12,7 @@ import com.jsy.community.entity.RepairOrderEntity;
 import com.jsy.community.mapper.CommonConstMapper;
 import com.jsy.community.mapper.RepairMapper;
 import com.jsy.community.mapper.RepairOrderMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.proprietor.RepairCommentQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
@@ -22,10 +23,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * <p>
@@ -52,6 +54,15 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Autowired
 	private CommonConstMapper commonConstMapper;
 	
+	@Autowired
+	private UserMapper userMapper;
+	
+	// 个人报修事项
+	private static final int TYPEPERSON = 1;
+	
+	// 公共报修事项
+	private static final int TYPECOMMON = 4;
+	
 	@Override
 	public List<RepairEntity> testList() {
 		return repairMapper.selectList(null);
@@ -60,23 +71,44 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addRepair(RepairEntity repairEntity) {
+		// 报修类别
+		Integer repairType = repairEntity.getRepairType();
+		// 报修事项
+		List<CommonConst> commonConstList = null;
+		if (repairType == 0) {
+			QueryWrapper<CommonConst> wrapper = new QueryWrapper<>();
+			wrapper.eq("type_id", TYPEPERSON);
+			commonConstList = commonConstMapper.selectList(wrapper);
+			
+			
+		} else {
+			QueryWrapper<CommonConst> wrapper = new QueryWrapper<>();
+			wrapper.eq("type_id", TYPECOMMON);
+			commonConstList = commonConstMapper.selectList(wrapper);
+			
+		}
 		
-		// 判断报修类别id与报修类别是否一致
-		Long typeId = repairEntity.getType();
-		
+		if (!CollectionUtils.isEmpty(commonConstList)) {
+			// 判断该报修类别是否有这样一个报修事项
+			QueryWrapper<CommonConst> constQueryWrapper = new QueryWrapper<>();
+			constQueryWrapper.eq("id", repairEntity.getType()).eq("const_name", repairEntity.getTypeName());
+			CommonConst commonConst = commonConstMapper.selectOne(constQueryWrapper);
+			if (!commonConstList.contains(commonConst)) {
+				throw new ProprietorException("您选择的报修事项不正确或不存在");
+			}
+		}
 		
 		repairEntity.setId(SnowFlake.nextId());
 		repairMapper.insert(repairEntity); // 1.png;2.png;3.png;   或 1.png;2.png;3.png 都可以            redis 现在存的是  3个 xx.png
-		Long id = repairEntity.getId();// 得到新添加报修的报修id
+		Long repairId = repairEntity.getId();// 得到新添加报修的报修id
 		
-		RepairOrderEntity orderEntity = new RepairOrderEntity(); // 关联订单表
-		long l = SnowFlake.nextId();
-		orderEntity.setId(l);
-		orderEntity.setRepairId(id);
-		orderEntity.setNumber(UUID.randomUUID().toString().replace("-", ""));
+		RepairOrderEntity orderEntity = new RepairOrderEntity(); // 用得到的新增报修id 关联订单表
+		BeanUtils.copyProperties(repairEntity, orderEntity);
+		orderEntity.setId(SnowFlake.nextId());
+		orderEntity.setStatus(0);
+		orderEntity.setOrderTime(new Date());
 		orderEntity.setNumber(MyMathUtils.randomCode(17));
-		orderEntity.setOrderTime(new DateTime());
-		orderEntity.setCommunityId(repairEntity.getCommunityId());
+		orderEntity.setRepairId(repairId);
 		repairOrderMapper.insert(orderEntity);
 	}
 	
@@ -89,7 +121,9 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 			for (RepairEntity repairEntity : list) {
 				Long type = repairEntity.getType();
 				CommonConst commonConst = commonConstMapper.selectById(type);
-				repairEntity.setTypeName(commonConst.getConstName());
+				if (commonConst != null) {
+					repairEntity.setTypeName(commonConst.getConstName());
+				}
 				
 				if (repairEntity.getStatus() == 0) {
 					repairEntity.setStatusString("待处理");
@@ -103,12 +137,15 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 					QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
 					queryWrapper.eq("repair_id", repairEntity.getId());
 					RepairOrderEntity order = repairOrderMapper.selectOne(queryWrapper);
-					if (order!=null) {
+					if (order != null) {
 						if (!StringUtils.isEmpty(order.getComment())) {
 							repairEntity.setComment(order.getComment());
 							System.out.println(repairEntity.getComment());
 						}
 					}
+				}
+				if (repairEntity.getStatus() == 3) {
+					repairEntity.setStatusString("已驳回");
 				}
 			}
 			return list;
@@ -133,12 +170,15 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 				QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
 				queryWrapper.eq("repair_id", repairEntity.getId());
 				RepairOrderEntity order = repairOrderMapper.selectOne(queryWrapper);
-				if (order!=null) {
+				if (order != null) {
 					if (!StringUtils.isEmpty(order.getComment())) {
 						repairEntity.setComment(order.getComment());
 						System.out.println(repairEntity.getComment());
 					}
 				}
+			}
+			if (repairEntity.getStatus() == 3) {
+				repairEntity.setStatusString("已驳回");
 			}
 		}
 		return list;
@@ -239,10 +279,28 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	}
 	
 	@Override
-	public List<CommonConst> getRepairType() {
+	public List<CommonConst> getRepairType(int repairType) {
+		// 如果前台传0 表示个人报修 1 公共报修
+		if (repairType == 0) {
+			repairType = TYPEPERSON;
+		} else if (repairType == 1) {
+			repairType = TYPECOMMON;
+		} else {
+			throw new PropertyException("请选择正确的报修类别");
+		}
+		
 		QueryWrapper<CommonConst> wrapper = new QueryWrapper<>();
-		wrapper.eq("type_id", 1).select("const_name", "id");
+		wrapper.eq("type_id", repairType).select("const_name", "id");
 		return commonConstMapper.selectList(wrapper);
+	}
+	
+	@Override
+	public String getRejectReason(Long id) {
+		RepairOrderEntity orderEntity = repairOrderMapper.selectById(id);
+		if (orderEntity==null) {
+			throw new ProprietorException("该报修订单不存在");
+		}
+		return orderEntity.getRejectReason();
 	}
 	
 }

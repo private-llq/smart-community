@@ -97,5 +97,14 @@ public interface IRepairService extends IService<RepairEntity> {
 	 * @Date 2020/12/26 10:01
 	 * @Param []
 	 **/
-	List<CommonConst> getRepairType();
+	List<CommonConst> getRepairType(int repairType);
+	
+	/**
+	 * @return java.lang.String
+	 * @Author lihao
+	 * @Description 查看驳回原因
+	 * @Date 2021/3/19 11:40
+	 * @Param [id, uid]
+	 **/
+	String getRejectReason(Long id);
 }
