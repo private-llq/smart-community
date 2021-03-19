@@ -10,7 +10,7 @@ import java.util.List;
 public class PageInfo<T> implements Serializable {
 	private static final long serialVersionUID = 8545991263226528798L;
 	
-	@ApiModelProperty(value = "每页记录数")
+	@ApiModelProperty(value = "每页数据")
 	private List<T> records;
 	
 	@ApiModelProperty(value = "总记录数")
