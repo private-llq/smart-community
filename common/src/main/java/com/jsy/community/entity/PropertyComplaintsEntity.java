@@ -22,6 +22,12 @@ public class PropertyComplaintsEntity extends BaseEntity {
     private String serialNumber;
     @ApiModelProperty(value = "投诉人")
     private String uid;
+    @ApiModelProperty(value = "社区id")
+    private Long communityId;
+    @ApiModelProperty(value = "投诉人名称")
+    private String name;
+    @ApiModelProperty(value = "投诉人电话")
+    private String mobile;
     @ApiModelProperty(value = "投诉原因,1质量投诉，2维修投诉，3扰民投诉，4安全投诉，" +
             "5停车管理投诉，6环境投诉，7设备设施，8服务投诉，9费用投诉，10其他投诉")
     private Integer type;
@@ -41,6 +47,7 @@ public class PropertyComplaintsEntity extends BaseEntity {
     private LocalDateTime replyTime;
     @ApiModelProperty(value = "回复类容")
     private String replyContent;
-
+    @ApiModelProperty(value = "回复人名称")
+    private String replyName;
 
 }

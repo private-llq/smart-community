@@ -58,12 +58,14 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             wrapper.ge("create_time",communityFunQO.getCreatrTimeStart());
         }
         if (!"".equals(communityFunQO.getCreatrTimeOut())&&communityFunQO.getCreatrTimeOut()!=null){
+            communityFunQO.setCreatrTimeOut(communityFunQO.getCreatrTimeOut().plusDays(1));
             wrapper.le("create_time",communityFunQO.getCreatrTimeOut());
         }
         if (!"".equals(communityFunQO.getIssueTimeStart())&&communityFunQO.getIssueTimeStart()!=null){
             wrapper.ge("start_time",communityFunQO.getIssueTimeStart());
         }
         if (!"".equals(communityFunQO.getIssueTimeOut())&&communityFunQO.getIssueTimeOut()!=null){
+            communityFunQO.setIssueTimeOut(communityFunQO.getIssueTimeOut().plusDays(1));
             wrapper.le("start_time",communityFunQO.getCreatrTimeStart());
         }
         Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());

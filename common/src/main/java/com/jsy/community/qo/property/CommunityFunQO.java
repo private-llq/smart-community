@@ -26,7 +26,7 @@ public class CommunityFunQO implements Serializable {
     @ApiModelProperty("社区趣事标题模糊查询")
     private String headline;
 
-    @ApiModelProperty("社区趣事标题模糊查询")
+    @ApiModelProperty("社区趣事标签模糊查询")
     private String tallys;
 
     @ApiModelProperty("创建时间")

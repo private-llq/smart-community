@@ -6,8 +6,10 @@ import com.jsy.community.api.IComplainService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ComplainEntity;
 import com.jsy.community.entity.PropertyComplaintsEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.ComplainMapper;
 import com.jsy.community.mapper.PropertyComplainMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.proprietor.PropertyComplainQO;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -29,6 +31,8 @@ import java.util.List;
 public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEntity> implements IComplainService {
 
     @Autowired
+    private UserMapper userMapper;
+    @Autowired
     private ComplainMapper complainMapper;
     @Autowired
     private PropertyComplainMapper propertyComplainMapper;
@@ -46,6 +50,11 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
     public void propertyComplain(PropertyComplainQO propertyComplainQO) {
         String str=null;
         PropertyComplaintsEntity entity = new PropertyComplaintsEntity();
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", propertyComplainQO.getUid()));
+        if (userEntity!=null){
+            entity.setName(userEntity.getRealName());
+            entity.setMobile(userEntity.getMobile());
+        }
         entity.setId(SnowFlake.nextId());
         entity.setContent(propertyComplainQO.getContent());
         entity.setStatus(0);
