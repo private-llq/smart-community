@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -72,6 +73,12 @@ public class RepairOrderEntity extends BaseEntity {
     
     @ApiModelProperty(value = "驳回原因")
     private String rejectReason;
+    
+    @ApiModelProperty(value = "驳回时间")
+    private DateTime rejectTime;
+    
+    @ApiModelProperty(value = "驳回人")
+    private String rejectName;
     
     @ApiModelProperty(value = "社区id")//
     private Long communityId;

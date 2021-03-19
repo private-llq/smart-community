@@ -142,6 +142,24 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	}
 	
 	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void rejectOrder(Long id,String reason) {
+		RepairOrderEntity entity = repairOrderMapper.selectById(id);
+		if (entity.getStatus()!=0) {
+			throw new PropertyException("该订单已开始处理，不能驳回");
+		}
+		entity.setStatus(3);
+		entity.setRejectReason(reason);
+		repairOrderMapper.updateById(entity);
+		
+		// 查询报修信息
+		RepairEntity repairEntity = repairMapper.selectById(entity.getRepairId());
+		// 对报修信息设置成驳回
+		repairEntity.setStatus(3);
+		repairMapper.updateById(repairEntity);
+	}
+	
+	@Override
 	public UserEntity getUser(Long id) {
 		RepairEntity repairEntity = commOrder(id);
 		String userId = repairEntity.getUserId();

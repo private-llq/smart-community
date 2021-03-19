@@ -82,4 +82,13 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Param [id]
 	 **/
 	RepairOrderEntity getRepairById(Long id);
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 驳回报修申请
+	 * @Date 2021/3/19 15:07
+	 * @Param [id]
+	 **/
+	void rejectOrder(Long id,String reason);
 }

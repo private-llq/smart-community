@@ -58,7 +58,7 @@ public class RepairOrderQO implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
 	private Date endTime;
 	
-	@ApiModelProperty(value = "评价类型 评价类型 0 好评 1 差评  2 中评")
+	@ApiModelProperty(value = "评价类型 评价类型 0 好评  2 中评")
 	private Integer commentStatus;
 	
 }

@@ -296,7 +296,9 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	
 	@Override
 	public String getRejectReason(Long id) {
-		RepairOrderEntity orderEntity = repairOrderMapper.selectById(id);
+		QueryWrapper<RepairOrderEntity> repairOrderEntityQueryWrapper = new QueryWrapper<>();
+		repairOrderEntityQueryWrapper.eq("repair_id",id);
+		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(repairOrderEntityQueryWrapper);
 		if (orderEntity==null) {
 			throw new ProprietorException("该报修订单不存在");
 		}

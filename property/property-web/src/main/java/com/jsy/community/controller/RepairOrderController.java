@@ -38,15 +38,17 @@ public class RepairOrderController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IRepairOrderService repairOrderService;
 	
+	// TODO: 2021/3/16  不传：查所有  传0：个人报修事项  传1：公共报修事项
 	@ApiOperation("报修事项查询")
 	@GetMapping("/listRepairType")
-	public CommonResult listRepairType(@ApiParam("报修类别") Integer typeId) {  // TODO: 2021/3/16  不传：查所有  传0：个人报修事项  传1：公共报修事项
+	public CommonResult listRepairType(@ApiParam("报修类别") Integer typeId) {
 		List<CommonConst> constList = repairOrderService.listRepairType(typeId);
 		return CommonResult.ok(constList);
 	}
 	
+	// TODO: 2021/3/18 时间查询那里好像没通过测试
 	@ApiOperation("分页查询所有报修申请")
-	@PostMapping("/listRepairOrder") // TODO: 2021/3/18 时间查询那里好像没通过测试
+	@PostMapping("/listRepairOrder")
 	public CommonResult<PageInfo<RepairOrderEntity>> listRepairOrder(@RequestBody BaseQO<RepairOrderQO> repairOrderQO) {
 		PageInfo<RepairOrderEntity> pageInfo = repairOrderService.listRepairOrder(repairOrderQO);
 		return CommonResult.ok(pageInfo);
@@ -60,7 +62,7 @@ public class RepairOrderController {
 		return CommonResult.ok(orderEntity);
 	}
 	
-	@ApiOperation("立即处理")
+	@ApiOperation("维修")
 	@GetMapping("/dealOrder")
 	// TODO: 2021/3/18 还没做有派单功能  以及 设置费用
 	public CommonResult dealOrder(@ApiParam("报修订单id") @RequestParam Long id) {
@@ -68,11 +70,19 @@ public class RepairOrderController {
 		return CommonResult.ok();
 	}
 	
+	@ApiOperation("驳回")
+	@GetMapping("/rejectOrder")
+	public CommonResult rejectOrder(@ApiParam("报修订单id") @RequestParam Long id,
+	                                @ApiParam("驳回原因") @RequestParam String reason) {
+		repairOrderService.rejectOrder(id, reason);
+		return CommonResult.ok();
+	}
+	
 	// TODO: 2021/3/19  根据id 更改订单的派单人信息 与 费用
 	@ApiOperation("报修订单设置")
 	@PostMapping("/updateOrder")
-	public CommonResult updateOrder(@ApiParam("报修订单id") Long id){
-		return  null;
+	public CommonResult updateOrder(@ApiParam("报修订单id") Long id) {
+		return null;
 	}
 	
 	@ApiOperation("完成处理")
@@ -84,18 +94,9 @@ public class RepairOrderController {
 	
 	@ApiOperation("查看进程")
 	@GetMapping("/checkCase")
-	public CommonResult checkCase(@ApiParam("报修订单id") @RequestParam Long id){
+	public CommonResult checkCase(@ApiParam("报修订单id") @RequestParam Long id) {
 		return null;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	// TODO: 2021/3/19 下面两个不用了
