@@ -33,7 +33,8 @@ public interface BusinessEnum {
 		CITY_MAP("getCityMap", 2, 2, null),
 		HOT_CITY("getHotCityList", 3,2, null),
 		VAGUE_QUERY_CITY("vagueQueryCity", 4,1, String.class),
-		CITY_LIST("getCityList", 5,2, null);
+		CITY_LIST("getCityList", 5,2, null),
+		VAGUE_QUERY_AREA("vagueQueryArea", 6,1, Object.class);
 		private String name;
 		private Integer code;
 		private Integer type;

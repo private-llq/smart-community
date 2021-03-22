@@ -92,14 +92,29 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		
 		// 判断是否有同名
 		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("id", departmentEntity.getId()).eq("community_id", departmentEntity.getCommunityId());
-		DepartmentEntity one = departmentMapper.selectOne(wrapper);
-		if (one == null) {
+		wrapper.eq("community_id", departmentEntity.getCommunityId());
+		List<DepartmentEntity> ones = departmentMapper.selectList(wrapper);
+		if (ones == null) {
 			throw new PropertyException("该小区没有此部门");
 		}
 		
-		if (departmentEntity.getDepartment().equals(one.getDepartment())) {
-			throw new PropertyException("您小区已存在同名部门，请重新修改");
+		for (DepartmentEntity one : ones) {
+			// 跳过当前正在修改的这条数据
+			if (one.getId().equals(departmentEntity.getId())) {
+				continue;
+			}
+			if (departmentEntity.getDepartment().equals(one.getDepartment())) {
+				throw new PropertyException("您小区已存在同名部门，请重新修改");
+			}
+		}
+		
+		// 判断父节点是否存在
+		Long pid = departmentEntity.getPid();
+		DepartmentEntity dept = departmentMapper.selectById(pid);
+		if (departmentEntity.getPid() != 0) {
+			if (dept == null) {
+				throw new PropertyException("您选择的父节点不存在,请重新选择");
+			}
 		}
 		
 		DepartmentEntity entity = new DepartmentEntity();

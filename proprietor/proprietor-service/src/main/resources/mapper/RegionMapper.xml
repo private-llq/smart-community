@@ -25,9 +25,10 @@
 	</insert>
 
 	<!-- 条件查询城市 -->
-	<select id="vagueQueryCity" resultType="com.jsy.community.entity.RegionEntity">
+	<select id="vagueQueryRegion" resultType="com.jsy.community.entity.RegionEntity">
 		select id,name,pid,level,initials,pinyin,lng,lat from t_region
-		where level = 2
+		where level = #{lv}
+		<if test="cityId != null">and pid = #{cityId}</if>
 		and
 		(
 			initials = #{searchStr}

@@ -3,7 +3,6 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IDepartmentService;
-import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentEntity;
 import com.jsy.community.qo.DepartmentQO;
@@ -44,9 +43,6 @@ public class DepartmentController {
 	@PostMapping("/addDepartment")
 	public CommonResult addDepartment(@RequestBody DepartmentQO departmentEntity) {
 		ValidatorUtils.validateEntity(departmentEntity, DepartmentQO.addDepartmentValidate.class);
-		if (departmentEntity.getSort() > 99 || departmentEntity.getSort() < 0) {
-			throw new PropertyException("你输入的排序序号不符要求,请重新输入!");
-		}
 		departmentService.addDepartment(departmentEntity);
 		return CommonResult.ok();
 	}
@@ -62,9 +58,6 @@ public class DepartmentController {
 	@PostMapping("/updateDepartment")
 	public CommonResult updateDepartment(@RequestBody DepartmentQO departmentEntity) {
 		ValidatorUtils.validateEntity(departmentEntity, DepartmentQO.updateDepartmentValidate.class);
-		if (departmentEntity.getSort() > 99 || departmentEntity.getSort() < 0) {
-			throw new PropertyException("你输入的排序序号不符要求,请重新输入!");
-		}
 		departmentService.updateDepartment(departmentEntity);
 		return CommonResult.ok();
 	}

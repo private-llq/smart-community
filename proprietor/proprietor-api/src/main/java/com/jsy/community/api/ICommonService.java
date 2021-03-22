@@ -118,6 +118,15 @@ public interface ICommonService {
 	 * @Date: 2020/12/10
 	**/
 	List<RegionEntity> vagueQueryCity(String searchStr);
+	
+	/**
+	* @Description: 区域模糊查询
+	 * @Param: [searchStr]
+	 * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/22
+	**/
+	List<RegionEntity> vagueQueryArea(String searchStr,Integer cityId);
 
 	//天气假数据
 	JSONObject getTempWeather();

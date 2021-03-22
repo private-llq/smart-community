@@ -1,10 +1,16 @@
 package com.jsy.community.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.entity.HouseEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpPost;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,19 +79,50 @@ public class CommonUtils {
 		return false;
 	}
 	
-	public static void main(String[] args) {
-		String houseReserveTitle = "房屋预约信息";
-		String houseReserveContent = "张大锤在1.16号上午10点对您发布的[江北-观音桥 三钢二路8号]进行了预约！请及时回复。";
-		String favoriteNoticeTitle = "您的房屋被收藏啦!";
-		String favoriteNoticeContent = "张大锤在 2021-1-15 10:52:34 收藏您发布的房屋[江北-观音桥 三钢二路8号]";
-		pushCommunityMSG(1,"120c83f76087f89f525",favoriteNoticeTitle,favoriteNoticeContent);
-	}
+//	public static void main(String[] args) {
+//		String houseReserveTitle = "房屋预约信息";
+//		String houseReserveContent = "张大锤在1.16号上午10点对您发布的[江北-观音桥 三钢二路8号]进行了预约！请及时回复。";
+//		String favoriteNoticeTitle = "您的房屋被收藏啦!";
+//		String favoriteNoticeContent = "张大锤在 2021-1-15 10:52:34 收藏您发布的房屋[江北-观音桥 三钢二路8号]";
+//		pushCommunityMSG(1,"120c83f76087f89f525",favoriteNoticeTitle,favoriteNoticeContent);
+//	}
 
 	/**
 	 * 判断数组是否为空
 	 */
 	public static boolean isEmpty(Object[] array) {
 		return array == null || array.length == 0;
+	}
+	
+	/**
+	* @Description: 对查询结果添加字符串格式id，适配js
+	 * @Param: [objList]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/3/22
+	**/
+	public static void addIdStr(List<?> objList){
+		for(Object obj : objList){
+			try {
+				Field idField = obj.getClass().getSuperclass().getDeclaredField("id");
+				Field idStrField = obj.getClass().getDeclaredField("idStr");
+				boolean idFlag = idField.isAccessible();
+				boolean idStrFlag = idStrField.isAccessible();
+				idField.setAccessible(true);
+				idStrField.setAccessible(true);
+				//赋值
+				idStrField.set(obj,String.valueOf(idField.get(obj)));
+				//还原权限控制
+				idField.setAccessible(idFlag);
+				idStrField.setAccessible(idStrFlag);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				break;
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+				break;
+			}
+		}
 	}
 	
 }
