@@ -1,15 +1,13 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.ProprietorEntity;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
@@ -103,16 +101,16 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
      * @return 返回查询的业主信息
      */
     @Override
-    public List<ProprietorVO> query(BaseQO<ProprietorQO> queryParam) {
-        queryParam.setPage((queryParam.getPage() - 1) * queryParam.getSize());
-        List<ProprietorVO> query = proprietorMapper.query(queryParam);
+    public Page<ProprietorVO> query(BaseQO<ProprietorQO> queryParam) {
+        Page<ProprietorVO> page = new Page<>(queryParam.getPage(), queryParam.getSize());
+        List<ProprietorVO> query = proprietorMapper.query(page,queryParam);
         query.forEach( vo -> {
             //通过身份证获得 用户的 年龄 、性别
             Map<String, Object> sexAndAge = CardUtil.getSexAndAge(vo.getIdCard());
             vo.setAge( sexAndAge.get("age").toString() );
             vo.setGender( sexAndAge.get("sex").toString() );
         });
-        return query;
+        return page.setRecords(query);
     }
 
 

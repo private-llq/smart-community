@@ -14,7 +14,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticSearchImportProvider;
+import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -141,7 +141,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     entity.setStartUid(uid);
     entity.setStartTime(LocalDateTime.now());
     communityFunMapper.updateById(entity);
-    ElasticSearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
+    ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
   }
 
 }

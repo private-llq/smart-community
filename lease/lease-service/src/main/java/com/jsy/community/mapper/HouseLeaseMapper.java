@@ -5,6 +5,7 @@ import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
+import com.jsy.community.vo.lease.HouseImageVo;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.*;
@@ -236,4 +237,12 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @return                      返回社区名称和房屋名称
      */
     Map<String, String> getUserAddrById(Long houseCommunityId, Long houseId );
+
+
+    /**
+     * 根据图片id批量查询图片
+     * @param voImageIds    图片id集合
+     * @return              返回图片关系对象
+     */
+    List<HouseImageVo> selectBatchImage(List<Long> voImageIds);
 }

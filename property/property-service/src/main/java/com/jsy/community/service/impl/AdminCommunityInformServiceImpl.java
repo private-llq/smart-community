@@ -11,7 +11,7 @@ import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticSearchImportProvider;
+import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -56,7 +56,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         boolean b = communityInformMapper.insert(entity) > 0;
         //0表示推送目标为所有社区
         if(b && qo.getPushTarget() ==  0){
-            ElasticSearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
+            ElasticsearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
         }
         return b;
     }

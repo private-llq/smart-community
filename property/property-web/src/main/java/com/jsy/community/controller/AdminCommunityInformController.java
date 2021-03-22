@@ -35,6 +35,7 @@ public class AdminCommunityInformController {
 
 
     /**
+     * TODO: 按物业原型修改发送公告
      * 新增推送通知消息
      * @param qo 新增推送消息
      * @return 返回是否新增成功
@@ -49,6 +50,7 @@ public class AdminCommunityInformController {
 
 
     /**
+     * TODO: 按物业原型修改删除发送公告
      * 删除通知消息 [管理员]
      *
      * @param id 消息id
@@ -63,6 +65,7 @@ public class AdminCommunityInformController {
 
 
     /**
+     * TODO: 按物业原型修改查询发送公告
      * 查询 通知消息 从轮播消息点进去之后的显示界面 分页查询
      * 本小区的通知消息
      * @param qo    查询参数 其中pushInform仅仅包含communityId

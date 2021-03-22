@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
@@ -40,7 +41,7 @@ public interface IProprietorService extends IService<ProprietorEntity> {
      * @param query     查询参数
      * @return          返回查询的业主信息
      */
-    List<ProprietorVO> query(BaseQO<ProprietorQO> query);
+    Page<ProprietorVO> query(BaseQO<ProprietorQO> query);
 
     /**
      * 录入业主信息业主房屋绑定信息至数据库

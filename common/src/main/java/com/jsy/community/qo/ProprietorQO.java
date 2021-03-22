@@ -36,8 +36,8 @@ public class ProprietorQO implements Serializable {
     private Long id;
 
 
-    @Range( groups = {PropertyAddValid.class,PropertyUpdateValid.class}, min = 1, message = "社区id范围不正确!")
-    @NotNull(groups = {PropertyAddValid.class, PropertyUpdateValid.class}, message = "社区id为空")
+    @Range( groups = {PropertyAddValid.class,PropertyUpdateValid.class,PropertySearchValid.class}, min = 1, message = "社区id范围不正确!")
+    @NotNull(groups = {PropertyAddValid.class, PropertyUpdateValid.class,PropertySearchValid.class}, message = "社区id为空")
     @ApiModelProperty("社区id")
     private Long communityId;
 

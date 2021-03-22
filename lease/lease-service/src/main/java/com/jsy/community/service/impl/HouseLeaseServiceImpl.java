@@ -17,6 +17,7 @@ import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
+import com.jsy.community.vo.lease.HouseImageVo;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.api.IHouseConstService;
@@ -29,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.regex.Pattern.*;
 
@@ -181,6 +183,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         }
         //1.通过存在的条件 查出符合条件的分页所有房屋数据
         List<HouseLeaseVO> vos = houseLeaseMapper.queryHouseLeaseByList(qo);
+        if( CollectionUtils.isEmpty(vos) ){
+            return null;
+        }
         //根据数据字段id 查询 一对多的 房屋标签name和id 如 邻地铁、可短租、临街商铺等多标签、之类
         getHouseFieldTag(vos);
         return vos;
@@ -364,12 +369,26 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     public List<HouseLeaseVO> ownerLeaseHouse(BaseQO<HouseLeaseQO> qo) {
         qo.setPage((qo.getPage() - 1) * qo.getSize());
         List<HouseLeaseVO> vos = houseLeaseMapper.ownerLeaseHouse(qo);
+        List<Long> voImageIds = new ArrayList<>(vos.size());
         vos.forEach(vo -> {
-            //TODO 待 sql 查询语句 放循环外
-            vo.setHouseImage(houseLeaseMapper.queryHouseImgById(vo.getHouseImageId(), vo.getId()));
+            voImageIds.add(vo.getHouseImageId());
             //房屋类型code转换成文本 如 040202 转换为 4室2厅2卫
             vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         });
+        if( !CollectionUtils.isEmpty(voImageIds) ){
+            //根据 图片 id 集合  in 查出所有的图片 url 和 对应的租赁id
+            List<HouseImageVo> houseImageVos = houseLeaseMapper.selectBatchImage(voImageIds);
+            //由于一个图片可能存在于多条 列表数据 只显示一条 根据图片id(field_id)是用Map 去重   toMap里面第一个逗号前面的参数 是作为Map的Key  第二个逗号前面的 是作为Map的值， 第三个参数是 重载函数，如果Map中有重复 那就还是用前面的值
+            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo,(value1, value2) -> value1));
+            //把图片 设置到返回集合每一个对象
+            vos.forEach( vo -> {
+                //该数据的图片对象不为空!
+                HouseImageVo houseImageVo = houseImageVoMap.get(vo.getHouseImageId());
+                if( Objects.nonNull(houseImageVo) ){
+                    vo.setHouseImage(Collections.singletonList(houseImageVo.getImgUrl()));
+                }
+            });
+        }
         return vos;
     }
 
@@ -432,7 +451,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             //按 地址 标题搜索
             vos = houseLeaseMapper.searchLeaseHouseByText(qo);
         }
-        if (vos == null) {
+        if (CollectionUtils.isEmpty(vos)) {
             return null;
         }
         getHouseFieldTag(vos);
@@ -480,6 +499,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @since 2020/12/30 16:39
      */
     private void getHouseFieldTag(List<HouseLeaseVO> vos) {
+        List<Long> voImageIds = new ArrayList<>(vos.size());
         //对字段一对多的标签做处理
         for (HouseLeaseVO vo : vos) {
             //从数字中解析出 常量的 code
@@ -497,11 +517,26 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
                 vo.setHouseAdvantageCode(advantageMap);
             }
             //2.从中间表查出该出租房屋的 第一张显示图片 用于列表标签展示
-            vo.setHouseImage(houseLeaseMapper.queryHouseImgById(vo.getHouseImageId(), vo.getId()));
+            voImageIds.add(vo.getHouseImageId());
             //3.通过出租方式id 查出 出租方式文本：如 合租、整租之类
             vo.setHouseLeaseMode(houseConstService.getConstNameByConstTypeCode(vo.getHouseLeasemodeId(), 11L));
             //4.通过户型id 查出 户型id对应的文本：如 四室一厅、三室一厅...
             vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
+        }
+        //设置图片url
+        if( !CollectionUtils.isEmpty(voImageIds) ){
+            //根据 图片 id 集合  in 查出所有的图片 url 和 对应的租赁id
+            List<HouseImageVo> houseImageVos = houseLeaseMapper.selectBatchImage(voImageIds);
+            //由于一个图片可能存在于多条 列表数据 只显示一条 根据图片id(field_id)是用Map 去重   toMap里面第一个逗号前面的参数 是作为Map的Key  第二个逗号前面的 是作为Map的值， 第三个参数是 重载函数，如果Map中有重复 那就还是用前面的值
+            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo,(value1, value2) -> value1));
+            //把图片 设置到返回集合每一个对象
+            vos.forEach( vo -> {
+                //该数据的图片对象不为空!
+                HouseImageVo houseImageVo = houseImageVoMap.get(vo.getHouseImageId());
+                if( Objects.nonNull(houseImageVo) ){
+                    vo.setHouseImage(Collections.singletonList(houseImageVo.getImgUrl()));
+                }
+            });
         }
     }
 

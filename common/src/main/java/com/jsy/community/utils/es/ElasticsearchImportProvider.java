@@ -16,7 +16,7 @@ import java.util.Arrays;
  * @author YuLF
  * @since 2021-02-02 14:41
  */
-public class ElasticSearchImportProvider {
+public class ElasticsearchImportProvider {
 
     private static RabbitTemplate rabbitTemplate = null;
 
@@ -101,7 +101,7 @@ public class ElasticSearchImportProvider {
 
     public static RabbitTemplate getRabbitTemplate() {
         if (rabbitTemplate == null) {
-            synchronized (ElasticSearchImportProvider.class) {
+            synchronized (ElasticsearchImportProvider.class) {
                 if (rabbitTemplate == null) {
                     rabbitTemplate = (RabbitTemplate) SpringContextUtils.getBean("rabbitTemplate");
                 }

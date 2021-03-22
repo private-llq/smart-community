@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.IpLimit;
@@ -405,7 +406,7 @@ public class ProprietorController {
      */
     @PostMapping()
     @ApiOperation("分页查询业主信息")
-    public CommonResult<List<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> baseQo) {
+    public CommonResult<Page<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> baseQo) {
         //1.验证分页 查询参数
         ValidatorUtils.validatePageParam(baseQo);
         if (baseQo.getQuery() == null) {

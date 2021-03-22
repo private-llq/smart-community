@@ -1,12 +1,14 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.ibatis.annotations.Param;
@@ -37,10 +39,11 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
 
     /**
      * [物业]通过分页参数查询 业主信息
+     * @param page          分页条件
      * @param queryParam    查询参数
      * @return              返回查询的业主信息
      */
-    List<ProprietorVO> query(BaseQO<ProprietorQO> queryParam);
+    List<ProprietorVO> query(Page<ProprietorVO> page, @Param("baseQo") BaseQO<ProprietorQO> queryParam);
 
 
     /**
