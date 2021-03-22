@@ -51,7 +51,7 @@ public interface UserInformMapper extends BaseMapper<UserInformEntity> {
      * @since  2020/12/14 18:0
      * @return              返回消息count
      */
-    @Select("select count(*) from t_acct_push_inform where acct_id = #{acctId} and deleted = 0")
+    @Select("select count(*) from t_push_inform where acct_id = #{acctId} and deleted = 0")
     Integer queryPushInformTotalCount(@Param("acctId") Long acctId);
 
 
@@ -76,7 +76,7 @@ public interface UserInformMapper extends BaseMapper<UserInformEntity> {
      * 拿到推送表 小于beforeTime的所有推送消息id
      * @param beforeTime   用当前时间 - 过期天数得到的时间 只要推送消息的创建时间小于 这个时间 说明该推送消息已经超过过期天数，达到清理条件
      */
-    @Select("select id from t_acct_push_inform where create_time < #{beforeTime} and deleted = 0")
+    @Select("select id from t_push_inform where create_time < #{beforeTime} and deleted = 0")
     List<Long> getExpireInformId(@Param("beforeTime") String beforeTime);
 
     /**

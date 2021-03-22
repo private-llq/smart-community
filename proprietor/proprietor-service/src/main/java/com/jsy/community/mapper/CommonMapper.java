@@ -77,7 +77,7 @@ public interface CommonMapper {
      * 所有公共社区消息数据
      * @return  返回所有 消息标题、id、 社区id
      */
-    @Select("select id,push_title as title,acct_id,'INFORM' as flag from t_acct_push_inform where deleted = 0 and push_target = 0")
+    @Select("select id,push_title as title,acct_id,'INFORM' as flag from t_push_inform where deleted = 0 and push_target = 0")
     List<FullTextSearchEntity> getAllInform();
 
 
@@ -117,10 +117,10 @@ public interface CommonMapper {
 
     /**
      * 查询单张图片
-     * @param id    t_acct_push_inform 数据id
+     * @param id    t_push_inform 数据id
      * @return      返回图片URL 作为列表缩略图
      */
-    @Select("select acct_avatar from t_acct_push_inform where id = #{id} limit 1")
+    @Select("select acct_avatar from t_push_inform where id = #{id} limit 1")
     String getInformPicture(Long id);
 
 

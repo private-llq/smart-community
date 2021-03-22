@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
+ * 【已过期、按新需求改动】
  * @author YuLF
  * @date 2020/11/10 10:56
  */
@@ -35,6 +36,7 @@ import java.util.*;
 @RequestMapping("/car")
 @Slf4j
 @ApiJSYController
+@Deprecated
 public class CarController {
 	
 	

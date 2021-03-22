@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("推送消息实体对象")
-@TableName(value = "t_acct_push_inform")
+@TableName(value = "t_push_inform")
 public class PushInformEntity extends BaseEntity {
 
 

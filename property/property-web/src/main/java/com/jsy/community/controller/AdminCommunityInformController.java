@@ -12,7 +12,6 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +23,10 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "社区消息控制器")
 @RestController
 @RequestMapping("/community/inform")
-@Slf4j
-@Login
 @ApiJSYController
 public class AdminCommunityInformController {
+
+
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IAdminCommunityInformService communityInformService;

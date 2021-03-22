@@ -8,7 +8,6 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.ibatis.annotations.Param;

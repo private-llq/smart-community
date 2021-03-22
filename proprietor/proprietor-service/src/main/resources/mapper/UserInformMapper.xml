@@ -15,13 +15,13 @@
        SELECT DISTINCT
 	        i.acct_id
         FROM
-	        t_acct_push_inform AS i
+	        t_push_inform AS i
 	    JOIN t_user_house AS h ON h.community_id = i.acct_id
 	    AND h.check_status = 1
 	    AND h.deleted = 0
 	    AND i.deleted = 0
         WHERE
-	    ( SELECT COUNT( 1 ) FROM t_acct_push_del AS d WHERE i.acct_id = d.acct_id AND d.uid = #{uid} ) = 0
+	    ( SELECT COUNT( 1 ) FROM t_push_inform_del AS d WHERE i.acct_id = d.acct_id AND d.uid = #{uid} ) = 0
 	    AND h.uid = #{uid}
     </select>
 
@@ -31,11 +31,11 @@
         SELECT DISTINCT
 	        i.acct_id
         FROM
-	        t_acct_push_inform AS i
+	        t_push_inform AS i
         WHERE
 	        i.push_target = 0
 	    AND i.deleted = 0
-	    AND ( SELECT count( 1 ) FROM t_acct_push_del AS d WHERE d.uid = #{uid} AND d.acct_id = i.acct_id ) = 0
+	    AND ( SELECT count( 1 ) FROM t_push_inform_del AS d WHERE d.uid = #{uid} AND d.acct_id = i.acct_id ) = 0
     </select>
 
     <!-- 根据id查询社区相关消息 -->
@@ -47,7 +47,7 @@
 	        push_title,
 	        create_time
         FROM
-	        t_acct_push_inform
+	        t_push_inform
         WHERE
 	        acct_id = #{id} and deleted = 0
         ORDER BY

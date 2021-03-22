@@ -7,7 +7,7 @@
         SELECT
 	        i.id
         FROM
-	        t_acct_push_inform AS i
+	        t_push_inform AS i
         WHERE
 	    (
 	    SELECT

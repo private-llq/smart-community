@@ -34,7 +34,7 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      * @param acctId            推送号ID
      * @param informId          消息ID
      */
-    @Update("update t_acct_push_inform set browse_count = browse_count+1,update_time = now() where acct_id = #{acctId} and id = #{informId} and deleted = 0")
+    @Update("update t_push_inform set browse_count = browse_count+1,update_time = now() where acct_id = #{acctId} and id = #{informId} and deleted = 0")
     void updatePushInformBrowseCount(@Param("acctId") Long acctId, @Param("informId") Long informId);
 
     /**
