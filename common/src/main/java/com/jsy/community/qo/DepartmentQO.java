@@ -5,7 +5,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -39,6 +41,7 @@ public class DepartmentQO implements Serializable {
 	
 	@ApiModelProperty(value = "部门名称")
 	@NotBlank(groups = {addDepartmentValidate.class, updateDepartmentValidate.class}, message = "部门名称不能为空")
+	@Length(groups = {addDepartmentValidate.class, updateDepartmentValidate.class},min = 1,max = 50)
 	private String department;
 	
 	@ApiModelProperty(value = "部门图片")
@@ -48,7 +51,8 @@ public class DepartmentQO implements Serializable {
 	@Size(groups = {addDepartmentValidate.class, updateDepartmentValidate.class}, min = 0, max = 3, message = "最多添加三个部门电话")
 	private List<String> phone;
 	
-	@ApiModelProperty(value = "排序序号")
+	@ApiModelProperty(value = "排序序号 0-99")
+	@Max(groups = {addDepartmentValidate.class, updateDepartmentValidate.class},value = 99,message = "排序序号最大为99")
 	private int sort;
 	
 	public interface addDepartmentValidate {
