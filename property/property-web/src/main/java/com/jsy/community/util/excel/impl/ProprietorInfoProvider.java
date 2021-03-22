@@ -195,7 +195,7 @@ public class ProprietorInfoProvider {
                         //第6列 QQ
                         case 5:
                             if (StrUtil.isNotBlank(cellValue)) {
-                                if (RegexUtils.isQQ(cellValue)) {
+                                if (RegexUtils.isQq(cellValue)) {
                                     userEntity.setQq(cellValue);
                                 } else {
                                     addResolverError(errorVos, dataRow, " qq号填写不正确!");

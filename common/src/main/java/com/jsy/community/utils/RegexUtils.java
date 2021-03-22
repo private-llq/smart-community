@@ -63,8 +63,8 @@ public class RegexUtils {
 	
 	/**
 	 * 正则表达式：验证手机号
+	 * public static final String REGEX_MOBILE = "^((17[0-9])|(14[0-9])|(13[0-9])|(15[^4,\\D])|(18[0-9]))\\d{8}$";
 	 */
-//	public static final String REGEX_MOBILE = "^((17[0-9])|(14[0-9])|(13[0-9])|(15[^4,\\D])|(18[0-9]))\\d{8}$";
 	public static final String REGEX_MOBILE = "^((13[0-9])|(14[5-9])|(15([0-3]|[5-9]))|(16[6-7])|(17[1-8])|(18[0-9])|(19[1|3])|(19[5|6])|(19[8|9]))\\d{8}$";
 	
 	/**
@@ -119,7 +119,7 @@ public class RegexUtils {
 	 * @param qq 		qq帐号
 	 * @return 校验通过返回true，否则返回false
 	 */
-	public static boolean isQQ(String qq) {
+	public static boolean isQq(String qq) {
 		return Pattern.matches(REGEX_QQ, qq);
 	}
 

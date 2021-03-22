@@ -297,13 +297,13 @@ public class DownloadLogController {
         if (!file.exists()) {
             return;
         }
-        int BUFFER = 2048;
+        int buffer = 2048;
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             ZipEntry entry = new ZipEntry(baseDir + file.getName());
             zipOut.putNextEntry(entry);
             int count;
-            byte[] data = new byte[BUFFER];
-            while ((count = bis.read(data, 0, BUFFER)) != -1) {
+            byte[] data = new byte[buffer];
+            while ((count = bis.read(data, 0, buffer)) != -1) {
                 zipOut.write(data, 0, count);
             }
         }

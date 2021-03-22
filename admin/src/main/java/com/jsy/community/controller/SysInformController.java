@@ -77,13 +77,13 @@ public class SysInformController {
     @Login
     @ApiOperation("系统消息列表")
     @PostMapping("/list")
-    public CommonResult<List<PushInformEntity>> query(@RequestBody BaseQO<PushInformQO> baseQO){
-        ValidatorUtils.validatePageParam(baseQO);
-        if(baseQO.getQuery() == null){
-            baseQO.setQuery(new PushInformQO());
+    public CommonResult<List<PushInformEntity>> query(@RequestBody BaseQO<PushInformQO> qo){
+        ValidatorUtils.validatePageParam(qo);
+        if(qo.getQuery() == null){
+            qo.setQuery(new PushInformQO());
         }
-        baseQO.getQuery().setId(sysInformId);
-        return CommonResult.ok(iSysInformService.query(baseQO));
+        qo.getQuery().setId(sysInformId);
+        return CommonResult.ok(iSysInformService.query(qo));
     }
 
 }

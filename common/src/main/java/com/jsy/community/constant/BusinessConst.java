@@ -13,6 +13,11 @@ public interface BusinessConst {
      * Zero
      */
     Integer ZERO = 0;
+    /**
+     * ONE
+     */
+    Integer ONE = 1;
+
 
     //============================ 用户真实姓名 长度边界 =============================
     /**
