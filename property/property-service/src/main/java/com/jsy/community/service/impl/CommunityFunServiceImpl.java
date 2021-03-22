@@ -9,21 +9,24 @@ import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
+import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.CommunityFunMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.property.CommunityFunQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,9 +40,11 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
 
     @Autowired
     private CommunityFunMapper communityFunMapper;
+    @Autowired
+    private AdminUserMapper adminUserMapper;
 
     @Override
-    public Map<String,Object> findList(BaseQO<CommunityFunQO> baseQO) {
+    public PageInfo findList(BaseQO<CommunityFunQO> baseQO) {
         CommunityFunQO communityFunQO = baseQO.getQuery();
         Map<String,Object> map = new HashMap<>();
         if (baseQO.getSize()==0||baseQO.getSize()==null)
@@ -53,30 +58,28 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         if (!"".equals(communityFunQO.getTallys())&&communityFunQO.getTallys()!=null){
             wrapper.like("tallys",communityFunQO.getTallys());
         }
-
-        if (!"".equals(communityFunQO.getCreatrTimeStart())&&communityFunQO.getCreatrTimeStart()!=null){
+        if (communityFunQO.getStatus()!=null&&communityFunQO.getStatus()!=0){
+            wrapper.like("status",communityFunQO.getStatus());
+        }
+        if (communityFunQO.getCreatrTimeStart()!=null){
             wrapper.ge("create_time",communityFunQO.getCreatrTimeStart());
         }
-        if (!"".equals(communityFunQO.getCreatrTimeOut())&&communityFunQO.getCreatrTimeOut()!=null){
+        if (communityFunQO.getCreatrTimeOut()!=null){
             communityFunQO.setCreatrTimeOut(communityFunQO.getCreatrTimeOut().plusDays(1));
             wrapper.le("create_time",communityFunQO.getCreatrTimeOut());
         }
-        if (!"".equals(communityFunQO.getIssueTimeStart())&&communityFunQO.getIssueTimeStart()!=null){
+        if (communityFunQO.getIssueTimeStart()!=null){
             wrapper.ge("start_time",communityFunQO.getIssueTimeStart());
         }
-        if (!"".equals(communityFunQO.getIssueTimeOut())&&communityFunQO.getIssueTimeOut()!=null){
+        if (communityFunQO.getIssueTimeOut()!=null){
             communityFunQO.setIssueTimeOut(communityFunQO.getIssueTimeOut().plusDays(1));
             wrapper.le("start_time",communityFunQO.getCreatrTimeStart());
         }
         Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
-
-        List<CommunityFunEntity> list = page.getRecords();
-
-        long total = page.getTotal();
-        map.put("list",list);
-        map.put("total",total);
-        return map;
+        PageInfo pageInfo=new PageInfo();
+        BeanUtils.copyProperties(page,pageInfo);
+        return pageInfo;
     }
 
     @Override
@@ -93,10 +96,14 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
 
     @Override
     public void insetOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
+        AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", uid));
         CommunityFunEntity entity = new CommunityFunEntity();
         entity.setTitleName(communityFunOperationQO.getTitleName());
         entity.setViewCount(communityFunOperationQO.getViewCount());
-        entity.setUid(communityFunOperationQO.getUid());
+        entity.setCreateUid(communityFunOperationQO.getUid());
+        if (userEntity!=null){
+            entity.setCreateName(userEntity.getRealName());
+        }
         entity.setContent(communityFunOperationQO.getContent());
         entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
         entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
@@ -111,8 +118,12 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Override
     @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.FUN, parameterType = CommunityFunEntity.class, importField = {"titleName","smallImageUrl"}, searchField = {"titleName"})
     public void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
+        AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", uid));
         CommunityFunEntity entity = communityFunMapper.selectById(communityFunOperationQO.getId());
         entity.setUpdateUid(uid);
+        if (userEntity!=null){
+            entity.setUpdateName(userEntity.getRealName());
+        }
         String tallys = Arrays.toString(communityFunOperationQO.getTallys());
         entity.setTallys(tallys.substring(1, tallys.length() - 1));
         entity.setContent(communityFunOperationQO.getContent());
@@ -135,9 +146,13 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
 
   @Override
   public void popUpOnline(Long id,String uid) {
+    AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", uid));
     CommunityFunEntity entity = communityFunMapper.selectById(id);
     if (entity.getStatus()==1){
       throw new PropertyException("该趣事已上线");
+    }
+    if (userEntity!=null){
+        entity.setStartName(userEntity.getRealName());
     }
     entity.setStatus(1);
     entity.setStartUid(uid);

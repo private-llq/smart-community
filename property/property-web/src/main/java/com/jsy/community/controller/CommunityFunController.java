@@ -47,14 +47,14 @@ public class CommunityFunController {
 
     @ApiOperation("分页查询所有社区趣事")
     @PostMapping("/list")
-    @Login
-    public CommonResult<Map> list(@RequestBody BaseQO<CommunityFunQO> baseQO) {
-        Map<String, Object> map = communityFunService.findList(baseQO);
-        return CommonResult.ok(map);
+//    @Login
+    public CommonResult list(@RequestBody BaseQO<CommunityFunQO> baseQO) {
+        PageInfo pageInfo = communityFunService.findList(baseQO);
+        return CommonResult.ok(pageInfo);
     }
     @ApiOperation("新增")
     @PostMapping("/save")
-    @Login
+    //@Login
     public CommonResult save(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
         String userId = UserUtils.getUserId();
@@ -64,7 +64,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增缩略图")
     @PostMapping("/smallImge")
-    @Login
+    //@Login
     public CommonResult upload(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -77,7 +77,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
-    @Login
+    //@Login
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -152,7 +152,7 @@ public class CommunityFunController {
 
     @ApiOperation("上线")
     @GetMapping("/popUpOnline")
-    @Login
+  //  @Login
     public CommonResult popUpOnline(@ApiParam("社区趣事id")
                                         @RequestParam("id") Long id) {
         String userId = UserUtils.getUserId();

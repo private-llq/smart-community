@@ -36,7 +36,7 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
         ComplainEntity complainEntity = complainsMapper.selectById(complainFeedbackQO.getId());
         complainEntity.setStatus(1);
         complainEntity.setComplainTime(LocalDateTime.now());
-        complainEntity.setFeedback(complainFeedbackQO.getContent());
+        complainEntity.setFeedback(complainFeedbackQO.getBody());
         complainsMapper.updateById(complainEntity);
     }
     /**

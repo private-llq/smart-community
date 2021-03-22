@@ -6,13 +6,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyComplaintsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PropertyComplaintsEntity;
+import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.PropertyComplaintsMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.ComplainFeedbackQO;
 import com.jsy.community.qo.property.PropertyComplaintsQO;
 import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
@@ -24,6 +29,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class PropertyComplaintsServiceImpl extends ServiceImpl<PropertyComplaintsMapper, PropertyComplaintsEntity> implements IPropertyComplaintsService {
     @Autowired
     private PropertyComplaintsMapper propertyComplaintsMapper;
+    @Autowired
+    private AdminUserMapper adminUserMapper;
+
+    @Override
+    public void complainFeedback(ComplainFeedbackQO complainFeedbackQO) {
+        PropertyComplaintsEntity entity = propertyComplaintsMapper.selectById(complainFeedbackQO.getId());
+        entity.setReplyContent(complainFeedbackQO.getBody());
+        entity.setStatus(1);
+        entity.setReplyUid(complainFeedbackQO.getUid());
+        AdminUserEntity userEntity = adminUserMapper.selectById(complainFeedbackQO.getUid());
+        if (userEntity!=null){
+            entity.setReplyName(userEntity.getRealName());
+        }
+        entity.setReplyTime(LocalDateTime.now());
+        propertyComplaintsMapper.updateById(entity);
+    }
+
     /**
      * @Description: 分页查询物业投诉接口
      * @author: Hu

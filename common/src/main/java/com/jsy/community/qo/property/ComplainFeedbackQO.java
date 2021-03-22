@@ -18,6 +18,8 @@ public class ComplainFeedbackQO implements Serializable {
     @ApiModelProperty("投诉信息id")
     private Long id;
     @ApiModelProperty("反馈内容")
-    private String content;
+    private String body;
+    @ApiModelProperty(value = "ID",hidden = true)
+    private String uid;
 
 }

@@ -4,8 +4,10 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IPropertyComplaintsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.ComplainFeedbackQO;
 import com.jsy.community.qo.property.PropertyComplaintsQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +38,13 @@ public class PropertyComplaintsController {
         System.out.println(baseQO);
         PageInfo list=propertyComplaintsService.findList(baseQO);
         return CommonResult.ok(list);
+    }
+    @ApiOperation("投诉回复")
+    @PostMapping("/complainFeedback")
+    public CommonResult complainFeedback(@RequestBody ComplainFeedbackQO complainFeedbackQO){
+        complainFeedbackQO.setUid(UserUtils.getUserId());
+        propertyComplaintsService.complainFeedback(complainFeedbackQO);
+        return CommonResult.ok();
     }
 
 

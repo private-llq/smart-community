@@ -12,8 +12,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 /**
  * 物业端用户
@@ -91,6 +89,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 组织机构名称
 	 */
+	@TableField(exist = false)
 	private String orgName;
 	
 	/**
@@ -159,6 +158,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * token
 	 */
+	@TableField(exist = false)
 	private String token;
 	
 	/**

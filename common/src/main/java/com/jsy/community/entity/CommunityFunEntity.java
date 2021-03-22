@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -15,20 +14,20 @@ import java.time.LocalDateTime;
  * @author: Hu
  * @create: 2020-12-09 10:22
  **/
-@EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel("业主实体类")
+@ApiModel("社区趣事")
 @TableName("t_community_fun")
 public class CommunityFunEntity extends BaseEntity {
+
     @ApiModelProperty(value = "社区趣事标题")
-    @NotBlank(groups = {CommunityFunValidated.class},message = "标题不能为空！")
+    @NotBlank(groups = {CommunityFunValidated.class}, message = "标题不能为空！")
     private String titleName;
 
     @ApiModelProperty(value = "社区趣事浏览次数")
     private Integer viewCount;
 
     @ApiModelProperty(value = "uid创建人")
-    private String uid;
+    private String createUid;
 
     @ApiModelProperty(value = "uid修改人")
     private String updateUid;
@@ -37,13 +36,13 @@ public class CommunityFunEntity extends BaseEntity {
     private String startUid;
 
     @ApiModelProperty(value = "社区趣事内容")
-    @NotBlank(groups = {CommunityFunValidated.class},message = "内容不能为空！")
+    @NotBlank(groups = {CommunityFunValidated.class}, message = "内容不能为空！")
     private String content;
     @ApiModelProperty(value = "社区趣事缩略图地址")
-    @NotBlank(groups = {CommunityFunValidated.class},message = "缩略图不能为空！")
+    @NotBlank(groups = {CommunityFunValidated.class}, message = "缩略图不能为空！")
     private String smallImageUrl;
     @ApiModelProperty(value = "社区趣事封面图地址")
-    @NotBlank(groups = {CommunityFunValidated.class},message = "封面图不能为空！")
+    @NotBlank(groups = {CommunityFunValidated.class}, message = "封面图不能为空！")
     private String coverImageUrl;
     @ApiModelProperty(value = "社区趣事状态1表示已上线，2二表示为上线")
     private Integer status;
@@ -53,8 +52,16 @@ public class CommunityFunEntity extends BaseEntity {
     private LocalDateTime outTime;
     @ApiModelProperty(value = "标签")
     private String tallys;
+    @ApiModelProperty(value = "创建人名称")
+    private String createName;
+    @ApiModelProperty(value = "修改人名称")
+    private String updateName;
+    @ApiModelProperty(value = "发布人名称")
+    private String startName;
 
-    public interface CommunityFunValidated{}
+
+    public interface CommunityFunValidated {
+    }
 
 
 }

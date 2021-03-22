@@ -5,8 +5,7 @@ import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.property.CommunityFunQO;
-
-import java.util.Map;
+import com.jsy.community.utils.PageInfo;
 
 /**
  * @program: com.jsy.community
@@ -15,7 +14,7 @@ import java.util.Map;
  * @create: 2020-12-09 10:49
  **/
 public interface ICommunityFunService extends IService<CommunityFunEntity> {
-    Map<String,Object> findList(BaseQO<CommunityFunQO> baseQO);
+    PageInfo findList(BaseQO<CommunityFunQO> baseQO);
 
 
     /**

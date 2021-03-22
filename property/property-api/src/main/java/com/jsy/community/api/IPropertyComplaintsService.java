@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.PropertyComplaintsEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.ComplainFeedbackQO;
 import com.jsy.community.qo.property.PropertyComplaintsQO;
 import com.jsy.community.utils.PageInfo;
 
@@ -21,4 +22,13 @@ public interface IPropertyComplaintsService extends IService<PropertyComplaintsE
      * @return:
      */
     PageInfo findList(BaseQO<PropertyComplaintsQO> baseQO);
+
+    /**
+     * @Description: 投诉回复
+     * @author: Hu
+     * @since: 2021/3/22 9:21
+     * @Param:
+     * @return:
+     */
+    void complainFeedback(ComplainFeedbackQO complainFeedbackQO);
 }
