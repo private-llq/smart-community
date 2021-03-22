@@ -54,6 +54,11 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	AdminUserEntity queryByMobile(String mobile);
 	
 	/**
+	 * 根据手机号，查询用户是否存在
+	 */
+	boolean isExistsByMobile(String mobile);
+	
+	/**
 	 * 保存用户
 	 */
 	void saveUser(AdminUserEntity user);

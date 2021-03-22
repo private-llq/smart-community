@@ -16,11 +16,11 @@ public class AdminLoginQO {
 	private String account;
 	
 	@ApiModelProperty(value = "密码")
-	@NotBlank(message = "账号不能为空")
 	private String password;
 	
 	@ApiModelProperty(value = "验证码")
 	private String captcha;
 	
-	
+	@ApiModelProperty("手机验证码")
+	private String code;
 }

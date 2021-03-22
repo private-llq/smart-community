@@ -121,6 +121,11 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	}
 	
 	@Override
+	public boolean isExistsByMobile(String mobile){
+		return baseMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("mobile",mobile)) == 1;
+	}
+	
+	@Override
 	@Transactional
 	public void saveUser(AdminUserEntity user) {
 		user.setCreateTime(LocalDateTime.now());
