@@ -52,4 +52,12 @@ public interface IFacilityTypeService extends IService<FacilityTypeEntity> {
 	 **/
 	List<FacilityTypeVO> listFacilityType(Long communityId);
 	
+	/**
+	 * @return com.jsy.community.entity.hk.FacilityTypeEntity
+	 * @Author lihao
+	 * @Description 根据id查询设备分类信息
+	 * @Date 2021/3/22 16:12
+	 * @Param [id]
+	 **/
+	FacilityTypeEntity getFacilityType(Long id);
 }
