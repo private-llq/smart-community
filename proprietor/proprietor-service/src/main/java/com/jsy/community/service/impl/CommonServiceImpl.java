@@ -40,6 +40,9 @@ import java.util.*;
 @Primary
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class CommonServiceImpl implements ICommonService {
+    
+    private static final Integer QUERY_TYPE_CITY = 2;
+    private static final Integer QUERY_TYPE_AREA = 3;
 
     @Resource
     private CommonMapper commonMapper;
@@ -190,7 +193,19 @@ public class CommonServiceImpl implements ICommonService {
     **/
     @Override
     public List<RegionEntity> vagueQueryCity(String searchStr) {
-        return regionMapper.vagueQueryCity(searchStr);
+        return regionMapper.vagueQueryRegion(searchStr,QUERY_TYPE_CITY,null);
+    }
+    
+    /**
+    * @Description: 区域模糊查询
+     * @Param: [searchStr]
+     * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+     * @Author: chq459799974
+     * @Date: 2021/3/22
+    **/
+    @Override
+    public List<RegionEntity> vagueQueryArea(String searchStr, Integer cityId) {
+        return regionMapper.vagueQueryRegion(searchStr,QUERY_TYPE_AREA,cityId);
     }
 
     //天气假数据
