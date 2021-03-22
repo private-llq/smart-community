@@ -3,7 +3,6 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IOrganizationService;
-import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.OrganizationEntity;
 import com.jsy.community.utils.ValidatorUtils;
@@ -43,13 +42,11 @@ public class OrganizationController {
 	@PostMapping("/addOrganization")
 	public CommonResult addOrganization(@RequestBody OrganizationEntity organizationEntity) {
 		ValidatorUtils.validateEntity(organizationEntity, OrganizationEntity.addOrganizationValidate.class);
-		if (organizationEntity.getSort() > 99 || organizationEntity.getSort() < 0) {
-			throw new PropertyException("你输入的排序序号不符要求,请重新输入!");
-		}
 		organizationService.addOrganization(organizationEntity);
 		return CommonResult.ok();
 	}
 	
+	// TODO: 2021/3/22 组织机构没有对其下有成员时做判定限制
 	@ApiOperation("删除组织机构")
 	@GetMapping("/deleteOrganization")
 	public CommonResult deleteOrganization(@RequestParam Long id, @RequestParam Long communityId) {
@@ -69,9 +66,6 @@ public class OrganizationController {
 	@PostMapping("/updateOrganization")
 	public CommonResult updateOrganization(@RequestBody OrganizationEntity organization) {
 		ValidatorUtils.validateEntity(organization, OrganizationEntity.updateOrganizationValidate.class);
-		if (organization.getSort() > 99 || organization.getSort() < 0) {
-			throw new PropertyException("你输入的排序序号不符要求,请重新输入!");
-		}
 		organizationService.updateOrganization(organization);
 		return CommonResult.ok();
 	}

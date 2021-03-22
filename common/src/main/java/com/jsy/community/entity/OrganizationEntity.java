@@ -7,7 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -39,12 +41,15 @@ public class OrganizationEntity extends BaseEntity {
 
     @ApiModelProperty(value = "组织名称")
     @NotNull(groups = {addOrganizationValidate.class, updateOrganizationValidate.class}, message = "组织机构名称不能为空")
+    @Length(groups = {addOrganizationValidate.class, updateOrganizationValidate.class},min = 1,max = 50)
     private String name;
 
     @ApiModelProperty(value = "排序序号 0-99")
+    @Max(groups = {addOrganizationValidate.class, updateOrganizationValidate.class},value = 99,message = "排序序号最大为99")
     private Integer sort;
 
     @ApiModelProperty(value = "是否为维修部 0 否 1 是")
+    @Max(groups = {addOrganizationValidate.class, updateOrganizationValidate.class},value = 1,message = "请正确选择是否为维修部")
     private Integer isRepair;
     
     
