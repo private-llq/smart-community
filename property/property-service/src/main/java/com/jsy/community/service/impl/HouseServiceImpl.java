@@ -367,10 +367,12 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				houseEntity.setBuilding(houseEntity.getName());
 				//查询子级单元id，子级房屋id，整合到一起
 				List<Long> subUnitIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
-				List<Long> subRoomIdList = houseMapper.getSubIdList(subUnitIdList);
-				subUnitIdList.addAll(subRoomIdList);
-				//同步修改子节点
-				houseMapper.updateSub(subUnitIdList,entity);
+				if(!CollectionUtils.isEmpty(subUnitIdList)){
+					List<Long> subRoomIdList = houseMapper.getSubIdList(subUnitIdList);
+					subUnitIdList.addAll(subRoomIdList);
+					//同步修改子节点
+					houseMapper.updateSub(subUnitIdList,entity);
+				}
 			}
 		//若类型为 单元，且单元名称有修改，同步修改房屋冗余的单元名称
 		}else if(BusinessConst.BUILDING_TYPE_UNIT == entity.getType()){
@@ -382,8 +384,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				houseEntity.setUnit(houseEntity.getName());
 				//查询子级房屋id
 				List<Long> subRoomIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
-				//同步修改子节点
-				houseMapper.updateSub(subRoomIdList,entity);
+				if(!CollectionUtils.isEmpty(subRoomIdList)){
+					//同步修改子节点
+					houseMapper.updateSub(subRoomIdList,entity);
+				}
 			}
 		}
 		return houseMapper.updateHouse(houseEntity) == 1;

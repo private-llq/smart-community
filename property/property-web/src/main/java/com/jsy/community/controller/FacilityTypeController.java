@@ -43,6 +43,14 @@ public class FacilityTypeController {
 	}
 	
 	//完成
+	@ApiOperation("根据id查询设备分类")
+	@GetMapping("/getFacilityType")
+	public CommonResult getFacilityType(@RequestParam Long id) {
+		FacilityTypeEntity typeEntity = facilityTypeService.getFacilityType(id);
+		return CommonResult.ok(typeEntity);
+	}
+	
+	//完成
 	@ApiOperation("修改设备分类")
 	@PostMapping("/updateFacilityType")
 	public CommonResult updateFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
@@ -51,7 +59,7 @@ public class FacilityTypeController {
 		return CommonResult.ok();
 	}
 	
-	//完成(没测)
+	//完成
 	@ApiOperation("删除设备分类")
 	@GetMapping("/deleteFacilityType")
 	public CommonResult deleteFacilityType(@RequestParam Long id,@RequestParam Long communityId) {

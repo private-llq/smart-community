@@ -384,7 +384,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserEntity.setUid(UserUtils.randomUUID());
 		adminUserEntity.setStatus(adminUserEntity.getStatus() != null ? adminUserEntity.getStatus() : 0);
 		//生成随机密码
-		String randomPass = RandomStringUtils.randomAlphanumeric(8);
+		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		adminUserEntity.setPassword(new Sha256Hash(randomPass, salt).toHex());
@@ -430,7 +430,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	public boolean resetPassword(Long id,String uid){
 		Long communityId = 2L;
 		//生成随机密码
-		String randomPass = RandomStringUtils.randomAlphanumeric(8);
+		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		String password = new Sha256Hash(randomPass, salt).toHex();
