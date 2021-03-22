@@ -397,6 +397,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
+    @Deprecated
     public Boolean proprietorUpdate(ProprietorQO qo) {
         updateCar(qo);
         //========================================== 业主房屋 =========================================================
