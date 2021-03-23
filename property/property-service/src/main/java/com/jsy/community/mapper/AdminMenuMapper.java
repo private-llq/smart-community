@@ -2,12 +2,10 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.admin.AdminMenuEntity;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author chq459799974
@@ -74,5 +72,39 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Date: 2020/12/15
 	 **/
 	List<AdminMenuEntity> queryUserMenu(Long uid);
+	
+	//================================================== 物业端原型 - 用户关联菜单start =========================================================================
+	
+//	/**
+//	 * @Description: 查询用户菜单(备份)
+//	 * @Param: [uid]
+//	 * @Return: java.util.List<java.lang.Long>
+//	 * @Author: chq459799974
+//	 * @Date: 2020/3/23
+//	 **/
+//	@Select("select menu_id from t_admin_user_menu where uid = #{uid}")
+//	List<Long> getUserMenu(String uid);
+	
+	/**
+	 * @Description: 清空用户菜单
+	 * @Param: [uid]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2020/3/23
+	 **/
+	@Delete("delete from t_admin_user_menu where uid = #{uid}")
+	void clearUserMenu(String uid);
+	
+	/**
+	 * @Description: 为用户批量添加菜单
+	 * @Param: [menuIdsSet, uid]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2020/3/23
+	 **/
+	int addUserMenuBatch(@Param("collection") Set<Long> menuIdsSet, @Param("uid") String uid);
+	
+	//================================================== 物业端原型 - 用户关联菜单end =========================================================================
+	
 	
 }

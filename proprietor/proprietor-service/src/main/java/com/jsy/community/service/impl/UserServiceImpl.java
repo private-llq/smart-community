@@ -110,6 +110,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         Date expireDate = new Date(new Date().getTime() + expire * 1000);
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setExpiredTime(LocalDateTimeUtil.of(expireDate));
+        userInfoVo.setIsBindMobile(1);
         userAuthVo.setUserInfo(userInfoVo);
         String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(userInfoVo), expire, TimeUnit.SECONDS);
         userAuthVo.setToken(token);

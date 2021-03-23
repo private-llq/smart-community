@@ -1,10 +1,9 @@
 package com.jsy.community.qo.admin;
 
-import com.jsy.community.qo.BaseQO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * @author chq459799974
@@ -12,7 +11,10 @@ import javax.validation.constraints.NotNull;
  * @since 2021-03-16 09:42
  **/
 @Data
-public class AdminUserQO extends BaseQO {
+public class AdminUserQO implements Serializable {
+	
+	@ApiModelProperty(value = "id")
+	private Long id;
 	
 	@ApiModelProperty(value = "社区ID")
 	private Long communityId;

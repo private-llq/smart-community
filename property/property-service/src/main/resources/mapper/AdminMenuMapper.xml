@@ -27,4 +27,13 @@
 		where ur.user_id = #{uid}
 	</select>
 
+	<!-- 批量添加用户菜单 -->
+	<insert id="addUserMenuBatch" parameterType="java.util.Set">
+		insert into t_admin_user_menu(uid,menu_id)
+		values
+		<foreach collection="collection" item="item" separator=",">
+			(#{uid},#{item})
+		</foreach>
+	</insert>
+
 </mapper>

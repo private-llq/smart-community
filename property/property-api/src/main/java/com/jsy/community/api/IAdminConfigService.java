@@ -109,4 +109,15 @@ public interface IAdminConfigService {
 	 * @Date: 2020/12/15
 	**/
 	List<AdminMenuEntity> queryUserMenu(Long uid);
+	
+	//================================================== 物业端原型 - 用户关联菜单start =========================================================================
+	/**
+	* @Description: 为用户分配菜单
+	 * @Param: [menuIds, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/23
+	**/
+	void setUserMenus(List<Long> menuIds,String uid);
+	//================================================== 物业端原型 - 用户关联菜单end =========================================================================
 }
