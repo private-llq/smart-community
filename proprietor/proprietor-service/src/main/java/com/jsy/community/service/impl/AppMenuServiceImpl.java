@@ -38,7 +38,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		// TODO: 2021/2/5 如果该小区没有菜单，暂时也给他返回小区  原因：现阶段便于测试人员测试
 		// 如果传入的小区没有菜单，则返回id为27839755849728L的小区菜单
 		List<Long> testmenuIds = appMenuMapper.selectMenuIdByCommunityId(27839755849728L,INDEX_MENU_COUNT);
-		if (menuIds==null) {
+		if (CollectionUtils.isEmpty(menuIds)) {
 			menuIds = testmenuIds;
 		}
 		
