@@ -1,9 +1,6 @@
 package com.jsy.community.service.impl;
 
-import com.jsy.community.api.IAdminUserService;
-import com.jsy.community.api.ICaptchaService;
-import com.jsy.community.api.IUserAuthService;
-import com.jsy.community.api.ProprietorException;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.utils.SmsUtil;
@@ -22,7 +19,7 @@ import javax.annotation.Resource;
  * @author ling
  * @since 2020-11-12 10:39
  */
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_property)
 @RefreshScope
 public class CaptchaServiceImpl implements ICaptchaService {
 	
@@ -41,15 +38,15 @@ public class CaptchaServiceImpl implements ICaptchaService {
 			// 验证是否已存在
 			boolean isExists = adminUserService.isExistsByMobile(mobile);
 			if (isExists) {
-				throw new ProprietorException("您已注册账号");
+				throw new PropertyException("您已注册账号");
 			}
 		} else if (type == UserAuthEntity.CODE_TYPE_LOGIN || type == UserAuthEntity.CODE_TYPE_FORGET_PWD) {
 			boolean isExists = adminUserService.isExistsByMobile(mobile);
 			if (!isExists) {
-				throw new ProprietorException("您还没有注册");
+				throw new PropertyException("您还没有注册");
 			}
 		} else{
-			throw new ProprietorException("不支持的验证码类型");
+			throw new PropertyException("不支持的验证码类型");
 		}
 		
 		//发短信
