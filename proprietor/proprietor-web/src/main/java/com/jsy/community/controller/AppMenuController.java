@@ -56,7 +56,7 @@ public class AppMenuController {
 		List<AppMenuEntity> list = appMenuService.moreIndexMenu(communityId);
 		return CommonResult.ok(list);
 	}
-
+	
 	
 }
 

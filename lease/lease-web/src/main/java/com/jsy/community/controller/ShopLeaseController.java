@@ -270,7 +270,6 @@ public class ShopLeaseController {
 	@ApiOperation("查询店铺详情")
 	@RequireRecentBrowse
 	@GetMapping("/getShop")
-//	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
 		Map<String, Object> map = shopLeaseService.getShop(shopId);
 		if (map == null) {

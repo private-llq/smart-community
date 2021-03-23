@@ -306,7 +306,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Override
 	public List<Map<String, Object>> listShop(String userId) {
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("uid", userId);
+		wrapper.eq("uid", userId).orderByDesc("create_time");
 		List<Map<String, Object>> maps = new ArrayList<>();
 		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
 		for (ShopLeaseEntity shopLeaseEntity : list) {

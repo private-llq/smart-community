@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.AppMenuEntity;
+import com.jsy.community.vo.menu.AppMenuVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Date 2021/2/2 18:56
 	 * @Param [appMenuEntity, communityId]
 	 **/
-	void insertMiddleMenu(List<AppMenuEntity> appMenuEntityList);
+	void insertMiddleMenu(List<AppMenuVO> appMenuVOS);
 	
 	/**
 	 * @return void
@@ -52,5 +53,5 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Date 2021/3/23 11:27
 	 * @Param [ids]
 	 **/
-	void deleteMiddleMenu(List<Long> ids);
+	void deleteMiddleMenu(Long id);
 }

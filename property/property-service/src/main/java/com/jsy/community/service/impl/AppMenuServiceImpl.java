@@ -6,11 +6,11 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.mapper.AppMenuMapper;
+import com.jsy.community.vo.menu.AppMenuVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +26,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	
 	@Autowired
 	private AppMenuMapper appMenuMapper;
-	
+
 //	@Override
 //	public List<AppMenuEntity> listParentMenu() {
 //		QueryWrapper<AppMenuEntity> wrapper = new QueryWrapper<>();
@@ -40,7 +40,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 //		queryWrapper.eq("parent_id", parentId);
 //		return appMenuMapper.selectList(queryWrapper);
 //	}
-	
+
 //	@Override
 //	public List<FrontParentMenu> listAdminMenu(Long communityId) {
 //		// 1. 根据社区id查询中间表中所有菜单id
@@ -150,24 +150,21 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void appMenu(List<AppMenuEntity> appMenuEntityList) {
-		List<Long> ids = new ArrayList<>();
+	public void appMenu(List<AppMenuVO> appMenuVOS) {
 		// 判断添加的菜单id是否存在
-		for (AppMenuEntity appMenuEntity : appMenuEntityList) {
-			Long id = appMenuEntity.getId();
+		for (AppMenuVO appMenuEntity : appMenuVOS) {
+			Long id = appMenuEntity.getMenuId();
 			AppMenuEntity menuEntity = appMenuMapper.selectById(id);
-			if (menuEntity==null) {
+			if (menuEntity == null) {
 				throw new PropertyException("您选择的菜单不存在或不正确,请重新添加");
 			}
-			ids.add(appMenuEntity.getCommunityId());
+			
+			// 删除该社区原本有的中间表数据
+			// TODO: 2021/3/23 因为这个功能 新增和编辑是同一个  不管他是新增还是编辑  把他原本的清空
+			appMenuMapper.deleteMiddleMenu(appMenuEntity.getCommunityId());
 		}
 		
-		// 删除该社区原本有的中间表数据
-		// TODO: 2021/3/23 因为这个功能 新增和编辑是同一个
-		appMenuMapper.deleteMiddleMenu(ids);
-		
 		// 添加菜单到中间表
-		appMenuMapper.insertMiddleMenu(appMenuEntityList);
-		
+		appMenuMapper.insertMiddleMenu(appMenuVOS);
 	}
 }

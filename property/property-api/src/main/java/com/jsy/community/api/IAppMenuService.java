@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.AppMenuEntity;
+import com.jsy.community.vo.menu.AppMenuVO;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * @since 2020-11-24
  */
 public interface IAppMenuService extends IService<AppMenuEntity> {
-	
+
 //	/**
 //	 * @return java.util.List<com.jsy.community.entity.AppMenuEntity>
 //	 * @Author lihao
@@ -85,5 +86,5 @@ public interface IAppMenuService extends IService<AppMenuEntity> {
 	 * @Date 2021/3/23 10:37
 	 * @Param [appMenuEntity]
 	 **/
-	void appMenu(List<AppMenuEntity> appMenuEntityList);
+	void appMenu(List<AppMenuVO> appMenuVOS);
 }

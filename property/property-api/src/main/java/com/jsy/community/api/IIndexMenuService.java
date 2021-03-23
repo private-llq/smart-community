@@ -5,7 +5,6 @@ import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.entity.IndexMenuEntity;
 import com.jsy.community.vo.FrontMenuVO;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.vo.menu.FrontParentMenu;
 
 import java.util.List;
 
@@ -101,14 +100,14 @@ public interface IIndexMenuService extends IService<IndexMenuEntity> {
 	 **/
 	List<FrontMenuVO> moreListMenu();
 	
-	/**
-	 * @return java.util.List<com.jsy.community.vo.menu.FrontParentMenu>
-	 * @Author lihao
-	 * @Description 树形结构
-	 * @Date 2020/11/17 10:14
-	 * @Param []
-	 **/
-	List<FrontParentMenu> listAdminMenu(Long communityId);
+//	/**
+//	 * @return java.util.List<com.jsy.community.vo.menu.FrontParentMenu>
+//	 * @Author lihao
+//	 * @Description 树形结构
+//	 * @Date 2020/11/17 10:14
+//	 * @Param []
+//	 **/
+//	List<FrontParentMenu> listAdminMenu(Long communityId);
 	
 	/**
 	 * @return void

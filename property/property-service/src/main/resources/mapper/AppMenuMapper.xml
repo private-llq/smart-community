@@ -9,8 +9,8 @@
 
     <insert id="insertMiddleMenu">
         insert into t_menu_community (community_id,menu_id,sort) values
-        <foreach collection="appMenuEntityList" item="appMenu" separator=";" open="(" close=")">
-            #{appMenu.communityId},#{appMenu.id},#{appMenu.sort}
+        <foreach collection="appMenuVOS" item="appMenu" separator=",">
+            (#{appMenu.communityId},#{appMenu.menuId},#{appMenu.sort})
         </foreach>
 
     </insert>
@@ -26,9 +26,6 @@
     </select>
 
     <delete id="deleteMiddleMenu">
-        delete from t_menu_community where community_id =
-        <foreach collection="ids" open="(" close=")" separator=";" item="id">
-            #{id}
-        </foreach>
+        delete from t_menu_community where community_id = #{id}
     </delete>
 </mapper>
