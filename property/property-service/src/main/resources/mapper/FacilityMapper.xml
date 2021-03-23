@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.FacilityMapper">
+    <select id="listFacility" resultType="com.jsy.community.entity.hk.FacilityEntity">
+        select id,number ,name ,facility_type_id,serial_number,ip,model_number,address,create_person,create_time,data_connect_time,remark
+        from t_facility
+        <where>
+            <!-- 设备编号 -->
+            <if test="number!=null and number!=''">
+                number like concat("%",#{number},"%")
+            </if>
+            <!-- 设备名称 -->
+            <if test="name!=null and name!=''">
+                and name like concat("%",#{name},"%")
+            </if>
+            <!-- 设备所属分类 -->
+            <if test="facilityTypeName!=null and facilityTypeName!=''">
+                and facility_type_name like concat("%",#{facilityTypeName},"%")
+            </if>
+            <!-- 设备备注 -->
+            <if test="remark!=null and remark!=''">
+                and remark like concat("%",#{remark},"%")
+            </if>
+            <!-- 数据同步时间 -->
+            <if test="startTime!=null and endTime!=null">
+                and data_connect_time between #{startTime} and #{endTime}
+            </if>
+            and deleted = 0 and community_id = #{communityId} and facility_type_id = #{facilityTypeId}
+        </where>
+        order by create_time desc
+        limit #{page},#{size}
+    </select>
+</mapper>

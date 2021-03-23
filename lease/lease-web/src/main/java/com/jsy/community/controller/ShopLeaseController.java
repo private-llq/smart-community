@@ -123,7 +123,7 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")
 	@PostMapping("/getShopByCondition")
-	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO,
+	public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO,
 	                                       @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
 	                                       @ApiParam("区域id") @RequestParam(required = false, defaultValue = "500103") Integer areaId) {
 		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO, query, areaId);
@@ -144,6 +144,8 @@ public class ShopLeaseController {
 					record.setMonthMoneyString(substring);
 				}
 			}
+		} else {
+			return CommonResult.ok(new PageInfo<IndexShopVO>().setCurrent(baseQO.getPage()).setSize(baseQO.getSize()));
 		}
 		return CommonResult.ok(pageInfo);
 	}
