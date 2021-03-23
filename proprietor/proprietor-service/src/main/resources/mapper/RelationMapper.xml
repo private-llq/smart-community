@@ -57,7 +57,7 @@
         </set>
     </update>
     <update id="updateUserRelationCar" parameterType="com.jsy.community.qo.RelationCarsQo">
-            update t_car
+            update t_relation_car
             <set>
                 <if test="carPlate!=null and carPlate!=''">
                     car_plate=#{carPlate},
@@ -72,7 +72,7 @@
             where id=#{id}
     </update>
     <insert id="insertOne">
-        insert into t_car(id,uid,car_type,car_plate,contact,owner,community_id,house_member_id,driving_license_url)
-        value (#{id},#{uid},#{carType},#{carPlate},#{contact},#{owner},#{communityId},#{houseMemberId},#{drivingLicenseUrl})
+        insert into t_relation_car(id,uid,car_type,car_plate,mobile,owner,id_card,community_id,relationship_id,driving_license_url,relation_type)
+        value (#{id},#{uid},#{carType},#{carPlate},#{mobile},#{owner},#{idCard},#{communityId},#{relationshipId},#{drivingLicenseUrl},#{relationType})
     </insert>
 </mapper>
