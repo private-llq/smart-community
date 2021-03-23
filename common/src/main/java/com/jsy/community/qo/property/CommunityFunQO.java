@@ -26,8 +26,11 @@ public class CommunityFunQO implements Serializable {
     @ApiModelProperty("社区趣事标题模糊查询")
     private String headline;
 
-    @ApiModelProperty("状态1发布2撤销3编辑")
+    @ApiModelProperty("状态1发布2撤销")
     private Integer status;
+
+    @ApiModelProperty("状态1发布2编辑")
+    private Integer redactStatus;
 
     @ApiModelProperty("社区趣事标签模糊查询")
     private String tallys;

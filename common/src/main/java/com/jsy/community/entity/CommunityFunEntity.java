@@ -44,10 +44,10 @@ public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "社区趣事封面图地址")
     @NotBlank(groups = {CommunityFunValidated.class}, message = "封面图不能为空！")
     private String coverImageUrl;
-    @ApiModelProperty(value = "社区趣事状态1表示已上线，2二表示为上线")
+    @ApiModelProperty(value = "社区趣事状态1发布，2撤销")
     private Integer status;
-    @ApiModelProperty(value = "发布过的趣事该字段为1,未发布过为空")
-    private Integer issueStatus;
+    @ApiModelProperty(value = "1发布2编辑")
+    private Integer redactStatus;
     @ApiModelProperty(value = "上线时间")
     private LocalDateTime startTime;
     @ApiModelProperty(value = "下线时间")

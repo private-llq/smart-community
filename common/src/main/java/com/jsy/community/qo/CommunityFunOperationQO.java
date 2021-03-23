@@ -45,6 +45,8 @@ public class CommunityFunOperationQO implements Serializable {
     private String coverImageUrl;
     @ApiModelProperty(value = "社区趣事状态1表示已上线，2二表示为上线")
     private Integer status;
+    @ApiModelProperty(value = "社区趣事状态1表示已发布，2二表示为编辑")
+    private Integer redactStatus;
     @ApiModelProperty(value = "上线时间")
     private LocalDateTime startTime;
     @ApiModelProperty(value = "下线时间")
