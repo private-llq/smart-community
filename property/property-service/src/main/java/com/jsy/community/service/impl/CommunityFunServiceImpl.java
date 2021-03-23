@@ -107,7 +107,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setContent(communityFunOperationQO.getContent());
         entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
         entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
-        entity.setStatus(0);
+        entity.setStatus(3);
         String tallys = Arrays.toString(communityFunOperationQO.getTallys());
         entity.setTallys(tallys.substring(1, tallys.length() - 1));
         entity.setId(SnowFlake.nextId());
