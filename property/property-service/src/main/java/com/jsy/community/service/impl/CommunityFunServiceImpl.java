@@ -59,10 +59,10 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             wrapper.like("tallys",communityFunQO.getTallys());
         }
         if (communityFunQO.getStatus()!=null&&communityFunQO.getStatus()!=0){
-                wrapper.like("status",communityFunQO.getStatus());
+                wrapper.eq("status",communityFunQO.getStatus());
         }
         if (communityFunQO.getRedactStatus()!=null&&communityFunQO.getRedactStatus()!=0){
-                wrapper.like("redact_status",communityFunQO.getRedactStatus());
+                wrapper.eq("redact_status",communityFunQO.getRedactStatus());
         }
         if (communityFunQO.getCreatrTimeStart()!=null){
             wrapper.ge("create_time",communityFunQO.getCreatrTimeStart());
