@@ -15,10 +15,10 @@
 </sql>
 <!--  添加车辆  -->
     <insert id="addCars" parameterType="List">
-        insert into t_car(id,uid,car_type,car_plate,contact,owner,community_id,house_member_id,driving_license_url)
+        insert into t_relation_car(id,uid,car_type,car_plate,mobile,owner,id_card,community_id,relationship_id,driving_license_url,relation_type)
         values
         <foreach collection="cars" item="item" separator=",">
-            (#{item.id},#{item.uid},#{item.carType},#{item.carPlate},#{item.contact},#{item.owner},#{item.communityId},#{item.houseMemberId},#{item.drivingLicenseUrl})
+            (#{item.id},#{item.uid},#{item.carType},#{item.carPlate},#{item.mobile},#{item.owner},#{item.idCard},#{item.communityId},#{item.relationshipId},#{item.drivingLicenseUrl},#{item.relationType})
         </foreach>
     </insert>
     <!--  通过id查询业主家属  -->
@@ -67,12 +67,6 @@
                 </if>
                 <if test="drivingLicenseUrl!=null and drivingLicenseUrl!=''">
                     driving_license_url=#{drivingLicenseUrl},
-                </if>
-                <if test="owner!=null and owner!=''">
-                    owner=#{owner},
-                </if>
-                <if test="communityId!=null and communityId>0">
-                    community_id=#{communityId},
                 </if>
             </set>
             where id=#{id}

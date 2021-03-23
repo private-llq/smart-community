@@ -123,7 +123,7 @@ public class CommunityFunController {
     }
 
     @ApiOperation("修改")
-    @PostMapping("/update")
+    @PutMapping("/update")
     @Login
     public CommonResult update(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);

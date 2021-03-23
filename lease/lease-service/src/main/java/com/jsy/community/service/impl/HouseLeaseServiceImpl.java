@@ -184,7 +184,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //1.通过存在的条件 查出符合条件的分页所有房屋数据
         List<HouseLeaseVO> vos = houseLeaseMapper.queryHouseLeaseByList(qo);
         if( CollectionUtils.isEmpty(vos) ){
-            return null;
+            return vos;
         }
         //根据数据字段id 查询 一对多的 房屋标签name和id 如 邻地铁、可短租、临街商铺等多标签、之类
         getHouseFieldTag(vos);

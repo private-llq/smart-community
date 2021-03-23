@@ -38,10 +38,10 @@ public class CommunityFunQO implements Serializable {
     @ApiModelProperty("创建时间")
     private LocalDate creatrTimeOut;
 
-    @ApiModelProperty("社区趣事标题模糊查询")
+    @ApiModelProperty("发布时间")
     private LocalDate issueTimeStart;
 
-    @ApiModelProperty("社区趣事标题模糊查询")
+    @ApiModelProperty("发布时间")
     private LocalDate issueTimeOut;
 
 }
