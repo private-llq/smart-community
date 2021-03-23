@@ -100,7 +100,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         CommunityFunEntity entity = new CommunityFunEntity();
         entity.setTitleName(communityFunOperationQO.getTitleName());
         entity.setViewCount(communityFunOperationQO.getViewCount());
-        entity.setCreateUid(communityFunOperationQO.getUid());
+        entity.setCreateBy(communityFunOperationQO.getUid());
         if (userEntity!=null){
             entity.setCreateName(userEntity.getRealName());
         }
@@ -120,7 +120,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     public void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
         AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", uid));
         CommunityFunEntity entity = communityFunMapper.selectById(communityFunOperationQO.getId());
-        entity.setUpdateUid(uid);
+        entity.setUpdateBy(uid);
         if (userEntity!=null){
             entity.setUpdateName(userEntity.getRealName());
         }
@@ -155,7 +155,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setStartName(userEntity.getRealName());
     }
     entity.setStatus(1);
-    entity.setStartUid(uid);
+    entity.setStartBy(uid);
     entity.setStartTime(LocalDateTime.now());
     communityFunMapper.updateById(entity);
     ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
