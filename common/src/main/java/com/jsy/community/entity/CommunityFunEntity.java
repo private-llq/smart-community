@@ -46,6 +46,8 @@ public class CommunityFunEntity extends BaseEntity {
     private String coverImageUrl;
     @ApiModelProperty(value = "社区趣事状态1表示已上线，2二表示为上线")
     private Integer status;
+    @ApiModelProperty(value = "发布过的趣事该字段为1,未发布过为空")
+    private Integer issueStatus;
     @ApiModelProperty(value = "上线时间")
     private LocalDateTime startTime;
     @ApiModelProperty(value = "下线时间")

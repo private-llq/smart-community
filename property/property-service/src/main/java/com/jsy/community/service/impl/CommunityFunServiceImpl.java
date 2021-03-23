@@ -75,6 +75,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             communityFunQO.setIssueTimeOut(communityFunQO.getIssueTimeOut().plusDays(1));
             wrapper.le("start_time",communityFunQO.getCreatrTimeStart());
         }
+        wrapper.eq("issue_status",1);
         Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
         PageInfo pageInfo=new PageInfo();
@@ -154,6 +155,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     if (userEntity!=null){
         entity.setStartName(userEntity.getRealName());
     }
+    entity.setIssueStatus(1);
     entity.setStatus(1);
     entity.setStartBy(uid);
     entity.setStartTime(LocalDateTime.now());
