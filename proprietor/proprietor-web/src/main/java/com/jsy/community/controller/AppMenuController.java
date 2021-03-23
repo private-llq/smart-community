@@ -7,7 +7,6 @@ import com.jsy.community.api.IAppMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.menu.FrontParentMenu;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -54,10 +53,10 @@ public class AppMenuController {
 	@GetMapping("/moreListMenu")
 	public CommonResult moreListMenu(@ApiParam(value = "社区id")
 	                                 @RequestParam(value = "communityId", defaultValue = "1", required = false) Long communityId) {
-		List<FrontParentMenu> list = appMenuService.moreIndexMenu(communityId);
+		List<AppMenuEntity> list = appMenuService.moreIndexMenu(communityId);
 		return CommonResult.ok(list);
 	}
-	
+
 	
 }
 

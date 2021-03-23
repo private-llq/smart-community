@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.AppMenuEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Date 2021/2/3 13:59
 	 * @Param [communityId]
 	 **/
-	List<Long> selectMenuIdByCommunityId(Long communityId);
+	List<Long> selectMenuIdByCommunityId(@Param("communityId") Long communityId, @Param("count") Integer count);
 	
 	/**
 	 * @return java.util.List<java.lang.Long>
@@ -34,4 +35,5 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Param [communityId]
 	 **/
 	List<Long> getMenuIdByCommunityId(Long communityId);
+	
 }

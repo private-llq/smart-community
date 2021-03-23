@@ -4,7 +4,7 @@
 
 
     <select id="selectMenuIdByCommunityId" resultType="long">
-        select menu_id from t_menu_community where community_id = #{communityId}
+        select menu_id from t_menu_community where community_id = #{communityId} order by sort asc limit #{count}
     </select>
 
 
@@ -13,4 +13,5 @@
         FROM t_menu_community
         where community_id = #{communityId}
     </select>
+
 </mapper>
