@@ -91,7 +91,7 @@
     </select>
     <select id="selectOrderId" resultType="com.jsy.community.vo.livingpayment.TheBillingDetailsVO">
         SELECT
-        t.id as orderId,t.pay_type as payType,tp.name as typeName,
+        t.id as orderId,t.pay_type_name as payTypeName,t.pay_type as payType,tp.name as typeName,
         tp.icon as icon,tp.medium_icon as mediumIcon,
         tp.large_size_icon as largeSizeIcon,t.company_name as companyName,
         t.payment_balance as paymentBalance,t.status as status,t.family_id as familyId,

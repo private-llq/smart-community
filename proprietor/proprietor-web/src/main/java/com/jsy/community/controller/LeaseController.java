@@ -37,6 +37,9 @@ public class LeaseController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
 
+    /**
+     * 社区消息、社区趣事、租赁数据 批量导入es接口
+     */
     @GetMapping("/esBulkImport")
     public String test() throws IOException {
         List<FullTextSearchEntity> fullTextSearchEntities = commonService.fullTextSearchEntities();

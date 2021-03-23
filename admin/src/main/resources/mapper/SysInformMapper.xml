@@ -12,7 +12,7 @@
 			browse_count,
 			create_time
 		FROM
-			t_acct_push_inform
+			t_push_inform
 		where
 		<trim prefixOverrides="and">
 			<if test="query.pushTitle != null and query.pushTitle != &quot;&quot;">

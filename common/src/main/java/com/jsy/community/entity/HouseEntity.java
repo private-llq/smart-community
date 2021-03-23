@@ -29,6 +29,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
+    @ApiModelProperty(value = "字符串格式id,针对js long型长度不够的问题")
+    @TableField(exist = false)
+    private String idStr;
+    
     @ApiModelProperty(value = "编号")
     @NotBlank(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
     private String number;
@@ -41,7 +45,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private Long communityId;
     
     @ApiModelProperty(value = "是否有电梯 0.无 1.有")
-    private String hasElevator;
+    private Integer hasElevator;
     
     @ApiModelProperty(value = "名称")
     @TableField(exist = false)
@@ -81,7 +85,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private Integer type;
     
     @ApiModelProperty(value = "建筑面积(㎡)")
-    @NotNull(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少建筑面积")
+    @NotNull(groups = {addRoomValidatedGroup.class}, message = "缺少建筑面积")
     private Double buildArea;
     
     @ApiModelProperty(value = "房屋类型1.商铺 2.住宅")

@@ -22,7 +22,7 @@ import com.jsy.community.utils.CommonUtils;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticSearchImportProvider;
+import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.shop.IndexShopVO;
@@ -132,7 +132,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			}
 			shopImgMapper.insertImg(list);
 		}
-		ElasticSearchImportProvider.elasticOperationSingle(baseShop.getId(), RecordFlag.LEASE_SHOP, Operation.INSERT, baseShop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
+		ElasticsearchImportProvider.elasticOperationSingle(baseShop.getId(), RecordFlag.LEASE_SHOP, Operation.INSERT, baseShop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
 	}
 	
 	@Override
@@ -279,7 +279,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 添加图片信息
 			shopImgMapper.insertImg(imgList);
 		}
-		ElasticSearchImportProvider.elasticOperationSingle(shop.getShopId(), RecordFlag.LEASE_SHOP, Operation.UPDATE, shop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
+		ElasticsearchImportProvider.elasticOperationSingle(shop.getShopId(), RecordFlag.LEASE_SHOP, Operation.UPDATE, shop.getTitle(), CommonUtils.isEmpty(imgPath) ? null : imgPath[0]);
 	}
 	
 	@Override

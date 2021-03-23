@@ -4,6 +4,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
+import io.minio.errors.*;
 import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -11,12 +12,15 @@ import org.apache.http.entity.ContentType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -55,7 +59,8 @@ public class MinioUtils {
 		}
 		return uploadPic(file, bucketName);
 	}
-	
+
+
 	/**
 	 * 文件上传
 	 * @param file

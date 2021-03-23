@@ -2,6 +2,9 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.admin.AdminUserQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,11 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * 根据手机号，查询系统用户
 	 */
 	AdminUserEntity queryByMobile(String mobile);
+	
+	/**
+	 * 根据手机号，查询用户是否存在
+	 */
+	boolean isExistsByMobile(String mobile);
 	
 	/**
 	 * 保存用户
@@ -109,4 +117,46 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2020/12/1
 	**/
 	Map<String,String> setUserName(Long uid, String username);
+	
+	
+	//==================================== 物业端（新）begin ====================================
+	
+	/**
+	* @Description: 操作员条件查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo
+	 * @Author: chq459799974
+	 * @Date: 2021/3/16
+	**/
+	PageInfo queryOperator(BaseQO<AdminUserQO> baseQO);
+	
+	/**
+	* @Description: 添加操作员
+	 * @Param: [adminUserEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/17
+	**/
+	boolean addOperator(AdminUserEntity adminUserEntity);
+	
+	/**
+	* @Description: 编辑操作员
+	 * @Param: [adminUserEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/18
+	**/
+	boolean updateOperator(AdminUserEntity adminUserEntity);
+	
+	/**
+	* @Description: 重置密码
+	 * @Param: [id, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/18
+	**/
+	boolean resetPassword(Long id,String uid);
+	
+	
+	//==================================== 物业端（新）end ====================================
 }

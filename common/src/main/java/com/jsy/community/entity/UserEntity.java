@@ -97,6 +97,7 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("联系邮箱")
 	private String email;
 
+
 	@ApiModelProperty("车辆信息")
 	@TableField( exist = false )
 	private CarEntity carEntity;

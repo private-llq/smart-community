@@ -2,6 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.ProprietorMapper">
 
+    <!-- excel批量导入业主信息 存在则忽略 -->
+    <insert id="saveUserBatch" parameterType="java.util.List">
+        insert ignore into t_proprietor (
+        id,community_id,real_name,house_id,mobile,id_card,identification_type,wechat,qq,email,create_time,create_by
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},#{item.communityId},#{item.realName},#{item.houseId},#{item.mobile},#{item.idCard},#{item.identificationType},#{item.wechat},#{item.qq},#{item.email},#{item.createTime},#{item.createBy}
+            )
+        </foreach>
+    </insert>
+
     <!-- 物业添加新增业主 -->
     <insert id="saveUser">
         insert into t_user ( id,real_name,uid,wechat,qq,email,mobile,id_card,identification_type )
@@ -9,7 +22,7 @@
         ( #{id},#{realName},#{uid},#{wechat},#{qq},#{email},#{mobile},#{idCard},#{identificationType})
     </insert>
     <!-- 物业查询业主用户信息 -->
-    <select id="query" resultType="com.jsy.community.vo.ProprietorVO" >
+    <select id="query" resultType="com.jsy.community.vo.property.ProprietorVO" >
         SELECT
 	        p.id,
 	        p.real_name,
@@ -42,27 +55,28 @@
                 AND p.deleted = 0
                 AND h.deleted = 0
                 /* 如果房屋id不为空 就直接按房屋id查询业主 */
-                <if test="query.houseId != null and query.houseId &gt; 0 ">
-                    AND p.house_id = #{query.houseId}
+                <if test="baseQo.query.houseId != null and baseQo.query.houseId &gt; 0 ">
+                    AND p.house_id = #{baseQo.query.houseId}
                 </if>
                 /* [单楼栋]如果房屋id为空 并且 楼栋id 不为空 并且 单元id为空 那就按 房屋 父级id 为楼栋id的查  */
-                <if test="query.houseId == null and query.buildingId != null and query.unitId == null">
-                    AND h.pid = #{query.buildingId} and type = 4
+                <if test="baseQo.query.houseId == null and baseQo.query.buildingId != null and baseQo.query.unitId == null">
+                    AND h.pid = #{baseQo.query.buildingId} and type = 4
                 </if>
                 /* [楼栋单元]如果房屋id为空 并且 楼栋id 不为空 并且 单元id也不为空 那就按 房屋 父级id 为单元id的查  */
-                <if test="query.houseId == null and query.buildingId != null and query.unitId != null">
-                    AND h.pid = #{query.unitId} and type = 4
+                <if test="baseQo.query.houseId == null and baseQo.query.buildingId != null and baseQo.query.unitId != null">
+                    AND h.pid = #{baseQo.query.unitId} and type = 4
                 </if>
                 /* [单单元]如果房屋id为空 并且 楼栋id 为空 并且 单元id不为空 那就按 房屋 父级id 为单元id的查  */
-                <if test="query.houseId == null and query.buildingId == null and query.unitId != null">
-                    AND h.pid = #{query.unitId} and type = 4
+                <if test="baseQo.query.houseId == null and baseQo.query.buildingId == null and baseQo.query.unitId != null">
+                    AND h.pid = #{baseQo.query.unitId} and type = 4
                 </if>
                 /* 搜索文本不为空 则按 真实姓名/证件号码/手机号码 来匹配 */
-                <if test="query.searchText != null and !query.searchText.equals(&quot;&quot;)">
-                    AND p.real_name like concat('%',#{query.searchText},'%') or p.id_card like concat('%', #{query.searchText}, '%') or p.mobile like concat('%', #{query.searchText}, '%')
+                <if test="baseQo.query.searchText != null and !baseQo.query.searchText.equals(&quot;&quot;)">
+                    AND p.real_name like concat('%',#{baseQo.query.searchText},'%') or p.id_card like concat('%', #{baseQo.query.searchText}, '%') or p.mobile like concat('%', #{baseQo.query.searchText}, '%')
                 </if>
+                    AND p.community_id = #{baseQo.query.communityId}
             </where>
-            LIMIT #{page},#{size}
+
     </select>
 
 

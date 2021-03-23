@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,17 +10,17 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PropertyEnum;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
+import com.jsy.community.utils.CommonUtils;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.HouseVo;
+import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 /**
@@ -367,10 +367,12 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				houseEntity.setBuilding(houseEntity.getName());
 				//查询子级单元id，子级房屋id，整合到一起
 				List<Long> subUnitIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
-				List<Long> subRoomIdList = houseMapper.getSubIdList(subUnitIdList);
-				subUnitIdList.addAll(subRoomIdList);
-				//同步修改子节点
-				houseMapper.updateSub(subUnitIdList,entity);
+				if(!CollectionUtils.isEmpty(subUnitIdList)){
+					List<Long> subRoomIdList = houseMapper.getSubIdList(subUnitIdList);
+					subUnitIdList.addAll(subRoomIdList);
+					//同步修改子节点
+					houseMapper.updateSub(subUnitIdList,entity);
+				}
 			}
 		//若类型为 单元，且单元名称有修改，同步修改房屋冗余的单元名称
 		}else if(BusinessConst.BUILDING_TYPE_UNIT == entity.getType()){
@@ -382,8 +384,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				houseEntity.setUnit(houseEntity.getName());
 				//查询子级房屋id
 				List<Long> subRoomIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
-				//同步修改子节点
-				houseMapper.updateSub(subRoomIdList,entity);
+				if(!CollectionUtils.isEmpty(subRoomIdList)){
+					//同步修改子节点
+					houseMapper.updateSub(subRoomIdList,entity);
+				}
 			}
 		}
 		return houseMapper.updateHouse(houseEntity) == 1;
@@ -430,29 +434,37 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		}
 		queryWrapper.orderByDesc("create_time");
 		Page<HouseEntity> pageData = houseMapper.selectPage(page, queryWrapper);
-		//查询类型为楼栋，再查出已绑定单元数
-		if(!CollectionUtils.isEmpty(pageData.getRecords()) && BusinessConst.BUILDING_TYPE_BUILDING == query.getType()){
-			List<Long> paramList = new ArrayList<>();
-			for(HouseEntity houseEntity : pageData.getRecords()){
-				paramList.add(houseEntity.getId());
-			}
-			Map<Long, Map<String,Long>> bindMap = houseMapper.queryBindUnitCountBatch(paramList);
-			for(HouseEntity houseEntity : pageData.getRecords()){
-				Map<String, Long> countMap = bindMap.get(houseEntity.getId());
-				houseEntity.setBindUnitCount(countMap != null ? countMap.get("count") : null);
-			}
-		}
-		//查询类型为房屋，设置房屋类型、房产类型、装修情况、户型
-		if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
-			for(HouseEntity houseEntity : pageData.getRecords()){
-				houseEntity.setHouseTypeStr(PropertyEnum.HouseTypeEnum.HOUSE_TYPE_MAP.get(houseEntity.getHouseType()));
-				houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
-				houseEntity.setDecorationStr(PropertyEnum.DecorationEnum.DECORATION_MAP.get(houseEntity.getDecoration()));
-				if("00000000".equals(houseEntity.getHouseTypeCode())){
-					houseEntity.setHouseTypeCodeStr("单间配套");
-					continue;
+		if(!CollectionUtils.isEmpty(pageData.getRecords())){
+			//添加字符串格式id，适配js
+			CommonUtils.addIdStr(pageData.getRecords());
+			//查询类型为楼栋，再查出已绑定单元数
+			if(BusinessConst.BUILDING_TYPE_BUILDING == query.getType()){
+				List<Long> paramList = new ArrayList<>();
+				for(HouseEntity houseEntity : pageData.getRecords()){
+					paramList.add(houseEntity.getId());
 				}
-				setHouseTypeCodeStr(houseEntity);
+				Map<Long, Map<String,Long>> bindMap = houseMapper.queryBindUnitCountBatch(paramList);
+				for(HouseEntity houseEntity : pageData.getRecords()){
+					Map<String, Long> countMap = bindMap.get(houseEntity.getId());
+					houseEntity.setBindUnitCount(countMap != null ? countMap.get("count") : null);
+				}
+				//若查详情，查出已绑定单元id
+				if(query.getId() != null){
+					CollectionUtils.firstElement(pageData.getRecords()).setUnitIdList(houseMapper.queryBindUnitList(query.getId()));
+				}
+			}
+			//查询类型为房屋，设置房屋类型、房产类型、装修情况、户型
+			else if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
+				for(HouseEntity houseEntity : pageData.getRecords()){
+					houseEntity.setHouseTypeStr(PropertyEnum.HouseTypeEnum.HOUSE_TYPE_MAP.get(houseEntity.getHouseType()));
+					houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
+					houseEntity.setDecorationStr(PropertyEnum.DecorationEnum.DECORATION_MAP.get(houseEntity.getDecoration()));
+					if("00000000".equals(houseEntity.getHouseTypeCode())){
+						houseEntity.setHouseTypeCodeStr("单间配套");
+						continue;
+					}
+					setHouseTypeCodeStr(houseEntity);
+				}
 			}
 		}
 		PageInfo<HouseEntity> pageInfo = new PageInfo<>();
@@ -533,8 +545,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	 * @Param  communityId	社区ID
 	 */
 	@Override
-	public List<HouseEntity> getCommunityArchitecture(long communityId) {
-		return houseMapper.getCommunityArchitecture(communityId);
+	public List<HouseEntity> getCommunityHouseNumber(long communityId) {
+		return houseMapper.getCommunityHouseNumber(communityId);
 	}
 	
 	
@@ -560,6 +572,13 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	@Override
 	public List<UserEntity> getCommunityNameAndUserInfo(long communityId) {
 		return houseMapper.getCommunityNameAndUserInfo(communityId);
+	}
+
+
+
+	@Override
+	public List<ProprietorVO> getCommunityHouseById(Long communityId) {
+		return houseMapper.getCommunityHouseById(communityId);
 	}
 
 }

@@ -78,7 +78,7 @@ public class LanIpResolver {
             Process process = Runtime.getRuntime().exec("arp -a");
             @Cleanup InputStream is = process.getInputStream();
             @Cleanup InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
+            @Cleanup BufferedReader br = new BufferedReader(isr);
             String line;
             while ((line = br.readLine()) != null) {
                 String mac = getMac(line);
@@ -86,7 +86,6 @@ public class LanIpResolver {
                     ipMap.put(mac, getIp(line));
                 }
             }
-            br.close();
         } catch (IOException e) {
             log.info("com.jsy.community.utils.LanIpResolver.getLanIpByMac：获取局域网IP失败：{}", e.getMessage());
             return null;

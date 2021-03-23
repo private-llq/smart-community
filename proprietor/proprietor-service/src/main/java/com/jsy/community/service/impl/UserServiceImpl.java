@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
-import com.jsy.community.constant.ConstError;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
@@ -26,10 +25,7 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
-import com.jsy.community.vo.HouseVo;
-import com.jsy.community.vo.UserAuthVo;
-import com.jsy.community.vo.UserInfoVo;
-import com.jsy.community.vo.VisitorEntryVO;
+import com.jsy.community.vo.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -172,7 +168,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public String register(RegisterQO qo) {
         commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 
-        String uuid = UserUtils.createUserToken();
+        String uuid = UserUtils.randomUUID();
 
         // 组装user表数据
         UserEntity user = new UserEntity();
@@ -214,7 +210,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //创建imID(t_user_im表)
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setUid(uuid);
-        userIMEntity.setImId(UserUtils.createUserToken());
+        userIMEntity.setImId(UserUtils.randomUUID());
         userIMMapper.insert(userIMEntity);
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
@@ -237,7 +233,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * 调用三方接口获取会员信息(走后端备用)(返回三方平台唯一id)
      */
-    private String getUserInfoFromThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
+    private String  getUserInfoFromThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
         String thirdUid = null;
         switch (userThirdPlatformQO.getThirdPlatformType()){
             case Const.ThirdPlatformConsts.ALIPAY :
@@ -274,18 +270,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      **/
     @Override
     public UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
+//        Map<String, Object> returnMap = new HashMap<>();
         //获取三方uid
         String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
         userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
                 .eq("third_platform_id", userThirdPlatformQO.getThirdPlatformId())
                 .eq("third_platform_type",userThirdPlatformQO.getThirdPlatformType()));
-        if(entity != null){
-            //返回token
-            UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
-            return createAuthVoWithToken(userInfoVo);
+        if(entity == null) { //首次授权
+            UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
+            userThirdPlatformEntity.setThirdPlatformType(userThirdPlatformQO.getThirdPlatformType());
+            userThirdPlatformEntity.setThirdPlatformId(thirdPlatformUid);
+            userThirdPlatformEntity.setId(SnowFlake.nextId());
+            userThirdPlatformMapper.insert(userThirdPlatformEntity);
+//            returnMap.put("exists",false);
+//            returnMap.put("data",userThirdPlatformEntity.getId());
+            return createBindMobile(userThirdPlatformEntity.getId());
+        }else{
+            if(!StringUtils.isEmpty(entity.getUid())){
+                //登录成功
+                UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+                userInfoVo.setIdCard(null);
+                UserAuthVo userAuthVo = createAuthVoWithToken(userInfoVo);
+//                returnMap.put("exists",true);
+//                returnMap.put("data",userAuthVo);
+                return userAuthVo;
+            }else{
+                  //非首次授权，但未绑定手机
+//                //继续返回id
+//                returnMap.put("exists",false);
+//                returnMap.put("data",entity.getId());
+                return createBindMobile(entity.getId());
+            }
+//            return returnMap;
         }
-        throw new ProprietorException(ConstError.NORMAL, "尚未绑定手机");
     }
 
     /**
@@ -298,11 +316,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
-        //获取三方uid
-        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
-        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
+        Long id = Long.valueOf(userThirdPlatformQO.getThirdPlatformId());
         //手机验证码验证 不过报错
         commonService.checkVerifyCode(userThirdPlatformQO.getMobile(), userThirdPlatformQO.getCode());
+        //获取三方uid
+//        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
+//        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("id", id));
+        if(entity == null){
+            throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"数据不存在，请重新授权登录");
+        }
+        userThirdPlatformQO.setThirdPlatformId(entity.getThirdPlatformId());
         //查询是否注册
         String uid = userAuthService.queryUserIdByMobile(userThirdPlatformQO.getMobile());
         //若没有注册 立即注册
@@ -311,20 +335,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             registerQO.setAccount(userThirdPlatformQO.getMobile());
             registerQO.setCode(userThirdPlatformQO.getCode());
             uid = register(registerQO);
+            //三方登录表入库
+            UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
+            BeanUtils.copyProperties(userThirdPlatformQO,userThirdPlatformEntity);
+            userThirdPlatformEntity.setId(SnowFlake.nextId());
+            userThirdPlatformEntity.setUid(uid);//把uid设置进三方登录表关联上
+            userThirdPlatformMapper.insert(userThirdPlatformEntity);
+        }else{
+            //更新uid
+            UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
+            userThirdPlatformEntity.setUid(uid);
+            userThirdPlatformMapper.update(userThirdPlatformEntity,new UpdateWrapper<UserThirdPlatformEntity>().eq("id",id));
         }
-        //三方登录表入库
-        UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
-        BeanUtils.copyProperties(userThirdPlatformQO,userThirdPlatformEntity);
-        userThirdPlatformEntity.setId(SnowFlake.nextId());
-        userThirdPlatformEntity.setUid(uid);//把uid设置进三方登录表关联上
-        userThirdPlatformMapper.insert(userThirdPlatformEntity);
-
-        UserInfoVo userInfoVo = new UserInfoVo();
-        userInfoVo.setUid(uid);
+//        UserInfoVo userInfoVo = new UserInfoVo();
+//        userInfoVo.setUid(uid);
+        //登录成功
+        UserInfoVo userInfoVo = queryUserInfo(uid);
+        userInfoVo.setIdCard(null);
         return createAuthVoWithToken(userInfoVo);
     }
-
-
+    
+    public UserAuthVo createBindMobile(Long id){
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setExpiredTime(null);
+        UserInfoVo vo = new UserInfoVo();
+        vo.setThirdPlatformId(id);
+        vo.setIsBindMobile(0);
+        userAuthVo.setUserInfo(vo);
+//        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
+        userAuthVo.setToken(null);
+        return userAuthVo;
+    }
 
 
 
@@ -356,6 +397,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
+    @Deprecated
     public Boolean proprietorUpdate(ProprietorQO qo) {
         updateCar(qo);
         //========================================== 业主房屋 =========================================================
@@ -431,9 +473,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             if( CollectionUtil.isEmpty(differenceList) ){
                 //操作用户所在房屋
                 //id==null || id == 0 就是需要新增的 验证房屋信息是否有需要新增的数据
-                boolean hasAddHouse = houseList.stream().anyMatch(w -> w.getId() == null || w.getId() == 0);
-                if( hasAddHouse ){
-                    List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                if( CollectionUtil.isNotEmpty(any) ){
                     houseList.removeAll(any);
                     //批量新增房屋信息
                     userHouseService.addHouseBatch(any, qo.getUid());
@@ -490,7 +531,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(userEntity, userInfoVo);
         //业主家属查询
-        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(userId, houseId);
+        List<RelationVO> houseMemberEntities = relationService.selectID(userId, houseId);
         userInfoVo.setProprietorMembers(houseMemberEntities);
         //业主房屋查询
         List<HouseVo> houseVos = userMapper.queryUserHouseById(userId, houseId);
@@ -678,7 +719,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userInfo.setCommunityId(userInfoVo.getCommunityId());
             userInfo.setHouseId(houseId);
         }
-        List<HouseMemberEntity> houseMemberEntities = relationService.selectID(uid, houseId);
+        List<RelationVO> houseMemberEntities = relationService.selectID(uid, houseId);
         userInfo.setProprietorMembers(houseMemberEntities);
         return userInfo;
     }

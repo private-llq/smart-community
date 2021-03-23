@@ -5,13 +5,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.annotation.EsImport;
 import com.jsy.community.api.IAdminCommunityInformService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticSearchImportProvider;
+import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -47,16 +49,18 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
     @Override
     public Boolean addPushInform(PushInformQO qo){
         PushInformEntity entity = PushInformEntity.getInstance();
+        //获取操作员信息
+        //TODO qo.setCreateBy(UserUtil.getAdminInfo().getUserName())
         BeanUtils.copyProperties(qo, entity);
         entity.setId(SnowFlake.nextId());
         //当某个推送号有新消息发布时：用户之前已经删除的 推送号 又会被拉取出来 同时通知有未读消息
         //清除推送消息屏蔽表
         communityInformMapper.clearPushDel(qo.getAcctId());
         //返回值为冗余
-        boolean b = communityInformMapper.insert(entity) > 0;
+        boolean b = communityInformMapper.insert(entity) > BusinessConst.ZERO;
         //0表示推送目标为所有社区
-        if(b && qo.getPushTarget() ==  0){
-            ElasticSearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
+        if(b && qo.getPushTarget().equals(BusinessConst.ZERO)){
+            ElasticsearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
         }
         return b;
     }

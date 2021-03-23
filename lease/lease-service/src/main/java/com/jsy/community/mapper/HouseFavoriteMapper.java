@@ -5,6 +5,7 @@ import com.jsy.community.entity.lease.HouseFavoriteEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseFavoriteQO;
 import com.jsy.community.vo.lease.HouseFavoriteVO;
+import com.jsy.community.vo.lease.HouseImageVo;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -39,20 +40,18 @@ public interface HouseFavoriteMapper extends BaseMapper<HouseFavoriteEntity> {
     List<HouseFavoriteVO> shopFavorite(BaseQO<HouseFavoriteQO> qo);
 
     /**
-     * 获取t_shop_img 的一张商铺房屋图片地址
-     * @param id       商铺id
+     * 获取t_shop_img 的商铺房屋图片地址
+     * @param shopIds  商铺房屋ids
      * @return         返回图片路径
      */
-    @Select("select i.img_url as houseImage from t_shop_img as i JOIN t_shop_lease as l on l.id = i.shop_id where l.id = #{id} limit 1")
-    String getShopImage(@Param("id") long id);
+    List<HouseImageVo> getShopImage(List<Long> shopIds);
 
     /**
-     * 获取t_lease_image 的一张房屋图片地址
-     * @param houseId       房屋id
+     * 获取t_lease_image 的房屋图片地址
+     * @param houseIds       房屋id
      * @return              返回图片路径
      */
-    @Select("select i.img_url as houseImage from t_house_image as i JOIN t_house_lease as l on l.id = i.hid where l.deleted = 0 and l.id = #{houseId} limit 1")
-    String getHouseLeaseImage(@Param("houseId") long houseId);
+    List<HouseImageVo> getHouseLeaseImage(List<Long> houseIds);
 
 
     /**

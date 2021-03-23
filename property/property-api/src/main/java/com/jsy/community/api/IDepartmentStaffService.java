@@ -62,4 +62,13 @@ public interface IDepartmentStaffService extends IService<DepartmentStaffEntity>
 	 * @Param [strings]
 	 **/
 	Map<String, Object> addLinkByExcel(List<String[]> strings);
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 根据id查询员工信息
+	 * @Date 2021/3/16 16:13
+	 * @Param [id, communityId]
+	 **/
+	DepartmentStaffEntity getDepartmentStaffById(Long id);
 }

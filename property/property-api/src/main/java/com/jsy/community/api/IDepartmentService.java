@@ -3,9 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.DepartmentEntity;
 import com.jsy.community.qo.DepartmentQO;
-import com.jsy.community.vo.DepartmentVO;
-
-import java.util.List;
+import com.jsy.community.vo.TreeCommunityVO;
 
 /**
  * <p>
@@ -51,5 +49,14 @@ public interface IDepartmentService extends IService<DepartmentEntity> {
 	 * @Date 2021/3/11 17:49
 	 * @Param [communityId]
 	 **/
-	List<DepartmentVO> listDepartment(Long communityId);
+	TreeCommunityVO listDepartment(Long communityId);
+	
+	/**
+	 * @return com.jsy.community.entity.DepartmentEntity
+	 * @Author lihao
+	 * @Description 根据id查询部门
+	 * @Date 2021/3/16 10:43
+	 * @Param [departmentId, communityId]
+	 **/
+	DepartmentEntity getDepartmentById(Long departmentId, Long communityId);
 }

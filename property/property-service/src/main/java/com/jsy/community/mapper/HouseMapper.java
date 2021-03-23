@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -41,9 +42,9 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 
 	/**
 	 * 按社区ID获取 社区名称和 当前社区住户房间数量
+	 * @param communityId 		社区id
 	 * @author YuLF
 	 * @since  2020/12/3 11:06
-	 * @Param  communityId   社区id
 	 * @return				 返回社区名称和 当前社区住户房间数量
 	 */
     Map<String, Object> getCommunityNameAndUserAmountById(long communityId);
@@ -59,14 +60,22 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
     List<UserEntity> getCommunityNameAndUserInfo(long communityId);
 
 
+	/**
+	 * 通过社区id 获得 社区内未被登记的房屋
+	 * @param communityId 		社区id
+	 * @return					返回 该社区未被登记的房屋编号 + house_id
+	 */
+	List<ProprietorVO> getCommunityHouseById(Long communityId);
+
 
 	/**
 	 * 通过社区ID查出所有 楼栋、单元、楼层、未被登记的门牌
+	 * @param communityId 	社区id
 	 * @author YuLF
 	 * @since  2020/11/26 9:38
-	 * @Param  communityId	社区ID
+	 * @return				返回该社区所有的房屋编号
 	 */
-    List<HouseEntity> getCommunityArchitecture(@Param("communityId") long communityId);
+    List<HouseEntity> getCommunityHouseNumber(@Param("communityId") long communityId);
     
     //============================================ 物业端产品原型确定后新加的 开始  ===========================================================
 	/**
@@ -136,6 +145,16 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	Map<Long,Map<String,Long>> queryBindUnitCountBatch(@Param("list")List<Long> ids);
 	
 	/**
+	* @Description: 查询楼栋已绑定单元id列表
+	 * @Param: [id]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/19
+	**/
+	@Select("select id from t_house where pid = #{id} and type = 2")
+	List<Long> queryBindUnitList(Long id);
+	
+	/**
 	* @Description: 验证是否有房屋关联数据
 	 * @Param: [id]
 	 * @Return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
@@ -150,6 +169,7 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 		"union all\n" +
 		"select 'houseLease' as item,count(0) as count from t_house_lease where house_id = #{id}")
 	List<Map<String,Object>> verifyRelevance(Long id);
-	
+
+
 	//============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 }

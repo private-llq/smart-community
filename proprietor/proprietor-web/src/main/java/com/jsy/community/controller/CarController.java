@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
+ * 【已过期、按新需求改动】
  * @author YuLF
  * @date 2020/11/10 10:56
  */
@@ -35,6 +36,7 @@ import java.util.*;
 @RequestMapping("/car")
 @Slf4j
 @ApiJSYController
+@Deprecated
 public class CarController {
 	
 	
@@ -107,7 +109,6 @@ public class CarController {
 	/**
 	 * 通过车辆ID 删除 车辆方法
 	 * 使用String类型接受，手动效验id，避免参数类型错误直接抛出500无信息提示
-	 *
 	 * @param id 车辆id
 	 * @return 返回逻辑删除影响行
 	 */

@@ -10,7 +10,7 @@ import java.util.List;
 public class PageInfo<T> implements Serializable {
 	private static final long serialVersionUID = 8545991263226528798L;
 	
-	@ApiModelProperty(value = "每页记录数")
+	@ApiModelProperty(value = "每页数据")
 	private List<T> records;
 	
 	@ApiModelProperty(value = "总记录数")
@@ -22,20 +22,14 @@ public class PageInfo<T> implements Serializable {
 	@ApiModelProperty(value = "当前页")
 	private long current;
 	
-	@ApiModelProperty(value = "每页起始数")
-	private int start;
 	
-	@ApiModelProperty(value = "每页终止数")
-	private int end;
 	
 	public PageInfo() {
-	}
-	
-	public PageInfo(List<T> records, long total, long size, long current) {
-		this.records = records;
-		this.total = total;
-		this.size = size;
-		this.current = current;
+		this.records = Collections.emptyList();
+		this.total = 0L;
+		this.size = 10L;
+		this.current = 1L;
+		
 	}
 	
 	public PageInfo(long current, long size) {
@@ -98,25 +92,5 @@ public class PageInfo<T> implements Serializable {
 	public PageInfo<T> setCurrent(long current) {
 		this.current = current;
 		return this;
-	}
-	
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
-	}
-	
-	public int getStart() {
-		return start;
-	}
-	
-	public void setStart(int start) {
-		this.start = start;
-	}
-	
-	public int getEnd() {
-		return end;
-	}
-	
-	public void setEnd(int end) {
-		this.end = end;
 	}
 }

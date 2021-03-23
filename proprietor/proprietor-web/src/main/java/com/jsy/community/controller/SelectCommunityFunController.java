@@ -4,7 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ISelectCommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
-import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.qo.proprietor.SelectCommunityFunQO;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,7 +36,7 @@ public class SelectCommunityFunController {
      */
     @ApiOperation("分页查询社区趣事")
     @PostMapping("/findList")
-    public CommonResult<Map> list(@RequestBody CommunityFunQO communityFunQO) {
+    public CommonResult<Map> list(@RequestBody SelectCommunityFunQO communityFunQO) {
         Map<String, Object> map = selectCommunityFunService.findList(communityFunQO);
         return CommonResult.ok(map);
     }

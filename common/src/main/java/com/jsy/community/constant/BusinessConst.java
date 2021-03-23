@@ -1,6 +1,5 @@
 package com.jsy.community.constant;
 
-import io.swagger.models.auth.In;
 
 /**
  * @author chq459799974
@@ -14,6 +13,11 @@ public interface BusinessConst {
      * Zero
      */
     Integer ZERO = 0;
+    /**
+     * ONE
+     */
+    Integer ONE = 1;
+
 
     //============================ 用户真实姓名 长度边界 =============================
     /**
@@ -351,5 +355,10 @@ public interface BusinessConst {
      * 用户发布房源最大
      */
     Integer USER_PUBLISH_LEASE_MAX = 10;
+
+    /**
+     * 租赁模块 房屋收藏 t_house_favorite  中 favorite_type 商铺类型
+     */
+    Short SHOP_FAVORITE_TYPE = 1;
 
 }

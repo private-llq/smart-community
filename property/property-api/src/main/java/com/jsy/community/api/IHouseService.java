@@ -6,6 +6,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.property.ProprietorVO;
 
 import java.util.List;
 import java.util.Map;
@@ -77,12 +78,14 @@ public interface IHouseService extends IService<HouseEntity> {
 	//=========================== 基础增删改查 结束 ==============================
 
 	/**
-	 * 通过社区ID查出所有 楼栋、单元、楼层、门牌
+	 * 通过社区ID查出所有 房屋编号
+	 *
+	 * @param communityId 	社区id
 	 * @author YuLF
 	 * @since  2020/11/26 9:38
-	 * @Param  communityId	社区ID
+	 * @return				所有的房屋信息
 	 */
-	List<HouseEntity> getCommunityArchitecture(long communityId);
+	List<HouseEntity> getCommunityHouseNumber(long communityId);
 
 	/**
 	 * 按社区ID获取 社区名称和 当前社区住户房间数量
@@ -101,4 +104,12 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @return						返回社区名称和 当前社区所有住户名称，住户uid
 	 */
     List<UserEntity> getCommunityNameAndUserInfo(long communityId);
+
+
+	/**
+	 * 通过社区id 获得 社区内未被登记的房屋
+	 * @param communityId 		社区id
+	 * @return					返回 该社区未被登记的房屋编号 + house_id
+	 */
+	List<ProprietorVO> getCommunityHouseById(Long communityId);
 }

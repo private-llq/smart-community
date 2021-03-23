@@ -42,13 +42,13 @@ public interface RegionMapper {
 	int insertRegion(List<RegionEntity> list);
 	
 	/**
-	* @Description: 城市模糊查询
+	* @Description: 城市/区域模糊查询
 	 * @Param: [searchStr]
 	 * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/10
 	**/
-	List<RegionEntity> vagueQueryCity(@Param("searchStr")String searchStr);
+	List<RegionEntity> vagueQueryRegion(@Param("searchStr")String searchStr, @Param("lv")Integer lv,@Param("cityId")Integer cityId);
 	
 	/**
 	 * @return java.util.List<java.lang.Long>

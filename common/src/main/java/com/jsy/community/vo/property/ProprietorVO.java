@@ -1,5 +1,6 @@
-package com.jsy.community.vo;
+package com.jsy.community.vo.property;
 
+import com.jsy.community.vo.BaseVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,14 +16,34 @@ import lombok.EqualsAndHashCode;
 @ApiModel("业主信息查询信息返回")
 public class ProprietorVO extends BaseVO {
 
+	/**
+	 * excel 导入返回对象构造函数
+	 * @param successNumber				成功数量
+	 * @param failNumber				失败数量
+	 * @param failExcelDetailsAddress	失败excel明细文件下载地址
+	 */
+	public ProprietorVO (Integer successNumber, Integer failNumber, String failExcelDetailsAddress){
+		this.successNumber = successNumber;
+		this.failNumber = failNumber;
+		this.failExcelDetailsAddress = failExcelDetailsAddress;
+	}
+
+	public ProprietorVO(){}
+
 	@ApiModelProperty("用户ID")
 	private String uid;
+
+	@ApiModelProperty("社区ID")
+	private Long communityId;
 
 	@ApiModelProperty("业主ID")
 	private Long householderId;
 
 	@ApiModelProperty("房屋ID")
 	private Long houseId;
+
+	@ApiModelProperty("房屋编号")
+	private String houseNumber;
 
 	@ApiModelProperty("昵称")
 	private String nickname;
@@ -95,5 +116,17 @@ public class ProprietorVO extends BaseVO {
 
 	@ApiModelProperty("房屋合并后的字符串")
 	private String houseMergeName;
+
+	@ApiModelProperty("错误信息备注,方便标记excel导入错误信息的回显")
+	private String remark;
+
+	@ApiModelProperty("excel导入成功条数")
+	private Integer successNumber;
+
+	@ApiModelProperty("excel导入失败条数")
+	private Integer failNumber;
+
+	@ApiModelProperty("excel导入失败文件下载地址")
+	private String failExcelDetailsAddress;
 
 }

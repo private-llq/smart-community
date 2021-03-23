@@ -477,4 +477,12 @@
             c.deleted = 0
         AND h.deleted = 0
     </select>
+
+    <!-- 根据图片id批量查询图片 -->
+    <select id="selectBatchImage" resultType="com.jsy.community.vo.lease.HouseImageVo">
+        select img_url,hid,field_id from t_house_image where field_id in
+        <foreach collection="voImageIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

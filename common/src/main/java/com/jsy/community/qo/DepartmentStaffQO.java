@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -38,6 +39,8 @@ public class DepartmentStaffQO implements Serializable {
 	
 	@ApiModelProperty(value = "员工")
 	@NotBlank(groups = {DepartmentStaffQO.addStaffValidate.class, DepartmentStaffQO.updateStaffValidate.class},message = "员工姓名不能为空")
+	@Length(groups = {DepartmentStaffQO.addStaffValidate.class, DepartmentStaffQO.updateStaffValidate.class},min = 1,max = 50)
+
 	private String person;
 	
 	@ApiModelProperty(value = "联系电话")
@@ -46,6 +49,7 @@ public class DepartmentStaffQO implements Serializable {
 	
 	@ApiModelProperty(value = "职务")
 	@NotBlank(groups = {DepartmentStaffQO.addStaffValidate.class, DepartmentStaffQO.updateStaffValidate.class},message = "职务不能为空")
+	@Length(groups = {DepartmentStaffQO.addStaffValidate.class, DepartmentStaffQO.updateStaffValidate.class},min = 1,max = 20)
 	private String duty;
 	
 	@ApiModelProperty(value = "邮箱")

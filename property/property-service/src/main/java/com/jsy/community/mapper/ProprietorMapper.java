@@ -1,6 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
@@ -8,7 +9,7 @@ import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.vo.HouseVo;
-import com.jsy.community.vo.ProprietorVO;
+import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -22,21 +23,6 @@ import java.util.List;
  */
 public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
 
-    /**
-     * [物业]通过分页参数查询 业主信息
-     * @param queryParam    查询参数
-     * @return              返回查询的业主信息
-     */
-    List<ProprietorVO> query(BaseQO<ProprietorQO> queryParam);
-
-
-    /**
-     * 通过社区id 拿到当前社区 所有未被登记的房屋信息
-     * @param communityId           社区id
-     * @param houseLevelMode        社区层级模式
-     * @return                      返回房屋信息列表
-     */
-    List<HouseEntity> getHouseListByCommunityId(@Param("communityId") Long communityId, @Param("houseLevelMode") Integer houseLevelMode);
 
     /**
      * 通过社区id拿到当前社区的 层级结构 房屋层级模式：1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元
@@ -48,12 +34,33 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
     @Select("select house_level_mode from t_community where id = #{communityId} and deleted = 0")
     Integer queryHouseLevelModeById(@Param("communityId") Long communityId);
 
+
+
+    /**
+     * [物业]通过分页参数查询 业主信息
+     * @param page          分页条件
+     * @param queryParam    查询参数
+     * @return              返回查询的业主信息
+     */
+    List<ProprietorVO> query(Page<ProprietorVO> page, @Param("baseQo") BaseQO<ProprietorQO> queryParam);
+
+
+    /**
+     * 通过社区id 拿到当前社区 所有未被登记的房屋信息
+     * @param communityId           社区id
+     * @param houseLevelMode        社区层级模式
+     * @return                      返回房屋信息列表
+     */
+    List<HouseEntity> getHouseListByCommunityId(@Param("communityId") Long communityId, @Param("houseLevelMode") Integer houseLevelMode);
+
+
     /**
      * [excel]批量注册用户t_user_auth
      * @param userEntityList        用户信息实体
      * @author YuLF
      * @since  2020/12/24 15:21
      */
+    @Deprecated
     void registerBatch(@Param("userEntityList") List<UserEntity> userEntityList);
 
 
@@ -61,6 +68,7 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * [excel]批量登记用户t_user
      * @param userEntityList        用户登记信息列表
      */
+    @Deprecated
     void insertUserBatch(@Param("userEntityList") List<UserEntity> userEntityList);
 
     /**
@@ -70,6 +78,7 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @author YuLF
      * @since  2020/12/24 16:27
      */
+    @Deprecated
     void registerHouseBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
 
 
@@ -186,5 +195,11 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
     String queryOperationDate(Long id, Integer operationType);
 
 
-
+    /**
+     * 录入业主信息业主房屋绑定信息至数据库
+     * @param userEntityList    用户信息
+     * @param communityId       社区id
+     * @return                  返回影响行数
+     */
+    Integer saveUserBatch(@Param("list") List<ProprietorEntity> userEntityList, @Param("communityId") Long communityId);
 }

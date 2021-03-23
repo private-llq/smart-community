@@ -10,6 +10,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseReserveQO;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.lease.HouseImageVo;
 import com.jsy.community.vo.lease.HouseReserveVO;
 import com.jsy.community.api.IHouseConstService;
 import com.jsy.community.api.IHouseReserveService;
@@ -18,10 +19,11 @@ import com.jsy.community.mapper.HouseLeaseMapper;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author YuLF
@@ -110,6 +112,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         List<HouseReserveVO> reserveVos = new ArrayList<>(meReserveVos.size() + reserveMeVos.size());
         reserveVos.addAll(meReserveVos);
         reserveVos.addAll(reserveMeVos);
+        List<Long> voImageIds = new ArrayList<>(reserveVos.size());
         reserveVos.forEach(r -> {
             //1.从缓存通过id和类型取出 中文Name
             //整租还是合租
@@ -122,9 +125,24 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
             r.setHouseSquareMeter(r.getHouseSquareMeter() + "m²");
             //房屋朝向
             r.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(r.getHouseDirectionId()));
-            //2. 第一张图片地址
-            r.setHouseImageUrl(houseLeaseMapper.queryHouseImgById(r.getHouseImageId(), r.getHouseLeaseId()));
+            //2. 获取图片查询
+            voImageIds.add(r.getHouseImageId());
         });
+        //设置图片url
+        if( !CollectionUtils.isEmpty(voImageIds) ){
+            //根据 图片 id 集合  in 查出所有的图片 url 和 对应的租赁id
+            List<HouseImageVo> houseImageVos = houseLeaseMapper.selectBatchImage(voImageIds);
+            //由于一个图片可能存在于多条 列表数据 只显示一条 根据图片id(field_id)是用Map 去重   toMap里面第一个逗号前面的参数 是作为Map的Key  第二个逗号前面的 是作为Map的值， 第三个参数是 重载函数，如果Map中有重复 那就还是用前面的值
+            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo,(value1, value2) -> value1));
+            //把图片 设置到返回集合每一个对象
+            reserveVos.forEach( vo -> {
+                //该数据的图片对象不为空!
+                HouseImageVo houseImageVo = houseImageVoMap.get(vo.getHouseImageId());
+                if( Objects.nonNull(houseImageVo) ){
+                    vo.setHouseImageUrl(Collections.singletonList(houseImageVo.getImgUrl()));
+                }
+            });
+        }
         return reserveVos;
     }
 

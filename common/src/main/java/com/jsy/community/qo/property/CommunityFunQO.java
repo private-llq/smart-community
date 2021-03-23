@@ -1,4 +1,4 @@
-package com.jsy.community.qo;
+package com.jsy.community.qo.property;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,14 +17,20 @@ import java.time.LocalDate;
 @ApiModel("分页查询社区趣事")
 public class CommunityFunQO implements Serializable {
 
-    @ApiModelProperty("分页查询当前页")
-    private Long page;
-
-    @ApiModelProperty("分页查询每页数据条数")
-    private Long size;
+//    @ApiModelProperty("分页查询当前页")
+//    private Long page;
+//
+//    @ApiModelProperty("分页查询每页数据条数")
+//    private Long size;
 
     @ApiModelProperty("社区趣事标题模糊查询")
     private String headline;
+
+    @ApiModelProperty("状态1发布2撤销")
+    private Integer status;
+
+    @ApiModelProperty("社区趣事标签模糊查询")
+    private String tallys;
 
     @ApiModelProperty("创建时间")
     private LocalDate creatrTimeStart;

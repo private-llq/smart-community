@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFacilityTypeService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.entity.hk.FacilityTypeEntity;
+import com.jsy.community.mapper.FacilityMapper;
 import com.jsy.community.mapper.FacilityTypeMapper;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.hk.FacilityTypeVO;
@@ -30,6 +32,9 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 	
 	@Resource
 	private FacilityTypeMapper facilityTypeMapper;
+	
+	@Resource
+	private FacilityMapper facilityMapper;
 	
 	@Override
 	public void addFacilityType(FacilityTypeEntity facilityTypeEntity) {
@@ -57,6 +62,17 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 			if (!CollectionUtils.isEmpty(list)) {
 				throw new PropertyException("\""+entity.getName()+"\""+"已有下级节点，不可删除");
 			}
+			
+			QueryWrapper<FacilityEntity> queryWrapper = new QueryWrapper<>();
+			queryWrapper.eq("facility_type_id",entity.getId()).eq("community_id",communityId);
+			List<FacilityEntity> entities = facilityMapper.selectList(queryWrapper);
+			if (!CollectionUtils.isEmpty(entities)) {
+				throw new PropertyException("\""+entity.getName()+"\""+"已有属于该分类的设备，不可删除");
+			}
+			
+			if (!entity.getCommunityId().equals(communityId)) {
+				throw new PropertyException("该社区下没有该设备分类");
+			}
 			facilityTypeMapper.deleteById(id);
 		}
 	}
@@ -79,6 +95,12 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 		List<FacilityTypeVO> parents = new ArrayList<>();
 		for (FacilityTypeVO entity : allFacilityVO) {
 			if (entity.getPid() == 0) {
+				// 获取并设置该节点的人数
+				Long typeId = entity.getId();
+				QueryWrapper<FacilityEntity> queryWrapper = new QueryWrapper<>();
+				queryWrapper.eq("facility_type_id",typeId);
+				Integer count = facilityMapper.selectCount(queryWrapper);
+				entity.setCount(count);
 				parents.add(entity);
 			}
 		}
@@ -90,6 +112,11 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 		}
 		
 		return parents;
+	}
+	
+	@Override
+	public FacilityTypeEntity getFacilityType(Long id) {
+		return facilityTypeMapper.selectById(id);
 	}
 	
 	/**
@@ -106,6 +133,12 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 			// 遍历所有节点，将所有菜单的父id与传过来的根节点的id比较
 			//相等说明：为该根节点的子节点。
 			if (id.equals(nav.getPid())) {
+				Long typeId = nav.getId();
+				QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
+				wrapper.eq("facility_type_id",typeId);
+				Integer count = facilityMapper.selectCount(wrapper);
+				nav.setCount(count);
+				
 				childList.add(nav);
 			}
 		}

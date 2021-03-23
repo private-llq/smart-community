@@ -18,6 +18,8 @@ public class TheBillingDetailsVO implements Serializable {
     private Long orderId;
     @ApiModelProperty(value = "付款方式")
     private Integer payType;
+    @ApiModelProperty(value = "付款方式名称")
+    private String payTypeName;
     @ApiModelProperty(value = "缴费类型名称")
     private String typeName;
     @ApiModelProperty(value = "小图片")

@@ -1,25 +1,22 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.ProprietorEntity;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.utils.CardUtil;
 import com.jsy.community.utils.DateUtils;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.HouseVo;
-import com.jsy.community.vo.ProprietorVO;
+import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -56,6 +53,10 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
     }
 
 
+    @Override
+    public String getAdminRealName( String adminUid ) {
+        return proprietorMapper.queryAdminNameByUid( adminUid );
+    }
 
     /**
      * 通过传入的参数更新业主信息
@@ -100,26 +101,19 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
      * @return 返回查询的业主信息
      */
     @Override
-    public List<ProprietorVO> query(BaseQO<ProprietorQO> queryParam) {
-        queryParam.setPage((queryParam.getPage() - 1) * queryParam.getSize());
-        List<ProprietorVO> query = proprietorMapper.query(queryParam);
+    public Page<ProprietorVO> query(BaseQO<ProprietorQO> queryParam) {
+        Page<ProprietorVO> page = new Page<>(queryParam.getPage(), queryParam.getSize());
+        List<ProprietorVO> query = proprietorMapper.query(page,queryParam);
         query.forEach( vo -> {
             //通过身份证获得 用户的 年龄 、性别
             Map<String, Object> sexAndAge = CardUtil.getSexAndAge(vo.getIdCard());
             vo.setAge( sexAndAge.get("age").toString() );
             vo.setGender( sexAndAge.get("sex").toString() );
         });
-        return query;
+        return page.setRecords(query);
     }
 
 
-
-    /**
-     * 通过house id 获取 楼栋+单元+楼层数+房屋类型
-     */
-    public String getHouseText( Long id){
-        return null;
-    }
     /**
      * 录入业主信息业主房屋绑定信息至数据库
      *
@@ -130,36 +124,8 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
      */
     @Transactional(rollbackFor = {Exception.class})
     @Override
-    public void saveUserBatch(List<UserEntity> userEntityList, Long communityId) {
-        //1.验证 录入信息 房屋信息是否正确
-        //1.1 拿到当前社区结构层级
-        Integer houseLevelMode = proprietorMapper.queryHouseLevelModeById(communityId);
-
-        if (houseLevelMode == null) {
-            throw new PropertyException("没有这个社区!");
-        }
-
-        //1.2 通过社区id 和 社区结构 拿到当前社区 所有未被登记的房屋信息
-        List<HouseEntity> houseEntities = proprietorMapper.getHouseListByCommunityId(communityId, houseLevelMode);
-        //1.3 验证excel录入的每一个房屋信息 是否正确  目前
-        validHouseList(userEntityList, houseEntities);
-        //2 为所有用户注册
-        //2.1 设置uid 及 id
-        userEntityList.forEach(w -> {
-            w.setUid(UserUtils.createUserToken());
-            w.setId(SnowFlake.nextId());
-            //由物业导入 所有人都是业主 因为家属在另一个导入表里面  householder_id 在数据库表示：业主ID 0.未认证 1.业主 其他.隶属业主ID
-            w.setHouseholderId(1L);
-        });
-        //2.2 批量注册 t_user_auth
-        proprietorMapper.registerBatch(userEntityList);
-        //2.3 批量发送短信告知用户 您的账号已注册 请使用电话号码验证码登录
-        //TODO: 批量发送短信 userEntityList  使用异步线程
-        //3 为所有用户 登记信息 t_user
-        proprietorMapper.insertUserBatch(userEntityList);
-        //4.为所有用户 登记房屋 状态都是已审核
-        userEntityList.forEach(h -> h.getHouseEntity().setId(SnowFlake.nextId()));
-        proprietorMapper.registerHouseBatch(userEntityList, communityId);
+    public Integer saveUserBatch(List<ProprietorEntity> userEntityList, Long communityId) {
+        return proprietorMapper.saveUserBatch(userEntityList, communityId);
     }
 
 
@@ -260,22 +226,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return proprietorMapper.queryUserHouseByCommunityId(communityId);
     }
 
-
-    /**
-     * [业主信息录入验证]验证用户录入的房屋信息是否能在数据库未登记房屋中 找到
-     *
-     * @param notVerified 未经验证的excel录入数据
-     * @param verified    数据库已存在未登记的房屋信息数据
-     */
-    private void validHouseList(List<UserEntity> notVerified, List<HouseEntity> verified) {
-        for (UserEntity userEntity : notVerified) {
-            HouseEntity houseEntity = userEntity.getHouseEntity();
-            //验证该房屋 是否能在 数据库中有匹配
-            if (!judgeExist(houseEntity, verified)) {
-                throw new PropertyException(" '姓名：" + userEntity.getRealName() + " 电话：" + userEntity.getMobile() + "' 这一行的房屋信息填写错误,  原因：在这个社区未被登记房屋中并没有能匹配的房屋! 或 该房屋信息已经被其他业主登记");
-            }
-        }
-    }
 
 
     /**

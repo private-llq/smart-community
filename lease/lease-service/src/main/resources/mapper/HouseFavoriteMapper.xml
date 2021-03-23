@@ -3,7 +3,21 @@
 
 <mapper namespace="com.jsy.community.mapper.HouseFavoriteMapper">
 
-    <!-- 商铺收藏列表 -->
+	<!-- [房屋租赁]根据房屋id获取所有图片 -->
+    <select id="getHouseLeaseImage" resultType="com.jsy.community.vo.lease.HouseImageVo">
+		select img_url,hid from t_house_image where hid in
+		<foreach collection="houseIds" item="id" index="index" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+	<!-- [商铺租赁]根据房屋id获取所有图片 -->
+	<select id="getShopImage" resultType="com.jsy.community.vo.lease.HouseImageVo">
+		select img_url,shop_id as hid from t_shop_img where shop_id in
+		<foreach collection="shopIds" item="id" index="index" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+	<!-- 商铺收藏列表 -->
     <select id="shopFavorite" resultType="com.jsy.community.vo.lease.HouseFavoriteVO">
         SELECT
         	l.id as houseId,

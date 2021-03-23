@@ -5,8 +5,9 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
-import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -46,14 +47,14 @@ public class CommunityFunController {
 
     @ApiOperation("分页查询所有社区趣事")
     @PostMapping("/list")
-    @Login
-    public CommonResult<Map> list(@RequestBody CommunityFunQO communityFunQO) {
-        Map<String, Object> map = communityFunService.findList(communityFunQO);
-        return CommonResult.ok(map);
+//    @Login
+    public CommonResult list(@RequestBody BaseQO<CommunityFunQO> baseQO) {
+        PageInfo pageInfo = communityFunService.findList(baseQO);
+        return CommonResult.ok(pageInfo);
     }
     @ApiOperation("新增")
     @PostMapping("/save")
-    @Login
+    //@Login
     public CommonResult save(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
         String userId = UserUtils.getUserId();
@@ -63,7 +64,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增缩略图")
     @PostMapping("/smallImge")
-    @Login
+    //@Login
     public CommonResult upload(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -76,7 +77,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
-    @Login
+    //@Login
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -151,10 +152,11 @@ public class CommunityFunController {
 
     @ApiOperation("上线")
     @GetMapping("/popUpOnline")
-    @Login
+  //  @Login
     public CommonResult popUpOnline(@ApiParam("社区趣事id")
                                         @RequestParam("id") Long id) {
-        communityFunService.popUpOnline(id);
+        String userId = UserUtils.getUserId();
+        communityFunService.popUpOnline(id,userId);
         return  CommonResult.ok();
     }
 

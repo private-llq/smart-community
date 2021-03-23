@@ -217,4 +217,9 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 		resultMap.put("failData", staffEntityList);
 		return resultMap;
 	}
+	
+	@Override
+	public DepartmentStaffEntity getDepartmentStaffById(Long id) {
+		return staffMapper.selectById(id);
+	}
 }

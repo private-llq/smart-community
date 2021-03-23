@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.EsImport;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.JsonUtils;
-import com.jsy.community.utils.es.ElasticSearchImportProvider;
+import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import lombok.AccessLevel;
@@ -72,7 +72,7 @@ public class EsImportAop extends BaseAop {
                 jsonObject.put("esId", businessId);
                 //标记这条数据的操作 删 类型
                 jsonObject.put("operation", operation);
-                ElasticSearchImportProvider.elasticOperation(jsonObject);
+                ElasticsearchImportProvider.elasticOperation(jsonObject);
                 break;
             case INSERT:
             case UPDATE:
@@ -111,7 +111,7 @@ public class EsImportAop extends BaseAop {
                 }
                 //插入 和 更新 都做同样的操作
                 JSONObject insertObj = getJsonObj(annotation, obj);
-                ElasticSearchImportProvider.elasticOperation(insertObj);
+                ElasticsearchImportProvider.elasticOperation(insertObj);
                 break;
             default:
                 break;

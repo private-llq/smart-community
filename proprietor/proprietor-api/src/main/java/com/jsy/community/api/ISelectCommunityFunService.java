@@ -2,7 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityFunEntity;
-import com.jsy.community.qo.CommunityFunQO;
+import com.jsy.community.qo.proprietor.SelectCommunityFunQO;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ public interface ISelectCommunityFunService extends IService<CommunityFunEntity>
      * @Param:
      * @return:
      */
-    Map<String, Object> findList(CommunityFunQO communityFunQO);
+    Map<String, Object> findList(SelectCommunityFunQO communityFunQO);
 
     /**
      * @Description: 查询一条趣事详情

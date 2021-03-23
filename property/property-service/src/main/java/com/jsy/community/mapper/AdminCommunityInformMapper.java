@@ -47,6 +47,6 @@ public interface AdminCommunityInformMapper extends BaseMapper<PushInformEntity>
      * 主要是用于 在新增推送消息时，重新给用户推送未读信息，在t_acct_push_del存在的推送号账号，拉取用户消息列表时，不会被拉取
      * @param acctId    推送账号id
      */
-    @Delete("delete from t_acct_push_del where acct_id = #{acctId}")
+    @Delete("delete from t_push_inform_del where acct_id = #{acctId}")
     void clearPushDel(@Param("acctId") Long acctId);
 }

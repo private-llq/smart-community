@@ -63,25 +63,39 @@ public class UserDataController {
     @ApiOperation("修改个人信息")
     @Login
     public CommonResult updateUserData(@RequestBody UserDataQO userDataQO){
-        if (BadWordUtil2.isContaintBadWord(userDataQO.getNickname(),BadWordUtil2.minMatchTYpe)){
-            return CommonResult.error("该名称不可用：名称中存在敏感字！");
-        }
+        String userId = UserUtils.getUserId();
+        userDataQO.setNickname(null);
+        userDataService.updateUserData(userDataQO,userId);
+        return CommonResult.ok();
+    }
+    @PutMapping("/updateUserNickName")
+    @ApiOperation("修改个人名称")
+    @Login
+    public CommonResult updateUserNickName(@RequestParam("nickname") String nickname){
         try {
-            String s = new String(userDataQO.getNickname().getBytes("GBK"));
-            if(!"".equals(userDataQO.getNickname())&&userDataQO.getNickname()!=null){
+            String s = new String(nickname.getBytes("GBK"));
+            if(!"".equals(nickname)&&nickname!=null){
                 if (s.length()<2||s.length()>16){
                     return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉子！");
                 }
+                if (BadWordUtil2.isContaintBadWord(nickname,BadWordUtil2.minMatchTYpe)){
+                    return CommonResult.error("该名称不可用：名称中存在敏感字！");
+                }
+                Pattern pattern = Pattern.compile(regex);
+                if (pattern.matcher(nickname).find()){
+                    return CommonResult.error("名称不能包含特殊字符！");
+                }
+            }else {
+                return CommonResult.error("名称不能为空！");
             }
-            Pattern pattern = Pattern.compile(regex);
-            if (pattern.matcher(userDataQO.getNickname()).find()){
-                return CommonResult.error("名称不能包含特殊字符！");
-            }
+
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         String userId = UserUtils.getUserId();
-        userDataService.updateUserData(userDataQO,userId);
+        UserDataQO dataQO = new UserDataQO();
+        dataQO.setNickname(nickname);
+        userDataService.updateUserData(dataQO,userId);
         return CommonResult.ok();
     }
 

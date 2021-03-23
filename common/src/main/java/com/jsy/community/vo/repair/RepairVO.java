@@ -15,7 +15,7 @@ import java.util.Date;
  * @Version 1.0
  **/
 @Data
-@ApiModel("报修详情")
+@ApiModel("app报修详情")
 public class RepairVO implements Serializable {
 	
 	@ApiModelProperty(value = "报修状态 0 待处理 1 处理中 2 已处理 3 未通过审核")

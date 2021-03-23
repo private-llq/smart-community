@@ -314,6 +314,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	**/
 	@Override
 	public List<AdminMenuEntity> queryUserMenu(Long uid){
+		//TODO 改sql 用户直接关联菜单 暂无角色一层
 		return adminMenuMapper.queryUserMenu(uid);
 	}
 	

@@ -50,11 +50,14 @@ public class RepairController {
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
+	/**
+	 * null 全部 0 待处理  1 处理中  2 已处理  3 已驳回
+	 **/
 	@ApiOperation("房屋报修查询")
 	@GetMapping("/getRepair")
-	public CommonResult getRepair(@ApiParam(value ="订单状态") @RequestParam(required = false) Integer status) {
+	public CommonResult getRepair(@ApiParam(value = "订单状态") @RequestParam(required = false) Integer status) {
 		String uid = UserUtils.getUserId();
-		List<RepairEntity> list = repairService.getRepair(uid,status);
+		List<RepairEntity> list = repairService.getRepair(uid, status);
 		return CommonResult.ok(list);
 	}
 	
@@ -74,23 +77,24 @@ public class RepairController {
 		return CommonResult.ok(repairVO);
 	}
 	
+	
+	// TODO: 2021/3/19 已弃用
 	@ApiOperation("报修所属类别查询")
 	@GetMapping("/getRepairType")
 	@Login(allowAnonymous = true)
-	public CommonResult getRepairType() {
-		List<CommonConst> list = repairService.getRepairType();
+	public CommonResult getRepairType(@ApiParam(value = "报修类别") @RequestParam int repairType) {
+		List<CommonConst> list = repairService.getRepairType(repairType);
 		return CommonResult.ok(list);
 	}
 	
-	
 	@ApiOperation("报修内容图片上传")
 	@PostMapping("/uploadRepairImg")
-	@UploadImg(bucketName = UploadBucketConst.REPAIR_BUCKET,redisKeyName = UploadRedisConst.REPAIR_IMG_PART)
-	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files,CommonResult commonResult) {
+	@UploadImg(bucketName = UploadBucketConst.REPAIR_BUCKET, redisKeyName = UploadRedisConst.REPAIR_IMG_PART)
+	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files, CommonResult commonResult) {
 		if (files.length > 3) {
 			throw new ProprietorException("只能上传3张图片");
 		}
-		String[] filePaths = (String[])commonResult.getData();
+		String[] filePaths = (String[]) commonResult.getData();
 		StringBuilder filePath = new StringBuilder();
 		for (String s : filePaths) {
 			if (!StringUtils.isEmpty(s)) {
@@ -119,8 +123,8 @@ public class RepairController {
 	
 	@ApiOperation("评价图片上传")
 	@PostMapping("/uploadCommentImg")
-	@UploadImg(bucketName = UploadBucketConst.REPAIR_BUCKET,redisKeyName = UploadRedisConst.REPAIR_COMMENT_IMG_PART)
-	public CommonResult uploadCommentImg(@RequestParam("file") MultipartFile[] files,CommonResult commonResult) {
+	@UploadImg(bucketName = UploadBucketConst.REPAIR_BUCKET, redisKeyName = UploadRedisConst.REPAIR_COMMENT_IMG_PART)
+	public CommonResult uploadCommentImg(@RequestParam("file") MultipartFile[] files, CommonResult commonResult) {
 		if (files.length > 3) {
 			throw new ProprietorException("只能上传3张图片");
 		}
@@ -153,23 +157,12 @@ public class RepairController {
 		return CommonResult.ok();
 	}
 	
-
-//	@ApiOperation("完成报修")
-//	@GetMapping("/completeRepair")
-//	public CommonResult completeRepair(@ApiParam(value = "房屋报修id") @RequestParam Long id,
-//	                                   @ApiParam(value = "业主id") @RequestParam Long userId) {
-//		repairService.completeRepair(id, userId);
-//		return CommonResult.ok();
-//	}
-
-
-//	@ApiOperation("删除评价")
-//	@GetMapping("/deleteAppraise")
-//	public CommonResult deleteAppraise(@ApiParam(value = "房屋报修id") @RequestParam Long id) {
-//		repairService.deleteAppraise(id);
-//		return CommonResult.ok();
-//	}
-	
-	
+	@Login(allowAnonymous = true)
+	@ApiOperation("查看驳回原因")
+	@GetMapping("/getRejectReason")
+	public CommonResult getRejectReason(@RequestParam() Long id) {
+		String reason = repairService.getRejectReason(id);
+		return CommonResult.ok(reason);
+	}
 }
 

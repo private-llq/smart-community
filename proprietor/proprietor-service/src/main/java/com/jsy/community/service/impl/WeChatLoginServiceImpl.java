@@ -16,7 +16,6 @@ import com.jsy.community.qo.proprietor.BindingMobileQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
-import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -73,23 +72,23 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
     private UserThirdPlatformMapper userThirdPlatformMapper;
 
     @Override
-    public CommonResult login(String openid) {
+    public UserAuthVo login(String openid) {
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
                 .eq("third_platform_id", openid).eq("third_platform_type",2));
         if(entity != null&&entity.getUid()!=null){
             //返回token
             UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
-            return CommonResult.ok(createAuthVoWithToken(userInfoVo));
+            return createAuthVoWithToken(userInfoVo);
         }
         if (entity!=null){
-            return CommonResult.ok(createBindMobile(entity.getId()));
+            return createBindMobile(entity.getId());
         }
         UserThirdPlatformEntity platformEntity = new UserThirdPlatformEntity();
         platformEntity.setThirdPlatformId(openid);
         platformEntity.setThirdPlatformType(2);
         platformEntity.setId(SnowFlake.nextId());
         userThirdPlatformMapper.insert(platformEntity);
-        return CommonResult.ok(createBindMobile(platformEntity.getId()));
+        return createBindMobile(platformEntity.getId());
     }
     @Override
     @Transactional
@@ -106,7 +105,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
             uid = userService.register(registerQO);
         }
         //三方登录表入库
-        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectById(bindingMobileQO.getId());
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectById(bindingMobileQO.getThirdPlatformId());
         entity.setUid(uid);
         userThirdPlatformMapper.updateById(entity);
         UserInfoVo userInfoVo = new UserInfoVo();
@@ -133,7 +132,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setExpiredTime(null);
         UserInfoVo vo = new UserInfoVo();
-        vo.setWeChatId(id);
+        vo.setThirdPlatformId(id);
         vo.setIsBindMobile(0);
         userAuthVo.setUserInfo(vo);
 //        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);

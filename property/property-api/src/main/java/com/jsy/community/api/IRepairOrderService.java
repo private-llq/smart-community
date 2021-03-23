@@ -1,10 +1,14 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairOrderEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -23,7 +27,7 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Date 2020/12/9 15:51
 	 * @Param [communityId]
 	 **/
-	PageInfo<RepairOrderEntity> listRepairOrder(Long communityId, BaseQO<RepairOrderEntity> baseQO);
+	PageInfo<RepairOrderEntity> listRepairOrder(BaseQO<RepairOrderQO> repairOrderQO);
 	
 	/**
 	 * @return void
@@ -60,4 +64,31 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Param [id]
 	 **/
 	void successOrder(Long id);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.CommonConst>
+	 * @Author lihao
+	 * @Description 报修事项查询
+	 * @Date 2021/3/16 17:47
+	 * @Param [typeId]
+	 **/
+	List<CommonConst> listRepairType(Integer typeId);
+	
+	/**
+	 * @return com.jsy.community.entity.RepairOrderEntity
+	 * @Author lihao
+	 * @Description 根据报修id查询报修信息
+	 * @Date 2021/3/18 15:03
+	 * @Param [id]
+	 **/
+	RepairOrderEntity getRepairById(Long id);
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 驳回报修申请
+	 * @Date 2021/3/19 15:07
+	 * @Param [id]
+	 **/
+	void rejectOrder(Long id,String reason);
 }

@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -38,25 +39,30 @@ public class RepairEntity extends BaseEntity {
     @ApiModelProperty(value = "社区id")
     @NotNull(groups = {addRepairValidate.class},message = "社区不能为空")
     private Long communityId;
+    
+    @ApiModelProperty(value = "报修类别 0 个人报修 1 公共报修")
+    @NotNull(groups = {addRepairValidate.class},message = "报修类别不能为空")
+    @Range(groups = {addRepairValidate.class}, min = 0, max = 1, message = "请选择正确的报修类别")
+    private Integer repairType;
 
     @ApiModelProperty(value = "报修地址")
     @NotBlank(groups = {addRepairValidate.class},message = "报修地址不能为空")
     private String address;
 
-    @ApiModelProperty(value = "报修状态 0 待处理 1 处理中 2 已处理")
+    @ApiModelProperty(value = "报修状态 0 待处理 1 处理中 2 已处理 3已驳回")
     private Integer status;
     
     @ApiModelProperty(value = "保修状态字符串形式")
     @TableField(exist = false)
     private String statusString;
 
-    @ApiModelProperty(value = "报修类别id")
-    @NotNull(groups = {addRepairValidate.class},message = "报修类别id不能为空")
+    @ApiModelProperty(value = "报修事项id")
+    @NotNull(groups = {addRepairValidate.class},message = "报修事项id不能为空")
     private Long type;
     
-    @ApiModelProperty(value = "报修类别字符串形式")
+    @ApiModelProperty(value = "报修事项字符串形式")
     @TableField(exist = false)
-    @NotNull(groups = {addRepairValidate.class},message = "报修类别不能为空")
+    @NotNull(groups = {addRepairValidate.class},message = "报修事项不能为空")
     private String typeName;
 
     @ApiModelProperty(value = "报修人姓名")

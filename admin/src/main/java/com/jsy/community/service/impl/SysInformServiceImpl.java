@@ -8,7 +8,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.service.ISysInformService;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticSearchImportProvider;
+import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +56,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 	@Override
 	public boolean deleteBatchByIds(List<Long> informIds) {
-		informIds.forEach( i -> ElasticSearchImportProvider.elasticOperationSingle(i, RecordFlag.INFORM, Operation.DELETE, null, null));
+		informIds.forEach( i -> ElasticsearchImportProvider.elasticOperationSingle(i, RecordFlag.INFORM, Operation.DELETE, null, null));
 		return sysInformMapper.deleteBatchIds(informIds) > 0 ;
 	}
 }

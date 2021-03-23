@@ -17,10 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -98,13 +95,19 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	
 	@Override
 	public void deleteOrganization(Long id, Long communityId) {
+		QueryWrapper<OrganizationEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id", id).eq("community_id", communityId);
+		OrganizationEntity entity = organizationMapper.selectOne(queryWrapper);
+		if (entity == null) {
+			throw new PropertyException("您要删除的组织不存在，请重新选择");
+		}
+		
 		QueryWrapper<OrganizationEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("pid", id).eq("community_id", communityId);
 		List<OrganizationEntity> list = organizationMapper.selectList(wrapper);
-		
-		OrganizationEntity entity = organizationMapper.selectById(id);
 		if (!CollectionUtils.isEmpty(list)) {
-			throw new PropertyException("\'" + entity.getName() + "\'" + "已有下级节点,不可删除");
+			System.out.println("\"" + entity.getName() + "\"" + "已有下级节点,不可删除");
+			throw new PropertyException("\"" + entity.getName() + "\"" + "已有下级节点,不可删除");
 		}
 		
 		// TODO: 2021/3/16 判断是否有属于该机构的操作员
@@ -118,6 +121,9 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		QueryWrapper<OrganizationEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", id).eq("community_id", communityId);
 		OrganizationEntity one = organizationMapper.selectOne(wrapper);
+		if (one == null) {
+			return new OrganizationEntity();
+		}
 		
 		// 根据父id获取节点名称
 		Long pid = one.getPid();
@@ -127,10 +133,42 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		
 		if (parent != null) {
 			one.setParentName(parent.getName());
+		} else {
+			// 如果他没有父节点，那么父节点就展示他的社区名
+			CommunityEntity communityEntity = communityMapper.selectById(communityId);
+			if (communityEntity != null) {
+				one.setParentName(communityEntity.getName());
+			}
 		}
 		
 		return one;
 	}
+	
+	/**
+	 * @Description: 根据idList批量获取对应组织机构名称
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long, java.util.Map < java.lang.Long, java.lang.Object>>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/16
+	 **/
+	@Override
+	public Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(List<Long> ids) {
+		return organizationMapper.queryOrganizationNameByIdBatch(ids);
+	}
+	
+	/**
+	 * @Description: 社区组织机构是否存在
+	 * @Param: [orgId, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/17
+	 **/
+	@Override
+	public boolean isExists(Long orgId, Long communityId) {
+		Integer count = organizationMapper.selectCount(new QueryWrapper<OrganizationEntity>().eq("id", orgId).eq("community_id", communityId));
+		return count > 0;
+	}
+	
 	
 	@Override
 	public void updateOrganization(OrganizationEntity organization) {
@@ -142,9 +180,36 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		
 		if (!CollectionUtils.isEmpty(childList)) {
 			for (OrganizationEntity child : childList) {
-				if (child.getId().equals(organization.getPid())||organization.getPid().equals(organization.getId())) {
+				if (child.getId().equals(organization.getPid()) || organization.getPid().equals(organization.getId())) {
 					throw new PropertyException("不可选择自己或自己的子集成为自己的父级");
 				}
+			}
+		}
+		
+		// 2. 判断是否有同名
+		QueryWrapper<OrganizationEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("community_id", organization.getCommunityId());
+		List<OrganizationEntity> ones = organizationMapper.selectList(queryWrapper);
+		if (ones == null) {
+			throw new PropertyException("该小区没有此组织");
+		}
+		
+		for (OrganizationEntity one : ones) {
+			// 跳过当前正在修改的这条数据
+			if (one.getId().equals(organization.getId())) {
+				continue;
+			}
+			if (organization.getName().equals(one.getName())) {
+				throw new PropertyException("您小区已存在同名组织，请重新修改");
+			}
+		}
+		
+		// 3. 判断父节点是否存在
+		Long pid = organization.getPid();
+		OrganizationEntity organizationEntity = organizationMapper.selectById(pid);
+		if (organization.getPid() != 0) {
+			if (organizationEntity == null) {
+				throw new PropertyException("您选择的父节点不存在,请重新选择");
 			}
 		}
 		

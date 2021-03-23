@@ -37,21 +37,29 @@ public class FacilityTypeController {
 	@ApiOperation("添加设备分类")
 	@PostMapping("/addFacilityType")
 	public CommonResult addFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
-		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.addFacilityValidate.class);
+		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.addFacilityTypeValidate.class);
 		facilityTypeService.addFacilityType(facilityTypeEntity);
 		return CommonResult.ok();
+	}
+	
+	//完成
+	@ApiOperation("根据id查询设备分类")
+	@GetMapping("/getFacilityType")
+	public CommonResult getFacilityType(@RequestParam Long id) {
+		FacilityTypeEntity typeEntity = facilityTypeService.getFacilityType(id);
+		return CommonResult.ok(typeEntity);
 	}
 	
 	//完成
 	@ApiOperation("修改设备分类")
 	@PostMapping("/updateFacilityType")
 	public CommonResult updateFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
-		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.updateFacilityValidate.class);
+		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.updateFacilityTypeValidate.class);
 		facilityTypeService.updateFacilityType(facilityTypeEntity);
 		return CommonResult.ok();
 	}
 	
-	//完成(没处理设备分类下有设备的)
+	//完成
 	@ApiOperation("删除设备分类")
 	@GetMapping("/deleteFacilityType")
 	public CommonResult deleteFacilityType(@RequestParam Long id,@RequestParam Long communityId) {
@@ -59,7 +67,7 @@ public class FacilityTypeController {
 		return CommonResult.ok();
 	}
 	
-	//完成(关于设备数没有处理)
+	//完成(没测 数量)
 	@ApiOperation("树形结构查询设备分类")
 	@GetMapping("/listFacilityType")
 	public CommonResult<List<FacilityTypeVO>> listFacilityType(@ApiParam("社区id") @RequestParam Long communityId) {

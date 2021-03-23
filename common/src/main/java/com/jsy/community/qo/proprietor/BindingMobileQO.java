@@ -19,8 +19,8 @@ import java.io.Serializable;
 @Data
 @ApiModel("微信绑定手机")
 public class BindingMobileQO implements Serializable {
-    @ApiModelProperty(value = "id")
-    private Long id;
+    @ApiModelProperty(value = "三方数据库id")
+    private Long thirdPlatformId;
     @ApiModelProperty(value = "电话")
     @NotNull(groups = {BindingMobileValidated.class},message = "手机号不能为空！")
     @NotBlank(groups = {BindingMobileValidated.class},message = "手机号不能为空！")

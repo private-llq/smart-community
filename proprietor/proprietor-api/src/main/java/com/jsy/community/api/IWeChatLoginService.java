@@ -1,7 +1,6 @@
 package com.jsy.community.api;
 
 import com.jsy.community.qo.proprietor.BindingMobileQO;
-import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 
 /**
@@ -11,7 +10,7 @@ import com.jsy.community.vo.UserAuthVo;
  * @create: 2021-03-08 10:51
  **/
 public interface IWeChatLoginService {
-    CommonResult login(String openid);
+    UserAuthVo login(String openid);
 
     UserAuthVo bindingMobile(BindingMobileQO bindingMobileQO);
 }

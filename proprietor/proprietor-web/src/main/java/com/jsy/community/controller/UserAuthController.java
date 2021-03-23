@@ -82,7 +82,7 @@ public class UserAuthController {
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "account", value = "账号，手机号或者邮箱地址", required = true, paramType = "query"),
 		@ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
-			allowableValues = "1,2,3,4", paramType = "query")
+			allowableValues = "1,2,3,4,5", paramType = "query")
 	})
 	public CommonResult<Boolean> sendCode(@RequestParam String account,
 	                                      @RequestParam Integer type) {
@@ -140,10 +140,13 @@ public class UserAuthController {
 	@PostMapping("/third/binding")
 	public CommonResult bindingThirdPlatform(@RequestBody UserThirdPlatformQO userThirdPlatformQO){
 		ValidatorUtils.validateEntity(userThirdPlatformQO);
-		if(StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())
-			&& StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
-			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"accessToken和authCode不允许同时为空");
+		if(StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())){
+			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"id不允许为空");
 		}
+//		if(StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())
+//			&& StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
+//			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"accessToken和authCode不允许同时为空");
+//		}
 		if(StringUtils.isEmpty(userThirdPlatformQO.getMobile())
 			|| StringUtils.isEmpty(userThirdPlatformQO.getCode())){
 			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"手机和验证码不能为空");

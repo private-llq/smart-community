@@ -10,10 +10,13 @@ spring:
       transport:
         dashboard: 127.0.0.1:1111
     gateway:
+#      default-filters:
+#        - Session
       discovery:
         locator:
           enabled: true
           lowerCaseServiceId: true
+
       routes:
         # 跳转URL
         - id: property

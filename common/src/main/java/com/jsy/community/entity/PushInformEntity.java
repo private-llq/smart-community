@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("推送消息实体对象")
-@TableName(value = "t_acct_push_inform")
+@TableName(value = "t_push_inform")
 public class PushInformEntity extends BaseEntity {
 
 
@@ -42,7 +42,20 @@ public class PushInformEntity extends BaseEntity {
     @ApiModelProperty(value = "推送目标：0表示推送至所有社区")
     private Integer pushTarget;
 
+    @ApiModelProperty(value = "推送消息状态：0表示草稿、1表示发布、2表示撤销")
+    private Integer pushState;
 
+    @ApiModelProperty(value = "推送公告类型 站内、外部链接")
+    private String informType;
+
+    @ApiModelProperty(value = "创建人")
+    private String createBy;
+
+    @ApiModelProperty(value = "更新人")
+    private String updateBy;
+
+    @ApiModelProperty(value = "置顶状态 0不置顶 1置顶")
+    private Integer topState;
 
     @ApiModelProperty(value = "推送消息浏览次数")
     private Long browseCount;

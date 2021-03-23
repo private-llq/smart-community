@@ -1,5 +1,6 @@
 package com.jsy.community.qo.proprietor;
 
+import com.jsy.community.annotation.FieldValid;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,13 +30,11 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "用户ID")
     private String uid;
 
-    @Range(groups = {AddPushInformValidate.class, CommunityPushInformValidate.class}, min = 1, message = "推送号ID范围错误!")
-    @NotNull(groups = {AddPushInformValidate.class, CommunityPushInformValidate.class}, message = "推送号ID不能为空!")
+    @Range(groups = {CommunityPushInformValidate.class}, min = 1, message = "推送号ID范围错误!")
+    @NotNull(groups = {CommunityPushInformValidate.class}, message = "推送号ID不能为空!")
     @ApiModelProperty(value = "推送账号ID、如果是社区推送则是社区ID、否则是第三方推送账号ID")
     private Long acctId;
 
-    @Length(groups = {AddPushInformValidate.class}, min = 1, max = 12, message = "推送消息账号名称长度在1~12之间")
-    @NotBlank(groups = {AddPushInformValidate.class}, message = "推送消息账号名称不能为空!")
     @ApiModelProperty(value = "推送消息账号名称")
     private String acctName;
 
@@ -47,8 +46,6 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "推送消息标题")
     private String pushTitle;
 
-    @Length(groups = {AddPushInformValidate.class}, min = 2, max = 64, message = "推送消息副标题长度在2~64")
-    @NotBlank(groups = {AddPushInformValidate.class}, message = "推送消息副标题不能为空!")
     @ApiModelProperty(value = "推送消息副标题")
     private String pushSubTitle;
 
@@ -57,11 +54,31 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "推送消息内容")
     private String pushMsg;
 
-    @Range(groups = {AddPushInformValidate.class}, min = 0, max = 1, message = "推送消息目标ID范围错误!")
-    @NotNull(groups = {AddPushInformValidate.class}, message = "推送消息目标社区ID未指定!")
+
     @ApiModelProperty(value = "推送目标：0表示推送至所有社区、1则是具体某个社区")
     private Integer pushTarget;
 
+    @FieldValid(groups = {AddPushInformValidate.class}, value = {"0","1","2"}, message = "推送消息状态只有-0表示草稿、1表示发布、2表示撤销")
+    @NotNull(groups = {AddPushInformValidate.class}, message = "推送消息状态不能为空!")
+    @ApiModelProperty(value = "推送消息状态：0表示草稿、1表示发布、2表示撤销")
+    private Integer pushState;
+
+    @FieldValid( groups = {AddPushInformValidate.class}, value = {"站内","外部链接"}, message = "推送公告类型 站内、外部链接")
+    @NotBlank(groups = {AddPushInformValidate.class}, message = "推送公告类型不能为空!")
+    @ApiModelProperty(value = "推送公告类型 站内、外部链接")
+    private String informType;
+
+    @ApiModelProperty(value = "创建人")
+    private String createBy;
+
+    @ApiModelProperty(value = "更新人")
+    private String updateBy;
+
+
+    @FieldValid( groups = {AddPushInformValidate.class}, value = {"0","1"}, message = "置顶状态 0不置顶 1置顶")
+    @NotNull(groups = {AddPushInformValidate.class}, message = "置顶状态不能为空!")
+    @ApiModelProperty(value = "置顶状态")
+    private Integer topState;
 
 
     /**

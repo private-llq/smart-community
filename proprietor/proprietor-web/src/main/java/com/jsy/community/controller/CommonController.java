@@ -11,7 +11,6 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.CommunityType;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -175,7 +174,7 @@ public class CommonController {
         try {
             //调用 用查询类型ID找到的 对应的查询方法
             Method queryMethod;
-            Object invoke;
+            Object invoke = null;
             //不带参
             if(BusinessEnum.RegionQueryTypeEnum.regionQueryTypeMap.get(queryType) == 2){
                 queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName);
@@ -183,11 +182,15 @@ public class CommonController {
             }else{
                 //带参
                 Class paramType = BusinessEnum.RegionQueryTypeEnum.regionQueryClassTypeMap.get(queryType);
-                queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,paramType);
                 if(paramType.equals(Integer.class)){
+                    queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,paramType);
                     invoke = queryMethod.invoke(commonService,regionNumber);
-                }else{
+                }else if(paramType.equals(String.class)){
+                    queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,paramType);
                     invoke = queryMethod.invoke(commonService,searchStr);
+                }else if(paramType.equals(Object.class)){
+                    queryMethod = ICommonService.class.getDeclaredMethod(queryMethodName,String.class,Integer.class);
+                    invoke = queryMethod.invoke(commonService,searchStr,regionNumber);
                 }
             }
             if (invoke == null) {
