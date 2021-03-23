@@ -27,13 +27,13 @@ public class CommunityFunEntity extends BaseEntity {
     private Integer viewCount;
 
     @ApiModelProperty(value = "uid创建人")
-    private String createUid;
+    private String createBy;
 
     @ApiModelProperty(value = "uid修改人")
-    private String updateUid;
+    private String updateBy;
 
     @ApiModelProperty(value = "发布人uid")
-    private String startUid;
+    private String startBy;
 
     @ApiModelProperty(value = "社区趣事内容")
     @NotBlank(groups = {CommunityFunValidated.class}, message = "内容不能为空！")
