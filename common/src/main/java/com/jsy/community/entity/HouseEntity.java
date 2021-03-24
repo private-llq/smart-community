@@ -12,7 +12,6 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import java.io.Serializable;
 import java.util.List;
 
@@ -28,10 +27,6 @@ import java.util.List;
 public class HouseEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    @ApiModelProperty(value = "字符串格式id,针对js long型长度不够的问题")
-    @TableField(exist = false)
-    private String idStr;
     
     @ApiModelProperty(value = "编号")
     @NotBlank(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")

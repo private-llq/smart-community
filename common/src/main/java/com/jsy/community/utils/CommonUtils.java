@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.HouseEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpPost;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -94,35 +95,70 @@ public class CommonUtils {
 		return array == null || array.length == 0;
 	}
 	
-	/**
-	* @Description: 对查询结果添加字符串格式id，适配js
-	 * @Param: [objList]
-	 * @Return: void
-	 * @Author: chq459799974
-	 * @Date: 2021/3/22
-	**/
-	public static void addIdStr(List<?> objList){
-		for(Object obj : objList){
-			try {
-				Field idField = obj.getClass().getSuperclass().getDeclaredField("id");
-				Field idStrField = obj.getClass().getDeclaredField("idStr");
-				boolean idFlag = idField.isAccessible();
-				boolean idStrFlag = idStrField.isAccessible();
-				idField.setAccessible(true);
-				idStrField.setAccessible(true);
-				//赋值
-				idStrField.set(obj,String.valueOf(idField.get(obj)));
-				//还原权限控制
-				idField.setAccessible(idFlag);
-				idStrField.setAccessible(idStrFlag);
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				break;
-			} catch (NoSuchFieldException e) {
-				e.printStackTrace();
-				break;
-			}
-		}
-	}
+//	/**
+//	* @Description: 对查询结果添加字符串格式id，适配js
+//	 * @Param: [objList]
+//	 * @Return: void
+//	 * @Author: chq459799974
+//	 * @Date: 2021/3/22
+//	**/
+//	public static void addIdStr(List<?> objList){
+//		if(CollectionUtils.isEmpty(objList)){
+//			return;
+//		}
+//		for(Object obj : objList){
+//			try {
+//				Field idField = obj.getClass().getSuperclass().getDeclaredField("id");
+//				Field idStrField = obj.getClass().getDeclaredField("idStr");
+//				boolean idFlag = idField.isAccessible();
+//				boolean idStrFlag = idStrField.isAccessible();
+//				idField.setAccessible(true);
+//				idStrField.setAccessible(true);
+//				//赋值
+//				idStrField.set(obj,String.valueOf(idField.get(obj)));
+//				//还原权限控制
+//				idField.setAccessible(idFlag);
+//				idStrField.setAccessible(idStrFlag);
+//			} catch (IllegalAccessException e) {
+//				e.printStackTrace();
+//				break;
+//			} catch (NoSuchFieldException e) {
+//				e.printStackTrace();
+//				break;
+//			}
+//		}
+//	}
+	
+//	/**
+//	* @Description: 给集合中对象添加任意临时属性
+//	 * @Param: [objList, attName, value]
+//	 * @Return: void
+//	 * @Author: chq459799974
+//	 * @Date: 2021/3/24
+//	**/
+//	public static void addTempAttribute(List<? extends HashMap> objList, String attName, Object value){
+//		if(CollectionUtils.isEmpty(objList)){
+//			return;
+//		}
+//		for(int i=0;i<objList.size();i++){
+//			objList.get(i).put(attName,value);
+//		}
+//	}
+	
+//	/**
+//	* @Description: 对查询结果添加字符串格式id(idStr)，适配js
+//	 * @Param:
+//	 * @Return:
+//	 * @Author: chq459799974
+//	 * @Date: 2021/3/24
+//	**/
+//	public static void addIdStr(List<? extends HashMap> objList){
+//		if(CollectionUtils.isEmpty(objList)){
+//			return;
+//		}
+//		for(int i=0;i<objList.size();i++){
+//			objList.get(i).put("idStr",String.valueOf(objList.get(i).get("id")));
+//		}
+//	}
 	
 }

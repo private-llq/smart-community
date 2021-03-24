@@ -435,8 +435,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		queryWrapper.orderByDesc("create_time");
 		Page<HouseEntity> pageData = houseMapper.selectPage(page, queryWrapper);
 		if(!CollectionUtils.isEmpty(pageData.getRecords())){
-			//添加字符串格式id，适配js
-			CommonUtils.addIdStr(pageData.getRecords());
 			//查询类型为楼栋，再查出已绑定单元数
 			if(BusinessConst.BUILDING_TYPE_BUILDING == query.getType()){
 				List<Long> paramList = new ArrayList<>();
