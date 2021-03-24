@@ -10,9 +10,7 @@ import java.util.List;
 
 @Data
 @ApiModel("返回家属详细信息")
-public class RelationVO implements Serializable {
-    @ApiModelProperty(value = "id")
-    private Long id;
+public class RelationVO extends BaseVO {
     @ApiModelProperty(value = "家属姓名",required = true)
     private String name;
     @ApiModelProperty("性别")

@@ -17,9 +17,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="House返回对象", description="社区房屋返回对象")
-public class HouseVo implements Serializable {
-
-    private Long id;
+public class HouseVo extends BaseVO {
 
     @ApiModelProperty(value = "城市id")
     private Integer cityId;

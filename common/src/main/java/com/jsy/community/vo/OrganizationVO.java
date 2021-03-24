@@ -20,10 +20,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "OrganizationVO对象", description = "组织机构树形结构展示效果")
-public class OrganizationVO implements Serializable {
-	
-	@ApiModelProperty(value = "组织id")
-	private Long id;
+public class OrganizationVO extends BaseVO {
 	
 	@ApiModelProperty(value = "父id")
 	private Long pid;

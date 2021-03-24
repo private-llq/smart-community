@@ -12,9 +12,7 @@ import java.io.Serializable;
  * @create: 2021-03-09 16:40
  **/
 @Data
-public class HouseTypeVo implements Serializable {
-    @ApiModelProperty(value = "ID")
-    private String id;
+public class HouseTypeVo extends BaseVO {
     @ApiModelProperty(value = "名称")
     private String name;
 }

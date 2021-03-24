@@ -12,8 +12,6 @@ import lombok.Data;
 @Data
 @ApiModel("轮播图查询返回")
 public class BannerVO extends BaseVO {
-	@ApiModelProperty(value = "ID")
-	private Long id;
 	
 	@ApiModelProperty(value = "文件路径")
 	private String url;

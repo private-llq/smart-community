@@ -14,10 +14,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InformListVO implements Serializable {
-
-    //消息推送号ID 有可能是社区有可能是系统消息
-    private Long id;
+public class InformListVO extends BaseVO {
 
     //消息名称
     private String name;
