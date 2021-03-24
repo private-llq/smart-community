@@ -5,4 +5,5 @@
     <select id="listByType" resultType="java.lang.Long">
         SELECT id FROM `t_common_const` where type_id =#{i}
     </select>
+
 </mapper>

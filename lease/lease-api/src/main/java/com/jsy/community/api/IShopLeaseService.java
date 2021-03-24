@@ -8,6 +8,7 @@ import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.qo.shop.ShopQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.shop.IndexShopVO;
+import com.jsy.community.vo.shop.ShopDetailsVO;
 
 import java.util.List;
 import java.util.Map;
@@ -121,4 +122,13 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Param [areaId]
 	 **/
 	List<CommunityEntity> getCommunity(Long areaId);
+	
+	/**  
+	 * @return com.jsy.community.vo.shop.ShopDetailsVO
+	 * @Author lihao
+	 * @Description 
+	 * @Date 2021/3/23 17:38
+	 * @Param [shopId] 
+	 **/
+	ShopDetailsVO getShopForUpdate(Long shopId);
 }

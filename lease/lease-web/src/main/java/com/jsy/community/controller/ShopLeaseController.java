@@ -20,6 +20,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.shop.IndexShopVO;
+import com.jsy.community.vo.shop.ShopDetailsVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -315,10 +316,17 @@ public class ShopLeaseController {
 		return CommonResult.ok(map);
 	}
 	
+	@ApiOperation("根据商铺id查询商铺详情（用于修改）")
+	@GetMapping("/getShopForUpdate")
+	public CommonResult getShopForUpdate(@ApiParam("店铺id") @RequestParam Long shopId) {
+		ShopDetailsVO detailsVO = shopLeaseService.getShopForUpdate(shopId);
+		return CommonResult.ok(detailsVO);
+	}
+	
 	@ApiOperation("商铺修改")
 	@PostMapping("/updateShop")
 	@Login
-	@Log(operationType = LogTypeConst.UPDATE, module = LogModule.LEASE, isSaveRequestData = true)
+//	@Log(operationType = LogTypeConst.UPDATE, module = LogModule.LEASE, isSaveRequestData = true)
 	public CommonResult updateShop(@RequestBody ShopQO shop) {
 		String[] imgPath = shop.getImgPath();
 		
@@ -420,6 +428,8 @@ public class ShopLeaseController {
 		System.out.println("1");
 		return CommonResult.ok();
 	}
+	
+	
 	
 	/**
 	 * POST---有参测试(对象参数)

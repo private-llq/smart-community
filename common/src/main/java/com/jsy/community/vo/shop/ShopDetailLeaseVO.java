@@ -12,7 +12,7 @@ import java.util.List;
  * @author lihao
  * @ClassName ShopDetailLeaseVO
  * @Date 2021/1/7  18:05
- * @Description TODO
+ * @Description 店铺详情页面查询数据
  * @Version 1.0
  **/
 @Data

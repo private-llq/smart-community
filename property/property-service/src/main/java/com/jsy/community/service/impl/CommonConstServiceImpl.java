@@ -52,4 +52,5 @@ public class CommonConstServiceImpl extends ServiceImpl<CommonConstMapper, Commo
 		commonConstQueryWrapper.eq("id",shopTypeId);
 		return commonConstMapper.selectOne(commonConstQueryWrapper);
 	}
+	
 }

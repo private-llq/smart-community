@@ -24,20 +24,24 @@ import java.util.List;
 public class ShopQO implements Serializable {
 	
 	@ApiModelProperty(value = "商铺id")
-	@NotBlank(groups = ShopQO.updateShopValidate.class, message = "业主id不能为空")
+	@NotNull(groups = ShopQO.updateShopValidate.class, message = "业主id不能为空")
 	private Long shopId;
 	
 	@ApiModelProperty(value = "业主id")
-	@NotBlank(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "业主id不能为空")
+	@NotBlank(groups = {ShopQO.addShopValidate.class}, message = "业主id不能为空")
 	private String uid;
 	
 	@ApiModelProperty(value = "城市id")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "所在城市不能为空")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "所在城市id不能为空")
 	private Long cityId;
+	@NotBlank(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "所在城市不能为空")
+	private String city;
 	
 	@ApiModelProperty(value = "区域id")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "所在区域不能为空")
+	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "所在区域id不能为空")
 	private Long areaId;
+	@NotBlank(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "所在区域不能为空")
+	private String area;
 	
 	@ApiModelProperty(value = "社区id")
 	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "商铺地址不能为空")
