@@ -59,7 +59,10 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             wrapper.like("tallys",communityFunQO.getTallys());
         }
         if (communityFunQO.getStatus()!=null&&communityFunQO.getStatus()!=0){
-            wrapper.like("status",communityFunQO.getStatus());
+                wrapper.eq("status",communityFunQO.getStatus());
+        }
+        if (communityFunQO.getRedactStatus()!=null&&communityFunQO.getRedactStatus()!=0){
+                wrapper.eq("redact_status",communityFunQO.getRedactStatus());
         }
         if (communityFunQO.getCreatrTimeStart()!=null){
             wrapper.ge("create_time",communityFunQO.getCreatrTimeStart());
@@ -75,6 +78,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             communityFunQO.setIssueTimeOut(communityFunQO.getIssueTimeOut().plusDays(1));
             wrapper.le("start_time",communityFunQO.getCreatrTimeStart());
         }
+
         Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
         PageInfo pageInfo=new PageInfo();
@@ -100,14 +104,15 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         CommunityFunEntity entity = new CommunityFunEntity();
         entity.setTitleName(communityFunOperationQO.getTitleName());
         entity.setViewCount(communityFunOperationQO.getViewCount());
-        entity.setCreateUid(communityFunOperationQO.getUid());
+        entity.setCreateBy(communityFunOperationQO.getUid());
         if (userEntity!=null){
             entity.setCreateName(userEntity.getRealName());
         }
         entity.setContent(communityFunOperationQO.getContent());
         entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
         entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
-        entity.setStatus(0);
+        entity.setStatus(2);
+        entity.setRedactStatus(2);
         String tallys = Arrays.toString(communityFunOperationQO.getTallys());
         entity.setTallys(tallys.substring(1, tallys.length() - 1));
         entity.setId(SnowFlake.nextId());
@@ -120,7 +125,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     public void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
         AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", uid));
         CommunityFunEntity entity = communityFunMapper.selectById(communityFunOperationQO.getId());
-        entity.setUpdateUid(uid);
+        entity.setUpdateBy(uid);
         if (userEntity!=null){
             entity.setUpdateName(userEntity.getRealName());
         }
@@ -154,8 +159,9 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     if (userEntity!=null){
         entity.setStartName(userEntity.getRealName());
     }
+    entity.setRedactStatus(1);
     entity.setStatus(1);
-    entity.setStartUid(uid);
+    entity.setStartBy(uid);
     entity.setStartTime(LocalDateTime.now());
     communityFunMapper.updateById(entity);
     ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());

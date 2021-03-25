@@ -2,7 +2,6 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.IndexMenuEntity;
-import com.jsy.community.vo.menu.FrontParentMenu;
 
 import java.util.List;
 
@@ -25,12 +24,12 @@ public interface IIndexMenuService extends IService<IndexMenuEntity> {
 	 **/
 	List<IndexMenuEntity> listIndexMenu(Long communityId);
 	
-	/**
-	 * @return java.util.List<com.jsy.community.vo.menu.FrontParentMenu>
-	 * @Author lihao
-	 * @Description 树形结构
-	 * @Date 2020/11/17 10:14
-	 * @Param []
-	 **/
-	List<FrontParentMenu> moreIndexMenu(Long communityId);
+//	/**
+//	 * @return java.util.List<com.jsy.community.vo.menu.FrontParentMenu>
+//	 * @Author lihao
+//	 * @Description 树形结构
+//	 * @Date 2020/11/17 10:14
+//	 * @Param []
+//	 **/
+//	List<FrontParentMenu> moreIndexMenu(Long communityId);
 }

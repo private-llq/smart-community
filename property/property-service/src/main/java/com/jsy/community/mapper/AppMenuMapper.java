@@ -2,8 +2,8 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.AppMenuEntity;
+import com.jsy.community.vo.menu.AppMenuVO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -29,11 +29,29 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	List<Long> getMenuIdByCommunityId(Long communityId);
 	
 	/**
+	 * @return java.util.List<java.lang.Long>
+	 * @Author lihao
+	 * @Description 查询中间表菜单id集合
+	 * @Date 2021/3/23 10:23
+	 * @Param [communityId]
+	 **/
+	List<Long> listMenuId(Long communityId);
+	
+	/**
 	 * @return void
 	 * @Author lihao
-	 * @Description
+	 * @Description 批量添加菜单到中间表
 	 * @Date 2021/2/2 18:56
 	 * @Param [appMenuEntity, communityId]
 	 **/
-	void addParentMenu(@Param("id") Long id, @Param("communityId")Long communityId);
+	void insertMiddleMenu(List<AppMenuVO> appMenuVOS);
+	
+	/**
+	 * @return void
+	 * @Author lihao
+	 * @Description 批量删除菜单中间表
+	 * @Date 2021/3/23 11:27
+	 * @Param [ids]
+	 **/
+	void deleteMiddleMenu(Long id);
 }

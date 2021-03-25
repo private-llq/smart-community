@@ -71,6 +71,9 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	@Select("select * from t_admin_user where uid = #{uid}")
 	AdminUserEntity queryByUid(String uid);
 	
+	@Select("select uid from t_admin_user where id = #{id}")
+	String queryUidById(Long id);
+	
 	/**
 	* @Description: 添加操作员
 	 * @Param: [entity]

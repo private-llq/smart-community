@@ -97,6 +97,14 @@ public class RelationController {
         String upload = MinioUtils.upload(file, "wocao");
         return CommonResult.ok(upload,"上传成功");
     }
+    @ApiOperation("删除车辆")
+    @DeleteMapping("/delCar")
+    @Login
+    public CommonResult delCar(@RequestParam("id") Long id){
+        String userId = UserUtils.getUserId();
+        relationService.delCar(userId, id);
+        return CommonResult.ok();
+    }
     @ApiOperation("查询一个家属详情")
     @GetMapping("/selectUserRelationDetails")
     @Login

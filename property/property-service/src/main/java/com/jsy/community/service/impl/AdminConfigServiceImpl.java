@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IAdminConfigService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.mapper.AdminRoleMapper;
 import com.jsy.community.qo.admin.AdminMenuQO;
@@ -306,7 +308,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	//==================================================== 用户-菜单 ===============================================================
 	/**
-	* @Description: 查询用户菜单权限
+	* @Description: 查询用户菜单权限(老接口，暂时弃用)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
@@ -318,4 +320,46 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		return adminMenuMapper.queryUserMenu(uid);
 	}
 	
+	//================================================== 物业端原型 - 用户关联菜单start =========================================================================
+	/**
+	* @Description: 为用户分配菜单
+	 * @Param: [menuIds, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/23
+	**/
+	@Override
+	public void setUserMenus(List<Long> menuIds,String uid){
+		//备份
+//		List<Long> menuBackup = adminMenuMapper.getUserMenu(uid);
+		//清空
+		adminMenuMapper.clearUserMenu(uid);
+		if(CollectionUtils.isEmpty(menuIds)){
+			return;
+		}
+		//去重
+		Set<Long> menuIdsSet = new HashSet<>(menuIds);
+		//新增
+		int rows = 0;
+		try{
+			rows = adminMenuMapper.addUserMenuBatch(menuIdsSet, uid);
+		}catch (Exception e){
+			//还原
+			log.error("设置角色菜单出错：" + uid + "成功条数：" + rows);
+//			adminMenuMapper.clearUserMenu(uid);
+//			adminMenuMapper.addUserMenuBatch(new HashSet<>(menuBackup), uid);
+//			return false;
+			throw new PropertyException(JSYError.INTERNAL.getCode(),"用户功能授权失败，操作失败");
+		}
+		//还原
+		if(rows != menuIdsSet.size()){
+			log.error("设置角色菜单异常：" + uid + "成功条数：" + rows);
+//			adminMenuMapper.clearUserMenu(uid);
+//			adminMenuMapper.addUserMenuBatch(new HashSet<>(menuBackup), uid);
+//			return false;
+			throw new PropertyException(JSYError.INTERNAL.getCode(),"用户功能授权失败，操作失败");
+		}
+//		return true;
+	}
+	//================================================== 物业端原型 - 用户关联菜单end =========================================================================
 }

@@ -19,10 +19,7 @@ import java.io.Serializable;
 @ToString
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public class UserHouseVO implements Serializable {
-	
-	@ApiModelProperty(value = "房屋id")
-	private Long id;
+public class UserHouseVO extends BaseVO {
 	
 	@ApiModelProperty(value = "业主")
 	private String nickname;

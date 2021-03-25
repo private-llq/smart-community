@@ -13,9 +13,7 @@ import java.time.LocalDateTime;
  * @create: 2021-03-15 17:31
  **/
 @Data
-public class CommunityFunVO implements Serializable {
-    @ApiModelProperty(value = "id")
-    private String id;
+public class CommunityFunVO extends BaseVO {
     @ApiModelProperty(value = "社区趣事标题")
     private String titleName;
     @ApiModelProperty(value = "社区趣事浏览次数")

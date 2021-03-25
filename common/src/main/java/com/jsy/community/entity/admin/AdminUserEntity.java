@@ -95,7 +95,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 状态  0：正常   1：禁用
 	 */
-	@Range(groups = addOperatorValidatedGroup.class, min = 1, max = 2, message = "操作员停/启用状态不正确")
+	@Range(groups = addOperatorValidatedGroup.class, min = 0, max = 1, message = "操作员停/启用状态不正确")
 	private Integer status;
 	
 	/**
@@ -120,6 +120,12 @@ public class AdminUserEntity extends BaseEntity {
 	 */
 	@TableField(exist = false)
 	private List<Integer> roleIdList;
+	
+	/**
+	 * 菜单ID列表(新版物业端原型 一个小区用户量少，不设角色，直接关联菜单)
+	 */
+	@TableField(exist = false)
+	private List<Long> menuIdList;
 	
 	/**
 	 * 用户菜单列表

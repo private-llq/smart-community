@@ -82,11 +82,24 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/3
 	**/
-//	public static UserInfoVo getUserInfo() {
-//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-//			.getRequest();
-//		return (UserInfoVo)request.getAttribute(USER_INFO);
-//	}
+	public static UserInfoVo getUserInfo() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+			.getRequest();
+		return (UserInfoVo)request.getAttribute(USER_INFO);
+	}
+	
+	/**
+	 * @Description: 获取request域中用户信息(登录用户自己的信息)
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.UserInfoVo
+	 * @Author: chq459799974
+	 * @Date: 2020/12/3
+	 **/
+	public static AdminInfoVo getAdminUserInfo() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+			.getRequest();
+		return (AdminInfoVo)request.getAttribute(USER_INFO);
+	}
 	
 	/**
 	* @Description: 获取request域中用户id(登录用户自己的uid)

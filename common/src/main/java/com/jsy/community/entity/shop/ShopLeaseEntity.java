@@ -34,8 +34,14 @@ public class ShopLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "城市id")
     private Long cityId;
     
+    @ApiModelProperty(value = "城市")
+    private String city;
+    
     @ApiModelProperty(value = "区域id")
     private Long areaId;
+    
+    @ApiModelProperty(value = "区域")
+    private String area;
     
     @ApiModelProperty(value = "社区id")
     private Long communityId;

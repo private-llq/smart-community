@@ -20,6 +20,15 @@ public interface IRelationService {
      */
     void addRelation(RelationQo relationQo);
 
+    /**
+     * @Description: 删除家属下的某个车辆
+     * @author: Hu
+     * @since: 2020/12/10 16:36
+     * @Param:
+     * @return:
+     */
+    void delCar(String uid , Long id);
+
 
     /**
      * @Description: 通过业主id查询家属信息

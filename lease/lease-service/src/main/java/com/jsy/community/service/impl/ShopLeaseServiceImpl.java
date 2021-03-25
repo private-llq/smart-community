@@ -26,6 +26,7 @@ import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.shop.IndexShopVO;
+import com.jsy.community.vo.shop.ShopDetailsVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -229,8 +230,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		Long communityId = shop.getCommunityId();
 		CommunityEntity community = communityService.getCommunityNameById(communityId);
-		shopLeaseVo.setShopAddress(area+"  "+community.getName());
-		
+		shopLeaseVo.setShopAddress(area + "  " + community.getName());
 		
 		
 		// 查询店铺发布人的电话和头像
@@ -306,16 +306,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Override
 	public List<Map<String, Object>> listShop(String userId) {
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("uid", userId);
+		wrapper.eq("uid", userId).orderByDesc("create_time");
 		List<Map<String, Object>> maps = new ArrayList<>();
 		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
 		for (ShopLeaseEntity shopLeaseEntity : list) {
 			HashMap<String, Object> map = new HashMap<>();
 			Integer status = shopLeaseEntity.getStatus();
-			if (0==(status)) {
+			if (0 == (status)) {
 				shopLeaseEntity.setStatusString("空置中");
 			}
-			if (1==(status)) {
+			if (1 == (status)) {
 				shopLeaseEntity.setStatusString("营业中");
 			}
 			map.put("shopLease", shopLeaseEntity);
@@ -462,6 +462,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			
 			// 分页
 			shopLeaseMapper.selectPage(page, wrapper);
+			
+			
 			return commonCode(page, shopVOS);
 		}
 		
@@ -630,7 +632,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Long communityId = record.getCommunityId();
 			CommunityEntity community = communityService.getCommunityNameById(communityId);
 			
-			indexShopVO.setAddress(area+"  "+community.getName());
+			indexShopVO.setAddress(area + "  " + community.getName());
 		}
 		PageInfo<IndexShopVO> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(page, pageInfo);
@@ -731,7 +733,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		// 1. 调用远端服务
 		communityService.addCommunityEntity();
-		int b =  1/0;
+		int b = 1 / 0;
 		// 2. 调用本地服务
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
 		shopLeaseEntity.setId(140L);
@@ -739,8 +741,8 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		shopLeaseMapper.insert(shopLeaseEntity);
 		
 		System.out.println(11);
-	
-
+		
+		
 	}
 	
 	@Override
@@ -812,6 +814,61 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Override
 	public List<CommunityEntity> getCommunity(Long areaId) {
 		return communityService.listCommunityByAreaId(areaId);
+	}
+	
+	@Override
+	public ShopDetailsVO getShopForUpdate(Long shopId) {
+		ShopLeaseEntity entity = shopLeaseMapper.selectById(shopId);
+		if (entity == null) {
+			throw new LeaseException("你选择的商铺不存在");
+		}
+		ShopDetailsVO detailsVO = new ShopDetailsVO();
+		BeanUtils.copyProperties(entity, detailsVO);
+		
+		// 社区id（商铺所在地址）
+		Long communityId = entity.getCommunityId();
+		CommunityEntity communityNameById = communityService.getCommunityNameById(communityId);
+		detailsVO.setCommunity(communityNameById.getName());
+		// 商铺类型
+		Long shopTypeId = entity.getShopTypeId();
+		CommonConst constType = commonConstService.getConstById(shopTypeId);
+		detailsVO.setShopType(constType.getConstName());
+		// 商铺行业
+		Long shopBusinessId = entity.getShopBusinessId();
+		CommonConst constBusiness = commonConstService.getConstById(shopBusinessId);
+		detailsVO.setShopBusiness(constBusiness.getConstName());
+		// 商铺图片
+		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("shop_id", entity.getId()).select("img_url");
+		List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(wrapper);
+		if (!CollectionUtils.isEmpty(shopImgEntities)) {
+			List<String> head = new ArrayList<>();
+			List<String> middle = new ArrayList<>();
+			List<String> other = new ArrayList<>();
+			for (ShopImgEntity shopImgEntity : shopImgEntities) {
+				String imgUrl = shopImgEntity.getImgUrl();
+				if (imgUrl.contains("shop-head-img")) {
+					head.add(imgUrl);
+				} else if (imgUrl.contains("shop-middle-img")) {
+					middle.add(imgUrl);
+				} else {
+					other.add(imgUrl);
+				}
+			}
+			detailsVO.setHeadImg(head);
+			detailsVO.setMiddleImg(middle);
+			detailsVO.setOtherImg(other);
+		}
+		
+		// 配套设施Code
+		Long shopFacility = entity.getShopFacility();
+		List<Long> facilityList = MyMathUtils.analysisTypeCode(shopFacility);
+		detailsVO.setShopFacilityList(facilityList);
+		// 客流人群Code
+		Long shopPeople = entity.getShopPeople();
+		List<Long> peopleList = MyMathUtils.analysisTypeCode(shopPeople);
+		detailsVO.setShopPeoples(peopleList);
+		return detailsVO;
 	}
 	
 }

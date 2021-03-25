@@ -8,9 +8,7 @@ import java.io.Serializable;
 
 @Data
 @ApiModel("返回车辆信息")
-public class RelationCarsVO implements Serializable {
-    @ApiModelProperty("id")
-    private Long id;// 85
+public class RelationCarsVO extends BaseVO {
     @ApiModelProperty("车牌号")
     private String carPlate;// 85
     @ApiModelProperty("车辆类型")

@@ -9,8 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -20,6 +19,11 @@ import java.time.LocalDateTime;
 public class BaseEntity implements Serializable {
 	@TableId
 	private Long id;
+	
+	//兼容H5，使用字符串格式， 针对js long型长度不够的问题
+	public String getIdStr(){
+		return String.valueOf(id);
+	}
 	
 	@TableLogic
 	private Integer deleted;

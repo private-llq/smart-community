@@ -30,20 +30,24 @@ public class RelationCarsQo implements Serializable {
     @ApiModelProperty("行驶证图片地址")
     private String drivingLicenseUrl;
 
-    @ApiModelProperty(value = "家属ID",hidden = true)
-    private Long houseMemberId;
+    @ApiModelProperty(value = "家属或者租户id",hidden = true)
+    private Long relationshipId;
 
-    //手机号
-    @ApiModelProperty(hidden = true)
-    private String contact;
+    @ApiModelProperty(value = "1家属2租户",hidden = true)
+    private Integer relationType;
+
+
 
     //用户ID
     @ApiModelProperty(hidden = true)
     private String uid;
 
-    //家属名字
-    @ApiModelProperty(hidden = true)
+    @ApiModelProperty(value = "电话",hidden = true)
+    private String mobile;
+    @ApiModelProperty(value = "车主",hidden = true)
     private String owner;
+    @ApiModelProperty(value = "身份证",hidden = true)
+    private String idCard;
 
     //所属社区
     @ApiModelProperty(hidden = true)

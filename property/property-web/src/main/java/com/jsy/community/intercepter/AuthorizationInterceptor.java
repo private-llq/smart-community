@@ -72,6 +72,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			AdminInfoVo adminInfoVo = userUtils.getAdminInfo(token);
 			if(adminInfoVo != null){
 				request.setAttribute(UserUtils.USER_KEY, adminInfoVo.getUid());
+				request.setAttribute(UserUtils.USER_INFO, adminInfoVo);
 				return true;
 			}
 		}

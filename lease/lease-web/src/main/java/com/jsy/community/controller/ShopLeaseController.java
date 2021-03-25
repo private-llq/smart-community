@@ -20,6 +20,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.shop.IndexShopVO;
+import com.jsy.community.vo.shop.ShopDetailsVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -123,7 +124,7 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")
 	@PostMapping("/getShopByCondition")
-	public CommonResult getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO,
+	public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO,
 	                                       @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
 	                                       @ApiParam("区域id") @RequestParam(required = false, defaultValue = "500103") Integer areaId) {
 		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO, query, areaId);
@@ -144,6 +145,8 @@ public class ShopLeaseController {
 					record.setMonthMoneyString(substring);
 				}
 			}
+		} else {
+			return CommonResult.ok(new PageInfo<IndexShopVO>().setCurrent(baseQO.getPage()).setSize(baseQO.getSize()));
 		}
 		return CommonResult.ok(pageInfo);
 	}
@@ -268,7 +271,6 @@ public class ShopLeaseController {
 	@ApiOperation("查询店铺详情")
 	@RequireRecentBrowse
 	@GetMapping("/getShop")
-//	@Login(allowAnonymous = true)
 	public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
 		Map<String, Object> map = shopLeaseService.getShop(shopId);
 		if (map == null) {
@@ -314,10 +316,17 @@ public class ShopLeaseController {
 		return CommonResult.ok(map);
 	}
 	
+	@ApiOperation("根据商铺id查询商铺详情（用于修改）")
+	@GetMapping("/getShopForUpdate")
+	public CommonResult getShopForUpdate(@ApiParam("店铺id") @RequestParam Long shopId) {
+		ShopDetailsVO detailsVO = shopLeaseService.getShopForUpdate(shopId);
+		return CommonResult.ok(detailsVO);
+	}
+	
 	@ApiOperation("商铺修改")
 	@PostMapping("/updateShop")
 	@Login
-	@Log(operationType = LogTypeConst.UPDATE, module = LogModule.LEASE, isSaveRequestData = true)
+//	@Log(operationType = LogTypeConst.UPDATE, module = LogModule.LEASE, isSaveRequestData = true)
 	public CommonResult updateShop(@RequestBody ShopQO shop) {
 		String[] imgPath = shop.getImgPath();
 		
@@ -419,6 +428,8 @@ public class ShopLeaseController {
 		System.out.println("1");
 		return CommonResult.ok();
 	}
+	
+	
 	
 	/**
 	 * POST---有参测试(对象参数)

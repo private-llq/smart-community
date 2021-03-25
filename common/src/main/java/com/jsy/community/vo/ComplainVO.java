@@ -17,9 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComplainVO implements Serializable {
-    @ApiModelProperty(value = "投诉建议id")
-    private Long id;
+public class ComplainVO extends BaseVO {
     @ApiModelProperty(value = "类型，1投诉，2建议")
     private Integer type;
     @ApiModelProperty(value = "内容")

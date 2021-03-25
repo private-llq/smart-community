@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IOrganizationService;
 import com.jsy.community.api.PropertyException;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -57,6 +59,9 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	
 	@Autowired
 	private IOrganizationService organizationService;
+	
+	@Autowired
+	private IAdminConfigService adminConfigService;
 	
 	/**
 	* @Description: 设置用户角色
@@ -339,6 +344,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		MyPageUtils.setPageAndSize(page,baseQO);
 		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,number,real_name,mobile,id_card,status,role_type,org_id,job,create_by,create_time,update_by,update_time");
 		queryWrapper.eq("community_id",query.getCommunityId());
+		//是否查详情
+		if(query.getId() != null){
+			queryWrapper.eq("id",query.getId());
+		}
 		if(!StringUtils.isEmpty(query.getName())){
 			queryWrapper.and(wrapper -> wrapper.like("number",query.getName())
 				.or().like("real_name",query.getName())
@@ -385,8 +394,9 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		if(!organizationService.isExists(adminUserEntity.getOrgId(),communityId)){
 			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
 		}
+		String uid = UserUtils.randomUUID();
 		adminUserEntity.setId(SnowFlake.nextId());
-		adminUserEntity.setUid(UserUtils.randomUUID());
+		adminUserEntity.setUid(uid);
 		adminUserEntity.setStatus(adminUserEntity.getStatus() != null ? adminUserEntity.getStatus() : 0);
 		//生成随机密码
 		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
@@ -395,6 +405,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserEntity.setPassword(new Sha256Hash(randomPass, salt).toHex());
 		adminUserEntity.setSalt(salt);
 		int result = adminUserMapper.addOperator(adminUserEntity);
+		//更新菜单权限
+		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
 		//发短信通知，并发送初始密码
 		boolean b = SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
 //		if(!b){
@@ -420,6 +432,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
 			}
 		}
+		//查询uid
+		String uid = adminUserMapper.queryUidById(adminUserEntity.getId());
+		if(StringUtils.isEmpty(uid)){
+			throw new PropertyException("用户不存在！");
+		}
+		//更新菜单权限
+		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
 		return adminUserMapper.updateOperator(adminUserEntity) == 1;
 	}
 	

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -216,7 +217,7 @@ public class AdminUserController {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少社区ID");
 		}
 		//TODO 一个手机号可以注册多个社区，根据token取UID查询拥有社区ID数组(或社区ID数组直接存到redis)，验证前端传过来的id是否in 社区ID数组(是否具有社区权限)
-		return CommonResult.ok(adminUserService.queryOperator(baseQO),"查询成功");
+		return CommonResult.ok(adminUserService.queryOperator(baseQO));
 	}
 	
 	/**
@@ -231,6 +232,9 @@ public class AdminUserController {
 		//TODO 获取操作员UID验证操作权限(1.是否是超级管理员 2.是否有操作员管理权限 3.是否具有社区权限) ， 操作带上社区id
 		//TODO 数据正则验证 手机号 身份证等
 		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.addOperatorValidatedGroup.class);
+		if(CollectionUtils.isEmpty(adminUserEntity.getMenuIdList())){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少功能授权");
+		}
 		return adminUserService.addOperator(adminUserEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
 	}
 	

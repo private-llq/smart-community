@@ -5,8 +5,8 @@ import com.jsy.community.api.IRelationService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.entity.RelationCarEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.RelationCarsQo;
@@ -38,7 +38,7 @@ public class RelationServiceImpl implements IRelationService {
     private UserMapper userMapper;
 
     @Autowired
-    private CarMapper carMapper;
+    private RelationCarMapper carMapper;
 
     @Autowired
     private HouseMemberMapper houseMemberMapper;
@@ -48,6 +48,18 @@ public class RelationServiceImpl implements IRelationService {
 
     @Autowired
     private UserHouseMapper userHouseMapper;
+
+    /**
+     * @Description: 删除车辆
+     * @author: Hu
+     * @since: 2021/3/23 15:32
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void delCar(String uid, Long id) {
+        carMapper.delete(new QueryWrapper<RelationCarEntity>().eq("uid",uid).eq("id",id));
+    }
 
     /**
      * 添加家属
@@ -71,7 +83,6 @@ public class RelationServiceImpl implements IRelationService {
         houseMemberEntity.setMobile(relationQo.getMobile());
         houseMemberEntity.setRelation(relationQo.getRelation());
         houseMemberEntity.setSex(relationQo.getSex());
-        houseMemberEntity.setPersonType(1);
         houseMemberMapper.insert(houseMemberEntity);
         //添加车辆信息
         List<RelationCarsQo> cars = relationQo.getCars();
@@ -79,10 +90,12 @@ public class RelationServiceImpl implements IRelationService {
                 for (RelationCarsQo car : cars) {
                     car.setId(SnowFlake.nextId());
                     car.setUid(relationQo.getUserId());
+                    car.setRelationType(1);
                     car.setCommunityId(relationQo.getCommunityId());
                     car.setOwner(relationQo.getName());
-                    car.setContact(relationQo.getMobile());
-                    car.setHouseMemberId(houseMemberEntity.getId());
+                    car.setMobile(relationQo.getMobile());
+                    car.setRelationshipId(houseMemberEntity.getId());
+                    car.setIdCard(houseMemberEntity.getIdCard());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                 }
                 relationMapper.addCars(cars);
@@ -117,7 +130,7 @@ public class RelationServiceImpl implements IRelationService {
         if (houseMemberEntity==null){
             throw new ProprietorException("数据不存在！");
         }
-        List<CarEntity> carEntities = carMapper.selectList(new QueryWrapper<CarEntity>().eq("house_member_id", RelationId));
+        List<RelationCarEntity> carEntities = carMapper.selectList(new QueryWrapper<RelationCarEntity>().eq("relationship_id", RelationId));
         RelationVO relationVO = new RelationVO();
         relationVO.setIdentificationType(houseMemberEntity.getIdentificationType());
         relationVO.setId(houseMemberEntity.getId());
@@ -134,7 +147,7 @@ public class RelationServiceImpl implements IRelationService {
         List<RelationCarsVO> objects = new ArrayList<>();
         //封装车辆信息
         if (objects!=null){
-            for (CarEntity carEntity : carEntities) {
+            for (RelationCarEntity carEntity : carEntities) {
                 RelationCarsVO relationCarsVO = new RelationCarsVO();
                 relationCarsVO.setId(carEntity.getId());
                 relationCarsVO.setCarType(carEntity.getCarType());
@@ -179,21 +192,22 @@ public class RelationServiceImpl implements IRelationService {
         relationMapper.updateUserRelationDetails(relationQo);
         List<RelationCarsQo> cars = relationQo.getCars();
         if(cars.size()>0){
-            for (RelationCarsQo relationCarsQo : cars) {
-                if (relationCarsQo.getId()==null||relationCarsQo.getId()==0){
-                    relationCarsQo.setContact(relationQo.getMobile());
-                    relationCarsQo.setCommunityId(relationQo.getCommunityId());
-                    relationCarsQo.setHouseMemberId(relationQo.getId());
-                    relationCarsQo.setOwner(relationQo.getName());
-                    relationCarsQo.setId(SnowFlake.nextId());
-                    relationCarsQo.setUid(relationQo.getUserId());
-                    relationMapper.insertOne(relationCarsQo);
+            for (RelationCarsQo car : cars) {
+                if (car.getId()==null||car.getId()==0){
+                    car.setId(SnowFlake.nextId());
+                    car.setUid(relationQo.getUserId());
+                    car.setRelationType(1);
+                    car.setCommunityId(relationQo.getCommunityId());
+                    car.setOwner(relationQo.getName());
+                    car.setMobile(relationQo.getMobile());
+                    car.setRelationshipId(relationQo.getId());
+                    car.setIdCard(relationQo.getIdCard());
+                    car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
+                    relationMapper.insertOne(car);
                 }else {
-                    relationMapper.updateUserRelationCar(relationCarsQo);
+                    relationMapper.updateUserRelationCar(car);
                 }
             }
-        }else {
-            carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",relationQo.getId()).eq("uid",relationQo.getUserId()));
         }
     }
 
@@ -214,7 +228,7 @@ public class RelationServiceImpl implements IRelationService {
     @Transactional
     public void deleteHouseMemberCars(Long id,String uid) {
         houseMemberMapper.delete(new QueryWrapper<HouseMemberEntity>().eq("uid",uid).eq("id",id));
-        carMapper.delete(new QueryWrapper<CarEntity>().eq("house_member_id",id).eq("uid",uid));
+        carMapper.delete(new QueryWrapper<RelationCarEntity>().eq("relationship_id",id).eq("uid",uid));
     }
 
     /**

@@ -29,6 +29,9 @@ public class CommunityFunQO implements Serializable {
     @ApiModelProperty("状态1发布2撤销")
     private Integer status;
 
+    @ApiModelProperty("状态1发布2编辑")
+    private Integer redactStatus;
+
     @ApiModelProperty("社区趣事标签模糊查询")
     private String tallys;
 
@@ -38,10 +41,10 @@ public class CommunityFunQO implements Serializable {
     @ApiModelProperty("创建时间")
     private LocalDate creatrTimeOut;
 
-    @ApiModelProperty("社区趣事标题模糊查询")
+    @ApiModelProperty("发布时间")
     private LocalDate issueTimeStart;
 
-    @ApiModelProperty("社区趣事标题模糊查询")
+    @ApiModelProperty("发布时间")
     private LocalDate issueTimeOut;
 
 }
