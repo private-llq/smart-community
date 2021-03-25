@@ -303,6 +303,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		}
 	}
 	
+	
 	@Override
 	public List<Map<String, Object>> listShop(String userId) {
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
@@ -869,6 +870,31 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		List<Long> peopleList = MyMathUtils.analysisTypeCode(shopPeople);
 		detailsVO.setShopPeoples(peopleList);
 		return detailsVO;
+	}
+	
+	@Override
+	public List<ShopLeaseEntity> listUserShop(String userId) {
+		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("uid", userId).orderByDesc("create_time");
+		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
+		
+		for (ShopLeaseEntity shopLeaseEntity : list) {
+			Integer status = shopLeaseEntity.getStatus();
+			if (0 == (status)) {
+				shopLeaseEntity.setStatusString("空置中");
+			}
+			if (1 == (status)) {
+				shopLeaseEntity.setStatusString("营业中");
+			}
+			
+			QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
+			queryWrapper.eq("shop_id", shopLeaseEntity.getId());
+			List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(queryWrapper);
+			if (!CollectionUtils.isEmpty(shopImgEntities)) {
+				shopLeaseEntity.setShopShowImg(shopImgEntities.get(0).getImgUrl());
+			}
+		}
+		return list;
 	}
 	
 }

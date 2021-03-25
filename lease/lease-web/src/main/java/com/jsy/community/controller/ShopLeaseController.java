@@ -11,6 +11,7 @@ import com.jsy.community.api.LeaseException;
 import com.jsy.community.constant.*;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.log.ProprietorLog;
+import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.qo.shop.ShopQO;
@@ -382,11 +383,8 @@ public class ShopLeaseController {
 	@Login
 	public CommonResult listShop() {
 		String userId = UserUtils.getUserId();
-		List<Map<String, Object>> map = shopLeaseService.listShop(userId);
-		if (map.size() == 0) {
-			return CommonResult.ok("你还没有发布过房源");
-		}
-		return CommonResult.ok(map);
+		List<ShopLeaseEntity> shops = shopLeaseService.listUserShop(userId);
+		return CommonResult.ok(shops);
 	}
 	
 	@ApiOperation("测试分布式事物---暂时先不删。用于测试")

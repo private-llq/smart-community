@@ -131,4 +131,13 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Param [shopId] 
 	 **/
 	ShopDetailsVO getShopForUpdate(Long shopId);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.shop.ShopLeaseEntity>
+	 * @Author lihao
+	 * @Description 查询业主发布的房源列表
+	 * @Date 2021/3/25 10:08
+	 * @Param [userId]
+	 **/
+	List<ShopLeaseEntity> listUserShop(String userId);
 }
