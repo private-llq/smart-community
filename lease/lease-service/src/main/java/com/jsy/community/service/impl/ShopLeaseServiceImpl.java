@@ -878,11 +878,14 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("uid", userId).orderByDesc("create_time");
 		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
+		if (CollectionUtils.isEmpty(list)) {
+			return new ArrayList<UserShopLeaseVO>();
+		}
 		
 		ArrayList<UserShopLeaseVO> userShopLeaseVOS = new ArrayList<>();
 		for (ShopLeaseEntity shopLeaseEntity : list) {
 			UserShopLeaseVO leaseVO = new UserShopLeaseVO();
-			BeanUtils.copyProperties(shopLeaseEntity,leaseVO);
+			BeanUtils.copyProperties(shopLeaseEntity, leaseVO);
 			
 			Integer status = shopLeaseEntity.getStatus();
 			if (0 == (status)) {
@@ -896,14 +899,21 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 商铺类型
 			Long shopTypeId = shopLeaseEntity.getShopTypeId();
 			CommonConst constById = commonConstService.getConstById(shopTypeId);
-			leaseVO.setShopType(constById.getConstName());
+			if (constById != null) {
+				leaseVO.setShopType(constById.getConstName());
+			}
 			
 			// 商铺地址
 			String city = shopLeaseEntity.getCity();
 			String area = shopLeaseEntity.getArea();
 			Long communityId = shopLeaseEntity.getCommunityId();
 			CommunityEntity communityNameById = communityService.getCommunityNameById(communityId);
-			leaseVO.setAddress(city+area+communityNameById.getName());
+			String community = "";
+			if (communityNameById!=null) {
+				community = communityNameById.getName();
+				
+			}
+			leaseVO.setAddress(city + area + community );
 			
 			QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
 			queryWrapper.eq("shop_id", shopLeaseEntity.getId());
