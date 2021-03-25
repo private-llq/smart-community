@@ -21,6 +21,9 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @ApiModel(value="UserShopLeaseVO对象", description="业主发布店铺列表展示")
 public class UserShopLeaseVO implements Serializable {
+	@ApiModelProperty(value = "商铺id")
+	private Long Id;
+	
 	@ApiModelProperty(value = "商铺地址")
 	private String address;
 	

@@ -250,7 +250,16 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	public void updateShop(ShopQO shop) {
 		ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
 		shopLeaseEntity.setId(shop.getShopId());
+		List<Long> shopFacilityList = shop.getShopFacilityList();
+		List<Long> shopPeoples = shop.getShopPeoples();
+		
 		BeanUtils.copyProperties(shop, shopLeaseEntity);
+		
+		// 商铺的配套设施Code
+		long facilityCode = MyMathUtils.getTypeCode(shopFacilityList);
+		long peopleCode = MyMathUtils.getTypeCode(shopPeoples);
+		shopLeaseEntity.setShopFacility(facilityCode);
+		shopLeaseEntity.setShopPeople(peopleCode);
 		// 更新基本信息
 //		shopLeaseEntity.setUpdateTime(null);
 		shopLeaseMapper.updateById(shopLeaseEntity);
