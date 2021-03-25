@@ -10,6 +10,7 @@ import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -47,24 +48,24 @@ public class CommunityFunController {
 
     @ApiOperation("分页查询所有社区趣事")
     @PostMapping("/list")
-//    @Login
+    @Login
     public CommonResult list(@RequestBody BaseQO<CommunityFunQO> baseQO) {
         PageInfo pageInfo = communityFunService.findList(baseQO);
         return CommonResult.ok(pageInfo);
     }
     @ApiOperation("新增")
     @PostMapping("/save")
-    //@Login
+    @Login
     public CommonResult save(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
-        String userId = UserUtils.getUserId();
-        communityFunService.insetOne(communityFunOperationQO,userId);
+        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        communityFunService.insetOne(communityFunOperationQO,adminInfoVo);
         return  CommonResult.ok();
     }
 
     @ApiOperation("新增缩略图")
     @PostMapping("/smallImge")
-    //@Login
+    @Login
     public CommonResult upload(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -77,7 +78,8 @@ public class CommunityFunController {
 
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
-    //@Login
+    @Login
+    @CrossOrigin
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -127,8 +129,8 @@ public class CommunityFunController {
     @Login
     public CommonResult update(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
-        String userId = UserUtils.getUserId();
-        communityFunService.updateOne(communityFunOperationQO,userId);
+        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        communityFunService.updateOne(communityFunOperationQO,adminInfoVo);
         return CommonResult.ok();
     }
 
@@ -152,11 +154,11 @@ public class CommunityFunController {
 
     @ApiOperation("上线")
     @GetMapping("/popUpOnline")
-  //  @Login
+    @Login
     public CommonResult popUpOnline(@ApiParam("社区趣事id")
                                         @RequestParam("id") Long id) {
-        String userId = UserUtils.getUserId();
-        communityFunService.popUpOnline(id,userId);
+        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        communityFunService.popUpOnline(id,adminInfoVo);
         return  CommonResult.ok();
     }
 

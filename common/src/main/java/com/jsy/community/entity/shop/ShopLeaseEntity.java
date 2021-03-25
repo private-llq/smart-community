@@ -105,6 +105,12 @@ public class ShopLeaseEntity extends BaseEntity {
     private String mobile;
     
 
+    // 业主查询商铺列表时的展示
+    @TableField(exist = false)
+    private String shopShowImg;
+    
+    
+    
     
     
     @ApiModelProperty(value = "客流人群Code")

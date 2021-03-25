@@ -19,6 +19,8 @@ public class CommunityFunOperationQO implements Serializable {
 
     @ApiModelProperty(value = "id")
     private Long id;
+    @ApiModelProperty(value = "1表示站内2表示外部链接")
+    private Integer type;
 
     @ApiModelProperty(value = "社区趣事标题")
     @NotNull(groups = {CommunityFunOperationValidated.class},message = "标题不能为空！")

@@ -9,7 +9,6 @@ import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.CommunityFunMapper;
 import com.jsy.community.qo.BaseQO;
@@ -20,6 +19,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +43,13 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Autowired
     private AdminUserMapper adminUserMapper;
 
+    /**
+     * @Description: 分页查询
+     * @author: Hu
+     * @since: 2021/3/24 15:44
+     * @Param:
+     * @return:
+     */
     @Override
     public PageInfo findList(BaseQO<CommunityFunQO> baseQO) {
         CommunityFunQO communityFunQO = baseQO.getQuery();
@@ -56,7 +63,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             wrapper.like("title_name", communityFunQO.getHeadline());
         }
         if (!"".equals(communityFunQO.getTallys())&&communityFunQO.getTallys()!=null){
-            wrapper.like("tallys",communityFunQO.getTallys());
+            wrapper.like("tallys",communityFunQO.getTallys()).or().like("content",communityFunQO.getTallys());
         }
         if (communityFunQO.getStatus()!=null&&communityFunQO.getStatus()!=0){
                 wrapper.eq("status",communityFunQO.getStatus());
@@ -76,7 +83,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         }
         if (communityFunQO.getIssueTimeOut()!=null){
             communityFunQO.setIssueTimeOut(communityFunQO.getIssueTimeOut().plusDays(1));
-            wrapper.le("start_time",communityFunQO.getCreatrTimeStart());
+            wrapper.le("start_time",communityFunQO.getIssueTimeOut());
         }
 
         Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
@@ -86,6 +93,13 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         return pageInfo;
     }
 
+    /**
+     * @Description: 撤销
+     * @author: Hu
+     * @since: 2021/3/24 15:44
+     * @Param:
+     * @return:
+     */
     @Override
     @EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.FUN)
     public void tapeOut(Long id) {
@@ -98,16 +112,21 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         communityFunMapper.updateById(entity);
     }
 
+    /**
+     * @Description: 新增
+     * @author: Hu
+     * @since: 2021/3/24 15:44
+     * @Param:
+     * @return:
+     */
     @Override
-    public void insetOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
-        AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", uid));
+    public void insetOne(CommunityFunOperationQO communityFunOperationQO, AdminInfoVo adminInfoVo) {
         CommunityFunEntity entity = new CommunityFunEntity();
         entity.setTitleName(communityFunOperationQO.getTitleName());
         entity.setViewCount(communityFunOperationQO.getViewCount());
-        entity.setCreateBy(communityFunOperationQO.getUid());
-        if (userEntity!=null){
-            entity.setCreateName(userEntity.getRealName());
-        }
+        entity.setType(communityFunOperationQO.getType());
+        entity.setCreateBy(adminInfoVo.getUid());
+        entity.setCreateName(adminInfoVo.getRealName());
         entity.setContent(communityFunOperationQO.getContent());
         entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
         entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
@@ -120,15 +139,19 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     }
 
 
+    /**
+     * @Description: 修改
+     * @author: Hu
+     * @since: 2021/3/24 15:44
+     * @Param:
+     * @return:
+     */
     @Override
     @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.FUN, parameterType = CommunityFunEntity.class, importField = {"titleName","smallImageUrl"}, searchField = {"titleName"})
-    public void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid) {
-        AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", uid));
+    public void updateOne(CommunityFunOperationQO communityFunOperationQO,AdminInfoVo adminInfoVo) {
         CommunityFunEntity entity = communityFunMapper.selectById(communityFunOperationQO.getId());
-        entity.setUpdateBy(uid);
-        if (userEntity!=null){
-            entity.setUpdateName(userEntity.getRealName());
-        }
+        entity.setUpdateBy(adminInfoVo.getUid());
+        entity.setUpdateName(adminInfoVo.getRealName());
         String tallys = Arrays.toString(communityFunOperationQO.getTallys());
         entity.setTallys(tallys.substring(1, tallys.length() - 1));
         entity.setContent(communityFunOperationQO.getContent());
@@ -138,30 +161,48 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         communityFunMapper.updateById(entity);
     }
 
+    /**
+     * @Description: 删除
+     * @author: Hu
+     * @since: 2021/3/24 15:44
+     * @Param:
+     * @return:
+     */
     @Override
     @EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.FUN)
     public void deleteById(Long id) {
         communityFunMapper.deleteById(id);
     }
 
+    /**
+     * @Description: 查询一条
+     * @author: Hu
+     * @since: 2021/3/24 15:44
+     * @Param:
+     * @return:
+     */
   @Override
   public CommunityFunEntity selectOne(Long id) {
     return communityFunMapper.selectById(id);
   }
 
+  /**
+   * @Description: 发布
+   * @author: Hu
+   * @since: 2021/3/24 15:44
+   * @Param:
+   * @return:
+   */
   @Override
-  public void popUpOnline(Long id,String uid) {
-    AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", uid));
+  public void popUpOnline(Long id,AdminInfoVo adminInfoVo) {
     CommunityFunEntity entity = communityFunMapper.selectById(id);
     if (entity.getStatus()==1){
       throw new PropertyException("该趣事已上线");
     }
-    if (userEntity!=null){
-        entity.setStartName(userEntity.getRealName());
-    }
+    entity.setStartName(adminInfoVo.getRealName());
     entity.setRedactStatus(1);
     entity.setStatus(1);
-    entity.setStartBy(uid);
+    entity.setStartBy(adminInfoVo.getUid());
     entity.setStartTime(LocalDateTime.now());
     communityFunMapper.updateById(entity);
     ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());

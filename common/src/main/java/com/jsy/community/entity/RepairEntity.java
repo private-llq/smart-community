@@ -44,7 +44,11 @@ public class RepairEntity extends BaseEntity {
     @NotNull(groups = {addRepairValidate.class},message = "报修类别不能为空")
     @Range(groups = {addRepairValidate.class}, min = 0, max = 1, message = "请选择正确的报修类别")
     private Integer repairType;
-
+    
+    @ApiModelProperty(value = "报修类别 0 个人报修 1 公共报修")
+    @TableField(exist = false)
+    private String repairTypeString;
+    
     @ApiModelProperty(value = "报修地址")
     @NotBlank(groups = {addRepairValidate.class},message = "报修地址不能为空")
     private String address;

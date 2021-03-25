@@ -1,7 +1,9 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyComplaintsService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ComplainFeedbackQO;
@@ -12,10 +14,7 @@ import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @program: com.jsy.community
@@ -34,6 +33,7 @@ public class PropertyComplaintsController {
 
     @ApiOperation("查询所有物业投诉信息")
     @PostMapping("/list")
+    @Login
     public CommonResult list(@RequestBody BaseQO<PropertyComplaintsQO> baseQO){
         System.out.println(baseQO);
         PageInfo list=propertyComplaintsService.findList(baseQO);
@@ -41,10 +41,17 @@ public class PropertyComplaintsController {
     }
     @ApiOperation("投诉回复")
     @PostMapping("/complainFeedback")
+    @Login
     public CommonResult complainFeedback(@RequestBody ComplainFeedbackQO complainFeedbackQO){
         complainFeedbackQO.setUid(UserUtils.getUserId());
         propertyComplaintsService.complainFeedback(complainFeedbackQO);
         return CommonResult.ok();
+    }
+    @ApiOperation("投诉类型")
+    @GetMapping("/getType")
+    @Login
+    public CommonResult getType(){
+        return CommonResult.ok(BusinessEnum.ComplainTypeEnum.toList());
     }
 
 

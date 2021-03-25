@@ -35,6 +35,9 @@ public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "发布人uid")
     private String startBy;
 
+    @ApiModelProperty(value = "1表示站内2表示外部链接")
+    private Integer type;
+
     @ApiModelProperty(value = "社区趣事内容")
     @NotBlank(groups = {CommunityFunValidated.class}, message = "内容不能为空！")
     private String content;

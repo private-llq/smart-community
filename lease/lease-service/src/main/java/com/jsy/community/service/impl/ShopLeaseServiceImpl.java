@@ -28,6 +28,7 @@ import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopDetailsVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
+import com.jsy.community.vo.shop.UserShopLeaseVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -302,6 +303,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			shopImgMapper.deleteBatchIds(longs);
 		}
 	}
+	
 	
 	@Override
 	public List<Map<String, Object>> listShop(String userId) {
@@ -869,6 +871,60 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		List<Long> peopleList = MyMathUtils.analysisTypeCode(shopPeople);
 		detailsVO.setShopPeoples(peopleList);
 		return detailsVO;
+	}
+	
+	@Override
+	public List<UserShopLeaseVO> listUserShop(String userId) {
+		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("uid", userId).orderByDesc("create_time");
+		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
+		if (CollectionUtils.isEmpty(list)) {
+			return new ArrayList<UserShopLeaseVO>();
+		}
+		
+		ArrayList<UserShopLeaseVO> userShopLeaseVOS = new ArrayList<>();
+		for (ShopLeaseEntity shopLeaseEntity : list) {
+			UserShopLeaseVO leaseVO = new UserShopLeaseVO();
+			BeanUtils.copyProperties(shopLeaseEntity, leaseVO);
+			
+			Integer status = shopLeaseEntity.getStatus();
+			if (0 == (status)) {
+				leaseVO.setStatusString("空置中");
+			}
+			if (1 == (status)) {
+				leaseVO.setStatusString("营业中");
+			}
+			
+			
+			// 商铺类型
+			Long shopTypeId = shopLeaseEntity.getShopTypeId();
+			CommonConst constById = commonConstService.getConstById(shopTypeId);
+			if (constById != null) {
+				leaseVO.setShopType(constById.getConstName());
+			}
+			
+			// 商铺地址
+			String city = shopLeaseEntity.getCity();
+			String area = shopLeaseEntity.getArea();
+			Long communityId = shopLeaseEntity.getCommunityId();
+			CommunityEntity communityNameById = communityService.getCommunityNameById(communityId);
+			String community = "";
+			if (communityNameById!=null) {
+				community = communityNameById.getName();
+				
+			}
+			leaseVO.setAddress(city + area + community );
+			
+			QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
+			queryWrapper.eq("shop_id", shopLeaseEntity.getId());
+			List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(queryWrapper);
+			if (!CollectionUtils.isEmpty(shopImgEntities)) {
+				leaseVO.setShopShowImg(shopImgEntities.get(0).getImgUrl());
+			}
+			
+			userShopLeaseVOS.add(leaseVO);
+		}
+		return userShopLeaseVOS;
 	}
 	
 }

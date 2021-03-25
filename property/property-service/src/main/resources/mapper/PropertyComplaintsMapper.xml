@@ -28,6 +28,12 @@
             <if test="query.complainTimeOut!=null">
                 and tpc.complain_time &lt;= #{query.complainTimeOut}
             </if>
+            <if test="query.replyTimeStart!=null">
+                and tpc.complain_time &gt;= #{query.replyTimeStart}
+            </if>
+            <if test="query.replyTimeOut!=null">
+                and tpc.complain_time &lt;= #{query.replyTimeOut}
+            </if>
             <if test="query.keyWord!=null and query.keyWord!=''">
                 and (tpc.name like concat("%",#{query.keyWord},"%") or tpc.serial_number like concat("%",#{query.keyWord},"%") or tpc.mobile like concat("%",#{query.keyWord},"%"))
             </if>
