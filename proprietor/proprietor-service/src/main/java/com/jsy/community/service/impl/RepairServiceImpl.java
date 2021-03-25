@@ -114,49 +114,32 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	
 	@Override
 	public List<RepairEntity> getRepair(String id, Integer status) {
+		List<RepairEntity> list = null;
+		// 如果不传status就是查询全部报修
 		if (status == null) {
 			QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
 			wrapper.eq("user_id", id).orderByDesc("create_time").orderByAsc("status");
-			List<RepairEntity> list = repairMapper.selectList(wrapper);
-			for (RepairEntity repairEntity : list) {
-				Long type = repairEntity.getType();
-				CommonConst commonConst = commonConstMapper.selectById(type);
-				if (commonConst != null) {
-					repairEntity.setTypeName(commonConst.getConstName());
-				}
-				
-				if (repairEntity.getStatus() == 0) {
-					repairEntity.setStatusString("待处理");
-				}
-				if (repairEntity.getStatus() == 1) {
-					repairEntity.setStatusString("处理中");
-				}
-				if (repairEntity.getStatus() == 2) {
-					repairEntity.setStatusString("已完成");
-					// 对已评价的 获取其评价信息，前端通过其判断是否该订单评价过[评价过的不能再次评价]
-					QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
-					queryWrapper.eq("repair_id", repairEntity.getId());
-					RepairOrderEntity order = repairOrderMapper.selectOne(queryWrapper);
-					if (order != null) {
-						if (!StringUtils.isEmpty(order.getComment())) {
-							repairEntity.setComment(order.getComment());
-							System.out.println(repairEntity.getComment());
-						}
-					}
-				}
-				if (repairEntity.getStatus() == 3) {
-					repairEntity.setStatusString("已驳回");
-				}
-			}
-			return list;
+			list = repairMapper.selectList(wrapper);
+		} else {
+			// 根据报修状态查询响应数据 0待处理 1处理中 2已完成 3已驳回
+			QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
+			wrapper.eq("user_id", id).orderByDesc("create_time").eq("status", status);
+			list = repairMapper.selectList(wrapper);
 		}
-		QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("user_id", id).orderByDesc("create_time").eq("status", status);
-		List<RepairEntity> list = repairMapper.selectList(wrapper);
 		for (RepairEntity repairEntity : list) {
 			Long type = repairEntity.getType();
 			CommonConst commonConst = commonConstMapper.selectById(type);
-			repairEntity.setTypeName(commonConst.getConstName());
+			if (commonConst != null) {
+				repairEntity.setTypeName(commonConst.getConstName());
+			}
+			
+			Integer repairType = repairEntity.getRepairType();
+			if (repairType == 0) {
+				repairEntity.setRepairTypeString("个人报修");
+			}
+			if (repairType == 1) {
+				repairEntity.setRepairTypeString("公共报修");
+			}
 			
 			if (repairEntity.getStatus() == 0) {
 				repairEntity.setStatusString("待处理");
@@ -183,6 +166,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		}
 		return list;
 	}
+	
 	
 	@Override
 	@Transactional
@@ -297,9 +281,9 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	@Override
 	public String getRejectReason(Long id) {
 		QueryWrapper<RepairOrderEntity> repairOrderEntityQueryWrapper = new QueryWrapper<>();
-		repairOrderEntityQueryWrapper.eq("repair_id",id);
+		repairOrderEntityQueryWrapper.eq("repair_id", id);
 		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(repairOrderEntityQueryWrapper);
-		if (orderEntity==null) {
+		if (orderEntity == null) {
 			throw new ProprietorException("该报修订单不存在");
 		}
 		return orderEntity.getRejectReason();

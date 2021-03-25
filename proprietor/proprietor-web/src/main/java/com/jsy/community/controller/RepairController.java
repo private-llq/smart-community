@@ -57,6 +57,7 @@ public class RepairController {
 	@GetMapping("/getRepair")
 	public CommonResult getRepair(@ApiParam(value = "订单状态") @RequestParam(required = false) Integer status) {
 		String uid = UserUtils.getUserId();
+		UserUtils.getAdminUserInfo();
 		List<RepairEntity> list = repairService.getRepair(uid, status);
 		return CommonResult.ok(list);
 	}
@@ -76,7 +77,6 @@ public class RepairController {
 		RepairVO repairVO = repairService.repairDetails(id, uid);
 		return CommonResult.ok(repairVO);
 	}
-	
 	
 	// TODO: 2021/3/19 已弃用
 	@ApiOperation("报修所属类别查询")
@@ -162,7 +162,7 @@ public class RepairController {
 	@GetMapping("/getRejectReason")
 	public CommonResult getRejectReason(@RequestParam() Long id) {
 		String reason = repairService.getRejectReason(id);
-		return CommonResult.ok(reason);
+		return CommonResult.ok(reason,"");
 	}
 }
 
