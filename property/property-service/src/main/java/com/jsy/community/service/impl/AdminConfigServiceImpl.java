@@ -11,6 +11,7 @@ import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.mapper.AdminRoleMapper;
+import com.jsy.community.mapper.AdminUserMenuMapper;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +23,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author chq459799974
@@ -44,6 +42,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	@Resource
 	private AdminRoleMapper adminRoleMapper;
+	
+	@Resource
+	private AdminUserMenuMapper adminUserMenuMapper;
 	
 	//==================================================== Menu菜单 ===============================================================
 	/**
@@ -316,11 +317,48 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	**/
 	@Override
 	public List<AdminMenuEntity> queryUserMenu(Long uid){
-		//TODO 改sql 用户直接关联菜单 暂无角色一层
 		return adminMenuMapper.queryUserMenu(uid);
 	}
 	
-	//================================================== 物业端原型 - 用户关联菜单start =========================================================================
+	//================================================== 新版物业端原型 - 用户-菜单start =========================================================================
+	/**
+	* @Description: 查询用户菜单权限(新接口)
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	@Override
+	public List<AdminMenuEntity> queryMenuByUid(String uid){
+		List<Long> menuIdList = adminUserMenuMapper.queryUserMenu(uid); //查ID
+		if(CollectionUtils.isEmpty(menuIdList)){
+			return null;
+		}
+		List<AdminMenuEntity> menuEntityList = adminMenuMapper.queryMenuBatch(menuIdList); //查实体
+		//组装数据
+		List<AdminMenuEntity> returnList = new ArrayList<>();
+		for(AdminMenuEntity adminMenuEntity : menuEntityList){
+			if(adminMenuEntity.getPid() == 0L){
+				returnList.add(adminMenuEntity);
+			}
+		}
+		menuEntityList.removeAll(returnList);
+		for(AdminMenuEntity adminMenuEntity : menuEntityList){
+			for(AdminMenuEntity fatherEntity : returnList){
+				if(adminMenuEntity.getPid() == fatherEntity.getId()){
+					if(!CollectionUtils.isEmpty(fatherEntity.getChildrenList())){
+						fatherEntity.getChildrenList().add(adminMenuEntity);
+					}else{
+						List<AdminMenuEntity> childrenList = new ArrayList<>();
+						childrenList.add(adminMenuEntity);
+						fatherEntity.setChildrenList(childrenList);
+					}
+				}
+			}
+		}
+		return returnList;
+	}
+	
 	/**
 	* @Description: 为用户分配菜单
 	 * @Param: [menuIds, uid]
@@ -361,5 +399,5 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 //		return true;
 	}
-	//================================================== 物业端原型 - 用户关联菜单end =========================================================================
+	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

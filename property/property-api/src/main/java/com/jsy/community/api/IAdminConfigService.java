@@ -102,7 +102,7 @@ public interface IAdminConfigService {
 	
 	//==================================================== 用户-菜单 ===============================================================
 	/**
-	* @Description: 查询用户菜单权限
+	* @Description: 查询用户菜单权限(老接口，暂时弃用)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
@@ -110,7 +110,16 @@ public interface IAdminConfigService {
 	**/
 	List<AdminMenuEntity> queryUserMenu(Long uid);
 	
-	//================================================== 物业端原型 - 用户关联菜单start =========================================================================
+	//================================================== 新版物业端原型 - 用户-菜单start =========================================================================
+	/**
+	* @Description: 查询用户菜单权限(新接口)
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	List<AdminMenuEntity> queryMenuByUid(String uid);
+	
 	/**
 	* @Description: 为用户分配菜单
 	 * @Param: [menuIds, uid]
@@ -119,5 +128,5 @@ public interface IAdminConfigService {
 	 * @Date: 2021/3/23
 	**/
 	void setUserMenus(List<Long> menuIds,String uid);
-	//================================================== 物业端原型 - 用户关联菜单end =========================================================================
+	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

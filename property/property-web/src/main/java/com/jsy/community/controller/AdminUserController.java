@@ -47,6 +47,7 @@ import java.util.UUID;
 @Api(tags = "系统用户控制器")
 @ApiJSYController
 @Slf4j
+//@Login
 @RestController
 public class AdminUserController {
 	
@@ -248,6 +249,9 @@ public class AdminUserController {
 	@PutMapping("")
 	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
 		//TODO 获取操作员UID验证操作权限(1.是否是超级管理员 2.是否有操作员管理权限 3.是否具有社区权限) ， 操作带上社区id
+		if(adminUserEntity.getCommunityId() == null){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少社区ID");
+		}
 		boolean b = adminUserService.updateOperator(adminUserEntity);
 		return b ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}

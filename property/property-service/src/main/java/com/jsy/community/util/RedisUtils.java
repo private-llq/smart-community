@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-//import com.jsy.community.intercepter.AuthorizationInterceptor;
 import com.jsy.community.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

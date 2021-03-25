@@ -2,4 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.CommunityMapper">
 
+    <!-- ids批量查小区 -->
+    <select id="queryCommunityBatch" resultType="com.jsy.community.entity.CommunityEntity">
+        select id,name,detail_address from t_community
+        where id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
 </mapper>

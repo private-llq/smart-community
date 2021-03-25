@@ -65,4 +65,16 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	public CommunityEntity getCommunityNameById(Long communityId) {
 		return communityMapper.selectById(communityId);
 	}
+	
+	/**
+	* @Description: ids批量查小区
+	 * @Param: [idList]
+	 * @Return: java.util.List<com.jsy.community.entity.CommunityEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	@Override
+	public List<CommunityEntity> queryCommunityBatch(List<Long> idList){
+		return communityMapper.queryCommunityBatch(idList);
+	}
 }

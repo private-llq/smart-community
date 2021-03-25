@@ -53,26 +53,50 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 */
 	List<Long> queryAllMenuId(Long userId);
 	
-	/**
-	 * 根据用户名，查询系统用户
-	 */
-	AdminUserEntity queryByUserName(String username);
+//	/**
+//	 * 根据用户名，查询系统用户
+//	 */
+//	AdminUserEntity queryByUserName(String username);
+	
+//	/**
+//	 * 根据邮箱，查询系统用户
+//	 */
+//	AdminUserEntity queryByEmail(String email);
+	
+//	/**
+//	 * 根据手机号，查询系统用户
+//	 */
+//	AdminUserEntity queryByMobile(String mobile);
 	
 	/**
-	 * 根据邮箱，查询系统用户
-	 */
-	AdminUserEntity queryByEmail(String email);
-	
-	/**
-	 * 根据手机号，查询系统用户
-	 */
-	AdminUserEntity queryByMobile(String mobile);
-	
+	* @Description: 根据uid查用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
 	@Select("select * from t_admin_user where uid = #{uid}")
 	AdminUserEntity queryByUid(String uid);
 	
+	/**
+	* @Description: 根据id查uid
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
 	@Select("select uid from t_admin_user where id = #{id}")
 	String queryUidById(Long id);
+	
+	/**
+	* @Description: 查询登录用户(操作员)已加入小区idList
+	 * @Param: [mobile]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	@Select("select community_id from t_admin_user where mobile = #{mobile} and status = 0")
+	List<Long> queryCommunityIdListByMobile(String mobile);
 	
 	/**
 	* @Description: 添加操作员
