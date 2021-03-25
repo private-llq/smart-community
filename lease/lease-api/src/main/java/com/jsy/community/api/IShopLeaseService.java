@@ -9,6 +9,7 @@ import com.jsy.community.qo.shop.ShopQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopDetailsVO;
+import com.jsy.community.vo.shop.UserShopLeaseVO;
 
 import java.util.List;
 import java.util.Map;
@@ -139,5 +140,5 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Date 2021/3/25 10:08
 	 * @Param [userId]
 	 **/
-	List<ShopLeaseEntity> listUserShop(String userId);
+	List<UserShopLeaseVO> listUserShop(String userId);
 }

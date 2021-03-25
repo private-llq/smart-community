@@ -28,6 +28,7 @@ import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopDetailsVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
+import com.jsy.community.vo.shop.UserShopLeaseVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -873,28 +874,47 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-	public List<ShopLeaseEntity> listUserShop(String userId) {
+	public List<UserShopLeaseVO> listUserShop(String userId) {
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("uid", userId).orderByDesc("create_time");
 		List<ShopLeaseEntity> list = shopLeaseMapper.selectList(wrapper);
 		
+		ArrayList<UserShopLeaseVO> userShopLeaseVOS = new ArrayList<>();
 		for (ShopLeaseEntity shopLeaseEntity : list) {
+			UserShopLeaseVO leaseVO = new UserShopLeaseVO();
+			BeanUtils.copyProperties(shopLeaseEntity,leaseVO);
+			
 			Integer status = shopLeaseEntity.getStatus();
 			if (0 == (status)) {
-				shopLeaseEntity.setStatusString("空置中");
+				leaseVO.setStatusString("空置中");
 			}
 			if (1 == (status)) {
-				shopLeaseEntity.setStatusString("营业中");
+				leaseVO.setStatusString("营业中");
 			}
+			
+			
+			// 商铺类型
+			Long shopTypeId = shopLeaseEntity.getShopTypeId();
+			CommonConst constById = commonConstService.getConstById(shopTypeId);
+			leaseVO.setShopType(constById.getConstName());
+			
+			// 商铺地址
+			String city = shopLeaseEntity.getCity();
+			String area = shopLeaseEntity.getArea();
+			Long communityId = shopLeaseEntity.getCommunityId();
+			CommunityEntity communityNameById = communityService.getCommunityNameById(communityId);
+			leaseVO.setAddress(city+area+communityNameById.getName());
 			
 			QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
 			queryWrapper.eq("shop_id", shopLeaseEntity.getId());
 			List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(queryWrapper);
 			if (!CollectionUtils.isEmpty(shopImgEntities)) {
-				shopLeaseEntity.setShopShowImg(shopImgEntities.get(0).getImgUrl());
+				leaseVO.setShopShowImg(shopImgEntities.get(0).getImgUrl());
 			}
+			
+			userShopLeaseVOS.add(leaseVO);
 		}
-		return list;
+		return userShopLeaseVOS;
 	}
 	
 }

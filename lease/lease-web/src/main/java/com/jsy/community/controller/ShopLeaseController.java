@@ -23,6 +23,7 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopDetailsVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
+import com.jsy.community.vo.shop.UserShopLeaseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -383,7 +384,7 @@ public class ShopLeaseController {
 	@Login
 	public CommonResult listShop() {
 		String userId = UserUtils.getUserId();
-		List<ShopLeaseEntity> shops = shopLeaseService.listUserShop(userId);
+		List<UserShopLeaseVO> shops = shopLeaseService.listUserShop(userId);
 		return CommonResult.ok(shops);
 	}
 	
