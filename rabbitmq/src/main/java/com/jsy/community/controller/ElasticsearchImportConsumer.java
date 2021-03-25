@@ -61,7 +61,6 @@ public class ElasticsearchImportConsumer implements ChannelAwareMessageListener 
             default:
                 break;
         }
-
         //如果操作 elasticsearch 成功 回复 mq
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
     }

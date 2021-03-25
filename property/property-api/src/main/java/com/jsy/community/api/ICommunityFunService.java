@@ -6,6 +6,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityFunOperationQO;
 import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.admin.AdminInfoVo;
 
 /**
  * @program: com.jsy.community
@@ -33,7 +34,7 @@ public interface ICommunityFunService extends IService<CommunityFunEntity> {
      * @Param:
      * @return:
      */
-    void popUpOnline(Long id,String uid);
+    void popUpOnline(Long id,AdminInfoVo adminInfoVo);
 
     /**
      * @Description: 查询一条详情
@@ -60,7 +61,7 @@ public interface ICommunityFunService extends IService<CommunityFunEntity> {
      * @Param:
      * @return:
      */
-    void updateOne(CommunityFunOperationQO communityFunOperationQO, String uid);
+    void updateOne(CommunityFunOperationQO communityFunOperationQO, AdminInfoVo adminInfoVo);
 
     /**
      * @Description: 新增
@@ -69,5 +70,5 @@ public interface ICommunityFunService extends IService<CommunityFunEntity> {
      * @Param:
      * @return:
      */
-    void insetOne(CommunityFunOperationQO communityFunOperationQO,String uid);
+    void insetOne(CommunityFunOperationQO communityFunOperationQO,AdminInfoVo adminInfoVo);
 }

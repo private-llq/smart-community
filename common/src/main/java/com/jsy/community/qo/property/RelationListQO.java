@@ -13,8 +13,10 @@ import java.io.Serializable;
  **/
 @Data
 public class RelationListQO implements Serializable {
-    @ApiModelProperty("社区id")
+    @ApiModelProperty(value = "社区id",hidden = true)
     private Long communityId;
     @ApiModelProperty("名称模糊查询")
     private String name;
+    @ApiModelProperty(value = "名称模糊查询",hidden = true)
+    private String uid;
 }

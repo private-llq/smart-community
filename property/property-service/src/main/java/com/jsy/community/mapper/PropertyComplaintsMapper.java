@@ -23,4 +23,5 @@ public interface PropertyComplaintsMapper extends BaseMapper<PropertyComplaintsE
      * @return:
      */
     Page findList(@Param("propertyComplaintsEntityPage")Page<PropertyComplaintsEntity> propertyComplaintsEntityPage, @Param("query") PropertyComplaintsQO query);
+
 }

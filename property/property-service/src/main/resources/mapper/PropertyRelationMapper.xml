@@ -42,13 +42,13 @@
         limit #{page},#{size}
     </select>
     <select id="getHouseId" resultMap="HouseTypeMap">
-        selec t.id as id,t.number as name from t_house t where t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.code) as name from t_house t where t.type=4 and t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
     </select>
     <select id="getBuildingId" resultMap="HouseTypeMap">
-        select t.id as id,t.building as name from t_house t where t.community_id=#{query.communityId} and t.building like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.building) as name from t_house t where t.type=1 and t.community_id=#{query.communityId} and t.building like concat("%",#{query.name},"%") limit #{page},#{size}
     </select>
     <select id="getUnitId" resultMap="HouseTypeMap">
-        select t.id as id,t.unit as name from t_house t where t.community_id=#{query.communityId} and t.unit like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.unit) as name from t_house t where t.type=2 and t.community_id=#{query.communityId} and t.unit like concat("%",#{query.name},"%") limit #{page},#{size}
     </select>
 
 

@@ -9,6 +9,7 @@ import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.PropertyRelationVO;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,27 +32,36 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 
 
     @Override
-    public List<HouseTypeVo> getHouseId(BaseQO<RelationListQO> baseQO) {
+    public List<HouseTypeVo> getHouseId(BaseQO<RelationListQO> baseQO,AdminInfoVo adminInfoVo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
-        return propertyRelationMapper.getHouseId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
+        RelationListQO qoQuery = baseQO.getQuery();
+        qoQuery.setUid(adminInfoVo.getUid());
+        qoQuery.setCommunityId(adminInfoVo.getCommunityId());
+        return propertyRelationMapper.getHouseId(qoQuery,baseQO.getPage(),baseQO.getSize());
     }
 
     @Override
-    public List getBuildingId(BaseQO<RelationListQO> baseQO) {
+    public List getBuildingId(BaseQO<RelationListQO> baseQO,AdminInfoVo adminInfoVo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
-        return propertyRelationMapper.getBuildingId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
+        RelationListQO qoQuery = baseQO.getQuery();
+        qoQuery.setUid(adminInfoVo.getUid());
+        qoQuery.setCommunityId(adminInfoVo.getCommunityId());
+        return propertyRelationMapper.getBuildingId(qoQuery,baseQO.getPage(),baseQO.getSize());
     }
 
     @Override
-    public List getUnitId(BaseQO<RelationListQO> baseQO) {
+    public List getUnitId(BaseQO<RelationListQO> baseQO, AdminInfoVo adminInfoVo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
-        return propertyRelationMapper.getUnitId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
+        RelationListQO qoQuery = baseQO.getQuery();
+        qoQuery.setUid(adminInfoVo.getUid());
+        qoQuery.setCommunityId(adminInfoVo.getCommunityId());
+        return propertyRelationMapper.getUnitId(qoQuery,baseQO.getPage(),baseQO.getSize());
     }
 
     @Override
