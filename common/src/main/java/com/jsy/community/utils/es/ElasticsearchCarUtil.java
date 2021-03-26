@@ -6,8 +6,8 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
+import com.jsy.community.vo.property.ElasticsearchCarVO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -31,6 +31,10 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -120,23 +124,25 @@ public class ElasticsearchCarUtil {
      * @Param:
      * @return:
      */
-    public static void search(BaseQO<ElasticsearchCarSearchQO> baseQO, RestHighLevelClient restHighLevelClient){
+    public static Map<String, Object> search(BaseQO<ElasticsearchCarSearchQO> baseQO, RestHighLevelClient restHighLevelClient){
         //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
         ElasticsearchCarSearchQO baseQOQuery = baseQO.getQuery();
         SearchRequest searchRequest = new SearchRequest(BusinessConst.INDEX_CAR);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        if ("".equals(baseQOQuery.getCarPlate())&&baseQOQuery.getCarPlate()!=null){
+        if (!"".equals(baseQOQuery.getCarPlate())&&baseQOQuery.getCarPlate()!=null){
             boolQuery.must(new MatchQueryBuilder("carPlate",baseQOQuery.getCarPlate()));
         }
-        if ("".equals(baseQOQuery.getOwner())&&baseQOQuery.getOwner()!=null) {
+        if (!"".equals(baseQOQuery.getOwner())&&baseQOQuery.getOwner()!=null) {
             boolQuery.must(new MatchQueryBuilder("owner", baseQOQuery.getOwner()));
         }
-        if (baseQOQuery.getCarPlate()!=null&&baseQOQuery.getCarType()!=0) {
+        if (baseQOQuery.getCarType()!=null&&baseQOQuery.getCarType()!=0) {
             boolQuery.must(new TermQueryBuilder("carType", baseQOQuery.getCarType()));
         }
+//        boolQuery.must(new TermQueryBuilder("communityId", null));
         sourceBuilder.sort(new FieldSortBuilder("createTime").order(SortOrder.DESC));
-        sourceBuilder.from((int) (baseQO.getPage()*baseQO.getSize()-1));
+        Long size=(baseQO.getPage()-1)*baseQO.getSize();
+        sourceBuilder.from(size.intValue());
         sourceBuilder.size(baseQO.getSize().intValue());
         sourceBuilder.query(boolQuery);
         searchRequest.source(sourceBuilder);
@@ -148,11 +154,16 @@ public class ElasticsearchCarUtil {
             log.info("查询失败："+e.getMessage());
         }
         SearchHits hits = searchResponse.getHits();
-        TotalHits totalHits = hits.getTotalHits();
-        System.out.println( "总条数：" + totalHits );
+        Map<String, Object> map = new HashMap<>();
+        List<Object> list = new LinkedList<>();
+        map.put("total",hits.getTotalHits().value);
         for (SearchHit searchHit : hits.getHits()) {
             String sourceAsString = searchHit.getSourceAsString();
-            System.out.println( sourceAsString );
+            ElasticsearchCarVO elasticsearchCarVO1 = JSON.toJavaObject(JSON.parseObject(sourceAsString), ElasticsearchCarVO.class);
+            list.add(elasticsearchCarVO1);
+            System.out.println( elasticsearchCarVO1 );
         }
+        map.put("list",list);
+        return map;
     }
 }

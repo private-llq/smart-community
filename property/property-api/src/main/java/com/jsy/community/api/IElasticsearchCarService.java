@@ -3,9 +3,8 @@ package com.jsy.community.api;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
-import com.jsy.community.vo.property.ElasticsearchCarVO;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -48,5 +47,5 @@ public interface IElasticsearchCarService {
      * @Param:
      * @return:
      */
-    List<ElasticsearchCarVO> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO);
+    Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO);
 }

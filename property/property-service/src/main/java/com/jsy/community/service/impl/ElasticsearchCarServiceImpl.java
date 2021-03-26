@@ -9,7 +9,6 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
 import com.jsy.community.utils.es.ElasticsearchCarUtil;
-import com.jsy.community.vo.property.ElasticsearchCarVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.elasticsearch.action.DocWriteResponse;
@@ -24,7 +23,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -122,9 +121,9 @@ public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
      * @return:
      */
     @Override
-    public List<ElasticsearchCarVO> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO){
-        ElasticsearchCarUtil.search(baseQO,restHighLevelClient);
-        return null;
+    public Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO){
+        Map<String, Object> map = ElasticsearchCarUtil.search(baseQO, restHighLevelClient);
+        return map;
     }
 
 }

@@ -37,7 +37,7 @@ public class ElasticsearchCarVO implements Serializable {
     @ApiModelProperty("车主身份1用户，2家属，3租户")
     private String ownerTypeText;
     @ApiModelProperty("1业主uid,2家属id，3租户id")
-    private Integer relationshipId;
+    private String relationshipId;
     @ApiModelProperty("房屋id")
     private Long houseId;
     @ApiModelProperty("楼栋")
