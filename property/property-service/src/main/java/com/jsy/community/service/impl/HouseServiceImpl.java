@@ -489,7 +489,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	//设置户型
 	private void setHouseTypeCodeStr(HouseEntity houseEntity){
 		String houseTypeCode = houseEntity.getHouseTypeCode();
-		if(houseTypeCode.length() != 8){
+		if(houseTypeCode == null || houseTypeCode.length() != 8){
 			houseEntity.setHouseTypeCodeStr(houseEntity.getHouseTypeCode());
 			return;
 		}

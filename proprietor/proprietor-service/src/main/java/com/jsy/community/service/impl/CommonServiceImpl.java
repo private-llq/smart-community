@@ -79,6 +79,9 @@ public class CommonServiceImpl implements ICommonService {
      * @author YuLF
      * @since 2020/12/8 16:39
      */
+    /**
+     *  queryType = 1
+     */
     @Override
     public List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer page, Integer pageSize) {
         return commonMapper.getAllCommunityFormCityId(id, page , pageSize);
@@ -90,6 +93,9 @@ public class CommonServiceImpl implements ICommonService {
      * @since  2020/12/29 15:08
      * @Param
      */
+    /**
+     *  queryType = 2
+     */
     @Override
     public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
         //按社区id 查询 下面的所有 楼栋
@@ -100,8 +106,11 @@ public class CommonServiceImpl implements ICommonService {
         //按社区id 查询 下面的所有 单元
         return commonMapper.getAllBuild(id, 2);
     }
-
-
+    
+    
+    /**
+     *  queryType = 3
+     */
     @Override
     public List<Map<String, Object>> getUnitOrFloorById(Long id, Integer page, Integer pageSize) {
         //1. 不管他是楼栋id还是单元id、第一种方式先按 他传的楼栋id来查单元
