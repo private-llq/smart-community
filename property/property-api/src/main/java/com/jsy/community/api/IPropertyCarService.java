@@ -21,4 +21,6 @@ public interface IPropertyCarService extends IService<CarEntity> {
      * @return:
      */
     PageInfo findList(BaseQO<CommunityFunQO> baseQO);
+
+    void insert();
 }

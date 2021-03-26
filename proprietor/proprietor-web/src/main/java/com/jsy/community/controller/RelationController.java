@@ -42,7 +42,6 @@ public class RelationController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
 
-
     /**
      * @Description: 添加家属和车辆信息
      * @author: Hu

@@ -7,7 +7,7 @@
         insert into t_car(id,uid,car_plate,car_type,driving_license_url,create_time)
         values
         <foreach collection="cars" item="item" separator=",">
-            (${@com.jsy.community.utils.SnowFlake@nextId()},#{uid},#{item.carPlate},#{item.carType},#{item.drivingLicenseUrl},now())
+            (#{id},#{uid},#{item.carPlate},#{item.carType},#{item.drivingLicenseUrl},now())
         </foreach>
     </insert>
     <!-- 通过车辆id 和 用户id更新用户车辆 -->

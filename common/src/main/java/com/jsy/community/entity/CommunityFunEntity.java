@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -57,6 +58,9 @@ public class CommunityFunEntity extends BaseEntity {
     private LocalDateTime outTime;
     @ApiModelProperty(value = "标签")
     private String tallys;
+    @ApiModelProperty(value = "标签数组")
+    @TableField(exist = false)
+    private String[] tallyArrays;
     @ApiModelProperty(value = "创建人名称")
     private String createName;
     @ApiModelProperty(value = "修改人名称")

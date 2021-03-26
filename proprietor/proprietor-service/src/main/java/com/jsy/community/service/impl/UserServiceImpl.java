@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
@@ -19,15 +20,18 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.mapper.UserThirdPlatformMapper;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
+import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
+import com.jsy.community.utils.es.ElasticsearchCarUtil;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.vo.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,6 +42,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -96,6 +101,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Autowired
     private UserIMMapper userIMMapper;
+
+    @Autowired
+    private RestHighLevelClient restHighLevelClient;
 
     @Autowired
     private ISignatureService signatureService;
@@ -420,6 +428,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return true;
     }
 
+
     /**
      * 更新车辆信息 如果 id = 0 | id = null 则新增
      * @param qo        请求参数
@@ -447,12 +456,70 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 cars.removeAll(any);
                 //批量新增车辆
                 carService.addProprietorCarForList(any, qo.getUid());
+                //循环添加id
+                any.forEach(x ->{
+                    x.setId(SnowFlake.nextId());
+                });
+                //循环保存车辆到es
+                any.forEach(x ->{
+                    ElasticsearchCarUtil.insertData(getInsertElasticsearchCar(qo,x),restHighLevelClient);
+                });
             }
             //批量更新车辆信息
-            cars.forEach( c -> carService.update(c, qo.getUid()));
+            cars.forEach( c -> {
+                carService.update(c, qo.getUid());
+                //循环更新车辆
+                ElasticsearchCarUtil.updateData(getUpdateElasticsearchCar(c),restHighLevelClient);
+                }
+            );
         }
     }
 
+    /**
+     * @Description: 添加车辆到es的qo封装方法
+     * @author: Hu
+     * @since: 2021/3/26 13:43
+     * @Param:
+     * @return:
+     */
+    public ElasticsearchCarQO getInsertElasticsearchCar(ProprietorQO proprietorQO,CarQO carQO){
+        HouseEntity entity = houseService.getById(proprietorQO.getHouseId());
+        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
+        elasticsearchCarQO.setId(carQO.getId());
+        elasticsearchCarQO.setCommunityId(proprietorQO.getCommunityId());
+        elasticsearchCarQO.setCarPlate(carQO.getCarPlate());
+        elasticsearchCarQO.setCarType(carQO.getCarType());
+        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carQO.getCarType()));
+        elasticsearchCarQO.setOwner(proprietorQO.getRealName());
+        elasticsearchCarQO.setIdCard(proprietorQO.getIdCard());
+        elasticsearchCarQO.setMobile(proprietorQO.getMobile());
+        elasticsearchCarQO.setOwnerType(1);
+        elasticsearchCarQO.setOwnerTypeText("用户");
+        elasticsearchCarQO.setRelationshipId(proprietorQO.getUid());
+        elasticsearchCarQO.setHouseId(proprietorQO.getHouseId());
+        elasticsearchCarQO.setBuilding(entity.getBuilding());
+        elasticsearchCarQO.setFloor(entity.getFloor());
+        elasticsearchCarQO.setUnit(entity.getUnit());
+        elasticsearchCarQO.setNumber(entity.getNumber());
+        elasticsearchCarQO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
+        elasticsearchCarQO.setCreateTime(LocalDateTime.now());
+        return elasticsearchCarQO;
+    }
+    /**
+     * @Description: 修改车辆到es的qo封装方法
+     * @author: Hu
+     * @since: 2021/3/26 13:43
+     * @Param:
+     * @return:
+     */
+    public ElasticsearchCarQO getUpdateElasticsearchCar(CarQO carQO){
+        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
+        elasticsearchCarQO.setId(carQO.getId());
+        elasticsearchCarQO.setCarPlate(carQO.getCarPlate());
+        elasticsearchCarQO.setCarType(carQO.getCarType());
+        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carQO.getCarType()));
+        return elasticsearchCarQO;
+    }
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateImprover(ProprietorQO qo) {

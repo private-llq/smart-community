@@ -1,8 +1,8 @@
 package com.jsy.community.api;
 
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseEntity;
-import org.apache.ibatis.annotations.MapKey;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.Map;
  * @description 楼栋房屋
  * @since 2020-12-16 14:12
  **/
-public interface IHouseService {
+public interface IHouseService extends IService<HouseEntity> {
 	
 	/**
 	 * @Description: 查询房间

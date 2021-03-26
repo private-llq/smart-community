@@ -92,4 +92,5 @@ public interface IRelationService {
      * @return:
      */
     UserHouseEntity getHouse(RelationQo relationQo);
+
 }

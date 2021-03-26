@@ -22,10 +22,17 @@ public class PropertyCarServiceImpl extends ServiceImpl<PropertyCarMapper, CarEn
     @Autowired
     private PropertyCarMapper propertyCarMapper;
 
+
+
     @Override
     public PageInfo findList(BaseQO<CommunityFunQO> baseQO) {
 
 
         return null;
+    }
+
+    @Override
+    public void insert() {
+
     }
 }

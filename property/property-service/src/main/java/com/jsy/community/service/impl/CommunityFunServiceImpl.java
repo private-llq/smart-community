@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -89,6 +90,13 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
         PageInfo pageInfo=new PageInfo();
+        List<CommunityFunEntity> list = page.getRecords();
+        for (CommunityFunEntity entity : list) {
+            if (entity.getTallys()!=null){
+                entity.setTallyArrays(entity.getTallys().split(","));
+            }
+        }
+        page.setRecords(list);
         BeanUtils.copyProperties(page,pageInfo);
         return pageInfo;
     }
@@ -183,8 +191,13 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
      */
   @Override
   public CommunityFunEntity selectOne(Long id) {
-    return communityFunMapper.selectById(id);
+      CommunityFunEntity entity = communityFunMapper.selectById(id);
+      if (entity!=null&&entity.getTallys()!=null){
+          entity.setTallyArrays(entity.getTallys().split(","));
+      }
+      return entity;
   }
+
 
   /**
    * @Description: 发布
