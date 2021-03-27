@@ -49,6 +49,8 @@ public class ElasticsearchCarQO implements Serializable {
     @ApiModelProperty("房屋")
     private String number;
     @ApiModelProperty("房屋类型")
+    private Integer houseType;
+    @ApiModelProperty("房屋类型")
     private String houseTypeText;
     @ApiModelProperty("创建时间")
     private LocalDateTime createTime;

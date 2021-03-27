@@ -32,6 +32,7 @@ import com.jsy.community.vo.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -95,6 +96,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Autowired
     private ICommunityService communityService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private IAlipayService alipayService;
@@ -462,14 +466,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 });
                 //循环保存车辆到es
                 any.forEach(x ->{
-                    ElasticsearchCarUtil.insertData(getInsertElasticsearchCar(qo,x),restHighLevelClient);
+                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo,x));
                 });
             }
             //批量更新车辆信息
             cars.forEach( c -> {
                 carService.update(c, qo.getUid());
                 //循环更新车辆
-                ElasticsearchCarUtil.updateData(getUpdateElasticsearchCar(c),restHighLevelClient);
+                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.update",getUpdateElasticsearchCar(c));
                 }
             );
         }
@@ -501,6 +505,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         elasticsearchCarQO.setFloor(entity.getFloor());
         elasticsearchCarQO.setUnit(entity.getUnit());
         elasticsearchCarQO.setNumber(entity.getNumber());
+        elasticsearchCarQO.setHouseType(entity.getHouseType());
         elasticsearchCarQO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
         elasticsearchCarQO.setCreateTime(LocalDateTime.now());
         return elasticsearchCarQO;

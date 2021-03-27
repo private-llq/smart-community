@@ -4,17 +4,18 @@ import com.jsy.community.api.IRelationService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.entity.RelationCarEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.RelationCarsQo;
 import com.jsy.community.qo.RelationQo;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.es.ElasticsearchCarUtil;
 import com.jsy.community.vo.RelationCarsVO;
 import com.jsy.community.vo.RelationVO;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +41,6 @@ public class RelationServiceImpl implements IRelationService {
     private UserMapper userMapper;
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
-    @Autowired
-    private RestHighLevelClient restHighLevelClient;
 
     @Autowired
     private RelationCarMapper relationCarMapper;
@@ -97,6 +95,7 @@ public class RelationServiceImpl implements IRelationService {
         elasticsearchCarQO.setFloor(houseEntity.getFloor());
         elasticsearchCarQO.setUnit(houseEntity.getUnit());
         elasticsearchCarQO.setNumber(houseEntity.getNumber());
+        elasticsearchCarQO.setHouseType(houseEntity.getHouseType());
         elasticsearchCarQO.setHouseTypeText(houseEntity.getHouseType()==1?"商铺":"住宅");
         elasticsearchCarQO.setCreateTime(LocalDateTime.now());
         System.out.println(elasticsearchCarQO);
@@ -270,7 +269,6 @@ public class RelationServiceImpl implements IRelationService {
                     car.setIdCard(relationQo.getIdCard());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                     relationMapper.insertOne(car);
-                    ElasticsearchCarUtil.insertData(getInsetElasticsearchCarQO(car,relationQo,houseEntity),restHighLevelClient);
                     rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(car,relationQo,houseEntity));
                 }else {
                     relationMapper.updateUserRelationCar(car);
@@ -308,7 +306,8 @@ public class RelationServiceImpl implements IRelationService {
      * @Author: chq459799974
      * @Date: 2020/12/23
      **/
-    public boolean isHouseMember(String mobile,Long communityId){
+    @Override
+    public boolean isHouseMember(String mobile, Long communityId){
         Integer count = houseMemberMapper.selectCount(new QueryWrapper<HouseMemberEntity>().eq("mobile", mobile).eq("community_id", communityId));
         return count > 0;
     }

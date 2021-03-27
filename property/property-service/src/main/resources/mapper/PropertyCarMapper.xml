@@ -2,4 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.PropertyCarMapper">
 
+    <update id="updateOne">
+        update t_property_car
+        <set>
+            <if test="carPlate!=null and carPlate!=''">
+                car_plate=#{carPlate},
+            </if>
+            <if test="carType!=null and carType!=''">
+                car_type=#{carType},
+            </if>
+            <if test="carTypeText!=null and carTypeText!=''">
+                car_type_text=#{carTypeText}
+            </if>
+        </set>
+        where id=#{id}
+    </update>
 </mapper>
