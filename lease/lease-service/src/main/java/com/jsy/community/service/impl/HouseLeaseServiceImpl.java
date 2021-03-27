@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.annotation.EsImport;
@@ -18,6 +19,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.lease.HouseImageVo;
+import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.api.IHouseConstService;
@@ -489,6 +491,34 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //房屋类型 code转换为文本 如 4室2厅1卫
         vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         vo.setHouseImage(houseLeaseMapper.queryHouseAllImgById(vo.getHouseImageId()));
+        return vo;
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 查询房屋出租数据单条简略详情
+     *@param: houseId: 出租房屋主键
+     *@Return: com.jsy.community.vo.lease.HouseLeaseSimpleVO
+     *@Date: 2021/3/27 16:25
+     **/
+    @Override
+    public HouseLeaseSimpleVO queryHouseLeaseSimpleDetail(Long houseId) {
+        //1.查出单条数据
+        HouseLeaseSimpleVO vo = houseLeaseMapper.queryHouseLeaseSimpleDetail(houseId);
+
+        if (vo == null) {
+            return null;
+        }
+        //1.2查出该条数据所有图片
+        vo.setHouseImage(houseLeaseMapper.queryHouseAllImgById(vo.getHouseImageId()));
+        //1.3 房屋类型 code转换为文本 如 4室2厅1卫
+        vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
+        //1.4查出小区名称 和 房屋地址
+        Map<String, String> communityNameAndHouseAddr = houseLeaseMapper.getUserAddrById(vo.getHouseCommunityId(), vo.getHouseId());
+        if( Objects.nonNull( communityNameAndHouseAddr ) ){
+            vo.setHouseCommunityName( communityNameAndHouseAddr.get("communityName") );
+            vo.setHouseAddress( communityNameAndHouseAddr.get("houseAddress") );
+        }
         return vo;
     }
 

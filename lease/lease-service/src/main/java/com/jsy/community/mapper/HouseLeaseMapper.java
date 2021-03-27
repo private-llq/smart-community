@@ -6,6 +6,7 @@ import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.vo.lease.HouseImageVo;
+import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 import org.apache.ibatis.annotations.*;
@@ -77,6 +78,15 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @return              返回这条数据的详情
      */
     HouseLeaseVO queryHouseLeaseOne(@Param("houseId") Long houseId);
+
+    /**
+     *@Author: Pipi
+     *@Description: 查询房屋出租数据单条简略详情
+     *@param: houseId: 出租房屋主键
+     *@Return: com.jsy.community.vo.lease.HouseLeaseSimpleVO
+     *@Date: 2021/3/27 16:47
+     **/
+    HouseLeaseSimpleVO queryHouseLeaseSimpleDetail(@Param("houseId") Long houseId);
 
 
     /**
