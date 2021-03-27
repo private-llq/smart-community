@@ -21,12 +21,14 @@ import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -153,9 +155,6 @@ public class AdminLoginController {
 			return CommonResult.error("账号或密码不正确");
 		}
 		
-		//查询用户菜单(选择小区后查询)
-//		List<AdminMenuEntity> menuList = adminConfigService.queryUserMenu(user.getId());
-//		user.setMenuList(menuList);
 		////查询已加入小区id列表
 		List<Long> idList = adminUserService.queryCommunityIdList(form.getAccount());
 		//查询已加入小区列表详情
@@ -198,13 +197,20 @@ public class AdminLoginController {
 		//查询该社区下用户资料、用户菜单，并返回token
 		//用户资料
 		AdminUserEntity user = adminUserService.queryUserByMobile(account, communityId);
+		if(user.getStatus() == 1){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
+		}
 		//用户菜单
 		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(user.getUid());
 		user.setMenuList(userMenu);
 		//创建token，保存redis
 		String token = adminUserTokenService.createToken(user);
 		user.setToken(token);
-		return CommonResult.ok(user);
+		AdminInfoVo adminInfoVo = new AdminInfoVo();
+		BeanUtils.copyProperties(user,adminInfoVo);
+		adminInfoVo.setUid(null);
+		adminInfoVo.setStatus(null);
+		return CommonResult.ok(adminInfoVo);
 	}
 	
 	//检查手机验证码

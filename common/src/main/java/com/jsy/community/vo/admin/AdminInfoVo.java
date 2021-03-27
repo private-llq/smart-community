@@ -1,6 +1,5 @@
 package com.jsy.community.vo.admin;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
@@ -39,14 +38,17 @@ public class AdminInfoVo implements Serializable {
 	/**
 	 * 角色ID列表
 	 */
-	@TableField(exist = false)
 	private List<Integer> roleIdList;
 	
 	/**
 	 * 用户菜单列表
 	 */
-	@TableField(exist = false)
 	private List<AdminMenuEntity> menuList;
+	
+	/**
+	 * 手机号
+	 */
+	private String mobile;
 	
 	/**
 	 * token
