@@ -178,7 +178,10 @@ public class AdminLoginController {
 	 * @Date: 2021/3/25
 	**/
 	@PostMapping("sys/enter")
-	public CommonResult enterCommunity(@RequestParam String account, @RequestParam Long communityId, @RequestParam String communityKey){
+	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
+		String communityKey = jsonObject.getString("communityKey");
+		String account = jsonObject.getString("account");
+		Long communityId = jsonObject.getLong("communityId");
 		//验证
 		String catchedAccount = redisTemplate.opsForValue().get("Admin:CommunityKey:" + communityKey);
 		if(StringUtils.isEmpty(catchedAccount)){
