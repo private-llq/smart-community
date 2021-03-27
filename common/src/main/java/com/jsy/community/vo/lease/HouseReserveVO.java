@@ -1,5 +1,6 @@
 package com.jsy.community.vo.lease;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -80,8 +82,9 @@ public class HouseReserveVO implements Serializable {
     @ApiModelProperty(value = "预约联系人头像地址")
     private String contactAvatar;
 
-    @ApiModelProperty(value = "预约时间")
-    private String reserveDateTime;
+    @ApiModelProperty(value = "看房时间")
+    @JsonFormat(pattern = "MM-dd HH:mm", timezone = "GMT+8")
+    private Date checkingTime;
 
     @ApiModelProperty(value = "是房东还是租客")
     private Boolean proprietor;

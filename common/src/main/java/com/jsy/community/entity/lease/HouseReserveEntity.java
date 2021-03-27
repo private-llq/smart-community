@@ -7,11 +7,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  *
@@ -48,16 +48,14 @@ public class HouseReserveEntity extends BaseEntity {
     @ApiModelProperty(value = "预约信息内容")
     private String reserveMsg;
 
-    @Length(groups = {Add.class}, max =  12, message = "预约日期长度错误!")
-    @NotBlank(groups = {Add.class}, message = "预约日期不能为空!")
-    @ApiModelProperty(value = "预约日期")
-    private String reserveDate;
+    @NotNull(groups = {Add.class}, message = "看房时间不能为空!")
+    @ApiModelProperty(value = "看房时间")
+    private Date checkingTime;
 
-
-    @Length(groups = {Add.class},  max =  12, message = "预约时间长度错误!")
-    @NotBlank(groups = {Add.class}, message = "预约时间不能为空!")
-    @ApiModelProperty(value = "预约时间")
-    private String reserveTime;
+    @Range(groups = {Add.class}, min = 1, max = 4, message = "预计入住时间错误!预计入住时间,1.一周内;2.1-2周内;3.2-4周内;4.一个月之后")
+    @NotNull(groups = {Add.class}, message = "预计入住时间不能为空")
+    @ApiModelProperty(value = "预计入住时间,1.一周内;2.1-2周内;3.2-4周内;4.一个月之后")
+    private Integer checkInTime;
 
     /**
      * 提交预约信息验证接口

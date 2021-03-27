@@ -876,4 +876,43 @@ public interface BusinessEnum {
 		}
 	}
 
+	/**
+	 *@Author: Pipi
+	 *@Description: 预约看房入住时间枚举
+	 *@Date: 2021/3/27 11:41
+	 **/
+	enum CheckInTimeEnum {
+		WITHIN_WEEK("1周内", 1),
+		WITHIN_ONE_TO_TWO_WEEKS("1-2周内", 2),
+		WITHIN_TWO_TO_FOUR_WEEKS("2-4周内", 3),
+		ONE_MONTH_LATER("1个月之后", 4);
+		private final String name;
+		private final Integer code;
+
+		CheckInTimeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public static String getName(Integer code) {
+			CheckInTimeEnum[] values = CheckInTimeEnum.values();
+			for (CheckInTimeEnum c : values) {
+				if (c.code.equals(code)) {
+					return c.name;
+				}
+			}
+			return null;
+		}
+
+		public static Integer getCode(String name) {
+			CheckInTimeEnum[] values = CheckInTimeEnum.values();
+			for (CheckInTimeEnum c : values) {
+				if (c.name.equals(name)) {
+					return c.code;
+				}
+			}
+			return null;
+		}
+	}
+
 }
