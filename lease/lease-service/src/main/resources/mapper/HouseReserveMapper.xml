@@ -6,10 +6,49 @@
     <!-- 提交预约 -->
     <insert id="insertReserve">
         insert into t_house_reserve
-        (id,house_lease_id,community_id,reserve_status,reserve_uid,reserve_msg,reserve _date,reserve_time,deleted,create_time)
-        select #{id},#{houseLeaseId},#{communityId},#{reserveStatus},#{reserveUid},#{reserveMsg},#{reserveDate},#{reserveTime},0,now()
-        from dual where not exists
-        (select id,house_lease_id,community_id,reserve_status,reserve_uid,reserve_msg,reserve_date,reserve_time,deleted,create_time from t_house_reserve where reserve_uid = #{reserveUid} and house_lease_id = #{houseLeaseId} and reserve_status = #{reserveStatus});
+        (
+            id,
+            house_lease_id,
+            community_id,
+            reserve_status,
+            reserve_uid,
+            reserve_msg,
+            checking_time,
+            check_in_time,
+            deleted,
+            create_time
+        )
+        select
+            #{id},
+            #{houseLeaseId},
+            #{communityId},
+            #{reserveStatus},
+            #{reserveUid},
+            #{reserveMsg},
+            #{checkingTime},
+            #{checkInTime},
+            0,
+            now()
+        from dual
+        where not exists
+        (
+            select
+                id,
+                house_lease_id,
+                community_id,
+                reserve_status,
+                reserve_uid,
+                reserve_msg,
+                checking_time,
+                check_in_time,
+                deleted,
+                create_time
+            from t_house_reserve
+            where
+                reserve_uid = #{reserveUid}
+                and house_lease_id = #{houseLeaseId}
+                and reserve_status = #{reserveStatus}
+        );
     </insert>
 
     <!-- 修改预约状态 -->
@@ -33,7 +72,7 @@
     <!-- 我预约的信息 我预约别人 -->
     <select id="meReserveHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">
         SELECT DISTINCT
-	        CONCAT( r.reserve_date, r.reserve_time ) AS reserveDateTime,
+	        checking_time AS checkingTime,
         CASE
 		    r.reserve_status
 		WHEN 0 THEN
@@ -71,7 +110,7 @@
     <!-- 预约我的信息 别人预约我 -->
     <select id="reserveMeHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">
         SELECT
-	        CONCAT( r.reserve_date, r.reserve_time ) AS reserveDateTime,
+	        checking_time AS checkingTime,
         CASE
 		    r.reserve_status
 		WHEN 0 THEN

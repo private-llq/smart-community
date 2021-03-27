@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * 房屋预约 Mapper 接口
- * @author YuLF
+ * @author YuLFHouseReserveEntity
  * @since 2020-12-26
  */
 public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
