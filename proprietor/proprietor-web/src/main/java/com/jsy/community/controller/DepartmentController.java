@@ -43,7 +43,6 @@ public class DepartmentController {
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IDepartmentStaffService departmentStaffService;
 	
-	//TODO 2021年1月21日14:20:08     最新的需求是 这个部门图片是有物业上传的  不是写死的
 	@ApiOperation("查询所有部门信息")
 	@GetMapping("/listDepartment")
 	public CommonResult<List<Map>> listDepartment(@ApiParam(value = "社区id")
@@ -68,6 +67,13 @@ public class DepartmentController {
 		return CommonResult.ok(staffEntityList);
 	}
 	
+	@ApiOperation("通讯录")
+	@GetMapping("/listDepartmentTel")
+	public CommonResult<List<DepartmentEntity>> listDepartmentTel(@ApiParam(value = "社区id")
+	                                              @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
+		List<DepartmentEntity> departmentTels =departmentService.listDepartmentTel(id);
+		return CommonResult.ok(departmentTels);
+	}
 	
 }
 
