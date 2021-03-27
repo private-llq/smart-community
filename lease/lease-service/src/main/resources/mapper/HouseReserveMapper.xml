@@ -80,7 +80,7 @@
 		WHEN 1 THEN
 		'正在预约中'
 		WHEN 2 THEN
-		'预约成功' ELSE '预约拒绝'
+		'预约成功' ELSE '已完成'
 	    END AS reserveStatusText,
 	        l.id as houseLeaseId,
 	        l.house_title AS houseTitle,
@@ -118,7 +118,7 @@
 		WHEN 1 THEN
 		'正在预约中'
 		WHEN 2 THEN
-		'预约成功' ELSE '预约拒绝'
+		'预约成功' ELSE '已完成'
 	    END AS reserveStatusText,
 	        l.id as houseLeaseId,
             l.house_title AS houseTitle,
