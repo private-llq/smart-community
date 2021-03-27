@@ -19,4 +19,13 @@ public interface AppContentService {
 	 * @Date: 2020/12/14
 	**/
 	boolean setHotCity(List<RegionEntity> hotCityList);
+	
+	/**
+	* @Description: 添加一版天气图标
+	 * @Param: [filepath]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/27
+	**/
+	int addWeatherIconFromFileDirectory(String filepath);
 }

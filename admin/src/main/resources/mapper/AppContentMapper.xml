@@ -12,4 +12,13 @@
 		</foreach>
 	</insert>
 
+	<!-- 批量新增天气图标 -->
+	<insert id="addWeatherIconBatch" parameterType="java.util.List">
+		insert into t_weather_icon(edition,num,url)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{edition},#{item.num},#{item.url})
+		</foreach>
+	</insert>
+
 </mapper>
