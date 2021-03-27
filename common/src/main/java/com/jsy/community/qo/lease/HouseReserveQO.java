@@ -29,7 +29,7 @@ public class HouseReserveQO implements Serializable {
     @ApiModelProperty(value = "预约所属人ID")
     private String reserveUid;
 
-    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功 3.预约已拒绝")
+    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功 3.已完成")
     private Integer reserveStatus;
 
     @ApiModelProperty(value = "预约信息内容")
