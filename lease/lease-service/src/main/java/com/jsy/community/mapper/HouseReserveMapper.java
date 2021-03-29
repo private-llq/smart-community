@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -65,6 +66,17 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      */
     @Select("select count(*) from t_house_lease where id = #{houseLeaseId} and deleted = 0")
     Integer existHouseLeaseId(@Param("houseLeaseId") Long houseLeaseId);
+
+    /**
+     * 通过房屋id查询房屋是否存在
+     * @param houseLeaseId      查询id
+     * @return                  返回sql影响行数
+     */
+    @Select("select count(*) from t_house_reserve where house_lease_id = #{houseLeaseId} and reserve_uid = #{reserveUid} and TO_DAYS(checking_time) = TO_DAYS(#{checkingTime}) and lease_delete_status = 0 and delete_landlord_status = 0")
+    Integer existHouseReserve(@Param("houseLeaseId") Long houseLeaseId,
+                              @Param("reserveUid") String reserveUid,
+                              @Param("checkingTime") Date checkingTime
+    );
 
 
     /**

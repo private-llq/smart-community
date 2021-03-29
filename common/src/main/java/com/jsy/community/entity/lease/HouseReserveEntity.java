@@ -58,6 +58,16 @@ public class HouseReserveEntity extends BaseEntity {
     private Integer checkInTime;
 
     /**
+     * 租客消息显示状态,0显示,1删除
+     */
+    private Integer leaseDeleteStatus;
+
+    /**
+     * 房东消息显示状态,0显示,1删除
+     */
+    private Integer deleteLandlordStatus;
+
+    /**
      * 提交预约信息验证接口
      */
     public interface Add{}
