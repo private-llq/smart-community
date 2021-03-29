@@ -53,6 +53,12 @@ public class UserAuthEntity extends BaseEntity {
 	@ApiModelProperty("密码")
 	private String password;
 	
-	@ApiModelProperty("密码")
+	@ApiModelProperty("密码验证(盐值)")
 	private String salt;
+	
+	@ApiModelProperty("支付密码")
+	private String payPassword;
+	
+	@ApiModelProperty("支付密码验证(盐值)")
+	private String paySalt;
 }

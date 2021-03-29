@@ -18,12 +18,32 @@ import java.io.Serializable;
 @ApiModel("添加密码表单")
 public class AddPasswordQO implements Serializable {
 	@ApiModelProperty("密码")
-	@NotEmpty(message = "密码不能为空")
-	@Length(min = 8, max = 30, message = "密码长度8-30")
+	@NotEmpty(groups = passwordVGroup.class,message = "密码不能为空")
+	@Length(groups = passwordVGroup.class,min = 8, max = 30, message = "密码长度8-30")
 	private String password;
 	
 	@ApiModelProperty("确认密码")
-	@NotEmpty(message = "确认密码不能为空")
-	@Length(min = 8, max = 30, message = "确认密码长度8-30")
+	@NotEmpty(groups = passwordVGroup.class,message = "确认密码不能为空")
+	@Length(groups = passwordVGroup.class,min = 8, max = 30, message = "确认密码长度8-30")
 	private String confirmPassword;
+	
+	@ApiModelProperty("支付密码")
+	@NotEmpty(groups = payPasswordVGroup.class,message = "支付密码不能为空")
+	@Length(groups = payPasswordVGroup.class,min = 6, max = 6, message = "支付密码长度为6位")
+	private String payPassword;
+	
+	@ApiModelProperty("确认支付密码")
+	@NotEmpty(groups = payPasswordVGroup.class,message = "确认支付密码不能为空")
+	@Length(groups = payPasswordVGroup.class,min = 6, max = 6, message = "确认支付密码长度为6位")
+	private String confirmPayPassword;
+	
+	/**
+	 * 密码操作
+	 */
+	public interface passwordVGroup{}
+	
+	/**
+	 * 支付密码操作
+	 */
+	public interface payPasswordVGroup{}
 }

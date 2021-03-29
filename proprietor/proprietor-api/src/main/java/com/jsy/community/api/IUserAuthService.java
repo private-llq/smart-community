@@ -26,13 +26,22 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	String checkUser(LoginQO qo);
 	
 	/**
-	 * 注册添加密码
+	 * 注册添加密码/修改密码
 	 *
 	 * @param uid 业主ID
 	 * @param qo  参数
 	 * @return boolean
 	 */
 	boolean addPassword(String uid, AddPasswordQO qo);
+	
+	/**
+	 * 注册添加支付密码/修改支付密码
+	 *
+	 * @param uid 业主ID
+	 * @param qo  参数
+	 * @return boolean
+	 */
+	boolean addPayPassword(String uid, AddPasswordQO qo);
 	
 	/**
 	 * 根据指定字段，检查业主是否存在

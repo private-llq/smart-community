@@ -172,11 +172,22 @@ public class UserAuthController {
 	@PostMapping("/password")
 	@Login
 	public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
-		ValidatorUtils.validateEntity(qo);
+		ValidatorUtils.validateEntity(qo,AddPasswordQO.passwordVGroup.class);
 		String uid = UserUtils.getUserId();
 		
 		boolean b = userAuthService.addPassword(uid, qo);
 		return b ? CommonResult.ok() : CommonResult.error("密码设置失败");
+	}
+	
+	@ApiOperation(value = "设置支付密码", notes = "需要登录")
+	@PostMapping("/password/pay")
+	@Login
+	public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
+		ValidatorUtils.validateEntity(qo,AddPasswordQO.payPasswordVGroup.class);
+		String uid = UserUtils.getUserId();
+		
+		boolean b = userAuthService.addPayPassword(uid, qo);
+		return b ? CommonResult.ok() : CommonResult.error("支付密码设置失败");
 	}
 	
 	@ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
@@ -297,5 +308,5 @@ public class UserAuthController {
 	}
 	
 	//TODO 待定-手机丢失更换新手机(旧手机不在线)
-	
+
 }

@@ -115,6 +115,24 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	}
 	
 	@Override
+	public boolean addPayPassword(String uid, AddPasswordQO qo) {
+		if (!qo.getPayPassword().equals(qo.getConfirmPayPassword())) {
+			throw new ProprietorException("密码不一致");
+		}
+		
+		String salt = RandomUtil.randomString(8);
+		String encryptedPassword = SecureUtil.sha256(qo.getPayPassword() + salt);
+		
+		UserAuthEntity entity = new UserAuthEntity();
+		entity.setPayPassword(encryptedPassword);
+		entity.setPaySalt(salt);
+		
+		LambdaQueryWrapper<UserAuthEntity> update = new LambdaQueryWrapper<>();
+		update.eq(UserAuthEntity::getUid, uid);
+		return update(entity, update);
+	}
+	
+	@Override
 	public boolean checkUserExists(String account, String field) {
 		return baseMapper.checkUserExists(account, field) != null;
 	}
