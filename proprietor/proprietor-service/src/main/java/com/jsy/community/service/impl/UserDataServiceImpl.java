@@ -33,7 +33,24 @@ public class UserDataServiceImpl implements IUserDataService {
 
     @Override
     public UserDataVO selectUserDataOne(String userId) {
-        return userDataMapper.selectUserDataOne(userId);
+        UserDataVO userDataVO = userDataMapper.selectUserDataOne(userId);
+        if (userDataVO==null){
+            UserDataVO dataVO = new UserDataVO();
+            dataVO.setAvatarUrl("");
+            dataVO.setNickname("");
+            dataVO.setBirthdayTime("");
+            return dataVO;
+        }
+        if (userDataVO.getNickname()==null){
+            userDataVO.setNickname("");
+        }
+        if (userDataVO.getAvatarUrl()==null){
+            userDataVO.setAvatarUrl("");
+        }
+        if (userDataVO.getBirthdayTime()==null){
+            userDataVO.setBirthdayTime("");
+        }
+        return userDataVO;
     }
     
     /**
