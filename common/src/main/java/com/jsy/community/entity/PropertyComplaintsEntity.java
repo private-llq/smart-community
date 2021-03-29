@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @TableName("t_property_complaints")
 @ApiModel(value = "PropertyComplaints对象", description = "物业投诉")
 public class PropertyComplaintsEntity extends BaseEntity {
-
     @ApiModelProperty(value = "编号")
     private String serialNumber;
     @ApiModelProperty(value = "投诉人")
@@ -42,12 +41,12 @@ public class PropertyComplaintsEntity extends BaseEntity {
     @ApiModelProperty(value = "投诉状态0未回复1已回复")
     private Integer status;
     @ApiModelProperty(value = "回复人")
-    private String replyUid;
+    private String feedbackBy;
     @ApiModelProperty(value = "回复时间")
-    private LocalDateTime replyTime;
+    private LocalDateTime feedbackTime;
     @ApiModelProperty(value = "回复类容")
-    private String replyContent;
+    private String feedbackContent;
     @ApiModelProperty(value = "回复人名称")
-    private String replyName;
+    private String feedbackName;
 
 }

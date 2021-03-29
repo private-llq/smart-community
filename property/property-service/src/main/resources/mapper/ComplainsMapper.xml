@@ -1,22 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.ComplainsMapper">
+    <sql id="query">
+        <where>
+            c.status=#{query.status} and c.community_id=#{query.communityId}
+            <if test="query.type!=null and query.type>0">
+                and c.type=#{query.type}
+            </if>
+            <if test="query.complainTimeStart!=null">
+                and c.complain_time &gt;= #{query.complainTimeStart}
+            </if>
+            <if test="query.complainTimeOut!=null">
+                and c.complain_time &lt;= #{query.complainTimeOut}
+            </if>
+            <if test="query.replyTimeStart!=null">
+                and c.feedback_time &gt;= #{query.feedbackTimeStart}
+            </if>
+            <if test="query.replyTimeOut!=null">
+                and c.feedback_time &lt;= #{query.feedbackTimeOut}
+            </if>
+            <if test="query.keyWord!=null and query.keyWord!=''">
+                and (c.name like concat("%",#{query.keyWord},"%") or c.serial_number like concat("%",#{query.keyWord},"%") or u.mobile like concat("%",#{query.keyWord},"%"))
+            </if>
+        </where>
+    </sql>
 
 
     <select id="listAll" resultMap="ComplainMap">
-        select c.id,c.type,c.content,c.complain_time,c.images,c.status,u.uid,u.mobile,u.real_name name,c.feedback
+        select c.id as id,c.type as type,c.content as content,
+        c.complain_time as complainTime,c.images as images,
+        c.status as status,u.mobile as mobile,u.real_name as name,
+        c.feedback_content as feedbackContent,feedback_time as feedbackTime,
+        a.real_name as feedbackName,c.serial_number as serialNumber
          from t_complain c join t_user u on c.uid=u.uid
+         left join t_admin_user a on c.feedback_by=a.uid
+         <include refid="query"></include>
+         order by c.complain_time desc limit #{page},#{size}
     </select>
     <resultMap id="ComplainMap" type="com.jsy.community.vo.ComplainVO">
         <result property="id" column="id"/>
         <result property="type" column="type"/>
         <result property="content" column="content"/>
-        <result property="complainTime" column="complain_time"/>
+        <result property="complainTime" column="complainTime"/>
         <result property="images" column="images"/>
         <result property="status" column="status"/>
         <result property="mobile" column="mobile"/>
-        <result property="uid" column="uid"/>
         <result property="name" column="name"/>
-        <result property="feedback" column="feedback"/>
+        <result property="serialNumber" column="serialNumber"/>
+        <result property="feedbackName" column="feedbackName"/>
+        <result property="feedbackTime" column="feedbackTime"/>
+        <result property="feedbackContent" column="feedbackContent"/>
     </resultMap>
 </mapper>

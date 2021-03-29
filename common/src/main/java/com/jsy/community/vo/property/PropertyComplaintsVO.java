@@ -39,11 +39,11 @@ public class PropertyComplaintsVO implements Serializable {
     @ApiModelProperty("回复状态0未回复，1已回复")
     private Integer status;
     @ApiModelProperty("回复人名称")
-    private String replyName;
+    private String feedbackName;
     @ApiModelProperty("回复时间")
-    private LocalDateTime replyTime;
+    private LocalDateTime feedbackTime;
     @ApiModelProperty("回复内容")
-    private String replyContent;
+    private String feedbackContent;
     @ApiModelProperty("位置")
     private String location;
 

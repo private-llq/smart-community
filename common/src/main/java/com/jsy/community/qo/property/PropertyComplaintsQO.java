@@ -27,9 +27,7 @@ public class PropertyComplaintsQO implements Serializable {
     @ApiModelProperty("结束的投诉时间")
     private LocalDate complainTimeOut;
     @ApiModelProperty("开始的回复时间")
-    private LocalDate replyTimeStart;
+    private LocalDate feedbackTimeStart;
     @ApiModelProperty("结束的回复时间")
-    private LocalDate replyTimeOut;
-
-
+    private LocalDate feedbackTimeOut;
 }

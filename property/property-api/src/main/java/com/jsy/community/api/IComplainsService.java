@@ -2,10 +2,10 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.ComplainEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ComplainFeedbackQO;
-import com.jsy.community.vo.ComplainVO;
-
-import java.util.List;
+import com.jsy.community.qo.property.PropertyComplaintsQO;
+import com.jsy.community.utils.PageInfo;
 
 /**
  * @program: com.jsy.community
@@ -21,7 +21,7 @@ public interface IComplainsService extends IService<ComplainEntity> {
      * @Param:
      * @return:
      */
-    List<ComplainVO> listAll();
+    PageInfo  listAll(BaseQO<PropertyComplaintsQO> baseQO);
     /**
      * @Description: 反馈内容
      * @author: Hu

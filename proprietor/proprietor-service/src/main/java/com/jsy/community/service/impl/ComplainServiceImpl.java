@@ -108,6 +108,32 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
      */
     @Override
     public void addComplain(ComplainEntity complainEntity) {
+        String str=null;
+        Object complain_serial_number = redisTemplate.opsForValue().get("complain_serial_number");
+        String s = String.valueOf(complain_serial_number);
+        if (s.length()<5){
+            if (s.length()==1) {
+                str="000"+s;
+            }else {
+                if (s.length()==2){
+                    str="00"+s;
+                }else{
+                    if (s.length()==3){
+                        str="0"+s;
+                    }else{
+                        if (s.length()==4){
+                            str=s;
+                        }
+                    }
+                }
+            }
+        }else {
+            str=s;
+        }
+        int anInt = Integer.parseInt(s);
+        ++anInt;
+        redisTemplate.opsForValue().set("complain_serial_number",anInt+"");
+        complainEntity.setSerialNumber(getSerialNumber()+str);
         complainMapper.insert(complainEntity);
     }
 

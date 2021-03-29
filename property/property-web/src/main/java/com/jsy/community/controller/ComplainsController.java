@@ -3,15 +3,15 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IComplainsService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ComplainFeedbackQO;
+import com.jsy.community.qo.property.PropertyComplaintsQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.ComplainVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -21,7 +21,7 @@ import java.util.List;
  **/
 @Api(tags = "投诉建议控制器")
 @RestController
-@RequestMapping("/complainProperty")
+@RequestMapping("/complains")
 @ApiJSYController
 public class ComplainsController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -29,9 +29,9 @@ public class ComplainsController {
 
     @ApiOperation("查询所有投诉建议")
     @GetMapping("/list")
-    public CommonResult<List<ComplainVO>> list() {
-        List<ComplainVO> complainVOS = complainsService.listAll();
-        return CommonResult.ok(complainVOS);
+    public CommonResult list(BaseQO<PropertyComplaintsQO> baseQO) {
+        PageInfo pageInfo = complainsService.listAll(baseQO);
+        return CommonResult.ok(pageInfo);
     }
     @ApiOperation("反馈内容")
     @PostMapping("/feedback")

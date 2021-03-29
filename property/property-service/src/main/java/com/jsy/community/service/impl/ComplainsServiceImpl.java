@@ -5,13 +5,14 @@ import com.jsy.community.api.IComplainsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ComplainEntity;
 import com.jsy.community.mapper.ComplainsMapper;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ComplainFeedbackQO;
-import com.jsy.community.vo.ComplainVO;
+import com.jsy.community.qo.property.PropertyComplaintsQO;
+import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -36,7 +37,7 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
         ComplainEntity complainEntity = complainsMapper.selectById(complainFeedbackQO.getId());
         complainEntity.setStatus(1);
         complainEntity.setComplainTime(LocalDateTime.now());
-        complainEntity.setFeedback(complainFeedbackQO.getBody());
+        complainEntity.setFeedbackContent(complainFeedbackQO.getBody());
         complainsMapper.updateById(complainEntity);
     }
     /**
@@ -47,7 +48,12 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
      * @return:
      */
     @Override
-    public List<ComplainVO> listAll() {
-        return complainsMapper.listAll();
+    public PageInfo listAll(BaseQO<PropertyComplaintsQO> baseQO) {
+        PropertyComplaintsQO query = baseQO.getQuery();
+        if (baseQO.getSize()==null||baseQO.getSize()==0){
+            baseQO.setSize(10L);
+        }
+        complainsMapper.listAll(baseQO.getPage(),baseQO.getSize(),query);
+        return null;
     }
 }
