@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * @author lihao
  * @since 2020-11-24
  */
-@Api(tags = "部门控制器")
+@Api(tags = "社区通讯录(部门控制器)")
 @RestController
 @RequestMapping("/department")
 @ApiJSYController

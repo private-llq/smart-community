@@ -78,37 +78,39 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	@Override
 	public void updateDepartment(DepartmentQO departmentEntity) {
 		// 不可选择自己或自己的子集成为自己的父级
+		// 1. 获取自己的子集
 		QueryWrapper<DepartmentEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("pid", departmentEntity.getId());
 		List<DepartmentEntity> childList = departmentMapper.selectList(queryWrapper);
 		
 		if (!CollectionUtils.isEmpty(childList)) {
 			for (DepartmentEntity child : childList) {
-				if (child.getId().equals(departmentEntity.getPid())||departmentEntity.getPid().equals(departmentEntity.getId())) {
-					throw new PropertyException("不可选择自己或自己的子集成为自己的父级");
+				if (child.getId().equals(departmentEntity.getPid())) {
+					throw new PropertyException("不可选择自己的子集成为自己的父级");
+				}
+			}
+		}
+		if (departmentEntity.getId().equals(departmentEntity.getPid())) {
+			throw new PropertyException("不可选择自己成为自己的父级");
+		}
+		
+		// 2. 判断是否有同名
+		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("community_id", departmentEntity.getCommunityId());
+		List<DepartmentEntity> ones = departmentMapper.selectList(wrapper);
+		if (!CollectionUtils.isEmpty(ones)) {
+			for (DepartmentEntity one : ones) {
+				// 跳过当前正在修改的这条数据
+				if (one.getId().equals(departmentEntity.getId())) {
+					continue;
+				}
+				if (departmentEntity.getDepartment().equals(one.getDepartment())) {
+					throw new PropertyException("您小区已存在同名部门，请重新修改");
 				}
 			}
 		}
 		
-		// 判断是否有同名
-		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("community_id", departmentEntity.getCommunityId());
-		List<DepartmentEntity> ones = departmentMapper.selectList(wrapper);
-		if (ones == null) {
-			throw new PropertyException("该小区没有此部门");
-		}
-		
-		for (DepartmentEntity one : ones) {
-			// 跳过当前正在修改的这条数据
-			if (one.getId().equals(departmentEntity.getId())) {
-				continue;
-			}
-			if (departmentEntity.getDepartment().equals(one.getDepartment())) {
-				throw new PropertyException("您小区已存在同名部门，请重新修改");
-			}
-		}
-		
-		// 判断父节点是否存在
+		// 3. 判断父节点是否存在
 		Long pid = departmentEntity.getPid();
 		DepartmentEntity dept = departmentMapper.selectById(pid);
 		if (departmentEntity.getPid() != 0) {

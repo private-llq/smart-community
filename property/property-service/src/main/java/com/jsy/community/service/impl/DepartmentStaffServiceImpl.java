@@ -42,7 +42,7 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 	@Override
 	public PageInfo<DepartmentStaffEntity> listDepartmentStaff(Long departmentId, Long page, Long size) {
 		QueryWrapper<DepartmentStaffEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("department_id", departmentId);
+		queryWrapper.eq("department_id", departmentId).orderByDesc("create_time");
 		Page<DepartmentStaffEntity> pageInfo = new Page<>(page, size);
 		staffMapper.selectPage(pageInfo, queryWrapper);
 		

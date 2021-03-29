@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @ApiJSYController
 @RequestMapping("/organization")
+// TODO: 2021/3/29 完结
 public class OrganizationController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -46,7 +47,6 @@ public class OrganizationController {
 		return CommonResult.ok();
 	}
 	
-	// TODO: 2021/3/22 组织机构没有对其下有成员时做判定限制
 	@ApiOperation("删除组织机构")
 	@GetMapping("/deleteOrganization")
 	public CommonResult deleteOrganization(@RequestParam Long id, @RequestParam Long communityId) {
@@ -61,7 +61,6 @@ public class OrganizationController {
 		return CommonResult.ok(organization);
 	}
 	
-	
 	@ApiOperation("修改组织机构")
 	@PostMapping("/updateOrganization")
 	public CommonResult updateOrganization(@RequestBody OrganizationEntity organization) {
@@ -69,7 +68,5 @@ public class OrganizationController {
 		organizationService.updateOrganization(organization);
 		return CommonResult.ok();
 	}
-	
-	
 }
 
