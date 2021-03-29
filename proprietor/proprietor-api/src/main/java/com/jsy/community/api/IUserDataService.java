@@ -3,6 +3,8 @@ package com.jsy.community.api;
 import com.jsy.community.qo.proprietor.UserDataQO;
 import com.jsy.community.vo.UserDataVO;
 
+import java.util.Map;
+
 /**
  * @program: com.jsy.community
  * @description: 用户个人信息
@@ -27,4 +29,13 @@ public interface IUserDataService {
      * @return:
      */
     void updateUserData(UserDataQO userDataQO,String userId);
+    
+    /**
+    * @Description: 账号安全状态查询
+     * @Param: [uid]
+     * @Return: java.util.Map<java.lang.String,java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/3/29
+    **/
+    Map<String,String> querySafeStatus(String uid);
 }

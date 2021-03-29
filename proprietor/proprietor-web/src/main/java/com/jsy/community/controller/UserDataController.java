@@ -60,7 +60,7 @@ public class UserDataController {
         return CommonResult.ok(upload,"上传成功");
     }
     @PutMapping("/updateUserData")
-    @ApiOperation("修改个人信息")
+    @ApiOperation("修改个人信息(头像、生日)")
     @Login
     public CommonResult updateUserData(@RequestBody UserDataQO userDataQO){
         String userId = UserUtils.getUserId();
@@ -98,6 +98,20 @@ public class UserDataController {
         userDataService.updateUserData(dataQO,userId);
         return CommonResult.ok();
     }
-
+    
+    /**
+    * @Description: 账号安全状态查询
+     * @Param: []
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2021/3/29
+    **/
+    @GetMapping("/safeStatus")
+    @ApiOperation("账号安全状态查询")
+    @Login
+    public CommonResult querySafeStatus(){
+        return CommonResult.ok(userDataService.querySafeStatus(UserUtils.getUserId()));
+    }
+    
 }
 
