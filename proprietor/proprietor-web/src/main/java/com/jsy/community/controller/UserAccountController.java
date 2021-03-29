@@ -272,7 +272,7 @@ public class UserAccountController {
 		String uid = UserUtils.getUserId();
 		UserAccountVO banlance = userAccountService.queryBalance(uid);
 		Integer tickets = userAccountService.countTicketByUid(uid);
-		returnMap.put("banlance",banlance.getBalance());
+		returnMap.put("balance",banlance.getBalance());
 		returnMap.put("tickets",tickets);
 		return CommonResult.ok(returnMap,"查询成功");
 	}
