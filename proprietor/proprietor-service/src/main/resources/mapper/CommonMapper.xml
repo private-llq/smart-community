@@ -3,7 +3,7 @@
 
 <mapper namespace="com.jsy.community.mapper.CommonMapper">
     <!-- 通用sql -->
-    <sql id="tableNameAndCondition">from t_house where deleted = 0 and </sql>
+    <sql id="tableNameAndCondition">from t_house_copy where deleted = 0 and </sql>
     <!-- 【社区查询】查询所有小区 queryType = 1 -->
     <select id="getAllCommunityFormCityId"  resultType="java.util.HashMap">
         select id,name from t_community where deleted = 0 and city_id = #{id} limit #{page},#{pageSize}
@@ -25,12 +25,12 @@
     </select>
     <!-- 根据 楼栋 id 查所有楼层 queryType = 3  暂不抽取重复代码 方便改动 -->
     <select id="getFloorByBuildingId" resultType="java.util.HashMap">
-        select DISTINCT floor,'floor' as type from t_house where pid = #{id}
+        select DISTINCT floor,'floor' as type from t_house_copy where pid = #{id} and type = 4
     </select>
 
     <!-- 按单元id查询楼层 queryType = 4 暂不抽取重复代码 方便改动 -->
     <select id="getFloorByUnitId"  resultType="java.util.HashMap">
-        select DISTINCT floor,'floor' as type <include refid="tableNameAndCondition"/> pid = #{id}  limit #{page},#{pageSize}
+        select DISTINCT floor,'floor' as type <include refid="tableNameAndCondition"/> pid = #{id} and type = 4 limit #{page},#{pageSize}
     </select>
 
     <!-- 通过 楼栋id或单元id 和 楼层文本查询属于该楼层的房屋 -->

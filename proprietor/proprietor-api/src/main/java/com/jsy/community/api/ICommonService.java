@@ -40,7 +40,8 @@ public interface ICommonService {
 	 * @param pageSize			当前分页最大条数
 	 * @return      			返回单元或楼栋集合
      */
-    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id,  Integer page, Integer pageSize);
+//    List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id,  Integer page, Integer pageSize);
+	Map<String,List<Map<String, Object>>> getBuildingOrUnitByCommunityId(Long id,  Integer page, Integer pageSize);
 
     /**
      * 根据 楼栋id | 查询下一级的数据
@@ -52,16 +53,17 @@ public interface ICommonService {
 	 * @param pageSize			每页显示条数
 	 * @return      			返回单元 集合 或者 房屋集合
      */
-	List<Map<String, Object>> getUnitOrFloorById(Long id,  Integer page, Integer pageSize);
+//	List<Map<String, Object>> getUnitOrFloorById(Long id,  Integer page, Integer pageSize);
+	Map<String,List<Map<String, Object>>> getUnitOrFloorById2(Long id,  Integer page, Integer pageSize);
 
 
-    /**
-     * 根据单元id查询所有门牌号
-     * @author YuLF
-     * @since  2020/12/8 16:39
-     * @Param  id   单元id
-     */
-	List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize);
+//    /**
+//     * 根据单元id查询所有门牌号
+//     * @author YuLF
+//     * @since  2020/12/8 16:39
+//     * @Param  id   单元id
+//     */
+//	List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize);
 
 
 

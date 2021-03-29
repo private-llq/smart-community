@@ -14,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -69,4 +66,23 @@ public class AppContentController {
 		}
 		return CommonResult.error("上传失败");
 	}
+	
+	@ApiOperation("天气图标上传")
+	@PostMapping("weatherIcon/upload")
+	public CommonResult uploadWeatherIcon(MultipartFile file){
+		PicUtil.imageQualified(file);
+		String url = MinioUtils.upload(file, "weather-icon");
+		if(!StringUtils.isEmpty(url)){
+			return CommonResult.ok(url);
+		}
+		return CommonResult.error("上传失败");
+	}
+	
+	@ApiOperation("天气图标批量上传并写库(文件名需要为数字需要，且与天气接口对应，详见天气接口文档)")
+	@PostMapping("weatherIcon/upload/batch")
+	public CommonResult uploadWeatherIconAndSave(@RequestParam String dirPath){
+		int result = appContentService.addWeatherIconFromFileDirectory(dirPath);
+		return CommonResult.ok("已添加" + result + "个天气图标");
+	}
+	
 }

@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -96,49 +97,90 @@ public class CommonServiceImpl implements ICommonService {
     /**
      *  queryType = 2
      */
+//    @Override
+//    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
+//        //按社区id 查询 下面的所有 楼栋
+//        List<Map<String, Object>> buildingList = commonMapper.getAllBuild(id, 1);
+//        if( CollectionUtil.isNotEmpty(buildingList) ){
+//            return buildingList;
+//        }
+//        //按社区id 查询 下面的所有 单元
+//        return commonMapper.getAllBuild(id, 2);
+//    }
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
+    public Map<String,List<Map<String, Object>>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
         //按社区id 查询 下面的所有 楼栋
         List<Map<String, Object>> buildingList = commonMapper.getAllBuild(id, 1);
-        if( CollectionUtil.isNotEmpty(buildingList) ){
-            return buildingList;
-        }
         //按社区id 查询 下面的所有 单元
-        return commonMapper.getAllBuild(id, 2);
+        List<Map<String, Object>> unitList = commonMapper.getAllBuild(id, 2);
+        Map<String, List<Map<String, Object>>> returnMap = new HashMap<>();
+        if(!CollectionUtils.isEmpty(buildingList)){
+            returnMap.put("buildingList",buildingList);
+        }
+        if(!CollectionUtils.isEmpty(unitList)){
+            returnMap.put("unitList",unitList);
+        }
+        return returnMap;
     }
     
     
     /**
      *  queryType = 3
      */
+//    @Override
+//    public List<Map<String, Object>> getUnitOrFloorById(Long id, Integer page, Integer pageSize) {
+//        //1. 不管他是楼栋id还是单元id、第一种方式先按 他传的楼栋id来查单元
+//        List<Map<String, Object>> unitList = commonMapper.getUnitByBuildingId(id);
+//        if( CollectionUtil.isNotEmpty(unitList) ){
+//            return unitList;
+//        }
+//        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有楼层
+//        //TODO 楼栋没挂单元 直接挂的房屋，先给出楼层
+//        List<Map<String, Object>> floorByBuildingId = commonMapper.getFloorByBuildingId(id);
+//        if( CollectionUtil.isNotEmpty(floorByBuildingId) ){
+//            return floorByBuildingId;
+//        }
+//        //3. 如果 按 以上id 当做楼栋去查 楼层都为空 那说明传的是一个 单元id 则按单元id查楼层
+//        //TODO 单元挂房屋？(大多数情况)
+////        return getFloorByUnitId(id, page, pageSize);
+//        return commonMapper.getFloorByUnitId(id, page, pageSize);
+//    }
     @Override
-    public List<Map<String, Object>> getUnitOrFloorById(Long id, Integer page, Integer pageSize) {
-        //1. 不管他是楼栋id还是单元id、第一种方式先按 他传的楼栋id来查单元
+    public Map<String,List<Map<String, Object>>> getUnitOrFloorById2(Long id, Integer page, Integer pageSize) {
+        //1. 楼栋id查单元
         List<Map<String, Object>> unitList = commonMapper.getUnitByBuildingId(id);
-        if( CollectionUtil.isNotEmpty(unitList) ){
-            return unitList;
+        //2.1 楼栋id查楼层
+        List<Map<String, Object>> floorList = commonMapper.getFloorByBuildingId(id);
+        //2.2 单元id查楼层
+        List<Map<String, Object>> floorByUnit = commonMapper.getFloorByUnitId(id, page, pageSize);
+        if(CollectionUtils.isEmpty(floorList)){
+            floorList.addAll(floorByUnit);
         }
-        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有楼层
-        List<Map<String, Object>> floorByBuildingId = commonMapper.getFloorByBuildingId(id);
-        if( CollectionUtil.isNotEmpty(floorByBuildingId) ){
-            return floorByBuildingId;
+        Map<String, List<Map<String, Object>>> returnMap = new HashMap<>();
+        if(!CollectionUtils.isEmpty(unitList)){
+            returnMap.put("unitList",unitList);
         }
-        //3. 如果 按 以上id 当做楼栋去查 楼层都为空 那说明传的是一个 单元id 则按单元id查楼层
-        return getFloorByUnitId(id, page, pageSize);
+        if(!CollectionUtils.isEmpty(floorList)){
+            returnMap.put("floorList",floorList);
+        }
+        return returnMap;
     }
 
 
+//    /**
+//     * 按单元id获取楼层
+//     * @author YuLF
+//     * @since  2020/12/29 15:08
+//     * @Param
+//     */
+//    @Override
+//    private List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize) {
+//        return commonMapper.getFloorByUnitId(id, page, pageSize);
+//    }
+    
     /**
-     * 按单元id获取楼层
-     * @author YuLF
-     * @since  2020/12/29 15:08
-     * @Param
+     *  楼层文本查房屋
      */
-    @Override
-    public List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize) {
-        return commonMapper.getFloorByUnitId(id, page, pageSize);
-    }
-
     @Override
     public List<Map<String, Object>> getHouseByFloor(Long id, String floor) {
         return commonMapper.getHouseByFloor( id, floor);

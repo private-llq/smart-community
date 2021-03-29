@@ -2,10 +2,12 @@ package com.jsy.community.mapper;
 
 import com.jsy.community.entity.RegionEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -31,4 +33,15 @@ public interface AppContentMapper {
 	 * 添加推荐城市
 	 */
 	int insertHotCity(List<RegionEntity> list);
+	
+	/**
+	 * 获取天气图标最新版本
+	 */
+	@Select("select max(edition) from t_weather_icon")
+	int getLeastEdition();
+	
+	/**
+	 * 天气图标入库
+	 */
+	int addWeatherIconBatch(@Param("edition")Integer edition, @Param("list") List<Map<String,String>> list);
 }

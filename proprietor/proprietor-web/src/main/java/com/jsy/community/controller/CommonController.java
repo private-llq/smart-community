@@ -50,6 +50,21 @@ public class CommonController {
     @Resource
     private RestHighLevelClient elasticsearchClient;
 
+    @GetMapping("community2")
+    public CommonResult test(@RequestParam Long id,@RequestParam Integer queryType){
+        Integer page = 0;
+        Integer size = 10;
+        switch (queryType){
+	        case 1:
+	        	return CommonResult.ok(commonService.getAllCommunityFormCityId(id,page,size));
+            case 2:
+                return CommonResult.ok(commonService.getBuildingOrUnitByCommunityId(id,page,size));
+            case 3:
+                return CommonResult.ok(commonService.getUnitOrFloorById2(id,page,size));
+        }
+        return CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    }
+    
     /**
      * @author YuLF
      * @since  2021/11/9 17:58
@@ -60,10 +75,10 @@ public class CommonController {
     @Login
     public CommonResult<?> queryZone(@RequestParam Long id,
                                      @RequestParam Integer queryType,
-                                     @RequestParam(required = false, defaultValue = "1")Integer page,
+                                     @RequestParam(required = false, defaultValue = "0")Integer page,
                                      @RequestParam(required = false, defaultValue = "10")Integer size) {
         //验证分页参数
-        page = ValidatorUtils.isInteger(page) ? page : 1;
+        page = ValidatorUtils.isInteger(page) ? page : 0;
         size = ValidatorUtils.isInteger(size) ? size : 10;
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);

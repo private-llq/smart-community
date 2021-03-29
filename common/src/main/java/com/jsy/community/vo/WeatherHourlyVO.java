@@ -14,4 +14,5 @@ public class WeatherHourlyVO  implements Serializable {
 	private String condition; //天气文字 如 晴
 	private String hour; //小时
 	private String temp; //气温
+	private String iconDay;//天气图标(取白天)
 }
