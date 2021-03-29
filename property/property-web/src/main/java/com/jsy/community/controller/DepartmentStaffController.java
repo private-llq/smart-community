@@ -2,12 +2,14 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IDepartmentStaffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentStaffEntity;
 import com.jsy.community.qo.DepartmentStaffQO;
 import com.jsy.community.utils.POIUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -33,6 +35,7 @@ import java.util.Map;
 @RestController
 @ApiJSYController
 @RequestMapping("/staff")
+@Login
 public class DepartmentStaffController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -57,6 +60,8 @@ public class DepartmentStaffController {
 	@PostMapping("/addDepartmentStaff")
 	// TODO: 2021/3/22 添加员工这里 我觉得应该是唯一的  不过需求没要求唯一
 	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffQO staffEntity) {
+		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		staffEntity.setCommunityId(communityId);
 		ValidatorUtils.validateEntity(staffEntity, DepartmentStaffQO.addStaffValidate.class);
 		departmentStaffService.addDepartmentStaff(staffEntity);
 		return CommonResult.ok();
@@ -65,6 +70,8 @@ public class DepartmentStaffController {
 	@ApiOperation("修改员工信息")
 	@PostMapping("/updateDepartmentStaff")
 	public CommonResult updateDepartmentStaff(@RequestBody DepartmentStaffQO departmentStaffEntity) {
+		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		departmentStaffEntity.setCommunityId(communityId);
 		ValidatorUtils.validateEntity(departmentStaffEntity, DepartmentStaffQO.updateStaffValidate.class);
 		departmentStaffService.updateDepartmentStaff(departmentStaffEntity);
 		return CommonResult.ok();
@@ -72,7 +79,8 @@ public class DepartmentStaffController {
 	
 	@ApiOperation("删除员工")
 	@GetMapping("/deleteDepartmentStaff")
-	public CommonResult deleteStaffByIds(@ApiParam("员工id") Long id, @ApiParam("社区id") Long communityId) {
+	public CommonResult deleteStaffByIds(@ApiParam("员工id") Long id) {
+		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentStaffService.deleteStaffByIds(id, communityId);
 		return CommonResult.ok();
 	}
