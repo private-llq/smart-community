@@ -15,6 +15,8 @@
             reserve_msg,
             checking_time,
             check_in_time,
+            lease_delete_status,
+            delete_landlord_status,
             deleted,
             create_time
         )
@@ -27,6 +29,8 @@
             #{reserveMsg},
             #{checkingTime},
             #{checkInTime},
+            0,
+            0,
             0,
             now()
         from dual
@@ -41,13 +45,16 @@
                 reserve_msg,
                 checking_time,
                 check_in_time,
+                lease_delete_status,
+                delete_landlord_status,
                 deleted,
                 create_time
             from t_house_reserve
             where
                 reserve_uid = #{reserveUid}
                 and house_lease_id = #{houseLeaseId}
-                and reserve_status = #{reserveStatus}
+                and reserve_status in (1, 2)
+                and TO_DAYS(checking_time) = TO_DAYS(#{checkingTime})
         );
     </insert>
 

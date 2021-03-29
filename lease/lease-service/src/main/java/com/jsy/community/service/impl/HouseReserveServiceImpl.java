@@ -56,6 +56,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     @Transactional(rollbackFor=Exception.class)
     @Override
     public Boolean add(HouseReserveEntity qo) {
+        // 查询预约房屋是否存在
         Integer integer = houseReserveMapper.existHouseLeaseId(qo.getHouseLeaseId());
         if( integer == 0){
             throw new LeaseException("房屋信息不存在!");
