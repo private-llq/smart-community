@@ -209,7 +209,54 @@ public class UserAuthController {
 		return b ? CommonResult.ok() : CommonResult.error("重置失败");
 	}
 	
-	// @Login是旧手机 @Auth是验证新手机
+//	// @Login是旧手机 @Auth是验证新手机
+//	@ApiOperation("更换手机号(旧手机在线)")
+//	@PutMapping("/reset/mobile")
+//	@Login
+//	public CommonResult changeMobile(@RequestBody Map<String,String> map){
+//		//入参验证
+//		String newMobile = map.get("account");
+//		if(StringUtils.isEmpty(newMobile)){
+//			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请填写新手机号");
+//		}
+//		if (!RegexUtils.isMobile(newMobile)) {
+//			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请检查手机号格式是否正确");
+//		}
+//		//权限验证
+//		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+//		String authToken = request.getHeader("authToken");
+//		if (StrUtil.isBlank(authToken)) {
+//			authToken = request.getParameter("authToken");
+//		}
+//		Object authTokenContent = userUtils.getRedisToken("Auth", authToken);
+//		if(authTokenContent == null){
+//			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
+//		}
+//		String uid = UserUtils.getUserId();
+//		String oldMobile = userAuthService.selectContactById(uid);
+//		if(oldMobile == null || !String.valueOf(authTokenContent).equals(oldMobile)){
+//			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
+//		}
+//		//用户是否已注册
+//		boolean exists = userAuthService.checkUserExists(newMobile, "mobile");
+//		if(exists){
+//			return CommonResult.error(JSYError.DUPLICATE_KEY.getCode(),"手机号已被注册，请直接登录或找回密码");
+//		}
+//		//更换手机号操作
+//		boolean b = userAuthService.changeMobile(newMobile, uid);
+//		if(b){
+//			//销毁Auth token
+//			userUtils.destroyToken("Auth", authToken);
+//			//销毁token
+//			String token = request.getHeader("token");
+//			if (StrUtil.isBlank(token)) {
+//				token = request.getParameter("token");
+//			}
+//			userUtils.destroyToken("Login", token);
+//		}
+//		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
+//	}
+	
 	@ApiOperation("更换手机号(旧手机在线)")
 	@PutMapping("/reset/mobile")
 	@Login
@@ -222,21 +269,14 @@ public class UserAuthController {
 		if (!RegexUtils.isMobile(newMobile)) {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请检查手机号格式是否正确");
 		}
+		String code = map.get("code");
+		if (StrUtil.isEmpty(map.get("code"))) {
+			throw new ProprietorException("验证码不能为空");
+		}
 		//权限验证
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		String authToken = request.getHeader("authToken");
-		if (StrUtil.isBlank(authToken)) {
-			authToken = request.getParameter("authToken");
-		}
-		Object authTokenContent = userUtils.getRedisToken("Auth", authToken);
-		if(authTokenContent == null){
-			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
-		}
+		commonService.checkVerifyCode(newMobile, code);
+		//从请求获取uid
 		String uid = UserUtils.getUserId();
-		String oldMobile = userAuthService.selectContactById(uid);
-		if(oldMobile == null || !String.valueOf(authTokenContent).equals(oldMobile)){
-			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
-		}
 		//用户是否已注册
 		boolean exists = userAuthService.checkUserExists(newMobile, "mobile");
 		if(exists){
@@ -245,11 +285,10 @@ public class UserAuthController {
 		//更换手机号操作
 		boolean b = userAuthService.changeMobile(newMobile, uid);
 		if(b){
-			//销毁Auth token
-			userUtils.destroyToken("Auth", authToken);
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 			//销毁token
 			String token = request.getHeader("token");
-			if (StrUtil.isBlank(authToken)) {
+			if (StrUtil.isBlank(token)) {
 				token = request.getParameter("token");
 			}
 			userUtils.destroyToken("Login", token);
