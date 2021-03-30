@@ -3,7 +3,6 @@ package com.jsy.community.mapper;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
 import java.util.Map;
 
 /**
