@@ -25,5 +25,5 @@ public interface ComplainsMapper extends BaseMapper<ComplainEntity> {
      * @param size
      * @param query
      */
-    List<ComplainVO> listAll(@Param("page") Long page,@Param("size") Long size,@Param("query") PropertyComplaintsQO query);
+    List<ComplainVO> listAll(@Param("page") Long page,@Param("size") Long size,@Param("query")PropertyComplaintsQO query);
 }

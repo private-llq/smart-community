@@ -3,7 +3,8 @@
 <mapper namespace="com.jsy.community.mapper.ComplainsMapper">
     <sql id="query">
         <where>
-            c.status=#{query.status} and c.community_id=#{query.communityId}
+                and c.status=#{query.status}
+--             and c.community_id=#{query.communityId}
             <if test="query.type!=null and query.type>0">
                 and c.type=#{query.type}
             </if>
@@ -13,10 +14,10 @@
             <if test="query.complainTimeOut!=null">
                 and c.complain_time &lt;= #{query.complainTimeOut}
             </if>
-            <if test="query.replyTimeStart!=null">
+            <if test="query.feedbackTimeStart!=null">
                 and c.feedback_time &gt;= #{query.feedbackTimeStart}
             </if>
-            <if test="query.replyTimeOut!=null">
+            <if test="query.feedbackTimeOut!=null">
                 and c.feedback_time &lt;= #{query.feedbackTimeOut}
             </if>
             <if test="query.keyWord!=null and query.keyWord!=''">

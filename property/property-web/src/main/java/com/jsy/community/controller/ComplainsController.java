@@ -7,7 +7,9 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ComplainFeedbackQO;
 import com.jsy.community.qo.property.PropertyComplaintsQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -28,16 +30,16 @@ public class ComplainsController {
     private IComplainsService complainsService;
 
     @ApiOperation("查询所有投诉建议")
-    @GetMapping("/list")
-    public CommonResult list(BaseQO<PropertyComplaintsQO> baseQO) {
+    @PostMapping("/list")
+    public CommonResult list(@RequestBody BaseQO<PropertyComplaintsQO> baseQO) {
         PageInfo pageInfo = complainsService.listAll(baseQO);
         return CommonResult.ok(pageInfo);
     }
     @ApiOperation("反馈内容")
     @PostMapping("/feedback")
     public CommonResult feedback(@RequestBody ComplainFeedbackQO complainFeedbackQO) {
-        System.out.println(complainFeedbackQO);
-        complainsService.feedback(complainFeedbackQO);
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        complainsService.feedback(complainFeedbackQO,userInfo);
         return CommonResult.ok();
     }
 }

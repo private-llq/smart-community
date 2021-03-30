@@ -6,6 +6,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ComplainFeedbackQO;
 import com.jsy.community.qo.property.PropertyComplaintsQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.admin.AdminInfoVo;
 
 /**
  * @program: com.jsy.community
@@ -29,5 +30,5 @@ public interface IComplainsService extends IService<ComplainEntity> {
      * @Param:
      * @return:
      */
-    void feedback(ComplainFeedbackQO complainFeedbackQO);
+    void feedback(ComplainFeedbackQO complainFeedbackQO, AdminInfoVo userInfo);
 }

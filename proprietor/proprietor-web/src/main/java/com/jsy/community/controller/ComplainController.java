@@ -53,8 +53,9 @@ public class ComplainController {
     @ApiOperation("用户投诉建议接口")
     @PostMapping("/addComplain")
     public CommonResult addComplain(@RequestBody ComplainEntity complainEntity){
-        String userId = UserUtils.getUserId();
-        complainEntity.setUid(userId);
+        String userInfo = UserUtils.getUserId();
+        complainEntity.setUid(userInfo);
+        complainEntity.setCommunityId(complainEntity.getCommunityId());
         complainEntity.setStatus(0);
         complainEntity.setId(SnowFlake.nextId());
         complainEntity.setComplainTime(LocalDateTime.now());
@@ -107,11 +108,14 @@ public class ComplainController {
         }
         String[] upload = MinioUtils.uploadForBatch(complainImages, BUCKET_NAME);
         StringBuilder filePath = new StringBuilder();
-        for (String s : upload) {
-            filePath.append(s);
-            filePath.append(",");
+        for (int i=0;i<upload.length;i++){
+            filePath.append(upload[i]);
+            if (i!=upload.length-1){
+                filePath.append(",");
+            }
         }
-        return CommonResult.ok(filePath,"上传成功");
+        String[] split = filePath.toString().split(",");
+        return CommonResult.ok(split,"上传成功");
     }
 
 
