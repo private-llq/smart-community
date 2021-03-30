@@ -169,6 +169,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		for (DepartmentEntity departmentEntity : allDepartment) {
 			DepartmentVO departmentVO = new DepartmentVO();
 			BeanUtils.copyProperties(departmentEntity, departmentVO);
+			departmentVO.setLabel(departmentEntity.getDepartment());
 			allDepartmentVO.add(departmentVO);
 		}
 		

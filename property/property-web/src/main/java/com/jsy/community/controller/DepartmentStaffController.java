@@ -7,10 +7,7 @@ import com.jsy.community.api.IDepartmentStaffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentStaffEntity;
 import com.jsy.community.qo.DepartmentStaffQO;
-import com.jsy.community.utils.POIUtils;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,6 +59,8 @@ public class DepartmentStaffController {
 	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffQO staffEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		staffEntity.setCommunityId(communityId);
+		staffEntity.setId(SnowFlake.nextId());
+		
 		ValidatorUtils.validateEntity(staffEntity, DepartmentStaffQO.addStaffValidate.class);
 		departmentStaffService.addDepartmentStaff(staffEntity);
 		return CommonResult.ok();
@@ -88,6 +87,7 @@ public class DepartmentStaffController {
 	@ApiOperation("通过Excel添加通讯录")
 	@PostMapping("/addLinkByExcel")
 	// TODO: 2021/3/29 关于这个地方的问题：   哪种情况下添加失败【产品说的那种，没有在列表添加员工的时候体现出来   所以这个功能到时候再问问】
+	// TODO: 2021/3/30 后面做这个功能的时候   注意哟   id要用snowF。nextId生成
 	public CommonResult addLinkByExcel(@RequestParam("file") MultipartFile file) {
 		try {
 			// 获取Excel中的数据，每一行数据封装成一个String[]，将一个工作簿里面的每行数据封装成一个List<String[]>
