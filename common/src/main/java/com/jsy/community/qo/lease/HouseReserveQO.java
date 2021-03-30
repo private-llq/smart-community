@@ -37,9 +37,9 @@ public class HouseReserveQO implements Serializable {
     @ApiModelProperty(value = "预约信息内容")
     private String reserveMsg;
 
-    @NotNull(groups = {Cancel.class, ReserveList.class}, message = "请求类型不能为空,1我的预约,2预约我的")
+    @NotNull(groups = {Cancel.class, ReserveList.class}, message = "请求类型不能为空,1我预约的,2预约我的")
     @Range(groups = {Cancel.class, ReserveList.class}, min = 1, max = 2, message = "请求类型范围错误!")
-    @ApiModelProperty(value = "请求类型,1我的预约,2预约我的")
+    @ApiModelProperty(value = "请求类型,1我预约的,2预约我的")
     private Integer requestType;
 
     /**
