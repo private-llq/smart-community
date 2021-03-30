@@ -75,6 +75,31 @@
         </where>
     </update>
 
+    <!-- 取消我预约的 -->
+    <update id="cancelMyReserveState">
+        update t_house_reserve
+        set
+            reserve_status = 0,
+            update_time = now()
+        where
+            reserve_uid = #{reserveUid}
+            and id = #{id}
+            and (reserve_status = 1 or reserve_status = 2)
+    </update>
+
+    <!-- 取消预约我的 -->
+    <update id="cancelReserveMeState">
+        update t_house_reserve thr
+        LEFT JOIN t_house_lease thl on thl.id = thr.house_lease_id
+        set
+            thr.reserve_status = 0,
+            thr.update_time = now()
+        where
+            thl.uid = #{reserveUid}
+            and thr.id = #{id}
+            and (thr.reserve_status = 1 or thr.reserve_status = 2)
+    </update>
+
 
     <!-- 我预约的信息 我预约别人 -->
     <select id="meReserveHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">
@@ -99,17 +124,23 @@
 	        l.house_price AS housePrice,
 	        l.house_unit,
 	        l.house_image_id,
+            l.house_community_id as houseCommunityId,
 	        r.id,
 	        u.real_name as contactName,
 	        u.avatar_url as contactAvatar,
+	        c.name as houseCommunityName,
 	        'false' as proprietor
         FROM
 	        t_house_reserve AS r
 	    LEFT JOIN t_house_lease AS l ON r.house_lease_id = l.id
 	    LEFT JOIN t_user AS u ON r.reserve_uid = u.uid
+	    LEFT JOIN t_community c on c.id = l.house_community_id
         WHERE
 	        r.reserve_uid = #{uid}
-	        and r.deleted = 0
+	        <if test="qo.query.reserveStatus >= 0">
+                and r.reserve_status = #{qo.query.reserveStatus}
+            </if>
+	        and r.lease_delete_status = 0
 			and l.deleted = 0
 	        and u.deleted = 0
 	    LIMIT #{qo.page},#{qo.size}
@@ -137,21 +168,42 @@
             l.house_price AS housePrice,
             l.house_unit,
             l.house_image_id,
+            l.house_community_id as houseCommunityId,
             r.id,
             u.real_name as contactName,
             u.avatar_url as contactAvatar,
+            c.name as houseCommunityName,
             'true' as proprietor
         FROM
 	        t_house_lease AS l
 	        LEFT JOIN t_house_reserve AS r ON l.id = r.house_lease_id
 	        LEFT JOIN t_user AS u ON r.reserve_uid = u.uid
+            LEFT JOIN t_community c on c.id = l.house_community_id
         WHERE
-            r.id is not null and
-            l.uid = #{uid} and
-            r.reserve_uid != #{uid}
-            and r.deleted = 0 and u.deleted = 0 and l.deleted = 0
+            r.id is not null
+            <if test="qo.query.reserveStatus >= 0">
+                and r.reserve_status = #{qo.query.reserveStatus}
+            </if>
+            and l.uid = #{uid}
+            and r.reserve_uid != #{uid}
+            and r.delete_landlord_status = 0
+            and u.deleted = 0
+            and l.deleted = 0
             LIMIT #{qo.page},
             #{qo.size}
+    </select>
+    <!-- 表拿到用户的推送信息 -->
+    <select id="getPushInfo" resultType="com.jsy.community.vo.lease.HouseReserveVO">
+        select
+            l.house_title,
+            u.reg_id as pushId
+        from t_house_reserve as r
+        LEFT JOIN t_user as u on r.reserve_uid = u.uid
+        join t_house_lease as l on r.house_lease_id = l.id
+        where
+            l.deleted = 0
+            and u.deleted = 0
+            and r.id = #{id}
     </select>
     <!-- 预约确认 -->
     <update id="confirm">
