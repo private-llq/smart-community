@@ -7,6 +7,7 @@ import com.jsy.community.api.IDepartmentService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentEntity;
 import com.jsy.community.qo.DepartmentQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -47,6 +48,8 @@ public class DepartmentController {
 	public CommonResult addDepartment(@RequestBody DepartmentQO departmentEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentEntity.setCommunityId(communityId);
+		departmentEntity.setId(SnowFlake.nextId());
+		
 		ValidatorUtils.validateEntity(departmentEntity, DepartmentQO.addDepartmentValidate.class);
 		departmentService.addDepartment(departmentEntity);
 		return CommonResult.ok();

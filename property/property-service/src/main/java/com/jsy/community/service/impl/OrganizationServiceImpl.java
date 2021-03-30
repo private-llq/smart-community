@@ -52,6 +52,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		for (OrganizationEntity organizationEntity : allOrganization) {
 			OrganizationVO organizationVO = new OrganizationVO();
 			BeanUtils.copyProperties(organizationEntity, organizationVO);
+			organizationVO.setLabel(organizationEntity.getName());
 			allOrganizationVO.add(organizationVO);
 		}
 		

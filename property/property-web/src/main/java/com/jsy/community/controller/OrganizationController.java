@@ -6,6 +6,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IOrganizationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.OrganizationEntity;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -45,6 +46,8 @@ public class OrganizationController {
 	@PostMapping("/addOrganization")
 	public CommonResult addOrganization(@RequestBody OrganizationEntity organizationEntity) {
 		organizationEntity.setCommunityId(UserUtils.getAdminUserInfo().getCommunityId());
+		organizationEntity.setId(SnowFlake.nextId());
+		
 		ValidatorUtils.validateEntity(organizationEntity, OrganizationEntity.addOrganizationValidate.class);
 		organizationService.addOrganization(organizationEntity);
 		return CommonResult.ok();

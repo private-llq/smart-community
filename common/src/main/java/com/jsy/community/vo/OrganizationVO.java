@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ public class OrganizationVO extends BaseVO {
 	private Long communityId;
 	
 	@ApiModelProperty(value = "组织名称")
-	private String name;
+	private String label;
 	
 	@ApiModelProperty(value = "排序序号 0-99")
 	private Integer sort;
