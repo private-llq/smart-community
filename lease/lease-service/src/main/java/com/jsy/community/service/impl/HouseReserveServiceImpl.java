@@ -66,7 +66,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         Integer insert = houseReserveMapper.insertReserve(qo);
         //推送
         if( !insert.equals(BusinessConst.ZERO) ){
-            houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "预约请求", "预约了您的房子");
+            houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "预约请求", "预约了您的房子", null);
             return true;
         }
         return false;
@@ -84,12 +84,25 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
      */
     @Override
     public Boolean cancel(HouseReserveQO qo) {
+        Integer integer = 0;
         //0代表着状态预约已取消
         qo.setReserveStatus(0);
-        Integer integer = houseReserveMapper.cancelReserveState(qo);
+        String pushMsgUid = null;
+        if (qo.getRequestType() == 1) {
+            // 我预约的
+            integer = houseReserveMapper.cancelMyReserveState(qo);
+            // 通知房东,房东uid由推送方法获取
+        } else {
+            // 预约我的
+            integer = houseReserveMapper.cancelReserveMeState(qo);
+            // 通知租客
+            // 获取这条预约的预约人uid
+            HouseReserveEntity houseReserveEntity = baseMapper.selectById(qo.getId());
+            pushMsgUid = houseReserveEntity.getReserveUid();
+        }
         //推送
         if(!integer.equals(BusinessConst.ZERO)){
-            houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "取消预约", "取消了预约");
+            houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "取消预约", "取消了预约", pushMsgUid);
             return true;
         }
         return false;
@@ -105,14 +118,15 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     @Override
     public List<HouseReserveVO> whole(BaseQO<HouseReserveQO> qo, String uid) {
         qo.setPage((qo.getPage() - 1) * qo.getSize());
-        //1.查出我的预约信息
-        List<HouseReserveVO> meReserveVos = houseReserveMapper.meReserveHouse(qo, uid);
-        //2.查出预约我的信息
-        List<HouseReserveVO> reserveMeVos = houseReserveMapper.reserveMeHouse(qo, uid);
+        List<HouseReserveVO> reserveVos = new ArrayList<>();
+        if (qo.getQuery().getRequestType() == 1) {
+            //1.查出我的预约信息
+            reserveVos = houseReserveMapper.meReserveHouse(qo, uid);
+        } else {
+            //2.查出预约我的信息
+            reserveVos = houseReserveMapper.reserveMeHouse(qo, uid);
+        }
         //返回VO
-        List<HouseReserveVO> reserveVos = new ArrayList<>(meReserveVos.size() + reserveMeVos.size());
-        reserveVos.addAll(meReserveVos);
-        reserveVos.addAll(reserveMeVos);
         List<Long> voImageIds = new ArrayList<>(reserveVos.size());
         reserveVos.forEach(r -> {
             //1.从缓存通过id和类型取出 中文Name
@@ -168,7 +182,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     public Boolean reject(HouseReserveQO qo) {
         Integer integer = houseReserveMapper.rejectReserve(qo);
         if( !integer.equals(BusinessConst.ZERO) ){
-            houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "拒绝预约", "不方便预约");
+            houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "拒绝预约", "不方便预约", null);
             return true;
         }
         return false;

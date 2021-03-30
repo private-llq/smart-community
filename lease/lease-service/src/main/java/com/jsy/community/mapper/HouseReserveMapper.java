@@ -90,13 +90,22 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
 
 
     /**
-     * 取消预约
-     * 预约状态 0.已取消，1.预约中 2.预约成功 3.预约已拒绝
-     * @param qo   请求参数
-     * @return      影响行数
-     */
-    @Update("update t_house_reserve set reserve_status = 0,update_time = now() where reserve_status = 1 or reserve_status = 2 and id = #{id}")
-    Integer cancelReserveState(HouseReserveQO qo);
+     *@Author: Pipi
+     *@Description: 取消我预约的
+     *@param: qo: 房屋预约参数对象
+     *@Return: java.lang.Integer 影响行数
+     *@Date: 2021/3/30 10:20
+     **/
+    Integer cancelMyReserveState(HouseReserveQO qo);
+
+    /**
+     *@Author: Pipi
+     *@Description: 取消预约我的
+     *@param: qo: 房屋预约参数对象
+     *@Return: java.lang.Integer 影响行数
+     *@Date: 2021/3/30 10:20
+     **/
+    Integer cancelReserveMeState(HouseReserveQO qo);
 
 
     /**
@@ -106,7 +115,6 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      * @since  2021/1/15 15:22
      * @return          返回用户推送id 房源标题
      */
-    @Select("select l.house_title,u.reg_id as pushId from t_house_reserve as r LEFT JOIN t_user as u on r.reserve_uid = u.uid join t_house_lease as l on r.house_lease_id = l.id where l.deleted = 0 and u.deleted = 0 and r.id = #{id} ")
     HouseReserveVO getPushInfo(Long id);
 
 

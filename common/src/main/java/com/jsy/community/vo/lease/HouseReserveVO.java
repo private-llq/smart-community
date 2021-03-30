@@ -89,4 +89,10 @@ public class HouseReserveVO implements Serializable {
     @ApiModelProperty(value = "是房东还是租客")
     private Boolean proprietor;
 
+    @ApiModelProperty(value = "社区id")
+    private Long houseCommunityId;
+
+    @ApiModelProperty(value = "社区名称")
+    private String houseCommunityName;
+
 }

@@ -108,6 +108,7 @@ public class HouseReserveController {
     public CommonResult<List<HouseReserveVO>> whole(@RequestBody BaseQO<HouseReserveQO> qo) {
         //预约分为两部分：1. 租客预约我发布的房子  2.我预约其他人发布的房子
         ValidatorUtils.validatePageParam(qo);
+        ValidatorUtils.validateEntity(qo.getQuery(), HouseReserveQO.ReserveList.class);
         return CommonResult.ok(iHouseReserveService.whole(qo, UserUtils.getUserId()));
     }
 
