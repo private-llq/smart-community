@@ -5,8 +5,9 @@ import com.jsy.community.entity.ComplainEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ComplainFeedbackQO;
 import com.jsy.community.qo.property.PropertyComplaintsQO;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
+
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -22,7 +23,7 @@ public interface IComplainsService extends IService<ComplainEntity> {
      * @Param:
      * @return:
      */
-    PageInfo  listAll(BaseQO<PropertyComplaintsQO> baseQO);
+    Map<String, Object> listAll(BaseQO<PropertyComplaintsQO> baseQO);
     /**
      * @Description: 反馈内容
      * @author: Hu

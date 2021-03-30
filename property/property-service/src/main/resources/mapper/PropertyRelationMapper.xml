@@ -3,7 +3,7 @@
 <mapper namespace="com.jsy.community.mapper.PropertyRelationMapper">
     <sql id="Query">
         <where>
-            thm.community_id=#{query.communityId} and thm.person_type=1 and thm.deleted=0 and tu.deleted=0 and th.deleted=0
+            thm.community_id=#{query.communityId} and thm.deleted=0 and tu.deleted=0 and th.deleted=0
             <if test="query.name!=null and query.name!=''">
                 and thm.name like concat('%',#{query.name},'%')
             </if>
@@ -42,13 +42,25 @@
         limit #{page},#{size}
     </select>
     <select id="getHouseId" resultMap="HouseTypeMap">
-        select t.id as id,concat(t.number,"-",t.code) as name from t_house t where t.type=4 and t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.code) as name from t_house t where t.type=4 and t.community_id=#{query.communityId}
+        <if test="query.name!=null and query.name!=''">
+            and t.number like concat("%",#{query.name},"%")
+        </if>
+        limit #{page},#{size}
     </select>
     <select id="getBuildingId" resultMap="HouseTypeMap">
-        select t.id as id,concat(t.number,"-",t.building) as name from t_house t where t.type=1 and t.community_id=#{query.communityId} and t.building like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.building) as name from t_house t where t.type=1 and t.community_id=#{query.communityId}
+        <if test="query.name!=null and query.name!=''">
+            and t.building like concat("%",#{query.name},"%")
+        </if>
+         limit #{page},#{size}
     </select>
     <select id="getUnitId" resultMap="HouseTypeMap">
-        select t.id as id,concat(t.number,"-",t.unit) as name from t_house t where t.type=2 and t.community_id=#{query.communityId} and t.unit like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.unit) as name from t_house t where t.type=2 and t.community_id=#{query.communityId}
+        <if test="query.name!=null and query.name!=''">
+            and t.unit like concat("%",#{query.name},"%")
+        </if>
+        limit #{page},#{size}
     </select>
 
 

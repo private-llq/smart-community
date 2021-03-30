@@ -9,14 +9,15 @@ import com.jsy.community.mapper.ComplainsMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ComplainFeedbackQO;
 import com.jsy.community.qo.property.PropertyComplaintsQO;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.ComplainVO;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -56,11 +57,15 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
      * @return:
      */
     @Override
-    public PageInfo listAll(BaseQO<PropertyComplaintsQO> baseQO) {
+    public Map<String, Object> listAll(BaseQO<PropertyComplaintsQO> baseQO) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
         List<ComplainVO> complainVOS = complainsMapper.listAll(baseQO.getPage(), baseQO.getSize(), baseQO.getQuery());
-        return null;
+        Long totel = complainsMapper.findTotel(baseQO.getQuery());
+        Map<String, Object> map = new HashMap<>();
+        map.put("totel",totel);
+        map.put("list",complainVOS);
+        return map;
     }
 }
