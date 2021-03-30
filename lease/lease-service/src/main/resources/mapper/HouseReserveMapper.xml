@@ -84,6 +84,7 @@
         where
             reserve_uid = #{reserveUid}
             and id = #{id}
+            and lease_delete_status = 0
             and (reserve_status = 1 or reserve_status = 2)
     </update>
 
@@ -97,6 +98,7 @@
         where
             thl.uid = #{reserveUid}
             and thr.id = #{id}
+            and thr.delete_landlord_status = 0
             and (thr.reserve_status = 1 or thr.reserve_status = 2)
     </update>
 
@@ -205,6 +207,18 @@
             and u.deleted = 0
             and r.id = #{id}
     </select>
+    <!-- 通过预约信息id 查出这个房主的uid -->
+    <select id="getUidByHouseReserveId" resultType="java.lang.String">
+        select
+            l.uid
+        from t_house_reserve as r
+        left join t_house_lease as l on r.house_lease_id = l.id
+        where
+            r.deleted = 0 and
+            l.deleted = 0 and
+            r.deleted = 0 and
+            r.id = #{id}
+    </select>
     <!-- 预约确认 -->
     <update id="confirm">
         update t_house_reserve
@@ -212,7 +226,7 @@
             reserve_status = 2
         </set>
         <where>
-            id = #{id} and reserve_status = 1 and deleted = 0
+            id = #{id} and reserve_status = 1 and delete_landlord_status = 0
         </where>
     </update>
 </mapper>
