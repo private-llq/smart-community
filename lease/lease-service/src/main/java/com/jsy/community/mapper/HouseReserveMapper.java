@@ -69,6 +69,15 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
     Integer deleteReserveMe(HouseReserveQO qo);
 
     /**
+     *@Author: Pipi
+     *@Description: 租房用户确认完成看房
+     *@param: qo:
+     *@Return: java.lang.Integer
+     *@Date: 2021/3/30 15:43
+     **/
+    Integer completeChecking(HouseReserveQO qo);
+
+    /**
      * 通过预约信息id 查出这个房主的uid
      * @param id        预约信息id
      * @return          返回该预约信息房源的uid

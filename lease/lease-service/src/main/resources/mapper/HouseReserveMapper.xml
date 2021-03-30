@@ -256,4 +256,16 @@
             id = #{id} and reserve_status = 1 and delete_landlord_status = 0
         </where>
     </update>
+    <!-- 租房用户确认完成看房 -->
+    <update id="completeChecking">
+        update t_house_reserve
+        set
+            reserve_status = 3,
+            update_time = now()
+        <where>
+            id = #{id}
+            and reserve_status = 2
+            and reserve_uid = #{reserveUid}
+        </where>
+    </update>
 </mapper>

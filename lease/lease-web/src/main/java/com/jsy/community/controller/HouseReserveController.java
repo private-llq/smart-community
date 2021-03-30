@@ -120,7 +120,7 @@ public class HouseReserveController {
      *@Date: 2021/3/30 11:32
      **/
     @Login
-        @DeleteMapping("/deleteReserve")
+    @DeleteMapping("/deleteReserve")
     @ApiOperation("删除预约信息")
     public CommonResult<Boolean> delete(@RequestBody HouseReserveQO qo) {
         qo.setReserveUid(UserUtils.getUserId());
@@ -129,6 +129,23 @@ public class HouseReserveController {
         return CommonResult.ok(deleteResult ? "删除成功!" : "删除失败!请不要重复操作!");
     }
 
+
+    /**
+     *@Author: Pipi
+     *@Description: 租房用户确认完成看房
+     *@param: qo:
+     *@Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
+     *@Date: 2021/3/30 15:23
+     **/
+    @Login
+    @PostMapping("/completeChecking")
+    @ApiOperation("租房用户确认完成看房")
+    public CommonResult<Boolean> completeChecking(@RequestBody HouseReserveQO qo) {
+        qo.setReserveUid(UserUtils.getUserId());
+        ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);
+        Boolean result = iHouseReserveService.completeChecking(qo);
+        return CommonResult.ok(result ? "完成看房成功!" : "完成看房失败!请不要重复操作!");
+    }
 
     /**
      * 获取今天、明天以及后面5天的字符串，

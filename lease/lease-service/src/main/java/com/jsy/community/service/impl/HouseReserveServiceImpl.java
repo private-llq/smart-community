@@ -55,27 +55,24 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
      * @Param qo   请求参数对象
      * @since 2020/12/26 16:25
      */
-    @Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean add(HouseReserveEntity qo) {
         // 查询预约房屋是否存在
         Integer integer = houseReserveMapper.existHouseLeaseId(qo.getHouseLeaseId());
-        if( integer == 0){
+        if (integer == 0) {
             throw new LeaseException("房屋信息不存在!");
         }
         qo.setId(SnowFlake.nextId());
         qo.setReserveStatus(1);
         Integer insert = houseReserveMapper.insertReserve(qo);
         //推送
-        if( !insert.equals(BusinessConst.ZERO) ){
+        if (!insert.equals(BusinessConst.ZERO)) {
             houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "预约请求", "预约了您的房子", null);
             return true;
         }
         return false;
     }
-
-
-
 
 
     /**
@@ -103,7 +100,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
             pushMsgUid = houseReserveEntity.getReserveUid();
         }
         //推送
-        if(!integer.equals(BusinessConst.ZERO)){
+        if (!integer.equals(BusinessConst.ZERO)) {
             houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "取消预约", "取消了预约", pushMsgUid);
             return true;
         }
@@ -146,16 +143,16 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
             voImageIds.add(r.getHouseImageId());
         });
         //设置图片url
-        if( !CollectionUtils.isEmpty(voImageIds) ){
+        if (!CollectionUtils.isEmpty(voImageIds)) {
             //根据 图片 id 集合  in 查出所有的图片 url 和 对应的租赁id
             List<HouseImageVo> houseImageVos = houseLeaseMapper.selectBatchImage(voImageIds);
             //由于一个图片可能存在于多条 列表数据 只显示一条 根据图片id(field_id)是用Map 去重   toMap里面第一个逗号前面的参数 是作为Map的Key  第二个逗号前面的 是作为Map的值， 第三个参数是 重载函数，如果Map中有重复 那就还是用前面的值
-            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo,(value1, value2) -> value1));
+            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo, (value1, value2) -> value1));
             //把图片 设置到返回集合每一个对象
-            reserveVos.forEach( vo -> {
+            reserveVos.forEach(vo -> {
                 //该数据的图片对象不为空!
                 HouseImageVo houseImageVo = houseImageVoMap.get(vo.getHouseImageId());
-                if( Objects.nonNull(houseImageVo) ){
+                if (Objects.nonNull(houseImageVo)) {
                     vo.setHouseImageUrl(Collections.singletonList(houseImageVo.getImgUrl()));
                 }
             });
@@ -166,14 +163,15 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
 
     /**
      * 确认预约信息
-     * @param qo          预约信息id参数对象
-     * @return            返回确认是否成功修改
+     *
+     * @param qo 预约信息id参数对象
+     * @return 返回确认是否成功修改
      */
     @Override
     public Boolean confirm(HouseReserveQO qo, String uid) {
         //验证当前提交请求的用户是否有权利修改这条预约信息 房子是他自己发布的 他才有权利确认
         String databasesUid = houseReserveMapper.getUidByHouseReserveId(qo.getId());
-        if(!uid.equals(databasesUid)){
+        if (!uid.equals(databasesUid)) {
             throw new LeaseException("您无权对此预约信息进行确认!");
         }
         Integer row = houseReserveMapper.confirm(qo);
@@ -183,7 +181,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     @Override
     public Boolean reject(HouseReserveQO qo) {
         Integer integer = houseReserveMapper.rejectReserve(qo);
-        if( !integer.equals(BusinessConst.ZERO) ){
+        if (!integer.equals(BusinessConst.ZERO)) {
             houseAsyncActuator.pushMsg(qo.getReserveUid(), qo.getId(), "拒绝预约", "不方便预约", null);
             return true;
         }
@@ -191,11 +189,11 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     }
 
     /**
-     *@Author: Pipi
-     *@Description: 删除预约消息
-     *@param: qo:
-     *@Return: java.lang.Boolean
-     *@Date: 2021/3/30 11:35
+     * @Author: Pipi
+     * @Description: 删除预约消息
+     * @param: qo:
+     * @Return: java.lang.Boolean
+     * @Date: 2021/3/30 11:35
      **/
     @Override
     public Boolean delete(HouseReserveQO qo) {
@@ -209,6 +207,20 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
             // 预约我的
             result = houseReserveMapper.deleteReserveMe(qo);
         }
+        return result > 0;
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 租房用户确认完成看房
+     *@param: qo:
+     *@Return: java.lang.Boolean
+     *@Date: 2021/3/30 15:25
+     **/
+    @Override
+    public Boolean completeChecking(HouseReserveQO qo) {
+        // 完成看房只能由预约人操作完成
+        Integer result = houseReserveMapper.completeChecking(qo);
         return result > 0;
     }
 
