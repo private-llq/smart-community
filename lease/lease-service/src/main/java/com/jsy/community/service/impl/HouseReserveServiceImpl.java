@@ -1,5 +1,7 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
@@ -187,4 +189,28 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         }
         return false;
     }
+
+    /**
+     *@Author: Pipi
+     *@Description: 删除预约消息
+     *@param: qo:
+     *@Return: java.lang.Boolean
+     *@Date: 2021/3/30 11:35
+     **/
+    @Override
+    public Boolean delete(HouseReserveQO qo) {
+        Integer result = 0;
+        // 我预约的只能删除已取消和已完成状态的消息
+        // 预约我的不能删除预约中的
+        if (qo.getRequestType() == 1) {
+            // 我预约的
+            result = houseReserveMapper.deleteMyReserve(qo);
+        } else {
+            // 预约我的
+            result = houseReserveMapper.deleteReserveMe(qo);
+        }
+        return result > 0;
+    }
+
+
 }

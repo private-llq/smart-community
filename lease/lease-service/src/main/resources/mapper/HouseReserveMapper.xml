@@ -102,6 +102,33 @@
             and (thr.reserve_status = 1 or thr.reserve_status = 2)
     </update>
 
+    <!-- 删除我预约的看房信息,只能删除已取消或已完成的 -->
+    <update id="deleteMyReserve">
+        update t_house_reserve
+        set
+            lease_delete_status = 1,
+            update_time = now()
+        <where>
+            reserve_uid = #{reserveUid}
+            and id = #{id}
+            and (reserve_status = 0 or reserve_status = 3)
+        </where>
+    </update>
+
+    <!-- 删除预约我的看房信息,只能删除不是待看房的 -->
+    <update id="deleteReserveMe">
+        update t_house_reserve thr
+        LEFT JOIN t_house_lease thl on thl.id = thr.house_lease_id
+        set
+            thr.delete_landlord_status = 1,
+            thr.update_time = now()
+        <where>
+            thr.reserve_status != 2
+            and thr.id = #{id}
+            and thl.uid = #{reserveUid}
+        </where>
+    </update>
+
 
     <!-- 我预约的信息 我预约别人 -->
     <select id="meReserveHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">

@@ -50,6 +50,23 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
      */
     Integer confirm(HouseReserveQO qo);
 
+    /**
+     *@Author: Pipi
+     *@Description: 删除我预约的看房信息,只能删除已取消或已完成的
+     *@param: qo:
+     *@Return: java.lang.Integer
+     *@Date: 2021/3/30 13:42
+     **/
+    Integer deleteMyReserve(HouseReserveQO qo);
+
+    /**
+     *@Author: Pipi
+     *@Description: 删除预约我的看房信息,只能删除不是待看房的
+     *@param: qo: 
+     *@Return: java.lang.Integer
+     *@Date: 2021/3/30 13:55
+     **/
+    Integer deleteReserveMe(HouseReserveQO qo);
 
     /**
      * 通过预约信息id 查出这个房主的uid
