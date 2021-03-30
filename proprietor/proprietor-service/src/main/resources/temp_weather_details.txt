@@ -22,6 +22,8 @@
         },
         "forecast": [
             {
+                "conditionIdDay": "0",
+                "conditionIdNight": "0",
                 "conditionDay": "多云",
                 "conditionNight": "中雨",
                 "predictDate": "2021-02-24",
@@ -31,6 +33,8 @@
                 "windLevelDay": "1"
             },
             {
+                "conditionIdDay": "1",
+                "conditionIdNight": "1",
                 "conditionDay": "小雨",
                 "conditionNight": "小雨",
                 "predictDate": "2021-02-25",
@@ -40,6 +44,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "2",
+                "conditionIdNight": "2",
                 "conditionDay": "阴",
                 "conditionNight": "多云",
                 "predictDate": "2021-02-26",
@@ -49,6 +55,8 @@
                 "windLevelDay": "1"
             },
             {
+                "conditionIdDay": "3",
+                "conditionIdNight": "3",
                 "conditionDay": "多云",
                 "conditionNight": "小雨",
                 "predictDate": "2021-02-27",
@@ -58,6 +66,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "4",
+                "conditionIdNight": "4",
                 "conditionDay": "小雨",
                 "conditionNight": "小雨",
                 "predictDate": "2021-02-28",
@@ -67,6 +77,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "5",
+                "conditionIdNight": "5",
                 "conditionDay": "小雨",
                 "conditionNight": "阴",
                 "predictDate": "2021-03-01",
@@ -76,6 +88,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "6",
+                "conditionIdNight": "6",
                 "conditionDay": "阴",
                 "conditionNight": "多云",
                 "predictDate": "2021-03-02",
@@ -85,6 +99,8 @@
                 "windLevelDay": "1"
             },
             {
+                "conditionIdDay": "7",
+                "conditionIdNight": "7",
                 "conditionDay": "阴",
                 "conditionNight": "多云",
                 "predictDate": "2021-03-03",
@@ -94,6 +110,8 @@
                 "windLevelDay": "1"
             },
             {
+                "conditionIdDay": "8",
+                "conditionIdNight": "8",
                 "conditionDay": "多云",
                 "conditionNight": "阴",
                 "predictDate": "2021-03-04",
@@ -103,6 +121,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "9",
+                "conditionIdNight": "9",
                 "conditionDay": "多云",
                 "conditionNight": "阴",
                 "predictDate": "2021-03-05",
@@ -112,6 +132,8 @@
                 "windLevelDay": "1"
             },
             {
+                "conditionIdDay": "10",
+                "conditionIdNight": "10",
                 "conditionDay": "阴",
                 "conditionNight": "小雨",
                 "predictDate": "2021-03-06",
@@ -121,6 +143,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "13",
+                "conditionIdNight": "13",
                 "conditionDay": "小雨",
                 "conditionNight": "小雨",
                 "predictDate": "2021-03-07",
@@ -130,6 +154,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "14",
+                "conditionIdNight": "14",
                 "conditionDay": "多云",
                 "conditionNight": "小雨",
                 "predictDate": "2021-03-08",
@@ -139,6 +165,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "15",
+                "conditionIdNight": "15",
                 "conditionDay": "小雨",
                 "conditionNight": "小雨",
                 "predictDate": "2021-03-09",
@@ -148,6 +176,8 @@
                 "windLevelDay": "2"
             },
             {
+                "conditionIdDay": "16",
+                "conditionIdNight": "16",
                 "conditionDay": "阴",
                 "conditionNight": "小雨",
                 "predictDate": "2021-03-10",
@@ -157,6 +187,8 @@
                 "windLevelDay": "1"
             },
             {
+                "conditionIdDay": "17",
+                "conditionIdNight": "17",
                 "conditionDay": "阴",
                 "conditionNight": "小雨",
                 "predictDate": "2021-03-11",
@@ -168,126 +200,151 @@
         ],
         "hourly": [
             {
+                "iconDay": "0",
                 "condition": "阴",
                 "temp": "13",
                 "hour": "16"
             },
             {
+                "iconDay": "1",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "17"
             },
             {
+                "iconDay": "2",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "18"
             },
             {
+                "iconDay": "3",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "19"
             },
             {
+                "iconDay": "4",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "20"
             },
             {
+                "iconDay": "5",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "21"
             },
             {
+                "iconDay": "6",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "22"
             },
             {
+                "iconDay": "7",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "23"
             },
             {
+                "iconDay": "8",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "0"
             },
             {
+                "iconDay": "9",
                 "condition": "中雨",
                 "temp": "14",
                 "hour": "1"
             },
             {
+                "iconDay": "10",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "2"
             },
             {
+                "iconDay": "13",
                 "condition": "阴",
                 "temp": "13",
                 "hour": "3"
             },
             {
+                "iconDay": "14",
                 "condition": "中雨",
                 "temp": "13",
                 "hour": "4"
             },
             {
+                "iconDay": "15",
                 "condition": "中雨",
                 "temp": "13",
                 "hour": "5"
             },
             {
+                "iconDay": "16",
                 "condition": "中雨",
                 "temp": "13",
                 "hour": "6"
             },
             {
+                "iconDay": "17",
                 "condition": "阴",
                 "temp": "13",
                 "hour": "7"
             },
             {
+                "iconDay": "18",
                 "condition": "阴",
                 "temp": "13",
                 "hour": "8"
             },
             {
+                "iconDay": "19",
                 "condition": "阴",
                 "temp": "12",
                 "hour": "9"
             },
             {
+                "iconDay": "20",
                 "condition": "阴",
                 "temp": "12",
                 "hour": "10"
             },
             {
+                "iconDay": "29",
                 "condition": "阴",
                 "temp": "12",
                 "hour": "11"
             },
             {
+                "iconDay": "30",
                 "condition": "阴",
                 "temp": "13",
                 "hour": "12"
             },
             {
+                "iconDay": "31",
                 "condition": "阴",
                 "temp": "12",
                 "hour": "13"
             },
             {
+                "iconDay": "32",
                 "condition": "阴",
                 "temp": "13",
                 "hour": "14"
             },
             {
+                "iconDay": "33",
                 "condition": "阴",
                 "temp": "13",
                 "hour": "15"
             },
             {
+                "iconDay": "34",
                 "condition": "阴",
                 "temp": "14",
                 "hour": "16"

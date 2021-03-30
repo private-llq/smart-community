@@ -110,7 +110,7 @@ public class WeatherUtils {
 	}
 	
 	//TODO 临时方法 动态修改时间 后期删除
-	public static void dealDateForTempData(JSONObject tempData){
+	private static void dealDateForTempData(JSONObject tempData){
 		String updatetimeStr = sdf.format(System.currentTimeMillis());
 		JSONObject conditionJson = tempData.getJSONObject("condition");
 		conditionJson.put("updatetime",updatetimeStr);

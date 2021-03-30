@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
@@ -12,6 +13,7 @@ import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
+import com.jsy.community.mapper.WeatherIconMapper;
 import com.jsy.community.utils.LunarCalendarFestivalUtils;
 import com.jsy.community.utils.WeatherUtils;
 import com.jsy.community.vo.WeatherForecastVO;
@@ -56,6 +58,9 @@ public class CommonServiceImpl implements ICommonService {
     
     @Autowired
     private WeatherUtils weatherUtils;
+    
+    @Autowired
+    private WeatherIconMapper weatherIconMapper;
 
     @Override
     public void checkVerifyCode(String account, String code) {
@@ -266,7 +271,18 @@ public class CommonServiceImpl implements ICommonService {
     
     //天气详情假数据
     public JSONObject getTempWeatherDetails(){
-        return WeatherUtils.getTempWeatherDetails();
+        Map<String,Map<String, String>> latestIcon = weatherIconMapper.getLatestIcon();
+        JSONObject tempWeatherDetails = WeatherUtils.getTempWeatherDetails();
+        JSONArray hourlyArr = tempWeatherDetails.getJSONArray("hourly");
+        for(int i=0;i<hourlyArr.size();i++){
+            hourlyArr.getJSONObject(i).put("iconUrl",latestIcon.get(hourlyArr.getJSONObject(i).getString("iconDay")).get("url"));
+        }
+        JSONArray forecastArr = tempWeatherDetails.getJSONArray("forecast");
+        for(int i=0;i<forecastArr.size();i++){
+            forecastArr.getJSONObject(i).put("iconUrlDay",latestIcon.get(forecastArr.getJSONObject(i).getString("conditionIdDay")).get("url"));
+            forecastArr.getJSONObject(i).put("iconUrlNight",latestIcon.get(forecastArr.getJSONObject(i).getString("conditionIdNight")).get("url"));
+        }
+        return tempWeatherDetails;
     }
     
     /**
@@ -310,6 +326,15 @@ public class CommonServiceImpl implements ICommonService {
             //处理数据
             WeatherUtils.addDayOfWeek(weatherNow); //补星期几
 //            WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
+            //查询天气图标
+            Map<String,Map<String, String>> latestIcon = weatherIconMapper.getLatestIcon();
+            for(int i=0;i<weatherFor24hours.size();i++){
+                weatherFor24hours.get(i).setIconUrl(latestIcon.get(weatherFor24hours.get(i).getIconDay()).get("url"));
+            }
+            for(int i=0;i<weatherForDays.size();i++){
+                weatherForDays.get(i).setIconUrlDay(latestIcon.get(weatherForDays.get(i).getConditionIdDay()).get("url"));
+                weatherForDays.get(i).setIconUrlNight(latestIcon.get(weatherForDays.get(i).getConditionIdNight()).get("url"));
+            }
             
             //组装返回
             weatherNow.put("hourly",weatherFor24hours);
@@ -317,6 +342,7 @@ public class CommonServiceImpl implements ICommonService {
             weatherNow.put("liveIndex",livingIndex);
             return weatherNow;
         }catch (Exception e){
+            e.printStackTrace();
             log.error(e.getMessage());
             return null;
         }
@@ -403,8 +429,11 @@ public class CommonServiceImpl implements ICommonService {
         for(String key : keys){
             originKey = key;
         }
-        JSONArray jsonArray = livingIndex.getJSONArray(originKey);
-        List<WeatherLiveIndexVO> weatherParamList = jsonArray.toJavaList(WeatherLiveIndexVO.class);
+        JSONObject jsonObject = livingIndex.getJSONObject(originKey);
+        String jsonStr = JSON.toJSONString(jsonObject.values());
+        List<WeatherLiveIndexVO> weatherParamList = JSONArray.parseArray(jsonStr.substring(1,jsonStr.length()-1),WeatherLiveIndexVO.class);
+//        JSONArray jsonArray = livingIndex.getJSONArray(originKey);
+//        List<WeatherLiveIndexVO> weatherParamList = jsonArray.toJavaList(WeatherLiveIndexVO.class);
         //筛选指定数据(code代表相应数据项 12感冒 17洗车 20穿衣 21紫外线 26运动 28钓鱼)
         Integer[] codeArr = {12,17,20,21,26,28};
         ArrayList<Integer> codeList = new ArrayList<>();

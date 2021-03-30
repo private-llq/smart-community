@@ -35,9 +35,9 @@ public interface AppContentMapper {
 	int insertHotCity(List<RegionEntity> list);
 	
 	/**
-	 * 获取天气图标最新版本
+	 * 获取天气图标最新版本(为空则为第0版)
 	 */
-	@Select("select max(edition) from t_weather_icon")
+	@Select("select IFNULL(max(edition),0) from t_weather_icon")
 	int getLeastEdition();
 	
 	/**

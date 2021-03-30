@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -89,17 +90,17 @@ public class AppContentServiceImpl implements AppContentService {
 				if(files.length == 0){
 					throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"目标文件夹空");
 				}
-				Map<String, String> iconMap = new HashMap<>();
 				for(File file : files){
-					FileInputStream input = new FileInputStream(file);
-					MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "image/png", IOUtils.toByteArray(input));
+					Map<String, String> iconMap = new HashMap<>();
+					FileInputStream in = new FileInputStream(file);
+					MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "image/png", IOUtils.toByteArray(in));
 					String name = multipartFile.getOriginalFilename();
 					String url = MinioUtils.upload(multipartFile, "weather-icon");
 					iconMap.put("num",name.substring(0,name.lastIndexOf(".")));
 					iconMap.put("url",url);
 					list.add(iconMap);
+					in.close();
 				}
-				System.out.println(iconMap);
 			}catch (Exception e){
 				e.printStackTrace();
 			}
@@ -107,7 +108,8 @@ public class AppContentServiceImpl implements AppContentService {
 		//查询最新版本
 		int leastEdition = appContentMapper.getLeastEdition();
 		//添加一版天气图标
-		return appContentMapper.addWeatherIconBatch(leastEdition,list);
+		int result = appContentMapper.addWeatherIconBatch(leastEdition + 1, list);
+		return result;
 	}
 	
 	public static void main(String[] args) {
