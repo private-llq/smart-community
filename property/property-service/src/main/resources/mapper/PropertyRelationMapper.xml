@@ -8,7 +8,7 @@
                 and thm.name like concat('%',#{query.name},'%')
             </if>
             <if test="query.ownerName!=null and query.ownerName!=''">
-                and th.name like concat('%',#{query.ownerName},'%')
+                and tu.real_name like concat('%',#{query.ownerName},'%')
             </if>
             <if test="query.houseId!=null and query.houseId>0">
                 and th.id=#{query.houseId}
@@ -26,7 +26,7 @@
         SELECT CONCAT(th.building,"-",th.unit,"-",th.floor,"-",th.door) as housing,
         thm.name as memberName,thm.mobile as mobile,thm.id_card as idCard,thm.relation as relation,
         tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile,
-        th.building as building,th.unit as unit,th.floor as floor,th.house_type as houseType
+        th.building as building,th.unit as unit,th.floor as floor,th.house_type as houseType,thm.create_time as createTime
         FROM t_house_member thm
         join t_user tu on tu.uid=thm.householder_id
         join t_house th on thm.house_id=th.id
@@ -39,7 +39,6 @@
         join t_user tu on tu.uid=thm.householder_id
         join t_house th on thm.house_id=th.id
         <include refid="Query"></include>
-        limit #{page},#{size}
     </select>
     <select id="getHouseId" resultMap="HouseTypeMap">
         select t.id as id,concat(t.number,"-",t.code) as name from t_house t where t.type=4 and t.community_id=#{query.communityId}
@@ -77,6 +76,7 @@
         <result property="ownerName" column="ownerName"/>
         <result property="ownerIdCard" column="ownerIdCard"/>
         <result property="ownerMobile" column="ownerMobile"/>
+        <result property="createTime" column="createTime"/>
     </resultMap>
     <resultMap id="HouseTypeMap" type="com.jsy.community.vo.HouseTypeVo">
         <result column="id" property="id"/>
