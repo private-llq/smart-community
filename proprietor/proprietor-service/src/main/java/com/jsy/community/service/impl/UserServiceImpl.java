@@ -634,6 +634,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public Collection<Map<String, Object>> queryUserHousesOfCommunity(String uid){
         //查所有房屋已认证的小区
         Set<Long> communityIds = userHouseService.queryUserHousesOfCommunityIds(uid);
+        if(CollectionUtils.isEmpty(communityIds)){
+           return null;
+        }
         //查小区名称
         Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
         return communityIdAndName.values();
