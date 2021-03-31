@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author chq459799974
@@ -28,16 +29,25 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	Boolean saveUserHouse(String uid, List<UserHouseEntity> houseEntityList);
 	
 	/**
-	* @Description: 查询业主所有拥有房屋的社区id
+	* @Description: 查询用户社区id(房屋已认证的)
+	 * @Param: [uid]
+	 * @Return: java.util.Set<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/31
+	**/
+	Set<Long> queryUserHousesOfCommunityIds(String uid);
+	
+	/**
+	* @Description: 查询业主所有拥有房屋id和相应社区id(房屋已认证的)
 	 * @Param: [uid]
 	 * @Return: java.util.List<java.lang.Long>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
 	**/
-	List<UserHouseEntity> queryUserCommunityIds(String uid);
+	List<UserHouseEntity> queryUserHouseIdsAndCommunityIds(String uid);
 	
 	/**
-	* @Description: 查询业主房屋及所属社区
+	* @Description: 查询业主房屋及所属社区(房屋已认证的)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.UserHouseEntity>
 	 * @Author: chq459799974

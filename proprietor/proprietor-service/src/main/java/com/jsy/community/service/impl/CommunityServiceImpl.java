@@ -131,8 +131,8 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	**/
 	@Override
 	public CommunityEntity locateCommunity(String uid,Map<String,Double> location){
-		// 查业主房屋所属社区id
-		List<UserHouseEntity> userHouseList = userHouseService.queryUserCommunityIds(uid);
+		// 查业主房屋id和所属社区id
+		List<UserHouseEntity> userHouseList = userHouseService.queryUserHouseIdsAndCommunityIds(uid);
 		List<Long> communityIds = new LinkedList<>();
 		CommunityEntity communityEntity;
 		//暂未绑定小区

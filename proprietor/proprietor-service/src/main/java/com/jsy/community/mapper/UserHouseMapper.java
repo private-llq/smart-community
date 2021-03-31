@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author chq459799974
@@ -20,17 +21,17 @@ import java.util.Map;
 public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	
 	/**
-	* @Description: 查询业主房屋所属小区id
+	* @Description: 查询业主房屋id和所属小区id(房屋已认证的)
 	 * @Param: [uid]
 	 * @Return: java.util.List<java.lang.Long>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
 	**/
 	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid} order by create_time")
-	List<UserHouseEntity> queryUserCommunityIds(String uid);
+	List<UserHouseEntity> queryUserHouseIdsAndCommunityIds(String uid);
 	
 	/**
-	* @Description: 查询业主房屋及所属社区
+	* @Description: 查询业主房屋及所属社区(房屋已认证的)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.UserHouseEntity>
 	 * @Author: chq459799974
@@ -39,6 +40,15 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid}")
 	List<UserHouseEntity> queryUserHouses(String uid);
 
+	/**
+	* @Description: 查询用户社区id(房屋已认证的)
+	 * @Param: [uid]
+	 * @Return: java.util.Set<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/31
+	**/
+	@Select("select community_id from t_user_house where uid = #{uid} and check_status = 1")
+	Set<Long> queryUserHousesOfCommunityIds(String uid);
 
 
 	/**

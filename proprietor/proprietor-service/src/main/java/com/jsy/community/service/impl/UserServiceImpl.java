@@ -622,6 +622,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setProprietorHouses(houseVos);
         return userInfoVo;
     }
+    
+    /**
+    * @Description: 查询用户社区(房屋已认证的)
+     * @Param: [uid]
+     * @Return: java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+    @Override
+    public Collection<Map<String, Object>> queryUserHousesOfCommunity(String uid){
+        //查所有房屋已认证的小区
+        Set<Long> communityIds = userHouseService.queryUserHousesOfCommunityIds(uid);
+        //查小区名称
+        Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
+        return communityIdAndName.values();
+    }
 
     /**
      * @Description: 查询业主所有小区的房屋
