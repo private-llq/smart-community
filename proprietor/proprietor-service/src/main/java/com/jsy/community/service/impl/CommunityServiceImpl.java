@@ -18,6 +18,7 @@ import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -133,13 +134,24 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		// 查业主房屋所属社区id
 		List<UserHouseEntity> userHouseList = userHouseService.queryUserCommunityIds(uid);
 		List<Long> communityIds = new LinkedList<>();
-		Long userHouseId = null;
+		CommunityEntity communityEntity;
+		//暂未绑定小区
+		if(CollectionUtils.isEmpty(userHouseList)){
+			communityEntity = communityMapper.locateCommunity(communityIds, location);
+			communityEntity.setName("暂未认证房屋");
+			return communityEntity;
+		}
+		//小区对应的最新一套已认证房屋id map
+		Map<Long, Long> communityHouseMap = new HashMap<>();
 		for(UserHouseEntity userHouseEntity : userHouseList){
 			communityIds.add(userHouseEntity.getCommunityId());
-			userHouseId = userHouseEntity.getHouseId();
+			if(communityHouseMap.get(userHouseEntity.getCommunityId()) == null){
+				communityHouseMap.put(userHouseEntity.getCommunityId(),userHouseEntity.getHouseId());
+			}
 		}
-		CommunityEntity communityEntity = communityMapper.locateCommunity(communityIds, location);
-		communityEntity.setHouseId(userHouseId);
+		//定位
+		communityEntity = communityMapper.locateCommunity(communityIds, location);
+		communityEntity.setHouseId(communityHouseMap.get(communityEntity.getId())); //家属界面默认房屋用
 		return communityEntity;
 	}
 	
