@@ -28,16 +28,16 @@
 	        p.real_name,
 	        p.house_id,
 	        CONCAT(
-		    h.number,
-		    ' ',
-		    h.building,
-		    h.unit,
-		    ' ',
-	    CASE
-			h.house_type
-			WHEN 1 THEN
-			'商铺' ELSE '住宅'
-		END
+                h.number,
+                ' ',
+                h.building,
+                h.unit,
+                ' ',
+                CASE
+                    h.house_type
+                    WHEN 1 THEN
+                    '商铺' ELSE '住宅'
+                END
 		    ) AS houseMergeName,
 	        p.mobile,
 	        p.id_card,
