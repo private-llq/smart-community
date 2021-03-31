@@ -25,8 +25,4 @@ public class LoginQO implements Serializable {
 	
 	@ApiModelProperty("密码")
 	private String password;
-	
-	@ApiModelProperty("离线推送id")
-	@NotEmpty(message = "离线推送id不能为空")
-	private String regId;
 }

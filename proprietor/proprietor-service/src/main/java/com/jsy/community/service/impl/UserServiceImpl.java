@@ -165,18 +165,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     /**
+    * @Description: 更新用户极光ID
+     * @Param: [regId, uid]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+    @Override
+    public boolean updateUserRegId(String regId, String uid){
+        return userMapper.updateUserRegId(regId, uid) == 1;
+    }
+    
+    /**
      * 登录
      */
     @Override
     public UserInfoVo login(LoginQO qo) {
         String uid = userAuthService.checkUser(qo);
-        UserInfoVo userInfoVo = queryUserInfo(uid);
-        //更新极光id绑定
-        int regUpdate = userMapper.updateUserRegId(qo.getRegId(), uid);
-        if(regUpdate == 0){
-            throw new ProprietorException(JSYError.INTERNAL.getCode(),"用户推送ID更新失败，登录失败");
-        }
-        return userInfoVo;
+        return queryUserInfo(uid);
     }
 
     /**

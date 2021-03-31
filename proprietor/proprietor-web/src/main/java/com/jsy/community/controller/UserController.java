@@ -61,7 +61,15 @@ public class UserController {
     
     @Resource
     private RedisTemplate redisTemplate;
-
+    
+    @ApiOperation("更新极光regId")
+    @Login
+    @PutMapping("regId")
+    public CommonResult updateUserRegId(@RequestParam String regId){
+        boolean result = userService.updateUserRegId(regId, UserUtils.getUserId());
+        return result ? CommonResult.ok("离线推送设备id设置成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"离线推送设备id设置失败");
+    }
+    
     /**
     * @Description: 业主或亲属 获取/刷新 门禁权限
      * @Param: [communityId]

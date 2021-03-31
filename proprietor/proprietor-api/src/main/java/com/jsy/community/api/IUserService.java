@@ -33,6 +33,15 @@ public interface IUserService extends IService<UserEntity> {
 	UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo);
 	
 	/**
+	* @Description: 更新用户极光ID
+	 * @Param: [regId, uid]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/31
+	**/
+	boolean updateUserRegId(String regId, String uid);
+	
+	/**
 	 * 登录接口
 	 *
 	 * @param qo 参数
