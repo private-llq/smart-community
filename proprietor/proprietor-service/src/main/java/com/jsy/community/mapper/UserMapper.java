@@ -28,7 +28,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/31
 	**/
-	@Update("update t_user set reg_id = #{regId} where uid = #{uid}")
+	@Update("update t_user set reg_id = #{regId} where uid = #{uid} and deleted = 0")
 	int updateUserRegId(String regId, String uid);
 	
 	/**
@@ -38,7 +38,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/31
 	**/
-	@Select("select * from t_user where uid = #{uid}")
+	@Select("select * from t_user where uid = #{uid} and deleted = 0")
 	UserEntity queryUserInfoByUid(String uid);
 	
 	/**
@@ -48,7 +48,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/31
 	**/
-	@Select("select mobile from t_user where uid = #{uid}")
+	@Select("select mobile from t_user where uid = #{uid} and deleted = 0")
 	String queryUserMobileByUid(String uid);
 	
 	//TODO user表householder_id字段暂未使用
@@ -62,7 +62,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
      * @Author: chq459799974
      * @Date: 2021/1/29
     **/
-	@Update("update t_user set mobile = #{newMobile} where uid = #{uid}")
+	@Update("update t_user set mobile = #{newMobile} where uid = #{uid} and deleted = 0")
 	int changeMobile(@Param("newMobile")String newMobile, @Param("uid")String uid);
 
 	/**
