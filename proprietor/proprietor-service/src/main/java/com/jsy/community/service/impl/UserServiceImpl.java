@@ -670,6 +670,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             pid = tempEntity.getPid();
             HouseEntity houseEntity = setBuildingId(parent);
             tempEntity.setBuildingId(houseEntity.getBuildingId());
+        }else{
+            tempEntity.setBuildingId(tempEntity.getPid());
         }
         return parent;
     }
