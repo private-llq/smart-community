@@ -20,8 +20,34 @@ import java.util.List;
  */
 @Mapper
 public interface UserMapper extends BaseMapper<UserEntity> {
+	
+	/**
+	* @Description: 更新用户regId
+	 * @Param: [regId, uid]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/31
+	**/
+	@Update("update t_user set reg_id = #{regId} where uid = #{uid}")
+	int updateUserRegId(String regId, String uid);
+	
+	/**
+	* @Description: uid查用户
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.UserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/3/31
+	**/
+	@Select("select * from t_user where uid = #{uid}")
 	UserEntity queryUserInfoByUid(String uid);
 	
+	/**
+	* @Description: uid查手机号
+	 * @Param: [uid]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/3/31
+	**/
 	@Select("select mobile from t_user where uid = #{uid}")
 	String queryUserMobileByUid(String uid);
 	

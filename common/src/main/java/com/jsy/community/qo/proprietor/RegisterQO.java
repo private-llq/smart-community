@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Data
 @ApiModel("注册表单")
 public class RegisterQO implements Serializable {
+	
 	@ApiModelProperty("注册的账号，手机号或邮箱地址")
 	@NotEmpty(message = "账号不能为空")
 	private String account;
@@ -24,7 +25,4 @@ public class RegisterQO implements Serializable {
 	@NotEmpty(message = "验证码不能为空")
 	private String code;
 	
-	@ApiModelProperty("离线推送id")
-	@NotEmpty(message = "离线推送id不能为空")
-	private String regId;
 }

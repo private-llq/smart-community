@@ -170,7 +170,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public UserInfoVo login(LoginQO qo) {
         String uid = userAuthService.checkUser(qo);
-        return queryUserInfo(uid);
+        UserInfoVo userInfoVo = queryUserInfo(uid);
+        //更新极光id绑定
+        int regUpdate = userMapper.updateUserRegId(qo.getRegId(), uid);
+        if(regUpdate == 0){
+            throw new ProprietorException(JSYError.INTERNAL.getCode(),"用户推送ID更新失败，登录失败");
+        }
+        return userInfoVo;
     }
 
     /**
@@ -187,7 +193,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity user = new UserEntity();
         user.setUid(uuid);
         user.setId(SnowFlake.nextId());
-        user.setRegId(qo.getRegId());
 
         // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
