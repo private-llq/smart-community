@@ -224,5 +224,17 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         return result > 0;
     }
 
+    /**
+     *@Author: Pipi
+     *@Description: 定时完成看房
+     *@param: :
+     *@Return: java.lang.Integer
+     *@Date: 2021/3/31 10:44
+     **/
+    @Override
+    public Integer timingCompleteChecking() {
+        // 将房东接受过预约的,看房时间在前一天的未完成的预约修改为完成看房状态
+        return houseReserveMapper.timingCompleteChecking();
+    }
 
 }

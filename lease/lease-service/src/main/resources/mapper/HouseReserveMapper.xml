@@ -268,4 +268,15 @@
             and reserve_uid = #{reserveUid}
         </where>
     </update>
+    <!-- 定时完成看房 -->
+    <update id="timingCompleteChecking">
+        update t_house_reserve
+        set
+            reserve_status = 3,
+            update_time = now()
+        <where>
+            reserve_status = 2
+            and DATE(checking_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+        </where>
+    </update>
 </mapper>

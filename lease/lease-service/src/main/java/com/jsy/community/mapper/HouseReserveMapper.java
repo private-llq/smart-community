@@ -85,6 +85,15 @@ public interface HouseReserveMapper extends BaseMapper<HouseReserveEntity> {
     String getUidByHouseReserveId(@Param("id") Long id);
 
     /**
+     *@Author: Pipi
+     *@Description: 定时完成看房
+     *@param: :
+     *@Return: java.lang.Integer
+     *@Date: 2021/3/31 10:45
+     **/
+    Integer timingCompleteChecking();
+
+    /**
      * 通过房屋id查询房屋是否存在
      * @param houseLeaseId      查询id
      * @return                  返回sql影响行数

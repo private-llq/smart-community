@@ -74,4 +74,13 @@ public interface IHouseReserveService extends IService<HouseReserveEntity> {
      *@Date: 2021/3/30 15:25
      **/
     Boolean completeChecking(HouseReserveQO qo);
+
+    /**
+     *@Author: Pipi
+     *@Description: 定时完成看房
+     *@param: :
+     *@Return: java.lang.Integer
+     *@Date: 2021/3/31 10:44
+     **/
+    Integer timingCompleteChecking();
 }
