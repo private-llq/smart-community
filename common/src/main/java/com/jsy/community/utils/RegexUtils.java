@@ -39,7 +39,7 @@ public class RegexUtils {
 	/**
 	 * 正则表达式：验证中国姓名
 	 */
-	public static final String REGEX_REAL_NAME = "^[\u4e00-\u9fa5]{2,4}";
+	public static final String REGEX_REAL_NAME = "^[\u4e00-\u9fa5]{2,20}";
 
 	/**
 	 * 正则表达式：验证 0-1限制
