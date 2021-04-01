@@ -440,15 +440,24 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		queryWrapper.orderByAsc("role_type","status");
 		queryWrapper.orderByDesc("create_time");
 		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
-		//设置组织机构名称
 		if(pageData.getRecords().size() > 0){
+			//补创建人和更新人姓名
+			List<String> createUidList = new ArrayList<>();
+			List<String> updateUidList = new ArrayList<>();
+			//补组织机构名称
 			LinkedList<Long> list = new LinkedList<>();
 			for(AdminUserEntity entity : pageData.getRecords()){
 				list.add(entity.getOrgId());
+				createUidList.add(entity.getCreateBy());
+				updateUidList.add(entity.getUpdateBy());
 			}
 			Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(list);
+			Map<String, Map<String, String>> createUserMap = queryNameByUidBatch(createUidList);
+			Map<String, Map<String, String>> updateUserMap = queryNameByUidBatch(updateUidList);
 			for(AdminUserEntity entity : pageData.getRecords()){
 				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+				entity.setCreateBy(createUserMap.get(entity.getCreateBy()).get("name"));
+				entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()).get("name"));
 			}
 		}
 		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
