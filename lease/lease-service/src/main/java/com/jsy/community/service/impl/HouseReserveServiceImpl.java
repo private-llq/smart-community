@@ -128,6 +128,9 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
         //返回VO
         List<Long> voImageIds = new ArrayList<>(reserveVos.size());
         reserveVos.forEach(r -> {
+            if (qo.getQuery().getReserveStatus() != null && qo.getQuery().getReserveStatus() == 0) {
+                r.setReserveStatus(0);
+            }
             //1.从缓存通过id和类型取出 中文Name
             //整租还是合租
             r.setHouseLeaseMode(houseConstService.getConstNameByConstTypeCode(Long.parseLong(r.getHouseLeaseMode()), 11L));

@@ -34,10 +34,10 @@ public class HouseReserveVO implements Serializable {
     @ApiModelProperty(value = "预约所属推送ID")
     private String pushId;
 
-    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功")
+    @ApiModelProperty(value = "预约状态 1.预约中 2.预约成功 3.已取消 4.已完成")
     private Integer reserveStatus;
 
-    @ApiModelProperty(value = "预约状态文本 0已取消 1预约中 2预约成功")
+    @ApiModelProperty(value = "预约状态文本 1.预约中 2.预约成功 3.已取消 4.已完成")
     private String reserveStatusText;
 
     @ApiModelProperty(value = "出租状态：合租、整租")
@@ -86,7 +86,7 @@ public class HouseReserveVO implements Serializable {
     @JsonFormat(pattern = "MM-dd HH:mm", timezone = "GMT+8")
     private Date checkingTime;
 
-    @ApiModelProperty(value = "是房东还是租客")
+    @ApiModelProperty(value = "是房东还是租客,true为房东,false为租客")
     private Boolean proprietor;
 
     @ApiModelProperty(value = "社区id")

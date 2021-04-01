@@ -40,8 +40,8 @@ public class HouseReserveEntity extends BaseEntity {
     @ApiModelProperty(value = "社区id")
     private Long communityId;
 
-    @Range(groups = {Add.class}, min = 0, max = 2, message = "预约范围错误! 0已取消 1预约中 2预约成功")
-    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功 3已完成")
+    @Range(groups = {Add.class}, min = 1, max = 3, message = "预约范围错误! 1.预约中 2.预约成功 3.已取消 4.已完成")
+    @ApiModelProperty(value = "预约状态 1.预约中 2.预约成功 3.已取消 4.已完成")
     private Integer reserveStatus;
 
 

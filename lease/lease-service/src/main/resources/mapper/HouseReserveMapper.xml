@@ -134,14 +134,15 @@
     <select id="meReserveHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">
         SELECT DISTINCT
 	        checking_time AS checkingTime,
+            reserve_status as reserveStatus,
         CASE
 		    r.reserve_status
-		WHEN 0 THEN
-		'已取消预约'
 		WHEN 1 THEN
-		'正在预约中'
+		'待处理'
 		WHEN 2 THEN
-		'预约成功' ELSE '已完成'
+		'待看房'
+		WHEN 3 THEN
+		'已取消' ELSE '已完成'
 	    END AS reserveStatusText,
 	        l.id as houseLeaseId,
 	        l.house_title AS houseTitle,
