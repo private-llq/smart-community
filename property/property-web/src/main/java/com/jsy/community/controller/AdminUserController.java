@@ -269,9 +269,12 @@ public class AdminUserController {
 	**/
 	@Login
 	@PutMapping("pass/reset")
-	public CommonResult resetPass(@RequestParam Long id){
+	public CommonResult resetPass(@RequestBody Map<String,Long> map){
+		if(map.get("id") == null){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少ID参数");
+		}
 		String uid = UserUtils.getUserId();
-		return adminUserService.resetPassword(id,uid) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+		return adminUserService.resetPassword(map.get("id"),uid) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
 	//==================================== 物业端（新）end ====================================

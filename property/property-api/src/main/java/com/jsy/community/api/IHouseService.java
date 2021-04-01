@@ -69,12 +69,12 @@ public interface IHouseService extends IService<HouseEntity> {
 	
 	/**
 	* @Description: 删除楼栋/单元/房屋
-	 * @Param: [id]
+	 * @Param: [id,communityId]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2021/3/15
 	**/
-	boolean deleteHouse(Long id);
+	boolean deleteHouse(Long id,Long communityId);
 	//=========================== 基础增删改查 结束 ==============================
 
 	/**

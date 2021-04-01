@@ -57,7 +57,7 @@
 			<if test="entity.job != null and entity.job != ''">,u.job = #{entity.job}</if>
 			<if test="entity.orgId != null and entity.orgId != 0">,u.org_id = #{entity.orgId}</if>
 			<if test="entity.status != null and (entity.status == 0 or entity.status == 1)">,u.status = #{entity.status}</if>
-			,update_time = now()
+			,update_time = now(),update_by = #{entity.updateBy}
 		</set>
 		where id = #{entity.id} and community_id = #{entity.communityId}
 	</update>

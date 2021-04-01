@@ -502,13 +502,13 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	
 	/**
 	* @Description: 删除楼栋/单元/房屋
-	 * @Param: [id]
+	 * @Param: [id,communityId]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2021/3/15
 	**/
-	public boolean deleteHouse(Long id){
-		HouseEntity entity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id",id));
+	public boolean deleteHouse(Long id,Long communityId){
+		HouseEntity entity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id",id).eq("community_id",communityId));
 		if(entity == null){
 			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"数据不存在");
 		}
