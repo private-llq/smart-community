@@ -126,18 +126,18 @@ public class ElasticsearchCarUtil {
      */
     public static Map<String, Object> search(BaseQO<ElasticsearchCarSearchQO> baseQO, RestHighLevelClient restHighLevelClient){
         //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
-        ElasticsearchCarSearchQO baseQOQuery = baseQO.getQuery();
+        ElasticsearchCarSearchQO query = baseQO.getQuery();
         SearchRequest searchRequest = new SearchRequest(BusinessConst.INDEX_CAR);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        if (!"".equals(baseQOQuery.getCarPlate())&&baseQOQuery.getCarPlate()!=null){
-            boolQuery.must(new MatchQueryBuilder("carPlate",baseQOQuery.getCarPlate()));
+        if (!"".equals(query.getCarPlate())&&query.getCarPlate()!=null){
+            boolQuery.must(new MatchQueryBuilder("carPlate",query.getCarPlate()));
         }
-        if (!"".equals(baseQOQuery.getOwner())&&baseQOQuery.getOwner()!=null) {
-            boolQuery.must(new MatchQueryBuilder("owner", baseQOQuery.getOwner()));
+        if (!"".equals(query.getOwner())&&query.getOwner()!=null) {
+            boolQuery.must(new MatchQueryBuilder("owner", query.getOwner()));
         }
-        if (baseQOQuery.getCarType()!=null&&baseQOQuery.getCarType()!=0) {
-            boolQuery.must(new TermQueryBuilder("carType", baseQOQuery.getCarType()));
+        if (query.getCarType()!=null&&query.getCarType()!=0) {
+            boolQuery.must(new TermQueryBuilder("carType", query.getCarType()));
         }
 //        boolQuery.must(new TermQueryBuilder("communityId", null));
         sourceBuilder.sort(new FieldSortBuilder("createTime").order(SortOrder.DESC));
@@ -161,7 +161,7 @@ public class ElasticsearchCarUtil {
             String sourceAsString = searchHit.getSourceAsString();
             ElasticsearchCarVO elasticsearchCarVO1 = JSON.toJavaObject(JSON.parseObject(sourceAsString), ElasticsearchCarVO.class);
             list.add(elasticsearchCarVO1);
-            System.out.println( elasticsearchCarVO1 );
+            log.info( elasticsearchCarVO1 +"");
         }
         map.put("list",list);
         return map;
