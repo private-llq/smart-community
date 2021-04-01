@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
@@ -23,6 +24,8 @@ public class PropertyRelationVO implements Serializable {
     private String floor;
     @ApiModelProperty("房屋类型")
     private Integer houseType;
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createTime;
     @ApiModelProperty("房屋类型名称")
     private String houseTypeName;
     @ApiModelProperty("和业主关系")

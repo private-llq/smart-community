@@ -165,6 +165,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     /**
+    * @Description: 更新用户极光ID
+     * @Param: [regId, uid]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+    @Override
+    public boolean updateUserRegId(String regId, String uid){
+        return userMapper.updateUserRegId(regId, uid) == 1;
+    }
+    
+    /**
      * 登录
      */
     @Override
@@ -187,7 +199,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity user = new UserEntity();
         user.setUid(uuid);
         user.setId(SnowFlake.nextId());
-        user.setRegId(qo.getRegId());
 
         // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
@@ -611,6 +622,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setProprietorHouses(houseVos);
         return userInfoVo;
     }
+    
+    /**
+    * @Description: 查询用户社区(房屋已认证的)
+     * @Param: [uid]
+     * @Return: java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+    @Override
+    public Collection<Map<String, Object>> queryUserHousesOfCommunity(String uid){
+        //查所有房屋已认证的小区
+        Set<Long> communityIds = userHouseService.queryUserHousesOfCommunityIds(uid);
+        if(CollectionUtils.isEmpty(communityIds)){
+           return null;
+        }
+        //查小区名称
+        Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
+        return communityIdAndName.values();
+    }
 
     /**
      * @Description: 查询业主所有小区的房屋
@@ -647,11 +677,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
 
         //步骤三
-        //查小区名
-        /* t_community */
+        //查小区名、业主姓名
+        /* t_community *//* t_user */
         Map<String, Map<String,Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
+        UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
         for(HouseEntity userHouseEntity : houses){
             userHouseEntity.setCommunityName(String.valueOf(communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId())).get("name")));
+            userHouseEntity.setOwner(userInfoVo.getRealName());
         }
         return houses;
     }
@@ -663,6 +695,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             pid = tempEntity.getPid();
             HouseEntity houseEntity = setBuildingId(parent);
             tempEntity.setBuildingId(houseEntity.getBuildingId());
+        }else{
+            tempEntity.setBuildingId(tempEntity.getPid());
         }
         return parent;
     }

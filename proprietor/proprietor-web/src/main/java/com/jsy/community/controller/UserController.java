@@ -61,7 +61,15 @@ public class UserController {
     
     @Resource
     private RedisTemplate redisTemplate;
-
+    
+    @ApiOperation("更新极光regId")
+    @Login
+    @PutMapping("regId")
+    public CommonResult updateUserRegId(@RequestParam String regId){
+        boolean result = userService.updateUserRegId(regId, UserUtils.getUserId());
+        return result ? CommonResult.ok("离线推送设备id设置成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"离线推送设备id设置失败");
+    }
+    
     /**
     * @Description: 业主或亲属 获取/刷新 门禁权限
      * @Param: [communityId]
@@ -252,10 +260,21 @@ public class UserController {
     public CommonResult<UserInfoVo> details() {
         return CommonResult.ok(userService.proprietorDetails(UserUtils.getUserId()));
     }
-
-
-
-
+    
+    
+    /**
+    * @Description: 查询用户所有社区(房屋已认证的)
+     * @Param: []
+     * @Return: com.jsy.community.vo.CommonResult<java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+    @Login
+    @ApiOperation("查询用户所有社区(房屋已认证的)")
+    @GetMapping("communityList")
+    public CommonResult<Collection<Map<String, Object>>> queryUserHousesOfCommunity(){
+        return CommonResult.ok(userService.queryUserHousesOfCommunity(UserUtils.getUserId()));
+    }
     
     /**
     * @Description: 查询业主所有社区的房屋

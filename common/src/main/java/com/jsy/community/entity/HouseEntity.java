@@ -148,6 +148,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "已绑定单元数")
     private Long bindUnitCount;
     
+    @TableField(exist = false)
+    @ApiModelProperty(value = "业主姓名")
+    private String owner;
+    
     /**
      * 新增house验证组
      */
