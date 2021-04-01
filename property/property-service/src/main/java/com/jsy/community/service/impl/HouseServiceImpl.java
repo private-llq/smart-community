@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.PropertyException;
@@ -21,6 +22,7 @@ import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.property.ProprietorVO;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +53,13 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	@Autowired
 	private HouseMapper houseMapper;
 	
-	@Autowired
-	private ICommunityService communityService;
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IAdminUserService adminUserService;
 	
+	
+//	@Autowired
+//	private ICommunityService communityService;
+
 //	/**
 //	 * @Description: 查询子级楼栋(单元/楼层/房间等)
 //	 * @Param: [baseQO]
@@ -463,6 +469,19 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 					}
 					setHouseTypeCodeStr(houseEntity);
 				}
+			}
+			//补创建人和更新人姓名
+			List<String> createUidList = new ArrayList<>();
+			List<String> updateUidList = new ArrayList<>();
+			for(HouseEntity houseEntity : pageData.getRecords()){
+				createUidList.add(houseEntity.getCreateBy());
+				updateUidList.add(houseEntity.getUpdateBy());
+			}
+			Map<String, Map<String, String>> createUserMap = adminUserService.queryNameByUidBatch(createUidList);
+			Map<String, Map<String, String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidList);
+			for(HouseEntity houseEntity : pageData.getRecords()){
+				houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()).get("name"));
+				houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
 			}
 		}
 		PageInfo<HouseEntity> pageInfo = new PageInfo<>();
