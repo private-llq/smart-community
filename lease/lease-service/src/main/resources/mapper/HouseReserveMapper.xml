@@ -167,7 +167,7 @@
 	    LEFT JOIN t_community c on c.id = l.house_community_id
         WHERE
 	        r.reserve_uid = #{uid}
-	        <if test="qo.query.reserveStatus >= 0">
+	        <if test="qo.query.reserveStatus > 0">
                 and r.reserve_status = #{qo.query.reserveStatus}
             </if>
 	        and r.lease_delete_status = 0
@@ -211,7 +211,7 @@
             LEFT JOIN t_community c on c.id = l.house_community_id
         WHERE
             r.id is not null
-            <if test="qo.query.reserveStatus >= 0">
+            <if test="qo.query.reserveStatus > 0">
                 and r.reserve_status = #{qo.query.reserveStatus}
             </if>
             and l.uid = #{uid}
