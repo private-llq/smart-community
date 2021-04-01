@@ -371,6 +371,29 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		return adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("*").eq("mobile",mobile).eq("community_id",communityId));
 	}
 	
+	/**
+	* @Description: 根据uid查询用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Override
+	public AdminUserEntity queryByUid(String uid){
+		return adminUserMapper.queryByUid(uid);
+	}
+	
+	/**
+	* @Description: uid批量查姓名
+	 * @Param: [uidList]
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Override
+	public Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList){
+		return adminUserMapper.queryNameByUidBatch(uidList);
+	}
 	//================ 用户登录相关end =================
 	
 	//============== 操作员管理相关begin ===============

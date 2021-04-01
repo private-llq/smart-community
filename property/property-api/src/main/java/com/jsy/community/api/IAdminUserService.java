@@ -8,6 +8,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -153,6 +154,24 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2021/3/25
 	**/
 	AdminUserEntity queryUserByMobile(String mobile,Long communityId);
+	
+	/**
+	* @Description: 根据uid查询用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	AdminUserEntity queryByUid(String uid);
+	
+	/**
+	* @Description: uid批量查姓名
+	 * @Param: [uidList]
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList);
 	//================ 用户登录相关end =================
 	
 	//============== 操作员管理相关begin ===============

@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import org.apache.ibatis.annotations.*;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 系统用户
@@ -77,6 +79,16 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	**/
 	@Select("select * from t_admin_user where uid = #{uid}")
 	AdminUserEntity queryByUid(String uid);
+	
+	/**
+	 * @Description: uid批量查姓名
+	 * @Param: [list]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	 **/
+	@MapKey("uid")
+	Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uidList);
 	
 	/**
 	* @Description: 根据id查uid
