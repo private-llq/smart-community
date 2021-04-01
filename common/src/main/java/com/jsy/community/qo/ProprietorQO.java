@@ -101,7 +101,7 @@ public class ProprietorQO implements Serializable {
     private String realName;
 
 
-    @Pattern(groups = {PropertyUpdateValid.class, PropertyAddValid.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "身份证错误")
+    @Pattern(groups = {PropertyUpdateValid.class, PropertyAddValid.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "身份证格式错误")
     @NotBlank(groups = {PropertyAddValid.class}, message = "证件号码未输入!")
     @ApiModelProperty("证件号码")
     private String idCard;

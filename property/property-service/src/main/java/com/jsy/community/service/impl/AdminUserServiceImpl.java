@@ -443,11 +443,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean addOperator(AdminUserEntity adminUserEntity){
-		Long communityId = adminUserEntity.getCommunityId(); //当前操作社区id
-		//TODO 获取用户社区id列表，对比当前操作社区id是否在社区列表内
-		adminUserEntity.setCommunityId(communityId);
 		//查询组织机构是否存在
-		if(!organizationService.isExists(adminUserEntity.getOrgId(),communityId)){
+		if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
 			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
 		}
 		//生成随机密码
@@ -486,8 +483,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public boolean updateOperator(AdminUserEntity adminUserEntity){
-		adminUserEntity.setUpdateBy("1a7a182d711e441fbb24659090daf5cb");
-//		adminUserEntity.setUpdateBy(UserUtils.getUserId());
 		if(adminUserEntity.getOrgId() != null){
 			//查询组织机构是否存在
 			if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
@@ -523,12 +518,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		String password = new Sha256Hash(randomPass, salt).toHex();
-		//更新
-//		AdminUserEntity adminUserEntity = new AdminUserEntity();
-//		adminUserEntity.setPassword(password);
-//		adminUserEntity.setSalt(salt);
-//		adminUserEntity.setUpdateBy(uid);
-//		int result = adminUserMapper.update(adminUserEntity, new UpdateWrapper<AdminUserEntity>().eq("id", id).eq("community_id",communityId));
 		//更新
 		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
 		adminUserAuthEntity.setPassword(password);

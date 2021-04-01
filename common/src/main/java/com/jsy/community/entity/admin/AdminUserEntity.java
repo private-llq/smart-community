@@ -3,6 +3,7 @@ package com.jsy.community.entity.admin;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
+import com.jsy.community.utils.RegexUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
@@ -11,6 +12,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 /**
@@ -24,7 +26,6 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 社区ID
 	 */
-	@NotNull(groups = addOperatorValidatedGroup.class, message = "缺少社区ID")
 	private Long communityId;
 	
 	/**
@@ -35,8 +36,8 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 编号
 	 */
-	@NotBlank(groups = addOperatorValidatedGroup.class, message = "缺少编号")
-	@Length(groups = addOperatorValidatedGroup.class, max = 20, message = "编号长度超限")
+	@NotBlank(groups = {addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, message = "缺少编号")
+	@Length(groups = {addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, max = 20, message = "编号长度超限")
 	private String number;
 	
 	/**
@@ -66,13 +67,15 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 手机号
 	 */
-	@NotBlank(groups = addOperatorValidatedGroup.class, message = "缺少电话号码")
+	@Pattern(groups = {addOperatorValidatedGroup.class, updateOperatorValidatedGroup.class}, regexp = RegexUtils.REGEX_MOBILE, message = "电话号码错误，只支持电信|联通|移动")
+	@NotBlank(groups = {addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, message = "缺少电话号码")
 	private String mobile;
 	
 	/**
 	 * 身份证号
 	 */
-	@NotBlank(groups = addOperatorValidatedGroup.class, message = "身份证号")
+	@Pattern(groups = {addOperatorValidatedGroup.class, updateOperatorValidatedGroup.class}, regexp = RegexUtils.REGEX_ID_CARD, message = "身份证格式错误")
+	@NotBlank(groups = {addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, message = "缺少身份证号")
 	private String idCard;
 	
 	/**
@@ -83,7 +86,9 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 真实姓名
 	 */
-	@NotBlank(groups = {inviteUserValidatedGroup.class,addOperatorValidatedGroup.class}, message = "人员姓名不能为空")
+	@Pattern(groups = {addOperatorValidatedGroup.class, updateOperatorValidatedGroup.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
+	@Length( groups = {addOperatorValidatedGroup.class, updateOperatorValidatedGroup.class}, min = 2, max = 20, message = "姓名长度不在正常范围之内!")
+	@NotBlank(groups = {inviteUserValidatedGroup.class,addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, message = "人员姓名不能为空")
 	private String realName;
 	
 	/**
@@ -95,7 +100,8 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 状态  0：正常   1：禁用
 	 */
-	@Range(groups = addOperatorValidatedGroup.class, min = 0, max = 1, message = "操作员停/启用状态不正确")
+	@NotNull(groups = {addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, message = "缺少停启用状态")
+	@Range(groups = {addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, min = 0, max = 1, message = "操作员停/启用状态不正确")
 	private Integer status;
 	
 	/**
@@ -106,13 +112,13 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 组织机构id
 	 */
-	@NotNull(groups = addOperatorValidatedGroup.class, message = "缺少组织机构")
+	@NotNull(groups = {addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, message = "缺少组织机构")
 	private Long orgId;
 	
 	/**
 	 * 职务
 	 */
-	@NotBlank(groups = addOperatorValidatedGroup.class, message = "缺少职务")
+	@NotBlank(groups = {addOperatorValidatedGroup.class,updateOperatorValidatedGroup.class}, message = "缺少职务")
 	private String job;
 	
 	/**
@@ -176,6 +182,11 @@ public class AdminUserEntity extends BaseEntity {
 	 * 添加操作员传参验证
 	 */
 	public interface addOperatorValidatedGroup{}
+	
+	/**
+	 * 修改操作员传参验证
+	 */
+	public interface updateOperatorValidatedGroup{}
 	
 	/**
 	 * 登录传参验证
