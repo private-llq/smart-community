@@ -13,6 +13,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PropertyEnum;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.BaseQO;
@@ -477,11 +478,11 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				createUidList.add(houseEntity.getCreateBy());
 				updateUidList.add(houseEntity.getUpdateBy());
 			}
-			Map<String, Map<String, String>> createUserMap = adminUserService.queryNameByUidBatch(createUidList);
-			Map<String, Map<String, String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidList);
+			Map<String, Map<String,String>> createUserMap = adminUserService.queryNameByUidBatch(createUidList);
+			Map<String, Map<String,String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidList);
 			for(HouseEntity houseEntity : pageData.getRecords()){
-				houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()).get("name"));
-				houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
+				houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
+				houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
 			}
 		}
 		PageInfo<HouseEntity> pageInfo = new PageInfo<>();
