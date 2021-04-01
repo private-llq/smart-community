@@ -29,9 +29,9 @@ public class HouseReserveQO implements Serializable {
     @ApiModelProperty(value = "预约所属人ID")
     private String reserveUid;
 
-    @NotNull(groups = {ReserveList.class}, message = "预约状态不能为空,-1查询全部列表 0已取消 1预约中 2预约成功 3已完成")
-    @Range(groups = {ReserveList.class}, min = -1, max = 3, message = "预约状态范围错误")
-    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功 3已完成")
+    @NotNull(groups = {ReserveList.class}, message = "预约状态不能为空,0查询全部列表 1.预约中 2.预约成功 3.已取消 4.已完成")
+    @Range(groups = {ReserveList.class}, min = 0, max = 4, message = "预约状态范围错误")
+    @ApiModelProperty(value = "预约状态 1.预约中 2.预约成功 3.已取消 4.已完成")
     private Integer reserveStatus;
 
     @ApiModelProperty(value = "预约信息内容")
