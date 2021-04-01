@@ -68,6 +68,14 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), qo.getId(), 2);
         ProprietorEntity entity = new ProprietorEntity();
         BeanUtils.copyProperties( qo, entity );
+        // 检查更新的房屋是否存在此业主之外的业主
+        QueryWrapper<ProprietorEntity> queryWrapper = new QueryWrapper<>();
+        // 查询此条记录之外的包含该房屋id不是删除的数据
+        queryWrapper.eq("house_id", qo.getHouseId()).eq("deleted", 0).ne("id", entity.getId());
+        ProprietorEntity selectOne = baseMapper.selectOne(queryWrapper);
+        if (Objects.nonNull(selectOne)) {
+            throw new JSYException("房屋业主已经存在,请不要重复添加!");
+        }
         return proprietorMapper.updateById(entity) > 0;
     }
 
