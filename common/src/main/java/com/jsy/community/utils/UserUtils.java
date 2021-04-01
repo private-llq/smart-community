@@ -122,10 +122,10 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/1
 	**/
-	public static String getAdminCommunityId() {
+	public static Long getAdminCommunityId() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
-		return (String) request.getAttribute(USER_COMMUNITY);
+		return (Long) request.getAttribute(USER_COMMUNITY);
 	}
 	
 	/**
