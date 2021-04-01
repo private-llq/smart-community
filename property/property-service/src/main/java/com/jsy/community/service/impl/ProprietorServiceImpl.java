@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarService;
@@ -8,6 +9,7 @@ import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
@@ -37,21 +39,16 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
     @Resource
     private ProprietorMapper proprietorMapper;
 
-
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService iCarService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IUserHouseService iUserHouseService;
 
-
-
-
     @Override
     public Boolean unbindHouse( Long id ) {
         return proprietorMapper.unbindHouse( id ) > 0;
     }
-
 
     @Override
     public String getAdminRealName( String adminUid ) {
@@ -74,13 +71,16 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return proprietorMapper.updateById(entity) > 0;
     }
 
-
-
-
-
     @Transactional( rollbackFor = {Exception.class})
     @Override
     public void addUser(ProprietorQO qo, String adminUid) {
+        // 检查新增的房屋是否存在业主
+        QueryWrapper<ProprietorEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("house_id", qo.getHouseId()).eq("deleted", 0);
+        ProprietorEntity selectOne = baseMapper.selectOne(queryWrapper);
+        if (Objects.nonNull(selectOne)) {
+            throw new JSYException("房屋业主已经存在,请不要重复添加!");
+        }
         //管理员姓名
         String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
         ProprietorEntity entity = new ProprietorEntity();
@@ -90,9 +90,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         proprietorMapper.insert(entity);
         //TODO 短信通知业主
     }
-
-
-
 
     /**
      * 通过分页参数查询 业主信息
@@ -113,7 +110,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return page.setRecords(query);
     }
 
-
     /**
      * 录入业主信息业主房屋绑定信息至数据库
      *
@@ -127,7 +123,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
     public Integer saveUserBatch(List<ProprietorEntity> userEntityList, Long communityId) {
         return proprietorMapper.saveUserBatch(userEntityList, communityId);
     }
-
 
     /**
      * 通过当前社区id查出的当前社区所有已登记的房屋
@@ -143,7 +138,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         Integer houseLevelMode = proprietorMapper.queryHouseLevelModeById(communityId);
         return proprietorMapper.queryHouseByCommunityId(communityId, houseLevelMode);
     }
-
 
     /**
      * [excel] 导入业主家属信息
@@ -166,7 +160,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return proprietorMapper.saveUserMemberBatch(userEntityList ,communityId);
     }
 
-
     /**
      * 通过数据id 拿到uid
      * @param id        数据id
@@ -175,7 +168,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
     public String getUidById(Long id){
         return proprietorMapper.selectUidById(id);
     }
-
 
     @Deprecated
     private void checkHouse(Long communityId, Long houseId, Operation operation) {
@@ -190,7 +182,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
             }
         }
     }
-
 
     /**
      * 验证excel 业主家属信息 录入 业主 和 家属所属房屋 是否能在数据库匹配 如果不匹配则选择有误
@@ -226,8 +217,6 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return proprietorMapper.queryUserHouseByCommunityId(communityId);
     }
 
-
-
     /**
      * 通过  houseEntity 中的某些属性 来 houseEntityList匹配是否存在这个对象
      *
@@ -256,6 +245,5 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         }
         return flag;
     }
-
 
 }
