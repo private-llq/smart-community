@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class UserDataController {
         UserAccountVO balance = userAccountService.queryBalance(userId);
         Integer tickets = userAccountService.countTicketByUid(userId);
         JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(userDataVO));
-        jsonObject.put("balance",balance.getBalance());
+        jsonObject.put("balance",balance.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
         jsonObject.put("tickets",tickets);
         return CommonResult.ok(jsonObject,"查询成功");
     }

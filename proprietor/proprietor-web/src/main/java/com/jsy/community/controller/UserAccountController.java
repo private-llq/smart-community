@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +64,10 @@ public class UserAccountController {
 	@ApiOperation("【用户账户】查询余额")
 	@GetMapping("balance")
 	public CommonResult queryBalance(){
-		return CommonResult.ok(userAccountService.queryBalance(UserUtils.getUserId()));
+		UserAccountVO userAccountVO = userAccountService.queryBalance(UserUtils.getUserId());
+		Map<String, Object> returnMap = new HashMap<>();
+		returnMap.put("balance",userAccountVO.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
+		return CommonResult.ok(returnMap,"查询成功");
 	}
 	
 	/**
@@ -265,15 +269,15 @@ public class UserAccountController {
 	}
 	
 	//============================= 查询整合接口 ==================================
-//	@ApiOperation("【整合查询】(个人中心)")
-//	@GetMapping("all")
-//	public CommonResult queryAll(){
-//		Map<String, Object> returnMap = new HashMap<>();
-//		String uid = UserUtils.getUserId();
-//		UserAccountVO balance = userAccountService.queryBalance(uid);
-//		Integer tickets = userAccountService.countTicketByUid(uid);
-//		returnMap.put("balance",balance.getBalance());
-//		returnMap.put("tickets",tickets);
-//		return CommonResult.ok(returnMap,"查询成功");
-//	}
+	@ApiOperation("【整合查询】(个人中心)")
+	@GetMapping("all")
+	public CommonResult queryAll(){
+		Map<String, Object> returnMap = new HashMap<>();
+		String uid = UserUtils.getUserId();
+		UserAccountVO balance = userAccountService.queryBalance(uid);
+		Integer tickets = userAccountService.countTicketByUid(uid);
+		returnMap.put("balance",balance.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
+		returnMap.put("tickets",tickets);
+		return CommonResult.ok(returnMap,"查询成功");
+	}
 }
