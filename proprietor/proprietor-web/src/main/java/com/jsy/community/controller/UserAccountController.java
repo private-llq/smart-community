@@ -265,15 +265,15 @@ public class UserAccountController {
 	}
 	
 	//============================= 查询整合接口 ==================================
-	@ApiOperation("【整合查询】(个人中心)")
-	@GetMapping("all")
-	public CommonResult queryAll(){
-		Map<String, Object> returnMap = new HashMap<>();
-		String uid = UserUtils.getUserId();
-		UserAccountVO banlance = userAccountService.queryBalance(uid);
-		Integer tickets = userAccountService.countTicketByUid(uid);
-		returnMap.put("balance",banlance.getBalance());
-		returnMap.put("tickets",tickets);
-		return CommonResult.ok(returnMap,"查询成功");
-	}
+//	@ApiOperation("【整合查询】(个人中心)")
+//	@GetMapping("all")
+//	public CommonResult queryAll(){
+//		Map<String, Object> returnMap = new HashMap<>();
+//		String uid = UserUtils.getUserId();
+//		UserAccountVO balance = userAccountService.queryBalance(uid);
+//		Integer tickets = userAccountService.countTicketByUid(uid);
+//		returnMap.put("balance",balance.getBalance());
+//		returnMap.put("tickets",tickets);
+//		return CommonResult.ok(returnMap,"查询成功");
+//	}
 }

@@ -1,5 +1,7 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserAccountService;
@@ -15,6 +17,7 @@ import com.jsy.community.vo.UserDataVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,13 +55,12 @@ public class UserDataController {
     public CommonResult selectUserDataOne(){
         String userId = UserUtils.getUserId();
         UserDataVO userDataVO = userDataService.selectUserDataOne(userId);
-        UserAccountVO banlance = userAccountService.queryBalance(userId);
+        UserAccountVO balance = userAccountService.queryBalance(userId);
         Integer tickets = userAccountService.countTicketByUid(userId);
-        Map<String, Object> returnMap = new HashMap<>();
-        returnMap.put("userData",userDataVO);
-        returnMap.put("banlance",banlance);
-        returnMap.put("tickets",tickets);
-        return CommonResult.ok(returnMap,"查询成功");
+        JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(userDataVO));
+        jsonObject.put("balance",balance.getBalance());
+        jsonObject.put("tickets",tickets);
+        return CommonResult.ok(jsonObject,"查询成功");
     }
     @PostMapping("/addAvatar")
     @ApiOperation("上传头像")
