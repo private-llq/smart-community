@@ -22,6 +22,7 @@ import java.util.Map;
 @Configuration
 public class RabbitMqConfig {
 
+
     public static final String QUEUE_WECHAT = "queue_wechat";
     public static final String QUEUE_WECHAT_DELAY = "queue_wechat_delay";
 
@@ -34,6 +35,9 @@ public class RabbitMqConfig {
     public static final String QUEUE_CAR_INSERT = "queue_car_insert";
     public static final String QUEUE_CAR_UPDATE = "queue_car_update";
     public static final String QUEUE_CAR_DELETE = "queue_car_delete";
+
+
+    //-------------------------------------------------------------------------------------
 
     //@author YuLF start
     /**

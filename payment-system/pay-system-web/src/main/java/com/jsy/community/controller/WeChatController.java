@@ -101,7 +101,8 @@ public class WeChatController {
 
 
         //mq异步保存账单到数据库
-        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
+//        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
+        weChatService.insertOrder(msg);
         //半个小时如果还没支付就自动删除数据库账单
         rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
             @Override
@@ -267,7 +268,7 @@ public class WeChatController {
      * @return:
      */
     @GetMapping("/wxPayQuery")
-    @Login
+//    @Login
     public CommonResult wxPayQuery(@RequestParam("orderId")String orderId){
         String body = "";
         HttpGet httpGet = new HttpGet(WechatConfig.WXPAY_PAY+orderId+""+"?mchid="+WechatConfig.MCH_ID+"");

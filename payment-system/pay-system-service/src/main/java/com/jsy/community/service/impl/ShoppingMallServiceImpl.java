@@ -23,7 +23,7 @@ import java.util.Map;
 public class ShoppingMallServiceImpl implements IShoppingMallService {
 	
 	private static final String protocolType = "http://";
-		private static final String host = "192.168.12.29";
+	private static final String host = "192.168.12.29";
 //	private static final String host = "222.178.212.29";
 	private static final String port = "9927";
 	private static final String path = "/services/order/pub/order/checkOrder";
