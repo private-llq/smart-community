@@ -27,7 +27,7 @@ import java.util.*;
 
 /**
  * @author chq459799974
- * @description 系统配置，菜单，角色，权限等
+ * @description 系统配置，菜单，角色，权限等(物业新版原型代码在最下面，新版无角色)
  * @since 2020-12-14 10:29
  **/
 @Slf4j
@@ -46,43 +46,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	@Resource
 	private AdminUserMenuMapper adminUserMenuMapper;
 	
-	//==================================================== Menu菜单 ===============================================================
-	/**
-	* @Description: 缓存菜单
-	 * @Param: []
-	 * @Return: void
-	 * @Author: chq459799974
-	 * @Date: 2020/12/14
-	**/
-	@PostConstruct
-	private void cacheMenuToRedis(){
-		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(queryMenu()));
-	}
-	
-	/**
-	* @Description: 查询大后台菜单
-	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
-	 * @Author: chq459799974
-	 * @Date: 2020/12/15
-	**/
-	public List<AdminMenuEntity> queryMenu(){
-		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*").eq("pid", 0));
-		setChildren(menuList,new LinkedList<AdminMenuEntity>());
-		return menuList;
-	}
-	
-	//组装子菜单
-	private void setChildren(List<AdminMenuEntity> parentList, List<AdminMenuEntity> childrenList){
-		if(!CollectionUtils.isEmpty(parentList)){
-			for(AdminMenuEntity adminMenuEntity : parentList){
-				childrenList = adminMenuMapper.getChildrenList(adminMenuEntity.getId());
-				adminMenuEntity.setChildrenList(childrenList);
-				setChildren(childrenList,new LinkedList<AdminMenuEntity>());
-			}
-		}
-	}
-	
+	//==================================================== Menu菜单 (旧) ===============================================================
 	/**
 	* @Description: 新增菜单
 	 * @Param: [sysMenuEntity]
@@ -182,26 +146,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		return false;
 	}
 	
-	/**
-	* @Description: 菜单列表
-	 * @Param: []
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
-	 * @Author: chq459799974
-	 * @Date: 2020/12/14
-	**/
-	@Override
-	public List<AdminMenuEntity> listOfMenu() {
-		List<AdminMenuEntity> list = null;
-		try{
-			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
-		}catch (Exception e){
-			log.error("redis获取菜单失败");
-			return queryMenu();//从mysql获取
-		}
-		return list;
-	}
-	
-	//==================================================== Role角色 ===============================================================
+	//==================================================== Role角色 (旧) ===============================================================
 	/**
 	 * @Description: 添加角色
 	 * @Param: [sysRoleEntity]
@@ -264,7 +209,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		return adminRoleMapper.selectList(new QueryWrapper<AdminRoleEntity>().select("*"));
 	}
 	
-	//==================================================== 角色-菜单 ===============================================================
+	//==================================================== 角色-菜单 (旧) ===============================================================
 	/**
 	 * @Description: 为角色设置菜单
 	 * @Param: [menuIds, roleId]
@@ -307,7 +252,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		return true;
 	}
 	
-	//==================================================== 用户-菜单 ===============================================================
+	//==================================================== 用户-菜单 (旧) ===============================================================
 	/**
 	* @Description: 查询用户菜单权限(老接口，暂时弃用)
 	 * @Param: [uid]
@@ -398,6 +343,61 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			throw new PropertyException(JSYError.INTERNAL.getCode(),"用户功能授权失败，操作失败");
 		}
 //		return true;
+	}
+	
+	/**
+	 * @Description: (功能授权)菜单列表
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	 **/
+	@Override
+	public List<AdminMenuEntity> listOfMenu() {
+		List<AdminMenuEntity> list = null;
+		try{
+			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
+		}catch (Exception e){
+			log.error("redis获取菜单失败");
+			return queryMenu();//从mysql获取
+		}
+		return list;
+	}
+	
+	/**
+	 * @Description: 缓存菜单到redis
+	 * @Param: []
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	 **/
+	@PostConstruct
+	private void cacheMenuToRedis(){
+		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(queryMenu()));
+	}
+	
+	/**
+	 * @Description: 查询全部菜单
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	 **/
+	private List<AdminMenuEntity> queryMenu(){
+		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*").eq("pid", 0));
+		setChildren(menuList,new LinkedList<AdminMenuEntity>());
+		return menuList;
+	}
+	
+	//组装子菜单
+	private void setChildren(List<AdminMenuEntity> parentList, List<AdminMenuEntity> childrenList){
+		if(!CollectionUtils.isEmpty(parentList)){
+			for(AdminMenuEntity adminMenuEntity : parentList){
+				childrenList = adminMenuMapper.getChildrenList(adminMenuEntity.getId());
+				adminMenuEntity.setChildrenList(childrenList);
+				setChildren(childrenList,new LinkedList<AdminMenuEntity>());
+			}
+		}
 	}
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

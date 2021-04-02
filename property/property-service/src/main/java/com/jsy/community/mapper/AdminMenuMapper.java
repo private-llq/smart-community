@@ -22,6 +22,7 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	@Insert("insert into t_admin_menu(icon,name,url,pid,sort)" +
 		"select #{entity.icon},#{entity.name},#{entity.url},#{entity.pid},max(sort)+1 from t_admin_menu where pid = #{entity.pid}")
 	int addMenu(@Param("entity") AdminMenuEntity adminMenuEntity);
@@ -33,18 +34,9 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	@Select("select id,pid,belong_to from t_admin_menu where id = #{pid}")
 	AdminMenuEntity findParent(Long pid);
-	
-	/**
-	 * @Description: 获取子菜单列表
-	 * @Param: [id]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
-	 * @Author: chq459799974
-	 * @Date: 2020/12/15
-	 **/
-	@Select("select * from t_admin_menu where pid = #{id}")
-	List<AdminMenuEntity> getChildrenList(Long id);
 	
 	/**
 	 * @Description: 批量获取子菜单id列表(查询pid)
@@ -62,6 +54,7 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	List<Long> getIdBelongList(List<Long> ids);
 	
 	/**
@@ -71,6 +64,7 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	List<AdminMenuEntity> queryUserMenu(Long uid);
 	
 	//================================================== 新版物业端原型 - 用户-菜单start =========================================================================
@@ -102,6 +96,16 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Date: 2020/3/23
 	 **/
 	int addUserMenuBatch(@Param("collection") Set<Long> menuIdsSet, @Param("uid") String uid);
+	
+	/**
+	 * @Description: 获取子菜单列表
+	 * @Param: [id]
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	 **/
+	@Select("select * from t_admin_menu where pid = #{id}")
+	List<AdminMenuEntity> getChildrenList(Long id);
 	
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 	

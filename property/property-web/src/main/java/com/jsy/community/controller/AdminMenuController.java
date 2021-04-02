@@ -64,6 +64,7 @@ public class AdminMenuController {
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
 	}
 	
+	//=================================== 物业端新版 begin ============================
 	/**
 	* @Description: 查询
 	 * @Param: []
@@ -75,4 +76,6 @@ public class AdminMenuController {
 	public CommonResult<List<AdminMenuEntity>> listOfMenu(){
 		return CommonResult.ok(adminConfigService.listOfMenu());
 	}
+	
+	//=================================== 物业端新版 end ============================
 }
