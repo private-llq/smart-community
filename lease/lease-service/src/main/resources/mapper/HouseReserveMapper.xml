@@ -79,7 +79,7 @@
     <update id="cancelMyReserveState">
         update t_house_reserve
         set
-            reserve_status = 0,
+            reserve_status = 3,
             update_time = now()
         where
             reserve_uid = #{reserveUid}
@@ -93,7 +93,7 @@
         update t_house_reserve thr
         LEFT JOIN t_house_lease thl on thl.id = thr.house_lease_id
         set
-            thr.reserve_status = 0,
+            thr.reserve_status = 3,
             thr.update_time = now()
         where
             thl.uid = #{reserveUid}
@@ -111,7 +111,7 @@
         <where>
             reserve_uid = #{reserveUid}
             and id = #{id}
-            and (reserve_status = 0 or reserve_status = 3)
+            and (reserve_status = 4 or reserve_status = 3)
         </where>
     </update>
 
@@ -179,14 +179,15 @@
     <select id="reserveMeHouse" resultType="com.jsy.community.vo.lease.HouseReserveVO">
         SELECT
 	        checking_time AS checkingTime,
+            reserve_status as reserveStatus,
         CASE
-		    r.reserve_status
-		WHEN 0 THEN
-		'已取消预约'
-		WHEN 1 THEN
-		'正在预约中'
-		WHEN 2 THEN
-		'预约成功' ELSE '已完成'
+            r.reserve_status
+        WHEN 1 THEN
+            '待处理'
+        WHEN 2 THEN
+            '待看房'
+        WHEN 3 THEN
+            '已取消' ELSE '已完成'
 	    END AS reserveStatusText,
 	        l.id as houseLeaseId,
             l.house_title AS houseTitle,
@@ -261,7 +262,7 @@
     <update id="completeChecking">
         update t_house_reserve
         set
-            reserve_status = 3,
+            reserve_status = 4,
             update_time = now()
         <where>
             id = #{id}
@@ -273,7 +274,7 @@
     <update id="timingCompleteChecking">
         update t_house_reserve
         set
-            reserve_status = 3,
+            reserve_status = 4,
             update_time = now()
         <where>
             reserve_status = 2
