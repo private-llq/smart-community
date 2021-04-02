@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
 * @Description: 支付宝接参
@@ -25,4 +26,10 @@ public class AliAppPayQO implements Serializable {
 	
 	@ApiModelProperty(value = "支付类型 1.APP 2.H5")
 	private int payType;
+	
+	@ApiModelProperty(value = "交易来源 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包")
+	private Integer tradeFrom;
+	
+	@ApiModelProperty(value = "订单详情")
+	private Map<String,Object> orderData;
 }
