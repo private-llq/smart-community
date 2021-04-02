@@ -1,17 +1,16 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.AiliAppPayRecordService;
 import com.jsy.community.api.AliAppPayService;
+import com.jsy.community.api.IShoppingMallService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.lease.AliAppPayQO;
 import com.jsy.community.utils.OrderNoUtil;
-import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,9 +39,19 @@ public class AliAppPayController {
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AiliAppPayRecordService ailiAppPayRecordService;
 	
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
+	private IShoppingMallService shoppingMallService;
+	
 	@ApiOperation("下单")
 	@PostMapping("order")
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
+		//商城订单支付，调用商城接口，校验订单
+		if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.getIndex().equals(aliAppPayQO.getTradeFrom())){
+			Map<String, Object> validationMap = shoppingMallService.validateShopOrder(aliAppPayQO.getOrderData());
+			if(0 != (int)validationMap.get("code")){
+				throw new JSYException((int)validationMap.get("code"),String.valueOf(validationMap.get("msg")));
+			}
+		}
 		String sysType = req.getHeader("sysType");
 //		if(!NumberUtil.isInteger(sysType) || (CommonConsts.SYS_ANDROID != Integer.parseInt(sysType) 
 //				&& CommonConsts.SYS_IOS != Integer.parseInt(sysType))){

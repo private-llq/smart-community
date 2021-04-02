@@ -1,7 +1,10 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IUserAccountService;
 import com.jsy.community.api.IUserDataService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.proprietor.UserDataQO;
@@ -9,15 +12,20 @@ import com.jsy.community.utils.BadWordUtil2;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.UserAccountVO;
 import com.jsy.community.vo.UserDataVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
+import java.math.RoundingMode;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -26,7 +34,7 @@ import java.util.regex.Pattern;
  * @author: Hu
  * @create: 2021-03-11 13:37
  **/
-@Api(tags = "生活缴费前端控制器--查询")
+@Api(tags = "用户个人信息(个人中心)")
 @RestController
 @RequestMapping("/userdata")
 @ApiJSYController
@@ -38,6 +46,9 @@ public class UserDataController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserDataService userDataService;
+    
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserAccountService userAccountService;
 
     @GetMapping("/selectUserDataOne")
     @ApiOperation("查询个人信息")
@@ -45,7 +56,12 @@ public class UserDataController {
     public CommonResult selectUserDataOne(){
         String userId = UserUtils.getUserId();
         UserDataVO userDataVO = userDataService.selectUserDataOne(userId);
-        return CommonResult.ok(userDataVO);
+        UserAccountVO balance = userAccountService.queryBalance(userId);
+        Integer tickets = userAccountService.countTicketByUid(userId);
+        JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(userDataVO));
+        jsonObject.put("balance",balance.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
+        jsonObject.put("tickets",tickets);
+        return CommonResult.ok(jsonObject,"查询成功");
     }
     @PostMapping("/addAvatar")
     @ApiOperation("上传头像")
