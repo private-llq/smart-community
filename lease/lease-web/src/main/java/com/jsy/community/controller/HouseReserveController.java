@@ -84,6 +84,7 @@ public class HouseReserveController {
     @Login
     @DeleteMapping("/reject")
     @ApiOperation("预约拒绝接口")
+    @Deprecated
     public CommonResult<Boolean> reject( @RequestBody HouseReserveQO qo) {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);
         qo.setReserveUid(UserUtils.getUserId());
