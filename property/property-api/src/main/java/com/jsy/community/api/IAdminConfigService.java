@@ -121,6 +121,15 @@ public interface IAdminConfigService {
 	List<AdminMenuEntity> queryMenuByUid(String uid);
 	
 	/**
+	* @Description: 统计用户菜单数
+	 * @Param: [uid]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/4/8
+	**/
+	Integer countUserMenu(String uid);
+	
+	/**
 	* @Description: 为用户分配菜单
 	 * @Param: [menuIds, uid]
 	 * @Return: boolean

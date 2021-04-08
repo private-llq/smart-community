@@ -61,7 +61,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Resource
 	private AdminUserMapper adminUserMapper;
 	
-	@Autowired
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IOrganizationService organizationService;
 	
 	@Autowired
@@ -424,9 +424,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,number,real_name,mobile,id_card,status,role_type,org_id,job,create_by,create_time,update_by,update_time");
 		queryWrapper.eq("community_id",query.getCommunityId());
 		//是否查详情
+		Integer menuCount = null;
 		if(query.getId() != null){
 			queryWrapper.eq("id",query.getId());
+			String uid = adminUserMapper.queryUidById(query.getId());
+			menuCount = adminConfigService.countUserMenu(uid);
 		}
+		
 		if(!StringUtils.isEmpty(query.getName())){
 			queryWrapper.and(wrapper -> wrapper.like("number",query.getName())
 				.or().like("real_name",query.getName())
@@ -459,6 +463,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 				entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
 				entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
 			}
+		}
+		//查详情 已授权菜单数统计
+		if(query.getId() != null){
+			pageData.getRecords().get(0).setMenuCount(menuCount);
 		}
 		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);

@@ -134,6 +134,12 @@ public class AdminUserEntity extends BaseEntity {
 	private List<Long> menuIdList;
 	
 	/**
+	 * 菜单功能授权数统计
+	 */
+	@TableField(exist = false)
+	private Integer menuCount;
+	
+	/**
 	 * 用户菜单列表
 	 */
 	@TableField(exist = false)

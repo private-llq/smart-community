@@ -8,6 +8,7 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
+import com.jsy.community.entity.admin.AdminUserMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.mapper.AdminRoleMapper;
@@ -54,6 +55,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@Deprecated
 	@Override
 	public boolean addMenu(AdminMenuEntity adminMenuEntity){
 		if(adminMenuEntity.getPid() != null && adminMenuEntity.getPid() != 0){ //①非顶级节点，查找父节点，确保数据严密性
@@ -217,6 +219,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	@Override
 	public boolean setRoleMenus(List<Long> menuIds,Long roleId){
 		//设置子菜单
@@ -260,6 +263,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
+	@Deprecated
 	@Override
 	public List<AdminMenuEntity> queryUserMenu(Long uid){
 		return adminMenuMapper.queryUserMenu(uid);
@@ -302,6 +306,18 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			}
 		}
 		return returnList;
+	}
+	
+	/**
+	* @Description: 统计用户菜单数
+	 * @Param: [uid]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/4/8
+	**/
+	@Override
+	public Integer countUserMenu(String uid){
+		return adminUserMenuMapper.selectCount(new QueryWrapper<AdminUserMenuEntity>().eq("uid",uid));
 	}
 	
 	/**
