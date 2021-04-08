@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.AiliAppPayRecordService;
 import com.jsy.community.api.AliAppPayService;
 import com.jsy.community.api.IShoppingMallService;
@@ -11,15 +12,14 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.lease.AliAppPayQO;
 import com.jsy.community.utils.OrderNoUtil;
+import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -44,13 +44,16 @@ public class AliAppPayController {
 	
 	@ApiOperation("下单")
 	@PostMapping("order")
+	@Login
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
+		ValidatorUtils.validateEntity(aliAppPayQO,AliAppPayQO.addOrderGroup.class);
 		//商城订单支付，调用商城接口，校验订单
 		if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.getIndex().equals(aliAppPayQO.getTradeFrom())){
-			Map<String, Object> validationMap = shoppingMallService.validateShopOrder(aliAppPayQO.getOrderData());
+			Map<String, Object> validationMap = shoppingMallService.validateShopOrder(aliAppPayQO.getOrderData(),UserUtils.getUserToken());
 			if(0 != (int)validationMap.get("code")){
 				throw new JSYException((int)validationMap.get("code"),String.valueOf(validationMap.get("msg")));
 			}
+			aliAppPayQO.setServiceOrderNo(String.valueOf(aliAppPayQO.getOrderData().get("uuid")));
 		}
 		String sysType = req.getHeader("sysType");
 //		if(!NumberUtil.isInteger(sysType) || (CommonConsts.SYS_ANDROID != Integer.parseInt(sysType) 
@@ -62,7 +65,6 @@ public class AliAppPayController {
 		//TODO 系统类型暂时写死
 		sysType = "1";
 		aliAppPayQO.setTotalAmount(aliAppPayQO.getTotalAmount().abs());
-//		String orderNo = String.valueOf(SnowFlake.nextId());
 		String orderNo = OrderNoUtil.getOrder();
 		aliAppPayQO.setOutTradeNo(orderNo);
 		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.TRADE_FROM_RENT.getName());
@@ -79,10 +81,9 @@ public class AliAppPayController {
 		boolean createResult = false;
 		if(!StringUtils.isEmpty(orderStr)){
 			AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
+			ailiAppPayRecordEntity.setServiceOrderNo(aliAppPayQO.getServiceOrderNo());
 			ailiAppPayRecordEntity.setOrderNo(orderNo);
-//			String uid = UserUtils.getUserId();
-			String uid = "aliTest";
-			ailiAppPayRecordEntity.setUserid(uid);
+			ailiAppPayRecordEntity.setUserid(UserUtils.getUserId());
 			ailiAppPayRecordEntity.setTradeAmount(aliAppPayQO.getTotalAmount());
 			ailiAppPayRecordEntity.setTradeName(PaymentEnum.TradeFromEnum.TRADE_FROM_RENT.getIndex());
 			ailiAppPayRecordEntity.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex());
@@ -97,4 +98,5 @@ public class AliAppPayController {
 		}
 		return createResult ? CommonResult.ok(returnMap, "下单成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"下单失败");
 	}
+	
 }

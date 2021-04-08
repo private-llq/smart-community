@@ -11,8 +11,6 @@ import com.jsy.community.qo.lease.AliAppPayQO;
 public interface AliAppPayService {
 	
 	String getOrderStr(AliAppPayQO aliAppPayQO); //app下单
-	String getOrderStrForH5(AliAppPayQO aliAppPayQO); //H5下单
-	
-	void dealOrder(AiliAppPayRecordEntity order);
+//	String getOrderStrForH5(AliAppPayQO aliAppPayQO); //H5下单
 	
 }

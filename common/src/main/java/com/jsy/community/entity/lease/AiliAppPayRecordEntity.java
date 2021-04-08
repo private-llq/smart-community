@@ -34,7 +34,7 @@ public class AiliAppPayRecordEntity extends BaseEntity {
 	@ApiModelProperty(value = "交易金额(RMB)")
 	private BigDecimal tradeAmount;
 	
-	@ApiModelProperty(value = "交易名称")
+	@ApiModelProperty(value = "交易名称 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包7.红包退回")
 	private Integer tradeName;
 	
 	@ApiModelProperty(value = "交易类型 1.充值 2.提现")
@@ -45,5 +45,8 @@ public class AiliAppPayRecordEntity extends BaseEntity {
 	
 	@ApiModelProperty(value = "系统类型 1.安卓 2.IOS")
 	private Integer sysType;
+	
+	@ApiModelProperty(value = "其他服务订单号 如 商城")
+	private String serviceOrderNo;
 	
 }

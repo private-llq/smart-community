@@ -2,17 +2,18 @@ package com.jsy.community.service.impl;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
-import com.jsy.community.api.AiliAppPayRecordService;
-import com.jsy.community.api.AliAppPayCallbackService;
-import com.jsy.community.api.AliAppPayService;
-import com.jsy.community.api.PaymentException;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
+import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
+import com.jsy.community.utils.AlipayUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -26,32 +27,29 @@ import java.util.Map;
 @DubboService(version = Const.version, group = Const.group_lease)
 public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	
-	@Autowired
-	private AliAppPayService aliAppPayService;
-	
-	@Autowired
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AiliAppPayRecordService ailiAppPayRecordService;
 	
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
+	private IShoppingMallService shoppingMallService;
+	
+	/**
+	* @Description: 回调验签/订单处理
+	 * @Param: [paramsMap]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/8
+	**/
+	@Override
 	public String dealCallBack(Map<String, String> paramsMap){
 		boolean signVerified;
 		//证书验签
 		try {
-			signVerified = AlipaySignature.rsaCertCheckV1(paramsMap, "/mnt/db/smart-community/cert/ali_cert/alipayCertPublicKey_RSA2.crt", "utf-8", "RSA2");
+			signVerified = AlipaySignature.rsaCertCheckV1(paramsMap, AlipayUtils.alipayPublicCertPath, "utf-8", "RSA2");
 		} catch (AlipayApiException e1) {
 			e1.printStackTrace();
 			throw new PaymentException("验签出错");
 		}
-		//支付宝公钥验签
-//		try {
-//			signVerified = AlipaySignature.rsaCheckV1(paramsMap,
-//					"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlpgw35Df0VnymYrolvYDqc+YF7VSSo3k2cscZQEB6OPycsHqtHGjldvJKPhstixuRpLXzOTkwL4AAwe2yI+AMcCZvIQpgn0qR9Z4/Shpramx8dznyxNqIy70qkU5xnKOac9Iye0hBjWRBNpwj7HHmCpYq0if6ZUhcYCe3+pn7O/qERQLe8iJKEYQcVTwlZKW4VCyGAH8hyryz9axE1yJy7yLo8lbTZutqGkApmzWBln2xcknHA9vB6niO2Oul8f6sdCWnVZTBaZIPkXWyCx38+bMVnpQOUI5KqUImsNgVunzvsrdS6br8qawpo5SLrzpLfmmdZOrDchgpbjfZ1E7GwIDAQAB",
-//					"utf-8",
-//					"RSA2"
-//					);
-//		} catch (AlipayApiException e) {
-//			e.printStackTrace();
-//			throw new MyException("验签出错", new Throwable(e));
-//		}
 		if (signVerified){
 			log.info("支付宝系统订单：" + paramsMap.get("out_trade_no") + "验签成功");
 			//按照支付结果异步通知中的描述，对支付结果中的业务内容进行1\2\3\4二次校验，校验成功后在response中返回success，校验失败返回failure
@@ -78,7 +76,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 						if(ConstClasses.AliPayDataEntity.appid.equals(appId)){ // appid正确
 							log.info("appid验证通过");
 							//处理订单
-							aliAppPayService.dealOrder(order);
+							dealOrder(order);
 						}
 					}
 				}
@@ -92,4 +90,35 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			return "failure";
 		}
 	}
+	
+	/**
+	* @Description: 回调订单处理
+	 * @Param: [order]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/4/8
+	**/
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void dealOrder(AiliAppPayRecordEntity order){
+		log.info("支付宝回调 - 开始处理订单：" + order.getOrderNo());
+		if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex().equals(order.getTradeType())){  // 支出
+			log.info("开始处理支出订单");
+			//支付订单修改状态完成
+			ailiAppPayRecordService.completeAliAppPayRecord(order.getOrderNo());
+			log.info("支付宝回调 - 本地订单状态修改完成，订单号：" + order.getOrderNo());
+			if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.equals(order.getTradeName())){
+				log.info("开始修改商城订单状态，订单号：" + order.getOrderNo());
+				Map<String, Object> shopOrderDealMap = shoppingMallService.completeShopOrder(order.getServiceOrderNo());
+				if(0 != (int)shopOrderDealMap.get("code")){
+					throw new PaymentException((int)shopOrderDealMap.get("code"),String.valueOf(shopOrderDealMap.get("msg")));
+				}
+				log.info("商城订单状态修改完成，订单号：" + order.getOrderNo());
+			}
+		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(order.getTradeType())){  // 提现
+			log.info("开始处理提现订单");
+			log.info("提现订单处理完成");
+		}
+	}
+	
 }

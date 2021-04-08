@@ -10,10 +10,19 @@ import java.util.Map;
 public interface IShoppingMallService {
 	/**
 	* @Description: 商城订单校验
-	 * @Param: [orderData]
+	 * @Param: [orderData, token]
 	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/2
 	**/
-	Map<String,Object> validateShopOrder(Map<String,Object> orderData);
+	Map<String,Object> validateShopOrder(Map<String,Object> orderData, String token);
+	
+	/**
+	* @Description: 修改商城订单状态为完成
+	 * @Param: [orderNo]
+	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/8
+	**/
+	Map<String,Object> completeShopOrder(String orderNo);
 }
