@@ -132,6 +132,7 @@ public class WeChatController {
         System.err.println("回调成功");
         Map<String, String> map = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
 //        weChatService.saveStatus(out_trade_no);
+        log.info(String.valueOf(map));
         log.info(map.get("attach"));
         log.info(map.get("out_trade_no"));
         log.info(map.get("transaction_id"));
@@ -222,8 +223,8 @@ public class WeChatController {
      * @Description:  提现查询
      * @author: Hu
      * @since: 2021/2/1 11:14
-     * @Param:
-     * @return:
+     * @Param: orderId
+     * @return: CommonResult
      */
     @GetMapping("/withdrawDepositQuery")
     @Login
