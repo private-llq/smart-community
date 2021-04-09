@@ -571,6 +571,18 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 //		}
 		return result == 1;
 	}
+	
+	/**
+	* @Description: 根据id查询uid
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/9
+	**/
+	@Override
+	public String queryUidById(Long id){
+		return adminUserMapper.queryUidById(id);
+	}
 	//============== 操作员管理相关end ===============
 	
 	//==================================== 物业端（新）end ====================================

@@ -10,7 +10,9 @@ import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -73,8 +75,15 @@ public class AdminMenuController {
 	 * @Date: 2020/12/14
 	**/
 	@GetMapping("")
-	public CommonResult<List<AdminMenuEntity>> listOfMenu(){
-		return CommonResult.ok(adminConfigService.listOfMenu());
+	public CommonResult listOfMenu(Long id){
+		Map<String, Object> returnMap = new HashMap<>();
+		List<AdminMenuEntity> allMenu = adminConfigService.listOfMenu();
+		returnMap.put("allMenu",allMenu);
+		if(id != null){
+			List<String> userMenu = adminConfigService.queryUserMenuIdList(id);
+			returnMap.put("userMenu",userMenu);
+		}
+		return CommonResult.ok(returnMap,"查询成功");
 	}
 	
 	//=================================== 物业端新版 end ============================

@@ -130,6 +130,15 @@ public interface IAdminConfigService {
 	Integer countUserMenu(String uid);
 	
 	/**
+	* @Description: 查询用户菜单id列表
+	 * @Param: [id]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/9
+	**/
+	List<String> queryUserMenuIdList(Long id);
+	
+	/**
 	* @Description: 为用户分配菜单
 	 * @Param: [menuIds, uid]
 	 * @Return: boolean

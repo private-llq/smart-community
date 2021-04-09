@@ -210,6 +210,15 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2021/3/18
 	**/
 	boolean resetPassword(Long id,String uid);
+	
+	/**
+	* @Description: 根据id查询uid
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/9
+	**/
+	String queryUidById(Long id);
 	//============== 操作员管理相关end ===============
 	
 	//==================================== 物业端（新）end ====================================

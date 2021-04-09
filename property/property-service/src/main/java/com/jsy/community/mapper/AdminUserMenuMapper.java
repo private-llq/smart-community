@@ -16,4 +16,7 @@ public interface AdminUserMenuMapper extends BaseMapper<AdminUserMenuEntity> {
 	@Select("select menu_id from t_admin_user_menu where uid = #{uid}")
 	List<Long> queryUserMenu(String uid);
 	
+	@Select("select menu_id from t_admin_user_menu where uid = #{uid}")
+	List<String> queryUserMenuIdList(String uid);
+	
 }

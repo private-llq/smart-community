@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IAdminConfigService;
+import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminMenuEntity;
@@ -16,6 +17,7 @@ import com.jsy.community.mapper.AdminUserMenuMapper;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	@Resource
 	private AdminUserMenuMapper adminUserMenuMapper;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IAdminUserService adminUserService;
 	
 	//==================================================== Menu菜单 (旧) ===============================================================
 	/**
@@ -318,6 +323,21 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	@Override
 	public Integer countUserMenu(String uid){
 		return adminUserMenuMapper.selectCount(new QueryWrapper<AdminUserMenuEntity>().eq("uid",uid));
+	}
+	
+	/**
+	* @Description: 查询用户菜单id列表
+	 * @Param: [id]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/9
+	**/
+	@Override
+	public List<String> queryUserMenuIdList(Long id){
+		//查询操作员UID
+		String uid = adminUserService.queryUidById(id);
+		//返回UID对应菜单列表
+		return adminUserMenuMapper.queryUserMenuIdList(uid);
 	}
 	
 	/**
