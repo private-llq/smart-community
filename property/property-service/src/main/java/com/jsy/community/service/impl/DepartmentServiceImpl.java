@@ -147,14 +147,14 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		departmentQuery.eq("pid", departmentId).eq("community_id", communityId);
 		List<DepartmentEntity> childList = departmentMapper.selectList(departmentQuery);
 		if (childList != null && childList.size() > 0) {
-			throw new PropertyException("\"" + entity.getDepartment() + "\""+"已有下级节点，不可删除");
+			throw new PropertyException("\"" + entity.getDepartment() + "\"" + "已有下级节点，不可删除");
 		}
 		
 		QueryWrapper<DepartmentStaffEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("department_id", departmentId).eq("community_id",communityId);
+		queryWrapper.eq("department_id", departmentId).eq("community_id", communityId);
 		List<DepartmentStaffEntity> staffEntities = departmentStaffMapper.selectList(queryWrapper);
 		if (!CollectionUtils.isEmpty(staffEntities)) {
-			throw new PropertyException("\"" + entity.getDepartment() + "\""+"请先删除部门下的员工");
+			throw new PropertyException("\"" + entity.getDepartment() + "\"" + "请先删除部门下的员工");
 		}
 		departmentMapper.deleteById(departmentId);
 	}
@@ -182,7 +182,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 				// 获取并设置该节点(父)的人员数量
 				Long departmentId = entity.getId();
 				QueryWrapper<DepartmentStaffEntity> staffQuery = new QueryWrapper<>();
-				staffQuery.eq("department_id",departmentId);
+				staffQuery.eq("department_id", departmentId);
 				Integer count = departmentStaffMapper.selectCount(staffQuery);
 				entity.setCount(count);
 				parents.add(entity);
@@ -190,7 +190,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		}
 		
 		// 根据sort字段进行排序
-		Collections.sort(parents,order());
+		Collections.sort(parents, order());
 		
 		// 为根节点设置子节点，getClild是递归调用的
 		for (DepartmentVO departmentVO : parents) {
@@ -201,15 +201,22 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		}
 		
 		CommunityEntity entity = communityMapper.selectById(communityId);
-		return new TreeCommunityVO().setCommunityId(communityId).setCommunityName(entity.getName()).setDepartmentVOList(parents);
+		
+		QueryWrapper<DepartmentStaffEntity> staffQuery = new QueryWrapper<>();
+		staffQuery.eq("community_id", communityId);
+		Integer count = departmentStaffMapper.selectCount(staffQuery);
+		if (count == null) {
+			count = 0;
+		}
+		return new TreeCommunityVO().setCommunityId(communityId).setCommunityName(entity.getName()).setDepartmentVOList(parents).setCount(count);
 	}
 	
 	@Override
 	public DepartmentEntity getDepartmentById(Long departmentId, Long communityId) {
 		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("id",departmentId).eq("community_id",communityId);
+		wrapper.eq("id", departmentId).eq("community_id", communityId);
 		DepartmentEntity departmentEntity = departmentMapper.selectOne(wrapper);
-		if (departmentEntity==null) {
+		if (departmentEntity == null) {
 			return new DepartmentEntity();
 		}
 		
@@ -233,7 +240,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	/**
 	 * 获取子节点
 	 *
-	 * @param id      父节点id
+	 * @param id            父节点id
 	 * @param allDepartment 所有节点列表
 	 * @return 每个根节点下，所有子菜单列表
 	 */
@@ -248,7 +255,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 				// 获取并设置该节点(子)的人员数量
 				Long departmentId = nav.getId();
 				QueryWrapper<DepartmentStaffEntity> staffQuery = new QueryWrapper<>();
-				staffQuery.eq("department_id",departmentId);
+				staffQuery.eq("department_id", departmentId);
 				Integer count = departmentStaffMapper.selectCount(staffQuery);
 				nav.setCount(count);
 				childList.add(nav);
@@ -260,7 +267,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		}
 		
 		//排序
-		Collections.sort(childList,order());
+		Collections.sort(childList, order());
 		
 		//如果节点下没有子节点，返回一个空List（递归退出）
 		if (childList.size() == 0) {
@@ -273,11 +280,11 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	/*
 	 * 排序,根据sort排序
 	 */
-	public Comparator<DepartmentVO> order(){
+	public Comparator<DepartmentVO> order() {
 		Comparator<DepartmentVO> comparator = new Comparator<DepartmentVO>() {
 			@Override
 			public int compare(DepartmentVO o1, DepartmentVO o2) {
-				if(o1.getSort() != o2.getSort()){
+				if (o1.getSort() != o2.getSort()) {
 					return o1.getSort() - o2.getSort();
 				}
 				return 0;

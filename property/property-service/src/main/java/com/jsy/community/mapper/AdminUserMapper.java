@@ -59,12 +59,12 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 //	 * 根据用户名，查询系统用户
 //	 */
 //	AdminUserEntity queryByUserName(String username);
-	
+
 //	/**
 //	 * 根据邮箱，查询系统用户
 //	 */
 //	AdminUserEntity queryByEmail(String email);
-	
+
 //	/**
 //	 * 根据手机号，查询系统用户
 //	 */
@@ -129,5 +129,14 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Date: 2021/3/17
 	**/
 	int updateOperator(@Param("entity") AdminUserEntity entity);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.admin.AdminUserEntity>
+	 * @Author lihao
+	 * @Description 根据条件[员工姓名,编号,所在组织]查询报修人员
+	 * @Date 2021/4/2 13:40
+	 * @Param []
+	 **/
+	List<Map<String, String>> getRepairPerson(@Param("condition")String condition, @Param("communityId") Long communityId);
 	
 }

@@ -19,7 +19,7 @@
 		LEFT JOIN t_admin_menu m on rm.menu_id = m.id
 		where ur.user_id = #{userId}
 	</select>
-	
+
 	<!-- 查询用户的所有菜单ID -->
 	<select id="queryAllMenuId" resultType="long">
 		select distinct rm.menu_id
@@ -27,7 +27,7 @@
 		LEFT JOIN t_admin_role_menu rm on ur.role_id = rm.role_id
 		where ur.user_id = #{userId}
 	</select>
-	
+
 <!--	<select id="queryByUserName" resultType="com.jsy.community.entity.admin.AdminUserEntity">-->
 <!--		select *-->
 <!--		from t_admin_user-->
@@ -70,4 +70,17 @@
 		</set>
 		where id = #{entity.id} and community_id = #{entity.communityId}
 	</update>
+
+	<select id="getRepairPerson" resultType="hashmap">
+		select u.id, u.real_name, u.number,o.name from t_admin_user u,t_organization o
+		<where>
+			<if test="condition!=null and condition!=''">
+                (u.real_name like concat ("%",#{condition},"%") or u.number like concat ("%",#{condition},"%") or o.name like concat("%",#{condition},"%"))
+			</if>
+            and u.org_id = o.id
+            and u.community_id = #{communityId}
+            and o.is_repair = 1
+		</where>
+	</select>
+
 </mapper>

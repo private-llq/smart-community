@@ -57,7 +57,6 @@ public class RepairController {
 	@GetMapping("/getRepair")
 	public CommonResult getRepair(@ApiParam(value = "订单状态") @RequestParam(required = false) Integer status) {
 		String uid = UserUtils.getUserId();
-//		UserUtils.getAdminUserInfo();
 		List<RepairEntity> list = repairService.getRepair(uid, status);
 		return CommonResult.ok(list);
 	}

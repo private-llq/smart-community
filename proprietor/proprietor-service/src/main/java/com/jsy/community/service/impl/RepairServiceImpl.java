@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -106,7 +105,6 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		BeanUtils.copyProperties(repairEntity, orderEntity);
 		orderEntity.setId(SnowFlake.nextId());
 		orderEntity.setStatus(0);
-		orderEntity.setOrderTime(new Date());
 		orderEntity.setNumber(MyMathUtils.randomCode(17));
 		orderEntity.setRepairId(repairId);
 		repairOrderMapper.insert(orderEntity);
