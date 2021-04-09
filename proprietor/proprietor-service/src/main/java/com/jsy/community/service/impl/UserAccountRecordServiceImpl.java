@@ -15,6 +15,8 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.RoundingMode;
+
 /**
  * @author chq459799974
  * @description 用户账户流水实现类
@@ -61,6 +63,8 @@ public class UserAccountRecordServiceImpl implements IUserAccountRecordService {
 		for(UserAccountRecordEntity userAccountRecordEntity : resultPage.getRecords()){
 			userAccountRecordEntity.setTradeTypeStr(PaymentEnum.TradeTypeEnum.tradeTypeMap.get(userAccountRecordEntity.getTradeType()));
 			userAccountRecordEntity.setTradeFromStr(PaymentEnum.TradeFromEnum.tradeFromMap.get(userAccountRecordEntity.getTradeFrom()));
+			userAccountRecordEntity.setTradeAmountStr(userAccountRecordEntity.getTradeAmount().setScale(2, RoundingMode.HALF_UP).toPlainString());
+			userAccountRecordEntity.setBalanceStr(userAccountRecordEntity.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
 		}
 		PageInfo<UserAccountRecordEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(resultPage,pageInfo);

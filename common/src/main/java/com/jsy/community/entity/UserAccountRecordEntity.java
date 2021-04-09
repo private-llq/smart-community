@@ -36,8 +36,14 @@ public class UserAccountRecordEntity  extends BaseEntity{
 	@ApiModelProperty(value = "交易金额")
 	private BigDecimal tradeAmount;
 	
+	@ApiModelProperty(value = "交易金额字符串")
+	private String tradeAmountStr;
+	
 	@ApiModelProperty(value = "交易后余额")
 	private BigDecimal balance;
+	
+	@ApiModelProperty(value = "交易后余额字符串")
+	private String balanceStr;
 	
 	@ApiModelProperty(value = "商品id")
 	private Long goodsId;
