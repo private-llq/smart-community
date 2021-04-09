@@ -278,6 +278,7 @@ public class UserAccountController {
 		Integer tickets = userAccountService.countTicketByUid(uid);
 		returnMap.put("balance",balance.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
 		returnMap.put("tickets",tickets);
+		returnMap.put("bankCard",0);
 		return CommonResult.ok(returnMap,"查询成功");
 	}
 }
