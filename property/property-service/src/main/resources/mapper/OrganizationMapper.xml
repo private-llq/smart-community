@@ -6,7 +6,7 @@
     <select id="queryOrganizationNameByIdBatch" resultType="Map">
         select id,name from t_organization
         where id in
-        <foreach collection="list" item="item" open="(" close=")" separator=",">
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
         and deleted = 0

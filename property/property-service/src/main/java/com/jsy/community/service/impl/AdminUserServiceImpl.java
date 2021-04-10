@@ -446,18 +446,18 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
 		if(pageData.getRecords().size() > 0){
 			//补创建人和更新人姓名
-			List<String> createUidList = new ArrayList<>();
-			List<String> updateUidList = new ArrayList<>();
+			Set<String> createUidSet = new HashSet<>();
+			Set<String> updateUidSet = new HashSet<>();
 			//补组织机构名称
-			LinkedList<Long> list = new LinkedList<>();
+			Set<Long> orgIdSet = new HashSet<>();
 			for(AdminUserEntity entity : pageData.getRecords()){
-				list.add(entity.getOrgId());
-				createUidList.add(entity.getCreateBy());
-				updateUidList.add(entity.getUpdateBy());
+				orgIdSet.add(entity.getOrgId());
+				createUidSet.add(entity.getCreateBy());
+				updateUidSet.add(entity.getUpdateBy());
 			}
-			Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(list);
-			Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidList);
-			Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidList);
+			Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(orgIdSet);
+			Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
+			Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
 			for(AdminUserEntity entity : pageData.getRecords()){
 				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
 				entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));

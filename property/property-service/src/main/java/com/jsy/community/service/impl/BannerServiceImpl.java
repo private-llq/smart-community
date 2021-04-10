@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
@@ -13,6 +14,7 @@ import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * banner轮播图 服务实现类
@@ -34,6 +34,9 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	
 	@Autowired
 	private BannerMapper bannerMapper;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IAdminUserService adminUserService;
 	
 	/**
 	* @Description: 轮播图入库
@@ -126,6 +129,23 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		queryWrapper.eq("community_id",query.getCommunityId());
 		queryWrapper.eq("publish_type",query.getPublishType());
 		Page<BannerEntity> pageData = bannerMapper.selectPage(page, queryWrapper);
+		//补创建人和更新人和发布人姓名
+		Set<String> createUidSet = new HashSet<>();
+		Set<String> updateUidSet = new HashSet<>();
+		Set<String> publishUidSet = new HashSet<>();
+		for(BannerEntity bannerEntity : pageData.getRecords()){
+			createUidSet.add(bannerEntity.getCreateBy());
+			updateUidSet.add(bannerEntity.getUpdateBy());
+			publishUidSet.add(bannerEntity.getPublishBy());
+		}
+		Map<String, Map<String,String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
+		Map<String, Map<String,String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
+		Map<String, Map<String,String>> publishUserMap = adminUserService.queryNameByUidBatch(publishUidSet);
+		for(BannerEntity bannerEntity : pageData.getRecords()){
+			bannerEntity.setCreateBy(createUserMap.get(bannerEntity.getCreateBy()) == null ? null : createUserMap.get(bannerEntity.getCreateBy()).get("name"));
+			bannerEntity.setUpdateBy(updateUserMap.get(bannerEntity.getUpdateBy()) == null ? null : updateUserMap.get(bannerEntity.getUpdateBy()).get("name"));
+			bannerEntity.setPublishBy(publishUserMap.get(bannerEntity.getPublishBy()) == null ? null : publishUserMap.get(bannerEntity.getPublishBy()).get("name"));
+		}
 		PageInfo<BannerEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;

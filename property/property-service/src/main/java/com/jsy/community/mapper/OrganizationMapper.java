@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.OrganizationEntity;
 import org.apache.ibatis.annotations.MapKey;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -24,5 +25,5 @@ public interface OrganizationMapper extends BaseMapper<OrganizationEntity> {
 	 * @Date: 2021/3/16
 	**/
 	@MapKey("id")
-	Map<Long,Map<Long,Object>> queryOrganizationNameByIdBatch(List<Long> ids);
+	Map<Long,Map<Long,Object>> queryOrganizationNameByIdBatch(Collection<Long> ids);
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.OrganizationEntity;
 import com.jsy.community.vo.TreeCommunityVO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public interface IOrganizationService extends IService<OrganizationEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/16
 	**/
-	Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(List<Long> ids);
+	Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(Collection<Long> ids);
 	
 	/**
 	* @Description: 社区组织机构是否存在

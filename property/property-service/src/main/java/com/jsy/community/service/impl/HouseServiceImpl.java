@@ -472,14 +472,14 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 				}
 			}
 			//补创建人和更新人姓名
-			List<String> createUidList = new ArrayList<>();
-			List<String> updateUidList = new ArrayList<>();
+			Set<String> createUidSet = new HashSet<>();
+			Set<String> updateUidSet = new HashSet<>();
 			for(HouseEntity houseEntity : pageData.getRecords()){
-				createUidList.add(houseEntity.getCreateBy());
-				updateUidList.add(houseEntity.getUpdateBy());
+				createUidSet.add(houseEntity.getCreateBy());
+				updateUidSet.add(houseEntity.getUpdateBy());
 			}
-			Map<String, Map<String,String>> createUserMap = adminUserService.queryNameByUidBatch(createUidList);
-			Map<String, Map<String,String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidList);
+			Map<String, Map<String,String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
+			Map<String, Map<String,String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
 			for(HouseEntity houseEntity : pageData.getRecords()){
 				houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
 				houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));

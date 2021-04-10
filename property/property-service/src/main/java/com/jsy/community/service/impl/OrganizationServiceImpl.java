@@ -161,7 +161,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	 * @Date: 2021/3/16
 	 **/
 	@Override
-	public Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(List<Long> ids) {
+	public Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(Collection<Long> ids) {
 		return organizationMapper.queryOrganizationNameByIdBatch(ids);
 	}
 	
