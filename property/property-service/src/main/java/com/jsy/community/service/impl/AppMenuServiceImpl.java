@@ -10,6 +10,7 @@ import com.jsy.community.vo.menu.AppMenuVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -145,6 +146,9 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	public List<AppMenuEntity> listMenu(Long communityId) {
 		// 查询中间表
 		List<Map<String, Long>> idsAdnSort = appMenuMapper.listMenuId(communityId);
+		if (CollectionUtils.isEmpty(idsAdnSort)) {
+			return new ArrayList<AppMenuEntity>();
+		}
 		List<AppMenuEntity> appMenuEntityList = new ArrayList<>();
 		for (Map<String, Long> stringLongMap : idsAdnSort) {
 			Long id = stringLongMap.get("menu_id");
