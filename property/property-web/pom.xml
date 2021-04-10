@@ -88,6 +88,13 @@
 			<artifactId>kaptcha</artifactId>
 		</dependency>
 
+		<!--*************  websocket  *************-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+		<!--*************  websocket  *************-->
+
 
 <!--		<dependency>-->
 <!--			<groupId>com.sun.jna</groupId>&lt;!&ndash;随便填&ndash;&gt;-->
