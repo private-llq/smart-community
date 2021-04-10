@@ -21,8 +21,8 @@
         where community_id = #{communityId}
     </select>
 
-    <select id="listMenuId" resultType="long">
-        select menu_id from t_menu_community where community_id = #{communityId}
+    <select id="listMenuId" resultType="java.util.HashMap">
+        select menu_id, sort from t_menu_community where community_id = #{communityId}
     </select>
 
     <delete id="deleteMiddleMenu">

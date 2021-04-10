@@ -6,6 +6,7 @@ import com.jsy.community.vo.menu.AppMenuVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -35,7 +36,7 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Date 2021/3/23 10:23
 	 * @Param [communityId]
 	 **/
-	List<Long> listMenuId(Long communityId);
+	List<Map<String, Long>> listMenuId(Long communityId);
 	
 	/**
 	 * @return void
@@ -54,4 +55,5 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Param [ids]
 	 **/
 	void deleteMiddleMenu(Long id);
+	
 }

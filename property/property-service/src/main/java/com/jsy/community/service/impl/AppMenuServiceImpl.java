@@ -11,7 +11,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -144,8 +144,30 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	@Override
 	public List<AppMenuEntity> listMenu(Long communityId) {
 		// 查询中间表
-		List<Long> ids = appMenuMapper.listMenuId(communityId);
-		return appMenuMapper.selectBatchIds(ids);
+		List<Map<String, Long>> idsAdnSort = appMenuMapper.listMenuId(communityId);
+		List<AppMenuEntity> appMenuEntityList = new ArrayList<>();
+		for (Map<String, Long> stringLongMap : idsAdnSort) {
+			Long id = stringLongMap.get("menu_id");
+			Long sort = stringLongMap.get("sort");
+			AppMenuEntity appMenuEntity = appMenuMapper.selectById(id);
+			appMenuEntity.setSort(sort);
+			appMenuEntityList.add(appMenuEntity);
+		}
+		
+		Collections.sort(appMenuEntityList, new Comparator<AppMenuEntity>() {
+			@Override
+			public int compare(AppMenuEntity o1, AppMenuEntity o2) {
+				Long sort = o1.getSort();
+				Long sort1 = o2.getSort();
+				if (sort.equals(sort1) ) {
+					return 0;
+				}else {
+					// 从小到大
+					return sort > sort1 ? 1 : -1 ;
+				}
+			}
+		});
+		return appMenuEntityList;
 	}
 	
 	@Override
@@ -160,7 +182,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 			}
 			
 			// 删除该社区原本有的中间表数据
-			// TODO: 2021/3/23 因为这个功能 新增和编辑是同一个  不管他是新增还是编辑  把他原本的清空
+			// 因为这个功能 新增和编辑是同一个  不管他是新增还是编辑  把他原本的清空
 			appMenuMapper.deleteMiddleMenu(appMenuEntity.getCommunityId());
 		}
 		
