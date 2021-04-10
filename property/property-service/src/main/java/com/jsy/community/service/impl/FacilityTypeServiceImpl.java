@@ -9,7 +9,6 @@ import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.entity.hk.FacilityTypeEntity;
 import com.jsy.community.mapper.FacilityMapper;
 import com.jsy.community.mapper.FacilityTypeMapper;
-import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.hk.FacilityTypeVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -21,7 +20,7 @@ import java.util.List;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author lihao
@@ -38,36 +37,41 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 	
 	@Override
 	public void addFacilityType(FacilityTypeEntity facilityTypeEntity) {
-		facilityTypeEntity.setId(SnowFlake.nextId());
 		facilityTypeMapper.insert(facilityTypeEntity);
 	}
 	
 	@Override
 	public void updateFacilityType(FacilityTypeEntity facilityTypeEntity) {
-		if (facilityTypeEntity.getId()==null) {
-			throw new PropertyException("修改失败");
+		if (facilityTypeEntity.getId() == null) {
+			throw new PropertyException("请选择要修改的设备分类");
 		}
-		System.out.println(facilityTypeEntity.getId());
-		facilityTypeMapper.updateById(facilityTypeEntity);
+		
+		QueryWrapper<FacilityTypeEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("community_id", facilityTypeEntity.getCommunityId()).eq("id", facilityTypeEntity.getId());
+		FacilityTypeEntity typeEntity = facilityTypeMapper.selectOne(wrapper);
+		if (typeEntity != null) {
+			System.out.println(facilityTypeEntity.getId());
+			facilityTypeMapper.updateById(facilityTypeEntity);
+		}
 	}
 	
 	@Override
-	public void deleteFacilityType(Long id,Long communityId) {
+	public void deleteFacilityType(Long id, Long communityId) {
 		FacilityTypeEntity entity = facilityTypeMapper.selectById(id);
-		if (entity!=null) {
+		if (entity != null) {
 			QueryWrapper<FacilityTypeEntity> wrapper = new QueryWrapper<>();
-			wrapper.eq("pid",id).eq("community_id",communityId);
+			wrapper.eq("pid", id).eq("community_id", communityId);
 			
 			List<FacilityTypeEntity> list = facilityTypeMapper.selectList(wrapper);
 			if (!CollectionUtils.isEmpty(list)) {
-				throw new PropertyException("\""+entity.getName()+"\""+"已有下级节点，不可删除");
+				throw new PropertyException("\"" + entity.getName() + "\"" + "已有下级节点，不可删除");
 			}
 			
 			QueryWrapper<FacilityEntity> queryWrapper = new QueryWrapper<>();
-			queryWrapper.eq("facility_type_id",entity.getId()).eq("community_id",communityId);
+			queryWrapper.eq("facility_type_id", entity.getId()).eq("community_id", communityId);
 			List<FacilityEntity> entities = facilityMapper.selectList(queryWrapper);
 			if (!CollectionUtils.isEmpty(entities)) {
-				throw new PropertyException("\""+entity.getName()+"\""+"已有属于该分类的设备，不可删除");
+				throw new PropertyException("\"" + entity.getName() + "\"" + "已有属于该分类的设备，不可删除");
 			}
 			
 			if (!entity.getCommunityId().equals(communityId)) {
@@ -81,13 +85,14 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 	public List<FacilityTypeVO> listFacilityType(Long communityId) {
 		//1. 查询所有设备分类
 		QueryWrapper<FacilityTypeEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("community_id",communityId);
+		wrapper.eq("community_id", communityId);
 		List<FacilityTypeEntity> allFacility = facilityTypeMapper.selectList(wrapper);
 		
 		List<FacilityTypeVO> allFacilityVO = new ArrayList<>();
 		for (FacilityTypeEntity facilityTypeEntity : allFacility) {
 			FacilityTypeVO facilityTypeVO = new FacilityTypeVO();
-			BeanUtils.copyProperties(facilityTypeEntity,facilityTypeVO);
+			BeanUtils.copyProperties(facilityTypeEntity, facilityTypeVO);
+			facilityTypeVO.setLabel(facilityTypeEntity.getName());
 			allFacilityVO.add(facilityTypeVO);
 		}
 		
@@ -98,7 +103,7 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 				// 获取并设置该节点的人数
 				Long typeId = entity.getId();
 				QueryWrapper<FacilityEntity> queryWrapper = new QueryWrapper<>();
-				queryWrapper.eq("facility_type_id",typeId);
+				queryWrapper.eq("facility_type_id", typeId);
 				Integer count = facilityMapper.selectCount(queryWrapper);
 				entity.setCount(count);
 				parents.add(entity);
@@ -107,7 +112,7 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 		
 		//3. 为根节点设置子节点，getClild是递归调用的
 		for (FacilityTypeVO parent : parents) {
-			List<FacilityTypeVO> childList = getChild(parent.getId(),allFacilityVO);
+			List<FacilityTypeVO> childList = getChild(parent.getId(), allFacilityVO);
 			parent.setChildren(childList);
 		}
 		
@@ -122,7 +127,7 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 	/**
 	 * 获取子节点
 	 *
-	 * @param id      父节点id
+	 * @param id            父节点id
 	 * @param allFacilityVO 所有菜单列表
 	 * @return 每个根节点下，所有子菜单列表
 	 */
@@ -135,7 +140,7 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 			if (id.equals(nav.getPid())) {
 				Long typeId = nav.getId();
 				QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
-				wrapper.eq("facility_type_id",typeId);
+				wrapper.eq("facility_type_id", typeId);
 				Integer count = facilityMapper.selectCount(wrapper);
 				nav.setCount(count);
 				

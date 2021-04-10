@@ -32,7 +32,7 @@ public class FacilityTypeVO implements Serializable {
 	private Long communityId;
 	
 	@ApiModelProperty(value = "类别名称")
-	private String name;
+	private String label;
 	
 	@ApiModelProperty(value = "设备数量")
 	private int count;

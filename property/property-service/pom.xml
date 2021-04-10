@@ -141,15 +141,6 @@
 			<version>5.0.2.RELEASE</version>
 		</dependency>
 		<!--*************  LCN	*************-->
-
-
-		<!--*************  websocket  *************-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
-		<!--*************  websocket  *************-->
-
     </dependencies>
 
 	<build>
