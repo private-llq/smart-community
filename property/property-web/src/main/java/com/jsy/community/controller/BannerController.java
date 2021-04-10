@@ -7,13 +7,19 @@ import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.BannerEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.BannerVO;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.catalina.User;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -45,17 +51,21 @@ public class BannerController {
 	
 	
 	/**
-	 * @Description: 轮播图列表查询
+	 * @Description: 轮播图 分页查询
 	 * @Param: [bannerQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
-	@ApiOperation("【轮播图】列表查询")
-	@PostMapping("list")
-	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
-		List<BannerVO> returnList = bannerService.queryBannerList(bannerQO);
-		return CommonResult.ok(returnList);
+	@ApiOperation("【轮播图】分页查询")
+	@PostMapping("page")
+	public CommonResult<PageInfo<BannerEntity>> list(@RequestBody BaseQO<BannerEntity> baseQO){
+		BannerEntity query = baseQO.getQuery();
+		if(query == null || query.getPublishType() == null){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请确定查询草稿或者已发布");
+		}
+		query.setCommunityId(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(bannerService.queryBannerPage(baseQO),"查询成功");
 	}
 
 	/**
@@ -69,9 +79,9 @@ public class BannerController {
 	@PostMapping("")
 	public CommonResult upload(@RequestBody BannerEntity bannerEntity){
 		ValidatorUtils.validateEntity(bannerEntity, BannerEntity.addBannerValidatedGroup.class);
-		if(bannerEntity.getCommunityId().equals(0L)){
-			return CommonResult.error("社区ID不正确");
-		}
+		AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
+		bannerEntity.setCommunityId(adminUserInfo.getCommunityId());
+		bannerEntity.setCreateBy(adminUserInfo.getUid());
 		//写库
 		boolean b = bannerService.addBanner(bannerEntity);
 		String filePath = bannerEntity.getUrl();
@@ -79,9 +89,9 @@ public class BannerController {
 			redisTemplate.opsForSet().add("banner_img_all",filePath);
 		}
 		if(b){
-			return CommonResult.ok();
+			return CommonResult.ok("操作成功");
 		}
-		return CommonResult.error(JSYError.INTERNAL);
+		return CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 	}
 	
 	/**

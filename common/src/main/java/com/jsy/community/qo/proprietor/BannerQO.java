@@ -26,17 +26,20 @@ public class BannerQO implements Serializable {
 	@ApiModelProperty(value = "Banner位置1.顶部 2.底部")
 	private Integer position;
 	
-	@ApiModelProperty(value = "轮播图类型1.非广告 2.广告")
+	@ApiModelProperty(value = "轮播图类型1.站内 2.外部链接")
 	private Integer type;
 	
 	@ApiModelProperty(value = "点击量排序 1.升序 -1.降序")
 	private int clickOrder;
 	
-	@ApiModelProperty(value = "跳转路径")
-	private String path;
+	@ApiModelProperty(value = "标题")
+	private String title;
 	
-	@ApiModelProperty(value = "描述")
-	private String description;
+	@ApiModelProperty(value = "内容(文字或外部链接)")
+	private String content;
+	
+	@ApiModelProperty(value = "封面路径")
+	private String url;
 	
 	/**
 	 * APP端查询轮播图验证组
