@@ -97,37 +97,42 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		Page<BannerEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
 		QueryWrapper<BannerEntity> queryWrapper = new QueryWrapper<>();
-		if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(query.getPublishType())){
-			queryWrapper.select("id,title,url,type,content,create_by,create_time");
-		}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(query.getPublishType())){
-			queryWrapper.select("id,title,url,content,click,sort,status,publish_by,publish_time,create_by,create_time,update_by,update_time");
-			if(query.getPublishDateStart() != null){
-				queryWrapper.ge("publish_time",query.getPublishDateStart());
+		if(query.getId() != null){ //查详情
+			queryWrapper.select("id,title,url,type,content");
+			queryWrapper.eq("id",query.getId());
+		}else{
+			if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(query.getPublishType())){ //查草稿
+				queryWrapper.select("id,title,url,type,content,create_by,create_time");
+			}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(query.getPublishType())){ // 查已发布
+				queryWrapper.select("id,title,url,content,click,sort,status,publish_by,publish_time,create_by,create_time,update_by,update_time");
+				if(query.getPublishDateStart() != null){
+					queryWrapper.ge("publish_time",query.getPublishDateStart());
+				}
+				if(query.getPublishDateEnd() != null){
+					queryWrapper.le("publish_time",query.getPublishDateEnd());
+				}
+				if(query.getStatus() != null){
+					queryWrapper.eq("status",query.getStatus());
+				}
 			}
-			if(query.getPublishDateEnd() != null){
-				queryWrapper.le("publish_time",query.getPublishDateEnd());
+			if(query.getPosition() != null){
+				queryWrapper.eq("position",query.getPosition());
 			}
-			if(query.getStatus() != null){
-				queryWrapper.eq("status",query.getStatus());
+			if(!StringUtils.isEmpty(query.getTitle())){
+				queryWrapper.like("title",query.getTitle());
 			}
-		}
-		if(query.getPosition() != null){
-			queryWrapper.eq("position",query.getPosition());
-		}
-		if(!StringUtils.isEmpty(query.getTitle())){
-			queryWrapper.like("title",query.getTitle());
-		}
-		if(!StringUtils.isEmpty(query.getContent())){
-			queryWrapper.like("content",query.getContent());
-		}
-		if(query.getCreateDateStart() != null){
-			queryWrapper.ge("create_time",query.getCreateDateStart());
-		}
-		if(query.getCreateDateEnd() != null){
-			queryWrapper.le("create_time",query.getCreateDateEnd());
+			if(!StringUtils.isEmpty(query.getContent())){
+				queryWrapper.like("content",query.getContent());
+			}
+			if(query.getCreateDateStart() != null){
+				queryWrapper.ge("create_time",query.getCreateDateStart());
+			}
+			if(query.getCreateDateEnd() != null){
+				queryWrapper.le("create_time",query.getCreateDateEnd());
+			}
+			queryWrapper.eq("publish_type",query.getPublishType());
 		}
 		queryWrapper.eq("community_id",query.getCommunityId());
-		queryWrapper.eq("publish_type",query.getPublishType());
 		Page<BannerEntity> pageData = bannerMapper.selectPage(page, queryWrapper);
 		//补创建人和更新人和发布人姓名
 		Set<String> createUidSet = new HashSet<>();

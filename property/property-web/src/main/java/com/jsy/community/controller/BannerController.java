@@ -61,8 +61,8 @@ public class BannerController {
 	@PostMapping("page")
 	public CommonResult<PageInfo<BannerEntity>> list(@RequestBody BaseQO<BannerEntity> baseQO){
 		BannerEntity query = baseQO.getQuery();
-		if(query == null || query.getPublishType() == null){
-			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请确定查询草稿或者已发布");
+		if(query == null || (query.getId() == null && query.getPublishType() == null)){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请确定操作 查询草稿/已发布/详情");
 		}
 		query.setCommunityId(UserUtils.getAdminCommunityId());
 		return CommonResult.ok(bannerService.queryBannerPage(baseQO),"查询成功");
