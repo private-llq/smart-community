@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -110,7 +111,7 @@ public class CommunityFunController {
     @ApiOperation("新增内容图片")
     @PostMapping("/contentImge")
     @Login
-    public CommonResult content(@RequestParam("file") MultipartFile file) throws IOException {
+    public CommonResult content(@RequestParam("file") MultipartFile file){
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
             String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);

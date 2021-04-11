@@ -10,10 +10,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.BannerQO;
-import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.BannerVO;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
@@ -27,6 +24,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -103,7 +101,10 @@ public class BannerController {
 	 **/
 	@ApiOperation("【轮播图图片】上传")
 	@PostMapping("uploadImg")
-	public CommonResult uploadImg(@RequestParam("file") MultipartFile file){
+	public CommonResult uploadImg(MultipartFile file){
+		if(!PicUtil.isPic(file)){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件格式错误");
+		}
 		String filePath = MinioUtils.upload(file, BUCKETNAME);
 		redisTemplate.opsForSet().add("banner_img_part",filePath);
 		return CommonResult.ok(filePath);

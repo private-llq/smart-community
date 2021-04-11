@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -48,7 +49,7 @@ public class PicUtil {
      */
     public static void imageQualified(MultipartFile file){
         if( Objects.isNull(file) ){
-            throw new JSYException(JSYError.BAD_REQUEST);
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件为空");
         }
         String originalFilename = file.getOriginalFilename();
         if( !FilenameUtils.isExtension(originalFilename, AVAILABLE_FORMAT) ){
@@ -122,7 +123,7 @@ public class PicUtil {
     /**
      * 判断是否是图片
      */
-    public static boolean isPic(MultipartFile[] files) throws IOException{
+    public static boolean isPic(MultipartFile[] files){
         boolean b;
         for(MultipartFile file : files){
             b = isPic(file);
@@ -133,11 +134,19 @@ public class PicUtil {
         return true;
     }
 
-    public static boolean isPic(MultipartFile file) throws IOException{
-            File tempFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+    public static boolean isPic(MultipartFile file){
+        if(file == null){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件为空");
+        }
+        String fileType;
+        File tempFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+        try {
             FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
-            String fileType = getPicType(new FileInputStream(tempFile));
-            if (tempFile.exists()) {
+            fileType = getPicType(new FileInputStream(tempFile));
+        }catch (IOException e){
+            throw new JSYException(JSYError.INTERNAL);
+        }
+        if (tempFile.exists()) {
                 boolean delete = tempFile.delete();
             }
             if(TYPE_UNKNOWN.equals(fileType)){
