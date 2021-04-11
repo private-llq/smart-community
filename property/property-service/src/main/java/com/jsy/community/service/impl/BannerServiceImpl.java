@@ -20,6 +20,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -57,7 +58,9 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 			bannerEntity.setStatus(null);//草稿无 发布/撤销 状态
 		}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(bannerEntity.getPublishType())){
 			//发布需要排序，保存草稿不用
+			//查出当前已有的排序号
 			List<Integer> sorts = bannerMapper.queryBannerSortByCommunityId(bannerEntity.getCommunityId());
+			////查找排序空位
 			Integer sort = findSort(sorts);
 			bannerEntity.setSort(sort);
 			//设置发布时间、发布人、状态
@@ -203,14 +206,15 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	 * @Date: 2020/12/29
 	 **/
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public boolean updateBanner(BannerQO bannerQO){
-		BannerEntity entity = bannerMapper.selectOne(new QueryWrapper<BannerEntity>().select("id,publish_type").eq("id", bannerQO.getId()).eq("community_id",bannerQO.getCommunityId()));
+		BannerEntity entity = bannerMapper.selectOne(new QueryWrapper<BannerEntity>().select("id,publish_type,status,community_id").eq("id", bannerQO.getId()).eq("community_id",bannerQO.getCommunityId()));
 		if(entity == null){
 			throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"数据不存在");
 		}
 		BannerEntity bannerEntity = new BannerEntity();
 		bannerEntity.setStatus(bannerQO.getStatus()); //已发布中的撤销、重新发布操作
-		if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(entity.getPublishType())){
+		if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(entity.getPublishType())){  //操作草稿
 			if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(bannerQO.getPublishType())){
 				//草稿 ==> 发布
 				bannerEntity.setPublishBy(bannerQO.getOperator());
@@ -221,10 +225,28 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 				bannerEntity.setStatus(null);
 //				bannerEntity.setUpdateBy(bannerQO.getOperator());//A1.修改草稿(不发布) 添加修改人
 			}
-		}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(entity.getPublishType())){
+		}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(entity.getPublishType())){  //操作发布中的
 			if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(bannerQO.getPublishType())){
 				//发布 ==> 草稿
 				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"已发布不能修改为草稿");
+			}
+			//修改状态 0.撤销 1.发布
+			if(bannerQO.getStatus() != null && !bannerQO.getStatus().equals(entity.getStatus())){
+				//发布中 ==> 已撤销
+				if(PropertyConsts.BANNER_STATUS_CANCEL.equals(bannerQO.getStatus())){
+					//调整其他发布中的广告位排序(排序在修改目标之后的全部-1)
+					bannerMapper.resortBanner(bannerQO.getId(),entity.getCommunityId());
+					//取消撤销发布对象的排序
+					bannerMapper.cancelSort(bannerQO.getId());
+				}
+				//已撤销 ==> 重新发布
+				else if(PropertyConsts.BANNER_STATUS_PUBLISH.equals(bannerQO.getStatus())){
+					//查出当前已有的排序号
+					List<Integer> sorts = bannerMapper.queryBannerSortByCommunityId(entity.getCommunityId());
+					//寻找空位设置排序
+					Integer sort = findSort(sorts);
+					bannerEntity.setSort(sort);
+				}
 			}
 //			bannerEntity.setUpdateBy(bannerQO.getOperator());//A2.修改已发布的 添加修改人
 		}
