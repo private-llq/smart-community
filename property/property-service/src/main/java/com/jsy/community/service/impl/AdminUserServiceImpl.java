@@ -549,8 +549,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean resetPassword(Long id,String uid){
-		AdminUserAuthEntity entity = adminUserAuthMapper.selectOne(new QueryWrapper<AdminUserAuthEntity>().select("mobile").eq("id", id));
-		if(entity == null){
+		AdminUserEntity adminUser = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile").eq("id", id));
+		if(adminUser == null){
 			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"用户不存在");
 		}
 		//生成随机密码
@@ -563,9 +563,9 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserAuthEntity.setPassword(password);
 		adminUserAuthEntity.setSalt(salt);
 		adminUserAuthEntity.setUpdateBy(uid);
-		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("id", id));
+		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", adminUser.getMobile()));
 		//发短信通知初始密码
-		boolean b = SmsUtil.sendSmsPassword(entity.getMobile(), randomPass);
+		boolean b = SmsUtil.sendSmsPassword(adminUser.getMobile(), randomPass);
 //		if(!b){
 //			throw new PropertyException(JSYError.INTERNAL.getCode(),"短信通知失败，用户添加失败");
 //		}
