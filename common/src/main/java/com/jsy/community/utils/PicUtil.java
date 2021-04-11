@@ -125,14 +125,12 @@ public class PicUtil {
         if(files == null || files.length == 0){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(),"请至少上传一个文件");
         }
-        boolean b = true;
         for(MultipartFile file : files){
-            b = isPic(file);
-            if(!b){
-                return b;
+            if(!isPic(file)){
+                return false;
             }
         }
-        return b;
+        return true;
     }
     
     /**
@@ -177,14 +175,12 @@ public class PicUtil {
         if(files == null || files.length == 0){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(),"请至少上传一个文件");
         }
-        boolean b = true;
         for(MultipartFile file : files){
-           b = checkSizeAndType(file, kb);
-           if(!b){
-               return b;
+           if(!checkSizeAndType(file, kb)){
+               return false;
            }
         }
-        return b;
+        return true;
     }
     
 }
