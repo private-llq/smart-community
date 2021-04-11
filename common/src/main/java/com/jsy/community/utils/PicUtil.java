@@ -163,7 +163,7 @@ public class PicUtil {
     public static boolean checkSizeAndType(MultipartFile file,long kb){
         long size = file.getSize() / 1024;
         if (size > kb) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "文件太大了,最大：" + IMAGE_MAX_SIZE + "KB");
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "文件太大了,最大：" + kb + "KB");
         }
         return isPic(file);
     }

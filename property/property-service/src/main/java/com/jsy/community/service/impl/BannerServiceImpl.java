@@ -105,6 +105,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		}else{
 			if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(query.getPublishType())){ //查草稿
 				queryWrapper.select("id,title,url,type,content,create_by,create_time");
+				queryWrapper.orderByDesc("create_time");
 			}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(query.getPublishType())){ // 查已发布
 				queryWrapper.select("id,title,url,content,click,sort,status,publish_by,publish_time,create_by,create_time,update_by,update_time");
 				if(query.getPublishDateStart() != null){
@@ -116,6 +117,8 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 				if(query.getStatus() != null){
 					queryWrapper.eq("status",query.getStatus());
 				}
+				queryWrapper.orderByDesc("status");
+				queryWrapper.orderByAsc("sort");
 			}
 			if(query.getPosition() != null){
 				queryWrapper.eq("position",query.getPosition());

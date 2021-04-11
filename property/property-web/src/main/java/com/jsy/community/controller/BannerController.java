@@ -102,7 +102,7 @@ public class BannerController {
 	@ApiOperation("【轮播图图片】上传")
 	@PostMapping("uploadImg")
 	public CommonResult uploadImg(MultipartFile file){
-		if(!PicUtil.isPic(file)){
+		if(!PicUtil.checkSizeAndType(file,5*1024)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件格式错误");
 		}
 		String filePath = MinioUtils.upload(file, BUCKETNAME);
