@@ -118,22 +118,26 @@ public class PicUtil {
         return null;
     }
 
-
-
     /**
-     * 判断是否是图片
+     * 判断是否是图片(批量)
      */
     public static boolean isPic(MultipartFile[] files){
-        boolean b;
+        if(files == null || files.length == 0){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"请至少上传一个文件");
+        }
+        boolean b = true;
         for(MultipartFile file : files){
             b = isPic(file);
             if(!b){
-                return false;
+                return b;
             }
         }
-        return true;
+        return b;
     }
-
+    
+    /**
+     * 判断是否是图片
+     */
     public static boolean isPic(MultipartFile file){
         if(file == null){
             throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件为空");
@@ -154,5 +158,33 @@ public class PicUtil {
             }
         return true;
     }
-
+    
+    /**
+     * 验证图片大小和格式
+     */
+    public static boolean checkSizeAndType(MultipartFile file,long kb){
+        long size = file.getSize() / 1024;
+        if (size > kb) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "文件太大了,最大：" + IMAGE_MAX_SIZE + "KB");
+        }
+        return isPic(file);
+    }
+    
+    /**
+     * 验证图片大小和格式(批量)
+     */
+    public static boolean checkSizeAndTypeBatch(MultipartFile[] files,long kb){
+        if(files == null || files.length == 0){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"请至少上传一个文件");
+        }
+        boolean b = true;
+        for(MultipartFile file : files){
+           b = checkSizeAndType(file, kb);
+           if(!b){
+               return b;
+           }
+        }
+        return b;
+    }
+    
 }
