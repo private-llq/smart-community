@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IBannerService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.BannerEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.BannerMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.BannerQO;
@@ -156,17 +158,38 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		return pageInfo;
 	}
 	
+//	/**
+//	* @Description: 轮播图 批量删除
+//	 * @Param: [bannerQO]
+//	 * @Return: boolean
+//	 * @Author: chq459799974
+//	 * @Date: 2020/11/16
+//	**/
+//	@Override
+//	public boolean deleteBannerBatch(Long[] ids){
+//		int result = bannerMapper.deleteBatchIds(Arrays.asList(ids));
+//		return result > 0;
+//	}
+	
 	/**
-	* @Description: 轮播图 批量删除
-	 * @Param: [bannerQO]
+	* @Description: 轮播图 删除
+	 * @Param: [id,communityId]
 	 * @Return: boolean
 	 * @Author: chq459799974
-	 * @Date: 2020/11/16
+	 * @Date: 2021/4/11
 	**/
 	@Override
-	public boolean deleteBannerBatch(Long[] ids){
-		int result = bannerMapper.deleteBatchIds(Arrays.asList(ids));
-		return result > 0;
+	public boolean delBanner(Long id, Long communityId){
+		BannerEntity entity = bannerMapper.selectOne(new QueryWrapper<BannerEntity>().select("id,publish_type,status").eq("id", id).eq("community_id",communityId));
+		if(entity == null){
+			throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"数据不存在");
+		}
+		//草稿或 已发布且已撤销 可以删除 , 已发布未撤销 不能删除
+		if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(entity.getPublishType())
+			&& PropertyConsts.BANNER_STATUS_PUBLISH.equals(entity.getStatus())){
+			throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"发布中无法删除");
+		}
+		return bannerMapper.deleteById(id) == 1;
 	}
 	
 	/**
@@ -178,12 +201,38 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	 **/
 	@Override
 	public boolean updateBanner(BannerQO bannerQO){
+		BannerEntity entity = bannerMapper.selectOne(new QueryWrapper<BannerEntity>().select("id,publish_type").eq("id", bannerQO.getId()).eq("community_id",bannerQO.getCommunityId()));
+		if(entity == null){
+			throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"数据不存在");
+		}
 		BannerEntity bannerEntity = new BannerEntity();
-		BeanUtils.copyProperties(bannerQO,bannerEntity);
+		bannerEntity.setStatus(bannerQO.getStatus()); //已发布中的撤销、重新发布操作
+		if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(entity.getPublishType())){
+			if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(bannerQO.getPublishType())){
+				//草稿 ==> 发布
+				bannerEntity.setPublishBy(bannerQO.getOperator());
+				bannerEntity.setPublishTime(LocalDateTime.now());
+				bannerEntity.setStatus(PropertyConsts.BANNER_STATUS_PUBLISH); //不能直接把草稿发布为已撤销状态
+			}else{
+				//草稿无状态
+				bannerEntity.setStatus(null);
+//				bannerEntity.setUpdateBy(bannerQO.getOperator());//A1.修改草稿(不发布) 添加修改人
+			}
+		}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(entity.getPublishType())){
+			if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(bannerQO.getPublishType())){
+				//发布 ==> 草稿
+				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"已发布不能修改为草稿");
+			}
+//			bannerEntity.setUpdateBy(bannerQO.getOperator());//A2.修改已发布的 添加修改人
+		}
+		bannerEntity.setUpdateBy(bannerQO.getOperator());//B.凡是有udpate操作就添加修改人
 		bannerEntity.setId(bannerQO.getId());
-		int result = bannerMapper.updateById(bannerEntity);
-		return result == 1;
+		bannerEntity.setTitle(bannerQO.getTitle());
+		bannerEntity.setUrl(bannerQO.getUrl());
+		bannerEntity.setType(bannerQO.getType());
+		bannerEntity.setContent(bannerQO.getContent());
+		bannerEntity.setPublishType(bannerQO.getPublishType());
+		return bannerMapper.updateById(bannerEntity) == 1;
 	}
 
-	//TODO 修改排序
 }

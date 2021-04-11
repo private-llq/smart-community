@@ -109,38 +109,50 @@ public class BannerController {
 		return CommonResult.ok(filePath);
 	}
 
+//	/**
+//	* @Description: 轮播图 批量删除
+//	 * @Param: [bannerQO]
+//	 * @Return: com.jsy.community.vo.CommonResult
+//	 * @Author: chq459799974
+//	 * @Date: 2020/11/16
+//	**/
+//	@ApiOperation("【轮播图】批量删除")
+//	@DeleteMapping("")
+//	public CommonResult deleteBanner(@RequestBody Long[] ids){
+//		if(ids.length == 0){
+//			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"缺少ID");
+//		}
+//		boolean result = bannerService.deleteBannerBatch(ids);
+//		return result ? CommonResult.ok("删除成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"轮播图删除失败");
+//	}
+	
 	/**
-	* @Description: 轮播图 批量删除
-	 * @Param: [bannerQO]
+	* @Description: 轮播图 删除
+	 * @Param: [id]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
-	 * @Date: 2020/11/16
+	 * @Date: 2021/4/11
 	**/
-	@ApiOperation("【轮播图】批量删除")
+	@ApiOperation("【轮播图】删除")
 	@DeleteMapping("")
-	public CommonResult deleteBanner(@RequestBody Long[] ids){
-		if(ids.length == 0){
-			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"缺少ID");
-		}
-		boolean result = bannerService.deleteBannerBatch(ids);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"轮播图删除失败");
+	public CommonResult delBanner(@RequestParam Long id){
+		return bannerService.delBanner(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
 	}
 	
 	/**
-	* @Description: 修改跳转路径和描述
+	* @Description: 修改
 	 * @Param: [bannerQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2021/2/2
 	**/
-	@ApiOperation("【轮播图】修改跳转路径和描述")
+	@ApiOperation("【轮播图】修改")
 	@PutMapping("")
 	public CommonResult updateBanner(@RequestBody BannerQO bannerQO){
-		if(bannerQO.getId() == null){
-			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"缺少ID");
-		}
-		boolean b = bannerService.updateBanner(bannerQO);
-		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改轮播图信息失败");
+		ValidatorUtils.validateEntity(bannerQO,BannerQO.updateBannerValidatedGroup.class);
+		bannerQO.setOperator(UserUtils.getUserId());
+		bannerQO.setCommunityId(UserUtils.getAdminCommunityId());
+		return bannerService.updateBanner(bannerQO) ? CommonResult.ok("操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 	}
 	
 }

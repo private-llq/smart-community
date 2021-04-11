@@ -49,7 +49,7 @@ public class BannerEntity extends BaseEntity implements Serializable {
     
     @ApiModelProperty(value = "轮播图类型1.站内 2.外部链接")
     @NotNull(groups = addBannerValidatedGroup.class, message = "类型为空")
-    @Range(min = 1, max = 2, message = "类型错误")
+    @Range(min = 1, max = 2, message = "站内/外部链接 类型选择错误")
     private Integer type;
     
     @ApiModelProperty(value = "点击量(浏览数)", hidden = true)
@@ -68,7 +68,7 @@ public class BannerEntity extends BaseEntity implements Serializable {
     @Range(groups = addBannerValidatedGroup.class, min = 0, max = 1, message = "状态不正确")
     private Integer publishType;
     
-    @ApiModelProperty(value = "状态 0.撤销 1.发布")
+    @ApiModelProperty(value = "状态 0.已撤销 1.发布中")
     private Integer status;
     
     @ApiModelProperty(value = "创建人")

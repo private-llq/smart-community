@@ -36,17 +36,26 @@ public interface IBannerService extends IService<BannerEntity> {
 	**/
 	PageInfo<BannerEntity> queryBannerPage(BaseQO<BannerEntity> baseQO);
 	
-	/**
-	* @Description: 轮播图 批量删除
-	 * @Param: [bannerQO]
-	 * @Return: boolean
-	 * @Author: chq45799974
-	 * @Date: 2020/11/16
-	**/
-	boolean deleteBannerBatch(Long[] ids);
+//	/**
+//	* @Description: 轮播图 批量删除
+//	 * @Param: [bannerQO]
+//	 * @Return: boolean
+//	 * @Author: chq45799974
+//	 * @Date: 2020/11/16
+//	**/
+//	boolean deleteBannerBatch(Long[] ids);
 	
 	/**
-	* @Description: 轮播图 修改跳转路径
+	* @Description: 轮播图 删除
+	 * @Param: [id,communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/11
+	**/
+	boolean delBanner(Long id, Long communityId);
+	
+	/**
+	* @Description: 轮播图 修改
 	 * @Param: [bannerQO]
 	 * @Return: boolean
 	 * @Author: chq459799974
