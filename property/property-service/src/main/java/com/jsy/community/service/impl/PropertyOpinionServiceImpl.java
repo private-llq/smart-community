@@ -6,6 +6,7 @@ import com.jsy.community.api.IPropertyOpinionService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PropertyOpinionEntity;
 import com.jsy.community.mapper.PropertyOpinionMapper;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class PropertyOpinionServiceImpl extends ServiceImpl<PropertyOpinionMappe
 
     @Override
     public void insetOne(PropertyOpinionEntity propertyOpinionEntity, AdminInfoVo userInfo) {
+        propertyOpinionEntity.setId(SnowFlake.nextId());
         propertyOpinionEntity.setUid(userInfo.getUid());
         propertyOpinionEntity.setCommunityId(userInfo.getCommunityId());
         propertyOpinionMapper.insert(propertyOpinionEntity);

@@ -25,13 +25,14 @@ public class PropertyOpinionEntity extends BaseEntity{
     private Long communityId;
     @ApiModelProperty(value = "邮箱")
     @NotBlank(groups = {PropertyOpinionValidated.class},message = "邮箱不能为空！")
+    @Pattern(groups = {PropertyOpinionValidated.class},regexp = RegexUtils.REGEX_EMAIL,message = "邮箱格式不正确！")
     private String email;
+
+    @ApiModelProperty(value = "图片")
+    private String images;
     @NotBlank(groups = {PropertyOpinionValidated.class},message = "内容不能为空！")
     @ApiModelProperty(value = "意见类容")
     private String content;
-    @ApiModelProperty(value = "图片")
-    @Pattern(groups = {PropertyOpinionValidated.class},regexp = RegexUtils.REGEX_EMAIL,message = "邮箱格式不正确！")
-    private String images;
 
     public interface PropertyOpinionValidated{}
 
