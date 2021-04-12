@@ -45,7 +45,7 @@ public class RepairOrderQO implements Serializable {
 	private String problem;
 	
 	@ApiModelProperty(value = "报修事项id")
-	private String type;
+	private Long type;
 	
 	@ApiModelProperty(value = "报修事项")
 	private String typeName;
