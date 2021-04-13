@@ -99,4 +99,10 @@ public class AliAppPayController {
 		return createResult ? CommonResult.ok(returnMap, "下单成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"下单失败");
 	}
 	
+	@PostMapping("test")
+	public String test(){
+		aliAppPayService.transferByCert();
+		return "success";
+	}
+	
 }

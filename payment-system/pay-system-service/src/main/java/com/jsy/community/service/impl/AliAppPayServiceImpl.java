@@ -2,8 +2,11 @@ package com.jsy.community.service.impl;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.jsy.community.api.AiliAppPayRecordService;
@@ -39,7 +42,7 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	public String getOrderStr(AliAppPayQO aliAppPayQO) {
 		AlipayClient alipayClient = alipayUtils.getDefaultCertClient();
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-		request.setNotifyUrl("http://222.178.212.29:9951/api/v1/payment/callBack/pay");
+		request.setNotifyUrl("http://blue99x.vicp.net:9951/api/v1/payment/callBack/pay");
 		request.setBizContent("{" +
 //		"\"timeout_express\":\"90m\"," +
 		"\"total_amount\":"+"\""+ aliAppPayQO.getTotalAmount()+"\""+","+
@@ -71,6 +74,39 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 		return null;
 	}
 	
+	/*转账*/
+	@Override
+	public void transferByCert() {
+		AlipayClient alipayClient = alipayUtils.getDefaultCertClient();
+		AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
+		request.setBizContent("{" +
+			"\"out_biz_no\":\"202008040001\"," +
+			"\"trans_amount\":0.01," +
+			"\"product_code\":\"TRANS_ACCOUNT_NO_PWD\"," +
+			"\"biz_scene\":\"DIRECT_TRANSFER\"," +
+			"\"order_title\":\"转账测试\"," +
+//				"\"original_order_id\":\"20190620110075000006640000063056\"," +
+			"\"payee_info\":{" +
+			"\"identity\":\"15178763584\"," +
+			"\"identity_type\":\"ALIPAY_LOGON_ID\"," +
+//			"\"name\":\"name\"" +
+			"    }," +
+//				"\"remark\":\"单笔转账\"," +
+//				"\"business_params\":\"{\\\"sub_biz_scene\\\":\\\"REDPACKET\\\"}\"" +
+			"}");
+		AlipayFundTransUniTransferResponse response = null;
+		try {
+			response = alipayClient.certificateExecute(request);
+		} catch (AlipayApiException e) {
+			e.printStackTrace();
+		}
+		System.out.println(response.getBody());
+		if(response.isSuccess()){
+			System.out.println("调用成功");
+		} else {
+			System.out.println("调用失败");
+		}
+	}
 	
 	//下单(H5)
 //	public String getOrderStrForH5(AliAppPayQO aliAppPayQO) {

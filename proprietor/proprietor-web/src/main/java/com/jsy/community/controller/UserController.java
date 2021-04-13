@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
@@ -344,6 +345,7 @@ public class UserController {
     @PostMapping("realName/blink/init")
     public JSONObject initBlink(@RequestBody RealnameBlinkInitQO realnameBlinkInitQO){
         ValidatorUtils.validateEntity(realnameBlinkInitQO);
+        System.out.println(realnameBlinkInitQO);
         JSONObject jsonObject = RealnameAuthUtils.initBlink(realnameBlinkInitQO);
         System.out.println("=========1========");
         System.out.println(jsonObject);
