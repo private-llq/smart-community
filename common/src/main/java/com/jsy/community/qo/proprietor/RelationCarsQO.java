@@ -1,4 +1,4 @@
-package com.jsy.community.qo;
+package com.jsy.community.qo.proprietor;
 
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 @Data
 @ApiModel("添加车辆信息")
-public class RelationCarsQo implements Serializable {
+public class RelationCarsQO implements Serializable {
 
     @ApiModelProperty("车辆id")
     private Long Id;

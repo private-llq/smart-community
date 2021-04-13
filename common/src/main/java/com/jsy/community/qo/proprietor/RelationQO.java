@@ -1,4 +1,4 @@
-package com.jsy.community.qo;
+package com.jsy.community.qo.proprietor;
 
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Data
 @ApiModel("添加家属")
-public class RelationQo implements Serializable {
+public class RelationQO implements Serializable {
     @ApiModelProperty(value = "家属ID",required = true)
     private Long id;
     @ApiModelProperty(value = "家属姓名",required = true)
@@ -49,7 +49,7 @@ public class RelationQo implements Serializable {
     @ApiModelProperty(value = "0，其他，1亲属，2租客")
     private Integer personType;
     @ApiModelProperty("车辆信息集合")
-    private List<RelationCarsQo> cars = new ArrayList<>();
+    private List<RelationCarsQO> cars = new ArrayList<>();
 
     public interface RelationValidated{}
 }

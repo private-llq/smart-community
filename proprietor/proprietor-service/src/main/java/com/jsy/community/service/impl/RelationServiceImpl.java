@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.api.ProprietorException;
@@ -9,9 +10,9 @@ import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.RelationCarEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.*;
-import com.jsy.community.qo.RelationCarsQo;
-import com.jsy.community.qo.RelationQo;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
+import com.jsy.community.qo.proprietor.RelationCarsQO;
+import com.jsy.community.qo.proprietor.RelationQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.RelationCarsVO;
 import com.jsy.community.vo.RelationVO;
@@ -77,7 +78,7 @@ public class RelationServiceImpl implements IRelationService {
      * @Param:
      * @return:
      */
-    public ElasticsearchCarQO getInsetElasticsearchCarQO(RelationCarsQo car,RelationQo relationQo,HouseEntity houseEntity){
+    public ElasticsearchCarQO getInsetElasticsearchCarQO(RelationCarsQO car,RelationQO relationQo,HouseEntity houseEntity){
         ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
         elasticsearchCarQO.setId(car.getId());
         elasticsearchCarQO.setCommunityId(relationQo.getCommunityId());
@@ -108,7 +109,7 @@ public class RelationServiceImpl implements IRelationService {
      * @Param:
      * @return:
      */
-    public ElasticsearchCarQO getUpdateElasticsearchCarQO(RelationCarsQo car){
+    public ElasticsearchCarQO getUpdateElasticsearchCarQO(RelationCarsQO car){
         ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
         elasticsearchCarQO.setId(car.getId());
         elasticsearchCarQO.setCarPlate(car.getCarPlate());
@@ -124,7 +125,7 @@ public class RelationServiceImpl implements IRelationService {
      */
     @Override
     @Transactional
-    public void addRelation(RelationQo relationQo) {
+    public void addRelation(RelationQO relationQo) {
         HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
         houseMemberEntity.setId(SnowFlake.nextId());
         if (relationQo.getIdentificationType()==0&&relationQo.getIdentificationType()==null){
@@ -145,9 +146,9 @@ public class RelationServiceImpl implements IRelationService {
 
         HouseEntity houseEntity = houseMapper.selectById(relationQo.getHouseId());
 
-        List<RelationCarsQo> cars = relationQo.getCars();
+        List<RelationCarsQO> cars = relationQo.getCars();
             if (cars.size()>0) {
-                for (RelationCarsQo car : cars) {
+                for (RelationCarsQO car : cars) {
                     car.setId(SnowFlake.nextId());
                     car.setUid(relationQo.getUserId());
                     car.setRelationType(1);
@@ -158,7 +159,7 @@ public class RelationServiceImpl implements IRelationService {
                     car.setIdCard(houseMemberEntity.getIdCard());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                 }
-                for (RelationCarsQo car : cars) {
+                for (RelationCarsQO car : cars) {
                     rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(car,relationQo,houseEntity));
                 }
                 relationMapper.addCars(cars);
@@ -252,12 +253,12 @@ public class RelationServiceImpl implements IRelationService {
      */
     @Override
     @Transactional
-    public void updateUserRelationDetails(RelationQo relationQo) {
+    public void updateUserRelationDetails(RelationQO relationQo) {
         relationMapper.updateUserRelationDetails(relationQo);
-        List<RelationCarsQo> cars = relationQo.getCars();
+        List<RelationCarsQO> cars = relationQo.getCars();
         HouseEntity houseEntity = houseMapper.selectById(relationQo.getHouseId());
         if(cars.size()>0){
-            for (RelationCarsQo car : cars) {
+            for (RelationCarsQO car : cars) {
                 if (car.getId()==null||car.getId()==0){
                     car.setId(SnowFlake.nextId());
                     car.setUid(relationQo.getUserId());
@@ -280,7 +281,7 @@ public class RelationServiceImpl implements IRelationService {
 
 
     @Override
-    public UserHouseEntity getHouse(RelationQo relationQo) {
+    public UserHouseEntity getHouse(RelationQO relationQo) {
         UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("uid", relationQo.getUserId()).eq("house_id", relationQo.getHouseId()).eq("community_id", relationQo.getCommunityId()));
         return entity;
     }

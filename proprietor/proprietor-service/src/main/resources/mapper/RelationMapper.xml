@@ -26,7 +26,7 @@
         select <include refid="selectId"></include> from t_house_member t join t_user_house tu on t.householder_id=tu.uid
         where t.deleted=0 and tu.deleted=0 and t.house_id=tu.house_id and t.householder_id=#{id} and t.house_id=#{houseId}
     </select>
-    <update id="updateUserRelationDetails" parameterType="com.jsy.community.qo.RelationQo">
+    <update id="updateUserRelationDetails" parameterType="com.jsy.community.qo.proprietor.RelationQO">
         update t_house_member
         <set>
             <if test="name!=null and name!=''">
@@ -56,7 +56,7 @@
             where id=#{id}
         </set>
     </update>
-    <update id="updateUserRelationCar" parameterType="com.jsy.community.qo.RelationCarsQo">
+    <update id="updateUserRelationCar" parameterType="com.jsy.community.qo.proprietor.RelationCarsQO">
             update t_relation_car
             <set>
                 <if test="carPlate!=null and carPlate!=''">

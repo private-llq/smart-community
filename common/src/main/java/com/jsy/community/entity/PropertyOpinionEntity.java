@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,6 +31,9 @@ public class PropertyOpinionEntity extends BaseEntity{
 
     @ApiModelProperty(value = "图片")
     private String images;
+    @ApiModelProperty(value = "图片")
+    @TableField(exist = false)
+    private String[] imagesArrays;
     @NotBlank(groups = {PropertyOpinionValidated.class},message = "内容不能为空！")
     @ApiModelProperty(value = "意见类容")
     private String content;

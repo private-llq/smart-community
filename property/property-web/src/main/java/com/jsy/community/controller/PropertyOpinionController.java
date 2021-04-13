@@ -53,7 +53,7 @@ public class PropertyOpinionController {
             return CommonResult.error("图片不能超过5张！");
         }
         StringBuilder str=new StringBuilder();
-        if (PicUtil.checkSizeAndTypeBatch(files,5*1024)){
+        if (!PicUtil.checkSizeAndTypeBatch(files,5*1024)){
             return CommonResult.ok("图片格式有误！");
         }
         for (int i=0;i<files.length;i++) {
@@ -63,6 +63,6 @@ public class PropertyOpinionController {
                 str.append(",");
             }
         }
-        return CommonResult.ok(str);
+        return CommonResult.ok(str.toString().split(","));
     }
 }

@@ -2,7 +2,7 @@ package com.jsy.community.api;
 
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserHouseEntity;
-import com.jsy.community.qo.RelationQo;
+import com.jsy.community.qo.proprietor.RelationQO;
 import com.jsy.community.vo.RelationVO;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public interface IRelationService {
      * @Param:
      * @return:
      */
-    void addRelation(RelationQo relationQo);
+    void addRelation(RelationQO relationQo);
 
     /**
      * @Description: 删除家属下的某个车辆
@@ -64,7 +64,7 @@ public interface IRelationService {
      * @param relationQo
      * @return
      */
-    void updateUserRelationDetails(RelationQo relationQo);
+    void updateUserRelationDetails(RelationQO relationQo);
     
     /**
     * @Description: 判断是否是指定小区家属
@@ -91,6 +91,6 @@ public interface IRelationService {
      * @Param:
      * @return:
      */
-    UserHouseEntity getHouse(RelationQo relationQo);
+    UserHouseEntity getHouse(RelationQO relationQo);
 
 }

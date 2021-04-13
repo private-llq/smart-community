@@ -6,7 +6,7 @@ import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.CommunityFunOperationQO;
+import com.jsy.community.qo.property.CommunityFunOperationQO;
 import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;

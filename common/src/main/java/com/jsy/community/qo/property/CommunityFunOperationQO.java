@@ -1,4 +1,4 @@
-package com.jsy.community.qo;
+package com.jsy.community.qo.property;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

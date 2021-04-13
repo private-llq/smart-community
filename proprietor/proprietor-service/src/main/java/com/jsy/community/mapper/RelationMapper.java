@@ -1,8 +1,8 @@
 package com.jsy.community.mapper;
 
 import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.qo.RelationCarsQo;
-import com.jsy.community.qo.RelationQo;
+import com.jsy.community.qo.proprietor.RelationCarsQO;
+import com.jsy.community.qo.proprietor.RelationQO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public interface RelationMapper {
      * 添加家属车辆
      * @param cars
      */
-    void addCars(@Param("cars") List<RelationCarsQo> cars);
+    void addCars(@Param("cars") List<RelationCarsQO> cars);
     /**
      * 通过业主id查询家属信息
      * @param id
@@ -34,7 +34,7 @@ public interface RelationMapper {
      * @Param:
      * @return:
      */
-    void updateUserRelationDetails(RelationQo relationQo);
+    void updateUserRelationDetails(RelationQO relationQo);
 
     /**
      * @Description: 批量修改车辆信息
@@ -43,7 +43,7 @@ public interface RelationMapper {
      * @Param:
      * @return:
      */
-    void updateUserRelationCar(RelationCarsQo relationCarsQo);
+    void updateUserRelationCar(RelationCarsQO relationCarsQo);
 
     /**
      * @Description: 新增一条
@@ -52,5 +52,5 @@ public interface RelationMapper {
      * @Param:
      * @return:
      */
-    void insertOne(RelationCarsQo relationCarsQo);
+    void insertOne(RelationCarsQO relationCarsQo);
 }

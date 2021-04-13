@@ -12,6 +12,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,8 +42,12 @@ public class PropertyOpinionServiceImpl extends ServiceImpl<PropertyOpinionMappe
     @Override
     public void insetOne(PropertyOpinionEntity propertyOpinionEntity, AdminInfoVo userInfo) {
         propertyOpinionEntity.setId(SnowFlake.nextId());
+        String[] arrays = propertyOpinionEntity.getImagesArrays();
+        String string = Arrays.toString(arrays);
+        propertyOpinionEntity.setImages(string.substring(1, string.length() - 1));
         propertyOpinionEntity.setUid(userInfo.getUid());
         propertyOpinionEntity.setCommunityId(userInfo.getCommunityId());
         propertyOpinionMapper.insert(propertyOpinionEntity);
     }
+
 }

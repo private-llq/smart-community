@@ -5,8 +5,8 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserHouseEntity;
-import com.jsy.community.qo.RelationCarsQo;
-import com.jsy.community.qo.RelationQo;
+import com.jsy.community.qo.proprietor.RelationCarsQO;
+import com.jsy.community.qo.proprietor.RelationQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -52,9 +52,9 @@ public class RelationController {
     @ApiOperation("添加家属信息")
     @PostMapping("/add")
     @Login
-    public CommonResult addRelation(@RequestBody RelationQo relationQo){
-        ValidatorUtils.validateEntity(relationQo, RelationQo.RelationValidated.class);
-        relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car,RelationCarsQo.proprietorCarValidated.class) );
+    public CommonResult addRelation(@RequestBody RelationQO relationQo){
+        ValidatorUtils.validateEntity(relationQo, RelationQO.RelationValidated.class);
+        relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car, RelationCarsQO.proprietorCarValidated.class) );
         String userId = UserUtils.getUserId();
         relationQo.setUserId(userId);
         UserHouseEntity entity=relationService.getHouse(relationQo);
@@ -115,9 +115,9 @@ public class RelationController {
     @ApiOperation("修改家属信息加汽车信息")
     @PutMapping("/updateUserRelationDetails")
     @Login
-    public CommonResult updateByRelationId(@RequestBody RelationQo relationQo){
-        ValidatorUtils.validateEntity(relationQo, RelationQo.RelationValidated.class);
-        relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car,RelationCarsQo.proprietorCarValidated.class) );
+    public CommonResult updateByRelationId(@RequestBody RelationQO relationQo){
+        ValidatorUtils.validateEntity(relationQo, RelationQO.RelationValidated.class);
+        relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car,RelationCarsQO.proprietorCarValidated.class) );
         String userId = UserUtils.getUserId();
         relationQo.setUserId(userId);
         UserHouseEntity entity=relationService.getHouse(relationQo);
