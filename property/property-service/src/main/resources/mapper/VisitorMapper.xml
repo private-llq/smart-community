@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.VisitorMapper">
+
+    <!-- 批量查询访客登记表 -->
+    <select id="queryVisitorMapBatch" resultType="Map">
+        select id,contact,car_plate,reason,address,create_time as vCreateTime,is_community_access,is_building_access,status from t_visitor
+        where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>
