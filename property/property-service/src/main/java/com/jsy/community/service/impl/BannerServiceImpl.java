@@ -142,6 +142,9 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		}
 		queryWrapper.eq("community_id",query.getCommunityId());
 		Page<BannerEntity> pageData = bannerMapper.selectPage(page, queryWrapper);
+		if(CollectionUtils.isEmpty(pageData.getRecords())){
+			return new PageInfo<>();
+		}
 		//补创建人和更新人和发布人姓名
 		Set<String> createUidSet = new HashSet<>();
 		Set<String> updateUidSet = new HashSet<>();

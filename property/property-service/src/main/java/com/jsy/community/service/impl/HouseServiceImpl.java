@@ -441,49 +441,50 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		}
 		queryWrapper.orderByDesc("create_time");
 		Page<HouseEntity> pageData = houseMapper.selectPage(page, queryWrapper);
-		if(!CollectionUtils.isEmpty(pageData.getRecords())){
-			//查询类型为楼栋，再查出已绑定单元数
-			if(BusinessConst.BUILDING_TYPE_BUILDING == query.getType()){
-				List<Long> paramList = new ArrayList<>();
-				for(HouseEntity houseEntity : pageData.getRecords()){
-					paramList.add(houseEntity.getId());
-				}
-				Map<Long, Map<String,Long>> bindMap = houseMapper.queryBindUnitCountBatch(paramList);
-				for(HouseEntity houseEntity : pageData.getRecords()){
-					Map<String, Long> countMap = bindMap.get(houseEntity.getId());
-					houseEntity.setBindUnitCount(countMap != null ? countMap.get("count") : null);
-				}
-				//若查详情，查出已绑定单元id
-				if(query.getId() != null){
-					CollectionUtils.firstElement(pageData.getRecords()).setUnitIdList(houseMapper.queryBindUnitList(query.getId()));
-				}
-			}
-			//查询类型为房屋，设置房屋类型、房产类型、装修情况、户型
-			else if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
-				for(HouseEntity houseEntity : pageData.getRecords()){
-					houseEntity.setHouseTypeStr(PropertyEnum.HouseTypeEnum.HOUSE_TYPE_MAP.get(houseEntity.getHouseType()));
-					houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
-					houseEntity.setDecorationStr(PropertyEnum.DecorationEnum.DECORATION_MAP.get(houseEntity.getDecoration()));
-					if("00000000".equals(houseEntity.getHouseTypeCode())){
-						houseEntity.setHouseTypeCodeStr("单间配套");
-						continue;
-					}
-					setHouseTypeCodeStr(houseEntity);
-				}
-			}
-			//补创建人和更新人姓名
-			Set<String> createUidSet = new HashSet<>();
-			Set<String> updateUidSet = new HashSet<>();
+		if(CollectionUtils.isEmpty(pageData.getRecords())){
+			return new PageInfo<>();
+		}
+		//查询类型为楼栋，再查出已绑定单元数
+		if(BusinessConst.BUILDING_TYPE_BUILDING == query.getType()){
+			List<Long> paramList = new ArrayList<>();
 			for(HouseEntity houseEntity : pageData.getRecords()){
-				createUidSet.add(houseEntity.getCreateBy());
-				updateUidSet.add(houseEntity.getUpdateBy());
+				paramList.add(houseEntity.getId());
 			}
-			Map<String, Map<String,String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
-			Map<String, Map<String,String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
+			Map<Long, Map<String,Long>> bindMap = houseMapper.queryBindUnitCountBatch(paramList);
 			for(HouseEntity houseEntity : pageData.getRecords()){
-				houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
-				houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
+				Map<String, Long> countMap = bindMap.get(houseEntity.getId());
+				houseEntity.setBindUnitCount(countMap != null ? countMap.get("count") : null);
 			}
+			//若查详情，查出已绑定单元id
+			if(query.getId() != null){
+				CollectionUtils.firstElement(pageData.getRecords()).setUnitIdList(houseMapper.queryBindUnitList(query.getId()));
+			}
+		}
+		//查询类型为房屋，设置房屋类型、房产类型、装修情况、户型
+		else if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
+			for(HouseEntity houseEntity : pageData.getRecords()){
+				houseEntity.setHouseTypeStr(PropertyEnum.HouseTypeEnum.HOUSE_TYPE_MAP.get(houseEntity.getHouseType()));
+				houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
+				houseEntity.setDecorationStr(PropertyEnum.DecorationEnum.DECORATION_MAP.get(houseEntity.getDecoration()));
+				if("00000000".equals(houseEntity.getHouseTypeCode())){
+					houseEntity.setHouseTypeCodeStr("单间配套");
+					continue;
+				}
+				setHouseTypeCodeStr(houseEntity);
+			}
+		}
+		//补创建人和更新人姓名
+		Set<String> createUidSet = new HashSet<>();
+		Set<String> updateUidSet = new HashSet<>();
+		for(HouseEntity houseEntity : pageData.getRecords()){
+			createUidSet.add(houseEntity.getCreateBy());
+			updateUidSet.add(houseEntity.getUpdateBy());
+		}
+		Map<String, Map<String,String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
+		Map<String, Map<String,String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
+		for(HouseEntity houseEntity : pageData.getRecords()){
+			houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
+			houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
 		}
 		PageInfo<HouseEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);

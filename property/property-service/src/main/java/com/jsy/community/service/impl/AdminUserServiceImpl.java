@@ -447,25 +447,26 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		queryWrapper.orderByAsc("role_type","status");
 		queryWrapper.orderByDesc("create_time");
 		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
-		if(pageData.getRecords().size() > 0){
-			//补创建人和更新人姓名
-			Set<String> createUidSet = new HashSet<>();
-			Set<String> updateUidSet = new HashSet<>();
-			//补组织机构名称
-			Set<Long> orgIdSet = new HashSet<>();
-			for(AdminUserEntity entity : pageData.getRecords()){
-				orgIdSet.add(entity.getOrgId());
-				createUidSet.add(entity.getCreateBy());
-				updateUidSet.add(entity.getUpdateBy());
-			}
-			Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(orgIdSet);
-			Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
-			Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
-			for(AdminUserEntity entity : pageData.getRecords()){
-				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
-				entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
-				entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
-			}
+		if(CollectionUtils.isEmpty(pageData.getRecords())){
+			return new PageInfo<>();
+		}
+		//补创建人和更新人姓名
+		Set<String> createUidSet = new HashSet<>();
+		Set<String> updateUidSet = new HashSet<>();
+		//补组织机构名称
+		Set<Long> orgIdSet = new HashSet<>();
+		for(AdminUserEntity entity : pageData.getRecords()){
+			orgIdSet.add(entity.getOrgId());
+			createUidSet.add(entity.getCreateBy());
+			updateUidSet.add(entity.getUpdateBy());
+		}
+		Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(orgIdSet);
+		Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
+		Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
+		for(AdminUserEntity entity : pageData.getRecords()){
+			entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+			entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
+			entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
 		}
 		//查详情 已授权菜单数统计
 		if(query.getId() != null){
