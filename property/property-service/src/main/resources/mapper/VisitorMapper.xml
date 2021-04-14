@@ -3,7 +3,7 @@
 <mapper namespace="com.jsy.community.mapper.VisitorMapper">
 
     <!-- 批量查询访客登记表 -->
-    <select id="queryVisitorMapBatch" resultType="Map">
+    <select id="queryVisitorMapBatch" resultType="com.jsy.community.entity.VisitorEntity">
         select id,contact,car_plate,reason,address,create_time as vCreateTime,is_community_access,is_building_access,status from t_visitor
         where id in
         <foreach collection="ids" item="item" open="(" separator="," close=")">
