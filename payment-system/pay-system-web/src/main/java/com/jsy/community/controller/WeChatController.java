@@ -8,7 +8,6 @@ import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
-import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
@@ -78,12 +77,12 @@ public class WeChatController {
         //如果商城调用就先验证
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
-        if (weChatPayQO.getDescription()==2){
+        if (weChatPayQO.getTradeFrom()==2){
             Map<String, Object> objectMap = shoppingMallService.validateShopOrder(weChatPayQO.getOrderData(), UserUtils.getUserToken());
             if(0 != (int)objectMap.get("code")){
                 throw new JSYException((int)objectMap.get("code"),String.valueOf(objectMap.get("msg")));
             }
-            map.put("attach",weChatPayQO.getDescription()+","+weChatPayQO.getOrderData().get("uuid"));
+            map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
         }
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
@@ -91,7 +90,7 @@ public class WeChatController {
         hashMap.put("currency","CNY");
         map.put("appid", WechatConfig.APPID);
         map.put("mchid",WechatConfig.MCH_ID);
-        map.put("description", PaymentEnum.TradeFromEnum.getCode(weChatPayQO.getDescription()));
+        map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://blue99x.vicp.net:9527/api/v1/payment/callback");
         map.put("amount",hashMap);
@@ -103,8 +102,8 @@ public class WeChatController {
         msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
         msg.setOpenId(null);
-        msg.setPayType(weChatPayQO.getDescription());
-        msg.setDescription((String) map.get("description"));
+        msg.setPayType(weChatPayQO.getTradeFrom());
+        msg.setDescription(weChatPayQO.getDescriptionStr());
         msg.setAmount(weChatPayQO.getAmount());
         msg.setOrderStatus(1);
         msg.setArriveStatus(1);
