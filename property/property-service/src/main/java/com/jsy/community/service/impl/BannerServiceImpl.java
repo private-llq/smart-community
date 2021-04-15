@@ -110,7 +110,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 				queryWrapper.select("id,title,url,type,content,create_by,create_time");
 				queryWrapper.orderByDesc("create_time");
 			}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(query.getPublishType())){ // 查已发布
-				queryWrapper.select("id,title,url,content,click,sort,status,publish_by,publish_time,create_by,create_time,update_by,update_time");
+				queryWrapper.select("id,title,url,type,content,click,sort,status,publish_by,publish_time,create_by,create_time,update_by,update_time");
 				if(query.getPublishDateStart() != null){
 					queryWrapper.ge("publish_time",query.getPublishDateStart());
 				}
