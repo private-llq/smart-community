@@ -159,6 +159,7 @@
 	        u.real_name as contactName,
 	        u.avatar_url as contactAvatar,
 	        c.name as houseCommunityName,
+            r.create_time,
 	        'false' as proprietor
         FROM
 	        t_house_reserve AS r
@@ -173,6 +174,7 @@
 	        and r.lease_delete_status = 0
 			and l.deleted = 0
 	        and u.deleted = 0
+	    order by r.create_time DESC
 	    LIMIT #{qo.page},#{qo.size}
     </select>
     <!-- 预约我的信息 别人预约我 -->
@@ -220,8 +222,8 @@
             and r.delete_landlord_status = 0
             and u.deleted = 0
             and l.deleted = 0
-            LIMIT #{qo.page},
-            #{qo.size}
+        order by r.create_time DESC
+        LIMIT #{qo.page},#{qo.size}
     </select>
     <!-- 表拿到用户的推送信息 -->
     <select id="getPushInfo" resultType="com.jsy.community.vo.lease.HouseReserveVO">
