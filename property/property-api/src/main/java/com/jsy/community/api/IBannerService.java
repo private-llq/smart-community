@@ -71,5 +71,14 @@ public interface IBannerService extends IService<BannerEntity> {
 	 * @Date: 2020/12/29
 	**/
 	boolean updateBanner(BannerQO bannerQO);
+	
+	/**
+	* @Description: 轮播图 修改排序
+	 * @Param: [idList, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	boolean changeSorts(List<Long> idList,Long communityId);
 
 }

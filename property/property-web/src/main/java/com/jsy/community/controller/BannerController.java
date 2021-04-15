@@ -148,7 +148,7 @@ public class BannerController {
 	}
 	
 	/**
-	* @Description: 修改
+	* @Description: 轮播图 修改
 	 * @Param: [bannerQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
@@ -161,6 +161,20 @@ public class BannerController {
 		bannerQO.setOperator(UserUtils.getUserId());
 		bannerQO.setCommunityId(UserUtils.getAdminCommunityId());
 		return bannerService.updateBanner(bannerQO) ? CommonResult.ok("操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
+	}
+	
+	/**
+	* @Description: 轮播图 修改排序
+	 * @Param: [idList]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	@ApiOperation("【轮播图】修改排序")
+	@PutMapping("sort")
+	public CommonResult changeSorts(@RequestBody List<Long> idList){
+		boolean result = bannerService.changeSorts(idList,UserUtils.getAdminCommunityId());
+		return result ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");
 	}
 	
 }
