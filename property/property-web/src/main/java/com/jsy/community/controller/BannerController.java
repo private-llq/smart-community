@@ -66,7 +66,14 @@ public class BannerController {
 		return CommonResult.ok(bannerService.queryBannerPage(baseQO),"查询成功");
 	}
 	
-	@ApiOperation("【轮播图】发布中列表查询(拖动排序用)")
+	/**
+	* @Description: 发布中轮播图按排序查询列表
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.BannerEntity>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	@ApiOperation("【轮播图】发布中轮播图按排序查询列表")
 	@GetMapping("listOnShow")
 	public CommonResult<List<BannerEntity>> listOnShow(){
 		return CommonResult.ok(bannerService.queryBannerListOnShowByCommunityId(UserUtils.getAdminCommunityId()));

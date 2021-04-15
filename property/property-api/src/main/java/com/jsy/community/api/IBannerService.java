@@ -37,7 +37,7 @@ public interface IBannerService extends IService<BannerEntity> {
 	PageInfo<BannerEntity> queryBannerPage(BaseQO<BannerEntity> baseQO);
 	
 	/**
-	* @Description: 轮播图 发布中列表查询(拖动排序用)
+	* @Description: 轮播图 发布中轮播图按排序查询列表
 	 * @Param: [communityId]
 	 * @Return: java.util.List<com.jsy.community.entity.BannerEntity>
 	 * @Author: chq459799974

@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserService;
@@ -58,10 +59,11 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 			bannerEntity.setStatus(null);//草稿无 发布/撤销 状态
 		}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(bannerEntity.getPublishType())){  //直接发布
 			//发布需要排序，保存草稿不用
-			
-			
 			//查出当前已有的排序号
 			List<Integer> sorts = bannerMapper.queryBannerSortByCommunityId(bannerEntity.getCommunityId());
+			if(sorts.size() > 5){
+				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"发布数量超过上限");
+			}
 			////查找排序空位
 			Integer sort = findSort(sorts);
 			bannerEntity.setSort(sort);
@@ -170,7 +172,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	}
 	
 	/**
-	* @Description: 轮播图 发布中列表查询(拖动排序用)
+	* @Description: 轮播图 发布中轮播图按排序查询列表
 	 * @Param: [communityId]
 	 * @Return: java.util.List<com.jsy.community.entity.BannerEntity>
 	 * @Author: chq459799974
@@ -278,6 +280,12 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		bannerEntity.setType(bannerQO.getType());
 		bannerEntity.setContent(bannerQO.getContent());
 		bannerEntity.setPublishType(bannerQO.getPublishType());
+		if(PropertyConsts.BANNER_STATUS_PUBLISH.equals(bannerEntity.getStatus())){
+			Integer count = bannerMapper.selectCount(new QueryWrapper<BannerEntity>().eq("communityId",bannerQO.getCommunityId()).eq("status",PropertyConsts.BANNER_STATUS_PUBLISH));
+			if(count > 5){
+				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"发布数量超过上限");
+			}
+		}
 		return bannerMapper.updateById(bannerEntity) == 1;
 	}
 	
