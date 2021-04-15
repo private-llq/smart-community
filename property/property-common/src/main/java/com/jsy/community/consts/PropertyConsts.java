@@ -16,6 +16,6 @@ public interface PropertyConsts {
 	Integer BANNER_PUB_TYPE_PUBLISH = 1; //已发布
 	
 	//======= 轮播图状态
-	Integer BANNER_STATUS_CANCEL = 0; //撤销
-	Integer BANNER_STATUS_PUBLISH = 1; //发布
+	Integer BANNER_STATUS_CANCEL = 0; //已撤销
+	Integer BANNER_STATUS_PUBLISH = 1; //发布中
 }

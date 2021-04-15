@@ -57,7 +57,7 @@ public class BannerController {
 	 **/
 	@ApiOperation("【轮播图】分页查询")
 	@PostMapping("page")
-	public CommonResult<PageInfo<BannerEntity>> list(@RequestBody BaseQO<BannerEntity> baseQO){
+	public CommonResult<PageInfo<BannerEntity>> page(@RequestBody BaseQO<BannerEntity> baseQO){
 		BannerEntity query = baseQO.getQuery();
 		if(query == null || (query.getId() == null && query.getPublishType() == null)){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请确定操作 查询草稿/已发布/详情");
@@ -65,6 +65,13 @@ public class BannerController {
 		query.setCommunityId(UserUtils.getAdminCommunityId());
 		return CommonResult.ok(bannerService.queryBannerPage(baseQO),"查询成功");
 	}
+	
+	@ApiOperation("【轮播图】发布中列表查询(拖动排序用)")
+	@GetMapping("listOnShow")
+	public CommonResult<List<BannerEntity>> listOnShow(){
+		return CommonResult.ok(bannerService.queryBannerListOnShowByCommunityId(UserUtils.getAdminCommunityId()));
+	}
+	
 
 	/**
 	* @Description: 轮播图 新增
