@@ -1,8 +1,11 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.VisitorHistoryEntity;
+import com.jsy.community.entity.VisitorPersonRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+
+import java.util.List;
 
 /**
  * @author chq459799974
@@ -19,5 +22,14 @@ public interface IVisitorService {
 	 * @Date: 2021/4/14
 	**/
 	PageInfo<VisitorHistoryEntity> queryVisitorPage(BaseQO<VisitorHistoryEntity> baseQO);
+	
+	/** 
+	* @Description: 查询单次访客邀请的随行人员列表
+	 * @Param: [visitorId]
+	 * @Return: java.util.List<com.jsy.community.entity.VisitorPersonRecordEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	List<VisitorPersonRecordEntity> queryFollowPersonListByVisitorId(Long visitorId);
 	
 }

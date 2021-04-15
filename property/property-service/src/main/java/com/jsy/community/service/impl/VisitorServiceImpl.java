@@ -6,6 +6,7 @@ import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorHistoryEntity;
+import com.jsy.community.entity.VisitorPersonRecordEntity;
 import com.jsy.community.mapper.VisitorHistoryMapper;
 import com.jsy.community.mapper.VisitorMapper;
 import com.jsy.community.mapper.VisitorPersonRecordMapper;
@@ -19,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,6 +69,18 @@ public class VisitorServiceImpl implements IVisitorService {
 		PageInfo pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
+	}
+	
+	/**
+	* @Description: 查询单次访客邀请的随行人员列表
+	 * @Param: [visitorId]
+	 * @Return: java.util.List<com.jsy.community.entity.VisitorPersonRecordEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	@Override
+	public List<VisitorPersonRecordEntity> queryFollowPersonListByVisitorId(Long visitorId){
+		return visitorPersonRecordMapper.selectList(new QueryWrapper<VisitorPersonRecordEntity>().select("name,mobile").eq("visitor_id",visitorId));
 	}
 	
 	/**

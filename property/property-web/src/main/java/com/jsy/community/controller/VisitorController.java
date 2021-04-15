@@ -11,10 +11,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author chq459799974
@@ -45,6 +42,18 @@ public class VisitorController {
 		}
 		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 		return CommonResult.ok(visitorService.queryVisitorPage(baseQO),"查询成功");
+	}
+	
+	/**
+	* @Description: 查询单次访客邀请的随行人员列表
+	 * @Param: [visitorId]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	@GetMapping("follow")
+	public CommonResult queryFollowPersonListByVisitorId(@RequestParam Long visitorId){
+		return CommonResult.ok(visitorService.queryFollowPersonListByVisitorId(visitorId),"查询成功");
 	}
 	
 }

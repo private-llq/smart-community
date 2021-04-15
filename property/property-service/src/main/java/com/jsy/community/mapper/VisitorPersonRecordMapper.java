@@ -1,6 +1,8 @@
 package com.jsy.community.mapper;
 
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jsy.community.entity.VisitorPersonRecordEntity;
 import org.apache.ibatis.annotations.MapKey;
 
 import java.util.Collection;
@@ -11,7 +13,7 @@ import java.util.Map;
  * @description 物业端 随行人员记录Mapper接口
  * @since 2021-04-12 14:07
  **/
-public interface VisitorPersonRecordMapper {
+public interface VisitorPersonRecordMapper extends BaseMapper<VisitorPersonRecordEntity> {
 	
 	/**
 	 * 批量查询访客随行人数统计
