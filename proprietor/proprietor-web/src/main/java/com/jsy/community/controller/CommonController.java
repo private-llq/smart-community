@@ -23,10 +23,16 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -111,12 +117,6 @@ public class CommonController {
     public CommonResult<List<Map<String, Object>>> getHouseByFloor(@RequestParam Long id, @RequestParam String floor){
         return CommonResult.ok(commonService.getHouseByFloor( id, floor ));
     }
-
-
-
-
-
-
     /**
      * app 全文搜索
      * @param text  搜索文本
@@ -126,36 +126,71 @@ public class CommonController {
     @Login
     @ApiOperation("App全文搜索")
     @GetMapping("/search")
-    public CommonResult<List<JSONObject>> search(@RequestParam String text)  {
+    public CommonResult search(@RequestParam String text)  {
         if( Objects.nonNull(text) && text.length() > BusinessConst.HOT_KEY_MAX_NUM  ){
             throw new JSYException(" 搜索文本太长了! ");
         }
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.indices(BusinessConst.FULL_TEXT_SEARCH_INDEX);
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //排除某些字段
-        String[] excludes = {"esId","searchTitle"};
-        String[] includes = {"*"};
-        searchSourceBuilder.fetchSource(includes, excludes);
-        //查询条件
-        searchSourceBuilder.query(QueryBuilders.matchQuery("searchTitle", text));
+        SearchRequest searchRequest = new SearchRequest(BusinessConst.FULL_TEXT_SEARCH_INDEX);
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
-        searchRequest.source(searchSourceBuilder);
-        SearchResponse searchResponse;
+        if (!"".equals(text)&&text!=null){
+            boolQuery.must(new MatchQueryBuilder("searchTitle",text));
+            sourceBuilder.query(boolQuery);
+            //搜索词添加至Redis热词排行里面
+            commonService.addFullTextSearchHotKey( text );
+        }else {
+            sourceBuilder.size(10000);
+        }
+        searchRequest.source(sourceBuilder);
+        SearchResponse searchResponse = null;
         try {
             searchResponse = elasticsearchClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
         } catch (IOException e) {
-            throw new JSYException(" 没有找到任何数据! ");
+            e.printStackTrace();
+            log.info("查询失败："+e.getMessage());
         }
-        SearchHit[] hits = searchResponse.getHits().getHits();
-        List<JSONObject> list = new ArrayList<>(hits.length);
-        for( SearchHit hit : hits){
-            String sourceAsString = hit.getSourceAsString();
-            list.add(JSON.parseObject(sourceAsString, JSONObject.class));
+        SearchHits hits = searchResponse.getHits();
+        Map<String, Object> map = new HashMap<>();
+        List<Object> FUN = new LinkedList<>();
+        List<Object> LEASE_HOUSE = new LinkedList<>();
+        List<Object> LEASE_SHOP = new LinkedList<>();
+        List<Object> INFORM = new LinkedList<>();
+        map.put("total",hits.getTotalHits().value);
+        if (!"".equals(text)&&text!=null){
+            for (SearchHit searchHit : hits.getHits()) {
+                String sourceAsString = searchHit.getSourceAsString();
+                JSONObject jsonObject = JSON.parseObject(sourceAsString);
+                FUN.add(jsonObject);
+            }
+            map.put("list",FUN);
+        }else {
+            for (SearchHit searchHit : hits.getHits()) {
+                String sourceAsString = searchHit.getSourceAsString();
+                JSONObject jsonObject = JSON.parseObject(sourceAsString);
+                if (jsonObject.get("flag").equals("FUN")){
+                    FUN.add(jsonObject);
+                    continue;
+                }
+                if (jsonObject.get("flag").equals("LEASE_HOUSE")){
+                    LEASE_HOUSE.add(jsonObject);
+                    continue;
+                }
+                if (jsonObject.get("flag").equals("LEASE_SHOP")){
+                    LEASE_SHOP.add(jsonObject);
+                    continue;
+                }
+                if (jsonObject.get("flag").equals("INFORM")){
+                    INFORM.add(jsonObject);
+                    continue;
+                }
+            }
+            map.put("FUN",FUN);
+            map.put("LEASE_HOUSE",LEASE_HOUSE);
+            map.put("LEASE_SHOP",LEASE_SHOP);
+            map.put("INFORM",INFORM);
         }
-        //搜索词添加至Redis热词排行里面
-        commonService.addFullTextSearchHotKey( text );
-        return CommonResult.ok(list);
+        return CommonResult.ok(map);
     }
 
     /**
