@@ -589,6 +589,20 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	}
 	//============== 操作员管理相关end ===============
 	
+	//============== 个人中心相关start ===============
+	/**
+	* @Description: 更新用户头像
+	 * @Param: [url, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Override
+	public boolean updateAvatar(String url,String uid){
+		return adminUserMapper.updateAvatar(url,uid) == 1;
+	}
+	
+	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================
 	
 }

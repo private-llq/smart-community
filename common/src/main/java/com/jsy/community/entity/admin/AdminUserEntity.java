@@ -92,6 +92,11 @@ public class AdminUserEntity extends BaseEntity {
 	private String realName;
 	
 	/**
+	 * 头像地址
+	 */
+	private String avatarUrl;
+	
+	/**
 	 * 组织机构名称
 	 */
 	@TableField(exist = false)

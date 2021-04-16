@@ -36,6 +36,11 @@ public class AdminInfoVo implements Serializable {
 	private String realName;
 	
 	/**
+	 * 头像地址
+	 */
+	private String avatarUrl;
+	
+	/**
 	 * 状态  0：禁用   1：正常
 	 */
 	private Integer status;

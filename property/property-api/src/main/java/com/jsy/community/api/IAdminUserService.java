@@ -118,7 +118,7 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	
 	
 	//==================================== 物业端（新）begin ====================================
-	//================ 用户登录相关begin =================
+	//================ 资料或账户相关begin =================
 	/**
 	* @Description: 根据手机号查询用户是否存在
 	 * @Param: [mobile]
@@ -172,7 +172,16 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2021/4/1
 	**/
 	Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList);
-	//================ 用户登录相关end =================
+	
+	/**
+	* @Description: 更新用户头像
+	 * @Param: [url, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	boolean updateAvatar(String url,String uid);
+	//================ 资料或账户相关end =================
 	
 	//============== 操作员管理相关begin ===============
 	/**

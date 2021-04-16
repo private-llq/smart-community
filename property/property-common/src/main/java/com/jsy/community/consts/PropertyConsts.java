@@ -18,4 +18,7 @@ public interface PropertyConsts {
 	//======= 轮播图状态
 	Integer BANNER_STATUS_CANCEL = 0; //已撤销
 	Integer BANNER_STATUS_PUBLISH = 1; //发布中
+	
+	//======= 头像文件夹
+	String BUCKET_NAME_AVATAR = "admin-avatar";
 }

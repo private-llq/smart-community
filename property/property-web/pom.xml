@@ -16,6 +16,12 @@
 	<name>物业端服务消费模块</name>
 	
 	<dependencies>
+		<dependency>
+			<groupId>com.jsy</groupId>
+			<artifactId>property-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!--	缩略图生成jar包	-->
 		<dependency>
 			<groupId>net.coobird</groupId>
