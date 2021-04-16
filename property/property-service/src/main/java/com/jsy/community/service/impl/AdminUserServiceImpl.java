@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConsts;
+import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
@@ -19,6 +21,7 @@ import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
 import com.jsy.community.utils.*;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -602,6 +605,26 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		return adminUserMapper.updateAvatar(url,uid) == 1;
 	}
 	
+	/**
+	* @Description: 个人信息查询
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Override
+	public AdminUserEntity queryPersonalData(String uid){
+		AdminUserEntity user = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile,real_name,org_id,job,id_card,role_type").eq("uid",uid));
+		user.setRoleTypeName(PropertyConstsEnum.RoleTypeEnum.ROLE_TYPE_MAP.get(user.getRoleType()));
+		//查询组织机构名称
+		user.setOrgName(organizationService.queryOrganizationNameById(user.getOrgId()));
+		//查询是否设置密码(by手机号)
+		Integer count = adminUserAuthMapper.selectCount(new QueryWrapper<AdminUserAuthEntity>().eq("mobile",user.getMobile()).isNotNull("password"));
+		user.setHasPassword(count > 0 ? PropertyConsts.ACCOUNT_PASS_HAS : PropertyConsts.ACCOUNT_PASS_HAS_NOT);
+		user.setOrgId(null);
+		user.setRoleType(null);
+		return user;
+	}
 	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================
 	

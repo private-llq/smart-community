@@ -6,10 +6,13 @@ package com.jsy.community.consts;
  * @since 2021-04-01 13:44
  **/
 public interface PropertyConsts {
-	/**
-	 * 超级管理员
-	 */
-	int SUPER_ADMIN = 1;
+	//======= 账户类型
+	Integer ACCOUNT_TYPE_SUPER_ADMIN = 1; //超级管理员
+	Integer ACCOUNT_TYPE_NORMAL_ADMIN = 2; //普通用户
+	
+	//======= 登录账户是否设置密码
+	Integer ACCOUNT_PASS_HAS = 0; //密码未设置
+	Integer ACCOUNT_PASS_HAS_NOT = 1; //密码已设置
 	
 	//======= 轮播图发布类型
 	Integer BANNER_PUB_TYPE_DRAFT = 0; //草稿

@@ -181,6 +181,15 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2021/4/16
 	**/
 	boolean updateAvatar(String url,String uid);
+	
+	/**
+	* @Description: 个人信息查询
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	AdminUserEntity queryPersonalData(String uid);
 	//================ 资料或账户相关end =================
 	
 	//============== 操作员管理相关begin ===============

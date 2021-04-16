@@ -278,6 +278,13 @@ public class AdminUserController {
 	//============== 操作员管理相关end ===============
 	
 	//============== 个人中心相关start ===============
+	/**
+	* @Description: 用户头像更新
+	 * @Param: [file]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
 	@Login
 	@PutMapping("avatar")
 	public CommonResult uploadAvatar(MultipartFile file){
@@ -289,6 +296,18 @@ public class AdminUserController {
 		return result ? CommonResult.ok(url,"操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 	}
 	
+	/**
+	* @Description: 个人资料查询
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Login
+	@GetMapping("info")
+	public CommonResult queryPersonalData(){
+		return CommonResult.ok(adminUserService.queryPersonalData(UserUtils.getUserId()),"查询成功");
+	}
 	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================
 }

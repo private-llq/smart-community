@@ -53,6 +53,12 @@ public class AdminUserEntity extends BaseEntity {
 	private String password;
 	
 	/**
+	 * 是否设置密码 0.否 1.是
+	 */
+	@TableField(exist = false)
+	private Integer hasPassword;
+	
+	/**
 	 * 盐
 	 */
 	private String salt;
@@ -113,6 +119,12 @@ public class AdminUserEntity extends BaseEntity {
 	 * 角色类型(第一版直接放进用户表)  1：超级管理员   2：普通用户
 	 */
 	private Integer roleType;
+	
+	/**
+	 * 角色(账户)类型名称
+	 */
+	@TableField(exist = false)
+	private String roleTypeName;
 	
 	/**
 	 * 组织机构id
