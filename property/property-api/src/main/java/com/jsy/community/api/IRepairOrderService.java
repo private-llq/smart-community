@@ -38,7 +38,7 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Date 2020/12/9 16:10
 	 * @Param [id, dealId, money, uid]
 	 **/
-	void dealOrder(Long id, Long dealId, BigDecimal money, String uid);
+	void dealOrder(Long id, String dealId, BigDecimal money, String uid);
 	
 	/**
 	 * @return com.jsy.community.entity.UserEntity
@@ -92,7 +92,7 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Date 2021/3/19 15:07
 	 * @Param [id]
 	 **/
-	void rejectOrder(Long id, String reason, String uid);
+	void rejectOrder(Long id, String reason, String uid,String number,String realName);
 	
 	/**
 	 * @return java.util.List<com.jsy.community.entity.admin.AdminUserEntity>
@@ -101,6 +101,6 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Date 2021/4/2 13:39
 	 * @Param [name, number, department]
 	 **/
-	List<Map<String, String>> getRepairPerson(String condition, Long communityId);
+	List<Map<String, Object>> getRepairPerson(String condition, Long communityId);
 	
 }

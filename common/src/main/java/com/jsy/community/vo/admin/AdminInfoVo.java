@@ -64,5 +64,10 @@ public class AdminInfoVo implements Serializable {
 	 * token
 	 */
 	private String token;
+	
+	/**
+	 * 编号
+	 */
+	private String number;
 
 }

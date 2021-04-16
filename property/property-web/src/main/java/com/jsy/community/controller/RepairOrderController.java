@@ -75,7 +75,9 @@ public class RepairOrderController {
 			throw new PropertyException("驳回原因过长");
 		}
 		String uid = UserUtils.getAdminUserInfo().getUid();
-		repairOrderService.rejectOrder(id, reason, uid);
+		String number = UserUtils.getAdminUserInfo().getNumber();
+		String realName = UserUtils.getAdminUserInfo().getRealName();
+		repairOrderService.rejectOrder(id, reason, uid, number,realName);
 		return CommonResult.ok();
 	}
 	
@@ -93,7 +95,7 @@ public class RepairOrderController {
 	@GetMapping("/dealOrder")
 	// TODO: 2021/4/8 完成
 	public CommonResult dealOrder(@ApiParam("报修订单id") @RequestParam Long id,
-	                              @ApiParam("处理人id") @RequestParam Long dealId,
+	                              @ApiParam("处理人id") @RequestParam String dealId,
 	                              @ApiParam("费用") BigDecimal money) {
 		String uid = UserUtils.getAdminUserInfo().getUid();
 		repairOrderService.dealOrder(id, dealId, money, uid);
@@ -107,7 +109,7 @@ public class RepairOrderController {
 	// TODO: 2021/4/8 完成
 	public CommonResult getRepairPerson(String condition) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		List<Map<String, String>> adminUserList = repairOrderService.getRepairPerson(condition, communityId);
+		List<Map<String, Object>> adminUserList = repairOrderService.getRepairPerson(condition, communityId);
 		return CommonResult.ok(adminUserList);
 	}
 	
@@ -148,7 +150,6 @@ public class RepairOrderController {
 		String img = repairOrderService.getOrderImg(id);
 		return CommonResult.ok(img);
 	}
-	
 	
 }
 

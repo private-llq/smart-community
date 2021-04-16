@@ -54,6 +54,10 @@ public class AppMenuEntity extends BaseEntity {
     @TableField(exist = false)
     private Long sort;
     
+    @ApiModelProperty(value = "是否被选中[标志]")
+    @TableField(exist = false)
+    private Long checked;
+    
     public interface addAdmin{}
     
     public interface updateAdmin{}

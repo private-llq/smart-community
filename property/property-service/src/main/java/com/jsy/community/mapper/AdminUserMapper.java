@@ -152,6 +152,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Date 2021/4/2 13:40
 	 * @Param []
 	 **/
-	List<Map<String, String>> getRepairPerson(@Param("condition")String condition, @Param("communityId") Long communityId);
+	List<Map<String, Object>> getRepairPerson(@Param("condition")String condition, @Param("communityId") Long communityId);
 	//========用户拓展end ==========
+	
 }

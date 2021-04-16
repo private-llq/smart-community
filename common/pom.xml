@@ -8,7 +8,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<artifactId>common</artifactId>
 	<name>公共模块</name>
 	<description>工具类、实体类等</description>
@@ -40,7 +40,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-		
+
 		<!-- 在线文档 -->
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -57,7 +57,7 @@
 			<artifactId>jakarta.xml.bind-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -84,7 +84,7 @@
 			<artifactId>jjwt</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
@@ -123,13 +123,13 @@
 			<artifactId>spring-integration-redis</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus-boot-starter</artifactId>
 			<version>${mybatis-plus.version}</version>
 		</dependency>
-		
+
 		<!-- 三方登录 -->
 		<dependency>
 			<groupId>com.xkcoding</groupId>
@@ -142,7 +142,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- OSS -->
 		<dependency>
 			<groupId>com.aliyun.oss</groupId>
@@ -159,7 +159,7 @@
 <!--			<artifactId>activation</artifactId>-->
 <!--			<scope>provided</scope>-->
 <!--		</dependency>-->
-		
+
 		<dependency>
 			<groupId>cn.hutool</groupId>
 			<artifactId>hutool-all</artifactId>
@@ -235,11 +235,18 @@
             <artifactId>spring-test</artifactId>
         </dependency>
 
+		<!--	poi	-->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>4.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>3.17</version>
+		</dependency>
+		<!--	poi	-->
 	</dependencies>
 
 </project>

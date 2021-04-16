@@ -72,7 +72,7 @@
 	</update>
 
 	<select id="getRepairPerson" resultType="hashmap">
-		select u.id, u.real_name, u.number,o.name from t_admin_user u,t_organization o
+		select u.id,u.uid, u.real_name, u.number,o.name from t_admin_user u,t_organization o
 		<where>
 			<if test="condition!=null and condition!=''">
                 (u.real_name like concat ("%",#{condition},"%") or u.number like concat ("%",#{condition},"%") or o.name like concat("%",#{condition},"%"))
