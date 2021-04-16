@@ -1,5 +1,6 @@
 package com.jsy.community.qo.property;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -53,5 +54,8 @@ public class ElasticsearchCarQO implements Serializable {
     @ApiModelProperty("房屋类型")
     private String houseTypeText;
     @ApiModelProperty("创建时间")
+//    @DateTimeFormat(pattern = "yyyy-MM-dd HH:MM:ss")
+//    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "yyyy-MM-dd HH:MM:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime createTime;
 }

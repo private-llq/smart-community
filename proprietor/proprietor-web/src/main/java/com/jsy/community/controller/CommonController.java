@@ -119,7 +119,6 @@ public class CommonController {
 
     /**
      * app 全文搜索
-     * @param size  搜索离text最相近条数
      * @param text  搜索文本
      * @author YuLF
      * @since  2021/3/9 16:58
@@ -127,7 +126,7 @@ public class CommonController {
     @Login
     @ApiOperation("App全文搜索")
     @GetMapping("/search")
-    public CommonResult<List<JSONObject>> search(@RequestParam( required = false, defaultValue = "10") Integer size, @RequestParam String text)  {
+    public CommonResult<List<JSONObject>> search(@RequestParam String text)  {
         if( Objects.nonNull(text) && text.length() > BusinessConst.HOT_KEY_MAX_NUM  ){
             throw new JSYException(" 搜索文本太长了! ");
         }
@@ -140,7 +139,7 @@ public class CommonController {
         searchSourceBuilder.fetchSource(includes, excludes);
         //查询条件
         searchSourceBuilder.query(QueryBuilders.matchQuery("searchTitle", text));
-        searchSourceBuilder.size(size);
+
         searchRequest.source(searchSourceBuilder);
         SearchResponse searchResponse;
         try {

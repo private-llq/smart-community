@@ -109,7 +109,6 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
      * @return:
      */
     @Override
-    @EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.FUN)
     public void tapeOut(Long id) {
         CommunityFunEntity entity = communityFunMapper.selectById(id);
         if (entity.getStatus()==2){
@@ -118,6 +117,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setStatus(2);
         entity.setStartTime(LocalDateTime.now());
         communityFunMapper.updateById(entity);
+        ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
     /**
@@ -130,6 +130,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Override
     public void insetOne(CommunityFunOperationQO communityFunOperationQO, AdminInfoVo adminInfoVo) {
         CommunityFunEntity entity = new CommunityFunEntity();
+        entity.setCommunityId(adminInfoVo.getCommunityId());
         entity.setTitleName(communityFunOperationQO.getTitleName());
         entity.setViewCount(communityFunOperationQO.getViewCount());
         entity.setType(communityFunOperationQO.getType());

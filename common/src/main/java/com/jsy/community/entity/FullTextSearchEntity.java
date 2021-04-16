@@ -46,5 +46,9 @@ public class FullTextSearchEntity implements Serializable {
      * 该数据向ES中的操作
      */
     private Operation operation;
+    /**
+     * 社区id
+     */
+    private Long communityId;
 
 }
