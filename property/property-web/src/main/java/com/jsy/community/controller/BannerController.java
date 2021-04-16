@@ -95,15 +95,12 @@ public class BannerController {
 		bannerEntity.setCommunityId(adminUserInfo.getCommunityId());
 		bannerEntity.setCreateBy(adminUserInfo.getUid());
 		//写库
-		boolean b = bannerService.addBanner(bannerEntity);
+		Long id = bannerService.addBanner(bannerEntity);
 		String filePath = bannerEntity.getUrl();
 		if (!StringUtils.isEmpty(filePath)) {
 			redisTemplate.opsForSet().add("banner_img_all",filePath);
 		}
-		if(b){
-			return CommonResult.ok("操作成功");
-		}
-		return CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
+		return CommonResult.ok(String.valueOf(id),"操作成功");
 	}
 	
 	/**

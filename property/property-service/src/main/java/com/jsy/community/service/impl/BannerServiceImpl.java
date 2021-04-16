@@ -50,7 +50,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	 * @Date: 2020/11/16
 	**/
 	@Override
-	public boolean addBanner(BannerEntity bannerEntity){
+	public Long addBanner(BannerEntity bannerEntity){
 		if(bannerEntity.getPosition() == null){
 			bannerEntity.setPosition(1);
 		}
@@ -61,7 +61,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 			//发布需要排序，保存草稿不用
 			//查出当前已有的排序号
 			List<Integer> sorts = bannerMapper.queryBannerSortByCommunityId(bannerEntity.getCommunityId());
-			if(sorts.size() > 5){
+			if(sorts.size() >= 5){
 				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"发布数量超过上限");
 			}
 			////查找排序空位
@@ -73,7 +73,10 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 			bannerEntity.setStatus(PropertyConsts.BANNER_STATUS_PUBLISH);
 		}
 		int result = bannerMapper.insert(bannerEntity);
-		return result > 0;
+		if(result != 1){
+			throw new PropertyException(JSYError.INTERNAL.getCode(),"操作失败");
+		}
+		return bannerEntity.getId();
 	}
 	
 	//查找排序空位
@@ -282,7 +285,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		bannerEntity.setPublishType(bannerQO.getPublishType());
 		if(PropertyConsts.BANNER_STATUS_PUBLISH.equals(bannerEntity.getStatus())){
 			Integer count = bannerMapper.selectCount(new QueryWrapper<BannerEntity>().eq("communityId",bannerQO.getCommunityId()).eq("status",PropertyConsts.BANNER_STATUS_PUBLISH));
-			if(count > 5){
+			if(count >= 5){
 				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"发布数量超过上限");
 			}
 		}

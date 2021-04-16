@@ -25,7 +25,7 @@ public interface IBannerService extends IService<BannerEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
-	boolean addBanner(BannerEntity bannerEntity);
+	Long addBanner(BannerEntity bannerEntity);
 	
 	/**
 	* @Description: 轮播图分页查询
