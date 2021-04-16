@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
+import com.jsy.community.api.IUserSearchService;
 import com.jsy.community.config.web.ElasticsearchConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
@@ -12,6 +13,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.CommunityType;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -52,6 +54,8 @@ public class CommonController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserSearchService userSearchService;
 
     @Resource
     private RestHighLevelClient elasticsearchClient;
@@ -130,6 +134,7 @@ public class CommonController {
         if( Objects.nonNull(text) && text.length() > BusinessConst.HOT_KEY_MAX_NUM  ){
             throw new JSYException(" 搜索文本太长了! ");
         }
+        String userId = UserUtils.getUserId();
         SearchRequest searchRequest = new SearchRequest(BusinessConst.FULL_TEXT_SEARCH_INDEX);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -139,6 +144,7 @@ public class CommonController {
             sourceBuilder.query(boolQuery);
             //搜索词添加至Redis热词排行里面
             commonService.addFullTextSearchHotKey( text );
+            userSearchService.addSearchHotKey(userId,text);
         }else {
             sourceBuilder.size(10000);
         }
@@ -152,43 +158,43 @@ public class CommonController {
         }
         SearchHits hits = searchResponse.getHits();
         Map<String, Object> map = new HashMap<>();
-        List<Object> FUN = new LinkedList<>();
-        List<Object> LEASE_HOUSE = new LinkedList<>();
-        List<Object> LEASE_SHOP = new LinkedList<>();
-        List<Object> INFORM = new LinkedList<>();
+        List<Object> fun = new LinkedList<>();
+        List<Object> leaseHouse = new LinkedList<>();
+        List<Object> leaseShop = new LinkedList<>();
+        List<Object> inform = new LinkedList<>();
         map.put("total",hits.getTotalHits().value);
         if (!"".equals(text)&&text!=null){
             for (SearchHit searchHit : hits.getHits()) {
                 String sourceAsString = searchHit.getSourceAsString();
                 JSONObject jsonObject = JSON.parseObject(sourceAsString);
-                FUN.add(jsonObject);
+                fun.add(jsonObject);
             }
-            map.put("list",FUN);
+            map.put("list",fun);
         }else {
             for (SearchHit searchHit : hits.getHits()) {
                 String sourceAsString = searchHit.getSourceAsString();
                 JSONObject jsonObject = JSON.parseObject(sourceAsString);
                 if (jsonObject.get("flag").equals("FUN")){
-                    FUN.add(jsonObject);
+                    fun.add(jsonObject);
                     continue;
                 }
                 if (jsonObject.get("flag").equals("LEASE_HOUSE")){
-                    LEASE_HOUSE.add(jsonObject);
+                    leaseHouse.add(jsonObject);
                     continue;
                 }
                 if (jsonObject.get("flag").equals("LEASE_SHOP")){
-                    LEASE_SHOP.add(jsonObject);
+                    leaseShop.add(jsonObject);
                     continue;
                 }
                 if (jsonObject.get("flag").equals("INFORM")){
-                    INFORM.add(jsonObject);
+                    inform.add(jsonObject);
                     continue;
                 }
             }
-            map.put("FUN",FUN);
-            map.put("LEASE_HOUSE",LEASE_HOUSE);
-            map.put("LEASE_SHOP",LEASE_SHOP);
-            map.put("INFORM",INFORM);
+            map.put("FUN",fun);
+            map.put("LEASE_HOUSE",leaseHouse);
+            map.put("LEASE_SHOP",leaseShop);
+            map.put("INFORM",inform);
         }
         return CommonResult.ok(map);
     }
@@ -207,10 +213,24 @@ public class CommonController {
         return commonService.getFullTextSearchHotKey(num);
     }
 
-
-
-
-
+    /**
+     * @Description: 查询个人搜索词汇
+     * @author: Hu
+     * @since: 2021/4/16 17:01
+     * @Param:
+     * @return:
+     */
+    @Login
+    @ApiOperation("App全文搜索个人词汇")
+    @GetMapping("/hotKey")
+    public CommonResult getUserKey(@RequestParam("num")Integer num ){
+        if (num==0||num==null){
+            num=10;
+        }
+        String userId = UserUtils.getUserId();
+        userSearchService.searchUserKey(userId,num);
+        return null;
+    }
 
 
 	@ApiOperation("查询下级省市区、查询城市等")

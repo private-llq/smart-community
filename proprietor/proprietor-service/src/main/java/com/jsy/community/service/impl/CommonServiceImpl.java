@@ -1,6 +1,5 @@
 package com.jsy.community.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -533,6 +532,8 @@ public class CommonServiceImpl implements ICommonService {
             //记录存入 更新存入时间
             stringObjectValueOperations.getAndSet(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + hotKey, System.currentTimeMillis() + "");
         }
+
+
 
     }
 
