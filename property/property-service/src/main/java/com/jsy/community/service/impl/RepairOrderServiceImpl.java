@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IRepairOrderService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CommonConst;
-import com.jsy.community.entity.RepairEntity;
-import com.jsy.community.entity.RepairOrderEntity;
-import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
@@ -21,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +48,9 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	@Autowired
 	private AdminUserMapper adminUserMapper;
 	
+	@Autowired
+	private OrganizationMapper organizationMapper;
+	
 	// 房屋报修事项(个人)
 	private static final int TYPE_PERSON = 1;
 	
@@ -75,7 +76,22 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 				wrapper.eq("uid", orderEntity.getAssignId());
 				AdminUserEntity adminUserEntity = adminUserMapper.selectOne(wrapper);
 				orderEntity.setAssignName(adminUserEntity.getRealName());
+				orderEntity.setAssignNameNumber(adminUserEntity.getNumber());
 			}
+			
+			if (orderEntity.getStatus() == 0) {
+				orderEntity.setStatusStr("待处理");
+			} else if (orderEntity.getStatus() == 1) {
+				orderEntity.setStatusStr("修复中");
+			} else if (orderEntity.getStatus() == 2) {
+				orderEntity.setStatusStr("已完成");
+			} else {
+				orderEntity.setStatusStr("已驳回");
+			}
+			
+			String repairImg = orderEntity.getRepairImg();
+			String[] strings = repairImg.split(";");
+			orderEntity.setRepairImgs(strings);
 		}
 		
 		PageInfo<RepairOrderEntity> objectPageInfo = new PageInfo<>();
@@ -88,12 +104,19 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	
 	@Override
 	@Transactional
-	public void dealOrder(Long id, Long dealId, BigDecimal money, String uid) {
+	public void dealOrder(Long id, String dealId, BigDecimal money, String uid) {
 		RepairOrderEntity orderEntity = repairOrderMapper.selectById(id);
 		if (orderEntity == null) {
 			throw new PropertyException("该报修订单不存在");
 		}
 		orderEntity.setStatus(1); // 将状态设置为 处理中
+		// 判断该dealId的人员是否存在
+		QueryWrapper<AdminUserEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("uid", dealId);
+		AdminUserEntity adminUserEntity = adminUserMapper.selectOne(wrapper);
+		if (adminUserEntity == null) {
+			throw new PropertyException("请选择正确的维修人员");
+		}
 		orderEntity.setDealId(dealId);
 		orderEntity.setMoney(money);
 		
@@ -106,10 +129,6 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		if (repairEntity == null) {
 			throw new PropertyException("该订单不存在");
 		}
-		Integer status = repairEntity.getStatus();
-		if (!status.equals(0)) {
-			throw new PropertyException("该报修订单已处理");
-		}
 		repairEntity.setStatus(1); // 将状态设置为 处理中
 		repairMapper.updateById(repairEntity); // 更新报修表
 	}
@@ -117,7 +136,17 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	@Override
 	@Transactional
 	public void successOrder(Long id, String uid) {
-		RepairEntity repairEntity = commOrder(id);
+		RepairOrderEntity orderEntity = repairOrderMapper.selectById(id);
+		
+		if (orderEntity == null) {
+			throw new PropertyException("该报修订单不存在");
+		}
+		orderEntity.setStatus(2); // 将状态设置为 处理中
+		orderEntity.setAssignId(uid);
+		repairOrderMapper.updateById(orderEntity);
+		
+		Long repairId = orderEntity.getRepairId();
+		RepairEntity repairEntity = repairMapper.selectById(repairId);
 		if (repairEntity == null) {
 			throw new PropertyException("该订单不存在");
 		}
@@ -127,20 +156,6 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		}
 		repairEntity.setStatus(2); // 将状态设置为 已处理
 		repairMapper.updateById(repairEntity); // 更新报修表
-		
-		
-		QueryWrapper<RepairOrderEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("repair_id", id);
-		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(queryWrapper);
-		
-		if (orderEntity == null) {
-			throw new PropertyException("该报修订单不存在");
-		}
-		orderEntity.setStatus(2); // 将状态设置为 处理中
-		orderEntity.setAssignId(uid);
-		repairOrderMapper.updateById(orderEntity);
-		
-		
 	}
 	
 	@Override
@@ -166,17 +181,43 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		if (orderEntity == null) {
 			throw new PropertyException("该报修订单不存在");
 		}
-		Long dealId = orderEntity.getDealId();
-		AdminUserEntity userEntity = adminUserMapper.selectById(dealId);
+		
+		// 图片处理
+		String imgPath = orderEntity.getRepairImg();
+		String[] strings = imgPath.split(";");
+		orderEntity.setRepairImgs(strings);
+		
+		// 订单状态处理
+		if (orderEntity.getStatus() == 0) {
+			orderEntity.setStatusStr("待处理");
+		} else if (orderEntity.getStatus() == 1) {
+			orderEntity.setStatusStr("修复中");
+		} else if (orderEntity.getStatus() == 2) {
+			orderEntity.setStatusStr("已完成");
+		} else {
+			orderEntity.setStatusStr("已驳回");
+		}
+		
+		String dealId = orderEntity.getDealId();
+		QueryWrapper<AdminUserEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("uid", dealId);
+		AdminUserEntity userEntity = adminUserMapper.selectOne(wrapper);
 		if (userEntity != null) {
+			// 被派单人
 			orderEntity.setDealName(userEntity.getRealName());
+			// 被派单人编号
+			orderEntity.setDealNameNumber(userEntity.getNumber());
+			// 被派单人部门
+			Long orgId = userEntity.getOrgId();
+			OrganizationEntity organizationEntity = organizationMapper.selectById(orgId);
+			orderEntity.setDepartment(organizationEntity.getName());
 		}
 		return orderEntity;
 	}
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void rejectOrder(Long id, String reason, String uid) {
+	public void rejectOrder(Long id, String reason, String uid, String number, String realName) {
 		RepairOrderEntity entity = repairOrderMapper.selectById(id);
 		if (entity.getStatus() != 0) {
 			throw new PropertyException("该订单已开始处理，不能驳回");
@@ -184,6 +225,8 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		entity.setStatus(3);
 		entity.setRejectReason(reason);
 		entity.setAssignId(uid);
+		entity.setAssignName(realName);
+		entity.setAssignNameNumber(number);
 		repairOrderMapper.updateById(entity);
 		
 		// 查询报修信息
@@ -194,8 +237,15 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	}
 	
 	@Override
-	public List<Map<String, String>> getRepairPerson(String condition, Long communityId) {
-		return adminUserMapper.getRepairPerson(condition, communityId);
+	public List<Map<String, Object>> getRepairPerson(String condition, Long communityId) {
+		List<Map<String, Object>> repairPerson = adminUserMapper.getRepairPerson(condition, communityId);
+		for (Map<String, Object> person : repairPerson) {
+			BigInteger s = (BigInteger) person.get("id");
+			
+			String idStr = s.toString();
+			person.put("idStr", idStr);
+		}
+		return repairPerson;
 	}
 	
 	@Override

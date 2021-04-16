@@ -102,7 +102,7 @@ public class ElasticsearchCarUtil {
     public static void insertData(ElasticsearchCarQO elasticsearchCarQO,RestHighLevelClient restHighLevelClient){
         //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
         IndexRequest indexRequest = new IndexRequest(BusinessConst.INDEX_CAR);
-//        indexRequest.create(true);
+        indexRequest.create(true);
         indexRequest.id(elasticsearchCarQO.getId()+"");
         //转换为json串发给elasticsearch
         indexRequest.source(JSON.toJSONString(elasticsearchCarQO), XContentType.JSON);

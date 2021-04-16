@@ -155,7 +155,7 @@ public class AdminLoginController {
 			return CommonResult.error("账号或密码不正确");
 		}
 		
-		////查询已加入小区id列表
+		//查询已加入小区id列表
 		List<Long> idList = adminUserService.queryCommunityIdList(form.getAccount());
 		//查询已加入小区列表详情
 		List<CommunityEntity> communityList = communityService.queryCommunityBatch(idList);

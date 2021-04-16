@@ -154,6 +154,18 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	}
 	
 	/**
+	* @Description: 根据id查询组织机构名称
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Override
+	public String queryOrganizationNameById(Long id){
+		return organizationMapper.queryOrganizationNameById(id);
+	}
+	
+	/**
 	 * @Description: 根据idList批量获取对应组织机构名称
 	 * @Param: [ids]
 	 * @Return: java.util.Map<java.lang.Long, java.util.Map < java.lang.Long, java.lang.Object>>

@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 @TableName("t_community_fun")
 public class CommunityFunEntity extends BaseEntity {
 
+    @ApiModelProperty(value = "社区趣事浏览次数")
+    private Long communityId;
+
     @ApiModelProperty(value = "社区趣事标题")
     @NotBlank(groups = {CommunityFunValidated.class}, message = "标题不能为空！")
     private String titleName;

@@ -25,7 +25,7 @@ public interface IBannerService extends IService<BannerEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
-	boolean addBanner(BannerEntity bannerEntity);
+	Long addBanner(BannerEntity bannerEntity);
 	
 	/**
 	* @Description: 轮播图分页查询
@@ -37,7 +37,7 @@ public interface IBannerService extends IService<BannerEntity> {
 	PageInfo<BannerEntity> queryBannerPage(BaseQO<BannerEntity> baseQO);
 	
 	/**
-	* @Description: 轮播图 发布中列表查询(拖动排序用)
+	* @Description: 轮播图 发布中轮播图按排序查询列表
 	 * @Param: [communityId]
 	 * @Return: java.util.List<com.jsy.community.entity.BannerEntity>
 	 * @Author: chq459799974
@@ -71,5 +71,14 @@ public interface IBannerService extends IService<BannerEntity> {
 	 * @Date: 2020/12/29
 	**/
 	boolean updateBanner(BannerQO bannerQO);
+	
+	/**
+	* @Description: 轮播图 修改排序
+	 * @Param: [idList, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	boolean changeSorts(List<Long> idList,Long communityId);
 
 }

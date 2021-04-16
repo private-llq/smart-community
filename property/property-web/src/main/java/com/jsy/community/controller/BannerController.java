@@ -66,7 +66,14 @@ public class BannerController {
 		return CommonResult.ok(bannerService.queryBannerPage(baseQO),"查询成功");
 	}
 	
-	@ApiOperation("【轮播图】发布中列表查询(拖动排序用)")
+	/**
+	* @Description: 发布中轮播图按排序查询列表
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.BannerEntity>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	@ApiOperation("【轮播图】发布中轮播图按排序查询列表")
 	@GetMapping("listOnShow")
 	public CommonResult<List<BannerEntity>> listOnShow(){
 		return CommonResult.ok(bannerService.queryBannerListOnShowByCommunityId(UserUtils.getAdminCommunityId()));
@@ -88,15 +95,12 @@ public class BannerController {
 		bannerEntity.setCommunityId(adminUserInfo.getCommunityId());
 		bannerEntity.setCreateBy(adminUserInfo.getUid());
 		//写库
-		boolean b = bannerService.addBanner(bannerEntity);
+		Long id = bannerService.addBanner(bannerEntity);
 		String filePath = bannerEntity.getUrl();
 		if (!StringUtils.isEmpty(filePath)) {
 			redisTemplate.opsForSet().add("banner_img_all",filePath);
 		}
-		if(b){
-			return CommonResult.ok("操作成功");
-		}
-		return CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
+		return CommonResult.ok(String.valueOf(id),"操作成功");
 	}
 	
 	/**
@@ -148,7 +152,7 @@ public class BannerController {
 	}
 	
 	/**
-	* @Description: 修改
+	* @Description: 轮播图 修改
 	 * @Param: [bannerQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
@@ -161,6 +165,20 @@ public class BannerController {
 		bannerQO.setOperator(UserUtils.getUserId());
 		bannerQO.setCommunityId(UserUtils.getAdminCommunityId());
 		return bannerService.updateBanner(bannerQO) ? CommonResult.ok("操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
+	}
+	
+	/**
+	* @Description: 轮播图 修改排序
+	 * @Param: [idList]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	@ApiOperation("【轮播图】修改排序")
+	@PutMapping("sort")
+	public CommonResult changeSorts(@RequestBody List<Long> idList){
+		boolean result = bannerService.changeSorts(idList,UserUtils.getAdminCommunityId());
+		return result ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");
 	}
 	
 }

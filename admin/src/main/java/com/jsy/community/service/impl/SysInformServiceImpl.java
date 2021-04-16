@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.annotation.EsImport;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.mapper.SysInformMapper;
 import com.jsy.community.qo.BaseQO;
@@ -33,18 +32,18 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 
 	@Override
-	@EsImport(operation = Operation.INSERT, recordFlag = RecordFlag.INFORM, parameterType = PushInformQO.class, importField = {"acctName","pushTitle","acctId"}, searchField = {"acctName","pushTitle","pushSubTitle"})
 	public boolean add(PushInformQO qo) {
 		PushInformEntity sysInformEntity = PushInformEntity.getInstance();
 		BeanUtils.copyProperties(qo, sysInformEntity);
 		sysInformEntity.setId(SnowFlake.nextId());
+		ElasticsearchImportProvider.elasticOperationSingle(sysInformEntity.getId(), RecordFlag.INFORM, Operation.INSERT, sysInformEntity.getPushTitle(), sysInformEntity.getAcctAvatar());
 		return sysInformMapper.insert(sysInformEntity) > 0;
 	}
 
 
 	@Override
-	@EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.INFORM, deletedId = "informId")
 	public boolean delete(Long informId) {
+		ElasticsearchImportProvider.elasticOperationSingle(informId, RecordFlag.INFORM, Operation.DELETE, null, null);
 		return sysInformMapper.deleteById(informId) > 0;
 	}
 

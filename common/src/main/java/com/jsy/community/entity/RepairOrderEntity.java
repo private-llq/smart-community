@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 
@@ -55,17 +54,23 @@ public class RepairOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "报修图片地址")
     private String repairImg;
     
+    @ApiModelProperty(value = "报修图片地址集合形式")
+    @TableField(exist = false)
+    private String[] repairImgs;
+    
     @ApiModelProperty(value = "报修类别 0 个人报修 1 公共报修")
     private Integer repairType;
     
     @ApiModelProperty(value = "订单状态 0 待处理 1 处理中 2 已处理 3已驳回")
     private Integer status;
+    @TableField(exist = false)
+    private String statusStr;
     
     @ApiModelProperty(value = "报修金额")
     private BigDecimal money;
     
     @ApiModelProperty(value = "被派单人id")
-    private Long dealId;
+    private String dealId;
     
     @ApiModelProperty(value = "派单人id")
     private String assignId;
@@ -77,6 +82,10 @@ public class RepairOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "被派单人编号")
     @TableField(exist = false)
     private String dealNameNumber;
+    
+    @ApiModelProperty(value = "被派单人部门")
+    @TableField(exist = false)
+    private String department;
     
     @ApiModelProperty(value = "派单人姓名")
     @TableField(exist = false)
@@ -93,12 +102,6 @@ public class RepairOrderEntity extends BaseEntity {
     
     @ApiModelProperty(value = "驳回原因")
     private String rejectReason;
-    
-    @ApiModelProperty(value = "驳回时间")
-    private DateTime rejectTime;
-    
-    @ApiModelProperty(value = "驳回人")
-    private String rejectName;
     
     @ApiModelProperty(value = "社区id")
     private Long communityId;

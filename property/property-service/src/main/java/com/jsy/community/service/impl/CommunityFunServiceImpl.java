@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.annotation.EsImport;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
@@ -109,7 +108,6 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
      * @return:
      */
     @Override
-    @EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.FUN)
     public void tapeOut(Long id) {
         CommunityFunEntity entity = communityFunMapper.selectById(id);
         if (entity.getStatus()==2){
@@ -118,6 +116,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setStatus(2);
         entity.setStartTime(LocalDateTime.now());
         communityFunMapper.updateById(entity);
+        ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
     /**
@@ -130,6 +129,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Override
     public void insetOne(CommunityFunOperationQO communityFunOperationQO, AdminInfoVo adminInfoVo) {
         CommunityFunEntity entity = new CommunityFunEntity();
+        entity.setCommunityId(adminInfoVo.getCommunityId());
         entity.setTitleName(communityFunOperationQO.getTitleName());
         entity.setViewCount(communityFunOperationQO.getViewCount());
         entity.setType(communityFunOperationQO.getType());
@@ -155,7 +155,6 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
      * @return:
      */
     @Override
-    @EsImport( operation = Operation.UPDATE, recordFlag = RecordFlag.FUN, parameterType = CommunityFunEntity.class, importField = {"titleName","smallImageUrl"}, searchField = {"titleName"})
     public void updateOne(CommunityFunOperationQO communityFunOperationQO,AdminInfoVo adminInfoVo) {
         CommunityFunEntity entity = communityFunMapper.selectById(communityFunOperationQO.getId());
         entity.setUpdateBy(adminInfoVo.getUid());
@@ -167,6 +166,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
         entity.setTitleName(communityFunOperationQO.getTitleName());
         communityFunMapper.updateById(entity);
+        ElasticsearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.FUN, Operation.UPDATE, entity.getTitleName(), entity.getSmallImageUrl());
     }
 
     /**
@@ -177,9 +177,9 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
      * @return:
      */
     @Override
-    @EsImport(operation = Operation.DELETE, recordFlag = RecordFlag.FUN)
     public void deleteById(Long id) {
         communityFunMapper.deleteById(id);
+        ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
     /**

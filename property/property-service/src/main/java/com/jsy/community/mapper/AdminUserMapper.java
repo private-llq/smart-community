@@ -70,6 +70,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 //	 */
 //	AdminUserEntity queryByMobile(String mobile);
 	
+	//========资料或账户相关start ==========
 	/**
 	* @Description: 根据uid查用户信息
 	 * @Param: [uid]
@@ -111,6 +112,18 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	List<Long> queryCommunityIdListByMobile(String mobile);
 	
 	/**
+	* @Description: 更新用户头像
+	 * @Param: [url, uid]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Update("update t_admin_user set avatar_url = #{url} where uid = #{uid}")
+	int updateAvatar(@Param("url")String url,@Param("uid")String uid);
+	//========资料或账户相关start ==========
+	
+	//========操作员增删改查start ==========
+	/**
 	* @Description: 添加操作员
 	 * @Param: [entity]
 	 * @Return: int
@@ -129,7 +142,9 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Date: 2021/3/17
 	**/
 	int updateOperator(@Param("entity") AdminUserEntity entity);
+	//========操作员增删改查end ==========
 	
+	//========用户拓展start ==========
 	/**
 	 * @return java.util.List<com.jsy.community.entity.admin.AdminUserEntity>
 	 * @Author lihao
@@ -137,6 +152,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Date 2021/4/2 13:40
 	 * @Param []
 	 **/
-	List<Map<String, String>> getRepairPerson(@Param("condition")String condition, @Param("communityId") Long communityId);
+	List<Map<String, Object>> getRepairPerson(@Param("condition")String condition, @Param("communityId") Long communityId);
+	//========用户拓展end ==========
 	
 }

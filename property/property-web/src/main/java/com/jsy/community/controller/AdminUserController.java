@@ -5,6 +5,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.entity.admin.AdminUserRoleEntity;
@@ -12,10 +13,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
-import com.jsy.community.utils.MyMathUtils;
-import com.jsy.community.utils.SmsUtil;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
@@ -32,6 +30,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -204,7 +203,7 @@ public class AdminUserController {
 //	}
 	
 	//==================================== 物业端（新）begin ====================================
-	
+	//============== 操作员管理相关start ===============
 	/**
 	* @Description: 操作员条件查询
 	 * @Param: [baseQO]
@@ -276,6 +275,39 @@ public class AdminUserController {
 		String uid = UserUtils.getUserId();
 		return adminUserService.resetPassword(map.get("id"),uid) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
+	//============== 操作员管理相关end ===============
 	
+	//============== 个人中心相关start ===============
+	/**
+	* @Description: 用户头像更新
+	 * @Param: [file]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Login
+	@PutMapping("avatar")
+	public CommonResult uploadAvatar(MultipartFile file){
+		if(!PicUtil.checkSizeAndType(file,5*1024)){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"图片格式错误");
+		}
+		String url = MinioUtils.upload(file, PropertyConsts.BUCKET_NAME_AVATAR);
+		boolean result = adminUserService.updateAvatar(url,UserUtils.getUserId());
+		return result ? CommonResult.ok(url,"操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
+	}
+	
+	/**
+	* @Description: 个人资料查询
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Login
+	@GetMapping("info")
+	public CommonResult queryPersonalData(){
+		return CommonResult.ok(adminUserService.queryPersonalData(UserUtils.getUserId()),"查询成功");
+	}
+	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================
 }

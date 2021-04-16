@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserService;
@@ -49,17 +50,20 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	 * @Date: 2020/11/16
 	**/
 	@Override
-	public boolean addBanner(BannerEntity bannerEntity){
+	public Long addBanner(BannerEntity bannerEntity){
 		if(bannerEntity.getPosition() == null){
 			bannerEntity.setPosition(1);
 		}
 		bannerEntity.setId(SnowFlake.nextId());
-		if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(bannerEntity.getPublishType())){
+		if(PropertyConsts.BANNER_PUB_TYPE_DRAFT.equals(bannerEntity.getPublishType())){  //保存草稿
 			bannerEntity.setStatus(null);//草稿无 发布/撤销 状态
-		}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(bannerEntity.getPublishType())){
+		}else if(PropertyConsts.BANNER_PUB_TYPE_PUBLISH.equals(bannerEntity.getPublishType())){  //直接发布
 			//发布需要排序，保存草稿不用
 			//查出当前已有的排序号
 			List<Integer> sorts = bannerMapper.queryBannerSortByCommunityId(bannerEntity.getCommunityId());
+			if(sorts.size() >= 5){
+				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"发布数量超过上限");
+			}
 			////查找排序空位
 			Integer sort = findSort(sorts);
 			bannerEntity.setSort(sort);
@@ -69,7 +73,10 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 			bannerEntity.setStatus(PropertyConsts.BANNER_STATUS_PUBLISH);
 		}
 		int result = bannerMapper.insert(bannerEntity);
-		return result > 0;
+		if(result != 1){
+			throw new PropertyException(JSYError.INTERNAL.getCode(),"操作失败");
+		}
+		return bannerEntity.getId();
 	}
 	
 	//查找排序空位
@@ -168,7 +175,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	}
 	
 	/**
-	* @Description: 轮播图 发布中列表查询(拖动排序用)
+	* @Description: 轮播图 发布中轮播图按排序查询列表
 	 * @Param: [communityId]
 	 * @Return: java.util.List<com.jsy.community.entity.BannerEntity>
 	 * @Author: chq459799974
@@ -276,7 +283,43 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		bannerEntity.setType(bannerQO.getType());
 		bannerEntity.setContent(bannerQO.getContent());
 		bannerEntity.setPublishType(bannerQO.getPublishType());
+		if(PropertyConsts.BANNER_STATUS_PUBLISH.equals(bannerEntity.getStatus())){
+			Integer count = bannerMapper.selectCount(new QueryWrapper<BannerEntity>().eq("communityId",bannerQO.getCommunityId()).eq("status",PropertyConsts.BANNER_STATUS_PUBLISH));
+			if(count >= 5){
+				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"发布数量超过上限");
+			}
+		}
 		return bannerMapper.updateById(bannerEntity) == 1;
+	}
+	
+	/**
+	* @Description: 轮播图 修改排序
+	 * @Param: [idList, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/15
+	**/
+	@Override
+	public boolean changeSorts(List<Long> idList,Long communityId){
+		if(CollectionUtils.isEmpty(idList)){
+//			return true;
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"要修改的数据为空");
+		}
+		//idList与数据库数量不完整
+		//1.当前处理方案：报错返回，提示不完整   2.备选：没传的数据当做不需要重排序，需要重排序的数据跟着不需要重排序的后面依次排序
+		Integer count = bannerMapper.selectCount(new QueryWrapper<BannerEntity>().eq("community_id",communityId).eq("status",PropertyConsts.BANNER_STATUS_PUBLISH));
+		if(idList.size() != count){
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"广告数量错误，请返回刷新");
+		}
+		//组装参数
+		Map<Long,Integer> paramMap = new HashMap<>();
+		for(int i=0;i<idList.size();i++){
+			paramMap.put(idList.get(i),i+1);
+		}
+		//批量修改
+		int rows = bannerMapper.changeSorts(paramMap);
+		System.out.println("已修改行数：" + rows);
+		return rows == idList.size();
 	}
 	
 }
