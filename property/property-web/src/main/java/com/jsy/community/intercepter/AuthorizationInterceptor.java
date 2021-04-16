@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.UserUtils;
@@ -42,13 +43,18 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 				if (StrUtil.isBlank(token)) {
 					token = request.getParameter("authToken");
 				}
-				Object authTokenContent = userUtils.getRedisToken("Auth", token);
+				Object authTokenContent = userUtils.getRedisToken("Admin:Auth", token);
 				if(authTokenContent == null){
 					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
 				}
 				String body = readBody(request);
 				JSONObject jsonObject = JSONObject.parseObject(body);
-				if(jsonObject == null || !(String.valueOf(authTokenContent).equals(jsonObject.getString("account")))){
+//				if(jsonObject == null || !(String.valueOf(authTokenContent).equals(jsonObject.getString("account")))){
+//					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
+//				}
+				if(jsonObject == null){
+					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
+				}else if(jsonObject.getString("account") != null && !(String.valueOf(authTokenContent).equals(jsonObject.getString("account")))){  //传了手机号就需要校验一致性(没传的可能是在线修改密码之类的)
 					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
 				}
 				request.setAttribute("body", body);
@@ -81,7 +87,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		if(checkPass){
 			return true;
 		}
-		throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
+		throw new PropertyException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
 	}
 	
 	private boolean allowAnonymous(Login methodAnnotation, Login classAnnotation){

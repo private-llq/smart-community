@@ -206,7 +206,10 @@ public class UserAuthController {
 	@Auth
 	public CommonResult<Boolean> resetPassword(@RequestAttribute(value = "body") String body) {
 		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
-		ValidatorUtils.validateEntity(qo);
+		ValidatorUtils.validateEntity(qo,ResetPasswordQO.forgetPassVGroup.class);
+		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
+			throw new JSYException("两次密码不一致");
+		}
 		boolean b = userAuthService.resetPassword(qo);
 		if(b){
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();

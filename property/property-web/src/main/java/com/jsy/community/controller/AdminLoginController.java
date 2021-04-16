@@ -4,6 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
@@ -16,6 +17,7 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
+import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.MyCaptchaUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
@@ -106,7 +108,7 @@ public class AdminLoginController {
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "account", value = "账号，手机号或者邮箱地址", required = true, paramType = "query"),
 		@ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
-			allowableValues = "1,2,3,4,5", paramType = "query")
+			allowableValues = "1,2,3,4,5,6", paramType = "query")
 	})
 	public CommonResult<Boolean> sendCode(@RequestParam String account,
 	                                      @RequestParam Integer type) {
@@ -226,6 +228,24 @@ public class AdminLoginController {
 		
 		// 验证通过后删除验证码
 //        redisTemplate.delete(account);
+	}
+	
+	/**
+	* @Description: 敏感操作短信验证(验证码和其他操作不同步,该接口返回的authToken即为中间桥梁)
+	 * @Param: [account, code]
+	 * @Return: com.jsy.community.vo.CommonResult<java.util.Map<java.lang.String,java.lang.Object>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
+	@GetMapping("/check/code")
+	public CommonResult<Map<String,Object>> checkCode(@RequestParam String account, @RequestParam String code) {
+		checkVerifyCode(account, code);
+		String token = userUtils.setRedisTokenWithTime("Admin:Auth", account,1, TimeUnit.HOURS);
+		Map<String, Object> map = new HashMap<>();
+		map.put("authToken",token);
+		map.put("msg","验证通过，请在1小时内完成操作");
+		return CommonResult.ok(map);
 	}
 	
 	/**

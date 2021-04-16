@@ -6,6 +6,7 @@ import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
+import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.PageInfo;
 
 import java.util.Collection;
@@ -190,6 +191,15 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2021/4/16
 	**/
 	AdminUserEntity queryPersonalData(String uid);
+	
+	/**
+	* @Description: 修改密码
+	 * @Param: [qo, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	boolean updatePassword(ResetPasswordQO qo, String uid);
 	//================ 资料或账户相关end =================
 	
 	//============== 操作员管理相关begin ===============

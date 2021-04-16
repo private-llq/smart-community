@@ -1,7 +1,9 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
@@ -13,10 +15,12 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
+import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
@@ -307,6 +311,34 @@ public class AdminUserController {
 	@GetMapping("info")
 	public CommonResult queryPersonalData(){
 		return CommonResult.ok(adminUserService.queryPersonalData(UserUtils.getUserId()),"查询成功");
+	}
+	
+	@ApiOperation("修改/忘记密码")
+	@PutMapping("password")
+	@Auth
+	@Login(allowAnonymous = true)
+	public CommonResult<Boolean> updatePassword(@RequestAttribute(value = "body") String body) {
+		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
+		String uid = UserUtils.getUserId();
+		if(uid == null){  //忘记密码
+			ValidatorUtils.validateEntity(qo,ResetPasswordQO.forgetPassVGroup.class);
+		}else{  //在线修改密码
+			ValidatorUtils.validateEntity(qo,ResetPasswordQO.updatePassVGroup.class);
+		}
+		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
+			throw new JSYException("两次密码不一致");
+		}
+		boolean b = adminUserService.updatePassword(qo,UserUtils.getUserId());
+		if(b){
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+			String authToken = request.getHeader("authToken");
+			if (StrUtil.isBlank(authToken)) {
+				authToken = request.getParameter("authToken");
+			}
+			//销毁Auth token
+			userUtils.destroyToken("Auth",authToken);
+		}
+		return b ? CommonResult.ok() : CommonResult.error("操作失败");
 	}
 	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================

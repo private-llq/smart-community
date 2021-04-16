@@ -139,10 +139,6 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	
 	@Override
 	public boolean resetPassword(ResetPasswordQO qo) {
-		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
-			throw new ProprietorException("密码不一致");
-		}
-		
 		UserAuthEntity entity;
 		if (RegexUtils.isMobile(qo.getAccount())) {
 			entity = baseMapper.queryUserByField(qo.getAccount(), "mobile");
