@@ -207,6 +207,8 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         if (vo == null) {
             return null;
         }
+        // 设立冗余字段
+        HashMap<String, Long> redundancy = new HashMap<>();
 
         //1.1 公共设施标签解析
         List<Long> commonFacilities = MyMathUtils.analysisTypeCode(vo.getCommonFacilitiesId());
@@ -228,8 +230,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
 
         //1.5查出 家具标签
         List<Long> furnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
+        Map<String, Long> houseFurniture = new HashMap<>();
         if (!CollectionUtils.isEmpty(furnitureId)) {
             vo.setHouseFurniture(houseLeaseMapper.queryHouseConstNameByFurnitureId(furnitureId, 13L));
+            houseFurniture = houseConstService.getConstByTypeCodeForList(furnitureId, 13L);
         }
 
         //1.6查出该条数据所有图片
@@ -240,6 +244,21 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         vo.setFavorite(houseLeaseMapper.isFavorite(houseId, uid) > 0);
         //1.9 房屋类型 code转换为文本 如 4室2厅1卫
         vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
+
+        // 为冗余熟悉添加值
+        if (vo.getCommonFacilitiesCode() != null) {
+            redundancy.putAll(vo.getCommonFacilitiesCode());
+        }
+        if (vo.getRoomFacilitiesCode() != null) {
+            redundancy.putAll(vo.getRoomFacilitiesCode());
+        }
+        if (vo.getHouseAdvantageCode() != null) {
+            redundancy.putAll(vo.getHouseAdvantageCode());
+        }
+        if (houseFurniture != null) {
+            redundancy.putAll(houseFurniture);
+        }
+        vo.setRedundancy(redundancy);
 
         return vo;
     }
