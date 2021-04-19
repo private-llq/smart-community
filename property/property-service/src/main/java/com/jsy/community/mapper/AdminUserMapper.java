@@ -72,7 +72,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	
 	//========资料或账户相关start ==========
 	/**
-	* @Description: 根据uid查用户信息
+	* @Description: uid查用户信息
 	 * @Param: [uid]
 	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
 	 * @Author: chq459799974
@@ -80,6 +80,16 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	**/
 	@Select("select * from t_admin_user where uid = #{uid}")
 	AdminUserEntity queryByUid(String uid);
+	
+	/**
+	* @Description: uid查手机号
+	 * @Param: [uid]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Select("select mobile from t_admin_user where uid = #{uid}")
+	String queryMobileByUid(String uid);
 	
 	/**
 	 * @Description: uid批量查姓名

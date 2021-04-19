@@ -166,7 +166,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setSmallImageUrl(communityFunOperationQO.getSmallImageUrl());
         entity.setTitleName(communityFunOperationQO.getTitleName());
         communityFunMapper.updateById(entity);
-        ElasticsearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.FUN, Operation.UPDATE, entity.getTitleName(), entity.getSmallImageUrl());
+        ElasticsearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.FUN, Operation.UPDATE, entity.getTitleName(), entity.getSmallImageUrl(),entity.getCommunityId());
     }
 
     /**
@@ -218,7 +218,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     entity.setStartBy(adminInfoVo.getUid());
     entity.setStartTime(LocalDateTime.now());
     communityFunMapper.updateById(entity);
-    ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl());
+    ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl(),entity.getCommunityId());
   }
 
 }

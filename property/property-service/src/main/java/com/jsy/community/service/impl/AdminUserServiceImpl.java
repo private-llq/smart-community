@@ -18,6 +18,7 @@ import com.jsy.community.mapper.AdminUserAuthMapper;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
+import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
 import com.jsy.community.utils.*;
@@ -624,6 +625,40 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		user.setOrgId(null);
 		user.setRoleType(null);
 		return user;
+	}
+	
+	/**
+	* @Description: 修改密码
+	 * @Param: [qo, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Override
+	public boolean updatePassword(ResetPasswordQO qo,String uid){
+		//没传账号(手机号)，属于在线修改密码操作，根据uid查出手机号
+		if(StringUtils.isEmpty(qo.getAccount())){
+			String mobile = adminUserMapper.queryMobileByUid(uid);
+			if(StringUtils.isEmpty(mobile)){
+				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"账号不存在");
+			}
+			qo.setAccount(mobile);
+		}
+		//目前只有手机号账户，查询用户登录账户固定用手机号
+		AdminUserAuthEntity userAuthEntity = adminUserAuthMapper.selectOne(new QueryWrapper<AdminUserAuthEntity>().select("mobile").eq("mobile", qo.getAccount()));
+		if(userAuthEntity == null){
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"账号不存在");
+		}
+		//生成盐值并对密码加密
+		String salt = RandomStringUtils.randomAlphanumeric(20);
+		String password = new Sha256Hash(qo.getPassword(), salt).toHex();
+		//更新
+		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
+		adminUserAuthEntity.setPassword(password);
+		adminUserAuthEntity.setSalt(salt);
+		adminUserAuthEntity.setUpdateBy(uid);
+		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", userAuthEntity.getMobile()));
+		return result == 1;
 	}
 	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================

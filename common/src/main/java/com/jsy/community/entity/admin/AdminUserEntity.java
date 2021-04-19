@@ -50,6 +50,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 密码
 	 */
 	@NotBlank(groups = loginValidatedGroup.class, message = "密码不能为空")
+	@TableField(exist = false)
 	private String password;
 	
 	/**
@@ -61,6 +62,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 盐
 	 */
+	@TableField(exist = false)
 	private String salt;
 	
 	/**
