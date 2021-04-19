@@ -12,6 +12,7 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.repair.RepairPlanVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -121,6 +123,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		orderEntity.setMoney(money);
 		
 		orderEntity.setAssignId(uid);
+		orderEntity.setServiceTime(new Date());
 		repairOrderMapper.updateById(orderEntity);
 		
 		
@@ -143,6 +146,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		}
 		orderEntity.setStatus(2); // 将状态设置为 处理中
 		orderEntity.setAssignId(uid);
+		orderEntity.setSuccessTime(new Date());
 		repairOrderMapper.updateById(orderEntity);
 		
 		Long repairId = orderEntity.getRepairId();
@@ -227,6 +231,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		entity.setAssignId(uid);
 		entity.setAssignName(realName);
 		entity.setAssignNameNumber(number);
+		entity.setRejectTime(new Date());
 		repairOrderMapper.updateById(entity);
 		
 		// 查询报修信息
@@ -246,6 +251,56 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 			person.put("idStr", idStr);
 		}
 		return repairPerson;
+	}
+	
+	@Override
+	public RepairPlanVO checkCase(Long id) {
+		RepairPlanVO planVO = new RepairPlanVO();
+		
+		// 1. 报修信息
+		RepairOrderEntity orderEntity = repairOrderMapper.selectById(id);
+		if (orderEntity != null) {
+			Long repairId = orderEntity.getRepairId();
+			RepairEntity repairEntity = repairMapper.selectById(repairId);
+			
+			planVO.setRepairTime(repairEntity.getCreateTime());
+			planVO.setRepairName(orderEntity.getName());
+			planVO.setRepairPhone(repairEntity.getPhone());
+			planVO.setProblem(orderEntity.getProblem());
+			planVO.setDealTime(orderEntity.getServiceTime());
+			
+			// 2. 派单信息
+			// 被派单人id
+			String dealId = orderEntity.getDealId();
+			QueryWrapper<AdminUserEntity> wrapper = new QueryWrapper<>();
+			wrapper.eq("uid", dealId);
+			AdminUserEntity adminUserEntity = adminUserMapper.selectOne(wrapper);
+			if (adminUserEntity != null) {
+				// 组织机构id
+				Long orgId = adminUserEntity.getOrgId();
+				OrganizationEntity organizationEntity = organizationMapper.selectById(orgId);
+				planVO.setDealName(adminUserEntity.getRealName() + "-" + adminUserEntity.getNumber() + "-" + organizationEntity.getName());
+				planVO.setDealPhone(adminUserEntity.getMobile());
+				planVO.setDealTime(orderEntity.getServiceTime());
+			}
+			
+			// 3. 完成时间
+			planVO.setSuccessTime(orderEntity.getSuccessTime());
+			
+			// 4. 评价信息
+			if (orderEntity.getStatus() == 2) {
+				planVO.setCommentTime(orderEntity.getCommentTime());
+				planVO.setCommentStatus(orderEntity.getCommentStatus());
+				planVO.setComment(orderEntity.getComment());
+			} else {
+				planVO.setCommentStatus(null);
+			}
+			
+			return planVO;
+		}
+		
+		
+		return null;
 	}
 	
 	@Override

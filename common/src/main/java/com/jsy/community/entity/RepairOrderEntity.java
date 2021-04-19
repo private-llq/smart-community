@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * <p>
@@ -95,6 +96,11 @@ public class RepairOrderEntity extends BaseEntity {
     @TableField(exist = false)
     private String assignNameNumber;
     
+    @ApiModelProperty(value = "维修时间")
+    private Date serviceTime;
+    
+    @ApiModelProperty(value = "完成时间")
+    private Date successTime;
     
     
     
@@ -103,11 +109,17 @@ public class RepairOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "驳回原因")
     private String rejectReason;
     
+    @ApiModelProperty(value = "驳回时间")
+    private Date rejectTime;
+    
     @ApiModelProperty(value = "社区id")
     private Long communityId;
 
     @ApiModelProperty(value = "用户评价")
     private String comment;
+    
+    @ApiModelProperty(value = "评价时间")
+    private Date commentTime;
     
     @ApiModelProperty(value = "评价类型 0 好评 1 差评")
     private Integer commentStatus;

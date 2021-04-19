@@ -44,6 +44,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 用户名
 	 */
 	@NotBlank(groups = loginValidatedGroup.class, message = "用户名不能为空")
+	@TableField(exist = false)
 	private String username;
 	
 	/**

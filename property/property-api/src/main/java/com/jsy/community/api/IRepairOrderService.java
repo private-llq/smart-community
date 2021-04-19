@@ -7,6 +7,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.repair.RepairPlanVO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -103,4 +104,12 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 **/
 	List<Map<String, Object>> getRepairPerson(String condition, Long communityId);
 	
+	/**
+	 * @return com.jsy.community.vo.repair.RepairPlanVO
+	 * @Author lihao
+	 * @Description 查看进程
+	 * @Date 2021/4/19 11:00
+	 * @Param [id]
+	 **/
+	RepairPlanVO checkCase(Long id);
 }
