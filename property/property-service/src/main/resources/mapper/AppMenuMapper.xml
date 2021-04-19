@@ -28,4 +28,9 @@
     <delete id="deleteMiddleMenu">
         delete from t_menu_community where community_id = #{id}
     </delete>
+
+
+    <select id="getMiddleMenu" resultType="java.util.HashMap">
+        select community_id,menu_id,sort from t_menu_community where menu_id = #{id} and community_id = #{communityId}
+    </select>
 </mapper>
