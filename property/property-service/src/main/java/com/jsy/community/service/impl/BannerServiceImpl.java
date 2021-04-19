@@ -284,7 +284,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		bannerEntity.setContent(bannerQO.getContent());
 		bannerEntity.setPublishType(bannerQO.getPublishType());
 		if(PropertyConsts.BANNER_STATUS_PUBLISH.equals(bannerEntity.getStatus())){
-			Integer count = bannerMapper.selectCount(new QueryWrapper<BannerEntity>().eq("communityId",bannerQO.getCommunityId()).eq("status",PropertyConsts.BANNER_STATUS_PUBLISH));
+			Integer count = bannerMapper.selectCount(new QueryWrapper<BannerEntity>().eq("community_id",bannerQO.getCommunityId()).eq("status",PropertyConsts.BANNER_STATUS_PUBLISH));
 			if(count >= 5){
 				throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"发布数量超过上限");
 			}
