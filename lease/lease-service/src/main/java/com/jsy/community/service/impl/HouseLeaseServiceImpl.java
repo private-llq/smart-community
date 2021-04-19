@@ -550,6 +550,8 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         List<Long> voImageIds = new ArrayList<>(vos.size());
         //对字段一对多的标签做处理
         for (HouseLeaseVO vo : vos) {
+            // 设立冗余字段
+            HashMap<String, Long> redundancy = new HashMap<>();
             //从数字中解析出 常量的 code
             List<Long> advantageId = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
             if (!CollectionUtils.isEmpty(advantageId)) {
@@ -564,12 +566,45 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
                 advantageMap.put(houseConstService.getConstNameByConstTypeCode(vo.getDecorationTypeId(), 18L), vo.getDecorationTypeId());
                 vo.setHouseAdvantageCode(advantageMap);
             }
+
             //2.从中间表查出该出租房屋的 第一张显示图片 用于列表标签展示
             voImageIds.add(vo.getHouseImageId());
             //3.通过出租方式id 查出 出租方式文本：如 合租、整租之类
             vo.setHouseLeaseMode(houseConstService.getConstNameByConstTypeCode(vo.getHouseLeasemodeId(), 11L));
             //4.通过户型id 查出 户型id对应的文本：如 四室一厅、三室一厅...
             vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
+
+            //5.1 公共设施标签解析
+            List<Long> commonFacilities = MyMathUtils.analysisTypeCode(vo.getCommonFacilitiesId());
+            if (!CollectionUtils.isEmpty(commonFacilities)) {
+                vo.setCommonFacilitiesCode(houseConstService.getConstByTypeCodeForList(commonFacilities, 24L));
+            }
+            //5.2 房屋设施标签解析
+            List<Long> roomFacilities = MyMathUtils.analysisTypeCode(vo.getRoomFacilitiesId());
+            if (!CollectionUtils.isEmpty(roomFacilities)) {
+                vo.setRoomFacilitiesCode(houseConstService.getConstByTypeCodeForList(roomFacilities, 23L));
+            }
+            //5.3查出 家具标签
+            List<Long> furnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
+            Map<String, Long> houseFurniture = new HashMap<>();
+            if (!CollectionUtils.isEmpty(furnitureId)) {
+                vo.setHouseFurniture(houseLeaseMapper.queryHouseConstNameByFurnitureId(furnitureId, 13L));
+                houseFurniture = houseConstService.getConstByTypeCodeForList(furnitureId, 13L);
+            }
+            // 为冗余熟悉添加值
+            if (vo.getCommonFacilitiesCode() != null) {
+                redundancy.putAll(vo.getCommonFacilitiesCode());
+            }
+            if (vo.getRoomFacilitiesCode() != null) {
+                redundancy.putAll(vo.getRoomFacilitiesCode());
+            }
+            if (vo.getHouseAdvantageCode() != null) {
+                redundancy.putAll(vo.getHouseAdvantageCode());
+            }
+            if (houseFurniture != null) {
+                redundancy.putAll(houseFurniture);
+            }
+            vo.setRedundancy(redundancy);
         }
         //设置图片url
         if( !CollectionUtils.isEmpty(voImageIds) ){
