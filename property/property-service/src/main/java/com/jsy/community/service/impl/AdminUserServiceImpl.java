@@ -587,6 +587,30 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	public String queryUidById(Long id){
 		return adminUserMapper.queryUidById(id);
 	}
+	
+	/**
+	* @Description: 根据手机号检查小区用户是否已存在(t_admin_user)
+	 * @Param: [mobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Override
+	public boolean checkUserExists(String mobile){
+		return adminUserMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("mobile",mobile)) == 1;
+	}
+	
+	/**
+	* @Description: 根据uid查询手机号
+	 * @Param: [uid]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Override
+	public String queryMobileByUid(String uid){
+		return adminUserMapper.queryMobileByUid(uid);
+	}
 	//============== 操作员管理相关end ===============
 	
 	//============== 个人中心相关start ===============
@@ -655,6 +679,24 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserAuthEntity.setUpdateBy(uid);
 		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", userAuthEntity.getMobile()));
 		return result == 1;
+	}
+	
+	/**
+	* @Description: 修改手机号
+	 * @Param: [newMobile, oldMobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public boolean changeMobile(String newMobile,String oldMobile){
+		int result1 = adminUserAuthMapper.changeMobile(newMobile, oldMobile);
+		int result2 = adminUserMapper.changeMobile(newMobile, oldMobile);
+		if(result1 == 1 && result2 > 0){
+			return true;
+		}
+		return false;
 	}
 	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================

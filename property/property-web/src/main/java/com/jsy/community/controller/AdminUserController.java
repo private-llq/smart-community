@@ -6,6 +6,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminUserService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserEntity;
@@ -26,6 +27,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -65,6 +69,9 @@ public class AdminUserController {
 	
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
+	
+	@Resource
+	private RedisTemplate<String, String> redisTemplate;
 
 //	/**
 //	* @Description: 设置用户角色
@@ -313,6 +320,13 @@ public class AdminUserController {
 		return CommonResult.ok(adminUserService.queryPersonalData(UserUtils.getUserId()),"查询成功");
 	}
 	
+	/**
+	* @Description: 修改/忘记密码
+	 * @Param: [body]
+	 * @Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
 	@ApiOperation("修改/忘记密码")
 	@PutMapping("password")
 	@Auth
@@ -340,6 +354,82 @@ public class AdminUserController {
 		}
 		return b ? CommonResult.ok() : CommonResult.error("操作失败");
 	}
+	
+	@ApiOperation("更换手机号")
+	@PutMapping("mobile")
+	@Login
+	public CommonResult changeMobile(@RequestBody Map<String,String> map){
+		//入参验证
+		String newMobile = map.get("newMobile");
+		if(StringUtils.isEmpty(newMobile)){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请填写新手机号");
+		}
+		if (!RegexUtils.isMobile(newMobile)) {
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请检查手机号格式是否正确");
+		}
+		String oldCode = map.get("oldCode");
+		String newCode = map.get("newCode");
+		if (StrUtil.isEmpty(oldCode)) {
+			throw new JSYException("旧手机号验证码不能为空");
+		}
+		if (StrUtil.isEmpty(newCode)) {
+			throw new JSYException("新手机号验证码不能为空");
+		}
+		//从请求获取uid
+		String uid = UserUtils.getUserId();
+		//获取当前用户手机号
+		String oldMobile = adminUserService.queryMobileByUid(uid);
+		if(newMobile.equals(oldCode)){
+			throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"新手机号与原手机号相同");
+		}
+		//权限验证
+		Map<String, String> returnMap1 = checkVerifyCode(oldMobile, oldCode);//验证老手机
+		if(!"0".equals(returnMap1.get("result"))){
+			throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"旧手机"+returnMap1.get("msg"));
+		}
+		Map<String, String> returnMap2 = checkVerifyCode(newMobile, newCode);//验证新手机
+		if(!"0".equals(returnMap2.get("result"))){
+			throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"新手机"+returnMap2.get("msg"));
+		}
+		//用户是否已注册
+		boolean exists = adminUserService.checkUserExists(newMobile);
+		if(exists){
+			return CommonResult.error(JSYError.DUPLICATE_KEY.getCode(),"手机号已被注册，请直接登录或找回密码");
+		}
+		//更换手机号操作
+		boolean b = adminUserService.changeMobile(newMobile, oldMobile);
+		if(b){
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+			//销毁token
+			String token = request.getHeader("token");
+			if (StrUtil.isBlank(token)) {
+				token = request.getParameter("token");
+			}
+			userUtils.destroyToken("Admin:Login", token);
+		}
+		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
+	}
 	//============== 个人中心相关end ===============
+	
+	//============== 通用start ==========================
+	//检查手机验证码
+	private Map<String,String> checkVerifyCode(String mobile, String code) {
+		Object oldCode = redisTemplate.opsForValue().get("vCodeAdmin:" + mobile);
+		Map<String, String> returnMap = new HashMap<>();
+		returnMap.put("result","0");
+		if (oldCode == null) {
+			returnMap.put("result","1");
+			returnMap.put("msg","验证码已失效");
+//			throw new PropertyException("验证码已失效");
+		}else if (!oldCode.equals(code)) {
+			returnMap.put("result","1");
+			returnMap.put("msg","验证码错误");
+//			throw new PropertyException("验证码错误");
+		}
+		return returnMap;
+		// 验证通过后删除验证码
+//        redisTemplate.delete(account);
+	}
+	//============== 通用end ==========================
 	//==================================== 物业端（新）end ====================================
 }
