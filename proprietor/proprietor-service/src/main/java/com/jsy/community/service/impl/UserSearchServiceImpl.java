@@ -10,7 +10,9 @@ import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -35,8 +37,24 @@ public class UserSearchServiceImpl extends ServiceImpl<UserSearchMapper, UserSea
             searchEntity.setSearchRecord(text);
             userSearchMapper.insert(searchEntity);
         }else {
-            entity.setSearchRecord(entity.getSearchRecord()+","+text);
-            userSearchMapper.updateById(entity);
+            if (entity.getSearchRecord()!=null){
+                String[] split = entity.getSearchRecord().split(",");
+                List<String> asList = Arrays.asList(split);
+                ArrayList<String> arrayList = new ArrayList<>(asList);
+                if (Arrays.asList(split).contains(text)){
+                    arrayList.remove(text);
+                    arrayList.add(0,text);
+                    String string = arrayList.toString();
+                    entity.setSearchRecord(string.substring(1,string.length()-1));
+                    userSearchMapper.updateById(entity);
+                }else {
+                    entity.setSearchRecord(text+","+entity.getSearchRecord());
+                    userSearchMapper.updateById(entity);
+                }
+            }else {
+                entity.setSearchRecord(text);
+                userSearchMapper.updateById(entity);
+            }
         }
     }
 
@@ -46,8 +64,10 @@ public class UserSearchServiceImpl extends ServiceImpl<UserSearchMapper, UserSea
         if (entity==null){
             return new String[0];
         }
+        if (entity.getSearchRecord()==null){
+            return new String[0];
+        }
         String[] split = entity.getSearchRecord().split(",");
-
         if (split.length<=num){
             return split;
         }else {
@@ -56,4 +76,11 @@ public class UserSearchServiceImpl extends ServiceImpl<UserSearchMapper, UserSea
 
     }
 
+    @Override
+    public void deleteUserKey(String userId) {
+        UserSearchEntity entity = userSearchMapper.selectOne(new QueryWrapper<UserSearchEntity>().eq("uid", userId));
+        if (entity!=null){
+            userSearchMapper.deleteUserKey(userId);
+        }
+    }
 }

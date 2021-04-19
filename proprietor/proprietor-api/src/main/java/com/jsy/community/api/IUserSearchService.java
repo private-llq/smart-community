@@ -27,4 +27,12 @@ public interface IUserSearchService extends IService<UserSearchEntity> {
      * @return:
      */
     String[] searchUserKey(String userId, Integer num);
+    /**
+     * @Description: 删除个人搜索词汇
+     * @author: Hu
+     * @since: 2021/4/16 17:04
+     * @Param:
+     * @return:
+     */
+    void deleteUserKey(String userId);
 }
