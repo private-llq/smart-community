@@ -143,7 +143,7 @@ public class CommonController {
             commonService.addFullTextSearchHotKey( text );
             userSearchService.addSearchHotKey(userId,text);
         }else {
-            sourceBuilder.size(10000);
+            sourceBuilder.size(1000);
         }
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse = null;

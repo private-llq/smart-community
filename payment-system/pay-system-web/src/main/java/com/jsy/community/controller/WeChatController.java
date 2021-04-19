@@ -72,6 +72,7 @@ public class WeChatController {
      * @Param:
      * @return:
      */
+    @Login
     @PostMapping("/wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //如果商城调用就先验证
