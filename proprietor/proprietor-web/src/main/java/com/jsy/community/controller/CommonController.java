@@ -222,7 +222,7 @@ public class CommonController {
      */
     @Login
     @ApiOperation("App全文搜索个人词汇")
-    @GetMapping("/hotKey")
+    @GetMapping("/getUserKey")
     public CommonResult getUserKey(@RequestParam("num")Integer num ){
         if (num==0||num==null){
             num=10;
