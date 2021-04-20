@@ -641,7 +641,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		user.setOrgName(organizationService.queryOrganizationNameById(user.getOrgId()));
 		//查询是否设置密码(by手机号)
 		Integer count = adminUserAuthMapper.selectCount(new QueryWrapper<AdminUserAuthEntity>().eq("mobile",user.getMobile()).isNotNull("password"));
-		user.setHasPassword(count > 0 ? PropertyConsts.ACCOUNT_PASS_HAS : PropertyConsts.ACCOUNT_PASS_HAS_NOT);
+		user.setHasPassword(count > 0 ? PropertyConsts.ACCOUNT_PASS_HAD : PropertyConsts.ACCOUNT_PASS_HAD_NOT);
 		user.setOrgId(null);
 		user.setRoleType(null);
 		return user;

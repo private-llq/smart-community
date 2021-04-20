@@ -11,8 +11,8 @@ public interface PropertyConsts {
 	Integer ACCOUNT_TYPE_NORMAL_ADMIN = 2; //普通用户
 	
 	//======= 登录账户是否设置密码
-	Integer ACCOUNT_PASS_HAS = 0; //密码未设置
-	Integer ACCOUNT_PASS_HAS_NOT = 1; //密码已设置
+	Integer ACCOUNT_PASS_HAD_NOT = 0; //密码未设置
+	Integer ACCOUNT_PASS_HAD = 1; //密码已设置
 	
 	//======= 轮播图发布类型
 	Integer BANNER_PUB_TYPE_DRAFT = 0; //草稿
