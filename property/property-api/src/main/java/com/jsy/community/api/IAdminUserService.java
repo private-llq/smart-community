@@ -200,6 +200,15 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2021/4/16
 	**/
 	boolean updatePassword(ResetPasswordQO qo, String uid);
+	
+	/**
+	* @Description: 修改手机号
+	 * @Param: [newMobile, oldMobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	boolean changeMobile(String newMobile,String oldMobile);
 	//================ 资料或账户相关end =================
 	
 	//============== 操作员管理相关begin ===============
@@ -247,6 +256,24 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2021/4/9
 	**/
 	String queryUidById(Long id);
+	
+	/**
+	* @Description: 根据手机号检查小区用户是否存在(t_admin_user)
+	 * @Param: [mobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	boolean checkUserExists(String mobile);
+	
+	/**
+	* @Description: 根据uid查询手机号
+	 * @Param: [uid]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	String queryMobileByUid(String uid);
 	//============== 操作员管理相关end ===============
 	
 	//==================================== 物业端（新）end ====================================

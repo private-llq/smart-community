@@ -45,6 +45,7 @@ public class LivingPaymentQueryController {
 
     @PostMapping("/getPayDetails")
     @ApiOperation("假账单接口")
+    @Login
     public CommonResult getPayDetails(@RequestParam("familyId")String familyId, @RequestParam("companyId")Long companyId){
         Map payDetails = livingpaymentQueryService.getPayDetails(familyId, companyId);
         return CommonResult.ok(payDetails);
@@ -52,6 +53,7 @@ public class LivingPaymentQueryController {
 
     @ApiOperation("缴费类型")
     @GetMapping("/getPayType")
+    @Login
     public CommonResult getPayType(@ApiParam("城市id") @RequestParam("cityId") Long cityId){
         List<PayTypeEntity> payType = payTypeService.getPayTypes(cityId);
         return CommonResult.ok(payType);
@@ -59,6 +61,7 @@ public class LivingPaymentQueryController {
 
     @ApiOperation("查询所有户号")
     @GetMapping("/selectFamilyId")
+    @Login
     public CommonResult selectfamilyId(){
         String userId = UserUtils.getUserId();
         List<FamilyIdVO> familyIdVOS = livingpaymentQueryService.selectFamilyId(userId);
@@ -66,6 +69,7 @@ public class LivingPaymentQueryController {
     }
     @ApiOperation("查询全部户号")
     @PostMapping("/selectPayCompany")
+    @Login
     public CommonResult selectPayCompany(@RequestBody PayCompanyQO payCompanyQO){
         List<PayCompanyVO> payCompany = payTypeService.selectPayCompany(payCompanyQO);
         return CommonResult.ok(payCompany);
@@ -102,6 +106,7 @@ public class LivingPaymentQueryController {
 
     @ApiOperation("缴费凭证")
     @GetMapping("/getOrderID")
+    @Login
     public CommonResult getOrderID(@ApiParam("订单id") @RequestParam("orderId") Long orderId){
         String uid = UserUtils.getUserId();
         PayVoucherVO payVoucherVO=livingpaymentQueryService.getOrderID(orderId,uid);

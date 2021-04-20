@@ -181,7 +181,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		});
 		
 		
-//
+//      todo 先不删 等前端联调测试完毕了来
 //		// 2. 查询中间表
 //		List<Map<String, Long>> idsAdnSort = appMenuMapper.listMenuId(communityId);
 //		if (CollectionUtils.isEmpty(idsAdnSort)) {

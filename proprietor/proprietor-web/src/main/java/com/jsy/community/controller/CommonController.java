@@ -31,10 +31,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -146,7 +143,7 @@ public class CommonController {
             commonService.addFullTextSearchHotKey( text );
             userSearchService.addSearchHotKey(userId,text);
         }else {
-            sourceBuilder.size(10000);
+            sourceBuilder.size(1000);
         }
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse = null;
@@ -228,8 +225,23 @@ public class CommonController {
             num=10;
         }
         String userId = UserUtils.getUserId();
-        userSearchService.searchUserKey(userId,num);
-        return null;
+        String[] key = userSearchService.searchUserKey(userId, num);
+        return CommonResult.ok(key);
+    }
+    /**
+     * @Description: 删除个人搜索词汇
+     * @author: Hu
+     * @since: 2021/4/16 17:01
+     * @Param:
+     * @return:
+     */
+    @Login
+    @ApiOperation("App删除全文搜索个人词汇")
+    @DeleteMapping("/deleteUserKey")
+    public CommonResult deleteUserKey(){
+        String userId = UserUtils.getUserId();
+        userSearchService.deleteUserKey(userId);
+        return CommonResult.ok();
     }
 
 

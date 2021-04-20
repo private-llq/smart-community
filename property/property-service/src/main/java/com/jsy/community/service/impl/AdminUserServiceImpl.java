@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,7 +9,6 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.consts.PropertyConstsEnum;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
@@ -22,7 +20,6 @@ import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
 import com.jsy.community.utils.*;
-import com.jsy.community.vo.admin.AdminInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -30,7 +27,6 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -591,6 +587,30 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	public String queryUidById(Long id){
 		return adminUserMapper.queryUidById(id);
 	}
+	
+	/**
+	* @Description: 根据手机号检查小区用户是否已存在(t_admin_user)
+	 * @Param: [mobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Override
+	public boolean checkUserExists(String mobile){
+		return adminUserMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("mobile",mobile)) == 1;
+	}
+	
+	/**
+	* @Description: 根据uid查询手机号
+	 * @Param: [uid]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Override
+	public String queryMobileByUid(String uid){
+		return adminUserMapper.queryMobileByUid(uid);
+	}
 	//============== 操作员管理相关end ===============
 	
 	//============== 个人中心相关start ===============
@@ -615,7 +635,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public AdminUserEntity queryPersonalData(String uid){
-		AdminUserEntity user = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile,real_name,org_id,job,id_card,role_type").eq("uid",uid));
+		AdminUserEntity user = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile,real_name,org_id,job,id_card,role_type,avatar_url").eq("uid",uid));
 		user.setRoleTypeName(PropertyConstsEnum.RoleTypeEnum.ROLE_TYPE_MAP.get(user.getRoleType()));
 		//查询组织机构名称
 		user.setOrgName(organizationService.queryOrganizationNameById(user.getOrgId()));
@@ -659,6 +679,24 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserAuthEntity.setUpdateBy(uid);
 		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", userAuthEntity.getMobile()));
 		return result == 1;
+	}
+	
+	/**
+	* @Description: 修改手机号
+	 * @Param: [newMobile, oldMobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public boolean changeMobile(String newMobile,String oldMobile){
+		int result1 = adminUserAuthMapper.changeMobile(newMobile, oldMobile);
+		int result2 = adminUserMapper.changeMobile(newMobile, oldMobile);
+		if(result1 == 1 && result2 > 0){
+			return true;
+		}
+		return false;
 	}
 	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================

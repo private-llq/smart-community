@@ -77,6 +77,9 @@ public class AdminLoginController {
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
 	
+	//	@Value("${loginExpireHour}")
+	private long loginExpireHour = 12;
+	
 	/**
 	 * 防频繁调用验证码
 	 */
@@ -168,6 +171,11 @@ public class AdminLoginController {
 		Map<String, Object> returnMap = new HashMap<>();
 		returnMap.put("communityList",communityList);
 		returnMap.put("communityKey",communityKey);
+		//清空该账号已之前的token(踢下线)
+		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
+		redisTemplate.delete("Admin:Login:" + oldToken);
+		//存入手机已登录状态
+		redisTemplate.opsForValue().set("Admin:LoginAccount:" + form.getAccount(), "0", loginExpireHour, TimeUnit.HOURS); //0是初始值 选择小区后该值为登录token
 		return CommonResult.ok(returnMap);
 	}
 	

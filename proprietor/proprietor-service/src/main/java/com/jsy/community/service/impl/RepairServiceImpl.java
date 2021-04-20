@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -219,6 +220,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 			orderEntity.setComment(repairCommentQO.getAppraise());
 			orderEntity.setCommentStatus(repairCommentQO.getStatus());
 			orderEntity.setImgPath(repairCommentQO.getFilePath());
+			orderEntity.setCommentTime(new Date());
 			repairOrderMapper.updateById(orderEntity);
 		}
 	}

@@ -78,7 +78,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
-//    @Login
+    @Login
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();

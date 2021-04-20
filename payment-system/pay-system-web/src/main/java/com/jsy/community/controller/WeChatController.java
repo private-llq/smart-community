@@ -72,6 +72,7 @@ public class WeChatController {
      * @Param:
      * @return:
      */
+    @Login
     @PostMapping("/wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //如果商城调用就先验证
@@ -134,6 +135,7 @@ public class WeChatController {
      * @Param:
      * @return:
      */
+    @Login
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.info("回调成功");
@@ -208,7 +210,7 @@ public class WeChatController {
      * @return:
      */
     @GetMapping("/wxPayQuery")
-//    @Login
+    @Login
     public CommonResult wxPayQuery(@RequestParam("orderId")String orderId){
         String body = "";
         HttpGet httpGet = new HttpGet(WechatConfig.WXPAY_PAY+orderId+""+"?mchid="+WechatConfig.MCH_ID+"");

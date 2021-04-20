@@ -130,6 +130,16 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	**/
 	@Update("update t_admin_user set avatar_url = #{url} where uid = #{uid}")
 	int updateAvatar(@Param("url")String url,@Param("uid")String uid);
+	
+	/**
+	* @Description: 更换手机号
+	 * @Param: [newMobile, uid]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Update("update t_admin_user set mobile = #{newMobile} where mobile = #{oldMobile}")
+	int changeMobile(@Param("newMobile")String newMobile, @Param("oldMobile")String oldMobile);
 	//========资料或账户相关start ==========
 	
 	//========操作员增删改查start ==========

@@ -13,6 +13,7 @@ import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.repair.RepairPlanVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -68,7 +69,6 @@ public class RepairOrderController {
 	
 	@ApiOperation("驳回")
 	@GetMapping("/rejectOrder")
-	// TODO: 2021/4/1 完成
 	public CommonResult rejectOrder(@ApiParam("报修订单id") @RequestParam Long id,
 	                                @ApiParam("驳回原因") String reason) {
 		if (reason.length() > 100) {
@@ -82,7 +82,6 @@ public class RepairOrderController {
 	}
 	
 	
-	// TODO: 2021/3/19 用于维修和设置   2021年4月2日14:05:50完成
 	@ApiOperation("根据id查询报修详情")
 	@GetMapping("/getRepairById")
 	public CommonResult getRepairById(@ApiParam("报修订单id") Long id) {
@@ -90,10 +89,8 @@ public class RepairOrderController {
 		return CommonResult.ok(orderEntity);
 	}
 	
-	
 	@ApiOperation("维修")
 	@GetMapping("/dealOrder")
-	// TODO: 2021/4/8 完成
 	public CommonResult dealOrder(@ApiParam("报修订单id") @RequestParam Long id,
 	                              @ApiParam("处理人id") @RequestParam String dealId,
 	                              @ApiParam("费用") BigDecimal money) {
@@ -102,18 +99,14 @@ public class RepairOrderController {
 		return CommonResult.ok();
 	}
 	
-	
 	@ApiOperation("派单人员查询")
 	@GetMapping("/getRepairPerson")
-	// TODO: 2021/4/2 这里条件没有让必填,后面考虑前端可能点击派单框就触发查询
-	// TODO: 2021/4/8 完成
 	public CommonResult getRepairPerson(String condition) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		List<Map<String, Object>> adminUserList = repairOrderService.getRepairPerson(condition, communityId);
 		return CommonResult.ok(adminUserList);
 	}
 	
-	// TODO: 2021/3/19  根据id 更改订单的派单人信息 与 费用
 	@ApiOperation("报修订单设置")
 	@PostMapping("/updateOrder")
 	public CommonResult updateOrder(@ApiParam("报修订单id") Long id) {
@@ -132,9 +125,9 @@ public class RepairOrderController {
 	@ApiOperation("查看进程")
 	@GetMapping("/checkCase")
 	public CommonResult checkCase(@ApiParam("报修订单id") @RequestParam Long id) {
-		return null;
+		RepairPlanVO repairPlanVO = repairOrderService.checkCase(id);
+		return CommonResult.ok(repairPlanVO);
 	}
-	
 	
 	// TODO: 2021/3/19 下面两个不用了
 	@ApiOperation("查看下单人信息")
