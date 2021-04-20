@@ -1,5 +1,6 @@
 package com.jsy.community.qo.proprietor;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.annotation.FieldValid;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,6 +11,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -24,6 +26,7 @@ public class PushInformQO implements Serializable {
 
 
     @ApiModelProperty(value = "推送消息ID")
+    @NotNull(groups = {UpdateTopStateValidate.class, UpdatePushStateValidate.class, UpdateDetailValidate.class}, message = "推送消息ID不能为空")
     private Long id;
 
 
@@ -41,30 +44,36 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "推送消息头像地址")
     private String acctAvatar;
 
-    @Length(groups = {AddPushInformValidate.class}, min = 2, max = 64, message = "推送消息标题长度在2~64")
-    @NotBlank(groups = {AddPushInformValidate.class}, message = "推送消息标题不能为空!")
+    @Length(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, min = 2, max = 64, message = "推送消息标题长度在2~64")
+    @NotBlank(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, message = "推送消息标题不能为空!")
     @ApiModelProperty(value = "推送消息标题")
     private String pushTitle;
 
     @ApiModelProperty(value = "推送消息副标题")
     private String pushSubTitle;
 
-    @Length(groups = {AddPushInformValidate.class}, min = 1, max = 1000, message = "推送消息内容长度在1~1000")
-    @NotBlank(groups = {AddPushInformValidate.class}, message = "推送消息内容不能为空!")
+    @Length(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, min = 1, max = 1000, message = "推送消息内容长度在1~1000")
+    @NotBlank(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, message = "推送消息内容不能为空!")
     @ApiModelProperty(value = "推送消息内容")
     private String pushMsg;
 
-
+    @Length(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, min = 0, max = 1, message = "推送目标超出范围：0表示推送至所有社区、1则是具体某个社区")
+    @NotNull(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, message = "推送目标不能为空")
     @ApiModelProperty(value = "推送目标：0表示推送至所有社区、1则是具体某个社区")
     private Integer pushTarget;
 
-    @FieldValid(groups = {AddPushInformValidate.class}, value = {"0","1","2"}, message = "推送消息状态只有-0表示草稿、1表示发布、2表示撤销")
-    @NotNull(groups = {AddPushInformValidate.class}, message = "推送消息状态不能为空!")
+    @FieldValid(groups = {AddPushInformValidate.class, UpdatePushStateValidate.class, UpdateDetailValidate.class}, value = {"0","1","2"}, message = "推送消息状态只有-0表示草稿、1表示发布、2表示撤销")
+    @NotNull(groups = {AddPushInformValidate.class, UpdatePushStateValidate.class, UpdateDetailValidate.class}, message = "推送消息状态不能为空!")
     @ApiModelProperty(value = "推送消息状态：0表示草稿、1表示发布、2表示撤销")
     private Integer pushState;
 
-    @FieldValid( groups = {AddPushInformValidate.class}, value = {"站内","外部链接"}, message = "推送公告类型 站内、外部链接")
-    @NotBlank(groups = {AddPushInformValidate.class}, message = "推送公告类型不能为空!")
+    @Range(groups = {PropertyInformListValidate.class}, min = 0, max = 1, message = "请求页面类型超出范围,0表示草稿,1表示发布")
+    @NotNull(groups = {PropertyInformListValidate.class}, message = "请求页面类型不能为空")
+    @ApiModelProperty(value = "请求页面类型,0表示草稿,1表示发布")
+    private Integer pageState;
+
+    @FieldValid( groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, value = {"站内","外部链接"}, message = "推送公告类型 站内、外部链接")
+    @NotBlank(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, message = "推送公告类型不能为空!")
     @ApiModelProperty(value = "推送公告类型 站内、外部链接")
     private String informType;
 
@@ -75,11 +84,26 @@ public class PushInformQO implements Serializable {
     private String updateBy;
 
 
-    @FieldValid( groups = {AddPushInformValidate.class}, value = {"0","1"}, message = "置顶状态 0不置顶 1置顶")
-    @NotNull(groups = {AddPushInformValidate.class}, message = "置顶状态不能为空!")
+    @FieldValid( groups = {AddPushInformValidate.class, UpdateTopStateValidate.class, UpdateDetailValidate.class}, value = {"0","1"}, message = "置顶状态 0不置顶 1置顶")
+    @NotNull(groups = {AddPushInformValidate.class, UpdateTopStateValidate.class, UpdateDetailValidate.class}, message = "置顶状态不能为空!")
     @ApiModelProperty(value = "置顶状态")
     private Integer topState;
 
+    @ApiModelProperty("创建日期开始时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date startCreateTime;
+
+    @ApiModelProperty("创建日期结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date endCreateTime;
+
+    @ApiModelProperty("发布日期开始时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date startUpdateTime;
+
+    @ApiModelProperty("发布日期结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date endUpdateTime;
 
     /**
      * 添加推送消息验证接口
@@ -88,8 +112,28 @@ public class PushInformQO implements Serializable {
 
 
     /**
-     * 查询社区推送消息验证接口
+     * (业主端)查询社区推送消息验证接口
      */
     public interface CommunityPushInformValidate {}
+
+    /**
+     * (物业端)查询公告列表接口
+     */
+    public interface PropertyInformListValidate {}
+
+    /**
+     * (物业端)更新置顶状态接口
+     */
+    public interface UpdateTopStateValidate {}
+
+    /**
+     * (物业端)更新发布状态接口
+     */
+    public interface UpdatePushStateValidate {}
+
+    /**
+     * (物业端)更新消息接口
+     */
+    public interface UpdateDetailValidate {}
 
 }
