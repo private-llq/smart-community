@@ -16,6 +16,7 @@ import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.utils.CardUtil;
 import com.jsy.community.utils.DateUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
@@ -94,6 +95,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         ProprietorEntity entity = new ProprietorEntity();
         BeanUtils.copyProperties( qo, entity );
         entity.setId( SnowFlake.nextId() );
+        entity.setCreateBy(adminUserName);
         proprietorMapper.insertOperationLog( SnowFlake.nextId(), adminUserName, DateUtils.now(), entity.getId(), 1 );
         proprietorMapper.insert(entity);
         //TODO 短信通知业主
