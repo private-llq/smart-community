@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * @author: Hu
  * @create: 2021-03-26 09:26
  **/
-@Api(tags = "社区趣事控制器")
+@Api(tags = "社区车辆控制器")
 @RestController
 @RequestMapping("/car")
 @ApiJSYController

@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IComplainsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
@@ -35,12 +36,14 @@ public class ComplainsController {
 
     @ApiOperation("查询所有投诉建议")
     @PostMapping("/list")
+    @Login
     public CommonResult list(@RequestBody BaseQO<PropertyComplaintsQO> baseQO) {
         Map<String, Object> map = complainsService.listAll(baseQO);
         return CommonResult.ok(map);
     }
     @ApiOperation("反馈内容")
     @PostMapping("/feedback")
+    @Login
     public CommonResult feedback(@RequestBody ComplainFeedbackQO complainFeedbackQO) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         complainsService.feedback(complainFeedbackQO,userInfo);
