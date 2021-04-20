@@ -343,7 +343,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	}
 	
 	@Override
-	public PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO, String query, Integer areaId) {
+	public PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO, String query, Long areaId) {
 		Page<ShopLeaseEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		
@@ -357,7 +357,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 搜索条件和筛选条件都不存在   PS：此时区域id这里从url上获取，若没有 默认查渝北区
 		if (houseQO == null && query == null) {
 			// 根据地区id查询该区域所有小区
-			List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId.longValue());
+			List<CommunityEntity> list = communityService.listCommunityByAreaId(areaId);
 			if (CollectionUtils.isEmpty(list)) {
 				return null;
 			}
@@ -375,7 +375,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 搜索条件存在但筛选条件不存在   PS：此时区域id这里从url上获取，若没有 默认查渝北区
 		if (houseQO == null && (!StringUtils.isEmpty(query))) {
 			// 根据小区名或地址，地区id查询该区域所有小区
-			List<CommunityEntity> list = communityService.listCommunityByName(query, areaId);
+			List<CommunityEntity> list = communityService.listCommunityByName(query, areaId.intValue());
 			if (CollectionUtils.isEmpty(list)) {
 				return null;
 			}

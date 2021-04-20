@@ -11,7 +11,6 @@ import com.jsy.community.api.LeaseException;
 import com.jsy.community.constant.*;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.log.ProprietorLog;
-import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.qo.shop.ShopQO;
@@ -126,9 +125,9 @@ public class ShopLeaseController {
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")
 	@PostMapping("/getShopByCondition")
-	public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO,
-	                                       @ApiParam("小区名或地址") @RequestParam(name = "query", required = false) String query,
-	                                       @ApiParam("区域id") @RequestParam(required = false, defaultValue = "500103") Integer areaId) {
+	public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
+		String query = baseQO.getQuery().getSearchText();
+		Long areaId = baseQO.getQuery().getHouseAreaId();
 		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO, query, areaId);
 		if (pageInfo != null) {
 			// 当月租金大于10000变成XX.XX万元
