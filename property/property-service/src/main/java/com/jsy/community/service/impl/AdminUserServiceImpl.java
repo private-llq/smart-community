@@ -635,7 +635,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public AdminUserEntity queryPersonalData(String uid){
-		AdminUserEntity user = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile,real_name,org_id,job,id_card,role_type").eq("uid",uid));
+		AdminUserEntity user = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile,real_name,org_id,job,id_card,role_type,avatar_url").eq("uid",uid));
 		user.setRoleTypeName(PropertyConstsEnum.RoleTypeEnum.ROLE_TYPE_MAP.get(user.getRoleType()));
 		//查询组织机构名称
 		user.setOrgName(organizationService.queryOrganizationNameById(user.getOrgId()));
