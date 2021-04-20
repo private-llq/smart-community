@@ -12,8 +12,8 @@ import lombok.Data;
  **/
 @Data
 @ApiModel("小区收费标准中间表")
-@TableName("t_community_rule")
-public class CommunityRuleEntity {
+@TableName("t_community_property_fee_rule")
+public class CommunityPropertyFeeRuleEntity {
     private Long communityId;
     private Long ruleId;
 }

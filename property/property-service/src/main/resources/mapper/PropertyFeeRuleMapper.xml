@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.PropertyFeeRuleMapper">
+    <select id="findList" resultType="com.jsy.community.entity.property.PropertyFeeRuleEntity">
+        select tpfr.id,tpfr.type,tpfr.serial_number,tpfr.name,tpfr.period,tpfr.charge_mode,tpfr.monetary_unit,tpfr.penal_sum,tpfr.penal_days,tpfr.status,tpfr.create_by,tpfr.update_by
+        from t_property_fee_rule tpfr
+        join t_community_property_fee_rule tcr
+        on tpfr.id=tcr.rule_id
+        join t_community tc
+        on tc.id=tcr.community_id
+        where tc.id=#{communityId}
+    </select>
+</mapper>
