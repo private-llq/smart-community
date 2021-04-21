@@ -735,11 +735,11 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			Long communityId = shopLeaseEntity.getCommunityId();
 			CommunityEntity communityNameById = communityService.getCommunityNameById(communityId);
 			String community = "";
-			if (communityNameById!=null) {
+			if (communityNameById != null) {
 				community = communityNameById.getName();
 				
 			}
-			leaseVO.setAddress(city + area + community );
+			leaseVO.setAddress(city + area + community);
 			
 			QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
 			queryWrapper.eq("shop_id", shopLeaseEntity.getId());
@@ -758,12 +758,11 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		Long page = baseQO.getPage();
 		Long size = baseQO.getSize();
 		Page<ShopLeaseEntity> info = new Page<>(page, size);
-		List<ShopLeaseEntity> shopList = shopLeaseMapper.getShopByCondition(baseQO,info);
-		
+		List<ShopLeaseEntity> shopList = shopLeaseMapper.getShopByCondition(baseQO, info);
 		ArrayList<IndexShopVO> shopVOS = new ArrayList<>();
 		for (ShopLeaseEntity shopLeaseEntity : shopList) {
 			IndexShopVO indexShopVO = new IndexShopVO();
-			BeanUtils.copyProperties(shopLeaseEntity,indexShopVO);
+			BeanUtils.copyProperties(shopLeaseEntity, indexShopVO);
 			
 			// 封装图片
 			QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();

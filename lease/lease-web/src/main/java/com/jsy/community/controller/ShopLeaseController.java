@@ -513,6 +513,11 @@ public class ShopLeaseController {
 	@ApiOperation("根据筛选条件查询商铺列表")
 	@PostMapping("/getShopByCondition")
 	public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
+		// 为了ios
+		if (baseQO.getQuery()==null){
+			baseQO.setQuery(new HouseLeaseQO());
+		}
+		// 为了ios
 		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO);
 		return CommonResult.ok(pageInfo);
 	}
