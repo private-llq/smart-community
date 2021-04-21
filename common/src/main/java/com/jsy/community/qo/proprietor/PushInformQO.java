@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 
 /**
@@ -91,19 +91,19 @@ public class PushInformQO implements Serializable {
 
     @ApiModelProperty("创建日期开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date startCreateTime;
+    private LocalDate startCreateTime;
 
     @ApiModelProperty("创建日期结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date endCreateTime;
+    private LocalDate endCreateTime;
 
     @ApiModelProperty("发布日期开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date startUpdateTime;
+    private LocalDate startUpdateTime;
 
     @ApiModelProperty("发布日期结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date endUpdateTime;
+    private LocalDate endUpdateTime;
 
     /**
      * 添加推送消息验证接口
