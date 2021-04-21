@@ -80,7 +80,7 @@ public class ProprietorController {
     @ApiOperation("下载业主信息录入Excel")
     public ResponseEntity<byte[]> downloadExcel(@RequestParam long communityId) {
         //1. 设置响应头
-        MultiValueMap<String, String> multiValueMap = setHeader("业主导入模板.xlsx");
+        MultiValueMap<String, String> multiValueMap = setHeader("业主导入模板.xls");
         //2.生成Excel模板
         try {
             //2.2 生成Excel 业主信息录入模板
