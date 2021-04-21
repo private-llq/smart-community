@@ -117,6 +117,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICommonConstService commonConstService;
 	
+	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	private ILeaseUserService leaseUserService;
+	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
@@ -281,6 +284,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 详情页展示的电话是用户在发布的时候填写的电话
 		one.setRealName(shop.getNickname());
 		one.setMobile(shop.getMobile());
+		//查询发布人聊天id(im_id)
+		String imId = leaseUserService.queryIMIdByUid(uid);
+		one.setImId(imId);
 		map.put("user", one);
 		return map;
 	}
