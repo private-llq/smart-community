@@ -397,8 +397,6 @@ public class ShopLeaseController {
 		return CommonResult.ok();
 	}
 	
-	
-	
 	/**
 	 * POST---有参测试(对象参数)
 	 *
@@ -458,7 +456,6 @@ public class ShopLeaseController {
 		}
 	}
 	
-	
 	//********************************
 	public static RestHighLevelClient getClient() {
 		HttpHost httpHost = new HttpHost("127.0.0.1", 9200);
@@ -506,8 +503,6 @@ public class ShopLeaseController {
 		CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
 		System.out.println(response.toString());
 	}
-	
-	
 	
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")

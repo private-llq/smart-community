@@ -118,10 +118,10 @@ public class DepartmentStaffController {
 	@GetMapping("/down")
 	@ApiOperation("下载模板")
 	@Login(allowAnonymous = true)
-	public String down(){
+	public String down() {
 		return "http://222.178.212.29:9000/excel/通讯录导入模板";
 	}
-	
+
 //	@PostMapping("/up")
 //	@ApiOperation("上传模板")
 //	@Login(allowAnonymous = true)
@@ -169,18 +169,18 @@ public class DepartmentStaffController {
 		// 合并单元格后的标题行，使用默认标题样式
 		writer.merge(5, "通讯录");
 		//自定义标题别名
-		writer.addHeaderAlias("person", "姓名").setColumnWidth(0,20);
-		writer.addHeaderAlias("department", "部门").setColumnWidth(1,20);
-		writer.addHeaderAlias("duty", "职务").setColumnWidth(2,10);
-		writer.addHeaderAlias("phone", "电话").setColumnWidth(3,30);
-		writer.addHeaderAlias("email", "邮箱").setColumnWidth(4,20);
-		writer.addHeaderAlias("failReason","失败原因").setColumnWidth(5,30);
+		writer.addHeaderAlias("person", "姓名").setColumnWidth(0, 20);
+		writer.addHeaderAlias("department", "部门").setColumnWidth(1, 20);
+		writer.addHeaderAlias("duty", "职务").setColumnWidth(2, 10);
+		writer.addHeaderAlias("phone", "电话").setColumnWidth(3, 30);
+		writer.addHeaderAlias("email", "邮箱").setColumnWidth(4, 20);
+		writer.addHeaderAlias("failReason", "失败原因").setColumnWidth(5, 30);
 		// 一次性写出内容，使用默认样式，强制输出标题
 		writer.write(newArrayList, true);
 		
 		//out为OutputStream，需要写出到的目标流
 		//response为HttpServletResponse对象
-		response.setContentType("application/vnd.ms-excel;charset=utf-8");
+		response.setContentType("application/vnd.ms-excel;charset=UTF-8");
 		//test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
 		response.setHeader("Content-Disposition", "attachment;filename=" + "failData" + ".xls");
 		ServletOutputStream out = null;
