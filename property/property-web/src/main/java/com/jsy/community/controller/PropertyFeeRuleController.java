@@ -38,12 +38,6 @@ public class PropertyFeeRuleController {
         List<PropertyFeeRuleEntity> list=propertyFeeRuleService.findList(communityId);
         return CommonResult.ok(list);
     }
-    @ApiOperation("查询当前小区物业收费规则")
-    @PostMapping("/update")
-//    @Login
-    public CommonResult yaer(){
-        propertyFeeRuleService.updateAll();
-        return CommonResult.ok();
-    }
+
 
 }

@@ -14,5 +14,4 @@ import java.util.List;
 public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity> {
     List<PropertyFeeRuleEntity> findList(String communityId);
 
-    void updateAll();
 }
