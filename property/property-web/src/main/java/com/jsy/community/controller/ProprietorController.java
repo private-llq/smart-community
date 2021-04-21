@@ -348,7 +348,7 @@ public class ProprietorController {
         //设置响应类型为附件类型直接下载这种
         multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileFullName, StandardCharsets.UTF_8));
         //设置响应的文件mime类型为 xls类型
-        multiValueMap.set("Content-type", "application/vnd.ms-excel");
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
         return multiValueMap;
     }
 

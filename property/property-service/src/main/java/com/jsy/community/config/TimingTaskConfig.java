@@ -1,6 +1,7 @@
 package com.jsy.community.config;
 
 import com.jsy.community.job.DateTimeJob;
+import com.jsy.community.job.FinanceStatementJob;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,39 @@ public class TimingTaskConfig{
         return TriggerBuilder.newTrigger()
                 .forJob(printTimeJobDetail())//关联上述的JobDetail
                 .withIdentity("quartzTaskService")//给Trigger起个名字
+                .withSchedule(cronScheduleBuilder)
+                .build();
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 创建财务结算JobDetail
+     *@Param: : 
+     *@Return: org.quartz.JobDetail
+     *@Date: 2021/4/21 14:56
+     **/
+    @Bean
+    public JobDetail financeStatementJobDetail() {
+        return JobBuilder.newJob(FinanceStatementJob.class)
+                .withDescription("FinanceStatementJob")
+                .usingJobData("statementJob", "statementJobQuartz")
+                .storeDurably()
+                .build();
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 创建财务结算JobTrigger
+     *@Param: :
+     *@Return: org.quartz.Trigger
+     *@Date: 2021/4/21 14:59
+     **/
+    @Bean
+    public Trigger financeStatementJobTrigger() {
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0 0 * * ? *");
+        return TriggerBuilder.newTrigger()
+                .forJob(financeStatementJobDetail())
+                .withIdentity("financeStatementJobTrigger")
                 .withSchedule(cronScheduleBuilder)
                 .build();
     }
