@@ -24,6 +24,9 @@ public class TreeCommunityVO implements Serializable {
 	
 	private String communityName;
 	
+	// 社区总人数
+	private Integer count;
+	
 	// 组织结构
 	private List<OrganizationVO> organizationVOList;
 	

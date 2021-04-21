@@ -78,14 +78,15 @@ public interface PaymentEnum {
 		TRADE_FROM_MANAGEMENT("物业管理", 4),
 		TRADE_FROM_RENT("房屋租金", 5),
 		TRADE_FROM_REDBAG("红包", 6),
-		TRADE_FROM_REDBAG_BACK("红包退回", 7);
+		TRADE_FROM_REDBAG_BACK("红包退回", 7),
+		OTHER("其他缴费",8);
 		private String name;
 		private Integer index;
 		TradeFromEnum(String name, Integer index) {
 			this.name = name;
 			this.index = index;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
@@ -118,6 +119,16 @@ public interface PaymentEnum {
 				tradeFromMap.put(tradeFromEnum.getIndex(), tradeFromEnum.getName());
 			}
 			sourceMap.put("tradeFrom",tradeFromList);
+		}
+
+		public static String getCode(Integer code){
+			TradeFromEnum[] values = TradeFromEnum.values();
+			for(TradeFromEnum c : values){
+				if( c.index.equals(code) ){
+					return c.name;
+				}
+			}
+			return OTHER.name;
 		}
 	}
 	

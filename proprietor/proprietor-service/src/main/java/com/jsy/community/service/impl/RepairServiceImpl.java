@@ -106,7 +106,6 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		BeanUtils.copyProperties(repairEntity, orderEntity);
 		orderEntity.setId(SnowFlake.nextId());
 		orderEntity.setStatus(0);
-		orderEntity.setOrderTime(new Date());
 		orderEntity.setNumber(MyMathUtils.randomCode(17));
 		orderEntity.setRepairId(repairId);
 		repairOrderMapper.insert(orderEntity);
@@ -221,6 +220,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 			orderEntity.setComment(repairCommentQO.getAppraise());
 			orderEntity.setCommentStatus(repairCommentQO.getStatus());
 			orderEntity.setImgPath(repairCommentQO.getFilePath());
+			orderEntity.setCommentTime(new Date());
 			repairOrderMapper.updateById(orderEntity);
 		}
 	}

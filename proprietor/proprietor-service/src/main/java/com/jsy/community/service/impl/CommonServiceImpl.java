@@ -1,6 +1,6 @@
 package com.jsy.community.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.ICommonService;
@@ -12,6 +12,7 @@ import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
+import com.jsy.community.mapper.WeatherIconMapper;
 import com.jsy.community.utils.LunarCalendarFestivalUtils;
 import com.jsy.community.utils.WeatherUtils;
 import com.jsy.community.vo.WeatherForecastVO;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -55,6 +57,9 @@ public class CommonServiceImpl implements ICommonService {
     
     @Autowired
     private WeatherUtils weatherUtils;
+    
+    @Autowired
+    private WeatherIconMapper weatherIconMapper;
 
     @Override
     public void checkVerifyCode(String account, String code) {
@@ -79,6 +84,9 @@ public class CommonServiceImpl implements ICommonService {
      * @author YuLF
      * @since 2020/12/8 16:39
      */
+    /**
+     *  queryType = 1
+     */
     @Override
     public List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer page, Integer pageSize) {
         return commonMapper.getAllCommunityFormCityId(id, page , pageSize);
@@ -90,46 +98,93 @@ public class CommonServiceImpl implements ICommonService {
      * @since  2020/12/29 15:08
      * @Param
      */
+    /**
+     *  queryType = 2
+     */
+//    @Override
+//    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
+//        //按社区id 查询 下面的所有 楼栋
+//        List<Map<String, Object>> buildingList = commonMapper.getAllBuild(id, 1);
+//        if( CollectionUtil.isNotEmpty(buildingList) ){
+//            return buildingList;
+//        }
+//        //按社区id 查询 下面的所有 单元
+//        return commonMapper.getAllBuild(id, 2);
+//    }
     @Override
-    public List<Map<String, Object>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
+    public Map<String,List<Map<String, Object>>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
         //按社区id 查询 下面的所有 楼栋
         List<Map<String, Object>> buildingList = commonMapper.getAllBuild(id, 1);
-        if( CollectionUtil.isNotEmpty(buildingList) ){
-            return buildingList;
-        }
         //按社区id 查询 下面的所有 单元
-        return commonMapper.getAllBuild(id, 2);
-    }
-
-
-    @Override
-    public List<Map<String, Object>> getUnitOrFloorById(Long id, Integer page, Integer pageSize) {
-        //1. 不管他是楼栋id还是单元id、第一种方式先按 他传的楼栋id来查单元
-        List<Map<String, Object>> unitList = commonMapper.getUnitByBuildingId(id);
-        if( CollectionUtil.isNotEmpty(unitList) ){
-            return unitList;
+        List<Map<String, Object>> unitList = commonMapper.getAllBuild(id, 2);
+        Map<String, List<Map<String, Object>>> returnMap = new HashMap<>();
+        if(!CollectionUtils.isEmpty(buildingList)){
+            returnMap.put("buildingList",buildingList);
         }
-        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有楼层
-        List<Map<String, Object>> floorByBuildingId = commonMapper.getFloorByBuildingId(id);
-        if( CollectionUtil.isNotEmpty(floorByBuildingId) ){
-            return floorByBuildingId;
+        if(!CollectionUtils.isEmpty(unitList)){
+            returnMap.put("unitList",unitList);
         }
-        //3. 如果 按 以上id 当做楼栋去查 楼层都为空 那说明传的是一个 单元id 则按单元id查楼层
-        return getFloorByUnitId(id, page, pageSize);
+        return returnMap;
     }
-
-
+    
+    
     /**
-     * 按单元id获取楼层
-     * @author YuLF
-     * @since  2020/12/29 15:08
-     * @Param
+     *  queryType = 3
      */
+//    @Override
+//    public List<Map<String, Object>> getUnitOrFloorById(Long id, Integer page, Integer pageSize) {
+//        //1. 不管他是楼栋id还是单元id、第一种方式先按 他传的楼栋id来查单元
+//        List<Map<String, Object>> unitList = commonMapper.getUnitByBuildingId(id);
+//        if( CollectionUtil.isNotEmpty(unitList) ){
+//            return unitList;
+//        }
+//        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有楼层
+//        //TODO 楼栋没挂单元 直接挂的房屋，先给出楼层
+//        List<Map<String, Object>> floorByBuildingId = commonMapper.getFloorByBuildingId(id);
+//        if( CollectionUtil.isNotEmpty(floorByBuildingId) ){
+//            return floorByBuildingId;
+//        }
+//        //3. 如果 按 以上id 当做楼栋去查 楼层都为空 那说明传的是一个 单元id 则按单元id查楼层
+//        //TODO 单元挂房屋？(大多数情况)
+////        return getFloorByUnitId(id, page, pageSize);
+//        return commonMapper.getFloorByUnitId(id, page, pageSize);
+//    }
     @Override
-    public List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize) {
-        return commonMapper.getFloorByUnitId(id, page, pageSize);
+    public Map<String,List<Map<String, Object>>> getUnitOrFloorById2(Long id, Integer page, Integer pageSize) {
+        //1. 楼栋id查单元
+        List<Map<String, Object>> unitList = commonMapper.getUnitByBuildingId(id);
+        //2.1 楼栋id查楼层
+        List<Map<String, Object>> floorList = commonMapper.getFloorByBuildingId(id);
+        //2.2 单元id查楼层
+        List<Map<String, Object>> floorByUnit = commonMapper.getFloorByUnitId(id, page, pageSize);
+        if(CollectionUtils.isEmpty(floorList)){
+            floorList.addAll(floorByUnit);
+        }
+        Map<String, List<Map<String, Object>>> returnMap = new HashMap<>();
+        if(!CollectionUtils.isEmpty(unitList)){
+            returnMap.put("unitList",unitList);
+        }
+        if(!CollectionUtils.isEmpty(floorList)){
+            returnMap.put("floorList",floorList);
+        }
+        return returnMap;
     }
 
+
+//    /**
+//     * 按单元id获取楼层
+//     * @author YuLF
+//     * @since  2020/12/29 15:08
+//     * @Param
+//     */
+//    @Override
+//    private List<Map<String, Object>> getFloorByUnitId(Long id,  Integer page, Integer pageSize) {
+//        return commonMapper.getFloorByUnitId(id, page, pageSize);
+//    }
+    
+    /**
+     *  楼层文本查房屋
+     */
     @Override
     public List<Map<String, Object>> getHouseByFloor(Long id, String floor) {
         return commonMapper.getHouseByFloor( id, floor);
@@ -215,7 +270,18 @@ public class CommonServiceImpl implements ICommonService {
     
     //天气详情假数据
     public JSONObject getTempWeatherDetails(){
-        return WeatherUtils.getTempWeatherDetails();
+        Map<String,Map<String, String>> latestIcon = weatherIconMapper.getLatestIcon();
+        JSONObject tempWeatherDetails = WeatherUtils.getTempWeatherDetails();
+        JSONArray hourlyArr = tempWeatherDetails.getJSONArray("hourly");
+        for(int i=0;i<hourlyArr.size();i++){
+            hourlyArr.getJSONObject(i).put("iconUrl",latestIcon.get(hourlyArr.getJSONObject(i).getString("iconDay")).get("url"));
+        }
+        JSONArray forecastArr = tempWeatherDetails.getJSONArray("forecast");
+        for(int i=0;i<forecastArr.size();i++){
+            forecastArr.getJSONObject(i).put("iconUrlDay",latestIcon.get(forecastArr.getJSONObject(i).getString("conditionIdDay")).get("url"));
+            forecastArr.getJSONObject(i).put("iconUrlNight",latestIcon.get(forecastArr.getJSONObject(i).getString("conditionIdNight")).get("url"));
+        }
+        return tempWeatherDetails;
     }
     
     /**
@@ -259,6 +325,15 @@ public class CommonServiceImpl implements ICommonService {
             //处理数据
             WeatherUtils.addDayOfWeek(weatherNow); //补星期几
 //            WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
+            //查询天气图标
+            Map<String,Map<String, String>> latestIcon = weatherIconMapper.getLatestIcon();
+            for(int i=0;i<weatherFor24hours.size();i++){
+                weatherFor24hours.get(i).setIconUrl(latestIcon.get(weatherFor24hours.get(i).getIconDay()).get("url"));
+            }
+            for(int i=0;i<weatherForDays.size();i++){
+                weatherForDays.get(i).setIconUrlDay(latestIcon.get(weatherForDays.get(i).getConditionIdDay()).get("url"));
+                weatherForDays.get(i).setIconUrlNight(latestIcon.get(weatherForDays.get(i).getConditionIdNight()).get("url"));
+            }
             
             //组装返回
             weatherNow.put("hourly",weatherFor24hours);
@@ -266,6 +341,7 @@ public class CommonServiceImpl implements ICommonService {
             weatherNow.put("liveIndex",livingIndex);
             return weatherNow;
         }catch (Exception e){
+            e.printStackTrace();
             log.error(e.getMessage());
             return null;
         }
@@ -352,8 +428,11 @@ public class CommonServiceImpl implements ICommonService {
         for(String key : keys){
             originKey = key;
         }
-        JSONArray jsonArray = livingIndex.getJSONArray(originKey);
-        List<WeatherLiveIndexVO> weatherParamList = jsonArray.toJavaList(WeatherLiveIndexVO.class);
+        JSONObject jsonObject = livingIndex.getJSONObject(originKey);
+        String jsonStr = JSON.toJSONString(jsonObject.values());
+        List<WeatherLiveIndexVO> weatherParamList = JSONArray.parseArray(jsonStr.substring(1,jsonStr.length()-1),WeatherLiveIndexVO.class);
+//        JSONArray jsonArray = livingIndex.getJSONArray(originKey);
+//        List<WeatherLiveIndexVO> weatherParamList = jsonArray.toJavaList(WeatherLiveIndexVO.class);
         //筛选指定数据(code代表相应数据项 12感冒 17洗车 20穿衣 21紫外线 26运动 28钓鱼)
         Integer[] codeArr = {12,17,20,21,26,28};
         ArrayList<Integer> codeList = new ArrayList<>();
@@ -453,6 +532,8 @@ public class CommonServiceImpl implements ICommonService {
             //记录存入 更新存入时间
             stringObjectValueOperations.getAndSet(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + hotKey, System.currentTimeMillis() + "");
         }
+
+
 
     }
 

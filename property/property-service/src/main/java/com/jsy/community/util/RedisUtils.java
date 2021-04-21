@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-//import com.jsy.community.intercepter.AuthorizationInterceptor;
 import com.jsy.community.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +40,8 @@ public class RedisUtils {
 	 * @Date: 2020/12/14
 	**/
 	public void setUserToken(String token, AdminUserEntity sysUserEntity){
-		stringRedisTemplate.opsForValue().set("Admin:Login:" + token, JSON.toJSONString(sysUserEntity), loginExpireHour, TimeUnit.HOURS);
+		stringRedisTemplate.opsForValue().set("Admin:Login:" + token, JSON.toJSONString(sysUserEntity), loginExpireHour, TimeUnit.HOURS);//登录token
+		stringRedisTemplate.opsForValue().set("Admin:LoginAccount:" + sysUserEntity.getMobile(), token, loginExpireHour, TimeUnit.HOURS);//登录账户key的value设为token
 	}
 	
 	/**

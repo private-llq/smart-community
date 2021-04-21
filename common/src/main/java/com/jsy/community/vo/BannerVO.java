@@ -31,4 +31,7 @@ public class BannerVO extends BaseVO {
 	@ApiModelProperty(value = "点击量")
 	private Integer click;
 	
+	@ApiModelProperty(value = "内容")
+	private String content;
+	
 }

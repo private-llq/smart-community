@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.vo.menu.AppMenuVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -35,7 +37,7 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Date 2021/3/23 10:23
 	 * @Param [communityId]
 	 **/
-	List<Long> listMenuId(Long communityId);
+	List<Map<String, Long>> listMenuId(Long communityId);
 	
 	/**
 	 * @return void
@@ -54,4 +56,13 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Param [ids]
 	 **/
 	void deleteMiddleMenu(Long id);
+	
+	/**
+	 * @return java.util.Map<java.lang.String,java.lang.Long>
+	 * @Author lihao
+	 * @Description 根据id和社区id 查询中间表
+	 * @Date 2021/4/19 10:36
+	 * @Param [id, communityId]
+	 **/
+	Map<String, Long> getMiddleMenu(@Param("id") Long id, @Param("communityId") Long communityId);
 }

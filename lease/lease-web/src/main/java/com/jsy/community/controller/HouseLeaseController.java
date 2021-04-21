@@ -19,6 +19,7 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseVo;
+import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -222,5 +223,19 @@ public class HouseLeaseController {
         ValidatorUtils.validateEntity(qo.getQuery(), HouseLeaseQO.SearchLeaseHouse.class);
         ValidatorUtils.validatePageParam(qo);
         return CommonResult.ok(iHouseLeaseService.searchLeaseHouse(qo));
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 查询房屋出租数据单条简略详情
+     *@param: houseId: 出租房屋主键
+     *@Return: com.jsy.community.vo.CommonResult<com.jsy.community.vo.lease.HouseLeaseSimpleVO>
+     *@Date: 2021/3/27 16:14
+     **/
+    @Login
+    @GetMapping("/simpleDetail")
+    @ApiOperation("查询房屋出租数据单条简略详情")
+    public CommonResult<HouseLeaseSimpleVO> houseLeaseSimpleDetails(@RequestParam Long houseId) {
+        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseSimpleDetail(houseId),"查询成功!");
     }
 }

@@ -41,8 +41,8 @@ public class ElasticsearchConfig {
 
 
 
-    @Bean(name = "customElasticsearchClient")
-    public RestHighLevelClient elasticsearchClient(){
+    @Bean
+    public RestHighLevelClient restHighLevelClient(){
         return new RestHighLevelClient(
                 RestClient.builder(new HttpHost( elasticsearchIp, elasticsearchPort, elasticsearchProtocol)));
     }

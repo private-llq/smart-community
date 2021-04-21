@@ -12,6 +12,7 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,15 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Date: 2020/12/3
 	**/
 	UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo);
+	
+	/**
+	* @Description: 更新用户极光ID
+	 * @Param: [regId, uid]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/3/31
+	**/
+	boolean updateUserRegId(String regId, String uid);
 	
 	/**
 	 * 登录接口
@@ -95,6 +105,15 @@ public interface IUserService extends IService<UserEntity> {
      */
     UserInfoVo proprietorQuery(String userId, Long houseId);
 	
+    /**
+    * @Description: 查询用户社区(房屋已认证的)
+     * @Param: [uid]
+     * @Return: java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+	Collection<Map<String, Object>> queryUserHousesOfCommunity(String uid);
+    
     /**
     * @Description: 查询业主所有社区的房屋
      * @Param: [uid]

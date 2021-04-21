@@ -55,7 +55,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @NotEmpty(message = "缺少来访人姓名")
     private String name;
 
-    @ApiModelProperty(value = "所属门牌号")
+    @ApiModelProperty(value = "来访地址")
     @NotEmpty(message = "缺少详细地址")
     private String address;
 
@@ -70,8 +70,8 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startTime;
     
-//    @ApiModelProperty(value = "预期来访结束时间")
-//    @JsonFormat(pattern = "yyyy-MM-dd")
+    @ApiModelProperty(value = "预期来访结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonIgnore
     private LocalDate endTime;
 
@@ -110,8 +110,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "来访车辆类型名", hidden = true)
     private String carTypeStr;
     
-    @JsonIgnore
-    @ApiModelProperty(value = "审核方式，1业主审核，2物业审核")
+    @ApiModelProperty(value = "审核方式，1业主审核，2物业审核",hidden = true)
     private Integer checkType;
     
     @ApiModelProperty(value = "是否审核，0未审核，1通过，2拒绝", hidden = true)
@@ -123,5 +122,12 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     
     @ApiModelProperty(value = "审核拒绝原因", hidden = true)
     private String refuseReason;
+    
+    @ApiModelProperty(value = "状态 1.待入园 2.已入园 3.已出园 4.已失效", hidden = true)
+    private Integer status;
+    
+    @ApiModelProperty(value = "创建时间别称", hidden = true)
+    @TableField(exist = false)
+    private LocalDateTime vCreateTime;
     
 }

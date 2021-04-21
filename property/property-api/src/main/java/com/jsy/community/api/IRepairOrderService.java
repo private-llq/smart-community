@@ -7,8 +7,11 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.repair.RepairPlanVO;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -34,9 +37,9 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Author lihao
 	 * @Description 处理报修申请
 	 * @Date 2020/12/9 16:10
-	 * @Param [id]
+	 * @Param [id, dealId, money, uid]
 	 **/
-	void dealOrder(Long id);
+	void dealOrder(Long id, String dealId, BigDecimal money, String uid);
 	
 	/**
 	 * @return com.jsy.community.entity.UserEntity
@@ -63,7 +66,7 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Date 2020/12/9 16:51
 	 * @Param [id]
 	 **/
-	void successOrder(Long id);
+	void successOrder(Long id, String uid);
 	
 	/**
 	 * @return java.util.List<com.jsy.community.entity.CommonConst>
@@ -90,5 +93,23 @@ public interface IRepairOrderService extends IService<RepairOrderEntity> {
 	 * @Date 2021/3/19 15:07
 	 * @Param [id]
 	 **/
-	void rejectOrder(Long id,String reason);
+	void rejectOrder(Long id, String reason, String uid,String number,String realName);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.admin.AdminUserEntity>
+	 * @Author lihao
+	 * @Description 根据条件查询报修人员
+	 * @Date 2021/4/2 13:39
+	 * @Param [name, number, department]
+	 **/
+	List<Map<String, Object>> getRepairPerson(String condition, Long communityId);
+	
+	/**
+	 * @return com.jsy.community.vo.repair.RepairPlanVO
+	 * @Author lihao
+	 * @Description 查看进程
+	 * @Date 2021/4/19 11:00
+	 * @Param [id]
+	 **/
+	RepairPlanVO checkCase(Long id);
 }

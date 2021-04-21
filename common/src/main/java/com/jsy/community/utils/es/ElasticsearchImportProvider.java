@@ -33,13 +33,14 @@ public class ElasticsearchImportProvider {
      * @Param recordPicture     数据的列表icon：如果该数据存在
      * @since 2021/2/2 15:40
      */
-    public static void elasticOperationSingle(@NonNull Long id, @NonNull RecordFlag recordFlag, @NonNull Operation operation, @Nullable String searchTitle, @Nullable String recordPicture) {
+    public static void elasticOperationSingle(@NonNull Long id, @NonNull RecordFlag recordFlag, @NonNull Operation operation, @Nullable String searchTitle, @Nullable String recordPicture, Long communityId) {
         FullTextSearchEntity fullTextSearchEntity = new FullTextSearchEntity();
         fullTextSearchEntity.setId(id);
         fullTextSearchEntity.setFlag(recordFlag);
         fullTextSearchEntity.setOperation(operation);
         fullTextSearchEntity.setTitle(searchTitle);
         fullTextSearchEntity.setPicture(recordPicture);
+        fullTextSearchEntity.setCommunityId(communityId);
         JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(fullTextSearchEntity));
         //为json对象添加 es 搜索字段
         jsonObject.put("searchTitle", searchTitle);
@@ -49,9 +50,15 @@ public class ElasticsearchImportProvider {
         jsonObject.put("flag", recordFlag);
         //对象数据业务id 作为 es id 存入 该对象 id 的名称
         jsonObject.put("esId", id);
+        //对象数据业务社区
+        jsonObject.put("communityId", communityId);
         rabbitTemplate = getRabbitTemplate();
         byte[] bytes = serializationObjectToByte(fullTextSearchEntity);
         rabbitTemplate.convertAndSend(BusinessConst.APP_SEARCH_EXCHANGE_NAME, BusinessConst.APP_SEARCH_ROUTE_KEY, jsonObject.toJSONString().getBytes());
+    }
+
+    public static void elasticOperationSingle(@NonNull Long id, @NonNull RecordFlag recordFlag, @NonNull Operation operation, @Nullable String searchTitle, @Nullable String recordPicture) {
+        elasticOperationSingle(id,recordFlag,operation,searchTitle,recordPicture,null);
     }
 
 

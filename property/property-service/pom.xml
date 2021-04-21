@@ -21,6 +21,11 @@
 			<artifactId>property-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jsy</groupId>
+			<artifactId>property-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 		<!-- nacos 服务发现 -->
 		<dependency>
@@ -141,15 +146,6 @@
 			<version>5.0.2.RELEASE</version>
 		</dependency>
 		<!--*************  LCN	*************-->
-
-
-		<!--*************  websocket  *************-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
-		<!--*************  websocket  *************-->
-
     </dependencies>
 
 	<build>

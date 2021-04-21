@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
@@ -19,15 +20,19 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.mapper.UserThirdPlatformMapper;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
+import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
+import com.jsy.community.utils.es.ElasticsearchCarUtil;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.vo.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,6 +43,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -92,10 +98,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     private ICommunityService communityService;
 
     @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
     private IAlipayService alipayService;
 
     @Autowired
     private UserIMMapper userIMMapper;
+
+    @Autowired
+    private RestHighLevelClient restHighLevelClient;
 
     @Autowired
     private ISignatureService signatureService;
@@ -153,6 +165,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     /**
+    * @Description: 更新用户极光ID
+     * @Param: [regId, uid]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+    @Override
+    public boolean updateUserRegId(String regId, String uid){
+        return userMapper.updateUserRegId(regId, uid) == 1;
+    }
+    
+    /**
      * 登录
      */
     @Override
@@ -175,7 +199,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity user = new UserEntity();
         user.setUid(uuid);
         user.setId(SnowFlake.nextId());
-        user.setRegId(qo.getRegId());
 
         // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
@@ -420,6 +443,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return true;
     }
 
+
     /**
      * 更新车辆信息 如果 id = 0 | id = null 则新增
      * @param qo        请求参数
@@ -447,12 +471,71 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 cars.removeAll(any);
                 //批量新增车辆
                 carService.addProprietorCarForList(any, qo.getUid());
+                //循环添加id
+                any.forEach(x ->{
+                    x.setId(SnowFlake.nextId());
+                });
+                //循环保存车辆到es
+                any.forEach(x ->{
+                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo,x));
+                });
             }
             //批量更新车辆信息
-            cars.forEach( c -> carService.update(c, qo.getUid()));
+            cars.forEach( c -> {
+                carService.update(c, qo.getUid());
+                //循环更新车辆
+                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.update",getUpdateElasticsearchCar(c));
+                }
+            );
         }
     }
 
+    /**
+     * @Description: 添加车辆到es的qo封装方法
+     * @author: Hu
+     * @since: 2021/3/26 13:43
+     * @Param:
+     * @return:
+     */
+    public ElasticsearchCarQO getInsertElasticsearchCar(ProprietorQO proprietorQO,CarQO carQO){
+        HouseEntity entity = houseService.getById(proprietorQO.getHouseId());
+        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
+        elasticsearchCarQO.setId(carQO.getId());
+        elasticsearchCarQO.setCommunityId(proprietorQO.getCommunityId());
+        elasticsearchCarQO.setCarPlate(carQO.getCarPlate());
+        elasticsearchCarQO.setCarType(carQO.getCarType());
+        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carQO.getCarType()));
+        elasticsearchCarQO.setOwner(proprietorQO.getRealName());
+        elasticsearchCarQO.setIdCard(proprietorQO.getIdCard());
+        elasticsearchCarQO.setMobile(proprietorQO.getMobile());
+        elasticsearchCarQO.setOwnerType(1);
+        elasticsearchCarQO.setOwnerTypeText("用户");
+        elasticsearchCarQO.setRelationshipId(proprietorQO.getUid());
+        elasticsearchCarQO.setHouseId(proprietorQO.getHouseId());
+        elasticsearchCarQO.setBuilding(entity.getBuilding());
+        elasticsearchCarQO.setFloor(entity.getFloor());
+        elasticsearchCarQO.setUnit(entity.getUnit());
+        elasticsearchCarQO.setNumber(entity.getNumber());
+        elasticsearchCarQO.setHouseType(entity.getHouseType());
+        elasticsearchCarQO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
+        elasticsearchCarQO.setCreateTime(LocalDateTime.now());
+        return elasticsearchCarQO;
+    }
+    /**
+     * @Description: 修改车辆到es的qo封装方法
+     * @author: Hu
+     * @since: 2021/3/26 13:43
+     * @Param:
+     * @return:
+     */
+    public ElasticsearchCarQO getUpdateElasticsearchCar(CarQO carQO){
+        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
+        elasticsearchCarQO.setId(carQO.getId());
+        elasticsearchCarQO.setCarPlate(carQO.getCarPlate());
+        elasticsearchCarQO.setCarType(carQO.getCarType());
+        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carQO.getCarType()));
+        return elasticsearchCarQO;
+    }
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateImprover(ProprietorQO qo) {
@@ -539,6 +622,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setProprietorHouses(houseVos);
         return userInfoVo;
     }
+    
+    /**
+    * @Description: 查询用户社区(房屋已认证的)
+     * @Param: [uid]
+     * @Return: java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+    @Override
+    public Collection<Map<String, Object>> queryUserHousesOfCommunity(String uid){
+        //查所有房屋已认证的小区
+        Set<Long> communityIds = userHouseService.queryUserHousesOfCommunityIds(uid);
+        if(CollectionUtils.isEmpty(communityIds)){
+           return null;
+        }
+        //查小区名称
+        Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
+        return communityIdAndName.values();
+    }
 
     /**
      * @Description: 查询业主所有小区的房屋
@@ -575,11 +677,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
 
         //步骤三
-        //查小区名
-        /* t_community */
+        //查小区名、业主姓名
+        /* t_community *//* t_user */
         Map<String, Map<String,Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
+        UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
         for(HouseEntity userHouseEntity : houses){
             userHouseEntity.setCommunityName(String.valueOf(communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId())).get("name")));
+            userHouseEntity.setOwner(userInfoVo.getRealName());
         }
         return houses;
     }
@@ -591,6 +695,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             pid = tempEntity.getPid();
             HouseEntity houseEntity = setBuildingId(parent);
             tempEntity.setBuildingId(houseEntity.getBuildingId());
+        }else{
+            tempEntity.setBuildingId(tempEntity.getPid());
         }
         return parent;
     }

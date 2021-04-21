@@ -3,12 +3,12 @@
 <mapper namespace="com.jsy.community.mapper.PropertyRelationMapper">
     <sql id="Query">
         <where>
-            thm.community_id=#{query.communityId} and thm.person_type=1 and thm.deleted=0 and tu.deleted=0 and th.deleted=0
+            thm.community_id=#{query.communityId} and thm.deleted=0 and tu.deleted=0 and th.deleted=0
             <if test="query.name!=null and query.name!=''">
                 and thm.name like concat('%',#{query.name},'%')
             </if>
             <if test="query.ownerName!=null and query.ownerName!=''">
-                and th.name like concat('%',#{query.ownerName},'%')
+                and tu.real_name like concat('%',#{query.ownerName},'%')
             </if>
             <if test="query.houseId!=null and query.houseId>0">
                 and th.id=#{query.houseId}
@@ -26,7 +26,7 @@
         SELECT CONCAT(th.building,"-",th.unit,"-",th.floor,"-",th.door) as housing,
         thm.name as memberName,thm.mobile as mobile,thm.id_card as idCard,thm.relation as relation,
         tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile,
-        th.building as building,th.unit as unit,th.floor as floor,th.house_type as houseType
+        th.building as building,th.unit as unit,th.floor as floor,th.house_type as houseType,thm.create_time as createTime
         FROM t_house_member thm
         join t_user tu on tu.uid=thm.householder_id
         join t_house th on thm.house_id=th.id
@@ -39,16 +39,27 @@
         join t_user tu on tu.uid=thm.householder_id
         join t_house th on thm.house_id=th.id
         <include refid="Query"></include>
-        limit #{page},#{size}
     </select>
     <select id="getHouseId" resultMap="HouseTypeMap">
-        select t.id as id,concat(t.number,"-",t.code) as name from t_house t where t.type=4 and t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.code) as name from t_house t where t.type=4 and t.community_id=#{query.communityId}
+        <if test="query.name!=null and query.name!=''">
+            and t.number like concat("%",#{query.name},"%")
+        </if>
+        limit #{page},#{size}
     </select>
     <select id="getBuildingId" resultMap="HouseTypeMap">
-        select t.id as id,concat(t.number,"-",t.building) as name from t_house t where t.type=1 and t.community_id=#{query.communityId} and t.building like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.building) as name from t_house t where t.type=1 and t.community_id=#{query.communityId}
+        <if test="query.name!=null and query.name!=''">
+            and t.building like concat("%",#{query.name},"%")
+        </if>
+         limit #{page},#{size}
     </select>
     <select id="getUnitId" resultMap="HouseTypeMap">
-        select t.id as id,concat(t.number,"-",t.unit) as name from t_house t where t.type=2 and t.community_id=#{query.communityId} and t.unit like concat("%",#{query.name},"%") limit #{page},#{size}
+        select t.id as id,concat(t.number,"-",t.unit) as name from t_house t where t.type=2 and t.community_id=#{query.communityId}
+        <if test="query.name!=null and query.name!=''">
+            and t.unit like concat("%",#{query.name},"%")
+        </if>
+        limit #{page},#{size}
     </select>
 
 
@@ -65,6 +76,7 @@
         <result property="ownerName" column="ownerName"/>
         <result property="ownerIdCard" column="ownerIdCard"/>
         <result property="ownerMobile" column="ownerMobile"/>
+        <result property="createTime" column="createTime"/>
     </resultMap>
     <resultMap id="HouseTypeMap" type="com.jsy.community.vo.HouseTypeVo">
         <result column="id" property="id"/>

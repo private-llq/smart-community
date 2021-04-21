@@ -84,6 +84,7 @@ public class HouseReserveController {
     @Login
     @DeleteMapping("/reject")
     @ApiOperation("预约拒绝接口")
+    @Deprecated
     public CommonResult<Boolean> reject( @RequestBody HouseReserveQO qo) {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);
         qo.setReserveUid(UserUtils.getUserId());
@@ -108,9 +109,44 @@ public class HouseReserveController {
     public CommonResult<List<HouseReserveVO>> whole(@RequestBody BaseQO<HouseReserveQO> qo) {
         //预约分为两部分：1. 租客预约我发布的房子  2.我预约其他人发布的房子
         ValidatorUtils.validatePageParam(qo);
+        ValidatorUtils.validateEntity(qo.getQuery(), HouseReserveQO.ReserveList.class);
         return CommonResult.ok(iHouseReserveService.whole(qo, UserUtils.getUserId()));
     }
 
+    /**
+     *@Author: Pipi
+     *@Description: 删除预约信息
+     *@param: qo:
+     *@Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
+     *@Date: 2021/3/30 11:32
+     **/
+    @Login
+    @DeleteMapping("/deleteReserve")
+    @ApiOperation("删除预约信息")
+    public CommonResult<Boolean> delete(@RequestBody HouseReserveQO qo) {
+        qo.setReserveUid(UserUtils.getUserId());
+        ValidatorUtils.validateEntity(qo, HouseReserveQO.Cancel.class);
+        Boolean deleteResult = iHouseReserveService.delete(qo);
+        return CommonResult.ok(deleteResult ? "删除成功!" : "删除失败!请不要重复操作!");
+    }
+
+
+    /**
+     *@Author: Pipi
+     *@Description: 租房用户确认完成看房
+     *@param: qo:
+     *@Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
+     *@Date: 2021/3/30 15:23
+     **/
+    @Login
+    @PostMapping("/completeChecking")
+    @ApiOperation("租房用户确认完成看房")
+    public CommonResult<Boolean> completeChecking(@RequestBody HouseReserveQO qo) {
+        qo.setReserveUid(UserUtils.getUserId());
+        ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);
+        Boolean result = iHouseReserveService.completeChecking(qo);
+        return CommonResult.ok(result ? "完成看房成功!" : "完成看房失败!请不要重复操作!");
+    }
 
     /**
      * 获取今天、明天以及后面5天的字符串，

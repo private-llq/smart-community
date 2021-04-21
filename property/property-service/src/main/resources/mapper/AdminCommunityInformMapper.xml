@@ -2,6 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jsy.community.mapper.AdminCommunityInformMapper">
+    <!-- 更新消息发布状态 -->
+    <update id="updatePushState">
+        update t_push_inform
+        <set>
+            push_state = #{pushState},
+            update_by = #{updateBy},
+            update_time = now(),
+            <if test="pushState == 2">
+                top_state = 0
+            </if>
+        </set>
+        where id = #{id}
+    </update>
     <!--根据推送帐号id 和 uid 查询用户未读的推送消息id-->
     <select id="selectUnreadInformId" resultType="java.lang.Long">
         SELECT

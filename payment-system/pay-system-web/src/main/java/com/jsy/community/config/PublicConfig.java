@@ -169,8 +169,10 @@ public class PublicConfig {
         response.flushBuffer();
         String out_trade_no = JSONObject.fromObject(plainText).getString("out_trade_no");
         String transaction_id = JSONObject.fromObject(plainText).getString("transaction_id");
+        String attach = JSONObject.fromObject(plainText).getString("attach");
         Map<String, String> hashMap = new HashMap<>();
         hashMap.put("out_trade_no",out_trade_no);
+        hashMap.put("attach",attach);
         hashMap.put("transaction_id",transaction_id);
         return hashMap;
     }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityEntity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -59,4 +60,23 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Param [communityId]
 	 **/
 	CommunityEntity getCommunityNameById(Long communityId);
+	
+	/**
+	* @Description: ids批量查小区
+	 * @Param: [idList]
+	 * @Return: java.util.List<com.jsy.community.entity.CommunityEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	List<CommunityEntity> queryCommunityBatch(List<Long> idList);
+	
+	/**
+	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author lihao
+	 * @Description 查询电子地图
+	 * @Date 2021/4/16 17:07
+	 * @Param []
+	 **/
+	Map<String, Object> getElectronicMap(Long communityId);
+	
 }

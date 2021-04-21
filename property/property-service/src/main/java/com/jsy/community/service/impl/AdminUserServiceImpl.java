@@ -1,31 +1,32 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.IAdminConfigService;
-import com.jsy.community.api.IAdminUserService;
-import com.jsy.community.api.IOrganizationService;
-import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConsts;
+import com.jsy.community.consts.PropertyConstsEnum;
+import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.AdminUserAuthMapper;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
+import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
 import com.jsy.community.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,6 +46,9 @@ import java.util.concurrent.TimeUnit;
 @DubboService(version = Const.version, group = Const.group_property)
 public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUserEntity> implements IAdminUserService {
 	
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICommunityService communityService;
+	
 //	@Value("${email.linkExpiretime}")
 	public long emailLinkExpiretime = 24;
 	
@@ -57,11 +61,15 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Resource
 	private AdminUserMapper adminUserMapper;
 	
-	@Autowired
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IOrganizationService organizationService;
 	
 	@Autowired
 	private IAdminConfigService adminConfigService;
+	
+	@Autowired
+	private AdminUserAuthMapper adminUserAuthMapper;
+	
 	
 	/**
 	* @Description: 设置用户角色
@@ -110,28 +118,19 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		return baseMapper.queryAllMenuId(userId);
 	}
 	
-	@Override
-	public AdminUserEntity queryByUserName(String username) {
-		return baseMapper.queryByUserName(username);
-	}
+//	@Override
+//	public AdminUserEntity queryByUserName(String username) {
+//		return baseMapper.queryByUserName(username);
+//	}
 	
-	@Override
-	public AdminUserEntity queryByEmail(String email) {
-		return baseMapper.queryByEmail(email);
-	}
-	
-	@Override
-	public AdminUserEntity queryByMobile(String mobile) {
-		return baseMapper.queryByMobile(mobile);
-	}
-	
-	@Override
-	public boolean isExistsByMobile(String mobile){
-		return baseMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("mobile",mobile)) == 1;
-	}
+//	@Override
+//	public AdminUserEntity queryByEmail(String email) {
+//		return baseMapper.queryByEmail(email);
+//	}
 	
 	@Override
 	@Transactional
+	@Deprecated
 	public void saveUser(AdminUserEntity user) {
 		user.setCreateTime(LocalDateTime.now());
 		//sha256加密
@@ -149,6 +148,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	}
 	
 	@Override
+	@Deprecated
 //	@Transactional
 	public boolean updateUser(AdminUserEntity user) {
 		if (StrUtil.isBlank(user.getPassword())) {
@@ -165,11 +165,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		return result;
 	}
 	
+	@Deprecated
 	@Override
 	public void deleteBatch(Long[] userId) {
 		this.removeByIds(Arrays.asList(userId));
 	}
 	
+	@Deprecated
 	@Override
 	public boolean updatePassword(Long userId, String password, String newPassword) {
 		AdminUserEntity userEntity = new AdminUserEntity();
@@ -181,6 +183,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	/**
 	 * 检查角色是否越权
 	 */
+	@Deprecated
 	private void checkRole(AdminUserEntity user) {
 		if (user.getRoleIdList() == null || user.getRoleIdList().size() == 0) {
 			return;
@@ -269,6 +272,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2020/12/1
 	**/
+	@Deprecated
 	private boolean checkEmailExists(String email){
 		Integer count = baseMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("email", email));
 		if(count > 0){
@@ -284,6 +288,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2020/12/1
 	**/
+	@Deprecated
 	public boolean checkUsernameExists(String username){
 		Integer count = baseMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("username", username));
 		if(count > 0){
@@ -329,6 +334,83 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	}
 	
 	//==================================== 物业端（新）begin ====================================
+	//================ 用户登录相关begin =================
+	/**
+	 * @Description: 根据手机号查询用户是否存在
+	 * @Param: [mobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	 **/
+	@Override
+	public boolean isExistsByMobile(String mobile){
+		return adminUserAuthMapper.selectCount(new QueryWrapper<AdminUserAuthEntity>().eq("mobile",mobile)) == 1;
+	}
+	
+	/**
+	* @Description: 根据手机号查询登录用户
+	 * @Param: [mobile]
+	 * @Return: com.jsy.community.entity.admin.AdminUserAuthEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	@Override
+	public AdminUserAuthEntity queryLoginUserByMobile(String mobile) {
+		return adminUserAuthMapper.selectOne(new QueryWrapper<AdminUserAuthEntity>().select("*").eq("mobile",mobile));
+	}
+	
+	/**
+	* @Description: 查询用户小区账户资料
+	 * @Param: [mobile, communityId]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	@Override
+	public AdminUserEntity queryUserByMobile(String mobile,Long communityId){
+		return adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("*").eq("mobile",mobile).eq("community_id",communityId));
+	}
+	
+	/**
+	* @Description: 根据uid查询用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Override
+	public AdminUserEntity queryByUid(String uid){
+		return adminUserMapper.queryByUid(uid);
+	}
+	
+	/**
+	* @Description: uid批量查姓名
+	 * @Param: [uidList]
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Override
+	public Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList){
+		if(CollectionUtils.isEmpty(uidList)){
+			return new HashMap<>();
+		}
+		return adminUserMapper.queryNameByUidBatch(uidList);
+	}
+	//================ 用户登录相关end =================
+	
+	//============== 操作员管理相关begin ===============
+	/**
+	* @Description: 查询登录用户(操作员)已加入小区idList
+	 * @Param: [mobile]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	@Override
+	public List<Long> queryCommunityIdList(String mobile){
+		return adminUserMapper.queryCommunityIdListByMobile(mobile);
+	}
 	
 	/**
 	* @Description: 操作员条件查询
@@ -345,9 +427,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,number,real_name,mobile,id_card,status,role_type,org_id,job,create_by,create_time,update_by,update_time");
 		queryWrapper.eq("community_id",query.getCommunityId());
 		//是否查详情
+		Integer menuCount = null;
 		if(query.getId() != null){
 			queryWrapper.eq("id",query.getId());
+			String uid = adminUserMapper.queryUidById(query.getId());
+			menuCount = adminConfigService.countUserMenu(uid);
 		}
+		
 		if(!StringUtils.isEmpty(query.getName())){
 			queryWrapper.and(wrapper -> wrapper.like("number",query.getName())
 				.or().like("real_name",query.getName())
@@ -361,16 +447,30 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		queryWrapper.orderByAsc("role_type","status");
 		queryWrapper.orderByDesc("create_time");
 		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
-		//设置组织机构名称
-		if(pageData.getRecords().size() > 0){
-			LinkedList<Long> list = new LinkedList<>();
-			for(AdminUserEntity entity : pageData.getRecords()){
-				list.add(entity.getOrgId());
-			}
-			Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(list);
-			for(AdminUserEntity entity : pageData.getRecords()){
-				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
-			}
+		if(CollectionUtils.isEmpty(pageData.getRecords())){
+			return new PageInfo<>();
+		}
+		//补创建人和更新人姓名
+		Set<String> createUidSet = new HashSet<>();
+		Set<String> updateUidSet = new HashSet<>();
+		//补组织机构名称
+		Set<Long> orgIdSet = new HashSet<>();
+		for(AdminUserEntity entity : pageData.getRecords()){
+			orgIdSet.add(entity.getOrgId());
+			createUidSet.add(entity.getCreateBy());
+			updateUidSet.add(entity.getUpdateBy());
+		}
+		Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(orgIdSet);
+		Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
+		Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
+		for(AdminUserEntity entity : pageData.getRecords()){
+			entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+			entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
+			entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
+		}
+		//查详情 已授权菜单数统计
+		if(query.getId() != null){
+			pageData.getRecords().get(0).setMenuCount(menuCount);
 		}
 		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);
@@ -387,26 +487,29 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean addOperator(AdminUserEntity adminUserEntity){
-		Long communityId = 2L;
-//		adminUserEntity.setCommunityId(1);
-		adminUserEntity.setCommunityId(communityId);
 		//查询组织机构是否存在
-		if(!organizationService.isExists(adminUserEntity.getOrgId(),communityId)){
+		if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
 			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
 		}
-		String uid = UserUtils.randomUUID();
-		adminUserEntity.setId(SnowFlake.nextId());
-		adminUserEntity.setUid(uid);
-		adminUserEntity.setStatus(adminUserEntity.getStatus() != null ? adminUserEntity.getStatus() : 0);
 		//生成随机密码
 		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
+		//生成UUID 和 ID
+		String uid = UserUtils.randomUUID();
+		adminUserEntity.setId(SnowFlake.nextId());
+		adminUserEntity.setUid(uid);
+		//t_admin_user用户资料表插入数据
+		adminUserEntity.setStatus(adminUserEntity.getStatus() != null ? adminUserEntity.getStatus() : 0);
 		adminUserEntity.setPassword(new Sha256Hash(randomPass, salt).toHex());
 		adminUserEntity.setSalt(salt);
 		int result = adminUserMapper.addOperator(adminUserEntity);
-		//更新菜单权限
+		//t_admin_user_menu更新菜单权限
 		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
+		//t_admin_user_auth用户登录表插入数据
+		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
+		BeanUtils.copyProperties(adminUserEntity,adminUserAuthEntity);
+		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
 		//发短信通知，并发送初始密码
 		boolean b = SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
 //		if(!b){
@@ -424,8 +527,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public boolean updateOperator(AdminUserEntity adminUserEntity){
-		adminUserEntity.setUpdateBy("1a7a182d711e441fbb24659090daf5cb");
-		adminUserEntity.setCommunityId(2L);
 		if(adminUserEntity.getOrgId() != null){
 			//查询组织机构是否存在
 			if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
@@ -452,26 +553,152 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean resetPassword(Long id,String uid){
-		Long communityId = 2L;
+		AdminUserEntity adminUser = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile").eq("id", id));
+		if(adminUser == null){
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"用户不存在");
+		}
 		//生成随机密码
 		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		String password = new Sha256Hash(randomPass, salt).toHex();
 		//更新
-		AdminUserEntity adminUserEntity = new AdminUserEntity();
-		adminUserEntity.setPassword(password);
-		adminUserEntity.setSalt(salt);
-		adminUserEntity.setUpdateBy(uid);
-		int result = adminUserMapper.update(adminUserEntity, new UpdateWrapper<AdminUserEntity>().eq("id", id).eq("community_id",communityId));
+		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
+		adminUserAuthEntity.setPassword(password);
+		adminUserAuthEntity.setSalt(salt);
+		adminUserAuthEntity.setUpdateBy(uid);
+		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", adminUser.getMobile()));
 		//发短信通知初始密码
-		boolean b = SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
+		boolean b = SmsUtil.sendSmsPassword(adminUser.getMobile(), randomPass);
 //		if(!b){
 //			throw new PropertyException(JSYError.INTERNAL.getCode(),"短信通知失败，用户添加失败");
 //		}
 		return result == 1;
 	}
 	
+	/**
+	* @Description: 根据id查询uid
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/9
+	**/
+	@Override
+	public String queryUidById(Long id){
+		return adminUserMapper.queryUidById(id);
+	}
+	
+	/**
+	* @Description: 根据手机号检查小区用户是否已存在(t_admin_user)
+	 * @Param: [mobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Override
+	public boolean checkUserExists(String mobile){
+		return adminUserMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("mobile",mobile)) == 1;
+	}
+	
+	/**
+	* @Description: 根据uid查询手机号
+	 * @Param: [uid]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Override
+	public String queryMobileByUid(String uid){
+		return adminUserMapper.queryMobileByUid(uid);
+	}
+	//============== 操作员管理相关end ===============
+	
+	//============== 个人中心相关start ===============
+	/**
+	* @Description: 更新用户头像
+	 * @Param: [url, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Override
+	public boolean updateAvatar(String url,String uid){
+		return adminUserMapper.updateAvatar(url,uid) == 1;
+	}
+	
+	/**
+	* @Description: 个人信息查询
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Override
+	public AdminUserEntity queryPersonalData(String uid){
+		AdminUserEntity user = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile,real_name,org_id,job,id_card,role_type,avatar_url").eq("uid",uid));
+		user.setRoleTypeName(PropertyConstsEnum.RoleTypeEnum.ROLE_TYPE_MAP.get(user.getRoleType()));
+		//查询组织机构名称
+		user.setOrgName(organizationService.queryOrganizationNameById(user.getOrgId()));
+		//查询是否设置密码(by手机号)
+		Integer count = adminUserAuthMapper.selectCount(new QueryWrapper<AdminUserAuthEntity>().eq("mobile",user.getMobile()).isNotNull("password"));
+		user.setHasPassword(count > 0 ? PropertyConsts.ACCOUNT_PASS_HAD : PropertyConsts.ACCOUNT_PASS_HAD_NOT);
+		user.setOrgId(null);
+		user.setRoleType(null);
+		return user;
+	}
+	
+	/**
+	* @Description: 修改密码
+	 * @Param: [qo, uid]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Override
+	public boolean updatePassword(ResetPasswordQO qo,String uid){
+		//没传账号(手机号)，属于在线修改密码操作，根据uid查出手机号
+		if(StringUtils.isEmpty(qo.getAccount())){
+			String mobile = adminUserMapper.queryMobileByUid(uid);
+			if(StringUtils.isEmpty(mobile)){
+				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"账号不存在");
+			}
+			qo.setAccount(mobile);
+		}
+		//目前只有手机号账户，查询用户登录账户固定用手机号
+		AdminUserAuthEntity userAuthEntity = adminUserAuthMapper.selectOne(new QueryWrapper<AdminUserAuthEntity>().select("mobile").eq("mobile", qo.getAccount()));
+		if(userAuthEntity == null){
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"账号不存在");
+		}
+		//生成盐值并对密码加密
+		String salt = RandomStringUtils.randomAlphanumeric(20);
+		String password = new Sha256Hash(qo.getPassword(), salt).toHex();
+		//更新
+		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
+		adminUserAuthEntity.setPassword(password);
+		adminUserAuthEntity.setSalt(salt);
+		adminUserAuthEntity.setUpdateBy(uid);
+		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", userAuthEntity.getMobile()));
+		return result == 1;
+	}
+	
+	/**
+	* @Description: 修改手机号
+	 * @Param: [newMobile, oldMobile]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	**/
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public boolean changeMobile(String newMobile,String oldMobile){
+		int result1 = adminUserAuthMapper.changeMobile(newMobile, oldMobile);
+		int result2 = adminUserMapper.changeMobile(newMobile, oldMobile);
+		if(result1 == 1 && result2 > 0){
+			return true;
+		}
+		return false;
+	}
+	//============== 个人中心相关end ===============
 	//==================================== 物业端（新）end ====================================
 	
 }

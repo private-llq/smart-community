@@ -11,6 +11,15 @@
 		</foreach>
 	</select>-->
 
+	<!-- 用户菜单权限查询 老sql，暂时弃用-->
+	<select id="queryUserMenu" resultType="com.jsy.community.entity.admin.AdminMenuEntity">
+		select m.* from t_admin_user_role ur
+		join t_admin_role_menu rm on ur.role_id = rm.role_id
+		join t_admin_menu m on m.id = rm.menu_id
+		where ur.user_id = #{uid}
+	</select>
+
+
     <select id="getIdBelongList" parameterType="java.util.List" resultType="Long">
 		select id from t_admin_menu
 		where belong_to in
@@ -19,12 +28,15 @@
 		</foreach>
 	</select>
 
-	<!-- 用户菜单权限查询 -->
-	<select id="queryUserMenu" resultType="com.jsy.community.entity.admin.AdminMenuEntity">
-		select m.* from t_admin_user_role ur
-		join t_admin_role_menu rm on ur.role_id = rm.role_id
-		join t_admin_menu m on m.id = rm.menu_id
-		where ur.user_id = #{uid}
+
+	<!-- 新版物业端原型start -->
+	<!-- idList入参批量查询菜单实体 -->
+	<select id="queryMenuBatch" resultType="com.jsy.community.entity.admin.AdminMenuEntity">
+		select * from t_admin_menu
+		where id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
 	</select>
 
 	<!-- 批量添加用户菜单 -->
@@ -35,5 +47,7 @@
 			(#{uid},#{item})
 		</foreach>
 	</insert>
+
+	<!-- 新版物业端原型end -->
 
 </mapper>

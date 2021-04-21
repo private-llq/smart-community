@@ -47,8 +47,7 @@ public class AliAppPayCallbackController {
             }
         }
         log.error("==========收到回调参数Map==============");
-		log.error(String.valueOf(paramsMap));
-//        JSONObject parseObject = JSONObject.parseObject(JSON.toJSONString(paramsMap));
+        log.error(JSON.toJSONString(paramsMap));
 		log.error("==========收到回调参数Map==============");
 		return aliAppPayCallbackService.dealCallBack(paramsMap);
 	}

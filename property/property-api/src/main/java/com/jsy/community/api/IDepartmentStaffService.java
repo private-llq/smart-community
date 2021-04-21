@@ -61,7 +61,7 @@ public interface IDepartmentStaffService extends IService<DepartmentStaffEntity>
 	 * @Date 2021/3/11 16:23
 	 * @Param [strings]
 	 **/
-	Map<String, Object> addLinkByExcel(List<String[]> strings);
+	Map<String, Object> addLinkByExcel(List<String[]> strings,Long communityId);
 	
 	/**
 	 * @return void

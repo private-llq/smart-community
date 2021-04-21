@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,6 +19,9 @@ import java.time.LocalDateTime;
 @ApiModel("社区趣事")
 @TableName("t_community_fun")
 public class CommunityFunEntity extends BaseEntity {
+
+    @ApiModelProperty(value = "社区趣事浏览次数")
+    private Long communityId;
 
     @ApiModelProperty(value = "社区趣事标题")
     @NotBlank(groups = {CommunityFunValidated.class}, message = "标题不能为空！")
@@ -57,6 +61,9 @@ public class CommunityFunEntity extends BaseEntity {
     private LocalDateTime outTime;
     @ApiModelProperty(value = "标签")
     private String tallys;
+    @ApiModelProperty(value = "标签数组")
+    @TableField(exist = false)
+    private String[] tallyArrays;
     @ApiModelProperty(value = "创建人名称")
     private String createName;
     @ApiModelProperty(value = "修改人名称")

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -18,14 +17,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ComplainVO extends BaseVO {
+    @ApiModelProperty(value = "编号")
+    private String serialNumber;
     @ApiModelProperty(value = "类型，1投诉，2建议")
     private Integer type;
     @ApiModelProperty(value = "内容")
     private String content;
     @ApiModelProperty(value = "图片地址")
     private String images;
-    @ApiModelProperty(value = "投诉ID")
-    private String uid;
     @ApiModelProperty(value = "投诉人名称")
     private String name;
     @ApiModelProperty(value = "投诉人电话")
@@ -33,7 +32,11 @@ public class ComplainVO extends BaseVO {
     @ApiModelProperty(value = "投诉时间")
     private LocalDateTime complainTime;
     @ApiModelProperty(value = "反馈内容")
-    private String feedback;
+    private String feedbackContent;
+    @ApiModelProperty(value = "回复人名称")
+    private String feedbackName;
     @ApiModelProperty(value = "反馈内容")
+    private LocalDateTime feedbackTime;
+    @ApiModelProperty(value = "1，已回复，0未回复")
     private Integer status;
 }

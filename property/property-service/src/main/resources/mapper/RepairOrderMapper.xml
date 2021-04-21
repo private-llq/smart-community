@@ -29,11 +29,11 @@
             <if test="qo.query.startTime!=null and qo.query.endTime!=null">
                 and order_time between #{qo.query.startTime} and #{qo.query.endTime}
             </if>
-            <if test="qo.query.startTime!=null and qo.query.endTime=null">
+            <if test="qo.query.startTime!=null and qo.query.endTime==null">
                 and order_time > #{qo.query.startTime}
             </if>
-            <if test="qo.query.startTime=null and qo.query.endTime!=null">
-                and order_time &lt;  #{qo.query.startTime}
+            <if test="qo.query.startTime==null and qo.query.endTime!=null">
+                and order_time &lt;  #{qo.query.endTime}
             </if>
             and community_id = #{qo.query.communityId} and deleted = 0
         </where>

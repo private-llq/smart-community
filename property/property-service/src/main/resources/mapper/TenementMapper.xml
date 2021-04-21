@@ -3,12 +3,12 @@
 <mapper namespace="com.jsy.community.mapper.TenementMapper">
     <sql id="Query">
         <where>
-            thm.community_id=#{query.communityId} and thm.person_type=2 and thm.deleted=0 and tu.deleted=0 and th.deleted=0
+            thm.community_id=#{query.communityId} and thm.deleted=0 and tu.deleted=0 and th.deleted=0
             <if test="query.name!=null and query.name!=''">
                 and thm.name like concat('%',#{query.name},'%')
             </if>
             <if test="query.ownerName!=null and query.ownerName!=''">
-                and th.name like concat('%',#{query.ownerName},'%')
+                and tu.real_name like concat('%',#{query.ownerName},'%')
             </if>
             <if test="query.houseId!=null and query.houseId>0">
                 and th.id=#{query.houseId}
@@ -27,8 +27,8 @@
         thm.name as tenementName,thm.mobile as mobile,thm.id_card as idCard,
         tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile,
         thm.lease_over_time as leaseOverTime,thm.lease_start_time as leaseStartTime,
-        th.unit as unit,th.floor as floor,th.house_type as houseType
-        FROM t_house_member thm
+        th.unit as unit,th.floor as floor,th.house_type as houseType,thm.create_time as createTime
+        FROM t_house_tenement thm
         join t_user tu on tu.uid=thm.householder_id
         join t_house th on thm.house_id=th.id
         <include refid="Query"></include>
@@ -40,7 +40,6 @@
         join t_user tu on tu.uid=thm.householder_id
         join t_house th on thm.house_id=th.id
         <include refid="Query"></include>
-        limit #{page},#{size}
     </select>
     <select id="getHouseId" resultMap="HouseTypeMap">
         select distinct t.id as id,t.number as name from t_house t where t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
@@ -66,6 +65,7 @@
         <result property="ownerName" column="ownerName"/>
         <result property="ownerIdCard" column="ownerIdCard"/>
         <result property="ownerMobile" column="ownerMobile"/>
+        <result property="createTime" column="createTime"/>
     </resultMap>
     <resultMap id="HouseTypeMap" type="com.jsy.community.vo.HouseTypeVo">
         <result column="id" property="id"/>

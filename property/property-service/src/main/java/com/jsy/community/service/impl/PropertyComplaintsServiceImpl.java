@@ -38,15 +38,15 @@ public class PropertyComplaintsServiceImpl extends ServiceImpl<PropertyComplaint
     @Override
     public void complainFeedback(ComplainFeedbackQO complainFeedbackQO) {
         PropertyComplaintsEntity entity = propertyComplaintsMapper.selectById(complainFeedbackQO.getId());
-        entity.setReplyContent(complainFeedbackQO.getBody());
+        entity.setFeedbackContent(complainFeedbackQO.getBody());
         entity.setStatus(1);
-        entity.setReplyUid(complainFeedbackQO.getUid());
+        entity.setFeedbackBy(complainFeedbackQO.getUid());
         AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid",complainFeedbackQO.getUid()));
         if (userEntity!=null){
-            entity.setReplyName(userEntity.getRealName());
+            entity.setFeedbackName(userEntity.getRealName());
             entity.setCommunityId(userEntity.getCommunityId());
         }
-        entity.setReplyTime(LocalDateTime.now());
+        entity.setFeedbackTime(LocalDateTime.now());
         propertyComplaintsMapper.updateById(entity);
     }
 

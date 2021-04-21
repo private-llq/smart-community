@@ -7,6 +7,8 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.OrganizationEntity;
+import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.OrganizationMapper;
 import com.jsy.community.utils.SnowFlake;
@@ -34,6 +36,9 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	private OrganizationMapper organizationMapper;
 	
 	@Resource
+	private AdminUserMapper adminUserMapper;
+	
+	@Resource
 	private CommunityMapper communityMapper;
 	
 	@Override
@@ -47,6 +52,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		for (OrganizationEntity organizationEntity : allOrganization) {
 			OrganizationVO organizationVO = new OrganizationVO();
 			BeanUtils.copyProperties(organizationEntity, organizationVO);
+			organizationVO.setLabel(organizationEntity.getName());
 			allOrganizationVO.add(organizationVO);
 		}
 		
@@ -106,13 +112,16 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		wrapper.eq("pid", id).eq("community_id", communityId);
 		List<OrganizationEntity> list = organizationMapper.selectList(wrapper);
 		if (!CollectionUtils.isEmpty(list)) {
-			System.out.println("\"" + entity.getName() + "\"" + "已有下级节点,不可删除");
 			throw new PropertyException("\"" + entity.getName() + "\"" + "已有下级节点,不可删除");
 		}
 		
-		// TODO: 2021/3/16 判断是否有属于该机构的操作员
-		
-		
+		// 判断是否有属于该机构的操作员
+		QueryWrapper<AdminUserEntity> userQuery = new QueryWrapper<>();
+		userQuery.eq("org_id",id);
+		List<AdminUserEntity> adminUserEntities = adminUserMapper.selectList(userQuery);
+		if (!CollectionUtils.isEmpty(adminUserEntities)) {
+			throw new PropertyException("\"" + entity.getName() + "\"" + "已有属于该机构的操作员，不可删除");
+		}
 		organizationMapper.deleteById(id);
 	}
 	
@@ -145,6 +154,18 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	}
 	
 	/**
+	* @Description: 根据id查询组织机构名称
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@Override
+	public String queryOrganizationNameById(Long id){
+		return organizationMapper.queryOrganizationNameById(id);
+	}
+	
+	/**
 	 * @Description: 根据idList批量获取对应组织机构名称
 	 * @Param: [ids]
 	 * @Return: java.util.Map<java.lang.Long, java.util.Map < java.lang.Long, java.lang.Object>>
@@ -152,7 +173,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	 * @Date: 2021/3/16
 	 **/
 	@Override
-	public Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(List<Long> ids) {
+	public Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(Collection<Long> ids) {
 		return organizationMapper.queryOrganizationNameByIdBatch(ids);
 	}
 	
@@ -180,27 +201,29 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 		
 		if (!CollectionUtils.isEmpty(childList)) {
 			for (OrganizationEntity child : childList) {
-				if (child.getId().equals(organization.getPid()) || organization.getPid().equals(organization.getId())) {
-					throw new PropertyException("不可选择自己或自己的子集成为自己的父级");
+				if (child.getId().equals(organization.getPid())) {
+					throw new PropertyException("不可选择自己的子集成为自己的父级");
 				}
 			}
 		}
+		if (organization.getId().equals(organization.getPid())) {
+			throw new PropertyException("不可选择自己成为自己的父级");
+		}
 		
-		// 2. 判断是否有同名
+		// 2. 判断是否有同名组织
 		QueryWrapper<OrganizationEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("community_id", organization.getCommunityId());
 		List<OrganizationEntity> ones = organizationMapper.selectList(queryWrapper);
-		if (ones == null) {
-			throw new PropertyException("该小区没有此组织");
-		}
-		
-		for (OrganizationEntity one : ones) {
-			// 跳过当前正在修改的这条数据
-			if (one.getId().equals(organization.getId())) {
-				continue;
-			}
-			if (organization.getName().equals(one.getName())) {
-				throw new PropertyException("您小区已存在同名组织，请重新修改");
+		if (!CollectionUtils.isEmpty(ones)) {
+			for (OrganizationEntity one : ones) {
+				// 跳过当前正在修改的这条数据
+				if (one.getId().equals(organization.getId())) {
+					continue;
+				}
+				// 判断小区是否有 和当前正在修改的组织 同名的
+				if (organization.getName().equals(one.getName())) {
+					throw new PropertyException("您小区已存在同名组织，请重新修改");
+				}
 			}
 		}
 		

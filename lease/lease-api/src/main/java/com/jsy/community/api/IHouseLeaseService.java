@@ -6,6 +6,7 @@ import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
 import com.jsy.community.utils.es.Operation;
+import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import com.jsy.community.vo.HouseVo;
 
@@ -143,6 +144,13 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
      */
     HouseLeaseVO editDetails(Long houseId, String uid);
 
-
+    /**
+     *@Author: Pipi
+     *@Description: 查询房屋出租数据单条简略详情
+     *@param: houseId: 出租房屋主键
+     *@Return: com.jsy.community.vo.lease.HouseLeaseSimpleVO
+     *@Date: 2021/3/27 16:25
+     **/
+    HouseLeaseSimpleVO queryHouseLeaseSimpleDetail(Long houseId);
 
 }

@@ -52,7 +52,11 @@ public class AppMenuEntity extends BaseEntity {
     @ApiModelProperty(value = "排序序号")
     @NotNull(groups = {addAdmin.class},message = "序号不能为空 ")
     @TableField(exist = false)
-    private Integer sort;
+    private Long sort;
+    
+    @ApiModelProperty(value = "是否被选中[标志] 0 未选中 1 已选中")
+    @TableField(exist = false)
+    private Integer checked;
     
     public interface addAdmin{}
     

@@ -1,9 +1,9 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.HouseMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.Map;
  * @since 2020-12-16 14:10
  **/
 @DubboService(version = Const.version, group = Const.group_proprietor)
-public class HouseServiceImpl implements IHouseService {
+public class HouseServiceImpl extends ServiceImpl<HouseMapper,HouseEntity> implements IHouseService {
 	
 	@Autowired
 	private HouseMapper houseMapper;

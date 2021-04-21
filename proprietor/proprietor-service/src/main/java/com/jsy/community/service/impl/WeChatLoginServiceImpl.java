@@ -78,6 +78,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         if(entity != null&&entity.getUid()!=null){
             //返回token
             UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+            userInfoVo.setIdCard(null);
             return createAuthVoWithToken(userInfoVo);
         }
         if (entity!=null){

@@ -2,28 +2,37 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.admin.AdminCaptchaEntity;
 import com.jsy.community.entity.admin.AdminMenuEntity;
+import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
+import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.MyCaptchaUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +46,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 登录相关
@@ -56,6 +65,8 @@ public class AdminLoginController {
 	private IAdminConfigService adminConfigService;
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICaptchaService captchaService;
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICommunityService communityService;
 	
 	@Autowired
 	private MyCaptchaUtil captchaUtil;
@@ -65,6 +76,9 @@ public class AdminLoginController {
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
+	
+	//	@Value("${loginExpireHour}")
+	private long loginExpireHour = 12;
 	
 	/**
 	 * 防频繁调用验证码
@@ -97,7 +111,7 @@ public class AdminLoginController {
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "account", value = "账号，手机号或者邮箱地址", required = true, paramType = "query"),
 		@ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
-			allowableValues = "1,2,3,4,5", paramType = "query")
+			allowableValues = "1,2,3,4,5,6", paramType = "query")
 	})
 	public CommonResult<Boolean> sendCode(@RequestParam String account,
 	                                      @RequestParam Integer type) {
@@ -112,10 +126,15 @@ public class AdminLoginController {
 	}
 	
 	/**
-	 * 登录
-	 */
+	* @Description: 登录获取小区列表
+	 * @Param: [form]
+	 * @Return: com.jsy.community.vo.CommonResult<?>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
 	@PostMapping("/sys/login")
 	public CommonResult<?> login(@RequestBody AdminLoginQO form) {
+		//图形验证码
 //		boolean captcha = adminCaptchaService.validate(form.getUsername(), form.getCaptcha());
 //		if (!captcha) {
 //			return CommonResult.error("验证码无效");
@@ -126,14 +145,11 @@ public class AdminLoginController {
 		}
 		log.info(form.getAccount() + "开始登录");
 		//用户信息
-		AdminUserEntity user;
-		if(RegexUtils.isMobile(form.getAccount())){
-			user = adminUserService.queryByMobile(form.getAccount());
-		}else if(RegexUtils.isEmail(form.getAccount())){
-			user = adminUserService.queryByEmail(form.getAccount());
-		}else{
-			user = adminUserService.queryByUserName(form.getAccount());
+		AdminUserAuthEntity user;
+		if(!RegexUtils.isMobile(form.getAccount())){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"非法手机号");
 		}
+		user = adminUserService.queryLoginUserByMobile(form.getAccount());
 		
 		//账号不存在、密码错误
 		if (user == null) {
@@ -144,20 +160,70 @@ public class AdminLoginController {
 			return CommonResult.error("账号或密码不正确");
 		}
 		
-		//账号锁定
-		if (user.getStatus() == 1) {
-			return CommonResult.error("账号已被锁定,请联系管理员");
-		}
-		
-		//生成token，并保存到redis
-		String token = adminUserTokenService.createToken(user);
-		user.setToken(token);
-		//查询用户菜单
-		List<AdminMenuEntity> menuList = adminConfigService.queryUserMenu(user.getId());
-		user.setMenuList(menuList);
-		return CommonResult.ok(user);
+		//查询已加入小区id列表
+		List<Long> idList = adminUserService.queryCommunityIdList(form.getAccount());
+		//查询已加入小区列表详情
+		List<CommunityEntity> communityList = communityService.queryCommunityBatch(idList);
+		//生成验证key，保存redis，验证完毕后即销毁
+		String communityKey = UUID.randomUUID().toString().replace("-", "");
+		redisTemplate.opsForValue().set("Admin:CommunityKey:" + communityKey, form.getAccount(),12,TimeUnit.HOURS);
+		//返回小区列表和下一个接口验证用的一次性key
+		Map<String, Object> returnMap = new HashMap<>();
+		returnMap.put("communityList",communityList);
+		returnMap.put("communityKey",communityKey);
+		//清空该账号已之前的token(踢下线)
+		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
+		redisTemplate.delete("Admin:Login:" + oldToken);
+		//存入手机已登录状态
+		redisTemplate.opsForValue().set("Admin:LoginAccount:" + form.getAccount(), "0", loginExpireHour, TimeUnit.HOURS); //0是初始值 选择小区后该值为登录token
+		return CommonResult.ok(returnMap);
 	}
 	
+	/**
+	* @Description: 登入小区
+	 * @Param: [account, communityId, communityKey]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	@PostMapping("sys/enter")
+	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
+		String communityKey = jsonObject.getString("communityKey");
+		String account = jsonObject.getString("account");
+		Long communityId = jsonObject.getLong("communityId");
+		//验证
+		String catchedAccount = redisTemplate.opsForValue().get("Admin:CommunityKey:" + communityKey);
+		if(StringUtils.isEmpty(catchedAccount)){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"登录过期，请重新登录");
+		}
+		if(!account.equals(catchedAccount)){
+			log.error("账户试图非法访问：" + account);
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"非法访问，已拦截");
+		}
+		List<Long> idList = adminUserService.queryCommunityIdList(account);
+		if(!idList.contains(communityId)){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"没有该社区权限");
+		}
+		//查询该社区下用户资料、用户菜单，并返回token
+		//用户资料
+		AdminUserEntity user = adminUserService.queryUserByMobile(account, communityId);
+		if(user.getStatus() == 1){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
+		}
+		//用户菜单
+		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(user.getUid());
+		user.setMenuList(userMenu);
+		//创建token，保存redis
+		String token = adminUserTokenService.createToken(user);
+		user.setToken(token);
+		AdminInfoVo adminInfoVo = new AdminInfoVo();
+		BeanUtils.copyProperties(user,adminInfoVo);
+		adminInfoVo.setUid(null);
+		adminInfoVo.setStatus(null);
+		return CommonResult.ok(adminInfoVo);
+	}
+	
+	//检查手机验证码
 	private void checkVerifyCode(String mobile, String code) {
 		Object oldCode = redisTemplate.opsForValue().get("vCodeAdmin:" + mobile);
 		if (oldCode == null) {
@@ -170,6 +236,24 @@ public class AdminLoginController {
 		
 		// 验证通过后删除验证码
 //        redisTemplate.delete(account);
+	}
+	
+	/**
+	* @Description: 敏感操作短信验证(验证码和其他操作不同步,该接口返回的authToken即为中间桥梁)
+	 * @Param: [account, code]
+	 * @Return: com.jsy.community.vo.CommonResult<java.util.Map<java.lang.String,java.lang.Object>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	@ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
+	@GetMapping("/check/code")
+	public CommonResult<Map<String,Object>> checkCode(@RequestParam String account, @RequestParam String code) {
+		checkVerifyCode(account, code);
+		String token = userUtils.setRedisTokenWithTime("Admin:Auth", account,1, TimeUnit.HOURS);
+		Map<String, Object> map = new HashMap<>();
+		map.put("authToken",token);
+		map.put("msg","验证通过，请在1小时内完成操作");
+		return CommonResult.ok(map);
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.alipay.api.AlipayApiException;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.qo.lease.AliAppPayQO;
 
@@ -11,8 +12,7 @@ import com.jsy.community.qo.lease.AliAppPayQO;
 public interface AliAppPayService {
 	
 	String getOrderStr(AliAppPayQO aliAppPayQO); //app下单
-	String getOrderStrForH5(AliAppPayQO aliAppPayQO); //H5下单
+//	String getOrderStrForH5(AliAppPayQO aliAppPayQO); //H5下单
 	
-	void dealOrder(AiliAppPayRecordEntity order);
-	
+	void transferByCert();//转账
 }

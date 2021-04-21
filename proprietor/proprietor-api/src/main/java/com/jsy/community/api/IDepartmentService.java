@@ -23,4 +23,13 @@ public interface IDepartmentService extends IService<DepartmentEntity> {
 	 * @Param [id]
 	 **/
 	List<DepartmentEntity> listDepartment(Long id);
+	
+	/**
+	 * @return java.util.List<java.util.Map>
+	 * @Author lihao
+	 * @Description 查询所有部门信息(APP首页通讯录)
+	 * @Date 2021/3/27 16:25
+	 * @Param [id]
+	 **/
+	List<DepartmentEntity> listDepartmentTel(Long id);
 }

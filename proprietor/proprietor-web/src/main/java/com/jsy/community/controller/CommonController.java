@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
+import com.jsy.community.api.IUserSearchService;
 import com.jsy.community.config.web.ElasticsearchConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
@@ -12,6 +13,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.CommunityType;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -23,8 +25,11 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,10 +51,27 @@ public class CommonController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserSearchService userSearchService;
 
     @Resource
     private RestHighLevelClient elasticsearchClient;
 
+    @GetMapping("community2")
+    public CommonResult test(@RequestParam Long id,@RequestParam Integer queryType){
+        Integer page = 0;
+        Integer size = 10;
+        switch (queryType){
+	        case 1:
+	        	return CommonResult.ok(commonService.getAllCommunityFormCityId(id,page,size));
+            case 2:
+                return CommonResult.ok(commonService.getBuildingOrUnitByCommunityId(id,page,size));
+            case 3:
+                return CommonResult.ok(commonService.getUnitOrFloorById2(id,page,size));
+        }
+        return CommonResult.error(JSYError.NOT_IMPLEMENTED);
+    }
+    
     /**
      * @author YuLF
      * @since  2021/11/9 17:58
@@ -60,10 +82,10 @@ public class CommonController {
     @Login
     public CommonResult<?> queryZone(@RequestParam Long id,
                                      @RequestParam Integer queryType,
-                                     @RequestParam(required = false, defaultValue = "1")Integer page,
+                                     @RequestParam(required = false, defaultValue = "0")Integer page,
                                      @RequestParam(required = false, defaultValue = "10")Integer size) {
         //验证分页参数
-        page = ValidatorUtils.isInteger(page) ? page : 1;
+        page = ValidatorUtils.isInteger(page) ? page : 0;
         size = ValidatorUtils.isInteger(size) ? size : 10;
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);
@@ -96,15 +118,8 @@ public class CommonController {
     public CommonResult<List<Map<String, Object>>> getHouseByFloor(@RequestParam Long id, @RequestParam String floor){
         return CommonResult.ok(commonService.getHouseByFloor( id, floor ));
     }
-
-
-
-
-
-
     /**
      * app 全文搜索
-     * @param size  搜索离text最相近条数
      * @param text  搜索文本
      * @author YuLF
      * @since  2021/3/9 16:58
@@ -112,36 +127,73 @@ public class CommonController {
     @Login
     @ApiOperation("App全文搜索")
     @GetMapping("/search")
-    public CommonResult<List<JSONObject>> search(@RequestParam( required = false, defaultValue = "10") Integer size, @RequestParam String text)  {
+    public CommonResult search(@RequestParam String text)  {
         if( Objects.nonNull(text) && text.length() > BusinessConst.HOT_KEY_MAX_NUM  ){
             throw new JSYException(" 搜索文本太长了! ");
         }
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.indices(BusinessConst.FULL_TEXT_SEARCH_INDEX);
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //排除某些字段
-        String[] excludes = {"esId","searchTitle"};
-        String[] includes = {"*"};
-        searchSourceBuilder.fetchSource(includes, excludes);
-        //查询条件
-        searchSourceBuilder.query(QueryBuilders.matchQuery("searchTitle", text));
-        searchSourceBuilder.size(size);
-        searchRequest.source(searchSourceBuilder);
-        SearchResponse searchResponse;
+        String userId = UserUtils.getUserId();
+        SearchRequest searchRequest = new SearchRequest(BusinessConst.FULL_TEXT_SEARCH_INDEX);
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        if (!"".equals(text)&&text!=null){
+            boolQuery.must(new MatchQueryBuilder("searchTitle",text));
+            sourceBuilder.query(boolQuery);
+            //搜索词添加至Redis热词排行里面
+            commonService.addFullTextSearchHotKey( text );
+            userSearchService.addSearchHotKey(userId,text);
+        }else {
+            sourceBuilder.size(1000);
+        }
+        searchRequest.source(sourceBuilder);
+        SearchResponse searchResponse = null;
         try {
             searchResponse = elasticsearchClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
         } catch (IOException e) {
-            throw new JSYException(" 没有找到任何数据! ");
+            e.printStackTrace();
+            log.info("查询失败："+e.getMessage());
         }
-        SearchHit[] hits = searchResponse.getHits().getHits();
-        List<JSONObject> list = new ArrayList<>(hits.length);
-        for( SearchHit hit : hits){
-            String sourceAsString = hit.getSourceAsString();
-            list.add(JSON.parseObject(sourceAsString, JSONObject.class));
+        SearchHits hits = searchResponse.getHits();
+        Map<String, Object> map = new HashMap<>();
+        List<Object> fun = new LinkedList<>();
+        List<Object> leaseHouse = new LinkedList<>();
+        List<Object> leaseShop = new LinkedList<>();
+        List<Object> inform = new LinkedList<>();
+        map.put("total",hits.getTotalHits().value);
+        if (!"".equals(text)&&text!=null){
+            for (SearchHit searchHit : hits.getHits()) {
+                String sourceAsString = searchHit.getSourceAsString();
+                JSONObject jsonObject = JSON.parseObject(sourceAsString);
+                fun.add(jsonObject);
+            }
+            map.put("list",fun);
+        }else {
+            for (SearchHit searchHit : hits.getHits()) {
+                String sourceAsString = searchHit.getSourceAsString();
+                JSONObject jsonObject = JSON.parseObject(sourceAsString);
+                if (jsonObject.get("flag").equals("FUN")){
+                    fun.add(jsonObject);
+                    continue;
+                }
+                if (jsonObject.get("flag").equals("LEASE_HOUSE")){
+                    leaseHouse.add(jsonObject);
+                    continue;
+                }
+                if (jsonObject.get("flag").equals("LEASE_SHOP")){
+                    leaseShop.add(jsonObject);
+                    continue;
+                }
+                if (jsonObject.get("flag").equals("INFORM")){
+                    inform.add(jsonObject);
+                    continue;
+                }
+            }
+            map.put("FUN",fun);
+            map.put("LEASE_HOUSE",leaseHouse);
+            map.put("LEASE_SHOP",leaseShop);
+            map.put("INFORM",inform);
         }
-        //搜索词添加至Redis热词排行里面
-        commonService.addFullTextSearchHotKey( text );
-        return CommonResult.ok(list);
+        return CommonResult.ok(map);
     }
 
     /**
@@ -158,10 +210,39 @@ public class CommonController {
         return commonService.getFullTextSearchHotKey(num);
     }
 
-
-
-
-
+    /**
+     * @Description: 查询个人搜索词汇
+     * @author: Hu
+     * @since: 2021/4/16 17:01
+     * @Param:
+     * @return:
+     */
+    @Login
+    @ApiOperation("App全文搜索个人词汇")
+    @GetMapping("/getUserKey")
+    public CommonResult getUserKey(@RequestParam("num")Integer num ){
+        if (num==0||num==null){
+            num=10;
+        }
+        String userId = UserUtils.getUserId();
+        String[] key = userSearchService.searchUserKey(userId, num);
+        return CommonResult.ok(key);
+    }
+    /**
+     * @Description: 删除个人搜索词汇
+     * @author: Hu
+     * @since: 2021/4/16 17:01
+     * @Param:
+     * @return:
+     */
+    @Login
+    @ApiOperation("App删除全文搜索个人词汇")
+    @DeleteMapping("/deleteUserKey")
+    public CommonResult deleteUserKey(){
+        String userId = UserUtils.getUserId();
+        userSearchService.deleteUserKey(userId);
+        return CommonResult.ok();
+    }
 
 
 	@ApiOperation("查询下级省市区、查询城市等")

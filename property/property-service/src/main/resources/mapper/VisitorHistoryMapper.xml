@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.VisitorHistoryMapper">
+
+    <!-- 物业端 查询访客记录 分页查询 -->
+    <select id="queryPage" resultType="com.jsy.community.entity.VisitorHistoryEntity">
+        select v.name,v.contact,v.car_plate,v.reason,v.start_time,v.address,v.is_community_access,v.is_building_access,v.status,v.create_time
+               ,vs.id,vs.visitor_id,vs.in_time,vs.out_time
+        from t_visitor v
+        left join t_visitor_history vs on v.id = vs.visitor_id
+        <where>
+            v.community_id = #{query.communityId}
+            <if test="query.name != null and query.name != ''">
+                and
+                (
+                     v.name like concat ("%",#{query.name},"%")
+                     or v.contact like concat ("%",#{query.name},"%")
+                     or v.car_plate like concat ("%",#{query.name},"%")
+                )
+            </if>
+            <if test="query.status != null and query.status &gt; 0 and query.status &lt; 5">and v.status = #{query.status}</if>
+            <if test="query.timeType != null and query.timeType &gt; 0 and query.timeType &lt; 4">
+                <if test="query.timeType == 1">
+                    <if test="query.startTime != null">and v.start_time <![CDATA[>=]]> #{query.startTime}</if>
+                    <if test="query.endTime != null">and v.start_time <![CDATA[<=]]> #{query.endTime}</if>
+                </if>
+                <if test="query.timeType == 2">
+                    <if test="query.startTime != null">and vs.in_time <![CDATA[>=]]> #{query.startTime}</if>
+                    <if test="query.endTime != null">and vs.in_time <![CDATA[<=]]> #{query.endTime}</if>
+                </if>
+                <if test="query.timeType == 3">
+                    <if test="query.startTime != null">and vs.in_time <![CDATA[>=]]> #{query.startTime}</if>
+                    <if test="query.endTime != null">and vs.out_time <![CDATA[<=]]> #{query.endTime}</if>
+                </if>
+            </if>
+        </where>
+        order by vs.start_time
+    </select>
+
+</mapper>

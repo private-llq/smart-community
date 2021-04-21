@@ -113,10 +113,14 @@
                 and house_area_id = #{query.houseAreaId}
             </if>
             <!-- 如果增加了租金筛选条件 大于最小租金 小于最大租金 -->
-            <if test="query.housePriceMin != null and query.housePriceMin != &quot;&quot; and query.housePriceMin &gt; 0
-                and query.housePriceMax != null and query.housePriceMax != &quot;&quot; and query.housePriceMax &gt; 0">
-                and house_price &gt; #{query.housePriceMin} and house_price &lt; #{query.housePriceMax}
+            <if test="query.housePriceMin != null and query.housePriceMin >= 0">
+                and house_price &gt; #{query.housePriceMin}
             </if>
+            <if test="query.housePriceMax != null and query.housePriceMax > 0">
+                and house_price &lt; #{query.housePriceMax}
+            </if>
+
+
             <!-- 如果增加了房屋面积筛选条件 大于最小房屋面积 小于最大房屋面积 -->
             <if test="query.houseSquareMeterMin != null and query.houseSquareMeterMin != &quot;&quot; and query.houseSquareMeterMin &gt; 0
                 and query.houseSquareMeterMax != null and query.houseSquareMeterMax != &quot;&quot; and query.houseSquareMeterMax &gt; 0">
@@ -484,5 +488,28 @@
         <foreach collection="voImageIds" item="id" index="index" open="(" close=")" separator=",">
             #{id}
         </foreach>
+    </select>
+
+    <!-- 查询房屋出租数据单条简略详情-->
+    <select id="queryHouseLeaseSimpleDetail" resultType="com.jsy.community.vo.lease.HouseLeaseSimpleVO">
+        SELECT
+            l.id,
+	        l.house_title,
+	        l.house_community_id,
+	        l.house_id,
+	        l.house_address,
+	        l.house_price,
+	        l.house_square_meter,
+	        l.house_unit,
+	        l.house_type_code,
+	        l.house_image_id,
+	        l.house_leasemode_id,
+	        c.house_const_name AS houseLeaseMode
+        FROM
+	        t_house_lease AS l
+	        LEFT JOIN t_house_const AS c ON l.house_leasemode_id = c.house_const_code
+	        AND c.house_const_type = 11
+            WHERE
+	        l.id = #{houseId} and l.deleted = 0
     </select>
 </mapper>

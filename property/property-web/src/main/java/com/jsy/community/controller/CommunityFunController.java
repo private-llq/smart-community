@@ -6,7 +6,7 @@ import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.CommunityFunOperationQO;
+import com.jsy.community.qo.property.CommunityFunOperationQO;
 import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
@@ -79,7 +79,6 @@ public class CommunityFunController {
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
     @Login
-    @CrossOrigin
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -111,7 +110,7 @@ public class CommunityFunController {
     @ApiOperation("新增内容图片")
     @PostMapping("/contentImge")
     @Login
-    public CommonResult content(@RequestParam("file") MultipartFile file) throws IOException {
+    public CommonResult content(@RequestParam("file") MultipartFile file){
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
             String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);

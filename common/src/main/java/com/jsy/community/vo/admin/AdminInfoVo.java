@@ -1,6 +1,5 @@
 package com.jsy.community.vo.admin;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
@@ -22,6 +21,11 @@ public class AdminInfoVo implements Serializable {
 	private Long communityId;
 	
 	/**
+	 * 角色类型(第一版直接放进用户表)  1：超级管理员   2：普通用户
+	 */
+	private Integer roleType;
+	
+	/**
 	 * uid
 	 */
 	private String uid;
@@ -32,6 +36,11 @@ public class AdminInfoVo implements Serializable {
 	private String realName;
 	
 	/**
+	 * 头像地址
+	 */
+	private String avatarUrl;
+	
+	/**
 	 * 状态  0：禁用   1：正常
 	 */
 	private Integer status;
@@ -39,18 +48,26 @@ public class AdminInfoVo implements Serializable {
 	/**
 	 * 角色ID列表
 	 */
-	@TableField(exist = false)
 	private List<Integer> roleIdList;
 	
 	/**
 	 * 用户菜单列表
 	 */
-	@TableField(exist = false)
 	private List<AdminMenuEntity> menuList;
+	
+	/**
+	 * 手机号
+	 */
+	private String mobile;
 	
 	/**
 	 * token
 	 */
 	private String token;
+	
+	/**
+	 * 编号
+	 */
+	private String number;
 
 }

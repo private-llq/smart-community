@@ -23,16 +23,21 @@ import java.util.Map;
 public class RabbitMqConfig {
 
 
-    public static final String QUEUE_EMAIL = "queue_email";
-    public static final String QUEUE_SMS = "queue_sms";
-    public static final String QUEUE_TEST = "queue_test";
     public static final String QUEUE_WECHAT = "queue_wechat";
     public static final String QUEUE_WECHAT_DELAY = "queue_wechat_delay";
 
-    public static final String EXCHANGE_TOPICS = "exchange_topics";
-    public static final String EXCHANGE_DELAY = "exchange_delay";
     public static final String EXCHANGE_TOPICS_WECHAT = "exchange_topics_wechat";
     public static final String EXCHANGE_DELAY_WECHAT = "exchange_delay_wechat";
+
+
+
+    public static final String EXCHANGE_CAR_TOPICS = "exchange_car_topics";
+    public static final String QUEUE_CAR_INSERT = "queue_car_insert";
+    public static final String QUEUE_CAR_UPDATE = "queue_car_update";
+    public static final String QUEUE_CAR_DELETE = "queue_car_delete";
+
+
+    //-------------------------------------------------------------------------------------
 
     //@author YuLF start
     /**
@@ -81,18 +86,8 @@ public class RabbitMqConfig {
     //@author YuLF end
 
 
+    //-------------------------------------------------微信消息队列----------------------------------------------------------
 
-    /**
-     * 交换机配置
-     * ExchangeBuilder提供了fanout、direct、topic、header交换机类型的配置
-     *
-     * @return the exchange
-     */
-    @Bean(EXCHANGE_TOPICS)
-    public Exchange exchangeTopicInform() {
-        //durable(true)持久化，消息队列重启后交换机仍然存在
-        return ExchangeBuilder.topicExchange(EXCHANGE_TOPICS).durable(true).build();
-    }
     /**
      * @Description: 微信普通队列
      * @author: Hu
@@ -104,20 +99,6 @@ public class RabbitMqConfig {
     public Exchange exchangeTopicInformWechat() {
         //durable(true)持久化，消息队列重启后交换机仍然存在
         return ExchangeBuilder.topicExchange(EXCHANGE_TOPICS_WECHAT).durable(true).build();
-    }
-
-    /**
-     * @Description: 延时队列
-     * @author: Hu
-     * @since: 2020/12/29 14:30
-     * @Param:
-     * @return:
-     */
-    @Bean(EXCHANGE_DELAY)
-    public CustomExchange delayExchange() {
-        Map<String, Object> args = new HashMap<>(1);
-        args.put("x-delayed-type", "direct");
-        return new CustomExchange(EXCHANGE_DELAY, "x-delayed-message", true, false, args);
     }
 
     /**
@@ -134,16 +115,6 @@ public class RabbitMqConfig {
         return new CustomExchange(EXCHANGE_DELAY_WECHAT, "x-delayed-message", true, false, args);
     }
 
-
-
-
-    /**
-     * 声明队列
-     */
-    @Bean(QUEUE_TEST)
-    public Queue queueInformTest() {
-        return new Queue(QUEUE_TEST);
-    }
 
     /**
      * 声明队列weChat普通队列
@@ -163,22 +134,6 @@ public class RabbitMqConfig {
 
 
     /**
-     * 声明队列
-     */
-    @Bean(QUEUE_SMS)
-    public Queue queueInformSms() {
-        return new Queue(QUEUE_SMS);
-    }
-
-    /**
-     * 声明队列
-     */
-    @Bean(QUEUE_EMAIL)
-    public Queue queueInformEmail() {
-        return new Queue(QUEUE_EMAIL);
-    }
-
-    /**
      * channel.queueBind(INFORM_QUEUE_SMS,"inform_exchange_topic","inform.#.sms.#");
      * 绑定队列到交换机 .
      *
@@ -191,43 +146,11 @@ public class RabbitMqConfig {
      * @return the binding
      */
     @Bean
-    public Binding bindingQueueInformSms(@Qualifier(QUEUE_SMS) Queue queue,
-                                            @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("queue.sms").noargs();
-    }
-
-
-
-    @Bean
-    public Binding bindingQueueInformEmail(@Qualifier(QUEUE_EMAIL) Queue queue,
-                                            @Qualifier(EXCHANGE_TOPICS) Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("queue.email").noargs();
-    }
-    /**
-     * @Description: 微信普通队列
-     * @author: Hu
-     * @since: 2021/1/23 15:45
-     * @Param:
-     * @return:
-     */
-    @Bean
     public Binding bindingQueueInformWeChat(@Qualifier(QUEUE_WECHAT) Queue queue,
                                             @Qualifier(EXCHANGE_TOPICS_WECHAT) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.wechat").noargs();
     }
 
-    /**
-     * @Description: 延时队列
-     * @author: Hu
-     * @since: 2020/12/29 14:30
-     * @Param:
-     * @return:
-     */
-    @Bean
-    public Binding bindingQueueInformTest(@Qualifier(QUEUE_TEST) Queue queue,
-                                              @Qualifier(EXCHANGE_DELAY) Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("queue.test").noargs();
-    }
     /**
      * @Description: 微信延时队列
      * @author: Hu
@@ -239,5 +162,93 @@ public class RabbitMqConfig {
     public Binding bindingQueueInformWeChatDelay(@Qualifier(QUEUE_WECHAT_DELAY) Queue queue,
                                               @Qualifier(EXCHANGE_DELAY_WECHAT) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.wechat.delay").noargs();
+    }
+
+
+
+
+
+
+    //----------------------------------------------es车辆消息配置-------------------------------------------------------
+    /**
+     * @Description: es车辆操作交换机
+     * @author: Hu
+     * @since: 2021/3/26 14:03
+     * @Param:
+     * @return:
+     */
+    @Bean(EXCHANGE_CAR_TOPICS)
+    public Exchange exchangeCarTopics() {
+        //durable(true)持久化，消息队列重启后交换机仍然存在
+        return ExchangeBuilder.topicExchange(EXCHANGE_CAR_TOPICS).durable(true).build();
+    }
+    /**
+     * @Description: es车辆新增队列
+     * @author: Hu
+     * @since: 2021/3/26 14:01
+     * @Param:
+     * @return:
+     */
+    @Bean(QUEUE_CAR_INSERT)
+    public Queue QUEUE_CAR_INSERT() {
+        return new Queue(QUEUE_CAR_INSERT);
+    }
+    /**
+     * @Description: es车辆修改队列
+     * @author: Hu
+     * @since: 2021/3/26 14:01
+     * @Param:
+     * @return:
+     */
+    @Bean(QUEUE_CAR_UPDATE)
+    public Queue QUEUE_CAR_UPDATE() {
+        return new Queue(QUEUE_CAR_UPDATE);
+    }
+    /**
+     * @Description: es车辆删除队列
+     * @author: Hu
+     * @since: 2021/3/26 14:01
+     * @Param:
+     * @return:
+     */
+    @Bean(QUEUE_CAR_DELETE)
+    public Queue QUEUE_CAR_DELETE() {
+        return new Queue(QUEUE_CAR_DELETE);
+    }
+    /**
+     * @Description: 绑定新增队列到交换机
+     * @author: Hu
+     * @since: 2021/1/23 15:45
+     * @Param:
+     * @return:
+     */
+    @Bean
+    public Binding bindingQueueInformCarInsert(@Qualifier(QUEUE_CAR_INSERT) Queue queue,
+                                            @Qualifier(EXCHANGE_CAR_TOPICS) Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("queue.car.insert").noargs();
+    }
+    /**
+     * @Description: 绑定新增队列到交换机
+     * @author: Hu
+     * @since: 2021/1/23 15:45
+     * @Param:
+     * @return:
+     */
+    @Bean
+    public Binding bindingQueueInformCarUpdate(@Qualifier(QUEUE_CAR_UPDATE) Queue queue,
+                                               @Qualifier(EXCHANGE_CAR_TOPICS) Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("queue.car.update").noargs();
+    }
+    /**
+     * @Description: 绑定新增队列到交换机
+     * @author: Hu
+     * @since: 2021/1/23 15:45
+     * @Param:
+     * @return:
+     */
+    @Bean
+    public Binding bindingQueueInformCarDelete(@Qualifier(QUEUE_CAR_DELETE) Queue queue,
+                                               @Qualifier(EXCHANGE_CAR_TOPICS) Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("queue.car.delete").noargs();
     }
 }

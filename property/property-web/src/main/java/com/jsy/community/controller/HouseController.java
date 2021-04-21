@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
@@ -10,8 +11,10 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -67,6 +70,14 @@ public class HouseController {
 	
 	// ============================================ 物业端产品原型确定后新加的 开始  ===========================================================
 	
+	/**
+	* @Description: 【楼宇房屋】新增楼栋、单元、房屋
+	 * @Param: [houseEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Login
 	@ApiOperation("【楼宇房屋】新增楼栋、单元、房屋")
 	@PostMapping("")
 	public CommonResult addHouse(@RequestBody HouseEntity houseEntity){
@@ -78,18 +89,40 @@ public class HouseController {
 		}else{
 			ValidatorUtils.validateEntity(houseEntity,HouseEntity.addHouseValidatedGroup.class);
 		}
+		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+		houseEntity.setCommunityId(loginUser.getCommunityId());
+		houseEntity.setCreateBy(loginUser.getUid());
 		boolean result = houseService.addHouse(houseEntity);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增楼栋信息失败");
 	}
 	
+	/**
+	* @Description: 【楼宇房屋】修改
+	 * @Param: [houseEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Login
 	@ApiOperation("【楼宇房屋】修改")
 	@PutMapping("")
 	public CommonResult updateHouse(@RequestBody HouseEntity houseEntity){
 		ValidatorUtils.validateEntity(houseEntity, HouseEntity.updateHouseValidatedGroup.class);
+		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+		houseEntity.setCommunityId(loginUser.getCommunityId());
+		houseEntity.setCreateBy(loginUser.getUid());
 		boolean result = houseService.updateHouse(houseEntity);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改楼栋信息失败");
 	}
 	
+	/**
+	* @Description: 【楼宇房屋】条件查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Login
 	@ApiOperation("【楼宇房屋】条件查询")
 	@PostMapping("query")
 	public CommonResult<PageInfo<HouseEntity>> queryHouse(@RequestBody BaseQO<HouseQO> baseQO){
@@ -97,9 +130,7 @@ public class HouseController {
 		if(query == null || query.getType() == null){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 		}
-		if(query.getCommunityId() == null){
-			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少社区ID");
-		}
+		query.setCommunityId(UserUtils.getAdminCommunityId());
 		if(BusinessConst.BUILDING_TYPE_BUILDING == query.getType()){
 			query.setBuilding(query.getName());
 		}else if(BusinessConst.BUILDING_TYPE_UNIT == query.getType()){
@@ -112,10 +143,18 @@ public class HouseController {
 		return CommonResult.ok(houseService.queryHouse(baseQO));
 	}
 	
+	/**
+	* @Description: 【楼宇房屋】删除
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Login
 	@ApiOperation("【楼宇房屋】删除")
 	@DeleteMapping("")
 	public CommonResult deleteHouse(@RequestParam Long id){
-		return houseService.deleteHouse(id) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
+		return houseService.deleteHouse(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
 	// ============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 	

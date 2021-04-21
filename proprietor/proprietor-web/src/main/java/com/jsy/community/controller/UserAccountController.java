@@ -20,6 +20,7 @@ import com.jsy.community.qo.proprietor.UserAccountTradeQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.UserAccountVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -27,6 +28,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -50,6 +53,7 @@ public class UserAccountController {
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IRedbagService redbagService;
 	
+	//========================== 用户账户 ==============================
 	/**
 	* @Description: 查询余额
 	 * @Param: []
@@ -60,7 +64,10 @@ public class UserAccountController {
 	@ApiOperation("【用户账户】查询余额")
 	@GetMapping("balance")
 	public CommonResult queryBalance(){
-		return CommonResult.ok(userAccountService.queryBalance(UserUtils.getUserId()));
+		UserAccountVO userAccountVO = userAccountService.queryBalance(UserUtils.getUserId());
+		Map<String, Object> returnMap = new HashMap<>();
+		returnMap.put("balance",userAccountVO.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
+		return CommonResult.ok(returnMap,"查询成功");
 	}
 	
 	/**
@@ -96,6 +103,7 @@ public class UserAccountController {
 		return CommonResult.ok(userAccountRecordService.queryAccountRecord(baseQO));
 	}
 	
+	//========================== 红包 ==============================
 	/**
 	* @Description: 单发红包、转账
 	 * @Param: [redBagQO]
@@ -188,6 +196,7 @@ public class UserAccountController {
 		return CommonResult.ok(redbagService.receiveRedbag(redbagQO),"领取成功");
 	}
 	
+	//========================== 现金券 ==============================
 	/**
 	* @Description: 统计用户可用券张数
 	 * @Param: []
@@ -259,4 +268,17 @@ public class UserAccountController {
 		return b ? CommonResult.ok("退回成功") : CommonResult.error("退回失败");
 	}
 	
+	//============================= 查询整合接口 ==================================
+	@ApiOperation("【整合查询】(个人中心)")
+	@GetMapping("all")
+	public CommonResult queryAll(){
+		Map<String, Object> returnMap = new HashMap<>();
+		String uid = UserUtils.getUserId();
+		UserAccountVO balance = userAccountService.queryBalance(uid);
+		Integer tickets = userAccountService.countTicketByUid(uid);
+		returnMap.put("balance",balance.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
+		returnMap.put("tickets",tickets);
+		returnMap.put("bankCard",0);
+		return CommonResult.ok(returnMap,"查询成功");
+	}
 }

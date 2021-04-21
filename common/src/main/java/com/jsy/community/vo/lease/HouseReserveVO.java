@@ -1,5 +1,6 @@
 package com.jsy.community.vo.lease;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,10 +34,10 @@ public class HouseReserveVO implements Serializable {
     @ApiModelProperty(value = "预约所属推送ID")
     private String pushId;
 
-    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功")
+    @ApiModelProperty(value = "预约状态 1.预约中 2.预约成功 3.已取消 4.已完成")
     private Integer reserveStatus;
 
-    @ApiModelProperty(value = "预约状态文本 0已取消 1预约中 2预约成功")
+    @ApiModelProperty(value = "预约状态文本 1.预约中 2.预约成功 3.已取消 4.已完成")
     private String reserveStatusText;
 
     @ApiModelProperty(value = "出租状态：合租、整租")
@@ -80,10 +82,17 @@ public class HouseReserveVO implements Serializable {
     @ApiModelProperty(value = "预约联系人头像地址")
     private String contactAvatar;
 
-    @ApiModelProperty(value = "预约时间")
-    private String reserveDateTime;
+    @ApiModelProperty(value = "看房时间")
+    @JsonFormat(pattern = "MM-dd HH:mm", timezone = "GMT+8")
+    private Date checkingTime;
 
-    @ApiModelProperty(value = "是房东还是租客")
+    @ApiModelProperty(value = "是房东还是租客,true为房东,false为租客")
     private Boolean proprietor;
+
+    @ApiModelProperty(value = "社区id")
+    private Long houseCommunityId;
+
+    @ApiModelProperty(value = "社区名称")
+    private String houseCommunityName;
 
 }

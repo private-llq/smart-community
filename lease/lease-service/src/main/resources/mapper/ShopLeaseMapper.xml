@@ -40,4 +40,43 @@
 <!--		where tsl.id = #{shopId} and thc.house_const_type = 8-->
 <!--    </select>-->
 
+    <select id="getShopByCondition" resultType="com.jsy.community.entity.shop.ShopLeaseEntity">
+        select * from t_shop_lease
+        <where>
+            <!-- 搜索文本 -->
+            <if test="qo.query.searchText!=null and qo.query.searchText!=''">
+                title like concat ("%",#{qo.query.searchText},"%")
+            </if>
+            <!-- 地区 -->
+            <if test="qo.query.houseAreaId!=null">
+                and area_id = #{qo.query.houseAreaId}
+            </if>
+            <!-- 租金范围 -->
+            <if test="qo.query.housePriceMin != null">
+                and month_money &gt;= #{qo.query.housePriceMin}
+            </if>
+            <if test="qo.query.housePriceMax != null">
+                and month_money &lt;= #{qo.query.housePriceMax}
+            </if>
+            <!-- 面积 -->
+            <if test="qo.query.houseSquareMeterMin != null and qo.query.houseSquareMeterMin != &quot;&quot; and qo.query.houseSquareMeterMin &gt; 0
+                and qo.query.houseSquareMeterMax != null and qo.query.houseSquareMeterMax != &quot;&quot; and qo.query.houseSquareMeterMax &gt; 0">
+                and shop_acreage &gt;= #{qo.query.houseSquareMeterMin} and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
+            </if>
+            <!-- 所属类型id -->
+            <if test="qo.query.shopTypeId !=null">
+                and shop_type_id = #{qo.query.shopTypeId}
+            </if>
+            <!-- 所属行业id -->
+            <if test="qo.query.shopBusinessId!=null">
+                and shop_business_id = #{qo.query.shopBusinessId}
+            </if>
+            <!-- 来源 传3就是来源不限-->
+            <if test="qo.query.houseSourceId!=null and qo.query.houseSourceId!=3">
+                and source = #{qo.query.houseSourceId}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
 </mapper>

@@ -33,6 +33,12 @@ public class CommunityEntity extends BaseEntity {
     @ApiModelProperty(value = "社区图标url", hidden = true)
     private String iconUrl;
     
+    @ApiModelProperty(value = "社区编号")
+    private String number;
+    
+    @ApiModelProperty(value = "面积")
+    private BigDecimal acreage;
+    
     @ApiModelProperty(value = "省份ID")
     @NotNull(groups = {sysAddValidatedGroup.class}, message = "所属省份ID不能为空")
     private Integer provinceId;

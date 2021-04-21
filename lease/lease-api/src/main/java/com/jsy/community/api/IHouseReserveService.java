@@ -56,4 +56,31 @@ public interface IHouseReserveService extends IService<HouseReserveEntity> {
      * @return            返回是否成功修改
      */
     Boolean reject(HouseReserveQO qo);
+
+    /**
+     *@Author: Pipi
+     *@Description: 删除预约消息
+     *@param: qo:
+     *@Return: java.lang.Boolean
+     *@Date: 2021/3/30 11:35
+     **/
+    Boolean delete(HouseReserveQO qo);
+
+    /**
+     *@Author: Pipi
+     *@Description: 租房用户确认完成看房
+     *@param: qo:
+     *@Return: java.lang.Boolean
+     *@Date: 2021/3/30 15:25
+     **/
+    Boolean completeChecking(HouseReserveQO qo);
+
+    /**
+     *@Author: Pipi
+     *@Description: 定时完成看房
+     *@param: :
+     *@Return: java.lang.Integer
+     *@Date: 2021/3/31 10:44
+     **/
+    Integer timingCompleteChecking();
 }

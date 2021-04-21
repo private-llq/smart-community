@@ -29,12 +29,18 @@ public class HouseReserveQO implements Serializable {
     @ApiModelProperty(value = "预约所属人ID")
     private String reserveUid;
 
-    @ApiModelProperty(value = "预约状态 0已取消 1预约中 2预约成功 3.预约已拒绝")
+    @NotNull(groups = {ReserveList.class}, message = "预约状态不能为空,0查询全部列表 1.预约中 2.预约成功 3.已取消 4.已完成")
+    @Range(groups = {ReserveList.class}, min = 0, max = 4, message = "预约状态范围错误")
+    @ApiModelProperty(value = "预约状态 1.预约中 2.预约成功 3.已取消 4.已完成")
     private Integer reserveStatus;
 
     @ApiModelProperty(value = "预约信息内容")
     private String reserveMsg;
 
+    @NotNull(groups = {Cancel.class, ReserveList.class}, message = "请求类型不能为空,1我预约的,2预约我的")
+    @Range(groups = {Cancel.class, ReserveList.class}, min = 1, max = 2, message = "请求类型范围错误!")
+    @ApiModelProperty(value = "请求类型,1我预约的,2预约我的")
+    private Integer requestType;
 
     /**
      * 取消预约信息参数验证接口
@@ -45,5 +51,10 @@ public class HouseReserveQO implements Serializable {
      * 拒绝预约信息参数验证接口
      */
     public interface Reject {}
+
+    /**
+     * 预约管理列表参数验证接口
+     */
+    public interface ReserveList{}
 
 }

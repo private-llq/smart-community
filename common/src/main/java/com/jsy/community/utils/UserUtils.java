@@ -24,8 +24,10 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class UserUtils {
 	
+	public static final String USER_TOKEN = "token";
 	public static final String USER_KEY = "userId";
 	public static final String USER_INFO = "userInfo";
+	public static final String USER_COMMUNITY = "communityId";
 	
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -112,6 +114,32 @@ public class UserUtils {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
 		return (String) request.getAttribute(USER_KEY);
+	}
+	
+	/**
+	* @Description: 获取request域中用户token
+	 * @Param: []
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/8
+	**/
+	public static String getUserToken() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+			.getRequest();
+		return (String) request.getAttribute(USER_TOKEN);
+	}
+	
+	/**
+	* @Description: 获取物业端登录用户社区ID
+	 * @Param: []
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	public static Long getAdminCommunityId() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+			.getRequest();
+		return (Long) request.getAttribute(USER_COMMUNITY);
 	}
 	
 	/**

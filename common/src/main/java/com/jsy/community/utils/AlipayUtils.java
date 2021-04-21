@@ -29,7 +29,7 @@ public class AlipayUtils {
 	//应用公钥证书路径
 	private static final String certPath = ConstClasses.AliPayDataEntity.certPath;
 	//支付宝公钥证书路径
-	private static final String alipayPublicCertPath = ConstClasses.AliPayDataEntity.alipayPublicCertPath;
+	public static final String alipayPublicCertPath = ConstClasses.AliPayDataEntity.alipayPublicCertPath;
 	//支付宝根证书路径
 	private static final String rootCertPath = ConstClasses.AliPayDataEntity.rootCertPath;
 	

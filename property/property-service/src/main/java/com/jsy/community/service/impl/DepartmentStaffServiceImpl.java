@@ -18,6 +18,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -39,10 +40,12 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 	@Autowired
 	private DepartmentMapper departmentMapper;
 	
+	private static final String SAME_STAFF_REASON = "该部门下已有相同员工";
+	
 	@Override
 	public PageInfo<DepartmentStaffEntity> listDepartmentStaff(Long departmentId, Long page, Long size) {
 		QueryWrapper<DepartmentStaffEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("department_id", departmentId);
+		queryWrapper.eq("department_id", departmentId).orderByDesc("create_time");
 		Page<DepartmentStaffEntity> pageInfo = new Page<>(page, size);
 		staffMapper.selectPage(pageInfo, queryWrapper);
 		
@@ -56,6 +59,34 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 		DepartmentStaffEntity staff = new DepartmentStaffEntity();
 		BeanUtils.copyProperties(staffEntity, staff);
 		
+		// 对姓名相同和电话号码有一个相同 这个情况 进行判断,  此种情况要添加失败
+		String person = staffEntity.getPerson();
+		// 1. 添加员工时,用户添加的员工电话
+		List<String> phoneFromFront = staffEntity.getPhone();
+		Long communityId = staffEntity.getCommunityId();
+		Long departmentId = staffEntity.getDepartmentId();
+		QueryWrapper<DepartmentStaffEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("person", person);
+		wrapper.eq("community_id", communityId);
+		wrapper.eq("department_id", departmentId);
+		List<DepartmentStaffEntity> staffEntityList = staffMapper.selectList(wrapper);
+		if (!CollectionUtils.isEmpty(staffEntityList)) {
+			for (DepartmentStaffEntity departmentStaffEntity : staffEntityList) {
+				// 2. 根据当前添加的员工信息  查询出来符合要求的员工的电话
+				String phoneFromMysql = departmentStaffEntity.getPhone();
+				// 二者比对,看是否有一个电话相同
+				if (phoneFromMysql != null && phoneFromMysql.length() > 0) {
+					String[] split = phoneFromMysql.split(",");
+					for (String phone : split) {
+						if (phoneFromFront.contains(phone)) {
+							throw new PropertyException("该部门下已有同名同电话员工");
+						}
+					}
+				}
+			}
+		}
+		
+		// 对电话号码进行处理
 		List<String> phones = staffEntity.getPhone();
 		if (phones != null && phones.size() > 0) {
 			String str = Convert.toStr(phones);
@@ -63,6 +94,7 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 			String newStr = replace.replace("]", "");
 			staff.setPhone(newStr);
 		}
+		
 		staff.setId(SnowFlake.nextId());
 		staffMapper.insert(staff);
 	}
@@ -104,16 +136,14 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public Map<String, Object> addLinkByExcel(List<String[]> strings) {
-		long communityId = 5;
-		
+	public Map<String, Object> addLinkByExcel(List<String[]> strings, Long communityId) {
 		// 成功数
 		int success = 0;
 		// 失败数
 		int fail = 0;
+		
 		// 失败明细数据
-		List<Map<String, String>> staffEntityList = new ArrayList<>();
-		// 返回结果
+		List<Map<String, String>> failStaffList = new ArrayList<>();
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		for (String[] string : strings) {
@@ -125,8 +155,8 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 			staff.setCommunityId(communityId);
 			
 			// 姓名
-			String name = string[0];
-			staff.setPerson(name);
+			String person = string[0];
+			staff.setPerson(person);
 			
 			// 部门
 			String department = string[1];
@@ -159,7 +189,6 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 			// 如果电话号码不符号要求则不能添加成功
 			if (!StringUtils.isEmpty(phone)) {
 				String[] strs = phone.split(",");
-				
 				List<String> phones = Arrays.asList(strs);
 				// 将电话集合转换成一个字符串(去掉前后的 [ 和 ] )
 				String str = Convert.toStr(phones);
@@ -176,45 +205,41 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 			// 如果电话号码大于3个则不能添加成功
 			if (dep != null) {
 				QueryWrapper<DepartmentStaffEntity> queryWrapper = new QueryWrapper<>();
-				queryWrapper.eq("department_id", dep.getId()).eq("community_id", communityId);
-				DepartmentStaffEntity departmentStaffEntity = staffMapper.selectOne(queryWrapper);
-				
-				String person = departmentStaffEntity.getPerson();
-				String entityPhone = departmentStaffEntity.getPhone();
-				
-				// 数据表中那条数据的电话
-				String[] mysqlData = entityPhone.split(",");
-				List<String> mysqlList = Arrays.asList(mysqlData);
-				// Excel中那条数据的电话
-				String[] excelData = phone.split(",");
-				List<String> excelList = Arrays.asList(excelData);
-				
-				// 如果两个指定的集合没有共同的元素，则返回true
-				boolean flag = Collections.disjoint(mysqlList, excelList);
-				
-				// 判断电话数是否大于3个
-				boolean telFlag = phone.length() > 3;
-				
-				// 有相同部门下的同名员工 且 电话号码完全相同或其中1个以上电话号码相同则不能添加成功
-				if ((!flag && name.equals(person))||telFlag) {
-					HashMap<String, String> map = new HashMap<>();
-					map.put("name", name);
-					map.put("department", department);
-					map.put("duty", duty);
-					map.put("phone", phone);
-					map.put("email", email);
-					staffEntityList.add(map);
+				queryWrapper.eq("department_id", dep.getId()).eq("community_id", communityId).eq("person", person);
+				List<DepartmentStaffEntity> staffEntities = staffMapper.selectList(queryWrapper);
+				if (!CollectionUtils.isEmpty(staffEntities)) {
+					for (DepartmentStaffEntity departmentStaffEntity : staffEntities) {
+						String entityPhone = departmentStaffEntity.getPhone();
+						// 数据表中那条数据的电话
+						String[] mysqlData = entityPhone.split(",");
+						List<String> mysqlList = Arrays.asList(mysqlData);
+						// Excel中那条数据的电话
+						String[] excelData = phone.split(",");
+						List<String> excelList = Arrays.asList(excelData);
+						// 如果两个指定的集合没有共同的元素，则返回true
+						boolean flag = Collections.disjoint(mysqlList, excelList);
+						if (!flag || (phone.length() > 3)) {
+							HashMap<String, String> map = new HashMap<>();
+							map.put("person", person);
+							map.put("department", department);
+							map.put("duty", duty);
+							map.put("phone", phone);
+							map.put("email", email);
+							map.put("failReason",SAME_STAFF_REASON);
+							failStaffList.add(map);
+							break;
+						}
+					}
 					fail += 1;
 					continue;
 				}
 			}
-			staffMapper.insert(staff);
 			success += 1;
-			
+			staffMapper.insert(staff);
 		}
 		resultMap.put("success", "成功" + success + "条");
 		resultMap.put("fail", "失败" + fail + "条");
-		resultMap.put("failData", staffEntityList);
+		resultMap.put("failData", failStaffList);
 		return resultMap;
 	}
 	

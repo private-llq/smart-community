@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.OrganizationEntity;
 import com.jsy.community.vo.TreeCommunityVO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -54,13 +55,22 @@ public interface IOrganizationService extends IService<OrganizationEntity> {
 	OrganizationEntity getOrganizationById(Long id, Long communityId);
 	
 	/**
+	* @Description: 根据id查询组织机构名称
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/4/16
+	**/
+	String queryOrganizationNameById(Long id);
+	
+	/**
 	* @Description: 根据idList批量获取对应组织机构名称
 	 * @Param: [ids]
 	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.Long,java.lang.Object>>
 	 * @Author: chq459799974
 	 * @Date: 2021/3/16
 	**/
-	Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(List<Long> ids);
+	Map<Long, Map<Long, Object>> queryOrganizationNameByIdBatch(Collection<Long> ids);
 	
 	/**
 	* @Description: 社区组织机构是否存在

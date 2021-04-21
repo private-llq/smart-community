@@ -3,11 +3,13 @@ package com.jsy.community.controller;
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IShoppingMallService;
 import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
 import com.jsy.community.utils.MyHttpClient;
@@ -15,6 +17,7 @@ import com.jsy.community.utils.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.XmlUtil;
 import com.jsy.community.vo.CommonResult;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.HttpEntity;
@@ -50,10 +53,13 @@ import java.util.UUID;
  **/
 @RestController
 @ApiJSYController
+@Slf4j
 public class WeChatController {
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private IWeChatService weChatService;
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private IShoppingMallService shoppingMallService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -66,42 +72,47 @@ public class WeChatController {
      * @Param:
      * @return:
      */
+    @Login
     @PostMapping("/wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
-        //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
+        //如果商城调用就先验证
         Map hashMap = new LinkedHashMap();
+        Map<Object, Object> map = new LinkedHashMap<>();
+        if (weChatPayQO.getTradeFrom()==2){
+            Map<String, Object> objectMap = shoppingMallService.validateShopOrder(weChatPayQO.getOrderData(), UserUtils.getUserToken());
+            if(0 != (int)objectMap.get("code")){
+                throw new JSYException((int)objectMap.get("code"),String.valueOf(objectMap.get("msg")));
+            }
+            map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
+        }
+        //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
         hashMap.put("currency","CNY");
-//        LinkedHashMap<String, Object> map4 = new LinkedHashMap<>();
-//        map4.put("payer_client_ip",weChatPayQO.getPayerClientIp());
-
-        Map<Object, Object> map = new LinkedHashMap<>();
-
         map.put("appid", WechatConfig.APPID);
         map.put("mchid",WechatConfig.MCH_ID);
-        map.put("description",weChatPayQO.getDescription());
+        map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://222.178.212.29:9951/api/v1/payment/callback");
+        map.put("notify_url","http://blue99x.vicp.net:9527/api/v1/payment/callback");
         map.put("amount",hashMap);
-//        map.put("scene_info",map4);
-
-
+        //转json
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
 
+        //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
         msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
-        msg.setOpenId(weChatPayQO.getOpenId());
-        msg.setDescription(weChatPayQO.getDescription());
+        msg.setOpenId(null);
+        msg.setPayType(weChatPayQO.getTradeFrom());
+        msg.setDescription(weChatPayQO.getDescriptionStr());
         msg.setAmount(weChatPayQO.getAmount());
         msg.setOrderStatus(1);
         msg.setArriveStatus(1);
         msg.setCreateTime(LocalDateTime.now());
 
-
         //mq异步保存账单到数据库
-        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
+//        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
+        weChatService.insertOrder(msg);
         //半个小时如果还没支付就自动删除数据库账单
         rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
             @Override
@@ -117,82 +128,6 @@ public class WeChatController {
         object.put("orderNum",map.get("out_trade_no"));
         return CommonResult.ok(object);
     }
-//    @GetMapping("ip")
-    public String getClientIpAddress(HttpServletRequest request) {
-        String clientIp = request.getHeader("x-forwarded-for");
-        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-            clientIp = request.getHeader("Proxy-Client-IP");
-        }
-        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-            clientIp = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
-            clientIp = request.getRemoteAddr();
-        }
-        return clientIp;
-    }
-
-    /**
-     * @Description: H5下单并返回支付连接
-     * @author: Hu
-     * @since: 2021/2/25 14:28
-     * @Param:
-     * @return:
-     */
-    @PostMapping("/wxPayH5")
-    public CommonResult wxPayH5(HttpServletRequest request,@RequestBody WeChatPayQO weChatPayQO) throws Exception {
-        //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
-        Map<Object, Object> map = new LinkedHashMap<>();
-
-        System.out.println(getClientIpAddress(request));
-        map.put("appid", WechatConfig.APPID);
-        map.put("mchid",WechatConfig.MCH_ID);
-        map.put("description",weChatPayQO.getDescription());
-        map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://222.178.212.29:9951/api/v1/payment/callback");
-        Map hashMap = new LinkedHashMap();
-//        hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
-        hashMap.put("total",1);
-        hashMap.put("currency","CNY");
-
-        Map hashMap1 = new LinkedHashMap();
-        hashMap1.put("payer_client_ip",weChatPayQO.getPayerClientIp());
-        LinkedHashMap hashMap2 = new LinkedHashMap();
-        hashMap2.put("type",weChatPayQO.getType());
-        hashMap1.put("h5_info",hashMap2);
-        map.put("amount",hashMap);
-        map.put("scene_info",hashMap1);
-
-
-        String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
-        System.out.println(wxPayRequestJsonStr);
-
-        WeChatOrderEntity msg = new WeChatOrderEntity();
-        msg.setId((String) map.get("out_trade_no"));
-        msg.setUid(UserUtils.getUserId());
-        msg.setOpenId(weChatPayQO.getOpenId());
-        msg.setDescription(weChatPayQO.getDescription());
-        msg.setAmount(weChatPayQO.getAmount());
-        msg.setOrderStatus(1);
-        msg.setArriveStatus(1);
-        msg.setCreateTime(LocalDateTime.now());
-
-
-        //mq异步保存账单到数据库
-        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
-        //半个小时如果还没支付就自动删除数据库账单
-        rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
-            @Override
-            public Message postProcessMessage(Message message) throws AmqpException {
-                    message.getMessageProperties().setHeader("x-delay",60000*30);
-                return message;
-            }
-        });
-        //第一步获取prepay_id
-        String h5_url = PublicConfig.V3PayGet("/v3/pay/transactions/h5", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
-        return CommonResult.ok(h5_url);
-    }
-
     /**
      * @Description: 支付成功回调地址
      * @author: Hu
@@ -200,14 +135,22 @@ public class WeChatController {
      * @Param:
      * @return:
      */
+    @Login
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        System.err.println("回调成功");
+        log.info("回调成功");
         Map<String, String> map = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
 //        weChatService.saveStatus(out_trade_no);
-        System.out.println(map.get("out_trade_no"));
-        System.out.println(map.get("transaction_id"));
+        log.info(String.valueOf(map));
+        log.info(map.get("out_trade_no"));
+        log.info(map.get("transaction_id"));
         weChatService.orderStatus(map);
+        if (map.get("attach")!=null){
+            String[] split = map.get("attach").split(",");
+            if (split[0]==2+""){
+                shoppingMallService.completeShopOrder(split[1]);
+            }
+        }
     }
 
 
@@ -294,8 +237,8 @@ public class WeChatController {
      * @Description:  提现查询
      * @author: Hu
      * @since: 2021/2/1 11:14
-     * @Param:
-     * @return:
+     * @Param: orderId
+     * @return: CommonResult
      */
     @GetMapping("/withdrawDepositQuery")
     @Login
@@ -356,6 +299,80 @@ public class WeChatController {
 
         return CommonResult.ok(restmap);
     }
+//    @GetMapping("ip")
+//    public String getClientIpAddress(HttpServletRequest request) {
+//        String clientIp = request.getHeader("x-forwarded-for");
+//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+//            clientIp = request.getHeader("Proxy-Client-IP");
+//        }
+//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+//            clientIp = request.getHeader("WL-Proxy-Client-IP");
+//        }
+//        if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+//            clientIp = request.getRemoteAddr();
+//        }
+//        return clientIp;
+//    }
 
+    /**
+     * @Description: H5下单并返回支付连接
+     * @author: Hu
+     * @since: 2021/2/25 14:28
+     * @Param:
+     * @return:
+     */
+//    @PostMapping("/wxPayH5")
+//    public CommonResult wxPayH5(HttpServletRequest request,@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+//        //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
+//        Map<Object, Object> map = new LinkedHashMap<>();
+//
+//        System.out.println(getClientIpAddress(request));
+//        map.put("appid", WechatConfig.APPID);
+//        map.put("mchid",WechatConfig.MCH_ID);
+//        map.put("description",weChatPayQO.getDescription());
+//        map.put("out_trade_no", OrderNoUtil.getOrder());
+//        map.put("notify_url","http://222.178.212.29:9951/api/v1/payment/callback");
+//        Map hashMap = new LinkedHashMap();
+////        hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
+//        hashMap.put("total",1);
+//        hashMap.put("currency","CNY");
+//
+//        Map hashMap1 = new LinkedHashMap();
+//        hashMap1.put("payer_client_ip",weChatPayQO.getPayerClientIp());
+//        LinkedHashMap hashMap2 = new LinkedHashMap();
+//        hashMap2.put("type",weChatPayQO.getType());
+//        hashMap1.put("h5_info",hashMap2);
+//        map.put("amount",hashMap);
+//        map.put("scene_info",hashMap1);
+//
+//
+//        String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
+//        System.out.println(wxPayRequestJsonStr);
+//
+//        WeChatOrderEntity msg = new WeChatOrderEntity();
+//        msg.setId((String) map.get("out_trade_no"));
+//        msg.setUid(UserUtils.getUserId());
+//        msg.setOpenId(weChatPayQO.getOpenId());
+//        msg.setDescription(weChatPayQO.getDescription());
+//        msg.setAmount(weChatPayQO.getAmount());
+//        msg.setOrderStatus(1);
+//        msg.setArriveStatus(1);
+//        msg.setCreateTime(LocalDateTime.now());
+//
+//
+//        //mq异步保存账单到数据库
+//        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
+//        //半个小时如果还没支付就自动删除数据库账单
+//        rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
+//            @Override
+//            public Message postProcessMessage(Message message) throws AmqpException {
+//                    message.getMessageProperties().setHeader("x-delay",60000*30);
+//                return message;
+//            }
+//        });
+//        //第一步获取prepay_id
+//        String h5_url = PublicConfig.V3PayGet("/v3/pay/transactions/h5", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
+//        return CommonResult.ok(h5_url);
+//    }
 
 }

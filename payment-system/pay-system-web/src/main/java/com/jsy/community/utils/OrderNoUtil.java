@@ -21,9 +21,8 @@ public class OrderNoUtil {
     public static String getOrder() {
         SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
-        int s1=(int) (Math.random() * 999999999);
-        int s2=(int) (Math.random() * 9);
-        return s + s1 + s2;
+        Long s1=(long) (Math.random() * 9999999999L);
+        return s + s1;
     }
     /**
      * @Description: 企业付款订单号

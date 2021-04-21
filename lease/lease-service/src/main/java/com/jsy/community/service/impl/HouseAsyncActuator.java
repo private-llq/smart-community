@@ -7,6 +7,7 @@ import com.jsy.community.utils.CommonUtils;
 import com.jsy.community.vo.lease.HouseReserveVO;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
@@ -30,9 +31,10 @@ public class HouseAsyncActuator {
      * @param houseLeaseId      房屋id
      * @param pushTitle         推送标题
      * @param pushMsg           推送信息
+     * @param tagUid            推送目标id
      */
     @Async(BusinessConst.LEASE_ASYNC_POOL)
-    public void pushMsg(String sourceUid, Long houseLeaseId, String pushTitle, String pushMsg){
+    public void pushMsg(String sourceUid, Long houseLeaseId, String pushTitle, String pushMsg, String tagUid){
         //[接受者信息] 通房屋id拿到房源出租标题 和 用户的 推送id
         HouseReserveVO vo = houseReserveMapper.getPushInfo(houseLeaseId);
         if( vo == null ){
@@ -46,8 +48,11 @@ public class HouseAsyncActuator {
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +
                 " " + pushMsg + " " +
                 "["+vo.getHouseTitle()+"]";
+        if (StringUtils.isEmpty(tagUid)) {
+            tagUid = vo.getPushId();
+        }
         //向目标推送
-        CommonUtils.pushCommunityMSG(1, vo.getPushId(), pushTitle, builder);
+        CommonUtils.pushCommunityMSG(1, tagUid, pushTitle, builder);
     }
 
 }

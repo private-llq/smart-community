@@ -1,10 +1,7 @@
 package com.jsy.community.api;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.CarEntity;
-import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.property.CommunityFunQO;
-import com.jsy.community.utils.PageInfo;
+import com.jsy.community.entity.PropertyCarEntity;
+import com.jsy.community.qo.property.ElasticsearchCarQO;
 
 /**
  * @program: com.jsy.community
@@ -12,13 +9,11 @@ import com.jsy.community.utils.PageInfo;
  * @author: Hu
  * @create: 2021-03-22 15:48
  **/
-public interface IPropertyCarService extends IService<CarEntity> {
-    /**
-     * @Description: 查询所有车辆信息
-     * @author: Hu
-     * @since: 2021/3/22 15:56
-     * @Param:
-     * @return:
-     */
-    PageInfo findList(BaseQO<CommunityFunQO> baseQO);
+public interface IPropertyCarService{
+
+    void insertOne(PropertyCarEntity entity);
+
+    void updateOne(ElasticsearchCarQO elasticsearchCarQO);
+
+    void deleteById(String id);
 }

@@ -8,7 +8,7 @@ import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
  * @since 2021-01-06 14:09
  **/
 public interface AiliAppPayRecordService {
-	boolean createAliAppPayRecord(AiliAppPayRecordEntity ailiAppPayRecordEntity);
-	AiliAppPayRecordEntity getAliAppPayByOutTradeNo(String outTradeNo);
-	boolean completeAliAppPayRecord(String outTradeNo);
+	boolean createAliAppPayRecord(AiliAppPayRecordEntity ailiAppPayRecordEntity);//订单创建
+	AiliAppPayRecordEntity getAliAppPayByOutTradeNo(String outTradeNo);//订单查询
+	void completeAliAppPayRecord(String outTradeNo);//订单完成
 }

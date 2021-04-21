@@ -1,12 +1,12 @@
 package com.jsy.community.vo.hk;
 
+import com.jsy.community.vo.BaseVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -20,10 +20,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "FacilityTypeVO对象", description = "设备类别树形结构展示")
-public class FacilityTypeVO implements Serializable {
-	
-	@ApiModelProperty(value = "设备类别id")
-	private Long id;
+public class FacilityTypeVO extends BaseVO {
 	
 	@ApiModelProperty(value = "父id")
 	private Long pid;
@@ -32,7 +29,7 @@ public class FacilityTypeVO implements Serializable {
 	private Long communityId;
 	
 	@ApiModelProperty(value = "类别名称")
-	private String name;
+	private String label;
 	
 	@ApiModelProperty(value = "设备数量")
 	private int count;

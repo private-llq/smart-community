@@ -22,6 +22,7 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	@Insert("insert into t_admin_menu(icon,name,url,pid,sort)" +
 		"select #{entity.icon},#{entity.name},#{entity.url},#{entity.pid},max(sort)+1 from t_admin_menu where pid = #{entity.pid}")
 	int addMenu(@Param("entity") AdminMenuEntity adminMenuEntity);
@@ -33,18 +34,9 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	@Select("select id,pid,belong_to from t_admin_menu where id = #{pid}")
 	AdminMenuEntity findParent(Long pid);
-	
-	/**
-	 * @Description: 获取子菜单列表
-	 * @Param: [id]
-	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
-	 * @Author: chq459799974
-	 * @Date: 2020/12/15
-	 **/
-	@Select("select * from t_admin_menu where pid = #{id}")
-	List<AdminMenuEntity> getChildrenList(Long id);
 	
 	/**
 	 * @Description: 批量获取子菜单id列表(查询pid)
@@ -62,28 +54,29 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	List<Long> getIdBelongList(List<Long> ids);
 	
 	/**
-	 * @Description: 查询用户菜单
+	 * @Description: 查询用户菜单(老sql，暂时弃用)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
+	@Deprecated
 	List<AdminMenuEntity> queryUserMenu(Long uid);
 	
-	//================================================== 物业端原型 - 用户关联菜单start =========================================================================
+	//================================================== 新版物业端原型 - 用户-菜单start =========================================================================
 	
-//	/**
-//	 * @Description: 查询用户菜单(备份)
-//	 * @Param: [uid]
-//	 * @Return: java.util.List<java.lang.Long>
-//	 * @Author: chq459799974
-//	 * @Date: 2020/3/23
-//	 **/
-//	@Select("select menu_id from t_admin_user_menu where uid = #{uid}")
-//	List<Long> getUserMenu(String uid);
+	/**
+	* @Description: 根据idList批量查询菜单实体
+	 * @Param: [list]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	List<AdminMenuEntity> queryMenuBatch(List<Long> list);
 	
 	/**
 	 * @Description: 清空用户菜单
@@ -104,7 +97,17 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 **/
 	int addUserMenuBatch(@Param("collection") Set<Long> menuIdsSet, @Param("uid") String uid);
 	
-	//================================================== 物业端原型 - 用户关联菜单end =========================================================================
+	/**
+	 * @Description: 获取子菜单列表
+	 * @Param: [id]
+	 * @Return: java.util.List<com.jsy.community.entity.sys.AppMenuEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/15
+	 **/
+	@Select("select * from t_admin_menu where pid = #{id}")
+	List<AdminMenuEntity> getChildrenList(Long id);
+	
+	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 	
 	
 }

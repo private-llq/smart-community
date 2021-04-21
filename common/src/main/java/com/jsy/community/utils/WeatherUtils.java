@@ -85,7 +85,7 @@ public class WeatherUtils {
 		//处理默认的15天天气预报，只截取未来3天的
 		dealForecastToAnyDays(tempData,3);
 		//假数据动态修改时间
-		dealDateForTempData(tempData);
+		dealDateForTempData(tempData,1);
 		//补上星期几
 		addDayOfWeek(tempData);
 		return tempData;
@@ -95,7 +95,7 @@ public class WeatherUtils {
 	public static JSONObject getTempWeatherDetails(){
 		JSONObject tempData = tempWeatherDetails.getJSONObject("data");
 		//假数据动态修改时间
-		dealDateForTempData(tempData);
+		dealDateForTempData(tempData,2);
 		//补上星期几
 		addDayOfWeek(tempData);
 		//补万年历
@@ -110,7 +110,7 @@ public class WeatherUtils {
 	}
 	
 	//TODO 临时方法 动态修改时间 后期删除
-	public static void dealDateForTempData(JSONObject tempData){
+	private static void dealDateForTempData(JSONObject tempData,int type){
 		String updatetimeStr = sdf.format(System.currentTimeMillis());
 		JSONObject conditionJson = tempData.getJSONObject("condition");
 		conditionJson.put("updatetime",updatetimeStr);
@@ -118,7 +118,11 @@ public class WeatherUtils {
 		long oneDay = 24*60*60*1000;
 		for(int i = 0;i<forecast.size();i++){
 			JSONObject day = forecast.getJSONObject(i);
-			day.put("updatetime",sdf.format(System.currentTimeMillis() + oneDay*(i+1)));
+			if(type == 1){
+				day.put("updatetime",sdf.format(System.currentTimeMillis() + oneDay*(i+1)));
+			}else if(type == 2){
+				day.put("updatetime",sdf.format(System.currentTimeMillis() - oneDay + oneDay*(i)));
+			}
 		}
 	}
 	

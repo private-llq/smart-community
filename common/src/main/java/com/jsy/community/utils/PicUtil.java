@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -48,7 +49,7 @@ public class PicUtil {
      */
     public static void imageQualified(MultipartFile file){
         if( Objects.isNull(file) ){
-            throw new JSYException(JSYError.BAD_REQUEST);
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件为空");
         }
         String originalFilename = file.getOriginalFilename();
         if( !FilenameUtils.isExtension(originalFilename, AVAILABLE_FORMAT) ){
@@ -117,27 +118,37 @@ public class PicUtil {
         return null;
     }
 
-
-
     /**
-     * 判断是否是图片
+     * 判断是否是图片(批量)
      */
-    public static boolean isPic(MultipartFile[] files) throws IOException{
-        boolean b;
+    public static boolean isPic(MultipartFile[] files){
+        if(files == null || files.length == 0){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"请至少上传一个文件");
+        }
         for(MultipartFile file : files){
-            b = isPic(file);
-            if(!b){
+            if(!isPic(file)){
                 return false;
             }
         }
         return true;
     }
-
-    public static boolean isPic(MultipartFile file) throws IOException{
-            File tempFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+    
+    /**
+     * 判断是否是图片
+     */
+    public static boolean isPic(MultipartFile file){
+        if(file == null){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件为空");
+        }
+        String fileType;
+        File tempFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+        try {
             FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
-            String fileType = getPicType(new FileInputStream(tempFile));
-            if (tempFile.exists()) {
+            fileType = getPicType(new FileInputStream(tempFile));
+        }catch (IOException e){
+            throw new JSYException(JSYError.INTERNAL);
+        }
+        if (tempFile.exists()) {
                 boolean delete = tempFile.delete();
             }
             if(TYPE_UNKNOWN.equals(fileType)){
@@ -145,5 +156,31 @@ public class PicUtil {
             }
         return true;
     }
-
+    
+    /**
+     * 验证图片大小和格式
+     */
+    public static boolean checkSizeAndType(MultipartFile file,long kb){
+        long size = file.getSize() / 1024;
+        if (size > kb) {
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "文件太大了,最大：" + kb + "KB");
+        }
+        return isPic(file);
+    }
+    
+    /**
+     * 验证图片大小和格式(批量)
+     */
+    public static boolean checkSizeAndTypeBatch(MultipartFile[] files,long kb){
+        if(files == null || files.length == 0){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"请至少上传一个文件");
+        }
+        for(MultipartFile file : files){
+           if(!checkSizeAndType(file, kb)){
+               return false;
+           }
+        }
+        return true;
+    }
+    
 }

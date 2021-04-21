@@ -10,6 +10,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AdminUserTokenMapper extends BaseMapper<AdminUserTokenEntity> {
 	
-	AdminUserTokenEntity queryByToken(String token);
+//	AdminUserTokenEntity queryByToken(String token);
 	
 }

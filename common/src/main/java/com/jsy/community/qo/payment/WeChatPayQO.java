@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -13,16 +14,14 @@ import java.math.BigDecimal;
  **/
 @Data
 public class WeChatPayQO {
-    @ApiModelProperty("支付描述")
-    private String description;
+    @ApiModelProperty(value = "支付描述 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包")
+    private Integer tradeFrom;
+    @ApiModelProperty(value = "支付描述")
+    private String descriptionStr;
     @ApiModelProperty("支付金额")
     private BigDecimal amount;
-//    @ApiModelProperty("支付金额")
-//    private String orderNum;
-    @ApiModelProperty("用户唯一标识")
-    private String openId;
-    @ApiModelProperty("调起支付的ip")
-    private String payerClientIp;
-    @ApiModelProperty("iOS, Android, Wap ")
-    private String type;
+    @ApiModelProperty("商城订单")
+    private Map<String,Object> orderData;
+
+
 }

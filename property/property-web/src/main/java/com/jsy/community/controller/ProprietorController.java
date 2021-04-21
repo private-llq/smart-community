@@ -432,6 +432,7 @@ public class ProprietorController {
     @PostMapping("/addUser")
     @ApiOperation("添加业主信息")
     public CommonResult<Boolean> addUser(@RequestBody ProprietorQO qo) {
+        qo.setCommunityId(UserUtils.getAdminCommunityId());
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyAddValid.class);
         iProprietorService.addUser(qo, UserUtils.getUserId());
         return CommonResult.ok("新增成功!");

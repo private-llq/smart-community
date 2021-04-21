@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.VisitorPersonRecordMapper">
+
+    <!-- 批量查询访客随行人数统计 -->
+    <select id="getFollowPersonBatch" resultType="Map">
+        select ANY_VALUE(visitor_id) as visitor_id,count(1) as count from t_visitor_person_record
+        where visitor_id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

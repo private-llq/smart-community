@@ -5,21 +5,25 @@ import com.jsy.community.api.IRelationService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.RelationCarEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.*;
-import com.jsy.community.qo.RelationCarsQo;
-import com.jsy.community.qo.RelationQo;
+import com.jsy.community.qo.property.ElasticsearchCarQO;
+import com.jsy.community.qo.proprietor.RelationCarsQO;
+import com.jsy.community.qo.proprietor.RelationQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.RelationCarsVO;
 import com.jsy.community.vo.RelationVO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +40,14 @@ public class RelationServiceImpl implements IRelationService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    private RelationCarMapper carMapper;
+    private RelationCarMapper relationCarMapper;
+
+    @Autowired
+    private HouseMapper houseMapper;
 
     @Autowired
     private HouseMemberMapper houseMemberMapper;
@@ -58,7 +67,55 @@ public class RelationServiceImpl implements IRelationService {
      */
     @Override
     public void delCar(String uid, Long id) {
-        carMapper.delete(new QueryWrapper<RelationCarEntity>().eq("uid",uid).eq("id",id));
+        relationCarMapper.delete(new QueryWrapper<RelationCarEntity>().eq("uid",uid).eq("id",id));
+        rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.delete",id);
+    }
+
+    /**
+     * @Description: 封装新增es车辆实体类方法
+     * @author: Hu
+     * @since: 2021/3/26 11:22
+     * @Param:
+     * @return:
+     */
+    public ElasticsearchCarQO getInsetElasticsearchCarQO(RelationCarsQO car,RelationQO relationQo,HouseEntity houseEntity){
+        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
+        elasticsearchCarQO.setId(car.getId());
+        elasticsearchCarQO.setCommunityId(relationQo.getCommunityId());
+        elasticsearchCarQO.setCarPlate(car.getCarPlate());
+        elasticsearchCarQO.setCarType(car.getCarType());
+        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(car.getCarType()));
+        elasticsearchCarQO.setOwner(relationQo.getName());
+        elasticsearchCarQO.setIdCard(relationQo.getIdCard());
+        elasticsearchCarQO.setMobile(relationQo.getMobile());
+        elasticsearchCarQO.setOwnerType(2);
+        elasticsearchCarQO.setOwnerTypeText("家属");
+        elasticsearchCarQO.setRelationshipId(relationQo.getId()+"");
+        elasticsearchCarQO.setHouseId(relationQo.getHouseId());
+        elasticsearchCarQO.setBuilding(houseEntity.getBuilding());
+        elasticsearchCarQO.setFloor(houseEntity.getFloor());
+        elasticsearchCarQO.setUnit(houseEntity.getUnit());
+        elasticsearchCarQO.setNumber(houseEntity.getNumber());
+        elasticsearchCarQO.setHouseType(houseEntity.getHouseType());
+        elasticsearchCarQO.setHouseTypeText(houseEntity.getHouseType()==1?"商铺":"住宅");
+        elasticsearchCarQO.setCreateTime(LocalDateTime.now());
+        System.out.println(elasticsearchCarQO);
+        return elasticsearchCarQO;
+    }
+    /**
+     * @Description: 封装修改es车辆实体类方法
+     * @author: Hu
+     * @since: 2021/3/26 11:22
+     * @Param:
+     * @return:
+     */
+    public ElasticsearchCarQO getUpdateElasticsearchCarQO(RelationCarsQO car){
+        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
+        elasticsearchCarQO.setId(car.getId());
+        elasticsearchCarQO.setCarPlate(car.getCarPlate());
+        elasticsearchCarQO.setCarType(car.getCarType());
+        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(car.getCarType()));
+        return elasticsearchCarQO;
     }
 
     /**
@@ -68,7 +125,7 @@ public class RelationServiceImpl implements IRelationService {
      */
     @Override
     @Transactional
-    public void addRelation(RelationQo relationQo) {
+    public void addRelation(RelationQO relationQo) {
         HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
         houseMemberEntity.setId(SnowFlake.nextId());
         if (relationQo.getIdentificationType()==0&&relationQo.getIdentificationType()==null){
@@ -84,10 +141,14 @@ public class RelationServiceImpl implements IRelationService {
         houseMemberEntity.setRelation(relationQo.getRelation());
         houseMemberEntity.setSex(relationQo.getSex());
         houseMemberMapper.insert(houseMemberEntity);
+        relationQo.setId(houseMemberEntity.getId());
         //添加车辆信息
-        List<RelationCarsQo> cars = relationQo.getCars();
+
+        HouseEntity houseEntity = houseMapper.selectById(relationQo.getHouseId());
+
+        List<RelationCarsQO> cars = relationQo.getCars();
             if (cars.size()>0) {
-                for (RelationCarsQo car : cars) {
+                for (RelationCarsQO car : cars) {
                     car.setId(SnowFlake.nextId());
                     car.setUid(relationQo.getUserId());
                     car.setRelationType(1);
@@ -98,8 +159,12 @@ public class RelationServiceImpl implements IRelationService {
                     car.setIdCard(houseMemberEntity.getIdCard());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                 }
+                for (RelationCarsQO car : cars) {
+                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(car,relationQo,houseEntity));
+                }
                 relationMapper.addCars(cars);
             }
+
     }
 
     /**
@@ -130,7 +195,7 @@ public class RelationServiceImpl implements IRelationService {
         if (houseMemberEntity==null){
             throw new ProprietorException("数据不存在！");
         }
-        List<RelationCarEntity> carEntities = carMapper.selectList(new QueryWrapper<RelationCarEntity>().eq("relationship_id", RelationId));
+        List<RelationCarEntity> carEntities = relationCarMapper.selectList(new QueryWrapper<RelationCarEntity>().eq("relationship_id", RelationId));
         RelationVO relationVO = new RelationVO();
         relationVO.setIdentificationType(houseMemberEntity.getIdentificationType());
         relationVO.setId(houseMemberEntity.getId());
@@ -188,11 +253,12 @@ public class RelationServiceImpl implements IRelationService {
      */
     @Override
     @Transactional
-    public void updateUserRelationDetails(RelationQo relationQo) {
+    public void updateUserRelationDetails(RelationQO relationQo) {
         relationMapper.updateUserRelationDetails(relationQo);
-        List<RelationCarsQo> cars = relationQo.getCars();
+        List<RelationCarsQO> cars = relationQo.getCars();
+        HouseEntity houseEntity = houseMapper.selectById(relationQo.getHouseId());
         if(cars.size()>0){
-            for (RelationCarsQo car : cars) {
+            for (RelationCarsQO car : cars) {
                 if (car.getId()==null||car.getId()==0){
                     car.setId(SnowFlake.nextId());
                     car.setUid(relationQo.getUserId());
@@ -204,15 +270,18 @@ public class RelationServiceImpl implements IRelationService {
                     car.setIdCard(relationQo.getIdCard());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                     relationMapper.insertOne(car);
+                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(car,relationQo,houseEntity));
                 }else {
                     relationMapper.updateUserRelationCar(car);
+                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.update",getUpdateElasticsearchCarQO(car));
                 }
             }
         }
     }
 
+
     @Override
-    public UserHouseEntity getHouse(RelationQo relationQo) {
+    public UserHouseEntity getHouse(RelationQO relationQo) {
         UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("uid", relationQo.getUserId()).eq("house_id", relationQo.getHouseId()).eq("community_id", relationQo.getCommunityId()));
         return entity;
     }
@@ -228,7 +297,7 @@ public class RelationServiceImpl implements IRelationService {
     @Transactional
     public void deleteHouseMemberCars(Long id,String uid) {
         houseMemberMapper.delete(new QueryWrapper<HouseMemberEntity>().eq("uid",uid).eq("id",id));
-        carMapper.delete(new QueryWrapper<RelationCarEntity>().eq("relationship_id",id).eq("uid",uid));
+        relationCarMapper.delete(new QueryWrapper<RelationCarEntity>().eq("relationship_id",id).eq("uid",uid));
     }
 
     /**
@@ -238,7 +307,8 @@ public class RelationServiceImpl implements IRelationService {
      * @Author: chq459799974
      * @Date: 2020/12/23
      **/
-    public boolean isHouseMember(String mobile,Long communityId){
+    @Override
+    public boolean isHouseMember(String mobile, Long communityId){
         Integer count = houseMemberMapper.selectCount(new QueryWrapper<HouseMemberEntity>().eq("mobile", mobile).eq("community_id", communityId));
         return count > 0;
     }

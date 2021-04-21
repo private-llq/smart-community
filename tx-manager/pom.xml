@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>tx-manager</artifactId>
-    <name>tx-manager</name>
+    <name>分布式事物</name>
     <description>分布式事务处理</description>
 
     <properties>

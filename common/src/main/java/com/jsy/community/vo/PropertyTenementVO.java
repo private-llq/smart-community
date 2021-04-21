@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
@@ -44,4 +45,6 @@ public class PropertyTenementVO implements Serializable {
     private String ownerMobile;
     @ApiModelProperty("业主身份证")
     private String ownerIdCard;
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createTime;
 }
