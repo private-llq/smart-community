@@ -44,6 +44,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -78,8 +80,36 @@ public class ProprietorController {
     @IpLimit(prefix = "excel", second = 60, count = 5, desc = "下载业主信息录入Excel")
     @GetMapping(params = {"downloadExcel"})
     @ApiOperation("下载业主信息录入Excel")
-    public ResponseEntity<byte[]> downloadExcel(@RequestParam long communityId) {
-        //1. 设置响应头
+    public void downloadExcel(HttpServletResponse response, @RequestParam long communityId) {
+        //response为HttpServletResponse对象
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("业主导入模板", StandardCharsets.UTF_8) + ".xlxs");
+        //2.2 生成Excel 业主信息录入模板
+        Workbook workbook = ProprietorExcelCommander.exportProprietorInfo();
+        ServletOutputStream out = null;
+        try (workbook) {
+            out = response.getOutputStream();
+            workbook.write(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (workbook != null) {
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        /*//1. 设置响应头
         MultiValueMap<String, String> multiValueMap = setHeader("业主导入模板.xls");
         //2.生成Excel模板
         try {
@@ -90,7 +120,7 @@ public class ProprietorController {
             //已接受。已经接受请求，但未处理完成
             log.error("com.jsy.community.controller.ProprietorController.downloadExcel：{}", e.getMessage());
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
-        }
+        }*/
     }
 
 
