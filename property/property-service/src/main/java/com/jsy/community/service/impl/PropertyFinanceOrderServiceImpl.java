@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -56,7 +55,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                         orderEntity.setHouseId(houseEntity.getId());
                         orderEntity.setPropertyFee(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
                         orderEntity.setPenalSum(new BigDecimal(0));
-                        orderEntity.setTotalMoney(new BigDecimal(0));
+                        orderEntity.setTotalMoney(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
                         orderEntity.setOrderStatus(0);
                         orderEntity.setId(SnowFlake.nextId());
                         propertyFinanceOrderMapper.insert(orderEntity);
@@ -69,7 +68,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                         orderEntity.setHouseId(houseEntity.getId());
                         orderEntity.setPropertyFee(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
                         orderEntity.setPenalSum(new BigDecimal(0));
-                        orderEntity.setTotalMoney(new BigDecimal(0));
+                        orderEntity.setTotalMoney(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
                         orderEntity.setOrderStatus(0);
                         orderEntity.setId(SnowFlake.nextId());
                         propertyFinanceOrderMapper.insert(orderEntity);
@@ -99,12 +98,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         String substring = serialNumber.substring(serialNumber.length() - 2, serialNumber.length());
         str.append(substring);
-        SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
-        str.append(s);
-        int s1=(int) (Math.random() * 999999);;
+        long time = new Date().getTime();
+        String s = String.valueOf(time).substring(String.valueOf(time).length() - 10, String.valueOf(time).length());
+        str.append(time);
+        int s1=(int) (Math.random() * 99);
         str.append(s1);
         return str.toString();
     }
+
 
 }

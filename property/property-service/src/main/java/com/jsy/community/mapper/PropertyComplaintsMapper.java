@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业投诉受理接口
  * @author: Hu
  * @create: 2021-03-19 13:36
  **/

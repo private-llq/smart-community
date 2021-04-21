@@ -22,7 +22,7 @@ import java.util.List;
  * @author: Hu
  * @create: 2021-04-20 16:36
  **/
-@Api(tags = "物业房间账单")
+@Api(tags = "小区物业收费规则")
 @RestController
 @RequestMapping("/feeRule")
 @ApiJSYController

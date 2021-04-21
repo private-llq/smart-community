@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业成员查询接口
  * @author: Hu
  * @create: 2021-03-05 11:20
  **/

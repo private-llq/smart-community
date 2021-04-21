@@ -26,7 +26,7 @@ public class PropertyFinanceOrderController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
 
-    @ApiOperation("查询当前小区物业收费规则")
+    @ApiOperation("")
     @PostMapping("/update")
     public CommonResult update(@RequestParam("communityId") String communityId){
        propertyFinanceOrderService.updateDays();

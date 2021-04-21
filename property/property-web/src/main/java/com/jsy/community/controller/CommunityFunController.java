@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业社区趣事
  * @author: Hu
  * @create: 2020-12-09 10:53
  **/

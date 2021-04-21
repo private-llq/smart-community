@@ -6,7 +6,7 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 
 /**
  * @program: com.jsy.community
- * @description: 意见反馈
+ * @description: 物业意见反馈
  * @author: Hu
  * @create: 2021-04-11 11:15
  **/
