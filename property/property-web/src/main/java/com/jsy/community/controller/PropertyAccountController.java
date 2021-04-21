@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -39,7 +40,6 @@ public class PropertyAccountController {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/20
 	**/
-	
 	@ApiOperation("本社区社区信息查询")
 	@GetMapping("")
 	public CommonResult queryByCommunityId(){
@@ -64,4 +64,17 @@ public class PropertyAccountController {
 		return CommonResult.ok(returnMap,"查询成功");
 	}
 	
+	/**
+	* @Description: 结算账户查询(对公账户)
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/21
+	**/
+	@ApiOperation("结算账户查询")
+	@GetMapping("statementAccount")
+	public CommonResult queryByBankAccountById(@RequestParam Long id){
+		//这里默认结算账户是物业银行卡账户
+		return CommonResult.ok(propertyAccountService.queryBankAccountById(id));
+	}
 }

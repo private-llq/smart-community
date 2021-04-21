@@ -30,4 +30,17 @@ public class PropertyAccountServiceImpl implements IPropertyAccountService {
 	public PropertyAccountBankEntity queryBankAccount(Long communityId){
 		return propertyAccountBankMapper.selectOne(new QueryWrapper<PropertyAccountBankEntity>().eq("community_id",communityId));
 	}
+	
+	/**
+	* @Description: 根据id查对公账号 - 银行卡
+	 * @Param: [id]
+	 * @Return: com.jsy.community.entity.property.PropertyAccountBankEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/4/21
+	**/
+	@Override
+	public PropertyAccountBankEntity queryBankAccountById(Long id){
+		return propertyAccountBankMapper.selectById(id);
+	}
+	
 }

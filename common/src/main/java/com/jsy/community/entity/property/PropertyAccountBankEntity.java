@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Data
 @TableName("t_property_account_bank")
 public class PropertyAccountBankEntity implements Serializable {
+	private Long id;
 	private Long communityId;//社区ID
 	private String accountName;//开户账户名称
 	private String bankName;//银行名称

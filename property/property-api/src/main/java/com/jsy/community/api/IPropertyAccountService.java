@@ -17,4 +17,13 @@ public interface IPropertyAccountService {
 	 * @Date: 2021/4/20
 	**/
 	PropertyAccountBankEntity queryBankAccount(Long communityId);
+	
+	/**
+	* @Description: 根据id查对公账号 - 银行卡
+	 * @Param: [id]
+	 * @Return: com.jsy.community.entity.property.PropertyAccountBankEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/4/21
+	**/
+	PropertyAccountBankEntity queryBankAccountById(Long id);
 }
