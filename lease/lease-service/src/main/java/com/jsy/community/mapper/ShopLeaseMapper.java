@@ -1,7 +1,10 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.lease.HouseLeaseQO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -37,4 +40,13 @@ public interface ShopLeaseMapper extends BaseMapper<ShopLeaseEntity> {
 	
 	
 	List<Long> selectMiddle(List<Long> advantage);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.shop.ShopLeaseEntity>
+	 * @Author lihao
+	 * @Description 条件分页查询商铺
+	 * @Date 2021/4/20 17:25
+	 * @Param [baseQO, info]
+	 **/
+	List<ShopLeaseEntity> getShopByCondition(@Param("qo") BaseQO<HouseLeaseQO> baseQO, @Param("info")Page<ShopLeaseEntity> info);
 }

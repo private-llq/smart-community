@@ -123,36 +123,6 @@ public class ShopLeaseController {
 	private static final Integer IMG_MAX = 19;
 	
 	@Login(allowAnonymous = true)
-	@ApiOperation("根据筛选条件查询商铺列表")
-	@PostMapping("/getShopByCondition")
-	public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
-		String query = baseQO.getQuery().getSearchText();
-		Long areaId = baseQO.getQuery().getHouseAreaId();
-		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO, query, areaId);
-		if (pageInfo != null) {
-			// 当月租金大于10000变成XX.XX万元
-			List<IndexShopVO> records = pageInfo.getRecords();
-			for (IndexShopVO record : records) {
-				if (record.getMonthMoney().doubleValue() > NORM_MONEY) {
-					String s = String.format("%.2f", record.getMonthMoney().doubleValue() / NORM_MONEY) + "万";
-					record.setMonthMoneyString(s);
-				} else if (record.getMonthMoney().compareTo(new BigDecimal(MIN_MONEY)) == 0) {
-					String s = "面议";
-					record.setMonthMoneyString(s);
-				} else {
-					String s = "" + record.getMonthMoney();
-					int i = s.lastIndexOf(".");
-					String substring = s.substring(0, i) + "元";
-					record.setMonthMoneyString(substring);
-				}
-			}
-		} else {
-			return CommonResult.ok(new PageInfo<IndexShopVO>().setCurrent(baseQO.getPage()).setSize(baseQO.getSize()));
-		}
-		return CommonResult.ok(pageInfo);
-	}
-	
-	@Login(allowAnonymous = true)
 	@ApiOperation("商铺头图上传")
 	@PostMapping("/uploadHeadImg")
 	public CommonResult uploadHeadImg(@RequestParam("file") MultipartFile[] files) {
@@ -535,6 +505,16 @@ public class ShopLeaseController {
 		RestHighLevelClient client = ShopLeaseController.getClient();
 		CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
 		System.out.println(response.toString());
+	}
+	
+	
+	
+	@Login(allowAnonymous = true)
+	@ApiOperation("根据筛选条件查询商铺列表")
+	@PostMapping("/getShopByCondition")
+	public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
+		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO);
+		return CommonResult.ok(pageInfo);
 	}
 }
 

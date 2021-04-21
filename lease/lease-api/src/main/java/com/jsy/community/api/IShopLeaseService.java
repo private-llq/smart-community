@@ -70,15 +70,6 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	List<Map<String, Object>> listShop(String userId);
 	
 	/**
-	 * @return java.util.List<com.jsy.community.entity.shop.ShopLeaseEntity>
-	 * @Author lihao
-	 * @Description 根据条件查询商铺列表
-	 * @Date 2020/12/21 10:09
-	 * @Param [shopQO]
-	 **/
-	PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO,String query,Long areaId);
-	
-	/**
 	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.entity.shop.ShopLeaseEntity>
 	 * @Author lihao
 	 * @Description 根据查询条件查询商铺列表
@@ -141,4 +132,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	 * @Param [userId]
 	 **/
 	List<UserShopLeaseVO> listUserShop(String userId);
+	
+	
+	PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO);
 }
