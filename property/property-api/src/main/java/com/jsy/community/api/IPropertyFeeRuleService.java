@@ -12,7 +12,13 @@ import java.util.List;
  * @create: 2021-04-20 16:30
  **/
 public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity> {
+    /**
+     * @Description: 查询当前小区收费规则
+     * @author: Hu
+     * @since: 2021/4/21 17:08
+     * @Param:
+     * @return:
+     */
     List<PropertyFeeRuleEntity> findList(String communityId);
 
-    void updateAll();
 }

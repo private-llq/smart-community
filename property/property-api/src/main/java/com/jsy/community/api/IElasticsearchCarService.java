@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业车辆查询
  * @author: Hu
  * @create: 2021-03-25 15:29
  **/

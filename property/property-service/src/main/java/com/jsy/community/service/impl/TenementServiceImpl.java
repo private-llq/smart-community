@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业租户查询
  * @author: Hu
  * @create: 2021-03-10 14:36
  **/

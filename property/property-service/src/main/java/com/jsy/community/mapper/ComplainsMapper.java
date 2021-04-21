@@ -27,5 +27,12 @@ public interface ComplainsMapper extends BaseMapper<ComplainEntity> {
      */
     List<ComplainVO> listAll(@Param("page") Long page,@Param("size") Long size,@Param("query")PropertyComplaintsQO query);
 
+    /**
+     * @Description: 总条数
+     * @author: Hu
+     * @since: 2021/4/21 17:06
+     * @Param:
+     * @return:
+     */
     Long findTotel(@Param("query") PropertyComplaintsQO query);
 }

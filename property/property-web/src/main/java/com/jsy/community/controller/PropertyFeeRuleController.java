@@ -22,7 +22,7 @@ import java.util.List;
  * @author: Hu
  * @create: 2021-04-20 16:36
  **/
-@Api(tags = "物业房间账单")
+@Api(tags = "小区物业收费规则")
 @RestController
 @RequestMapping("/feeRule")
 @ApiJSYController
@@ -38,12 +38,6 @@ public class PropertyFeeRuleController {
         List<PropertyFeeRuleEntity> list=propertyFeeRuleService.findList(communityId);
         return CommonResult.ok(list);
     }
-    @ApiOperation("查询当前小区物业收费规则")
-    @PostMapping("/update")
-//    @Login
-    public CommonResult yaer(){
-        propertyFeeRuleService.updateAll();
-        return CommonResult.ok();
-    }
+
 
 }

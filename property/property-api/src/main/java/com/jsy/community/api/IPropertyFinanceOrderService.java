@@ -10,4 +10,5 @@ import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
  * @create: 2021-04-20 16:28
  **/
 public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOrderEntity> {
+    void updateDays();
 }
