@@ -31,11 +31,6 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     private AdminUserMapper adminUserMapper;
 
     @Override
-    public PropertyFeeRuleEntity selectOneById(Long id) {
-        return propertyFeeRuleMapper.selectById(id);
-    }
-
-    @Override
     public void updateOneRule(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
         propertyFeeRuleEntity.setUpdateBy(userInfo.getUid());
         propertyFeeRuleMapper.updateById(propertyFeeRuleEntity);

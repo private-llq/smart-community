@@ -35,8 +35,8 @@ public class RedisConfig {
 	@Value("${spring.redis.host}")
 	private String redisHost;
 
-//	@Value("${spring.redis.password}")
-//	private String redisPassword;
+	@Value("${spring.redis.password}")
+	private String redisPassword;
 
 	@Value("${spring.redis.database}")
 	private Integer redisDatabase;
@@ -47,7 +47,7 @@ public class RedisConfig {
 		SingleServerConfig singleServerConfig = config.useSingleServer();
 		singleServerConfig.setAddress("redis://"+ redisHost + ":" + redisPort);
 		singleServerConfig.setDatabase(redisDatabase);
-//		singleServerConfig.setPassword(redisPassword);
+		singleServerConfig.setPassword(redisPassword);
 		//连接到任何Redis服务器时超时。默认值是10000毫秒。
 		singleServerConfig.setConnectTimeout(10000);
 		//如果一段timeout时间未使用池化连接，并且当前连接量大于最小空闲连接池大小，则它将关闭并从池中删除。 超时（以毫秒为单位）

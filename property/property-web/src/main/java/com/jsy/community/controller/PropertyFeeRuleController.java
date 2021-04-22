@@ -58,21 +58,12 @@ public class PropertyFeeRuleController {
     }
 
     @ApiOperation("修改")
-    @GetMapping("/updateById")
+    @PutMapping("/updateById")
     @Login
     public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);
         return CommonResult.ok();
     }
-    @ApiOperation("查询一条详情")
-    @GetMapping("/selectOne")
-    @Login
-    public CommonResult selectOne(@RequestParam("id")Long id){
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        PropertyFeeRuleEntity entity = propertyFeeRuleService.selectOneById(id);
-        return CommonResult.ok(entity);
-    }
-
 
 }

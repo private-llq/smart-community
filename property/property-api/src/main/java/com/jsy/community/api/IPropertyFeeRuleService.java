@@ -42,6 +42,4 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      */
     void updateOneRule(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity);
 
-
-    PropertyFeeRuleEntity selectOneById(Long id);
 }
