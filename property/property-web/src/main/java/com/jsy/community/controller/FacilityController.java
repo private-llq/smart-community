@@ -6,7 +6,9 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IFacilityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.hk.FacilityEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -15,8 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * <p>
@@ -54,43 +54,6 @@ public class FacilityController {
 		return CommonResult.ok();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	@ApiOperation("删除设备")
 	@GetMapping("/deleteFacility")
 	public CommonResult deleteFacility(@RequestParam("id") Long id) {
@@ -98,11 +61,22 @@ public class FacilityController {
 		return CommonResult.ok();
 	}
 	
+	
+	
+	
+	
+	
 	@ApiOperation("分页查询设备")
 	@PostMapping("/listFacility")
-	public CommonResult listFacility(@RequestBody FacilityQO facilityQO) {
-		List<FacilityEntity> list = facilityService.listFacility(facilityQO);
-		return CommonResult.ok(list);
+	public CommonResult listFacility(@RequestBody BaseQO<FacilityQO> facilityQO) {
+		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		
+		if (facilityQO.getQuery()==null) {
+			facilityQO.setQuery(new FacilityQO());
+		}
+		facilityQO.getQuery().setCommunityId(communityId);
+		PageInfo<FacilityEntity> pageInfo= facilityService.listFacility(facilityQO);
+		return CommonResult.ok(pageInfo);
 	}
 }
 

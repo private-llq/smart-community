@@ -2,9 +2,9 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.hk.FacilityEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
-
-import java.util.List;
+import com.jsy.community.utils.PageInfo;
 
 /**
  * <p>
@@ -32,7 +32,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date 2021/3/13 16:02
 	 * @Param [facilityEntity, page, size]
 	 **/
-	List<FacilityEntity> listFacility(FacilityQO facilityQO);
+	PageInfo<FacilityEntity> listFacility(BaseQO<FacilityQO> facilityQO);
 	
 	/**
 	 * @return void

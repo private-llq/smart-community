@@ -1,5 +1,6 @@
 package com.jsy.community.entity.hk;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
@@ -28,6 +29,10 @@ import java.util.Date;
 @TableName("t_facility")
 @ApiModel(value = "Facility对象", description = "设备信息")
 public class FacilityEntity extends BaseEntity {
+	
+	@ApiModelProperty(value = "设备在线状态")
+	@TableField(exist = false)
+	private Integer status;
 	
 	@ApiModelProperty(value = "创建人id")
 	private String personId;
@@ -67,8 +72,8 @@ public class FacilityEntity extends BaseEntity {
 	private String ip;
 	
 	@ApiModelProperty(value = "端口号")
-	@NotBlank(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "端口号不能为空")
-	private String port;
+	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "端口号不能为空")
+	private Short port;
 	
 	@ApiModelProperty(value = "设备账号")
 	private String username;
