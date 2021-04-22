@@ -1,0 +1,47 @@
+package com.jsy.community.entity.property;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.jsy.community.entity.BaseEntity;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+/**
+ * @Author: Pipi
+ * @Description: 物业财务-结算单实体
+ * @Date: 2021/4/21 17:57
+ * @Version: 1.0
+ **/
+@Data
+@ApiModel("物业财务-结算单")
+@TableName("t_property_finance_statement")
+public class PropertyFinanceStatementEntity extends BaseEntity {
+
+    @ApiModelProperty("社区id")
+    private Long communityId;
+
+    @ApiModelProperty("结算单号")
+    private Long statementNum;
+
+    @ApiModelProperty("结算时间段-开始时间")
+    private LocalDateTime startDate;
+
+    @ApiModelProperty("结算时间段-开始时间")
+    private LocalDateTime endDate;
+
+    @ApiModelProperty("结算状态1.待审核 2.结算中 3.已结算 4.驳回")
+    private Integer statementStatus;
+
+    @ApiModelProperty("结算金额")
+    private BigDecimal totalMoney;
+
+    @ApiModelProperty("收款账户id(物业对公账户)")
+    private Long receiptAccount;
+
+    @ApiModelProperty("驳回原因")
+    private String rejectReason;
+
+}
