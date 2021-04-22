@@ -82,11 +82,11 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
             return new PageInfo();
         }
         //收款合计
-	    BigDecimal totalReceipt = new BigDecimal("0");
+	    BigDecimal totalReceipt = new BigDecimal(0);
         HashSet<String> receiptNums = new HashSet<>();
         for(PropertyFinanceReceiptEntity entity : pageData.getRecords()){
             receiptNums.add(entity.getReceiptNum());
-	        totalReceipt.add(entity.getReceiptMoney());
+	        totalReceipt = totalReceipt.add(entity.getReceiptMoney());
         }
         //关联查询账单
         List<PropertyFinanceOrderEntity> orderTotalList = propertyFinanceOrderService.queryByReceiptNums(receiptNums,orderQuery);
