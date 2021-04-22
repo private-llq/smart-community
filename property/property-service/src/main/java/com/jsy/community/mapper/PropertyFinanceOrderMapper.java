@@ -3,8 +3,13 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -39,4 +44,26 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @Date: 2021/4/22 10:26
      **/
     List<PropertyFinanceOrderEntity> queryNeedStatementOrderListByCommunityIdAndOrderTime(List<Long> communityIdS);
+    
+    /**
+    * @Description: 根据收款单号批量查询列表
+     * @Param: [receiptNums,query]
+     * @Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/22
+    **/
+    List<PropertyFinanceOrderEntity> queryByReceiptNums(@Param("receiptNums")Collection<String> receiptNums, @Param("query")PropertyFinanceOrderEntity query);
+    
+    /**
+    * @Description: 账单号模糊查询收款单号列表
+     * @Param: [orderNum]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/22
+    **/
+    @Select("select re.receipt_num from t_property_finance_order o \n" +
+        "join t_property_finance_receipt re on o.receipt_num = re.receipt_num \n" +
+        "where o.receipt_num is not null and o.order_num like concat('%',#{orderNum},'%') \n" +
+        "group by o.receipt_num")
+    List<String> queryReceiptNumsListByOrderNumLike(String orderNum);
 }

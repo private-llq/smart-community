@@ -26,4 +26,17 @@
             </foreach>
         </where>
     </select>
+
+    <!-- 根据收款单号批量查询列表 -->
+    <select id="queryByReceiptNums" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
+        select * from t_property_finance_order
+        where receipt_num in
+        <foreach collection="receiptNums" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="query != null">
+            <if test="query.orderNum != null and query.orderNum != ''">and order_num like concat('%',#{query.orderNum},'%')</if>
+        </if>
+    </select>
+
 </mapper>

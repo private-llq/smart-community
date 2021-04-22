@@ -5,6 +5,10 @@ import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 
 import java.util.List;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @program: com.jsy.community
  * @description:  物业房间账单
@@ -22,4 +26,22 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Date: 2021/4/22 10:24
      **/
     List<PropertyFinanceOrderEntity> getNeedStatementOrderList(List<Long> communityIdS);
+    
+    /**
+    * @Description: 根据收款单号批量查询列表
+     * @Param: [receiptNums,query]
+     * @Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/22
+    **/
+    List<PropertyFinanceOrderEntity> queryByReceiptNums(Collection<String> receiptNums,PropertyFinanceOrderEntity query);
+    
+    /**
+    * @Description: 账单号模糊查询收款单号列表
+     * @Param: [orderNum]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/22
+    **/
+    List<String> queryReceiptNumsListByOrderNumLike(String orderNum);
 }

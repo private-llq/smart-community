@@ -17,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -118,5 +120,29 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         return str.toString();
     }
 
+    /**
+    * @Description: 根据收款单号批量查询列表
+     * @Param: [receiptNums,query]
+     * @Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/22
+    **/
+    @Override
+    public List<PropertyFinanceOrderEntity> queryByReceiptNums(Collection<String> receiptNums, PropertyFinanceOrderEntity query){
+        return propertyFinanceOrderMapper.queryByReceiptNums(receiptNums,query);
+    }
+    
+    /**
+    * @Description: 账单号模糊查询收款单号列表
+     * @Param: [orderNum]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/22
+    **/
+    @Override
+    public List<String> queryReceiptNumsListByOrderNumLike(String orderNum){
+        return propertyFinanceOrderMapper.queryReceiptNumsListByOrderNumLike(orderNum);
+    }
+    
 
 }
