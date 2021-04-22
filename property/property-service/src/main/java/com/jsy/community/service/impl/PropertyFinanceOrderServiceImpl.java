@@ -10,6 +10,9 @@ import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.PropertyFinanceOrderVO;
+import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +43,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
 
 
+    /**
+     * @Description: 更新所有小区账单
+     * @author: Hu
+     * @since: 2021/4/22 9:28
+     * @Param:
+     * @return:
+     */
     @Override
     @Transactional
     public void updateDays(){
@@ -77,10 +88,49 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                     }
                 }
             }
-
         }
-
     }
+
+    @Override
+    public Map<String, Object> houseCost(AdminInfoVo userInfo, Long houseId) {
+        List<PropertyFinanceOrderVO> list = propertyFinanceOrderMapper.houseCost(houseId);
+        for (PropertyFinanceOrderVO propertyFinanceOrderVO : list) {
+            propertyFinanceOrderVO.setHouseTypeText(propertyFinanceOrderVO.getHouseType()==1?"商铺":"住宅");
+        }
+        UserPropertyFinanceOrderVO userPropertyFinanceOrderVO=propertyFinanceOrderMapper.findUser(houseId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("user",userPropertyFinanceOrderVO);
+        map.put("bill",list);
+        return map;
+    }
+
+    /**
+     * @Description: 更新所有小区账单
+     * @author: Hu
+     * @since: 2021/4/22 9:28
+     * @Param:
+     * @return:
+     */
+    @Override
+    @Transactional
+    public void updatePenalSum(){
+        List<Long> list=propertyFinanceOrderMapper.communityIdList();
+        for (Long id : list) {
+            PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("community_id",id));
+            if (entity != null) {
+                List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("community_id", id));
+                for (PropertyFinanceOrderEntity orderEntity : entities) {
+                        //在缴费规则的条件下把账单加上违约天数和当前时间比较
+                        if (orderEntity.getOrderTime().plusDays(entity.getPenalDays()).isBefore(LocalDate.now())) {
+                            orderEntity.setPenalSum(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum().add(new BigDecimal(1)))));
+                            orderEntity.setTotalMoney(orderEntity.getPropertyFee().add(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum().add(new BigDecimal(1))))));
+                            propertyFinanceOrderMapper.updateById(orderEntity);
+                        }
+                    }
+            }
+        }
+    }
+
 
     /**
      *@Author: Pipi
@@ -94,6 +144,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         return baseMapper.queryNeedStatementOrderListByCommunityIdAndOrderTime(communityIdS);
     }
 
+
+    /**
+     * @Description: 生成账单号
+     * @author: Hu
+     * @since: 2021/4/22 9:28
+     * @Param:
+     * @return:
+     */
     public String getOrderNum(String communityId,String serialNumber){
         StringBuilder str=new StringBuilder();
         if (communityId.length()>=4){

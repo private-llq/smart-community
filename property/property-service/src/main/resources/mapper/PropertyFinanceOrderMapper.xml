@@ -39,4 +39,24 @@
         </if>
     </select>
 
+    <select id="houseCost" resultType="com.jsy.community.vo.property.PropertyFinanceOrderVO">
+        select
+        tpfo.id,tpfo.order_num,tpfo.community_id,tpfo.order_time,tpfo.house_id,tpfo.property_fee,
+        tpfo.penal_sum,tpfo.total_money,th.build_area,th.number,th.building,th.unit,th.floor,th.house_type
+        from t_property_finance_order tpfo
+        join t_user_house tuh
+        on tpfo.house_id=tuh.house_id
+        join t_house th
+        on tuh.house_id=th.id
+        where th.id=#{houseId}  and tpfo.order_status=0
+    </select>
+    <select id="findUser" resultType="com.jsy.community.vo.property.UserPropertyFinanceOrderVO">
+        select th.number,tu.real_name
+        from t_user_house tuh
+        join t_house th
+        on tuh.house_id=th.id
+        join t_user tu
+        on tuh.uid=tu.uid
+        where tuh.house_id=#{houseId}
+    </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
+import com.jsy.community.vo.admin.AdminInfoVo;
 
 import java.util.List;
 
@@ -19,6 +20,28 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      * @Param:
      * @return:
      */
-    List<PropertyFeeRuleEntity> findList(String communityId);
+    List<PropertyFeeRuleEntity> findList(Long communityId);
 
+    PropertyFeeRuleEntity selectOne(Long communityId, Integer type);
+
+    /**
+     * @Description: 启用或者停用
+     * @author: Hu
+     * @since: 2021/4/22 14:28
+     * @Param:
+     * @return:
+     */
+    void startOrOut(AdminInfoVo userInfo, Integer status,Long id);
+
+    /**
+     * @Description: 修改
+     * @author: Hu
+     * @since: 2021/4/22 15:28
+     * @Param:
+     * @return:
+     */
+    void updateOneRule(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity);
+
+
+    PropertyFeeRuleEntity selectOneById(Long id);
 }

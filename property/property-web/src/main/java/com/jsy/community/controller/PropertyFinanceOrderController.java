@@ -1,16 +1,18 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -26,10 +28,14 @@ public class PropertyFinanceOrderController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
 
-    @ApiOperation("")
-    @PostMapping("/update")
-    public CommonResult update(@RequestParam("communityId") String communityId){
-       propertyFinanceOrderService.updateDays();
-        return CommonResult.ok();
+    @ApiOperation("查询房屋所有未缴账单")
+    @GetMapping("/houseCost")
+    @Login
+    public CommonResult houseCost(@RequestParam("houseId") Long houseId){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        Map<String, Object> map=propertyFinanceOrderService.houseCost(userInfo,houseId);
+        return CommonResult.ok(map);
     }
+
+
 }
