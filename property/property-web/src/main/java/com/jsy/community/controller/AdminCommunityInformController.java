@@ -146,8 +146,8 @@ public class AdminCommunityInformController {
         }
         ValidatorUtils.validateEntity(qo.getQuery(), PushInformQO.PropertyInformListValidate.class);
         qo.getQuery().setAcctId(UserUtils.getAdminCommunityId());
-        List<PushInformEntity> pushInformEntities = communityInformService.queryInformList(qo);
-        return CommonResult.ok(pushInformEntities);
+//        List<PushInformEntity> pushInformEntities = communityInformService.queryInformList(qo);
+        return CommonResult.ok(communityInformService.queryInformList(qo));
     }
 
     /**

@@ -192,7 +192,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      *@Date: 2021/4/20 13:53
      **/
     @Override
-    public List<PushInformEntity> queryInformList(BaseQO<PushInformQO> qo) {
+    public Page<PushInformEntity> queryInformList(BaseQO<PushInformQO> qo) {
         QueryWrapper<PushInformEntity>  queryWrapper = new QueryWrapper<>();
         PushInformQO query = qo.getQuery();
         Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
@@ -227,7 +227,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
             queryWrapper.le("DATE(update_time)", query.getEndUpdateTime());
         }
         queryWrapper.last("ORDER BY push_state asc,update_time,create_time desc");
-        return communityInformMapper.selectPage(objectPage, queryWrapper).getRecords();
+        return communityInformMapper.selectPage(objectPage, queryWrapper);
     }
 
     /**

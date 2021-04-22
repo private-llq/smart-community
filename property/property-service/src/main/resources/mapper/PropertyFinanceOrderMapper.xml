@@ -10,4 +10,20 @@
         on tuh.house_id=th.id
         where th.community_id=#{id} and tuh.check_status=1
     </select>
+    <!-- 获取上一个月的需要结算和被驳回的账单 -->
+    <select id="queryNeedStatementOrderListByCommunityIdAndOrderTime" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
+        select
+            *
+        from t_property_finance_order
+        <where>
+            DATE_FORMAT( order_time, '%Y-%m' ) = DATE_FORMAT(
+                DATE_SUB( NOW(), INTERVAL 1 MONTH ),
+                '%Y-%m'
+            )
+            and statement_status in (0, 4)
+            <foreach collection="list" open=" and community_id in (" close=")" separator="," item="communityId">
+                #{communityId}
+            </foreach>
+        </where>
+    </select>
 </mapper>

@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.PropertyFinanceCycleMapper">
+    <!-- 根据号数获取需要结算的社区ID列表 -->
+    <select id="queryCommunityIdByStartDate" resultType="java.lang.Long">
+        select
+            community_id
+        from t_property_finance_cycle
+        where
+            start_date = #{startDate}
+    </select>
 </mapper>

@@ -80,6 +80,18 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     }
 
+    /**
+     *@Author: Pipi
+     *@Description: 获取上一个月的需要结算和被驳回的账单
+     *@Param: communityIdS: 社区ID列表
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     *@Date: 2021/4/22 10:24
+     **/
+    @Override
+    public List<PropertyFinanceOrderEntity> getNeedStatementOrderList(List<Long> communityIdS) {
+        return baseMapper.queryNeedStatementOrderListByCommunityIdAndOrderTime(communityIdS);
+    }
+
     public String getOrderNum(String communityId,String serialNumber){
         StringBuilder str=new StringBuilder();
         if (communityId.length()>=4){
