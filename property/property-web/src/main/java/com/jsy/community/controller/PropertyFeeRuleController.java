@@ -44,7 +44,7 @@ public class PropertyFeeRuleController {
     @Login
     public CommonResult selectOne(@RequestParam("type")Integer type){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        PropertyFeeRuleEntity propertyFeeRuleEntity=propertyFeeRuleService.selectOne(userInfo.getCommunityId(),type);
+        PropertyFeeRuleEntity propertyFeeRuleEntity=propertyFeeRuleService.selectByOne(userInfo.getCommunityId(),type);
         return CommonResult.ok(propertyFeeRuleEntity);
     }
 

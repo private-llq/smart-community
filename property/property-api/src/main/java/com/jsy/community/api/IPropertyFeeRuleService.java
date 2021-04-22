@@ -22,7 +22,14 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      */
     List<PropertyFeeRuleEntity> findList(Long communityId);
 
-    PropertyFeeRuleEntity selectOne(Long communityId, Integer type);
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/4/22 16:26
+     * @Param:
+     * @return:
+     */
+    PropertyFeeRuleEntity selectByOne(Long communityId, Integer type);
 
     /**
      * @Description: 启用或者停用

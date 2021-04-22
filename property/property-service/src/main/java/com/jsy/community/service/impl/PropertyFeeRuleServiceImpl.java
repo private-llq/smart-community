@@ -51,7 +51,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     }
 
     @Override
-    public PropertyFeeRuleEntity selectOne(Long communityId, Integer type) {
+    public PropertyFeeRuleEntity selectByOne(Long communityId, Integer type) {
         return propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type",type).eq("community_id",communityId));
     }
 
