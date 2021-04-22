@@ -50,7 +50,6 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 		wrapper.eq("community_id", facilityTypeEntity.getCommunityId()).eq("id", facilityTypeEntity.getId());
 		FacilityTypeEntity typeEntity = facilityTypeMapper.selectOne(wrapper);
 		if (typeEntity != null) {
-			System.out.println(facilityTypeEntity.getId());
 			facilityTypeMapper.updateById(facilityTypeEntity);
 		}
 	}

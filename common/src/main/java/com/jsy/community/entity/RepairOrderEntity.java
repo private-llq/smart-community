@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -98,6 +99,9 @@ public class RepairOrderEntity extends BaseEntity {
     
     @ApiModelProperty(value = "维修时间")
     private Date serviceTime;
+    
+    @ApiModelProperty(value = "报修时间")
+    private LocalDateTime orderTime;
     
     @ApiModelProperty(value = "完成时间")
     private Date successTime;

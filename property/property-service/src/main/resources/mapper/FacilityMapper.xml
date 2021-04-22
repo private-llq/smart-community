@@ -6,28 +6,38 @@
         from t_facility
         <where>
             <!-- 设备编号 -->
-            <if test="number!=null and number!=''">
-                number like concat("%",#{number},"%")
+            <if test="qo.number!=null and qo.number!=''">
+                number like concat("%",#{qo.number},"%")
             </if>
             <!-- 设备名称 -->
-            <if test="name!=null and name!=''">
-                and name like concat("%",#{name},"%")
+            <if test="qo.name!=null and qo.name!=''">
+                and name like concat("%",#{qo.name},"%")
             </if>
             <!-- 设备所属分类 -->
-            <if test="facilityTypeName!=null and facilityTypeName!=''">
-                and facility_type_name like concat("%",#{facilityTypeName},"%")
+            <if test="qo.facilityTypeName!=null and qo.facilityTypeName!=''">
+                and facility_type_name like concat("%",#{qo.facilityTypeName},"%")
             </if>
             <!-- 设备备注 -->
-            <if test="remark!=null and remark!=''">
-                and remark like concat("%",#{remark},"%")
+            <if test="qo.remark!=null and qo.remark!=''">
+                and remark like concat("%",#{qo.remark},"%")
             </if>
-            <!-- 数据同步时间 -->
-            <if test="startTime!=null and endTime!=null">
-                and data_connect_time between #{startTime} and #{endTime}
+            <!-- 数据同步时间                    超级注意：这里现在是这样写的哟   是开始时间和完成时间都要传  一个不传都不行  因为阿黄说的 他一般都是2个一起穿-->
+            <if test="qo.startTime!=null and qo.endTime!=null">
+                and data_connect_time between #{qo.startTime} and #{endTime}
             </if>
-            and deleted = 0 and community_id = #{communityId} and facility_type_id = #{facilityTypeId}
+            <!-- 设备所属分类 -->
+            <if test="qo.facilityTypeId!=null">
+                and facility_type_id = #{qo.facilityTypeId}
+            </if>
+            and deleted = 0 and community_id = #{qo.communityId}
         </where>
         order by create_time desc
-        limit #{page},#{size}
     </select>
+
+
+    <insert id="insertFacilityStatus">
+        insert into t_facility_status (id,facility_handle,status,facility_id) values (#{id},#{facilityHandle},#{status},#{facilityId})
+    </insert>
+
+
 </mapper>
