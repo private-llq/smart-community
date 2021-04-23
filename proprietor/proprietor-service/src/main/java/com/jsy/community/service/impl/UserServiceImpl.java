@@ -889,7 +889,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     **/
     @Override
     public Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids){
-        if(CollectionUtils.isEmpty(uids)){
+        if(CollectionUtils.isEmpty(uids) || (uids.size() == 1 && uids.contains(null))){
             return new HashMap<>();
         }
         return userMapper.queryNameByUidBatch(uids);

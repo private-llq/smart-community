@@ -609,7 +609,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	**/
 	@Override
 	public Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> ids){
-		if(CollectionUtils.isEmpty(ids)){
+		if(CollectionUtils.isEmpty(ids) || (ids.size() == 1 && ids.contains(null))){
 			return new HashMap<>();
 		}
 		return houseMapper.queryIdAndHouseMap(ids);

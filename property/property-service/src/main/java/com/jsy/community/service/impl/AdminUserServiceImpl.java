@@ -392,7 +392,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList){
-		if(CollectionUtils.isEmpty(uidList)){
+		if(CollectionUtils.isEmpty(uidList) || (uidList.size() == 1 && uidList.contains(null))){
 			return new HashMap<>();
 		}
 		return adminUserMapper.queryNameByUidBatch(uidList);

@@ -248,7 +248,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
     **/
     @Override
     public Map<String,PropertyFinanceStatementEntity> queryByStatementNumBatch(Collection<String> nums){
-        if(CollectionUtils.isEmpty(nums)){
+        if(CollectionUtils.isEmpty(nums) || (nums.size() == 1 && nums.contains(null))){
             return new HashMap<>();
         }
         return propertyFinanceStatementMapper.queryByStatementNumBatch(nums);

@@ -118,7 +118,7 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
     **/
     @Override
 	public Map<String,PropertyFinanceReceiptEntity> queryByReceiptNumBatch(Collection<String> nums){
-    	if(CollectionUtils.isEmpty(nums)){
+    	if(CollectionUtils.isEmpty(nums) || (nums.size() == 1 && nums.contains(null))){
     		return new HashMap<>();
 	    }
     	return propertyFinanceReceiptMapper.queryByReceiptNumBatch(nums);
