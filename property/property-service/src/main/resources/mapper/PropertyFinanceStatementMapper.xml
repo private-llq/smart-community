@@ -9,4 +9,13 @@
             #{statementNum}
         </foreach>
     </update>
+
+    <!-- 结算单号批量查询 单号-结算单数据 映射 -->
+    <select id="queryByStatementNumBatch" resultType="com.jsy.community.entity.property.PropertyFinanceStatementEntity">
+        select statement_num as statementNum, create_time,statement_status from t_property_finance_statement
+        where statement_num in
+        <foreach collection="nums" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
 </mapper>
