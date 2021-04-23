@@ -224,6 +224,47 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if(!StringUtils.isEmpty(query.getOrderNum())){
             queryWrapper.like("order_num",query.getOrderNum());
         }
+        if(!StringUtils.isEmpty(query.getReceiptNum())){
+            queryWrapper.like("receipt_num",query.getReceiptNum());
+        }
+        if(!StringUtils.isEmpty(query.getStatementNum())){
+            queryWrapper.like("statement_num",query.getStatementNum());
+        }
+        if(query.getOrderStatus() != null){
+            queryWrapper.eq("order_status",query.getOrderStatus());
+        }
+        if(query.getStatementStatus() != null){
+            queryWrapper.eq("statement_status",query.getStatementStatus());
+        }
+        if(query.getHouseId() != null){
+            queryWrapper.eq("house_id",query.getHouseId());
+        }
+        if(query.getOrderStartDate() != null){
+            queryWrapper.ge("order_time",query.getOrderStartDate());
+        }
+        if(query.getOrderEndDate() != null){
+            queryWrapper.ge("order_time",query.getOrderEndDate());
+        }
+        if(query.getReceiptStartDate() != null || query.getReceiptEndDate() != null){
+            PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
+            receiptEntity.setStartDate(query.getReceiptStartDate());
+            receiptEntity.setEndDate(query.getReceiptEndDate());
+            List<String> receiptNums = propertyFinanceReceiptService.queryReceiptNumsByCondition(receiptEntity);
+            if(CollectionUtils.isEmpty(receiptNums)){
+                return new PageInfo<>();
+            }
+            queryWrapper.in("receipt_num",receiptNums);
+        }
+        if(query.getStatementStartDate() != null || query.getStatementEndDate() != null){
+            PropertyFinanceStatementEntity statementEntity = new PropertyFinanceStatementEntity();
+            statementEntity.setCreateStartDate(query.getStatementStartDate());
+            statementEntity.setCreateEndDate(query.getStatementEndDate());
+            List<String> statementNums = propertyFinanceStatementService.queryStatementNumsByCondition(statementEntity);
+            if(CollectionUtils.isEmpty(statementNums)){
+                return new PageInfo<>();
+            }
+            queryWrapper.in("statement_num",statementNums);
+        }
         Page<PropertyFinanceOrderEntity> pageData = propertyFinanceOrderMapper.selectPage(page,queryWrapper);
         if(CollectionUtils.isEmpty(pageData.getRecords())){
             return new PageInfo<>();

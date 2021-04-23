@@ -254,4 +254,16 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         return propertyFinanceStatementMapper.queryByStatementNumBatch(nums);
     }
     
+    /**
+     * @Description: 条件查询批量结算单号
+     * @Param: [query]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+     **/
+    @Override
+    public List<String> queryStatementNumsByCondition(PropertyFinanceStatementEntity query){
+        return propertyFinanceStatementMapper.queryStatementNumsByCondition(query);
+    }
+    
 }

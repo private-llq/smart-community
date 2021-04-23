@@ -84,10 +84,9 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @Author: chq459799974
      * @Date: 2021/4/22
     **/
-    @Select("select re.receipt_num from t_property_finance_order o \n" +
+    @Select("select distinct re.receipt_num from t_property_finance_order o \n" +
         "join t_property_finance_receipt re on o.receipt_num = re.receipt_num \n" +
-        "where o.receipt_num is not null and o.order_num like concat('%',#{orderNum},'%') \n" +
-        "group by o.receipt_num")
+        "where o.receipt_num is not null and o.order_num like concat('%',#{orderNum},'%')")
     List<String> queryReceiptNumsListByOrderNumLike(String orderNum);
 
     /**

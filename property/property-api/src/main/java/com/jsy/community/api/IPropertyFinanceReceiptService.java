@@ -5,6 +5,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,4 +32,13 @@ public interface IPropertyFinanceReceiptService {
 	 * @Date: 2021/4/23
 	**/
 	Map<String,PropertyFinanceReceiptEntity> queryByReceiptNumBatch(Collection<String> nums);
+	
+	/**
+	* @Description: 条件查询批量收款单号
+	 * @Param: [query]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	List<String> queryReceiptNumsByCondition(PropertyFinanceReceiptEntity query);
 }

@@ -9,4 +9,13 @@
             #{item}
         </foreach>
     </select>
+
+    <!-- 条件查询批量收款单号 -->
+    <select id="queryReceiptNumsByCondition" resultType="String">
+        select receipt_num from t_property_finance_receipt
+        <where>
+            <if test="query.startDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ >= ]]> #{query.startDate}</if>
+            <if test="query.endDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ <= ]]> #{query.endDate}</if>
+        </where>
+    </select>
 </mapper>

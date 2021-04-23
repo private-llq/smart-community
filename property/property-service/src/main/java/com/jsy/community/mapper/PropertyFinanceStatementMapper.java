@@ -3,9 +3,11 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
 import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,4 +36,12 @@ public interface PropertyFinanceStatementMapper extends BaseMapper<PropertyFinan
     @MapKey("statementNum")
     Map<String,PropertyFinanceStatementEntity> queryByStatementNumBatch(Collection<String> nums);
     
+    /**
+     * @Description: 条件查询批量结算单号
+     * @Param: [query]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+     **/
+    List<String> queryStatementNumsByCondition(@Param("query")PropertyFinanceStatementEntity query);
 }

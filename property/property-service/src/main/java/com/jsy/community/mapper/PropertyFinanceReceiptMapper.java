@@ -3,8 +3,10 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,4 +26,12 @@ public interface PropertyFinanceReceiptMapper extends BaseMapper<PropertyFinance
 	@MapKey("receiptNum")
 	Map<String,PropertyFinanceReceiptEntity> queryByReceiptNumBatch(Collection<String> nums);
 	
+	/**
+	* @Description: 条件查询批量收款单号
+	 * @Param: [query]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	List<String> queryReceiptNumsByCondition(@Param("query")PropertyFinanceReceiptEntity query);
 }

@@ -18,4 +18,13 @@
             #{item}
         </foreach>
     </select>
+
+    <!-- 条件查询批量结算单号 -->
+    <select id="queryStatementNumsByCondition" resultType="String">
+        select statement_num from t_property_finance_statement
+        <where>
+            <if test="query.createStartDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ >= ]]> #{query.createStartDate}</if>
+            <if test="query.createEndDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ <= ]]> #{query.createEndDate}</if>
+        </where>
+    </select>
 </mapper>

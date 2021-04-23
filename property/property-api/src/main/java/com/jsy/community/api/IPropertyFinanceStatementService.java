@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,4 +31,13 @@ public interface IPropertyFinanceStatementService extends IService<PropertyFinan
      * @Date: 2021/4/23
     **/
     Map<String,PropertyFinanceStatementEntity> queryByStatementNumBatch(Collection<String> nums);
+    
+    /**
+    * @Description: 条件查询批量结算单号
+     * @Param: [query]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    List<String> queryStatementNumsByCondition(PropertyFinanceStatementEntity query);
 }
