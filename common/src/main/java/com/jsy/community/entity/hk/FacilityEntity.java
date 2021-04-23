@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -30,8 +31,13 @@ import java.util.Date;
 @ApiModel(value = "Facility对象", description = "设备信息")
 public class FacilityEntity extends BaseEntity {
 	
+	@ApiModelProperty(value = "设备作用id")
+	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备作用id不能为空")
+	private Long facilityEffectId;
+	
 	@ApiModelProperty(value = "设备在线状态")
 	@TableField(exist = false)
+	@Range(groups = {updateFacilityValidate.class}, min = 0, max = 1, message = "请选择正确的设备在线状态")
 	private Integer status;
 	
 	@ApiModelProperty(value = "创建人id")

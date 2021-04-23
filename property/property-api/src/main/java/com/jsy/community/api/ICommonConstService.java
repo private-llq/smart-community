@@ -43,4 +43,14 @@ public interface ICommonConstService extends IService<CommonConst> {
 	 * @Param [shopTypeId]
 	 **/
 	CommonConst getConstById(Long shopTypeId);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.CommonConst>
+	 * @Author 91李寻欢
+	 * @Description 获取设备分类作用
+	 * @Date 2021/4/23 11:46
+	 * @Param []
+	 **/
+	List<CommonConst> getFacilityTypeEffect();
+	
 }
