@@ -11,10 +11,7 @@ import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: com.jsy.community
@@ -105,4 +102,14 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @return:
      */
     UserPropertyFinanceOrderVO findUser(Long houseId);
+    
+    /**
+    * @Description: 查出当前社区所有订单中所有不重复uid
+     * @Param: [communityId]
+     * @Return: java.util.Set<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    @Select("select distinct uid from t_property_finance_order where community_id = #{communityId}")
+    Set<String> queryUidSetByCommunityId(Long communityId);
 }

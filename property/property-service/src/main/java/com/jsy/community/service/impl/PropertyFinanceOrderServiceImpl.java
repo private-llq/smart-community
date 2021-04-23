@@ -221,6 +221,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         queryWrapper.select("*");
         queryWrapper.eq("community_id",query.getCommunityId());
         queryWrapper.orderByDesc("create_time");
+        //本表条件查询
         if(!StringUtils.isEmpty(query.getOrderNum())){
             queryWrapper.like("order_num",query.getOrderNum());
         }
@@ -244,6 +245,29 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if(query.getOrderEndDate() != null){
             queryWrapper.ge("order_time",query.getOrderEndDate());
+        }
+        //其他表条件查询
+        if(!StringUtils.isEmpty(query.getRealName())){
+            //查出当前社区所有订单中所有不重复uid
+            Set<String> allUidSet = propertyFinanceOrderMapper.queryUidSetByCommunityId(query.getCommunityId());
+            LinkedList<String> allUidSetList = new LinkedList<>(allUidSet);
+            //判断数量，in条件超过999，分割查询
+            int size = 999;
+            if(!CollectionUtils.isEmpty(allUidSet)){
+                //确定查询次数
+                int times = allUidSet.size()%size == 0 ? allUidSet.size()/size : allUidSet.size()/size + 1;
+                //符合条件的uid
+                List<String> uids = new LinkedList<>();
+                int remain = allUidSet.size(); //剩余数据长度
+                for(int i=0;i<times;i++){
+                    uids.addAll(userService.queryUidOfNameLike(allUidSetList.subList(i*size,(i*size)+remain), query.getRealName()));
+                    remain = remain > size ? remain : remain - size;
+                }
+                //添加查询条件
+                if(!CollectionUtils.isEmpty(uids)){
+                    queryWrapper.in("uid",uids);
+                }
+            }
         }
         if(query.getReceiptStartDate() != null || query.getReceiptEndDate() != null){
             PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
