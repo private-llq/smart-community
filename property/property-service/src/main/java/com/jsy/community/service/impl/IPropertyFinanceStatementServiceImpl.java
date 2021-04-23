@@ -23,10 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.thymeleaf.util.MapUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: Pipi
@@ -46,6 +43,9 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
 
     @Autowired
     private PropertyAccountBankMapper propertyAccountBankMapper;
+    
+    @Autowired
+    private PropertyFinanceStatementMapper propertyFinanceStatementMapper;
 
     /**
      *@Author: Pipi
@@ -232,4 +232,20 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         }
         return statementId.toString();
     }
+    
+    /**
+    * @Description: 结算单号批量查 单号-结算单数据 映射
+     * @Param: [nums]
+     * @Return: java.util.Map<java.lang.String,com.jsy.community.entity.property.PropertyFinanceStatementEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    @Override
+    public Map<String,PropertyFinanceStatementEntity> queryByStatementNumBatch(Collection<String> nums){
+        if(CollectionUtils.isEmpty(nums)){
+            return new HashMap<>();
+        }
+        return propertyFinanceStatementMapper.queryByStatementNumBatch(nums);
+    }
+    
 }

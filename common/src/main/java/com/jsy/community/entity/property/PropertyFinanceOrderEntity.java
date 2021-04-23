@@ -2,6 +2,7 @@ package com.jsy.community.entity.property;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,7 +21,7 @@ import java.time.LocalDate;
 @ApiModel("物业缴费账单表")
 @TableName("t_property_finance_order")
 public class PropertyFinanceOrderEntity extends BaseEntity {
-    @ApiModelProperty(value = "支付单号")
+    @ApiModelProperty(value = "账单号")
     private String orderNum;
     @ApiModelProperty(value = "支付单号")
     private Long communityId;
@@ -56,5 +57,39 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "收款单信息",hidden = true)
     @TableField(exist = false)
     private PropertyFinanceReceiptEntity receiptEntity;
+    
+    @ApiModelProperty(value = "结算单信息",hidden = true)
+    @TableField(exist = false)
+    private PropertyFinanceStatementEntity statementEntity;
+    
+    //查询条件
+    @ApiModelProperty(value = "查询条件 - 账单开始日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate orderStartDate;
+    @ApiModelProperty(value = "查询条件 - 账单结束日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate orderEndDate;
+    
+    @ApiModelProperty(value = "查询条件 - 收款单开始日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate receiptStartDate;
+    @ApiModelProperty(value = "查询条件 - 收款单结束日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate receiptEndDate;
+    
+    @ApiModelProperty(value = "查询条件 - 结算单开始日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate statementStartDate;
+    @ApiModelProperty(value = "查询条件 - 结算单结束日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate statementEndDate;
+    
+    
     
 }

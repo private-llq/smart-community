@@ -3,15 +3,13 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.IHouseService;
-import com.jsy.community.api.IPropertyFinanceOrderService;
-import com.jsy.community.api.IPropertyFinanceReceiptService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
+import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.qo.BaseQO;
@@ -28,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -56,6 +55,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceReceiptService propertyFinanceReceiptService;
+    
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFinanceStatementService propertyFinanceStatementService;
 
 
     /**
@@ -219,30 +221,37 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         queryWrapper.select("*");
         queryWrapper.eq("community_id",query.getCommunityId());
         queryWrapper.orderByDesc("create_time");
+        if(!StringUtils.isEmpty(query.getOrderNum())){
+            queryWrapper.like("order_num",query.getOrderNum());
+        }
         Page<PropertyFinanceOrderEntity> pageData = propertyFinanceOrderMapper.selectPage(page,queryWrapper);
         if(CollectionUtils.isEmpty(pageData.getRecords())){
             return new PageInfo<>();
         }
-        //采集数据
         Set<Long> houseIds = new HashSet<>();
         Set<String> uids = new HashSet<>();
         Set<String> receiptNums = new HashSet<>();
+        Set<String> statementNums = new HashSet<>();
         for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
             houseIds.add(entity.getHouseId());
             uids.add(entity.getUid());
             receiptNums.add(entity.getReceiptNum());
+            statementNums.add(entity.getStatementNum());
         }
         //查房屋全称映射 (houseService)
         Map<Long,HouseEntity> houseMap = houseService.queryIdAndHouseMap(houseIds);
         //查业主姓名映射 (houseService)
         Map<String,Map<String, String>> realNameMap = userService.queryNameByUidBatch(uids);
-        //查收款单数据映射
+        //查收款单数据映射 (propertyFinanceReceiptService)
         Map<String, PropertyFinanceReceiptEntity> receiptEntityMap = propertyFinanceReceiptService.queryByReceiptNumBatch(receiptNums);
+        //查结算单数据映射 (propertyFinanceStatementService)
+        Map<String, PropertyFinanceStatementEntity> statementEntityMap = propertyFinanceStatementService.queryByStatementNumBatch(statementNums);
         //设置数据
         for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
             entity.setAddress(houseMap.get(entity.getHouseId()) == null ? null : houseMap.get(entity.getHouseId()).getAddress());
             entity.setRealName(realNameMap.get(entity.getUid()) == null ? null : realNameMap.get(entity.getUid()).get("name"));
             entity.setReceiptEntity(receiptEntityMap.get(entity.getReceiptNum()) == null ? null : receiptEntityMap.get(entity.getReceiptNum()));
+            entity.setStatementEntity(statementEntityMap.get(entity.getStatementNum()) == null ? null : statementEntityMap.get(entity.getStatementNum()));
         }
         PageInfo<PropertyFinanceOrderEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData,pageInfo);
