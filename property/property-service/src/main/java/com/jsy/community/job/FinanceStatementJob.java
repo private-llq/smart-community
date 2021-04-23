@@ -7,8 +7,6 @@ import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 /**
  * @Author: Pipi
  * @Description: 财务定时产生结算单任务
@@ -19,7 +17,7 @@ import javax.annotation.Resource;
 @Slf4j
 public class FinanceStatementJob extends QuartzJobBean {
 
-    @Resource
+//    @Resource
     private IPropertyFinanceStatementService statementService;
 
     @Override

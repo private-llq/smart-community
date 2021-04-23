@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FinanceBillJob extends QuartzJobBean {
 
+//    @Resource
     private IPropertyFinanceOrderService propertyFinanceOrderService;
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {

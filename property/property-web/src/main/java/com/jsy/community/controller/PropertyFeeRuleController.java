@@ -5,6 +5,8 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFeeRuleService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FeeRuleQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
@@ -13,7 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -31,12 +33,12 @@ public class PropertyFeeRuleController {
     private IPropertyFeeRuleService propertyFeeRuleService;
 
     @ApiOperation("查询当前小区物业收费规则")
-    @GetMapping("/list")
+    @PostMapping("/list")
     @Login
-    public CommonResult feeRule(){
+    public CommonResult feeRule(@RequestBody BaseQO<FeeRuleQO> baseQO){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        List<PropertyFeeRuleEntity> list=propertyFeeRuleService.findList(userInfo.getCommunityId());
-        return CommonResult.ok(list);
+        Map<Object, Object> map=propertyFeeRuleService.findList(baseQO,userInfo.getCommunityId());
+        return CommonResult.ok(map);
     }
 
     @ApiOperation("查询当前小区物业收费规则")

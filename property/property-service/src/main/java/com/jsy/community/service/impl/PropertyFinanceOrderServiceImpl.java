@@ -50,7 +50,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseService houseService;
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IUserService userService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -135,15 +135,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         for (Long id : list) {
             PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("community_id",id));
             if (entity != null) {
-                List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("community_id", id));
+                List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("community_id", id).eq("order_status",0));
                 for (PropertyFinanceOrderEntity orderEntity : entities) {
                         //在缴费规则的条件下把账单加上违约天数和当前时间比较
                         if (orderEntity.getOrderTime().plusDays(entity.getPenalDays()).isBefore(LocalDate.now())) {
-                            orderEntity.setPenalSum(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum().add(new BigDecimal(1)))));
-                            orderEntity.setTotalMoney(orderEntity.getPropertyFee().add(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum().add(new BigDecimal(1))))));
+                            orderEntity.setPenalSum(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum())));
+                            orderEntity.setTotalMoney(orderEntity.getPropertyFee().multiply(entity.getPenalSum()).add(orderEntity.getTotalMoney()));
                             propertyFinanceOrderMapper.updateById(orderEntity);
                         }
-                    }
+                }
             }
         }
     }
