@@ -106,4 +106,19 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
 	    pageInfo.setExtra(extra);
         return pageInfo;
     }
+	
+    /**
+    * @Description: 收款单号批量查 单号-收款单数据 映射
+     * @Param: [nums]
+     * @Return: java.util.Map<java.lang.String,com.jsy.community.entity.property.PropertyFinanceReceiptEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    @Override
+	public Map<String,PropertyFinanceReceiptEntity> queryByReceiptNumBatch(Collection<String> nums){
+    	if(CollectionUtils.isEmpty(nums)){
+    		return new HashMap<>();
+	    }
+    	return propertyFinanceReceiptMapper.queryByReceiptNumBatch(nums);
+	}
 }

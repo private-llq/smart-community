@@ -880,6 +880,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //        }
     }
 
-
+    /**
+    * @Description: uids批量查询 uid-姓名映射
+     * @Param: [uids]
+     * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    @Override
+    public Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids){
+        if(CollectionUtils.isEmpty(uids)){
+            return new HashMap<>();
+        }
+        return userMapper.queryNameByUidBatch(uids);
+    }
 
 }

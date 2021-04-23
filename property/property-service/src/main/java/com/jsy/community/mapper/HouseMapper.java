@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -172,4 +173,13 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 
 
 	//============================================ 物业端产品原型确定后新加的 结束  ===========================================================
+	/**
+	* @Description: 房屋ids 批量查 id-address对应关系
+	 * @Param: [houseIds]
+	 * @Return: java.util.Map<java.lang.Long,com.jsy.community.entity.HouseEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	@MapKey("houseId")
+	Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> houseIds);
 }

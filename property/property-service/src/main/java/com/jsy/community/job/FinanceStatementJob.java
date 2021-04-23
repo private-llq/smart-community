@@ -22,10 +22,10 @@ import java.util.List;
 @Component
 public class FinanceStatementJob extends QuartzJobBean {
 
-    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+//    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceCycleService cycleService;
 
-    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+//    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService financeOrderService;
 
     @Override

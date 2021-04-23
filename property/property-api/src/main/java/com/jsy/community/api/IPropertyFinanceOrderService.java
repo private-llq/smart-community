@@ -2,6 +2,8 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 
 import java.util.Map;
@@ -71,4 +73,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     Map<String, Object> houseCost(AdminInfoVo userInfo, Long houseId);
+    
+    /**
+    * @Description: 批量查询
+     * @Param: [baseQO]
+     * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    PageInfo<PropertyFinanceOrderEntity> queryPage(BaseQO<PropertyFinanceOrderEntity> baseQO);
 }

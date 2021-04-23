@@ -599,5 +599,21 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	public List<ProprietorVO> getCommunityHouseById(Long communityId) {
 		return houseMapper.getCommunityHouseById(communityId);
 	}
+	
+	/**
+	* @Description: 房屋ids 批量查 id-address对应关系
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long,com.jsy.community.entity.HouseEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	@Override
+	public Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> ids){
+		if(CollectionUtils.isEmpty(ids)){
+			return new HashMap<>();
+		}
+		return houseMapper.queryIdAndHouseMap(ids);
+	}
 
+	
 }
