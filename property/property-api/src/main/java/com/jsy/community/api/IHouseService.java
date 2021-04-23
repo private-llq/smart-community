@@ -8,6 +8,7 @@ import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.property.ProprietorVO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -112,4 +113,13 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @return					返回 该社区未被登记的房屋编号 + house_id
 	 */
 	List<ProprietorVO> getCommunityHouseById(Long communityId);
+	
+	/**
+	* @Description: 房屋ids 批量查 id-address对应关系
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long,com.jsy.community.entity.HouseEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> ids);
 }

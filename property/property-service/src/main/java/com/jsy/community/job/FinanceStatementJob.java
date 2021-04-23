@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FinanceStatementJob extends QuartzJobBean {
 
-    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceStatementService statementService;
 
     @Override

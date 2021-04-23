@@ -8,6 +8,9 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.UserMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * 业主 服务实现类
  * @author YuLF
@@ -22,5 +25,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 		wrapper.eq("uid",uid);
 		UserEntity userEntity = baseMapper.selectOne(wrapper);
 		return userEntity;
+	}
+	
+	//此方法不会进入，因为本端有同名Service，所以必须实现
+	@Override
+	public Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids){
+		return null;
 	}
 }

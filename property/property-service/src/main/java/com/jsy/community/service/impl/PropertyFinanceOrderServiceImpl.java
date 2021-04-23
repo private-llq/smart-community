@@ -1,24 +1,37 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IPropertyFinanceOrderService;
+import com.jsy.community.api.IPropertyFinanceReceiptService;
+import com.jsy.community.api.IUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.PropertyFinanceOrderVO;
+import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @program: com.jsy.community
@@ -35,8 +48,23 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     @Autowired
     private PropertyFeeRuleMapper propertyFeeRuleMapper;
 
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IHouseService houseService;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IUserService userService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFinanceReceiptService propertyFinanceReceiptService;
 
 
+    /**
+     * @Description: 更新所有小区账单
+     * @author: Hu
+     * @since: 2021/4/22 9:28
+     * @Param:
+     * @return:
+     */
     @Override
     @Transactional
     public void updateDays(){
@@ -75,11 +103,56 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                     }
                 }
             }
-
         }
-
     }
 
+    @Override
+    public Map<String, Object> houseCost(AdminInfoVo userInfo, Long houseId) {
+        List<PropertyFinanceOrderVO> list = propertyFinanceOrderMapper.houseCost(houseId);
+        for (PropertyFinanceOrderVO propertyFinanceOrderVO : list) {
+            propertyFinanceOrderVO.setHouseTypeText(propertyFinanceOrderVO.getHouseType()==1?"商铺":"住宅");
+        }
+        UserPropertyFinanceOrderVO userPropertyFinanceOrderVO=propertyFinanceOrderMapper.findUser(houseId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("user",userPropertyFinanceOrderVO);
+        map.put("bill",list);
+        return map;
+    }
+
+    /**
+     * @Description: 更新所有小区账单
+     * @author: Hu
+     * @since: 2021/4/22 9:28
+     * @Param:
+     * @return:
+     */
+    @Override
+    @Transactional
+    public void updatePenalSum(){
+        List<Long> list=propertyFinanceOrderMapper.communityIdList();
+        for (Long id : list) {
+            PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("community_id",id));
+            if (entity != null) {
+                List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("community_id", id));
+                for (PropertyFinanceOrderEntity orderEntity : entities) {
+                        //在缴费规则的条件下把账单加上违约天数和当前时间比较
+                        if (orderEntity.getOrderTime().plusDays(entity.getPenalDays()).isBefore(LocalDate.now())) {
+                            orderEntity.setPenalSum(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum().add(new BigDecimal(1)))));
+                            orderEntity.setTotalMoney(orderEntity.getPropertyFee().add(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum().add(new BigDecimal(1))))));
+                            propertyFinanceOrderMapper.updateById(orderEntity);
+                        }
+                    }
+            }
+        }
+    }
+
+    /**
+     * @Description: 生成账单号
+     * @author: Hu
+     * @since: 2021/4/22 9:28
+     * @Param:
+     * @return:
+     */
     public String getOrderNum(String communityId,String serialNumber){
         StringBuilder str=new StringBuilder();
         if (communityId.length()>=4){
@@ -106,5 +179,74 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         return str.toString();
     }
 
+    /**
+    * @Description: 根据收款单号批量查询列表
+     * @Param: [receiptNums,query]
+     * @Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/22
+    **/
+    @Override
+    public List<PropertyFinanceOrderEntity> queryByReceiptNums(Collection<String> receiptNums, PropertyFinanceOrderEntity query){
+        return propertyFinanceOrderMapper.queryByReceiptNums(receiptNums,query);
+    }
+
+    /**
+    * @Description: 账单号模糊查询收款单号列表
+     * @Param: [orderNum]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/22
+    **/
+    @Override
+    public List<String> queryReceiptNumsListByOrderNumLike(String orderNum){
+        return propertyFinanceOrderMapper.queryReceiptNumsListByOrderNumLike(orderNum);
+    }
+
+    /**
+    * @Description: 分页查询
+     * @Param: [baseQO]
+     * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    @Override
+    public PageInfo<PropertyFinanceOrderEntity> queryPage(BaseQO<PropertyFinanceOrderEntity> baseQO){
+        PropertyFinanceOrderEntity query = baseQO.getQuery();
+        Page<PropertyFinanceOrderEntity> page = new Page<>();
+        MyPageUtils.setPageAndSize(page,baseQO);
+        QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*");
+        queryWrapper.eq("community_id",query.getCommunityId());
+        queryWrapper.orderByDesc("create_time");
+        Page<PropertyFinanceOrderEntity> pageData = propertyFinanceOrderMapper.selectPage(page,queryWrapper);
+        if(CollectionUtils.isEmpty(pageData.getRecords())){
+            return new PageInfo<>();
+        }
+        //采集数据
+        Set<Long> houseIds = new HashSet<>();
+        Set<String> uids = new HashSet<>();
+        Set<String> receiptNums = new HashSet<>();
+        for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
+            houseIds.add(entity.getHouseId());
+            uids.add(entity.getUid());
+            receiptNums.add(entity.getReceiptNum());
+        }
+        //查房屋全称映射 (houseService)
+        Map<Long,HouseEntity> houseMap = houseService.queryIdAndHouseMap(houseIds);
+        //查业主姓名映射 (houseService)
+        Map<String,Map<String, String>> realNameMap = userService.queryNameByUidBatch(uids);
+        //查收款单数据映射
+        Map<String, PropertyFinanceReceiptEntity> receiptEntityMap = propertyFinanceReceiptService.queryByReceiptNumBatch(receiptNums);
+        //设置数据
+        for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
+            entity.setAddress(houseMap.get(entity.getHouseId()) == null ? null : houseMap.get(entity.getHouseId()).getAddress());
+            entity.setRealName(realNameMap.get(entity.getUid()) == null ? null : realNameMap.get(entity.getUid()).get("name"));
+            entity.setReceiptEntity(receiptEntityMap.get(entity.getReceiptNum()) == null ? null : receiptEntityMap.get(entity.getReceiptNum()));
+        }
+        PageInfo<PropertyFinanceOrderEntity> pageInfo = new PageInfo<>();
+        BeanUtils.copyProperties(pageData,pageInfo);
+        return pageInfo;
+    }
 
 }

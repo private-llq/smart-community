@@ -5,14 +5,13 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFeeRuleService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,12 +31,39 @@ public class PropertyFeeRuleController {
     private IPropertyFeeRuleService propertyFeeRuleService;
 
     @ApiOperation("查询当前小区物业收费规则")
-    @PostMapping("/list")
+    @GetMapping("/list")
     @Login
-    public CommonResult feeRule(@RequestParam("communityId") String communityId){
-        List<PropertyFeeRuleEntity> list=propertyFeeRuleService.findList(communityId);
+    public CommonResult feeRule(){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        List<PropertyFeeRuleEntity> list=propertyFeeRuleService.findList(userInfo.getCommunityId());
         return CommonResult.ok(list);
     }
 
+    @ApiOperation("查询当前小区物业收费规则")
+    @GetMapping("/selectOne")
+    @Login
+    public CommonResult selectOne(@RequestParam("type")Integer type){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        PropertyFeeRuleEntity propertyFeeRuleEntity=propertyFeeRuleService.selectByOne(userInfo.getCommunityId(),type);
+        return CommonResult.ok(propertyFeeRuleEntity);
+    }
+
+    @ApiOperation("启用或者停用")
+    @GetMapping("/startOrOut")
+    @Login
+    public CommonResult startOrOut(@RequestParam("status")Integer status,Long id){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFeeRuleService.startOrOut(userInfo,status,id);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("修改")
+    @PutMapping("/updateById")
+    @Login
+    public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);
+        return CommonResult.ok();
+    }
 
 }

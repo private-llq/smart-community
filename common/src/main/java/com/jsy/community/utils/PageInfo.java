@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class PageInfo<T> implements Serializable {
 	private static final long serialVersionUID = 8545991263226528798L;
@@ -22,7 +23,8 @@ public class PageInfo<T> implements Serializable {
 	@ApiModelProperty(value = "当前页")
 	private long current;
 	
-	
+	@ApiModelProperty(value = "附加数据")
+	private Map<String,Object> extra;
 	
 	public PageInfo() {
 		this.records = Collections.emptyList();
@@ -92,5 +94,13 @@ public class PageInfo<T> implements Serializable {
 	public PageInfo<T> setCurrent(long current) {
 		this.current = current;
 		return this;
+	}
+	
+	public Map<String, Object> getExtra() {
+		return extra;
+	}
+	
+	public void setExtra(Map<String, Object> extra) {
+		this.extra = extra;
 	}
 }

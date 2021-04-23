@@ -3,8 +3,6 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 
-import java.util.List;
-
 /**
  * @program: com.jsy.community
  * @description:  物业缴费收费标准
@@ -19,6 +17,6 @@ public interface PropertyFeeRuleMapper extends BaseMapper<PropertyFeeRuleEntity>
      * @Param:
      * @return:
      */
-    List<PropertyFeeRuleEntity> findList(String communityId);
+//    List<PropertyFeeRuleEntity> findList(Long communityId);
 
 }
