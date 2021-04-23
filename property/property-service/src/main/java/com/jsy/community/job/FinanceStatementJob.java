@@ -1,13 +1,13 @@
 package com.jsy.community.job;
 
 import com.jsy.community.api.IPropertyFinanceStatementService;
-import com.jsy.community.constant.Const;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @Author: Pipi
@@ -19,10 +19,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FinanceStatementJob extends QuartzJobBean {
 
+    @Resource
     private IPropertyFinanceStatementService statementService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        log.info("开始执行定时结算任务!");
         statementService.timingStatement();
+        log.info("执行定时结算任务结束!");
     }
 }

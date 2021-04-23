@@ -23,8 +23,8 @@
             </foreach>
             end
         where id in
-        <foreach collection="map.entrySet()" index="statementNum" item="orderIds">
-            <foreach collection="orderIds" open="(" close=")" separator="," item="orderId">
+        <foreach collection="map.entrySet()" open="(" close=")" separator="," index="statementNum" item="orderIds">
+            <foreach collection="orderIds" separator="," item="orderId">
                 #{orderId}
             </foreach>
         </foreach>

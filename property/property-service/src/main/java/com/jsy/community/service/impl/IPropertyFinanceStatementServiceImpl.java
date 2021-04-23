@@ -9,7 +9,6 @@ import com.jsy.community.entity.property.PropertyAccountBankEntity;
 import com.jsy.community.entity.property.PropertyFinanceCycleEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.PropertyAccountBankMapper;
 import com.jsy.community.mapper.PropertyFinanceCycleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
@@ -135,7 +134,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
                     });
                 }
                 // 执行新增结算单
-                // batchInsertStatement(statementEntities, statementOrderUpdateMap);
+                 batchInsertStatement(statementEntities, statementOrderUpdateMap);
                 // 2.2将被驳回的账单的状态更新为待结算
                 // 需要更新的账单列表
                 ArrayList<Long> orderNumS = new ArrayList<>();
@@ -149,7 +148,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
                         });
                     });
                 }
-                //batchUpdateStatementStatus(orderNumS, statementNumSet);
+                batchUpdateStatementStatus(orderNumS, statementNumSet);
             } else {
                 log.info("社区ID为:{}的社区{}日上月没有需要结算的账单", communityIdS.toString(), dayOfMonth);
             }
