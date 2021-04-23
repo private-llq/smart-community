@@ -1,5 +1,8 @@
 package com.jsy.community.api;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.property.PropertyFinanceCycleEntity;
+
 import java.util.List;
 
 /**
@@ -8,7 +11,7 @@ import java.util.List;
  * @Date: 2021/4/22 9:28
  * @Version: 1.0
  **/
-public interface IPropertyFinanceCycleService {
+public interface IPropertyFinanceCycleService extends IService<PropertyFinanceCycleEntity> {
 
     /**
      *@Author: Pipi
@@ -17,5 +20,5 @@ public interface IPropertyFinanceCycleService {
      *@Return: java.util.List<java.lang.Long>
      *@Date: 2021/4/22 10:01
      **/
-    List<Long> needStatementCommunityId(Integer date);
+    List<PropertyFinanceCycleEntity> needStatementCommunityId(Integer date);
 }

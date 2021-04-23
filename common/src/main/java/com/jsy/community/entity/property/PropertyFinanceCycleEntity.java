@@ -18,7 +18,7 @@ import lombok.Data;
 public class PropertyFinanceCycleEntity extends BaseEntity {
 
     @ApiModelProperty("社区主键")
-    private String communityId;
+    private Long communityId;
 
     @ApiModelProperty("结算日期开始时间,具体几号")
     private String startDate;

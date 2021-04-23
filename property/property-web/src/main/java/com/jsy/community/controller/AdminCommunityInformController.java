@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminCommunityInformService;
+import com.jsy.community.api.IPropertyFinanceStatementService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
@@ -39,6 +40,9 @@ public class AdminCommunityInformController {
 
     @Autowired
     private UserUtils userUtils;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFinanceStatementService statementService;
 
     /**
      * (物业端)新增推送通知消息
@@ -180,7 +184,9 @@ public class AdminCommunityInformController {
     @GetMapping("/getDetatil")
     @ApiOperation("(物业端)获取单条消息详情")
     public CommonResult<?> getDetatil(@RequestParam Long id) {
-        return CommonResult.ok(communityInformService.getDetail(id));
+        statementService.timingStatement();
+        return null;
+        // return CommonResult.ok(communityInformService.getDetail(id));
     }
 
     /**

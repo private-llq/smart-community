@@ -30,7 +30,7 @@ public class IPropertyFinanceCycleServiceImpl extends ServiceImpl<PropertyFinanc
      *@Date: 2021/4/22 10:01
      **/
     @Override
-    public List<Long> needStatementCommunityId(Integer date) {
+    public List<PropertyFinanceCycleEntity> needStatementCommunityId(Integer date) {
         return cycleMapper.queryCommunityIdByStartDate(date);
     }
 }

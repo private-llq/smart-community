@@ -3,7 +3,9 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -39,4 +41,22 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @Date: 2021/4/22 10:26
      **/
     List<PropertyFinanceOrderEntity> queryNeedStatementOrderListByCommunityIdAndOrderTime(List<Long> communityIdS);
+
+    /**
+     *@Author: Pipi
+     *@Description: 批量更新结算状态为待审核,更新对象为被驳回的
+     *@Param: statementOrderNumS:
+     *@Return: java.lang.Integer
+     *@Date: 2021/4/22 17:33
+     **/
+    Integer updateRejectStatementStatusByIdS(List<Long> statementOrderNumS);
+    
+    /**
+     *@Author: Pipi
+     *@Description: 批量更新结算状态为待审核,更新对象为未结算的
+     *@Param: statementOrderUpdateMap: 
+     *@Return: java.lang.Integer
+     *@Date: 2021/4/23 10:41
+     **/
+    Integer updateStatementStatusByIdS(@Param("map")HashMap<String, List<Long>> statementOrderUpdateMap);
 }

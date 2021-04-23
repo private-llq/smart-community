@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.PropertyFinanceOrderMapper">
+    <!-- 批量更新结算状态为待审核,更新对象为被驳回的 -->
+    <update id="updateRejectStatementStatusByIdS">
+        update t_property_finance_order set statement_status = 1, update_time = now()
+        where id in
+        <foreach collection="list" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量更新结算状态为待审核,更新对象为未结算的 -->
+    <update id="updateStatementStatusByIdS" parameterType="java.util.Map">
+        update t_property_finance_order
+        set statement_status = 1,
+            update_time = now(),
+            statement_num = case id
+            <foreach collection="map.entrySet()" index="statementNum" item="orderIds">
+                <foreach collection="orderIds" item="orderId">
+                    when #{orderId} then #{statementNum}
+                </foreach>
+            </foreach>
+            end
+        where id in
+        <foreach collection="map.entrySet()" index="statementNum" item="orderIds">
+            <foreach collection="orderIds" open="(" close=")" separator="," item="orderId">
+                #{orderId}
+            </foreach>
+        </foreach>
+    </update>
+
     <select id="communityIdList" resultType="java.lang.Long">
         select distinct community_id from t_user_house where check_status=1
     </select>

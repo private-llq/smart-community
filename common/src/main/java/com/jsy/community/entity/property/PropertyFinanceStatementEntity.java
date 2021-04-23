@@ -24,13 +24,13 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
     private Long communityId;
 
     @ApiModelProperty("结算单号")
-    private Long statementNum;
+    private String statementNum;
 
     @ApiModelProperty("结算时间段-开始时间")
-    private LocalDateTime startDate;
+    private String startDate;
 
     @ApiModelProperty("结算时间段-开始时间")
-    private LocalDateTime endDate;
+    private String endDate;
 
     @ApiModelProperty("结算状态1.待审核 2.结算中 3.已结算 4.驳回")
     private Integer statementStatus;

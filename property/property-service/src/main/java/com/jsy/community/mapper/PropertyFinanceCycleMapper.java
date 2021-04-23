@@ -20,5 +20,5 @@ public interface PropertyFinanceCycleMapper extends BaseMapper<PropertyFinanceCy
      *@Return: java.util.List<java.lang.Long>
      *@Date: 2021/4/22 10:04
      **/
-    List<Long> queryCommunityIdByStartDate(Integer startDate);
+    List<PropertyFinanceCycleEntity> queryCommunityIdByStartDate(Integer startDate);
 }
