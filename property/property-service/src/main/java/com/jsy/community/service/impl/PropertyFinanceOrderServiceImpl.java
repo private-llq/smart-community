@@ -50,7 +50,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseService houseService;
 
-    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserService userService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
