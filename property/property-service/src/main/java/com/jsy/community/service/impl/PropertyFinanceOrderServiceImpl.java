@@ -293,6 +293,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if(CollectionUtils.isEmpty(pageData.getRecords())){
             return new PageInfo<>();
         }
+        //后续查询参数
         Set<Long> houseIds = new HashSet<>();
         Set<String> uids = new HashSet<>();
         Set<String> receiptNums = new HashSet<>();
@@ -311,15 +312,59 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         Map<String, PropertyFinanceReceiptEntity> receiptEntityMap = propertyFinanceReceiptService.queryByReceiptNumBatch(receiptNums);
         //查结算单数据映射 (propertyFinanceStatementService)
         Map<String, PropertyFinanceStatementEntity> statementEntityMap = propertyFinanceStatementService.queryByStatementNumBatch(statementNums);
+        //金额统计数据(账单)
+        BigDecimal totalOrder = new BigDecimal(0);//应收合计
+        BigDecimal notReceipt = new BigDecimal(0);//0.待收款
+        BigDecimal receipted = new BigDecimal(0);//1.已收款
+        //金额统计数据(结算单)
+        BigDecimal notStatement = new BigDecimal(0);//1.待结算
+        BigDecimal statementing = new BigDecimal(0);//2.结算中
+        BigDecimal statemented = new BigDecimal(0);//3.已结算
+        BigDecimal statementReject = new BigDecimal(0);//4.驳回
         //设置数据
         for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
             entity.setAddress(houseMap.get(entity.getHouseId()) == null ? null : houseMap.get(entity.getHouseId()).getAddress());
             entity.setRealName(realNameMap.get(entity.getUid()) == null ? null : realNameMap.get(entity.getUid()).get("name"));
             entity.setReceiptEntity(receiptEntityMap.get(entity.getReceiptNum()) == null ? null : receiptEntityMap.get(entity.getReceiptNum()));
             entity.setStatementEntity(statementEntityMap.get(entity.getStatementNum()) == null ? null : statementEntityMap.get(entity.getStatementNum()));
+            //金额统计
+            totalOrder = totalOrder.add(entity.getTotalMoney());
+            switch (entity.getOrderStatus()){
+                case 0:
+                    notReceipt = notReceipt.add(entity.getTotalMoney());
+                    break;
+                case 1:
+                    receipted = receipted.add(entity.getTotalMoney());
+                    break;
+            }
+            if(entity.getStatementEntity() != null){
+                switch (entity.getStatementStatus()){
+                    case 1:
+                        notStatement = notStatement.add(entity.getStatementEntity().getTotalMoney());
+                        break;
+                    case 2:
+                        statementing = statementing.add(entity.getStatementEntity().getTotalMoney());
+                        break;
+                    case 3:
+                        statemented = statemented.add(entity.getStatementEntity().getTotalMoney());
+                        break;
+                    case 4:
+                        statementReject = statementReject.add(entity.getStatementEntity().getTotalMoney());
+                        break;
+                }
+            }
         }
         PageInfo<PropertyFinanceOrderEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData,pageInfo);
+        Map<String,Object> extra = new HashMap<>();
+        extra.put("totalOrder",totalOrder);
+        extra.put("notReceipt",notReceipt);
+        extra.put("receipted",receipted);
+        extra.put("notStatement",notStatement);
+        extra.put("statementing",statementing);
+        extra.put("statemented",statemented);
+        extra.put("statementReject",statementReject);
+        pageInfo.setExtra(extra);
         return pageInfo;
     }
 
