@@ -128,6 +128,11 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
                         statementEntity.setStatementStatus(1);
                         statementEntity.setTotalMoney(statementAmount[0]);
                         statementEntity.setReceiptAccount(propertyAccountBankEntity.getId());
+                        statementEntity.setAccountName(propertyAccountBankEntity.getAccountName());
+                        statementEntity.setBankName(propertyAccountBankEntity.getBankName());
+                        statementEntity.setBankCity(propertyAccountBankEntity.getBankCity());
+                        statementEntity.setBankBranchName(propertyAccountBankEntity.getBankBranchName());
+                        statementEntity.setBankNo(propertyAccountBankEntity.getBankNo());
                         statementEntity.setId(SnowFlake.nextId());
                         statementOrderUpdateMap.put(statementId, statementOrderNumS);
                         statementEntities.add(statementEntity);

@@ -41,6 +41,21 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
     @ApiModelProperty("收款账户id(物业对公账户)")
     private Long receiptAccount;
 
+    @ApiModelProperty("开户账户名称")
+    private String accountName;
+
+    @ApiModelProperty("银行名称")
+    private String bankName;
+
+    @ApiModelProperty("开户行所在城市")
+    private String bankCity;
+
+    @ApiModelProperty("开户支行名称")
+    private String bankBranchName;
+
+    @ApiModelProperty("银行卡号")
+    private String bankNo;
+
     @ApiModelProperty("驳回原因")
     private String rejectReason;
 

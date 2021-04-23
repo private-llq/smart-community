@@ -107,7 +107,7 @@ public class TimingTaskConfig{
      **/
     @Bean
     public Trigger financeStatementJobTrigger() {
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0 0 * * ? *");
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 10 0 * * ? *");
         return TriggerBuilder.newTrigger()
                 .forJob(financeStatementJobDetail())
                 .withIdentity("financeStatementJobTrigger")
