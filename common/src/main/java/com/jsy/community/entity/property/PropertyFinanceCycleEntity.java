@@ -21,9 +21,9 @@ public class PropertyFinanceCycleEntity extends BaseEntity {
     private Long communityId;
 
     @ApiModelProperty("结算日期开始时间,具体几号")
-    private String startDate;
+    private Integer startDate;
 
     @ApiModelProperty("结算日期结束时间,具体几号")
-    private String endDate;
+    private Integer endDate;
 
 }

@@ -1,6 +1,7 @@
 package com.jsy.community.entity.property;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -27,10 +28,12 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
     private String statementNum;
 
     @ApiModelProperty("结算时间段-开始时间")
-    private String startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDateTime startDate;
 
     @ApiModelProperty("结算时间段-开始时间")
-    private String endDate;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDateTime endDate;
 
     @ApiModelProperty("结算状态1.待审核 2.结算中 3.已结算 4.驳回")
     private Integer statementStatus;

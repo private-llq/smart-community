@@ -23,6 +23,8 @@ import org.springframework.util.CollectionUtils;
 import org.thymeleaf.util.MapUtils;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -123,8 +125,12 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
                         PropertyFinanceStatementEntity statementEntity = new PropertyFinanceStatementEntity();
                         statementEntity.setCommunityId(communityId);
                         statementEntity.setStatementNum(statementId);
-                        statementEntity.setStartDate(cycleEntityMap.get(communityId).getStartDate());
-                        statementEntity.setEndDate(cycleEntityMap.get(communityId).getEndDate());
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(new Date());
+                        calendar.set(Calendar.DAY_OF_MONTH, cycleEntityMap.get(communityId).getStartDate());
+                        statementEntity.setStartDate(LocalDateTimeUtil.of(calendar.getTime()));
+                        calendar.set(Calendar.DAY_OF_MONTH, cycleEntityMap.get(communityId).getEndDate());
+                        statementEntity.setEndDate(LocalDateTimeUtil.of(calendar.getTime()));
                         statementEntity.setStatementStatus(1);
                         statementEntity.setTotalMoney(statementAmount[0]);
                         statementEntity.setReceiptAccount(propertyAccountBankEntity.getId());
