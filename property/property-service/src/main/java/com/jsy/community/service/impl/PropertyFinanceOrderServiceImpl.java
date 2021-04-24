@@ -289,6 +289,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             }
             queryWrapper.in("statement_num",statementNums);
         }
+        //分页查询
         Page<PropertyFinanceOrderEntity> pageData = propertyFinanceOrderMapper.selectPage(page,queryWrapper);
         if(CollectionUtils.isEmpty(pageData.getRecords())){
             return new PageInfo<>();
@@ -353,6 +354,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                         break;
                 }
             }
+	        entity.setUid(null);
+	        entity.setHouseId(null);
         }
         PageInfo<PropertyFinanceOrderEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData,pageInfo);
