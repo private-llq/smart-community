@@ -49,7 +49,7 @@ public class MinioUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/2
 	**/
-	public static String upload(byte[] byteData, String bucketName){
+	public static String uploadPic(byte[] byteData, String bucketName){
 		InputStream inputStream = new ByteArrayInputStream(byteData);
 		MultipartFile file = null;
 		try {
@@ -81,7 +81,7 @@ public class MinioUtils {
 			String objectName;
 			if (!StringUtils.isEmpty(file.getOriginalFilename())) {
 				endName = file.getOriginalFilename();
-				objectName = getRandomFileName(endName);
+				objectName = getRandomFileName(endName) + ".jpg";
 			}else{
 				objectName = getRandomFileName("") + ".jpg";
 			}
