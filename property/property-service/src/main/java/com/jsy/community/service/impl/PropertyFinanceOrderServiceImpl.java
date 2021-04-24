@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
@@ -204,9 +205,100 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     public List<String> queryReceiptNumsListByOrderNumLike(String orderNum){
         return propertyFinanceOrderMapper.queryReceiptNumsListByOrderNumLike(orderNum);
     }
-
+    
+    /** 
+    * @Description: 查询已缴费账单 (缴费模块)
+     * @Param: [baseQO]
+     * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/24
+    **/
+    @Override
+    public PageInfo<PropertyFinanceOrderEntity> queryPaid(BaseQO<PropertyFinanceOrderEntity> baseQO){
+        PropertyFinanceOrderEntity query = baseQO.getQuery();
+        Page<PropertyFinanceOrderEntity> page = new Page<>();
+        MyPageUtils.setPageAndSize(page,baseQO);
+        QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*");
+        queryWrapper.eq("community_id",query.getCommunityId());
+        queryWrapper.eq("order_status", PropertyConstsEnum.OrderStatusEnum.ORDER_STATUS_PAID.getCode());
+        queryWrapper.orderByDesc("create_time");
+        if(query.getHouseId() != null){
+            queryWrapper.eq("house_id",query.getHouseId());
+        }
+        if(query.getOrderStartDate() != null){
+            queryWrapper.ge("order_time",query.getOrderStartDate());
+        }
+        if(query.getOrderEndDate() != null){
+            queryWrapper.le("order_time",query.getOrderEndDate());
+        }
+        if(query.getReceiptStartDate() != null || query.getReceiptEndDate() != null){
+            PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
+            receiptEntity.setStartDate(query.getReceiptStartDate());
+            receiptEntity.setEndDate(query.getReceiptEndDate());
+            List<String> receiptNums = propertyFinanceReceiptService.queryReceiptNumsByCondition(receiptEntity);
+            if(CollectionUtils.isEmpty(receiptNums)){
+                return new PageInfo<>();
+            }
+            queryWrapper.in("receipt_num",receiptNums);
+        }
+        if(!StringUtils.isEmpty(query.getRealName())){
+            //查出当前社区所有订单中所有不重复uid
+            Set<String> allUidSet = propertyFinanceOrderMapper.queryUidSetByCommunityId(query.getCommunityId());
+            LinkedList<String> allUidSetList = new LinkedList<>(allUidSet);
+            //判断数量，in条件超过999，分割查询
+            int size = 999;
+            if(!CollectionUtils.isEmpty(allUidSet)){
+                //确定查询次数
+                int times = allUidSet.size()%size == 0 ? allUidSet.size()/size : allUidSet.size()/size + 1;
+                //符合条件的uid
+                List<String> uids = new LinkedList<>();
+                int remain = allUidSet.size(); //剩余数据长度
+                for(int i=0;i<times;i++){
+                    uids.addAll(userService.queryUidOfNameLike(allUidSetList.subList(i*size,(i*size)+remain), query.getRealName()));
+                    remain = remain > size ? remain : remain - size;
+                }
+                //添加查询条件
+                if(!CollectionUtils.isEmpty(uids)){
+                    queryWrapper.in("uid",uids);
+                }
+            }
+        }
+        //分页查询
+        Page<PropertyFinanceOrderEntity> pageData = propertyFinanceOrderMapper.selectPage(page,queryWrapper);
+        if(CollectionUtils.isEmpty(pageData.getRecords())){
+            return new PageInfo<>();
+        }
+        //后续查询参数
+        Set<Long> houseIds = new HashSet<>();
+        Set<String> uids = new HashSet<>();
+        Set<String> receiptNums = new HashSet<>();
+        for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
+            houseIds.add(entity.getHouseId());
+            uids.add(entity.getUid());
+            receiptNums.add(entity.getReceiptNum());
+        }
+        //查房屋全称映射 (houseService)
+        Map<Long,HouseEntity> houseMap = houseService.queryIdAndHouseMap(houseIds);
+        //查业主姓名映射 (houseService)
+        Map<String,Map<String, String>> realNameMap = userService.queryNameByUidBatch(uids);
+        //查收款单数据映射 (propertyFinanceReceiptService)
+        Map<String, PropertyFinanceReceiptEntity> receiptEntityMap = propertyFinanceReceiptService.queryByReceiptNumBatch(receiptNums);
+        //设置数据
+        for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
+            entity.setAddress(houseMap.get(entity.getHouseId()) == null ? null : houseMap.get(entity.getHouseId()).getAddress());
+            entity.setRealName(realNameMap.get(entity.getUid()) == null ? null : realNameMap.get(entity.getUid()).get("name"));
+            entity.setReceiptEntity(receiptEntityMap.get(entity.getReceiptNum()) == null ? null : receiptEntityMap.get(entity.getReceiptNum()));
+            entity.setUid(null);
+            entity.setHouseId(null);
+        }
+        PageInfo<PropertyFinanceOrderEntity> pageInfo = new PageInfo<>();
+        BeanUtils.copyProperties(pageData,pageInfo);
+        return pageInfo;
+    }
+    
     /**
-    * @Description: 分页查询
+    * @Description: 分页查询 (财务模块)
      * @Param: [baseQO]
      * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
      * @Author: chq459799974
@@ -244,7 +336,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             queryWrapper.ge("order_time",query.getOrderStartDate());
         }
         if(query.getOrderEndDate() != null){
-            queryWrapper.ge("order_time",query.getOrderEndDate());
+            queryWrapper.le("order_time",query.getOrderEndDate());
         }
         //其他表条件查询
         if(!StringUtils.isEmpty(query.getRealName())){

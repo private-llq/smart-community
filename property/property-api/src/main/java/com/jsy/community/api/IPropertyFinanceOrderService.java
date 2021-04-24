@@ -66,11 +66,20 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
     Map<String, Object> houseCost(AdminInfoVo userInfo, Long houseId);
 
     /**
-    * @Description: 批量查询
+    * @Description: 分页查询 (财务模块)
      * @Param: [baseQO]
      * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
      * @Author: chq459799974
      * @Date: 2021/4/23
     **/
     PageInfo<PropertyFinanceOrderEntity> queryPage(BaseQO<PropertyFinanceOrderEntity> baseQO);
+    
+    /**
+    * @Description: 分页查询已缴费 (缴费模块)
+     * @Param: [baseQO]
+     * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/24
+    **/
+    PageInfo<PropertyFinanceOrderEntity> queryPaid(BaseQO<PropertyFinanceOrderEntity> baseQO);
 }
