@@ -62,7 +62,9 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
 	    //带账单号模糊查询
 	    if(!StringUtils.isEmpty(query.getOrderNum())){
 		    List<String> receiptNumsList = propertyFinanceOrderService.queryReceiptNumsListByOrderNumLike(query.getOrderNum());
-		    queryWrapper.in("receipt_num",receiptNumsList);
+		    if(!CollectionUtils.isEmpty(receiptNumsList)){
+		        queryWrapper.in("receipt_num",receiptNumsList);
+		    }
 	    }
         if(query.getStartDate() != null){
         	queryWrapper.ge("create_time",query.getStartDate());
@@ -116,9 +118,21 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
     **/
     @Override
 	public Map<String,PropertyFinanceReceiptEntity> queryByReceiptNumBatch(Collection<String> nums){
-    	if(CollectionUtils.isEmpty(nums)){
+    	if(CollectionUtils.isEmpty(nums) || (nums.size() == 1 && nums.contains(null))){
     		return new HashMap<>();
 	    }
     	return propertyFinanceReceiptMapper.queryByReceiptNumBatch(nums);
+	}
+	
+	/**
+	* @Description: 条件查询批量收款单号
+	 * @Param: [query]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	@Override
+	public List<String> queryReceiptNumsByCondition(PropertyFinanceReceiptEntity query){
+        return propertyFinanceReceiptMapper.queryReceiptNumsByCondition(query);
 	}
 }

@@ -143,4 +143,13 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	**/
 	@MapKey("uid")
 	Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids);
+
+	/**
+	* @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
+	 * @Param: [uids, nameLike]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	List<String> queryUidOfNameLike(@Param("uids")Collection<String> uids, @Param("nameLike")String nameLike);
 }

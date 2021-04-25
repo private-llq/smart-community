@@ -37,6 +37,15 @@ public interface IPropertyFinanceStatementService extends IService<PropertyFinan
     Map<String,PropertyFinanceStatementEntity> queryByStatementNumBatch(Collection<String> nums);
 
     /**
+    * @Description: 条件查询批量结算单号
+     * @Param: [query]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    List<String> queryStatementNumsByCondition(PropertyFinanceStatementEntity query);
+
+    /**
      *@Author: Pipi
      *@Description: 物业财务-结算单列表
      *@Param: statementQO:

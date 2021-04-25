@@ -53,4 +53,11 @@ public class CommonConstServiceImpl extends ServiceImpl<CommonConstMapper, Commo
 		return commonConstMapper.selectOne(commonConstQueryWrapper);
 	}
 	
+	@Override
+	public List<CommonConst> getFacilityTypeEffect() {
+		QueryWrapper<CommonConst> wrapper = new QueryWrapper<>();
+		wrapper.eq("type_id",5);
+		return commonConstMapper.selectList(wrapper);
+	}
+	
 }

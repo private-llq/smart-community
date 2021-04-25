@@ -36,8 +36,31 @@
 
 
     <insert id="insertFacilityStatus">
-        insert into t_facility_status (id,facility_handle,status,facility_id) values (#{id},#{facilityHandle},#{status},#{facilityId})
+        insert into t_facility_status (id,facility_handle,status,facility_id,facility_alarm_handle) values (#{id},#{facilityHandle},#{status},#{facilityId},#{facilityAlarmHandle})
     </insert>
 
+    <select id="selectId" resultType="long">
+        select id from t_facility where community_id = #{communityId}
+    </select>
+
+    <delete id="deleteMiddleFacilityIds">
+        delete from t_facility_status where facility_id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <update id="updateMiddleStatus">
+        update t_facility_status set status = #{status} where facility_id = #{id}
+    </update>
+
+    <select id="getFacilityIdByTypeId" resultType="long">
+        select id from t_facility where facility_type_id = #{typeId}
+    </select>
+
+    <update id="updateStatusByFacilityId">
+        update t_facility_type set status = #{online} where facility_id = #{id}
+    </update>
 
 </mapper>

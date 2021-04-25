@@ -1,5 +1,6 @@
 package com.jsy.community.entity.property;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -69,6 +71,15 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
 
     @ApiModelProperty("驳回原因")
     private String rejectReason;
+    
+    @ApiModelProperty(value = "查询条件 - 结算单开始日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate createStartDate;
+    @ApiModelProperty(value = "查询条件 - 结算单结束日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate createEndDate;
 
     // 冗余的查询显示字段
     @ApiModelProperty("收款账户类型")

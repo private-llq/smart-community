@@ -36,4 +36,13 @@
 			#{item}
 		</foreach>
 	</select>
+	<!-- 在固定的uid范围内筛选姓名满足模糊匹配条件的uid -->
+	<select id="queryUidOfNameLike" resultType="String">
+		select uid from t_user
+		where uid in
+		<foreach collection="uids" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		and real_name like concat('%',#{nameLike},'%')
+	</select>
 </mapper>

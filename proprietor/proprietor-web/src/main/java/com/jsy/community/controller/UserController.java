@@ -387,7 +387,7 @@ public class UserController {
                 //上传人脸url并设置
                 HttpGet httpGet = MyHttpUtils.httpGetWithoutParams(blinkResult.getString("photoUrl"));
                 byte[] byteData = (byte[]) MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_BYTE);
-                String filePath = MinioUtils.upload(byteData,"face-url");
+                String filePath = MinioUtils.uploadPic(byteData,"face-url");
                 userEntity.setFaceUrl(filePath);
                 //更新信息
                 userService.updateUserAfterRealnameAuth(userEntity);

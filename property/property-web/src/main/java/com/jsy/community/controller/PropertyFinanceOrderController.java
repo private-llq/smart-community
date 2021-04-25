@@ -12,6 +12,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -42,9 +43,35 @@ public class PropertyFinanceOrderController {
         Map<String, Object> map=propertyFinanceOrderService.houseCost(userInfo,houseId);
         return CommonResult.ok(map);
     }
+    @ApiOperation("查询一条已交账单详情")
+    @GetMapping("/getOrderNum")
+    @Login
+    public CommonResult getOrderNum(@RequestParam("orderNum") String orderNum){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        PropertyFinanceOrderVO propertyFinanceOrderVO=propertyFinanceOrderService.getOrderNum(userInfo,orderNum);
+        return CommonResult.ok(propertyFinanceOrderVO);
+    }
+    
     
     /**
-    * @Description: 分页查询
+     * @Description: 分页查询已缴费 (缴费模块)
+     * @Param: [baseQO]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2021/4/24
+     **/
+    @ApiOperation("分页查询已缴费")
+    @PostMapping("paid")
+    public CommonResult queryPaid(@RequestBody BaseQO<PropertyFinanceOrderEntity> baseQO){
+        if(baseQO.getQuery() == null){
+            baseQO.setQuery(new PropertyFinanceOrderEntity());
+        }
+        baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(propertyFinanceOrderService.queryPaid(baseQO),"查询成功");
+    }
+    
+    /**
+    * @Description: 分页查询 (财务模块)
      * @Param: [baseQO]
      * @Return: com.jsy.community.vo.CommonResult
      * @Author: chq459799974
@@ -52,7 +79,7 @@ public class PropertyFinanceOrderController {
     **/
     @ApiOperation("分页查询")
     @PostMapping("page")
-    public CommonResult queryPage(@RequestBody BaseQO<PropertyFinanceOrderEntity> baseQO){
+    public CommonResult queryUnionPage(@RequestBody BaseQO<PropertyFinanceOrderEntity> baseQO){
         if(baseQO.getQuery() == null){
             baseQO.setQuery(new PropertyFinanceOrderEntity());
         }

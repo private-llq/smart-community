@@ -2,9 +2,11 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FeeRuleQO;
 import com.jsy.community.vo.admin.AdminInfoVo;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -20,7 +22,7 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      * @Param:
      * @return:
      */
-    List<PropertyFeeRuleEntity> findList(Long communityId);
+    Map<Object, Object> findList(BaseQO<FeeRuleQO> baseQO, Long communityId);
 
     /**
      * @Description: 查询一条详情

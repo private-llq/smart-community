@@ -146,4 +146,11 @@
 		</foreach>
 	</select>
 
+	<select id="selectHouseAll" resultType="com.jsy.community.entity.HouseEntity">
+        select th.*,tuh.uid as uid from  t_user_house tuh
+        join t_house th
+        on tuh.house_id=th.id
+        where th.community_id=#{id} and tuh.check_status=1
+    </select>
+
 </mapper>

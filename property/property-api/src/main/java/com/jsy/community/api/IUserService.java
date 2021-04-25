@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserEntity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,4 +34,15 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Date: 2021/4/23
 	**/
 	Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids);
+	
+	/**
+	 * @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
+	 * @Param: [uids, nameLike]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	 **/
+	List<String> queryUidOfNameLike(List<String> uids, String nameLike);
+
+	UserEntity queryUserDetailByUid(String uid);
 }

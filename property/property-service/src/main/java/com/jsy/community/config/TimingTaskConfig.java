@@ -25,11 +25,11 @@ public class TimingTaskConfig{
      */
     @Bean
     public JobDetail printTimeJobDetail(){
-        return JobBuilder.newJob(DateTimeJob.class)//PrintTimeJob我们的业务类
-                .withIdentity("DateTimeJob")//可以给该JobDetail起一个id
+        return JobBuilder.newJob(DateTimeJob.class)
+                .withIdentity("DateTimeJob")
                 //每个JobDetail内都有一个Map，包含了关联到这个Job的数据，在Job类中可以通过context获取
-                .usingJobData("msg", "Hello Quartz")//关联键值对
-                .storeDurably()//即使没有Trigger关联时，也不需要删除该JobDetail
+                .usingJobData("msg", "Hello Quartz")
+                .storeDurably()
                 .build();
     }
     /**
@@ -43,8 +43,9 @@ public class TimingTaskConfig{
     public Trigger printTimeJobTrigger() {
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0 0 * * ? *");
         return TriggerBuilder.newTrigger()
-                .forJob(printTimeJobDetail())//关联上述的JobDetail
-                .withIdentity("quartzTaskService")//给Trigger起个名字
+                //关联上述的JobDetail
+                .forJob(printTimeJobDetail())
+                .withIdentity("quartzTaskService")
                 .withSchedule(cronScheduleBuilder)
                 .build();
     }
@@ -53,31 +54,31 @@ public class TimingTaskConfig{
      * @Description: 每天查询数据库生成财务账单或者生成违约费
      * @author: Hu
      * @since: 2021/4/22 9:22
-     * @Param:
-     * @return:
+     * @Param: null
+     * @return: JobDetail
      */
     @Bean
     public JobDetail financeBillJobDetail(){
-        return JobBuilder.newJob(FinanceBillJob.class)//PrintTimeJob我们的业务类
-                .withIdentity("FinanceBillJob")//可以给该JobDetail起一个id
+        return JobBuilder.newJob(FinanceBillJob.class)
+                .withIdentity("FinanceBillJob")
                 //每个JobDetail内都有一个Map，包含了关联到这个Job的数据，在Job类中可以通过context获取
-                .usingJobData("msg", "Hello Quartz")//关联键值对
-                .storeDurably()//即使没有Trigger关联时，也不需要删除该JobDetail
+                .usingJobData("msg", "Hello Quartz")
+                .storeDurably()
                 .build();
     }
     /**
      * @Description: 每天查询数据库生成财务账单或者生成违约费
      * @author: Hu
      * @since: 2021/4/22 9:22
-     * @Param:
-     * @return:
+     * @Param: null
+     * @return: Trigger
      */
     @Bean
     public Trigger financeBillJobTrigger() {
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0 0 * * ? *");
         return TriggerBuilder.newTrigger()
-                .forJob(financeBillJobDetail())//关联上述的JobDetail
-                .withIdentity("financeBillTaskService")//给Trigger起个名字
+                .forJob(financeBillJobDetail())
+                .withIdentity("financeBillTaskService")
                 .withSchedule(cronScheduleBuilder)
                 .build();
     }

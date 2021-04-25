@@ -6,6 +6,8 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.Map;
+
 /**
  * <p>
  * 服务类
@@ -42,4 +44,31 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Param [id]
 	 **/
 	void deleteFacility(Long id);
+	
+	/**
+	 * @return void
+	 * @Author 91李寻欢
+	 * @Description 编辑设备
+	 * @Date 2021/4/23 9:36
+	 * @Param [facilityEntity]
+	 **/
+	void updateFacility(FacilityEntity facilityEntity);
+	
+	/**
+	 * @return java.util.Map<java.lang.String,java.lang.Integer>
+	 * @Author 91李寻欢
+	 * @Description 获取设备在线离线数
+	 * @Date 2021/4/23 17:03
+	 * @Param [communityId]
+	 **/
+	Map<String, Integer> getCount(Long typeId);
+	
+	/**
+	 * @return void
+	 * @Author 91李寻欢
+	 * @Description 刷新设备
+	 * @Date 2021/4/23 18:11
+	 * @Param [page, size]
+	 **/
+	void flushFacility(Integer page, Integer size);
 }

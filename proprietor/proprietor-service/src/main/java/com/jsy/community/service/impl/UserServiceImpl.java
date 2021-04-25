@@ -889,10 +889,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     **/
     @Override
     public Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids){
-        if(CollectionUtils.isEmpty(uids)){
+        if(CollectionUtils.isEmpty(uids) || (uids.size() == 1 && uids.contains(null))){
             return new HashMap<>();
         }
         return userMapper.queryNameByUidBatch(uids);
+    }
+    
+    /**
+    * @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
+     * @Param: [uids, nameLike]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    @Override
+    public List<String> queryUidOfNameLike(List<String> uids,String nameLike){
+        return userMapper.queryUidOfNameLike(uids,nameLike);
     }
 
 }

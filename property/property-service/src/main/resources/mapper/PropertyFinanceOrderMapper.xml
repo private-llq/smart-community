@@ -33,12 +33,7 @@
     <select id="communityIdList" resultType="java.lang.Long">
         select distinct community_id from t_user_house where check_status=1
     </select>
-    <select id="selectHouseAll" resultType="com.jsy.community.entity.HouseEntity">
-        select th.*,tuh.uid as uid from  t_user_house tuh
-        join t_house th
-        on tuh.house_id=th.id
-        where th.community_id=#{id} and tuh.check_status=1
-    </select>
+
     <!-- 获取上一个月的需要结算和被驳回的账单 -->
     <select id="queryNeedStatementOrderListByCommunityIdAndOrderTime" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
         select

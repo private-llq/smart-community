@@ -1,10 +1,12 @@
 package com.jsy.community.job;
 
-import com.jsy.community.api.IPropertyFinanceOrderService;
+import com.jsy.community.api.IFinanceBillService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @program: com.jsy.community
@@ -15,10 +17,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class FinanceBillJob extends QuartzJobBean {
 
-    private IPropertyFinanceOrderService propertyFinanceOrderService;
+    @Resource
+    IFinanceBillService financeBillService;
+
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        propertyFinanceOrderService.updateDays();
-        propertyFinanceOrderService.updatePenalSum();
+        System.out.println("操作执行了");
+
+        financeBillService.updateDays();
+        financeBillService.updatePenalSum();
+        System.out.println(financeBillService);
+        System.out.println("操作成功了");
     }
+
+
+
 }

@@ -5,6 +5,7 @@ import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
 import com.jsy.community.qo.property.StatementQO;
 import com.jsy.community.vo.StatementVO;
 import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,4 +37,13 @@ public interface PropertyFinanceStatementMapper extends BaseMapper<PropertyFinan
     **/
     @MapKey("statementNum")
     Map<String,PropertyFinanceStatementEntity> queryByStatementNumBatch(Collection<String> nums);
+
+    /**
+     * @Description: 条件查询批量结算单号
+     * @Param: [query]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+     **/
+    List<String> queryStatementNumsByCondition(@Param("query")PropertyFinanceStatementEntity query);
 }

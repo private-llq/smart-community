@@ -12,10 +12,19 @@
 
     <!-- 结算单号批量查询 单号-结算单数据 映射 -->
     <select id="queryByStatementNumBatch" resultType="com.jsy.community.entity.property.PropertyFinanceStatementEntity">
-        select statement_num as statementNum, create_time,statement_status from t_property_finance_statement
+        select statement_num as statementNum, create_time,statement_status,total_money from t_property_finance_statement
         where statement_num in
         <foreach collection="nums" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
+    </select>
+
+    <!-- 条件查询批量结算单号 -->
+    <select id="queryStatementNumsByCondition" resultType="String">
+        select statement_num from t_property_finance_statement
+        <where>
+            <if test="query.createStartDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ >= ]]> #{query.createStartDate}</if>
+            <if test="query.createEndDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ <= ]]> #{query.createEndDate}</if>
+        </where>
     </select>
 </mapper>
