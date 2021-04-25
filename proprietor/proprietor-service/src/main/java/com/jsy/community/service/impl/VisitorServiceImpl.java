@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -19,6 +20,7 @@ import com.jsy.community.utils.*;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -51,6 +54,12 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     
     @Autowired
     private StringRedisTemplate redisTemplate;
+    
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    
+    @Autowired
+    private CommunityHardWareMapper communityHardWareMapper;
     
 //    @Value("${}")
     private long visitorTimeLimit = 60*24*60; //单位 秒
@@ -116,84 +125,164 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             addCarBatch(carRecordList);
         }
         //0是无权限 小区和楼栋都是0 则不需要后续操作
-        if((visitorEntity.getIsCommunityAccess() != null && visitorEntity.getCommunityId() != 0)
-           || (visitorEntity.getIsBuildingAccess() != null && visitorEntity.getIsBuildingAccess() != 0)){
-           return getVisitorEntry(visitorEntity);// 返回门禁权限VO
+//        if((visitorEntity.getIsCommunityAccess() != null && visitorEntity.getCommunityId() != 0)
+//           || (visitorEntity.getIsBuildingAccess() != null && visitorEntity.getIsBuildingAccess() != 0)){
+//           return getVisitorEntry(visitorEntity);// 返回门禁权限VO
+//        }
+        //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
+        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
+        if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())
+            || BusinessEnum.BuildingAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsBuildingAccess())){
+            //小区是否有二维码设备(目前只用炫优一体机判断)
+            Integer count = communityHardWareMapper.countCommunityHardWare(visitorEntity.getCommunityId(), BusinessConst.HARDWARE_TYPE_XU_FACE);
+            if(count < 1){
+                return null;
+            }
+            visitorEntryVO.setId(visitorEntity.getId());
+            return visitorEntryVO;
         }
         return null;
     }
     
     /**
-    * @Description: 设置门禁权限
-     * @Param: [visitorEntity]
-     * @Return: com.jsy.community.vo.VisitorEntryVO
-     * @Author: chq459799974
-     * @Date: 2020/12/11
-    **/
-    private VisitorEntryVO getVisitorEntry(VisitorEntity visitorEntity){
-        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
-        visitorEntryVO.setPassword(MyMathUtils.randomCode(7)); //TODO 密码保存与验证方案待定
-        visitorEntryVO.setIsCommunityAccess(visitorEntity.getIsCommunityAccess());
-        visitorEntryVO.setIsBuildingAccess(visitorEntity.getIsBuildingAccess());
-        visitorEntryVO.setUid(visitorEntity.getUid());
-        String token = UUID.randomUUID().toString().replace("-","");
-        visitorEntryVO.setToken(token);
-        visitorEntryVO.setTimeLimit(visitorTimeLimit);
-        //小区门禁权限
-        if(visitorEntryVO.getIsCommunityAccess() != null && visitorEntryVO.getIsCommunityAccess() != 0){
-            redisTemplate.opsForValue().set("CEntry:" + token, JSON.toJSONString(visitorEntryVO), visitorTimeLimit, TimeUnit.MINUTES);
-        }
-        //楼栋门禁权限
-        if(visitorEntryVO.getIsBuildingAccess() != null && visitorEntryVO.getIsBuildingAccess() != 0){
-            redisTemplate.opsForValue().set("BEntry:" + token, JSON.toJSONString(visitorEntryVO), visitorTimeLimit, TimeUnit.MINUTES);
-        }
-        return visitorEntryVO;
-    }
-    
-    /**
-     * @Description: 访客门禁验证
-     * @Param: [token, type]
+     * @Description: 验证二维码
+     * @Param: [jsonObject, hardwareType]
      * @Return: void
      * @Author: chq459799974
-     * @Date: 2020/12/11
+     * @Date: 2021/4/25
      **/
-    //TODO 后续流程未知，返回值未定
-    public boolean verifyEntry(String token,Integer type){
-        if(BusinessEnum.EntryTypeEnum.COMMUNITY.getCode().equals(type)){ //小区门禁验证
-            String cEntry = redisTemplate.opsForValue().get("CEntry:" + token);
-            if(StringUtils.isEmpty(cEntry)){
-                return false;
-            }
-            VisitorEntryVO visitor = JSONObject.parseObject(cEntry, VisitorEntryVO.class);
-            switch (String.valueOf(visitor.getIsCommunityAccess())){
-                case BusinessConst.ACCESS_COMMUNITY_QR_CODE :
-                    //TODO 二维码类型
-                    return true;
-                case BusinessConst.ACCESS_COMMUNITY_FACE :
-                    //TODO 人脸
-                    return true;
-                default:
-                    return false;
-            }
-        }else if(BusinessEnum.EntryTypeEnum.BUILDING.getCode().equals(type)){ //楼栋门禁验证
-            String bEntry = redisTemplate.opsForValue().get("BEntry:" + token);
-            if(StringUtils.isEmpty(bEntry)){
-                return false;
-            }
-            VisitorEntryVO visitor = JSONObject.parseObject(bEntry, VisitorEntryVO.class);
-            switch (String.valueOf(visitor.getIsBuildingAccess())){
-                case BusinessConst.ACCESS_BUILDING_QR_CODE:
-                    //TODO 二维码类型
-                    return true;
-                case BusinessConst.ACCESS_BUILDING_COMMUNICATION:
-                    //TODO 可视对讲
-                    return true;
-                default:
-                    return false;
-            }
+    @Override
+    public void verifyQRCode(JSONObject jsonObject,Integer hardwareType){
+        JSONObject pushMap = new JSONObject();
+        pushMap.put("op","openDoor"); //二维码操作目前只有开门
+        Long visitorId = null; //访客登记ID
+        String hardwareId = null; //硬件ID
+        if(BusinessConst.HARDWARE_TYPE_XU_FACE.equals(hardwareType)){  //炫优人脸识别一体机
+            //机器传过来的二维码中的访客登记id
+            visitorId = jsonObject.getJSONObject("info").getJSONObject("QRCodeInfo").getLong("visitorId");
+            hardwareId = jsonObject.getJSONObject("info").getString("facesluiceId");
         }
-        return false;
+        //查询访客记录
+        VisitorEntity visitorEntity = visitorMapper.selectById(visitorId);
+        //无访客记录
+        if(visitorEntity == null){
+            pushMap.put("code","-1");
+            pushMap.put("msg","访客登记记录查找失败");
+            pushMsg(pushMap);
+            return;
+        }
+        //小区不对
+        Long communityId = visitorEntity.getCommunityId();
+        Long hareWareCommunityId = communityHardWareMapper.queryCommunityIdByHardWareIdAndType(hardwareId, hardwareType);
+        if(!communityId.equals(hareWareCommunityId)){
+            pushMap.put("code","-1");
+            pushMap.put("msg","设备与小区不对应");
+            pushMsg(pushMap);
+            return;
+        }
+        //来访过早
+        if(LocalDate.now().isBefore(visitorEntity.getStartTime())){
+            pushMap.put("code","-1");
+            pushMap.put("msg","未到访问时间");
+            pushMsg(pushMap);
+            return;
+        }
+        if(visitorEntity.getEndTime() == null){ //无结束时间
+            if(LocalDate.now().isAfter(visitorEntity.getStartTime())){ //暂定二维码在访问开始时间内一天有效
+                pushMap.put("code","-1");
+                pushMap.put("msg","已超出访问时间");
+                pushMsg(pushMap);
+                return;
+            }
+        }else if(LocalDate.now().isAfter(visitorEntity.getEndTime())){ //有结束时间
+            pushMap.put("code","-1");
+            pushMap.put("msg","已超出访问时间");
+            pushMsg(pushMap);
+            return;
+        }
+        pushMap.put("code","0");
+        pushMap.put("msg","二维码验证通过");
+        pushMap.put("uid",visitorEntity.getUid());
+        pushMap.put("name",visitorEntity.getName());
+        pushMsg(pushMap);
     }
+    
+    //推送返回结果
+    private void pushMsg(Map map){
+        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU,TopicExConfig.TOPIC_FACE_XU_SERVER,map);
+    }
+    
+//    /**
+//    * @Description: 设置门禁权限
+//     * @Param: [visitorEntity]
+//     * @Return: com.jsy.community.vo.VisitorEntryVO
+//     * @Author: chq459799974
+//     * @Date: 2020/12/11
+//    **/
+//    private VisitorEntryVO getVisitorEntry(VisitorEntity visitorEntity){
+//        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
+//        visitorEntryVO.setPassword(MyMathUtils.randomCode(7)); //TODO 密码保存与验证方案待定
+//        visitorEntryVO.setIsCommunityAccess(visitorEntity.getIsCommunityAccess());
+//        visitorEntryVO.setIsBuildingAccess(visitorEntity.getIsBuildingAccess());
+//        visitorEntryVO.setUid(visitorEntity.getUid());
+//        String token = UUID.randomUUID().toString().replace("-","");
+//        visitorEntryVO.setToken(token);
+//        visitorEntryVO.setTimeLimit(visitorTimeLimit);
+//        //小区门禁权限
+//        if(visitorEntryVO.getIsCommunityAccess() != null && visitorEntryVO.getIsCommunityAccess() != 0){
+//            redisTemplate.opsForValue().set("CEntry:" + token, JSON.toJSONString(visitorEntryVO), visitorTimeLimit, TimeUnit.MINUTES);
+//        }
+//        //楼栋门禁权限
+//        if(visitorEntryVO.getIsBuildingAccess() != null && visitorEntryVO.getIsBuildingAccess() != 0){
+//            redisTemplate.opsForValue().set("BEntry:" + token, JSON.toJSONString(visitorEntryVO), visitorTimeLimit, TimeUnit.MINUTES);
+//        }
+//        return visitorEntryVO;
+//    }
+    
+//    /**
+//     * @Description: 访客门禁验证
+//     * @Param: [token, type]
+//     * @Return: void
+//     * @Author: chq459799974
+//     * @Date: 2020/12/11
+//     **/
+//    //TODO 后续流程未知，返回值未定
+//    public boolean verifyEntry(String token,Integer type){
+//        if(BusinessEnum.EntryTypeEnum.COMMUNITY.getCode().equals(type)){ //小区门禁验证
+//            String cEntry = redisTemplate.opsForValue().get("CEntry:" + token);
+//            if(StringUtils.isEmpty(cEntry)){
+//                return false;
+//            }
+//            VisitorEntryVO visitor = JSONObject.parseObject(cEntry, VisitorEntryVO.class);
+//            switch (String.valueOf(visitor.getIsCommunityAccess())){
+//                case BusinessConst.ACCESS_COMMUNITY_QR_CODE :
+//                    //TODO 二维码类型
+//                    return true;
+//                case BusinessConst.ACCESS_COMMUNITY_FACE :
+//                    //TODO 人脸
+//                    return true;
+//                default:
+//                    return false;
+//            }
+//        }else if(BusinessEnum.EntryTypeEnum.BUILDING.getCode().equals(type)){ //楼栋门禁验证
+//            String bEntry = redisTemplate.opsForValue().get("BEntry:" + token);
+//            if(StringUtils.isEmpty(bEntry)){
+//                return false;
+//            }
+//            VisitorEntryVO visitor = JSONObject.parseObject(bEntry, VisitorEntryVO.class);
+//            switch (String.valueOf(visitor.getIsBuildingAccess())){
+//                case BusinessConst.ACCESS_BUILDING_QR_CODE:
+//                    //TODO 二维码类型
+//                    return true;
+//                case BusinessConst.ACCESS_BUILDING_COMMUNICATION:
+//                    //TODO 可视对讲
+//                    return true;
+//                default:
+//                    return false;
+//            }
+//        }
+//        return false;
+//    }
     
     /**
      * @Description: 批量添加随行人员

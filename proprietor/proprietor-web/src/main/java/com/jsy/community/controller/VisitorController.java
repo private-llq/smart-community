@@ -71,26 +71,26 @@ public class VisitorController {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "填写车辆类型后车牌号不能为空");
 		}
 		visitorEntity.setUid(UserUtils.getUserId());
-		return CommonResult.ok(iVisitorService.addVisitor(visitorEntity));
+		return CommonResult.ok(iVisitorService.addVisitor(visitorEntity),"操作成功");
 	}
 	
-	//三方调用进来
-	@ApiOperation("【访客】社区门禁验证(模拟)")
-	@GetMapping("verifyCommunityEntry")
-	@Login(allowAnonymous = true)
-	//TODO 流程未知，参数和返回值待确定
-	public boolean verifyCommunityEntry(@RequestParam("entryToken") String token){
-		return iVisitorService.verifyEntry(token, BusinessEnum.EntryTypeEnum.COMMUNITY.getCode());
-	}
-	
-	//三方调用进来
-	@ApiOperation("【访客】楼栋门禁验证(模拟)")
-	@GetMapping("verifyBuildingEntry")
-	@Login(allowAnonymous = true)
-	//TODO 流程未知，参数和返回值待确定
-	public boolean verifyBuildingEntry(@RequestParam("entryToken") String token){
-		return iVisitorService.verifyEntry(token,BusinessEnum.EntryTypeEnum.BUILDING.getCode());
-	}
+//	//三方调用进来
+//	@ApiOperation("【访客】社区门禁验证(模拟)")
+//	@GetMapping("verifyCommunityEntry")
+//	@Login(allowAnonymous = true)
+//	//TODO 流程未知，参数和返回值待确定
+//	public boolean verifyCommunityEntry(@RequestParam("entryToken") String token){
+//		return iVisitorService.verifyEntry(token, BusinessEnum.EntryTypeEnum.COMMUNITY.getCode());
+//	}
+//
+//	//三方调用进来
+//	@ApiOperation("【访客】楼栋门禁验证(模拟)")
+//	@GetMapping("verifyBuildingEntry")
+//	@Login(allowAnonymous = true)
+//	//TODO 流程未知，参数和返回值待确定
+//	public boolean verifyBuildingEntry(@RequestParam("entryToken") String token){
+//		return iVisitorService.verifyEntry(token,BusinessEnum.EntryTypeEnum.BUILDING.getCode());
+//	}
 	
 	/**
 	 * @Description: 访客登记 逻辑删除
