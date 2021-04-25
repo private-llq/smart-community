@@ -182,4 +182,14 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	**/
 	@MapKey("houseId")
 	Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> houseIds);
+
+
+	/**
+	 * @Description: 查询小区下所有房间
+	 * @author: Hu
+	 * @since: 2021/4/24 14:47
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> selectHouseAll(Long communityId);
 }

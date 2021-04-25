@@ -9,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -38,6 +39,14 @@ public class PropertyFinanceOrderController {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<String, Object> map=propertyFinanceOrderService.houseCost(userInfo,houseId);
         return CommonResult.ok(map);
+    }
+    @ApiOperation("查询一条已交账单详情")
+    @GetMapping("/getOrderNum")
+    @Login
+    public CommonResult getOrderNum(@RequestParam("orderNum") String orderNum){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        PropertyFinanceOrderVO propertyFinanceOrderVO=propertyFinanceOrderService.getOrderNum(userInfo,orderNum);
+        return CommonResult.ok(propertyFinanceOrderVO);
     }
     
     

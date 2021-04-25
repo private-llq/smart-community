@@ -26,6 +26,10 @@ public class PropertyFinanceOrderVO extends BaseVO {
 
     @ApiModelProperty(value = "房间id")
     private Long houseId;
+
+    @ApiModelProperty(value = "收款状态")
+    private Integer orderStatus;
+
     @ApiModelProperty(value = "物业费")
     private BigDecimal propertyFee;
     @ApiModelProperty(value = "违约金")

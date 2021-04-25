@@ -5,10 +5,7 @@ import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
-
-import java.util.Map;
-
-import java.util.List;
+import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,14 +18,7 @@ import java.util.Map;
  * @create: 2021-04-20 16:28
  **/
 public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOrderEntity> {
-    /**
-     * @Description: 每天查询数据库更新账单
-     * @author: Hu
-     * @since: 2021/4/22 10:05
-     * @Param:
-     * @return:
-     */
-    void updateDays();
+
 
     /**
     * @Description: 根据收款单号批量查询列表
@@ -47,14 +37,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Date: 2021/4/22
     **/
     List<String> queryReceiptNumsListByOrderNumLike(String orderNum);
-    /**
-     * @Description: 每天更新账单违约金和总金额
-     * @author: Hu
-     * @since: 2021/4/22 10:05
-     * @Param:
-     * @return:
-     */
-    void updatePenalSum();
+
 
     /**
      * @Description: 查询房间所有未缴账单
@@ -73,7 +56,16 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Date: 2021/4/23
     **/
     PageInfo<PropertyFinanceOrderEntity> queryPage(BaseQO<PropertyFinanceOrderEntity> baseQO);
-    
+
+    /**
+     * @Description: 查询一条账单详情
+     * @author: Hu
+     * @since: 2021/4/23 17:14
+     * @Param:
+     * @return:
+     */
+    PropertyFinanceOrderVO getOrderNum(AdminInfoVo userInfo, String orderNum);
+
     /**
     * @Description: 分页查询已缴费 (缴费模块)
      * @Param: [baseQO]

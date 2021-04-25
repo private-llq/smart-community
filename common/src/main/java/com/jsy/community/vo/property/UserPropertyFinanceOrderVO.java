@@ -17,6 +17,6 @@ public class UserPropertyFinanceOrderVO implements Serializable {
     @ApiModelProperty(value = "编号")
     private String number;
 
-    @ApiModelProperty(value = "编号")
+    @ApiModelProperty(value = "名称")
     private String realName;
 }

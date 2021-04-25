@@ -11,7 +11,6 @@ import org.apache.dubbo.config.annotation.DubboService;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 业主 服务实现类
@@ -28,7 +27,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 		UserEntity userEntity = baseMapper.selectOne(wrapper);
 		return userEntity;
 	}
-	
+
+	@Override
+	public UserEntity queryUserDetailByUid(String uid) {
+		return null;
+	}
+
 	//此方法不会进入，因为本端有同名Service，所以必须实现
 	@Override
 	public Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids){

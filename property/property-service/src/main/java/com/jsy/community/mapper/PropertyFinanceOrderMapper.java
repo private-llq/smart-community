@@ -3,15 +3,15 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @program: com.jsy.community
@@ -30,7 +30,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
     List<Long> communityIdList();
 
     /**
-     * @Description:
+     * @Description:  查询一个小区下的所有id
      * @author: Hu
      * @since: 2021/4/21 14:04
      * @Param:
@@ -72,7 +72,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @Author: chq459799974
      * @Date: 2021/4/22
     **/
-    List<PropertyFinanceOrderEntity> queryByReceiptNums(@Param("receiptNums")Collection<String> receiptNums, @Param("query")PropertyFinanceOrderEntity query);
+    List<PropertyFinanceOrderEntity> queryByReceiptNums(@Param("receiptNums") Collection<String> receiptNums, @Param("query")PropertyFinanceOrderEntity query);
 
     /**
     * @Description: 账单号模糊查询收款单号列表
@@ -102,7 +102,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @return:
      */
     UserPropertyFinanceOrderVO findUser(Long houseId);
-    
+
     /**
     * @Description: 查出当前社区所有订单中所有不重复uid
      * @Param: [communityId]
@@ -112,4 +112,5 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
     **/
     @Select("select distinct uid from t_property_finance_order where community_id = #{communityId}")
     Set<String> queryUidSetByCommunityId(Long communityId);
+
 }

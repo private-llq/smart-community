@@ -122,4 +122,13 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021/4/23
 	**/
 	Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> ids);
+
+	/**
+	 * @Description: 查询小区下所有房间
+	 * @author: Hu
+	 * @since: 2021/4/24 14:42
+	 * @Param:
+	 * @return:
+	 */
+    List<HouseEntity> selectHouseAll(Long communityId);
 }
