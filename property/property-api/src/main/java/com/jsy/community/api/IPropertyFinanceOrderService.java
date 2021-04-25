@@ -1,8 +1,10 @@
 package com.jsy.community.api;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 
@@ -73,4 +75,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Date: 2021/4/23
     **/
     PageInfo<PropertyFinanceOrderEntity> queryPage(BaseQO<PropertyFinanceOrderEntity> baseQO);
+
+    /**
+     *@Author: Pipi
+     *@Description: 分页查询结算单的账单列表
+     *@Param: baseQO:
+     *@Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     *@Date: 2021/4/24 11:44
+     **/
+    Page<PropertyFinanceOrderEntity> queryPageByStatemenNum(BaseQO<StatementNumQO> baseQO);
 }

@@ -5,8 +5,11 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
@@ -55,6 +58,25 @@ public class PropertyFinanceOrderController {
         }
         baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyFinanceOrderService.queryPage(baseQO),"查询成功");
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 分页获取结算单的账单列表
+     *@Param: baseQO:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/4/24 11:42
+     **/
+    @Login
+    @ApiOperation("分页获取结算单的账单列表")
+    @PostMapping("/getPageByStatemenNum")
+    public CommonResult getPageByStatemenNum(@RequestBody BaseQO<StatementNumQO> baseQO) {
+        ValidatorUtils.validatePageParam(baseQO);
+        if (baseQO.getQuery() == null) {
+            return CommonResult.error(JSYError.BAD_REQUEST);
+        }
+        ValidatorUtils.validateEntity(baseQO.getQuery());
+        return CommonResult.ok(propertyFinanceOrderService.queryPageByStatemenNum(baseQO),"查询成功");
     }
 
 }

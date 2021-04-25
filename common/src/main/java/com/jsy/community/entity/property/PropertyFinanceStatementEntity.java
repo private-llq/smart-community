@@ -2,6 +2,10 @@ package com.jsy.community.entity.property;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,10 +33,14 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
 
     @ApiModelProperty("结算时间段-开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime startDate;
 
     @ApiModelProperty("结算时间段-开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime endDate;
 
     @ApiModelProperty("结算状态1.待审核 2.结算中 3.已结算 4.驳回")
@@ -61,5 +69,9 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
 
     @ApiModelProperty("驳回原因")
     private String rejectReason;
+
+    // 冗余的查询显示字段
+    @ApiModelProperty("收款账户类型")
+    private String receiptAccountType;
 
 }

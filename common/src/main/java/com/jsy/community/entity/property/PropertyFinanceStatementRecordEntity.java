@@ -17,13 +17,10 @@ import lombok.Data;
 @ApiModel("物业财务结算记录表实体")
 public class PropertyFinanceStatementRecordEntity extends BaseEntity {
 
-    @ApiModelProperty("账单号")
-    private String orderNum;
-
     @ApiModelProperty("结算单号")
     private String statementNum;
 
-    @ApiModelProperty("操作类型,1:审核,2:结算,4:驳回")
+    @ApiModelProperty("操作类型,1:生成结算单,2:审核通过,3:结算中,4:驳回,5结算完成")
     private Integer operationType;
 
     @ApiModelProperty("操作备注")

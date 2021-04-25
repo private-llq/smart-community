@@ -1,9 +1,14 @@
 package com.jsy.community.api;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.StatementQO;
+import com.jsy.community.vo.StatementVO;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,4 +35,22 @@ public interface IPropertyFinanceStatementService extends IService<PropertyFinan
      * @Date: 2021/4/23
     **/
     Map<String,PropertyFinanceStatementEntity> queryByStatementNumBatch(Collection<String> nums);
+
+    /**
+     *@Author: Pipi
+     *@Description: 物业财务-结算单列表
+     *@Param: statementQO:
+     *@Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.vo.StatementVO>
+     *@Date: 2021/4/23 17:01
+     **/
+    Page<PropertyFinanceStatementEntity> getStatementList(BaseQO<StatementQO> statementQO);
+
+    /**
+     *@Author: Pipi
+     *@Description: 查询导出结算单数据
+     *@Param: :
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceStatementEntity>
+     *@Date: 2021/4/24 15:23
+     **/
+    List<StatementVO> getDownloadStatementList(StatementQO statementQO);
 }

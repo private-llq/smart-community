@@ -49,6 +49,7 @@
                 DATE_SUB( NOW(), INTERVAL 1 MONTH ),
                 '%Y-%m'
             )
+            and order_status = 1
             and statement_status in (0, 4)
             <foreach collection="list" open=" and community_id in (" close=")" separator="," item="communityId">
                 #{communityId}
@@ -87,5 +88,25 @@
         join t_user tu
         on tuh.uid=tu.uid
         where tuh.house_id=#{houseId}
+    </select>
+
+    <!-- 根据结算单号查询相关账单列表 -->
+    <select id="queryOrderByStatementNum" resultType="com.jsy.community.vo.StatementOrderVO">
+        select
+            tpfo.id as orderId,
+            tpfo.order_num,
+            tpfo.order_time,
+            tpfo.total_money,
+            tpfo.statement_num,
+            tpfr.create_time as payTime,
+            tpfr.transaction_type,
+            tpfr.transaction_no,
+            '物业费' as orderType
+        from t_property_finance_order tpfo
+        left join t_property_finance_receipt tpfr on tpfr.receipt_num = tpfo.receipt_num
+        where tpfo.statement_num in
+        <foreach collection="collection" open="(" close=")" separator="," item="statementNum">
+            #{statementNum}
+        </foreach>
     </select>
 </mapper>

@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.vo.StatementOrderVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -11,10 +12,7 @@ import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: com.jsy.community
@@ -106,4 +104,24 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @return:
      */
     UserPropertyFinanceOrderVO findUser(Long houseId);
+
+    /**
+     *@Author: Pipi
+     *@Description: 根据账单号模糊查询相关的结算单号列表
+     *@Param: orderNum:
+     *@Return: java.util.List<java.lang.String>
+     *@Date: 2021/4/23 17:42
+     **/
+    @Select("select statement_num from t_property_finance_order where order_num like concat('%', #{orderNum}, '%')")
+    List<String> queryStatementNumLikeOrderNum(String orderNum);
+
+    /**
+     *@Author: Pipi
+     *@Description: 根据结算单号查询相关账单列表
+     *@Param: statementNums:
+     *@Return: java.util.List<com.jsy.community.vo.StatementOrderVO>
+     *@Date: 2021/4/24 16:22
+     **/
+    List<StatementOrderVO> queryOrderByStatementNum(Set<String> statementNums);
+
 }

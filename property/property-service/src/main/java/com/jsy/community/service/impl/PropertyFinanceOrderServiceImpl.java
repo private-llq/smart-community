@@ -13,6 +13,7 @@ import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
@@ -256,6 +257,36 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         PageInfo<PropertyFinanceOrderEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData,pageInfo);
         return pageInfo;
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 分页查询结算单的账单列表
+     *@Param: baseQO:
+     *@Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     *@Date: 2021/4/24 11:44
+     **/
+    @Override
+    public Page<PropertyFinanceOrderEntity> queryPageByStatemenNum(BaseQO<StatementNumQO> baseQO) {
+        QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
+        Page<PropertyFinanceOrderEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
+        StatementNumQO query = baseQO.getQuery();
+        queryWrapper.select("id, order_num, order_time, '物业费' as orderType, total_money, receipt_num");
+        queryWrapper.eq("statement_num", query.getStatementNum());
+        queryWrapper.orderByDesc("create_time");
+        Page<PropertyFinanceOrderEntity> pageData = propertyFinanceOrderMapper.selectPage(page,queryWrapper);
+        if (!CollectionUtils.isEmpty(pageData.getRecords())) {
+            Set<String> receiptNums = new HashSet<>();
+            pageData.getRecords().forEach(orderEntity -> {
+                receiptNums.add(orderEntity.getReceiptNum());
+            });
+            //查收款单数据映射 (propertyFinanceReceiptService)
+            Map<String, PropertyFinanceReceiptEntity> receiptEntityMap = propertyFinanceReceiptService.queryByReceiptNumBatch(receiptNums);
+            pageData.getRecords().forEach(orderEntity -> {
+                orderEntity.setReceiptEntity(receiptEntityMap.get(orderEntity.getReceiptNum()) == null ? null : receiptEntityMap.get(orderEntity.getReceiptNum()));
+            });
+        }
+        return pageData;
     }
 
 }

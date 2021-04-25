@@ -89,7 +89,8 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @TableField(exist = false)
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate statementEndDate;
-    
-    
+
+    @ApiModelProperty("账单类型-冗余属性,给前端显示")
+    private String orderType;
     
 }

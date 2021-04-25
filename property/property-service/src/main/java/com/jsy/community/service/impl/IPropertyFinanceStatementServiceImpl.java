@@ -1,30 +1,29 @@
 package com.jsy.community.service.impl;
-
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyFinanceStatementService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.property.PropertyAccountBankEntity;
-import com.jsy.community.entity.property.PropertyFinanceCycleEntity;
-import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
-import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
-import com.jsy.community.mapper.PropertyAccountBankMapper;
-import com.jsy.community.mapper.PropertyFinanceCycleMapper;
-import com.jsy.community.mapper.PropertyFinanceOrderMapper;
-import com.jsy.community.mapper.PropertyFinanceStatementMapper;
+import com.jsy.community.entity.property.*;
+import com.jsy.community.mapper.*;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.StatementQO;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.StatementOrderVO;
+import com.jsy.community.vo.StatementVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.util.MapUtils;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -48,6 +47,9 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
     
     @Autowired
     private PropertyFinanceStatementMapper propertyFinanceStatementMapper;
+
+    @Autowired
+    private PropertyFinanceStatementRecordMapper recordMapper;
 
     /**
      *@Author: Pipi
@@ -102,6 +104,9 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
                     }
 
                 });
+                // 操作记录实体
+                List<PropertyFinanceStatementRecordEntity> insertRecordEntities = new ArrayList<>();
+                List<PropertyFinanceStatementRecordEntity> updateRecordEntities = new ArrayList<>();
                 // 2.1将已收款的未结算的账单生成结算单
                 List<PropertyFinanceStatementEntity> statementEntities = new ArrayList<>();
                 HashMap<String, List<Long>> statementOrderUpdateMap = new HashMap<>();
@@ -142,10 +147,18 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
                         statementEntity.setId(SnowFlake.nextId());
                         statementOrderUpdateMap.put(statementId, statementOrderNumS);
                         statementEntities.add(statementEntity);
+                        // 操作记录
+                        PropertyFinanceStatementRecordEntity recordEntity = new PropertyFinanceStatementRecordEntity();
+                        recordEntity.setStatementNum(statementId);
+                        recordEntity.setOperationType(1);
+                        recordEntity.setRemake("生成结算单");
+                        recordEntity.setOperatorId(0L);
+                        recordEntity.setId(SnowFlake.nextId());
+                        insertRecordEntities.add(recordEntity);
                     });
                 }
                 // 执行新增结算单
-                 batchInsertStatement(statementEntities, statementOrderUpdateMap);
+                 batchInsertStatement(statementEntities, statementOrderUpdateMap, insertRecordEntities);
                 // 2.2将被驳回的账单的状态更新为待结算
                 // 需要更新的账单列表
                 ArrayList<Long> orderNumS = new ArrayList<>();
@@ -159,7 +172,19 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
                         });
                     });
                 }
-                batchUpdateStatementStatus(orderNumS, statementNumSet);
+                // 更新操作记录
+                if (!CollectionUtils.isEmpty(statementNumSet)) {
+                    statementNumSet.forEach(statementNum -> {
+                        PropertyFinanceStatementRecordEntity recordEntity = new PropertyFinanceStatementRecordEntity();
+                        recordEntity.setStatementNum(statementNum);
+                        recordEntity.setOperationType(1);
+                        recordEntity.setRemake("重新进入审核流程");
+                        recordEntity.setOperatorId(0L);
+                        recordEntity.setId(SnowFlake.nextId());
+                        updateRecordEntities.add(recordEntity);
+                    });
+                }
+                batchUpdateStatementStatus(orderNumS, statementNumSet, updateRecordEntities);
             } else {
                 log.info("社区ID为:{}的社区{}日上月没有需要结算的账单", communityIdS.toString(), dayOfMonth);
             }
@@ -176,12 +201,18 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
      *@Date: 2021/4/22 17:21
      **/
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.MANDATORY)
-    protected void batchInsertStatement(List<PropertyFinanceStatementEntity> statementEntities, HashMap<String, List<Long>> statementOrderUpdateMap) {
+    protected void batchInsertStatement(List<PropertyFinanceStatementEntity> statementEntities,
+                                        HashMap<String, List<Long>> statementOrderUpdateMap,
+                                        List<PropertyFinanceStatementRecordEntity> recordEntities
+    ) {
         if (!CollectionUtils.isEmpty(statementEntities)) {
             boolean b = this.saveBatch(statementEntities);
         }
         if (!CollectionUtils.isEmpty(statementOrderUpdateMap)) {
             orderMapper.updateStatementStatusByIdS(statementOrderUpdateMap);
+        }
+        if (!CollectionUtils.isEmpty(recordEntities)) {
+            recordMapper.batchInsert(recordEntities);
         }
     }
 
@@ -194,12 +225,17 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
      *@Date: 2021/4/22 17:45
      **/
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.MANDATORY)
-    protected void batchUpdateStatementStatus(ArrayList<Long> orderNumS, HashSet<String> statementNumSet) {
+    protected void batchUpdateStatementStatus(ArrayList<Long> orderNumS,
+                                              HashSet<String> statementNumSet,
+                                              List<PropertyFinanceStatementRecordEntity> recordEntities) {
         if (!CollectionUtils.isEmpty(orderNumS)) {
             orderMapper.updateRejectStatementStatusByIdS(orderNumS);
         }
         if (!CollectionUtils.isEmpty(statementNumSet)) {
             baseMapper.batchUpdateStatementStatusByStatementNum(statementNumSet);
+        }
+        if (!CollectionUtils.isEmpty(recordEntities)) {
+            recordMapper.batchInsert(recordEntities);
         }
     }
 
@@ -253,5 +289,135 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         }
         return propertyFinanceStatementMapper.queryByStatementNumBatch(nums);
     }
-    
+
+    /**
+     *@Author: Pipi
+     *@Description: 物业财务-结算单列表
+     *@Param: statementQO:
+     *@Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.vo.StatementVO>
+     *@Date: 2021/4/23 17:00
+     **/
+    @Override
+    public Page<PropertyFinanceStatementEntity> getStatementList(BaseQO<StatementQO> statementQO) {
+        QueryWrapper<PropertyFinanceStatementEntity> queryWrapper = new QueryWrapper<>();
+        StatementQO query = statementQO.getQuery();
+        Page<PropertyFinanceStatementEntity> page = new Page<>(statementQO.getPage(), statementQO.getSize());
+        queryWrapper.select("*, '对公账户' as receiptAccountType");
+        queryWrapper.eq("community_id", query.getCommunityId());
+        queryWrapper.eq("deleted", 0);
+        if (query.getStatementStatus() != null) {
+            queryWrapper.eq("statement_status", query.getStatementStatus());
+        }
+        if (query.getStatementStartDate() != null) {
+            queryWrapper.ge("DATE(start_date)", query.getStatementStartDate());
+        }
+        if (query.getStatementEndDate() != null) {
+            queryWrapper.le("DATE(start_date)", query.getStatementEndDate());
+        }
+        if (query.getCreateStartTime() != null) {
+            queryWrapper.ge("DATE(create_time)", query.getCreateStartTime());
+        }
+        if (query.getCreateEndTime() != null) {
+            queryWrapper.le("DATE(create_time)", query.getCreateEndTime());
+        }
+        if (!StringUtils.isEmpty(query.getStatementNum())) {
+            queryWrapper.like("statement_num", query.getStatementNum());
+        }
+        // 如果有账单号条件,先查相关的结算单号列表
+        if (!StringUtils.isEmpty(query.getOrderNum())) {
+            List<String> statementNumS = new ArrayList<>();
+            statementNumS = orderMapper.queryStatementNumLikeOrderNum(query.getOrderNum());
+            if (!CollectionUtils.isEmpty(statementNumS)) {
+                queryWrapper.in("statement_num", statementNumS);
+            } else {
+                queryWrapper.in("statement_num", "0");
+            }
+        }
+        queryWrapper.last("ORDER BY create_time desc");
+        return baseMapper.selectPage(page, queryWrapper);
+    }
+
+    /**
+     * @Author: Pipi
+     * @Description: 查询导出结算单数据
+     * @Param: :
+     * @Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceStatementEntity>
+     * @Date: 2021/4/24 15:23
+     */
+    @Override
+    public List<StatementVO> getDownloadStatementList(StatementQO statementQO) {
+        List<StatementVO> statementVOS = new ArrayList<>();
+        QueryWrapper<PropertyFinanceStatementEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*, '对公账户' as receiptAccountType");
+        queryWrapper.eq("community_id", statementQO.getCommunityId());
+        queryWrapper.eq("deleted", 0);
+        if (statementQO.getStatementStatus() != null) {
+            queryWrapper.eq("statement_status", statementQO.getStatementStatus());
+        }
+        if (statementQO.getStatementStartDate() != null) {
+            queryWrapper.ge("DATE(start_date)", statementQO.getStatementStartDate());
+        }
+        if (statementQO.getStatementEndDate() != null) {
+            queryWrapper.le("DATE(start_date)", statementQO.getStatementEndDate());
+        }
+        if (statementQO.getCreateStartTime() != null) {
+            queryWrapper.ge("DATE(create_time)", statementQO.getCreateStartTime());
+        }
+        if (statementQO.getCreateEndTime() != null) {
+            queryWrapper.le("DATE(create_time)", statementQO.getCreateEndTime());
+        }
+        if (!StringUtils.isEmpty(statementQO.getStatementNum())) {
+            queryWrapper.like("statement_num", statementQO.getStatementNum());
+        }
+        // 如果有账单号条件,先查相关的结算单号列表
+        if (!StringUtils.isEmpty(statementQO.getOrderNum())) {
+            List<String> statementNumS = new ArrayList<>();
+            statementNumS = orderMapper.queryStatementNumLikeOrderNum(statementQO.getOrderNum());
+            if (!CollectionUtils.isEmpty(statementNumS)) {
+                queryWrapper.in("statement_num", statementNumS);
+            } else {
+                queryWrapper.in("statement_num", "0");
+            }
+        }
+        queryWrapper.last("ORDER BY create_time desc");
+        List<PropertyFinanceStatementEntity> propertyFinanceStatementEntities = propertyFinanceStatementMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(propertyFinanceStatementEntities)) {
+            propertyFinanceStatementEntities.forEach(propertyFinanceStatementEntity -> {
+                StatementVO statementVO = new StatementVO();
+                BeanUtils.copyProperties(propertyFinanceStatementEntity, statementVO);
+                statementVOS.add(statementVO);
+            });
+        }
+        if (statementQO.getExportType() == 2 && !CollectionUtils.isEmpty(statementVOS)) {
+            // 导出主从数据时,需要查询账单数据
+            Set<String> statementNums = new HashSet<>();
+            if (!CollectionUtils.isEmpty(propertyFinanceStatementEntities)) {
+                propertyFinanceStatementEntities.forEach(entity ->{
+                    statementNums.add(entity.getStatementNum());
+                });
+            }
+            if (!CollectionUtils.isEmpty(statementNums)) {
+                List<StatementOrderVO> statementOrderVOS = orderMapper.queryOrderByStatementNum(statementNums);
+                if (!CollectionUtils.isEmpty(statementOrderVOS)) {
+                    HashMap<String, List<StatementOrderVO>> statementOrderVOMap = new HashMap<>();
+                    statementOrderVOS.forEach(statementOrderVO -> {
+                        if (statementOrderVOMap != null && statementOrderVOMap.containsKey(statementOrderVO.getStatementNum())) {
+                            statementOrderVOMap.get(statementOrderVO.getStatementNum()).add(statementOrderVO);
+                        } else {
+                            List<StatementOrderVO> statementOrderVOList = new ArrayList<>();
+                            statementOrderVOList.add(statementOrderVO);
+                            statementOrderVOMap.put(statementOrderVO.getStatementNum(), statementOrderVOList);
+                        }
+                    });
+                    if (!CollectionUtils.isEmpty(statementOrderVOMap)) {
+                        statementVOS.forEach(statementVO -> {
+                            statementVO.setOrderVOList(statementOrderVOMap.get(statementVO.getStatementNum()));
+                        });
+                    }
+                }
+            }
+        }
+        return statementVOS;
+    }
+
 }
