@@ -21,4 +21,15 @@ public interface CommunityHardWareMapper extends BaseMapper<CommunityHardWareEnt
 	**/
 	@Select("select community_id from t_community_hardware where hardware_id = #{id} and hardware_type = #{type}")
 	Long queryCommunityIdByHardWareIdAndType(@Param("id")String id,@Param("type")Integer type);
+	
+	/**
+	* @Description: 查询小区是否有某种类型的设备
+	 * @Param: [communityId, type]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/4/25
+	**/
+	@Select("select count(0) from t_community_hardware where community_id = #{communityId} and hardware_type = #{type}")
+	Integer countCommunityHardWare(@Param("communityId")Long communityId,@Param("type")Integer type);
+	
 }

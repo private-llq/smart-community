@@ -133,14 +133,24 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
         if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())
             || BusinessEnum.BuildingAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsBuildingAccess())){
+            //小区是否有二维码设备(目前只用炫优一体机判断)
+            Integer count = communityHardWareMapper.countCommunityHardWare(visitorEntity.getCommunityId(), BusinessConst.HARDWARE_TYPE_XU_FACE);
+            if(count < 1){
+                return null;
+            }
             visitorEntryVO.setId(visitorEntity.getId());
             return visitorEntryVO;
         }
         return null;
     }
     
-    
-    //验证二维码
+    /**
+     * @Description: 验证二维码
+     * @Param: [jsonObject, hardwareType]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2021/4/25
+     **/
     @Override
     public void verifyQRCode(JSONObject jsonObject,Integer hardwareType){
         JSONObject pushMap = new JSONObject();
