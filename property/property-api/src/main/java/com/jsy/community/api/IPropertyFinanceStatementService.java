@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.StatementQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.StatementVO;
 
 import java.util.Collection;
@@ -52,7 +53,7 @@ public interface IPropertyFinanceStatementService extends IService<PropertyFinan
      *@Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.vo.StatementVO>
      *@Date: 2021/4/23 17:01
      **/
-    Page<PropertyFinanceStatementEntity> getStatementList(BaseQO<StatementQO> statementQO);
+    PageInfo<PropertyFinanceStatementEntity> getStatementList(BaseQO<StatementQO> statementQO);
 
     /**
      *@Author: Pipi

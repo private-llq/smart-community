@@ -10,6 +10,7 @@ import com.jsy.community.entity.property.*;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.StatementQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.StatementOrderVO;
 import com.jsy.community.vo.StatementVO;
@@ -312,43 +313,55 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
      *@Date: 2021/4/23 17:00
      **/
     @Override
-    public Page<PropertyFinanceStatementEntity> getStatementList(BaseQO<StatementQO> statementQO) {
+    public PageInfo<PropertyFinanceStatementEntity> getStatementList(BaseQO<StatementQO> statementQO) {
         QueryWrapper<PropertyFinanceStatementEntity> queryWrapper = new QueryWrapper<>();
         StatementQO query = statementQO.getQuery();
         Page<PropertyFinanceStatementEntity> page = new Page<>(statementQO.getPage(), statementQO.getSize());
         queryWrapper.select("*, '对公账户' as receiptAccountType");
-        queryWrapper.eq("community_id", query.getCommunityId());
-        queryWrapper.eq("deleted", 0);
-        if (query.getStatementStatus() != null) {
-            queryWrapper.eq("statement_status", query.getStatementStatus());
-        }
-        if (query.getStatementStartDate() != null) {
-            queryWrapper.ge("DATE(start_date)", query.getStatementStartDate());
-        }
-        if (query.getStatementEndDate() != null) {
-            queryWrapper.le("DATE(start_date)", query.getStatementEndDate());
-        }
-        if (query.getCreateStartTime() != null) {
-            queryWrapper.ge("DATE(create_time)", query.getCreateStartTime());
-        }
-        if (query.getCreateEndTime() != null) {
-            queryWrapper.le("DATE(create_time)", query.getCreateEndTime());
-        }
-        if (!StringUtils.isEmpty(query.getStatementNum())) {
-            queryWrapper.like("statement_num", query.getStatementNum());
-        }
-        // 如果有账单号条件,先查相关的结算单号列表
-        if (!StringUtils.isEmpty(query.getOrderNum())) {
-            List<String> statementNumS = new ArrayList<>();
-            statementNumS = orderMapper.queryStatementNumLikeOrderNum(query.getOrderNum());
-            if (!CollectionUtils.isEmpty(statementNumS)) {
-                queryWrapper.in("statement_num", statementNumS);
-            } else {
-                queryWrapper.in("statement_num", "0");
+        buildQueryMapper(queryWrapper, query);
+        queryWrapper.last("ORDER BY create_time desc");
+        Page<PropertyFinanceStatementEntity> pageData = baseMapper.selectPage(page, queryWrapper);
+        PageInfo<PropertyFinanceStatementEntity> pageInfo = new PageInfo<>();
+        BeanUtils.copyProperties(pageData, pageInfo);
+        //金额统计数据(结算单)
+        BigDecimal notStatement = new BigDecimal(0);//1.待结算
+        BigDecimal statementing = new BigDecimal(0);//2.结算中
+        BigDecimal statemented = new BigDecimal(0);//3.已结算
+        BigDecimal statementReject = new BigDecimal(0);//4.驳回
+        // 金额统计
+        // 需要创建新的queryMapper
+        QueryWrapper<PropertyFinanceStatementEntity> queryAmountWrapper = new QueryWrapper<>();
+        queryAmountWrapper.select("statement_status, sum(total_money) as total_money");
+        buildQueryMapper(queryAmountWrapper, query);
+        queryAmountWrapper.groupBy("statement_status");
+        List<PropertyFinanceStatementEntity> amountResult = baseMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(amountResult)) {
+            for (PropertyFinanceStatementEntity entity : amountResult) {
+                switch (entity.getStatementStatus()) {
+                    case 1:
+                        notStatement = entity.getTotalMoney();
+                        break;
+                    case 2:
+                        statementing = entity.getTotalMoney();
+                        break;
+                    case 3:
+                        statemented = entity.getTotalMoney();
+                        break;
+                    case 4:
+                        statementReject = entity.getTotalMoney();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-        queryWrapper.last("ORDER BY create_time desc");
-        return baseMapper.selectPage(page, queryWrapper);
+        Map<String,Object> extra = new HashMap<>();
+        extra.put("notStatement",notStatement);
+        extra.put("statementing",statementing);
+        extra.put("statemented",statemented);
+        extra.put("statementReject",statementReject);
+        pageInfo.setExtra(extra);
+        return pageInfo;
     }
 
     /**
@@ -363,36 +376,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         List<StatementVO> statementVOS = new ArrayList<>();
         QueryWrapper<PropertyFinanceStatementEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*, '对公账户' as receiptAccountType");
-        queryWrapper.eq("community_id", statementQO.getCommunityId());
-        queryWrapper.eq("deleted", 0);
-        if (statementQO.getStatementStatus() != null) {
-            queryWrapper.eq("statement_status", statementQO.getStatementStatus());
-        }
-        if (statementQO.getStatementStartDate() != null) {
-            queryWrapper.ge("DATE(start_date)", statementQO.getStatementStartDate());
-        }
-        if (statementQO.getStatementEndDate() != null) {
-            queryWrapper.le("DATE(start_date)", statementQO.getStatementEndDate());
-        }
-        if (statementQO.getCreateStartTime() != null) {
-            queryWrapper.ge("DATE(create_time)", statementQO.getCreateStartTime());
-        }
-        if (statementQO.getCreateEndTime() != null) {
-            queryWrapper.le("DATE(create_time)", statementQO.getCreateEndTime());
-        }
-        if (!StringUtils.isEmpty(statementQO.getStatementNum())) {
-            queryWrapper.like("statement_num", statementQO.getStatementNum());
-        }
-        // 如果有账单号条件,先查相关的结算单号列表
-        if (!StringUtils.isEmpty(statementQO.getOrderNum())) {
-            List<String> statementNumS = new ArrayList<>();
-            statementNumS = orderMapper.queryStatementNumLikeOrderNum(statementQO.getOrderNum());
-            if (!CollectionUtils.isEmpty(statementNumS)) {
-                queryWrapper.in("statement_num", statementNumS);
-            } else {
-                queryWrapper.in("statement_num", "0");
-            }
-        }
+        buildQueryMapper(queryWrapper, statementQO);
         queryWrapper.last("ORDER BY create_time desc");
         List<PropertyFinanceStatementEntity> propertyFinanceStatementEntities = propertyFinanceStatementMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(propertyFinanceStatementEntities)) {
@@ -434,4 +418,44 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         return statementVOS;
     }
 
+    /**
+     *@Author: Pipi
+     *@Description: 抽出构建queryWrapper的公共代码
+     *@Param: queryWrapper:
+     *@Param: query:
+     *@Return: void
+     *@Date: 2021/4/25 18:04
+     **/
+    private void buildQueryMapper(QueryWrapper<PropertyFinanceStatementEntity> queryWrapper, StatementQO query) {
+        queryWrapper.eq("community_id", query.getCommunityId());
+        queryWrapper.eq("deleted", 0);
+        if (query.getStatementStatus() != null) {
+            queryWrapper.eq("statement_status", query.getStatementStatus());
+        }
+        if (query.getStatementStartDate() != null) {
+            queryWrapper.ge("DATE(start_date)", query.getStatementStartDate());
+        }
+        if (query.getStatementEndDate() != null) {
+            queryWrapper.le("DATE(start_date)", query.getStatementEndDate());
+        }
+        if (query.getCreateStartTime() != null) {
+            queryWrapper.ge("DATE(create_time)", query.getCreateStartTime());
+        }
+        if (query.getCreateEndTime() != null) {
+            queryWrapper.le("DATE(create_time)", query.getCreateEndTime());
+        }
+        if (!StringUtils.isEmpty(query.getStatementNum())) {
+            queryWrapper.like("statement_num", query.getStatementNum());
+        }
+        // 如果有账单号条件,先查相关的结算单号列表
+        if (!StringUtils.isEmpty(query.getOrderNum())) {
+            List<String> statementNumS = new ArrayList<>();
+            statementNumS = orderMapper.queryStatementNumLikeOrderNum(query.getOrderNum());
+            if (!CollectionUtils.isEmpty(statementNumS)) {
+                queryWrapper.in("statement_num", statementNumS);
+            } else {
+                queryWrapper.in("statement_num", "0");
+            }
+        }
+    }
 }
