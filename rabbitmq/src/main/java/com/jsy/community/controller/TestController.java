@@ -30,7 +30,7 @@ public class TestController {
 	public void testSendTopic(){
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("messageId", UUID.randomUUID().toString().replace("-",""));
-		map.put("name", "张三");
+		map.put("id", "49546830832340992");
 		map.put("age", 22);
 		rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU,TopicExConfig.TOPIC_FACE_XU,map);
 		
