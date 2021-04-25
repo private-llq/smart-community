@@ -5,6 +5,8 @@ import com.jsy.community.entity.CommunityHardWareEntity;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 /**
  * @author chq459799974
  * @description 社区硬件Mapper
@@ -20,7 +22,8 @@ public interface CommunityHardWareMapper extends BaseMapper<CommunityHardWareEnt
 	 * @Date: 2021/4/25
 	**/
 	@Select("select community_id from t_community_hardware where hardware_id = #{id} and hardware_type = #{type}")
-	Long queryCommunityIdByHardWareIdAndType(@Param("id")String id,@Param("type")Integer type);
+//	Long queryCommunityIdByHardWareIdAndType(@Param("id")String id,@Param("type")Integer type);
+	List<Long> queryCommunityIdByHardWareIdAndType(@Param("id")String id, @Param("type")Integer type);//测试用
 	
 	/**
 	* @Description: 查询小区是否有某种类型的设备

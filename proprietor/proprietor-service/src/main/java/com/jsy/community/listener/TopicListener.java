@@ -45,6 +45,8 @@ public class TopicListener {
 			//手动确认
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 		}
+		//手动确认
+		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 	}
 	
 	
