@@ -60,6 +60,15 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
     PageInfo<PropertyFinanceOrderEntity> queryPage(BaseQO<PropertyFinanceOrderEntity> baseQO);
 
     /**
+     *@Author: Pipi
+     *@Description: 财务模块查询导出账单表数据
+     *@Param: propertyFinanceOrderEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     *@Date: 2021/4/25 15:52
+     **/
+    List<PropertyFinanceOrderEntity> queryExportExcelList(PropertyFinanceOrderEntity propertyFinanceOrderEntity);
+
+    /**
      * @Description: 查询一条账单详情
      * @author: Hu
      * @since: 2021/4/23 17:14

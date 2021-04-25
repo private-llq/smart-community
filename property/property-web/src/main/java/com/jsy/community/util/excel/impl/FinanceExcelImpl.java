@@ -1,10 +1,10 @@
 package com.jsy.community.util.excel.impl;
 
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.util.FinanceExcelHandler;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.vo.StatementOrderVO;
 import com.jsy.community.vo.StatementVO;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
@@ -25,8 +25,11 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
     // 结算单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
     public static final String[] STATEMENT_TITLE_FIELD = {"结算单号", "结算时间段", "状态", "结算金额", "开户名称", "开户银行", "开户支行", "银行账号", "创建日期", "驳回原因"};
 
-    // 账单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
+    // 结算单关联账单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
     public static final String[] ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "收款金额", "收款时间", "收款渠道", "支付渠道单号"};
+
+    // 账单表字段 如果增加字段  需要改变实现类逻辑
+    public static final String[] MASTER_ORDER_TITLE_FIELD = {"账单号", "状态", "账单日期", "账单类型", "应收金额", "房屋/车牌号", "业主姓名", "收款单号", "收款时间", "收款渠道", "支付渠道单号", "结算单号", "结算状态"};
 
     /**
      * @Author: Pipi
@@ -238,6 +241,143 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
 
     /**
      *@Author: Pipi
+     *@Description: 导出账单表
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/4/25 15:46
+     **/
+    @Override
+    public Workbook exportMaterOrder(List<?> entityList) {
+        //工作表名称
+        String titleName = "账单表";
+        //1.创建excel 工作簿
+        Workbook workbook = new XSSFWorkbook();
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = MASTER_ORDER_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        // 设置列宽
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 3000);
+        sheet.setColumnWidth(2, 3000);
+        sheet.setColumnWidth(3, 3000);
+        sheet.setColumnWidth(4, 3000);
+        sheet.setColumnWidth(5, 9000);
+        sheet.setColumnWidth(6, 4000);
+        sheet.setColumnWidth(7, 7000);
+        sheet.setColumnWidth(8, 6000);
+        sheet.setColumnWidth(9, 4000);
+        sheet.setColumnWidth(10, 10000);
+        sheet.setColumnWidth(11, 6000);
+        sheet.setColumnWidth(12, 4000);
+        for (int index = 0; index < entityList.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < MASTER_ORDER_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyFinanceOrderEntity entity = (PropertyFinanceOrderEntity) entityList.get(index);
+                switch (j) {
+                    case 0:
+                        // 账单号
+                        cell.setCellValue(entity.getOrderNum());
+                        break;
+                    case 1:
+                        // 状态
+                        if (entity.getOrderStatus() != null) {
+                            if (entity.getOrderStatus() == 0) {
+                                cell.setCellValue("待收款");
+                            } else if (entity.getOrderStatus() == 0) {
+                                cell.setCellValue("已收款");
+                            }
+                        }
+                        break;
+                    case 2:
+                        // 账单日期
+                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM").format(entity.getOrderTime()));
+                        break;
+                    case 3:
+                        // 账单类型
+                        cell.setCellValue("物业费");
+                        break;
+                    case 4:
+                        // 应收金额
+                        cell.setCellValue(entity.getTotalMoney().setScale(2).toString());
+                        break;
+                    case 5:
+                        // 房屋/车牌号
+                        cell.setCellValue(entity.getAddress());
+                        break;
+                    case 6:
+                        // 业主姓名
+                        cell.setCellValue(entity.getRealName());
+                        break;
+                    case 7:
+                        // 收款单号
+                        if (entity.getReceiptEntity() != null) {
+                            cell.setCellValue(entity.getReceiptEntity().getReceiptNum());
+                        }
+                        break;
+                    case 8:
+                        // 收款时间
+                        if (entity.getReceiptEntity() != null) {
+                            cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd: HH:mm:ss").format(entity.getReceiptEntity().getCreateTime()));
+                        }
+                        break;
+                    case 9:
+                        // 收款渠道
+                        if (entity.getReceiptEntity() != null) {
+                            if (entity.getReceiptEntity().getTransactionType() != null) {
+                                if (entity.getReceiptEntity().getTransactionType() == 1) {
+                                    cell.setCellValue("支付宝");
+                                } else if (entity.getReceiptEntity().getTransactionType() == 2) {
+                                    cell.setCellValue("微信");
+                                }
+                            }
+                        }
+                        break;
+                    case 10:
+                        // 支付渠道单号
+                        if (entity.getReceiptEntity() != null) {
+                            cell.setCellValue(entity.getReceiptEntity().getTransactionNo());
+                        }
+                        break;
+                    case 11:
+                        // 结算单号
+                        cell.setCellValue(entity.getStatementNum());
+                        break;
+                    case 12:
+                        // 结算状态
+                        if (entity.getStatementStatus() != null) {
+                            if (entity.getStatementStatus() == 0) {
+                                cell.setCellValue("待结算");
+                            } else if (entity.getStatementStatus() == 1) {
+                                cell.setCellValue("待审核");
+                            } else if (entity.getStatementStatus() == 2) {
+                                cell.setCellValue("结算中");
+                            } else if (entity.getStatementStatus() == 3) {
+                                cell.setCellValue("已结算");
+                            } else if (entity.getStatementStatus() == 4) {
+                                cell.setCellValue("驳回");
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
+    }
+
+    /**
+     *@Author: Pipi
      *@Description: 创建多sheet,用于关联结算单的账单表
      *@Param: entityList:
      *@Param: titleName:
@@ -267,7 +407,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         for (int index = 0; index < entityList.size(); index++) {
             row = sheet.createRow(index + 2);
             //创建列
-            for (int j = 0; j < STATEMENT_TITLE_FIELD.length; j++) {
+            for (int j = 0; j < ORDER_TITLE_FIELD.length; j++) {
                 cell = row.createCell(j);
                 StatementOrderVO statementOrderVO = (StatementOrderVO)entityList.get(index);
                 switch (j) {

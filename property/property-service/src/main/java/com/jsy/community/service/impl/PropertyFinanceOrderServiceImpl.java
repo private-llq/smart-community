@@ -389,6 +389,121 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     /**
      *@Author: Pipi
+     *@Description: 财务模块查询导出账单表数据
+     *@Param: propertyFinanceOrderEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     *@Date: 2021/4/25 15:52
+     **/
+    @Override
+    public List<PropertyFinanceOrderEntity> queryExportExcelList(PropertyFinanceOrderEntity query) {
+        List<PropertyFinanceOrderEntity> orderEntities = new ArrayList<>();
+        QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*");
+        queryWrapper.eq("community_id",query.getCommunityId());
+        queryWrapper.orderByDesc("create_time");
+        //本表条件查询
+        if(!StringUtils.isEmpty(query.getOrderNum())){
+            queryWrapper.like("order_num",query.getOrderNum());
+        }
+        if(!StringUtils.isEmpty(query.getReceiptNum())){
+            queryWrapper.like("receipt_num",query.getReceiptNum());
+        }
+        if(!StringUtils.isEmpty(query.getStatementNum())){
+            queryWrapper.like("statement_num",query.getStatementNum());
+        }
+        if(query.getOrderStatus() != null){
+            queryWrapper.eq("order_status",query.getOrderStatus());
+        }
+        if(query.getStatementStatus() != null){
+            queryWrapper.eq("statement_status",query.getStatementStatus());
+        }
+        if(query.getHouseId() != null){
+            queryWrapper.eq("house_id",query.getHouseId());
+        }
+        if(query.getOrderStartDate() != null){
+            queryWrapper.ge("order_time",query.getOrderStartDate());
+        }
+        if(query.getOrderEndDate() != null){
+            queryWrapper.le("order_time",query.getOrderEndDate());
+        }
+        //其他表条件查询
+        if(!StringUtils.isEmpty(query.getRealName())){
+            //查出当前社区所有订单中所有不重复uid
+            Set<String> allUidSet = propertyFinanceOrderMapper.queryUidSetByCommunityId(query.getCommunityId());
+            LinkedList<String> allUidSetList = new LinkedList<>(allUidSet);
+            //判断数量，in条件超过999，分割查询
+            int size = 999;
+            if(!CollectionUtils.isEmpty(allUidSet)){
+                //确定查询次数
+                int times = allUidSet.size()%size == 0 ? allUidSet.size()/size : allUidSet.size()/size + 1;
+                //符合条件的uid
+                List<String> uids = new LinkedList<>();
+                int remain = allUidSet.size(); //剩余数据长度
+                for(int i=0;i<times;i++){
+                    uids.addAll(userService.queryUidOfNameLike(allUidSetList.subList(i*size,(i*size)+remain), query.getRealName()));
+                    remain = remain > size ? remain : remain - size;
+                }
+                //添加查询条件
+                if(!CollectionUtils.isEmpty(uids)){
+                    queryWrapper.in("uid",uids);
+                }
+            }
+        }
+        if(query.getReceiptStartDate() != null || query.getReceiptEndDate() != null){
+            PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
+            receiptEntity.setStartDate(query.getReceiptStartDate());
+            receiptEntity.setEndDate(query.getReceiptEndDate());
+            List<String> receiptNums = propertyFinanceReceiptService.queryReceiptNumsByCondition(receiptEntity);
+            if(CollectionUtils.isEmpty(receiptNums)){
+                return orderEntities;
+            }
+            queryWrapper.in("receipt_num",receiptNums);
+        }
+        if(query.getStatementStartDate() != null || query.getStatementEndDate() != null){
+            PropertyFinanceStatementEntity statementEntity = new PropertyFinanceStatementEntity();
+            statementEntity.setCreateStartDate(query.getStatementStartDate());
+            statementEntity.setCreateEndDate(query.getStatementEndDate());
+            List<String> statementNums = propertyFinanceStatementService.queryStatementNumsByCondition(statementEntity);
+            if(CollectionUtils.isEmpty(statementNums)){
+                return orderEntities;
+            }
+            queryWrapper.in("statement_num",statementNums);
+        }
+        orderEntities = propertyFinanceOrderMapper.selectList(queryWrapper);
+        if(CollectionUtils.isEmpty(orderEntities)){
+            return orderEntities;
+        }
+        //后续查询参数
+        Set<Long> houseIds = new HashSet<>();
+        Set<String> uids = new HashSet<>();
+        Set<String> receiptNums = new HashSet<>();
+        Set<String> statementNums = new HashSet<>();
+        for(PropertyFinanceOrderEntity entity : orderEntities){
+            houseIds.add(entity.getHouseId());
+            uids.add(entity.getUid());
+            receiptNums.add(entity.getReceiptNum());
+            statementNums.add(entity.getStatementNum());
+        }
+        //查房屋全称映射 (houseService)
+        Map<Long,HouseEntity> houseMap = houseService.queryIdAndHouseMap(houseIds);
+        //查业主姓名映射 (houseService)
+        Map<String,Map<String, String>> realNameMap = userService.queryNameByUidBatch(uids);
+        //查收款单数据映射 (propertyFinanceReceiptService)
+        Map<String, PropertyFinanceReceiptEntity> receiptEntityMap = propertyFinanceReceiptService.queryByReceiptNumBatch(receiptNums);
+        //查结算单数据映射 (propertyFinanceStatementService)
+        Map<String, PropertyFinanceStatementEntity> statementEntityMap = propertyFinanceStatementService.queryByStatementNumBatch(statementNums);
+        //设置数据
+        for(PropertyFinanceOrderEntity entity : orderEntities){
+            entity.setAddress(houseMap.get(entity.getHouseId()) == null ? null : houseMap.get(entity.getHouseId()).getAddress());
+            entity.setRealName(realNameMap.get(entity.getUid()) == null ? null : realNameMap.get(entity.getUid()).get("name"));
+            entity.setReceiptEntity(receiptEntityMap.get(entity.getReceiptNum()) == null ? null : receiptEntityMap.get(entity.getReceiptNum()));
+            entity.setStatementEntity(statementEntityMap.get(entity.getStatementNum()) == null ? null : statementEntityMap.get(entity.getStatementNum()));
+        }
+        return orderEntities;
+    }
+
+    /**
+     *@Author: Pipi
      *@Description: 分页查询结算单的账单列表
      *@Param: baseQO:
      *@Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PropertyFinanceOrderEntity>

@@ -33,5 +33,12 @@ public interface FinanceExcelHandler {
      **/
     Workbook exportMasterSlaveStatement(List<?> entityList);
 
-
+    /**
+     *@Author: Pipi
+     *@Description: 导出账单表
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/4/25 15:46
+     **/
+    Workbook exportMaterOrder(List<?> entityList);
 }
