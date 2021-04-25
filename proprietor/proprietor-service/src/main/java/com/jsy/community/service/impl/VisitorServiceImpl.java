@@ -173,8 +173,10 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         }
         //小区不对
         Long communityId = visitorEntity.getCommunityId();
-        Long hareWareCommunityId = communityHardWareMapper.queryCommunityIdByHardWareIdAndType(hardwareId, hardwareType);
-        if(!communityId.equals(hareWareCommunityId)){
+//        Long hareWareCommunityId = communityHardWareMapper.queryCommunityIdByHardWareIdAndType(hardwareId, hardwareType);
+        List<Long> hareWareCommunityId = communityHardWareMapper.queryCommunityIdByHardWareIdAndType(hardwareId, hardwareType);//测试用
+//        if(!communityId.equals(hareWareCommunityId)){
+        if(!hareWareCommunityId.contains(communityId)){ //测试用
             pushMap.put("code","-1");
             pushMap.put("msg","设备与小区不对应");
             pushMsg(pushMap);
