@@ -356,10 +356,17 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         BigDecimal statemented = new BigDecimal(0);//3.已结算
         BigDecimal statementReject = new BigDecimal(0);//4.驳回
         //统计数据查询
-        List<PropertyFinanceOrderEntity> listData = propertyFinanceOrderMapper.selectList(queryWrapper);
-        for(PropertyFinanceOrderEntity entity : listData){
-            //金额统计
-            totalOrder = totalOrder.add(entity.getTotalMoney());
+        //收款金额统计(总金额)
+        queryWrapper.select("sum(total_money) as totalOrder");
+        List<Map<String, Object>> totalOrderMoneyListMap = propertyFinanceOrderMapper.selectMaps(queryWrapper);
+        if(totalOrderMoneyListMap.get(0) != null){
+            totalOrder = totalOrder.add(new BigDecimal(String.valueOf(totalOrderMoneyListMap.get(0).get("totalOrder"))));
+        }
+        //收款金额统计(已收、待收)
+        queryWrapper.select("order_status, sum(total_money) as total_money, now() as create_time");
+        queryWrapper.groupBy("order_status");
+        List<PropertyFinanceOrderEntity> receiptData = propertyFinanceOrderMapper.selectList(queryWrapper);
+        for(PropertyFinanceOrderEntity entity : receiptData){
             switch (entity.getOrderStatus()){
                 case 0:
                     notReceipt = notReceipt.add(entity.getTotalMoney());
@@ -368,19 +375,25 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                     receipted = receipted.add(entity.getTotalMoney());
                     break;
             }
-            if(entity.getStatementEntity() != null){
+        }
+        //结算金额统计
+        queryWrapper.select("statement_status, sum(total_money) as total_money, now() as create_time");
+        queryWrapper.groupBy("statement_status");
+        List<PropertyFinanceOrderEntity> statementData = propertyFinanceOrderMapper.selectList(queryWrapper);
+        for(PropertyFinanceOrderEntity entity : statementData){
+            if(entity.getStatementStatus() != null){
                 switch (entity.getStatementStatus()){
                     case 1:
-                        notStatement = notStatement.add(entity.getStatementEntity().getTotalMoney());
+                        notStatement = notStatement.add(entity.getTotalMoney());
                         break;
                     case 2:
-                        statementing = statementing.add(entity.getStatementEntity().getTotalMoney());
+                        statementing = statementing.add(entity.getTotalMoney());
                         break;
                     case 3:
-                        statemented = statemented.add(entity.getStatementEntity().getTotalMoney());
+                        statemented = statemented.add(entity.getTotalMoney());
                         break;
                     case 4:
-                        statementReject = statementReject.add(entity.getStatementEntity().getTotalMoney());
+                        statementReject = statementReject.add(entity.getTotalMoney());
                         break;
                 }
             }
