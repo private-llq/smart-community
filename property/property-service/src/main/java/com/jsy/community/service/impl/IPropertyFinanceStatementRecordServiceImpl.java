@@ -36,10 +36,12 @@ public class IPropertyFinanceStatementRecordServiceImpl extends ServiceImpl<Prop
      **/
     @Override
     public PropertyFinanceStatementEntity statementRecordList(String statementNum) {
-        PropertyFinanceStatementEntity statementEntity = new PropertyFinanceStatementEntity();
         QueryWrapper<PropertyFinanceStatementEntity> statementEntityQueryWrapper = new QueryWrapper<>();
         statementEntityQueryWrapper.eq("statement_num", statementNum);
-        statementEntity = statementMapper.selectOne(statementEntityQueryWrapper);
+        PropertyFinanceStatementEntity statementEntity = statementMapper.selectOne(statementEntityQueryWrapper);
+        if (statementEntity == null) {
+            return statementEntity;
+        }
         QueryWrapper<PropertyFinanceStatementRecordEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("statement_num", statementNum);
         queryWrapper.last("order by create_time asc");
