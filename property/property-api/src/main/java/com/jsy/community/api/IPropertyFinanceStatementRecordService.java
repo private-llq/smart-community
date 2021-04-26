@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
 import com.jsy.community.entity.property.PropertyFinanceStatementRecordEntity;
 
 import java.util.List;
@@ -19,5 +20,5 @@ public interface IPropertyFinanceStatementRecordService extends IService<Propert
      *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceStatementRecordEntity>
      *@Date: 2021/4/24 10:50
      **/
-    List<PropertyFinanceStatementRecordEntity> statementRecordList(String statementNum);
+    PropertyFinanceStatementEntity statementRecordList(String statementNum);
 }

@@ -75,7 +75,6 @@ public class PropertyFinanceReceiptController {
 	public ResponseEntity<byte[]> downloadReceiptList(@RequestBody PropertyFinanceReceiptEntity receiptEntity) {
 		ValidatorUtils.validateEntity(receiptEntity, PropertyFinanceReceiptEntity.ExportValiadate.class);
 		receiptEntity.setCommunityId(UserUtils.getAdminCommunityId());
-		receiptEntity.setCommunityId(1L);
 		List<PropertyFinanceReceiptEntity> receiptEntities = propertyFinanceReceiptService.queryExportReceiptList(receiptEntity);
 		//设置excel 响应头信息
 		MultiValueMap<String, String> multiValueMap = new HttpHeaders();

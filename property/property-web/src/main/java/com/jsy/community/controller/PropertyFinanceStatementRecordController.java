@@ -37,7 +37,7 @@ public class PropertyFinanceStatementRecordController {
      **/
     @Login
     @ApiOperation("物业结算-结算进程")
-    @GetMapping("getStatementRecord")
+    @GetMapping("/getStatementRecord")
     public CommonResult getStatementRecord(@RequestParam String statementNum) {
         return CommonResult.ok(statementRecordService.statementRecordList(statementNum));
     }

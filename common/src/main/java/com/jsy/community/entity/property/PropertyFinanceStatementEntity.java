@@ -15,6 +15,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @Author: Pipi
@@ -88,5 +89,9 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
     @ApiModelProperty("收款账户类型")
     @TableField(exist = false)
     private String receiptAccountType;
+
+    @ApiModelProperty("结算单进程")
+    @TableField(exist = false)
+    private List<PropertyFinanceStatementRecordEntity> recordEntities;
 
 }
