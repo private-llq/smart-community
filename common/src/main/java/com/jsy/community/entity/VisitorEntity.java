@@ -106,8 +106,8 @@ public class VisitorEntity extends BaseEntity {
     @ApiModelProperty(value = "来访车辆车牌", hidden = true)
     private String carPlate;
     
-    @ApiModelProperty(value = "来访车辆类型 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车", hidden = true)
-    @Range(min = 1, max = 5, message = "车辆类型不正确")
+    @ApiModelProperty(value = "来访车辆类型 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车 6.其他车型", hidden = true)
+    @Range(min = 1, max = 6, message = "车辆类型不正确")
     private Integer carType;
     
     @ApiModelProperty(value = "来访车辆类型名", hidden = true)
