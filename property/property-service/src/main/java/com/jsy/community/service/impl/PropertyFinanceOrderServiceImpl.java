@@ -22,11 +22,11 @@ import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.shiro.util.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -179,13 +179,17 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 List<String> uids = new LinkedList<>();
                 int remain = allUidSet.size(); //剩余数据长度
                 for(int i=0;i<times;i++){
-                    uids.addAll(userService.queryUidOfNameLike(allUidSetList.subList(i*size,(i*size)+remain), query.getRealName()));
+                    List<String> targetUid = userService.queryUidOfNameLike(allUidSetList.subList(i * size, (i * size) + remain), query.getRealName());
+                    if(!CollectionUtils.isEmpty(targetUid)){
+                        uids.addAll(targetUid);
+                    }
                     remain = remain > size ? remain : remain - size;
                 }
                 //添加查询条件
-                if(!CollectionUtils.isEmpty(uids)){
-                    queryWrapper.in("uid",uids);
+                if(CollectionUtils.isEmpty(uids)){
+                    return new PageInfo<>();
                 }
+                queryWrapper.in("uid",uids);
             }
         }
         //分页查询
@@ -276,13 +280,17 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 List<String> uids = new LinkedList<>();
                 int remain = allUidSet.size(); //剩余数据长度
                 for(int i=0;i<times;i++){
-                    uids.addAll(userService.queryUidOfNameLike(allUidSetList.subList(i*size,(i*size)+remain), query.getRealName()));
+                    List<String> targetUid = userService.queryUidOfNameLike(allUidSetList.subList(i * size, (i * size) + remain), query.getRealName());
+                    if(!CollectionUtils.isEmpty(targetUid)){
+                        uids.addAll(targetUid);
+                    }
                     remain = remain > size ? remain : remain - size;
                 }
                 //添加查询条件
-                if(!CollectionUtils.isEmpty(uids)){
-                    queryWrapper.in("uid",uids);
+                if(CollectionUtils.isEmpty(uids)){
+                    return new PageInfo<>();
                 }
+                queryWrapper.in("uid",uids);
             }
         }
         if(query.getReceiptStartDate() != null || query.getReceiptEndDate() != null){
@@ -329,6 +337,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         Map<String, PropertyFinanceReceiptEntity> receiptEntityMap = propertyFinanceReceiptService.queryByReceiptNumBatch(receiptNums);
         //查结算单数据映射 (propertyFinanceStatementService)
         Map<String, PropertyFinanceStatementEntity> statementEntityMap = propertyFinanceStatementService.queryByStatementNumBatch(statementNums);
+        //设置数据
+        for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
+            entity.setAddress(houseMap.get(entity.getHouseId()) == null ? null : houseMap.get(entity.getHouseId()).getAddress());
+            entity.setRealName(realNameMap.get(entity.getUid()) == null ? null : realNameMap.get(entity.getUid()).get("name"));
+            entity.setReceiptEntity(receiptEntityMap.get(entity.getReceiptNum()) == null ? null : receiptEntityMap.get(entity.getReceiptNum()));
+            entity.setStatementEntity(statementEntityMap.get(entity.getStatementNum()) == null ? null : statementEntityMap.get(entity.getStatementNum()));
+	        entity.setUid(null);
+	        entity.setHouseId(null);
+        }
         //金额统计数据(账单)
         BigDecimal totalOrder = new BigDecimal(0);//应收合计
         BigDecimal notReceipt = new BigDecimal(0);//0.待收款
@@ -338,12 +355,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         BigDecimal statementing = new BigDecimal(0);//2.结算中
         BigDecimal statemented = new BigDecimal(0);//3.已结算
         BigDecimal statementReject = new BigDecimal(0);//4.驳回
-        //设置数据
-        for(PropertyFinanceOrderEntity entity : pageData.getRecords()){
-            entity.setAddress(houseMap.get(entity.getHouseId()) == null ? null : houseMap.get(entity.getHouseId()).getAddress());
-            entity.setRealName(realNameMap.get(entity.getUid()) == null ? null : realNameMap.get(entity.getUid()).get("name"));
-            entity.setReceiptEntity(receiptEntityMap.get(entity.getReceiptNum()) == null ? null : receiptEntityMap.get(entity.getReceiptNum()));
-            entity.setStatementEntity(statementEntityMap.get(entity.getStatementNum()) == null ? null : statementEntityMap.get(entity.getStatementNum()));
+        //统计数据查询
+        List<PropertyFinanceOrderEntity> listData = propertyFinanceOrderMapper.selectList(queryWrapper);
+        for(PropertyFinanceOrderEntity entity : listData){
             //金额统计
             totalOrder = totalOrder.add(entity.getTotalMoney());
             switch (entity.getOrderStatus()){
@@ -370,8 +384,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                         break;
                 }
             }
-	        entity.setUid(null);
-	        entity.setHouseId(null);
         }
         PageInfo<PropertyFinanceOrderEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData,pageInfo);
