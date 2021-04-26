@@ -41,4 +41,13 @@ public interface IPropertyFinanceReceiptService {
 	 * @Date: 2021/4/23
 	**/
 	List<String> queryReceiptNumsByCondition(PropertyFinanceReceiptEntity query);
+
+	/**
+	 *@Author: Pipi
+	 *@Description: 查询导出的收款单列表
+	 *@Param: receiptEntity:
+	 *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceReceiptEntity>
+	 *@Date: 2021/4/26 9:34
+	 **/
+	List<PropertyFinanceReceiptEntity> queryExportReceiptList(PropertyFinanceReceiptEntity receiptEntity);
 }

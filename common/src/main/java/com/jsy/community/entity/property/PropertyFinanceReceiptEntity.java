@@ -4,10 +4,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
+import com.jsy.community.qo.property.StatementQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,4 +58,11 @@ public class PropertyFinanceReceiptEntity extends BaseEntity {
     @TableField(exist = false)
     private String orderNum;
 
+    @ApiModelProperty("导出选项, 1:仅导出主数据, 2:导出主数据和从数据")
+    @Range(min = 1, max = 2, message = "导出选项值超出范围, 1:仅导出主数据, 2:导出主数据和从数据")
+    @NotNull(groups = {ExportValiadate.class}, message = "导出选项不能为空")
+    @TableField(exist = false)
+    private Integer exportType;
+
+    public interface ExportValiadate {}
 }

@@ -135,4 +135,68 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
 	public List<String> queryReceiptNumsByCondition(PropertyFinanceReceiptEntity query){
         return propertyFinanceReceiptMapper.queryReceiptNumsByCondition(query);
 	}
+
+	/**
+	 *@Author: Pipi
+	 *@Description: 查询导出的收款单列表
+	 *@Param: receiptEntity:
+	 *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceReceiptEntity>
+	 *@Date: 2021/4/26 9:34
+	 **/
+	@Override
+	public List<PropertyFinanceReceiptEntity> queryExportReceiptList(PropertyFinanceReceiptEntity receiptEntity) {
+		QueryWrapper<PropertyFinanceReceiptEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("*");
+		queryWrapper.eq("community_id",receiptEntity.getCommunityId());
+		queryWrapper.orderByDesc("create_time");
+		if(!StringUtils.isEmpty(receiptEntity.getReceiptNum())){
+			queryWrapper.like("receipt_num",receiptEntity.getReceiptNum());
+		}
+		//带账单号模糊查询
+		if(!StringUtils.isEmpty(receiptEntity.getOrderNum())){
+			List<String> receiptNumsList = propertyFinanceOrderService.queryReceiptNumsListByOrderNumLike(receiptEntity.getOrderNum());
+			if (CollectionUtils.isEmpty(receiptNumsList)) {
+				receiptNumsList.add("0");
+			}
+			queryWrapper.in("receipt_num", receiptNumsList);
+		}
+		if(receiptEntity.getStartDate() != null){
+			queryWrapper.ge("create_time",receiptEntity.getStartDate());
+		}
+		if(receiptEntity.getEndDate() != null){
+			queryWrapper.le("create_time",receiptEntity.getEndDate());
+		}
+		if(receiptEntity.getTransactionType() != null){
+			queryWrapper.eq("transaction_type",receiptEntity.getTransactionType());
+		}
+		if(receiptEntity.getTransactionNo() != null){
+			queryWrapper.like("transaction_no",receiptEntity.getTransactionNo());
+		}
+		List<PropertyFinanceReceiptEntity> receiptEntities = propertyFinanceReceiptMapper.selectList(queryWrapper);
+		if (receiptEntity.getExportType() == 2 && !CollectionUtils.isEmpty(receiptEntities)) {
+			// 查询管理账单列表
+			HashSet<String> receiptNums = new HashSet<>();
+			for (PropertyFinanceReceiptEntity entity : receiptEntities) {
+				receiptNums.add(entity.getReceiptNum());
+			}
+			PropertyFinanceOrderEntity orderQuery = null;
+			//关联查询账单
+			List<PropertyFinanceOrderEntity> orderTotalList = propertyFinanceOrderService.queryByReceiptNums(receiptNums,orderQuery);
+			for (PropertyFinanceReceiptEntity entity : receiptEntities) {
+				if (!CollectionUtils.isEmpty(orderTotalList)) {
+					List<PropertyFinanceOrderEntity> orderList = new ArrayList();
+					for (PropertyFinanceOrderEntity orderEntity : orderTotalList) {
+						if (orderEntity.getReceiptNum().equals("8888")) {
+							System.out.println(1);
+						}
+						if(orderEntity.getReceiptNum().equals(entity.getReceiptNum())){
+							orderList.add(orderEntity);
+						}
+					}
+					entity.setOrderList(orderList);
+				}
+			}
+		}
+		return receiptEntities;
+	}
 }

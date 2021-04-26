@@ -91,6 +91,7 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     private LocalDate statementEndDate;
 
     @ApiModelProperty("账单类型-冗余属性,给前端显示")
+    @TableField(exist = false)
     private String orderType;
     
 }

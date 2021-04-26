@@ -86,6 +86,7 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
 
     // 冗余的查询显示字段
     @ApiModelProperty("收款账户类型")
+    @TableField(exist = false)
     private String receiptAccountType;
 
 }

@@ -136,7 +136,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("物业财务-导出账单")
     @PostMapping("/downloadOrderList")
     public ResponseEntity<byte[]> downloadOrderList(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity) {
-        propertyFinanceOrderEntity.setCommunityId(2L);
+        propertyFinanceOrderEntity.setCommunityId(UserUtils.getAdminCommunityId());
         List<PropertyFinanceOrderEntity> orderEntities = propertyFinanceOrderService.queryExportExcelList(propertyFinanceOrderEntity);
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();

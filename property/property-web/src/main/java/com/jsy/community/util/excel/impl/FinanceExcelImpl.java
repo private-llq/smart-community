@@ -1,6 +1,7 @@
 package com.jsy.community.util.excel.impl;
 
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.util.FinanceExcelHandler;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.vo.StatementOrderVO;
@@ -30,6 +31,12 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
 
     // 账单表字段 如果增加字段  需要改变实现类逻辑
     public static final String[] MASTER_ORDER_TITLE_FIELD = {"账单号", "状态", "账单日期", "账单类型", "应收金额", "房屋/车牌号", "业主姓名", "收款单号", "收款时间", "收款渠道", "支付渠道单号", "结算单号", "结算状态"};
+
+    // 收款单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
+    public static final String[] RECEIPT_TITLE_FIELD = {"收款单号", "收款金额", "收款时间", "收款渠道", "收款渠道单号"};
+
+    // 收款单关联账单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
+    public static final String[] RECEIPT_ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "应收金额"};
 
     /**
      * @Author: Pipi
@@ -378,6 +385,208 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
 
     /**
      *@Author: Pipi
+     *@Description: 导出收款单主表
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/4/26 10:16
+     **/
+    @Override
+    public Workbook exportMasterReceipt(List<?> entityList) {
+        //工作表名称
+        String titleName = "收款单表";
+        //1.创建excel 工作簿
+        Workbook workbook = new XSSFWorkbook();
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = RECEIPT_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 6000);
+        sheet.setColumnWidth(3, 3000);
+        sheet.setColumnWidth(4, 9000);
+        for (int index = 0; index < entityList.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < RECEIPT_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyFinanceReceiptEntity entity = (PropertyFinanceReceiptEntity) entityList.get(index);
+                switch (j) {
+                    case 0:
+                        // 收款单号
+                        cell.setCellValue(entity.getReceiptNum());
+                        break;
+                    case 1:
+                        // 收款金额
+                        cell.setCellValue(entity.getReceiptMoney().setScale(2).toString());
+                        break;
+                    case 2:
+                        // 收款时间
+                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(entity.getCreateTime()));
+                        break;
+                    case 3:
+                        // 收款渠道
+                        if (entity.getTransactionType() != null) {
+                            if (entity.getTransactionType() == 1) {
+                                cell.setCellValue("支付宝");
+                            } else if (entity.getTransactionType() == 2) {
+                                cell.setCellValue("微信");
+                            }
+                        }
+                        break;
+                    case 4:
+                        // 收款渠道单号
+                        cell.setCellValue(entity.getTransactionNo());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 导出收款单主从表
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/4/26 11:26
+     **/
+    @Override
+    public Workbook exportMasterSlaveReceipt(List<?> entityList) {
+        //工作表名称
+        String titleName = "收款单表";
+        //1.创建excel 工作簿
+        Workbook workbook = new XSSFWorkbook();
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = RECEIPT_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 6000);
+        sheet.setColumnWidth(3, 3000);
+        sheet.setColumnWidth(4, 9000);
+        for (int index = 0; index < entityList.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < RECEIPT_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyFinanceReceiptEntity entity = (PropertyFinanceReceiptEntity) entityList.get(index);
+                switch (j) {
+                    case 0:
+                        // 收款单号
+                        String orderSheetName = entity.getReceiptNum();
+                        cell.setCellValue(entity.getReceiptNum());
+                        createReceiptSubOrderExcel(workbook, entity.getOrderList(), orderSheetName);
+                        cell.setCellFormula("HYPERLINK(\"#" + orderSheetName +"!A1\",\"" + orderSheetName + "\")");
+                        XSSFCellStyle fieldCellStyle = hyperlinkStyle(workbook);
+                        // 设置单元格字体颜色
+                        cell.setCellStyle(fieldCellStyle);
+                        break;
+                    case 1:
+                        // 收款金额
+                        cell.setCellValue(entity.getReceiptMoney().setScale(2).toString());
+                        break;
+                    case 2:
+                        // 收款时间
+                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(entity.getCreateTime()));
+                        break;
+                    case 3:
+                        // 收款渠道
+                        if (entity.getTransactionType() != null) {
+                            if (entity.getTransactionType() == 1) {
+                                cell.setCellValue("支付宝");
+                            } else if (entity.getTransactionType() == 2) {
+                                cell.setCellValue("微信");
+                            }
+                        }
+                        break;
+                    case 4:
+                        // 收款渠道单号
+                        cell.setCellValue(entity.getTransactionNo());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description:
+     *@Param: workbook: 创建多sheet,用于关联收款单的账单表
+     *@Param: entityList:
+     *@Param: titleName:
+     *@Return: void
+     *@Date: 2021/4/26 11:29
+     **/
+    private void createReceiptSubOrderExcel(Workbook workbook, List<?> entityList, String titleName) {
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = RECEIPT_ORDER_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        createExcelTitle(workbook, sheet, titleName + "账单表", 530, "宋体", 20, titleField.length, "收款单表");
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 3000);
+        sheet.setColumnWidth(2, 3000);
+        sheet.setColumnWidth(3, 3000);
+        //往excel模板内写入数据  从第三行开始 前两行是 标题和字段
+        for (int index = 0; index < entityList.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < RECEIPT_ORDER_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyFinanceOrderEntity orderEntity = (PropertyFinanceOrderEntity) entityList.get(index);
+                switch (j) {
+                    case 0:
+                        // 账单号
+                        cell.setCellValue(orderEntity.getOrderNum());
+                        break;
+                    case 1:
+                        // 账单日期
+                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM").format(orderEntity.getOrderTime()));
+                        break;
+                    case 2:
+                        // 账单类型
+                        cell.setCellValue("物业费");
+                        break;
+                    case 3:
+                        // 应收金额
+                        cell.setCellValue(orderEntity.getTotalMoney().setScale(2).toString());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     *@Author: Pipi
      *@Description: 创建多sheet,用于关联结算单的账单表
      *@Param: entityList:
      *@Param: titleName:
@@ -389,7 +598,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
         String[] titleField = ORDER_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        createExcelTitle(workbook, sheet, titleName + "账单表", 530, "宋体", 20, titleField.length);
+        createExcelTitle(workbook, sheet, titleName + "账单表", 530, "宋体", 20, titleField.length, "结算单表");
         //5.创建excel 字段列  (表示具体的数据列字段)
         createExcelField(workbook, sheet, titleField);
         //每行excel数据
@@ -540,7 +749,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
      * @param fontSize          excel标题字体大小
      * @param mergeCellLength   excel合并单元格数量
      */
-    public static void createExcelTitle(Workbook workbook, XSSFSheet sheet, String excelTitle, int titleHeight, String font, int fontSize, int mergeCellLength){
+    public static void createExcelTitle(Workbook workbook, XSSFSheet sheet, String excelTitle, int titleHeight, String font, int fontSize, int mergeCellLength, String relationTitleName){
         //创建表头行
         XSSFRow row = sheet.createRow(0);
         row.setHeight((short) (titleHeight));
@@ -548,7 +757,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFCell cell = row.createCell(0);
         //设置表头名称
         cell.setCellValue(excelTitle);
-        cell.setCellFormula("HYPERLINK(\"#结算单表!A1\",\"结算单表\")");
+        cell.setCellFormula("HYPERLINK(\"#" + relationTitleName + "!A1\",\"" + relationTitleName + "\")");
         //创建一个单元格样式
         XSSFCellStyle workBookCellStyle = (XSSFCellStyle) workbook.createCellStyle();
         //创建单元格字体

@@ -451,11 +451,10 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         if (!StringUtils.isEmpty(query.getOrderNum())) {
             List<String> statementNumS = new ArrayList<>();
             statementNumS = orderMapper.queryStatementNumLikeOrderNum(query.getOrderNum());
-            if (!CollectionUtils.isEmpty(statementNumS)) {
-                queryWrapper.in("statement_num", statementNumS);
-            } else {
-                queryWrapper.in("statement_num", "0");
+            if (CollectionUtils.isEmpty(statementNumS)) {
+                statementNumS.add("0");
             }
+            queryWrapper.in("statement_num", statementNumS);
         }
     }
 }
