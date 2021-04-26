@@ -444,9 +444,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                     remain = remain > size ? remain : remain - size;
                 }
                 //添加查询条件
-                if(!CollectionUtils.isEmpty(uids)){
-                    queryWrapper.in("uid",uids);
+                if(CollectionUtils.isEmpty(uids)){
+                    uids.add("0");
                 }
+                queryWrapper.in("uid",uids);
             }
         }
         if(query.getReceiptStartDate() != null || query.getReceiptEndDate() != null){
