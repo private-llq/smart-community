@@ -71,6 +71,9 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
 
     @ApiModelProperty("驳回原因")
     private String rejectReason;
+
+    @ApiModelProperty("凭证")
+    private String certificate;
     
     @ApiModelProperty(value = "查询条件 - 结算单开始日期")
     @TableField(exist = false)
