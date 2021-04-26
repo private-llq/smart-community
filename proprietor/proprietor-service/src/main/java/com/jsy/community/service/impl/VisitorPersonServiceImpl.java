@@ -41,11 +41,7 @@ public class VisitorPersonServiceImpl extends ServiceImpl<VisitorPersonMapper, V
 	 **/
 	@Override
 	public boolean addVisitorPerson(VisitorPersonEntity visitorPersonEntity){
-		int result = visitorPersonMapper.insert(visitorPersonEntity);
-		if(result == 1){
-			return true;
-		}
-		return false;
+		return visitorPersonMapper.addPerson(visitorPersonEntity) > 0;
 	}
 	
 	/**
