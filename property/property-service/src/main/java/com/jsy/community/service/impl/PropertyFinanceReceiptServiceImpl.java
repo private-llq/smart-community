@@ -62,9 +62,10 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
 	    //带账单号模糊查询
 	    if(!StringUtils.isEmpty(query.getOrderNum())){
 		    List<String> receiptNumsList = propertyFinanceOrderService.queryReceiptNumsListByOrderNumLike(query.getOrderNum());
-		    if(!CollectionUtils.isEmpty(receiptNumsList)){
-		        queryWrapper.in("receipt_num",receiptNumsList);
+		    if(CollectionUtils.isEmpty(receiptNumsList)){
+			    return new PageInfo();
 		    }
+		        queryWrapper.in("receipt_num",receiptNumsList);
 	    }
         if(query.getStartDate() != null){
         	queryWrapper.ge("create_time",query.getStartDate());
