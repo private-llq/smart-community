@@ -38,7 +38,9 @@ public class ComplainsController {
     @PostMapping("/list")
     @Login
     public CommonResult list(@RequestBody BaseQO<PropertyComplaintsQO> baseQO) {
-        Map<String, Object> map = complainsService.listAll(baseQO);
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        Map<String, Object> map = complainsService.listAll(baseQO,userInfo);
+
         return CommonResult.ok(map);
     }
     @ApiOperation("反馈内容")
