@@ -117,28 +117,28 @@
         </foreach>
     </select>
 
-    <select id="test2" resultType="">
-        select sum(total_money) as totalMoney from t_property_finance_order
-        where receipt_num in
-        <foreach collection="item" item="item2" separator="," open="(" close=")">
-            #{item2}
-        </foreach>
-        and order_status = 1
+<!--    <select id="test2" resultType="">-->
+<!--        select sum(total_money) as totalMoney from t_property_finance_order-->
+<!--        where receipt_num in-->
+<!--        <foreach collection="item" item="item2" separator="," open="(" close=")">-->
+<!--            #{item2}-->
+<!--        </foreach>-->
+<!--        and order_status = 1-->
 
-    </select>
+<!--    </select>-->
 
     <!-- 批量修改排序 -->
-    <update id="changeSorts" parameterType="java.util.Map">
-        update t_banner
-        set sort = case id
-        <foreach collection="map.entrySet()" index="key" item="value">
-            when #{key} then #{value}
-        </foreach>
-        end
-        where id in
-        <foreach collection="map.entrySet()" index="key" separator="," open="(" close=")">
-            #{key}
-        </foreach>
-        and status = 1
-    </update>
+<!--    <update id="changeSorts" parameterType="java.util.Map">-->
+<!--        update t_banner-->
+<!--        set sort = case id-->
+<!--        <foreach collection="map.entrySet()" index="key" item="value">-->
+<!--            when #{key} then #{value}-->
+<!--        </foreach>-->
+<!--        end-->
+<!--        where id in-->
+<!--        <foreach collection="map.entrySet()" index="key" separator="," open="(" close=")">-->
+<!--            #{key}-->
+<!--        </foreach>-->
+<!--        and status = 1-->
+<!--    </update>-->
 </mapper>
