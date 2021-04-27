@@ -56,15 +56,12 @@ public class CommunityInformController {
         return CommonResult.ok(communityInformService.rotationCommunityInform(informInitializeCount, communityId));
     }
     
-    public static void main(String[] args) {
-        System.out.println(SnowFlake.nextId());
-    }
     /**
      * 属于社区主页  最新租约消息轮播的接口 条数有限制
      */
     @Login
     @GetMapping("/latest")
-    @Cacheable(value = "inform:latest",  unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
+//    @Cacheable(value = "inform:latest",  unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
     @ApiOperation("社区租赁最新消息")
     public CommonResult<List<HouseLeaseVO>> leaseLatestInform() {
         return CommonResult.ok(communityInformService.leaseLatestInform(leaseInformInitializeCount));

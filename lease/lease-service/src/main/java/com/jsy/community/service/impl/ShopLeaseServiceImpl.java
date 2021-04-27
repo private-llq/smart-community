@@ -773,6 +773,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 封装图片
 			QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();
 			imgWrapper.eq("shop_id", shopLeaseEntity.getId());
+			imgWrapper.orderByDesc("create_time");
 			List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(imgWrapper);
 			if (!CollectionUtils.isEmpty(shopImgEntities)) {
 				for (ShopImgEntity imgEntity : shopImgEntities) {
