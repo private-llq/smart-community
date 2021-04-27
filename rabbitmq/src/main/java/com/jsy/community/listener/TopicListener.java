@@ -17,14 +17,19 @@ import java.util.Map;
  **/
 //@Component
 public class TopicListener {
-	
+//	@RabbitHandler
+//	@RabbitListener(queues = TopicExConfig.TOPIC_FACE_XU)
+//	public void process1(Map testMessage) {
+//		System.out.println("监听到队列topic消息(" + TopicExConfig.TOPIC_FACE_XU +") : " + testMessage.toString());
+//	}
+
 //	@RabbitListener(queues = TopicExConfig.TOPIC_FACE_XU)
 //	public void process1(Map testMessage, Message message, Channel channel) throws IOException {
 //		System.out.println("监听到队列topic消息(" + TopicExConfig.TOPIC_FACE_XU +") : " + testMessage.toString());
 //		//手动确认
 //		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 //	}
-	
+
 	
 //	@RabbitHandler
 //	@RabbitListener(queues = "topic.t1")

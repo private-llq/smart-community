@@ -118,14 +118,13 @@ public class ElasticsearchCarUtil {
     }
 
     /**
-     * @Description: 查询
+     * @Description: 查询车辆
      * @author: Hu
      * @since: 2021/3/26 9:11
      * @Param:
      * @return:
      */
     public static Map<String, Object> search(BaseQO<ElasticsearchCarSearchQO> baseQO, RestHighLevelClient restHighLevelClient){
-        //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
         ElasticsearchCarSearchQO query = baseQO.getQuery();
         SearchRequest searchRequest = new SearchRequest(BusinessConst.INDEX_CAR);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
@@ -139,8 +138,12 @@ public class ElasticsearchCarUtil {
         if (query.getCarType()!=null&&query.getCarType()!=0) {
             boolQuery.must(new TermQueryBuilder("carType", query.getCarType()));
         }
+        //按小区查询，展示不用
 //        boolQuery.must(new TermQueryBuilder("communityId", null));
+
+        //创建时间排序
         sourceBuilder.sort(new FieldSortBuilder("createTime").order(SortOrder.DESC));
+        //分页
         Long size=(baseQO.getPage()-1)*baseQO.getSize();
         sourceBuilder.from(size.intValue());
         sourceBuilder.size(baseQO.getSize().intValue());

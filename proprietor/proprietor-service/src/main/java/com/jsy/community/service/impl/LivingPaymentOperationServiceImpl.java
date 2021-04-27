@@ -70,6 +70,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
      * @Param:
      * @return:
      */
+    @Override
     @Transactional
     public void add(LivingPaymentQO livingPaymentQO){
         PayCompanyEntity payCompanyEntity = payCompanyMapper.selectOne(new QueryWrapper<PayCompanyEntity>().eq("id", livingPaymentQO.getCompanyId()).eq("type_id", livingPaymentQO.getTypeId()));
@@ -77,7 +78,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
             throw new ProprietorException(JSYError.REQUEST_PARAM);
         }
         //如果组名为空   默认我家
-        Long group_id=0l;
+        Long group_id=0L;
         if(livingPaymentQO.getGroupName()!=null&&!"".equals(livingPaymentQO.getGroupName())) {
             //先查没有就新增
             PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("name",livingPaymentQO.getGroupName()));

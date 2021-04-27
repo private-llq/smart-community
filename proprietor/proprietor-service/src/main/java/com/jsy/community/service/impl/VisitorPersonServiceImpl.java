@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorPersonEntity;
 import com.jsy.community.mapper.VisitorPersonMapper;
 import com.jsy.community.qo.BaseQO;

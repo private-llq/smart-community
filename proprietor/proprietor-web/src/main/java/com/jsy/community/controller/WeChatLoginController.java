@@ -30,6 +30,7 @@ public class WeChatLoginController {
     private IWeChatLoginService weChatLoginService;
 
 
+
     @ApiOperation("登录")
     @PostMapping("/login")
     public CommonResult login(@RequestParam("code")String code) {

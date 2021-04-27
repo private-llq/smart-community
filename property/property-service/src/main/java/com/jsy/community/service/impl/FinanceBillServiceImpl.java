@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -135,7 +134,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
      * @Param:
      * @return:
      */
-    public String getOrderNum(String communityId,String serialNumber){
+    public static String getOrderNum(String communityId,String serialNumber){
         StringBuilder str=new StringBuilder();
         if (communityId.length()>=4){
             String s = communityId.substring(communityId.length() - 4, communityId.length());
@@ -153,12 +152,13 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         }
         String substring = serialNumber.substring(serialNumber.length() - 2, serialNumber.length());
         str.append(substring);
-        long time = new Date().getTime();
-        String s = String.valueOf(time).substring(String.valueOf(time).length() - 10, String.valueOf(time).length());
+        long millis = System.currentTimeMillis();
+        String time = String.valueOf(millis).substring(String.valueOf(millis).length() - 10, String.valueOf(millis).length());
         str.append(time);
         int s1=(int) (Math.random() * 99);
         str.append(s1);
         return str.toString();
     }
+
 
 }

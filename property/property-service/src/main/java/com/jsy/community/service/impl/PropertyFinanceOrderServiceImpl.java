@@ -70,6 +70,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 orderVO.setId(propertyFinanceOrderEntity.getId());
                 orderVO.setOrderNum(propertyFinanceOrderEntity.getOrderNum());
                 orderVO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
+
                 objects.add(orderVO);
             }
             UserEntity userEntity = userService.queryUserDetailByUid(list.get(0).getUid());

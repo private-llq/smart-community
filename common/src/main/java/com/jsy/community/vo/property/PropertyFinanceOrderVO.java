@@ -15,8 +15,6 @@ import java.time.LocalDate;
  **/
 @Data
 public class PropertyFinanceOrderVO extends BaseVO {
-    @ApiModelProperty(value = "id")
-    private Long id;
     @ApiModelProperty(value = "支付单号")
     private String orderNum;
     @ApiModelProperty(value = "支付单号")
