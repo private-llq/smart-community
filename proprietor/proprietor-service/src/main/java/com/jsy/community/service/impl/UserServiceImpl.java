@@ -682,7 +682,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         Map<String, Map<String,Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
         UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
         for(HouseEntity userHouseEntity : houses){
-            userHouseEntity.setCommunityName(String.valueOf(communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId())).get("name")));
+            Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
+            userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));
             userHouseEntity.setOwner(userInfoVo.getRealName());
         }
         return houses;
