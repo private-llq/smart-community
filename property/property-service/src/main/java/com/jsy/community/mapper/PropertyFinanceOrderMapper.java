@@ -2,9 +2,11 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.property.PropertyFinanceCountEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.TestEntity;
 import com.jsy.community.vo.StatementOrderVO;
+import com.jsy.community.vo.property.FinanceOrderEntityVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -139,4 +141,39 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
     
     List<BigDecimal> test1(@Param("outList")ArrayList<ArrayList<String>> outList);
 
+    /**
+     *@Author: Pipi
+     *@Description: 缴费按月统计
+     *@Param: query:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     *@Date: 2021/4/27 10:33
+     **/
+    List<FinanceOrderEntityVO> statisticsReceipt(@Param("query") PropertyFinanceCountEntity query);
+
+    /**
+     *@Author: Pipi
+     *@Description: 缴费按月应收统计
+     *@Param: query: 
+     *@Return: java.util.List<com.jsy.community.vo.property.FinanceOrderEntityVO>
+     *@Date: 2021/4/27 14:58
+     **/
+    List<FinanceOrderEntityVO> statisticsReceivable(@Param("query") PropertyFinanceCountEntity query);
+
+    /**
+     *@Author: Pipi
+     *@Description: 缴费按月已结算统计
+     *@Param: query:
+     *@Return: java.util.List<com.jsy.community.vo.property.FinanceOrderEntityVO>
+     *@Date: 2021/4/28 9:25
+     **/
+    List<FinanceOrderEntityVO> settledStatistics(@Param("query") PropertyFinanceCountEntity query);
+
+    /**
+     *@Author: Pipi
+     *@Description: 缴费按月未结算统计
+     *@Param: query:
+     *@Return: java.util.List<com.jsy.community.vo.property.FinanceOrderEntityVO>
+     *@Date: 2021/4/28 9:29
+     **/
+    List<FinanceOrderEntityVO> unsettlementStatistics(@Param("query") PropertyFinanceCountEntity query);
 }

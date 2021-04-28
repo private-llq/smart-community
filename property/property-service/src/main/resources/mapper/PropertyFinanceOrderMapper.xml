@@ -116,8 +116,42 @@
             and order_status = 1
         </foreach>
     </select>
+    <!-- 缴费按月统计 -->
+    <select id="statisticsReceipt" resultType="com.jsy.community.vo.property.FinanceOrderEntityVO">
+        SELECT
+            DATE_FORMAT( tpfr.create_time, '%Y-%m' ) as createTime,
+            sum( tpfo.total_money) as totalMoney
+        FROM
+            t_property_finance_order tpfo
+        LEFT JOIN t_property_finance_receipt tpfr ON tpfo.receipt_num = tpfr.receipt_num
+        WHERE
+            DATE_FORMAT( tpfr.create_time, '%Y-%m' ) &gt;= DATE_FORMAT( #{query.startDate}, '%Y-%m' )
+            AND DATE_FORMAT( tpfr.create_time, '%Y-%m' ) &lt;= DATE_FORMAT( #{query.endDate}, '%Y-%m' )
+        GROUP BY
+            DATE_FORMAT( tpfr.create_time, '%Y-%m' )
+        ORDER BY
+            DATE_FORMAT( tpfr.create_time, '%Y-%m') asc
+    </select>
+    <!-- 缴费按月应收统计 -->
+    <select id="statisticsReceivable" resultType="com.jsy.community.vo.property.FinanceOrderEntityVO">
+        SELECT
+            DATE_FORMAT( create_time, "%Y-%m" ) AS create_time,
+            SUM( total_money ) as total_money,
+            order_status,
+            '物业费' AS order_type
+        FROM
+            t_property_finance_order
+        WHERE
+            DATE_FORMAT( create_time, '%Y-%m' ) &gt;= DATE_FORMAT( #{query.startDate}, '%Y-%m' )
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &lt;= DATE_FORMAT( #{query.endDate}, '%Y-%m' )
+        GROUP BY
+            DATE_FORMAT( create_time, "%Y-%m" ),
+            order_status
+        ORDER BY
+            DATE_FORMAT( create_time, "%Y-%m" ) ASC
+    </select>
 
-<!--    <select id="test2" resultType="">-->
+    <!--    <select id="test2" resultType="">-->
 <!--        select sum(total_money) as totalMoney from t_property_finance_order-->
 <!--        where receipt_num in-->
 <!--        <foreach collection="item" item="item2" separator="," open="(" close=")">-->
@@ -128,17 +162,51 @@
 <!--    </select>-->
 
     <!-- 批量修改排序 -->
-<!--    <update id="changeSorts" parameterType="java.util.Map">-->
-<!--        update t_banner-->
-<!--        set sort = case id-->
-<!--        <foreach collection="map.entrySet()" index="key" item="value">-->
-<!--            when #{key} then #{value}-->
-<!--        </foreach>-->
-<!--        end-->
-<!--        where id in-->
-<!--        <foreach collection="map.entrySet()" index="key" separator="," open="(" close=")">-->
-<!--            #{key}-->
-<!--        </foreach>-->
-<!--        and status = 1-->
-<!--    </update>-->
+    <update id="changeSorts" parameterType="java.util.Map">
+        update t_banner
+        set sort = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then #{value}
+        </foreach>
+        end
+        where id in
+        <foreach collection="map.entrySet()" index="key" separator="," open="(" close=")">
+            #{key}
+        </foreach>
+        and status = 1
+    </update>
+
+    <!-- 缴费按月结算统计 -->
+    <select id="settledStatistics" resultType="com.jsy.community.vo.property.FinanceOrderEntityVO">
+        SELECT
+            DATE_FORMAT( create_time, "%Y-%m" ) as create_time,
+            SUM(total_money) as total_money
+        FROM
+            t_property_finance_order
+        WHERE
+            statement_status = 3
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &gt;= DATE_FORMAT( #{query.startDate}, '%Y-%m' )
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &lt;= DATE_FORMAT( #{query.endDate}, '%Y-%m' )
+        GROUP BY
+            DATE_FORMAT( create_time, "%Y-%m" )
+        ORDER BY
+            DATE_FORMAT( create_time, "%Y-%m" ) ASC
+    </select>
+
+    <!-- 缴费按月未结算统计 -->
+    <select id="unsettlementStatistics" resultType="com.jsy.community.vo.property.FinanceOrderEntityVO">
+        SELECT
+            DATE_FORMAT( create_time, "%Y-%m" ) as create_time,
+            SUM(total_money) as total_money
+        FROM
+            t_property_finance_order
+        WHERE
+            statement_status in (1, 2)
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &gt;= DATE_FORMAT( #{query.startDate}, '%Y-%m' )
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &lt;= DATE_FORMAT( #{query.endDate}, '%Y-%m' )
+        GROUP BY
+            DATE_FORMAT( create_time, "%Y-%m" )
+        ORDER BY
+            DATE_FORMAT( create_time, "%Y-%m" ) ASC
+    </select>
 </mapper>

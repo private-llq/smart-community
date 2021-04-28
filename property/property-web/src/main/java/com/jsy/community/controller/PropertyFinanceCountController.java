@@ -3,36 +3,18 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceCountService;
-import com.jsy.community.api.IPropertyFinanceReceiptService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFinanceCountEntity;
-import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
-import com.jsy.community.qo.BaseQO;
-import com.jsy.community.util.excel.impl.FinanceExcelImpl;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.property.StatisticsVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.Cleanup;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.List;
 
 /**
  * @author chq459799974
@@ -53,13 +35,30 @@ public class PropertyFinanceCountController {
 	@ApiOperation("缴费统计")
 	@PostMapping("orderPaid")
 	public CommonResult orderPaid(@RequestBody PropertyFinanceCountEntity query){
-		if(query.getStartDate() == null && query.getEndDate() == null){ //第一次默认查询本日
+		ValidatorUtils.validateEntity(query, PropertyFinanceCountEntity.QueryValidate.class);
+		//第一次默认查询本日
+		if(query.getStartDate() == null){
 			query.setStartDate(LocalDate.now());
+		}
+		if (query.getEndDate() == null) {
 			query.setEndDate(LocalDate.now());
 		}
 		query.setCommunityId(UserUtils.getAdminCommunityId());
-		propertyFinanceCountService.orderPaidCount(query);
-		return CommonResult.ok("查询成功");
+		StatisticsVO statisticsVO = new StatisticsVO();
+		switch (query.getQueryType()) {
+			case 1:
+				statisticsVO = propertyFinanceCountService.orderPaidCount(query);
+				break;
+			case 2:
+				statisticsVO = propertyFinanceCountService.orderReceivableCount(query);
+				break;
+			case 3:
+				statisticsVO = propertyFinanceCountService.statementCount(query);
+				break;
+			default:
+				break;
+		}
+		return CommonResult.ok(statisticsVO, "查询成功");
 	}
 
 }

@@ -5,7 +5,10 @@ import org.redisson.executor.CronExpression;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author YuLF
@@ -34,6 +37,48 @@ public class DateUtils {
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
     }
 
+    /**
+     * 解析两个日期段之间的所有月份
+     * @param beginDateStr 开始日期  ，至少精确到yyyy-MM
+     * @param endDateStr 结束日期  ，至少精确到yyyy-MM
+     * @return yyyy-MM-dd日期集合
+     */
+    public static List<String> getDayListOfMonth(String beginDateStr, String endDateStr) {
+        // 指定要解析的时间格式
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM");
 
+        // 定义一些变量
+        Date beginDate = null;
+        Date endDate = null;
 
+        Calendar beginGC = null;
+        Calendar endGC = null;
+        List<String> list = new ArrayList<String>();
+
+        try {
+            // 将字符串parse成日期
+            beginDate = f.parse(beginDateStr);
+            endDate = f.parse(endDateStr);
+
+            // 设置日历
+            beginGC = Calendar.getInstance();
+            beginGC.setTime(beginDate);
+
+            endGC = Calendar.getInstance();
+            endGC.setTime(endDate);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+
+            // 直到两个时间相同
+            while (beginGC.getTime().compareTo(endGC.getTime()) <= 0) {
+
+                list.add(sdf.format(beginGC.getTime()));
+                // 以日为单位，增加时间
+                beginGC.add(Calendar.MONTH, 1);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
