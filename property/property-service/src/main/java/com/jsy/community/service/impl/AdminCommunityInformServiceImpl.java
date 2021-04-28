@@ -206,10 +206,12 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
             // 草稿页面
             queryWrapper.eq("push_state", query.getPageState());
         } else {
-            // 发布页面
-            queryWrapper.eq("push_state", query.getPushState());
             // 保证发布页面不会查出草稿
             queryWrapper.ge("push_state", query.getPageState());
+            if (query.getPushState() != null) {
+                // 发布页面
+                queryWrapper.eq("push_state", query.getPushState());
+            }
         }
         if (!StringUtils.isEmpty(query.getPushMsg())) {
             queryWrapper.like("push_msg", query.getPushMsg());
