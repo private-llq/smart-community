@@ -24,8 +24,8 @@ import java.util.Map;
 public class ShoppingMallServiceImpl implements IShoppingMallService {
 	
 	private static final String PROTOCOL_TYPE = "http://";
-	private static final String HOST = "192.168.12.29";
-//	private static final String HOST = "222.178.212.29";
+//	private static final String HOST = "192.168.12.29";
+	private static final String HOST = "222.178.212.29";
 	private static final String PORT = "9927";
 	private static final String PATH_CHECK_ORDER = "/services/order/order/checkOrder";
 	private static final String PATH_COMPLETE_ORDER = "/services/order/order/pub/payedOrder";
