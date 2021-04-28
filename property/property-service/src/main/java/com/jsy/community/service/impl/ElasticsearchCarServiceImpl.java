@@ -9,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
 import com.jsy.community.utils.es.ElasticsearchCarUtil;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.elasticsearch.action.DocWriteResponse;
@@ -121,8 +122,8 @@ public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
      * @return:
      */
     @Override
-    public Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO){
-        Map<String, Object> map = ElasticsearchCarUtil.search(baseQO, restHighLevelClient);
+    public Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO, AdminInfoVo info){
+        Map<String, Object> map = ElasticsearchCarUtil.search(baseQO, info,restHighLevelClient);
         return map;
     }
 

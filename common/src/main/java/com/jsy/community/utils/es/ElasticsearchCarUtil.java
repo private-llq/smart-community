@@ -6,6 +6,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.ElasticsearchCarVO;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.DocWriteResponse;
@@ -124,7 +125,7 @@ public class ElasticsearchCarUtil {
      * @Param:
      * @return:
      */
-    public static Map<String, Object> search(BaseQO<ElasticsearchCarSearchQO> baseQO, RestHighLevelClient restHighLevelClient){
+    public static Map<String, Object> search(BaseQO<ElasticsearchCarSearchQO> baseQO, AdminInfoVo info,RestHighLevelClient restHighLevelClient){
         ElasticsearchCarSearchQO query = baseQO.getQuery();
         SearchRequest searchRequest = new SearchRequest(BusinessConst.INDEX_CAR);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
@@ -139,7 +140,7 @@ public class ElasticsearchCarUtil {
             boolQuery.must(new TermQueryBuilder("carType", query.getCarType()));
         }
         //按小区查询，展示不用
-//        boolQuery.must(new TermQueryBuilder("communityId", null));
+        boolQuery.must(new TermQueryBuilder("communityId", info.getCommunityId()));
 
         //创建时间排序
         sourceBuilder.sort(new FieldSortBuilder("createTime").order(SortOrder.DESC));

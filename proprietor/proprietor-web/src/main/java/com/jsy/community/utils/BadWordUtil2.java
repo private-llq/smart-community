@@ -197,13 +197,5 @@ public class BadWordUtil2 {
             }
         }
     }
- 
- 
-    public static void main(String[] args) {
-        String string = "六合彩是违法的";
-        System.out.println(BadWordUtil2.replaceBadWord(string,minMatchTYpe,"*"));
-        System.out.println(BadWordUtil2.isContaintBadWord(string,minMatchTYpe));
-
-    }
 }
 

@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
+import com.jsy.community.vo.admin.AdminInfoVo;
 
 import java.util.Map;
 
@@ -47,5 +48,5 @@ public interface IElasticsearchCarService {
      * @Param:
      * @return:
      */
-    Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO);
+    Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO, AdminInfoVo info);
 }

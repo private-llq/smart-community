@@ -25,6 +25,12 @@ public class OrderNoUtil {
         int s2=(int) (Math.random() * 9);
         return s + s1 + s2;
     }
+
+    public static void main(String[] args) {
+        System.out.println(getOrder());
+        System.out.println(new Date().getTime());
+    }
+
     /**
      * @Description: 企业付款订单号
      * @author: Hu

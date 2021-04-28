@@ -21,7 +21,7 @@
                 and c.feedback_time &lt;= #{query.feedbackTimeOut}
             </if>
             <if test="query.keyWord!=null and query.keyWord!=''">
-                and (u.name like concat("%",#{query.keyWord},"%") or c.serial_number like concat("%",#{query.keyWord},"%") or u.mobile like concat("%",#{query.keyWord},"%"))
+                and (u.real_name like concat("%",#{query.keyWord},"%") or c.serial_number like concat("%",#{query.keyWord},"%") or u.mobile like concat("%",#{query.keyWord},"%"))
             </if>
         </where>
     </sql>
