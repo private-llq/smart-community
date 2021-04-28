@@ -57,7 +57,7 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "推送消息内容")
     private String pushMsg;
 
-    @Length(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, min = 0, max = 1, message = "推送目标超出范围：0表示推送至所有社区、1则是具体某个社区")
+    @Range(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, min = 0, max = 1, message = "推送目标超出范围：0表示推送至所有社区、1则是具体某个社区")
     @NotNull(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, message = "推送目标不能为空")
     @ApiModelProperty(value = "推送目标：0表示推送至所有社区、1则是具体某个社区")
     private Integer pushTarget;
