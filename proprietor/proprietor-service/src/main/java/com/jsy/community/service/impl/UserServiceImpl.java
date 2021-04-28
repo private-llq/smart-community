@@ -546,14 +546,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         List<UserHouseQo> houseList = qo.getHouses();
     
         List<UserHouseQo> any = null;
-        
+	
+	    UserEntity userEntity = null;
         //用户提交的房屋信息不为空
         if (CollectionUtil.isNotEmpty(houseList)) {
             //用来找用户提交的房屋信息 和 物业用户所属的房屋信息 差集的集合
             List<UserHouseQo> tmpQos = new ArrayList<>(houseList);
             log.error("入参houseList" + houseList);
             //1.通过uid拿到业主的身份证
-            UserEntity userEntity = queryUserDetailByUid(qo.getUid());
+            userEntity = queryUserDetailByUid(qo.getUid());
             //通过 业主身份证 拿到 业主表的 该业主的所有 房屋id + 社区id
             List<UserHouseQo> resHouseList = userMapper.getProprietorInfo(userEntity.getIdCard());
             if( CollectionUtil.isEmpty(resHouseList) ){
@@ -588,7 +589,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             }
         }
         updateCar(qo);
-        //需要往人脸设备添加人脸数据的小区 = 需要添加的房屋所在小区
+        //没有添加房屋
         if(CollectionUtils.isEmpty(any)){
             return true;
         }
@@ -597,14 +598,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             communityIds.add(userHouseQo.getCommunityId());
         }
         //下发人脸数据
-        setFaceUrlToCommunityMachine(qo.getUid(),communityIds);
+        setFaceUrlToCommunityMachine(userEntity,communityIds);
         return true;
     }
     
     //向小区设备下发人脸数据
-    private void setFaceUrlToCommunityMachine(String uid, Set<Long> communityIds){
+    private void setFaceUrlToCommunityMachine(UserEntity userEntity, Set<Long> communityIds){
         //查询用户实名信息
-        UserEntity userEntity = userMapper.queryUserInfoByUid(uid);
         if(userEntity.getIsRealAuth() == null || userEntity.getIsRealAuth() != 2){
             // 用户实名认证未人脸认证 放弃后续操作
             return;
@@ -614,7 +614,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         JSONObject pushMap = new JSONObject();
         pushMap.put("op","editPerson");
-        pushMap.put("uid",uid);
+        pushMap.put("uid",userEntity.getUid());
         pushMap.put("faceUrl",userEntity.getFaceUrl());
         pushMap.put("communityIdSet",communityIds);
     
