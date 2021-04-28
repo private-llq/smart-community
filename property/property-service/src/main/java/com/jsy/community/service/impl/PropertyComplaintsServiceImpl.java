@@ -60,12 +60,11 @@ public class PropertyComplaintsServiceImpl extends ServiceImpl<PropertyComplaint
     @Override
     public PageInfo findList(BaseQO<PropertyComplaintsQO> baseQO) {
         PageInfo<Object> pageInfo = new PageInfo<>();
-        QueryWrapper<PropertyComplaintsEntity> wrapper = new QueryWrapper<>();
         PropertyComplaintsQO qoQuery = baseQO.getQuery();
         if (qoQuery.getComplainTimeOut()!=null) {
             qoQuery.setComplainTimeOut(qoQuery.getComplainTimeOut().plusDays(1));
         }
-        Page page =propertyComplaintsMapper.findList(new Page<PropertyComplaintsEntity>(baseQO.getPage(),baseQO.getSize()),baseQO.getQuery());
+        Page page =propertyComplaintsMapper.findList(new Page<PropertyComplaintsEntity>(baseQO.getPage(),baseQO.getSize()),qoQuery);
         List<PropertyComplaintsVO> list = page.getRecords();
         if (list.size()>0){
             for (PropertyComplaintsVO entity : list) {

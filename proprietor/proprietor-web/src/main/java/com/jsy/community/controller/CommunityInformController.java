@@ -8,6 +8,7 @@ import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -49,18 +50,18 @@ public class CommunityInformController {
      */
     @Login
     @GetMapping("/rotation")
-    @Cacheable(value = "inform:rotation", key = "#communityId", unless = "#result.data == null or #result.data.size() == 0", condition = "#communityId > 0", cacheManager = "redisCacheManager")
+//    @Cacheable(value = "inform:rotation", key = "#communityId", unless = "#result.data == null or #result.data.size() == 0", condition = "#communityId > 0", cacheManager = "redisCacheManager")
     @ApiOperation("社区轮播消息")
     public CommonResult<List<PushInformEntity>> rotationCommunityInform(@RequestParam Long communityId) {
         return CommonResult.ok(communityInformService.rotationCommunityInform(informInitializeCount, communityId));
     }
-
+    
     /**
      * 属于社区主页  最新租约消息轮播的接口 条数有限制
      */
     @Login
     @GetMapping("/latest")
-    @Cacheable(value = "inform:latest",  unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
+//    @Cacheable(value = "inform:latest",  unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
     @ApiOperation("社区租赁最新消息")
     public CommonResult<List<HouseLeaseVO>> leaseLatestInform() {
         return CommonResult.ok(communityInformService.leaseLatestInform(leaseInformInitializeCount));

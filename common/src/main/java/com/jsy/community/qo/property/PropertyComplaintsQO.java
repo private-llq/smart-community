@@ -1,5 +1,6 @@
 package com.jsy.community.qo.property;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -8,7 +9,7 @@ import java.time.LocalDate;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  app投诉建议
  * @author: Hu
  * @create: 2021-03-19 13:50
  **/
@@ -23,11 +24,15 @@ public class PropertyComplaintsQO implements Serializable {
     @ApiModelProperty("投诉类型")
     private Integer type;
     @ApiModelProperty("开始的投诉时间")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate complainTimeStart;
     @ApiModelProperty("结束的投诉时间")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate complainTimeOut;
     @ApiModelProperty("开始的回复时间")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate feedbackTimeStart;
     @ApiModelProperty("结束的回复时间")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate feedbackTimeOut;
 }

@@ -57,11 +57,19 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
      * @return:
      */
     @Override
-    public Map<String, Object> listAll(BaseQO<PropertyComplaintsQO> baseQO) {
+    public Map<String, Object> listAll(BaseQO<PropertyComplaintsQO> baseQO,AdminInfoVo userInfo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
-        List<ComplainVO> complainVOS = complainsMapper.listAll(baseQO.getPage(), baseQO.getSize(), baseQO.getQuery());
+        PropertyComplaintsQO qoQuery = baseQO.getQuery();
+        if (qoQuery.getComplainTimeOut()!=null){
+            qoQuery.setComplainTimeOut(qoQuery.getComplainTimeOut().plusDays(1));
+        }
+        if (qoQuery.getFeedbackTimeOut()!=null){
+            qoQuery.setFeedbackTimeOut(qoQuery.getFeedbackTimeOut().plusDays(1));
+        }
+        qoQuery.setCommunityId(userInfo.getCommunityId());
+        List<ComplainVO> complainVOS = complainsMapper.listAll(baseQO.getPage(), baseQO.getSize(), qoQuery);
         Long totel = complainsMapper.findTotel(baseQO.getQuery());
         Map<String, Object> map = new HashMap<>();
         map.put("totel",totel);
