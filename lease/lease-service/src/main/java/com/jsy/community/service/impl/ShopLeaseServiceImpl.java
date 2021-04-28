@@ -670,7 +670,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 商铺行业
 		Long shopBusinessId = entity.getShopBusinessId();
 		CommonConst constBusiness = commonConstService.getConstById(shopBusinessId);
-		detailsVO.setShopBusiness(constBusiness.getConstName());
+		if (constBusiness != null) {
+			detailsVO.setShopBusiness(constBusiness.getConstName());
+		}
 		// 商铺图片
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("shop_id", entity.getId()).select("img_url");

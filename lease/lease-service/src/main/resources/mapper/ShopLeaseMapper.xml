@@ -64,6 +64,9 @@
                 and qo.query.houseSquareMeterMax != null and qo.query.houseSquareMeterMax != &quot;&quot; and qo.query.houseSquareMeterMax &gt; 0">
                 and shop_acreage &gt;= #{qo.query.houseSquareMeterMin} and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
             </if>
+            <if test="qo.query.houseSquareMeterMin == 0 and qo.query.houseSquareMeterMax != null">
+                and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
+            </if>
             <!-- 所属类型id -->
             <if test="qo.query.shopTypeId !=null">
                 and shop_type_id = #{qo.query.shopTypeId}
