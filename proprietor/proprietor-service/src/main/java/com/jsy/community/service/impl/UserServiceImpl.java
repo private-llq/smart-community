@@ -30,6 +30,7 @@ import com.jsy.community.utils.*;
 import com.jsy.community.utils.es.ElasticsearchCarUtil;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.vo.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -56,6 +57,7 @@ import java.util.stream.Collectors;
  * @author ling
  * @since 2020-11-11 18:12
  */
+@Slf4j
 @DubboService(version = Const.version, group = Const.group)
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements IUserService {
 
@@ -549,6 +551,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (CollectionUtil.isNotEmpty(houseList)) {
             //用来找用户提交的房屋信息 和 物业用户所属的房屋信息 差集的集合
             List<UserHouseQo> tmpQos = new ArrayList<>(houseList);
+            log.error("入参houseList" + houseList);
             //1.通过uid拿到业主的身份证
             UserEntity userEntity = queryUserDetailByUid(qo.getUid());
             //通过 业主身份证 拿到 业主表的 该业主的所有 房屋id + 社区id
@@ -557,7 +560,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 throw new ProprietorException("物业没有添加您的房屋信息!");
             }
             //取出 业主房屋信息 和 物业信息的差异集合  如果 differenceList 不为空 业主提交了 物业没有认证的房屋信息
-            List<UserHouseQo> differenceList = differenceSet( tmpQos, resHouseList );
+	        //剔除带了id的数据，带id目的是修改，差集只对比新增数据
+	        ArrayList<UserHouseQo> forInsert = new ArrayList<>();
+	        for(UserHouseQo userHouseQo : tmpQos){
+	        	if(userHouseQo.getId() == null || userHouseQo.getId() == 0){
+			        forInsert.add(userHouseQo);
+		        }
+	        }
+            List<UserHouseQo> differenceList = differenceSet( forInsert, resHouseList );
+            log.error("差集" + differenceList);
+            log.error("差集size：" + differenceList.size());
             if( CollectionUtil.isEmpty(differenceList) ){
                 //操作用户所在房屋
                 //id==null || id == 0 就是需要新增的 验证房屋信息是否有需要新增的数据
