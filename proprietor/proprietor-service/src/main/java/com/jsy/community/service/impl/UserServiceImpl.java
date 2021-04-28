@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
@@ -541,6 +542,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public Boolean updateImprover(ProprietorQO qo) {
         //========================================== 1.业主房屋 =========================================================
         List<UserHouseQo> houseList = qo.getHouses();
+    
+        List<UserHouseQo> any = null;
+        
         //用户提交的房屋信息不为空
         if (CollectionUtil.isNotEmpty(houseList)) {
             //用来找用户提交的房屋信息 和 物业用户所属的房屋信息 差集的集合
@@ -557,7 +561,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             if( CollectionUtil.isEmpty(differenceList) ){
                 //操作用户所在房屋
                 //id==null || id == 0 就是需要新增的 验证房屋信息是否有需要新增的数据
-                List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
                 if( CollectionUtil.isNotEmpty(any) ){
                     houseList.removeAll(any);
                     //批量新增房屋信息
@@ -572,10 +576,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             }
         }
         updateCar(qo);
+        //需要往人脸设备添加人脸数据的小区 = 需要添加的房屋所在小区
+        if(CollectionUtils.isEmpty(any)){
+            return true;
+        }
+        Set<Long> communityIds = new HashSet<>();
+        for(UserHouseQo userHouseQo : any){
+            communityIds.add(userHouseQo.getCommunityId());
+        }
+        //下发人脸数据
+        setFaceUrlToCommunityMachine(qo.getUid(),communityIds);
         return true;
     }
-
-
+    
+    //向小区设备下发人脸数据
+    private void setFaceUrlToCommunityMachine(String uid, Set<Long> communityIds){
+        //查询用户实名信息
+        UserEntity userEntity = userMapper.queryUserInfoByUid(uid);
+        if(userEntity.getIsRealAuth() == null || userEntity.getIsRealAuth() != 2){
+            // 用户实名认证未人脸认证 放弃后续操作
+            return;
+        }
+        if(StringUtils.isEmpty(userEntity.getFaceUrl())){
+            throw new ProprietorException("用户已实人认证，人脸图片不存在！"); //数据异常，停止房屋相关操作
+        }
+        JSONObject pushMap = new JSONObject();
+        pushMap.put("op","editPerson");
+        pushMap.put("uid",uid);
+        pushMap.put("faceUrl",userEntity.getFaceUrl());
+        pushMap.put("communityIdSet",communityIds);
+    
+        pushMap.put("sex",userEntity.getSex());
+        pushMap.put("realName",userEntity.getRealName());
+        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU,TopicExConfig.TOPIC_FACE_XU_SERVER,pushMap);
+    }
 
 
     /**
