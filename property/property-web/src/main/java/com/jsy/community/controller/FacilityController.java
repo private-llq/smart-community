@@ -116,8 +116,16 @@ public class FacilityController {
 	
 	@ApiOperation("刷新设备")
 	@GetMapping("/flushFacility")
-	public CommonResult flushFacility(@RequestParam("page") Integer page,@RequestParam("size") Integer size) {
-		facilityService.flushFacility(page,size);
+	// 完成
+	public CommonResult flushFacility(@RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("facilityTypeId") String facilityTypeId) {
+		facilityService.flushFacility(page, size, facilityTypeId);
+		return CommonResult.ok();
+	}
+	
+	@ApiOperation("数据同步")
+	@GetMapping("/connectData")
+	public CommonResult connectData(@RequestParam("id") Long id) {
+		facilityService.connectData(id);
 		return CommonResult.ok();
 	}
 }

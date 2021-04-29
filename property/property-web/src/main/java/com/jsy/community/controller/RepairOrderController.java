@@ -66,7 +66,6 @@ public class RepairOrderController {
 		}
 	}
 	
-	
 	@ApiOperation("驳回")
 	@GetMapping("/rejectOrder")
 	public CommonResult rejectOrder(@ApiParam("报修订单id") @RequestParam Long id,
@@ -77,7 +76,7 @@ public class RepairOrderController {
 		String uid = UserUtils.getAdminUserInfo().getUid();
 		String number = UserUtils.getAdminUserInfo().getNumber();
 		String realName = UserUtils.getAdminUserInfo().getRealName();
-		repairOrderService.rejectOrder(id, reason, uid, number,realName);
+		repairOrderService.rejectOrder(id, reason, uid, number, realName);
 		return CommonResult.ok();
 	}
 	
