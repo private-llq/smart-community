@@ -4,6 +4,7 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.callback.FMSGCallBack_V31Impl;
 import com.jsy.community.sdk.HCNetSDK;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -188,106 +189,106 @@ public class FacilityUtils {
 		}
 	}
 
-//	/**
-//	 * @return long
-//	 * @Author 91李寻欢
-//	 * @Description ************上传图片至人脸库************
-//	 * 上传接口调用流程：
-//	 * 1) 调用NET_DVR_UploadFile_V40开始上传数据。
-//	 * 2) 调用NET_DVR_UploadSend发送一张人脸图片数据和附加信息。
-//	 * 3) 上传过程中循环调用NET_DVR_GetUploadState获取上传状态和进度。
-//	 * 4) 上传成功之后调用NET_DVR_GetUploadResult获取结果信息（图片ID等）。
-//	 * 5) 重复步骤2、3、4，顺序上传其他人脸数据。
-//	 * 6) 调用NET_DVR_UploadClose停止上传，释放资源。
-//	 * @Date 2021/4/28 9:09
-//	 * @Param []
-//	 **/
-//	public static void uploadFaceLibrary(int lUserID, String FDID) throws IOException {
-//		//1. 调用NET_DVR_UploadFile_V40开始上传数据(命令:IMPORT_DATA_TO_FACELIB)开始上传数据。
-//		//上传条件里面byConcurrent赋值为0时不开启并发处理，设备会自动对上传的图片进行建模，如果批量上传大量图片，可以赋值为1开启并发处理，提高速度，但是上传之后需要自己建模
-//		log.info("调用NET_DVR_UploadFile_V40开始上传数据啦");
-//		HCNetSDK.NET_DVR_FACELIB_COND struFaceLibCond = new HCNetSDK.NET_DVR_FACELIB_COND();
-//		struFaceLibCond.read();
-//		struFaceLibCond.dwSize = struFaceLibCond.size();
-//		struFaceLibCond.szFDID = FDID.getBytes(); //人脸库ID
-//		struFaceLibCond.byConcurrent = 0; //设备是否并发处理：0- 不开启(设备自动会建模)，1- 开始(设备不会自动进行建模)
-//		struFaceLibCond.byCover = 0;  //是否覆盖式导入(人脸库存储满的情况下强制覆盖导入时间最久的图片数据)：0- 否，1- 是    PS：客服说每个摄像机可以存30000张人脸
-//		struFaceLibCond.write();
-//		Pointer pStruFaceLibCond = struFaceLibCond.getPointer();
-//		int iUploadHandle = hCNetSDK.NET_DVR_UploadFile_V40(lUserID, HCNetSDK.IMPORT_DATA_TO_FACELIB, pStruFaceLibCond, struFaceLibCond.size(), null, Pointer.NULL, 0);
-//		if (iUploadHandle <= -1) {
-//			log.info("NET_DVR_UploadFile_V40失败，错误号" + hCNetSDK.NET_DVR_GetLastError());
-//			return;
-//		} else {
-//			log.info("NET_DVR_UploadFile_V40成功");
-//		}
-//
-//		//2. 调用NET_DVR_UploadSend发送一张人脸图片数据和附加信息
-//		// 通过该接口将人脸数据(人脸图片+图片附件信息)发送到设备的人脸库。图片格式要求：JPG或者JPEG，像素在40x40以上，大小在300KB以下
-//		HCNetSDK.NET_DVR_SEND_PARAM_IN struSendParam = new HCNetSDK.NET_DVR_SEND_PARAM_IN();
-//		struSendParam.read();
-//
-//		byte[] picbyte = toByteArray("D:\\zhsj\\smart-community\\property\\property-web\\src\\main\\resources\\face\\small.jpg");
-//		HCNetSDK.BYTE_ARRAY arraybyte = new HCNetSDK.BYTE_ARRAY(picbyte.length);
-//		arraybyte.read();
-//		arraybyte.byValue = picbyte;
-//		arraybyte.write();
-//
-//		struSendParam.pSendData = arraybyte.getPointer();
-//		struSendParam.dwSendDataLen = picbyte.length;
-//		struSendParam.byPicType = 1; //图片格式：1- jpg，2- bmp，3- png，4- SWF，5- GIF
-//		struSendParam.sPicName = "哇哈哈".getBytes(); //图片名称
-//		byte[] byFDLibName = "测试名称".getBytes("UTF-8");
-//		String strInBuffer1 = new String("<FaceAppendData version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><bornTime>2014-12-12T00:00:00Z</bornTime><name>");
-//		String strInBuffer2 = new String("</name><sex>female</sex><province>11</province><city>01</city><certificateType>officerID</certificateType><certificateNumber>1123123123</certificateNumber><PersonInfoExtendList><PersonInfoExtend><id>1</id><enable>false</enable><name>test1</name><value>test2</value></PersonInfoExtend></PersonInfoExtendList></FaceAppendData>");
-//		int iStringSize = byFDLibName.length + strInBuffer1.length() + strInBuffer2.length();
-//		HCNetSDK.BYTE_ARRAY ptrByte = new HCNetSDK.BYTE_ARRAY(iStringSize);
-//		System.arraycopy(strInBuffer1.getBytes(), 0, ptrByte.byValue, 0, strInBuffer1.length());
-//		System.arraycopy(byFDLibName, 0, ptrByte.byValue, strInBuffer1.length(), byFDLibName.length);
-//		System.arraycopy(strInBuffer2.getBytes(), 0, ptrByte.byValue, strInBuffer1.length() + byFDLibName.length, strInBuffer2.length());
-//		ptrByte.write();
-//		struSendParam.pSendAppendData = ptrByte.getPointer();
-//		struSendParam.dwSendAppendDataLen = ptrByte.byValue.length;
-//
-//		struSendParam.write();
-//		int iSendData = hCNetSDK.NET_DVR_UploadSend(lUserID, struSendParam, Pointer.NULL);
-//		if (iSendData <= -1) {
-//			System.err.println("NET_DVR_UploadSend失败，错误号" + hCNetSDK.NET_DVR_GetLastError());
-//			return;
-//		}
-//
-//
-//		while (true) {
-//			IntByReference Pint = new IntByReference(0);
-//			int state = hCNetSDK.NET_DVR_GetUploadState(iSendData, Pint.getPointer());
-//			if (state == 1) {
-//				System.out.println("上传成功");
-//				//获取图片ID
-//				HCNetSDK.NET_DVR_UPLOAD_FILE_RET struUploadRet = new HCNetSDK.NET_DVR_UPLOAD_FILE_RET();
-//				boolean bUploadResult = hCNetSDK.NET_DVR_GetUploadResult(iUploadHandle, struUploadRet.getPointer(), struUploadRet.size());
-//				if (!bUploadResult) {
-//					int iErr = hCNetSDK.NET_DVR_GetLastError();
-//					System.err.println("NET_DVR_GetUploadResult失败，错误号" + iErr);
-//				} else {
-//					struUploadRet.read();
-//					System.out.println("图片ID：" + new String(struUploadRet.sUrl, "UTF-8"));
-//				}
-//				break;
-//			} else if (state == 2) {
-//				System.out.println("进度：" + Pint.getValue());
-//				continue;
-//			}
-//			System.err.println("返回值" + state);
-//			break;
-//		}
-//		//关闭图片上传连接
-//		boolean b_Close = hCNetSDK.NET_DVR_UploadClose(iUploadHandle);
-//		if (!b_Close) {
-//			int iErr = hCNetSDK.NET_DVR_GetLastError();
-//			System.err.println("NET_DVR_UploadSend失败，错误号" + iErr);
-//			return;
-//		}
-//	}
+	/**
+	 * @return long
+	 * @Author 91李寻欢
+	 * @Description ************上传图片至人脸库************
+	 * 上传接口调用流程：
+	 * 1) 调用NET_DVR_UploadFile_V40开始上传数据。
+	 * 2) 调用NET_DVR_UploadSend发送一张人脸图片数据和附加信息。
+	 * 3) 上传过程中循环调用NET_DVR_GetUploadState获取上传状态和进度。
+	 * 4) 上传成功之后调用NET_DVR_GetUploadResult获取结果信息（图片ID等）。
+	 * 5) 重复步骤2、3、4，顺序上传其他人脸数据。
+	 * 6) 调用NET_DVR_UploadClose停止上传，释放资源。
+	 * @Date 2021/4/28 9:09
+	 * @Param []
+	 **/
+	public static void uploadFaceLibrary(int lUserID, String FDID) throws IOException {
+		//1. 调用NET_DVR_UploadFile_V40开始上传数据(命令:IMPORT_DATA_TO_FACELIB)开始上传数据。
+		//上传条件里面byConcurrent赋值为0时不开启并发处理，设备会自动对上传的图片进行建模，如果批量上传大量图片，可以赋值为1开启并发处理，提高速度，但是上传之后需要自己建模
+		log.info("调用NET_DVR_UploadFile_V40开始上传数据啦");
+		HCNetSDK.NET_DVR_FACELIB_COND struFaceLibCond = new HCNetSDK.NET_DVR_FACELIB_COND();
+		struFaceLibCond.read();
+		struFaceLibCond.dwSize = struFaceLibCond.size();
+		struFaceLibCond.szFDID = FDID.getBytes(); //人脸库ID
+		struFaceLibCond.byConcurrent = 0; //设备是否并发处理：0- 不开启(设备自动会建模)，1- 开始(设备不会自动进行建模)
+		struFaceLibCond.byCover = 0;  //是否覆盖式导入(人脸库存储满的情况下强制覆盖导入时间最久的图片数据)：0- 否，1- 是    PS：客服说每个摄像机可以存30000张人脸
+		struFaceLibCond.write();
+		Pointer pStruFaceLibCond = struFaceLibCond.getPointer();
+		int iUploadHandle = hCNetSDK.NET_DVR_UploadFile_V40(lUserID, HCNetSDK.IMPORT_DATA_TO_FACELIB, pStruFaceLibCond, struFaceLibCond.size(), null, Pointer.NULL, 0);
+		if (iUploadHandle <= -1) {
+			log.info("NET_DVR_UploadFile_V40失败，错误号" + hCNetSDK.NET_DVR_GetLastError());
+			return;
+		} else {
+			log.info("NET_DVR_UploadFile_V40成功");
+		}
+
+		//2. 调用NET_DVR_UploadSend发送一张人脸图片数据和附加信息
+		// 通过该接口将人脸数据(人脸图片+图片附件信息)发送到设备的人脸库。图片格式要求：JPG或者JPEG，像素在40x40以上，大小在300KB以下
+		HCNetSDK.NET_DVR_SEND_PARAM_IN struSendParam = new HCNetSDK.NET_DVR_SEND_PARAM_IN();
+		struSendParam.read();
+
+		byte[] picbyte = toByteArray("D:\\zhsj\\smart-community\\property\\property-web\\src\\main\\resources\\face\\small.jpg");
+		HCNetSDK.BYTE_ARRAY arraybyte = new HCNetSDK.BYTE_ARRAY(picbyte.length);
+		arraybyte.read();
+		arraybyte.byValue = picbyte;
+		arraybyte.write();
+
+		struSendParam.pSendData = arraybyte.getPointer();
+		struSendParam.dwSendDataLen = picbyte.length;
+		struSendParam.byPicType = 1; //图片格式：1- jpg，2- bmp，3- png，4- SWF，5- GIF
+		struSendParam.sPicName = "哇哈哈".getBytes(); //图片名称
+		byte[] byFDLibName = "测试名称".getBytes("UTF-8");
+		String strInBuffer1 = new String("<FaceAppendData version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><bornTime>2014-12-12T00:00:00Z</bornTime><name>");
+		String strInBuffer2 = new String("</name><sex>female</sex><province>11</province><city>01</city><certificateType>officerID</certificateType><certificateNumber>1123123123</certificateNumber><PersonInfoExtendList><PersonInfoExtend><id>1</id><enable>false</enable><name>test1</name><value>test2</value></PersonInfoExtend></PersonInfoExtendList></FaceAppendData>");
+		int iStringSize = byFDLibName.length + strInBuffer1.length() + strInBuffer2.length();
+		HCNetSDK.BYTE_ARRAY ptrByte = new HCNetSDK.BYTE_ARRAY(iStringSize);
+		System.arraycopy(strInBuffer1.getBytes(), 0, ptrByte.byValue, 0, strInBuffer1.length());
+		System.arraycopy(byFDLibName, 0, ptrByte.byValue, strInBuffer1.length(), byFDLibName.length);
+		System.arraycopy(strInBuffer2.getBytes(), 0, ptrByte.byValue, strInBuffer1.length() + byFDLibName.length, strInBuffer2.length());
+		ptrByte.write();
+		struSendParam.pSendAppendData = ptrByte.getPointer();
+		struSendParam.dwSendAppendDataLen = ptrByte.byValue.length;
+
+		struSendParam.write();
+		int iSendData = hCNetSDK.NET_DVR_UploadSend(lUserID, struSendParam, Pointer.NULL);
+		if (iSendData <= -1) {
+			System.err.println("NET_DVR_UploadSend失败，错误号" + hCNetSDK.NET_DVR_GetLastError());
+			return;
+		}
+
+
+		while (true) {
+			IntByReference Pint = new IntByReference(0);
+			int state = hCNetSDK.NET_DVR_GetUploadState(iSendData, Pint.getPointer());
+			if (state == 1) {
+				System.out.println("上传成功");
+				//获取图片ID
+				HCNetSDK.NET_DVR_UPLOAD_FILE_RET struUploadRet = new HCNetSDK.NET_DVR_UPLOAD_FILE_RET();
+				boolean bUploadResult = hCNetSDK.NET_DVR_GetUploadResult(iUploadHandle, struUploadRet.getPointer(), struUploadRet.size());
+				if (!bUploadResult) {
+					int iErr = hCNetSDK.NET_DVR_GetLastError();
+					System.err.println("NET_DVR_GetUploadResult失败，错误号" + iErr);
+				} else {
+					struUploadRet.read();
+					System.out.println("图片ID：" + new String(struUploadRet.sUrl, "UTF-8"));
+				}
+				break;
+			} else if (state == 2) {
+				System.out.println("进度：" + Pint.getValue());
+				continue;
+			}
+			System.err.println("返回值" + state);
+			break;
+		}
+		//关闭图片上传连接
+		boolean b_Close = hCNetSDK.NET_DVR_UploadClose(iUploadHandle);
+		if (!b_Close) {
+			int iErr = hCNetSDK.NET_DVR_GetLastError();
+			System.err.println("NET_DVR_UploadSend失败，错误号" + iErr);
+			return;
+		}
+	}
 
 	/**
 	 * @return byte[]

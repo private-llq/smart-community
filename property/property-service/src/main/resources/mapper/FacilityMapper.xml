@@ -2,34 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.FacilityMapper">
     <select id="listFacility" resultType="com.jsy.community.entity.hk.FacilityEntity">
-        select id,number ,name ,facility_type_id,serial_number,ip,model_number,address,create_person,create_time,data_connect_time,remark
-        from t_facility
+        select f.id,number ,name ,facility_type_id,serial_number,ip,model_number,address,create_person,create_time,data_connect_time,remark,is_connect_data,username,password,port,facility_effect_id
+        from t_facility f,t_facility_status fs
         <where>
-            <!-- 设备编号 -->
-            <if test="qo.number!=null and qo.number!=''">
-                number like concat("%",#{qo.number},"%")
-            </if>
-            <!-- 设备名称 -->
-            <if test="qo.name!=null and qo.name!=''">
-                and name like concat("%",#{qo.name},"%")
-            </if>
-            <!-- 设备所属分类 -->
-            <if test="qo.facilityTypeName!=null and qo.facilityTypeName!=''">
-                and facility_type_name like concat("%",#{qo.facilityTypeName},"%")
-            </if>
-            <!-- 设备备注 -->
-            <if test="qo.remark!=null and qo.remark!=''">
-                and remark like concat("%",#{qo.remark},"%")
-            </if>
-            <!-- 数据同步时间                    超级注意：这里现在是这样写的哟   是开始时间和完成时间都要传  一个不传都不行  因为阿黄说的 他一般都是2个一起穿-->
+            <!-- 数据同步时间-->
             <if test="qo.startTime!=null and qo.endTime!=null">
-                and data_connect_time between #{qo.startTime} and #{endTime}
+                and data_connect_time between #{qo.startTime} and #{qo.endTime}
             </if>
-            <!-- 设备所属分类 -->
-            <if test="qo.facilityTypeId!=null">
-                and facility_type_id = #{qo.facilityTypeId}
+            <if test="qo.startTime!=null and qo.endTime==null">
+                and data_connect_time &gt; #{qo.startTime}
             </if>
-            and deleted = 0 and community_id = #{qo.communityId}
+            <if test="qo.startTime==null and qo.endTime!=null">
+                and data_connect_time &lt;  #{qo.endTime}
+            </if>
+            <if test="qo.isConnectData!=null">
+                and is_connect_data = #{qo.isConnectData}
+            </if>
+            <!-- 设备在线状态 -->
+            <if test="qo.status!=null">
+                and status = #{qo.status}
+            </if>
+            <!-- 是否仅展示需要同步数据的设备 -->
+            <if test="qo.isConnectData!=null">
+                and is_connect_data = #{qo.isConnectData}
+            </if>
+            <!-- 设备搜索条件 -->
+            <if test="qo.searchText!=null and qo.searchText!=''">
+                and number like concat("%",#{qo.searchText},"%") or name like concat("%",#{qo.searchText},"%") or facility_type_name like concat("%",#{qo.searchText},"%") or remark like concat("%",#{qo.searchText},"%")
+            </if>
+            and deleted = 0 and community_id = #{qo.communityId} and f.id = facility_id
         </where>
         order by create_time desc
     </select>
@@ -60,7 +61,7 @@
     </select>
 
     <update id="updateStatusByFacilityId">
-        update t_facility_type set status = #{online} where facility_id = #{id}
+        update t_facility_status set status = #{online} where facility_id = #{id}
     </update>
 
 </mapper>

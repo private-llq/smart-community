@@ -5,14 +5,8 @@
     <select id="listRepairOrder" resultType="com.jsy.community.entity.RepairOrderEntity">
         select * from t_repair_order
         <where>
-            <if test="qo.query.name!=null and qo.query.name!=''">
-                name like concat ("%",#{qo.query.name},"%")
-            </if>
-            <if test="qo.query.phone!=null and qo.query.phone!=''">
-                and phone like concat ("%",#{qo.query.phone},"%")
-            </if>
-            <if test="qo.query.number!=null and qo.query.number!=''">
-                and number like concat ("%",#{qo.query.number},"%")
+            <if test="qo.query.searchText!=null and qo.query.searchText!=''">
+                name like concat ("%",#{qo.query.searchText},"%") or phone like concat("%",#{qo.query.searchText},"%") or number like concat("%",#{qo.query.searchText},"%")
             </if>
             <if test="qo.query.problem!=null and qo.query.problem!=''">
                 and problem like concat ("%",#{qo.query.problem},"%")

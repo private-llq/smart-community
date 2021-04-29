@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.PropertyException;
-import com.jsy.community.callback.FMSGCallBack_V31Impl;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.entity.hk.FacilityTypeEntity;
@@ -13,7 +12,6 @@ import com.jsy.community.mapper.FacilityMapper;
 import com.jsy.community.mapper.FacilityTypeMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
-import com.jsy.community.sdk.HCNetSDK;
 import com.jsy.community.util.facility.FacilityUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
@@ -45,12 +43,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Autowired
 	private FacilityTypeMapper facilityTypeMapper;
 	
-	// 人脸比对
-	private static final Long EFFECT = 41565L;
-	
-	// 车牌抓拍
-	private static final Long EFFECT_CAR = 456L;
-	
 	@Override
 	@Transactional
 	public void addFacility(FacilityEntity facilityEntity) {
@@ -74,10 +66,11 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		}
 		
 		facilityEntity.setId(SnowFlake.nextId());
+		facilityEntity.setIsConnectData(0);
 		facilityMapper.insert(facilityEntity);
 		
 		// 登录设备
-		Map<String, Integer> map = FacilityUtils.login(ip, port, username, password, -1, true);
+		Map<String, Integer> map = FacilityUtils.login(ip, port, username, password, -1);
 		
 		// 根据设备的作用id，执行不同的作用[目前有人脸比对，车牌抓拍]
 		Long facilityEffectId = facilityEntity.getFacilityEffectId();
@@ -126,10 +119,14 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		int loginHandle = facilityMapper.getLoginHandle(id);
 		
 		// TODO: 2021/4/23 海康那个栽舅子客服给我说的必须撤防和注销设备。最后程序关闭的时候释放SDK
-		// 撤防
-		FacilityUtils.cancel(alarmHandle);
-		// 注销设备
-		FacilityUtils.logOut(loginHandle);
+		if (alarmHandle==-1) { // 说明根本就没布防或者说他没布防成功，就没必要去撤防
+			// 撤防
+			FacilityUtils.cancel(alarmHandle);
+		}
+		if (loginHandle==-1) {// 说明根本就没登录或者说他没登录成功，就没必要去注销
+			// 注销设备
+			FacilityUtils.logOut(loginHandle);
+		}
 		
 		facilityMapper.deleteById(id);
 		// 删除设备状态信息
@@ -138,14 +135,53 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void updateFacility(FacilityEntity facilityEntity) {
-		facilityMapper.updateById(facilityEntity);
-		
-		Integer status = facilityEntity.getStatus();
-		// 更新状态信息
-		if (status != null) {
-			Long id = facilityEntity.getId();
-			facilityMapper.updateMiddleStatus(id, status);
+		// 判断此次修改是否没有修改ip，账号，密码，端口号。若没有修改就只更新基本信息即可
+		Long facilityId = facilityEntity.getId();
+		FacilityEntity facility = facilityMapper.selectById(facilityId);
+		if (facility==null) {
+			throw new PropertyException("请选择你要更改的设备,或该设备不存在");
+		}
+		// ip，账号，密码，端口号 都没有发生改变
+		if (facility.getIp().equals(facilityEntity.getIp()) &&
+			facility.getUsername().equals(facilityEntity.getUsername()) &&
+			facility.getPassword().equals(facilityEntity.getPassword()) &&
+			facility.getPort().equals(facilityEntity.getPort())) {
+			
+			// 判断这次更改输入的 ip是否有
+			
+			facilityMapper.updateById(facilityEntity);
+		} else {
+			//ip，账号，密码，端口号 有至少一个发生了改变     so，需要重新登录设备
+			String ip = facilityEntity.getIp();
+			String username = facilityEntity.getUsername();
+			String password = facilityEntity.getPassword();
+			Short port = facilityEntity.getPort();
+			
+			// 1. 将原来的设备撤防
+			int alarmHandle = facilityMapper.getAlarmHandle(facilityEntity.getId());
+			FacilityUtils.cancel(alarmHandle);
+			// 2. 将原来的设备注销
+			int loginHandle = facilityMapper.getLoginHandle(facilityEntity.getId());
+			FacilityUtils.logOut(loginHandle);
+			
+			// 3. 登录设备
+			Map<String, Integer> login = FacilityUtils.login(ip, port, username, password, -1);
+			Integer status = login.get("status");
+			Integer handle = login.get("facilityHandle");
+			// 4. 布防设备
+			// todo 注意看这里的设备作用来源，更新的时候目前做的是不准她选择作用，现在设备作用来源是原本这个设备的作用来源
+			// TODO: 2021/4/27 如果后面修改可以更新设备作用的话，facility.getFacilityEffectId() 应该由前端传来
+			int facilityAlarmHandle = FacilityUtils.toEffect(status, handle, facility.getFacilityEffectId());
+			
+			
+			// 更新设备表
+			facilityMapper.updateById(facilityEntity);
+			// 更新状态表[这里采用的不是更新表，而是直接删除原本条数据，重新新增数据]
+			facilityMapper.deleteMiddleFacility(facilityId);
+			long id = SnowFlake.nextId();
+			facilityMapper.insertFacilityStatus(id,status,handle,facilityId,facilityAlarmHandle);
 		}
 	}
 	
@@ -171,12 +207,16 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		return map;
 	}
 	
+	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void flushFacility(Integer page, Integer size) {
+	public void flushFacility(Integer page, Integer size,String facilityTypeId) {
 		//1. 获取当前页的数据
 		Page<FacilityEntity> entityPage = new Page<>(page, size);
-		Page<FacilityEntity> facilityEntityPage = facilityMapper.selectPage(entityPage, null);
+		
+		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("facility_type_id",facilityTypeId);
+		Page<FacilityEntity> facilityEntityPage = facilityMapper.selectPage(entityPage, wrapper);
 		List<FacilityEntity> list = facilityEntityPage.getRecords();
 		
 		for (FacilityEntity facilityEntity : list) {
@@ -191,20 +231,15 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		
 	}
 	
+	@Override
+	public FacilityEntity listByIp(String ip) {
+		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("ip",ip);
+		return facilityMapper.selectOne(wrapper);
+	}
 	
-	public static void main(String[] args) {
-		
-		// 加载HK库
-		HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
-		FMSGCallBack_V31Impl dVRMessageCallBack;
-		
-		//1. 初始化SDK    TRUE表示成功，FALSE表示失败。                          //////////////  1. 先初始化SDK（只需要调用一次，在程序起来时候调用一次）
-		if (!hCNetSDK.NET_DVR_Init()) {
-			log.info("初始化SDK失败，错误码为" + hCNetSDK.NET_DVR_GetLastError());
-		}
-		
-		int login = 0;
-		boolean b = hCNetSDK.NET_DVR_RemoteControl(login, 20005, null, 0);
-		System.out.println(b);
+	@Override
+	public void connectData(Long id) {
+	
 	}
 }

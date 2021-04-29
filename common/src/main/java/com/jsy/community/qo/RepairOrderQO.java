@@ -32,14 +32,8 @@ public class RepairOrderQO implements Serializable {
 	@ApiModelProperty(value = "报修类别 0 个人报修 1 公共报修")
 	private Integer repairType;
 	
-	@ApiModelProperty(value = "报修人")
-	private String name;
-	
-	@ApiModelProperty(value = "联系电话")
-	private String phone;
-	
-	@ApiModelProperty(value = "订单编号")
-	private String number;
+	@ApiModelProperty(value = "报修人/电话/编号")
+	private String searchText;
 	
 	@ApiModelProperty(value = "报修内容")
 	private String problem;

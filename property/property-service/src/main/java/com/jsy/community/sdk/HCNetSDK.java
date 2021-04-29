@@ -108,7 +108,9 @@ public interface HCNetSDK extends StdCallLibrary {
 	public static final int MAX_ALARMIN_V30 = (MAX_ANALOG_ALARMIN + MAX_IP_ALARMIN);//160
 	public static final int MAX_IP_DEVICE_V40 = 64;
 	public static final int STREAM_ID_LEN = 32;
-
+	public static final int IMPORT_DATA_TO_FACELIB = 39; //导入人脸数据（人脸图片+图片附件信息 到设备人脸库）
+	
+	
 	public static final int MAX_LICENSE_LEN = 16;
 	public static final int MAX_LICENSE_LEN_EX = 32; //车牌号最大长度
 	public static final int MAX_CARDNO_LEN = 48;     //卡号最大长度
@@ -7309,6 +7311,15 @@ DVR实现巡航数据结构
 		public int dwSendAppendDataLen;    //发送图片的附加信息数据长度  FaceAppendData  XML的长度；
 		public byte[] byRes = new byte[192];
 	}
+	
+	public static final int   MAX_UPLOADFILE_URL_LEN    =  240;
+	
+	
+	public static class NET_DVR_UPLOAD_FILE_RET extends Structure {
+		
+		public byte[]  sUrl=new byte[MAX_UPLOADFILE_URL_LEN];   //url
+		public byte[] byRes=new byte[260];
+	}
 
 	class NET_DVR_INQUEST_ROOM extends Structure {
 		public byte byRoomIndex;     //审讯室编号
@@ -8633,6 +8644,7 @@ DVR实现巡航数据结构
 
 	int NET_DVR_SetupAlarmChan_V30(int lUserID);
 
+	// 建立报警上传通道，获取报警等信息
 	int NET_DVR_SetupAlarmChan_V41(int lUserID, NET_DVR_SETUPALARM_PARAM lpSetupParam);
 
 	boolean NET_DVR_CloseAlarmChan_V30(int lAlarmHandle);
@@ -9026,6 +9038,7 @@ DVR实现巡航数据结构
 
 	int NET_DVR_UploadFile_V40(int lUserID, int dwUploadType, Pointer lpInBuffer, int dwInBufferSize, String sFileName, Pointer lpOutBuffer, int dwOutBufferSize);
 
+	// 获取文件上传的进度和状态
 	int NET_DVR_GetUploadState(int lUploadHandle, Pointer pProgress);
 
 	boolean NET_DVR_UploadClose(int lUploadHandle);
@@ -9110,5 +9123,9 @@ DVR实现巡航数据结构
 	}
 
 	int NET_DVR_GetVehicleGpsInfo(int lUserID, NET_DVR_GET_GPS_DATA_PARAM lpGPSDataParam, fGPSDataCallback cbGPSDataCallBack, Pointer pUser);
+	
+	boolean NET_DVR_GetUploadResult(int lUploadHandle, Pointer lpOutBuffer, int dwOutBufferSize);
+	
+	int  NET_DVR_UploadSend(int lUserID,NET_DVR_SEND_PARAM_IN sendParamIN,Pointer lpOutBuffer);
 }
 

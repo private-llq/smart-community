@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author lihao
@@ -23,7 +23,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	
 	List<FacilityEntity> listFacility(@Param("qo") FacilityQO facilityQO, @Param("page") Page<FacilityEntity> info);
 	
-	void insertFacilityStatus(@Param("id")long id,@Param("status") Integer status,@Param("facilityHandle") Integer facilityHandle,@Param("facilityId") Long facilityId,@Param("facilityAlarmHandle") int facilityAlarmHandle);
+	void insertFacilityStatus(@Param("id") long id, @Param("status") Integer status, @Param("facilityHandle") Integer facilityHandle, @Param("facilityId") Long facilityId, @Param("facilityAlarmHandle") int facilityAlarmHandle);
 	
 	/**
 	 * @return int

@@ -70,5 +70,23 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date 2021/4/23 18:11
 	 * @Param [page, size]
 	 **/
-	void flushFacility(Integer page, Integer size);
+	void flushFacility(Integer page, Integer size,String facilityTypeId);
+	
+	/**
+	 * @return com.jsy.community.entity.hk.FacilityEntity
+	 * @Author 91李寻欢
+	 * @Description 根据ip地址查询出这个设备的基本信息
+	 * @Date 2021/4/25 9:19
+	 * @Param [ip]
+	 **/
+	FacilityEntity listByIp(String ip);
+	
+	/**
+	 * @return void
+	 * @Author 91李寻欢
+	 * @Description 同步数据
+	 * @Date 2021/4/29 10:56
+	 * @Param [id]
+	 **/
+	void connectData(Long id);
 }

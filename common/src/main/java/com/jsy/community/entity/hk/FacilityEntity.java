@@ -14,7 +14,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -32,11 +32,14 @@ import java.util.Date;
 public class FacilityEntity extends BaseEntity {
 	
 	@ApiModelProperty(value = "设备作用id")
-	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备作用id不能为空")
+	// TODO: 2021/4/27 目前更新设备的时候不让其可以更改设备作用  ***************************************************************************************
+//	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备作用id不能为空")
+	@NotNull(groups = {FacilityEntity.addFacilityValidate.class,}, message = "设备作用id不能为空")
 	private Long facilityEffectId;
 	
 	@ApiModelProperty(value = "设备在线状态")
 	@TableField(exist = false)
+	// TODO: 2021/4/27 这个地方暂时不让其可以修改 ***************************************************************************************
 	@Range(groups = {updateFacilityValidate.class}, min = 0, max = 1, message = "请选择正确的设备在线状态")
 	private Integer status;
 	
@@ -52,6 +55,9 @@ public class FacilityEntity extends BaseEntity {
 	@ApiModelProperty(value = "设备分类id")
 	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备分类id不能为空")
 	private Long facilityTypeId;
+	
+	@ApiModelProperty(value = "是否已同步数据 0 未同步 1 已同步 ")
+	private Integer isConnectData;
 	
 	@ApiModelProperty(value = "设备分类")
 	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备分类id不能为空")
@@ -100,7 +106,7 @@ public class FacilityEntity extends BaseEntity {
 	
 	@ApiModelProperty(value = "数据同步时间")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date dataConnectTime;
+	private LocalDateTime dataConnectTime;
 	
 	public interface addFacilityValidate {
 	}

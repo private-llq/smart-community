@@ -47,7 +47,7 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
 		}
 		
 		//1. 获取根据社区id查询所有摄像id
-		int communityId = 2;
+		int communityId = 1;
 		
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("community_id", communityId);
@@ -75,7 +75,7 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
 			Short port = facilityEntity.getPort();
 			
 			// 登录设备
-			Map<String, Integer> map = FacilityUtils.login(ip, port, username, password, -1, true);
+			Map<String, Integer> map = FacilityUtils.login(ip, port, username, password, -1);
 			Integer loginStatus = map.get("status");
 			Integer handle = map.get("facilityHandle");
 			int facilityAlarmHandle = FacilityUtils.toEffect(loginStatus, handle, facilityEntity.getFacilityEffectId());
@@ -85,6 +85,9 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
 			Long facilityId = facilityEntity.getId();
 			long id = SnowFlake.nextId();
 			facilityMapper.insertFacilityStatus(id, status, facilityHandle, facilityId, facilityAlarmHandle);
+			
+			//*******
+			FacilityUtils.uploadFaceLibrary(handle,"1");
 			log.info(facilityEntity.getIp() + ": 摄像头登录完毕==============================================");
 		}
 	}
