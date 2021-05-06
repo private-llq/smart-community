@@ -36,8 +36,7 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
 	
 	// TODO: 2021/4/22 在项目启动的时候，登录所有摄像头。
 	// TODO: 2021/4/22 缺点：随着摄像头的增多，项目一启动的时候就要登录所有摄像头会影响启动时间，可能会导致很长
-	// TODO: 2021/4/22 最佳解决方案：利用rabbitMQ，用户一登录物业后台，就传社区id给消费者，消费者根据响应的社区id去只登录该社区的摄像头
-	// TODO: 2021/4/22 为什么这里采用有缺点的方式？  因为rabbitMQ还不熟  后面熟悉了再改成rabbitMQ方式吧  我的哥
+	// TODO: 2021/4/22 解决方案[暂定]：利用rabbitMQ，用户一登录物业后台，就传社区id给消费者，消费者根据响应的社区id去只登录该社区的摄像头  或者 应该加个开启摄像头功能的按钮
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		
