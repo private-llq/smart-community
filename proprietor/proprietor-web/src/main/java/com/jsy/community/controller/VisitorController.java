@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IVisitingCarService;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -39,13 +41,27 @@ import java.util.List;
 public class VisitorController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-	private IVisitorService iVisitorService;
+	private IVisitorService visitorService;
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-	private IVisitorPersonService iVisitorPersonService;
+	private IVisitorPersonService visitorPersonService;
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-	private IVisitingCarService iVisitingCarService;
+	private IVisitingCarService visitingCarService;
+	
+	/**
+	* @Description: 【访客】验证二维码
+	 * @Param: [jsonObject]
+	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author: chq459799974
+	 * @Date: 2021/5/6
+	**/
+	@ApiOperation("【访客】验证二维码")
+	@PostMapping("/QRCode/verify")
+	@Login(allowAnonymous = true)
+	public Map<String,Object> verifyQRCode(@RequestBody JSONObject jsonObject){
+		return visitorService.verifyQRCode(jsonObject,jsonObject.getInteger("hardwareType"));
+	}
 	
 	/**
 	 * @Description: 访客登记 新增
@@ -71,7 +87,7 @@ public class VisitorController {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "填写车辆类型后车牌号不能为空");
 		}
 		visitorEntity.setUid(UserUtils.getUserId());
-		return CommonResult.ok(iVisitorService.addVisitor(visitorEntity),"操作成功");
+		return CommonResult.ok(visitorService.addVisitor(visitorEntity),"操作成功");
 	}
 	
 //	//三方调用进来
@@ -102,7 +118,7 @@ public class VisitorController {
 	@ApiOperation("【访客】删除")
 	@DeleteMapping("")
 	public CommonResult delete(@RequestParam("id") Long id) {
-		boolean delResult = iVisitorService.deleteVisitorById(id);
+		boolean delResult = visitorService.deleteVisitorById(id);
 		return delResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "删除失败");
 	}
 	
@@ -116,7 +132,7 @@ public class VisitorController {
 	@ApiOperation("【访客】分页查询")
 	@PostMapping("page")
 	public CommonResult<PageInfo> query(@RequestBody BaseQO<VisitorQO> baseQO) {
-		return CommonResult.ok(iVisitorService.queryByPage(baseQO,UserUtils.getUserId()));
+		return CommonResult.ok(visitorService.queryByPage(baseQO,UserUtils.getUserId()));
 	}
 	
 	/**
@@ -129,12 +145,12 @@ public class VisitorController {
 	@ApiOperation("【访客】根据ID单查详情")
 	@GetMapping("")
 	public CommonResult<VisitorEntity> queryById(@RequestParam("id") Long id) {
-		VisitorEntity visitorEntity = iVisitorService.selectOneById(id);
+		VisitorEntity visitorEntity = visitorService.selectOneById(id);
 		if (visitorEntity == null) {
 			return CommonResult.ok(null);
 		}
-		visitorEntity.setVisitorPersonRecordList(iVisitorService.queryPersonRecordList(visitorEntity.getId()));
-		visitorEntity.setVisitingCarRecordList(iVisitorService.queryCarRecordList(visitorEntity.getId()));
+		visitorEntity.setVisitorPersonRecordList(visitorService.queryPersonRecordList(visitorEntity.getId()));
+		visitorEntity.setVisitingCarRecordList(visitorService.queryCarRecordList(visitorEntity.getId()));
 		return CommonResult.ok(visitorEntity);
 	}
 	
@@ -151,7 +167,7 @@ public class VisitorController {
 		ValidatorUtils.validateEntity(visitorPersonEntity,VisitorPersonEntity.addPersonValidatedGroup.class);
 		visitorPersonEntity.setUid(UserUtils.getUserId());
 		visitorPersonEntity.setId(SnowFlake.nextId());
-		boolean result = iVisitorPersonService.addVisitorPerson(visitorPersonEntity);
+		boolean result = visitorPersonService.addVisitorPerson(visitorPersonEntity);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行人员 添加失败");
 	}
 	
@@ -166,7 +182,7 @@ public class VisitorController {
 	@PutMapping("person")
 	public CommonResult updatePerson(@RequestBody VisitorPersonQO visitorPersonQO) {
 		ValidatorUtils.validateEntity(visitorPersonQO);
-		boolean updateResult = iVisitorPersonService.updateVisitorPersonById(visitorPersonQO);
+		boolean updateResult = visitorPersonService.updateVisitorPersonById(visitorPersonQO);
 		return updateResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行人员 修改失败");
 	}
 	
@@ -180,7 +196,7 @@ public class VisitorController {
 	@ApiOperation("【随行人员】批量删除")
 	@DeleteMapping("person")
 	public CommonResult deletePerson(@RequestBody List<Long> ids) {
-		boolean result = iVisitorPersonService.deleteVisitorPersonById(ids);
+		boolean result = visitorPersonService.deleteVisitorPersonById(ids);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行人员 批量删除失败");
 	}
 	
@@ -195,7 +211,7 @@ public class VisitorController {
 	@PostMapping("person/page")
 	public CommonResult<PageInfo<VisitorPersonEntity>> queryPersonPage(@RequestBody BaseQO<String> baseQO){
 		baseQO.setQuery(UserUtils.getUserId());
-		return CommonResult.ok(iVisitorPersonService.queryVisitorPersonPage(baseQO));
+		return CommonResult.ok(visitorPersonService.queryVisitorPersonPage(baseQO));
 	}
 	
 	/**
@@ -211,7 +227,7 @@ public class VisitorController {
 		ValidatorUtils.validateEntity(visitingCarEntity,VisitingCarEntity.addCarValidatedGroup.class);
 		visitingCarEntity.setUid(UserUtils.getUserId());
 		visitingCarEntity.setId(SnowFlake.nextId());
-		boolean result = iVisitingCarService.addVisitingCar(visitingCarEntity);
+		boolean result = visitingCarService.addVisitingCar(visitingCarEntity);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行车辆 添加失败");
 	}
 	
@@ -226,7 +242,7 @@ public class VisitorController {
 	@PutMapping("car")
 	public CommonResult updateCar(@RequestBody VisitingCarQO visitingCarQO) {
 		ValidatorUtils.validateEntity(visitingCarQO);
-		boolean updateResult = iVisitingCarService.updateVisitingCarById(visitingCarQO);
+		boolean updateResult = visitingCarService.updateVisitingCarById(visitingCarQO);
 		return updateResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行车辆 修改失败");
 	}
 	
@@ -240,7 +256,7 @@ public class VisitorController {
 	@ApiOperation("【随行车辆】批量删除")
 	@DeleteMapping("car")
 	public CommonResult deleteCar(@RequestBody List<Long> ids) {
-		boolean result = iVisitingCarService.deleteVisitingCarById(ids);
+		boolean result = visitingCarService.deleteVisitingCarById(ids);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行车辆 批量删除失败");
 	}
 	
@@ -255,7 +271,7 @@ public class VisitorController {
 	@PostMapping("car/page")
 	public CommonResult<PageInfo<VisitingCarEntity>> queryCarPage(@RequestBody BaseQO<String> baseQO){
 		baseQO.setQuery(UserUtils.getUserId());
-		return CommonResult.ok(iVisitingCarService.queryVisitingCarPage(baseQO));
+		return CommonResult.ok(visitingCarService.queryVisitingCarPage(baseQO));
 	}
 
 }
