@@ -42,6 +42,7 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 		return true;
 	}
 	
+	
 	/**
 	 * @return void
 	 * @Author lihao

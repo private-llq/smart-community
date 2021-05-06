@@ -122,10 +122,11 @@ public class FacilityController {
 		return CommonResult.ok();
 	}
 	
-	@ApiOperation("数据同步")
+	@ApiOperation("根据设备id同步数据")
 	@GetMapping("/connectData")
 	public CommonResult connectData(@RequestParam("id") Long id) {
-		facilityService.connectData(id);
+		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		facilityService.connectData(id,communityId);
 		return CommonResult.ok();
 	}
 }

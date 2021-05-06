@@ -43,18 +43,10 @@ public class FacilityUtils {
 		// 对接多台设备，是否需要调用多次NET_DVR_Init接口分别初始化？
 		// 答：不是 初始化接口全局的，一次即可。NET_DVR_Init和NET_DVR_Cleanup需要配对使用，程序运行开始调用NET_DVR_Init，程序退出时调用NET_DVR_Cleanup释放资源，都只需要调用一次即可。
 		// 为什么登录设备不需要初始化  答：因为我在 ApplicationRunnerImpl 【项目一启动的时候已经初始化】
-		// TODO: 2021/4/27 下面注释的代码被我提取出来了   该代码原本是用于判断设备是否在线
-//		if (!fffff) {
-//			boolean flag = hCNetSDK.NET_DVR_RemoteControl(lUserID, 20005, null, 0);
-//			HashMap<String, Integer> map = new HashMap<>();
-//			int workStatus = flag ? 1 : 0;
-//			map.put("workStatus", workStatus);
-//			return map;
-//		}
 
 		//2. 用户注册设备    返回值：-1表示失败，其他值表示返回的用户ID值。该用户ID具有唯一性，后续对设备的操作都需要通过此ID实现。
 		// 注册之前先注销已注册的设备
-		if (lUserID > -1) { // lUserID：用户句柄   （每个设备都需要单独登录NET_DVR_Login_V30，登录成功返回唯一的userID1）;
+		if (lUserID > -1) { // lUserID：用户句柄   （每个设备都需要单独登录NET_DVR_Login_V30，登录成功返回唯一的userID）;
 			//先注销
 			hCNetSDK.NET_DVR_Logout(lUserID);
 			lUserID = -1;
@@ -227,8 +219,9 @@ public class FacilityUtils {
 		// 通过该接口将人脸数据(人脸图片+图片附件信息)发送到设备的人脸库。图片格式要求：JPG或者JPEG，像素在40x40以上，大小在300KB以下
 		HCNetSDK.NET_DVR_SEND_PARAM_IN struSendParam = new HCNetSDK.NET_DVR_SEND_PARAM_IN();
 		struSendParam.read();
-
-		byte[] picbyte = toByteArray("D:\\zhsj\\smart-community\\property\\property-web\\src\\main\\resources\\face\\small.jpg");
+		
+		String relativelyPath=System.getProperty("user.dir");
+		byte[] picbyte = toByteArray(relativelyPath+"\\property\\property-web\\src\\main\\resources\\face\\small.jpg");
 		HCNetSDK.BYTE_ARRAY arraybyte = new HCNetSDK.BYTE_ARRAY(picbyte.length);
 		arraybyte.read();
 		arraybyte.byValue = picbyte;
@@ -256,7 +249,6 @@ public class FacilityUtils {
 			System.err.println("NET_DVR_UploadSend失败，错误号" + hCNetSDK.NET_DVR_GetLastError());
 			return;
 		}
-
 
 		while (true) {
 			IntByReference Pint = new IntByReference(0);
