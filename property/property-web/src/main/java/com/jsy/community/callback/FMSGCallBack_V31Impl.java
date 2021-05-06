@@ -17,7 +17,7 @@ import java.util.Date;
  * @author lihao
  * @ClassName FMSGCallBack_V31Impl
  * @Date 2021/3/3  15:43
- * @Description 人脸识别回调函数
+ * @Description 人脸识别/车牌识别回调函数
  * @Version 1.0
  **/
 @Slf4j
