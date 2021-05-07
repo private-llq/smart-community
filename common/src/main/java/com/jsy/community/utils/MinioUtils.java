@@ -82,6 +82,9 @@ public class MinioUtils {
 				objectName = getRandomFileName("");
 			}
 			String picType = PicUtil.getPicType(file);
+			if(PicUtil.TYPE_UNKNOWN.equals(picType)){
+				throw new JSYException(JSYError.BAD_REQUEST.getCode(),"非法图片格式！");
+			}
 			objectName += "." + picType;
 			// 存储文件
 			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());
