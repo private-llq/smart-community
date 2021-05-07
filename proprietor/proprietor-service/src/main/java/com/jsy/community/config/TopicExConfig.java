@@ -17,34 +17,49 @@ public class TopicExConfig {
 	
 	//交换机名称
 	public final static String EX_FACE_XU = "topicExOfXUFace"; //炫优人脸识别一体机 - 交换机
+	
 	//topic名称
 	public final static String TOPIC_FACE_XU_SERVER = "topic.face.xu.server"; //炫优人脸识别一体机 - topic - server
 	//topic名称
 	public final static String TOPIC_FACE_XU_CLIENT = "topic.face.xu.client"; //炫优人脸识别一体机 - topic - client
 	
-	//队列
+	
+	//声明队列
 	@Bean
 	public Queue queueOfXUFaceServer() {
-		return new Queue(TopicExConfig.TOPIC_FACE_XU_SERVER,true);
+		return new Queue(TOPIC_FACE_XU_SERVER,true);
 	}
 	@Bean
 	public Queue queueOfXUFaceClient() {
-		return new Queue(TopicExConfig.TOPIC_FACE_XU_CLIENT,true);
+		return new Queue(TOPIC_FACE_XU_CLIENT,true);
 	}
-	//交换机
+	@Bean
+	public Queue queueOfPropertyVisitor() {
+		return new Queue(RabbitMQConfig.TOPIC_PROPERTY_VISITOR_RECORD,true);
+	}
+	//声明交换机  TODO 人脸下发改扇形交换机？
 	@Bean
 	TopicExchange topicExOfXUFace() {
 		return new TopicExchange(EX_FACE_XU);
 	}
-	//绑定
+	@Bean
+	TopicExchange topicExOfProperty() {
+		return new TopicExchange(RabbitMQConfig.EX_PROPERTY);
+	}
+	//队列绑定交换机
 	@Bean
 	Binding bindingExchangeMessage1() {
 		return BindingBuilder.bind(queueOfXUFaceServer()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_SERVER);
 	}
-	//绑定
+	//队列绑定交换机
 	@Bean
 	Binding bindingExchangeMessage2() {
 		return BindingBuilder.bind(queueOfXUFaceClient()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_CLIENT);
+	}
+	//队列绑定交换机
+	@Bean
+	Binding bindingExchangeMessage3() {
+		return BindingBuilder.bind(queueOfPropertyVisitor()).to(topicExOfProperty()).with(RabbitMQConfig.TOPIC_PROPERTY_VISITOR_RECORD);
 	}
 	
 	

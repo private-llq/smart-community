@@ -1,13 +1,12 @@
 package com.jsy.community.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
-import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.config.RabbitMQConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -20,6 +19,7 @@ import com.jsy.community.utils.*;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.poi.poifs.property.PropertyConstants;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -164,6 +163,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         }
         //查询访客记录
         VisitorEntity visitorEntity = visitorMapper.selectById(visitorId);
+        System.out.println(visitorEntity);
         //无访客记录
         if(visitorEntity == null){
             returnMap.put("code","-1");
@@ -201,9 +201,20 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         returnMap.put("msg","二维码验证通过");
         returnMap.put("uid",visitorEntity.getUid());
         returnMap.put("name",visitorEntity.getName());
-        //插入访客记录(MQ)
-    
+        
+        //MQ向物业端新增一条访客记录
+        VisitorHistoryEntity historyEntity = new VisitorHistoryEntity();
+        BeanUtils.copyProperties(visitorEntity,historyEntity);
+        historyEntity.setId(SnowFlake.nextId());
+        historyEntity.setVisitorId(visitorEntity.getId());
+        historyEntity.setAccessType(BusinessConst.ACCESS_TYPE_QRCODE);
+        pushVisitorRecord(historyEntity);
         return returnMap;
+    }
+    
+    //推送访客记录
+    private void pushVisitorRecord(VisitorHistoryEntity historyEntity){
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EX_PROPERTY, RabbitMQConfig.TOPIC_PROPERTY_VISITOR_RECORD,historyEntity);
     }
     
 //    /**

@@ -36,7 +36,9 @@ public class VisitorHistoryEntity extends BaseEntity{
 	
 	//冗余字段
 	private String name;//登记主访客姓名
+	@TableField(exist = false)
 	private String contact;//主访客联系方式
+	@TableField(exist = false)
 	private String carPlate;//来访车辆车牌
 	
 	//其他表数据(后期主表为t_visitor_history时，复制数据用)

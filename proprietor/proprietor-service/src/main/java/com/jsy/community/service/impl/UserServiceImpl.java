@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.config.RabbitMQConfig;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -27,7 +28,6 @@ import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
-import com.jsy.community.utils.es.ElasticsearchCarUtil;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -620,7 +620,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     
         pushMap.put("sex",userEntity.getSex());
         pushMap.put("realName",userEntity.getRealName());
-        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU,TopicExConfig.TOPIC_FACE_XU_SERVER,pushMap);
+        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER,pushMap);
     }
 
 
