@@ -50,12 +50,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		if(bannerQO.getCommunityId() == null){
 			bannerQO.setCommunityId(0L);//通用轮播图查询
 		}
-		queryWrapper.eq("community_id",bannerQO.getCommunityId());
-		if(bannerQO.getPosition() != null){
-			queryWrapper.eq("position",bannerQO.getPosition());
-		}
-		queryWrapper.orderByAsc("sort");
-		List<BannerEntity> entityList = bannerMapper.selectList(queryWrapper);
+		List<BannerEntity> entityList = bannerMapper.queryListByCommunityIdAndPosition(bannerQO.getCommunityId(),bannerQO.getPosition());
 		List<BannerVO> returnList = new ArrayList<>(entityList.size());
 		BannerVO bannerVO;
 		for(BannerEntity bannerEntity : entityList){
