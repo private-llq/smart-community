@@ -77,10 +77,12 @@ public class MinioUtils {
 			String objectName;
 			if (!StringUtils.isEmpty(file.getOriginalFilename())) {
 				endName = file.getOriginalFilename();
-				objectName = getRandomFileName(endName) + ".jpg";
+				objectName = getRandomFileName(endName);
 			}else{
-				objectName = getRandomFileName("") + ".jpg";
+				objectName = getRandomFileName("");
 			}
+			String picType = PicUtil.getPicType(file);
+			objectName += "." + picType;
 			// 存储文件
 			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());
 			//返回路径
