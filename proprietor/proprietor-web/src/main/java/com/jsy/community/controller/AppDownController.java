@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,5 +41,17 @@ public class AppDownController {
 	public CommonResult uploadIos(@RequestParam("file") MultipartFile file) {
 		String app = MinioUtils.uploadName(file, "ios");
 		return CommonResult.ok(app);
+	}
+	
+//	@ApiOperation("APP上传到服务器")
+//	@PostMapping("/uploadApp")
+//	public CommonResult uploadApp(@RequestParam("file") MultipartFile file) {
+////		String app = MinioUtils.upload(file, "app");
+//		String app = MinioUtils.uploadPic(file, "user-face-avatar");
+//		return CommonResult.ok(app);
+//	}
+	
+	public static void main(String[] args) {
+		System.out.println(SnowFlake.nextId());
 	}
 }

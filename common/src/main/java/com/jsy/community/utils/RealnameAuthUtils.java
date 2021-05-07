@@ -59,7 +59,7 @@ public class RealnameAuthUtils {
 	 * @Date: 2021/3/2
 	**/
 	public static JSONObject initBlink(RealnameBlinkInitQO realnameBlinkInitQO){
-		String appCode = "289ee72eb0c5477f8a4e4aaba531b5a8";
+		String appCode = "7def68d3c18341d6a43d33259fa3d0c5";
 		String host = "https://ediszim.market.alicloudapi.com";
 		String path = "/zoloz/zim/init";
 		String method = "POST";
@@ -94,7 +94,7 @@ public class RealnameAuthUtils {
 	 * @Date: 2021/3/2
 	**/
 	public static JSONObject getBlinkResult(RealnameBlinkQueryQO realnameBlinkQueryQO){
-		String appCode = "289ee72eb0c5477f8a4e4aaba531b5a8";
+		String appCode = "7def68d3c18341d6a43d33259fa3d0c5";
 		String host = "https://ediszim.market.alicloudapi.com";
 		String path = "/zoloz/zim/getResult";
 		String method = "POST";
