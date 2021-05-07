@@ -10,6 +10,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.es.ElasticsearchCarUtil;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
@@ -55,14 +56,17 @@ public class ElasticsearchCarController {
     }
 
 
-//    @ApiOperation("车辆批量更新")
-//    @PostMapping("/updateAll")
-//    @Login
-//    public CommonResult updateAll(@RequestBody TestQO testQO) {
-//        List<ElasticsearchCarQO> cars = testQO.getCars();
-//        for (ElasticsearchCarQO elasticsearchCarQO : cars) {
-//            ElasticsearchCarUtil.insertData(elasticsearchCarQO,restHighLevelClient);
-//        }
-//        return CommonResult.ok();
-//    }
+    @ApiOperation("车辆批量更新")
+    @PostMapping("/updateAll")
+    public CommonResult updateAll() {
+        elasticsearchCarService.updateCars();
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("全部删除")
+    @PostMapping("/deleteAll")
+    public CommonResult deleteAll() {
+        ElasticsearchCarUtil.deleteDataAll(restHighLevelClient);
+        return CommonResult.ok();
+    }
 }

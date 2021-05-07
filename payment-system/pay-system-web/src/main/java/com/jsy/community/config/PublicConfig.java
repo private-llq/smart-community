@@ -1,7 +1,6 @@
 package com.jsy.community.config;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.utils.AesUtil;
 import com.jsy.community.utils.MyHttpClient;
@@ -156,17 +155,13 @@ public class PublicConfig {
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
         String plainText = verifyNotify(result, privateKey);
         if (StrUtil.isNotEmpty(plainText)) {
-            response.setStatus(200);
             map.put("code", "SUCCESS");
             map.put("message", "SUCCESS");
         } else {
-            response.setStatus(500);
             map.put("code", "ERROR");
             map.put("message", "签名错误");
         }
-        response.setHeader("Content-type", ContentType.JSON.toString());
-        response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
-        response.flushBuffer();
+
         String out_trade_no = JSONObject.fromObject(plainText).getString("out_trade_no");
         String transaction_id = JSONObject.fromObject(plainText).getString("transaction_id");
         String attach = JSONObject.fromObject(plainText).getString("attach");

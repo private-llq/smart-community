@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
@@ -39,6 +40,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -151,6 +153,14 @@ public class WeChatController {
                 shoppingMallService.completeShopOrder(split[1]);
             }
         }
+        if("SUCCESS".equals(map.get("code"))){
+            response.setStatus(200);
+        }else{
+            response.setStatus(500);
+        }
+        response.setHeader("Content-type", ContentType.JSON.toString());
+        response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
+        response.flushBuffer();
     }
 
 

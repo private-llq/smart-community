@@ -160,7 +160,12 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
             payFamilyEntity.setFamilyName(livingPaymentQO.getFamilyName());
             payFamilyEntity.setTypeId(livingPaymentQO.getTypeId());
             payFamilyEntity.setUid(livingPaymentQO.getUserID());
+            payFamilyEntity.setUpdateTime(LocalDateTime.now());
             payFamilyMapper.insert(payFamilyEntity);
+        }else {
+            //设置修改时间用作排序
+            familyEntity.setUpdateTime(LocalDateTime.now());
+            payFamilyMapper.updateById(familyEntity);
         }
         //添加户主详情
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",livingPaymentQO.getUserID()));

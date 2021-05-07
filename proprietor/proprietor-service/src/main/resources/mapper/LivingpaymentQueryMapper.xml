@@ -27,12 +27,13 @@
         tpt.medium_icon as mediumIcon,
         tpt.large_size_icon as largeSizeIcon,
         tpt.id as typeId,
-        tpt.name as typeName
-        FROM t_pay_order tpf
+        tpt.name as typeName,
+        tpf.update_time as updateTime
+        FROM t_pay_family tpf
         join t_pay_type tpt on tpf.type_id=tpt.id
         join t_pay_group tpg on tpf.group_id=tpg.id
         join t_pay_company tpc on tpf.company_id=tpc.id
-        where tpf.deleted=0 and tpt.deleted=0 and tpg.deleted=0 and tpc.deleted=0 and tpf.uid=#{userId} limit #{page},#{size}
+        where tpf.deleted=0 and tpt.deleted=0 and tpg.deleted=0 and tpc.deleted=0 and tpf.uid=#{userId} order by updateTime desc limit #{page},#{size}
     </select>
 
 

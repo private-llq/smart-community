@@ -26,6 +26,9 @@ public class PayFamilyEntity extends BaseEntity {
     @ApiModelProperty(value = "户号")
     private String familyName;
 
+    @ApiModelProperty(value = "地址")
+    private String address;
+
     @ApiModelProperty(value = "缴费单位")
     private Long companyId;
 

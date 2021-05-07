@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @program: com.jsy.community
@@ -85,6 +87,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             communityFunQO.setIssueTimeOut(communityFunQO.getIssueTimeOut().plusDays(1));
             wrapper.le("start_time",communityFunQO.getIssueTimeOut());
         }
+        wrapper.orderByDesc("create_time");
 
         Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
@@ -99,6 +102,8 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         BeanUtils.copyProperties(page,pageInfo);
         return pageInfo;
     }
+
+
 
     /**
      * @Description: 撤销
@@ -118,7 +123,6 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         communityFunMapper.updateById(entity);
         ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
-
     /**
      * @Description: 新增
      * @author: Hu
@@ -128,6 +132,10 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
      */
     @Override
     public void insetOne(CommunityFunOperationQO communityFunOperationQO, AdminInfoVo adminInfoVo) {
+        Pattern pattern = Pattern.compile("<.+?>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(communityFunOperationQO.getContent());
+        String string = matcher.replaceAll("");
+
         CommunityFunEntity entity = new CommunityFunEntity();
         entity.setCommunityId(adminInfoVo.getCommunityId());
         entity.setTitleName(communityFunOperationQO.getTitleName());
@@ -140,13 +148,12 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
         entity.setStatus(2);
         entity.setRedactStatus(2);
+        entity.setOriginalContent(string);
         String tallys = Arrays.toString(communityFunOperationQO.getTallys());
         entity.setTallys(tallys.substring(1, tallys.length() - 1));
         entity.setId(SnowFlake.nextId());
         communityFunMapper.insert(entity);
     }
-
-
     /**
      * @Description: 修改
      * @author: Hu

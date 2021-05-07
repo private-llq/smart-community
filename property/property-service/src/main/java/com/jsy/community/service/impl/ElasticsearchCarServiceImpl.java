@@ -5,6 +5,8 @@ import com.jsy.community.api.IElasticsearchCarService;
 import com.jsy.community.config.web.ElasticsearchConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.PropertyCarEntity;
+import com.jsy.community.mapper.PropertyCarMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
@@ -21,9 +23,11 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +41,8 @@ import java.util.Map;
 public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+    @Autowired
+    private PropertyCarMapper propertyCarMapper;
 
     /**
      * @Description: 删除
@@ -113,6 +119,23 @@ public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
     }
 
 
+    /**
+     * @Description: 更新es物业车辆
+     * @author: Hu
+     * @since: 2021/5/6 14:31
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void updateCars() {
+        List<PropertyCarEntity> entities = propertyCarMapper.selectList(null);
+        ElasticsearchCarUtil.deleteDataAll(restHighLevelClient);
+        for (PropertyCarEntity entity : entities) {
+            ElasticsearchCarQO carQO = new ElasticsearchCarQO();
+            BeanUtils.copyProperties(entity,carQO);
+            ElasticsearchCarUtil.insertData(carQO,restHighLevelClient);
+        }
+    }
 
     /**
      * @Description: 新增

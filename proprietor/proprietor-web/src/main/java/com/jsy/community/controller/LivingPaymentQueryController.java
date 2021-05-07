@@ -59,15 +59,16 @@ public class LivingPaymentQueryController {
         return CommonResult.ok(payType);
     }
 
-    @ApiOperation("查询所有户号")
+    @ApiOperation("查询全部户号")
     @GetMapping("/selectFamilyId")
     @Login
-    public CommonResult selectfamilyId(){
+    public CommonResult selectFamilyId(){
         String userId = UserUtils.getUserId();
         List<FamilyIdVO> familyIdVOS = livingpaymentQueryService.selectFamilyId(userId);
         return CommonResult.ok(familyIdVOS);
     }
-    @ApiOperation("查询全部户号")
+
+    @ApiOperation("根据城市和缴费类型查询缴费单位")
     @PostMapping("/selectPayCompany")
     @Login
     public CommonResult selectPayCompany(@RequestBody PayCompanyQO payCompanyQO){
@@ -113,11 +114,6 @@ public class LivingPaymentQueryController {
         return CommonResult.ok(payVoucherVO);
     }
 
-    /**
-     * 查询一条订单详情
-     * @param orderId
-     * @return
-     */
     @ApiOperation("缴费详情")
     @GetMapping("/selectPaymentDetailsVO")
     @Login
@@ -126,12 +122,8 @@ public class LivingPaymentQueryController {
         PaymentDetailsVO paymentDetailsVO = livingpaymentQueryService.selectPaymentDetailsVO(orderId,userId);
         return CommonResult.ok(paymentDetailsVO);
     }
-    /**
-     * 选择分组查询下面缴过费的水电气户号
-     * @param
-     * @return
-     */
-    @ApiOperation("全部户号")
+
+    @ApiOperation("户号管理")
     @GetMapping("/selectGroupAll")
     @Login
     public CommonResult selectGroupAll(){
@@ -140,12 +132,6 @@ public class LivingPaymentQueryController {
         return CommonResult.ok(voList);
     }
 
-
-    /**
-     * 通过组户号查询订单详情
-     * @param
-     * @return
-     */
     @ApiOperation("缴费记录")
     @PostMapping("/selectOrder")
     @Login

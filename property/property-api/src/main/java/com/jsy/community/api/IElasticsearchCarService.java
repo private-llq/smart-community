@@ -49,4 +49,13 @@ public interface IElasticsearchCarService {
      * @return:
      */
     Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO, AdminInfoVo info);
+
+    /**
+     * @Description: 更新es车辆
+     * @author: Hu
+     * @since: 2021/5/6 14:26
+     * @Param:
+     * @return:
+     */
+    void updateCars();
 }

@@ -34,4 +34,11 @@ public class AppDownController {
 		String app = MinioUtils.upload(file, "app");
 		return CommonResult.ok(app);
 	}
+
+	@ApiOperation("APP上传到服务器")
+	@PostMapping("/uploadIos")
+	public CommonResult uploadIos(@RequestParam("file") MultipartFile file) {
+		String app = MinioUtils.uploadName(file, "ios");
+		return CommonResult.ok(app);
+	}
 }
