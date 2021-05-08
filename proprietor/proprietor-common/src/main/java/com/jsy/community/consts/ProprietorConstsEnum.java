@@ -1,10 +1,5 @@
 package com.jsy.community.consts;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author chq459799974
  * @description 业主端枚举
