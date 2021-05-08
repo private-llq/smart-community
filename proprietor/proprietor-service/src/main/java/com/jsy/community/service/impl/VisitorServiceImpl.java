@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
-import com.jsy.community.config.RabbitMQConfig;
+import com.jsy.community.config.RabbitMQCommonConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -19,7 +19,6 @@ import com.jsy.community.utils.*;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.vo.VisitorEntryVO;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.poi.poifs.property.PropertyConstants;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,7 +213,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     
     //推送访客记录
     private void pushVisitorRecord(VisitorHistoryEntity historyEntity){
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EX_PROPERTY, RabbitMQConfig.TOPIC_PROPERTY_VISITOR_RECORD,historyEntity);
+        rabbitTemplate.convertAndSend(RabbitMQCommonConfig.EX_PROPERTY, RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD,historyEntity);
     }
     
 //    /**

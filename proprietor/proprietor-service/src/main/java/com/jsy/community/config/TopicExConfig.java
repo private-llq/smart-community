@@ -35,7 +35,7 @@ public class TopicExConfig {
 	}
 	@Bean
 	public Queue queueOfPropertyVisitor() {
-		return new Queue(RabbitMQConfig.TOPIC_PROPERTY_VISITOR_RECORD,true);
+		return new Queue(RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD,true);
 	}
 	//声明交换机  TODO 人脸下发改扇形交换机？
 	@Bean
@@ -44,7 +44,7 @@ public class TopicExConfig {
 	}
 	@Bean
 	TopicExchange topicExOfProperty() {
-		return new TopicExchange(RabbitMQConfig.EX_PROPERTY);
+		return new TopicExchange(RabbitMQCommonConfig.EX_PROPERTY);
 	}
 	//队列绑定交换机
 	@Bean
@@ -59,7 +59,7 @@ public class TopicExConfig {
 	//队列绑定交换机
 	@Bean
 	Binding bindingExchangeMessage3() {
-		return BindingBuilder.bind(queueOfPropertyVisitor()).to(topicExOfProperty()).with(RabbitMQConfig.TOPIC_PROPERTY_VISITOR_RECORD);
+		return BindingBuilder.bind(queueOfPropertyVisitor()).to(topicExOfProperty()).with(RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD);
 	}
 	
 	

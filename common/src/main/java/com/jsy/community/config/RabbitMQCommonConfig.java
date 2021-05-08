@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2021-05-06 16:19
  **/
 @Configuration
-public class RabbitMQConfig {
+public class RabbitMQCommonConfig {
 	
 	//交换机名称
 	public final static String EX_PROPERTY = "topicExOfProperty"; //物业端 - 交换机

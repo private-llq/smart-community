@@ -2,7 +2,6 @@ package com.jsy.community.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IVisitorService;
-import com.jsy.community.config.RabbitMQConfig;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.rabbitmq.client.Channel;
