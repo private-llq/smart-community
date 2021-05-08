@@ -43,6 +43,7 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
         if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
             wrapper.like("title_name", communityFunQO.getHeadline());
         }
+//        wrapper.eq("community_id",communityFunQO.getCommunityId());
         wrapper.orderByDesc("start_time");
 
         IPage<CommunityFunEntity> page = selectCommunityFunMapper.selectPage(new Page<CommunityFunEntity>(communityFunQO.getPage(), communityFunQO.getSize()),wrapper);
@@ -62,7 +63,7 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
      */
     @Override
     public CommunityFunEntity findFunOne(Long id) {
-        return selectCommunityFunMapper.selectById(id);
+        return selectCommunityFunMapper.selectOne(new QueryWrapper<CommunityFunEntity>().eq("id",id).eq("status",1));
 
     }
 
