@@ -7,7 +7,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
- 
+ /**
+  * @Description: 敏感词汇过滤工具类
+  * @author: Hu
+  * @since: 2021/5/8 15:55
+  * @Param:
+  * @return:
+  */
 public class BadWordUtil2 {
     public static String filePath = "classpath:dictionary.txt";//敏感词库文件路径
     public static Set<String> words;
