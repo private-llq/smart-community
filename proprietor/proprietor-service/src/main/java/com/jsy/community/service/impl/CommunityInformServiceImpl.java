@@ -85,10 +85,15 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
     public List<PushInformEntity> rotationCommunityInform(Integer initialInformCount , Long communityId) {
         CommunityConfigEntity config = communityConfigMapper.selectOne(new QueryWrapper<CommunityConfigEntity>().select("show_sys_msg").eq("community_id", communityId));
         //无小区配置或配置展示系统消息
-        if(config == null || ProprietorConsts.COMMUNITY_CONFIG_SHOW_SYS_MSG.equals(config.getShowSysMsg())){
+        if(config == null){
+            //没有找到小区配置项 默认展示
             log.error("获取首页轮播消息 - 未查询到小区配置，请检查小区配置。小区ID：" + communityId);
             return communityInformMapper.rotationCommunityInform(initialInformCount, communityId);
+        }else if(ProprietorConsts.COMMUNITY_CONFIG_SHOW_SYS_MSG.equals(config.getShowSysMsg())){
+            //小区配置了展示系统消息
+            return communityInformMapper.rotationCommunityInform(initialInformCount, communityId);
         }
+        //小区配置了不展示系统消息
         return communityInformMapper.rotationCommunityInformSelf(initialInformCount, communityId);
     }
 
