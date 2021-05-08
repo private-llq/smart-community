@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>property</artifactId>
+        <artifactId>proprietor</artifactId>
         <groupId>com.jsy</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <groupId>com.jsy</groupId>
-    <artifactId>property-common</artifactId>
+    <artifactId>proprietor-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>property-common</name>
-    <description>物业端公共模块</description>
+    <name>proprietor-common</name>
+    <description>业主端公共模块</description>
     <properties>
         <java.version>11</java.version>
     </properties>

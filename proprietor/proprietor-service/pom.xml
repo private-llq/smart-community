@@ -20,6 +20,12 @@
 			<artifactId>proprietor-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.jsy</groupId>
+			<artifactId>proprietor-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 		<!-- nacos 服务发现 -->
 		<dependency>

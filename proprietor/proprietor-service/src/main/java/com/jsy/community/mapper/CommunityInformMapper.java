@@ -18,11 +18,17 @@ import java.util.List;
  * @since 2020-11-16
  */
 public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
-
-
+    
+    /**
+     * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量 (只获取当前小区)
+     * @param initialInformCount     初始轮播消息条数
+     * @param communityId            社区id、
+     * @return                       返回消息列表
+     */
+    List<PushInformEntity> rotationCommunityInformSelf(@Param("initialCount") Integer initialInformCount, @Param("acctId") Long communityId);
 
     /**
-     * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量
+     * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量 (获取当前小区和系统消息)
      * @param initialInformCount     初始轮播消息条数
      * @param communityId            社区id、
      * @return                       返回消息列表
