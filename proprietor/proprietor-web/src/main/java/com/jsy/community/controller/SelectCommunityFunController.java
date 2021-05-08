@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ISelectCommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
@@ -36,6 +37,7 @@ public class SelectCommunityFunController {
      */
     @ApiOperation("分页查询社区趣事")
     @PostMapping("/findList")
+    @Login
     public CommonResult<Map> list(@RequestBody SelectCommunityFunQO communityFunQO) {
         Map<String, Object> map = selectCommunityFunService.findList(communityFunQO);
         return CommonResult.ok(map);
@@ -49,8 +51,11 @@ public class SelectCommunityFunController {
      */
     @ApiOperation("查询一条社区趣事详情传入id")
     @GetMapping("/findFunOne")
-    public CommonResult<CommunityFunEntity> findOne(@RequestParam("id")Long id) {
+    public CommonResult findOne(@RequestParam("id")Long id) {
         CommunityFunEntity communityFunEntity=selectCommunityFunService.findFunOne(id);
+        if (communityFunEntity==null){
+            return CommonResult.error("该条趣事已下线！");
+        }
         selectCommunityFunService.saveViewCount(id);
         return CommonResult.ok(communityFunEntity);
     }

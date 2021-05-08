@@ -6,8 +6,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityInformService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.ProprietorConsts;
+import com.jsy.community.entity.CommunityConfigEntity;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.entity.UserInformEntity;
+import com.jsy.community.mapper.CommunityConfigMapper;
 import com.jsy.community.mapper.CommunityInformMapper;
 import com.jsy.community.mapper.UserInformMapper;
 import com.jsy.community.qo.BaseQO;
@@ -40,6 +43,9 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
 
     @Resource
     private UserInformMapper userInformMapper;
+    
+    @Resource
+    private CommunityConfigMapper communityConfigMapper;
 
     /**
      * 列表查询社区消息
@@ -77,7 +83,18 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      */
     @Override
     public List<PushInformEntity> rotationCommunityInform(Integer initialInformCount , Long communityId) {
-        return communityInformMapper.rotationCommunityInform(initialInformCount, communityId);
+        CommunityConfigEntity config = communityConfigMapper.selectOne(new QueryWrapper<CommunityConfigEntity>().select("show_sys_msg").eq("community_id", communityId));
+        //无小区配置或配置展示系统消息
+        if(config == null){
+            //没有找到小区配置项 默认展示
+            log.error("获取首页轮播消息 - 未查询到小区配置，请检查小区配置。小区ID：" + communityId);
+            return communityInformMapper.rotationCommunityInform(initialInformCount, communityId);
+        }else if(ProprietorConsts.COMMUNITY_CONFIG_SHOW_SYS_MSG.equals(config.getShowSysMsg())){
+            //小区配置了展示系统消息
+            return communityInformMapper.rotationCommunityInform(initialInformCount, communityId);
+        }
+        //小区配置了不展示系统消息
+        return communityInformMapper.rotationCommunityInformSelf(initialInformCount, communityId);
     }
 
     /**

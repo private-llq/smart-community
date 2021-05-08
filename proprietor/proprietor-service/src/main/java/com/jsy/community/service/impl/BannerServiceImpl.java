@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.ProprietorConsts;
 import com.jsy.community.entity.BannerEntity;
+import com.jsy.community.entity.CommunityConfigEntity;
 import com.jsy.community.mapper.BannerMapper;
+import com.jsy.community.mapper.CommunityConfigMapper;
 import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.vo.BannerVO;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -36,6 +40,9 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	@Autowired
 	private RedisTemplate redisTemplate;
 	
+	@Resource
+	private CommunityConfigMapper communityConfigMapper;
+	
 	/**
 	 * @Description: 轮播图 列表查询
 	 * @Param: [bannerQO]
@@ -47,10 +54,20 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 	public List<BannerVO> queryBannerList(BannerQO bannerQO){
 		QueryWrapper<BannerEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("id,position,sort,url");
-		if(bannerQO.getCommunityId() == null){
-			bannerQO.setCommunityId(0L);//通用轮播图查询
+		CommunityConfigEntity config = communityConfigMapper.selectOne(new QueryWrapper<CommunityConfigEntity>().select("show_sys_banner").eq("community_id", bannerQO.getCommunityId()));
+		List<BannerEntity> entityList;
+		//不带配置项或者配置了显示系统广告(轮播图)
+		if(config == null){
+			//没有找到小区配置项 默认展示
+			log.error("获取首页轮播图 - 未查询到小区配置，请检查小区配置。小区ID：" + bannerQO.getCommunityId());
+			entityList = bannerMapper.queryListByCommunityIdAndPosition(bannerQO.getCommunityId(),bannerQO.getPosition(),"or community_id = 0");
+		}else if(ProprietorConsts.COMMUNITY_CONFIG_SHOW_SYS_BANNER.equals(config.getShowSysBanner())){
+			//小区配置了显示系统广告(轮播图)
+			entityList = bannerMapper.queryListByCommunityIdAndPosition(bannerQO.getCommunityId(),bannerQO.getPosition(),"or community_id = 0");
+		}else{
+			//小区配置了不显示系统广告(轮播图)
+			entityList = bannerMapper.queryListByCommunityIdAndPosition(bannerQO.getCommunityId(),bannerQO.getPosition(),null);
 		}
-		List<BannerEntity> entityList = bannerMapper.queryListByCommunityIdAndPosition(bannerQO.getCommunityId(),bannerQO.getPosition());
 		List<BannerVO> returnList = new ArrayList<>(entityList.size());
 		BannerVO bannerVO;
 		for(BannerEntity bannerEntity : entityList){

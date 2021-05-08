@@ -19,6 +19,7 @@
 		<module>proprietor-api</module>
 		<module>proprietor-web</module>
 		<module>proprietor-service</module>
+		<module>proprietor-common</module>
 	</modules>
 	
 	<dependencies>

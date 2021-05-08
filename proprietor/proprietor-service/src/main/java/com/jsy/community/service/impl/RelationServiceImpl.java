@@ -287,7 +287,7 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     /**
-     * @Description: 删除家属信息
+     * @Description: 删除家属信息和相关车辆信息
      * @author: Hu
      * @since: 2020/12/25 14:46
      * @Param:
@@ -296,8 +296,16 @@ public class RelationServiceImpl implements IRelationService {
     @Override
     @Transactional
     public void deleteHouseMemberCars(Long id,String uid) {
-        houseMemberMapper.delete(new QueryWrapper<HouseMemberEntity>().eq("uid",uid).eq("id",id));
+        houseMemberMapper.delete(new QueryWrapper<HouseMemberEntity>().eq("householder_id",uid).eq("id",id));
         relationCarMapper.delete(new QueryWrapper<RelationCarEntity>().eq("relationship_id",id).eq("uid",uid));
+        List<RelationCarEntity> relationCarEntities = relationCarMapper.selectList(new QueryWrapper<RelationCarEntity>().eq("relationship_id", id).eq("uid", uid));
+        if (relationCarEntities.size()!=0){
+            for (RelationCarEntity relationCarEntity : relationCarEntities) {
+                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.delete",relationCarEntity.getId());
+            }
+        }
+
+
     }
 
     /**
