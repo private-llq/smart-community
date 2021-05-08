@@ -126,7 +126,7 @@ public class FacilityController {
 	@GetMapping("/connectData")
 	public CommonResult connectData(@RequestParam("id") Long id) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		facilityService.connectData(id,communityId);
+//		facilityService.connectData(id,communityId);
 		return CommonResult.ok();
 	}
 }
