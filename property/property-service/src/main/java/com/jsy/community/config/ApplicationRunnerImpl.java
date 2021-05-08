@@ -86,7 +86,7 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
 			facilityMapper.insertFacilityStatus(id, status, facilityHandle, facilityId, facilityAlarmHandle);
 			
 			//*******
-			FacilityUtils.uploadFaceLibrary(handle,"1");
+//			FacilityUtils.uploadFaceLibrary(handle,"1");
 			log.info(facilityEntity.getIp() + ": 摄像头登录完毕==============================================");
 		}
 	}
