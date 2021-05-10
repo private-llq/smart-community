@@ -1,6 +1,5 @@
 package com.jsy.community.callback;
 
-
 public class FDSearch {
     
     ISAPI isapi = new ISAPI();
@@ -12,8 +11,9 @@ public class FDSearch {
      * @Date 2021/5/8 15:04
      * @Param [lUserID]
      **/
-    public void getFaceLibSpace(int lUserID){
-        isapi.Isapi(lUserID,"GET /ISAPI/Intelligent/FDLib/1/picture/surplusCapacity","");
+    public boolean getFaceLibSpace(int lUserID){
+        boolean isapi = this.isapi.Isapi(lUserID, "GET /ISAPI/Intelligent/FDLib/1/picture/surplusCapacity", "");
+        return isapi;
     }
     
 }

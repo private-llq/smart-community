@@ -54,6 +54,14 @@ public class DepartmentController {
 			map.put("id", departmentEntity.getId());
 			map.put("department", departmentEntity.getDepartment());
 			map.put("nightImg", departmentEntity.getImgUrl());
+			String phone = departmentEntity.getPhone();
+			String[] phoneArray = phone.split(",");
+			List<String> phones = new ArrayList<>();
+			for (String s : phoneArray) {
+				String trim = s.trim();
+				phones.add(trim);
+			}
+			map.put("phones",phones);
 			strings.add(map);
 		}
 		return CommonResult.ok(strings);

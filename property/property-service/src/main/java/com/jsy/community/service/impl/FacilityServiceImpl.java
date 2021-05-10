@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.PropertyException;
+import com.jsy.community.callback.FDSearch;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.entity.hk.FacilityTypeEntity;
 import com.jsy.community.mapper.FacilityMapper;
 import com.jsy.community.mapper.FacilityTypeMapper;
 import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.util.facility.FacilityUtils;
@@ -21,7 +24,9 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +51,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Autowired
 	private UserHouseMapper houseMapper;
+	
+	@Autowired
+	private UserMapper userMapper;
 	
 	@Override
 	@Transactional
@@ -123,11 +131,11 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		int loginHandle = facilityMapper.getLoginHandle(id);
 		
 		// TODO: 2021/4/23 海康那个栽舅子客服给我说的必须撤防和注销设备。最后程序关闭的时候释放SDK
-		if (alarmHandle==-1) { // 说明根本就没布防或者说他没布防成功，就没必要去撤防
+		if (alarmHandle == -1) { // 说明根本就没布防或者说他没布防成功，就没必要去撤防
 			// 撤防
 			FacilityUtils.cancel(alarmHandle);
 		}
-		if (loginHandle==-1) {// 说明根本就没登录或者说他没登录成功，就没必要去注销
+		if (loginHandle == -1) {// 说明根本就没登录或者说他没登录成功，就没必要去注销
 			// 注销设备
 			FacilityUtils.logOut(loginHandle);
 		}
@@ -137,14 +145,14 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		facilityMapper.deleteMiddleFacility(id);
 		
 	}
-
+	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void updateFacility(FacilityEntity facilityEntity) {
 		// 判断此次修改是否没有修改ip，账号，密码，端口号。若没有修改就只更新基本信息即可
 		Long facilityId = facilityEntity.getId();
 		FacilityEntity facility = facilityMapper.selectById(facilityId);
-		if (facility==null) {
+		if (facility == null) {
 			throw new PropertyException("请选择你要更改的设备,或该设备不存在");
 		}
 		// ip，账号，密码，端口号 都没有发生改变
@@ -185,7 +193,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			// 更新状态表[这里采用的不是更新表，而是直接删除原本条数据，重新新增数据]
 			facilityMapper.deleteMiddleFacility(facilityId);
 			long id = SnowFlake.nextId();
-			facilityMapper.insertFacilityStatus(id,status,handle,facilityId,facilityAlarmHandle);
+			facilityMapper.insertFacilityStatus(id, status, handle, facilityId, facilityAlarmHandle);
 		}
 	}
 	
@@ -206,20 +214,20 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			}
 		}
 		HashMap<String, Integer> map = new HashMap<>();
-		map.put("onlineCount",onlineCount);
-		map.put("failCount",failCount);
+		map.put("onlineCount", onlineCount);
+		map.put("failCount", failCount);
 		return map;
 	}
 	
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void flushFacility(Integer page, Integer size,String facilityTypeId) {
+	public void flushFacility(Integer page, Integer size, String facilityTypeId) {
 		//1. 获取当前页的数据
 		Page<FacilityEntity> entityPage = new Page<>(page, size);
 		
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("facility_type_id",facilityTypeId);
+		wrapper.eq("facility_type_id", facilityTypeId);
 		Page<FacilityEntity> facilityEntityPage = facilityMapper.selectPage(entityPage, wrapper);
 		List<FacilityEntity> list = facilityEntityPage.getRecords();
 		
@@ -230,7 +238,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			
 			// 更新该句柄的设备在线状态
 			int online = FacilityUtils.isOnline(handle);
-			facilityMapper.updateStatusByFacilityId(online,facilityEntity.getId());
+			facilityMapper.updateStatusByFacilityId(online, facilityEntity.getId());
 		}
 		
 	}
@@ -238,17 +246,41 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Override
 	public FacilityEntity listByIp(String ip) {
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("ip",ip);
+		wrapper.eq("ip", ip);
 		return facilityMapper.selectOne(wrapper);
 	}
 	
 	@Override
-	public void connectData(Long id,Long communityId) {
-		//判断是否是一个全新的摄像机
-		//不是
+	public void connectData(Long id, Long communityId) {
+		//0. 查询该设备的唯一用户句柄
+		int handle = facilityMapper.selectFacilityHandle(id);
 		
-		//是
-		//1. 查询该社区的所有已认证的用户数据
-//		houseMapper.listAuthUser
+		//判断是否是一个全新的摄像机
+		FDSearch fdSearch = new FDSearch();
+		boolean flag = fdSearch.getFaceLibSpace(handle);
+		if (!flag) {
+			//不是
+			//1. 查询redis里面
+			log.info("不是一个全新的摄像机");
+		} else {
+			//是
+			//1. 查询该社区的所有已认证的用户id
+			List<String> ids = houseMapper.listAuthUserId(communityId);
+			//2. 批量查询已认证的用户数据
+			List<UserEntity> userList = userMapper.listAuthUserInfo(ids);
+			//2. 上传数据
+			for (UserEntity user : userList) {
+				try {
+					log.info("开始上传人脸");
+					if (StringUtils.isEmpty(user.getFaceUrl())) {
+						continue;
+					}
+					FacilityUtils.uploadFaceLibrary(handle, "1", user);
+				} catch (IOException e) {
+					e.printStackTrace();
+					log.info("上传人脸失败");
+				}
+			}
+		}
 	}
 }
