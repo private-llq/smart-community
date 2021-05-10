@@ -30,4 +30,13 @@ public interface IUserInformService extends IService<UserInformEntity> {
      * @return              返回影响行数
      */
     Integer regularCleaning(String beforeTime);
+
+    /**
+     * @Description: 查看当前人员是否有未读消息
+     * @author: Hu
+     * @since: 2021/5/10 15:06
+     * @Param:
+     * @return:
+     */
+    Integer totalInForm(String uid);
 }

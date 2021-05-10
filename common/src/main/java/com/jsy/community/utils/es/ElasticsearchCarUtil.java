@@ -161,7 +161,7 @@ public class ElasticsearchCarUtil {
             boolQuery.must(new TermQueryBuilder("carType", query.getCarType()));
         }
         //按小区查询，展示不用
-//        boolQuery.must(new TermQueryBuilder("communityId", info.getCommunityId()));
+        boolQuery.must(new TermQueryBuilder("communityId", info.getCommunityId()));
 
         //创建时间排序
         sourceBuilder.sort(new FieldSortBuilder("createTime").order(SortOrder.DESC));
