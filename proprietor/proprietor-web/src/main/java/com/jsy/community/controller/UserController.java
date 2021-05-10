@@ -401,12 +401,24 @@ public class UserController {
         }
         return CommonResult.ok(blinkResult);
     }
-
-//    @RequestMapping("/test")
-//    public String test(){
-//        HttpGet httpGet = MyHttpUtils.httpGetWithoutParams("https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF");
-//        byte[] byteData = (byte[]) MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_BYTE);
-//        String filePath = MinioUtils.upload(byteData,"face-url");
-//        return filePath;
-//    }
+    
+    /**
+    * @Description: 用户简单信息查询(单服务，单表)
+     * @Param: []
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: chq459799974
+     * @Date: 2021/5/10
+    **/
+    @Login
+    @ApiOperation("用户简单信息查询(快接口)")
+    @GetMapping("info/simple")
+    public CommonResult getSimpleInfo(){
+        UserEntity userEntity = userService.queryUserDetailByUid(UserUtils.getUserId());
+        if(userEntity == null){
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"用户不存在");
+        }
+        UserEntity returnEntity = new UserEntity();
+        returnEntity.setIsRealAuth(userEntity.getIsRealAuth()); //实名 0.否 1.已实名 2.已实人
+        return CommonResult.ok(returnEntity,"查询成功");
+    }
 }
