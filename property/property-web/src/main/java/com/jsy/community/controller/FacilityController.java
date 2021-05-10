@@ -47,7 +47,6 @@ public class FacilityController {
 	
 	@ApiOperation("获取设备作用")
 	@GetMapping("/getFacilityTypeEffect")
-	// 完成
 	public CommonResult getFacilityTypeEffect() {
 		List<CommonConst> constList = commonConstService.getFacilityTypeEffect();
 		return CommonResult.ok(constList);
@@ -55,7 +54,6 @@ public class FacilityController {
 	
 	@ApiOperation("添加设备")
 	@PostMapping("/addFacility")
-	// 完成
 	public CommonResult addFacility(@RequestBody FacilityEntity facilityEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		facilityEntity.setCommunityId(communityId);
@@ -73,7 +71,6 @@ public class FacilityController {
 	
 	@ApiOperation("分页查询设备")
 	@PostMapping("/listFacility")
-	// 完成
 	public CommonResult listFacility(@RequestBody BaseQO<FacilityQO> facilityQO) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		
@@ -88,7 +85,6 @@ public class FacilityController {
 	
 	@ApiOperation("获取设备在线离线数")
 	@GetMapping("/getCount")
-	// 完成
 	public CommonResult getCount(@ApiParam("设备分类Id") @RequestParam("typeId") Long typeId) {
 		Map<String, Integer> map = facilityService.getCount(typeId);
 		return CommonResult.ok(map);
@@ -108,7 +104,6 @@ public class FacilityController {
 	
 	@ApiOperation("删除设备")
 	@GetMapping("/deleteFacility")
-	// 完成
 	public CommonResult deleteFacility(@RequestParam("id") Long id) {
 		facilityService.deleteFacility(id);
 		return CommonResult.ok();
@@ -116,7 +111,6 @@ public class FacilityController {
 	
 	@ApiOperation("刷新设备")
 	@GetMapping("/flushFacility")
-	// 完成
 	public CommonResult flushFacility(@RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("facilityTypeId") String facilityTypeId) {
 		facilityService.flushFacility(page, size, facilityTypeId);
 		return CommonResult.ok();
@@ -126,7 +120,7 @@ public class FacilityController {
 	@GetMapping("/connectData")
 	public CommonResult connectData(@RequestParam("id") Long id) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-//		facilityService.connectData(id,communityId);
+		facilityService.connectData(id,communityId);
 		return CommonResult.ok();
 	}
 }

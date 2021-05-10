@@ -10,6 +10,7 @@ import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.entity.hk.FacilityTypeEntity;
 import com.jsy.community.mapper.FacilityMapper;
 import com.jsy.community.mapper.FacilityTypeMapper;
+import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.util.facility.FacilityUtils;
@@ -42,6 +43,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Autowired
 	private FacilityTypeMapper facilityTypeMapper;
+	
+	@Autowired
+	private UserHouseMapper houseMapper;
 	
 	@Override
 	@Transactional
@@ -239,7 +243,12 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 	
 	@Override
-	public void connectData(Long id) {
-	
+	public void connectData(Long id,Long communityId) {
+		//判断是否是一个全新的摄像机
+		//不是
+		
+		//是
+		//1. 查询该社区的所有已认证的用户数据
+//		houseMapper.listAuthUser
 	}
 }

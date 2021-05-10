@@ -6245,7 +6245,10 @@ DVR实现巡航数据结构
 	}
 
 	public static class NET_DVR_STRING_POINTER extends Structure {
-		public byte[] byString = new byte[2 * 1024];
+		public byte[] byString;
+		public NET_DVR_STRING_POINTER(int iLen){
+			byString=new byte[iLen];
+		}
 	}
 
 	public static class NET_DVR_XML_CONFIG_OUTPUT extends Structure {

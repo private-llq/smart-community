@@ -88,5 +88,5 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date 2021/4/29 10:56
 	 * @Param [id]
 	 **/
-	void connectData(Long id);
+	void connectData(Long id,Long communityId);
 }
