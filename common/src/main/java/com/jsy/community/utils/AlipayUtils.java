@@ -49,15 +49,21 @@ public class AlipayUtils {
 		certAlipayRequest.setCharset("utf-8");
 		//设置签名类型
 		certAlipayRequest.setSignType("RSA2");
-		//设置应用公钥证书路径
-		certAlipayRequest.setCertPath("D:/ali_cert/appCertPublicKey_2021002119679359.crt");
-//		certAlipayRequest.setCertPath(certPath);
-		//设置支付宝公钥证书路径
-		certAlipayRequest.setAlipayPublicCertPath("D:/ali_cert/alipayCertPublicKey_RSA2.crt");
-//		certAlipayRequest.setAlipayPublicCertPath(alipayPublicCertPath);
-		//设置支付宝根证书路径
-		certAlipayRequest.setRootCertPath("D:/ali_cert/alipayRootCert.crt");
-//		certAlipayRequest.setRootCertPath(rootCertPath);
+		if(System.getProperty("os.name").startsWith("Win")){
+			//设置应用公钥证书路径
+			certAlipayRequest.setCertPath("D:/ali_cert/appCertPublicKey_2021002119679359.crt");
+			//设置支付宝公钥证书路径
+			certAlipayRequest.setAlipayPublicCertPath("D:/ali_cert/alipayCertPublicKey_RSA2.crt");
+			//设置支付宝根证书路径
+			certAlipayRequest.setRootCertPath("D:/ali_cert/alipayRootCert.crt");
+		}else{
+			//设置应用公钥证书路径
+			certAlipayRequest.setCertPath(certPath);
+			//设置支付宝公钥证书路径
+			certAlipayRequest.setAlipayPublicCertPath(alipayPublicCertPath);
+			//设置支付宝根证书路径
+			certAlipayRequest.setRootCertPath(rootCertPath);
+		}
 	}
 	
 	//获取证书请求客户端
