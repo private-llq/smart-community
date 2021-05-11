@@ -95,7 +95,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://blue99x.vicp.net:9527/api/v1/payment/callback");
+        map.put("notify_url","http:222.178.212.28:9527/api/v1/payment/callback");
         map.put("amount",hashMap);
         //转json
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);

@@ -67,6 +67,10 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
         return map;
     }
 
+    public static void main(String[] args) {
+        System.out.println(RandomUtil.randomDouble(-500, 1, 2, RoundingMode.CEILING));
+    }
+
     /**
      * @Description: 查询组下面已经缴过费的户号
      * @author: Hu

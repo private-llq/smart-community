@@ -10,18 +10,18 @@ spring:
       transport:
         dashboard: 127.0.0.1:1111
     gateway:
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedHeaders: "*"
-            allowedOrigins: "*"
-            allowCredentials: true
-            allowedMethods:
-              - GET
-              - POST
-              - DELETE
-              - PUT
-              - OPTION
+#      globalcors:
+#        corsConfigurations:
+#          '[/**]':
+#            allowedHeaders: "*"
+#            allowedOrigins: "*"
+#            allowCredentials: true
+#            allowedMethods:
+#              - GET
+#              - POST
+#              - DELETE
+#              - PUT
+#              - OPTION
       discovery:
         locator:
           enabled: true
