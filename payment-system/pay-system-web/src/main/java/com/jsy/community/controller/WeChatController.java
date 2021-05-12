@@ -119,7 +119,7 @@ public class WeChatController {
         rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
-                    message.getMessageProperties().setHeader("x-delay",60000);
+                    message.getMessageProperties().setHeader("x-delay",60000*30);
                 return message;
             }
         });
