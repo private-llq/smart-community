@@ -160,7 +160,7 @@ public class ElasticsearchCarUtil {
         if (query.getCarType()!=null&&query.getCarType()!=0) {
             boolQuery.must(new TermQueryBuilder("carType", query.getCarType()));
         }
-        //按小区查询，展示不用
+        //只查询当前的小区的车辆
         boolQuery.must(new TermQueryBuilder("communityId", info.getCommunityId()));
 
         //创建时间排序

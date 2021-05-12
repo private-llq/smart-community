@@ -45,6 +45,7 @@ public class WeChatListener{
      */
     @RabbitListener(queues = {"queue_wechat_delay"})
     public void receive_wechat_delay (String msg, Message message, Channel channel) throws Exception {
+        System.out.println("oj8k");
         WeChatOrderEntity one = weChatService.getOrderOne(msg);
         if (one!=null){
             if (one.getOrderStatus()!=2){

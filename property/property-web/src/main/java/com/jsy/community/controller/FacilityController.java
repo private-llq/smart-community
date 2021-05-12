@@ -19,6 +19,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,12 +46,22 @@ public class FacilityController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICommonConstService commonConstService;
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 	
 	@ApiOperation("获取设备作用")
 	@GetMapping("/getFacilityTypeEffect")
 	public CommonResult getFacilityTypeEffect() {
 		List<CommonConst> constList = commonConstService.getFacilityTypeEffect();
 		return CommonResult.ok(constList);
+	}
+
+	@ApiOperation("获取设备作用")
+	@GetMapping("/get")
+	public CommonResult get() {
+		rabbitTemplate.convertAndSend("exchange_camera_face","queue.camera.face","曹尼玛");
+		return CommonResult.ok();
 	}
 	
 	@ApiOperation("添加设备")

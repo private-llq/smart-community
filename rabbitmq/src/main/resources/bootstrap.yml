@@ -1,20 +1,4 @@
 spring:
-#  rabbitmq:
-#    host: 222.178.212.29
-#    port: 5672
-#    username: root
-#    password: root
-#    virtualHost: /
-#    listener:
-#      simple:
-#        acknowledge-mode: MANUAL
-#        retry:
-#          enabled: true
-#  redis:
-#    port: 6379
-#    host: 222.178.212.29
-#    password: smart99--
-#    database: 0
   main:
     allow-bean-definition-overriding: true
   application:
