@@ -46,7 +46,7 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 	public IFacilityService facilityService;
 	
 	@PostConstruct
-	public void init(){
+	public void init() {
 		FMSGCallBack_V31Impl = this;
 		FMSGCallBack_V31Impl.carTrackService = this.carTrackService;
 		FMSGCallBack_V31Impl.facilityService = this.facilityService;
@@ -60,11 +60,12 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 	 * @Description
 	 * @Date 2021/4/20 10:36
 	 * @Param [
-	 *      lCommand：   上传的消息类型，不同的报警信息对应不同的类型，通过类型区分是什么报警信息，详见SDK中NET_DVR_SetDVRMessageCallBack_V31下的 “Remarks” 列表。
-	 *      pAlarmer：   报警设备信息，包括设备序列号、IP地址、登录IUserID句柄等
-	 *      pAlarmInfo： 报警信息，通过lCommand值判断pAlarmer对应的结构体，详见“Remarks”中列表
-	 *      dwBufLen：   报警信息缓存大小
-	 *      pUser：      用户数据
+	 * lCommand：   上传的消息类型，不同的报警信息对应不同的类型，通过类型区分是什么报警信息，详见SDK中NET_DVR_SetDVRMessageCallBack_V31下的 “Remarks” 列表。
+	 * pAlarmer：   报警设备信息，包括设备序列号、IP地址、登录IUserID句柄等
+	 * pAlarmInfo： 报警信息，通过lCommand值判断pAlarmer对应的结构体，详见“Remarks”中列表
+	 * dwBufLen：   报警信息缓存大小
+	 * pUser：      用户数据
+	 * pS: 该接口中回调函数的第一个参数（lCommand）和第三个参数（pAlarmInfo）是密切关联的
 	 * ]
 	 **/
 	@Override
@@ -76,16 +77,15 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 	/**
 	 * @return void
 	 * @Author lihao
-	 * @Description
-	 * 人脸抓拍：支持对运动人脸进行检测、跟踪、抓拍、评分、筛选，输出最优的人脸抓图，最多同时检测60个/帧，支持前端人脸比对，支持最多3个人脸库的管理，支持最多9万张人脸库，每个人脸库支持的人脸数量为30000个，单张人脸不超过300kb  ->来自产品客服回答
+	 * @Description 人脸抓拍：支持对运动人脸进行检测、跟踪、抓拍、评分、筛选，输出最优的人脸抓图，最多同时检测60个/帧，支持前端人脸比对，支持最多3个人脸库的管理，支持最多9万张人脸库，每个人脸库支持的人脸数量为30000个，单张人脸不超过300kb  ->来自产品客服回答
 	 * 人脸比对：是设备实现的，设备配置好之后自动抓拍和人脸库里面人脸图片比对，比对相似度超过相似的阈值时就是人脸比对成功，不是上传相似度最高的结果  ->来自技术客服回答
 	 * @Date 2021/3/4 10:17
 	 * @Param [lCommand, pAlarmer, pAlarmInfo, dwBufLen, pUser]
 	 **/
 	public void AlarmDataHandle(int lCommand, HCNetSDK.NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser) {
-		//lCommand是传的报警类型
+		//lCommand是传的报警类型，有各种各样的报警类型。
 		switch (lCommand) {
-//			case HCNetSDK.COMM_UPLOAD_FACESNAP_RESULT: //人脸识别结果上传
+//			case HCNetSDK.COMM_UPLOAD_FACESNAP_RESULT: //人脸抓拍结果信息
 //				log.info("");
 //				log.info("设备：" + new String(pAlarmer.sDeviceIP) + ",人脸抓拍事件开始触发");
 //				//实时人脸抓拍上传
@@ -159,14 +159,18 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 			 * @Date 2021/3/4 9:51
 			 * @Param [lCommand, pAlarmer, pAlarmInfo, dwBufLen, pUser]
 			 **/
-			case HCNetSDK.COMM_SNAP_MATCH_ALARM:  //人脸比对结果上传
+			case HCNetSDK.COMM_SNAP_MATCH_ALARM:  //人脸比对结果信息
+				log.info("");
+				log.info("人脸名单比对报警事件开始触发");
+				
 				PeopleTrackEntity peopleTrackEntity = new PeopleTrackEntity();
 				
 				// 根据拍摄设备ip获取设备相关信息
 				byte[] ipFace = pAlarmer.sDeviceIP;
 				String facilityIp = new String(ipFace);
 				FacilityEntity facility = FMSGCallBack_V31Impl.facilityService.listByIp(facilityIp);
-				
+				// 拍摄设备所在社区
+				peopleTrackEntity.setCommunityId(facility.getCommunityId());
 				// 拍摄设备名称
 				peopleTrackEntity.setFacilityName(facility.getName());
 				// 拍摄设备编号
@@ -174,9 +178,6 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 				// 拍摄设备地址
 				peopleTrackEntity.setFacilityAddress(facility.getAddress());
 				
-				
-				log.info("");
-				log.info("人脸名单比对报警事件开始触发");
 				//人脸名单比对报警
 				// NET_VCA_FACESNAP_MATCH_ALARM：人脸比对结果报警上传结构体。
 				// *************意思是把当前摄像头抓拍到的信息赋值给 NET_VCA_FACESNAP_MATCH_ALARM【人脸比对结果报警上传结构体】*******************//
@@ -190,39 +191,40 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 				// dwSnapPicLen：设备识别抓拍图片长度
 				// byPicTransType：图片数据传输方式: 0- 二进制，1- URL路径(HTTP协议的图片URL)
 				// ----------------大图[远距离图]
-				// 将设备抓拍的图片写出到存储设备[或上传到服务器]
+				// 将设备抓拍的图片写出到电脑上[或上传到存储服务器]
 				// dwSnapPicLen：设备识别抓拍图片长度     byPicTransType：图片数据传输方式: 0- 二进制，1- URL路径(HTTP协议的图片URL)
-				if ((strFaceSnapMatch.dwSnapPicLen > 0) && (strFaceSnapMatch.byPicTransType == 0)) {
-					SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss"); //设置日期格式
-					String time = df.format(new Date()); // new Date()为获取当前系统时间
-					FileOutputStream fout;
-					try {
-						String filename = System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\face\\" + time + "(人脸比对)设备识别抓拍图片" + ".jpg";
-						fout = new FileOutputStream(filename);
-						
-						//将字节写入文件
-						long offset = 0;
-						ByteBuffer buffers = strFaceSnapMatch.pSnapPicBuffer.getByteBuffer(offset, strFaceSnapMatch.dwSnapPicLen);
-						byte[] bytes = new byte[strFaceSnapMatch.dwSnapPicLen];
-						
-						// 拍摄留影 TODO: 2021/4/26 这里有点问题
-						String capture = MinioUtils.uploadPic(bytes, "dasd");
-						peopleTrackEntity.setCapture(capture);
-						FMSGCallBack_V31Impl.peopleTrackService.insertPeopleTrack(peopleTrackEntity);
-						
-						buffers.rewind();
-						buffers.get(bytes);
-						fout.write(bytes);
-						fout.close();
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+//				if ((strFaceSnapMatch.dwSnapPicLen > 0) && (strFaceSnapMatch.byPicTransType == 0)) {
+//					SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss"); //设置日期格式
+//					String time = df.format(new Date()); // new Date()为获取当前系统时间
+//					FileOutputStream fout;
+//					try {
+//						String filename = System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\face\\" + time + "(人脸比对)设备识别抓拍图片" + ".jpg";
+//						fout = new FileOutputStream(filename);
+//
+//						//将字节写入文件
+//						long offset = 0;
+//						ByteBuffer buffers = strFaceSnapMatch.pSnapPicBuffer.getByteBuffer(offset, strFaceSnapMatch.dwSnapPicLen);
+//						byte[] bytes = new byte[strFaceSnapMatch.dwSnapPicLen];
+//
+//						// 拍摄留影
+//						String capture = MinioUtils.uploadPic(bytes, "dasd");
+//						peopleTrackEntity.setCapture(capture);
+//						FMSGCallBack_V31Impl.peopleTrackService.insertPeopleTrack(peopleTrackEntity);
+//
+//						buffers.rewind();
+//						buffers.get(bytes);
+//						fout.write(bytes);
+//						fout.close();
+//					} catch (FileNotFoundException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
 				
+				/////////////////////////////////////////////////////////////////////人脸子图/////////////////////////////////////////////////////////////////////
 				// struSnapInfo：人脸抓拍上传信息
 				// dwSnapFacePicLen：抓拍人脸子图的长度，为0表示没有图片，大于0表示有图片
 				// byPicTransType：图片数据传输方式: 0- 二进制，1- URL路径(HTTP协议的图片URL)
@@ -239,62 +241,56 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 						long offset = 0;
 						ByteBuffer buffers = strFaceSnapMatch.struSnapInfo.pBuffer1.getByteBuffer(offset, strFaceSnapMatch.struSnapInfo.dwSnapFacePicLen);
 						byte[] bytes = new byte[strFaceSnapMatch.struSnapInfo.dwSnapFacePicLen];
+						String capture = MinioUtils.uploadPic(bytes, "dasd");
+						peopleTrackEntity.setCapture(capture);
 						buffers.rewind();
 						buffers.get(bytes);
 						fout.write(bytes);
 						fout.close();
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
+					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 				
 				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				// struBlockListInfo：人脸比对报警信息  dwBlockListPicLen：黑名单人脸子图的长度，为0表示没有图片，大于0表示有图片       byPicTransType：图片数据传输方式: 0- 二进制，1- URL路径(HTTP协议的图片URL)
+				/////////////////////////////////////////////////////////////////////匹配的人脸库信息/////////////////////////////////////////////////////////////////////
+				// struBlockListInfo：人脸比对报警信息  dwBlockListPicLen：黑名单（指的就是人脸库）人脸子图的长度，为0表示没有图片，大于0表示有图片       byPicTransType：图片数据传输方式: 0- 二进制，1- URL路径(HTTP协议的图片URL)
 				// ps：这里的黑名单报警  我的理解就是：黑名单指的就是从人脸库中获取到的最符合当前抓拍的人脸
-				// 将人脸库中最匹配的人脸图片写出到存储设备[或上传到服务器]
+				// 将人脸库中最匹配的人脸图片写出到电脑备[或上传到存储服务器]
 				if ((strFaceSnapMatch.struBlockListInfo.dwBlockListPicLen > 0) && (strFaceSnapMatch.byPicTransType == 0)) {
-					SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
-					String newName = sf.format(new Date());
-					FileOutputStream fout;
-					try {
-						String filename = System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\face\\" + newName + "(人脸比对)最符合的人脸" + strFaceSnapMatch.fSimilarity + ".jpg";
-						fout = new FileOutputStream(filename);
-						//将字节写入文件
-						long offset = 0;
-						ByteBuffer buffers = strFaceSnapMatch.struBlockListInfo.pBuffer1.getByteBuffer(offset, strFaceSnapMatch.struBlockListInfo.dwBlockListPicLen);
-						byte[] bytes = new byte[strFaceSnapMatch.struBlockListInfo.dwBlockListPicLen];
-						buffers.rewind();
-						buffers.get(bytes);
-						fout.write(bytes);
-						fout.close();
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					float fSimilarity = strFaceSnapMatch.fSimilarity;
+					if (fSimilarity < 0.8) {  // TODO: 2021/5/11 暂定个0.8   如果相识度小于0.8就不算业主
+						FMSGCallBack_V31Impl.peopleTrackService.insertPeopleTrack(peopleTrackEntity);
+					} else {
+						SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
+						String newName = sf.format(new Date());
+						FileOutputStream fout;
+						try {
+							String filename = System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\face\\" + newName + "(人脸比对)最符合的人脸" + strFaceSnapMatch.fSimilarity + ".jpg";
+							fout = new FileOutputStream(filename);
+							//将字节写入文件
+							long offset = 0;
+							ByteBuffer buffers = strFaceSnapMatch.struBlockListInfo.pBuffer1.getByteBuffer(offset, strFaceSnapMatch.struBlockListInfo.dwBlockListPicLen);
+							byte[] bytes = new byte[strFaceSnapMatch.struBlockListInfo.dwBlockListPicLen];
+							String authImg = MinioUtils.uploadPic(bytes, "dasd");
+							String peopleName = new String(strFaceSnapMatch.struBlockListInfo.struBlockListInfo.struAttribute.byName, "GBK");
+							peopleTrackEntity.setAuthImg(authImg);
+							peopleTrackEntity.setPeopleName(peopleName);
+							FMSGCallBack_V31Impl.peopleTrackService.insertPeopleTrack(peopleTrackEntity);
+							buffers.rewind();
+							buffers.get(bytes);
+							fout.write(bytes);
+							fout.close();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
+				
+				
+				//获取人脸比对报警相识度
 				try {
 					log.info("人脸名单比对报警，相识度[0.001-1]：" + strFaceSnapMatch.fSimilarity + "，人脸库姓名：" + new String(strFaceSnapMatch.struBlockListInfo.struBlockListInfo.struAttribute.byName, "GBK").trim() + "，人脸库证件信息：" + new String(strFaceSnapMatch.struBlockListInfo.struBlockListInfo.struAttribute.byCertificateNumber).trim());
 				} catch (UnsupportedEncodingException e) {
@@ -327,10 +323,6 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 				break;
 			
 			
-				
-				
-				
-				
 			//交通抓拍的终端图片上传
 			case HCNetSDK.COMM_ITS_PLATE_RESULT:
 				
@@ -408,7 +400,7 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 							fout.close();
 							
 							// 将图片存到服务器
-							carTrackEntity.setCapture(MinioUtils.uploadPic(bytes,"aop"));
+							carTrackEntity.setCapture(MinioUtils.uploadPic(bytes, "aop"));
 							
 							FMSGCallBack_V31Impl.carTrackService.insertCarTrack(carTrackEntity);
 						} catch (FileNotFoundException e) {

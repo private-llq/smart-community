@@ -27,18 +27,18 @@ public class FacilityUtils {
 	
 	// 加载HK库
 	private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
+	// 人脸与车牌的回调函数
 	private static FMSGCallBack_V31Impl dVRMessageCallBack;
 	
 	// 人脸比对
 	private static final Long EFFECT_FACE = 41565L;
-	
 	// 车牌抓拍
 	private static final Long EFFECT_CAR = 456L;
 	
 	/**
 	 * @return java.util.Map<java.lang.String, java.lang.Integer>
 	 * @Author lihao
-	 * @Description 设备登录
+	 * @Description 设备登录, 并更新设备在线状态信息
 	 * @Date 2021/4/21 16:43
 	 * @Param [ip, port, username, password]
 	 **/
@@ -46,15 +46,21 @@ public class FacilityUtils {
 		log.info(ip + "：开始登录");
 		// 对接多台设备，是否需要调用多次NET_DVR_Init接口分别初始化？
 		// 答：不是 初始化接口全局的，一次即可。NET_DVR_Init和NET_DVR_Cleanup需要配对使用，程序运行开始调用NET_DVR_Init，程序退出时调用NET_DVR_Cleanup释放资源，都只需要调用一次即可。
-		// 为什么登录设备不需要初始化  答：因为我在 ApplicationRunnerImpl 【项目一启动的时候已经初始化】
+		// 为什么登录设备这里不需要初始化  答：因为我在 ApplicationRunnerImpl 【项目一启动的时候已经初始化】
 		
 		//2. 用户注册设备    返回值：-1表示失败，其他值表示返回的用户ID值。该用户ID具有唯一性，后续对设备的操作都需要通过此ID实现。
-		// 注册之前先注销已注册的设备
+		// 登录之前先判断是否已经登录
 		if (lUserID > -1) { // lUserID：用户句柄   （每个设备都需要单独登录NET_DVR_Login_V30，登录成功返回唯一的userID）;
 			//先注销
 			hCNetSDK.NET_DVR_Logout(lUserID);
 			lUserID = -1;
 		}
+		// 登录设备函数：NET_DVR_Login_V30   返回值：-1表示失败，其他值表示返回的用户ID值。该用户ID具有唯一性，后续对设备的操作都需要通过此ID实现
+		// 参数1：设备IP地址或是静态域名，字符数不大于128个
+		// 参数2：设备端口号
+		// 参数3：登录的用户名
+		// 参数4：用户密码
+		// 参数5：设备信息
 		HCNetSDK.NET_DVR_DEVICEINFO_V30 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V30();
 		lUserID = hCNetSDK.NET_DVR_Login_V30(ip, port, username, password, m_strDeviceInfo);
 		if (lUserID == -1) {
@@ -62,11 +68,15 @@ public class FacilityUtils {
 		} else {
 			log.info(ip + "：登录成功！");
 		}
-		
-		// 设备在线状态检测
-		boolean flag = hCNetSDK.NET_DVR_RemoteControl(lUserID, 20005, null, 0);
+		log.info(ip + "：登录完毕");
+		// 设备在线状态函数：NET_DVR_RemoteControl  返回值：true表示成功[在线]  false表示失败[不在线]
+		// 参数1：用户 ID 号，NET_DVR_Login_V40 的返回值
+		// 参数2：控制命令
+		// 参数3：输入参数
+		// 参数4：输入参数长度
+		Pointer pointer = null;
+		boolean flag = hCNetSDK.NET_DVR_RemoteControl(lUserID, 20005, pointer, 0);
 		int status = flag ? 1 : 0;
-		
 		Map<String, Integer> map = new HashMap<>();
 		map.put("status", status);
 		map.put("facilityHandle", lUserID);
@@ -84,28 +94,28 @@ public class FacilityUtils {
 		log.info("开始开启设备功能");
 		//1. 判断是否登录成功
 		if (loginStatus == 1) {//0不在线 1在线
-			// TODO: 2021/4/23 这个报警布防句柄是由摄像头传过来的 且是唯一的
 			if (!facilityEffectId.equals(EFFECT_FACE) && !facilityEffectId.equals(EFFECT_CAR)) {
 				throw new PropertyException("该功能没有实现");
 			}
 			
 			int lAlarmHandle = -1;//报警布防句柄
-			//判断是否布防。尚未布防,需要布防
+			//尚未布防,需要布防
 			if (lAlarmHandle < 0) {
 				// 4.1 判断是否设置报警回调函数 若没有，则设置报警回调函数
 				if (dVRMessageCallBack == null) {
 					dVRMessageCallBack = new FMSGCallBack_V31Impl();
 					Pointer pUser = null;
-					// NET_DVR_SetDVRMessageCallBack_V31： 用于注册回调函数，接收设备报警消息等
-					//              两个参数：参数1：fMessageCallBack //[in] 回调函数    参数2：pUser  //[in] 用户数据
+					// 报警回调函数：NET_DVR_SetDVRMessageCallBack_V31   返回值：true表示成功，false表示失败
+					//             用于注册回调函数，接收设备报警消息等
+					//                  参数1：fMessageCallBack //[in] 回调函数
+					//                  参数2：pUser  //[in] 用户数据
 					//              注册回调函数，接收设备报警消息等。true：成功  false：失败
 					//              回调函数里面接收数据之后可以通过报警设备信息(NET_DVR_ALARMER)判断区分设备。
 					
-					//              返回值：TRUE表示成功，FALSE表示失败。接口返回失败请调用NET_DVR_GetLastError获取错误码，通过错误码判断出错原因。
 					if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V31(dVRMessageCallBack, pUser)) {
-						log.info("设置回调函数失败!");
+						log.info("设置报警布防回调函数失败!");
 					} else {
-						log.info("设置回调函数成功!");
+						log.info("设置报警布防回调函数成功!");
 					}
 				}
 				
@@ -131,8 +141,9 @@ public class FacilityUtils {
 					return lAlarmHandle;
 				}
 			}
+			log.info("开启设备功能成功");
 		}
-		log.info("开启设备功能失败，因为没有登录连接成功");
+		log.info("开启设备功能失败，因为设备没有登录或已掉线");
 		return -1;
 	}
 	
@@ -217,7 +228,7 @@ public class FacilityUtils {
 		Integer cityId = user.getCityId();
 		String cityStr = "未知";
 		if (cityId != null) {
-			cityStr = String.valueOf(cityId).substring(2,4);
+			cityStr = String.valueOf(cityId).substring(2, 4);
 		}
 		Integer provinceId = user.getProvinceId();
 		String provinceStr = null;
@@ -277,7 +288,7 @@ public class FacilityUtils {
 		byte[] byFDLibName = realName.getBytes("UTF-8");
 //		2014-12-12T00:00:00Z
 		String strInBuffer1 = new String("<FaceAppendData version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><bornTime>" + birthdayTimeStr + "</bornTime><name>");
-		String strInBuffer2 = new String("</name><sex>" + sexStr + "</sex><province>"+provinceStr+"</province><city>"+cityStr+"</city><certificateType>" + ficationTypeStr + "</certificateType><certificateNumber>" + idCard + "</certificateNumber><PersonInfoExtendList><PersonInfoExtend><id>1</id><enable>false</enable><name>test1</name><value>test2</value></PersonInfoExtend></PersonInfoExtendList></FaceAppendData>");
+		String strInBuffer2 = new String("</name><sex>" + sexStr + "</sex><province>" + provinceStr + "</province><city>" + cityStr + "</city><certificateType>" + ficationTypeStr + "</certificateType><certificateNumber>" + idCard + "</certificateNumber><PersonInfoExtendList><PersonInfoExtend><id>1</id><enable>false</enable><name>test1</name><value>test2</value></PersonInfoExtend></PersonInfoExtendList></FaceAppendData>");
 		int iStringSize = byFDLibName.length + strInBuffer1.length() + strInBuffer2.length();
 		HCNetSDK.BYTE_ARRAY ptrByte = new HCNetSDK.BYTE_ARRAY(iStringSize);
 		System.arraycopy(strInBuffer1.getBytes(), 0, ptrByte.byValue, 0, strInBuffer1.length());
@@ -356,6 +367,16 @@ public class FacilityUtils {
 		}
 	}
 	
+	/**
+	 * @return void
+	 * @Author 91李寻欢
+	 * @Description 以图搜图     设备不支持该功能
+	 * @Date 2021/5/11 15:52
+	 * @Param []
+	 **/
+	public void search(){
+	
+	}
 	
 	/**
 	 * 得到文件流
@@ -394,5 +415,12 @@ public class FacilityUtils {
 		}
 		inStream.close();
 		return outStream.toByteArray();
+	}
+	
+	public static void main(String[] args) {
+		CLibrary.INSTANCE.printf("Hello, World\n");
+		for (int i = 0; i < args.length; i++) {
+			CLibrary.INSTANCE.printf("Argument %d: %s\n", i, args[i]);
+		}
 	}
 }

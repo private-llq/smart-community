@@ -219,7 +219,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		return map;
 	}
 	
-	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void flushFacility(Integer page, Integer size, String facilityTypeId) {

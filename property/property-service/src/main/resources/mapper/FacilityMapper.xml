@@ -5,14 +5,10 @@
         select f.id,number ,name ,facility_type_id,serial_number,ip,model_number,address,create_person,create_time,data_connect_time,remark,is_connect_data,username,password,port,facility_effect_id
         from t_facility f,t_facility_status fs
         <where>
-            <!-- 数据同步时间-->
-            <if test="qo.startTime!=null and qo.endTime!=null">
-                and data_connect_time between #{qo.startTime} and #{qo.endTime}
-            </if>
-            <if test="qo.startTime!=null and qo.endTime==null">
+            <if test="qo.startTime!=null">
                 and data_connect_time &gt; #{qo.startTime}
             </if>
-            <if test="qo.startTime==null and qo.endTime!=null">
+            <if test="qo.endTime!=null">
                 and data_connect_time &lt;  #{qo.endTime}
             </if>
             <if test="qo.isConnectData!=null">

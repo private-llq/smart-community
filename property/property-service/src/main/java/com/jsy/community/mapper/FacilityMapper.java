@@ -23,6 +23,13 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	
 	List<FacilityEntity> listFacility(@Param("qo") FacilityQO facilityQO, @Param("page") Page<FacilityEntity> info);
 	
+	/**
+	 * @return void
+	 * @Author 91李寻欢
+	 * @Description 保存设备状态信息
+	 * @Date 2021/5/11 12:55
+	 * @Param [id, status, facilityHandle, facilityId, facilityAlarmHandle]
+	 **/
 	void insertFacilityStatus(@Param("id") long id, @Param("status") Integer status, @Param("facilityHandle") Integer facilityHandle, @Param("facilityId") Long facilityId, @Param("facilityAlarmHandle") int facilityAlarmHandle);
 	
 	/**
