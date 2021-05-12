@@ -34,6 +34,12 @@ public class UserTicketEntity extends BaseEntity{
 	@ApiModelProperty(value = "要求最低消费(门槛)")
 	private BigDecimal leastConsume;
 	
+	@ApiModelProperty(value = "面值(String)")
+	private String moneyStr;
+	
+	@ApiModelProperty(value = "要求最低消费(门槛)(String)")
+	private String leastConsumeStr;
+	
 	@ApiModelProperty(value = "是否使用 0.未使用 1.已使用")
 	private Integer status;
 	
