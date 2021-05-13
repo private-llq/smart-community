@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.CarTrackMapper">
+
+
+    <select id="listCarTrack" resultType="com.jsy.community.entity.CarTrackEntity">
+        select id,facility_id,car_number,facility_number,facility_address,color,auth_img,car_owner,capture,auth_type,facility_name,create_time,update_time
+        from t_car_track
+        <where>
+            <if test="qo.query.carNumber!=null and qo.query.carNumber!=''">
+                car_number like concat ("%",#{qo.query.carNumber},"%")
+            </if>
+            <if test="qo.query.color!=null and qo.query.color!=''">
+                and color = #{qo.query.color}
+            </if>
+            <if test="qo.query.facilitySearch!=null and qo.query.facilitySearch!=''">
+                and facility_number like concat ("%",#{qo.query.facilitySearch},"%") or facility_name like concat ("%",#{qo.query.facilitySearch},"%") or facility_address like concat ("%",#{qo.query.facilitySearch},"%")
+            </if>
+            <if test="qo.query.authType!=null">
+                and auth_type = #{qo.query.authType}
+            </if>
+            <if test="qo.query.startTime!=null and qo.query.endTime!=null">
+                and create_time between #{qo.query.startTime} and #{qo.query.endTime}
+            </if>
+            <if test="qo.query.startTime!=null and qo.query.endTime==null">
+                and create_time &gt; #{qo.query.startTime}
+            </if>
+            <if test="qo.query.startTime==null and qo.query.endTime!=null">
+                and create_time &lt;  #{qo.query.endTime}
+            </if>
+            and community_id = #{qo.query.communityId} and deleted = 0
+        </where>
+        order by create_time desc
+    </select>
+
+</mapper>

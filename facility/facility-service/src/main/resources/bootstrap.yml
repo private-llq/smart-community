@@ -1,0 +1,39 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: facility-service
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml
+        # 全部服务提供模块固定不变的配置，比如mybatis plus配置，三方登录配置，
+        extension-configs[0]:
+          data-id: common-service-fixed.yaml
+          refresh: true
+        extension-configs[1]:
+          data-id: common.yaml
+          refresh: true
+
+dubbo:
+  registry:
+    address: nacos://127.0.0.1:8848
+    use-as-metadata-center: false
+  protocol:
+    name: dubbo
+    port: -1
+  application:
+    name: ${spring.application.name}
+  cloud:
+    subscribed-services: facility-web
+  consumer:
+    retries: 0
+    timeout: 99999
+  provider:
+    retries: 0
+    timeout: 99999
