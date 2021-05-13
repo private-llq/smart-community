@@ -24,9 +24,9 @@ public class UnionPayConfig {
     // 银联回调验签公钥
     public final static String VERIFY_PUBLIC_KEY = "30820122300d06092a864886f70d01010105000382010f003082010a0282010100c15b0bb2626606e1c9514e2fe3f67965464459b9373f3e1b1ee3dcedd8e3670a7aff82afb63417a672ab2d5946122eb46ffbfde4ed2732f2dbb3ee3a0f8d9c764c306dfad4306934fd15629332c3645d33a305a8ccd95fed002aa3811170515f39f1ac5068a111159c1a4df5d0d3b4f4261ee7d27e9c38437ba17241a5aa863c11dc6a8f4ef2792c4dbb586c51811892edf1c864b5545f32bad2598778e8d0ad910b659687a057751b8a23b70e33bb4f98d95cab9950bd7b8de815b07da63b9adc5f65503574461d23ca49231cee206b4ae6fa2d129a86889aa3771d0668c56c2c04ba4dd916211e746537245af239d151dd284734702ea626f52f5fbd0a934f0203010001";
     // 银联支付公钥
-    public final static String PUBLIC_KEY = "D:\\ideaProjectDirectory\\smart-community-copy\\common\\src\\main\\resources\\certificate\\2048-cfca.der";
+    public final static String PUBLIC_KEY = "2048-cfca.der";
     // 银联支付私钥
-    public final static String PRIVATE_KEY = "D:\\ideaProjectDirectory\\smart-community-copy\\common\\src\\main\\resources\\certificate\\A0010000-0014.pfx";
+    public final static String PRIVATE_KEY = "A0010000-0014.pfx";
     public final static String PRIVATE_KEY_PASS = "123456";
     // 交易请求方法头
     public final static String TRANS_METHOD_HEADER = "gnete.wallbc.WallbcOpenapi102TransRpcService";

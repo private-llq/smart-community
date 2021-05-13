@@ -102,11 +102,13 @@ public class UnionPayUtils {
      *@Date: 2021/4/10 14:00
      **/
     private DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> buildClient() {
+        String certificatePath = UnionPayUtils.class.getResource("/").getPath().replaceFirst("/", "");
+        certificatePath = certificatePath.replace("payment-system/pay-system-service", "common") + "certificate/";
         DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> client =
                 DefaultOpenApiRequestClient.builder(UnionPayConfig.TEST_REQUEST_URL,
                         UnionPayConfig.APP_ID,
-                        UnionPayConfig.SHA1_WITH_RSA).setHexPrivateKey(UnionPayConfig.PRIVATE_KEY)
-                        .setHexPublicKey(UnionPayConfig.PUBLIC_KEY).setPrivateKeyPassword(UnionPayConfig.PRIVATE_KEY_PASS).build();
+                        UnionPayConfig.SHA1_WITH_RSA).setHexPrivateKey(certificatePath + UnionPayConfig.PRIVATE_KEY)
+                        .setHexPublicKey(certificatePath + UnionPayConfig.PUBLIC_KEY).setPrivateKeyPassword(UnionPayConfig.PRIVATE_KEY_PASS).build();
         return client;
     }
 
