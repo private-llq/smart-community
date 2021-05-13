@@ -31,10 +31,16 @@ public class RegexUtils {
 	 * 年代正则表达式：匹配用户选择的是否是1930~当前年
 	 */
 	public static final String REGEX_YEAR = "^[0-9]{4}";
+
 	/**
 	 * 正则表达式：验证数字性别、参数只能 0-2
 	 */
 	public static final String REGEX_GENDER = "^[0-2]$";
+
+	/**
+	 * 正则表达式：验证6位数字
+	 */
+	public static final String REGEX_SIX_NUM = "^[0-9]{6}$";
 
 	/**
 	 * 正则表达式：验证中国姓名

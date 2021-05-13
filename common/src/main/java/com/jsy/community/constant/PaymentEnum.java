@@ -250,5 +250,100 @@ public interface PaymentEnum {
 			return this.index+"_"+this.name;
 		}
 	}
-	
+
+	/**
+	 *@Author: Pipi
+	 *@Description: 银联支付短信模板编码
+	 *@Param: null:
+	 *@Return:
+	 *@Date: 2021/4/12 17:10
+	 **/
+	enum SmsTmpltCode {
+		COMMON("COMMON", "1"),
+		REGIST("REGIST", "2"),
+		ACTIVATE("ACTIVATE", "3"),
+		TRADE("TRADE", "4");
+
+		private String name;
+		private String index;
+
+		SmsTmpltCode(String name, String index) {
+			this.name = name;
+			this.index = index;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getIndex() {
+			return index;
+		}
+
+		public void setIndex(String index) {
+			this.index = index;
+		}
+
+		public static String getName(String index) {
+			for (SmsTmpltCode value : SmsTmpltCode.values()) {
+				if (index.equals(value.getIndex())) {
+					return value.getName();
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 *@Author: Pipi
+	 *@Description: 银联支付短信业务类型
+	 *@Param: null:
+	 *@Return:
+	 *@Date: 2021/4/12 17:16
+	 **/
+	enum SmsTmpltBusinessType {
+		BIND("绑定第三方用户", 1),
+		RESET("重置密码", 2),
+		CHANGE("变更手机号", 3),
+		OPEN_ACCOUNT("开户", 4),
+		SIGN_UP("银行卡签约", 5),
+		TRADE("交易", 6);
+
+		private String name;
+		private Integer index;
+
+		SmsTmpltBusinessType(String name, Integer index) {
+			this.name = name;
+			this.index = index;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getIndex() {
+			return index;
+		}
+
+		public void setIndex(Integer index) {
+			this.index = index;
+		}
+
+		public static String getName(Integer index) {
+			for (SmsTmpltBusinessType value : SmsTmpltBusinessType.values()) {
+				if (index == value.getIndex()) {
+					return value.getName();
+				}
+			}
+			return null;
+		}
+	}
 }

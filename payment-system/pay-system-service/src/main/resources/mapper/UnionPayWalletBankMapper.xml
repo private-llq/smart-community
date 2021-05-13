@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.UnionPayWalletBankMapper">
+    <!-- 根据钱包ID设置默认状态 -->
+    <update id="updateIsDefaultByWalletId">
+        update t_user_union_pay_wallet_bank set is_default = 0 where wallet_id = #{walletId}
+    </update>
+    <!-- 根据钱包ID和银行卡号设置默认状态-->
+    <update id="updateIsDefaultByWalletIdAndBankAcctNo">
+        update t_user_union_pay_wallet_bank set is_default = 1 where wallet_id = #{walletId} and bank_acct_no = #{bankAcctNo}
+    </update>
+    <!-- 根据钱包ID和银行账号更新为软删 -->
+    <update id="updateDeleted">
+        update t_user_union_pay_wallet_bank set deleted = 1 where wallet_id = #{walletId} and bank_acct_no = #{bankAcctNo}
+    </update>
+</mapper>
