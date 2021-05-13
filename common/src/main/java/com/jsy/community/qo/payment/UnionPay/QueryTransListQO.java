@@ -71,12 +71,13 @@ public class QueryTransListQO implements Serializable {
     @ApiModelProperty("是否输入密码-必填,0：不需要密码。1：需要密码。")
     @Range(min = 0, max = 1, message = "是否输入密码的区间为0或1")
     @NotBlank(message = "是否输入密码不能为空")
-    private String isNeedPwd;
+    private Integer isNeedPwd;
 
     @ApiModelProperty("密码密文")
     private String encryptPwd;
 
     @ApiModelProperty("加密类型")
+    @Range(min = 1, max = 2, message = "加密类型的取值范围为1或2,1：H5密码键盘加密,2：非H5加密。")
     private String encryptType;
 
     @ApiModelProperty("控件随机因子")

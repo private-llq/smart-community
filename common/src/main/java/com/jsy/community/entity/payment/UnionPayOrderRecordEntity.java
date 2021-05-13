@@ -62,10 +62,10 @@ public class UnionPayOrderRecordEntity extends BaseEntity {
     private Integer sysType;
 
     @ApiModelProperty("商户订单号,下单接口返回值之一")
-    private String mct_order_no;
+    private String mctOrderNo;
 
     @ApiModelProperty("消费类支付（H5）url,下单接口返回值之一")
-    private String pay_h5_url;
+    private String payH5Url;
 
     @ApiModelProperty("支付类型：00：钱包余额支付；01：银行卡支付")
     private String payType;

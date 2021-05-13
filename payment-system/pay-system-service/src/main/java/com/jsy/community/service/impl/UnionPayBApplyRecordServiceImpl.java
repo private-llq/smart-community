@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.PaymentException;
 import com.jsy.community.api.UnionPayBApplyRecordService;
+import com.jsy.community.api.UnionPayService;
 import com.jsy.community.config.service.UnionPayConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.BUnionPayWalletEntity;
@@ -21,6 +22,7 @@ import com.jsy.community.vo.livingpayment.UnionPay.OpenApiResponseVO;
 import com.jsy.community.vo.livingpayment.UnionPay.ResetBtypeAcctPwdVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,6 +48,9 @@ public class UnionPayBApplyRecordServiceImpl extends ServiceImpl<UnionPayBApplyR
     @Autowired
     private BUnionPayWalletMapper bUnionPayWalletMapper;
 
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false, timeout = 1200000)
+    private UnionPayService unionPayService;
+
     /**
      *@Author: Pipi
      *@Description: 获取银联支付凭据
@@ -56,24 +61,22 @@ public class UnionPayBApplyRecordServiceImpl extends ServiceImpl<UnionPayBApplyR
     @Override
     public CredentialVO getCredential(CredentialQO credentialQO, String uid) {
         CredentialVO credentialVO = new CredentialVO();
-        // 构建请求json
-        String msgBody = unionPayUtils.buildBizContent(credentialQO);
-        OpenApiResponseVO response = unionPayUtils.credentialApi(msgBody, UnionPayConfig.APPLY_TICKET);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        OpenApiResponseVO response = unionPayService.getCredential(credentialQO);
+        if (response.getResponse() == null || !UnionPayConfig.SUCCESS_CODE.equals(response.getCode())) {
             log.info("获取凭据失败!");
             return credentialVO;
         }
         CredentialResponseVO credentialResponseVO = JSONObject.parseObject(response.getBody(), CredentialResponseVO.class);
-        if (credentialResponseVO != null && "00000".equals(credentialResponseVO.getCode())
+        if (credentialResponseVO != null && UnionPayConfig.SUCCESS_CODE.equals(credentialResponseVO.getCode())
                 && ("10".equals(credentialQO.getJumpType()) || "11".equals(credentialQO.getJumpType()))) {
-            // 当获取凭据未用于开户时,且返回成功时,向数据库添加申请记录
+            // 当获取凭据用于开户时,且返回成功时,向数据库添加申请记录
             UnionPayBApplyRecordEntity bApplyRecordEntity = new UnionPayBApplyRecordEntity();
             bApplyRecordEntity.setUid(uid);
             bApplyRecordEntity.setJumpUrl(credentialResponseVO.getResponse().getJumpUrl());
             bApplyRecordEntity.setTicket(credentialResponseVO.getResponse().getTicket());
             bApplyRecordEntity.setRegisterNo(credentialResponseVO.getResponse().getRegisterNo());
             bApplyRecordEntity.setOperationType(0);
-            bApplyRecordEntity.setRegStatus("01");
+            bApplyRecordEntity.setRegStatus("00");
             bApplyRecordEntity.setId(SnowFlake.nextId());
             bApplyRecordEntity.setDeleted(0);
             bApplyRecordMapper.insert(bApplyRecordEntity);
@@ -134,12 +137,12 @@ public class UnionPayBApplyRecordServiceImpl extends ServiceImpl<UnionPayBApplyR
         // 构建请求json
         String msgBody = unionPayUtils.buildMsgBody(resetBtypeAcctPwdQO);
         OpenApiResponseVO response = unionPayUtils.transApi(msgBody, UnionPayConfig.RESET_BTYPE_ACCT_PWD);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !UnionPayConfig.SUCCESS_CODE.equals(response.getCode())) {
             log.info("B端钱包重置支付密码失败!{}", response.getMsg());
             return false;
         }
         ResetBtypeAcctPwdVO resetBtypeAcctPwdVO = JSONObject.parseObject(response.getResponse().getMsgBody(), ResetBtypeAcctPwdVO.class);
-        if (resetBtypeAcctPwdVO == null || !"00000".equals(resetBtypeAcctPwdVO.getRspCode())) {
+        if (resetBtypeAcctPwdVO == null || !UnionPayConfig.SUCCESS_CODE.equals(resetBtypeAcctPwdVO.getRspCode())) {
             log.info("B端钱包重置支付密码失败!{}", resetBtypeAcctPwdVO.getRspResult());
             throw new PaymentException("B端钱包重置支付密码失败!" + resetBtypeAcctPwdVO.getRspResult());
         }

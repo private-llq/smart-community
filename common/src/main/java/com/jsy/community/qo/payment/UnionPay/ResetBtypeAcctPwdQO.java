@@ -3,6 +3,7 @@ package com.jsy.community.qo.payment.UnionPay;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -30,6 +31,7 @@ public class ResetBtypeAcctPwdQO implements Serializable {
 
     @ApiModelProperty("加密类型-必填")
     @NotBlank(message = "加密类型不能为空")
+    @Range(min = 1, max = 2, message = "加密类型取值范围为1或2, 1：H5密码键盘加密,2：非H5加密。")
     private String encryptType;
 
     @ApiModelProperty("控件随机因子-必填")

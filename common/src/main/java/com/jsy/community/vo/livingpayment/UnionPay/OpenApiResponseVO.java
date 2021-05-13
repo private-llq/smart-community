@@ -18,4 +18,12 @@ public class OpenApiResponseVO extends OpenApiResponse {
     public void setResponse(BizResponseContentVO response) {
         this.response = response;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("OpenApiResponseVO{");
+        sb.append("response=").append(response.toString());
+        sb.append('}');
+        return sb.toString();
+    }
 }

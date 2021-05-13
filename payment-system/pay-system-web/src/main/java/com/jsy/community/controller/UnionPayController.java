@@ -316,7 +316,7 @@ public class UnionPayController {
         return CommonResult.ok(credential);
     }
 
-    /**t_union_pay_b_apply_record
+    /**
      *@Author: Pipi
      *@Description: 凭据异步回调接口
      *@Param: request:

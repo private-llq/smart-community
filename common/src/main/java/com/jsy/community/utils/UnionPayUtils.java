@@ -35,7 +35,7 @@ public class UnionPayUtils {
         openApiRequestDemo.setApiMethodName(apiName);
         openApiRequestDemo.setNeedSign(true);
         OpenApiResponseVO response = client.requestApi(openApiRequestDemo);
-        log.info("银联接口响应结果+++++{}", response.getResponse().toString());
+        log.info("银联接口响应结果+++++{}", response.toString());
         return response;
     }
 
@@ -48,7 +48,7 @@ public class UnionPayUtils {
         openApiRequestDemo.setApiMethodName(apiName);
         openApiRequestDemo.setNeedSign(true);
         OpenApiResponseVO response = client.requestApi(openApiRequestDemo);
-        log.info("银联接口响应结果+++++{}", response.getResponse().toString());
+        log.info("银联接口响应结果+++++{}", response.toString());
         return response;
     }
 
@@ -69,7 +69,7 @@ public class UnionPayUtils {
         openApiRequestDemo.setApiMethodName(apiName);
         openApiRequestDemo.setNeedSign(true);
         OpenApiResponseVO response = client.requestApi(openApiRequestDemo);
-        log.info("银联接口响应结果+++++{}", response.getResponse().toString());
+        log.info("银联接口响应结果+++++{}", response.toString());
         return response;
     }
 
@@ -90,7 +90,7 @@ public class UnionPayUtils {
         openApiRequestDemo.setApiMethodName(apiName);
         openApiRequestDemo.setNeedSign(true);
         OpenApiResponseVO response = client.requestApi(openApiRequestDemo);
-        log.info("银联接口响应结果+++++{}", response.getResponse().toString());
+        log.info("银联接口响应结果+++++{}", response.toString());
         return response;
     }
 

@@ -65,6 +65,7 @@ public class BindBankCardQO implements Serializable {
 
     // 银行账号-必填
     @ApiModelProperty("银行账号")
+    @NotBlank(message = "银行账号不能为空")
     private String bankAcctNo;
 
     // 绑定时必填，必须与用户姓名保持一致。

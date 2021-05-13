@@ -35,6 +35,7 @@ public class WithdrawQO implements Serializable {
     private String feeIntoWalletId;
 
     @ApiModelProperty("提现类型-必填;T0：快捷提现；")
+    @NotBlank(message = "提现类型不能为空")
     private String withdrawType;
 
     @ApiModelProperty("支付密码密文-条件必填")
@@ -50,9 +51,11 @@ public class WithdrawQO implements Serializable {
     private String certSign;
 
     @ApiModelProperty("验证方式-条件必填")
+    @NotBlank(message = "验证方式不能为空")
     private String tradeWayCode;
 
     @ApiModelProperty("验证字段-条件必填")
+    @NotBlank(message = "验证字段不能为空")
     private String tradeWayFeilds;
 
     @ApiModelProperty("提现银行账号-已绑定的银行账号，如果不填，表示提现到绑定的默认银行卡。")

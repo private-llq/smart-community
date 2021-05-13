@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.PaymentException;
 import com.jsy.community.api.UnionPayOrderRecordService;
+import com.jsy.community.api.UnionPayService;
 import com.jsy.community.config.service.UnionPayConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.UnionPayOrderRecordEntity;
@@ -23,6 +25,7 @@ import com.jsy.community.vo.livingpayment.UnionPay.QueryBillInfoListVO;
 import com.jsy.community.vo.livingpayment.UnionPay.UnionPayOrderVO;
 import com.jsy.community.vo.livingpayment.UnionPay.UnionPayTransListVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -49,6 +52,9 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false, timeout = 1200000)
+    private UnionPayService unionPayService;
+
     /**
      *@Author: Pipi
      *@Description: 银联消费下单
@@ -65,7 +71,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
         walletEntityQueryWrapper.eq("uid", unionPayOrderRecordEntity.getUid());
         UnionPayWalletEntity unionPayWalletEntity = unionPayWalletMapper.selectOne(walletEntityQueryWrapper);
         if (unionPayWalletEntity == null) {
-            throw new JSYException("没有查询到用户钱包信息,请用户先进行钱包开户!");
+            throw new PaymentException("没有查询到用户钱包信息,请用户先进行钱包开户!");
         }
         // 添加银联支付订单数据
         unionPayOrderRecordEntity.setOrderAmt(unionPayOrderRecordEntity.getOrderAmt());
@@ -75,9 +81,11 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
         unionPayOrderRecordEntity.setMerWalletId(UnionPayConfig.MER_WALLET_ID);
         unionPayOrderRecordEntity.setMerName(UnionPayConfig.MER_NAME);
         unionPayOrderRecordEntity.setTradeName(unionPayOrderRecordEntity.getTradeName());
+        // 指定订单为待支付
         unionPayOrderRecordEntity.setTradeStatus(1);
         unionPayOrderRecordEntity.setUid(unionPayOrderRecordEntity.getUid());
         unionPayOrderRecordEntity.setId(SnowFlake.nextId());
+        // 应用缓存,具体目的不记得了
         redisTemplate.opsForValue().set("union_pay_order:" + unionPayOrderRecordEntity.getId() + unionPayOrderRecordEntity.getServiceOrderNo(), unionPayOrderRecordEntity.toString());
         // 银联参数对象
         GenerateOrderQO generateOrderQO = new GenerateOrderQO();
@@ -91,24 +99,23 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
         // 设置过期时间为30分钟
         generateOrderQO.setTimeoutExpress("30m");
         generateOrderQO.setMerName(UnionPayConfig.MER_NAME);
-        generateOrderQO.setNotifyUrl(UnionPayConfig.NOTIFY_URL);
-        // 构建请求json
-        String msgBody = unionPayUtils.buildMsgBody(generateOrderQO);
+        generateOrderQO.setNotifyUrl(UnionPayConfig.TEST_NOTIFY_URL);
         // 调用接口请求
-        OpenApiResponseVO response =  unionPayUtils.transApi(msgBody, UnionPayConfig.CONSUME_APPLY_ORDER);
+        OpenApiResponseVO response = unionPayService.generateConsumeOrder(generateOrderQO);
         // 判断业务
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !UnionPayConfig.SUCCESS_CODE.equals(response.getCode())) {
             log.info("银联下单失败!");
             throw new JSYException("银联下单失败!");
         }
         unionPayOrderVO = JSONObject.parseObject(response.getResponse().getMsgBody(), UnionPayOrderVO.class);
-        if (unionPayOrderVO == null || !"00000".equals(unionPayOrderVO.getRspCode())) {
+        if (unionPayOrderVO == null || !UnionPayConfig.SUCCESS_CODE.equals(unionPayOrderVO.getRspCode())) {
             log.info("银联下单失败!{}", unionPayOrderVO.getRspResult());
-            throw new JSYException("银联下单失败!");
+            throw new PaymentException("银联下单失败!" + unionPayOrderVO.getRspResult());
         }
-        unionPayOrderRecordEntity.setMct_order_no(unionPayOrderVO.getMctOrderNo());
-        unionPayOrderRecordEntity.setPay_h5_url(unionPayOrderVO.getPayH5Url());
+        unionPayOrderRecordEntity.setMctOrderNo(unionPayOrderVO.getMctOrderNo());
+        unionPayOrderRecordEntity.setPayH5Url(unionPayOrderVO.getPayH5Url());
         baseMapper.insert(unionPayOrderRecordEntity);
+        // 全部成功,清楚缓存
         redisTemplate.delete("union_pay_order:" + unionPayOrderRecordEntity.getId() + unionPayOrderRecordEntity.getServiceOrderNo());
         return unionPayOrderVO;
     }
@@ -156,10 +163,9 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
     @Override
     public UnionPayTransListVO queryTransList(QueryTransListQO queryTransListQO) {
         UnionPayTransListVO unionPayTransListVO = new UnionPayTransListVO();
-        String msgBody = unionPayUtils.buildMsgBody(queryTransListQO);
-        OpenApiResponseVO response = unionPayUtils.queryApi(msgBody, UnionPayConfig.QUERY_TRANS_LIST);
+        OpenApiResponseVO response = unionPayService.queryTransList(queryTransListQO);
         // 判断业务
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !UnionPayConfig.SUCCESS_CODE.equals(response.getCode())) {
             log.info("查询交易明细失败!");
             return unionPayTransListVO;
         }
@@ -186,10 +192,9 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
             queryBillInfoQO.setMaxTransAmt(maxTransAmt.toString());
         }
         QueryBillInfoListVO queryBillInfoListVO = new QueryBillInfoListVO();
-        String msgBody = unionPayUtils.buildMsgBody(queryBillInfoQO);
-        OpenApiResponseVO response = unionPayUtils.queryApi(msgBody, UnionPayConfig.QUERY_BILL_INFO);
+        OpenApiResponseVO response = unionPayService.queryBillInfo(queryBillInfoQO);
         // 判断业务
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !UnionPayConfig.SUCCESS_CODE.equals(response.getCode())) {
             log.info("账单查询失败!");
             return queryBillInfoListVO;
         }

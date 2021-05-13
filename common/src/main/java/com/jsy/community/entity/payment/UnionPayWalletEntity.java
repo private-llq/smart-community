@@ -48,12 +48,6 @@ public class UnionPayWalletEntity implements Serializable {
     @ApiModelProperty(value = "是否激活,0-不激活,1-激活,默认激活")
     private Integer activeStatus;
 
-    @ApiModelProperty(value = "密码密文：使用encryptType指定的方式进行加密（最终密文是base64编码的字符串）")
-    private String encryptPwd;
-
-    @ApiModelProperty(value = "加密类型：1：H5密码键盘加密（密码键盘先使用公钥加密，然后自身再加密）。2：非H5加密。（加密控件先使用公钥加密，然后控件自身再加密）。")
-    private Integer encryptType;
-
     @ApiModelProperty(value = "用户联系电话")
     private String userTelNo;
 

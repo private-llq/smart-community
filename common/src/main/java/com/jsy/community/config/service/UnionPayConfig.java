@@ -12,7 +12,7 @@ public class UnionPayConfig {
     // 测试地址
     public final static String TEST_REQUEST_URL = "https://testapi.gnete.com:9083/routejson";
     // 支付回调地址
-    public final static String NOTIFY_URL = "https://ymxd.cn.utools.club/api/v1/payment/unionPay/unionPayNotifyUrl";
+    public final static String TEST_NOTIFY_URL = "https://ymxd.cn.utools.club/api/v1/payment/unionPay/unionPayNotifyUrl";
     // 凭据回调地址
     public final static String CREDENTIAL_NOTIFY_URL = "https://ymxd.cn.utools.club/api/v1/payment/unionPay/credentialNotifyUrl";
     // 银联支付appid
@@ -100,4 +100,6 @@ public class UnionPayConfig {
     public final static String HMAC_SHA256 = "4";
     // MD5
     public final static String ENCRYPT_MD5 = "5";
+    // 接口成功结果码
+    public final static String SUCCESS_CODE = "00000";
 }
