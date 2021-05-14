@@ -493,6 +493,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		}
 		//生成随机密码
 		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
+		//TODO 测试阶段暂时生成固定密码
+		randomPass = "11111111";
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		//生成UUID 和 ID
@@ -559,6 +561,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		}
 		//生成随机密码
 		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
+		//TODO 测试阶段暂时生成固定密码
+		randomPass = "22222222";
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		String password = new Sha256Hash(randomPass, salt).toHex();
