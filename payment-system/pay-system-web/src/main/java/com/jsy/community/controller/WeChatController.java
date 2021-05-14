@@ -67,6 +67,9 @@ public class WeChatController {
 
     private HttpClient httpClient;
 
+    public WeChatController() {
+    }
+
     /**
      * @Description: app下单并返回调起支付参数
      * @author: Hu
@@ -243,6 +246,7 @@ public class WeChatController {
 
         return CommonResult.ok(body);
     }
+
     /**
      * @Description:  提现查询
      * @author: Hu

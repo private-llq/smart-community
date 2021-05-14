@@ -50,7 +50,7 @@ public class RabbitMqConfig {
      * @return:
      */
     @Bean(QUEUE_CAMERA_FACE)
-    public Queue QUEUE_CAMERA_FACE() {
+    public Queue queueCameraFace() {
         return new Queue(QUEUE_CAMERA_FACE);
     }
 
@@ -74,7 +74,7 @@ public class RabbitMqConfig {
      * @return:
      */
     @Bean
-    public Binding bindingExchangeCamera_face(@Qualifier(QUEUE_CAMERA_FACE) Queue queue,
+    public Binding bindingExchangeCameraFace(@Qualifier(QUEUE_CAMERA_FACE) Queue queue,
                                                @Qualifier(EXCHANGE_CAMERA_FACE) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("queue.camera.face").noargs();
     }
@@ -232,7 +232,7 @@ public class RabbitMqConfig {
      * @return:
      */
     @Bean(QUEUE_CAR_INSERT)
-    public Queue QUEUE_CAR_INSERT() {
+    public Queue queueCarInsert() {
         return new Queue(QUEUE_CAR_INSERT);
     }
     /**
@@ -243,7 +243,7 @@ public class RabbitMqConfig {
      * @return:
      */
     @Bean(QUEUE_CAR_UPDATE)
-    public Queue QUEUE_CAR_UPDATE() {
+    public Queue queueCarUpdate() {
         return new Queue(QUEUE_CAR_UPDATE);
     }
     /**
@@ -254,7 +254,7 @@ public class RabbitMqConfig {
      * @return:
      */
     @Bean(QUEUE_CAR_DELETE)
-    public Queue QUEUE_CAR_DELETE() {
+    public Queue queueCarDelete() {
         return new Queue(QUEUE_CAR_DELETE);
     }
     /**

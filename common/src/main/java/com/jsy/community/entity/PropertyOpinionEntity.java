@@ -11,7 +11,7 @@ import javax.validation.constraints.Pattern;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业意见反馈
  * @author: Hu
  * @create: 2021-04-11 11:02
  **/

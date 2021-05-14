@@ -70,7 +70,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- springboot main方法入口 -->
-                    <mainClass>com.jsy.GatewayApp</mainClass>
+                    <mainClass>com.jsy.community.GatewayApp</mainClass>
                 </configuration>
                 <executions>
                     <execution>

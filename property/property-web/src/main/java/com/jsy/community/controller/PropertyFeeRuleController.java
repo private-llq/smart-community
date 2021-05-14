@@ -40,7 +40,7 @@ public class PropertyFeeRuleController {
         Map<Object, Object> map=propertyFeeRuleService.findList(baseQO,userInfo.getCommunityId());
         return CommonResult.ok(map);
     }
-
+    
     @ApiOperation("查询当前小区物业收费规则")
     @GetMapping("/selectOne")
     @Login
