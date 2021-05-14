@@ -398,6 +398,60 @@ public class FacilityUtils {
 		return null;
 	}
 	
+//	public static void aaa(int lUserID){
+//
+//		boolean bRealPlay = false;//是否在预览
+//		HCNetSDK.NET_DVR_CLIENTINFO m_strClientInfo;//用户参数
+//
+//
+//		// *** 判断是否注册
+//		if (lUserID == -1) {
+//			System.out.println("请先注册");
+//			return;
+//		}
+//
+//		//如果预览窗口没打开,不在预览
+//		if (bRealPlay == false) {
+//
+//			//获取通道号
+//			int iChannelNum = getChannelNumber();//通道号
+//			if (iChannelNum == -1) {
+//				JOptionPane.showMessageDialog(this, "请选择要预览的通道");
+//				return;
+//			}
+//
+//			m_strClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();
+//			m_strClientInfo.lChannel = new NativeLong(iChannelNum);
+//
+//			//在此判断是否回调预览,0,不回调 1 回调
+//			if (jComboBoxCallback.getSelectedIndex() == 0) {
+//				m_strClientInfo.hPlayWnd = hwnd;
+//				lPreviewHandle = hCNetSDK.NET_DVR_RealPlay_V30(lUserID,m_strClientInfo, null, null, true);
+//			} else if (jComboBoxCallback.getSelectedIndex() == 1) {
+//				m_strClientInfo.hPlayWnd = null;
+//				lPreviewHandle = hCNetSDK.NET_DVR_RealPlay_V30(lUserID,m_strClientInfo, fRealDataCallBack, null, true);
+//			}
+//
+//			long previewSucValue = lPreviewHandle.longValue();
+//
+//			//预览失败时:
+//			if (previewSucValue == -1) {
+//				JOptionPane.showMessageDialog(this, "预览失败");
+//				return;
+//			}
+//
+//			//预览成功的操作
+//			jButtonRealPlay.setText("停止");
+//			bRealPlay = true;
+//
+//			//显示云台控制窗口
+//			framePTZControl = new JFramePTZControl(lPreviewHandle);
+//			framePTZControl.setLocation(this.getX() + this.getWidth(), this.getY());
+//			framePTZControl.setVisible(true);
+//		}
+//
+//	}
+	
 	/**
 	 * 从输入流中获取数据
 	 *
@@ -416,10 +470,36 @@ public class FacilityUtils {
 		return outStream.toByteArray();
 	}
 	
-	public static void main(String[] args) {
-		CLibrary.INSTANCE.printf("Hello, World\n");
-		for (int i = 0; i < args.length; i++) {
-			CLibrary.INSTANCE.printf("Argument %d: %s\n", i, args[i]);
-		}
-	}
+	
+	
+//	/*************************************************
+//	 函数:    getChannelNumber
+//	 函数描述:从设备树获取通道号
+//	 *************************************************/
+//	int getChannelNumber() {
+//		int iChannelNum = -1;
+//		TreePath tp = jTreeDevice.getSelectionPath();//获取选中节点的路径
+//		if (tp != null)//判断路径是否有效,即判断是否有通道被选中
+//		{
+//			//获取选中的通道名,对通道名进行分析:
+//			String sChannelName = ((DefaultMutableTreeNode) tp.getLastPathComponent()).toString();
+//			if (sChannelName.charAt(0) == 'C')//Camara开头表示模拟通道
+//			{
+//				//子字符串中获取通道号
+//				iChannelNum = Integer.parseInt(sChannelName.substring(6));
+//			} else {
+//				if (sChannelName.charAt(0) == 'I')//IPCamara开头表示IP通道
+//				{
+//					//子字符创中获取通道号,IP通道号要加32
+//					iChannelNum = Integer.parseInt(sChannelName.substring(8)) + 32;
+//				} else {
+//					return -1;
+//				}
+//			}
+//		} else {
+//			return -1;
+//		}
+//		return iChannelNum;
+//	}
+	
 }
