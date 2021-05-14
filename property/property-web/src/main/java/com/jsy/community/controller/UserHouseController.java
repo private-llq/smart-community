@@ -73,6 +73,7 @@ public class UserHouseController {
 	@ApiOperation("通过审核")
 	@GetMapping("/pass")
 	public CommonResult<Boolean> pass(@ApiParam(value = "待审核房屋id") @RequestParam Long id) {
+		// 房屋通过认证
 		Boolean b = userHouseService.pass(id);
 		return b ? CommonResult.ok() : CommonResult.error("您的订单不存在或已经审核完成");
 	}

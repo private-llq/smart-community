@@ -68,7 +68,6 @@ public class FacilityUtils {
 		} else {
 			log.info(ip + "：登录成功！");
 		}
-		log.info(ip + "：登录完毕");
 		// 设备在线状态函数：NET_DVR_RemoteControl  返回值：true表示成功[在线]  false表示失败[不在线]
 		// 参数1：用户 ID 号，NET_DVR_Login_V40 的返回值
 		// 参数2：控制命令
@@ -91,7 +90,7 @@ public class FacilityUtils {
 	 * @Param [loginStatus, handle, facilityEffectId]
 	 **/
 	public static int toEffect(Integer loginStatus, Integer handle, Long facilityEffectId) {
-		log.info("开始开启设备功能");
+		log.info("开始开启设备功能ing...");
 		//1. 判断是否登录成功
 		if (loginStatus == 1) {//0不在线 1在线
 			if (!facilityEffectId.equals(EFFECT_FACE) && !facilityEffectId.equals(EFFECT_CAR)) {
