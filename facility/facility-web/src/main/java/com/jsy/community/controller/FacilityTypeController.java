@@ -36,7 +36,6 @@ public class FacilityTypeController {
 	@DubboReference(version = Const.version, group = Const.group_facility, check = false)
 	private IFacilityTypeService facilityTypeService;
 
-	
 	@ApiOperation("添加设备分类")
 	@PostMapping("/addFacilityType")
 	public CommonResult addFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
@@ -80,5 +79,6 @@ public class FacilityTypeController {
 		List<FacilityTypeVO> facilityTypeVOS = facilityTypeService.listFacilityType(communityId);
 		return CommonResult.ok(facilityTypeVOS);
 	}
+	
 }
 

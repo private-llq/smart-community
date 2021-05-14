@@ -6,6 +6,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>facility-api</module>
+        <module>facility-service</module>
+        <module>facility-web</module>
     </modules>
 
     <parent>

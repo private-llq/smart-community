@@ -37,6 +37,8 @@
         <!-- 任务 -->
         <module>task</module>
         <module>payment-system</module>
+        <!-- 设备 -->
+        <module>facility</module>
     </modules>
     
     <properties>

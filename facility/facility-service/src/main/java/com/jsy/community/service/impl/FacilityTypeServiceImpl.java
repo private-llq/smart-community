@@ -3,7 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFacilityTypeService;
-import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.FacilityException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.entity.hk.FacilityTypeEntity;
@@ -43,7 +43,7 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 	@Override
 	public void updateFacilityType(FacilityTypeEntity facilityTypeEntity) {
 		if (facilityTypeEntity.getId() == null) {
-			throw new PropertyException("请选择要修改的设备分类");
+			throw new FacilityException("请选择要修改的设备分类");
 		}
 		
 		QueryWrapper<FacilityTypeEntity> wrapper = new QueryWrapper<>();
@@ -63,18 +63,18 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 			
 			List<FacilityTypeEntity> list = facilityTypeMapper.selectList(wrapper);
 			if (!CollectionUtils.isEmpty(list)) {
-				throw new PropertyException("\"" + entity.getName() + "\"" + "已有下级节点，不可删除");
+				throw new FacilityException("\"" + entity.getName() + "\"" + "已有下级节点，不可删除");
 			}
 			
 			QueryWrapper<FacilityEntity> queryWrapper = new QueryWrapper<>();
 			queryWrapper.eq("facility_type_id", entity.getId()).eq("community_id", communityId);
 			List<FacilityEntity> entities = facilityMapper.selectList(queryWrapper);
 			if (!CollectionUtils.isEmpty(entities)) {
-				throw new PropertyException("\"" + entity.getName() + "\"" + "已有属于该分类的设备，不可删除");
+				throw new FacilityException("\"" + entity.getName() + "\"" + "已有属于该分类的设备，不可删除");
 			}
 			
 			if (!entity.getCommunityId().equals(communityId)) {
-				throw new PropertyException("该社区下没有该设备分类");
+				throw new FacilityException("该社区下没有该设备分类");
 			}
 			facilityTypeMapper.deleteById(id);
 		}

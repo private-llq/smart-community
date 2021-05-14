@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.FacilityException;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.UserUtils;
@@ -86,7 +86,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		if(checkPass){
 			return true;
 		}
-		throw new PropertyException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
+		throw new FacilityException(JSYError.UNAUTHORIZED.getCode(), "登录过期");
 	}
 	
 	private boolean allowAnonymous(Login methodAnnotation, Login classAnnotation){

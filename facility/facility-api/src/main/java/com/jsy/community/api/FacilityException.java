@@ -10,20 +10,20 @@ import com.jsy.community.exception.JSYException;
  * @author ling
  * @since 2020-11-18 14:32
  */
-public class PropertyException extends JSYException {
-	public PropertyException(Integer code, String message) {
+public class FacilityException extends JSYException {
+	public FacilityException(Integer code, String message) {
 		super(code, message);
 	}
 	
-	public PropertyException() {
+	public FacilityException() {
 		super();
 	}
 	
-	public PropertyException(String message) {
+	public FacilityException(String message) {
 		super(ConstError.NORMAL, message);
 	}
 	
-	public PropertyException(JSYError error) {
+	public FacilityException(JSYError error) {
 		super(error);
 	}
 }

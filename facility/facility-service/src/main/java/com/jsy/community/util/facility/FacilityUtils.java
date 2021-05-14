@@ -1,6 +1,6 @@
 package com.jsy.community.util.facility;
 
-import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.FacilityException;
 import com.jsy.community.callback.FMSGCallBack_V31Impl;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.sdk.HCNetSDK;
@@ -94,7 +94,7 @@ public class FacilityUtils {
 		//1. 判断是否登录成功
 		if (loginStatus == 1) {//0不在线 1在线
 			if (!facilityEffectId.equals(EFFECT_FACE) && !facilityEffectId.equals(EFFECT_CAR)) {
-				throw new PropertyException("该功能没有实现");
+				throw new FacilityException("该功能没有实现");
 			}
 			
 			int lAlarmHandle = -1;//报警布防句柄

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFacilityService;
-import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.FacilityException;
 import com.jsy.community.callback.FDSearch;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserEntity;
@@ -78,7 +78,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		wrapper.eq("ip", ip).eq("facility_type_id", facilityEntity.getFacilityTypeId());
 		FacilityEntity one = facilityMapper.selectOne(wrapper);
 		if (one != null) {
-			throw new PropertyException("您已添加相同ip的设备");
+			throw new FacilityException("您已添加相同ip的设备");
 		}
 		
 		facilityEntity.setId(SnowFlake.nextId());
@@ -157,7 +157,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		Long facilityId = facilityEntity.getId();
 		FacilityEntity facility = facilityMapper.selectById(facilityId);
 		if (facility == null) {
-			throw new PropertyException("请选择你要更改的设备,或该设备不存在");
+			throw new FacilityException("请选择你要更改的设备,或该设备不存在");
 		}
 		// ip，账号，密码，端口号 都没有发生改变
 		if (facility.getIp().equals(facilityEntity.getIp()) &&
