@@ -16,6 +16,7 @@
         <module>pay-system-web</module>
         <module>pay-system-api</module>
         <module>pay-system-service</module>
+        <module>pay-system-common</module>
     </modules>
     <dependencies>
         <dependency>
