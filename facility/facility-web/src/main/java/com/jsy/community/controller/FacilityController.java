@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * <p>
- * 前端控制器
+ * 设备控制器
  * </p>
  *
  * @author lihao
@@ -56,14 +56,10 @@ public class FacilityController {
 		List<CommonConst> constList = commonConstService.getFacilityTypeEffect();
 		return CommonResult.ok(constList);
 	}
-
-	@ApiOperation("获取设备作用")
-	@GetMapping("/get")
-	public CommonResult get() {
-		rabbitTemplate.convertAndSend("exchange_camera_face","queue.camera.face","曹尼玛");
-		return CommonResult.ok();
-	}
 	
+	/**
+	 * 添加设备功能：  1. 保存设备基本信息   2. 根据基本信息开启设备响应功能   3. 保存设备状态信息
+	 **/
 	@ApiOperation("添加设备")
 	@PostMapping("/addFacility")
 	public CommonResult addFacility(@RequestBody FacilityEntity facilityEntity) {
@@ -97,6 +93,7 @@ public class FacilityController {
 	
 	@ApiOperation("获取设备在线离线数")
 	@GetMapping("/getCount")
+	// TODO: 2021/5/15 这个功能好像前端没有在强制刷新后调用这个接口  应该让他调的 后面让前端做下
 	public CommonResult getCount(@ApiParam("设备分类Id") @RequestParam("typeId") Long typeId) {
 		Map<String, Integer> map = facilityService.getCount(typeId);
 		return CommonResult.ok(map);
@@ -104,11 +101,10 @@ public class FacilityController {
 	
 	@ApiOperation("编辑设备")
 	@PostMapping("/updateFacility")
-	// TODO: 2021/4/23 注意，更新设备状态后  如果定时任务执行了会又根据定时任务当时获取的状态来
-	// TODO: 2021/4/23 编辑的时候先不考虑让用户可以更改该摄像头的作用
+	// TODO: 2021/4/23 编辑的时候不能更改该摄像头的作用  因为摄像头的作用需要更改摄像头后台  开启相应的功能
+	// TODO: 2021/4/23 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		
 		facilityEntity.setCommunityId(communityId);
 		facilityService.updateFacility(facilityEntity);
 		return CommonResult.ok();
@@ -121,6 +117,9 @@ public class FacilityController {
 		return CommonResult.ok();
 	}
 	
+	/**
+	 * 刷新设备： 强制刷新 获取当前页设备最新在线状态
+	 **/
 	@ApiOperation("刷新设备")
 	@GetMapping("/flushFacility")
 	public CommonResult flushFacility(@RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("facilityTypeId") String facilityTypeId) {

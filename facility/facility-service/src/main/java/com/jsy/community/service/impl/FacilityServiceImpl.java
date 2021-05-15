@@ -62,7 +62,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Override
 	@Transactional
 	public void addFacility(FacilityEntity facilityEntity) {
-		// 1. 开启设备
+		// 1. 保存设备基本信息
 		// 设备ip地址
 		String ip = facilityEntity.getIp();
 		// 设备账号
@@ -72,8 +72,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		// 端口号
 		Short port = facilityEntity.getPort();
 		
-		// 2. 保存设备基本信息
-		// 有可能不同类型的设备会有相同的ip，所以这里没有用唯一索引
+		// 有可能不同类型的设备会有相同的ip，所以这里表中对ip地址没有用唯一索引
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("ip", ip).eq("facility_type_id", facilityEntity.getFacilityTypeId());
 		FacilityEntity one = facilityMapper.selectOne(wrapper);
@@ -85,16 +84,17 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		facilityEntity.setIsConnectData(0);
 		facilityMapper.insert(facilityEntity);
 		
-		// 登录设备
+		// 2. 登录设备
 		Map<String, Integer> map = FacilityUtils.login(ip, port, username, password, -1);
 		
-		// 根据设备的作用id，执行不同的作用[目前有人脸比对，车牌抓拍]
+		// 3. 开启设备
+		// 根据设备的作用id，执行不同的作用[目前的需求有人脸比对，车牌抓拍]
 		Long facilityEffectId = facilityEntity.getFacilityEffectId();
 		Integer loginStatus = map.get("status");
 		Integer handle = map.get("facilityHandle");
 		int facilityAlarmHandle = FacilityUtils.toEffect(loginStatus, handle, facilityEffectId);
 		
-		// 3. 保存设备状态信息
+		// 4. 保存设备状态信息
 		Integer status = map.get("status");
 		Integer facilityHandle = map.get("facilityHandle");
 		Long facilityId = facilityEntity.getId();
@@ -134,12 +134,11 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		// 根据设备id查询他的唯一登录句柄
 		int loginHandle = facilityMapper.getLoginHandle(id);
 		
-		// TODO: 2021/4/23 海康那个栽舅子客服给我说的必须撤防和注销设备。最后程序关闭的时候释放SDK
-		if (alarmHandle == -1) { // 说明根本就没布防或者说他没布防成功，就没必要去撤防
+		if (alarmHandle != -1) {
 			// 撤防
 			FacilityUtils.cancel(alarmHandle);
 		}
-		if (loginHandle == -1) {// 说明根本就没登录或者说他没登录成功，就没必要去注销
+		if (loginHandle != -1) {
 			// 注销设备
 			FacilityUtils.logOut(loginHandle);
 		}
@@ -147,7 +146,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		facilityMapper.deleteById(id);
 		// 删除设备状态信息
 		facilityMapper.deleteMiddleFacility(id);
-		
 	}
 	
 	@Override
@@ -157,19 +155,19 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		Long facilityId = facilityEntity.getId();
 		FacilityEntity facility = facilityMapper.selectById(facilityId);
 		if (facility == null) {
-			throw new FacilityException("请选择你要更改的设备,或该设备不存在");
+			throw new FacilityException("你选择的设备不存在");
 		}
-		// ip，账号，密码，端口号 都没有发生改变
+		// ip，账号，密码，端口号 都没有发生改变  只更新一些不重要的信息
 		if (facility.getIp().equals(facilityEntity.getIp()) &&
 			facility.getUsername().equals(facilityEntity.getUsername()) &&
 			facility.getPassword().equals(facilityEntity.getPassword()) &&
 			facility.getPort().equals(facilityEntity.getPort())) {
-			
-			// 判断这次更改输入的 ip是否有
-			
 			facilityMapper.updateById(facilityEntity);
 		} else {
-			//ip，账号，密码，端口号 有至少一个发生了改变     so，需要重新登录设备
+			if (!facility.getFacilityEffectId().equals(facilityEntity.getFacilityEffectId())) {
+				throw new FacilityException("不可以改变设备作用功能");
+			}
+			//ip，账号，密码，端口号 有至少一个发生了改变    ——>需要重新登录设备，开启功能
 			String ip = facilityEntity.getIp();
 			String username = facilityEntity.getUsername();
 			String password = facilityEntity.getPassword();
@@ -181,20 +179,17 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			// 2. 将原来的设备注销
 			int loginHandle = facilityMapper.getLoginHandle(facilityEntity.getId());
 			FacilityUtils.logOut(loginHandle);
-			
 			// 3. 登录设备
 			Map<String, Integer> login = FacilityUtils.login(ip, port, username, password, -1);
 			Integer status = login.get("status");
 			Integer handle = login.get("facilityHandle");
 			// 4. 布防设备
-			// todo 注意看这里的设备作用来源，更新的时候目前做的是不准她选择作用，现在设备作用来源是原本这个设备的作用来源
-			// TODO: 2021/4/27 如果后面修改可以更新设备作用的话，facility.getFacilityEffectId() 应该由前端传来
 			int facilityAlarmHandle = FacilityUtils.toEffect(status, handle, facility.getFacilityEffectId());
 			
 			
-			// 更新设备表
+			// 更新设备信息表
 			facilityMapper.updateById(facilityEntity);
-			// 更新状态表[这里采用的不是更新表，而是直接删除原本条数据，重新新增数据]
+			// 更新设备状态表[这里采用的不是更新表，而是直接删除原本条数据，重新新增数据]
 			facilityMapper.deleteMiddleFacility(facilityId);
 			long id = SnowFlake.nextId();
 			facilityMapper.insertFacilityStatus(id, status, handle, facilityId, facilityAlarmHandle);

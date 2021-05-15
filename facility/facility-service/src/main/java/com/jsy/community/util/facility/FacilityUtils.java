@@ -36,26 +36,26 @@ public class FacilityUtils {
 	private static final Long EFFECT_CAR = 456L;
 	
 	/**
-	 * @return java.util.Map<java.lang.String, java.lang.Integer>
+	 * @return [status：在线状态, facilityHandle：用户句柄]
 	 * @Author lihao
-	 * @Description 设备登录, 并更新设备在线状态信息
+	 * @Description 设备登录, 并返回设备在线状态信息
 	 * @Date 2021/4/21 16:43
-	 * @Param [ip, port, username, password]
+	 * @Param [ip：设备ip, port：设备端口号, username：设备账号, password：设备密码, lUserID：用户句柄]
 	 **/
 	public static Map<String, Integer> login(String ip, short port, String username, String password, int lUserID) {
 		log.info(ip + "：开始登录");
-		// 对接多台设备，是否需要调用多次NET_DVR_Init接口分别初始化？
-		// 答：不是 初始化接口全局的，一次即可。NET_DVR_Init和NET_DVR_Cleanup需要配对使用，程序运行开始调用NET_DVR_Init，程序退出时调用NET_DVR_Cleanup释放资源，都只需要调用一次即可。
-		// 为什么登录设备这里不需要初始化  答：因为我在 ApplicationRunnerImpl 【项目一启动的时候已经初始化】
+		// 对接多台设备，是否需要调用多次NET_DVR_Init接口分别初始化SDK？
+		// 答：不是 初始化SDK是全局的，一次即可。NET_DVR_Init和NET_DVR_Cleanup需要配对使用，程序运行开始调用NET_DVR_Init，程序退出时调用NET_DVR_Cleanup释放资源，都只需要调用一次即可。
+		// 为什么登录设备这里不需要初始化  答：因为我在 ApplicationRunnerImpl类中【项目一启动的时候已经初始化SDK】
 		
-		//2. 用户注册设备    返回值：-1表示失败，其他值表示返回的用户ID值。该用户ID具有唯一性，后续对设备的操作都需要通过此ID实现。
+		//2. 用户注册设备    返回值：-1表示失败，其他值表示返回的用户句柄值。该用户句柄具有唯一性，后续对设备的操作都需要通过此ID实现。
 		// 登录之前先判断是否已经登录
 		if (lUserID > -1) { // lUserID：用户句柄   （每个设备都需要单独登录NET_DVR_Login_V30，登录成功返回唯一的userID）;
 			//先注销
 			hCNetSDK.NET_DVR_Logout(lUserID);
 			lUserID = -1;
 		}
-		// 登录设备函数：NET_DVR_Login_V30   返回值：-1表示失败，其他值表示返回的用户ID值。该用户ID具有唯一性，后续对设备的操作都需要通过此ID实现
+		// 登录设备函数：NET_DVR_Login_V30   返回值：-1表示失败，其他值表示返回的用户句柄值。该用户句柄具有唯一性，后续对设备的操作都需要通过此用户句柄实现
 		// 参数1：设备IP地址或是静态域名，字符数不大于128个
 		// 参数2：设备端口号
 		// 参数3：登录的用户名
@@ -68,8 +68,11 @@ public class FacilityUtils {
 		} else {
 			log.info(ip + "：登录成功！");
 		}
-		// 设备在线状态函数：NET_DVR_RemoteControl  返回值：true表示成功[在线]  false表示失败[不在线]
-		// 参数1：用户 ID 号，NET_DVR_Login_V40 的返回值
+		
+		
+		
+		// 判断设备在线状态函数：NET_DVR_RemoteControl       返回值：true表示成功[在线]  false表示失败[不在线]
+		// 参数1：用户句柄号，NET_DVR_Login_V30 的返回值
 		// 参数2：控制命令
 		// 参数3：输入参数
 		// 参数4：输入参数长度
@@ -83,11 +86,11 @@ public class FacilityUtils {
 	}
 	
 	/**
-	 * @return void
+	 * @return 布防句柄
 	 * @Author 91李寻欢
-	 * @Description 根据不同的作用id开启不同的设备功能
+	 * @Description 根据不同的设备作用id开启不同的设备功能   目前需求要做的是“人脸比对”与“车牌识别”
 	 * @Date 2021/4/23 13:59
-	 * @Param [loginStatus, handle, facilityEffectId]
+	 * @Param [loginStatus：在线状态, handle：用户句柄, facilityEffectId：设备作用ID]
 	 **/
 	public static int toEffect(Integer loginStatus, Integer handle, Long facilityEffectId) {
 		log.info("开始开启设备功能ing...");
@@ -97,10 +100,11 @@ public class FacilityUtils {
 				throw new FacilityException("该功能没有实现");
 			}
 			
-			int lAlarmHandle = -1;//报警布防句柄
+			//报警布防句柄
+			int lAlarmHandle = -1;
 			//尚未布防,需要布防
 			if (lAlarmHandle < 0) {
-				// 4.1 判断是否设置报警回调函数 若没有，则设置报警回调函数
+				// 4.1 判断是否设置报警回调函数   若没有，则设置报警回调函数
 				if (dVRMessageCallBack == null) {
 					dVRMessageCallBack = new FMSGCallBack_V31Impl();
 					Pointer pUser = null;
@@ -151,7 +155,7 @@ public class FacilityUtils {
 	 * @Author 91李寻欢
 	 * @Description 撤防
 	 * @Date 2021/4/23 15:11
-	 * @Param []
+	 * @Param [lAlarmHandle：布防句柄]
 	 **/
 	public static void cancel(int lAlarmHandle) {
 		// 1. 撤防
@@ -167,7 +171,7 @@ public class FacilityUtils {
 	 * @Author 91李寻欢
 	 * @Description 注销
 	 * @Date 2021/4/23 18:44
-	 * @Param [lUserID]
+	 * @Param [lUserID：用户句柄]
 	 **/
 	public static void logOut(int lUserID) {
 		if (lUserID > -1) {
@@ -181,10 +185,9 @@ public class FacilityUtils {
 	 * @return int
 	 * @Author 91李寻欢
 	 * @Description 根据用户句柄判断设备是否在线
-	 * 1. 当某设备掉线了，此时拿着他的用户句柄去判断是否在线，返回false。
-	 * 2. 当设备重新连接了，此时拿着他在线时的用户句柄去判断是否在线，返回true。因为这个用户句柄我们没有注销过，它相当于一直给这个设备留着的，等你重新上线了，拿着这个句柄去判断是否在线，就返回true了
+	 * 当某设备掉线了，此时拿着他在线时的用户句柄去判断是否在线。  在线：true   不在线：false
 	 * @Date 2021/4/23 18:46
-	 * @Param [lUserID]
+	 * @Param [lUserID：用户句柄]
 	 **/
 	public static int isOnline(int lUserID) {
 		boolean b = hCNetSDK.NET_DVR_RemoteControl(lUserID, 20005, null, 0);
