@@ -38,6 +38,6 @@ dubbo:
     timeout: 99999
 jsy:
   elasticsearch:
-    ip: localhost
+    ip: 222.178.212.29
     port: 9200
     protocol: http

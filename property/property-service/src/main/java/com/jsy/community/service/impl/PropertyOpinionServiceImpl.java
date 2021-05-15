@@ -33,7 +33,6 @@ public class PropertyOpinionServiceImpl extends ServiceImpl<PropertyOpinionMappe
                 .ge("create_time", LocalDate.now())
                 .le("create_time", LocalDate.now().plusDays(1)));
         if (list!=null){
-
             return list.size();
         }
         return 0;

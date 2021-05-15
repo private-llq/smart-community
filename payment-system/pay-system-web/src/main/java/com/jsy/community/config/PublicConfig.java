@@ -54,7 +54,7 @@ public class PublicConfig {
      * @return 订单支付的参数
      * @throws Exception
      */
-    public static String V3PayGet(String url, String jsonStr, String mercId, String serial_no, String privateKeyFilePath) throws Exception {
+    public static String V3PayGet(String url, String jsonStr, String mercId, String serialNo, String privateKeyFilePath) throws Exception {
         String body = "";
         //创建httpclient对象
         CloseableHttpClient client = HttpClients.createDefault();
@@ -179,19 +179,19 @@ public class PublicConfig {
      * @param method             请求方式
      * @param url                请求地址
      * @param mercId             商户ID
-     * @param serial_no          证书序列号
+     * @param serialNo          证书序列号
      * @param privateKeyFilePath 私钥路径
      * @param body               请求体
      * @return 组装请求的数据
      * @throws Exception
      */
-    public static String getToken(String method, HttpUrl url, String mercId, String serial_no, String privateKeyFilePath, String body) throws Exception {
+    public static String getToken(String method, HttpUrl url, String mercId, String serialNo, String privateKeyFilePath, String body) throws Exception {
         String nonceStr = UUID.randomUUID().toString().replace("-", "");
         long timestamp = System.currentTimeMillis() / 1000;
         String message = buildMessage(method, url, timestamp, nonceStr, body);
         String signature = sign(message.getBytes("UTF-8"), privateKeyFilePath);
         return "mchid=\"" + mercId + "\","
-                + "serial_no=\"" + serial_no + "\","
+                + "serial_no=\"" + serialNo + "\","
                 + "nonce_str=\"" + nonceStr + "\","
                 + "timestamp=\"" + timestamp + "\","
                 + "signature=\"" + signature + "\"";
@@ -340,7 +340,7 @@ public class PublicConfig {
      * @Param:
      * @return:
      */
-    public static void CloseOrder(String order) throws Exception {
+    public static void closeOrder(String order) throws Exception {
 
         String postfix="/v3/pay/transactions/out-trade-no/"+order+"/close";
         //请求URL
@@ -431,6 +431,7 @@ public class PublicConfig {
             // 对所有传入参数按照字段名的 ASCII 码从小到大排序（字典序）
             Collections.sort(infoIds, new Comparator<Map.Entry<String, Object>>() {
 
+                @Override
                 public int compare(Map.Entry<String, Object> o1, Map.Entry<String, Object> o2) {
                     return (o1.getKey()).toString().compareTo(o2.getKey());
                 }
