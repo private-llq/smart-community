@@ -2,10 +2,10 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.payment.UnionPayBApplyRecordEntity;
-import com.jsy.community.qo.payment.UnionPay.CredentialNotifyQO;
-import com.jsy.community.qo.payment.UnionPay.CredentialQO;
-import com.jsy.community.qo.payment.UnionPay.ResetBtypeAcctPwdQO;
-import com.jsy.community.vo.livingpayment.UnionPay.CredentialVO;
+import com.jsy.community.qo.CredentialNotifyQO;
+import com.jsy.community.qo.CredentialQO;
+import com.jsy.community.qo.ResetBtypeAcctPwdQO;
+import com.jsy.community.vo.CredentialVO;
 
 /**
  * @Author: Pipi

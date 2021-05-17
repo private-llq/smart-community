@@ -2,7 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.payment.UnionPayBApplyRecordEntity;
-import com.jsy.community.qo.payment.UnionPay.CredentialNotifyQO;
+import com.jsy.community.qo.CredentialNotifyQO;
 import org.apache.ibatis.annotations.Param;
 
 /**

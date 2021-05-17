@@ -1,11 +1,11 @@
 package com.jsy.community.service.impl;
 
 import com.jsy.community.api.UnionPayService;
-import com.jsy.community.config.service.UnionPayConfig;
+import com.jsy.community.config.UnionPayConfig;
 import com.jsy.community.constant.Const;
-import com.jsy.community.qo.payment.UnionPay.*;
-import com.jsy.community.utils.UnionPayUtils;
-import com.jsy.community.vo.livingpayment.UnionPay.OpenApiResponseVO;
+import com.jsy.community.qo.*;
+import com.jsy.community.untils.UnionPayUtils;
+import com.jsy.community.vo.OpenApiResponseVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +130,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 获取钱包账户信息
      * @Param: walletIdQO: 钱包ID接参
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.AcctInfoVO
+     * @Return: com.jsy.community.vo.AcctInfoVO
      * @Date: 2021/4/14 13:44
      */
     @Override
@@ -143,7 +143,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 获取钱包账户绑定的银行卡列表
      * @Param: walletIdQO: 钱包ID接参
-     * @Return: java.util.List<com.jsy.community.vo.livingpayment.UnionPay.BindBankCardVO>
+     * @Return: java.util.List<com.jsy.community.vo.BindBankCardVO>
      * @Date: 2021/4/14 17:35
      */
     @Override
@@ -169,7 +169,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 查询钱包余额
      * @Param: balanceQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.BalanceVO
+     * @Return: com.jsy.community.vo.BalanceVO
      * @Date: 2021/4/28 17:46
      */
     @Override
@@ -182,7 +182,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 查询开B端开户情况
      * @Param: bizLicNoQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.BEndAccountOpeningVO
+     * @Return: com.jsy.community.vo.BEndAccountOpeningVO
      * @Date: 2021/5/10 9:18
      */
     @Override
@@ -195,7 +195,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 发送提现申请
      * @Param: withdrawQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.WithdrawVO
+     * @Return: com.jsy.community.vo.WithdrawVO
      * @Date: 2021/5/10 10:38
      */
     @Override
@@ -208,7 +208,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 激活账户
      * @Param: activeAcctQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.ActiveAcctVO
+     * @Return: com.jsy.community.vo.ActiveAcctVO
      * @Date: 2021/5/12 17:22
      */
     @Override
@@ -221,7 +221,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 银联消费下单
      * @Param: unionPayOrderRecordEntity:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.UnionPayOrderVO
+     * @Return: com.jsy.community.vo.UnionPayOrderVO
      * @Date: 2021/4/26 16:56
      */
     @Override
@@ -236,7 +236,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 查询交易明细
      * @Param: queryTransListQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.UnionPayTransListVO
+     * @Return: com.jsy.community.vo.UnionPayTransListVO
      * @Date: 2021/5/12 10:08
      */
     @Override
@@ -249,7 +249,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Author: Pipi
      * @Description: 账单查询
      * @Param: queryBillInfoQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.QueryBillInfoListVO
+     * @Return: com.jsy.community.vo.QueryBillInfoListVO
      * @Date: 2021/5/12 11:27
      */
     @Override

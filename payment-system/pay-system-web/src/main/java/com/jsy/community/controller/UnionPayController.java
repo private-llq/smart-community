@@ -8,15 +8,14 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.UnionPayBApplyRecordService;
 import com.jsy.community.api.UnionPayOrderRecordService;
 import com.jsy.community.api.UnionPayWalletService;
-import com.jsy.community.config.service.UnionPayConfig;
+import com.jsy.community.config.UnionPayConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.UnionPayOrderRecordEntity;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.qo.payment.UnionPay.*;
+import com.jsy.community.qo.*;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
-import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.livingpayment.UnionPay.*;
+import com.jsy.community.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -119,7 +118,7 @@ public class UnionPayController {
         if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getElecBankNo())) {
             throw new JSYException(400, "绑定银行卡时,电子联行号不能为空");
         }
-        if ((oprtType == 1 || oprtType == 2) && ObjectUtils.isEmpty(bindBankCardQO.getBankAcctType())) {
+        if ((oprtType == 1 || oprtType == 2) && bindBankCardQO.getBankAcctType() == null) {
             throw new JSYException(400, "绑定银行卡时,银行账户类型不能为空");
         }
         Boolean result = unionPayWalletService.bindBankCard(bindBankCardQO);
