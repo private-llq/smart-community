@@ -7,7 +7,13 @@ import org.dom4j.DocumentException;
 import java.io.IOException;
 import java.util.Scanner;
 
-
+/**
+ * @return
+ * @Author lihao
+ * @Description 这个是我扭着客服找他私人要的 他自己写的  他做了人脸库相关的功能   可以打debug看他怎么做出来人脸库(增删改查)的操作
+ * @Date 2021/5/8 11:53
+ * @Param
+ **/
 public class FaceMain {
 
     static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
@@ -16,16 +22,11 @@ public class FaceMain {
     public static void main(String[] args) throws InterruptedException, IOException, DocumentException {
         FaceMain faceMain=new FaceMain();
         FaceLibManage faceLibManage=new FaceLibManage();
-        FacePicManage facePicManage=new FacePicManage();
         FDSearch fdSearch=new FDSearch();
-        FCSearch fcSearch=new FCSearch();
         Alarm alarm=new Alarm();
 
         /**初始化*/
         hCNetSDK.NET_DVR_Init();
-
-        /**加载日志*/
-        boolean i= hCNetSDK.NET_DVR_SetLogToFile(3, "..//sdklog", false);
 
         /**登录*/
         faceMain.Login();

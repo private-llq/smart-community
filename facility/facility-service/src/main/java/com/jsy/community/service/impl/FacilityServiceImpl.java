@@ -71,7 +71,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		String password = facilityEntity.getPassword();
 		// 端口号
 		Short port = facilityEntity.getPort();
-		
 		// 有可能不同类型的设备会有相同的ip，所以这里表中对ip地址没有用唯一索引
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("ip", ip).eq("facility_type_id", facilityEntity.getFacilityTypeId());
@@ -79,7 +78,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		if (one != null) {
 			throw new FacilityException("您已添加相同ip的设备");
 		}
-		
 		facilityEntity.setId(SnowFlake.nextId());
 		facilityEntity.setIsConnectData(0);
 		facilityMapper.insert(facilityEntity);
@@ -87,8 +85,8 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		// 2. 登录设备
 		Map<String, Integer> map = FacilityUtils.login(ip, port, username, password, -1);
 		
-		// 3. 开启设备
-		// 根据设备的作用id，执行不同的作用[目前的需求有人脸比对，车牌抓拍]
+		// 3. 开启设备功能
+		// 根据设备的作用id，执行不同的作用功能[目前的需求有人脸比对，车牌抓拍]
 		Long facilityEffectId = facilityEntity.getFacilityEffectId();
 		Integer loginStatus = map.get("status");
 		Integer handle = map.get("facilityHandle");
