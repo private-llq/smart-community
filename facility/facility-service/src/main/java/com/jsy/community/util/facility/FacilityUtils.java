@@ -199,7 +199,7 @@ public class FacilityUtils {
 	}
 	
 	/**
-	 * @return long
+	 * @return
 	 * @Author 91李寻欢
 	 * @Description ************上传图片至人脸库************
 	 * 上传接口调用流程：
@@ -210,7 +210,7 @@ public class FacilityUtils {
 	 * 5) 重复步骤2、3、4，顺序上传其他人脸数据。
 	 * 6) 调用NET_DVR_UploadClose停止上传，释放资源。
 	 * @Date 2021/4/28 9:09
-	 * @Param []
+	 * @Param [lUserID：用户句柄，FDID：人脸库ID，user：业主信息]
 	 **/
 	public static void uploadFaceLibrary(int lUserID, String FDID, UserEntity user) throws IOException {
 		String realName = user.getRealName();
@@ -269,6 +269,9 @@ public class FacilityUtils {
 			log.info("NET_DVR_UploadFile_V40成功");
 		}
 		
+		
+		
+		
 		//2. 调用NET_DVR_UploadSend发送一张人脸图片数据和附加信息
 		// 通过该接口将人脸数据(人脸图片+图片附件信息)发送到设备的人脸库。图片格式要求：JPG或者JPEG，像素在40x40以上，大小在300KB以下
 		HCNetSDK.NET_DVR_SEND_PARAM_IN struSendParam = new HCNetSDK.NET_DVR_SEND_PARAM_IN();
@@ -307,6 +310,9 @@ public class FacilityUtils {
 			return;
 		}
 		
+		
+		
+		//3. 上传过程中循环调用NET_DVR_GetUploadState获取上传状态和进度
 		while (true) {
 			IntByReference Pint = new IntByReference(0);
 			int state = hCNetSDK.NET_DVR_GetUploadState(iSendData, Pint.getPointer());
@@ -314,6 +320,8 @@ public class FacilityUtils {
 				System.out.println("上传成功");
 				//获取图片ID
 				HCNetSDK.NET_DVR_UPLOAD_FILE_RET struUploadRet = new HCNetSDK.NET_DVR_UPLOAD_FILE_RET();
+				
+				//4. 上传成功之后调用NET_DVR_GetUploadResult获取结果信息（图片ID等）
 				boolean bUploadResult = hCNetSDK.NET_DVR_GetUploadResult(iUploadHandle, struUploadRet.getPointer(), struUploadRet.size());
 				if (!bUploadResult) {
 					int iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -330,7 +338,10 @@ public class FacilityUtils {
 			System.err.println("返回值" + state);
 			break;
 		}
-		//关闭图片上传连接
+		
+		
+		
+		//5. 调用NET_DVR_UploadClose停止上传，释放资源
 		boolean b_Close = hCNetSDK.NET_DVR_UploadClose(iUploadHandle);
 		if (!b_Close) {
 			int iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -383,7 +394,7 @@ public class FacilityUtils {
 	/**
 	 * 得到文件流
 	 *
-	 * @param url 网络图片URL地址
+	 * @param url 将图片url转成字节数组
 	 * @return
 	 */
 	public static byte[] getFileStream(String url) {

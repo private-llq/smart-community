@@ -250,16 +250,19 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Override
 	public void connectData(Long id, Long communityId) {
-		//0. 查询该设备的唯一用户句柄
+		//0. 查询该设备的用户句柄
 		int handle = facilityMapper.selectFacilityHandle(id);
 		
 		//判断是否是一个全新的摄像机
 		FDSearch fdSearch = new FDSearch();
 		boolean flag = fdSearch.getFaceLibSpace(handle);
 		if (!flag) {
+			log.info("不是一个全新的摄像机");
 			//不是
 			//1. 查询redis里面
-			log.info("不是一个全新的摄像机");
+			
+			
+			
 		} else {
 			//是
 			//1. 查询该社区的所有已认证的用户id

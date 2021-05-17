@@ -127,6 +127,12 @@ public class FacilityController {
 		return CommonResult.ok();
 	}
 	
+	/**
+	 * 同步数据：指把数据库里面最新的数据情况下发到摄像机上面
+	 * 比如：新买了一个摄像机，它里面没有人脸，那么此时就需要（同步数据）批量导入数据进去。
+	 * 比如：数据库里面今天多了几个新业主信息，此时摄像机还没有添加这些业主的信息，那么此时就需要（同步数据）批量导入数据进去。
+	 *          其实每次来点这个同步按钮，在业主认证时用rabbitMQ监听，只要添加了新业主，将其信息发到rabbitMQ，然后异步消费实现将新增的业主添加到人脸库
+	 **/
 	@ApiOperation("根据设备id同步数据")
 	@GetMapping("/connectData")
 	public CommonResult connectData(@RequestParam("id") Long id) {

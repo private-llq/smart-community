@@ -51,7 +51,6 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 		FMSGCallBack_V31Impl.carTrackService = this.carTrackService;
 		FMSGCallBack_V31Impl.facilityService = this.facilityService;
 		FMSGCallBack_V31Impl.peopleTrackService = this.peopleTrackService;
-		
 	}
 	
 	/**
@@ -60,12 +59,11 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 	 * @Description
 	 * @Date 2021/4/20 10:36
 	 * @Param [
-	 * lCommand：   上传的消息类型，不同的报警信息对应不同的类型，通过类型区分是什么报警信息，详见SDK中NET_DVR_SetDVRMessageCallBack_V31下的 “Remarks” 列表。
-	 * pAlarmer：   报警设备信息，包括设备序列号、IP地址、登录IUserID句柄等
-	 * pAlarmInfo： 报警信息，通过lCommand值判断pAlarmer对应的结构体，详见“Remarks”中列表
-	 * dwBufLen：   报警信息缓存大小
-	 * pUser：      用户数据
-	 * pS: 该接口中回调函数的第一个参数（lCommand）和第三个参数（pAlarmInfo）是密切关联的
+	 *      lCommand：   上传的消息类型，不同的报警信息对应不同的类型，通过类型区分是什么报警信息，详见SDK中NET_DVR_SetDVRMessageCallBack_V31下的 “Remarks” 列表。
+	 *      pAlarmer：   报警设备信息，包括设备序列号、IP地址、登录IUserID句柄等
+	 *      pAlarmInfo： 报警信息，通过lCommand值判断pAlarmer对应的结构体，详见“Remarks”中列表
+	 *      dwBufLen：   报警信息缓存大小
+	 *      pUser：      用户数据
 	 * ]
 	 **/
 	@Override
@@ -180,19 +178,19 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 				
 				//人脸名单比对报警
 				// NET_VCA_FACESNAP_MATCH_ALARM：人脸比对结果报警上传结构体。
-				// *************意思是把当前摄像头抓拍到的信息赋值给 NET_VCA_FACESNAP_MATCH_ALARM【人脸比对结果报警上传结构体】*******************//
 				HCNetSDK.NET_VCA_FACESNAP_MATCH_ALARM strFaceSnapMatch = new HCNetSDK.NET_VCA_FACESNAP_MATCH_ALARM();
 				strFaceSnapMatch.write();
 				Pointer pFaceSnapMatch = strFaceSnapMatch.getPointer();
 				pFaceSnapMatch.write(0, pAlarmInfo.getByteArray(0, strFaceSnapMatch.size()), 0, strFaceSnapMatch.size());
 				strFaceSnapMatch.read();
-				// *************意思是把当前摄像头抓拍到的信息赋值给 NET_VCA_FACESNAP_MATCH_ALARM【人脸比对结果报警上传结构体】*******************//
 				
 				// dwSnapPicLen：设备识别抓拍图片长度
 				// byPicTransType：图片数据传输方式: 0- 二进制，1- URL路径(HTTP协议的图片URL)
 				// ----------------大图[远距离图]
 				// 将设备抓拍的图片写出到电脑上[或上传到存储服务器]
 				// dwSnapPicLen：设备识别抓拍图片长度     byPicTransType：图片数据传输方式: 0- 二进制，1- URL路径(HTTP协议的图片URL)
+				/////////////////////////////////////////////////////////////////////设备抓拍的图[比起人脸子图大一些，会带一点背景]/////////////////////////////////////////////////////////////////////
+
 //				if ((strFaceSnapMatch.dwSnapPicLen > 0) && (strFaceSnapMatch.byPicTransType == 0)) {
 //					SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss"); //设置日期格式
 //					String time = df.format(new Date()); // new Date()为获取当前系统时间
