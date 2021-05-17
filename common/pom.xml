@@ -276,17 +276,17 @@
 		</dependency>
 		<!-- 银联支付相关结束 -->
 	</dependencies>
-	<!--引入本地资源-->
-	<build>
-		<!--引入本地资源-->
-		<resources>
-			<resource>
-				<directory>lib</directory>
-				<targetPath>BOOT-INF/lib/</targetPath>
-				<includes>
-					<include>**/*.jar</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
+<!--	&lt;!&ndash;引入本地资源&ndash;&gt;-->
+<!--	<build>-->
+<!--		&lt;!&ndash;引入本地资源&ndash;&gt;-->
+<!--		<resources>-->
+<!--			<resource>-->
+<!--				<directory>lib</directory>-->
+<!--				<targetPath>BOOT-INF/lib/</targetPath>-->
+<!--				<includes>-->
+<!--					<include>**/*.jar</include>-->
+<!--				</includes>-->
+<!--			</resource>-->
+<!--		</resources>-->
+<!--	</build>-->
 </project>
