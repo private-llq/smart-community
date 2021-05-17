@@ -247,46 +247,18 @@
 			<version>4.1.0</version>
 		</dependency>
 		<!--	poi	-->
-		<!-- 银联支付相关开始 -->
-		<dependency>
-			<groupId>com.gnete.openapi</groupId>
-			<artifactId>gnete-openapi-sdk-1.0.2-RELEASE</artifactId>
-			<version>1.0.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/gnete-openapi-sdk-1.0.2-RELEASE.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>com.sdk.api</groupId>
-			<artifactId>gnete-sdk-api-1.0.2-RELEASE</artifactId>
-			<version>1.0.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/gnete-sdk-api-1.0.2-RELEASE.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>com.gnete.sign</groupId>
-			<artifactId>gnete-sign-suite-1.0.2-RELEASE</artifactId>
-			<version>1.0.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/gnete-sign-suite-1.0.2-RELEASE.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.4.4</version>
-		</dependency>
-		<!-- 银联支付相关结束 -->
 	</dependencies>
-	<!--引入本地资源-->
-	<build>
-		<!--引入本地资源-->
-		<resources>
-			<resource>
-				<directory>lib</directory>
-				<targetPath>BOOT-INF/lib/</targetPath>
-				<includes>
-					<include>**/*.jar</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
+<!--	&lt;!&ndash;引入本地资源&ndash;&gt;-->
+<!--	<build>-->
+<!--		&lt;!&ndash;引入本地资源&ndash;&gt;-->
+<!--		<resources>-->
+<!--			<resource>-->
+<!--				<directory>lib</directory>-->
+<!--				<targetPath>BOOT-INF/lib/</targetPath>-->
+<!--				<includes>-->
+<!--					<include>**/*.jar</include>-->
+<!--				</includes>-->
+<!--			</resource>-->
+<!--		</resources>-->
+<!--	</build>-->
 </project>

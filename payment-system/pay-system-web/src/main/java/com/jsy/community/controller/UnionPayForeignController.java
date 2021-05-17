@@ -5,14 +5,13 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.UnionPayService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.qo.payment.UnionPay.*;
+import com.jsy.community.qo.*;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.livingpayment.UnionPay.OpenApiResponseVO;
+import com.jsy.community.vo.OpenApiResponseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -104,7 +103,7 @@ public class UnionPayForeignController {
         if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getElecBankNo())) {
             throw new JSYException(400, "绑定银行卡时,电子联行号不能为空");
         }
-        if ((oprtType == 1 || oprtType == 2) && ObjectUtils.isEmpty(bindBankCardQO.getBankAcctType())) {
+        if ((oprtType == 1 || oprtType == 2) && bindBankCardQO.getBankAcctType() == null) {
             throw new JSYException(400, "绑定银行卡时,银行账户类型不能为空");
         }
         OpenApiResponseVO responseVO = unionPayService.bindBankCard(bindBankCardQO);

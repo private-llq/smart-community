@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.PaymentException;
 import com.jsy.community.api.UnionPayService;
 import com.jsy.community.api.UnionPayWalletService;
-import com.jsy.community.config.service.UnionPayConfig;
+import com.jsy.community.config.UnionPayConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.UnionPayTradeRecordEntity;
 import com.jsy.community.entity.payment.UnionPayWalletBankEntity;
@@ -17,10 +17,10 @@ import com.jsy.community.mapper.UnionPayBApplyRecordMapper;
 import com.jsy.community.mapper.UnionPayTradeRecordMapper;
 import com.jsy.community.mapper.UnionPayWalletBankMapper;
 import com.jsy.community.mapper.UnionPayWalletMapper;
-import com.jsy.community.qo.payment.UnionPay.*;
+import com.jsy.community.qo.*;
+import com.jsy.community.untils.UnionPayUtils;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UnionPayUtils;
-import com.jsy.community.vo.livingpayment.UnionPay.*;
+import com.jsy.community.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -256,7 +256,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
      *@Author: Pipi
      *@Description: 获取钱包账户信息
      *@Param: walletIdQO: 钱包ID接参
-     *@Return: com.jsy.community.vo.livingpayment.UnionPay.AcctInfoVO
+     *@Return: com.jsy.community.vo.AcctInfoVO
      *@Date: 2021/4/14 13:44
      **/
     @Override
@@ -303,7 +303,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
      *@Author: Pipi
      *@Description: 获取钱包账户绑定的银行卡列表
      *@Param: walletIdQO: 钱包ID接参
-     *@Return: java.util.List<com.jsy.community.vo.livingpayment.UnionPay.BindBankCardVO>
+     *@Return: java.util.List<com.jsy.community.vo.BindBankCardVO>
      *@Date: 2021/4/14 17:35
      **/
     @Override
@@ -343,7 +343,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
      * @Author: Pipi
      * @Description: 查询钱包余额
      * @Param: balanceQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.BalanceVO
+     * @Return: com.jsy.community.vo.BalanceVO
      * @Date: 2021/4/28 17:46
      */
     @Override
@@ -361,7 +361,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
      *@Author: Pipi
      *@Description: 查询开B端开户情况
      *@Param: bizLicNoQO:
-     *@Return: com.jsy.community.vo.livingpayment.UnionPay.BEndAccountOpeningVO
+     *@Return: com.jsy.community.vo.BEndAccountOpeningVO
      *@Date: 2021/5/10 9:18
      **/
     @Override
@@ -380,7 +380,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
      *@Author: Pipi
      *@Description: 发送提现申请
      *@Param: withdrawQO:
-     *@Return: com.jsy.community.vo.livingpayment.UnionPay.WithdrawVO
+     *@Return: com.jsy.community.vo.WithdrawVO
      *@Date: 2021/5/10 10:38
      **/
     @Override
@@ -426,7 +426,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
      * @Author: Pipi
      * @Description: 激活账户
      * @Param: activeAcctQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.ActiveAcctVO
+     * @Return: com.jsy.community.vo.ActiveAcctVO
      * @Date: 2021/5/12 17:22
      */
     @Override

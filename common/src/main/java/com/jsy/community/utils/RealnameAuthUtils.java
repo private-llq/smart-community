@@ -1,6 +1,7 @@
 package com.jsy.community.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.RealnameBlinkInitQO;
 import com.jsy.community.qo.RealnameBlinkQueryQO;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class RealnameAuthUtils {
 	 * @Date: 2021/3/2
 	**/
 	public static JSONObject initBlink(RealnameBlinkInitQO realnameBlinkInitQO){
-		String appCode = "7def68d3c18341d6a43d33259fa3d0c5";
+		String appCode = "cff6fed543a9459cbabb54b0dab6d9ea";
 		String host = "https://ediszim.market.alicloudapi.com";
 		String path = "/zoloz/zim/init";
 		String method = "POST";
@@ -79,6 +80,7 @@ public class RealnameAuthUtils {
 			result = JSONObject.parseObject(EntityUtils.toString(response.getEntity()));
 			if(result == null){
 				log.error("实人认证三要素 - 前置接口 三方服务使用次数耗尽");
+				throw new JSYException("实人认证-三方服务使用次数可能耗尽，请检查");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -94,7 +96,7 @@ public class RealnameAuthUtils {
 	 * @Date: 2021/3/2
 	**/
 	public static JSONObject getBlinkResult(RealnameBlinkQueryQO realnameBlinkQueryQO){
-		String appCode = "7def68d3c18341d6a43d33259fa3d0c5";
+		String appCode = "cff6fed543a9459cbabb54b0dab6d9ea";
 		String host = "https://ediszim.market.alicloudapi.com";
 		String path = "/zoloz/zim/getResult";
 		String method = "POST";
@@ -112,6 +114,7 @@ public class RealnameAuthUtils {
 			result = JSONObject.parseObject(EntityUtils.toString(response.getEntity()));
 			if(result == null){
 				log.error("实人认证三要素 - 获取认证结果 三方服务使用次数耗尽");
+				throw new JSYException("实人认证-三方服务使用次数可能耗尽，请检查");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

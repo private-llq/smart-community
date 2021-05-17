@@ -1,7 +1,8 @@
 package com.jsy.community.api;
 
-import com.jsy.community.qo.payment.UnionPay.*;
-import com.jsy.community.vo.livingpayment.UnionPay.OpenApiResponseVO;
+
+import com.jsy.community.qo.*;
+import com.jsy.community.vo.OpenApiResponseVO;
 
 /**
  * @Author: Pipi
@@ -78,7 +79,7 @@ public interface UnionPayService {
      * @Author: Pipi
      * @Description: 获取钱包账户信息
      * @Param: walletIdQO: 钱包ID接参
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.AcctInfoVO
+     * @Return: com.jsy.community.vo.AcctInfoVO
      * @Date: 2021/4/14 13:44
      **/
     OpenApiResponseVO queryAcctInfo(WalletIdQO walletIdQO);
@@ -87,7 +88,7 @@ public interface UnionPayService {
      * @Author: Pipi
      * @Description: 获取钱包账户绑定的银行卡列表
      * @Param: walletIdQO: 钱包ID接参
-     * @Return: java.util.List<com.jsy.community.vo.livingpayment.UnionPay.BindBankCardVO>
+     * @Return: java.util.List<com.jsy.community.vo.BindBankCardVO>
      * @Date: 2021/4/14 17:35
      **/
     OpenApiResponseVO queryBindBankCardList(WalletIdQO walletIdQO);
@@ -105,7 +106,7 @@ public interface UnionPayService {
      * @Author: Pipi
      * @Description: 查询钱包余额
      * @Param: balanceQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.BalanceVO
+     * @Return: com.jsy.community.vo.BalanceVO
      * @Date: 2021/4/28 17:46
      */
     OpenApiResponseVO queryBalance(BalanceQO balanceQO);
@@ -114,7 +115,7 @@ public interface UnionPayService {
      * @Author: Pipi
      * @Description: 查询开B端开户情况
      * @Param: bizLicNoQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.BEndAccountOpeningVO
+     * @Return: com.jsy.community.vo.BEndAccountOpeningVO
      * @Date: 2021/5/10 9:18
      **/
     OpenApiResponseVO queryWalletByBizLicNo(BizLicNoQO bizLicNoQO);
@@ -123,7 +124,7 @@ public interface UnionPayService {
      * @Author: Pipi
      * @Description: 发送提现申请
      * @Param: withdrawQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.WithdrawVO
+     * @Return: com.jsy.community.vo.WithdrawVO
      * @Date: 2021/5/10 10:38
      **/
     OpenApiResponseVO withdrawApply(WithdrawQO withdrawQO);
@@ -132,7 +133,7 @@ public interface UnionPayService {
      * @Author: Pipi
      * @Description: 激活账户
      * @Param: activeAcctQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.ActiveAcctVO
+     * @Return: com.jsy.community.vo.ActiveAcctVO
      * @Date: 2021/5/12 17:22
      */
     OpenApiResponseVO activeAcct(ActiveAcctQO activeAcctQO);
@@ -141,7 +142,7 @@ public interface UnionPayService {
      *@Author: Pipi
      *@Description: 银联消费下单
      *@Param: unionPayOrderRecordEntity:
-     *@Return: com.jsy.community.vo.livingpayment.UnionPay.UnionPayOrderVO
+     *@Return: com.jsy.community.vo.UnionPayOrderVO
      *@Date: 2021/4/26 16:56
      **/
     OpenApiResponseVO generateConsumeOrder(GenerateOrderQO generateOrderQO);
@@ -150,7 +151,7 @@ public interface UnionPayService {
      * @Author: Pipi
      * @Description: 查询交易明细
      * @Param: queryTransListQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.UnionPayTransListVO
+     * @Return: com.jsy.community.vo.UnionPayTransListVO
      * @Date: 2021/5/12 10:08
      */
     OpenApiResponseVO queryTransList(QueryTransListQO queryTransListQO);
@@ -159,7 +160,7 @@ public interface UnionPayService {
      * @Author: Pipi
      * @Description: 账单查询
      * @Param: queryBillInfoQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.QueryBillInfoListVO
+     * @Return: com.jsy.community.vo.QueryBillInfoListVO
      * @Date: 2021/5/12 11:27
      */
     OpenApiResponseVO queryBillInfo(QueryBillInfoQO queryBillInfoQO);

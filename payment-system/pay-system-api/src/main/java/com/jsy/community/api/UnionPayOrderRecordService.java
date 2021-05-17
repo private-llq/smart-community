@@ -2,12 +2,12 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.payment.UnionPayOrderRecordEntity;
-import com.jsy.community.qo.payment.UnionPay.ConsumeApplyOrderNotifyQO;
-import com.jsy.community.qo.payment.UnionPay.QueryBillInfoQO;
-import com.jsy.community.qo.payment.UnionPay.QueryTransListQO;
-import com.jsy.community.vo.livingpayment.UnionPay.QueryBillInfoListVO;
-import com.jsy.community.vo.livingpayment.UnionPay.UnionPayOrderVO;
-import com.jsy.community.vo.livingpayment.UnionPay.UnionPayTransListVO;
+import com.jsy.community.qo.ConsumeApplyOrderNotifyQO;
+import com.jsy.community.qo.QueryBillInfoQO;
+import com.jsy.community.qo.QueryTransListQO;
+import com.jsy.community.vo.QueryBillInfoListVO;
+import com.jsy.community.vo.UnionPayOrderVO;
+import com.jsy.community.vo.UnionPayTransListVO;
 
 /**
  * @Author: Pipi
@@ -21,7 +21,7 @@ public interface UnionPayOrderRecordService extends IService<UnionPayOrderRecord
      *@Author: Pipi
      *@Description: 银联消费下单
      *@Param: unionPayOrderRecordEntity:
-     *@Return: com.jsy.community.vo.livingpayment.UnionPay.UnionPayOrderVO
+     *@Return: com.jsy.community.vo.UnionPayOrderVO
      *@Date: 2021/4/26 16:56
      **/
     UnionPayOrderVO generateOrder(UnionPayOrderRecordEntity unionPayOrderRecordEntity);
@@ -39,7 +39,7 @@ public interface UnionPayOrderRecordService extends IService<UnionPayOrderRecord
      *@Author: Pipi
      *@Description: 查询交易明细
      *@Param: queryTransListQO:
-     *@Return: com.jsy.community.vo.livingpayment.UnionPay.UnionPayTransListVO
+     *@Return: com.jsy.community.vo.UnionPayTransListVO
      *@Date: 2021/5/12 10:08
      **/
     UnionPayTransListVO queryTransList(QueryTransListQO queryTransListQO);
@@ -48,7 +48,7 @@ public interface UnionPayOrderRecordService extends IService<UnionPayOrderRecord
      *@Author: Pipi
      *@Description: 账单查询
      *@Param: queryBillInfoQO: 
-     *@Return: com.jsy.community.vo.livingpayment.UnionPay.QueryBillInfoListVO
+     *@Return: com.jsy.community.vo.QueryBillInfoListVO
      *@Date: 2021/5/12 11:27
      **/
     QueryBillInfoListVO queryBillInfo(QueryBillInfoQO queryBillInfoQO);

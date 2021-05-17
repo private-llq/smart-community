@@ -7,23 +7,23 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.PaymentException;
 import com.jsy.community.api.UnionPayOrderRecordService;
 import com.jsy.community.api.UnionPayService;
-import com.jsy.community.config.service.UnionPayConfig;
+import com.jsy.community.config.UnionPayConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.UnionPayOrderRecordEntity;
 import com.jsy.community.entity.payment.UnionPayWalletEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.UnionPayOrderRecordMapper;
 import com.jsy.community.mapper.UnionPayWalletMapper;
-import com.jsy.community.qo.payment.UnionPay.ConsumeApplyOrderNotifyQO;
-import com.jsy.community.qo.payment.UnionPay.GenerateOrderQO;
-import com.jsy.community.qo.payment.UnionPay.QueryBillInfoQO;
-import com.jsy.community.qo.payment.UnionPay.QueryTransListQO;
+import com.jsy.community.qo.ConsumeApplyOrderNotifyQO;
+import com.jsy.community.qo.GenerateOrderQO;
+import com.jsy.community.qo.QueryBillInfoQO;
+import com.jsy.community.qo.QueryTransListQO;
+import com.jsy.community.untils.UnionPayUtils;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UnionPayUtils;
-import com.jsy.community.vo.livingpayment.UnionPay.OpenApiResponseVO;
-import com.jsy.community.vo.livingpayment.UnionPay.QueryBillInfoListVO;
-import com.jsy.community.vo.livingpayment.UnionPay.UnionPayOrderVO;
-import com.jsy.community.vo.livingpayment.UnionPay.UnionPayTransListVO;
+import com.jsy.community.vo.OpenApiResponseVO;
+import com.jsy.community.vo.QueryBillInfoListVO;
+import com.jsy.community.vo.UnionPayOrderVO;
+import com.jsy.community.vo.UnionPayTransListVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -59,7 +59,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
      *@Author: Pipi
      *@Description: 银联消费下单
      *@Param: unionPayOrderRecordEntity:
-     *@Return: com.jsy.community.vo.livingpayment.UnionPay.UnionPayOrderVO
+     *@Return: com.jsy.community.vo.UnionPayOrderVO
      *@Date: 2021/4/26 16:56
      **/
     @Override
@@ -157,7 +157,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
      * @Author: Pipi
      * @Description: 查询交易明细
      * @Param: queryTransListQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.UnionPayTransListVO
+     * @Return: com.jsy.community.vo.UnionPayTransListVO
      * @Date: 2021/5/12 10:08
      */
     @Override
@@ -176,7 +176,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
      * @Author: Pipi
      * @Description: 账单查询
      * @Param: queryBillInfoQO:
-     * @Return: com.jsy.community.vo.livingpayment.UnionPay.QueryBillInfoListVO
+     * @Return: com.jsy.community.vo.QueryBillInfoListVO
      * @Date: 2021/5/12 11:27
      */
     @Override

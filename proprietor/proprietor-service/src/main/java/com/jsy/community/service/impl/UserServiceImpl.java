@@ -36,6 +36,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
@@ -214,10 +215,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         } else { //用户名注册
             userAuth.setUsername(qo.getAccount());
         }
-        //添加业主(user表)
-        save(user);
-        //添加账户(user_auth表)
-        userAuthService.save(userAuth);
+        try{
+            //添加业主(user表)
+            save(user);
+            //添加账户(user_auth表)
+            userAuthService.save(userAuth);
+        }catch (DuplicateKeyException e){
+            throw new ProprietorException("该用户已注册");
+        }
         //创建金钱账户(t_user_account表)
         boolean userAccountResult = userAccountService.createUserAccount(uuid);
         if(!userAccountResult){
