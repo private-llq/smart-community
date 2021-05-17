@@ -220,6 +220,8 @@ public class AdminLoginController {
 		BeanUtils.copyProperties(user,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
+		//删除登录用的一次性key
+		redisTemplate.delete("Admin:CommunityKey:" + communityKey);
 		return CommonResult.ok(adminInfoVo);
 	}
 	
