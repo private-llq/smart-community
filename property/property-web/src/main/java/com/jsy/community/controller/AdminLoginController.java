@@ -223,7 +223,9 @@ public class AdminLoginController {
 		return CommonResult.ok(adminInfoVo);
 	}
 	
-	//检查手机验证码
+	/**
+	 * 检查手机验证码
+	 */
 	private void checkVerifyCode(String mobile, String code) {
 		Object oldCode = redisTemplate.opsForValue().get("vCodeAdmin:" + mobile);
 		if (oldCode == null) {
