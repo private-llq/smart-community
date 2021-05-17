@@ -50,6 +50,9 @@ public class FacilityController {
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 	
+	/**
+	 * 在添加设备的时候，让用户选择该摄像机是做什么功能的。
+	 **/
 	@ApiOperation("获取设备作用")
 	@GetMapping("/getFacilityTypeEffect")
 	public CommonResult getFacilityTypeEffect() {
@@ -58,7 +61,7 @@ public class FacilityController {
 	}
 	
 	/**
-	 * 添加设备功能：  1. 保存设备基本信息   2. 根据基本信息开启设备响应功能   3. 保存设备状态信息
+	 * 添加设备功能：  1. 保存设备基本信息   2. 根据基本信息开启设备相应功能   3. 保存设备状态信息
 	 **/
 	@ApiOperation("添加设备")
 	@PostMapping("/addFacility")
@@ -102,7 +105,7 @@ public class FacilityController {
 	@ApiOperation("编辑设备")
 	@PostMapping("/updateFacility")
 	// TODO: 2021/4/23 编辑的时候不能更改该摄像头的作用  因为摄像头的作用需要更改摄像头后台  开启相应的功能
-	// TODO: 2021/4/23 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
+	// TODO: 2021/4/23 一个摄像机不能同时做车牌抓拍识别与人脸比对功能2个事
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		facilityEntity.setCommunityId(communityId);
@@ -129,9 +132,9 @@ public class FacilityController {
 	
 	/**
 	 * 同步数据：指把数据库里面最新的数据情况下发到摄像机上面
-	 * 比如：新买了一个摄像机，它里面没有人脸，那么此时就需要（同步数据）批量导入数据进去。
-	 * 比如：数据库里面今天多了几个新业主信息，此时摄像机还没有添加这些业主的信息，那么此时就需要（同步数据）批量导入数据进去。
-	 *          其实每次来点这个同步按钮，在业主认证时用rabbitMQ监听，只要添加了新业主，将其信息发到rabbitMQ，然后异步消费实现将新增的业主添加到人脸库
+	 * 情况1：新买了一个摄像机，它里面没有人脸，那么此时就需要（同步数据）批量导入数据进去。
+	 * 情况2：数据库里面今天多了几个新业主信息，此时摄像机还没有添加这些业主的信息，那么此时就需要（同步数据）批量导入数据进去。
+	 *      PS：情况2 其实每次来点这个同步按钮是没必要的，在业主认证时用rabbitMQ监听，只要添加了新业主，将其信息发到rabbitMQ，然后就及时异步消费实现将新增的业主添加到人脸库
 	 **/
 	@ApiOperation("根据设备id同步数据")
 	@GetMapping("/connectData")

@@ -20,7 +20,13 @@ import java.util.List;
  */
 public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	
-	
+	/**
+	 * @return List<FacilityEntity>
+	 * @Author 91李寻欢
+	 * @Description 条件分页查询
+	 * @Date 2021/5/11 12:55
+	 * @Param
+	 **/
 	List<FacilityEntity> listFacility(@Param("qo") FacilityQO facilityQO, @Param("page") Page<FacilityEntity> info);
 	
 	/**
@@ -28,7 +34,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 * @Author 91李寻欢
 	 * @Description 保存设备状态信息
 	 * @Date 2021/5/11 12:55
-	 * @Param [id, status, facilityHandle, facilityId, facilityAlarmHandle]
+	 * @Param [id：设备id, status：设备在线状态, facilityHandle：设备用户句槟, facilityId：设备作用id, facilityAlarmHandle：设备报警布防句槟]
 	 **/
 	void insertFacilityStatus(@Param("id") long id, @Param("status") Integer status, @Param("facilityHandle") Integer facilityHandle, @Param("facilityId") Long facilityId, @Param("facilityAlarmHandle") int facilityAlarmHandle);
 	
@@ -42,6 +48,13 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	@Select("select facility_handle from t_facility_status where facility_id = #{id}")
 	int selectFacilityHandle(Long id);
 	
+	/**
+	 * @return int
+	 * @Author 91李寻欢
+	 * @Description 根据设备id获取设备状态
+	 * @Date 2021/4/23 18:42
+	 * @Param [id]
+	 **/
 	@Select("select status from t_facility_status where facility_id = #{id}")
 	int getStatus(Long id);
 	
@@ -55,6 +68,13 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	@Delete("delete from t_facility_status where facility_id = #{id}")
 	void deleteMiddleFacility(Long id);
 	
+	/**
+	 * @return void
+	 * @Author 91李寻欢
+	 * @Description 根据社区id查询设备id集合
+	 * @Date 2021/4/22 17:17
+	 * @Param [id]
+	 **/
 	List<Long> selectId(int communityId);
 	
 	/**

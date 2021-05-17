@@ -21,12 +21,12 @@ public class AdminMenuEntity extends BaseEntity {
 	
 	@NotBlank(message = "菜单名不能为空")
 	private String name;//菜单名
-	private String url;//菜单url
+	private String path;//菜单url
 	private Integer sort;//排序
 	private Long pid;//父级id
 	@JsonIgnore
 	private Long belongTo;//顶级菜单id
-	private List<AdminMenuEntity> childrenList;//子菜单
+	private List<AdminMenuEntity> children;//子菜单
 	
 	private Long createBy;//创建人
 	private Long updateBy;//修改人

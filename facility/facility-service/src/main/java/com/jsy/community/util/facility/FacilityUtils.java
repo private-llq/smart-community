@@ -87,7 +87,7 @@ public class FacilityUtils {
 	
 	/**
 	 * @return 布防句柄
-	 * @Author 91李寻欢
+	 * @Author lihao
 	 * @Description 根据不同的设备作用id开启不同的设备功能   目前需求要做的是“人脸比对”与“车牌识别”
 	 * @Date 2021/4/23 13:59
 	 * @Param [loginStatus：在线状态, handle：用户句柄, facilityEffectId：设备作用ID]
@@ -152,7 +152,7 @@ public class FacilityUtils {
 	
 	/**
 	 * @return void
-	 * @Author 91李寻欢
+	 * @Author lihao
 	 * @Description 撤防
 	 * @Date 2021/4/23 15:11
 	 * @Param [lAlarmHandle：布防句柄]
@@ -168,7 +168,7 @@ public class FacilityUtils {
 	
 	/**
 	 * @return void
-	 * @Author 91李寻欢
+	 * @Author lihao
 	 * @Description 注销
 	 * @Date 2021/4/23 18:44
 	 * @Param [lUserID：用户句柄]
@@ -183,7 +183,7 @@ public class FacilityUtils {
 	
 	/**
 	 * @return int
-	 * @Author 91李寻欢
+	 * @Author lihao
 	 * @Description 根据用户句柄判断设备是否在线
 	 * 当某设备掉线了，此时拿着他在线时的用户句柄去判断是否在线。  在线：true   不在线：false
 	 * @Date 2021/4/23 18:46
@@ -200,7 +200,7 @@ public class FacilityUtils {
 	
 	/**
 	 * @return
-	 * @Author 91李寻欢
+	 * @Author lihao
 	 * @Description ************上传图片至人脸库************
 	 * 上传接口调用流程：
 	 * 1) 调用NET_DVR_UploadFile_V40开始上传数据。
@@ -291,7 +291,6 @@ public class FacilityUtils {
 		struSendParam.byPicType = 1; //图片格式：1- jpg，2- bmp，3- png，4- SWF，5- GIF
 		struSendParam.sPicName = "哇哈哈".getBytes(); //图片名称
 		byte[] byFDLibName = realName.getBytes("UTF-8");
-//		2014-12-12T00:00:00Z
 		String strInBuffer1 = new String("<FaceAppendData version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><bornTime>" + birthdayTimeStr + "</bornTime><name>");
 		String strInBuffer2 = new String("</name><sex>" + sexStr + "</sex><province>" + provinceStr + "</province><city>" + cityStr + "</city><certificateType>" + ficationTypeStr + "</certificateType><certificateNumber>" + idCard + "</certificateNumber><PersonInfoExtendList><PersonInfoExtend><id>1</id><enable>false</enable><name>test1</name><value>test2</value></PersonInfoExtend></PersonInfoExtendList></FaceAppendData>");
 		int iStringSize = byFDLibName.length + strInBuffer1.length() + strInBuffer2.length();
@@ -352,8 +351,8 @@ public class FacilityUtils {
 	
 	/**
 	 * @return byte[]
-	 * @Author 91李寻欢
-	 * @Description 返回读取到的数据到 byte数组
+	 * @Author lihao
+	 * @Description 将本地文件转成字节数组
 	 * @Date 2021/4/28 13:59
 	 * @Param [filename] 本地文件
 	 **/
@@ -469,7 +468,7 @@ public class FacilityUtils {
 	/**
 	 * 从输入流中获取数据
 	 *
-	 * @param inStream 输入流
+	 * @param inStream 将输入流转成二进制数组
 	 * @return
 	 * @throws Exception
 	 */

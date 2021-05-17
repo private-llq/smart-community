@@ -46,7 +46,7 @@ public interface ICommonConstService extends IService<CommonConst> {
 	
 	/**
 	 * @return java.util.List<com.jsy.community.entity.CommonConst>
-	 * @Author 91李寻欢
+	 * @Author lihao
 	 * @Description 获取设备作用
 	 * @Date 2021/4/23 11:46
 	 * @Param []
