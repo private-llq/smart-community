@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description: 微信支付入参
  * @author: Hu
  * @create: 2021-01-22 14:12
  **/
