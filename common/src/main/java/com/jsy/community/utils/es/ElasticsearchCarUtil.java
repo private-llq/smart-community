@@ -76,7 +76,6 @@ public class ElasticsearchCarUtil {
      * @return:
      */
     public static void deleteDataAll(RestHighLevelClient restHighLevelClient){
-        //第一个参数为操作索引名称、第二个参数为删除文档的id
         DeleteIndexRequest deleteRequest = new DeleteIndexRequest(BusinessConst.INDEX_CAR);
         AcknowledgedResponse response = null;
         try {
