@@ -12,10 +12,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * &#x5e03;&#x9632;&#x56de;&#x8c03;&#x51fd;&#x6570;
  *
- * @author jiangxin
- * @create 2021-03-11-11:09
+ *
+ *
+ * 这个类是客服给我的不要删除，可以作为一个demo例子查看人家是怎么做的  FaceMain 这个类需要它
  */
 public class FMSGCallBack_V31 implements HCNetSDK.FMSGCallBack_V31 {
 	

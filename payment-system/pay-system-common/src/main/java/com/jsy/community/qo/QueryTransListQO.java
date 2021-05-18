@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
@@ -67,7 +68,7 @@ public class QueryTransListQO implements Serializable {
 
     // 是否输入密码-必填,0：不需要密码。1：需要密码。
     @Range(min = 0, max = 1, message = "是否输入密码的区间为0或1")
-    @NotBlank(message = "是否输入密码不能为空")
+    @NotNull(message = "是否输入密码不能为空")
     private Integer isNeedPwd;
 
     // 密码密文

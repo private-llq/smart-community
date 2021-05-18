@@ -34,9 +34,9 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/5/7 17:55
      */
     @Override
-    public OpenApiResponseVO getCredential(CredentialQO credentialQO) {
+    public OpenApiResponseVO getCredential(CredentialQO credentialQo) {
         // 构建请求json
-        String msgBody = unionPayUtils.buildBizContent(credentialQO);
+        String msgBody = unionPayUtils.buildBizContent(credentialQo);
         return unionPayUtils.credentialApi(msgBody, UnionPayConfig.APPLY_TICKET);
     }
 
@@ -48,9 +48,9 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/5/11 17:48
      */
     @Override
-    public OpenApiResponseVO resetBtypeAcctPwd(ResetBtypeAcctPwdQO resetBtypeAcctPwdQO) {
+    public OpenApiResponseVO resetBtypeAcctPwd(ResetBtypeAcctPwdQO resetBtypeAcctPwdQo) {
         // 构建请求json
-        String msgBody = unionPayUtils.buildMsgBody(resetBtypeAcctPwdQO);
+        String msgBody = unionPayUtils.buildMsgBody(resetBtypeAcctPwdQo);
         return unionPayUtils.transApi(msgBody, UnionPayConfig.RESET_BTYPE_ACCT_PWD);
     }
 
@@ -62,9 +62,9 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/8 10:49
      */
     @Override
-    public OpenApiResponseVO openAccountForC(OpenAccountForCQO openAccountForCQO) {
+    public OpenApiResponseVO openAccountForC(OpenAccountForCQO openAccountForcQo) {
         // 构建请求json
-        String msgBody = unionPayUtils.buildMsgBody(openAccountForCQO);
+        String msgBody = unionPayUtils.buildMsgBody(openAccountForcQo);
         // 调用接口请求
         return unionPayUtils.transApi(msgBody, UnionPayConfig.OPEN_ACCOUNT_FOR_C);
     }
@@ -78,7 +78,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      **/
     @Override
     public OpenApiResponseVO getPlugRandomKey(Integer num) {
-        Map<String,Integer> bizMap = new HashMap<>();
+        Map<String,Integer> bizMap = new HashMap<>(1);
         // 获取随机因子数量,最多100个
         bizMap.put("applyCount", num);
         String msgBody = unionPayUtils.buildMsgBody(bizMap);
@@ -94,9 +94,9 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/12 15:11
      */
     @Override
-    public OpenApiResponseVO bindBankCard(BindBankCardQO bindBankCardQO) {
+    public OpenApiResponseVO bindBankCard(BindBankCardQO bindBankCardQo) {
         // 向银联发送处理请求
-        String msgBody = unionPayUtils.buildMsgBody(bindBankCardQO);
+        String msgBody = unionPayUtils.buildMsgBody(bindBankCardQo);
         return unionPayUtils.transApi(msgBody, UnionPayConfig.SET_BANK_METHOD);
     }
 
@@ -108,8 +108,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/12 17:59
      */
     @Override
-    public OpenApiResponseVO sendSmsAuthCode(SendSmsAuthCodeQO sendSmsAuthCodeQO) {
-        String msgBody = unionPayUtils.buildMsgBody(sendSmsAuthCodeQO);
+    public OpenApiResponseVO sendSmsAuthCode(SendSmsAuthCodeQO sendSmsAuthCodeQo) {
+        String msgBody = unionPayUtils.buildMsgBody(sendSmsAuthCodeQo);
         return unionPayUtils.transApi(msgBody, UnionPayConfig.SEND_SMS_AUTH_CODE);
     }
 
@@ -121,8 +121,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/14 9:36
      */
     @Override
-    public OpenApiResponseVO modifyUserMobile(ModifyUserMobileQO modifyUserMobileQO) {
-        String msgBody = unionPayUtils.buildMsgBody(modifyUserMobileQO);
+    public OpenApiResponseVO modifyUserMobile(ModifyUserMobileQO modifyUserMobileQo) {
+        String msgBody = unionPayUtils.buildMsgBody(modifyUserMobileQo);
         return unionPayUtils.transApi(msgBody, UnionPayConfig.MODIFY_USER_MOBILE);
     }
 
@@ -134,8 +134,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/14 13:44
      */
     @Override
-    public OpenApiResponseVO queryAcctInfo(WalletIdQO walletIdQO) {
-        String msgBody = unionPayUtils.buildMsgBody(walletIdQO);
+    public OpenApiResponseVO queryAcctInfo(WalletIdQO walletIdQo) {
+        String msgBody = unionPayUtils.buildMsgBody(walletIdQo);
         return unionPayUtils.queryApi(msgBody, UnionPayConfig.QUERY_ACCT_INFO);
     }
 
@@ -147,8 +147,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/14 17:35
      */
     @Override
-    public OpenApiResponseVO queryBindBankCardList(WalletIdQO walletIdQO) {
-        String msgBody = unionPayUtils.buildMsgBody(walletIdQO);
+    public OpenApiResponseVO queryBindBankCardList(WalletIdQO walletIdQo) {
+        String msgBody = unionPayUtils.buildMsgBody(walletIdQo);
         return unionPayUtils.queryApi(msgBody, UnionPayConfig.QUERY_BIND_BANK_CARD);
     }
 
@@ -160,8 +160,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/15 11:31
      */
     @Override
-    public OpenApiResponseVO modifyPwd(ModifyPwdQO modifyPwdQO) {
-        String msgBody = unionPayUtils.buildMsgBody(modifyPwdQO);
+    public OpenApiResponseVO modifyPwd(ModifyPwdQO modifyPwdQo) {
+        String msgBody = unionPayUtils.buildMsgBody(modifyPwdQo);
         return unionPayUtils.transApi(msgBody, UnionPayConfig.MODIFY_PWD);
     }
 
@@ -173,8 +173,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/28 17:46
      */
     @Override
-    public OpenApiResponseVO queryBalance(BalanceQO balanceQO) {
-        String msgBody = unionPayUtils.buildMsgBody(balanceQO);
+    public OpenApiResponseVO queryBalance(BalanceQO balanceQo) {
+        String msgBody = unionPayUtils.buildMsgBody(balanceQo);
         return unionPayUtils.queryApi(msgBody, UnionPayConfig.QUERY_ACCT_BAL);
     }
 
@@ -186,8 +186,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/5/10 9:18
      */
     @Override
-    public OpenApiResponseVO queryWalletByBizLicNo(BizLicNoQO bizLicNoQO) {
-        String msgBody = unionPayUtils.buildMsgBody(bizLicNoQO);
+    public OpenApiResponseVO queryWalletByBizLicNo(BizLicNoQO bizLicNoQo) {
+        String msgBody = unionPayUtils.buildMsgBody(bizLicNoQo);
         return unionPayUtils.queryApi(msgBody, UnionPayConfig.QUERY_WALLET_BY_BIZ_LIC_NO);
     }
 
@@ -199,8 +199,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/5/10 10:38
      */
     @Override
-    public OpenApiResponseVO withdrawApply(WithdrawQO withdrawQO) {
-        String msgBody = unionPayUtils.buildMsgBody(withdrawQO);
+    public OpenApiResponseVO withdrawApply(WithdrawQO withdrawQo) {
+        String msgBody = unionPayUtils.buildMsgBody(withdrawQo);
         return unionPayUtils.transApi(msgBody, UnionPayConfig.WITHDRAW);
     }
 
@@ -212,8 +212,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/5/12 17:22
      */
     @Override
-    public OpenApiResponseVO activeAcct(ActiveAcctQO activeAcctQO) {
-        String msgBody = unionPayUtils.buildMsgBody(activeAcctQO);
+    public OpenApiResponseVO activeAcct(ActiveAcctQO activeAcctQo) {
+        String msgBody = unionPayUtils.buildMsgBody(activeAcctQo);
         return unionPayUtils.transApi(msgBody, UnionPayConfig.ACTIVE_ACCT);
     }
 
@@ -225,9 +225,9 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/4/26 16:56
      */
     @Override
-    public OpenApiResponseVO generateConsumeOrder(GenerateOrderQO generateOrderQO) {
+    public OpenApiResponseVO generateConsumeOrder(GenerateOrderQO generateOrderQo) {
         // 构建请求json
-        String msgBody = unionPayUtils.buildMsgBody(generateOrderQO);
+        String msgBody = unionPayUtils.buildMsgBody(generateOrderQo);
         // 调用接口请求
         return unionPayUtils.transApi(msgBody, UnionPayConfig.CONSUME_APPLY_ORDER);
     }
@@ -240,8 +240,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/5/12 10:08
      */
     @Override
-    public OpenApiResponseVO queryTransList(QueryTransListQO queryTransListQO) {
-        String msgBody = unionPayUtils.buildMsgBody(queryTransListQO);
+    public OpenApiResponseVO queryTransList(QueryTransListQO queryTransListQo) {
+        String msgBody = unionPayUtils.buildMsgBody(queryTransListQo);
         return unionPayUtils.queryApi(msgBody, UnionPayConfig.QUERY_TRANS_LIST);
     }
 
@@ -253,8 +253,8 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @Date: 2021/5/12 11:27
      */
     @Override
-    public OpenApiResponseVO queryBillInfo(QueryBillInfoQO queryBillInfoQO) {
-        String msgBody = unionPayUtils.buildMsgBody(queryBillInfoQO);
+    public OpenApiResponseVO queryBillInfo(QueryBillInfoQO queryBillInfoQo) {
+        String msgBody = unionPayUtils.buildMsgBody(queryBillInfoQo);
         return unionPayUtils.queryApi(msgBody, UnionPayConfig.QUERY_BILL_INFO);
     }
 }

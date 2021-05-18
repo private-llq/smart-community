@@ -40,7 +40,7 @@ public class PropertyFinanceStatementEntity extends BaseEntity {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime startDate;
 
-    @ApiModelProperty("结算时间段-开始时间")
+    @ApiModelProperty("结算时间段-结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

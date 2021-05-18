@@ -33,7 +33,7 @@ public class PropertyFinanceCountController {
 	
 	
 	@ApiOperation("缴费统计")
-	@PostMapping("orderPaid")
+	@PostMapping("/orderPaid")
 	public CommonResult orderPaid(@RequestBody PropertyFinanceCountEntity query){
 		ValidatorUtils.validateEntity(query, PropertyFinanceCountEntity.QueryValidate.class);
 		//第一次默认查询本日
