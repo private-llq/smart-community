@@ -55,6 +55,7 @@ public class StatementQO implements Serializable {
     @NotNull(groups = {ExportValiadate.class}, message = "导出选项不能为空")
     private Integer exportType;
 
+
     private List<String> statementNumS;
 
     public interface ExportValiadate {}
