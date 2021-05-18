@@ -411,6 +411,7 @@ public class FacilityUtils {
 		return null;
 	}
 	
+//  实时预览画面
 //	public static void aaa(int lUserID){
 //
 //		boolean bRealPlay = false;//是否在预览
