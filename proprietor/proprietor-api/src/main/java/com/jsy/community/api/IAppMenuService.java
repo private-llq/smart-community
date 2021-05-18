@@ -20,7 +20,7 @@ public interface IAppMenuService extends IService<AppMenuEntity> {
 	 * @Author lihao
 	 * @Description 查询app首页菜单
 	 * @Date 2021/2/3 13:50
-	 * @Param [communityId]
+	 * @Param [communityId：社区id]
 	 **/
 	List<AppMenuEntity> listIndexMenu(Long communityId);
 

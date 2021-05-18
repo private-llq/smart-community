@@ -38,8 +38,6 @@ public class AppMenuController {
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IAppMenuService appMenuService;
 	
-	// TODO: 2021/2/3 这里应该设计成  打开app，如果没有选择社区  就不展示菜单  而不是默认走社区1的菜单
-	// TODO: 2021/2/3 还有这里首页展示菜单的问题  后面再说吧  到时候再到中间表添加个字段排序 主要还是需求不合理的问题
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu")
 	public CommonResult listIndexMenu(@ApiParam(value = "社区id")

@@ -53,7 +53,7 @@ public class DepartmentController {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("id", departmentEntity.getId());
 			map.put("department", departmentEntity.getDepartment());
-			map.put("nightImg", departmentEntity.getImgUrl());
+			map.put("nightImg", departmentEntity.getImgUrl());  // 为什么要将其命名为nightImg呢  最开始需求说的是这个地方有两种部门图片样式，当初留了一手白色主题的。为了便于前端区分所以有nightImg与dayImg  结果现在又说没有2中图片样式了 所以导致这里命名是nightImg，前端又写的nightImg所以没有改 不然后端改了 前端也要改
 			String phone = departmentEntity.getPhone();
 			String[] phoneArray = phone.split(",");
 			List<String> phones = new ArrayList<>();
@@ -67,6 +67,7 @@ public class DepartmentController {
 		return CommonResult.ok(strings);
 	}
 	
+	@Deprecated
 	@ApiOperation("根据部门查询联系方式")
 	@GetMapping("/listStaffPhone")
 	public CommonResult<List<DepartmentStaffEntity>> listStaffPhone(@ApiParam(value = "部门id")
@@ -75,6 +76,7 @@ public class DepartmentController {
 		return CommonResult.ok(staffEntityList);
 	}
 	
+	@Deprecated
 	@ApiOperation("通讯录")
 	@GetMapping("/listDepartmentTel")
 	public CommonResult<List<DepartmentEntity>> listDepartmentTel(@ApiParam(value = "社区id")

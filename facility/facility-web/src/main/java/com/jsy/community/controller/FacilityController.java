@@ -19,8 +19,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,9 +45,6 @@ public class FacilityController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICommonConstService commonConstService;
 
-	@Autowired
-	private RabbitTemplate rabbitTemplate;
-	
 	/**
 	 * 在添加设备的时候，让用户选择该摄像机是做什么功能的。
 	 **/
@@ -61,7 +56,7 @@ public class FacilityController {
 	}
 	
 	/**
-	 * 添加设备功能：  1. 保存设备基本信息   2. 根据基本信息开启设备相应功能   3. 保存设备状态信息
+	 * 添加设备功能：  1. 保存设备基本信息   2. 根据基本信息(账号密码...)开启设备相应功能   3. 保存设备状态信息
 	 **/
 	@ApiOperation("添加设备")
 	@PostMapping("/addFacility")
@@ -104,8 +99,8 @@ public class FacilityController {
 	
 	@ApiOperation("编辑设备")
 	@PostMapping("/updateFacility")
-	// TODO: 2021/4/23 编辑的时候不能更改该摄像头的作用  因为摄像头的作用需要更改摄像头后台  开启相应的功能
-	// TODO: 2021/4/23 一个摄像机不能同时做车牌抓拍识别与人脸比对功能2个事
+	// TODO: 2021/4/23 编辑的时候不能更改该摄像头的作用哈  因为摄像头的作用需要更改摄像头后台  开启相应的功能 比如你要开启人脸比对，摄像机应该去后台选择人脸比对模式
+	// TODO: 2021/4/23 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		facilityEntity.setCommunityId(communityId);
