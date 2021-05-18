@@ -40,7 +40,6 @@ public class WeChatLoginController {
         }
         String accessToken = object.getString("access_token");
         String openid = object.getString("openid");
-
         return CommonResult.ok(weChatLoginService.login(openid));
     }
 
