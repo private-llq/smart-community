@@ -49,7 +49,7 @@ public class PublicConfig {
      * @param url                请求地址（只需传入域名之后的路由地址）
      * @param jsonStr            请求体 json字符串 此参数与微信官方文档一致
      * @param mercId             商户ID
-     * @param serial_no          证书序列号
+     * @param serialNo          证书序列号
      * @param privateKeyFilePath 私钥的路径
      * @return 订单支付的参数
      * @throws Exception

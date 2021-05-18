@@ -15,7 +15,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.web.reactive.function.BodyInserters.fromObject;
+import static org.springframework.web.reactive.function.BodyInserters.fromValue;
+
 /**
  * @Description: 异常统一返回数据格式
  * @author: Hu
@@ -33,38 +34,43 @@ public class SentinelExceptionHandler implements BlockRequestHandler {
 
         //限流响应
         if (throwable instanceof FlowException) {
-            resp.setCode(10001);
+            resp.setCode(500);
             resp.setMessage("提示：系统繁忙，请稍后再试");
+            resp.setData(false);
             status = 429;
         }
         //服务降级响应
         else if (throwable instanceof DegradeException) {
-            resp.setCode(10002);
+            resp.setCode(500);
             resp.setMessage("提示：系统繁忙，请稍后再试");
+            resp.setData(false);
             status = 430;
         }
         //热点参数限流响应
         else if (throwable instanceof ParamFlowException) {
-            resp.setCode(10003);
+            resp.setCode(500);
             resp.setMessage("提示：系统繁忙，请稍后再试");
+            resp.setData(false);
             status = 431;
         }
         //触发系统保护规则响应
         else if (throwable instanceof SystemBlockException) {
-            resp.setCode(10004);
+            resp.setCode(500);
             resp.setMessage("提示：系统繁忙，请稍后再试");
+            resp.setData(false);
             status = 432;
         }
         //授权规则不通过响应
         else if (throwable instanceof AuthorityException) {
-            resp.setCode(10005);
+            resp.setCode(500);
             resp.setMessage("提示：系统繁忙，请稍后再试");
+            resp.setData(false);
             status = 433;
         }
         //返回固定响应信息
         ServerHttpResponse response = serverWebExchange.getResponse();
         response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
-        return ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON_UTF8).body(fromObject(JSONObject.toJSONString(resp)));
+        return ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON).body(fromValue(JSONObject.toJSONString(resp)));
     }
 
 }

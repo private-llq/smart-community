@@ -304,7 +304,7 @@ public class WeChatController {
             System.out.println(restmap.get("status"));
             System.out.println(restmap.get("reason"));
             System.out.println(restmap.get("openid"));
-            System.out.println(restmap.get("transfer_name "));
+            System.out.println(restmap.get("transfer_name"));
             System.out.println(restmap.get("payment_amount"));
         }else {
             System.out.println(restmap.get("err_code"));

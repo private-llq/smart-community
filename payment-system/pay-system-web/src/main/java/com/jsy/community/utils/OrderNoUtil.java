@@ -1,7 +1,6 @@
 package com.jsy.community.utils;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * @program: pay
@@ -20,10 +19,11 @@ public class OrderNoUtil {
      */
     public static String getOrder() {
         SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
+        String s=sdfTime.format(System.currentTimeMillis()).replaceAll("[[\\s-:punct:]]", "");
         Long s1=(long) (Math.random() * 9999999999L);
         return s + s1;
     }
+
     /**
      * @Description: 企业付款订单号
      * @author: Hu
@@ -33,7 +33,7 @@ public class OrderNoUtil {
      */
     public static String txOrder() {
         SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
+        String s=sdfTime.format(System.currentTimeMillis()).replaceAll("[[\\s-:punct:]]", "");
         s+=(char) (Math.random() * 26 + 'a');
         s+=(int) (Math.random() * 99);
         s+=(char) (Math.random() * 26 + 'A');
