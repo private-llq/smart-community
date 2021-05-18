@@ -32,14 +32,11 @@ import java.time.LocalDateTime;
 public class FacilityEntity extends BaseEntity {
 	
 	@ApiModelProperty(value = "设备作用id")
-	// TODO: 2021/4/27 目前更新设备的时候不让其可以更改设备作用  ***************************************************************************************
-//	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备作用id不能为空")
 	@NotNull(groups = {FacilityEntity.addFacilityValidate.class,}, message = "设备作用id不能为空")
 	private Long facilityEffectId;
 	
 	@ApiModelProperty(value = "设备在线状态")
 	@TableField(exist = false)
-	// TODO: 2021/4/27 这个地方暂时不让其可以修改 ***************************************************************************************
 	@Range(groups = {updateFacilityValidate.class}, min = 0, max = 1, message = "请选择正确的设备在线状态")
 	private Integer status;
 	

@@ -32,15 +32,15 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	
 	@Override
 	public List<AppMenuEntity> listIndexMenu(Long communityId) {
-		// 根据社区id查询中间表关于该社区的菜单id集合
+		// 根据社区id查询中间表t_menu_community关于该社区的菜单id集合
 		List<Long> menuIds = appMenuMapper.selectMenuIdByCommunityId(communityId,INDEX_MENU_COUNT);
 		
 		// TODO: 2021/2/5 如果该小区没有菜单，暂时也给他返回小区  原因：现阶段便于测试人员测试
 		// 如果传入的小区没有菜单，则返回id为27839755849728L的小区菜单
-		List<Long> testmenuIds = appMenuMapper.selectMenuIdByCommunityId(27839755849728L,INDEX_MENU_COUNT);
 		if (CollectionUtils.isEmpty(menuIds)) {
-			menuIds = testmenuIds;
+			menuIds = appMenuMapper.selectMenuIdByCommunityId(27839755849728L,INDEX_MENU_COUNT);
 		}
+		// TODO: 2021/2/5 如果该小区没有菜单，暂时也给他返回小区  原因：现阶段便于测试人员测试
 		
 		return appMenuMapper.selectBatchIds(menuIds);
 		
@@ -48,7 +48,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	
 	@Override
 	public List<AppMenuEntity>  moreIndexMenu(Long communityId) {
-		// 根据社区id查询中间表关于该社区的菜单id集合
+		// 根据社区id查询中间表t_menu_community关于该社区的菜单id集合
 		List<Long> menuIds = appMenuMapper.selectMenuIdByCommunityId(communityId,50);
 		
 		// TODO: 2021/2/5 如果该小区没有菜单，暂时也给他返回小区  原因：现阶段便于测试人员测试
@@ -57,6 +57,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		if (CollectionUtils.isEmpty(menuIds)) {
 			menuIds = testmenuIds;
 		}
+		// TODO: 2021/2/5 如果该小区没有菜单，暂时也给他返回小区  原因：现阶段便于测试人员测试
 		
 		return appMenuMapper.selectBatchIds(menuIds);
 	}
