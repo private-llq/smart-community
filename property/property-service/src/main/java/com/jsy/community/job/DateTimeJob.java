@@ -19,7 +19,7 @@ public class DateTimeJob extends QuartzJobBean{
     private RedisTemplate redisTemplate;
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        redisTemplate.opsForValue().set("complain_serial_number",1+"");
-        System.out.println("complain_serial_number的值被重置了");
+//        redisTemplate.opsForValue().set("complain_serial_number",1+"");
+//        System.out.println("complain_serial_number的值被重置了");
     }
 }
