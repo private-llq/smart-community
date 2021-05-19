@@ -83,5 +83,7 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
 			long id = SnowFlake.nextId();
 			facilityMapper.insertFacilityStatus(id, loginStatus, handle, facilityId, facilityAlarmHandle);
 		}
+		//预览测试
+		FacilityUtils.preview(0);
 	}
 }
