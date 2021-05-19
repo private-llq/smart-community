@@ -33,7 +33,8 @@
 	<!-- idList入参批量查询菜单实体 -->
 	<select id="queryMenuBatch" resultType="com.jsy.community.entity.admin.AdminMenuEntity">
 		select * from t_admin_menu
-		where id in
+		where deleted = 0
+		and id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
