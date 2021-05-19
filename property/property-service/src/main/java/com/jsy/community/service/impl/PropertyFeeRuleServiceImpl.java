@@ -75,7 +75,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         Page<PropertyFeeRuleEntity> page = propertyFeeRuleMapper.selectPage(new Page<>(baseQO.getPage(), baseQO.getSize()), wrapper);
         List<PropertyFeeRuleEntity> pageRecords = page.getRecords();
         for (PropertyFeeRuleEntity entity : pageRecords) {
-            if (entity.getUpdateBy()!=null){
+            if (!"".equals(entity.getUpdateBy())&&entity.getUpdateBy()!=null){
                 AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", entity.getUpdateBy()));
                 entity.setUpdateByName(userEntity.getRealName());
             }

@@ -5,21 +5,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IComplainService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ComplainEntity;
-import com.jsy.community.entity.PropertyComplaintsEntity;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.ComplainMapper;
-import com.jsy.community.mapper.PropertyComplainMapper;
-import com.jsy.community.mapper.UserMapper;
-import com.jsy.community.qo.proprietor.PropertyComplainQO;
-import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: com.jsy.community
@@ -29,75 +23,12 @@ import java.util.List;
  **/
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEntity> implements IComplainService {
-
-    @Autowired
-    private UserMapper userMapper;
     @Autowired
     private ComplainMapper complainMapper;
     @Autowired
-    private PropertyComplainMapper propertyComplainMapper;
-    @Autowired
     private RedisTemplate redisTemplate;
 
-    /**
-     * @Description: 物业投诉
-     * @author: Hu
-     * @since: 2021/3/17 14:44
-     * @Param:
-     * @return:
-     */
-    @Override
-    public void propertyComplain(PropertyComplainQO propertyComplainQO) {
-        String str=null;
-        PropertyComplaintsEntity entity = new PropertyComplaintsEntity();
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", propertyComplainQO.getUid()));
-        if (userEntity!=null){
-            entity.setName(userEntity.getRealName());
-            entity.setMobile(userEntity.getMobile());
-        }
-        entity.setId(SnowFlake.nextId());
-        entity.setContent(propertyComplainQO.getContent());
-        entity.setStatus(0);
-        entity.setImages(propertyComplainQO.getImages());
-        entity.setLocation(propertyComplainQO.getLocation());
-        entity.setType(propertyComplainQO.getType());
-        entity.setUid(propertyComplainQO.getUid());
-        entity.setComplainTime(LocalDateTime.now());
-        Object complain_serial_number = redisTemplate.opsForValue().get("complain_serial_number");
-        String s = String.valueOf(complain_serial_number);
-        if (s.length()<5){
-            if (s.length()==1) {
-                str="000"+s;
-            }else {
-                if (s.length()==2){
-                    str="00"+s;
-                }else{
-                    if (s.length()==3){
-                        str="0"+s;
-                    }else{
-                        if (s.length()==4){
-                            str=s;
-                        }
-                    }
-                }
-            }
-        }else {
-            str=s;
-        }
-        int anInt = Integer.parseInt(s);
-        ++anInt;
-        redisTemplate.opsForValue().set("complain_serial_number",anInt+"");
-        entity.setSerialNumber(getSerialNumber()+str);
-        System.out.println(getSerialNumber() + str);
-        propertyComplainMapper.insert(entity);
-    }
-
-    public String getSerialNumber() {
-        String str="TS";
-        SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd");
-        String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
-        return str+=s;
-    }
+    private String serialNumber="complain_number:";
 
     /**
      * @Description: 用户投诉接口
@@ -109,8 +40,14 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
     @Override
     public void addComplain(ComplainEntity complainEntity) {
         String str=null;
-        Object complain_serial_number = redisTemplate.opsForValue().get("complain_serial_number");
-        String s = String.valueOf(complain_serial_number);
+        String s = null;
+        Object number = redisTemplate.opsForValue().get(serialNumber+complainEntity.getCommunityId());
+        if (number!=null){
+            s = String.valueOf(number);
+        }else {
+            redisTemplate.opsForValue().set(serialNumber+complainEntity.getCommunityId(),String.valueOf(1),getMinute(), TimeUnit.MINUTES);
+            s=String.valueOf(1);
+        }
         if (s.length()<5){
             if (s.length()==1) {
                 str="000"+s;
@@ -132,11 +69,38 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
         }
         int anInt = Integer.parseInt(s);
         ++anInt;
-        redisTemplate.opsForValue().set("complain_serial_number",anInt+"");
+        redisTemplate.opsForValue().set(serialNumber+complainEntity.getCommunityId(),String.valueOf(anInt));
         complainEntity.setSerialNumber(getSerialNumber()+str);
         complainMapper.insert(complainEntity);
     }
 
+    /**
+     * @Description: 获取当前时间到0点钟的分钟数
+     * @author: Hu
+     * @since: 2021/5/19 9:48
+     * @Param:
+     * @return:
+     */
+    public int getMinute() {
+        int hour = LocalDateTime.now().getHour();
+        int minute = LocalDateTime.now().getMinute();
+        int remainHour=24-hour-1;
+        int remainMinute=60-minute;
+        return remainHour*60+remainMinute;
+    }
+    /**
+     * @Description: 投诉编号生成类
+     * @author: Hu
+     * @since: 2021/5/19 9:50
+     * @Param:
+     * @return:
+     */
+    public String getSerialNumber() {
+        String str="TS";
+        SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd");
+        String s=sdfTime.format(System.currentTimeMillis()).replaceAll("[[\\s-:punct:]]", "");
+        return str+=s;
+    }
     /**
      * @Description: 查询用户所有的投诉建议
      * @author: Hu
