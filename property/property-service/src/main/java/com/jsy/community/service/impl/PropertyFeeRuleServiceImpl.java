@@ -45,7 +45,12 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     public void startOrOut(AdminInfoVo userInfo, Integer status,Long id) {
         PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectById(id);
         if (status==1){
-            List<PropertyFeeRuleEntity> entities = propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>().eq("type", entity.getType()).eq("community_id", userInfo.getCommunityId()));
+            PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type", entity.getType()).eq("status", 1).eq("community_id",entity.getCommunityId()));
+            if (ruleEntity!=null){
+                ruleEntity.setStatus(0);
+                ruleEntity.setUpdateBy(userInfo.getUid());
+                propertyFeeRuleMapper.updateById(ruleEntity);
+            }
             entity.setUpdateBy(userInfo.getUid());
             entity.setStatus(1);
             propertyFeeRuleMapper.updateById(entity);

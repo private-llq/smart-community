@@ -22,7 +22,7 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "1物业费，2车位费")
     private Integer type;
     @ApiModelProperty(value = "社区id")
-    private Integer communityId;
+    private Long communityId;
     @ApiModelProperty(value = "编号")
     private String serialNumber;
     @ApiModelProperty(value = "名称")
