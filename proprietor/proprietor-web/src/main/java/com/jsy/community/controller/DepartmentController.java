@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,14 +56,16 @@ public class DepartmentController {
 			map.put("department", departmentEntity.getDepartment());
 			map.put("nightImg", departmentEntity.getImgUrl());  // 为什么要将其命名为nightImg呢  最开始需求说的是这个地方有两种部门图片样式，当初留了一手白色主题的。为了便于前端区分所以有nightImg与dayImg  结果现在又说没有2中图片样式了 所以导致这里命名是nightImg，前端又写的nightImg所以没有改 不然后端改了 前端也要改
 			String phone = departmentEntity.getPhone();
-			String[] phoneArray = phone.split(",");
-			List<String> phones = new ArrayList<>();
-			for (String s : phoneArray) {
-				String trim = s.trim();
-				phones.add(trim);
+			if (!StringUtils.isEmpty(phone)) {
+				String[] phoneArray = phone.split(",");
+				List<String> phones = new ArrayList<>();
+				for (String s : phoneArray) {
+					String trim = s.trim();
+					phones.add(trim);
+				}
+				map.put("phones", phones);
+				strings.add(map);
 			}
-			map.put("phones",phones);
-			strings.add(map);
 		}
 		return CommonResult.ok(strings);
 	}
@@ -80,8 +83,8 @@ public class DepartmentController {
 	@ApiOperation("通讯录")
 	@GetMapping("/listDepartmentTel")
 	public CommonResult<List<DepartmentEntity>> listDepartmentTel(@ApiParam(value = "社区id")
-	                                              @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
-		List<DepartmentEntity> departmentTels =departmentService.listDepartmentTel(id);
+	                                                              @RequestParam(required = false, defaultValue = "1", value = "id") Long id) {
+		List<DepartmentEntity> departmentTels = departmentService.listDepartmentTel(id);
 		return CommonResult.ok(departmentTels);
 	}
 	
