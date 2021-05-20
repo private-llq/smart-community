@@ -138,7 +138,6 @@ public class WeChatController {
      * @Param:
      * @return:
      */
-    @Login
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.info("回调成功");

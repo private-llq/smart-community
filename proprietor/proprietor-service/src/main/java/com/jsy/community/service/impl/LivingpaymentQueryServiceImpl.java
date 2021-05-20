@@ -57,7 +57,7 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
         PayCompanyEntity entity = payCompanyMapper.selectById(id);
         Map map = new HashMap();
 
-        map.put("familyName","纵横世纪");
+        map.put("familyName","今盛源");
         map.put("familyId",number);
         map.put("companyId",entity.getId());
         map.put("companyName",entity.getName());
