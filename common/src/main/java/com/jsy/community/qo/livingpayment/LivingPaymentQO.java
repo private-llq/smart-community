@@ -29,6 +29,7 @@ public class LivingPaymentQO implements Serializable {
     private String orderNum;
 
     @ApiModelProperty(value = "分组名称")
+    @NotBlank(groups = {LivingPaymentValidated.class},message = "组名不能为空！")
     private String groupName;
 
     @Length(groups = {LivingPaymentValidated.class},max = 12,min = 8,message = "请输入8~12数字")
