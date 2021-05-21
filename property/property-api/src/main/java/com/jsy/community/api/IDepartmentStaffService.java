@@ -21,9 +21,9 @@ public interface IDepartmentStaffService extends IService<DepartmentStaffEntity>
 	/**
 	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.entity.DepartmentStaffEntity>
 	 * @Author lihao
-	 * @Description 查询所有员工信息
+	 * @Description 分页查询所有员工信息
 	 * @Date 2020/11/30 14:57
-	 * @Param [staffEntity]
+	 * @Param [departmentId：部门id, page, size]
 	 **/
 	PageInfo<DepartmentStaffEntity> listDepartmentStaff(Long departmentId,Long page,Long size);
 	
@@ -50,7 +50,7 @@ public interface IDepartmentStaffService extends IService<DepartmentStaffEntity>
 	 * @Author lihao
 	 * @Description 删除员工信息
 	 * @Date 2021/3/10 14:33
-	 * @Param [id, communityId]
+	 * @Param [id：员工id, communityId：社区id]
 	 **/
 	void deleteStaffByIds(Long id, Long communityId);
 	
@@ -59,7 +59,7 @@ public interface IDepartmentStaffService extends IService<DepartmentStaffEntity>
 	 * @Author lihao
 	 * @Description 通过Excel添加通讯录
 	 * @Date 2021/3/11 16:23
-	 * @Param [strings]
+	 * @Param [strings：Excel读出的每一行数据，communityId：社区id]
 	 **/
 	Map<String, Object> addLinkByExcel(List<String[]> strings,Long communityId);
 	

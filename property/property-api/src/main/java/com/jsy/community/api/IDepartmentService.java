@@ -38,7 +38,7 @@ public interface IDepartmentService extends IService<DepartmentEntity> {
 	 * @Author lihao
 	 * @Description 删除部门
 	 * @Date 2020/11/30 14:24
-	 * @Param [id]
+	 * @Param [departmentId：部门id, communityId：社区id]
 	 **/
 	void deleteDepartment(Long departmentId,Long communityId);
 	
@@ -47,7 +47,7 @@ public interface IDepartmentService extends IService<DepartmentEntity> {
 	 * @Author lihao
 	 * @Description 树形结构查询部门信息
 	 * @Date 2021/3/11 17:49
-	 * @Param [communityId]
+	 * @Param [communityId：社区id]
 	 **/
 	TreeCommunityVO listDepartment(Long communityId);
 	
@@ -56,7 +56,7 @@ public interface IDepartmentService extends IService<DepartmentEntity> {
 	 * @Author lihao
 	 * @Description 根据id查询部门
 	 * @Date 2021/3/16 10:43
-	 * @Param [departmentId, communityId]
+	 * @Param [departmentId：部门id, communityId：社区id]
 	 **/
 	DepartmentEntity getDepartmentById(Long departmentId, Long communityId);
 }

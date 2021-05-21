@@ -146,6 +146,7 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 		List<Map<String, String>> failStaffList = new ArrayList<>();
 		Map<String, Object> resultMap = new HashMap<>();
 		
+		// 将从Excel中读取每行数据遍历出来封装成DepartmentStaffEntity对象
 		for (String[] string : strings) {
 			DepartmentStaffEntity staff = new DepartmentStaffEntity();
 			// 主键id
@@ -201,7 +202,7 @@ public class DepartmentStaffServiceImpl extends ServiceImpl<DepartmentStaffMappe
 			String email = string[4];
 			staff.setEmail(email);
 			
-			// 如果Excel中有与数据库中 有相同部门下的同名员工 且 电话号码完全相同或其中1个以上电话号码相同则不能添加成功
+			// 如果Excel中有与数据库中 有相同部门下的同名员工 且 电话号码其中1个以上电话号码相同则不能添加成功
 			// 如果电话号码大于3个则不能添加成功
 			if (dep != null) {
 				QueryWrapper<DepartmentStaffEntity> queryWrapper = new QueryWrapper<>();

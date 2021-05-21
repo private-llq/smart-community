@@ -18,11 +18,22 @@ public interface IDepartmentService extends IService<DepartmentEntity> {
 	/**
 	 * @return java.util.List<com.jsy.community.entity.DepartmentEntity>
 	 * @Author lihao
-	 * @Description 查询所有部门信息
+	 * @Description 根据社区id查询所有部门信息
 	 * @Date 2020/11/24 17:33
-	 * @Param [id]
+	 * @Param [id：社区id]
 	 **/
 	List<DepartmentEntity> listDepartment(Long id);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * @return java.util.List<java.util.Map>

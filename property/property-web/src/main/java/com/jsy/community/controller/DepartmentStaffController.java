@@ -30,13 +30,13 @@ import java.util.Map;
 
 /**
  * <p>
- * 前端控制器
+ * 员工控制器
  * </p>
  *
  * @author lihao
  * @since 2020-11-24
  */
-@Api(tags = "部门员工控制器")
+@Api(tags = "社区通讯录(员工控制器)")
 @RestController
 @ApiJSYController
 @RequestMapping("/staff")
@@ -46,10 +46,9 @@ public class DepartmentStaffController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IDepartmentStaffService departmentStaffService;
 	
-	@ApiOperation("查询所有员工信息")
+	@ApiOperation("分页查询所有员工信息")
 	@GetMapping("/listDepartmentStaff")
-	public CommonResult<PageInfo<DepartmentStaffEntity>> listDepartmentStaff(@ApiParam("部门id") @RequestParam Long departmentId,
-	                                                                         @RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "10") Long size) {
+	public CommonResult<PageInfo<DepartmentStaffEntity>> listDepartmentStaff(@ApiParam("部门id") @RequestParam Long departmentId, @RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "10") Long size) {
 		PageInfo<DepartmentStaffEntity> pageInfo = departmentStaffService.listDepartmentStaff(departmentId, page, size);
 		return CommonResult.ok(pageInfo);
 	}
@@ -63,9 +62,10 @@ public class DepartmentStaffController {
 	
 	@ApiOperation("添加员工")
 	@PostMapping("/addDepartmentStaff")
-	// TODO: 2021/3/22 添加员工这里 我觉得应该是唯一的  不过需求没要求唯一
-	// // TODO: 2021/4/14 今天做Excel，Excel添加的需求  当时问的经理 说是同一个部门 有一个人以上姓名相同,电话号码有一个相同  就算重复 不能添加成功
-	// // TODO: 2021/4/14 但是原型上面没有体现出来，所以 3/22 就没有处理姓名相同和电话号码有一个相同 这个情况  现在来处理
+	// TODO: 2021/3/22 添加员工这里 我觉得姓名应该是唯一的  不过需求没要求唯一
+	// // TODO: 2021/4/14 今天做Excel，Excel添加时  当时问的经理 说是同一个部门 有一个人姓名相同,电话号码有一个相同  就算重复 不能添加成功
+	// // TODO: 2021/4/14 但是原型上面没有体现出来这个需求啊，没说。  好吧所以需求应该是员工（姓名相同，电话号码有一个以上相同就属于是同一个员工就不应该让其添加成功）
+	// // TODO: 2021/4/17  现在来处理2021/4/14这个问题
 	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffQO staffEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		staffEntity.setCommunityId(communityId);
@@ -95,10 +95,6 @@ public class DepartmentStaffController {
 	}
 	
 	
-	// TODO: 2021/3/29 关于这个地方的问题：   哪种情况下添加失败【产品说的那种，没有在列表添加员工的时候体现出来   所以这个功能到时候再问问】
-	// TODO: 2021/3/22 添加员工这里 我觉得应该是唯一的  不过需求没要求唯一
-	// // TODO: 2021/4/14 今天做Excel，Excel添加的需求  当时问的经理 说是同一个部门 有一个人以上姓名相同,电话号码有一个相同  就算重复 不能添加成功
-	// // TODO: 2021/4/14 但是原型上面没有体现出来，所以 3/22 就没有处理姓名相同和电话号码有一个相同 这个情况  现在来处理
 	@ApiOperation("通过Excel添加通讯录")
 	@PostMapping("/addLinkByExcel")
 	public CommonResult addLinkByExcel(@RequestParam("file") MultipartFile file) {
@@ -114,7 +110,7 @@ public class DepartmentStaffController {
 		}
 	}
 	
-	// TODO: 2021/4/16 这里采用从服务器下载吧
+	// TODO: 2021/4/16 这里暂时采用从服务器下载吧
 	@GetMapping("/down")
 	@ApiOperation("下载模板")
 	@Login(allowAnonymous = true)
