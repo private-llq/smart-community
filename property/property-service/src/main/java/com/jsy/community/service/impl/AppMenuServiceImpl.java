@@ -231,7 +231,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 			appMenuMapper.deleteMiddleMenu(appMenuEntity.getCommunityId());
 		}
 		
-		// 添加菜单到中间表
+		// 重新添加菜单到中间表
 		appMenuMapper.insertMiddleMenu(appMenuVOS);
 	}
 }
