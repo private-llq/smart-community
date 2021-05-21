@@ -30,12 +30,14 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
 
     private String serialNumber="complain_number:";
 
+
+
     /**
      * @Description: 用户投诉接口
      * @author: Hu
-     * @since: 2021/2/23 17:35
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:53
+     * @Param: [complainEntity]
+     * @return: void
      */
     @Override
     public void addComplain(ComplainEntity complainEntity) {
@@ -101,12 +103,14 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
         String s=sdfTime.format(System.currentTimeMillis()).replaceAll("[[\\s-:punct:]]", "");
         return str+=s;
     }
+
+
     /**
      * @Description: 查询用户所有的投诉建议
      * @author: Hu
-     * @since: 2020/12/23 11:30
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:52
+     * @Param: [userId]
+     * @return: java.util.List<com.jsy.community.entity.ComplainEntity>
      */
     @Override
     public List<ComplainEntity> selectUserIdComplain(String userId) {

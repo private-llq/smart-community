@@ -26,11 +26,27 @@ public class UserDataServiceImpl implements IUserDataService {
      @Autowired
      private UserAuthMapper userAuthMapper;
 
+
+    /**
+     * @Description: 修改个人资料
+     * @author: Hu
+     * @since: 2021/5/21 13:57
+     * @Param: [userDataQO, userId]
+     * @return: void
+     */
     @Override
     public void updateUserData(UserDataQO userDataQO, String userId) {
         userDataMapper.updateUserData(userDataQO,userId);
     }
 
+
+    /**
+     * @Description: 查询一条信息
+     * @author: Hu
+     * @since: 2021/5/21 13:57
+     * @Param: [userId]
+     * @return: com.jsy.community.vo.UserDataVO
+     */
     @Override
     public UserDataVO selectUserDataOne(String userId) {
         UserDataVO userDataVO = userDataMapper.selectUserDataOne(userId);
