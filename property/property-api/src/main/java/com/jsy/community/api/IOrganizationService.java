@@ -5,7 +5,6 @@ import com.jsy.community.entity.OrganizationEntity;
 import com.jsy.community.vo.TreeCommunityVO;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +22,7 @@ public interface IOrganizationService extends IService<OrganizationEntity> {
 	 * @Author lihao
 	 * @Description 树形查询所有组织
 	 * @Date 2021/3/15 18:05
-	 * @Param [communityId]
+	 * @Param [communityId：社区id]
 	 **/
 	TreeCommunityVO listOrganization(Long communityId);
 	
@@ -41,7 +40,7 @@ public interface IOrganizationService extends IService<OrganizationEntity> {
 	 * @Author lihao
 	 * @Description 删除组织机构
 	 * @Date 2021/3/16 9:02
-	 * @Param [id, communityId]
+	 * @Param [id：组织id, communityId]
 	 **/
 	void deleteOrganization(Long id, Long communityId);
 	
@@ -50,7 +49,7 @@ public interface IOrganizationService extends IService<OrganizationEntity> {
 	 * @Author lihao
 	 * @Description 根据id查询组织机构
 	 * @Date 2021/3/16 9:09
-	 * @Param [id, communityId]
+	 * @Param [id：组织id, communityId]
 	 **/
 	OrganizationEntity getOrganizationById(Long id, Long communityId);
 	

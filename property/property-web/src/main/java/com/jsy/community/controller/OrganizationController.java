@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
- * 前端控制器
+ * 组织机构控制器
  * </p>
  *
  * @author lihao
