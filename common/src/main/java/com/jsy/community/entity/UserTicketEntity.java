@@ -19,6 +19,12 @@ public class UserTicketEntity extends BaseEntity{
 	@ApiModelProperty(value = "用户id")
 	private String uid;
 	
+	@ApiModelProperty(value = "现金券标题")
+	private String title;
+	
+	@ApiModelProperty(value = "描述")
+	private String remark;
+	
 	@ApiModelProperty(value = "类型 1.全平台现金抵扣券")
 	private Integer type;
 	
@@ -27,6 +33,12 @@ public class UserTicketEntity extends BaseEntity{
 	
 	@ApiModelProperty(value = "要求最低消费(门槛)")
 	private BigDecimal leastConsume;
+	
+	@ApiModelProperty(value = "面值(String)")
+	private String moneyStr;
+	
+	@ApiModelProperty(value = "要求最低消费(门槛)(String)")
+	private String leastConsumeStr;
 	
 	@ApiModelProperty(value = "是否使用 0.未使用 1.已使用")
 	private Integer status;

@@ -47,6 +47,7 @@ public class RepairOrderController {
 	// 不传：查所有  传0：个人报修事项  传1：公共报修事项
 	@ApiOperation("报修事项查询")
 	@GetMapping("/listRepairType")
+	@Login(allowAnonymous = true)
 	public CommonResult listRepairType(@ApiParam("报修类别") Integer typeId) {
 		List<CommonConst> constList = repairOrderService.listRepairType(typeId);
 		return CommonResult.ok(constList);
@@ -66,7 +67,6 @@ public class RepairOrderController {
 		}
 	}
 	
-	
 	@ApiOperation("驳回")
 	@GetMapping("/rejectOrder")
 	public CommonResult rejectOrder(@ApiParam("报修订单id") @RequestParam Long id,
@@ -77,7 +77,7 @@ public class RepairOrderController {
 		String uid = UserUtils.getAdminUserInfo().getUid();
 		String number = UserUtils.getAdminUserInfo().getNumber();
 		String realName = UserUtils.getAdminUserInfo().getRealName();
-		repairOrderService.rejectOrder(id, reason, uid, number,realName);
+		repairOrderService.rejectOrder(id, reason, uid, number, realName);
 		return CommonResult.ok();
 	}
 	

@@ -1,11 +1,9 @@
 package com.jsy.community.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserService;
-import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.BusinessConst;
@@ -13,12 +11,10 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PropertyEnum;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
-import com.jsy.community.utils.CommonUtils;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
@@ -600,4 +596,32 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		return houseMapper.getCommunityHouseById(communityId);
 	}
 
+	/**
+	 * @Description: 小区下所有房间
+	 * @author: Hu
+	 * @since: 2021/4/24 14:42
+	 * @Param:
+	 * @return:
+	 */
+	@Override
+	public List<HouseEntity> selectHouseAll(Long communityId) {
+		return houseMapper.selectHouseAll(communityId);
+	}
+
+	/**
+	* @Description: 房屋ids 批量查 id-address对应关系
+	 * @Param: [ids]
+	 * @Return: java.util.Map<java.lang.Long,com.jsy.community.entity.HouseEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	@Override
+	public Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> ids){
+		if(CollectionUtils.isEmpty(ids) || (ids.size() == 1 && ids.contains(null))){
+			return new HashMap<>();
+		}
+		return houseMapper.queryIdAndHouseMap(ids);
+	}
+
+	
 }

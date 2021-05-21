@@ -23,7 +23,7 @@ public interface IComplainsService extends IService<ComplainEntity> {
      * @Param:
      * @return:
      */
-    Map<String, Object> listAll(BaseQO<PropertyComplaintsQO> baseQO);
+    Map<String, Object> listAll(BaseQO<PropertyComplaintsQO> baseQO,AdminInfoVo userInfo);
     /**
      * @Description: 反馈内容
      * @author: Hu

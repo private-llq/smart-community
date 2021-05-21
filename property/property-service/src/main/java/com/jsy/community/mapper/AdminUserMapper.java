@@ -118,7 +118,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
-	@Select("select community_id from t_admin_user where mobile = #{mobile} and status = 0")
+	@Select("select community_id from t_admin_user where mobile = #{mobile}")
 	List<Long> queryCommunityIdListByMobile(String mobile);
 	
 	/**
@@ -150,8 +150,8 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	@Insert("insert into t_admin_user(id,uid,community_id,number,password,salt,real_name,status,mobile,id_card,job,org_id,create_by,create_time,role_type) " +
-		"values(#{entity.id},#{entity.uid},#{entity.communityId},#{entity.number},#{entity.password},#{entity.salt},#{entity.realName},#{entity.status},#{entity.mobile},#{entity.idCard},#{entity.job},#{entity.orgId},#{entity.createBy},now(),2)")
+	@Insert("insert into t_admin_user(id,uid,community_id,number,real_name,status,mobile,id_card,job,org_id,create_by,create_time,role_type) " +
+		"values(#{entity.id},#{entity.uid},#{entity.communityId},#{entity.number},#{entity.realName},#{entity.status},#{entity.mobile},#{entity.idCard},#{entity.job},#{entity.orgId},#{entity.createBy},now(),2)")
 	int addOperator(@Param("entity") AdminUserEntity entity);
 	
 	/**

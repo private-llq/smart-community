@@ -151,7 +151,7 @@ public class HouseLeaseController {
 
     @Login
     @PostMapping("/page")
-    @Cacheable( value = "lease:house", key = "#baseQo", unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
+//    @Cacheable( value = "lease:house", key = "#baseQo", unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
     @ApiOperation("分页查询房屋出租数据")
     public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQo) {
         ValidatorUtils.validatePageParam(baseQo);

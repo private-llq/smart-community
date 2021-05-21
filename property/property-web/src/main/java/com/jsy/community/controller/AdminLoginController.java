@@ -220,10 +220,14 @@ public class AdminLoginController {
 		BeanUtils.copyProperties(user,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
+		//删除登录用的一次性key
+		redisTemplate.delete("Admin:CommunityKey:" + communityKey);
 		return CommonResult.ok(adminInfoVo);
 	}
 	
-	//检查手机验证码
+	/**
+	 * 检查手机验证码
+	 */
 	private void checkVerifyCode(String mobile, String code) {
 		Object oldCode = redisTemplate.opsForValue().get("vCodeAdmin:" + mobile);
 		if (oldCode == null) {

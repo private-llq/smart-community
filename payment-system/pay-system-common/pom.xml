@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>payment-system</artifactId>
+        <groupId>com.jsy</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>pay-system-common</artifactId>
+    <name>三方支付公共模块</name>
+    <dependencies>
+        <!-- 银联支付相关开始 -->
+        <dependency>
+            <groupId>com.gnete.openapi</groupId>
+            <artifactId>gnete-openapi-sdk-1.0.2-RELEASE</artifactId>
+            <version>1.0.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/gnete-openapi-sdk-1.0.2-RELEASE.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sdk.api</groupId>
+            <artifactId>gnete-sdk-api-1.0.2-RELEASE</artifactId>
+            <version>1.0.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/gnete-sdk-api-1.0.2-RELEASE.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.gnete.sign</groupId>
+            <artifactId>gnete-sign-suite-1.0.2-RELEASE</artifactId>
+            <version>1.0.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/gnete-sign-suite-1.0.2-RELEASE.jar</systemPath>
+        </dependency>
+        <!-- 银联支付相关结束 -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <compilerArguments>
+                        <extdirs>${project.basedir}/src/main/resources/lib</extdirs>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

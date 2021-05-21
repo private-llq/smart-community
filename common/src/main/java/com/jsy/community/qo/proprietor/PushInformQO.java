@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 
 /**
@@ -57,7 +57,7 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "推送消息内容")
     private String pushMsg;
 
-    @Length(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, min = 0, max = 1, message = "推送目标超出范围：0表示推送至所有社区、1则是具体某个社区")
+    @Range(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, min = 0, max = 1, message = "推送目标超出范围：0表示推送至所有社区、1则是具体某个社区")
     @NotNull(groups = {AddPushInformValidate.class, UpdateDetailValidate.class}, message = "推送目标不能为空")
     @ApiModelProperty(value = "推送目标：0表示推送至所有社区、1则是具体某个社区")
     private Integer pushTarget;
@@ -91,19 +91,19 @@ public class PushInformQO implements Serializable {
 
     @ApiModelProperty("创建日期开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date startCreateTime;
+    private LocalDate startCreateTime;
 
     @ApiModelProperty("创建日期结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date endCreateTime;
+    private LocalDate endCreateTime;
 
     @ApiModelProperty("发布日期开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date startUpdateTime;
+    private LocalDate startUpdateTime;
 
     @ApiModelProperty("发布日期结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date endUpdateTime;
+    private LocalDate endUpdateTime;
 
     /**
      * 添加推送消息验证接口

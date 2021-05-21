@@ -49,7 +49,7 @@ public class WeChatListener{
         if (one!=null){
             if (one.getOrderStatus()!=2){
                 weChatService.deleteByOrder(msg);
-                PublicConfig.CloseOrder(msg);
+                PublicConfig.closeOrder(msg);
             }
         }
         //手动确认

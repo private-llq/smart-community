@@ -44,6 +44,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -78,9 +80,9 @@ public class ProprietorController {
     @IpLimit(prefix = "excel", second = 60, count = 5, desc = "下载业主信息录入Excel")
     @GetMapping(params = {"downloadExcel"})
     @ApiOperation("下载业主信息录入Excel")
-    public ResponseEntity<byte[]> downloadExcel(@RequestParam long communityId) {
+    public ResponseEntity<byte[]> downloadExcel(HttpServletResponse response, @RequestParam long communityId) {
         //1. 设置响应头
-        MultiValueMap<String, String> multiValueMap = setHeader("业主导入模板.xlsx");
+        MultiValueMap<String, String> multiValueMap = setHeader("业主导入模板.xls");
         //2.生成Excel模板
         try {
             //2.2 生成Excel 业主信息录入模板
@@ -348,7 +350,7 @@ public class ProprietorController {
         //设置响应类型为附件类型直接下载这种
         multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileFullName, StandardCharsets.UTF_8));
         //设置响应的文件mime类型为 xls类型
-        multiValueMap.set("Content-type", "application/vnd.ms-excel");
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
         return multiValueMap;
     }
 

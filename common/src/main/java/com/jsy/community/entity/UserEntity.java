@@ -105,6 +105,10 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("导入excel记录用户的房屋信息")
 	@TableField( exist = false )
 	private HouseEntity houseEntity;
+	
+	@ApiModelProperty("用户聊天ID")
+	@TableField( exist = false )
+	private String imId;
 
 	/**
 	 * 业主登记验证接口

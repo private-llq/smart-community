@@ -1,0 +1,46 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: facility-web
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      # 服务发现
+      discovery:
+        server-addr: 127.0.0.1:8848
+      # 配置中心
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml
+        # 全部服务提供模块固定不变的配置，比如mybatis plus配置，三方登录配置，
+        extension-configs[0]:
+          data-id: common-web-fixed.yaml
+          refresh: true
+        extension-configs[1]:
+          data-id: common.yaml
+          refresh: true
+
+dubbo:
+  registry:
+    address: nacos://127.0.0.1:8848
+    use-as-metadata-center: false
+  protocol:
+    name: dubbo
+    port: -1
+  application:
+    name: ${spring.application.name}
+  cloud:
+    subscribed-services: facility-service
+  consumer:
+    retries: 0
+    timeout: 99999
+  provider:
+    retries: 0
+    timeout: 99999
+jsy:
+  redis:
+    annotation:
+      # 当前模块@Cacheable 缓存的数据的超时时间/s
+      cacheTimeout: 1800

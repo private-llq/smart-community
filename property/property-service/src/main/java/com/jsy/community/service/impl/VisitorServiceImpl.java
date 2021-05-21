@@ -13,6 +13,7 @@ import com.jsy.community.mapper.VisitorPersonRecordMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,5 +131,17 @@ public class VisitorServiceImpl implements IVisitorService {
 //		BeanUtils.copyProperties(pageData,pageInfo);
 //		return pageInfo;
 //	}
+	
+	/**
+	* @Description: 新增访客进出记录(数据来自机器)
+	 * @Param: [historyEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/5/7
+	**/
+	@Override
+	public boolean addVisitorRecord(VisitorHistoryEntity historyEntity){
+		return visitorHistoryMapper.insert(historyEntity) == 1;
+	}
 	
 }

@@ -6,12 +6,11 @@ import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.UserInfoVo;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -134,4 +133,23 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @return				返回房屋id + 社区 id 集合列表
 	 */
 	List<UserHouseQo> getProprietorInfo(String idCard);
+	
+	/**
+	* @Description: uids批量查 uid-姓名映射
+	 * @Param: [uids]
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	@MapKey("uid")
+	Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids);
+
+	/**
+	* @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
+	 * @Param: [uids, nameLike]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/23
+	**/
+	List<String> queryUidOfNameLike(@Param("uids")Collection<String> uids, @Param("nameLike")String nameLike);
 }

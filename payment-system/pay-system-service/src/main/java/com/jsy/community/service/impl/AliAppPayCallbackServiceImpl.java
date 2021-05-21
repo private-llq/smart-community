@@ -107,7 +107,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			//支付订单修改状态完成
 			ailiAppPayRecordService.completeAliAppPayRecord(order.getOrderNo());
 			log.info("支付宝回调 - 本地订单状态修改完成，订单号：" + order.getOrderNo());
-			if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.equals(order.getTradeName())){
+			if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.getIndex().equals(order.getTradeName())){
 				log.info("开始修改商城订单状态，订单号：" + order.getOrderNo());
 				Map<String, Object> shopOrderDealMap = shoppingMallService.completeShopOrder(order.getServiceOrderNo());
 				if(0 != (int)shopOrderDealMap.get("code")){

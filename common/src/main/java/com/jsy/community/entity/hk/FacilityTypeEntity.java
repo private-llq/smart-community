@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull;
 public class FacilityTypeEntity extends BaseEntity {
 
     @ApiModelProperty(value = "父id")
-    @NotNull(groups = {FacilityTypeEntity.addFacilityTypeValidate.class, FacilityTypeEntity.updateFacilityTypeValidate.class},message = "父id不能为空")
+    @NotNull(groups = {FacilityTypeEntity.addFacilityTypeValidate.class},message = "父id不能为空")
     private Long pid;
 
     @ApiModelProperty(value = "社区id")

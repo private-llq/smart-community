@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业意见反馈
  * @author: Hu
  * @create: 2021-04-11 11:15
  **/
@@ -26,6 +26,14 @@ public class PropertyOpinionServiceImpl extends ServiceImpl<PropertyOpinionMappe
     @Autowired
     private PropertyOpinionMapper propertyOpinionMapper;
 
+
+    /**
+     * @Description: 查询当天投诉是否已达三条
+     * @author: Hu
+     * @since: 2021/5/21 11:09
+     * @Param: [userInfo]
+     * @return: java.lang.Integer
+     */
     @Override
     public Integer selectCount(AdminInfoVo userInfo) {
         List<PropertyOpinionEntity> list = propertyOpinionMapper.selectList(new QueryWrapper<PropertyOpinionEntity>()
@@ -33,12 +41,19 @@ public class PropertyOpinionServiceImpl extends ServiceImpl<PropertyOpinionMappe
                 .ge("create_time", LocalDate.now())
                 .le("create_time", LocalDate.now().plusDays(1)));
         if (list!=null){
-
             return list.size();
         }
         return 0;
     }
 
+
+    /**
+     * @Description: 新增
+     * @author: Hu
+     * @since: 2021/5/21 11:09
+     * @Param: [propertyOpinionEntity, userInfo]
+     * @return: void
+     */
     @Override
     public void insetOne(PropertyOpinionEntity propertyOpinionEntity, AdminInfoVo userInfo) {
         propertyOpinionEntity.setId(SnowFlake.nextId());

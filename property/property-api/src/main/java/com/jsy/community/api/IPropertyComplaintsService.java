@@ -9,7 +9,7 @@ import com.jsy.community.utils.PageInfo;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业投诉受理接口
  * @author: Hu
  * @create: 2021-03-19 11:19
  **/

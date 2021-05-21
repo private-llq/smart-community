@@ -5,8 +5,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.mapper.TenementMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
-import com.jsy.community.qo.property.RelationListQO;
-import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.PropertyTenementVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,7 @@ import java.util.regex.Pattern;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业租户查询
  * @author: Hu
  * @create: 2021-03-10 14:36
  **/
@@ -29,30 +27,13 @@ public class TenementServiceImpl implements ITenementService {
     private TenementMapper tenementMapper;
 
 
-    @Override
-    public List<HouseTypeVo> getHouseId(BaseQO<RelationListQO> baseQO) {
-        if (baseQO.getSize()==null||baseQO.getSize()==0){
-            baseQO.setSize(10L);
-        }
-        return tenementMapper.getHouseId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
-    }
-
-    @Override
-    public List getBuildingId(BaseQO<RelationListQO> baseQO) {
-        if (baseQO.getSize()==null||baseQO.getSize()==0){
-            baseQO.setSize(10L);
-        }
-        return tenementMapper.getBuildingId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
-    }
-
-    @Override
-    public List getUnitId(BaseQO<RelationListQO> baseQO) {
-        if (baseQO.getSize()==null||baseQO.getSize()==0){
-            baseQO.setSize(10L);
-        }
-        return tenementMapper.getUnitId(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize());
-    }
-
+    /**
+     * @Description: 分页查询
+     * @author: Hu
+     * @since: 2021/5/21 11:13
+     * @Param: [baseQO]
+     * @return: java.util.Map
+     */
     @Override
     public Map list(BaseQO<PropertyRelationQO> baseQO) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){

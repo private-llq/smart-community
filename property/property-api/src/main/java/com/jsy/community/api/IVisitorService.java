@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.jsy.community.entity.VisitorPersonRecordEntity;
 import com.jsy.community.qo.BaseQO;
@@ -31,5 +32,14 @@ public interface IVisitorService {
 	 * @Date: 2021/4/15
 	**/
 	List<VisitorPersonRecordEntity> queryFollowPersonListByVisitorId(Long visitorId);
+	
+	/**
+	* @Description: 新增访客进出记录(数据来自机器)
+	 * @Param: [historyEntity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021/5/7
+	**/
+	boolean addVisitorRecord(VisitorHistoryEntity historyEntity);
 	
 }

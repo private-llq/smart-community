@@ -1,5 +1,6 @@
 package com.jsy.community.entity.hk;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
@@ -9,10 +10,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -29,21 +31,30 @@ import java.util.Date;
 @ApiModel(value = "Facility对象", description = "设备信息")
 public class FacilityEntity extends BaseEntity {
 	
+	@ApiModelProperty(value = "设备作用id")
+	@NotNull(groups = {FacilityEntity.addFacilityValidate.class,}, message = "设备作用id不能为空")
+	private Long facilityEffectId;
+	
+	@ApiModelProperty(value = "设备在线状态")
+	@TableField(exist = false)
+	@Range(groups = {updateFacilityValidate.class}, min = 0, max = 1, message = "请选择正确的设备在线状态")
+	private Integer status;
+	
 	@ApiModelProperty(value = "创建人id")
-	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "创建人id不能为空")
-	private Long personId;
+	private String personId;
 	
 	@ApiModelProperty(value = "创建人")
-	@NotBlank(groups = {FacilityEntity.addFacilityValidate.class}, message = "创建人不能为空")
 	private String createPerson;
 	
 	@ApiModelProperty(value = "社区id")
-	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "社区id不能为空")
 	private Long communityId;
 	
 	@ApiModelProperty(value = "设备分类id")
 	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备分类id不能为空")
 	private Long facilityTypeId;
+	
+	@ApiModelProperty(value = "是否已同步数据 0 未同步 1 已同步 ")
+	private Integer isConnectData;
 	
 	@ApiModelProperty(value = "设备分类")
 	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备分类id不能为空")
@@ -70,8 +81,8 @@ public class FacilityEntity extends BaseEntity {
 	private String ip;
 	
 	@ApiModelProperty(value = "端口号")
-	@NotBlank(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "端口号不能为空")
-	private String port;
+	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "端口号不能为空")
+	private Short port;
 	
 	@ApiModelProperty(value = "设备账号")
 	private String username;
@@ -87,12 +98,12 @@ public class FacilityEntity extends BaseEntity {
 	private String address;
 	
 	@ApiModelProperty(value = "备注")
-	@Length(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, min = 1, max = 100)
+	@Length(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, min = 0, max = 100)
 	private String remark;
 	
 	@ApiModelProperty(value = "数据同步时间")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date dataConnectTime;
+	private LocalDateTime dataConnectTime;
 	
 	public interface addFacilityValidate {
 	}

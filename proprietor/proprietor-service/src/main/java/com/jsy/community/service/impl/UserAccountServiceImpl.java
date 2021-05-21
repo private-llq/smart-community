@@ -24,6 +24,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 /**
@@ -148,6 +149,10 @@ public class UserAccountServiceImpl implements IUserAccountService {
 			queryWrapper.le("expire_time",LocalDateTime.now());
 		}
 		Page<UserTicketEntity> pageResult = userTicketMapper.selectPage(page, queryWrapper);
+		for(UserTicketEntity ticketEntity : pageResult.getRecords()){
+			ticketEntity.setMoneyStr(ticketEntity.getMoney().setScale(2, RoundingMode.HALF_UP).toPlainString());
+			ticketEntity.setLeastConsumeStr(ticketEntity.getLeastConsume().setScale(2, RoundingMode.HALF_UP).toPlainString());
+		}
 		PageInfo<UserTicketEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageResult,pageInfo);
 		return pageInfo;

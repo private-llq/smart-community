@@ -65,6 +65,9 @@ public class WeChatController {
 
     private HttpClient httpClient;
 
+    public WeChatController() {
+    }
+
     /**
      * @Description: app下单并返回调起支付参数
      * @author: Hu
@@ -93,7 +96,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://blue99x.vicp.net:9527/api/v1/payment/callback");
+        map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback");
         map.put("amount",hashMap);
         //转json
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
@@ -135,15 +138,13 @@ public class WeChatController {
      * @Param:
      * @return:
      */
-    @Login
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.info("回调成功");
-        Map<String, String> map = PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
+        Map<String, String> map = PublicConfig.notifyParam(request, response, WechatConfig.API_V3_KEY);
 //        weChatService.saveStatus(out_trade_no);
         log.info(String.valueOf(map));
-        log.info(map.get("out_trade_no"));
-        log.info(map.get("transaction_id"));
+
         weChatService.orderStatus(map);
         if (map.get("attach")!=null){
             String[] split = map.get("attach").split(",");
@@ -151,6 +152,7 @@ public class WeChatController {
                 shoppingMallService.completeShopOrder(split[1]);
             }
         }
+        PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
     }
 
 
@@ -233,6 +235,7 @@ public class WeChatController {
 
         return CommonResult.ok(body);
     }
+
     /**
      * @Description:  提现查询
      * @author: Hu
@@ -290,7 +293,7 @@ public class WeChatController {
             System.out.println(restmap.get("status"));
             System.out.println(restmap.get("reason"));
             System.out.println(restmap.get("openid"));
-            System.out.println(restmap.get("transfer_name "));
+            System.out.println(restmap.get("transfer_name"));
             System.out.println(restmap.get("payment_amount"));
         }else {
             System.out.println(restmap.get("err_code"));

@@ -23,8 +23,8 @@
     </insert>
     <!--  通过id查询业主家属  -->
     <select id="selectID" resultType="com.jsy.community.entity.HouseMemberEntity">
-        select <include refid="selectId"></include> from t_house_member t join t_user_house tu on t.householder_id=tu.uid
-        where t.deleted=0 and tu.deleted=0 and t.house_id=tu.house_id and t.householder_id=#{id} and t.house_id=#{houseId}
+        select <include refid="selectId"></include> from t_house_member t
+        where t.deleted=0 and t.householder_id=#{id} and t.house_id=#{houseId}
     </select>
     <update id="updateUserRelationDetails" parameterType="com.jsy.community.qo.proprietor.RelationQO">
         update t_house_member
@@ -32,7 +32,7 @@
             <if test="name!=null and name!=''">
                 name=#{name},
             </if>
-            <if test="sex!=null and sex>0">
+            <if test="sex!=null">
                 sex=#{sex},
             </if>
              <if test="mobile!=null and mobile!=''">

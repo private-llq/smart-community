@@ -35,6 +35,14 @@ public class PropertyComplaintsServiceImpl extends ServiceImpl<PropertyComplaint
     @Autowired
     private AdminUserMapper adminUserMapper;
 
+
+    /**
+     * @Description: 投诉回复
+     * @author: Hu
+     * @since: 2021/5/21 11:06
+     * @Param: [complainFeedbackQO]
+     * @return: void
+     */
     @Override
     public void complainFeedback(ComplainFeedbackQO complainFeedbackQO) {
         PropertyComplaintsEntity entity = propertyComplaintsMapper.selectById(complainFeedbackQO.getId());
@@ -50,22 +58,23 @@ public class PropertyComplaintsServiceImpl extends ServiceImpl<PropertyComplaint
         propertyComplaintsMapper.updateById(entity);
     }
 
+
+
     /**
      * @Description: 分页查询物业投诉接口
      * @author: Hu
-     * @since: 2021/3/19 14:05
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:06
+     * @Param: [baseQO]
+     * @return: com.jsy.community.utils.PageInfo
      */
     @Override
     public PageInfo findList(BaseQO<PropertyComplaintsQO> baseQO) {
         PageInfo<Object> pageInfo = new PageInfo<>();
-        QueryWrapper<PropertyComplaintsEntity> wrapper = new QueryWrapper<>();
         PropertyComplaintsQO qoQuery = baseQO.getQuery();
         if (qoQuery.getComplainTimeOut()!=null) {
             qoQuery.setComplainTimeOut(qoQuery.getComplainTimeOut().plusDays(1));
         }
-        Page page =propertyComplaintsMapper.findList(new Page<PropertyComplaintsEntity>(baseQO.getPage(),baseQO.getSize()),baseQO.getQuery());
+        Page page =propertyComplaintsMapper.findList(new Page<PropertyComplaintsEntity>(baseQO.getPage(),baseQO.getSize()),qoQuery);
         List<PropertyComplaintsVO> list = page.getRecords();
         if (list.size()>0){
             for (PropertyComplaintsVO entity : list) {

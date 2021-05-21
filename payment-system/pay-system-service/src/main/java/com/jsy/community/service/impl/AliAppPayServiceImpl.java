@@ -18,6 +18,7 @@ import com.jsy.community.utils.AlipayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 
 /**
@@ -27,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 **/
 @DubboService(version = Const.version, group = Const.group_payment)
 public class AliAppPayServiceImpl implements AliAppPayService {
+	
+	@Value("${notifyUrl}")
+	private String notifyUrl;
 	
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AiliAppPayRecordService ailiAppPayRecordService;
@@ -42,7 +46,8 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	public String getOrderStr(AliAppPayQO aliAppPayQO) {
 		AlipayClient alipayClient = alipayUtils.getDefaultCertClient();
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-		request.setNotifyUrl("http://blue99x.vicp.net:9951/api/v1/payment/callBack/pay");
+//		request.setNotifyUrl("http://blue99x.vicp.net:9951/api/v1/payment/callBack/pay");
+		request.setNotifyUrl(notifyUrl);
 		request.setBizContent("{" +
 //		"\"timeout_express\":\"90m\"," +
 		"\"total_amount\":"+"\""+ aliAppPayQO.getTotalAmount()+"\""+","+

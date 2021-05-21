@@ -3,6 +3,7 @@ package com.jsy.community.config;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
+import com.jsy.community.api.PaymentException;
 import com.jsy.community.utils.AesUtil;
 import com.jsy.community.utils.MyHttpClient;
 import net.sf.json.JSONObject;
@@ -50,12 +51,12 @@ public class PublicConfig {
      * @param url                请求地址（只需传入域名之后的路由地址）
      * @param jsonStr            请求体 json字符串 此参数与微信官方文档一致
      * @param mercId             商户ID
-     * @param serial_no          证书序列号
+     * @param serialNo          证书序列号
      * @param privateKeyFilePath 私钥的路径
      * @return 订单支付的参数
      * @throws Exception
      */
-    public static String V3PayGet(String url, String jsonStr, String mercId, String serial_no, String privateKeyFilePath) throws Exception {
+    public static String V3PayGet(String url, String jsonStr, String mercId, String serialNo, String privateKeyFilePath) throws Exception {
         String body = "";
         //创建httpclient对象
         CloseableHttpClient client = HttpClients.createDefault();
@@ -150,31 +151,51 @@ public class PublicConfig {
      * @param response
      * @param privateKey APIv3 32的秘钥
      */
-    public static Map<String, String> notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
+    public static Map<String, String> notifyParam(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
         Map<String, String> map = new HashMap<>(12);
         String result = readData(request);
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
         String plainText = verifyNotify(result, privateKey);
         if (StrUtil.isNotEmpty(plainText)) {
-            response.setStatus(200);
+            String out_trade_no = JSONObject.fromObject(plainText).getString("out_trade_no");
+            String transaction_id = JSONObject.fromObject(plainText).getString("transaction_id");
+            String attach = JSONObject.fromObject(plainText).getString("attach");
+            Map<String, String> hashMap = new HashMap<>();
+            hashMap.put("out_trade_no",out_trade_no);
+            hashMap.put("attach",attach);
+            hashMap.put("transaction_id",transaction_id);
+            return hashMap;
+        }
+        throw new PaymentException("验签出错！");
+
+    }
+    /**
+     * 异步验签
+     *
+     * @param request
+     * @param response
+     * @param privateKey APIv3 32的秘钥
+     */
+    public static void notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
+        Map<String, String> map = new HashMap<>(12);
+        String result = readData(request);
+        // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
+        String plainText = verifyNotify(result, privateKey);
+        if (StrUtil.isNotEmpty(plainText)) {
             map.put("code", "SUCCESS");
             map.put("message", "SUCCESS");
         } else {
-            response.setStatus(500);
             map.put("code", "ERROR");
             map.put("message", "签名错误");
+        }
+        if("SUCCESS".equals(map.get("code"))){
+            response.setStatus(200);
+        }else{
+            response.setStatus(500);
         }
         response.setHeader("Content-type", ContentType.JSON.toString());
         response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
         response.flushBuffer();
-        String out_trade_no = JSONObject.fromObject(plainText).getString("out_trade_no");
-        String transaction_id = JSONObject.fromObject(plainText).getString("transaction_id");
-        String attach = JSONObject.fromObject(plainText).getString("attach");
-        Map<String, String> hashMap = new HashMap<>();
-        hashMap.put("out_trade_no",out_trade_no);
-        hashMap.put("attach",attach);
-        hashMap.put("transaction_id",transaction_id);
-        return hashMap;
     }
 
 
@@ -184,19 +205,19 @@ public class PublicConfig {
      * @param method             请求方式
      * @param url                请求地址
      * @param mercId             商户ID
-     * @param serial_no          证书序列号
+     * @param serialNo          证书序列号
      * @param privateKeyFilePath 私钥路径
      * @param body               请求体
      * @return 组装请求的数据
      * @throws Exception
      */
-    public static String getToken(String method, HttpUrl url, String mercId, String serial_no, String privateKeyFilePath, String body) throws Exception {
+    public static String getToken(String method, HttpUrl url, String mercId, String serialNo, String privateKeyFilePath, String body) throws Exception {
         String nonceStr = UUID.randomUUID().toString().replace("-", "");
         long timestamp = System.currentTimeMillis() / 1000;
         String message = buildMessage(method, url, timestamp, nonceStr, body);
         String signature = sign(message.getBytes("UTF-8"), privateKeyFilePath);
         return "mchid=\"" + mercId + "\","
-                + "serial_no=\"" + serial_no + "\","
+                + "serial_no=\"" + serialNo + "\","
                 + "nonce_str=\"" + nonceStr + "\","
                 + "timestamp=\"" + timestamp + "\","
                 + "signature=\"" + signature + "\"";
@@ -345,7 +366,7 @@ public class PublicConfig {
      * @Param:
      * @return:
      */
-    public static void CloseOrder(String order) throws Exception {
+    public static void closeOrder(String order) throws Exception {
 
         String postfix="/v3/pay/transactions/out-trade-no/"+order+"/close";
         //请求URL
@@ -436,6 +457,7 @@ public class PublicConfig {
             // 对所有传入参数按照字段名的 ASCII 码从小到大排序（字典序）
             Collections.sort(infoIds, new Comparator<Map.Entry<String, Object>>() {
 
+                @Override
                 public int compare(Map.Entry<String, Object> o1, Map.Entry<String, Object> o2) {
                     return (o1.getKey()).toString().compareTo(o2.getKey());
                 }

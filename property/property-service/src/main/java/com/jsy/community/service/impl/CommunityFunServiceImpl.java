@@ -28,10 +28,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @program: com.jsy.community
- * @description: 社区趣事
+ * @description: 物业社区趣事
  * @author: Hu
  * @create: 2020-12-09 10:51
  **/
@@ -43,12 +45,14 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     @Autowired
     private AdminUserMapper adminUserMapper;
 
+
+
     /**
      * @Description: 分页查询
      * @author: Hu
-     * @since: 2021/3/24 15:44
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:14
+     * @Param: [baseQO]
+     * @return: com.jsy.community.utils.PageInfo
      */
     @Override
     public PageInfo findList(BaseQO<CommunityFunQO> baseQO) {
@@ -85,6 +89,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             communityFunQO.setIssueTimeOut(communityFunQO.getIssueTimeOut().plusDays(1));
             wrapper.le("start_time",communityFunQO.getIssueTimeOut());
         }
+        wrapper.orderByDesc("create_time");
 
         Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
@@ -100,12 +105,16 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         return pageInfo;
     }
 
+
+
+
+
     /**
      * @Description: 撤销
      * @author: Hu
-     * @since: 2021/3/24 15:44
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:15
+     * @Param: [id]
+     * @return: void
      */
     @Override
     public void tapeOut(Long id) {
@@ -119,15 +128,20 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
+
     /**
      * @Description: 新增
      * @author: Hu
-     * @since: 2021/3/24 15:44
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:15
+     * @Param: [communityFunOperationQO, adminInfoVo]
+     * @return: void
      */
     @Override
     public void insetOne(CommunityFunOperationQO communityFunOperationQO, AdminInfoVo adminInfoVo) {
+        Pattern pattern = Pattern.compile("<.+?>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(communityFunOperationQO.getContent());
+        String string = matcher.replaceAll("");
+
         CommunityFunEntity entity = new CommunityFunEntity();
         entity.setCommunityId(adminInfoVo.getCommunityId());
         entity.setTitleName(communityFunOperationQO.getTitleName());
@@ -140,6 +154,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         entity.setCoverImageUrl(communityFunOperationQO.getCoverImageUrl());
         entity.setStatus(2);
         entity.setRedactStatus(2);
+        entity.setOriginalContent(string);
         String tallys = Arrays.toString(communityFunOperationQO.getTallys());
         entity.setTallys(tallys.substring(1, tallys.length() - 1));
         entity.setId(SnowFlake.nextId());
@@ -150,9 +165,9 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     /**
      * @Description: 修改
      * @author: Hu
-     * @since: 2021/3/24 15:44
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:15
+     * @Param: [communityFunOperationQO, adminInfoVo]
+     * @return: void
      */
     @Override
     public void updateOne(CommunityFunOperationQO communityFunOperationQO,AdminInfoVo adminInfoVo) {
@@ -169,12 +184,14 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         ElasticsearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.FUN, Operation.UPDATE, entity.getTitleName(), entity.getSmallImageUrl(),entity.getCommunityId());
     }
 
+
+
     /**
      * @Description: 删除
      * @author: Hu
-     * @since: 2021/3/24 15:44
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:15
+     * @Param: [id]
+     * @return: void
      */
     @Override
     public void deleteById(Long id) {
@@ -182,13 +199,15 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
 
-    /**
-     * @Description: 查询一条
-     * @author: Hu
-     * @since: 2021/3/24 15:44
-     * @Param:
-     * @return:
-     */
+
+
+  /**
+   * @Description: 查询一条
+   * @author: Hu
+   * @since: 2021/5/21 11:15
+   * @Param: [id]
+   * @return: com.jsy.community.entity.CommunityFunEntity
+   */
   @Override
   public CommunityFunEntity selectOne(Long id) {
       CommunityFunEntity entity = communityFunMapper.selectById(id);
@@ -199,12 +218,14 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
   }
 
 
+
+
   /**
    * @Description: 发布
    * @author: Hu
-   * @since: 2021/3/24 15:44
-   * @Param:
-   * @return:
+   * @since: 2021/5/21 11:15
+   * @Param: [id, adminInfoVo]
+   * @return: void
    */
   @Override
   public void popUpOnline(Long id,AdminInfoVo adminInfoVo) {

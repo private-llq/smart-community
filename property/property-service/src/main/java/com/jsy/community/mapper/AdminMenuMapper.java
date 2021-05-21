@@ -104,7 +104,7 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
-	@Select("select * from t_admin_menu where pid = #{id}")
+	@Select("select * from t_admin_menu where pid = #{id} and deleted = 0")
 	List<AdminMenuEntity> getChildrenList(Long id);
 	
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================

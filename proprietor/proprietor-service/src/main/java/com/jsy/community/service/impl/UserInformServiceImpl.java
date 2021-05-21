@@ -71,6 +71,40 @@ public class UserInformServiceImpl extends ServiceImpl<UserInformMapper, UserInf
         vos.sort((o1, o2) -> o2.getUnreadInformCreateTime().compareTo(o1.getUnreadInformCreateTime()));
         return vos;
     }
+    /**
+     * @Description: 查看是否有未读消息
+     * @author: Hu
+     * @since: 2021/5/10 14:56
+     * @Param:
+     * @return:
+     */
+    @Override
+    public Integer totalInForm(String userId) {
+        Integer status=0;
+        //1. 查出当前用户拥有的可推送小区ID,只要这个用户在这个小区有房子就可以推送
+        List<Long> communityIds = userInformMapper.queryUserAllCommunityId(userId);
+        //2. 查出 推送消息 推送至所有 小区的 推送号ID
+        List<Long> pushInformIds = userInformMapper.queryPushAcctIds(userId);
+
+        //合并两个List id
+        Set<Long> ids = mergeList(communityIds, pushInformIds);
+
+        if( ids == null ){
+            return null;
+        }
+        for(Long id : ids){
+            //1.查出当前推送消息id 用户已读数量
+            Integer readCount = userInformMapper.queryReadInformById(userId, id);
+            //2.查出当前推送消息id 推送消息总计数
+            Integer totalCount = userInformMapper.queryPushInformTotalCount(id);
+            //4.总计数 - 已读数 得到未读数
+            if(totalCount - readCount>0){
+                status = 1;
+                return status;
+            }
+        }
+        return status;
+    }
 
     /**
      * @author YuLF

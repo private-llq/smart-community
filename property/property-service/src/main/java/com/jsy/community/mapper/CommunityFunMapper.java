@@ -5,7 +5,7 @@ import com.jsy.community.entity.CommunityFunEntity;
 
 /**
  * @program: com.jsy.community
- * @description: 社区趣事
+ * @description: 物业社区趣事
  * @author: Hu
  * @create: 2020-12-09 10:50
  **/

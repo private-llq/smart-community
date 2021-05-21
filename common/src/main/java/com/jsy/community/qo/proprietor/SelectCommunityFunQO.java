@@ -21,4 +21,7 @@ public class SelectCommunityFunQO implements Serializable {
 
     @ApiModelProperty("社区趣事标题模糊查询")
     private String headline;
+
+    @ApiModelProperty("社区id")
+    private Long communityId;
 }

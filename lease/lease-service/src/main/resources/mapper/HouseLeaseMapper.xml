@@ -347,6 +347,7 @@
     <select id="queryHouseLeaseOne" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         SELECT
             l.id,
+            l.uid,
 	        l.house_contact,
 	        l.appellation,
 	        l.house_address,

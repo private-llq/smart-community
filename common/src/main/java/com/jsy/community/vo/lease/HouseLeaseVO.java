@@ -1,5 +1,6 @@
 package com.jsy.community.vo.lease;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,6 +25,10 @@ public class HouseLeaseVO implements Serializable {
 
     @ApiModelProperty(value = "业务数据唯一标识")
     private Long id;
+    
+    @ApiModelProperty(value = "发布人uid")
+    @TableField(exist = false)
+    private String uid;
 
     @ApiModelProperty(value = "房屋租售标题")
     private String houseTitle;
@@ -196,4 +201,7 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty( value = "室友性别: 1.限女生 2.限男生 4.男女不限")
     private String roommateSex;
 
+    @ApiModelProperty("发布人信息")
+    private Map<String,Object> user;
+    
 }

@@ -30,6 +30,7 @@ public class WeChatLoginController {
     private IWeChatLoginService weChatLoginService;
 
 
+
     @ApiOperation("登录")
     @PostMapping("/login")
     public CommonResult login(@RequestParam("code")String code) {
@@ -39,7 +40,6 @@ public class WeChatLoginController {
         }
         String accessToken = object.getString("access_token");
         String openid = object.getString("openid");
-
         return CommonResult.ok(weChatLoginService.login(openid));
     }
 

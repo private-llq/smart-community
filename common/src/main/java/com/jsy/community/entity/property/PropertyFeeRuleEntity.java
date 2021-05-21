@@ -1,5 +1,6 @@
 package com.jsy.community.entity.property;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
@@ -20,6 +21,8 @@ import java.math.BigDecimal;
 public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "1物业费，2车位费")
     private Integer type;
+    @ApiModelProperty(value = "社区id")
+    private Long communityId;
     @ApiModelProperty(value = "编号")
     private String serialNumber;
     @ApiModelProperty(value = "名称")
@@ -40,4 +43,7 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     private String createBy;
     @ApiModelProperty(value = "最近修改人")
     private String updateBy;
+    @ApiModelProperty(value = "修改人名称")
+    @TableField(exist = false)
+    private String updateByName;
 }

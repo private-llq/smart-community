@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseConstService;
 import com.jsy.community.api.IHouseLeaseService;
 import com.jsy.community.api.LeaseException;
+import com.jsy.community.api.ILeaseUserService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -47,6 +48,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
+    
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
+    private ILeaseUserService leaseUserService;
 
     /**
      * 保存房屋图片标签
@@ -260,6 +264,11 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         }
         vo.setRedundancy(redundancy);
 
+        //2.0查询发布人聊天id(im_id)
+        String imId = leaseUserService.queryIMIdByUid(vo.getUid());
+        Map<String, Object> user = new HashMap<>();
+        user.put("imId",imId);
+        vo.setUser(user);
         return vo;
     }
 

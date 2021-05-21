@@ -117,6 +117,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICommonConstService commonConstService;
 	
+	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	private ILeaseUserService leaseUserService;
+	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 	
@@ -281,6 +284,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 详情页展示的电话是用户在发布的时候填写的电话
 		one.setRealName(shop.getNickname());
 		one.setMobile(shop.getMobile());
+		//查询发布人聊天id(im_id)
+		String imId = leaseUserService.queryIMIdByUid(uid);
+		one.setImId(imId);
 		map.put("user", one);
 		return map;
 	}
@@ -664,7 +670,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		// 商铺行业
 		Long shopBusinessId = entity.getShopBusinessId();
 		CommonConst constBusiness = commonConstService.getConstById(shopBusinessId);
-		detailsVO.setShopBusiness(constBusiness.getConstName());
+		if (constBusiness != null) {
+			detailsVO.setShopBusiness(constBusiness.getConstName());
+		}
 		// 商铺图片
 		QueryWrapper<ShopImgEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("shop_id", entity.getId()).select("img_url");
@@ -767,6 +775,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 封装图片
 			QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();
 			imgWrapper.eq("shop_id", shopLeaseEntity.getId());
+			imgWrapper.orderByDesc("create_time");
 			List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(imgWrapper);
 			if (!CollectionUtils.isEmpty(shopImgEntities)) {
 				for (ShopImgEntity imgEntity : shopImgEntities) {

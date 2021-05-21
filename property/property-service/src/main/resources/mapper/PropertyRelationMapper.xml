@@ -41,7 +41,10 @@
         <include refid="Query"></include>
     </select>
     <select id="getHouseId" resultMap="HouseTypeMap">
-        select t.id as id,concat(t.number,"-",t.code) as name from t_house t where t.type=4 and t.community_id=#{query.communityId}
+        select t.id as id,concat(t.number,"-",t.code) as name
+        from t_user_house tuh
+        join t_house t on t.id=tuh.house_id
+        where tuh.community_id=#{query.communityId} and tuh.check_status=1
         <if test="query.name!=null and query.name!=''">
             and t.number like concat("%",#{query.name},"%")
         </if>

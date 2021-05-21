@@ -24,8 +24,8 @@ import java.util.Map;
 public class ShoppingMallServiceImpl implements IShoppingMallService {
 	
 	private static final String PROTOCOL_TYPE = "http://";
-	private static final String HOST = "192.168.12.29";
-//	private static final String HOST = "222.178.212.29";
+//	private static final String HOST = "192.168.12.29";
+	private static final String HOST = "222.178.212.29";
 	private static final String PORT = "9927";
 	private static final String PATH_CHECK_ORDER = "/services/order/order/checkOrder";
 	private static final String PATH_COMPLETE_ORDER = "/services/order/order/pub/payedOrder";
@@ -74,6 +74,7 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 			return returnMap;
 		}catch (Exception e) {
 			log.error("订单校验远程服务 - http执行或解析异常，json解析结果" + result);
+			log.error(e.getMessage());
 			returnMap.put("code",JSYError.INTERNAL.getCode());
 			returnMap.put("msg","订单校验出错");
 			return returnMap;
@@ -120,6 +121,7 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 			return returnMap;
 		}catch (Exception e) {
 			log.error("商城订单状态修改 - http执行或解析异常，json解析结果" + result);
+			log.error(e.getMessage());
 			returnMap.put("code",JSYError.INTERNAL.getCode());
 			returnMap.put("msg","订单出错");
 			return returnMap;

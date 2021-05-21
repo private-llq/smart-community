@@ -58,7 +58,19 @@ public class UserInformController {
     public CommonResult<List<InformListVO>> totalCommunityInformList(){
         return CommonResult.ok(userInformService.totalCommunityInformList(UserUtils.getUserId()));
     }
-
+    /**
+     * @Description: 查看当前登录人员是否有未读消息
+     * @author: Hu
+     * @since: 2021/5/10 15:06
+     * @Param:
+     * @return:
+     */
+    @Login
+    @GetMapping("/totalInForm")
+    @ApiOperation("查看当前登录人员是否有未读消息")
+    public CommonResult<Integer> totalInForm(){
+        return CommonResult.ok(userInformService.totalInForm(UserUtils.getUserId()));
+    }
 
 
 }

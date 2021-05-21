@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
@@ -70,7 +71,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      *@Return: java.util.List<com.jsy.community.entity.PushInformEntity>
      *@Date: 2021/4/20 13:53
      **/
-    List<PushInformEntity> queryInformList(BaseQO<PushInformQO> qo);
+    Page<PushInformEntity> queryInformList(BaseQO<PushInformQO> qo);
 
     /**
      *@Author: Pipi

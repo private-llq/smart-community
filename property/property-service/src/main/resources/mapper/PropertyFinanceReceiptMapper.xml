@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.PropertyFinanceReceiptMapper">
+    <!-- 收款单号批量查询 单号-收款单数据 映射 -->
+    <select id="queryByReceiptNumBatch" resultType="com.jsy.community.entity.property.PropertyFinanceReceiptEntity">
+        select receipt_num as receiptNum, create_time,transaction_type,transaction_no  from t_property_finance_receipt
+        where receipt_num in
+        <foreach collection="nums" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 条件查询批量收款单号 -->
+    <select id="queryReceiptNumsByCondition" resultType="String">
+        select receipt_num from t_property_finance_receipt
+        <where>
+            <if test="query.startDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ >= ]]> #{query.startDate}</if>
+            <if test="query.endDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ <= ]]> #{query.endDate}</if>
+        </where>
+    </select>
+
+    <!-- 条件查询批量收款单号 -->
+    <select id="queryReceiptNumsAndMonthByMonth" resultType="Map">
+        select receipt_num,DATE_FORMAT(create_time, '%Y-%m') as perMonth from t_property_finance_receipt
+        <where>
+            <if test="query.startDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ >= ]]> #{query.startDate}</if>
+            <if test="query.endDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ <= ]]> #{query.endDate}</if>
+        </where>
+    </select>
+
+    <!-- 条件查询批量收款单号(按月分组) -->
+    <select id="queryReceiptNumsAndMonthMapByMonth" resultType="Map">
+        select DATE_FORMAT(create_time, '%Y年%m月') as perMonth,group_concat(receipt_num) as receiptNums
+        from t_property_finance_receipt
+        <where>
+            <if test="query.startDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ >= ]]> #{query.startDate}</if>
+            <if test="query.endDate != null">and DATE_FORMAT(create_time, '%Y-%m-%d') <![CDATA[ <= ]]> #{query.endDate}</if>
+        </where>
+        group by perMonth
+        order by perMonth
+    </select>
+</mapper>

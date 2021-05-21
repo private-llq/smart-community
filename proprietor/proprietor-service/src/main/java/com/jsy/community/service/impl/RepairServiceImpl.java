@@ -108,6 +108,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		orderEntity.setStatus(0);
 		orderEntity.setNumber(MyMathUtils.randomCode(17));
 		orderEntity.setRepairId(repairId);
+		orderEntity.setOrderTime(repairEntity.getCreateTime());
 		repairOrderMapper.insert(orderEntity);
 	}
 	

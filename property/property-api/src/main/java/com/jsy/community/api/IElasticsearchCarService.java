@@ -3,12 +3,13 @@ package com.jsy.community.api;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
+import com.jsy.community.vo.admin.AdminInfoVo;
 
 import java.util.Map;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业车辆查询
  * @author: Hu
  * @create: 2021-03-25 15:29
  **/
@@ -47,5 +48,14 @@ public interface IElasticsearchCarService {
      * @Param:
      * @return:
      */
-    Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO);
+    Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO, AdminInfoVo info);
+
+    /**
+     * @Description: 更新es车辆
+     * @author: Hu
+     * @since: 2021/5/6 14:26
+     * @Param:
+     * @return:
+     */
+    void updateCars();
 }

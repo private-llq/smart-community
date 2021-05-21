@@ -1,22 +1,25 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyFeeRuleService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.entity.property.CommunityPropertyFeeRuleEntity;
+import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
-import com.jsy.community.mapper.CommunityMapper;
-import com.jsy.community.mapper.CommunityPropertyFeeRuleMapper;
+import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
-import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -30,41 +33,93 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     @Autowired
     private PropertyFeeRuleMapper propertyFeeRuleMapper;
     @Autowired
-    private CommunityPropertyFeeRuleMapper communityRuleMapper;
-    @Autowired
-    private CommunityMapper communityMapper;
+    private AdminUserMapper adminUserMapper;
 
+
+    /**
+     * @Description: 修改
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [userInfo, propertyFeeRuleEntity]
+     * @return: void
+     */
     @Override
-    @Transactional
-    public void updateAll() {
-        List<CommunityEntity> list = communityMapper.selectList(null);
-        for (CommunityEntity communityEntity : list) {
-            Integer i=1;
-            PropertyFeeRuleEntity ruleEntity = new PropertyFeeRuleEntity();
-            ruleEntity.setId(SnowFlake.nextId());
-            ruleEntity.setType(1);
-            String str=i+"";
-            ruleEntity.setSerialNumber(str.length()==1?"000"+i:str.length()==2?"00"+i:"0"+i);
-            ruleEntity.setName("物业费");
-            ruleEntity.setPeriod(3);
-            ruleEntity.setChargeMode(1);
-            ruleEntity.setMonetaryUnit(new BigDecimal(300));
-            ruleEntity.setPenalSum(new BigDecimal(0.01));
-            ruleEntity.setPenalDays(3);
-            ruleEntity.setStatus(0);
-            ruleEntity.setCreateBy("1a7a182d711e441fbb24659090daf5cb");
-            ruleEntity.setUpdateBy("");
-            propertyFeeRuleMapper.insert(ruleEntity);
-            CommunityPropertyFeeRuleEntity entity = new CommunityPropertyFeeRuleEntity();
-            entity.setCommunityId(communityEntity.getId());
-            entity.setRuleId(ruleEntity.getId());
-            communityRuleMapper.insert(entity);
-            i++;
+    public void updateOneRule(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
+        propertyFeeRuleEntity.setUpdateBy(userInfo.getUid());
+        propertyFeeRuleMapper.updateById(propertyFeeRuleEntity);
+    }
+
+
+    /**
+     * @Description: 启用或者停用
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [userInfo, status, id]
+     * @return: void
+     */
+    @Override
+    public void startOrOut(AdminInfoVo userInfo, Integer status,Long id) {
+        PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectById(id);
+        if (status==1){
+            PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type", entity.getType()).eq("status", 1).eq("community_id",entity.getCommunityId()));
+            if (ruleEntity!=null){
+                ruleEntity.setStatus(0);
+                ruleEntity.setUpdateBy(userInfo.getUid());
+                propertyFeeRuleMapper.updateById(ruleEntity);
+            }
+            entity.setUpdateBy(userInfo.getUid());
+            entity.setStatus(1);
+            propertyFeeRuleMapper.updateById(entity);
+        }else {
+            entity.setUpdateBy(userInfo.getUid());
+            entity.setStatus(0);
+            propertyFeeRuleMapper.updateById(entity);
         }
     }
 
+
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [communityId, type]
+     * @return: com.jsy.community.entity.property.PropertyFeeRuleEntity
+     */
     @Override
-    public List<PropertyFeeRuleEntity> findList(String communityId) {
-        return propertyFeeRuleMapper.findList(communityId);
+    public PropertyFeeRuleEntity selectByOne(Long communityId, Integer type) {
+        return propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type",type).eq("community_id",communityId));
+    }
+
+
+    /**
+     * @Description: 查询当前小区收费规则
+     * @author: Hu
+     * @since: 2021/5/21 11:08
+     * @Param: [baseQO, communityId]
+     * @return: java.util.Map<java.lang.Object,java.lang.Object>
+     */
+    @Override
+    public Map<Object, Object> findList(BaseQO<FeeRuleQO> baseQO,Long communityId) {
+        FeeRuleQO query = baseQO.getQuery();
+        if (baseQO.getSize()==null||baseQO.getSize()<=0){
+            baseQO.setSize(10L);
+        }
+        QueryWrapper<PropertyFeeRuleEntity> wrapper=new QueryWrapper<PropertyFeeRuleEntity>();
+        wrapper.eq("community_id", communityId);
+        if (!"".equals(query.getKey())&&query.getKey()!=null){
+            wrapper.like("name", query.getKey()).or().like("serial_number", query.getKey());
+        }
+        Page<PropertyFeeRuleEntity> page = propertyFeeRuleMapper.selectPage(new Page<>(baseQO.getPage(), baseQO.getSize()), wrapper);
+        List<PropertyFeeRuleEntity> pageRecords = page.getRecords();
+        for (PropertyFeeRuleEntity entity : pageRecords) {
+            if (!"".equals(entity.getUpdateBy())&&entity.getUpdateBy()!=null){
+                AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", entity.getUpdateBy()));
+                entity.setUpdateByName(userEntity.getRealName());
+            }
+        }
+        Map<Object, Object> map = new HashMap<>();
+        map.put("total",page.getTotal());
+        map.put("list",pageRecords);
+        return map;
     }
 }

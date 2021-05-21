@@ -2,6 +2,7 @@ package com.jsy.community.utils;
 
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,7 @@ import java.util.Objects;
  * @Author: chq459799974
  * @Date: 2020/12/2
  **/
+@Slf4j
 public class PicUtil {
 
     public static final String TYPE_JPG = "jpg";
@@ -82,12 +84,10 @@ public class PicUtil {
         return stringBuilder.toString();
     }
 
-
-
     /**
      * 根据文件流判断图片类型
      */
-    public static String getPicType(FileInputStream fis) {
+    private static String getPicType(FileInputStream fis) {
         //读取文件的前几个字节来判断图片格式
         byte[] b = new byte[4];
         try {
@@ -117,7 +117,32 @@ public class PicUtil {
         }
         return null;
     }
-
+    
+    /**
+     * 获取图片类型
+     */
+    public static String getPicType(MultipartFile file){
+        if(file == null){
+            throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件为空");
+        }
+        String fileType;
+        File tempFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+        try {
+            FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
+            fileType = getPicType(new FileInputStream(tempFile));
+            if (tempFile.exists()) {
+                boolean delete = tempFile.delete();
+                if(!delete){
+                    log.error("临时文件资源未被清理...");
+                    throw new JSYException(JSYError.INTERNAL);
+                }
+            }
+        }catch (IOException e){
+            throw new JSYException(JSYError.INTERNAL);
+        }
+        return fileType;
+    }
+    
     /**
      * 判断是否是图片(批量)
      */

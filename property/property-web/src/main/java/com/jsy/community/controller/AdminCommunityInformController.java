@@ -4,7 +4,6 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 
 /**
@@ -146,8 +144,8 @@ public class AdminCommunityInformController {
         }
         ValidatorUtils.validateEntity(qo.getQuery(), PushInformQO.PropertyInformListValidate.class);
         qo.getQuery().setAcctId(UserUtils.getAdminCommunityId());
-        List<PushInformEntity> pushInformEntities = communityInformService.queryInformList(qo);
-        return CommonResult.ok(pushInformEntities);
+//        List<PushInformEntity> pushInformEntities = communityInformService.queryInformList(qo);
+        return CommonResult.ok(communityInformService.queryInformList(qo));
     }
 
     /**

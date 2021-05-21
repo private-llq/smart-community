@@ -4,7 +4,6 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
-import io.minio.errors.*;
 import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -12,15 +11,12 @@ import org.apache.http.entity.ContentType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
 import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -49,7 +45,7 @@ public class MinioUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/2
 	**/
-	public static String upload(byte[] byteData, String bucketName){
+	public static String uploadPic(byte[] byteData, String bucketName){
 		InputStream inputStream = new ByteArrayInputStream(byteData);
 		MultipartFile file = null;
 		try {
@@ -57,7 +53,7 @@ public class MinioUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return uploadPic(file, bucketName);
+		return upload(file, bucketName);
 	}
 
 
@@ -83,8 +79,13 @@ public class MinioUtils {
 				endName = file.getOriginalFilename();
 				objectName = getRandomFileName(endName);
 			}else{
-				objectName = getRandomFileName("") + ".jpg";
+				objectName = getRandomFileName("");
 			}
+			String picType = PicUtil.getPicType(file);
+			if(PicUtil.TYPE_UNKNOWN.equals(picType)){
+				throw new JSYException(JSYError.BAD_REQUEST.getCode(),"非法图片格式！");
+			}
+			objectName += "." + picType;
 			// 存储文件
 			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());
 			//返回路径
@@ -123,6 +124,29 @@ public class MinioUtils {
 			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());
 			//返回路径
 			return ENDPOINT + ":" + PROT + "/" + BUCKETNAME + "/" + objectName;
+		} catch (Exception e) {
+			throw new JSYException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
+		}
+	}/**
+	 * 文件上传
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	public static String uploadName(MultipartFile file, String bucketName) {
+		try {
+			//获取minio客户端实例
+			minioClient = getMinioClientInstance();
+			//创建存储桶
+			createBucket(bucketName);
+			// 文件存储的目录结构
+			if(file == null){
+				throw new JSYException("请上传文件");
+			}
+			// 存储文件
+			minioClient.putObject(BUCKETNAME, file.getOriginalFilename(), file.getInputStream(), file.getContentType());
+			//返回路径
+			return ENDPOINT + ":" + PROT + "/" + BUCKETNAME + "/" + file.getOriginalFilename();
 		} catch (Exception e) {
 			throw new JSYException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
 		}

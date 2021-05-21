@@ -284,11 +284,13 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	**/
 	@Override
 	public List<AdminMenuEntity> queryMenuByUid(String uid){
-		List<Long> menuIdList = adminUserMenuMapper.queryUserMenu(uid); //查ID
+		//查ID
+		List<Long> menuIdList = adminUserMenuMapper.queryUserMenu(uid);
 		if(CollectionUtils.isEmpty(menuIdList)){
 			return null;
 		}
-		List<AdminMenuEntity> menuEntityList = adminMenuMapper.queryMenuBatch(menuIdList); //查实体
+		//查实体
+		List<AdminMenuEntity> menuEntityList = adminMenuMapper.queryMenuBatch(menuIdList);
 		//组装数据
 		List<AdminMenuEntity> returnList = new ArrayList<>();
 		for(AdminMenuEntity adminMenuEntity : menuEntityList){
@@ -299,13 +301,13 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		menuEntityList.removeAll(returnList);
 		for(AdminMenuEntity adminMenuEntity : menuEntityList){
 			for(AdminMenuEntity fatherEntity : returnList){
-				if(adminMenuEntity.getPid() == fatherEntity.getId()){
-					if(!CollectionUtils.isEmpty(fatherEntity.getChildrenList())){
-						fatherEntity.getChildrenList().add(adminMenuEntity);
+				if(adminMenuEntity.getPid().equals(fatherEntity.getId())){
+					if(!CollectionUtils.isEmpty(fatherEntity.getChildren())){
+						fatherEntity.getChildren().add(adminMenuEntity);
 					}else{
 						List<AdminMenuEntity> childrenList = new ArrayList<>();
 						childrenList.add(adminMenuEntity);
-						fatherEntity.setChildrenList(childrenList);
+						fatherEntity.setChildren(childrenList);
 					}
 				}
 			}
@@ -430,7 +432,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		if(!CollectionUtils.isEmpty(parentList)){
 			for(AdminMenuEntity adminMenuEntity : parentList){
 				childrenList = adminMenuMapper.getChildrenList(adminMenuEntity.getId());
-				adminMenuEntity.setChildrenList(childrenList);
+				adminMenuEntity.setChildren(childrenList);
 				setChildren(childrenList,new LinkedList<AdminMenuEntity>());
 			}
 		}

@@ -145,6 +145,16 @@ public interface BusinessConst {
      * 楼栋门禁-可视对讲
      */
     String ACCESS_BUILDING_COMMUNICATION = "2";
+    
+    //======= 门禁进入方式(物业端)
+    Integer ACCESS_TYPE_QRCODE = 1; //二维码
+    Integer ACCESS_TYPE_FACE = 2; //人脸识别
+    
+    //========= 硬件类型 ============
+    /**
+     * 炫优人脸识别一体机
+     */
+    Integer HARDWARE_TYPE_XU_FACE = 1;
 
     //========= 证件类型 ================
     /**

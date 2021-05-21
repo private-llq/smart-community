@@ -28,7 +28,7 @@ import java.util.List;
 @Accessors(chain = true)
 @ApiModel(value="来访人员", description="来访人员")
 @TableName("t_visitor")
-public class VisitorEntity extends BaseEntity implements Serializable {
+public class VisitorEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     
@@ -63,6 +63,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private Integer reason;
     
     @ApiModelProperty(value = "来访事由名")
+    @TableField(exist = false)
     private String reasonStr;
     
     @ApiModelProperty(value = "预期来访开始时间")
@@ -91,6 +92,7 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private Integer isCommunityAccess;
     
     @ApiModelProperty(value = "是否授予来访人社区门禁权限 文字描述", hidden = true)
+    @TableField(exist = false)
     private String isCommunityAccessStr;
     
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1二维码通行证，2可视对讲")
@@ -98,16 +100,18 @@ public class VisitorEntity extends BaseEntity implements Serializable {
     private Integer isBuildingAccess;
     
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限 文字描述", hidden = true)
+    @TableField(exist = false)
     private String isBuildingAccessStr;
     
     @ApiModelProperty(value = "来访车辆车牌", hidden = true)
     private String carPlate;
     
-    @ApiModelProperty(value = "来访车辆类型 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车", hidden = true)
-    @Range(min = 1, max = 5, message = "车辆类型不正确")
+    @ApiModelProperty(value = "来访车辆类型 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车 6.其他车型", hidden = true)
+    @Range(min = 1, max = 6, message = "车辆类型不正确")
     private Integer carType;
     
     @ApiModelProperty(value = "来访车辆类型名", hidden = true)
+    @TableField(exist = false)
     private String carTypeStr;
     
     @ApiModelProperty(value = "审核方式，1业主审核，2物业审核",hidden = true)

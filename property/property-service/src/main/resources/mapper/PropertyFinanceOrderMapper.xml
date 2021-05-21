@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.PropertyFinanceOrderMapper">
+    <!-- 批量更新结算状态为待审核,更新对象为被驳回的 -->
+    <update id="updateRejectStatementStatusByIdS">
+        update t_property_finance_order set statement_status = 1, update_time = now()
+        where id in
+        <foreach collection="list" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量更新结算状态为待审核,更新对象为未结算的 -->
+    <update id="updateStatementStatusByIdS" parameterType="java.util.Map">
+        update t_property_finance_order
+        set statement_status = 1,
+            update_time = now(),
+            statement_num = case id
+            <foreach collection="map.entrySet()" index="statementNum" item="orderIds">
+                <foreach collection="orderIds" item="orderId">
+                    when #{orderId} then #{statementNum}
+                </foreach>
+            </foreach>
+            end
+        where id in
+        <foreach collection="map.entrySet()" open="(" close=")" separator="," index="statementNum" item="orderIds">
+            <foreach collection="orderIds" separator="," item="orderId">
+                #{orderId}
+            </foreach>
+        </foreach>
+    </update>
+
+    <select id="communityIdList" resultType="java.lang.Long">
+        select distinct community_id from t_user_house where check_status=1
+    </select>
+
+    <!-- 获取上一个月的需要结算和被驳回的账单 -->
+    <select id="queryNeedStatementOrderListByCommunityIdAndOrderTime" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
+        select
+            *
+        from t_property_finance_order
+        <where>
+            DATE_FORMAT( order_time, '%Y-%m' ) = DATE_FORMAT(
+                DATE_SUB( NOW(), INTERVAL 1 MONTH ),
+                '%Y-%m'
+            )
+            and order_status = 1
+            and statement_status in (0, 4)
+            <foreach collection="list" open=" and community_id in (" close=")" separator="," item="communityId">
+                #{communityId}
+            </foreach>
+        </where>
+    </select>
+
+    <!-- 根据收款单号批量查询列表 -->
+    <select id="queryByReceiptNums" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
+        select * from t_property_finance_order
+        where receipt_num in
+        <foreach collection="receiptNums" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="query != null">
+            <if test="query.orderNum != null and query.orderNum != ''">and order_num like concat('%',#{query.orderNum},'%')</if>
+        </if>
+    </select>
+
+    <select id="houseCost" resultType="com.jsy.community.vo.property.PropertyFinanceOrderVO">
+        select
+        tpfo.id,tpfo.order_num,tpfo.community_id,tpfo.order_time,tpfo.house_id,tpfo.property_fee,
+        tpfo.penal_sum,tpfo.total_money,th.build_area,th.number,th.building,th.unit,th.floor,th.house_type
+        from t_property_finance_order tpfo
+        join t_user_house tuh
+        on tpfo.house_id=tuh.house_id
+        join t_house th
+        on tuh.house_id=th.id
+        where th.id=#{houseId}  and tpfo.order_status=0
+    </select>
+    <select id="findUser" resultType="com.jsy.community.vo.property.UserPropertyFinanceOrderVO">
+        select th.number,tu.real_name
+        from t_user_house tuh
+        join t_house th
+        on tuh.house_id=th.id
+        join t_user tu
+        on tuh.uid=tu.uid
+        where tuh.house_id=#{houseId}
+    </select>
+
+    <!-- 根据结算单号查询相关账单列表 -->
+    <select id="queryOrderByStatementNum" resultType="com.jsy.community.vo.StatementOrderVO">
+        select
+            tpfo.id as orderId,
+            tpfo.order_num,
+            tpfo.order_time,
+            tpfo.total_money,
+            tpfo.statement_num,
+            tpfr.create_time as payTime,
+            tpfr.transaction_type,
+            tpfr.transaction_no,
+            '物业费' as orderType
+        from t_property_finance_order tpfo
+        left join t_property_finance_receipt tpfr on tpfr.receipt_num = tpfo.receipt_num
+        where tpfo.statement_num in
+        <foreach collection="collection" open="(" close=")" separator="," item="statementNum">
+            #{statementNum}
+        </foreach>
+    </select>
+
+    <!-- 不固定的月份数量的数据查询(无法分组，循环union all?) -->
+    <select id="test1" resultType="java.math.BigDecimal">
+        <foreach collection="outList" item="item" separator="union all">
+            select sum(total_money) as totalMoney from t_property_finance_order
+            where receipt_num in
+            <foreach collection="item" item="item2" separator="," open="(" close=")">
+                #{item2}
+            </foreach>
+            and order_status = 1
+        </foreach>
+    </select>
+    <!-- 缴费按月统计 -->
+    <select id="statisticsReceipt" resultType="com.jsy.community.vo.property.FinanceOrderEntityVO">
+        SELECT
+            DATE_FORMAT( tpfr.create_time, '%Y-%m' ) as createTime,
+            sum( tpfo.total_money) as totalMoney
+        FROM
+            t_property_finance_order tpfo
+        LEFT JOIN t_property_finance_receipt tpfr ON tpfo.receipt_num = tpfr.receipt_num
+        WHERE
+            DATE_FORMAT( tpfr.create_time, '%Y-%m' ) &gt;= DATE_FORMAT( #{query.startDate}, '%Y-%m' )
+            AND DATE_FORMAT( tpfr.create_time, '%Y-%m' ) &lt;= DATE_FORMAT( #{query.endDate}, '%Y-%m' )
+        GROUP BY
+            DATE_FORMAT( tpfr.create_time, '%Y-%m' )
+        ORDER BY
+            DATE_FORMAT( tpfr.create_time, '%Y-%m') asc
+    </select>
+    <!-- 缴费按月应收统计 -->
+    <select id="statisticsReceivable" resultType="com.jsy.community.vo.property.FinanceOrderEntityVO">
+        SELECT
+            DATE_FORMAT( create_time, "%Y-%m" ) AS create_time,
+            SUM( total_money ) as total_money,
+            order_status,
+            '物业费' AS order_type
+        FROM
+            t_property_finance_order
+        WHERE
+            DATE_FORMAT( create_time, '%Y-%m' ) &gt;= DATE_FORMAT( #{query.startDate}, '%Y-%m' )
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &lt;= DATE_FORMAT( #{query.endDate}, '%Y-%m' )
+        GROUP BY
+            DATE_FORMAT( create_time, "%Y-%m" ),
+            order_status
+        ORDER BY
+            DATE_FORMAT( create_time, "%Y-%m" ) ASC
+    </select>
+
+    <!--    <select id="test2" resultType="">-->
+<!--        select sum(total_money) as totalMoney from t_property_finance_order-->
+<!--        where receipt_num in-->
+<!--        <foreach collection="item" item="item2" separator="," open="(" close=")">-->
+<!--            #{item2}-->
+<!--        </foreach>-->
+<!--        and order_status = 1-->
+
+<!--    </select>-->
+
+    <!-- 批量修改排序 -->
+    <update id="changeSorts" parameterType="java.util.Map">
+        update t_banner
+        set sort = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then #{value}
+        </foreach>
+        end
+        where id in
+        <foreach collection="map.entrySet()" index="key" separator="," open="(" close=")">
+            #{key}
+        </foreach>
+        and status = 1
+    </update>
+
+    <!-- 缴费按月结算统计 -->
+    <select id="settledStatistics" resultType="com.jsy.community.vo.property.FinanceOrderEntityVO">
+        SELECT
+            DATE_FORMAT( create_time, "%Y-%m" ) as create_time,
+            SUM(total_money) as total_money
+        FROM
+            t_property_finance_order
+        WHERE
+            statement_status = 3
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &gt;= DATE_FORMAT( #{query.startDate}, '%Y-%m' )
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &lt;= DATE_FORMAT( #{query.endDate}, '%Y-%m' )
+        GROUP BY
+            DATE_FORMAT( create_time, "%Y-%m" )
+        ORDER BY
+            DATE_FORMAT( create_time, "%Y-%m" ) ASC
+    </select>
+
+    <!-- 缴费按月未结算统计 -->
+    <select id="unsettlementStatistics" resultType="com.jsy.community.vo.property.FinanceOrderEntityVO">
+        SELECT
+            DATE_FORMAT( create_time, "%Y-%m" ) as create_time,
+            SUM(total_money) as total_money
+        FROM
+            t_property_finance_order
+        WHERE
+            statement_status in (1, 2)
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &gt;= DATE_FORMAT( #{query.startDate}, '%Y-%m' )
+            AND DATE_FORMAT( create_time, '%Y-%m' ) &lt;= DATE_FORMAT( #{query.endDate}, '%Y-%m' )
+        GROUP BY
+            DATE_FORMAT( create_time, "%Y-%m" )
+        ORDER BY
+            DATE_FORMAT( create_time, "%Y-%m" ) ASC
+    </select>
+</mapper>

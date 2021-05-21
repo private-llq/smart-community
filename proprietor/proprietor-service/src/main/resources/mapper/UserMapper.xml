@@ -28,4 +28,21 @@
 	<select id="getProprietorInfo" resultType="com.jsy.community.qo.proprietor.UserHouseQo">
 		select community_id,house_id from t_proprietor where id_card = #{idCard} and deleted = 0
 	</select>
+	<!-- uid批量查姓名映射 -->
+	<select id="queryNameByUidBatch" resultType="Map">
+		select uid,real_name as name from t_user
+		where uid in
+		<foreach collection="uids" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	<!-- 在固定的uid范围内筛选姓名满足模糊匹配条件的uid -->
+	<select id="queryUidOfNameLike" resultType="String">
+		select uid from t_user
+		where uid in
+		<foreach collection="uids" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		and real_name like concat('%',#{nameLike},'%')
+	</select>
 </mapper>

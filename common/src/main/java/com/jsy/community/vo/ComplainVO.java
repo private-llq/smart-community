@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -30,12 +31,14 @@ public class ComplainVO extends BaseVO {
     @ApiModelProperty(value = "投诉人电话")
     private String mobile;
     @ApiModelProperty(value = "投诉时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime complainTime;
     @ApiModelProperty(value = "反馈内容")
     private String feedbackContent;
     @ApiModelProperty(value = "回复人名称")
     private String feedbackName;
     @ApiModelProperty(value = "反馈内容")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime feedbackTime;
     @ApiModelProperty(value = "1，已回复，0未回复")
     private Integer status;

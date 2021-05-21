@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
@@ -26,15 +27,16 @@ import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
-import com.jsy.community.utils.es.ElasticsearchCarUtil;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.vo.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +57,7 @@ import java.util.stream.Collectors;
  * @author ling
  * @since 2020-11-11 18:12
  */
+@Slf4j
 @DubboService(version = Const.version, group = Const.group)
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements IUserService {
 
@@ -212,10 +215,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         } else { //用户名注册
             userAuth.setUsername(qo.getAccount());
         }
-        //添加业主(user表)
-        save(user);
-        //添加账户(user_auth表)
-        userAuthService.save(userAuth);
+        try{
+            //添加业主(user表)
+            save(user);
+            //添加账户(user_auth表)
+            userAuthService.save(userAuth);
+        }catch (DuplicateKeyException e){
+            throw new ProprietorException("该用户已注册");
+        }
         //创建金钱账户(t_user_account表)
         boolean userAccountResult = userAccountService.createUserAccount(uuid);
         if(!userAccountResult){
@@ -541,23 +548,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public Boolean updateImprover(ProprietorQO qo) {
         //========================================== 1.业主房屋 =========================================================
         List<UserHouseQo> houseList = qo.getHouses();
+    
+        List<UserHouseQo> any = null;
+	
+	    UserEntity userEntity = null;
         //用户提交的房屋信息不为空
         if (CollectionUtil.isNotEmpty(houseList)) {
             //用来找用户提交的房屋信息 和 物业用户所属的房屋信息 差集的集合
             List<UserHouseQo> tmpQos = new ArrayList<>(houseList);
+            log.error("入参houseList" + houseList);
             //1.通过uid拿到业主的身份证
-            UserEntity userEntity = queryUserDetailByUid(qo.getUid());
+            userEntity = queryUserDetailByUid(qo.getUid());
             //通过 业主身份证 拿到 业主表的 该业主的所有 房屋id + 社区id
             List<UserHouseQo> resHouseList = userMapper.getProprietorInfo(userEntity.getIdCard());
             if( CollectionUtil.isEmpty(resHouseList) ){
                 throw new ProprietorException("物业没有添加您的房屋信息!");
             }
             //取出 业主房屋信息 和 物业信息的差异集合  如果 differenceList 不为空 业主提交了 物业没有认证的房屋信息
-            List<UserHouseQo> differenceList = differenceSet( tmpQos, resHouseList );
+	        //剔除带了id的数据，带id目的是修改，差集只对比新增数据
+	        ArrayList<UserHouseQo> forInsert = new ArrayList<>();
+	        for(UserHouseQo userHouseQo : tmpQos){
+	        	if(userHouseQo.getId() == null || userHouseQo.getId() == 0){
+			        forInsert.add(userHouseQo);
+		        }
+	        }
+            List<UserHouseQo> differenceList = differenceSet( forInsert, resHouseList );
+            log.error("差集" + differenceList);
+            log.error("差集size：" + differenceList.size());
             if( CollectionUtil.isEmpty(differenceList) ){
                 //操作用户所在房屋
                 //id==null || id == 0 就是需要新增的 验证房屋信息是否有需要新增的数据
-                List<UserHouseQo> any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
+                any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
                 if( CollectionUtil.isNotEmpty(any) ){
                     houseList.removeAll(any);
                     //批量新增房屋信息
@@ -572,10 +593,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             }
         }
         updateCar(qo);
+        //没有添加房屋
+        if(CollectionUtils.isEmpty(any)){
+            return true;
+        }
+        Set<Long> communityIds = new HashSet<>();
+        for(UserHouseQo userHouseQo : any){
+            communityIds.add(userHouseQo.getCommunityId());
+        }
+        //下发人脸数据
+        setFaceUrlToCommunityMachine(userEntity,communityIds);
         return true;
     }
-
-
+    
+    //向小区设备下发人脸数据
+    private void setFaceUrlToCommunityMachine(UserEntity userEntity, Set<Long> communityIds){
+        //查询用户实名信息
+        if(userEntity.getIsRealAuth() == null || userEntity.getIsRealAuth() != 2){
+            // 用户实名认证未人脸认证 放弃后续操作
+            return;
+        }
+        if(StringUtils.isEmpty(userEntity.getFaceUrl())){
+            throw new ProprietorException("用户已实人认证，人脸图片不存在！"); //数据异常，停止房屋相关操作
+        }
+        JSONObject pushMap = new JSONObject();
+        pushMap.put("op","editPerson");
+        pushMap.put("uid",userEntity.getUid());
+        pushMap.put("faceUrl",userEntity.getFaceUrl());
+        pushMap.put("communityIdSet",communityIds);
+    
+        pushMap.put("sex",userEntity.getSex());
+        pushMap.put("realName",userEntity.getRealName());
+        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER,pushMap);
+    }
 
 
     /**
@@ -682,7 +732,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         Map<String, Map<String,Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
         UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
         for(HouseEntity userHouseEntity : houses){
-            userHouseEntity.setCommunityName(String.valueOf(communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId())).get("name")));
+            Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
+            userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));
             userHouseEntity.setOwner(userInfoVo.getRealName());
         }
         return houses;
@@ -880,6 +931,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //        }
     }
 
-
+    /**
+    * @Description: uids批量查询 uid-姓名映射
+     * @Param: [uids]
+     * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    @Override
+    public Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids){
+        if(CollectionUtils.isEmpty(uids) || (uids.size() == 1 && uids.contains(null))){
+            return new HashMap<>();
+        }
+        return userMapper.queryNameByUidBatch(uids);
+    }
+    
+    /**
+    * @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
+     * @Param: [uids, nameLike]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+    **/
+    @Override
+    public List<String> queryUidOfNameLike(List<String> uids,String nameLike){
+        return userMapper.queryUidOfNameLike(uids,nameLike);
+    }
 
 }

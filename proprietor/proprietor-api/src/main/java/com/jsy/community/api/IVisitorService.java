@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.*;
 import com.jsy.community.qo.BaseQO;
@@ -8,6 +9,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.VisitorEntryVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -29,13 +31,23 @@ public interface IVisitorService extends IService<VisitorEntity> {
     VisitorEntryVO addVisitor(VisitorEntity visitorEntity);
     
     /**
-    * @Description: 访客门禁验证
-     * @Param: [token, type]
-     * @Return: boolean
+    * @Description: 二维码开门验证
+     * @Param: [jsonObject, hardWareType]
+     * @Return: java.util.Map<java.lang.String,java.lang.Object>
      * @Author: chq459799974
-     * @Date: 2020/12/11
+     * @Date: 2021/5/6
     **/
-    boolean verifyEntry(String token,Integer type);
+//    void verifyQRCode(JSONObject jsonObject,Integer hardWareType);
+    Map<String,Object> verifyQRCode(JSONObject jsonObject, Integer hardWareType);
+    
+//    /**
+//    * @Description: 访客门禁验证
+//     * @Param: [token, type]
+//     * @Return: boolean
+//     * @Author: chq459799974
+//     * @Date: 2020/12/11
+//    **/
+//    boolean verifyEntry(String token,Integer type);
     
     /**
     * @Description: 根据ID 删除访客登记申请

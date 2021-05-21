@@ -38,15 +38,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.json.JsonXContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -397,8 +391,6 @@ public class ShopLeaseController {
 		return CommonResult.ok();
 	}
 	
-	
-	
 	/**
 	 * POST---有参测试(对象参数)
 	 *
@@ -458,7 +450,6 @@ public class ShopLeaseController {
 		}
 	}
 	
-	
 	//********************************
 	public static RestHighLevelClient getClient() {
 		HttpHost httpHost = new HttpHost("127.0.0.1", 9200);
@@ -467,47 +458,6 @@ public class ShopLeaseController {
 		return client;
 	}
 	//
-	
-	public static void main3(String[] args) {
-		RestHighLevelClient client = ShopLeaseController.getClient();
-		System.out.println(client);
-	}
-	
-	public static void main(String[] args) throws IOException {
-		//1. 准备关于索引的settings
-		Settings settings = Settings.builder()
-			.put("number_of_shards", 3)
-			.put("number_of_replicas", 1).build();
-		
-		//2. 准备关于索引的结构mappings
-		XContentBuilder mappings = JsonXContent.contentBuilder()
-			.startObject()
-			.startObject("properties")
-			.startObject("name")
-			.field("type", "text")
-			.endObject()
-			.startObject("age")
-			.field("type", "integer")
-			.endObject()
-			.startObject("birthday")
-			.field("type", "date")
-			.field("format", "yyyy-MM-dd")
-			.endObject()
-			.endObject()
-			.endObject();
-		
-		//3. 将settings和mappings封装到一个Request对象
-		CreateIndexRequest request = new CreateIndexRequest("person")
-			.settings(settings)
-			.mapping("man", mappings);
-		
-		//4. 通过client对象去连接ES并执行创建索引
-		RestHighLevelClient client = ShopLeaseController.getClient();
-		CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
-		System.out.println(response.toString());
-	}
-	
-	
 	
 	@Login(allowAnonymous = true)
 	@ApiOperation("根据筛选条件查询商铺列表")

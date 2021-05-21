@@ -37,6 +37,48 @@ public class RabbitMqConfig {
     public static final String QUEUE_CAR_DELETE = "queue_car_delete";
 
 
+    public static final String QUEUE_CAMERA_FACE = "queue_camera_face";
+    public static final String EXCHANGE_CAMERA_FACE = "exchange_camera_face";
+
+
+    //-------------------------------------------------------------------------------------
+    /**
+     * @Description: 摄像头配置队列
+     * @author: Hu
+     * @since: 2021/3/26 14:01
+     * @Param:
+     * @return:
+     */
+    @Bean(QUEUE_CAMERA_FACE)
+    public Queue queueCameraFace() {
+        return new Queue(QUEUE_CAMERA_FACE);
+    }
+
+    /**
+     * @Description: 摄像头配置交换机
+     * @author: Hu
+     * @since: 2021/1/23 16:46
+     * @Param:
+     * @return:
+     */
+    @Bean(EXCHANGE_CAMERA_FACE)
+    public Exchange exchangeCameraFace() {
+        //durable(true)持久化，消息队列重启后交换机仍然存在
+        return ExchangeBuilder.topicExchange(EXCHANGE_CAMERA_FACE).durable(true).build();
+    }
+    /**
+     * @Description: 绑定交换机
+     * @author: Hu
+     * @since: 2021/1/23 15:45
+     * @Param:
+     * @return:
+     */
+    @Bean
+    public Binding bindingExchangeCameraFace(@Qualifier(QUEUE_CAMERA_FACE) Queue queue,
+                                               @Qualifier(EXCHANGE_CAMERA_FACE) Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("queue.camera.face").noargs();
+    }
+
     //-------------------------------------------------------------------------------------
 
     //@author YuLF start
@@ -190,7 +232,7 @@ public class RabbitMqConfig {
      * @return:
      */
     @Bean(QUEUE_CAR_INSERT)
-    public Queue QUEUE_CAR_INSERT() {
+    public Queue queueCarInsert() {
         return new Queue(QUEUE_CAR_INSERT);
     }
     /**
@@ -201,7 +243,7 @@ public class RabbitMqConfig {
      * @return:
      */
     @Bean(QUEUE_CAR_UPDATE)
-    public Queue QUEUE_CAR_UPDATE() {
+    public Queue queueCarUpdate() {
         return new Queue(QUEUE_CAR_UPDATE);
     }
     /**
@@ -212,7 +254,7 @@ public class RabbitMqConfig {
      * @return:
      */
     @Bean(QUEUE_CAR_DELETE)
-    public Queue QUEUE_CAR_DELETE() {
+    public Queue queueCarDelete() {
         return new Queue(QUEUE_CAR_DELETE);
     }
     /**

@@ -5,10 +5,13 @@ import com.jsy.community.api.IElasticsearchCarService;
 import com.jsy.community.config.web.ElasticsearchConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.PropertyCarEntity;
+import com.jsy.community.mapper.PropertyCarMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.qo.property.ElasticsearchCarSearchQO;
 import com.jsy.community.utils.es.ElasticsearchCarUtil;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.elasticsearch.action.DocWriteResponse;
@@ -20,14 +23,16 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description:  物业车辆查询
  * @author: Hu
  * @create: 2021-03-25 14:45
  **/
@@ -36,13 +41,17 @@ import java.util.Map;
 public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+    @Autowired
+    private PropertyCarMapper propertyCarMapper;
+
+
 
     /**
      * @Description: 删除
      * @author: Hu
-     * @since: 2021/3/25 15:37
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:01
+     * @Param: [id]
+     * @return: void
      */
     @Override
     public void deleteData(Long id){
@@ -59,12 +68,14 @@ public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
         DocWriteResponse.Result result = response.getResult();
     }
 
+
+
     /**
      * @Description: 修改
      * @author: Hu
-     * @since: 2021/3/25 15:37
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:02
+     * @Param: [elasticsearchCarQO]
+     * @return: void
      */
     @Override
     public void updateData(ElasticsearchCarQO elasticsearchCarQO) {
@@ -86,12 +97,14 @@ public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
         DocWriteResponse.Result result = update.getResult();
     }
 
+
+
     /**
      * @Description: 新增
      * @author: Hu
-     * @since: 2021/3/25 15:37
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:02
+     * @Param: [elasticsearchCarQO]
+     * @return: void
      */
     @Override
     public void insertData(ElasticsearchCarQO elasticsearchCarQO){
@@ -113,16 +126,37 @@ public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
 
 
 
+
+    /**
+     * @Description: 更新es物业车辆
+     * @author: Hu
+     * @since: 2021/5/21 11:02
+     * @Param: []
+     * @return: void
+     */
+    @Override
+    public void updateCars() {
+        List<PropertyCarEntity> entities = propertyCarMapper.selectList(null);
+        ElasticsearchCarUtil.deleteDataAll(restHighLevelClient);
+        for (PropertyCarEntity entity : entities) {
+            ElasticsearchCarQO carQO = new ElasticsearchCarQO();
+            BeanUtils.copyProperties(entity,carQO);
+            ElasticsearchCarUtil.insertData(carQO,restHighLevelClient);
+        }
+    }
+
+
+
     /**
      * @Description: 新增
      * @author: Hu
-     * @since: 2021/3/25 15:37
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:02
+     * @Param: [baseQO, info]
+     * @return: java.util.Map<java.lang.String,java.lang.Object>
      */
     @Override
-    public Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO){
-        Map<String, Object> map = ElasticsearchCarUtil.search(baseQO, restHighLevelClient);
+    public Map<String, Object> searchData(BaseQO<ElasticsearchCarSearchQO> baseQO, AdminInfoVo info){
+        Map<String, Object> map = ElasticsearchCarUtil.search(baseQO, info,restHighLevelClient);
         return map;
     }
 

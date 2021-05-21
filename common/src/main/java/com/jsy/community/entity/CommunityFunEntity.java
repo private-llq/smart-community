@@ -45,6 +45,10 @@ public class CommunityFunEntity extends BaseEntity {
     @ApiModelProperty(value = "社区趣事内容")
     @NotBlank(groups = {CommunityFunValidated.class}, message = "内容不能为空！")
     private String content;
+
+    @ApiModelProperty(value = "未编辑过的类容")
+    @NotBlank(groups = {CommunityFunValidated.class}, message = "内容不能为空！")
+    private String originalContent;
     @ApiModelProperty(value = "社区趣事缩略图地址")
     @NotBlank(groups = {CommunityFunValidated.class}, message = "缩略图不能为空！")
     private String smallImageUrl;
