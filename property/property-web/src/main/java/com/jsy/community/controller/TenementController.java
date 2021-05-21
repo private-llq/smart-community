@@ -7,7 +7,6 @@ import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
-import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,24 +39,5 @@ public class TenementController {
         System.out.println(baseQO);
         Map map=tenementService.list(baseQO);
         return CommonResult.ok(map);
-    }
-
-    @ApiOperation("房屋下拉框")
-    @PostMapping("/getHouseId")
-    public CommonResult getHouseId(@RequestBody BaseQO<RelationListQO> baseQO){
-        List list =tenementService.getHouseId(baseQO);
-        return CommonResult.ok(list);
-    }
-    @ApiOperation("楼栋下拉框")
-    @PostMapping("/getBuildingId")
-    public CommonResult getBuildingId(@RequestBody BaseQO<RelationListQO> baseQO){
-        List list =tenementService.getBuildingId(baseQO);
-        return CommonResult.ok(list);
-    }
-    @ApiOperation("单元下拉框")
-    @PostMapping("/getUnitId")
-    public CommonResult getUnitId(@RequestBody BaseQO<RelationListQO> baseQO){
-        List list =tenementService.getUnitId(baseQO);
-        return CommonResult.ok(list);
     }
 }

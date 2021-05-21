@@ -18,7 +18,6 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * @program: com.jsy.community
@@ -160,6 +159,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         payUserDetailsMapper.insert(payUserDetailsEntity);
     }
 
+
     /**
      * @Description: 生成订单流水号
      * @author: Hu
@@ -169,7 +169,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
      */
     public String order() {
         SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
+        String s=sdfTime.format(System.currentTimeMillis()).replaceAll("[[\\s-:punct:]]", "");
         int s1=(int) (Math.random() * 999999);
         return s+s1;
     }

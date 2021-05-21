@@ -35,12 +35,28 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     @Autowired
     private AdminUserMapper adminUserMapper;
 
+
+    /**
+     * @Description: 修改
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [userInfo, propertyFeeRuleEntity]
+     * @return: void
+     */
     @Override
     public void updateOneRule(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
         propertyFeeRuleEntity.setUpdateBy(userInfo.getUid());
         propertyFeeRuleMapper.updateById(propertyFeeRuleEntity);
     }
 
+
+    /**
+     * @Description: 启用或者停用
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [userInfo, status, id]
+     * @return: void
+     */
     @Override
     public void startOrOut(AdminInfoVo userInfo, Integer status,Long id) {
         PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectById(id);
@@ -61,11 +77,27 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         }
     }
 
+
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [communityId, type]
+     * @return: com.jsy.community.entity.property.PropertyFeeRuleEntity
+     */
     @Override
     public PropertyFeeRuleEntity selectByOne(Long communityId, Integer type) {
         return propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type",type).eq("community_id",communityId));
     }
 
+
+    /**
+     * @Description: 查询当前小区收费规则
+     * @author: Hu
+     * @since: 2021/5/21 11:08
+     * @Param: [baseQO, communityId]
+     * @return: java.util.Map<java.lang.Object,java.lang.Object>
+     */
     @Override
     public Map<Object, Object> findList(BaseQO<FeeRuleQO> baseQO,Long communityId) {
         FeeRuleQO query = baseQO.getQuery();

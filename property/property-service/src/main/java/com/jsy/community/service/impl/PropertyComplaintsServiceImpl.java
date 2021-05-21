@@ -35,6 +35,14 @@ public class PropertyComplaintsServiceImpl extends ServiceImpl<PropertyComplaint
     @Autowired
     private AdminUserMapper adminUserMapper;
 
+
+    /**
+     * @Description: 投诉回复
+     * @author: Hu
+     * @since: 2021/5/21 11:06
+     * @Param: [complainFeedbackQO]
+     * @return: void
+     */
     @Override
     public void complainFeedback(ComplainFeedbackQO complainFeedbackQO) {
         PropertyComplaintsEntity entity = propertyComplaintsMapper.selectById(complainFeedbackQO.getId());
@@ -50,12 +58,14 @@ public class PropertyComplaintsServiceImpl extends ServiceImpl<PropertyComplaint
         propertyComplaintsMapper.updateById(entity);
     }
 
+
+
     /**
      * @Description: 分页查询物业投诉接口
      * @author: Hu
-     * @since: 2021/3/19 14:05
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:06
+     * @Param: [baseQO]
+     * @return: com.jsy.community.utils.PageInfo
      */
     @Override
     public PageInfo findList(BaseQO<PropertyComplaintsQO> baseQO) {

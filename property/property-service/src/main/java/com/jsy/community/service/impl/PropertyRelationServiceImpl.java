@@ -31,6 +31,14 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     private PropertyRelationMapper propertyRelationMapper;
 
 
+
+    /**
+     * @Description: 房屋下拉框
+     * @author: Hu
+     * @since: 2021/5/21 11:09
+     * @Param: [baseQO, adminInfoVo]
+     * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
+     */
     @Override
     public List<HouseTypeVo> getHouseId(BaseQO<RelationListQO> baseQO,AdminInfoVo adminInfoVo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
@@ -42,6 +50,14 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         return propertyRelationMapper.getHouseId(qoQuery,baseQO.getPage(),baseQO.getSize());
     }
 
+
+    /**
+     * @Description: 楼栋下拉框
+     * @author: Hu
+     * @since: 2021/5/21 11:10
+     * @Param: [baseQO, adminInfoVo]
+     * @return: java.util.List
+     */
     @Override
     public List getBuildingId(BaseQO<RelationListQO> baseQO,AdminInfoVo adminInfoVo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
@@ -53,6 +69,14 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         return propertyRelationMapper.getBuildingId(qoQuery,baseQO.getPage(),baseQO.getSize());
     }
 
+
+    /**
+     * @Description: 单元下拉框
+     * @author: Hu
+     * @since: 2021/5/21 11:10
+     * @Param: [baseQO, adminInfoVo]
+     * @return: java.util.List
+     */
     @Override
     public List getUnitId(BaseQO<RelationListQO> baseQO, AdminInfoVo adminInfoVo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
@@ -64,6 +88,14 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         return propertyRelationMapper.getUnitId(qoQuery,baseQO.getPage(),baseQO.getSize());
     }
 
+
+    /**
+     * @Description: 成员列表
+     * @author: Hu
+     * @since: 2021/5/21 11:10
+     * @Param: [baseQO]
+     * @return: java.util.Map
+     */
     @Override
     public Map list(BaseQO<PropertyRelationQO> baseQO) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
@@ -81,6 +113,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         map.put("total",propertyRelationMapper.getTotal(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize()));
         return map;
     }
+
     public static String replaceStr(String str){
         StringBuffer buf = new StringBuffer();
         Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
