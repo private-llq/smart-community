@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
- * 部门控制器
+ * 社区通讯录(部门控制器)
  * </p>
  *
  * @author lihao

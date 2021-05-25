@@ -26,12 +26,14 @@ import java.util.Map;
 public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFunMapper, CommunityFunEntity> implements ISelectCommunityFunService {
     @Autowired
     private SelectCommunityFunMapper selectCommunityFunMapper;
+
+
     /**
      * @Description: 分页查询所有趣事
      * @author: Hu
-     * @since: 2021/2/23 17:29
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:51
+     * @Param: [communityFunQO]
+     * @return: java.util.Map<java.lang.String,java.lang.Object>
      */
     @Override
     public Map<String,Object> findList(SelectCommunityFunQO communityFunQO) {
@@ -54,12 +56,14 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
         return map;
     }
 
+
+
     /**
      * @Description: 查询一条趣事详情
      * @author: Hu
-     * @since: 2021/2/23 17:29
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:51
+     * @Param: [id]
+     * @return: com.jsy.community.entity.CommunityFunEntity
      */
     @Override
     public CommunityFunEntity findFunOne(Long id) {
@@ -67,12 +71,14 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
 
     }
 
+
+
     /**
      * @Description: 浏览量
      * @author: Hu
-     * @since: 2021/2/23 17:28
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:51
+     * @Param: [id]
+     * @return: void
      */
     @Override
     public void saveViewCount(Long id) {

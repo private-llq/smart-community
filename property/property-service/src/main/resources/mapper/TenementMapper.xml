@@ -41,15 +41,6 @@
         join t_house th on thm.house_id=th.id
         <include refid="Query"></include>
     </select>
-    <select id="getHouseId" resultMap="HouseTypeMap">
-        select distinct t.id as id,t.number as name from t_house t where t.community_id=#{query.communityId} and t.number like concat("%",#{query.name},"%") limit #{page},#{size}
-    </select>
-    <select id="getBuildingId" resultMap="HouseTypeMap">
-        select distinct t.id as id,t.building as name from t_house t where t.community_id=#{query.communityId} and t.building like concat("%",#{query.name},"%") limit #{page},#{size}
-    </select>
-    <select id="getUnitId" resultMap="HouseTypeMap">
-        select distinct t.id as id,t.unit as name from t_house t where t.community_id=#{query.communityId} and t.unit like concat("%",#{query.name},"%") limit #{page},#{size}
-    </select>
 
 
     <resultMap id="PropertyRelationMap" type="com.jsy.community.vo.PropertyTenementVO">

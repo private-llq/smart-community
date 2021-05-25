@@ -57,19 +57,16 @@ public class LivingpaymentQueryServiceImpl implements ILivingpaymentQueryService
         PayCompanyEntity entity = payCompanyMapper.selectById(id);
         Map map = new HashMap();
 
-        map.put("familyName","纵横世纪");
+        map.put("familyName","今盛源");
         map.put("familyId",number);
         map.put("companyId",entity.getId());
         map.put("companyName",entity.getName());
         map.put("typeId",entity.getTypeId());
         map.put("accountBalance", RandomUtil.randomDouble(-500,1,2, RoundingMode.CEILING));
-        map.put("address","天王星b座1810");
+        map.put("address","仙桃数据谷");
         return map;
     }
 
-    public static void main(String[] args) {
-        System.out.println(RandomUtil.randomDouble(-500, 1, 2, RoundingMode.CEILING));
-    }
 
     /**
      * @Description: 查询组下面已经缴过费的户号

@@ -57,6 +57,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
 
 
+
+    /**
+     * @Description: 查询房间所有未缴账单
+     * @author: Hu
+     * @since: 2021/5/21 11:08
+     * @Param: [userInfo, houseId]
+     * @return: java.util.Map<java.lang.String,java.lang.Object>
+     */
     @Override
     public Map<String, Object> houseCost(AdminInfoVo userInfo, Long houseId) {
         List<PropertyFinanceOrderEntity> list = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("house_id",houseId).eq("order_status",0));
@@ -100,12 +108,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         return propertyFinanceOrderMapper.queryByReceiptNums(receiptNums,query);
     }
 
+
+
     /**
      * @Description: 查询一条已缴费详情
      * @author: Hu
-     * @since: 2021/4/23 16:58
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:08
+     * @Param: [userInfo, orderNum]
+     * @return: com.jsy.community.vo.property.PropertyFinanceOrderVO
      */
     @Override
     public PropertyFinanceOrderVO getOrderNum(AdminInfoVo userInfo, String orderNum) {

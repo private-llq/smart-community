@@ -18,7 +18,6 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * @program: com.jsy.community
@@ -77,37 +76,19 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         if (StringUtils.isEmpty(payCompanyEntity)){
             throw new ProprietorException(JSYError.REQUEST_PARAM);
         }
-        //如果组名为空   默认我家
-        Long group_id=0L;
-        if(livingPaymentQO.getGroupName()!=null&&!"".equals(livingPaymentQO.getGroupName())) {
-            //先查没有就新增
-            PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("name",livingPaymentQO.getGroupName()));
-            if (!StringUtils.isEmpty(payGroupEntity)){
-                group_id=payGroupEntity.getId();
-
-            }else {
-                PayGroupEntity groupEntity = new PayGroupEntity();
-                groupEntity.setId(SnowFlake.nextId());
-                groupEntity.setUid(livingPaymentQO.getUserID());
-                groupEntity.setName(livingPaymentQO.getGroupName());
-                groupEntity.setType(livingPaymentQO.getGroupName()=="我家"?1:livingPaymentQO.getGroupName()=="父母"?2:livingPaymentQO.getGroupName()=="房东"?3:livingPaymentQO.getGroupName()=="朋友"?4:5);
-                payGroupMapper.insert(groupEntity);
-                group_id=groupEntity.getId();
-            }
+        //判断组名
+        Long groupId=0L;
+        PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid",livingPaymentQO.getUserID()).eq("name",livingPaymentQO.getGroupName()));
+        if (!StringUtils.isEmpty(payGroupEntity)){
+            groupId=payGroupEntity.getId();
         }else {
-            //先查没有就新增
-            PayGroupEntity payGroupEntity = payGroupMapper.selectOne(new QueryWrapper<PayGroupEntity>().eq("uid", livingPaymentQO.getUserID()).eq("name", "我家"));
-            if (!StringUtils.isEmpty(payGroupEntity)) {
-                group_id = payGroupEntity.getId();
-            } else {
-                PayGroupEntity groupEntity = new PayGroupEntity();
-                groupEntity.setId(SnowFlake.nextId());
-                groupEntity.setUid(livingPaymentQO.getUserID());
-                groupEntity.setName("我家");
-                groupEntity.setType(1);
-                payGroupMapper.insert(groupEntity);
-                group_id = groupEntity.getId();
-            }
+            PayGroupEntity groupEntity = new PayGroupEntity();
+            groupEntity.setId(SnowFlake.nextId());
+            groupEntity.setUid(livingPaymentQO.getUserID());
+            groupEntity.setName(livingPaymentQO.getGroupName());
+            groupEntity.setType(livingPaymentQO.getGroupName().equals("我家")?1:livingPaymentQO.getGroupName().equals("父母")?2:livingPaymentQO.getGroupName().equals("房东")?3:livingPaymentQO.getGroupName().equals("朋友")?4:5);
+            payGroupMapper.insert(groupEntity);
+            groupId=groupEntity.getId();
         }
         PayCompanyEntity entity = payCompanyMapper.selectOne(new QueryWrapper<PayCompanyEntity>()
                 .eq("id", livingPaymentQO.getCompanyId())
@@ -120,7 +101,6 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         //生成订单号
         payOrderEntity.setOrderNum(livingPaymentQO.getOrderNum());
 
-
         payOrderEntity.setPayType(livingPaymentQO.getPayType());
         payOrderEntity.setFamilyId(livingPaymentQO.getFamilyId());
         payOrderEntity.setStatus(2);
@@ -130,7 +110,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         payOrderEntity.setPayYear(LocalDateTime.now().getYear());
         payOrderEntity.setPayMonth(LocalDateTime.now().getMonthValue());
         payOrderEntity.setOrderTime(LocalDateTime.now());
-        payOrderEntity.setGroupId(group_id);
+        payOrderEntity.setGroupId(groupId);
         payOrderEntity.setPayTypeName(livingPaymentQO.getPayType()==1?"微信付款":livingPaymentQO.getPayType()==2?"支付宝付款":livingPaymentQO.getPayType()==3?"账户余额":livingPaymentQO.getPayTypeName());
         payOrderEntity.setFamilyName(livingPaymentQO.getFamilyName());
         payOrderEntity.setTypeId(livingPaymentQO.getTypeId());
@@ -154,7 +134,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
             //添加缴费户号
             PayFamilyEntity payFamilyEntity = new PayFamilyEntity();
             payFamilyEntity.setId(SnowFlake.nextId());
-            payFamilyEntity.setGroupId(group_id);
+            payFamilyEntity.setGroupId(groupId);
             payFamilyEntity.setCompanyId(livingPaymentQO.getCompanyId());
             payFamilyEntity.setFamilyId(livingPaymentQO.getFamilyId());
             payFamilyEntity.setFamilyName(livingPaymentQO.getFamilyName());
@@ -179,6 +159,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
         payUserDetailsMapper.insert(payUserDetailsEntity);
     }
 
+
     /**
      * @Description: 生成订单流水号
      * @author: Hu
@@ -188,7 +169,7 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
      */
     public String order() {
         SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String s=sdfTime.format(new Date().getTime()).replaceAll("[[\\s-:punct:]]", "");
+        String s=sdfTime.format(System.currentTimeMillis()).replaceAll("[[\\s-:punct:]]", "");
         int s1=(int) (Math.random() * 999999);
         return s+s1;
     }

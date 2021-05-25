@@ -6,9 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
@@ -21,12 +19,6 @@ public class WeCharUtil {
 
     private final static String clientId="wxe84d22f50370bbda";
     private final static String clientSecret="e03145398568e0e174e9bd635b889a54";
-
-    @Resource
-    private RestTemplate restTemplate;
-
-
-
 
     /**
      * @Description: 通过code获取access_token和openid

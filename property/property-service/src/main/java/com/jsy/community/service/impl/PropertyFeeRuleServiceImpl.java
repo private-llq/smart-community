@@ -35,17 +35,38 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     @Autowired
     private AdminUserMapper adminUserMapper;
 
+
+    /**
+     * @Description: 修改
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [userInfo, propertyFeeRuleEntity]
+     * @return: void
+     */
     @Override
     public void updateOneRule(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
         propertyFeeRuleEntity.setUpdateBy(userInfo.getUid());
         propertyFeeRuleMapper.updateById(propertyFeeRuleEntity);
     }
 
+
+    /**
+     * @Description: 启用或者停用
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [userInfo, status, id]
+     * @return: void
+     */
     @Override
     public void startOrOut(AdminInfoVo userInfo, Integer status,Long id) {
         PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectById(id);
         if (status==1){
-            List<PropertyFeeRuleEntity> entities = propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>().eq("type", entity.getType()).eq("community_id", userInfo.getCommunityId()));
+            PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type", entity.getType()).eq("status", 1).eq("community_id",entity.getCommunityId()));
+            if (ruleEntity!=null){
+                ruleEntity.setStatus(0);
+                ruleEntity.setUpdateBy(userInfo.getUid());
+                propertyFeeRuleMapper.updateById(ruleEntity);
+            }
             entity.setUpdateBy(userInfo.getUid());
             entity.setStatus(1);
             propertyFeeRuleMapper.updateById(entity);
@@ -56,11 +77,27 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         }
     }
 
+
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/5/21 11:07
+     * @Param: [communityId, type]
+     * @return: com.jsy.community.entity.property.PropertyFeeRuleEntity
+     */
     @Override
     public PropertyFeeRuleEntity selectByOne(Long communityId, Integer type) {
         return propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type",type).eq("community_id",communityId));
     }
 
+
+    /**
+     * @Description: 查询当前小区收费规则
+     * @author: Hu
+     * @since: 2021/5/21 11:08
+     * @Param: [baseQO, communityId]
+     * @return: java.util.Map<java.lang.Object,java.lang.Object>
+     */
     @Override
     public Map<Object, Object> findList(BaseQO<FeeRuleQO> baseQO,Long communityId) {
         FeeRuleQO query = baseQO.getQuery();
@@ -75,7 +112,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         Page<PropertyFeeRuleEntity> page = propertyFeeRuleMapper.selectPage(new Page<>(baseQO.getPage(), baseQO.getSize()), wrapper);
         List<PropertyFeeRuleEntity> pageRecords = page.getRecords();
         for (PropertyFeeRuleEntity entity : pageRecords) {
-            if (entity.getUpdateBy()!=null){
+            if (!"".equals(entity.getUpdateBy())&&entity.getUpdateBy()!=null){
                 AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", entity.getUpdateBy()));
                 entity.setUpdateByName(userEntity.getRealName());
             }

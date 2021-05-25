@@ -129,7 +129,15 @@ public class RepairOrderController {
 		return CommonResult.ok(repairPlanVO);
 	}
 	
+	
+	
+	
+	
+	
+	
+	
 	// TODO: 2021/3/19 下面两个不用了
+	@Deprecated
 	@ApiOperation("查看下单人信息")
 	@GetMapping("/getUser")
 	public CommonResult getUser(@ApiParam("报修订单id") @RequestParam Long id) {
@@ -137,6 +145,7 @@ public class RepairOrderController {
 		return CommonResult.ok(userEntity);
 	}
 	
+	@Deprecated
 	@ApiOperation("查看图片信息")
 	@GetMapping("/listOrderImg")
 	public CommonResult listOrderImg(@ApiParam("报修订单id") @RequestParam Long id) {

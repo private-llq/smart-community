@@ -1,11 +1,7 @@
 package com.jsy.community.sdk;
 
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.Structure;
-import com.sun.jna.Union;
+import com.sun.jna.*;
 import com.sun.jna.examples.win32.W32API;
-import com.sun.jna.examples.win32.W32API.HWND;
 import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.ShortByReference;
@@ -3776,7 +3772,7 @@ DVR实现巡航数据结构
 	public static class NET_DVR_CLIENTINFO extends Structure {
 		public int lChannel;
 		public int lLinkMode;
-		public HWND hPlayWnd;
+		public W32API.HWND hPlayWnd;
 		public String sMultiCastIP;
 	}
 
@@ -3785,7 +3781,7 @@ DVR实现巡航数据结构
 		public int lChannel;//通道号
 		public int dwStreamType;    // 码流类型，0-主码流，1-子码流，2-码流3，3-码流4, 4-码流5,5-码流6,7-码流7,8-码流8,9-码流9,10-码流10
 		public int dwLinkMode;// 0：TCP方式,1：UDP方式,2：多播方式,3 - RTP方式，4-RTP/RTSP,5-RSTP/HTTP ,6- HRUDP（可靠传输） ,7-RTSP/HTTPS
-		public HWND hPlayWnd;//播放窗口的句柄,为NULL表示不播放图象
+		public W32API.HWND hPlayWnd;//播放窗口的句柄,为NULL表示不播放图象
 		public int bBlocked;  //0-非阻塞取流, 1-阻塞取流, 如果阻塞SDK内部connect失败将会有5s的超时才能够返回,不适合于轮询取流操作.
 		public int bPassbackRecord; //0-不启用录像回传,1启用录像回传
 		public byte byPreviewMode;//预览模式，0-正常预览，1-延迟预览
@@ -4058,7 +4054,7 @@ DVR实现巡航数据结构
 		public NET_DVR_STREAM_INFO struIDInfo;
 		public NET_DVR_TIME struBeginTime;
 		public NET_DVR_TIME struEndTime;
-		public HWND hWnd;
+		public W32API.HWND hWnd;
 		public byte byDrawFrame; //0:不抽帧，1：抽帧
 		public byte byVolumeType;  //0-普通录像卷  1-存档卷
 		public byte byVolumeNum;  //卷号，目前指存档卷号
@@ -8253,9 +8249,9 @@ DVR实现巡航数据结构
 
 
 	/***API函数声明,详细说明见API手册***/
-    interface FRealDataCallBack_V30 extends StdCallCallback {
-		void invoke(int lRealHandle, int dwDataType,
-		            ByteByReference pBuffer, int dwBufSize, Pointer pUser);
+	public static interface FRealDataCallBack_V30 extends StdCallCallback {
+		public void invoke(NativeLong lRealHandle, int dwDataType,
+		                   ByteByReference pBuffer, int dwBufSize, Pointer pUser);
 	}
 
 	interface FMSGCallBack extends StdCallCallback {
@@ -8573,9 +8569,9 @@ DVR实现巡航数据结构
 
 	boolean NET_DVR_UnlockFileByName(int lUserID, String sUnlockFileName);
 
-	int NET_DVR_PlayBackByName(int lUserID, String sPlayBackFileName, HWND hWnd);
+	int NET_DVR_PlayBackByName(int lUserID, String sPlayBackFileName, W32API.HWND hWnd);
 
-	int NET_DVR_PlayBackByTime(int lUserID, int lChannel, NET_DVR_TIME lpStartTime, NET_DVR_TIME lpStopTime, HWND hWnd);
+	int NET_DVR_PlayBackByTime(int lUserID, int lChannel, NET_DVR_TIME lpStartTime, NET_DVR_TIME lpStopTime, W32API.HWND hWnd);
 
 	int NET_DVR_PlayBackByTime_V40(int lUserID, NET_DVR_VOD_PARA pVodPara);
 

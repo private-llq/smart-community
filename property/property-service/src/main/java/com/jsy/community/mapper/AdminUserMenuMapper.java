@@ -13,10 +13,10 @@ import java.util.List;
  **/
 public interface AdminUserMenuMapper extends BaseMapper<AdminUserMenuEntity> {
 	
-	@Select("select menu_id from t_admin_user_menu where uid = #{uid}")
+	@Select("select menu_id from t_admin_user_menu where uid = #{uid} and deleted = 0")
 	List<Long> queryUserMenu(String uid);
 	
-	@Select("select menu_id from t_admin_user_menu where uid = #{uid}")
+	@Select("select menu_id from t_admin_user_menu where uid = #{uid} and deleted = 0")
 	List<String> queryUserMenuIdList(String uid);
 	
 }

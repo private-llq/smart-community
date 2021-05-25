@@ -73,7 +73,7 @@
 		if(unit != '',unit,#{houseEntity.unit}),
 		#{houseEntity.floor},
 		if(door != '',door,#{houseEntity.door}),
-		id,#{houseEntity.type},#{houseEntity.comment},#{houseEntity.create_by},#{houseEntity.create_time}
+		id,#{houseEntity.type},#{houseEntity.comment},#{houseEntity.createBy},#{houseEntity.createTime}
 		from t_house
 		where id = #{houseEntity.pid}
 	</insert>

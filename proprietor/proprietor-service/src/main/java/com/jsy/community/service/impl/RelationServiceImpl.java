@@ -58,12 +58,14 @@ public class RelationServiceImpl implements IRelationService {
     @Autowired
     private UserHouseMapper userHouseMapper;
 
+
+
     /**
      * @Description: 删除车辆
      * @author: Hu
-     * @since: 2021/3/23 15:32
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:56
+     * @Param: [uid, id]
+     * @return: void
      */
     @Override
     public void delCar(String uid, Long id) {
@@ -75,8 +77,8 @@ public class RelationServiceImpl implements IRelationService {
      * @Description: 封装新增es车辆实体类方法
      * @author: Hu
      * @since: 2021/3/26 11:22
-     * @Param:
-     * @return:
+     * @Param: car,relationQo,houseEntity
+     * @return: ElasticsearchCarQO
      */
     public ElasticsearchCarQO getInsetElasticsearchCarQO(RelationCarsQO car,RelationQO relationQo,HouseEntity houseEntity){
         ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
@@ -106,8 +108,8 @@ public class RelationServiceImpl implements IRelationService {
      * @Description: 封装修改es车辆实体类方法
      * @author: Hu
      * @since: 2021/3/26 11:22
-     * @Param:
-     * @return:
+     * @Param: car
+     * @return: ElasticsearchCarQO
      */
     public ElasticsearchCarQO getUpdateElasticsearchCarQO(RelationCarsQO car){
         ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
@@ -118,10 +120,14 @@ public class RelationServiceImpl implements IRelationService {
         return elasticsearchCarQO;
     }
 
+
+
     /**
-     * 添加家属
-     * @param relationQo
-     * @return
+     * @Description: 添加家属
+     * @author: Hu
+     * @since: 2021/5/21 13:55
+     * @Param: [relationQo]
+     * @return: void
      */
     @Override
     @Transactional
@@ -167,10 +173,14 @@ public class RelationServiceImpl implements IRelationService {
 
     }
 
+
+
     /**
-     * 查询业主下面的家属
-     * @param id
-     * @return
+     * @Description: 查询业主下面的家属
+     * @author: Hu
+     * @since: 2021/5/21 13:55
+     * @Param: [id, houseId]
+     * @return: java.util.List<com.jsy.community.vo.RelationVO>
      */
     @Override
     public List<RelationVO> selectID(String id,Long houseId) {
@@ -184,10 +194,13 @@ public class RelationServiceImpl implements IRelationService {
         }
         return list;
     }
+
     /**
-     * 查询业主下面的家属详情
-     * @param RelationId 家属id
-     * @return
+     * @Description: 查询业主下面的家属详情
+     * @author: Hu
+     * @since: 2021/5/21 13:55
+     * @Param: [RelationId, userId]
+     * @return: com.jsy.community.vo.RelationVO
      */
     @Override
     public RelationVO selectOne(Long RelationId, String userId) {
@@ -225,31 +238,41 @@ public class RelationServiceImpl implements IRelationService {
         relationVO.setCars(objects);
         return relationVO;
     }
+
+
     /**
-     * 修改家属信息
-     * @param houseMemberEntity
-     * @return
+     * @Description: 修改家属信息
+     * @author: Hu
+     * @since: 2021/5/21 13:54
+     * @Param: [houseMemberEntity]
+     * @return: void
      */
     @Override
     public void updateByRelationId(HouseMemberEntity houseMemberEntity) {
         houseMemberMapper.updateById(houseMemberEntity);
     }
+
+
     /**
-     * 查询一条表单回填
-     * @param relationId
-     * @return
+     * @Description: 查询一条表单回填
+     * @author: Hu
+     * @since: 2021/5/21 13:54
+     * @Param: [relationId]
+     * @return: com.jsy.community.entity.HouseMemberEntity
      */
     @Override
     public HouseMemberEntity updateFormBackFillId(Long relationId) {
         return houseMemberMapper.selectById(relationId);
     }
 
+
+
     /**
      * @Description: 修改用户家属和汽车
      * @author: Hu
-     * @since: 2020/12/21 9:58
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:54
+     * @Param: [relationQo]
+     * @return: void
      */
     @Override
     @Transactional
@@ -280,18 +303,28 @@ public class RelationServiceImpl implements IRelationService {
     }
 
 
+
+    /**
+     * @Description: 房间验证
+     * @author: Hu
+     * @since: 2021/5/21 13:54
+     * @Param: [relationQo]
+     * @return: com.jsy.community.entity.UserHouseEntity
+     */
     @Override
     public UserHouseEntity getHouse(RelationQO relationQo) {
         UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("uid", relationQo.getUserId()).eq("house_id", relationQo.getHouseId()).eq("community_id", relationQo.getCommunityId()));
         return entity;
     }
 
+
+
     /**
      * @Description: 删除家属信息和相关车辆信息
      * @author: Hu
-     * @since: 2020/12/25 14:46
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:53
+     * @Param: [id, uid]
+     * @return: void
      */
     @Override
     @Transactional

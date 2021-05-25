@@ -2,7 +2,6 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.ComplainEntity;
-import com.jsy.community.qo.proprietor.PropertyComplainQO;
 
 import java.util.List;
 
@@ -31,12 +30,4 @@ public interface IComplainService extends IService<ComplainEntity> {
      */
     void addComplain(ComplainEntity complainEntity);
 
-    /**
-     * @Description: 物业投诉接口
-     * @author: Hu
-     * @since: 2021/3/17 14:41
-     * @Param:
-     * @return:
-     */
-    void propertyComplain(PropertyComplainQO propertyComplainQO);
 }

@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @program: com.jsy.community
- * @description:
+ * @description: 三方微信登录
  * @author: Hu
  * @create: 2021-03-08 10:52
  **/
@@ -71,6 +71,14 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
     @Autowired
     private UserThirdPlatformMapper userThirdPlatformMapper;
 
+
+    /**
+     * @Description: 登录
+     * @author: Hu
+     * @since: 2021/5/21 13:59
+     * @Param: [openid]
+     * @return: com.jsy.community.vo.UserAuthVo
+     */
     @Override
     public UserAuthVo login(String openid) {
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
@@ -91,6 +99,14 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         userThirdPlatformMapper.insert(platformEntity);
         return createBindMobile(platformEntity.getId());
     }
+
+    /**
+     * @Description: 绑定手机
+     * @author: Hu
+     * @since: 2021/5/21 13:59
+     * @Param: [bindingMobileQO]
+     * @return: com.jsy.community.vo.UserAuthVo
+     */
     @Override
     @Transactional
     public UserAuthVo bindingMobile(BindingMobileQO bindingMobileQO){
@@ -117,7 +133,11 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
 
 
     /**
-     * 创建用户token
+     * @Description: 创建登录所需的UserAuthVo
+     * @author: Hu
+     * @since: 2021/5/21 14:00
+     * @Param:
+     * @return:
      */
     public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo){
         Date expireDate = new Date(new Date().getTime() + expire * 1000);
@@ -129,6 +149,14 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         userAuthVo.setToken(token);
         return userAuthVo;
     }
+
+    /**
+     * @Description: 返回没有绑定手机的UserAuthVo
+     * @author: Hu
+     * @since: 2021/5/21 14:00
+     * @Param:
+     * @return:
+     */
     public UserAuthVo createBindMobile(Long id){
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setExpiredTime(null);

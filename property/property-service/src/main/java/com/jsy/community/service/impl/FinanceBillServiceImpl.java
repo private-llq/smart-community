@@ -44,12 +44,14 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     private HouseMapper houseMapper;
 
 
+
+
     /**
      * @Description: 更新所有小区账单
      * @author: Hu
-     * @since: 2021/4/22 9:28
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:05
+     * @Param: []
+     * @return: void
      */
     @Override
     @Transactional
@@ -97,12 +99,14 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
 
 
 
+
+
     /**
      * @Description: 更新所有小区账单
      * @author: Hu
-     * @since: 2021/4/22 9:28
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 11:03
+     * @Param: []
+     * @return: void
      */
     @Override
     @Transactional
@@ -130,11 +134,11 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     /**
      * @Description: 生成账单号
      * @author: Hu
-     * @since: 2021/4/22 9:28
+     * @since: 2021/5/21 11:03
      * @Param:
      * @return:
      */
-    public static String getOrderNum(String communityId,String serialNumber){
+    public String getOrderNum(String communityId,String serialNumber){
         StringBuilder str=new StringBuilder();
         if (communityId.length()>=4){
             String s = communityId.substring(communityId.length() - 4, communityId.length());
