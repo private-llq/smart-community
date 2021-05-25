@@ -134,5 +134,12 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
 	List<UserShopLeaseVO> listUserShop(String userId);
 	
 	
+	/**
+	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.vo.shop.IndexShopVO>
+	 * @Author lihao
+	 * @Description 根据筛选条件查询商铺列表
+	 * @Date 2021/5/25 14:58
+	 * @Param [baseQO]
+	 **/
 	PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO);
 }
