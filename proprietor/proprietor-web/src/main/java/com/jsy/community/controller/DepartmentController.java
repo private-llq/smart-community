@@ -82,6 +82,21 @@ public class DepartmentController {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Deprecated // 过期不再使用
 	@ApiOperation("根据部门查询联系方式")
 	@GetMapping("/listStaffPhone")
@@ -91,7 +106,7 @@ public class DepartmentController {
 		return CommonResult.ok(staffEntityList);
 	}
 	
-	@Deprecated
+	@Deprecated // 过期不再使用
 	@ApiOperation("通讯录xx")
 	@GetMapping("/listDepartmentTel")
 	public CommonResult<List<DepartmentEntity>> listDepartmentTel(@ApiParam(value = "社区id")

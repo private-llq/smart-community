@@ -179,39 +179,6 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 				}
 			}
 		});
-		
-		
-//      todo 先不删 等前端联调测试完毕了来
-//		// 2. 查询中间表
-//		List<Map<String, Long>> idsAdnSort = appMenuMapper.listMenuId(communityId);
-//		if (CollectionUtils.isEmpty(idsAdnSort)) {
-//			return new ArrayList<AppMenuEntity>();
-//		}
-//		List<AppMenuEntity> appMenuEntityList = new ArrayList<>();
-//		for (Map<String, Long> stringLongMap : idsAdnSort) {
-//			Long id = stringLongMap.get("menu_id");
-//			Long sort = stringLongMap.get("sort");
-//			AppMenuEntity appMenuEntity = appMenuMapper.selectById(id);
-//			appMenuEntity.setSort(sort);
-//			appMenuEntityList.add(appMenuEntity);
-//		}
-//		Collections.sort(appMenuEntityList, new Comparator<AppMenuEntity>() {
-//			@Override
-//			public int compare(AppMenuEntity o1, AppMenuEntity o2) {
-//				Long sort = o1.getSort();
-//				Long sort1 = o2.getSort();
-//				if (sort.equals(sort1) ) {
-//					return 0;
-//				}else {
-//					// 从小到大
-//					return sort > sort1 ? 1 : -1 ;
-//				}
-//			}
-//		});
-//
-//
-		
-		
 		return allAppList;
 	}
 	
