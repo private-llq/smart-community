@@ -15,7 +15,6 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.util.excel.impl.HouseExcelHandlerImpl;
-import com.jsy.community.util.excel.impl.NewTestHandlerImpl;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -68,9 +67,6 @@ public class HouseController {
 
 	@Autowired
 	private HouseExcelHandlerImpl houseExcelHandler;
-
-	@Autowired
-	private NewTestHandlerImpl testHandler;
 
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IProprietorService iProprietorService;
