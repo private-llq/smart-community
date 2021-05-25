@@ -36,18 +36,4 @@
         </dependency>
         <!-- 银联支付相关结束 -->
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <compilerArguments>
-                        <extdirs>${project.basedir}/src/main/resources/lib</extdirs>
-                    </compilerArguments>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

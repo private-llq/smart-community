@@ -1,5 +1,6 @@
 package com.jsy.community.util.excel.impl;
 
+import com.jsy.community.utils.ExcelUtil;
 import lombok.Cleanup;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -7,6 +8,7 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,9 +60,9 @@ public class CommonExcelHelper {
         //取得Map列中队列的所有字段中文值 作为 excel 中文字段
         List<Object> titleField= new ArrayList<>(fieldHeader.values());
         //2. 创建 标题 头
-        createExcelTitle(workbook, sheet, excelTitle, titleField.size());
+        ExcelUtil.createExcelTitle(workbook, sheet, excelTitle, 530, "宋体", 20, titleField.size());
         //3. 创建 列 字段
-        createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField.toArray(new String[titleField.size()]));
         int dataRow = 2;
         //4. 创建 数据 列
         for (Object o : objects) {
@@ -76,8 +78,8 @@ public class CommonExcelHelper {
             }
             dataRow++;
         }
-        MultiValueMap<String, String> multiValueMap = setHeader(excelTitle);
-        return new ResponseEntity<>(readWorkbook(workbook) , multiValueMap, HttpStatus.OK );
+        MultiValueMap<String, String> multiValueMap = ExcelUtil.setHeader(excelTitle);
+        return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook) , multiValueMap, HttpStatus.OK );
     }
 
     /**
@@ -119,91 +121,7 @@ public class CommonExcelHelper {
         return null;
     }
 
-    /**
-     * 设置响应头信息
-     * @param fileFullName  附件下载文件全名称
-     * @return              返回响应头Map
-     */
-    private static MultiValueMap<String, String> setHeader(String fileFullName){
-        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
-        fileFullName = new String((fileFullName + ".xlsx").getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
-        multiValueMap.set("Content-Disposition", "attachment;filename=" + fileFullName);
-        multiValueMap.set("Content-type", "application/vnd.ms-excel");
-        return multiValueMap;
-    }
-
-    /**
-     * 读取工作簿 返回字节数组
-     * @param workbook      excel工作簿
-     * @return              返回读取完成的字节数组
-     */
-    private static byte[] readWorkbook(Workbook workbook) throws IOException {
-        @Cleanup ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        workbook.write(bos);
-        @Cleanup InputStream is = new ByteArrayInputStream(bos.toByteArray());
-        byte[] byt = new byte[is.available()];
-        int read = is.read(byt);
-        return byt;
-    }
-
     private static Field[] getAllField(Object o){
         return o.getClass().getDeclaredFields();
     }
-
-
-    /**
-     * 【创建excel列字段头】
-     * @param workbook      工作簿
-     * @param sheet         工作表
-     * @param fieldData     列字段数据
-     */
-    private static void createExcelField(Workbook workbook, XSSFSheet sheet, List<Object> fieldData){
-        XSSFRow row2 = sheet.createRow(1);
-        CellStyle cellStyle = provideBold(workbook);
-        AtomicInteger i = new AtomicInteger();
-        fieldData.forEach( field -> {
-            XSSFCell cell1 = row2.createCell(i.get());
-            cell1.setCellValue(fieldData.get(i.get()).toString());
-            cell1.setCellStyle(cellStyle);
-            i.getAndIncrement();
-        });
-    }
-
-    /**
-     * 【提供粗体字体样式】
-     * @param workbook      工作簿
-     * @return              返回设置好的样式
-     */
-    private static CellStyle provideBold(Workbook workbook){
-        CellStyle fieldCellStyle = workbook.createCellStyle();
-        Font fieldFont = workbook.createFont();
-        fieldFont.setBold(true);
-        fieldCellStyle.setFont(fieldFont);
-        return fieldCellStyle;
-    }
-
-    /**
-     * 【创建excel标题头-第一行】
-     * @param workbook          工作簿
-     * @param sheet             工作表
-     * @param excelTitle        excel标题名称
-     * @param mergeCellLength   excel合并单元格数量
-     */
-    private static void createExcelTitle(Workbook workbook, XSSFSheet sheet, String excelTitle, int mergeCellLength){
-        XSSFRow row = sheet.createRow(0);
-        row.setHeight((short) (530));
-        XSSFCell cell = row.createCell(0);
-        cell.setCellValue(excelTitle);
-        XSSFCellStyle workBookCellStyle = (XSSFCellStyle) workbook.createCellStyle();
-        Font workBookFont = workbook.createFont();
-        workBookFont.setFontHeightInPoints((short) 20);
-        workBookFont.setFontName("宋体");
-        workBookCellStyle.setFont(workBookFont);
-        workBookCellStyle.setAlignment(HorizontalAlignment.CENTER);
-        cell.setCellStyle(workBookCellStyle);
-        CellRangeAddress region = new CellRangeAddress(0, 0, 0, mergeCellLength - 1);
-        sheet.addMergedRegion(region);
-    }
-
-
 }

@@ -77,7 +77,16 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @return				返回该社区所有的房屋编号
 	 */
     List<HouseEntity> getCommunityHouseNumber(@Param("communityId") long communityId);
-    
+
+    /**
+     *@Author: Pipi
+     *@Description: 通过社区ID查询出所有楼栋和单元
+     *@Param: communityId:
+     *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
+     *@Date: 2021/5/19 15:35
+     **/
+    List<HouseEntity> getBuildingAndUnitList(@Param("communityId") long communityId);
+
     //============================================ 物业端产品原型确定后新加的 开始  ===========================================================
 	/**
 	* @Description: 单元绑定楼栋
@@ -192,4 +201,22 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @return:
 	 */
 	List<HouseEntity> selectHouseAll(Long communityId);
+
+	/**
+	 *@Author: Pipi
+	 *@Description: 查询小区下所有的房间
+	 *@Param: communityId:
+	 *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 *@Date: 2021/5/21 17:14
+	 **/
+	List<HouseEntity> getAllHouse(Long communityId);
+
+	/**
+	 * @Author: Pipi
+	 * @Description: 批量新增房屋数据
+	 * @Param: houseEntityList:
+	 * @Return: java.lang.Integer
+	 * @Date: 2021/5/21 16:48
+	 **/
+	Integer saveHouseBatch(@Param("list") List<HouseEntity> houseEntityList);
 }
