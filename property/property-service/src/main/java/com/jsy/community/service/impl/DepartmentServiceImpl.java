@@ -276,7 +276,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	}
 	
 	
-	/*
+	/**
 	 * 排序,根据sort排序
 	 */
 	public Comparator<DepartmentVO> order() {

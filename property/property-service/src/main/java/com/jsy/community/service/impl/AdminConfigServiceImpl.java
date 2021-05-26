@@ -426,8 +426,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		setChildren(menuList,new LinkedList<AdminMenuEntity>());
 		return menuList;
 	}
-	
-	//组装子菜单
+	/**
+	 * 组装子菜单
+	 */
 	private void setChildren(List<AdminMenuEntity> parentList, List<AdminMenuEntity> childrenList){
 		if(!CollectionUtils.isEmpty(parentList)){
 			for(AdminMenuEntity adminMenuEntity : parentList){

@@ -239,7 +239,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	}
 	
 	
-	/*
+	/**
 	 * 排序,根据sort排序
 	 */
 	public Comparator<OrganizationVO> order() {

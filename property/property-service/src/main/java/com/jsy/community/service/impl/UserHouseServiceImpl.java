@@ -153,7 +153,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public Boolean pass(Long id) {
 		UserHouseEntity houseEntity = userHouseMapper.selectById(id);
 		if (houseEntity != null) {
-			if (houseEntity.getCheckStatus() != WAITPASS) {
+			if (WAITPASS.equals(houseEntity.getCheckStatus())) {
 				throw new PropertyException("您选择的房屋不存在或已经审核完成");
 			}
 			houseEntity.setCheckStatus(PASS);
@@ -177,7 +177,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public Boolean notPass(Long id) {
 		UserHouseEntity houseEntity = userHouseMapper.selectById(id);
 		if (houseEntity != null) {
-			if (houseEntity.getCheckStatus() != WAITPASS) {
+			if (WAITPASS.equals(houseEntity.getCheckStatus())) {
 				throw new PropertyException("您的订单不存在或已经审核完成");
 			}
 			houseEntity.setCheckStatus(NOPASS);

@@ -24,6 +24,7 @@ public class AdminCaptchaServiceImpl extends ServiceImpl<AdminCaptchaMapper, Adm
 	private AdminCaptchaMapper adminCaptchaMapper;
 	
 	//保存验证码
+	@Override
 	public void saveCaptcha(AdminCaptchaEntity captchaEntity){
 		//TODO 暂时5小时过期
 		captchaEntity.setExpireTime(DateUtil.offset(new Date(), DateField.HOUR, 5));

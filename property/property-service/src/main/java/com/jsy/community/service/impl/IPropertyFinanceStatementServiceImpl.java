@@ -287,7 +287,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
     @Override
     public Map<String,PropertyFinanceStatementEntity> queryByStatementNumBatch(Collection<String> nums){
         if(CollectionUtils.isEmpty(nums) || (nums.size() == 1 && nums.contains(null))){
-            return new HashMap<>();
+            return new HashMap<>(1);
         }
         return propertyFinanceStatementMapper.queryByStatementNumBatch(nums);
     }
@@ -355,7 +355,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
                 }
             }
         }
-        Map<String,Object> extra = new HashMap<>();
+        Map<String,Object> extra = new HashMap<>(4);
         extra.put("notStatement",notStatement);
         extra.put("statementing",statementing);
         extra.put("statemented",statemented);
