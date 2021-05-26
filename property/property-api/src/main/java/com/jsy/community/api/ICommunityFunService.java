@@ -15,9 +15,14 @@ import com.jsy.community.vo.admin.AdminInfoVo;
  * @create: 2020-12-09 10:49
  **/
 public interface ICommunityFunService extends IService<CommunityFunEntity> {
+    /**
+     * @Description: 分页查询
+     * @author: Hu
+     * @since: 2021/5/21 11:14
+     * @Param: [baseQO]
+     * @return: com.jsy.community.utils.PageInfo
+     */
     PageInfo findList(BaseQO<CommunityFunQO> baseQO);
-
-
     /**
      * @Description: 下线
      * @author: Hu

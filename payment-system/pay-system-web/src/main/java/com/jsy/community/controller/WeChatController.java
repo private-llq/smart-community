@@ -65,9 +65,6 @@ public class WeChatController {
 
     private HttpClient httpClient;
 
-    public WeChatController() {
-    }
-
     /**
      * @Description: app下单并返回调起支付参数
      * @author: Hu
@@ -77,7 +74,7 @@ public class WeChatController {
      */
     @Login
     @PostMapping("/wxPay")
-    public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+    public CommonResult<JSONObject> wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //如果商城调用就先验证
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
@@ -165,7 +162,7 @@ public class WeChatController {
      */
     @PostMapping(value = "/withdrawDeposit")
     @Login
-    public CommonResult withdrawDeposit(@RequestBody WithdrawalQO withdrawalQO) throws Exception {
+    public CommonResult<Map<String, String>> withdrawDeposit(@RequestBody WithdrawalQO withdrawalQO) throws Exception {
 
         String body=null;
         Map<String, String> restmap=null;

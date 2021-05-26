@@ -30,8 +30,6 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
 
     private String serialNumber="complain_number:";
 
-
-
     /**
      * @Description: 用户投诉接口
      * @author: Hu
@@ -47,7 +45,6 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
         if (number!=null){
             s = String.valueOf(number);
         }else {
-            redisTemplate.opsForValue().set(serialNumber+complainEntity.getCommunityId(),String.valueOf(1),getMinute(), TimeUnit.MINUTES);
             s=String.valueOf(1);
         }
         if (s.length()<5){
@@ -71,7 +68,7 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
         }
         int anInt = Integer.parseInt(s);
         ++anInt;
-        redisTemplate.opsForValue().set(serialNumber+complainEntity.getCommunityId(),String.valueOf(anInt));
+        redisTemplate.opsForValue().set(serialNumber+complainEntity.getCommunityId(),String.valueOf(anInt),getMinute(),TimeUnit.MINUTES);
         complainEntity.setSerialNumber(getSerialNumber()+str);
         complainMapper.insert(complainEntity);
     }
