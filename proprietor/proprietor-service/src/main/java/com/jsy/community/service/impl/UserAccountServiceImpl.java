@@ -119,6 +119,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/28
 	**/
+	@Override
 	public Integer countTicketByUid(String uid){
 		return userTicketMapper.countAvailableTickets(uid);
 	}

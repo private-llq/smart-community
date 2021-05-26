@@ -111,6 +111,14 @@ public class CommonServiceImpl implements ICommonService {
 //        //按社区id 查询 下面的所有 单元
 //        return commonMapper.getAllBuild(id, 2);
 //    }
+    
+    /**
+    * @Description: 根据社区id 查询下面的所有单元 或 所有楼栋
+     * @Param: [id, page, pageSize]
+     * @Return: java.util.Map<java.lang.String,java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: chq459799974
+     * @Date: 2021/5/26
+    **/
     @Override
     public Map<String,List<Map<String, Object>>> getBuildingOrUnitByCommunityId(Long id, Integer page, Integer pageSize) {
         //按社区id 查询 下面的所有 楼栋
@@ -149,6 +157,14 @@ public class CommonServiceImpl implements ICommonService {
 ////        return getFloorByUnitId(id, page, pageSize);
 //        return commonMapper.getFloorByUnitId(id, page, pageSize);
 //    }
+    
+    /**
+    * @Description: 根据单元或楼栋id查询单元或楼层
+     * @Param: [id, page, pageSize]
+     * @Return: java.util.Map<java.lang.String,java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: chq459799974
+     * @Date: 2021/5/26
+    **/
     @Override
     public Map<String,List<Map<String, Object>>> getUnitOrFloorById2(Long id, Integer page, Integer pageSize) {
         //1. 楼栋id查单元

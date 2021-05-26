@@ -58,7 +58,8 @@ public class SignatureServiceImpl implements ISignatureService {
 		HttpPost httpPost = null;
 		HttpPut httpPut = null;
 		String url = "";
-		long id = SnowFlake.nextId(); //远程服务调用id
+		long id = SnowFlake.nextId();
+		//远程服务调用id
 		switch(type){
 			case 1:
 				url = protocolType + host + ":" + port + "/LongRange/insertUser";

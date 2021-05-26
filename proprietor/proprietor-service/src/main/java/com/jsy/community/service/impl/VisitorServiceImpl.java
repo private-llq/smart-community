@@ -430,7 +430,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     @Override
     public PageInfo<VisitorEntity> queryByPage(BaseQO<VisitorQO> baseQO, String uid){
         Page<VisitorEntity> page = new Page<>();
-        MyPageUtils.setPageAndSize(page, baseQO); //设置分页参数
+        MyPageUtils.setPageAndSize(page, baseQO);
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>().select("*").eq("uid",uid);
         VisitorQO visitorQO = baseQO.getQuery();
         if(visitorQO != null){
