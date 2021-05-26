@@ -131,13 +131,18 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		// 根据设备id查询他的唯一登录句柄
 		int loginHandle = facilityMapper.getLoginHandle(id);
 		
-		if (alarmHandle != -1) {
-			// 撤防
-			FacilityUtils.cancel(alarmHandle);
+		// 撤防
+		Map<String,Object> cancelResultMap = FacilityUtils.cancel(alarmHandle);
+		if(!(Boolean)cancelResultMap.get("result")){
+			log.error("摄像头：" + id +" 撤防失败，" + "原因：" +cancelResultMap.get("reason"));
+			throw new FacilityException("摄像头撤防失败，删除失败");
 		}
-		if (loginHandle != -1) {
-			// 注销设备
-			FacilityUtils.logOut(loginHandle);
+		
+		// 注销设备
+		Map<String,Object> logOutResultMap = FacilityUtils.logOut(loginHandle);
+		if(!(Boolean)logOutResultMap.get("result")){
+			log.error("摄像头：" + id +" 注销失败，" + "原因：" +logOutResultMap.get("reason"));
+			throw new FacilityException("摄像头注销失败，删除失败");
 		}
 		
 		facilityMapper.deleteById(id);
@@ -172,10 +177,18 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			
 			// 1. 将原来的设备撤防
 			int alarmHandle = facilityMapper.getAlarmHandle(facilityEntity.getId());
-			FacilityUtils.cancel(alarmHandle);
+			Map<String,Object> cancelResultMap = FacilityUtils.cancel(alarmHandle);
+			if(!(Boolean)cancelResultMap.get("result")){
+				log.error("摄像头：" + facilityEntity.getId() +" 撤防失败，" + "原因：" +cancelResultMap.get("reason"));
+				throw new FacilityException("摄像头撤防失败，修改失败");
+			}
 			// 2. 将原来的设备注销
 			int loginHandle = facilityMapper.getLoginHandle(facilityEntity.getId());
-			FacilityUtils.logOut(loginHandle);
+			Map<String,Object> logOutResultMap = FacilityUtils.logOut(loginHandle);
+			if(!(Boolean)logOutResultMap.get("result")){
+				log.error("摄像头：" + facilityEntity.getId() +" 注销失败，" + "原因：" +logOutResultMap.get("reason"));
+				throw new FacilityException("摄像头注销失败，修改失败");
+			}
 			// 3. 登录设备
 			Map<String, Integer> login = FacilityUtils.login(ip, port, username, password, -1);
 			Integer status = login.get("status");
@@ -196,6 +209,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Override
 	public Map<String, Integer> getCount(Long typeId) {
 		// 根据设备分类id查询其下设备的id集合
+		//TODO 查询条件加社区id
 		List<Long> facilityIds = facilityMapper.getFacilityIdByTypeId(typeId);
 		
 		int onlineCount = 0;
