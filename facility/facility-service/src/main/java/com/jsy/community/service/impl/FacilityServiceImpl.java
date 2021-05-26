@@ -28,9 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * <p>
@@ -217,26 +216,57 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 	
 	@Override
-	@Transactional(rollbackFor = Exception.class)
+//	@Transactional(rollbackFor = Exception.class)
 	public void flushFacility(Integer page, Integer size, String facilityTypeId) {
 		//1. 获取当前页的数据
 		Page<FacilityEntity> entityPage = new Page<>(page, size);
 		
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("facility_type_id", facilityTypeId);
+		//TODO 查询条件带小区id
 		Page<FacilityEntity> facilityEntityPage = facilityMapper.selectPage(entityPage, wrapper);
 		List<FacilityEntity> list = facilityEntityPage.getRecords();
 		
+//		for (FacilityEntity facilityEntity : list) {
+//			// 获取设备的唯一用户句柄
+//			Long id = facilityEntity.getId();
+//			int handle = facilityMapper.selectFacilityHandle(id);
+//
+//			// 更新该句柄的设备在线状态
+//			int online = FacilityUtils.isOnline(handle);
+//			facilityMapper.updateStatusByFacilityId(online, facilityEntity.getId());
+//		}
+		
+		//组装批量入参id集合
+		List<Long> idList = new ArrayList<>();
 		for (FacilityEntity facilityEntity : list) {
-			// 获取设备的唯一用户句柄
-			Long id = facilityEntity.getId();
-			int handle = facilityMapper.selectFacilityHandle(id);
-			
-			// 更新该句柄的设备在线状态
-			int online = FacilityUtils.isOnline(handle);
-			facilityMapper.updateStatusByFacilityId(online, facilityEntity.getId());
+			idList.add(facilityEntity.getId());
+		}
+		//批量查询，得到Map<设备ID,Map<设备ID,句柄>>
+		Map<Long, Map<Long, Integer>> idAndHandelMap = facilityMapper.selectFacilityHandleBatch(idList);
+		
+		//组装Map<设备ID,在线状态>
+		Map<Long,Integer> idAndStatusMap = new HashMap<>();
+		for(Long facilityId : idList){
+			Map<Long, Integer> facilityMap = idAndHandelMap.get(BigInteger.valueOf(facilityId));
+			Integer handle = facilityMap.get("facility_handle");
+			//调用SDK，查询最新在线状态单个结果
+			int status = FacilityUtils.isOnline(handle);
+			idAndStatusMap.put(facilityId,status);
 		}
 		
+		//批量更新在线状态
+		facilityMapper.updateStatusByFacilityIdBatch(idAndStatusMap);
+		
+		//TODO 下面代码留着 供参考
+		//Set<设备ID>
+//		Set<Long> ids = idAndHandelMap.keySet();
+		//Map<设备ID，句柄>转list
+//		List<Map<Long, Integer>> list2 = new ArrayList<>(idAndHandelMap.values());
+		//批量更新在线状态
+//		facilityMapper.updateStatusByFacilityIdBatch(list2,ids);
+
+	
 	}
 	
 	@Override

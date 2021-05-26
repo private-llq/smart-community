@@ -36,7 +36,7 @@ public class FacilityTypeController {
 	@DubboReference(version = Const.version, group = Const.group_facility, check = false)
 	private IFacilityTypeService facilityTypeService;
 
-	@ApiOperation("添加设备分类")
+	@ApiOperation("添加设备分类树")
 	@PostMapping("/addFacilityType")
 	public CommonResult addFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
 		facilityTypeEntity.setId(SnowFlake.nextId());
