@@ -1,7 +1,5 @@
 package com.jsy.community.utils;
 
-import com.jsy.community.constant.ConstError;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import lombok.Cleanup;
 import org.apache.commons.lang3.StringUtils;
@@ -10,21 +8,31 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.util.MultiValueMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: Pipi
+ * maven
+ *  * 		<!-- poi excel 2007 -->
+ *  * 		<dependency>
+ *  * 			<groupId>org.apache.poi</groupId>
+ *  * 			<artifactId>poi-ooxml</artifactId>
+ *  * 			<version>4.1.2</version>
+ *  * 		</dependency>
  * @Description: Excel表格工具类
  * @Date: 2021/5/24 11:48
  * @Version: 1.0
@@ -40,6 +48,94 @@ public class ExcelUtil {
      * PROPRIETOR_TITLE_FIELD 回显 excel 错误信息 备注列 宽度
      */
     private static final int REMARK_WIDTH = 256 * 80;
+
+    /**
+     * 用户导入文件时 可用后缀
+     */
+    public static final String[] SUPPORT_EXCEL_EXTENSION = {"xls", "xlsx"};
+
+    /**
+     * 导出业务数据集合为excel文档
+     * @Param   objects         业务数据集合
+     * @Param   fieldHeader     业务数据对象 字段 对应的 中文名称，excel将用这些中文名称作为字段列
+     * @Param   excelTitle      excel标题栏文字
+     * @return  返回响应实体，Controller直接返回该类型，为响应下载类型
+     */
+    public static ResponseEntity<byte[]> export(@NonNull List<?> objects, @NonNull Map<String, Object> fieldHeader, @NonNull String excelTitle) throws IOException {
+        Workbook workbook = new XSSFWorkbook();
+        //1.创建 sheet
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(excelTitle);
+
+        // 设置第5列的列宽为20个字符宽度
+        //sheet.setColumnWidth(4, 20*256);
+
+        //取得Map列中队列的所有字段中文值 作为 excel 中文字段
+        List<Object> titleField= new ArrayList<>(fieldHeader.values());
+        //2. 创建 标题 头
+        createExcelTitle(workbook, sheet, excelTitle, 530, "宋体", 20, titleField.size());
+        //3. 创建 列 字段
+        createExcelField(workbook, sheet, titleField.toArray(new String[titleField.size()]));
+        int dataRow = 2;
+        //4. 创建 数据 列
+        for (Object o : objects) {
+            XSSFRow row = sheet.createRow(dataRow);
+            Field[] allField = getAllField(o);
+            for( int cell = 0; cell < titleField.size(); cell++ ){
+                XSSFCell fieldCell = row.createCell(cell);
+                String fieldKey = getKeyForVal(allField, titleField.get(cell), fieldHeader);
+                if( Objects.isNull(fieldKey) ){
+                    throw new IllegalArgumentException("fieldHeader 存在对象不存在的字段!");
+                }
+                fieldCell.setCellValue(getObjectField(fieldKey, o));
+            }
+            dataRow++;
+        }
+        MultiValueMap<String, String> multiValueMap = ExcelUtil.setHeader(excelTitle);
+        return new ResponseEntity<>(readWorkbook(workbook) , multiValueMap, HttpStatus.OK );
+    }
+
+    /**
+     * 调用对象的 Get 方法 取出值
+     * @Param field     字段名称
+     * @Param o         具体的对象
+     * @author YuLF
+     * @since  2021/2/26 11:41
+     */
+    private static String getObjectField(String field, Object o)  {
+        Method getFieldMethod;
+        Object invoke = null;
+        try {
+            getFieldMethod = o.getClass().getDeclaredMethod("get" + field.substring(0, 1).toUpperCase() + field.substring(1));
+            invoke = getFieldMethod.invoke(o);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return invoke == null ? "" : String.valueOf(invoke);
+    }
+
+    /**
+     * Map 通过 值找到Key 前置条件 excel 标题 值不唯一
+     * @author YuLF
+     * @since  2021/2/26 11:31
+     * @Param  objField  对象的所有列字段
+     * @Param  fieldVal  某个列字段的值
+     */
+    private static String getKeyForVal(Field[] objField, Object fieldVal, Map<String, Object> header){
+        for (Field field : objField) {
+            Object o = header.get(field.getName());
+            if( Objects.isNull(o) ){
+                continue;
+            }
+            if( o.equals(fieldVal) ){
+                return field.getName();
+            }
+        }
+        return null;
+    }
+
+    private static Field[] getAllField(Object o){
+        return o.getClass().getDeclaredFields();
+    }
 
     /**
      * 【创建excel标题头-第一行】
@@ -69,6 +165,51 @@ public class ExcelUtil {
         workBookFont.setFontHeightInPoints((short) fontSize);
         workBookFont.setFontName(font);
         workBookCellStyle.setFont(workBookFont);
+        //设置居中显示
+        workBookCellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cell.setCellStyle(workBookCellStyle);
+        //合并单元格
+        CellRangeAddress region = new CellRangeAddress(0, 0, 0, mergeCellLength - 1);
+        sheet.addMergedRegion(region);
+    }
+
+    /**
+     * 【创建excel标题头-第一行】
+     * @Description: 附加给表头增加超链接
+     * @param workbook          工作簿
+     * @param sheet             工作表
+     * @param excelTitle        excel标题名称
+     * @param titleHeight       excel标题高度
+     * @param font              excel标题字体
+     * @param fontSize          excel标题字体大小
+     * @param mergeCellLength   excel合并单元格数量
+     */
+    public static void createLinkExcelTitle(Workbook workbook, XSSFSheet sheet, String excelTitle, int titleHeight, String font, int fontSize, int mergeCellLength, String relationTitleName){
+        //创建表头行
+        XSSFRow row = sheet.createRow(0);
+        row.setHeight((short) (titleHeight));
+        //创建表头列
+        XSSFCell cell = row.createCell(0);
+        //设置表头名称
+        cell.setCellValue(excelTitle);
+        cell.setCellFormula("HYPERLINK(\"#" + relationTitleName + "!A1\",\"" + relationTitleName + "\")");
+        //创建一个单元格样式
+        XSSFCellStyle workBookCellStyle = (XSSFCellStyle) workbook.createCellStyle();
+        //创建单元格字体
+        Font workBookFont = workbook.createFont();
+        //设置粗体
+        workBookFont.setBold(true);
+        //设置表头字体样式
+        workBookFont.setFontHeightInPoints((short) fontSize);
+        workBookFont.setFontName(font);
+        workBookCellStyle.setFont(workBookFont);
+        // 创建颜色对象,设置颜色
+        byte[] rgb = new byte[]{(byte) 0, (byte) 0, (byte) 255};
+        DefaultIndexedColorMap colorMap = new DefaultIndexedColorMap();
+        XSSFColor xssfColor = new XSSFColor(rgb, new DefaultIndexedColorMap());
+        // 设置颜色序号
+        xssfColor.setIndexed(4);
+        workBookFont.setColor(xssfColor.getIndexed());
         //设置居中显示
         workBookCellStyle.setAlignment(HorizontalAlignment.CENTER);
         cell.setCellStyle(workBookCellStyle);
@@ -250,13 +391,13 @@ public class ExcelUtil {
         //效验工作表头字段
         Row row = sheet.getRow(1);
         if (row == null) {
-            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "excel文件信息无效!请重新下载模板");
+            throw new JSYException(400, "excel文件信息无效!请重新下载模板");
         }
         for (int i = 0; i < field.length; i++) {
             Cell cell = row.getCell(i);
             //如果标题 字段 列为空 或者 标题列字段 和 titleField 里面对应的下标 列内容不匹配 则抛出异常
             if (cell == null || !row.getCell(i).getStringCellValue().equals(field[i])) {
-                throw new JSYException(ConstError.NORMAL, "字段匹配错误：预期第" + (i + 1) + "列字段是" + field[i] + "，但发现的是：" + row.getCell(i).getStringCellValue());
+                throw new JSYException(1, "字段匹配错误：预期第" + (i + 1) + "列字段是" + field[i] + "，但发现的是：" + row.getCell(i).getStringCellValue());
             }
         }
     }
@@ -342,7 +483,7 @@ public class ExcelUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(),"数据类型转换失败!请重试");
+            throw new JSYException(501, "数据类型转换失败!请重试");
         }
         return resMap;
     }
@@ -376,5 +517,137 @@ public class ExcelUtil {
         multiValueMap.set("Content-Disposition", "attachment;filename=" + fileFullName);
         multiValueMap.set("Content-type", "application/vnd.ms-excel");
         return multiValueMap;
+    }
+
+    /**
+     *@Author: Pipi
+     *@Description: 超链接样式
+     *@Param: workbook:
+     *@Return: org.apache.poi.xssf.usermodel.XSSFCellStyle
+     *@Date: 2021/4/25 14:31
+     **/
+    public static XSSFCellStyle hyperlinkStyle(Workbook workbook) {
+        XSSFCellStyle fieldCellStyle = (XSSFCellStyle) workbook.createCellStyle();
+        Font font = null;
+        //创建一个字体对象
+        font = workbook.createFont();
+        // 创建颜色对象,设置颜色
+        byte[] rgb = new byte[]{(byte) 0, (byte) 0, (byte) 255};
+        DefaultIndexedColorMap colorMap = new DefaultIndexedColorMap();
+        XSSFColor xssfColor = new XSSFColor(rgb, new DefaultIndexedColorMap());
+        // 设置颜色序号
+        xssfColor.setIndexed(4);
+        // 给字体设置颜色
+        font.setColor(xssfColor.getIndexed());
+        // 设置下划线
+        font.setUnderline(Font.U_SINGLE);
+        fieldCellStyle.setFont(font);
+        return fieldCellStyle;
+    }
+
+    /**
+     * 设置有效性
+     * @param offset 主影响单元格所在列，即此单元格由哪个单元格影响联动
+     * @param sheet
+     * @param rowNum 行数
+     * @param colNum 列数
+     */
+    public static void setDataValidation(String offset,XSSFSheet sheet, int rowNum,int colNum) {
+        XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
+        DataValidation data_validation_list;
+        data_validation_list = getDataValidationByFormula(
+                "INDIRECT($" + offset + (rowNum) + ")", rowNum, colNum,dvHelper);
+        sheet.addValidationData(data_validation_list);
+    }
+
+    /**
+     * 加载下拉列表内容
+     * @param formulaString
+     * @param naturalRowIndex
+     * @param naturalColumnIndex
+     * @param dvHelper
+     * @return
+     */
+    private static  DataValidation getDataValidationByFormula(
+            String formulaString, int naturalRowIndex, int naturalColumnIndex,XSSFDataValidationHelper dvHelper) {
+        // 加载下拉列表内容
+        // 举例：若formulaString = "INDIRECT($A$2)" 表示规则数据会从名称管理器中获取key与单元格 A2 值相同的数据，
+        //如果A2是江苏省，那么此处就是江苏省下的市信息。
+        XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) dvHelper.createFormulaListConstraint(formulaString);
+        // 设置数据有效性加载在哪个单元格上。
+        // 四个参数分别是：起始行、终止行、起始列、终止列
+        int firstRow = naturalRowIndex -1;
+        int lastRow = naturalRowIndex - 1;
+        int firstCol = naturalColumnIndex - 1;
+        int lastCol = naturalColumnIndex - 1;
+        CellRangeAddressList regions = new CellRangeAddressList(firstRow,
+                lastRow, firstCol, lastCol);
+        // 数据有效性对象
+        // 绑定
+        XSSFDataValidation data_validation_list = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, regions);
+        data_validation_list.setEmptyCellAllowed(false);
+        if (data_validation_list instanceof XSSFDataValidation) {
+            data_validation_list.setSuppressDropDownArrow(true);
+            data_validation_list.setShowErrorBox(true);
+        } else {
+            data_validation_list.setSuppressDropDownArrow(false);
+        }
+        // 设置输入信息提示信息
+        data_validation_list.createPromptBox("下拉选择提示", "请使用下拉方式选择合适的值！");
+        return data_validation_list;
+    }
+
+    /**
+     *  计算formula
+     * @param offset 偏移量，如果给0，表示从A列开始，1，就是从B列
+     * @param rowId 第几行
+     * @param colCount 一共多少列
+     * @return 如果给入参 1,1,10. 表示从B1-K1。最终返回 $B$1:$K$1
+     *
+     */
+    public static String getRange(int offset, int rowId, int colCount) {
+        char start = (char)('A' + offset);
+        if (colCount <= 25) {
+            char end = (char)(start + colCount - 1);
+            return "$" + start + "$" + rowId + ":$" + end + "$" + rowId;
+        } else {
+            char endPrefix = 'A';
+            char endSuffix = 'A';
+            if ((colCount - 25) / 26 == 0 || colCount == 51) {// 26-51之间，包括边界（仅两次字母表计算）
+                if ((colCount - 25) % 26 == 0) {// 边界值
+                    endSuffix = (char)('A' + 25);
+                } else {
+                    endSuffix = (char)('A' + (colCount - 25) % 26 - 1);
+                }
+            } else {// 51以上
+                if ((colCount - 25) % 26 == 0) {
+                    endSuffix = (char)('A' + 25);
+                    endPrefix = (char)(endPrefix + (colCount - 25) / 26 - 1);
+                } else {
+                    endSuffix = (char)('A' + (colCount - 25) % 26 - 1);
+                    endPrefix = (char)(endPrefix + (colCount - 25) / 26);
+                }
+            }
+            return "$" + start + "$" + rowId + ":$" + endPrefix + endSuffix + "$" + rowId;
+        }
+    }
+
+    /**
+     * 把指定的Obj对象转换为对应的List<String>对象
+     * @param obj           List<String>的Object对象
+     *
+     */
+    public static   List<String> castStrList(Object obj)
+    {
+        List<String> result = new ArrayList<>();
+        if(obj instanceof List<?>)
+        {
+            for (Object o : (List<?>) obj)
+            {
+                result.add((String) o);
+            }
+            return result;
+        }
+        return null;
     }
 }

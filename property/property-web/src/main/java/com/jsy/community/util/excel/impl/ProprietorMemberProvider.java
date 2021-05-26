@@ -8,6 +8,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.ExcelHandler;
 import com.jsy.community.util.ProprietorExcelCommander;
+import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.RegexUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,19 +45,19 @@ public class ProprietorMemberProvider implements ExcelHandler {
             //excel 字段列
             String[] titleField = ProprietorExcelCommander.MEMBER_TITLE_FIELD;
             //效验excel标题行
-            ProprietorExcelCommander.validExcelField(sheetAt, titleField);
+            ExcelUtil.validExcelField(sheetAt, titleField);
             //获取该社区的
             //开始读入excel数据 跳过标题和字段 从真正的数据行开始读取
             for (int j = 2; j <= sheetAt.getLastRowNum(); j++) {
                 Row dataRow = sheetAt.getRow(j);
-                if (ProprietorExcelCommander.cellOneIsNotNull(dataRow)) {
+                if (ExcelUtil.cellOneIsNotNull(dataRow)) {
                     //如果这行数据不为空 创建一个 实体接收 信息
                     UserEntity userEntity = new UserEntity();
                     userEntity.setHouseEntity(new HouseEntity());
                     //遍历列
                     for (int z = 0; z < titleField.length; z++) {
                         Cell cell = dataRow.getCell(z);
-                        String cellValue = ProprietorExcelCommander.getCellValForType(cell).toString();
+                        String cellValue = ExcelUtil.getCellValForType(cell).toString();
                         //列字段效验
                         switch (z) {
                             // 1列 通过业主姓名获取业主的Uid  因为家属需要和业主关联
@@ -175,14 +176,14 @@ public class ProprietorMemberProvider implements ExcelHandler {
         XSSFSheet hiddenSheet = (XSSFSheet) workbook.createSheet("hiddenSheet");
         String[] titleField = ProprietorExcelCommander.MEMBER_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
         //5.创建excel 字段列  (表示具体的数据列字段)
-        ProprietorExcelCommander.createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
         //添加需要约束数据的列下标   "所属业主",  "与业主关系", "家属性别", "所属房屋"
         int[] arrIndex = new int[]{0, 1, 2, 3};
         //取出所有的房屋信息
         Object obj = res.get("communityHouseAddr");
-        List<String> communityHouseAddr = castStrList(obj);
+        List<String> communityHouseAddr = ExcelUtil.castStrList(obj);
         //表明验证约束 结束行
         int endRow = ProprietorExcelCommander.MEMBER_CONSTRAINT_ROW;
         for (int index : arrIndex) {
@@ -190,32 +191,13 @@ public class ProprietorMemberProvider implements ExcelHandler {
             //其中 业主姓名 和 业主uid是关联的 所以需要一起创建对应的Map数据
             String[] constraintData = getConstraintSet(entityList, index, communityHouseAddr);
             //创建业主信息登记表与隐藏表的约束字段
-            ProprietorExcelCommander.createProprietorConstraintRef(workbook, hiddenSheet, constraintData, endRow, index);
+            ExcelUtil.createProprietorConstraintRef(workbook, hiddenSheet, constraintData, endRow, index);
             //绑定验证
-            sheet.addValidationData(ProprietorExcelCommander.setBox(sheet, endRow, index));
+            sheet.addValidationData(ExcelUtil.setBox(sheet, endRow, index));
         }
         //隐藏 隐藏表  下标1 就是隐藏表
         workbook.setSheetHidden(1, true);
         return workbook;
-    }
-
-    /**
-     * 把指定的Obj对象转换为对应的List<String>对象
-     * @param obj           List<String>的Object对象
-     *
-     */
-    private List<String> castStrList(Object obj)
-    {
-        List<String> result = new ArrayList<>();
-        if(obj instanceof List<?>)
-        {
-            for (Object o : (List<?>) obj)
-            {
-                result.add((String) o);
-            }
-            return result;
-        }
-        return null;
     }
 
     /**
