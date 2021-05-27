@@ -79,7 +79,9 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		return bannerEntity.getId();
 	}
 	
-	//查找排序空位
+	/**
+	 * 查找排序空位
+	 */
 	private Integer findSort(List<Integer> sorts){
 		if(CollectionUtils.isEmpty(sorts)){
 			return 1; //集合无元素(社区无轮播图) 返回首位 1

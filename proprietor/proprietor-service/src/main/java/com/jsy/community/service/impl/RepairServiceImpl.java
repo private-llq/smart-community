@@ -169,7 +169,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	
 	
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void cancelRepair(Long id, String userId) {
 		QueryWrapper<RepairEntity> condition = new QueryWrapper<>();
 		condition.eq("user_id", userId).eq("id", id);

@@ -78,6 +78,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@Override
 	public boolean setUserRoles(List<Long> roleIds,Long userId){
 		//备份
 		List<Long> userRoles = adminUserMapper.getUserRole(userId);
@@ -288,6 +289,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Author: chq459799974
 	 * @Date: 2020/12/1
 	**/
+	@Override
 	@Deprecated
 	public boolean checkUsernameExists(String username){
 		Integer count = baseMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("username", username));

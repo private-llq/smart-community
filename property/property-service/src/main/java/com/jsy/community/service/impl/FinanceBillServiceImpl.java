@@ -54,7 +54,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
      * @return: void
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateDays(){
         QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
         wrapper.select("DISTINCT community_id");
@@ -109,7 +109,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
      * @return: void
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updatePenalSum(){
         QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
         wrapper.select("DISTINCT no,community_id");

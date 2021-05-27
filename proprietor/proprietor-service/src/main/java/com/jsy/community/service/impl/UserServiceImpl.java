@@ -606,7 +606,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return true;
     }
     
-    //向小区设备下发人脸数据
+    /**
+     * 向小区设备下发人脸数据
+     */
     private void setFaceUrlToCommunityMachine(UserEntity userEntity, Set<Long> communityIds){
         //查询用户实名信息
         if(userEntity.getIsRealAuth() == null || userEntity.getIsRealAuth() != 2){
@@ -614,7 +616,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             return;
         }
         if(StringUtils.isEmpty(userEntity.getFaceUrl())){
-            throw new ProprietorException("用户已实人认证，人脸图片不存在！"); //数据异常，停止房屋相关操作
+            //数据异常，停止房屋相关操作
+            throw new ProprietorException("用户已实人认证，人脸图片不存在！");
         }
         JSONObject pushMap = new JSONObject();
         pushMap.put("op","editPerson");

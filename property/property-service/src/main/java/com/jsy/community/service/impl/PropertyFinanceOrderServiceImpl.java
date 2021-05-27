@@ -385,6 +385,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 case 1:
                     receipted = receipted.add(entity.getTotalMoney());
                     break;
+                default:
             }
         }
         //结算金额统计
@@ -406,6 +407,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                     case 4:
                         statementReject = statementReject.add(entity.getTotalMoney());
                         break;
+                    default:
                 }
             }
         }

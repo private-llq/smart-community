@@ -74,7 +74,7 @@ public class PropertyComplaintsServiceImpl extends ServiceImpl<PropertyComplaint
         if (qoQuery.getComplainTimeOut()!=null) {
             qoQuery.setComplainTimeOut(qoQuery.getComplainTimeOut().plusDays(1));
         }
-        Page page =propertyComplaintsMapper.findList(new Page<PropertyComplaintsEntity>(baseQO.getPage(),baseQO.getSize()),qoQuery);
+        Page page =propertyComplaintsMapper.findList(new Page<>(baseQO.getPage(),baseQO.getSize()),qoQuery);
         List<PropertyComplaintsVO> list = page.getRecords();
         if (list.size()>0){
             for (PropertyComplaintsVO entity : list) {

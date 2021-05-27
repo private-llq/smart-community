@@ -14,7 +14,10 @@ import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
 
-
+/**
+ * @author qq459799974
+ * @since 2020-11-16
+ */
 @DubboService(version = Const.version, group = Const.group_property)
 public class AdminUserTokenServiceImpl extends ServiceImpl<AdminUserTokenMapper, AdminUserTokenEntity> implements IAdminUserTokenService {
 

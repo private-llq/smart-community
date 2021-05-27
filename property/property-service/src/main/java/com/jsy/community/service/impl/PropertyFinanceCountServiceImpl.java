@@ -50,7 +50,9 @@ public class PropertyFinanceCountServiceImpl implements IPropertyFinanceCountSer
 	@Autowired
 	private PropertyFinanceStatementMapper statementMapper;
 	
-	//缴费统计
+	/**
+	 * 缴费统计
+	 */
 	@Override
 	public StatisticsVO orderPaidCount(PropertyFinanceCountEntity query){
 		StatisticsVO statisticsVO = new StatisticsVO();
@@ -142,7 +144,10 @@ public class PropertyFinanceCountServiceImpl implements IPropertyFinanceCountSer
 		
 	}
 	
-	//应收统计
+	/**
+	 * 应收统计
+	 */
+	@Override
 	public StatisticsVO orderReceivableCount(PropertyFinanceCountEntity query){
 		StatisticsVO statisticsVO = new StatisticsVO();
 		List<FinanceOrderEntityVO> financeOrderEntityVOS = orderMapper.statisticsReceivable(query);
@@ -294,7 +299,10 @@ public class PropertyFinanceCountServiceImpl implements IPropertyFinanceCountSer
 		return statisticsVO;
 	}
 	
-	//结算统计
+	/**
+	 * 结算统计
+	 */
+	@Override
 	public StatisticsVO statementCount(PropertyFinanceCountEntity query) {
 		List<String> dayListOfMonth = DateUtils.getDayListOfMonth(query.getStartDate().toString(), query.getEndDate().toString());
 		StatisticsVO statisticsVO = new StatisticsVO();

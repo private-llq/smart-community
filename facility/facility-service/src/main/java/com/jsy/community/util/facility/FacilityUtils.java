@@ -159,13 +159,16 @@ public class FacilityUtils {
 	 * @Date 2021/4/23 15:11
 	 * @Param [lAlarmHandle：布防句柄]
 	 **/
-	public static void cancel(int lAlarmHandle) {
-		// 1. 撤防
-		if (lAlarmHandle > -1) {
-			if (hCNetSDK.NET_DVR_CloseAlarmChan_V30(lAlarmHandle)) {
-				log.info("撤防成功");
+	public static Map<String,Object> cancel(int lAlarmHandle) {
+		Map returnMap = new HashMap<>();
+		returnMap.put("result",true);
+		if(lAlarmHandle > -1){
+			if(!hCNetSDK.NET_DVR_CloseAlarmChan_V30(lAlarmHandle)){
+				returnMap.put("result",false);
+				returnMap.put("reason",hCNetSDK.NET_DVR_GetLastError());
 			}
 		}
+		return returnMap;
 	}
 	
 	/**
@@ -175,12 +178,16 @@ public class FacilityUtils {
 	 * @Date 2021/4/23 18:44
 	 * @Param [lUserID：用户句柄]
 	 **/
-	public static void logOut(int lUserID) {
+	public static Map<String,Object> logOut(int lUserID) {
+		Map returnMap = new HashMap<>();
+		returnMap.put("result",true);
 		if (lUserID > -1) {
-			if (hCNetSDK.NET_DVR_Logout(lUserID)) {
-				log.info("注销成功");
+			if (!hCNetSDK.NET_DVR_Logout(lUserID)) {
+				returnMap.put("result",false);
+				returnMap.put("reason",hCNetSDK.NET_DVR_GetLastError());
 			}
 		}
+		return returnMap;
 	}
 	
 	/**

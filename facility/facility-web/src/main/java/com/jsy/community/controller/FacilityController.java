@@ -103,6 +103,7 @@ public class FacilityController {
 	// TODO: 2021/4/23 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		//TODO 后续操作带小区id
 		facilityEntity.setCommunityId(communityId);
 		facilityService.updateFacility(facilityEntity);
 		return CommonResult.ok();

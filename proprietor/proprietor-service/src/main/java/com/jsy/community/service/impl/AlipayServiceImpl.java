@@ -35,7 +35,8 @@ public class AlipayServiceImpl implements IAlipayService {
 		if(StringUtils.isEmpty(authCode)){
 			return null;
 		}
-		AlipaySystemOauthTokenRequest alipaySystemOauthTokenRequest = new AlipaySystemOauthTokenRequest(); //创建API对应的request类
+		//创建API对应的request类
+		AlipaySystemOauthTokenRequest alipaySystemOauthTokenRequest = new AlipaySystemOauthTokenRequest();
 		alipaySystemOauthTokenRequest.setGrantType("authorization_code");
 		alipaySystemOauthTokenRequest.setCode(authCode);
 		AlipaySystemOauthTokenResponse response = null;

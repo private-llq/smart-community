@@ -290,7 +290,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //	}
 
     //========================================= 基础增删改查 开始 ========================================================
-
+    
     /**
      * @Description: 新增楼栋、单元、房屋（改）(根据物业端原型)
      * @Param: [houseEntity]
@@ -298,6 +298,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
      * @Author: chq459799974
      * @Date: 2021/3/8
      **/
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addHouse(HouseEntity houseEntity) {
         int addResult = 0;
@@ -326,9 +327,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         } else if (BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()) {
             //查询父级是否存在
             Integer pidExists = houseMapper.selectCount(new QueryWrapper<HouseEntity>()
-                    .eq("id", houseEntity.getPid())
-                    .eq("community_id", houseEntity.getCommunityId())
-                    .and(wrapper -> wrapper.eq("type", BusinessConst.BUILDING_TYPE_BUILDING).or().eq("type", BusinessConst.BUILDING_TYPE_UNIT))
+                .eq("id", houseEntity.getPid())
+                .eq("community_id", houseEntity.getCommunityId())
+                .and(wrapper -> wrapper.eq("type", BusinessConst.BUILDING_TYPE_BUILDING).or().eq("type", BusinessConst.BUILDING_TYPE_UNIT))
             );
             // queryWrapper.and(wrapper -> wrapper.like("unit",query.getUnit()).or().like("number",query.getUnit()));
             if (pidExists != 1) {
@@ -640,7 +641,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
     @Override
     public Map<Long, HouseEntity> queryIdAndHouseMap(Collection<Long> ids) {
         if (CollectionUtils.isEmpty(ids) || (ids.size() == 1 && ids.contains(null))) {
-            return new HashMap<>();
+            return new HashMap<>(1);
         }
         return houseMapper.queryIdAndHouseMap(ids);
     }
