@@ -57,7 +57,6 @@ public class FacilityEntity extends BaseEntity {
 	private Integer isConnectData;
 	
 	@ApiModelProperty(value = "设备分类")
-	@NotNull(groups = {FacilityEntity.addFacilityValidate.class, FacilityEntity.updateFacilityValidate.class}, message = "设备分类id不能为空")
 	private String facilityTypeName;
 	
 	@ApiModelProperty(value = "设备编号")
