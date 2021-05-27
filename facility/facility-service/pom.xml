@@ -127,7 +127,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- springboot main方法入口 -->
-                    <mainClass>com.jsy.community.PropertyServiceApp</mainClass>
+                    <mainClass>com.jsy.community.FacilityServiceApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -137,6 +137,28 @@
                     </execution>
                 </executions>
             </plugin>
+
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-compiler-plugin</artifactId>-->
+<!--                <version>3.3</version>-->
+<!--                <configuration>-->
+<!--                    <source>11</source>-->
+<!--                    <target>11</target>-->
+<!--                    &lt;!&ndash; "Since 3.0, the default compiler is javax.tools.JavaCompiler &ndash;&gt;-->
+<!--                    &lt;!&ndash; (if you are using java 1.6) and is used to compile Java sources. &ndash;&gt;-->
+<!--                    &lt;!&ndash; If you want to force the plugin using javac, you must configure &ndash;&gt;-->
+<!--                    &lt;!&ndash; the plugin option forceJavacCompilerUse." &ndash;&gt;-->
+<!--                    &lt;!&ndash; ElPaaso compilation failed if set to false with multitrhead &ndash;&gt;-->
+<!--                    &lt;!&ndash; compilation enabled (-T3). &ndash;&gt;-->
+<!--                    &lt;!&ndash; Try to disable it after switching to jdk 1.7 &ndash;&gt;-->
+<!--                    <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
+<!--                    &lt;!&ndash; workaround maven compiler 3.1 bug which incorrectly recompiles some resources that have not changed See https://jira.codehaus.org/browse/MCOMPILER-209-->
+<!--                        and http://stackoverflow.com/questions/17944108/maven-compiler-plugin-always-detecting-a-set-of-sources-as-stale &ndash;&gt;-->
+<!--                    <useIncrementalCompilation>false</useIncrementalCompilation>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+
         </plugins>
     </build>
 
