@@ -3,6 +3,7 @@ package com.jsy.community.callback;
 import com.jsy.community.api.ICarTrackService;
 import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.IPeopleTrackService;
+import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarTrackEntity;
 import com.jsy.community.entity.PeopleTrackEntity;
 import com.jsy.community.entity.hk.FacilityEntity;
@@ -11,6 +12,7 @@ import com.jsy.community.utils.HKCarTypeUtils;
 import com.jsy.community.utils.MinioUtils;
 import com.sun.jna.Pointer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,13 +38,13 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 	
 	public static FMSGCallBack_V31Impl FMSGCallBack_V31Impl;
 	
-	@Autowired
+	@DubboReference(version = Const.version, group = Const.group_facility, check = false)
 	public ICarTrackService carTrackService;
 	
-	@Autowired
+	@DubboReference(version = Const.version, group = Const.group_facility, check = false)
 	public IPeopleTrackService peopleTrackService;
 	
-	@Autowired
+	@DubboReference(version = Const.version, group = Const.group_facility, check = false)
 	public IFacilityService facilityService;
 	
 	@PostConstruct
