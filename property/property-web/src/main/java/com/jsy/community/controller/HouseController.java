@@ -13,7 +13,6 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
-import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.util.excel.impl.HouseExcelHandlerImpl;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
