@@ -83,58 +83,58 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 	public void AlarmDataHandle(int lCommand, HCNetSDK.NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser) {
 		//lCommand是传的报警类型，有各种各样的报警类型。
 		switch (lCommand) {
-//			case HCNetSDK.COMM_UPLOAD_FACESNAP_RESULT: //人脸抓拍结果信息
-//				log.info("");
-//				log.info("设备：" + new String(pAlarmer.sDeviceIP) + ",人脸抓拍事件开始触发");
-//				//实时人脸抓拍上传
-//				// *************意思是把当前摄像头抓拍到的信息赋值给 NET_VCA_FACESNAP_RESULT【人脸抓拍结果(人脸抓拍结果结构体)】*******************//
-//				HCNetSDK.NET_VCA_FACESNAP_RESULT strFaceSnapInfo = new HCNetSDK.NET_VCA_FACESNAP_RESULT();
-//				strFaceSnapInfo.write();
-//				Pointer pFaceSnapInfo = strFaceSnapInfo.getPointer();
-//				pFaceSnapInfo.write(0, pAlarmInfo.getByteArray(0, strFaceSnapInfo.size()), 0, strFaceSnapInfo.size());
-//				strFaceSnapInfo.read();
-//				// *************意思是把当前摄像头抓拍到的信息赋值给 NET_VCA_FACESNAP_RESULT【人脸抓拍结果(人脸抓拍结果结构体)】*******************//
-//
-//				// strFaceSnapInfo.struFeature  获取人体属性参数结构体。    NET_VCA_HUMAN_FEATURE
-//				log.info("抓拍人脸评分[0-100]：" + strFaceSnapInfo.dwFaceScore + "，年龄段：" + strFaceSnapInfo.struFeature.byAgeGroup + "，性别：" + strFaceSnapInfo.struFeature.bySex + "，是否戴眼镜[1不戴，2戴]：" + strFaceSnapInfo.struFeature.byEyeGlass + "，是否戴帽子[0不支持，1不戴，2戴]：" + strFaceSnapInfo.struFeature.byHat);
-//
-//				// 将抓拍人脸图片写出到存储设备[或上传到服务器]
-//				// 人脸抓拍一般只能上传背景图（dwBackgroundPicLen、pBuffer2）和人脸子图区域（struRect），人脸子图需要应用层根据区域从背景图截取。
-//				try {
-//					log.info("触发抓拍人脸保存事件触发");
-//					SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss"); //设置日期格式
-//					String time = df.format(new Date()); // new Date()为获取当前系统时间
-//
-//					// 人脸子图
-//					FileOutputStream small = new FileOutputStream(System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\face\\" + time + "(人脸抓拍)人脸子图.jpg");
-//					// 人脸子图加背景图
-//					FileOutputStream big = new FileOutputStream(System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\face\\" + time + "(人脸抓拍)带背景的人脸子图.jpg");
-//
-//					// dwFacePicLen：人脸子图的长度，为0表示没有图片，大于0表示有图片
-//					if (strFaceSnapInfo.dwFacePicLen > 0) {
-//						try {
-//							//pBuffer1：人脸子图的图片数据                                            dwFacePicLen：人脸子图的长度，为0表示没有图片，大于0表示有图片
-//							small.write(strFaceSnapInfo.pBuffer1.getByteArray(0, strFaceSnapInfo.dwFacePicLen), 0, strFaceSnapInfo.dwFacePicLen);
-//							small.close();
-//						} catch (IOException ex) {
-//							ex.printStackTrace();
-//						}
-//					}
-//					// dwBackgroundPicLen：背景图的长度，为0表示没有图片，大于0表示有图片(保留)
-//					if (strFaceSnapInfo.dwBackgroundPicLen > 0) {
-//						try {
-//							//pBuffer2：背景图的图片数据                                             dwBackgroundPicLen：背景图的长度，为0表示没有图片，大于0表示有图片(保留)
-//							big.write(strFaceSnapInfo.pBuffer2.getByteArray(0, strFaceSnapInfo.dwBackgroundPicLen), 0, strFaceSnapInfo.dwBackgroundPicLen);
-//							big.close();
-//						} catch (IOException ex) {
-//							ex.printStackTrace();
-//						}
-//					}
-//				} catch (FileNotFoundException ex) {
-//					ex.printStackTrace();
-//				}
-//				log.info("人脸抓拍事件结束");
-//				break;
+			case HCNetSDK.COMM_UPLOAD_FACESNAP_RESULT: //人脸抓拍结果信息
+				log.info("");
+				log.info("设备：" + new String(pAlarmer.sDeviceIP) + ",人脸抓拍事件开始触发");
+				//实时人脸抓拍上传
+				// *************意思是把当前摄像头抓拍到的信息赋值给 NET_VCA_FACESNAP_RESULT【人脸抓拍结果(人脸抓拍结果结构体)】*******************//
+				HCNetSDK.NET_VCA_FACESNAP_RESULT strFaceSnapInfo = new HCNetSDK.NET_VCA_FACESNAP_RESULT();
+				strFaceSnapInfo.write();
+				Pointer pFaceSnapInfo = strFaceSnapInfo.getPointer();
+				pFaceSnapInfo.write(0, pAlarmInfo.getByteArray(0, strFaceSnapInfo.size()), 0, strFaceSnapInfo.size());
+				strFaceSnapInfo.read();
+				// *************意思是把当前摄像头抓拍到的信息赋值给 NET_VCA_FACESNAP_RESULT【人脸抓拍结果(人脸抓拍结果结构体)】*******************//
+
+				// strFaceSnapInfo.struFeature  获取人体属性参数结构体。    NET_VCA_HUMAN_FEATURE
+				log.info("抓拍人脸评分[0-100]：" + strFaceSnapInfo.dwFaceScore + "，年龄段：" + strFaceSnapInfo.struFeature.byAgeGroup + "，性别：" + strFaceSnapInfo.struFeature.bySex + "，是否戴眼镜[1不戴，2戴]：" + strFaceSnapInfo.struFeature.byEyeGlass + "，是否戴帽子[0不支持，1不戴，2戴]：" + strFaceSnapInfo.struFeature.byHat);
+
+				// 将抓拍人脸图片写出到存储设备[或上传到服务器]
+				// 人脸抓拍一般只能上传背景图（dwBackgroundPicLen、pBuffer2）和人脸子图区域（struRect），人脸子图需要应用层根据区域从背景图截取。
+				try {
+					log.info("触发抓拍人脸保存事件触发");
+					SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss"); //设置日期格式
+					String time = df.format(new Date()); // new Date()为获取当前系统时间
+
+					// 人脸子图
+					FileOutputStream small = new FileOutputStream(System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\face\\" + time + "(人脸抓拍)人脸子图.jpg");
+					// 人脸子图加背景图
+					FileOutputStream big = new FileOutputStream(System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\face\\" + time + "(人脸抓拍)带背景的人脸子图.jpg");
+
+					// dwFacePicLen：人脸子图的长度，为0表示没有图片，大于0表示有图片
+					if (strFaceSnapInfo.dwFacePicLen > 0) {
+						try {
+							//pBuffer1：人脸子图的图片数据                                            dwFacePicLen：人脸子图的长度，为0表示没有图片，大于0表示有图片
+							small.write(strFaceSnapInfo.pBuffer1.getByteArray(0, strFaceSnapInfo.dwFacePicLen), 0, strFaceSnapInfo.dwFacePicLen);
+							small.close();
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					}
+					// dwBackgroundPicLen：背景图的长度，为0表示没有图片，大于0表示有图片(保留)
+					if (strFaceSnapInfo.dwBackgroundPicLen > 0) {
+						try {
+							//pBuffer2：背景图的图片数据                                             dwBackgroundPicLen：背景图的长度，为0表示没有图片，大于0表示有图片(保留)
+							big.write(strFaceSnapInfo.pBuffer2.getByteArray(0, strFaceSnapInfo.dwBackgroundPicLen), 0, strFaceSnapInfo.dwBackgroundPicLen);
+							big.close();
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					}
+				} catch (FileNotFoundException ex) {
+					ex.printStackTrace();
+				}
+				log.info("人脸抓拍事件结束");
+				break;
 			
 			/**
 			 * @return void
@@ -385,7 +385,8 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 						FileOutputStream fout;
 						try {
 							// sDeviceIP：设备IP地址
-							String filename = System.getProperty("user.dir") + "\\property\\property-web\\src\\main\\resources\\car\\" + new String(pAlarmer.sDeviceIP).trim() + "_"
+							//TODO ==========项目里暂时存一份方便查看==========
+							String filename = System.getProperty("user.dir") + "\\facility\\facility-service\\src\\main\\resources\\car\\" + new String(pAlarmer.sDeviceIP).trim() + "_"
 								+ newName + "_type[" + strItsPlateResult.struPicInfo[i].byType + "]_ItsPlate.jpg";
 							fout = new FileOutputStream(filename);
 							//将字节写入文件
@@ -396,6 +397,7 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 							buffers.get(bytes);
 							fout.write(bytes);
 							fout.close();
+							//TODO ==========项目里暂时存一份方便查看==========
 							
 							// 将图片存到服务器
 							carTrackEntity.setCapture(MinioUtils.uploadPic(bytes, "aop"));
@@ -411,6 +413,7 @@ public class FMSGCallBack_V31Impl implements HCNetSDK.FMSGCallBack_V31 {
 					}
 				}
 				break;
+				default:
 		}
 	}
 	

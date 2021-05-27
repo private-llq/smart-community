@@ -81,6 +81,7 @@ public class SignatureServiceImpl implements ISignatureService {
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_UPDATE_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
+			default:
 		}
 		//获取加密对象
 //		OpenParam openParam = AESUtil.returnOpenParam(redbagQO);
