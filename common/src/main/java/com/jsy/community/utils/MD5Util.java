@@ -99,4 +99,40 @@ public class MD5Util {
         }
         return buffer.toString();
     }
+    
+    //im组接口用户相关签名(同步实名状态)
+    public static String signStr(Map param){
+        if (param == null){
+            return null;
+        }
+        /* 获取字段， 先排序 */
+        List<String> field = new ArrayList<>();
+        Iterator<String> iterator = param.keySet().iterator();
+        String k;
+        while (iterator.hasNext()) {
+            k = iterator.next();
+            if (SIGN.equals(k)){
+                continue;
+            }
+            field.add(k);
+        }
+        /* 排序 */
+        Collections.sort(field);
+        /* 生成待签名字符串*/
+        StringBuffer buffer = new StringBuffer(param.size() * NumberCtt_42);
+        Object v;
+        String ve;
+        for (int i = 0; i < field.size(); i++) {
+            k = field.get(i);
+            v = param.get(k);
+            if (v == null){
+                continue;
+            }else {
+                ve = v.getClass().isArray() ? ((String[]) v)[0] : v.toString();
+            }
+            buffer.append(k).append(EQ).append(ve).append(AND);
+        }
+        return buffer.toString().substring(0,buffer.toString().lastIndexOf("&"));
+    }
+    
 }
