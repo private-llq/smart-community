@@ -108,6 +108,7 @@ public class UnionPayUtils {
     private DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> buildClient() {
         String certificatePath = UnionPayUtils.class.getResource("/").getPath().replaceFirst("/", "");
         certificatePath = certificatePath.replace("pay-system-service", "pay-system-common") + "certificates/";
+        certificatePath = certificatePath.replace("!", "");
         log.info("私钥地址+++++++++++{}", certificatePath + UnionPayConfig.PRIVATE_KEY);
         log.info("公钥地址+++++++++++{}", certificatePath + UnionPayConfig.PUBLIC_KEY);
         DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> client =
