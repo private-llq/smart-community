@@ -37,7 +37,7 @@
         </encoder>
     </appender>
     <!-- 添加监听位置 -->
-<!--    <logger name="com.jsy.community.mapper" level="DEBUG" />-->
+    <logger name="com.jsy.community.mapper" level="DEBUG" />
     <!-- root级别 -->
     <root level="INFO">
         <!-- 文件输出 -->
