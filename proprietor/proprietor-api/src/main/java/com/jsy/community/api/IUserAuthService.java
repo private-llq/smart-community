@@ -62,11 +62,11 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	/**
 	* @Description: 更换手机号
 	 * @Param: [newMobile, uid]
-	 * @Return: boolean
+	 * @Return: void
 	 * @Author: chq459799974
 	 * @Date: 2020/12/7
 	**/
-	boolean changeMobile(String newMobile,String uid);
+	void changeMobile(String newMobile,String uid);
 	
 	/**
 	 * 通过用户ID 查询用户手机号码
