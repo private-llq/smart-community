@@ -111,7 +111,7 @@ public class UnionPayUtils {
             // windows操作系统
             certificatePath = "D:\\ideaProjectDirectory\\smart-community\\payment-system\\pay-system-common\\src\\main\\resources\\certificates\\";
         } else {
-            certificatePath = "/mnt/db/smart-community/file/certificates/";
+            certificatePath = "/mnt/db/smart-community/union_cert/";
         }
         /*String certificatePath = UnionPayUtils.class.getResource("/").getPath().replaceFirst("/", "");
         certificatePath = certificatePath.replace("pay-system-service", "pay-system-common") + "certificates/";
