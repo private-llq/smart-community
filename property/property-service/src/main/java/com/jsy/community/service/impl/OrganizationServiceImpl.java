@@ -74,7 +74,6 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 			parent.setChildren(childList);
 		}
 		
-		
 		CommunityEntity communityEntity = communityMapper.selectById(communityId);
 		TreeCommunityVO treeCommunityVO = new TreeCommunityVO();
 		treeCommunityVO.setCommunityId(communityId).setCommunityName(communityEntity.getName()).setOrganizationVOList(parents);
@@ -240,7 +239,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 	}
 	
 	
-	/*
+	/**
 	 * 排序,根据sort排序
 	 */
 	public Comparator<OrganizationVO> order() {

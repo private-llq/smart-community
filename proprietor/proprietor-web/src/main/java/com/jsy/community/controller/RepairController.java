@@ -51,7 +51,7 @@ public class RepairController {
 	private StringRedisTemplate redisTemplate;
 	
 	/**
-	 * null 全部 0 待处理  1 处理中  2 已处理  3 已驳回
+	 * null 全部   0 待处理    1 处理中   2 已处理    3 已驳回
 	 **/
 	@ApiOperation("房屋报修查询")
 	@GetMapping("/getRepair")
@@ -77,8 +77,7 @@ public class RepairController {
 		return CommonResult.ok(repairVO);
 	}
 	
-	// TODO: 2021/3/19 已弃用
-	@ApiOperation("报修所属类别查询")
+	@ApiOperation("报修事项查询")
 	@GetMapping("/getRepairType")
 	@Login(allowAnonymous = true)
 	public CommonResult getRepairType(@ApiParam(value = "报修类别") @RequestParam int repairType) {
@@ -97,7 +96,7 @@ public class RepairController {
 		StringBuilder filePath = new StringBuilder();
 		for (String s : filePaths) {
 			if (!StringUtils.isEmpty(s)) {
-				redisTemplate.opsForSet().add("repair_img_part", s); // TODO 前端要注意调整 repairImg
+				redisTemplate.opsForSet().add("repair_img_part", s);
 				filePath.append(s);
 				filePath.append(";");
 			}
@@ -130,7 +129,6 @@ public class RepairController {
 		String[] filePaths = (String[]) commonResult.getData();
 		StringBuilder filePath = new StringBuilder();
 		for (String s : filePaths) {
-			// TODO 前端要注意调整 repairImg
 			if (!StringUtils.isEmpty(s)) {
 				redisTemplate.opsForSet().add(UploadRedisConst.REPAIR_COMMENT_IMG_PART, s);
 				filePath.append(s);

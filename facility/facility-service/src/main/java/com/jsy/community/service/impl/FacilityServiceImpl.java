@@ -28,9 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * <p>
@@ -132,13 +131,18 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		// 根据设备id查询他的唯一登录句柄
 		int loginHandle = facilityMapper.getLoginHandle(id);
 		
-		if (alarmHandle != -1) {
-			// 撤防
-			FacilityUtils.cancel(alarmHandle);
+		// 撤防
+		Map<String,Object> cancelResultMap = FacilityUtils.cancel(alarmHandle);
+		if(!(Boolean)cancelResultMap.get("result")){
+			log.error("摄像头：" + id +" 撤防失败，" + "原因：" +cancelResultMap.get("reason"));
+			throw new FacilityException("摄像头撤防失败，删除失败");
 		}
-		if (loginHandle != -1) {
-			// 注销设备
-			FacilityUtils.logOut(loginHandle);
+		
+		// 注销设备
+		Map<String,Object> logOutResultMap = FacilityUtils.logOut(loginHandle);
+		if(!(Boolean)logOutResultMap.get("result")){
+			log.error("摄像头：" + id +" 注销失败，" + "原因：" +logOutResultMap.get("reason"));
+			throw new FacilityException("摄像头注销失败，删除失败");
 		}
 		
 		facilityMapper.deleteById(id);
@@ -173,10 +177,18 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			
 			// 1. 将原来的设备撤防
 			int alarmHandle = facilityMapper.getAlarmHandle(facilityEntity.getId());
-			FacilityUtils.cancel(alarmHandle);
+			Map<String,Object> cancelResultMap = FacilityUtils.cancel(alarmHandle);
+			if(!(Boolean)cancelResultMap.get("result")){
+				log.error("摄像头：" + facilityEntity.getId() +" 撤防失败，" + "原因：" +cancelResultMap.get("reason"));
+				throw new FacilityException("摄像头撤防失败，修改失败");
+			}
 			// 2. 将原来的设备注销
 			int loginHandle = facilityMapper.getLoginHandle(facilityEntity.getId());
-			FacilityUtils.logOut(loginHandle);
+			Map<String,Object> logOutResultMap = FacilityUtils.logOut(loginHandle);
+			if(!(Boolean)logOutResultMap.get("result")){
+				log.error("摄像头：" + facilityEntity.getId() +" 注销失败，" + "原因：" +logOutResultMap.get("reason"));
+				throw new FacilityException("摄像头注销失败，修改失败");
+			}
 			// 3. 登录设备
 			Map<String, Integer> login = FacilityUtils.login(ip, port, username, password, -1);
 			Integer status = login.get("status");
@@ -197,6 +209,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Override
 	public Map<String, Integer> getCount(Long typeId) {
 		// 根据设备分类id查询其下设备的id集合
+		//TODO 查询条件加社区id
 		List<Long> facilityIds = facilityMapper.getFacilityIdByTypeId(typeId);
 		
 		int onlineCount = 0;
@@ -217,26 +230,57 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 	
 	@Override
-	@Transactional(rollbackFor = Exception.class)
+//	@Transactional(rollbackFor = Exception.class)
 	public void flushFacility(Integer page, Integer size, String facilityTypeId) {
 		//1. 获取当前页的数据
 		Page<FacilityEntity> entityPage = new Page<>(page, size);
 		
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("facility_type_id", facilityTypeId);
+		//TODO 查询条件带小区id
 		Page<FacilityEntity> facilityEntityPage = facilityMapper.selectPage(entityPage, wrapper);
 		List<FacilityEntity> list = facilityEntityPage.getRecords();
 		
+//		for (FacilityEntity facilityEntity : list) {
+//			// 获取设备的唯一用户句柄
+//			Long id = facilityEntity.getId();
+//			int handle = facilityMapper.selectFacilityHandle(id);
+//
+//			// 更新该句柄的设备在线状态
+//			int online = FacilityUtils.isOnline(handle);
+//			facilityMapper.updateStatusByFacilityId(online, facilityEntity.getId());
+//		}
+		
+		//组装批量入参id集合
+		List<Long> idList = new ArrayList<>();
 		for (FacilityEntity facilityEntity : list) {
-			// 获取设备的唯一用户句柄
-			Long id = facilityEntity.getId();
-			int handle = facilityMapper.selectFacilityHandle(id);
-			
-			// 更新该句柄的设备在线状态
-			int online = FacilityUtils.isOnline(handle);
-			facilityMapper.updateStatusByFacilityId(online, facilityEntity.getId());
+			idList.add(facilityEntity.getId());
+		}
+		//批量查询，得到Map<设备ID,Map<设备ID,句柄>>
+		Map<Long, Map<Long, Integer>> idAndHandelMap = facilityMapper.selectFacilityHandleBatch(idList);
+		
+		//组装Map<设备ID,在线状态>
+		Map<Long,Integer> idAndStatusMap = new HashMap<>();
+		for(Long facilityId : idList){
+			Map<Long, Integer> facilityMap = idAndHandelMap.get(BigInteger.valueOf(facilityId));
+			Integer handle = facilityMap.get("facility_handle");
+			//调用SDK，查询最新在线状态单个结果
+			int status = FacilityUtils.isOnline(handle);
+			idAndStatusMap.put(facilityId,status);
 		}
 		
+		//批量更新在线状态
+		facilityMapper.updateStatusByFacilityIdBatch(idAndStatusMap);
+		
+		//TODO 下面代码留着 供参考
+		//Set<设备ID>
+//		Set<Long> ids = idAndHandelMap.keySet();
+		//Map<设备ID，句柄>转list
+//		List<Map<Long, Integer>> list2 = new ArrayList<>(idAndHandelMap.values());
+		//批量更新在线状态
+//		facilityMapper.updateStatusByFacilityIdBatch(list2,ids);
+
+	
 	}
 	
 	@Override

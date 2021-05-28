@@ -80,6 +80,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- springboot main方法入口 -->
+                    <includeSystemScope>true</includeSystemScope>
                     <mainClass>com.jsy.community.PaySystemServiceApp</mainClass>
                 </configuration>
                 <executions>

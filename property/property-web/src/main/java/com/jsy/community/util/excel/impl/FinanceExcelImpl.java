@@ -3,11 +3,10 @@ package com.jsy.community.util.excel.impl;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.util.FinanceExcelHandler;
-import com.jsy.community.util.ProprietorExcelCommander;
+import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.vo.StatementOrderVO;
 import com.jsy.community.vo.StatementVO;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 
@@ -56,9 +55,9 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
         String[] titleField = STATEMENT_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
         //5.创建excel 字段列  (表示具体的数据列字段)
-        createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
         //每行excel数据
         XSSFRow row;
         //每列数据
@@ -157,9 +156,9 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
         String[] titleField = STATEMENT_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
         //5.创建excel 字段列  (表示具体的数据列字段)
-        createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
         //每行excel数据
         XSSFRow row;
         //每列数据
@@ -188,7 +187,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         cell.setCellValue(statementVO.getStatementNum());
                         createStatementSubOrderExcel(workbook, statementVO.getOrderVOList(), statementSheetName);
                         cell.setCellFormula("HYPERLINK(\"#" + statementSheetName +"!A1\",\"" + statementSheetName + "\")");
-                        XSSFCellStyle fieldCellStyle = hyperlinkStyle(workbook);
+                        XSSFCellStyle fieldCellStyle = ExcelUtil.hyperlinkStyle(workbook);
                         // 设置单元格字体颜色
                         cell.setCellStyle(fieldCellStyle);
                         break;
@@ -263,9 +262,9 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
         String[] titleField = MASTER_ORDER_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
         //5.创建excel 字段列  (表示具体的数据列字段)
-        createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
         //每行excel数据
         XSSFRow row;
         //每列数据
@@ -400,9 +399,9 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
         String[] titleField = RECEIPT_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
         //5.创建excel 字段列  (表示具体的数据列字段)
-        createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
         //每行excel数据
         XSSFRow row;
         //每列数据
@@ -470,9 +469,9 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
         String[] titleField = RECEIPT_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        ProprietorExcelCommander.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
         //5.创建excel 字段列  (表示具体的数据列字段)
-        createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
         //每行excel数据
         XSSFRow row;
         //每列数据
@@ -495,7 +494,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         cell.setCellValue(entity.getReceiptNum());
                         createReceiptSubOrderExcel(workbook, entity.getOrderList(), orderSheetName);
                         cell.setCellFormula("HYPERLINK(\"#" + orderSheetName +"!A1\",\"" + orderSheetName + "\")");
-                        XSSFCellStyle fieldCellStyle = hyperlinkStyle(workbook);
+                        XSSFCellStyle fieldCellStyle = ExcelUtil.hyperlinkStyle(workbook);
                         // 设置单元格字体颜色
                         cell.setCellStyle(fieldCellStyle);
                         break;
@@ -543,9 +542,9 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
         String[] titleField = RECEIPT_ORDER_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        createExcelTitle(workbook, sheet, titleName + "账单表", 530, "宋体", 20, titleField.length, "收款单表");
+        ExcelUtil.createLinkExcelTitle(workbook, sheet, titleName + "账单表", 530, "宋体", 20, titleField.length, "收款单表");
         //5.创建excel 字段列  (表示具体的数据列字段)
-        createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
         //每行excel数据
         XSSFRow row;
         //每列数据
@@ -598,9 +597,9 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
         String[] titleField = ORDER_TITLE_FIELD;
         //4.创建excel标题行头(最大的那个标题)
-        createExcelTitle(workbook, sheet, titleName + "账单表", 530, "宋体", 20, titleField.length, "结算单表");
+        ExcelUtil.createLinkExcelTitle(workbook, sheet, titleName + "账单表", 530, "宋体", 20, titleField.length, "结算单表");
         //5.创建excel 字段列  (表示具体的数据列字段)
-        createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
         //每行excel数据
         XSSFRow row;
         //每列数据
@@ -661,125 +660,5 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                 }
             }
         }
-    }
-
-    /**
-     * 【创建excel列字段头】
-     * @param workbook      工作簿
-     * @param sheet         工作表
-     * @param fieldData     列字段数据
-     */
-    public static void createExcelField(Workbook workbook, XSSFSheet sheet, String[] fieldData){
-        //创建 工作表 字段标题 第二行
-        XSSFRow row2 = sheet.createRow(1);
-        //获取字体样式
-        XSSFCellStyle cellStyle = provideBold(workbook);
-        //水平居中
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        //垂直居中
-        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        //设置边框
-        cellStyle.setBorderTop(BorderStyle.THIN);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        row2.setHeight((short)380);
-        //创建字段标题头
-        for (int i = 0; i < fieldData.length; i++) {
-            XSSFCell cell1 = row2.createCell(i);
-            cell1.setCellValue(fieldData[i]);
-            cell1.setCellStyle(cellStyle);
-        }
-    }
-
-    /**
-     * 【提供粗体字体样式】
-     * @param workbook      工作簿
-     * @return              返回设置好的样式
-     */
-    public static XSSFCellStyle provideBold(Workbook workbook){
-        XSSFCellStyle fieldCellStyle = (XSSFCellStyle) workbook.createCellStyle();
-        //设置粗体
-        Font fieldFont = workbook.createFont();
-        fieldFont.setBold(true);
-        //设置字体大小
-        fieldFont.setFontHeightInPoints((short)14);
-        //设置字体样式
-        fieldFont.setFontName("宋体");
-        //设置字体高度
-        fieldFont.setFontHeight((short)200);
-        fieldCellStyle.setFont(fieldFont);
-        return fieldCellStyle;
-    }
-
-    /**
-     *@Author: Pipi
-     *@Description: 超链接样式
-     *@Param: workbook:
-     *@Return: org.apache.poi.xssf.usermodel.XSSFCellStyle
-     *@Date: 2021/4/25 14:31
-     **/
-    public XSSFCellStyle hyperlinkStyle(Workbook workbook) {
-        XSSFCellStyle fieldCellStyle = (XSSFCellStyle) workbook.createCellStyle();
-        Font font = null;
-        //创建一个字体对象
-        font = workbook.createFont();
-        // 创建颜色对象,设置颜色
-        byte[] rgb = new byte[]{(byte) 0, (byte) 0, (byte) 255};
-        DefaultIndexedColorMap colorMap = new DefaultIndexedColorMap();
-        XSSFColor xssfColor = new XSSFColor(rgb, new DefaultIndexedColorMap());
-        // 设置颜色序号
-        xssfColor.setIndexed(4);
-        // 给字体设置颜色
-        font.setColor(xssfColor.getIndexed());
-        // 设置下划线
-        font.setUnderline(Font.U_SINGLE);
-        fieldCellStyle.setFont(font);
-        return fieldCellStyle;
-    }
-
-    /**
-     * 【创建excel标题头-第一行】
-     * @Description: 附加给表头增加超链接
-     * @param workbook          工作簿
-     * @param sheet             工作表
-     * @param excelTitle        excel标题名称
-     * @param titleHeight       excel标题高度
-     * @param font              excel标题字体
-     * @param fontSize          excel标题字体大小
-     * @param mergeCellLength   excel合并单元格数量
-     */
-    public static void createExcelTitle(Workbook workbook, XSSFSheet sheet, String excelTitle, int titleHeight, String font, int fontSize, int mergeCellLength, String relationTitleName){
-        //创建表头行
-        XSSFRow row = sheet.createRow(0);
-        row.setHeight((short) (titleHeight));
-        //创建表头列
-        XSSFCell cell = row.createCell(0);
-        //设置表头名称
-        cell.setCellValue(excelTitle);
-        cell.setCellFormula("HYPERLINK(\"#" + relationTitleName + "!A1\",\"" + relationTitleName + "\")");
-        //创建一个单元格样式
-        XSSFCellStyle workBookCellStyle = (XSSFCellStyle) workbook.createCellStyle();
-        //创建单元格字体
-        Font workBookFont = workbook.createFont();
-        //设置粗体
-        workBookFont.setBold(true);
-        //设置表头字体样式
-        workBookFont.setFontHeightInPoints((short) fontSize);
-        workBookFont.setFontName(font);
-        workBookCellStyle.setFont(workBookFont);
-        // 创建颜色对象,设置颜色
-        byte[] rgb = new byte[]{(byte) 0, (byte) 0, (byte) 255};
-        DefaultIndexedColorMap colorMap = new DefaultIndexedColorMap();
-        XSSFColor xssfColor = new XSSFColor(rgb, new DefaultIndexedColorMap());
-        // 设置颜色序号
-        xssfColor.setIndexed(4);
-        workBookFont.setColor(xssfColor.getIndexed());
-        //设置居中显示
-        workBookCellStyle.setAlignment(HorizontalAlignment.CENTER);
-        cell.setCellStyle(workBookCellStyle);
-        //合并单元格
-        CellRangeAddress region = new CellRangeAddress(0, 0, 0, mergeCellLength - 1);
-        sheet.addMergedRegion(region);
     }
 }

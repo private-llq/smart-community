@@ -45,6 +45,24 @@ public interface PropertyEnum {
 				HOUSE_TYPE_MAP.put(houseTypeEnum.getCode(), houseTypeEnum.getName());
 			}
 		}
+
+		public static Integer getCode(String name) {
+			for (HouseTypeEnum value : HouseTypeEnum.values()) {
+				if (value.getName().equals(name)) {
+					return value.getCode();
+				}
+			}
+			return null;
+		}
+
+		public static String getName(Integer code) {
+			for (HouseTypeEnum value : HouseTypeEnum.values()) {
+				if (value.getCode().equals(code)) {
+					return value.getName();
+				}
+			}
+			return null;
+		}
 	}
 	
 	/**
@@ -88,6 +106,24 @@ public interface PropertyEnum {
 				PROPERTY_TYPE_MAP.put(propertyTypeEnum.getCode(), propertyTypeEnum.getName());
 			}
 		}
+
+		public static Integer getCode(String name) {
+			for (PropertyTypeEnum value : PropertyTypeEnum.values()) {
+				if (value.getName().equals(name)) {
+					return value.getCode();
+				}
+			}
+			return null;
+		}
+
+		public static String getName(Integer code) {
+			for (PropertyTypeEnum value : PropertyTypeEnum.values()) {
+				if (value.getCode().equals(code)) {
+					return value.getName();
+				}
+			}
+			return null;
+		}
 	}
 	
 	/**
@@ -126,6 +162,24 @@ public interface PropertyEnum {
 				map.put("name", decorationEnum.getName());
 				DECORATION_MAP.put(decorationEnum.getCode(), decorationEnum.getName());
 			}
+		}
+
+		public static Integer getCode(String name) {
+			for (DecorationEnum value : DecorationEnum.values()) {
+				if (value.getName().equals(name)) {
+					return value.getCode();
+				}
+			}
+			return null;
+		}
+
+		public static String getName(Integer code) {
+			for (DecorationEnum value : DecorationEnum.values()) {
+				if (value.getCode().equals(code)) {
+					return value.getName();
+				}
+			}
+			return null;
 		}
 	}
 	

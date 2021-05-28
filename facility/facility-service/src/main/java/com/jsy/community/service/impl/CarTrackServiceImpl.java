@@ -8,6 +8,7 @@ import com.jsy.community.entity.CarTrackEntity;
 import com.jsy.community.mapper.CarTrackMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CarTrackQO;
+import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
@@ -46,17 +47,16 @@ public class CarTrackServiceImpl extends ServiceImpl<CarTrackMapper, CarTrackEnt
 	
 	@Override
 	public PageInfo<CarTrackEntity> listCarTrack(BaseQO<CarTrackQO> qo) {
-		Page<CarTrackEntity> page = new Page<>(qo.getPage(), qo.getSize());
+		Page<CarTrackEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,qo);
 		List<CarTrackEntity> carTrackEntityList = carTrackMapper.listCarTrack(qo,page);
 		for (CarTrackEntity carTrackEntity : carTrackEntityList) {
 			String carNumber = carTrackEntity.getCarNumber();
 			
 			// TODO: 2021/4/27  这是为了解决查询出来有乱码的问题[会在车牌后面多出几个空格]   可能是因为编码问题[解确认]  暂时用这种办法来解决
-			if (!carNumber.contains(" ")) {
-				// 车牌
-				String trimCarNumber = carNumber.trim();
-				carTrackEntity.setCarNumber(trimCarNumber);
-			}
+			// 车牌
+			String trimCarNumber = carNumber.trim();
+			carTrackEntity.setCarNumber(trimCarNumber);
 		}
 		PageInfo<CarTrackEntity> info = new PageInfo<>();
 		BeanUtils.copyProperties(page,info);

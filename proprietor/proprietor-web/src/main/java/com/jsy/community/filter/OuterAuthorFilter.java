@@ -39,7 +39,8 @@ public class OuterAuthorFilter implements Filter{
 	
 	//要校验IP的接口路径前缀
 	private static final Set<String> NEED_IP_AUTH_PREFIX_PATHS = Collections.unmodifiableSet(new HashSet<>(
-			Arrays.asList("/api/v1/proprietor/out")));
+//			Arrays.asList("/api/v1/proprietor/out")));
+			Arrays.asList("/xxx")));
 	
 	//允许IP前缀
 	private static final Set<String> ALLOWED_PREFIX_IP = Collections.unmodifiableSet(new HashSet<>(

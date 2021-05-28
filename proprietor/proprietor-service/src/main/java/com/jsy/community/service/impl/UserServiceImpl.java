@@ -253,7 +253,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
-//        boolean signUserResult = signatureService.insertUser(signatureUserDTO);
+        boolean signUserResult = signatureService.insertUser(signatureUserDTO);
 //        if(!signUserResult){
 //            log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
 //            throw new ProprietorException(JSYError.INTERNAL);
@@ -285,6 +285,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 break;
             case Const.ThirdPlatformConsts.QQ :
                 break;
+            default:
         }
         if(StringUtils.isEmpty(thirdUid)){
             throw new ProprietorException("三方平台uid获取失败 三方登录失败");
@@ -476,12 +477,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 List<CarQO> any = cars.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
                 //从更新车辆的集合中 移除 需要 新增的数据
                 cars.removeAll(any);
-                //批量新增车辆
-                carService.addProprietorCarForList(any, qo.getUid());
                 //循环添加id
                 any.forEach(x ->{
                     x.setId(SnowFlake.nextId());
                 });
+                //批量新增车辆
+                carService.addProprietorCarForList(any, qo.getUid());
                 //循环保存车辆到es
                 any.forEach(x ->{
                     rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo,x));
@@ -606,7 +607,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return true;
     }
     
-    //向小区设备下发人脸数据
+    /**
+     * 向小区设备下发人脸数据
+     */
     private void setFaceUrlToCommunityMachine(UserEntity userEntity, Set<Long> communityIds){
         //查询用户实名信息
         if(userEntity.getIsRealAuth() == null || userEntity.getIsRealAuth() != 2){
@@ -614,7 +617,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             return;
         }
         if(StringUtils.isEmpty(userEntity.getFaceUrl())){
-            throw new ProprietorException("用户已实人认证，人脸图片不存在！"); //数据异常，停止房屋相关操作
+            //数据异常，停止房屋相关操作
+            throw new ProprietorException("用户已实人认证，人脸图片不存在！");
         }
         JSONObject pushMap = new JSONObject();
         pushMap.put("op","editPerson");
@@ -925,7 +929,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         signatureUserDTO.setIdCardName(userEntity.getRealName());
         signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
         signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
-//        if(!signatureService.realNameUpdateUser(signatureUserDTO)){
+        boolean b = signatureService.realNameUpdateUser(signatureUserDTO);
+//        if(!b){
 //            log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
 //                throw new ProprietorException(JSYError.INTERNAL);
 //        }

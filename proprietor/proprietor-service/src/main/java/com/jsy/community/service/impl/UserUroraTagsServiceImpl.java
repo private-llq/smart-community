@@ -78,6 +78,7 @@ public class UserUroraTagsServiceImpl implements IUserUroraTagsService {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/14
 	**/
+	@Override
 	public boolean deleteTags(UserUroraTagsEntity paramsEntity){
 		UserUroraTagsEntity dataEntity = userUroraTagsMapper.selectOne(new QueryWrapper<UserUroraTagsEntity>()
 			.select("community_tags").eq("uid", paramsEntity.getUid()));

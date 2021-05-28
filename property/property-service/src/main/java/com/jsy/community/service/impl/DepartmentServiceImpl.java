@@ -62,7 +62,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		
 		DepartmentEntity entity = new DepartmentEntity();
 		BeanUtils.copyProperties(departmentEntity, entity);
-		
+
 		// 将电话集合转换成一个字符串(去掉前后的 [ 和 ] )
 		List<String> phones = departmentEntity.getPhone();
 		if (phones != null && phones.size() > 0) {
@@ -154,14 +154,14 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		queryWrapper.eq("department_id", departmentId).eq("community_id", communityId);
 		List<DepartmentStaffEntity> staffEntities = departmentStaffMapper.selectList(queryWrapper);
 		if (!CollectionUtils.isEmpty(staffEntities)) {
-			throw new PropertyException("\"" + entity.getDepartment() + "\"" + "请先删除部门下的员工");
+			throw new PropertyException("\"" + entity.getDepartment() + "\""+"已有属于" + entity.getDepartment()+"的员工，不可删除");
 		}
 		departmentMapper.deleteById(departmentId);
 	}
 	
 	@Override
 	public TreeCommunityVO listDepartment(Long communityId) {
-		//1. 查询所有部门
+		//1. 根据社区id查询所有部门
 		QueryWrapper<DepartmentEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("community_id", communityId);
 		List<DepartmentEntity> allDepartment = departmentMapper.selectList(wrapper);
@@ -178,7 +178,6 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 		for (DepartmentVO entity : allDepartmentVO) {
 			// pid为0就是根节点
 			if (entity.getPid() == 0) {
-				
 				// 获取并设置该节点(父)的人员数量
 				Long departmentId = entity.getId();
 				QueryWrapper<DepartmentStaffEntity> staffQuery = new QueryWrapper<>();
@@ -277,7 +276,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	}
 	
 	
-	/*
+	/**
 	 * 排序,根据sort排序
 	 */
 	public Comparator<DepartmentVO> order() {

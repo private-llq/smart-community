@@ -69,7 +69,11 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
             qoQuery.setFeedbackTimeOut(qoQuery.getFeedbackTimeOut().plusDays(1));
         }
         qoQuery.setCommunityId(userInfo.getCommunityId());
-        List<ComplainVO> complainVOS = complainsMapper.listAll(baseQO.getPage(), baseQO.getSize(), qoQuery);
+        Long page=(baseQO.getPage()-1)*baseQO.getSize();
+        if (page==0){
+            page++;
+        }
+        List<ComplainVO> complainVOS = complainsMapper.listAll(page, baseQO.getSize(), qoQuery);
         Long totel = complainsMapper.findTotel(baseQO.getQuery());
         Map<String, Object> map = new HashMap<>();
         map.put("totel",totel);

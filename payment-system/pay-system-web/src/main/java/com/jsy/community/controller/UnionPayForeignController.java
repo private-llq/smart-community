@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.UnionPayService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYException;
@@ -41,7 +40,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult<org.apache.poi.ss.formula.functions.T>
      *@Date: 2021/4/8 10:38
      **/
-    @Login
     @PostMapping("/openAccountForC")
     @ApiOperation("C端用户开户")
     public CommonResult openAccountForC(@RequestBody OpenAccountForCQO openAccountForCQO) {
@@ -64,7 +62,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult<org.apache.poi.ss.formula.functions.T>
      *@Date: 2021/4/10 13:56
      **/
-    @Login
     @GetMapping("/getPlugRandomKey")
     @ApiOperation("获取控件随机因子")
     public CommonResult getPlugRandomKey(@RequestParam Integer num) {
@@ -82,7 +79,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/12 15:09
      **/
-    @Login
     @PostMapping("/bindBankCard")
     @ApiOperation("钱包银行卡操作,账户绑定/解绑/设置默认银行卡")
     public CommonResult bindBankCard(@RequestBody BindBankCardQO bindBankCardQO) {
@@ -117,7 +113,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/12 17:34
      **/
-    @Login
     @PostMapping("/sendSmsAuthCode")
     @ApiOperation("银联发送短信验证码")
     public CommonResult sendSmsAuthCode(@RequestBody SendSmsAuthCodeQO sendSmsAuthCodeQO) {
@@ -133,7 +128,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 9:35
      **/
-    @Login
     @PostMapping("/modifyUserMobile")
     @ApiOperation("修改用户手机号")
     public CommonResult modifyUserMobile(@RequestBody ModifyUserMobileQO modifyUserMobileQO) {
@@ -149,7 +143,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 10:58
      **/
-    @Login
     @PostMapping("/queryAcctInfo")
     @ApiOperation("获取钱包账户信息")
     public CommonResult queryAcctInfo(@RequestBody WalletIdQO walletIdQO) {
@@ -165,7 +158,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 17:34
      **/
-    @Login
     @PostMapping("/queryBindBankCardList")
     @ApiOperation("获取钱包账户绑定的银行卡列表")
     public CommonResult queryBindBankCardList(@RequestBody WalletIdQO walletIdQO) {
@@ -181,7 +173,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/15 11:30
      **/
-    @Login
     @PostMapping("/modifyPwd")
     @ApiOperation("修改银联支付密码")
     public CommonResult modifyPwd(@RequestBody ModifyPwdQO modifyPwdQO) {
@@ -197,7 +188,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/26 16:33
      **/
-    @Login
     @PostMapping("/generateOrder")
     @ApiOperation("银联消费类下单")
     public CommonResult generateOrder(@RequestBody GenerateOrderQO generateOrderQO) {
@@ -213,7 +203,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/28 17:45
      **/
-    @Login
     @PostMapping("/queryBalance")
     @ApiOperation("查询钱包余额")
     public CommonResult queryBalance(@RequestBody BalanceQO balanceQO) {
@@ -240,7 +229,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/7 17:38
      **/
-    @Login
     @PostMapping("/getCredential")
     @ApiOperation("银联支付获取凭据接口")
     public CommonResult getCredential(@RequestBody CredentialQO credentialsQO) {
@@ -256,7 +244,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/10 9:08
      **/
-    @Login
     @PostMapping("/queryWalletByBizLicNo")
     @ApiOperation("查询开B端开户情况")
     public CommonResult queryWalletByBizLicNo(@RequestBody BizLicNoQO bizLicNoQO) {
@@ -272,7 +259,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/10 10:19
      **/
-    @Login
     @PostMapping("/withdrawApply")
     @ApiOperation("提现申请接口")
     public CommonResult withdrawApply(@RequestBody WithdrawQO withdrawQO) {
@@ -288,7 +274,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/11 17:47
      **/
-    @Login
     @PostMapping("/resetBtypeAcctPwd")
     @ApiOperation("B端钱包重置支付密码")
     public CommonResult resetBtypeAcctPwd(@RequestBody ResetBtypeAcctPwdQO resetBtypeAcctPwdQO) {
@@ -304,7 +289,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 9:59
      **/
-    @Login
     @PostMapping("/queryTransList")
     @ApiOperation("查询交易明细")
     public CommonResult queryTransList(@RequestBody QueryTransListQO queryTransListQO) {
@@ -340,7 +324,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 11:22
      **/
-    @Login
     @PostMapping("/queryBillInfo")
     @ApiOperation("账单查询")
     public CommonResult queryBillInfo(@RequestBody QueryBillInfoQO queryBillInfoQO) {
@@ -375,7 +358,6 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 17:13
      **/
-    @Login
     @PostMapping("/activeAcct")
     @ApiOperation("激活账户")
     public CommonResult activeAcct(@RequestBody ActiveAcctQO activeAcctQO) {

@@ -78,6 +78,60 @@
 		where id = #{houseEntity.pid}
 	</insert>
 
+	<!-- 批量新增房屋数据 -->
+	<insert id="saveHouseBatch">
+		insert into t_house (
+			id,
+			number,
+			code,
+			community_id,
+			has_elevator,
+			total_floor,
+			type,
+			building,
+			unit,
+			floor,
+			door,
+			pid,
+			build_area,
+			house_type,
+			property_type,
+			decoration,
+			house_type_code,
+			comment,
+			deleted,
+			create_by,
+			create_time,
+			update_by,
+			update_time
+		)
+		values
+		<foreach collection="list" separator="," item="houseEntity">
+			(#{houseEntity.id},
+			#{houseEntity.number},
+			#{houseEntity.code},
+			#{houseEntity.communityId},
+			#{houseEntity.hasElevator},
+			#{houseEntity.totalFloor},
+			#{houseEntity.type},
+			#{houseEntity.building},
+			#{houseEntity.unit},
+			#{houseEntity.floor},
+			#{houseEntity.door},
+			#{houseEntity.pid},
+			#{houseEntity.buildArea},
+			#{houseEntity.houseType},
+			#{houseEntity.propertyType},
+			#{houseEntity.decoration},
+			#{houseEntity.houseTypeCode},
+			#{houseEntity.comment},
+			#{houseEntity.deleted},
+			#{houseEntity.createBy},
+			#{houseEntity.createTime},
+			#{houseEntity.updateBy},
+			#{houseEntity.updateTime})
+		</foreach>
+	</insert>
 	<!-- 批量更新次级节点冗余的父级名称 -->
 	<update id="updateSub">
 		update t_house
@@ -152,5 +206,29 @@
         on tuh.house_id=th.id
         where th.community_id=#{id} and tuh.check_status=1
     </select>
+
+	<!-- 通过社区ID查询出所有楼栋和单元 -->
+	<select id="getBuildingAndUnitList" resultType="com.jsy.community.entity.HouseEntity">
+		select
+			*
+		from t_house
+		<where>
+			type in (1,2)
+			and community_id = #{communityId}
+			and deleted = 0
+		</where>
+	</select>
+
+	<!-- 查询小区下所有的房间 -->
+	<select id="getAllHouse" resultType="com.jsy.community.entity.HouseEntity">
+		select
+		*
+		from t_house
+		<where>
+			type = 4
+			and community_id = #{communityId}
+			and deleted = 0
+		</where>
+	</select>
 
 </mapper>

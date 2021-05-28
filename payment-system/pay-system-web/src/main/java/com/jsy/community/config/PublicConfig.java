@@ -93,17 +93,17 @@ public class PublicConfig {
         if (response!=null){
             response.close();
         }
-        switch (url) {
-            case "/v3/pay/transactions/app"://返回APP支付所需的参数
-                return JSONObject.fromObject(body).getString("prepay_id");
-            case "/v3/pay/transactions/jsapi"://返回JSAPI支付所需的参数
-                return JSONObject.fromObject(body).getString("prepay_id");
-            case "/v3/pay/transactions/native"://返回native的请求地址
-                return JSONObject.fromObject(body).getString("code_url");
-            case "/v3/pay/transactions/h5"://返回h5支付的链接
-                return JSONObject.fromObject(body).getString("h5_url");
-        }
-        return null;
+//        switch (url) {
+//            case "/v3/pay/transactions/app"://返回APP支付所需的参数
+//                return JSONObject.fromObject(body).getString("prepay_id");
+//            case "/v3/pay/transactions/jsapi"://返回JSAPI支付所需的参数
+//                return JSONObject.fromObject(body).getString("prepay_id");
+//            case "/v3/pay/transactions/native"://返回native的请求地址
+//                return JSONObject.fromObject(body).getString("code_url");
+//            case "/v3/pay/transactions/h5"://返回h5支付的链接
+//                return JSONObject.fromObject(body).getString("h5_url");
+//        }
+        return JSONObject.fromObject(body).getString("prepay_id");
     }
 
 

@@ -6,6 +6,7 @@ import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.ProprietorExcelCommander;
+import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.vo.property.ProprietorVO;
 import lombok.NonNull;
@@ -42,9 +43,9 @@ public class ProprietorInfoProvider {
         //创建 一个工作表
         XSSFSheet sheet = (XSSFSheet) workbook.createSheet(sheetName);
         //创建excel标题行头
-        ProprietorExcelCommander.createExcelTitle(workbook, sheet, ProprietorExcelCommander.PROPRIETOR_TITLE_NAME, 380, "宋体", 15, titleField.length);
+        ExcelUtil.createExcelTitle(workbook, sheet, ProprietorExcelCommander.PROPRIETOR_TITLE_NAME, 380, "宋体", 15, titleField.length);
         //创建excel列字段
-        ProprietorExcelCommander.createExcelField(workbook, sheet, titleField);
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
 
         return workbook;
     }
@@ -120,7 +121,7 @@ public class ProprietorInfoProvider {
             //excel 字段列
             String[] titleField = Arrays.copyOf(ProprietorExcelCommander.PROPRIETOR_TITLE_FIELD, ProprietorExcelCommander.PROPRIETOR_TITLE_FIELD.length - 1);
             //效验excel标题行
-            ProprietorExcelCommander.validExcelField(sheetAt, titleField);
+            ExcelUtil.validExcelField(sheetAt, titleField);
             //创建一个 Set集合 用于验证房屋编号是否重复输入
             Set<String> houseNumberSet = new HashSet<>(sheetAt.getLastRowNum());
             //每一列对象 值
@@ -141,7 +142,7 @@ public class ProprietorInfoProvider {
                 userEntity = new ProprietorEntity();
                 for (int z = 0; z < titleField.length; z++) {
                     cell = dataRow.getCell(z);
-                    cellValue = ProprietorExcelCommander.getCellValForType(cell).toString();
+                    cellValue = ExcelUtil.getCellValForType(cell).toString();
                     //列字段效验
                     switch (z) {
                         // 1列 验证是否 是一个 正确的中国姓名
@@ -278,7 +279,7 @@ public class ProprietorInfoProvider {
         }
         for (int cellIndex = 0; cellIndex < dataRow.getLastCellNum(); cellIndex++) {
             cell = dataRow.getCell(cellIndex);
-            stringCellValue = String.valueOf(ProprietorExcelCommander.getCellValForType(cell));
+            stringCellValue = String.valueOf(ExcelUtil.getCellValForType(cell));
             switch (cellIndex) {
                 case 0:
                     vo.setRealName(stringCellValue);

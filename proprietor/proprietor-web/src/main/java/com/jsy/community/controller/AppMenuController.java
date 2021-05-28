@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * <p>
- * 菜单 前端控制器
+ * APP首页菜单控制器
  * </p>
  *
  * @author lihao
@@ -40,8 +40,7 @@ public class AppMenuController {
 	
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu")
-	public CommonResult listIndexMenu(@ApiParam(value = "社区id")
-	                                  @RequestParam(value = "communityId", defaultValue = "1", required = false) Long communityId) {
+	public CommonResult listIndexMenu(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.listIndexMenu(communityId);
 		return CommonResult.ok(list);
 		
@@ -49,8 +48,7 @@ public class AppMenuController {
 	
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu")
-	public CommonResult moreListMenu(@ApiParam(value = "社区id")
-	                                 @RequestParam(value = "communityId", defaultValue = "1", required = false) Long communityId) {
+	public CommonResult moreListMenu(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.moreIndexMenu(communityId);
 		return CommonResult.ok(list);
 	}

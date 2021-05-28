@@ -120,7 +120,7 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
     @Override
 	public Map<String,PropertyFinanceReceiptEntity> queryByReceiptNumBatch(Collection<String> nums){
     	if(CollectionUtils.isEmpty(nums) || (nums.size() == 1 && nums.contains(null))){
-    		return new HashMap<>();
+    		return new HashMap<>(1);
 	    }
     	return propertyFinanceReceiptMapper.queryByReceiptNumBatch(nums);
 	}
@@ -185,9 +185,9 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
 			List<PropertyFinanceOrderEntity> orderTotalList = propertyFinanceOrderService.queryByReceiptNums(receiptNums,orderQuery);
 			for (PropertyFinanceReceiptEntity entity : receiptEntities) {
 				if (!CollectionUtils.isEmpty(orderTotalList)) {
-					List<PropertyFinanceOrderEntity> orderList = new ArrayList();
+					List<PropertyFinanceOrderEntity> orderList = new ArrayList<>();
 					for (PropertyFinanceOrderEntity orderEntity : orderTotalList) {
-						if (orderEntity.getReceiptNum().equals("8888")) {
+						if ("8888".equals(orderEntity.getReceiptNum())) {
 							System.out.println(1);
 						}
 						if(orderEntity.getReceiptNum().equals(entity.getReceiptNum())){

@@ -105,7 +105,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	
 	
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void dealOrder(Long id, String dealId, BigDecimal money, String uid) {
 		RepairOrderEntity orderEntity = repairOrderMapper.selectById(id);
 		if (orderEntity == null) {
@@ -137,7 +137,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void successOrder(Long id, String uid) {
 		RepairOrderEntity orderEntity = repairOrderMapper.selectById(id);
 		

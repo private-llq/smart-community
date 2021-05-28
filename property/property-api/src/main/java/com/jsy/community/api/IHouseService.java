@@ -89,6 +89,15 @@ public interface IHouseService extends IService<HouseEntity> {
 	List<HouseEntity> getCommunityHouseNumber(long communityId);
 
 	/**
+	 *@Author: Pipi
+	 *@Description: 通过社区ID查询出所有楼栋和单元
+	 *@Param: communityId:
+	 *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 *@Date: 2021/5/19 15:34
+	 **/
+	List<HouseEntity> getBuildingAndUnitList(long communityId);
+
+	/**
 	 * 按社区ID获取 社区名称和 当前社区住户房间数量
 	 * @author YuLF
 	 * @since  2020/12/3 11:06
@@ -131,4 +140,22 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @return:
 	 */
     List<HouseEntity> selectHouseAll(Long communityId);
+
+    /**
+     *@Author: Pipi
+     *@Description: excel导入时,批量新增房屋数据
+     *@Param: houseEntityList: 
+     *@Return: java.lang.Integer
+     *@Date: 2021/5/21 14:26
+     **/
+	Integer saveHouseBatch(List<HouseEntity> houseEntityList, Long communityId, String uid);
+
+	/**
+	 *@Author: Pipi
+	 *@Description: 查询小区的所有房间
+	 *@Param: communityId:
+	 *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 *@Date: 2021/5/21 17:17
+	 **/
+	List<HouseEntity> getAllHouse(Long communityId);
 }

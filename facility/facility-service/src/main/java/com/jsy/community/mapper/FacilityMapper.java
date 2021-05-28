@@ -5,10 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.qo.hk.FacilityQO;
 import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -132,4 +136,16 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 * @Param [online, id]
 	 **/
 	void updateStatusByFacilityId(int online, Long id);
+	
+	//批量获取
+	@MapKey("facility_id")
+	Map<Long, Map<Long,Integer>> selectFacilityHandleBatch(List<Long> ids);
+	
+	//TODO 这个代码留着 供参考
+	//批量更新设备在线状态
+//	void updateStatusByFacilityIdBatch(@Param("list")List<Map<Long, Integer>> map, @Param("ids")Set<Long> ids);
+	
+	//批量更新设备在线状态
+	void updateStatusByFacilityIdBatch(@Param("map") Map<Long,Integer> map);
+	
 }

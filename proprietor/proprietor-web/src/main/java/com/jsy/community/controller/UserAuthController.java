@@ -297,17 +297,15 @@ public class UserAuthController {
 			return CommonResult.error(JSYError.DUPLICATE_KEY.getCode(),"手机号已被注册，请直接登录或找回密码");
 		}
 		//更换手机号操作
-		boolean b = userAuthService.changeMobile(newMobile, uid);
-		if(b){
-			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-			//销毁token
-			String token = request.getHeader("token");
-			if (StrUtil.isBlank(token)) {
-				token = request.getParameter("token");
-			}
-			userUtils.destroyToken("Login", token);
+		userAuthService.changeMobile(newMobile, uid);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		//销毁token
+		String token = request.getHeader("token");
+		if (StrUtil.isBlank(token)) {
+			token = request.getParameter("token");
 		}
-		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
+		userUtils.destroyToken("Login", token);
+		return CommonResult.ok("操作成功");
 	}
 	
 	//TODO 待定-手机丢失更换新手机(旧手机不在线)

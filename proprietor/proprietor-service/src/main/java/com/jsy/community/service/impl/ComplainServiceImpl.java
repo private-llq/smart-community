@@ -33,9 +33,9 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
     /**
      * @Description: 用户投诉接口
      * @author: Hu
-     * @since: 2021/2/23 17:35
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:53
+     * @Param: [complainEntity]
+     * @return: void
      */
     @Override
     public void addComplain(ComplainEntity complainEntity) {
@@ -45,7 +45,6 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
         if (number!=null){
             s = String.valueOf(number);
         }else {
-            redisTemplate.opsForValue().set(serialNumber+complainEntity.getCommunityId(),String.valueOf(1),getMinute(), TimeUnit.MINUTES);
             s=String.valueOf(1);
         }
         if (s.length()<5){
@@ -69,7 +68,7 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
         }
         int anInt = Integer.parseInt(s);
         ++anInt;
-        redisTemplate.opsForValue().set(serialNumber+complainEntity.getCommunityId(),String.valueOf(anInt));
+        redisTemplate.opsForValue().set(serialNumber+complainEntity.getCommunityId(),String.valueOf(anInt),getMinute(),TimeUnit.MINUTES);
         complainEntity.setSerialNumber(getSerialNumber()+str);
         complainMapper.insert(complainEntity);
     }
@@ -101,12 +100,14 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
         String s=sdfTime.format(System.currentTimeMillis()).replaceAll("[[\\s-:punct:]]", "");
         return str+=s;
     }
+
+
     /**
      * @Description: 查询用户所有的投诉建议
      * @author: Hu
-     * @since: 2020/12/23 11:30
-     * @Param:
-     * @return:
+     * @since: 2021/5/21 13:52
+     * @Param: [userId]
+     * @return: java.util.List<com.jsy.community.entity.ComplainEntity>
      */
     @Override
     public List<ComplainEntity> selectUserIdComplain(String userId) {

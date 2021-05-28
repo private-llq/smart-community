@@ -29,6 +29,7 @@ import java.util.List;
 @ApiJSYController
 @RestController
 @RequestMapping("/repairType")
+@Deprecated
 public class RepairTypeController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

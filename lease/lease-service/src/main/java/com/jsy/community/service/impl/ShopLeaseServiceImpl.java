@@ -791,6 +791,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			// 城市地址
 			Long areaId = shopLeaseEntity.getAreaId();
 			String area = redisTemplate.opsForValue().get("RegionSingle" + ":" + areaId);
+			if (StringUtils.isEmpty(area)) {
+				area = "";
+			}
 			Long communityId = shopLeaseEntity.getCommunityId();
 			CommunityEntity community = communityService.getCommunityNameById(communityId);
 			indexShopVO.setAddress(area + "  " + community.getName());

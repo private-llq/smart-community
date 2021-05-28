@@ -1,5 +1,10 @@
 package com.jsy.community.service.impl;
 
+import com.google.common.collect.Lists;
+
+import java.time.LocalDateTime;
+
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -40,20 +45,20 @@ import java.util.*;
 @DubboService(version = Const.version, group = Const.group_property)
 public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> implements IHouseService {
 
-	private static final Map<String,String> RELATION_MSG_MAP = new HashMap<>(){{
-		put("proprietor","业主信息");
-		put("userHouse","APP业主房屋板块");
-		put("houseMember","房间成员");
-		put("houseLease","APP租房板块");
-	}};
-	
-	@Autowired
-	private HouseMapper houseMapper;
-	
-	@DubboReference(version = Const.version, group = Const.group_property, check = false)
-	private IAdminUserService adminUserService;
-	
-	
+    private static final Map<String, String> RELATION_MSG_MAP = new HashMap<>() {{
+        put("proprietor", "业主信息");
+        put("userHouse", "APP业主房屋板块");
+        put("houseMember", "房间成员");
+        put("houseLease", "APP租房板块");
+    }};
+
+    @Autowired
+    private HouseMapper houseMapper;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IAdminUserService adminUserService;
+
+
 //	@Autowired
 //	private ICommunityService communityService;
 
@@ -80,7 +85,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //		BeanUtils.copyProperties(houseEntityPage,pageInfo);
 //		return pageInfo;
 //	}
-	
+
 //	/**
 //	 * 新增楼栋入参检查和处理
 //	 */
@@ -114,7 +119,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //				}
 //		}
 //	}
-	
+
 //	/**
 //	 * @Description: 新增楼栋（老）（单元/楼层/房间等）
 //	 * @Param: [houseEntity]
@@ -168,7 +173,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //		}
 //		return result == 1;
 //	}
-	
+
 //	/**
 //	 * 检查层级关系(不包含顶级)
 //	 */
@@ -216,7 +221,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //			throw new PropertyException("父级单位与新增对象层级关系不对，新增失败");
 //		}
 //	}
-	
+
 //	/**
 //	 * @Description: 删除楼栋(单元/楼层/房间等)
 //	 * @Param: [id]
@@ -245,7 +250,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //			setDeleteIds(idList,houseMapper.getSubIdList(subIdList));
 //		}
 //	}
-	
+
 //	/**
 //	 * @Description: 修改楼栋(单元/楼层/房间等)
 //	 * @Param: [houseEntity]
@@ -283,345 +288,498 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //		}
 //		return false;
 //	}
-	
-	//========================================= 基础增删改查 开始 ========================================================
-	/**
-	 * @Description: 新增楼栋、单元、房屋（改）(根据物业端原型)
-	 * @Param: [houseEntity]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2021/3/8
-	 **/
-	@Transactional(rollbackFor = Exception.class)
-	public boolean addHouse(HouseEntity houseEntity){
-		int addResult = 0;
-		//生成id
-		long id = SnowFlake.nextId();
-		houseEntity.setId(id);
-		if(BusinessConst.BUILDING_TYPE_BUILDING == houseEntity.getType()){
-			//设置对应名称
-			houseEntity.setBuilding(houseEntity.getName());
-			//设置顶级pid
-			houseEntity.setPid(0L);
-			//处理子级单元列表
-			if(!CollectionUtils.isEmpty(houseEntity.getUnitIdList())){
-				//绑定单元 修改单元的pid,building字段
-				houseMapper.unitBindBuilding(houseEntity.getUnitIdList(), houseEntity);
-			}
-			//直接新增
-			addResult = houseMapper.insert(houseEntity);
-		}else if(BusinessConst.BUILDING_TYPE_UNIT == houseEntity.getType()){
-			//设置对应名称
-			houseEntity.setUnit(houseEntity.getName());
-			//设置顶级pid 单元新增时是pid是0，若新增楼栋绑定了该单元，单元pid置为楼栋id
-			houseEntity.setPid(0L);
-			//直接新增
-			addResult = houseMapper.insert(houseEntity);
-		}else if(BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()){
-			//查询父级是否存在
-			Integer pidExists = houseMapper.selectCount(new QueryWrapper<HouseEntity>()
-				.eq("id", houseEntity.getPid())
-				.eq("community_id", houseEntity.getCommunityId())
-				.and(wrapper -> wrapper.eq("type",BusinessConst.BUILDING_TYPE_BUILDING).or().eq("type",BusinessConst.BUILDING_TYPE_UNIT))
-			);
-			// queryWrapper.and(wrapper -> wrapper.like("unit",query.getUnit()).or().like("number",query.getUnit()));
-			if(pidExists != 1){
-				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"楼栋/单元 不存在");
-			}
-			houseEntity.setDoor(houseEntity.getNumber()); //TODO 后期可删除，但需要先修改依赖了t_house表door字段的代码
-			houseEntity.setCode(UUID.randomUUID().toString().replace("-",""));
-			addResult = houseMapper.addRoom(houseEntity);
-		}
-		return addResult == 1;
-	}
-	
-	/**
-	* @Description: 修改楼栋、单元、房屋（改）(根据物业端原型)
-	 * @Param: [houseEntity]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2021/3/9
-	**/
-	@Transactional(rollbackFor = Exception.class)
-	public boolean updateHouse(HouseEntity houseEntity){
-		//判断类型
-		HouseEntity entity = houseMapper.queryHouseByAnyProperty("id", houseEntity.getId());
-		if(entity == null){
-			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"数据不存在");
-		}
-		//置空不能自行修改项(条件修改里面有的)
-		houseEntity.setBuilding(null);
-		houseEntity.setUnit(null);
-		houseEntity.setDoor(null);
-		//若类型为 楼栋 ，绑定单元做全删权增
-		if(BusinessConst.BUILDING_TYPE_BUILDING == entity.getType()){
-			//禁止手动修改楼栋pid
-			houseEntity.setPid(null);
-			//解绑原有单元
-			houseMapper.unitUnBindBuilding(houseEntity.getId());
-			//绑定新单元列表
-			if(!CollectionUtils.isEmpty(houseEntity.getUnitIdList())){
-				houseMapper.unitBindBuilding(houseEntity.getUnitIdList(),entity);
-			}
-			//若楼栋名称有修改，同步修改单元和房屋冗余的楼栋名称
-			if(!StringUtils.isEmpty(houseEntity.getName())){
-				//设置对应名称
-				entity.setBuilding(houseEntity.getName());
-				houseEntity.setBuilding(houseEntity.getName());
-				//查询子级单元id，子级房屋id，整合到一起
-				List<Long> subUnitIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
-				if(!CollectionUtils.isEmpty(subUnitIdList)){
-					List<Long> subRoomIdList = houseMapper.getSubIdList(subUnitIdList);
-					subUnitIdList.addAll(subRoomIdList);
-					//同步修改子节点
-					houseMapper.updateSub(subUnitIdList,entity);
-				}
-			}
-		//若类型为 单元，且单元名称有修改，同步修改房屋冗余的单元名称
-		}else if(BusinessConst.BUILDING_TYPE_UNIT == entity.getType()){
-			//禁止手动修改单元pid
-			houseEntity.setPid(null);
-			if(!StringUtils.isEmpty(houseEntity.getName())){
-				//设置对应名称
-				entity.setUnit(houseEntity.getName());
-				houseEntity.setUnit(houseEntity.getName());
-				//查询子级房屋id
-				List<Long> subRoomIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
-				if(!CollectionUtils.isEmpty(subRoomIdList)){
-					//同步修改子节点
-					houseMapper.updateSub(subRoomIdList,entity);
-				}
-			}
-		}
-		return houseMapper.updateHouse(houseEntity) == 1;
-	}
-	
-	/**
-	* @Description: 查询楼栋、单元、房屋（改）(根据物业端原型)
-	 * @Param: [baseQO]
-	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
-	 * @Author: chq459799974
-	 * @Date: 2021/3/12
-	**/
-	public PageInfo<HouseEntity> queryHouse(BaseQO<HouseQO> baseQO){
-		HouseQO query = baseQO.getQuery();
-		Page<HouseEntity> page = new Page<>();
-		MyPageUtils.setPageAndSize(page,baseQO);
-		QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("type",query.getType());
-		queryWrapper.eq("community_id",query.getCommunityId());
-		setQueryWrapper(queryWrapper,query);
-		//是否查详情
-		if(query.getId() != null){
-			queryWrapper.eq("id",query.getId());
-		}
-		//是否有电梯
-		if(query.getHasElevator() != null){
-			queryWrapper.eq("has_elevator",query.getHasElevator());
-		}
-		//楼栋和单元均不为空 只取单元id
-		if(query.getBuildingId() != null && query.getUnitId() != null){
-			queryWrapper.eq("pid",query.getUnitId());
-		}else if(query.getBuildingId() != null && 0L != query.getBuildingId()){  //楼栋不为空，单元空  取楼栋id及其所有子级单元id
-			List<Long> pidList = new ArrayList<>();
-			//房屋直接挂楼栋
-			pidList.add(query.getBuildingId());
-			//房屋挂单元，查询单元idList并添加
-			List<Long> unitIdList = houseMapper.getSubIdList(Arrays.asList(query.getBuildingId()));
-			if(!CollectionUtils.isEmpty(unitIdList)){
-				pidList.addAll(unitIdList);
-			}
-			queryWrapper.in("pid",pidList);
-		}else if(query.getUnitId() != null){  //单元不为空，楼栋空 只取单元id
-			queryWrapper.eq("pid",query.getUnitId());
-		}
-		queryWrapper.orderByDesc("create_time");
-		Page<HouseEntity> pageData = houseMapper.selectPage(page, queryWrapper);
-		if(CollectionUtils.isEmpty(pageData.getRecords())){
-			return new PageInfo<>();
-		}
-		//查询类型为楼栋，再查出已绑定单元数
-		if(BusinessConst.BUILDING_TYPE_BUILDING == query.getType()){
-			List<Long> paramList = new ArrayList<>();
-			for(HouseEntity houseEntity : pageData.getRecords()){
-				paramList.add(houseEntity.getId());
-			}
-			Map<Long, Map<String,Long>> bindMap = houseMapper.queryBindUnitCountBatch(paramList);
-			for(HouseEntity houseEntity : pageData.getRecords()){
-				Map<String, Long> countMap = bindMap.get(houseEntity.getId());
-				houseEntity.setBindUnitCount(countMap != null ? countMap.get("count") : null);
-			}
-			//若查详情，查出已绑定单元id
-			if(query.getId() != null){
-				CollectionUtils.firstElement(pageData.getRecords()).setUnitIdList(houseMapper.queryBindUnitList(query.getId()));
-			}
-		}
-		//查询类型为房屋，设置房屋类型、房产类型、装修情况、户型
-		else if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
-			for(HouseEntity houseEntity : pageData.getRecords()){
-				houseEntity.setHouseTypeStr(PropertyEnum.HouseTypeEnum.HOUSE_TYPE_MAP.get(houseEntity.getHouseType()));
-				houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
-				houseEntity.setDecorationStr(PropertyEnum.DecorationEnum.DECORATION_MAP.get(houseEntity.getDecoration()));
-				if("00000000".equals(houseEntity.getHouseTypeCode())){
-					houseEntity.setHouseTypeCodeStr("单间配套");
-					continue;
-				}
-				setHouseTypeCodeStr(houseEntity);
-			}
-		}
-		//补创建人和更新人姓名
-		Set<String> createUidSet = new HashSet<>();
-		Set<String> updateUidSet = new HashSet<>();
-		for(HouseEntity houseEntity : pageData.getRecords()){
-			createUidSet.add(houseEntity.getCreateBy());
-			updateUidSet.add(houseEntity.getUpdateBy());
-		}
-		Map<String, Map<String,String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
-		Map<String, Map<String,String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
-		for(HouseEntity houseEntity : pageData.getRecords()){
-			houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
-			houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
-		}
-		PageInfo<HouseEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(pageData,pageInfo);
-		return pageInfo;
-	}
-	
-	//设置通用查询条件
-	private void setQueryWrapper(QueryWrapper<HouseEntity> queryWrapper,HouseQO query){
+
+    //========================================= 基础增删改查 开始 ========================================================
+    
+    /**
+     * @Description: 新增楼栋、单元、房屋（改）(根据物业端原型)
+     * @Param: [houseEntity]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2021/3/8
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addHouse(HouseEntity houseEntity) {
+        int addResult = 0;
+        //生成id
+        long id = SnowFlake.nextId();
+        houseEntity.setId(id);
+        if (BusinessConst.BUILDING_TYPE_BUILDING == houseEntity.getType()) {
+            //设置对应名称
+            houseEntity.setBuilding(houseEntity.getName());
+            //设置顶级pid
+            houseEntity.setPid(0L);
+            //处理子级单元列表
+            if (!CollectionUtils.isEmpty(houseEntity.getUnitIdList())) {
+                //绑定单元 修改单元的pid,building字段
+                houseMapper.unitBindBuilding(houseEntity.getUnitIdList(), houseEntity);
+            }
+            //直接新增
+            addResult = houseMapper.insert(houseEntity);
+        } else if (BusinessConst.BUILDING_TYPE_UNIT == houseEntity.getType()) {
+            //设置对应名称
+            houseEntity.setUnit(houseEntity.getName());
+            //设置顶级pid 单元新增时是pid是0，若新增楼栋绑定了该单元，单元pid置为楼栋id
+            houseEntity.setPid(0L);
+            //直接新增
+            addResult = houseMapper.insert(houseEntity);
+        } else if (BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()) {
+            //查询父级是否存在
+            Integer pidExists = houseMapper.selectCount(new QueryWrapper<HouseEntity>()
+                .eq("id", houseEntity.getPid())
+                .eq("community_id", houseEntity.getCommunityId())
+                .and(wrapper -> wrapper.eq("type", BusinessConst.BUILDING_TYPE_BUILDING).or().eq("type", BusinessConst.BUILDING_TYPE_UNIT))
+            );
+            // queryWrapper.and(wrapper -> wrapper.like("unit",query.getUnit()).or().like("number",query.getUnit()));
+            if (pidExists != 1) {
+                throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "楼栋/单元 不存在");
+            }
+            houseEntity.setDoor(houseEntity.getNumber()); //TODO 后期可删除，但需要先修改依赖了t_house表door字段的代码
+            houseEntity.setCode(UUID.randomUUID().toString().replace("-", ""));
+            addResult = houseMapper.addRoom(houseEntity);
+        }
+        return addResult == 1;
+    }
+
+    /**
+     * @Description: 修改楼栋、单元、房屋（改）(根据物业端原型)
+     * @Param: [houseEntity]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2021/3/9
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateHouse(HouseEntity houseEntity) {
+        //判断类型
+        HouseEntity entity = houseMapper.queryHouseByAnyProperty("id", houseEntity.getId());
+        if (entity == null) {
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "数据不存在");
+        }
+        //置空不能自行修改项(条件修改里面有的)
+        houseEntity.setBuilding(null);
+        houseEntity.setUnit(null);
+        houseEntity.setDoor(null);
+        //若类型为 楼栋 ，绑定单元做全删权增
+        if (BusinessConst.BUILDING_TYPE_BUILDING == entity.getType()) {
+            //禁止手动修改楼栋pid
+            houseEntity.setPid(null);
+            //解绑原有单元
+            houseMapper.unitUnBindBuilding(houseEntity.getId());
+            //绑定新单元列表
+            if (!CollectionUtils.isEmpty(houseEntity.getUnitIdList())) {
+                houseMapper.unitBindBuilding(houseEntity.getUnitIdList(), entity);
+            }
+            //若楼栋名称有修改，同步修改单元和房屋冗余的楼栋名称
+            if (!StringUtils.isEmpty(houseEntity.getName())) {
+                //设置对应名称
+                entity.setBuilding(houseEntity.getName());
+                houseEntity.setBuilding(houseEntity.getName());
+                //查询子级单元id，子级房屋id，整合到一起
+                List<Long> subUnitIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
+                if (!CollectionUtils.isEmpty(subUnitIdList)) {
+                    List<Long> subRoomIdList = houseMapper.getSubIdList(subUnitIdList);
+                    subUnitIdList.addAll(subRoomIdList);
+                    //同步修改子节点
+                    houseMapper.updateSub(subUnitIdList, entity);
+                }
+            }
+            //若类型为 单元，且单元名称有修改，同步修改房屋冗余的单元名称
+        } else if (BusinessConst.BUILDING_TYPE_UNIT == entity.getType()) {
+            //禁止手动修改单元pid
+            houseEntity.setPid(null);
+            if (!StringUtils.isEmpty(houseEntity.getName())) {
+                //设置对应名称
+                entity.setUnit(houseEntity.getName());
+                houseEntity.setUnit(houseEntity.getName());
+                //查询子级房屋id
+                List<Long> subRoomIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
+                if (!CollectionUtils.isEmpty(subRoomIdList)) {
+                    //同步修改子节点
+                    houseMapper.updateSub(subRoomIdList, entity);
+                }
+            }
+        }
+        return houseMapper.updateHouse(houseEntity) == 1;
+    }
+
+    /**
+     * @Description: 查询楼栋、单元、房屋（改）(根据物业端原型)
+     * @Param: [baseQO]
+     * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
+     * @Author: chq459799974
+     * @Date: 2021/3/12
+     **/
+    @Override
+    public PageInfo<HouseEntity> queryHouse(BaseQO<HouseQO> baseQO) {
+        HouseQO query = baseQO.getQuery();
+        Page<HouseEntity> page = new Page<>();
+        MyPageUtils.setPageAndSize(page, baseQO);
+        QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("type", query.getType());
+        queryWrapper.eq("community_id", query.getCommunityId());
+        setQueryWrapper(queryWrapper, query);
+        //是否查详情
+        if (query.getId() != null) {
+            queryWrapper.eq("id", query.getId());
+        }
+        //是否有电梯
+        if (query.getHasElevator() != null) {
+            queryWrapper.eq("has_elevator", query.getHasElevator());
+        }
+        //楼栋和单元均不为空 只取单元id
+        if (query.getBuildingId() != null && query.getUnitId() != null) {
+            queryWrapper.eq("pid", query.getUnitId());
+        } else if (query.getBuildingId() != null && 0L != query.getBuildingId()) {  //楼栋不为空，单元空  取楼栋id及其所有子级单元id
+            List<Long> pidList = new ArrayList<>();
+            //房屋直接挂楼栋
+            pidList.add(query.getBuildingId());
+            //房屋挂单元，查询单元idList并添加
+            List<Long> unitIdList = houseMapper.getSubIdList(Arrays.asList(query.getBuildingId()));
+            if (!CollectionUtils.isEmpty(unitIdList)) {
+                pidList.addAll(unitIdList);
+            }
+            queryWrapper.in("pid", pidList);
+        } else if (query.getUnitId() != null) {  //单元不为空，楼栋空 只取单元id
+            queryWrapper.eq("pid", query.getUnitId());
+        }
+        queryWrapper.orderByDesc("create_time");
+        Page<HouseEntity> pageData = houseMapper.selectPage(page, queryWrapper);
+        if (CollectionUtils.isEmpty(pageData.getRecords())) {
+            return new PageInfo<>();
+        }
+        //查询类型为楼栋，再查出已绑定单元数
+        if (BusinessConst.BUILDING_TYPE_BUILDING == query.getType()) {
+            List<Long> paramList = new ArrayList<>();
+            for (HouseEntity houseEntity : pageData.getRecords()) {
+                paramList.add(houseEntity.getId());
+            }
+            Map<Long, Map<String, Long>> bindMap = houseMapper.queryBindUnitCountBatch(paramList);
+            for (HouseEntity houseEntity : pageData.getRecords()) {
+                Map<String, Long> countMap = bindMap.get(houseEntity.getId());
+                houseEntity.setBindUnitCount(countMap != null ? countMap.get("count") : null);
+            }
+            //若查详情，查出已绑定单元id
+            if (query.getId() != null) {
+                CollectionUtils.firstElement(pageData.getRecords()).setUnitIdList(houseMapper.queryBindUnitList(query.getId()));
+            }
+        }
+        //查询类型为房屋，设置房屋类型、房产类型、装修情况、户型
+        else if (BusinessConst.BUILDING_TYPE_DOOR == query.getType()) {
+            for (HouseEntity houseEntity : pageData.getRecords()) {
+                houseEntity.setHouseTypeStr(PropertyEnum.HouseTypeEnum.HOUSE_TYPE_MAP.get(houseEntity.getHouseType()));
+                houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
+                houseEntity.setDecorationStr(PropertyEnum.DecorationEnum.DECORATION_MAP.get(houseEntity.getDecoration()));
+                if ("00000000".equals(houseEntity.getHouseTypeCode())) {
+                    houseEntity.setHouseTypeCodeStr("单间配套");
+                    continue;
+                }
+                setHouseTypeCodeStr(houseEntity);
+            }
+        }
+        //补创建人和更新人姓名
+        Set<String> createUidSet = new HashSet<>();
+        Set<String> updateUidSet = new HashSet<>();
+        for (HouseEntity houseEntity : pageData.getRecords()) {
+            createUidSet.add(houseEntity.getCreateBy());
+            updateUidSet.add(houseEntity.getUpdateBy());
+        }
+        Map<String, Map<String, String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
+        Map<String, Map<String, String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
+        for (HouseEntity houseEntity : pageData.getRecords()) {
+            houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
+            houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
+        }
+        PageInfo<HouseEntity> pageInfo = new PageInfo<>();
+        BeanUtils.copyProperties(pageData, pageInfo);
+        return pageInfo;
+    }
+
+    //设置通用查询条件
+    private void setQueryWrapper(QueryWrapper<HouseEntity> queryWrapper, HouseQO query) {
 //		if(!StringUtils.isEmpty(query.getNumber())){
 //			queryWrapper.like("number",query.getNumber());
 //		}
-		if(!StringUtils.isEmpty(query.getBuilding())){
-			queryWrapper.and(wrapper -> wrapper.like("building",query.getBuilding()).or().like("number",query.getBuilding()));
-		}
-		if(!StringUtils.isEmpty(query.getUnit())){
-			queryWrapper.and(wrapper -> wrapper.like("unit",query.getUnit()).or().like("number",query.getUnit()));
-		}
-		if(!StringUtils.isEmpty(query.getDoor())){
-			queryWrapper.and(wrapper -> wrapper.like("door",query.getDoor()).or().like("number",query.getDoor()));
-		}
-	}
-	
-	//设置户型
-	private void setHouseTypeCodeStr(HouseEntity houseEntity){
-		String houseTypeCode = houseEntity.getHouseTypeCode();
-		if(houseTypeCode == null || houseTypeCode.length() != 8){
-			houseEntity.setHouseTypeCodeStr(houseEntity.getHouseTypeCode());
-			return;
-		}
-		String bedRoom = Integer.valueOf(houseTypeCode.substring(0, 2)) + "室";
-		String livingRoom = Integer.valueOf(houseTypeCode.substring(2, 4)) + "厅";
-		String kitchen = Integer.valueOf(houseTypeCode.substring(4, 6)) + "厨";
-		String toilet = Integer.valueOf(houseTypeCode.substring(6, 8)) + "卫";
-		houseEntity.setHouseTypeCodeStr(bedRoom.concat(livingRoom).concat(kitchen).concat(toilet));
-	}
-	
-	/**
-	* @Description: 删除楼栋/单元/房屋
-	 * @Param: [id,communityId]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2021/3/15
-	**/
-	public boolean deleteHouse(Long id,Long communityId){
-		HouseEntity entity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id",id).eq("community_id",communityId));
-		if(entity == null){
-			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"数据不存在");
-		}
-		//删除楼栋/单元(有下级依赖不允许删除)
-		//删除房屋(有依赖数据不允许删除)
-		if(BusinessConst.BUILDING_TYPE_BUILDING == entity.getType()
-			|| BusinessConst.BUILDING_TYPE_UNIT == entity.getType()){
-			Integer count = houseMapper.selectCount(new QueryWrapper<HouseEntity>().eq("pid", id));
-			if(count > 0){
-				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"存在下级单元或房屋，不允许删除");
-			}
-		}else if(BusinessConst.BUILDING_TYPE_DOOR == entity.getType()){
-			List<Map<String,Object>> countList = houseMapper.verifyRelevance(id);
-			List<String> errorList = new ArrayList<>(countList.size());
-			for(Map<String,Object> map : countList){
-					if(Integer.valueOf(map.get("count").toString()) > 0){
-						errorList.add(RELATION_MSG_MAP.get(map.get("item")));
-					}
-				}
-			if(errorList.size() > 0){
-				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),errorList + " 存在关联数据，不允许删除");
-			}
-		}
-		return houseMapper.deleteById(id) == 1;
-	}
-	//========================================= 基础增删改查 结束 ========================================================
-	
-	/**
-	 * 通过社区ID查出所有 楼栋、单元、楼层、未被登记的门牌
-	 * @author YuLF
-	 * @since  2020/11/26 9:38
-	 * @Param  communityId	社区ID
-	 */
-	@Override
-	public List<HouseEntity> getCommunityHouseNumber(long communityId) {
-		return houseMapper.getCommunityHouseNumber(communityId);
-	}
-	
-	
-	/**
-	 * 按社区ID获取 社区名称和 当前社区住户房间数量
-	 * @author YuLF
-	 * @since  2020/12/3 11:06
-	 * @Param  communityId   社区id
-	 * @return				 返回社区名称和 当前社区住户房间数量
-	 */
-	@Override
-	public Map<String, Object> getCommunityNameAndUserAmountById(long communityId) {
-		return houseMapper.getCommunityNameAndUserAmountById(communityId);
-	}
+        if (!StringUtils.isEmpty(query.getBuilding())) {
+            queryWrapper.and(wrapper -> wrapper.like("building", query.getBuilding()).or().like("number", query.getBuilding()));
+        }
+        if (!StringUtils.isEmpty(query.getUnit())) {
+            queryWrapper.and(wrapper -> wrapper.like("unit", query.getUnit()).or().like("number", query.getUnit()));
+        }
+        if (!StringUtils.isEmpty(query.getDoor())) {
+            queryWrapper.and(wrapper -> wrapper.like("door", query.getDoor()).or().like("number", query.getDoor()));
+        }
+    }
 
-	/**
-	 * 按社区ID获取 社区名称 社区用户名和社区用户uid
-	 * @author YuLF
-	 * @since  2020/12/7 11:06
-	 * @param communityId 			社区id
-	 * @return						返回社区名称和 当前社区所有住户名称，住户uid
-	 */
-	@Override
-	public List<UserEntity> getCommunityNameAndUserInfo(long communityId) {
-		return houseMapper.getCommunityNameAndUserInfo(communityId);
-	}
+    //设置户型
+    private void setHouseTypeCodeStr(HouseEntity houseEntity) {
+        String houseTypeCode = houseEntity.getHouseTypeCode();
+        if (houseTypeCode == null || houseTypeCode.length() != 8) {
+            houseEntity.setHouseTypeCodeStr(houseEntity.getHouseTypeCode());
+            return;
+        }
+        String bedRoom = Integer.valueOf(houseTypeCode.substring(0, 2)) + "室";
+        String livingRoom = Integer.valueOf(houseTypeCode.substring(2, 4)) + "厅";
+        String kitchen = Integer.valueOf(houseTypeCode.substring(4, 6)) + "厨";
+        String toilet = Integer.valueOf(houseTypeCode.substring(6, 8)) + "卫";
+        houseEntity.setHouseTypeCodeStr(bedRoom.concat(livingRoom).concat(kitchen).concat(toilet));
+    }
+
+    /**
+     * @Description: 删除楼栋/单元/房屋
+     * @Param: [id, communityId]
+     * @Return: boolean
+     * @Author: chq459799974
+     * @Date: 2021/3/15
+     **/
+    @Override
+    public boolean deleteHouse(Long id, Long communityId) {
+        HouseEntity entity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id", id).eq("community_id", communityId));
+        if (entity == null) {
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "数据不存在");
+        }
+        //删除楼栋/单元(有下级依赖不允许删除)
+        //删除房屋(有依赖数据不允许删除)
+        if (BusinessConst.BUILDING_TYPE_BUILDING == entity.getType()
+                || BusinessConst.BUILDING_TYPE_UNIT == entity.getType()) {
+            Integer count = houseMapper.selectCount(new QueryWrapper<HouseEntity>().eq("pid", id));
+            if (count > 0) {
+                throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "存在下级单元或房屋，不允许删除");
+            }
+        } else if (BusinessConst.BUILDING_TYPE_DOOR == entity.getType()) {
+            List<Map<String, Object>> countList = houseMapper.verifyRelevance(id);
+            List<String> errorList = new ArrayList<>(countList.size());
+            for (Map<String, Object> map : countList) {
+                if (Integer.valueOf(map.get("count").toString()) > 0) {
+                    errorList.add(RELATION_MSG_MAP.get(map.get("item")));
+                }
+            }
+            if (errorList.size() > 0) {
+                throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), errorList + " 存在关联数据，不允许删除");
+            }
+        }
+        return houseMapper.deleteById(id) == 1;
+    }
+    //========================================= 基础增删改查 结束 ========================================================
+
+    /**
+     * 通过社区ID查出所有 楼栋、单元、楼层、未被登记的门牌
+     *
+     * @author YuLF
+     * @Param communityId    社区ID
+     * @since 2020/11/26 9:38
+     */
+    @Override
+    public List<HouseEntity> getCommunityHouseNumber(long communityId) {
+        return houseMapper.getCommunityHouseNumber(communityId);
+    }
+
+    /**
+     * @Author: Pipi
+     * @Description: 通过社区ID查询出所有楼栋和单元
+     * @Param: communityId:
+     * @Return: java.util.List<com.jsy.community.entity.HouseEntity>
+     * @Date: 2021/5/19 15:34
+     */
+    @Override
+    public List<HouseEntity> getBuildingAndUnitList(long communityId) {
+        return houseMapper.getBuildingAndUnitList(communityId);
+    }
+
+    /**
+     * 按社区ID获取 社区名称和 当前社区住户房间数量
+     *
+     * @author YuLF
+     * @Param communityId   社区id
+     * @return 返回社区名称和 当前社区住户房间数量
+     * @since 2020/12/3 11:06
+     */
+    @Override
+    public Map<String, Object> getCommunityNameAndUserAmountById(long communityId) {
+        return houseMapper.getCommunityNameAndUserAmountById(communityId);
+    }
+
+    /**
+     * 按社区ID获取 社区名称 社区用户名和社区用户uid
+     *
+     * @param communityId 社区id
+     * @author YuLF
+     * @return 返回社区名称和 当前社区所有住户名称，住户uid
+     * @since 2020/12/7 11:06
+     */
+    @Override
+    public List<UserEntity> getCommunityNameAndUserInfo(long communityId) {
+        return houseMapper.getCommunityNameAndUserInfo(communityId);
+    }
 
 
+    @Override
+    public List<ProprietorVO> getCommunityHouseById(Long communityId) {
+        return houseMapper.getCommunityHouseById(communityId);
+    }
 
-	@Override
-	public List<ProprietorVO> getCommunityHouseById(Long communityId) {
-		return houseMapper.getCommunityHouseById(communityId);
-	}
+    /**
+     * @Description: 小区下所有房间
+     * @author: Hu
+     * @since: 2021/4/24 14:42
+     * @Param:
+     * @return:
+     */
+    @Override
+    public List<HouseEntity> selectHouseAll(Long communityId) {
+        return houseMapper.selectHouseAll(communityId);
+    }
 
-	/**
-	 * @Description: 小区下所有房间
-	 * @author: Hu
-	 * @since: 2021/4/24 14:42
-	 * @Param:
-	 * @return:
-	 */
-	@Override
-	public List<HouseEntity> selectHouseAll(Long communityId) {
-		return houseMapper.selectHouseAll(communityId);
-	}
+    /**
+     * @Description: 房屋ids 批量查 id-address对应关系
+     * @Param: [ids]
+     * @Return: java.util.Map<java.lang.Long, com.jsy.community.entity.HouseEntity>
+     * @Author: chq459799974
+     * @Date: 2021/4/23
+     **/
+    @Override
+    public Map<Long, HouseEntity> queryIdAndHouseMap(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids) || (ids.size() == 1 && ids.contains(null))) {
+            return new HashMap<>(1);
+        }
+        return houseMapper.queryIdAndHouseMap(ids);
+    }
 
-	/**
-	* @Description: 房屋ids 批量查 id-address对应关系
-	 * @Param: [ids]
-	 * @Return: java.util.Map<java.lang.Long,com.jsy.community.entity.HouseEntity>
-	 * @Author: chq459799974
-	 * @Date: 2021/4/23
-	**/
-	@Override
-	public Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> ids){
-		if(CollectionUtils.isEmpty(ids) || (ids.size() == 1 && ids.contains(null))){
-			return new HashMap<>();
-		}
-		return houseMapper.queryIdAndHouseMap(ids);
-	}
+    /**
+     * @Author: Pipi
+     * @Description: excel导入时, 批量新增房屋数据
+     * @Param: houseEntityList:
+     * @Return: java.lang.Integer
+     * @Date: 2021/5/21 14:26
+     */
+    @Override
+    public Integer saveHouseBatch(List<HouseEntity> houseEntityList, Long communityId, String uid) {
+        // 需要验证社区下这个编号的楼栋或者单元是否存在,如果不存在,则新增楼栋或者单元
+        // 先将楼栋编号和单元编号拿出来,放入到set里面
+        HashMap<String, HouseEntity> buildingNumMap = new HashMap<>();
+        HashMap<String, HouseEntity> unitNumMap = new HashMap<>();
+        // 此次新增的所有房屋
+        List<HouseEntity> addHouseEntityList = new ArrayList<>();
+        for (HouseEntity houseEntity : houseEntityList) {
+            // 楼栋
+            if (!buildingNumMap.containsKey(houseEntity.getBuildingNumber())) {
+                HouseEntity buildingHouseEntity = new HouseEntity();
+                buildingHouseEntity.setNumber(houseEntity.getBuildingNumber());
+                buildingHouseEntity.setCommunityId(communityId);
+                buildingHouseEntity.setBuilding(houseEntity.getBuilding());
+                buildingHouseEntity.setPid(0L);
+                buildingHouseEntity.setType(1);
+                buildingHouseEntity.setPropertyType(houseEntity.getPropertyType());
+                buildingHouseEntity.setCreateBy(uid);
+                buildingHouseEntity.setId(SnowFlake.nextId());
+                buildingHouseEntity.setDeleted(0);
+                buildingHouseEntity.setCreateTime(LocalDateTime.now());
+                buildingHouseEntity.setUpdateTime(LocalDateTime.now());
+                buildingNumMap.put(houseEntity.getBuildingNumber(), buildingHouseEntity);
+            }
+            // 单元
+            if (!unitNumMap.containsKey(houseEntity.getUnitNumber())) {
+                HouseEntity unitHouseEntity = new HouseEntity();
+                unitHouseEntity.setNumber(houseEntity.getUnitNumber());
+                unitHouseEntity.setCommunityId(communityId);
+                unitHouseEntity.setBuilding(houseEntity.getBuilding());
+                unitHouseEntity.setUnit(houseEntity.getUnit());
+                unitHouseEntity.setType(2);
+                unitHouseEntity.setPropertyType(houseEntity.getPropertyType());
+                unitHouseEntity.setCreateBy(uid);
+                unitHouseEntity.setBuildingNumber(houseEntity.getBuildingNumber());
+                unitHouseEntity.setId(SnowFlake.nextId());
+                unitHouseEntity.setDeleted(0);
+                unitHouseEntity.setCreateTime(LocalDateTime.now());
+                unitHouseEntity.setUpdateTime(LocalDateTime.now());
+                unitNumMap.put(houseEntity.getUnitNumber(), unitHouseEntity);
+            }
+            // 房屋
+            HouseEntity addHouseEntity = new HouseEntity();
+            addHouseEntity.setNumber(houseEntity.getNumber());
+            addHouseEntity.setCommunityId(communityId);
+            addHouseEntity.setBuilding(houseEntity.getBuilding());
+            addHouseEntity.setUnit(houseEntity.getUnit());
+            addHouseEntity.setUnitNumber(houseEntity.getUnitNumber());
+            addHouseEntity.setFloor(houseEntity.getFloor());
+            addHouseEntity.setType(4);
+            addHouseEntity.setBuildArea(houseEntity.getBuildArea());
+            addHouseEntity.setHouseType(houseEntity.getHouseType());
+            addHouseEntity.setPropertyType(houseEntity.getPropertyType());
+            addHouseEntity.setDecoration(houseEntity.getDecoration());
+            addHouseEntity.setComment(houseEntity.getComment());
+            addHouseEntity.setCreateBy(uid);
+            addHouseEntity.setId(SnowFlake.nextId());
+            addHouseEntity.setDeleted(0);
+            addHouseEntity.setCreateTime(LocalDateTime.now());
+            addHouseEntity.setUpdateTime(LocalDateTime.now());
+            addHouseEntityList.add(addHouseEntity);
+        }
+        // 将社区下的所有楼栋和单元全部查出来
+        List<HouseEntity> allExistHouseEntities = houseMapper.getBuildingAndUnitList(communityId);
+        HashSet<String> buildingNumSet = new HashSet<>();
+        HashSet<String> unitNumSet = new HashSet<>();
+        if (CollectionUtil.isNotEmpty(allExistHouseEntities)) {
+            for (HouseEntity houseEntity : allExistHouseEntities) {
+                if (houseEntity.getType() == 1) {
+                    buildingNumSet.add(houseEntity.getNumber());
+                }
+                if (houseEntity.getType() == 2) {
+                    unitNumSet.add(houseEntity.getNumber());
+                }
+            }
+        }
+        // 需要添加的楼栋实体
+        List<HouseEntity> addBuildingHouseEntityList = new ArrayList<>();
+        for (String number : buildingNumMap.keySet()) {
+            if (!buildingNumSet.contains(number)) {
+                addBuildingHouseEntityList.add(buildingNumMap.get(number));
+            }
+        }
+        // 需要添加的单元实体
+        List<HouseEntity> addUnitHouseEntityList = new ArrayList<>();
+        allExistHouseEntities.addAll(addBuildingHouseEntityList);
+        for (String number : unitNumMap.keySet()) {
+            if (!buildingNumSet.contains(number)) {
+                // 新增单元,比对原有的楼栋和新增的楼栋,获取楼栋id
+                for (HouseEntity houseEntity : allExistHouseEntities) {
+                    if (houseEntity.getType() == 1) {
+                        if (houseEntity.getNumber().equals(unitNumMap.get(number).getBuildingNumber())) {
+                            HouseEntity unitHouseEntity = unitNumMap.get(number).setPid(houseEntity.getId());
+                            addUnitHouseEntityList.add(unitHouseEntity);
+                        }
+                    }
+                }
+            }
+        }
+        allExistHouseEntities.addAll(addUnitHouseEntityList);
+        // 给每个新增的房屋设置pid
+        for (HouseEntity houseEntity : addHouseEntityList) {
+            for (HouseEntity allExistHouseEntity : allExistHouseEntities) {
+                if (allExistHouseEntity.getType() == 2) {
+                    if (houseEntity.getUnitNumber().equals(allExistHouseEntity.getNumber())) {
+                        houseEntity.setPid(allExistHouseEntity.getId());
+                    }
+                }
+            }
+        }
+        // 最终需要增加的单元和楼栋数据
+        addUnitHouseEntityList.addAll(addBuildingHouseEntityList);
+        // 最终需要增加的单元,楼栋,房屋的数据集合
+        addUnitHouseEntityList.addAll(addHouseEntityList);
+        return houseMapper.saveHouseBatch(addUnitHouseEntityList);
+    }
 
-	
+    /**
+     * @Author: Pipi
+     * @Description: 查询小区的所有房间
+     * @Param: communityId:
+     * @Return: java.util.List<com.jsy.community.entity.HouseEntity>
+     * @Date: 2021/5/21 17:16
+     */
+    @Override
+    public List<HouseEntity> getAllHouse(Long communityId) {
+        return houseMapper.getAllHouse(communityId);
+    }
 }
