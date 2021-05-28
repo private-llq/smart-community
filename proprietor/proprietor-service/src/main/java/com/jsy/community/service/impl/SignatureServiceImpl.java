@@ -25,9 +25,9 @@ import java.util.Map;
 public class SignatureServiceImpl implements ISignatureService {
 	
 	private static final String protocolType = "http://";
-		private static final String host = "192.168.12.37";
-//	private static final String host = "222.178.212.29";
-	private static final String port = "10005";
+//		private static final String host = "192.168.12.37";
+	private static final String host = "222.178.212.29";
+	private static final String port = "13000";
 	
 	//POST 新增用户信息
 	@Override
@@ -117,7 +117,7 @@ public class SignatureServiceImpl implements ISignatureService {
 		MyHttpUtils.setDefaultHeader(httpPost != null ? httpPost : httpPut);
 		//设置默认配置
 		MyHttpUtils.setRequestConfig(httpPost != null ? httpPost : httpPut);
-		JSONObject result = null;
+		JSONObject result;
 		String httpResult = null;
 		try{
 			//执行请求，解析结果

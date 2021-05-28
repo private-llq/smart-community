@@ -253,7 +253,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
-//        boolean signUserResult = signatureService.insertUser(signatureUserDTO);
+        boolean signUserResult = signatureService.insertUser(signatureUserDTO);
 //        if(!signUserResult){
 //            log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
 //            throw new ProprietorException(JSYError.INTERNAL);
@@ -285,6 +285,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 break;
             case Const.ThirdPlatformConsts.QQ :
                 break;
+            default:
         }
         if(StringUtils.isEmpty(thirdUid)){
             throw new ProprietorException("三方平台uid获取失败 三方登录失败");
@@ -928,7 +929,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         signatureUserDTO.setIdCardName(userEntity.getRealName());
         signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
         signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
-//        if(!signatureService.realNameUpdateUser(signatureUserDTO)){
+        boolean b = signatureService.realNameUpdateUser(signatureUserDTO);
+//        if(!b){
 //            log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
 //                throw new ProprietorException(JSYError.INTERNAL);
 //        }

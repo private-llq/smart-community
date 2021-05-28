@@ -7,25 +7,25 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommonService;
+import com.jsy.community.api.ISignatureService;
 import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.UserAuthEntity;
-import com.jsy.community.entity.UserThirdPlatformEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
-import com.jsy.community.mapper.UserThirdPlatformMapper;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
-import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 //import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
@@ -47,6 +47,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	
 	@Resource
 	private UserMapper userMapper;
+	
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+	private ISignatureService signatureService;
 	
 	@Value(value = "${jsy.third-platform-domain:http://www.jsy.com}")
 	private String callbackUrl;
@@ -168,13 +171,18 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 	**/
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public boolean changeMobile(String newMobile,String uid){
-		int result1 = userAuthMapper.changeMobile(newMobile, uid);
-		int result2 = userMapper.changeMobile(newMobile, uid);
-		if(result1 == 1 && result2 == 1){
-			return true;
-		}
-		return false;
+	public void changeMobile(String newMobile,String uid){
+		userAuthMapper.changeMobile(newMobile, uid);
+		userMapper.changeMobile(newMobile, uid);
+		//同步修改签章用户
+		SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
+		signatureUserDTO.setTelephone(newMobile);
+		signatureUserDTO.setUuid(uid);
+		boolean b = signatureService.updateUser(signatureUserDTO);
+//		if(!b){
+//            log.error("更换手机号，签章用户同步失败，相关账户：" + uid + "，新手机号：" + newMobile);
+//            throw new ProprietorException(JSYError.INTERNAL.getCode(),"签章板块手机号同步失败，请联系管理员");
+//        }
 	}
 	
 	/**
