@@ -476,12 +476,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 List<CarQO> any = cars.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
                 //从更新车辆的集合中 移除 需要 新增的数据
                 cars.removeAll(any);
-                //批量新增车辆
-                carService.addProprietorCarForList(any, qo.getUid());
                 //循环添加id
                 any.forEach(x ->{
                     x.setId(SnowFlake.nextId());
                 });
+                //批量新增车辆
+                carService.addProprietorCarForList(any, qo.getUid());
                 //循环保存车辆到es
                 any.forEach(x ->{
                     rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo,x));

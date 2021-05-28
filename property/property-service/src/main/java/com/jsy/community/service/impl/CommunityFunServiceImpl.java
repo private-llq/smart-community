@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.regex.Pattern.DOTALL;
+import static java.util.regex.Pattern.compile;
+
 /**
  * @program: com.jsy.community
  * @description: 物业社区趣事
@@ -70,10 +73,10 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             wrapper.like("tallys",communityFunQO.getTallys()).or().like("content",communityFunQO.getTallys());
         }
         if (communityFunQO.getStatus()!=null&&communityFunQO.getStatus()!=0){
-                wrapper.eq("status",communityFunQO.getStatus());
+            wrapper.eq("status",communityFunQO.getStatus());
         }
         if (communityFunQO.getRedactStatus()!=null&&communityFunQO.getRedactStatus()!=0){
-                wrapper.eq("redact_status",communityFunQO.getRedactStatus());
+            wrapper.eq("redact_status",communityFunQO.getRedactStatus());
         }
         if (communityFunQO.getCreatrTimeStart()!=null){
             wrapper.ge("create_time",communityFunQO.getCreatrTimeStart());
@@ -90,8 +93,6 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
             wrapper.le("start_time",communityFunQO.getIssueTimeOut());
         }
         wrapper.orderByDesc("create_time");
-
-        Page<CommunityFunEntity> communityFunEntityPage = new Page<>(baseQO.getPage(), baseQO.getSize());
         IPage<CommunityFunEntity>  page = communityFunMapper.selectPage(new Page<CommunityFunEntity>(baseQO.getPage(), baseQO.getSize()),wrapper);
         PageInfo pageInfo=new PageInfo();
         List<CommunityFunEntity> list = page.getRecords();
@@ -138,7 +139,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
      */
     @Override
     public void insetOne(CommunityFunOperationQO communityFunOperationQO, AdminInfoVo adminInfoVo) {
-        Pattern pattern = Pattern.compile("<.+?>", Pattern.DOTALL);
+        Pattern pattern = compile("<.+?>", DOTALL);
         Matcher matcher = pattern.matcher(communityFunOperationQO.getContent());
         String string = matcher.replaceAll("");
 

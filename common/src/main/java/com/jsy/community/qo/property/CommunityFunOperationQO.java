@@ -57,4 +57,5 @@ public class CommunityFunOperationQO implements Serializable {
     private String[] tallys;
 
     public interface CommunityFunOperationValidated{}
+
 }
