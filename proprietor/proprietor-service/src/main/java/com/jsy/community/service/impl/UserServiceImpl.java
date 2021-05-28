@@ -478,14 +478,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 //从更新车辆的集合中 移除 需要 新增的数据
                 cars.removeAll(any);
                 //循环添加id
-                any.forEach(x ->{
-                    x.setId(SnowFlake.nextId());
-                });
+                for (CarQO carQO : any) {
+                    carQO.setId(SnowFlake.nextId());
+                }
                 //批量新增车辆
                 carService.addProprietorCarForList(any, qo.getUid());
                 //循环保存车辆到es
                 any.forEach(x ->{
-                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo,x));
+                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo.getUid(),qo.getHouses(),x));
                 });
             }
             //批量更新车辆信息
@@ -505,21 +505,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Param:
      * @return:
      */
-    public ElasticsearchCarQO getInsertElasticsearchCar(ProprietorQO proprietorQO,CarQO carQO){
-        HouseEntity entity = houseService.getById(proprietorQO.getHouseId());
+    public ElasticsearchCarQO getInsertElasticsearchCar(String uid,List<UserHouseQo> qo,CarQO carQO){
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
+        HouseEntity entity = houseService.getById(qo.get(0).getHouseId());
         ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
         elasticsearchCarQO.setId(carQO.getId());
-        elasticsearchCarQO.setCommunityId(proprietorQO.getCommunityId());
+        elasticsearchCarQO.setCommunityId(qo.get(0).getCommunityId());
         elasticsearchCarQO.setCarPlate(carQO.getCarPlate());
         elasticsearchCarQO.setCarType(carQO.getCarType());
         elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carQO.getCarType()));
-        elasticsearchCarQO.setOwner(proprietorQO.getRealName());
-        elasticsearchCarQO.setIdCard(proprietorQO.getIdCard());
-        elasticsearchCarQO.setMobile(proprietorQO.getMobile());
+        elasticsearchCarQO.setOwner(userEntity.getRealName());
+        elasticsearchCarQO.setIdCard(userEntity.getIdCard());
+        elasticsearchCarQO.setMobile(userEntity.getMobile());
         elasticsearchCarQO.setOwnerType(1);
         elasticsearchCarQO.setOwnerTypeText("用户");
-        elasticsearchCarQO.setRelationshipId(proprietorQO.getUid());
-        elasticsearchCarQO.setHouseId(proprietorQO.getHouseId());
+        elasticsearchCarQO.setRelationshipId(userEntity.getUid());
+        elasticsearchCarQO.setHouseId(qo.get(0).getHouseId());
         elasticsearchCarQO.setBuilding(entity.getBuilding());
         elasticsearchCarQO.setFloor(entity.getFloor());
         elasticsearchCarQO.setUnit(entity.getUnit());
