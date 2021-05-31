@@ -64,4 +64,27 @@ public interface ConstClasses {
 		}
 	}
 	
+	/**
+	 * @Description: 阿里云数据常量类
+	 * @Author: chq459799974
+	 * @Date: 2021/5/31
+	 **/
+	@Component
+	class AliYunDataEntity{
+		
+		public static String appCode;//公司阿里云appCode
+		
+		public static String URL_ID_CARD_OCR;//身份证文字识别三方接口
+		
+		@Value("${aliyun.appCode}")
+		public void setAppCode(String appCode) {
+			AliYunDataEntity.appCode = AESOperator.decrypt(appCode);
+		}
+		
+		@Value("${aliyun.url.id-card-ocr}")
+		public void setUrlIdCardOcr(String urlIdCardOcr) {
+			AliYunDataEntity.URL_ID_CARD_OCR = urlIdCardOcr;
+		}
+	}
+	
 }

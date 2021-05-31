@@ -1,6 +1,7 @@
 package com.jsy.community.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.RealnameBlinkInitQO;
 import com.jsy.community.qo.RealnameBlinkQueryQO;
@@ -60,7 +61,6 @@ public class RealnameAuthUtils {
 	 * @Date: 2021/3/2
 	**/
 	public static JSONObject initBlink(RealnameBlinkInitQO realnameBlinkInitQO){
-		String appCode = "cff6fed543a9459cbabb54b0dab6d9ea";
 		String host = "https://ediszim.market.alicloudapi.com";
 		String path = "/zoloz/zim/init";
 		String method = "POST";
@@ -70,9 +70,9 @@ public class RealnameAuthUtils {
 		bodyMap.put("metaInfo",realnameBlinkInitQO.getMetaInfo());
 		bodyMap.put("packageName",realnameBlinkInitQO.getPackageName());
 		bodyMap.put("platform",realnameBlinkInitQO.getPlatform());
-		Map<String, String> querys = new HashMap<String, String>();
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", "APPCODE " + appCode);
+		Map<String, String> querys = new HashMap<>();
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Authorization", "APPCODE " + ConstClasses.AliYunDataEntity.appCode);
 		headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 		JSONObject result = null;
 		try {
@@ -96,7 +96,6 @@ public class RealnameAuthUtils {
 	 * @Date: 2021/3/2
 	**/
 	public static JSONObject getBlinkResult(RealnameBlinkQueryQO realnameBlinkQueryQO){
-		String appCode = "cff6fed543a9459cbabb54b0dab6d9ea";
 		String host = "https://ediszim.market.alicloudapi.com";
 		String path = "/zoloz/zim/getResult";
 		String method = "POST";
@@ -106,7 +105,7 @@ public class RealnameAuthUtils {
 		bodyMap.put("certifyId",realnameBlinkQueryQO.getCertifyId());
 		Map<String, String> querys = new HashMap<String, String>();
 		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", "APPCODE " + appCode);
+		headers.put("Authorization", "APPCODE " + ConstClasses.AliYunDataEntity.appCode);
 		headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 		JSONObject result = null;
 		try {
