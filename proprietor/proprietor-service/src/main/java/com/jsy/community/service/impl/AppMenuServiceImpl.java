@@ -26,8 +26,8 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	private AppMenuMapper appMenuMapper;
 	
 	/**
-	 * 首页展示的菜单数   本来原先需求是说每个社区首页展示的菜单数可有物业控制(可以有1个2个3个...)   最新产品的需求：每个社区首页最多有3个菜单  其中有个菜单是固定的(我的房屋)
-	 * 菜单可以考虑做缓存  暂没做了 因为需求变得快   之前原本我做了缓存的
+	 * 首页展示的菜单数   本来原先需求是说每个社区首页展示的菜单数可有物业控制(可以有1个2个3个...)   最新产品暂定的需求：每个社区首页最多有3个菜单  其中有个菜单是固定的(我的房屋) pS:应该在社区入驻的同事为其添加一条菜单(我的房屋)   应该是写在大后台的
+	 * 菜单可以考虑做缓存  暂时没做了 因为需求变得快   之前原本我是做了缓存的
 	 **/
 	private static final Integer INDEX_MENU_COUNT = 3;
 	
