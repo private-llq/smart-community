@@ -56,8 +56,8 @@ public class AppleUtil {
     public static AppleTokenVo getAppleUserInfo(String identityToken) {
         AppleTokenVo appleTokenVo = null;
         try {
-            String str2 = new String(Base64Utils.decodeFromString(identityToken), StandardCharsets.UTF_8);
-            appleTokenVo = JSON.parseObject(str2, AppleTokenVo.class);
+            String userInfo = new String(Base64Utils.decodeFromString(identityToken), StandardCharsets.UTF_8);
+            appleTokenVo = JSON.parseObject(userInfo, AppleTokenVo.class);
         } catch (Exception e) {
             log.info("get apple user information fail,e={} ", e);
         }
