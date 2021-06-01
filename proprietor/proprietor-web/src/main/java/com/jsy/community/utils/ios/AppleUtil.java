@@ -86,7 +86,9 @@ public class AppleUtil {
             log.error("apple token verify fail,identityToken is expired!");
         } catch (Exception e2) {
             log.error("apple token verify fail,error={}", e2);
+            log.error("apple token verify fail,error={}", e2.getMessage());
         }
         return false;
     }
+
 }

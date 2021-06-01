@@ -100,6 +100,35 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         return createBindMobile(platformEntity.getId());
     }
 
+
+    /**
+     * @Description:
+     * @author: Hu
+     * @since: 2021/6/1 10:15
+     * @Param: [sub]
+     * @return: com.jsy.community.vo.UserAuthVo
+     */
+    @Override
+    public UserAuthVo IosLogin(String sub) {
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
+                .eq("third_platform_id", sub).eq("third_platform_type",4));
+        if(entity != null&&entity.getUid()!=null){
+            //返回token
+            UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+            userInfoVo.setIdCard(null);
+            return createAuthVoWithToken(userInfoVo);
+        }
+        if (entity!=null){
+            return createBindMobile(entity.getId());
+        }
+        UserThirdPlatformEntity platformEntity = new UserThirdPlatformEntity();
+        platformEntity.setThirdPlatformId(sub);
+        platformEntity.setThirdPlatformType(4);
+        platformEntity.setId(SnowFlake.nextId());
+        userThirdPlatformMapper.insert(platformEntity);
+        return createBindMobile(platformEntity.getId());
+    }
+
     /**
      * @Description: 绑定手机
      * @author: Hu
