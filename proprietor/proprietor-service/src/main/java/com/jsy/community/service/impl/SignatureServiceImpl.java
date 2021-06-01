@@ -56,7 +56,7 @@ public class SignatureServiceImpl implements ISignatureService {
 	/**
 	 * 数据加密
 	 */
-	public SignResult<String> getParamEntity(SignatureUserDTO signatureUserDTO) {
+	public static SignResult<String> getParamEntity(SignatureUserDTO signatureUserDTO) {
 		String encrypt = AESUtil.encrypt(JSON.toJSONString(signatureUserDTO), "?b@R~@Js6yH`aFal=LAHg?l~K|ExYJd;", "1E}@+?f-voEy;_?r");
 		SignResult<String> success = SignResult.success(encrypt);
 		Map map = JSON.parseObject(JSON.toJSONString(success), Map.class);
@@ -79,22 +79,22 @@ public class SignatureServiceImpl implements ISignatureService {
 		//远程服务调用id
 		switch(type){
 			case 1:
-				url = protocolType + host + ":" + port + "/LongRange/insertUser";
+				url = protocolType + host + ":" + port + "/zh-sign/contract-server/LongRange/insertUser";
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_INSERT_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 2:
-				url = protocolType + host + ":" + port + "/LongRange/batchInsertUser";
+				url = protocolType + host + ":" + port + "/zh-sign/contract-server/LongRange/batchInsertUser";
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_BATCH_INSERT_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 3:
-				url = protocolType + host + ":" + port + "/LongRange/RealNameUpdateUser";
+				url = protocolType + host + ":" + port + "/zh-sign/contract-server/LongRange/realNameUpdateUser";
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_REALNAME_UPDATE_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 4:
-				url = protocolType + host + ":" + port + "/LongRange/updateUser";
+				url = protocolType + host + ":" + port + "/zh-sign/contract-server/LongRange/updateUser";
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_UPDATE_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
