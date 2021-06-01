@@ -11,12 +11,11 @@ import java.security.PublicKey;
 import java.util.Map;
 
 /**
- * 苹果工具类
- *
- * @author :  
- * @version : 1.0.0
- * @date :   2020/7/13 17:10
- */
+ * @program: com.jsy.community
+ * @description: 苹果工具类
+ * @author: Hu
+ * @create: 2021/6/1 14:59
+ **/
 @Slf4j
 public class AppleUtil {
 

@@ -1,11 +1,11 @@
 package com.jsy.community.utils.ios;
 
 /**
- * 苹果用户token中信息
- *
- * @version : 1.0.0
- * @date :   2020/7/17 15:03
- */
+ * @program: com.jsy.community
+ * @description: 苹果用户token中信息
+ * @author: Hu
+ * @create: 2021/6/1 14:59
+ **/
 public class AppleTokenVo {
 
     /**
