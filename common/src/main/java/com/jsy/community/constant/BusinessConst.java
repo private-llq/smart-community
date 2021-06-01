@@ -7,7 +7,17 @@ package com.jsy.community.constant;
  * @since 2020-11-28 13:44
  **/
 public interface BusinessConst {
-
+    
+    //============================ 系统常量 =============================
+    /**
+     * 系统类型-安卓
+     */
+    Integer SYS_TYPE_ANDROID = 1;
+    /**
+     * 系统类型-IOS
+     */
+    Integer SYS_TYPE_IOS = 2;
+    
     //============================ 数字常量 =============================
     /**
      * Zero

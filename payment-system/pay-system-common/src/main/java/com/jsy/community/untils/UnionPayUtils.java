@@ -106,8 +106,16 @@ public class UnionPayUtils {
      *@Date: 2021/4/10 14:00
      **/
     private DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> buildClient() {
-        String certificatePath = UnionPayUtils.class.getResource("/").getPath().replaceFirst("/", "");
+        String certificatePath = new String();
+        if (System.getProperty("os.name").startsWith("Win")) {
+            // windows操作系统
+            certificatePath = "D:\\ideaProjectDirectory\\smart-community\\payment-system\\pay-system-common\\src\\main\\resources\\certificates\\";
+        } else {
+            certificatePath = "/mnt/db/smart-community/cert/union_cert/";
+        }
+        /*String certificatePath = UnionPayUtils.class.getResource("/").getPath().replaceFirst("/", "");
         certificatePath = certificatePath.replace("pay-system-service", "pay-system-common") + "certificates/";
+        certificatePath = certificatePath.replace("!", "");*/
         log.info("私钥地址+++++++++++{}", certificatePath + UnionPayConfig.PRIVATE_KEY);
         log.info("公钥地址+++++++++++{}", certificatePath + UnionPayConfig.PUBLIC_KEY);
         DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> client =

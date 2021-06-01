@@ -38,7 +38,6 @@ public class ElasticsearchConfig {
     }
 
 
-
     @Bean
     public RestHighLevelClient elasticsearchClient(){
         return new RestHighLevelClient(

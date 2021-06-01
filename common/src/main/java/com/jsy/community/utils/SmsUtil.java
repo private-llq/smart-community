@@ -13,6 +13,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.jsy.community.constant.ConstClasses;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.stereotype.Component;
 
@@ -66,11 +67,10 @@ public class SmsUtil {
     //发送初始密码
     public static boolean sendSmsPassword(String phonenumber,String password) {
         String url = "http://smsbanling.market.alicloudapi.com/smsapis";
-        String appCode = "abfc59f0cdbc4c038a2e804f9e9e37de";
 //        String msg = "账号：" + phonenumber +"，登录密码：" + password + "。您的物业管理后台账号已创建，请妥善保管账号资料，可登录系统设置新密码。";
 	    String msg = "账号：" + phonenumber +"，登录密码" + password + "。您的物业管理后台账号已创建，请妥善保管账号资料，可登录系统设置新密码。";
         Map<String, String> headers = new HashMap<>(1);
-        headers.put("Authorization", "APPCODE " + appCode);
+        headers.put("Authorization", "APPCODE " + ConstClasses.AliYunDataEntity.appCode);
         Map<String, String> queryParam = new HashMap<>(2);
         queryParam.put("mobile",phonenumber);
         queryParam.put("msg",msg);
