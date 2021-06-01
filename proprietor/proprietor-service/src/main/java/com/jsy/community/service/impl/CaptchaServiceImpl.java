@@ -36,9 +36,6 @@ public class CaptchaServiceImpl implements ICaptchaService {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IUserAuthService userAuthService;
 	
-	@Autowired
-	private SmsUtil smsUtil;
-	
 	@Override
 	public boolean sendMobile(String mobile, Integer type) {
 		if (type == UserAuthEntity.CODE_TYPE_REGISTER || type == UserAuthEntity.CODE_TYPE_CHANGE_MOBILE) {
