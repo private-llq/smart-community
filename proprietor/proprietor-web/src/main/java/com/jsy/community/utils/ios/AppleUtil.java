@@ -24,11 +24,6 @@ public class AppleUtil {
 
     private static final String APPLE_SERVER_ULR = "https://appleid.apple.com";
 
-    /*public static void main(String[] args) {
-        AppleTokenVo appleTokenVo = decodeIdentityToken("eyJraWQiOiJlWGF1bm1MIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLmNoYW5nZGFvLnR0c2Nob29sIiwiZXhwIjoxNTg5MjcwMzI3LCJpYXQiOjE1ODkyNjk3MjcsInN1YiI6IjAwMTk0MC43YTExNDFhYTAwMWM0NjllYTE1NjNjNmJhZTk5YzM3ZC4wMzA3IiwiY19oYXNoIjoienNIUW9xbTdjcDZOcmxrUHFhTmpGQSIsImVtYWlsIjoiYXEzMmsydnpjd0Bwcml2YXRlcmVsYXkuYXBwbGVpZC5jb20iLCJlbWFpbF92ZXJpZmllZCI6InRydWUiLCJpc19wcml2YXRlX2VtYWlsIjoidHJ1ZSIsImF1dGhfdGltZSI6MTU4OTI2OTcyNywibm9uY2Vfc3VwcG9ydGVkIjp0cnVlfQ.q5unOzswOjpRYmrVKVm3FRb_Th6kkhgEvoFfTEAIETwgTXZ7bYcQM8J8tCjkGGqtt2z74Z-wTW7Q3ia209xhmwrVDIup0jcQgNTvsCEMkfo9evPIDrNRNQw2Dzw2EBKma8004NL6THYlySoDnPRoW_VQCHP_m0HnjYuIc-wtREEClf-_tOFDPpTsvUFoETHNfhpsLhqj24-zm6MSOocYY3WbUaYJQVEFCz-x6AGko1XkMtms_-JU1xakNtjMZTIVj2XyUI5MO7_eo-D9i_c7Hj-OE9HNBEvFnPxOesDzXvEoYdb7uByXEfa-H1syJMecBMRa3tL76W_CYKsONRkU9Q");
-        System.out.println(appleTokenVo);
-    }*/
-
     /**
      * 获取publicKey 的算法id
      *
