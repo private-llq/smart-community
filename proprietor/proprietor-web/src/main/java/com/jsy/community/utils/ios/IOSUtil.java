@@ -25,6 +25,13 @@ import java.util.List;
  **/
 public  class IOSUtil {
 
+    /**
+     * @Description: 获取ios PublicKey工具类
+     * @author: Hu
+     * @since: 2021/6/1 15:02
+     * @Param: [kid]
+     * @return: java.security.PublicKey
+     */
     public static PublicKey getPublicKey(String kid) {
         String body=null;
         try {
