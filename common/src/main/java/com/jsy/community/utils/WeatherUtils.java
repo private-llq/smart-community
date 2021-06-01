@@ -207,10 +207,10 @@ public class WeatherUtils {
 			FileReader fileReader2;
 			log.info("开始读取假天气数据");
 			if(System.getProperty("os.name").startsWith("Win")){
-//				fileReader = new FileReader(new File(getClassesPath() + "temp_weather.txt"));
-//				fileReader2 = new FileReader(new File(getClassesPath() + "temp_weather_details.txt"));
-				fileReader = new FileReader(new File("D:/" + "temp_weather.txt"));
-				fileReader2 = new FileReader(new File("D:/" + "temp_weather_details.txt"));
+				fileReader = new FileReader(new File(getClassesPath() + "temp_weather.txt"));
+				fileReader2 = new FileReader(new File(getClassesPath() + "temp_weather_details.txt"));
+//				fileReader = new FileReader(new File("D:/" + "temp_weather.txt"));
+//				fileReader2 = new FileReader(new File("D:/" + "temp_weather_details.txt"));
 			}else{
 				fileReader = new FileReader(new File(OS_LINUX_PATH + "temp_weather.txt"));
 				fileReader2 = new FileReader(new File(OS_LINUX_PATH + "temp_weather_details.txt"));

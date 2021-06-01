@@ -25,8 +25,8 @@ public class ResourceLoadUtil {
 		try {
 			FileReader fileInputStream;
 			if(System.getProperty("os.name").startsWith("Win")){
-//				fileInputStream = new FileReader(new File(getClassesPath() + templateName));
-				fileInputStream = new FileReader(new File("D:/" + templateName));
+				fileInputStream = new FileReader(new File(getClassesPath() + templateName));
+//				fileInputStream = new FileReader(new File("D:/" + templateName));
 			}else{
 				fileInputStream = new FileReader(new File(OS_LINUX_PATH + templateName));
 			}
