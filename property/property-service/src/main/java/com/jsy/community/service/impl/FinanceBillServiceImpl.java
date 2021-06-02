@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -56,47 +57,53 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDays(){
+        List<PropertyFinanceOrderEntity> list=new LinkedList();
+        PropertyFinanceOrderEntity orderEntity=null;
         QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
         wrapper.select("DISTINCT community_id");
         wrapper.eq("check_status",1);
+        //查出所有认证过的小区ID
         List<UserHouseEntity> entityList = userHouseMapper.selectList(wrapper);
         for (UserHouseEntity userHouseEntity : entityList) {
+            //查出当前小区的收费规则
             PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("community_id",userHouseEntity.getCommunityId()));
             if (entity != null) {
+                //查出当前小区所有已认证过的房屋
                 List<HouseEntity> entities = houseMapper.selectHouseAll(userHouseEntity.getCommunityId());
+                //根据收费规则循环封装当前小区所有房屋账单
                 for (HouseEntity houseEntity : entities) {
+                    //根据period计费周期封装账单数据   1日，2周，3月，4季，5年  测试阶段只有按天计费的和按月计费的
                     if (entity.getPeriod() == 1) {
-                        PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
+                        orderEntity = new PropertyFinanceOrderEntity();
                         orderEntity.setOrderNum(getOrderNum(userHouseEntity.getCommunityId()+"",entity.getSerialNumber()));
                         orderEntity.setOrderTime(LocalDate.now());
                         orderEntity.setCommunityId(userHouseEntity.getCommunityId());
                         orderEntity.setUid(houseEntity.getUid());
                         orderEntity.setHouseId(houseEntity.getId());
                         orderEntity.setPropertyFee(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
-                        orderEntity.setPenalSum(new BigDecimal(0));
                         orderEntity.setTotalMoney(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
-                        orderEntity.setOrderStatus(0);
                         orderEntity.setId(SnowFlake.nextId());
-                        propertyFinanceOrderMapper.insert(orderEntity);
-                    }else if (LocalDate.now().getDayOfMonth() == 1) {
-                        PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
+                        list.add(orderEntity);
+                    }
+                    //如果不是按天计费就获取当前日期如果是一号就新增账单
+                    else if (LocalDate.now().getDayOfMonth() == 1) {
+                        orderEntity = new PropertyFinanceOrderEntity();
                         orderEntity.setOrderNum(getOrderNum(userHouseEntity.getCommunityId()+"",entity.getSerialNumber()));
                         orderEntity.setOrderTime(LocalDate.now());
                         orderEntity.setCommunityId(userHouseEntity.getCommunityId());
                         orderEntity.setUid(houseEntity.getUid());
                         orderEntity.setHouseId(houseEntity.getId());
                         orderEntity.setPropertyFee(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
-                        orderEntity.setPenalSum(new BigDecimal(0));
                         orderEntity.setTotalMoney(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
-                        orderEntity.setOrderStatus(0);
                         orderEntity.setId(SnowFlake.nextId());
-                        propertyFinanceOrderMapper.insert(orderEntity);
+                        list.add(orderEntity);
                     }
                 }
             }
         }
+        //把封装好的list批量新增到数据库订单表
+        propertyFinanceOrderMapper.saveList(list);
     }
-
 
 
 
@@ -114,13 +121,16 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
         wrapper.select("DISTINCT no,community_id");
         wrapper.eq("check_status",1);
+        //查出所有认证过的小区ID
         List<UserHouseEntity> entityList = userHouseMapper.selectList(wrapper);
         for (UserHouseEntity houseEntity : entityList) {
+            //查询当前小区的收费规则
             PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("community_id",houseEntity.getCommunityId()));
             if (entity != null) {
+                //查询当前小区所有未结算的账单
                 List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("community_id", houseEntity.getCommunityId()).eq("order_status",0));
                 for (PropertyFinanceOrderEntity orderEntity : entities) {
-                    //在缴费规则的条件下把账单加上违约天数和当前时间比较
+                    //根据小区缴费规则生成违约金
                     if (orderEntity.getOrderTime().plusDays(entity.getPenalDays()).isBefore(LocalDate.now())) {
                         orderEntity.setPenalSum(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum())));
                         orderEntity.setTotalMoney(orderEntity.getPropertyFee().multiply(entity.getPenalSum()).add(orderEntity.getTotalMoney()));
