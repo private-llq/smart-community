@@ -65,9 +65,6 @@ public class AdminUserController {
 	private UserUtils userUtils;
 	
 	@Autowired
-	private SmsUtil smsUtil;
-	
-	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 	
 	@Resource

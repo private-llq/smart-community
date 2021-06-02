@@ -27,4 +27,13 @@ public interface IWeChatLoginService {
      * @return: UserAuthVo
      */
     UserAuthVo bindingMobile(BindingMobileQO bindingMobileQO);
+
+    /**
+     * @Description: ios三方登录
+     * @author: Hu
+     * @since: 2021/6/1 10:15
+     * @Param:
+     * @return:
+     */
+    UserAuthVo IosLogin(String sub);
 }

@@ -4,13 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFinanceCountEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
-import com.jsy.community.entity.property.TestEntity;
 import com.jsy.community.vo.StatementOrderVO;
 import com.jsy.community.vo.property.FinanceOrderEntityVO;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
 import org.apache.ibatis.annotations.Param;
@@ -176,4 +171,13 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Date: 2021/4/28 9:29
      **/
     List<FinanceOrderEntityVO> unsettlementStatistics(@Param("query") PropertyFinanceCountEntity query);
+
+    /**
+     * @Description: 批量新增
+     * @author: Hu
+     * @since: 2021/6/2 10:47
+     * @Param:
+     * @return:
+     */
+    void saveList(@Param("list")List<PropertyFinanceOrderEntity> list);
 }

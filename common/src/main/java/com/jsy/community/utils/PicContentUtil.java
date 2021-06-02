@@ -3,11 +3,11 @@ package com.jsy.community.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.constant.DrivingLicense;
 import com.jsy.community.exception.JSYException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.util.EntityUtils;
 
@@ -21,15 +21,13 @@ import java.util.Map;
  **/
 public class PicContentUtil {
 
-
 	public static final String ID_CARD_PIC_SIDE_FACE = "face";
 	public static final String ID_CARD_PIC_SIDE_BACK = "back";
 	private static volatile DrivingLicense drivingLicense;
 	
 	//身份证照片内容识别
 	public static Map<String,Object> getIdCardPicContent(String picBase64,String type){
-		String appCode = "17e38ac209824aab9d0e82097f59ba11";
-		String url = "https://dm-51.data.aliyun.com/rest/160601/ocr/ocr_idcard.json";
+		String url = ConstClasses.AliYunDataEntity.URL_ID_CARD_OCR;
 		//新建请求，设置参数
 		Map<String, Object> bodyMap = new HashMap<>();
 		bodyMap.put("image",picBase64);
@@ -39,7 +37,7 @@ public class PicContentUtil {
 		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url,bodyMap);
 		//设置header
 		Map<String,String> headers = new HashMap<>();
-		headers.put("Authorization","APPCODE " + appCode);
+		headers.put("Authorization","APPCODE " + ConstClasses.AliYunDataEntity.appCode);
 		MyHttpUtils.setHeader(httpPost,headers);
 		MyHttpUtils.setDefaultHeader(httpPost);
 		//设置默认配置

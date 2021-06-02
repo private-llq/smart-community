@@ -2,32 +2,36 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IAppVersionService;
+import com.jsy.community.constant.BusinessConst;
+import com.jsy.community.constant.Const;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author lihao
- * @ClassName AppDownController
+ * @ClassName AppController
  * @Date 2021/2/5  15:38
  * @Description TODO
  * @Version 1.0
  **/
-@Api(tags = "APP上传")
+@Api(tags = "APP相关")
 @Slf4j
 @RestController
 @RequestMapping("/app")
 @Login(allowAnonymous = true)
 @ApiJSYController
-public class AppDownController {
+public class AppController {
+	
+	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+	private IAppVersionService appVersionService;
 	
 	@ApiOperation("APP上传到服务器")
 	@PostMapping("/uploadApp")
@@ -50,6 +54,16 @@ public class AppDownController {
 //		String app = MinioUtils.uploadPic(file, "user-face-avatar");
 //		return CommonResult.ok(app);
 //	}
+	
+	@ApiOperation("查询APP版本列表")
+	@GetMapping("/list/version")
+	public CommonResult queryAppVersionList(Integer sysType,String sysVersion){
+		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
+			sysType = null;
+		}
+		return CommonResult.ok(appVersionService.queryAppVersionList(sysType,sysVersion),"查询成功");
+	}
+	
 	
 	public static void main(String[] args) {
 		System.out.println(SnowFlake.nextId());
