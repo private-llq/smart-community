@@ -4,7 +4,7 @@ server:
     context-path: /
 rabbitmq:
   ####连接地址
-  host: 106.13.84.80
+  host: 222.178.212.29
   ####端口号
   port: 5672
   username: root
@@ -95,3 +95,12 @@ alipay:
     app-public-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ15R+VEYa74K3asVSOsI9WCXDo4MVqWj4RqvYMe3ThdYumnZAyjwI3d1azh6DYX7H88=
     alipay-public-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ15qbBLdzQJkM7QsnxbgB2Dc/1mbQsqE49BNhdf6kmsHDnA4BI+fU4byotb6SDlsUZ8=
     root-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ17UiK8ZLIVZbCNVejlM24NyTkKoI4y8q+5+FyPuq655yQ==
+
+
+aliyun:
+  #通用appcode
+  appCode: syPMjrYHXkdwA+2hgBYqsPosEzLrkZ4hgNncsiuGFJdhXEuLWcOV9xgIRp2XMS6S
+  #三方接口url
+  url:
+    #身份证照片识别
+    id-card-ocr: https://dm-51.data.aliyun.com/rest/160601/ocr/ocr_idcard.json
