@@ -71,7 +71,12 @@ public class CommonServiceImpl implements ICommonService {
         if (!oldCode.equals(code)) {
             throw new ProprietorException("验证码错误");
         }
-
+    
+        //苹果审核用账号
+        if("18183132010".equals(account)){
+            return;
+        }
+        
         // 验证通过后删除验证码
         redisTemplate.delete("vCode:" + account);
     }
