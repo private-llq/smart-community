@@ -23,6 +23,9 @@ public class UserInfoVo implements Serializable {
 	@ApiModelProperty("是否绑定手机1已绑定，0未绑定")
 	private Integer isBindMobile;
 
+	@ApiModelProperty("手机号")
+	private String mobile;
+
 	@ApiModelProperty("业主ID")
 	private String uid;
 
