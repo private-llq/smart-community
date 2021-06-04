@@ -98,7 +98,7 @@ public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, Fac
 		//2. 查询所有根节点
 		List<FacilityTypeVO> parents = new ArrayList<>();
 		for (FacilityTypeVO entity : allFacilityVO) {
-			if (entity.getPid() == 0) {
+			if (entity.getPid() != null && entity.getPid() == 0) {
 				// 获取并设置该节点的人数
 				Long typeId = entity.getId();
 				QueryWrapper<FacilityEntity> queryWrapper = new QueryWrapper<>();
