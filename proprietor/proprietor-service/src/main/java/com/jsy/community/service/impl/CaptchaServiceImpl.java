@@ -44,7 +44,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
 			if (isExists) {
 				throw new ProprietorException("您已注册账号");
 			}
-		} else if (type == UserAuthEntity.CODE_TYPE_LOGIN || type == UserAuthEntity.CODE_TYPE_FORGET_PWD) {
+		} else if (type == UserAuthEntity.CODE_TYPE_LOGIN || type == UserAuthEntity.CODE_TYPE_FORGET_PWD || type == UserAuthEntity.CODE_TYPE_CHANGE_PWD || type == UserAuthEntity.CODE_TYPE_CHANGE_PAY_PWD) {
 			boolean isExists = userAuthService.checkUserExists(mobile, "mobile");
 			if (!isExists) {
 				throw new ProprietorException("您还没有注册");
