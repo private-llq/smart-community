@@ -43,6 +43,11 @@ public class UserAuthEntity extends BaseEntity {
 	 */
 	public static final int CODE_TYPE_CHANGE_PWD = 6;
 	
+	/**
+	 * 修改支付密码
+	 */
+	public static final int CODE_TYPE_CHANGE_PAY_PWD = 7;
+	
 	@ApiModelProperty("业主ID")
 	private String uid;
 	
