@@ -72,9 +72,21 @@ public interface ConstClasses {
 	@Component
 	class AliYunDataEntity{
 		
+		public static String smsAccessKeyId;//阿里云短信子账号accessKeyId
+		public static String smsSecret;//阿里云短信子账号secret
+		
 		public static String appCode;//公司阿里云appCode
 		
 		public static String URL_ID_CARD_OCR;//身份证文字识别三方接口
+		
+		@Value("${aliyun.sms.smsAccessKeyId}")
+		public void setSmsAccessKeyId(String smsAccessKeyId) {
+			AliYunDataEntity.smsAccessKeyId = AESOperator.decrypt(smsAccessKeyId);
+		}
+		@Value("${aliyun.sms.smsSecret}")
+		public void setSmsSecret(String smsSecret) {
+			AliYunDataEntity.smsSecret = AESOperator.decrypt(smsSecret);
+		}
 		
 		@Value("${aliyun.appCode}")
 		public void setAppCode(String appCode) {

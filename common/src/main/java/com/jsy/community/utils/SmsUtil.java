@@ -13,7 +13,11 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.stereotype.Component;
 
@@ -22,16 +26,16 @@ import org.springframework.stereotype.Component;
  * @Author: chq459799974
  * @Date: 2020/12/11
 **/
-@Component
+@Slf4j
 public class SmsUtil {
-    //TODO 后期重载几个方法 templateName不用传
-    public static Map<String,String> sendSmsCode(String phonenumber,String templateName) {
-        //TODO templateName模板名待申请
-        //TODO signName签名待申请(如有需要)
+    /**
+     * 调用阿里云短信接口
+     */
+    public static void sendSmsCode(String mobile,String signName,String templateName,String jsonContent) {
         String regionId = "";
-        String accessKeyId = "";
-        String secret = "";
-        String signName = "";
+        String accessKeyId = ConstClasses.AliYunDataEntity.smsAccessKeyId;
+        String secret = ConstClasses.AliYunDataEntity.smsSecret;
+        
         DefaultProfile profile = DefaultProfile.getProfile(regionId,accessKeyId,secret);
         IAcsClient client = new DefaultAcsClient(profile);
 
@@ -41,57 +45,52 @@ public class SmsUtil {
         request.setSysVersion("2017-05-25");
         request.setSysAction("SendSms");
         request.putQueryParameter("RegionId", regionId);
-        request.putQueryParameter("PhoneNumbers", phonenumber);
+        request.putQueryParameter("PhoneNumbers", mobile);
         request.putQueryParameter("SignName", signName);
         request.putQueryParameter("TemplateCode", templateName);
-        String randomCode = MyMathUtils.randomCode(4);
-        request.putQueryParameter("TemplateParam", "{\"code\":".concat(randomCode).concat("}"));
-        Map<String,String> resMap = null;
+        request.putQueryParameter("TemplateParam", jsonContent);
         try {
         	CommonResponse  response = client.getCommonResponse(request);
             if(response != null && response.getData() != null){
             	JSONObject parseObject = JSONObject.parseObject(response.getData());
+                System.out.println(parseObject);
             	if("OK".equals(parseObject.getString("Message")) && "OK".equals(parseObject.getString("Code"))){
-            		resMap = new HashMap<>();
-            		resMap.put(phonenumber, randomCode);
-            	}
+                    log.info("向" + mobile + "发送短信成功");
+                    log.info("短信内容：\n" + jsonContent);
+            	}else{
+                    throw new JSYException(JSYError.INTERNAL.getCode(),"短信发送失败");
+                }
             }
         } catch (ServerException e) {
+            log.info("向" + mobile + "发送短信失败");
             e.printStackTrace();
+            throw new JSYException(JSYError.INTERNAL);
         } catch (ClientException e) {
+            log.info("向" + mobile + "发送短信失败");
             e.printStackTrace();
+            throw new JSYException(JSYError.INTERNAL);
         }
-        return resMap;
     }
     
-    //发送初始密码
-    public static boolean sendSmsPassword(String phonenumber,String password) {
-        String url = "http://smsbanling.market.alicloudapi.com/smsapis";
-//        String msg = "账号：" + phonenumber +"，登录密码：" + password + "。您的物业管理后台账号已创建，请妥善保管账号资料，可登录系统设置新密码。";
-	    String msg = "账号：" + phonenumber +"，登录密码" + password + "。您的物业管理后台账号已创建，请妥善保管账号资料，可登录系统设置新密码。";
-        Map<String, String> headers = new HashMap<>(1);
-        headers.put("Authorization", "APPCODE " + ConstClasses.AliYunDataEntity.appCode);
-        Map<String, String> queryParam = new HashMap<>(2);
-        queryParam.put("mobile",phonenumber);
-        queryParam.put("msg",msg);
-        queryParam.put("sign","智慧社区");
-    
-        //发送短信
-        HttpGet httpGet = MyHttpUtils.httpGet(url,queryParam);
-        MyHttpUtils.setHeader(httpGet,headers);
-        String result = (String) MyHttpUtils.exec(httpGet,1);
-        //验证结果
-        if ( Objects.isNull(result) ){
-            return false;
-        }
-        Integer resultCode = JSON.parseObject(result).getInteger("result");
-        if( resultCode != 0 ){
-            return false;
-        }
-        return true;
+    /**
+     * 发送验证码
+     */
+    public static String sendVcode(String mobile){
+        String code = MyMathUtils.randomCode(4);
+        Map<String,String> map = new HashMap<>();
+        map.put("code",code);
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.VCODE,JSON.toJSONString(map));
+        return code;
     }
     
-    public static void main(String[] args) {
-        sendSmsPassword("15178763584","abc123456");
-	}
+    /**
+     * 物业端添加操作员-发送初始密码
+     */
+    public static void sendSmsPassword(String mobile,String password) {
+        Map<String,String> map = new HashMap<>();
+        map.put("phonenumber",mobile);
+        map.put("password",password);
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.ADD_OPERATOR,JSON.toJSONString(map));
+    }
+    
 }

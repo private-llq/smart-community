@@ -16,9 +16,28 @@ public interface Const {
 		int QQ = 3;//QQ
 	}
 	
-	interface HouseMemberConsts {
-		Integer UNJOIN = 0;//未加入
-		Integer JOINED = 1;//已加入
+	/**
+	 * 已申请短信签名
+	 */
+	interface SMSSignName {
+		/**
+		 * 公司签名
+		 */
+		String SIGN_COMPANY = "纵横世纪";
+	}
+	
+	/**
+	 * 已申请短信模板
+	 */
+	interface SMSTemplateName {
+		/**
+		 * 短信验证码
+		 */
+		String VCODE =  "SMS_217925309";
+		/**
+		 * 物业端添加操作员-成功通知初始密码
+		 */
+		String ADD_OPERATOR = "SMS_218031262";
 	}
 	
 }

@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @RefreshScope
 public class CaptchaServiceImpl implements ICaptchaService {
 	
-	@Value(value = "${jsy.mobileCodeExpiredTime:10}")
+	@Value(value = "${jsy.mobileCodeExpiredTime}")
 	private Integer mobileExpiredTime;
 	
 	@Resource
@@ -56,15 +56,13 @@ public class CaptchaServiceImpl implements ICaptchaService {
 		}
 		
 		//发短信
-//		Map<String, String> smsSendMap = smsUtil.sendSms(mobile, "模板名");
-		// 验证码暂时固定1111
-		String code = "1111";
+		String code = SmsUtil.sendVcode(mobile);
+		//5分钟有效期
+		redisTemplate.opsForValue().set("vCode:" + mobile, code, mobileExpiredTime, TimeUnit.MINUTES);
 		
-		// 5分钟有效期
-//		if(smsSendMap != null){
-//			redisTemplate.opsForValue().set("vCode:" + mobile, smsSendMap.get(mobile), mobileExpiredTime, TimeUnit.MINUTES);
-//		}
-		redisTemplate.opsForValue().set("vCode:" + mobile, code); //测试阶段不过期
+		// 验证码暂时固定1111
+//		String code = "1111";
+//		redisTemplate.opsForValue().set("vCode:" + mobile, code); //测试阶段不过期
 		
 		return true;
 	}
