@@ -63,6 +63,12 @@ public class CommonServiceImpl implements ICommonService {
 
     @Override
     public void checkVerifyCode(String account, String code) {
+        
+        //苹果审核用账号
+        if("18183132010".equals(account)){
+            return;
+        }
+        
         Object oldCode = redisTemplate.opsForValue().get("vCode:" + account);
         if (oldCode == null) {
             throw new ProprietorException("验证码已失效");
@@ -72,10 +78,6 @@ public class CommonServiceImpl implements ICommonService {
             throw new ProprietorException("验证码错误");
         }
     
-        //苹果审核用账号
-        if("18183132010".equals(account)){
-            return;
-        }
         
         // 验证通过后删除验证码
         redisTemplate.delete("vCode:" + account);
