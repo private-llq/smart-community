@@ -49,7 +49,7 @@ public class WeatherUtils {
 	//TODO 三方接口商家待定 暂时用墨迹天气
 	public JSONObject getWeather(String lon,String lat,String url){
 		
-		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+		String appCode = "bde510ecefd94980823bd294f76eed79";
 		//params参数
 		Map<String, String> paramsMap = new HashMap<>();
 		paramsMap.put("lon", lon);
@@ -105,6 +105,7 @@ public class WeatherUtils {
 		lunarCalendar.setCode(0);
 		lunarCalendar.setName("万年历");
 		lunarCalendar.setStatus(lunarCalendarUtils.getLunarMonth()+"月"+lunarCalendarUtils.getLunarDay());
+		tempData.getJSONArray("liveIndex").remove(lunarCalendar);
 		tempData.getJSONArray("liveIndex").add(0,lunarCalendar);
 		return tempData;
 	}
