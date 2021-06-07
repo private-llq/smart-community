@@ -44,6 +44,25 @@ public class IosLoginController {
         }
         return CommonResult.error("服务器繁忙，请稍后再试！");
     }
+    /**
+     * @Description: 苹果三方登录接口(不绑定手机)
+     * @author: Hu
+     * @since: 2021/6/1 9:09
+     * @Param: [code]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PostMapping("/loginNotMobile")
+    public CommonResult loginNotMobile(@RequestParam String identityToken){
+        String[] split = identityToken.split("\\.");
+        AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
+        if (userInfo != null) {
+            if (AppleUtil.verifyIdentityToken(IOSUtil.getPublicKey(AppleUtil.getKid(split[0])), identityToken, userInfo.getAud(), userInfo.getSub())){
+                UserAuthVo userAuthVo = weChatLoginService.loginNotMobile(userInfo.getSub());
+                return CommonResult.ok(userAuthVo);
+            }
+        }
+        return CommonResult.error("服务器繁忙，请稍后再试！");
+    }
 
     /**
      * @Description: 苹果三方登录绑定手机

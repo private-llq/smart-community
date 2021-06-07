@@ -90,7 +90,9 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
             return createAuthVoWithToken(userInfoVo);
         }
         if (entity!=null){
-            return createBindMobile(entity.getId());
+            UserAuthVo userAuthVo = createBindMobile(entity.getId());
+            userAuthVo.setToken("");
+            return userAuthVo;
         }
         UserThirdPlatformEntity platformEntity = new UserThirdPlatformEntity();
         platformEntity.setThirdPlatformId(openid);
@@ -101,6 +103,34 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
     }
 
 
+
+    /**
+     * @Description: 不绑定手机登录
+     * @author: Hu
+     * @since: 2021/6/7 11:36
+     * @Param: [sub]
+     * @return: com.jsy.community.vo.UserAuthVo
+     */
+    @Override
+    public UserAuthVo loginNotMobile(String sub) {
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
+                .eq("third_platform_id", sub).eq("third_platform_type",4));
+        if(entity != null){
+            //返回token
+            UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+            userInfoVo.setIdCard(null);
+            return createAuthVoWithToken(userInfoVo);
+        }
+
+        String uid = userService.register(new RegisterQO());
+        UserThirdPlatformEntity platformEntity = new UserThirdPlatformEntity();
+        platformEntity.setThirdPlatformId(sub);
+        platformEntity.setThirdPlatformType(4);
+        platformEntity.setId(SnowFlake.nextId());
+        platformEntity.setUid(uid);
+        userThirdPlatformMapper.insert(platformEntity);
+        return createBindMobile(platformEntity.getId());
+    }
     /**
      * @Description:
      * @author: Hu
