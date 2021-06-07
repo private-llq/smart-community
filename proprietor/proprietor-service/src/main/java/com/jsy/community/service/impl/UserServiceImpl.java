@@ -194,7 +194,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Transactional(rollbackFor = Exception.class)
     @Override
     public String register(RegisterQO qo) {
-        commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+//        commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 
         String uuid = UserUtils.randomUUID();
 
@@ -250,6 +250,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             signatureUserDTO.setTelephone(qo.getAccount());
         } else if (RegexUtils.isEmail(qo.getAccount())) { // 邮箱注册
             signatureUserDTO.setEmail(qo.getAccount());
+        } else { //苹果三方登录等无手机号注册
+            return uuid;
         }
         String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
