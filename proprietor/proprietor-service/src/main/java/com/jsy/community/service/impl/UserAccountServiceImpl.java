@@ -151,8 +151,8 @@ public class UserAccountServiceImpl implements IUserAccountService {
 		}
 		Page<UserTicketEntity> pageResult = userTicketMapper.selectPage(page, queryWrapper);
 		for(UserTicketEntity ticketEntity : pageResult.getRecords()){
-			ticketEntity.setMoneyStr(ticketEntity.getMoney().setScale(2, RoundingMode.HALF_UP).toPlainString());
-			ticketEntity.setLeastConsumeStr(ticketEntity.getLeastConsume().setScale(2, RoundingMode.HALF_UP).toPlainString());
+			ticketEntity.setMoneyStr(ticketEntity.getMoney().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+			ticketEntity.setLeastConsumeStr(ticketEntity.getLeastConsume().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 		}
 		PageInfo<UserTicketEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageResult,pageInfo);
