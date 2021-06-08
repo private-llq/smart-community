@@ -97,7 +97,13 @@ alipay:
     root-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ17UiK8ZLIVZbCNVejlM24NyTkKoI4y8q+5+FyPuq655yQ==
 
 
+#阿里云
 aliyun:
+  sms:
+    #阿里云短信子账号accessKeyId
+    smsAccessKeyId: 622Q5a5VNsT/d8HgXBx4jQjcjeO4DSZnS2KNlLjLVss=
+    #阿里云短信子账号secret
+    smsSecret: QncgeFbByiIuHgB327wpp7kVrWNvZhS6zTurWIEPYE8=
   #通用appcode
   appCode: syPMjrYHXkdwA+2hgBYqsPosEzLrkZ4hgNncsiuGFJdhXEuLWcOV9xgIRp2XMS6S
   #三方接口url
