@@ -328,33 +328,56 @@ public class CommonServiceImpl implements ICommonService {
     
         //走缓存数据
         JSONObject jsonCache = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("CityWeatherInfo:" + cityName));
+        String cityNameLike = null;
+        RegionEntity cityLike = null;
+        if(jsonCache == null){
+            //尝试寻找相似地区
+            List<RegionEntity> cityLikeList = regionMapper.getCityNameLike(cityName);
+            if(cityLikeList != null && cityLikeList.size() == 1){
+                //找到相似地区且唯一，继续尝试从缓存获取数据
+                cityLike = cityLikeList.get(0);
+                jsonCache = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("CityWeatherInfo:" + cityLike.getName()));
+            }
+        }
         if(jsonCache != null){
             return jsonCache;
         }
-    
-        //根据城市名称获取经纬度
-        JSONObject lonAndLat = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("RegionLL:"+cityName));
-        if(lonAndLat == null){
-            throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"暂不支持该城市！");
-        }
-        double lon = lonAndLat.getDoubleValue("lon");
-        double lat = lonAndLat.getDoubleValue("lat");
         
-        //接口调用
+        //缓存无数据
+        //1.根据传入的城市名称cityName获取经纬度
+        JSONObject lonAndLat = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("RegionLL:"+cityName));
+        double lon;
+        double lat;
+        if(lonAndLat != null){
+            lon = lonAndLat.getDoubleValue("lon");
+            lat = lonAndLat.getDoubleValue("lat");
+        }else{
+            //没有找到或找到多个相似城市
+            if(cityLike == null){
+                throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"暂不支持该城市！");
+            }
+            //使用相似城市
+            cityNameLike = cityLike.getName();
+            lon = cityLike.getLng();
+            lat = cityLike.getLat();
+        }
+        
+        //2.用经纬度调用三方天气接口
         JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
         JSONArray weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
         weatherNow.put("forecast",weatherForDays);
-        
+
         //处理数据
         WeatherUtils.dealForecastToAnyDays(weatherNow,3);  //截取未来3天天气预报
         WeatherUtils.addDayOfWeek(weatherNow); //补星期几
-        
+
         //去除不需要属性
         List<WeatherForecastVO> newForecastList = weatherForDays.toJavaList(WeatherForecastVO.class);
         weatherNow.put("forecast",newForecastList);
     
         //放入缓存
-        stringRedisTemplate.opsForValue().set("CityWeatherInfo:" + cityName,JSON.toJSONString(weatherNow),30, TimeUnit.MINUTES);
+        //TODO 缓存时间写到配置
+        stringRedisTemplate.opsForValue().set("CityWeatherInfo:" + (cityNameLike != null ? cityNameLike : cityName),JSON.toJSONString(weatherNow),30, TimeUnit.MINUTES);
         return weatherNow;
     }
     
@@ -370,19 +393,40 @@ public class CommonServiceImpl implements ICommonService {
     
         //走缓存数据
         JSONObject jsonCache = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("CityWeather:" + cityName));
+        String cityNameLike = null;
+        RegionEntity cityLike = null;
+        if(jsonCache == null){
+            //尝试寻找相似地区
+            List<RegionEntity> cityLikeList = regionMapper.getCityNameLike(cityName);
+            if(cityLikeList != null && cityLikeList.size() == 1){
+                //找到相似地区且唯一，继续尝试从缓存获取数据
+                cityLike = cityLikeList.get(0);
+                jsonCache = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("CityWeather:" + cityLike.getName()));
+            }
+        }
         if(jsonCache != null){
             return jsonCache;
         }
         
         //根据城市名称获取经纬度
         JSONObject lonAndLat = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("RegionLL:"+cityName));
-        if(lonAndLat == null){
-            throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"暂不支持该城市！");
+        double lon;
+        double lat;
+        if(lonAndLat != null){
+            lon = lonAndLat.getDoubleValue("lon");
+            lat = lonAndLat.getDoubleValue("lat");
+        }else{
+            //没有找到或找到多个相似城市
+            if(cityLike == null){
+                throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"暂不支持该城市！");
+            }
+            //使用相似城市
+            cityNameLike = cityLike.getName();
+            lon = cityLike.getLng();
+            lat = cityLike.getLat();
         }
-        double lon = lonAndLat.getDoubleValue("lon");
-        double lat = lonAndLat.getDoubleValue("lat");
+        
         try {
-            
             //接口调用
             JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
             JSONArray weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
@@ -397,7 +441,6 @@ public class CommonServiceImpl implements ICommonService {
             List<WeatherForecastVO> newForecastList = weatherForDays.toJavaList(WeatherForecastVO.class);
             weatherNow.put("forecast",newForecastList);
 
-//            WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
             //查询天气图标
             Map<String,Map<String, String>> latestIcon = weatherIconMapper.getLatestIcon();
             for(int i=0;i<weatherFor24hours.size();i++){
@@ -414,7 +457,7 @@ public class CommonServiceImpl implements ICommonService {
             weatherNow.put("liveIndex",livingIndex);
             
             //放入缓存
-            stringRedisTemplate.opsForValue().set("CityWeather:" + cityName,JSON.toJSONString(weatherNow),30, TimeUnit.MINUTES);
+            stringRedisTemplate.opsForValue().set("CityWeather:" + (cityNameLike != null ? cityNameLike : cityName),JSON.toJSONString(weatherNow),30, TimeUnit.MINUTES);
             return weatherNow;
         }catch (Exception e){
             e.printStackTrace();

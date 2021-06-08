@@ -289,8 +289,9 @@ public class CommonController {
     @ApiOperation("首页天气")
     @GetMapping("weatherNow")
     public CommonResult<JSONObject> getWeatherNow(@RequestParam String cityName){
+        //真实数据
 //        JSONObject weather = commonService.getWeather(cityName);
-        //TODO 天气接口未购买，临时用假数据
+        //假数据
         JSONObject weather = commonService.getTempWeather();
         return CommonResult.ok(weather);
     }
@@ -299,8 +300,9 @@ public class CommonController {
     @ApiOperation("天气详情")
     @GetMapping("weatherDetails")
     public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam String cityName){
+        //真实数据
 //        JSONObject weather = commonService.getWeatherDetails(cityName);
-        //TODO 天气接口未购买，临时用假数据
+        //假数据
         JSONObject weather = commonService.getTempWeatherDetails();
         return CommonResult.ok(weather);
     }
