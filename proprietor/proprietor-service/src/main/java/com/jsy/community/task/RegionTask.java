@@ -238,11 +238,11 @@ public class RegionTask {
 	
 	//腾讯地图接口未提供
 	private void fillLostData(List<RegionEntity> list){
-		list.add(new RegionEntity(100000,"中国",0,0,"Z","zhongguo"));
-		list.add(new RegionEntity(500100,"重庆市",500000,2,"C","chongqing"));
-		list.add(new RegionEntity(110100,"北京市",110000,2,"B","beijing"));
-		list.add(new RegionEntity(120100,"天津市",120000,2,"T","tianjin"));
-		list.add(new RegionEntity(310100,"上海市",310000,2,"S","shanghai"));
+		list.add(new RegionEntity(100000,"中国",0,0,"Z","zhongguo",0f,0f));
+		list.add(new RegionEntity(500100,"重庆市",500000,2,"C","chongqing",106.551f,29.5647f));
+		list.add(new RegionEntity(110100,"北京市",110000,2,"B","beijing",116.407f,39.9047f));
+		list.add(new RegionEntity(120100,"天津市",120000,2,"T","tianjin",117.199f,39.0851f));
+		list.add(new RegionEntity(310100,"上海市",310000,2,"S","shanghai",121.474f,31.2304f));
 	}
 	
 	//调用腾讯地图-行政区划
