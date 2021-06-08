@@ -285,21 +285,21 @@ public class CommonController {
         }
     }
     
-//    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气")
+    //    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气")
     @ApiOperation("首页天气")
     @GetMapping("weatherNow")
-    public CommonResult<JSONObject> getWeatherNow(@RequestParam double lon,@RequestParam double lat){
-//        JSONObject weather = commonService.getWeather(lon, lat);
+    public CommonResult<JSONObject> getWeatherNow(@RequestParam String cityName){
+//        JSONObject weather = commonService.getWeather(cityName);
         //TODO 天气接口未购买，临时用假数据
         JSONObject weather = commonService.getTempWeather();
         return CommonResult.ok(weather);
     }
     
-//    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情")
+    //    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情")
     @ApiOperation("天气详情")
     @GetMapping("weatherDetails")
-    public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam double lon,@RequestParam double lat){
-//        JSONObject weather = commonService.getWeatherDetails(lon, lat);
+    public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam String cityName){
+//        JSONObject weather = commonService.getWeatherDetails(cityName);
         //TODO 天气接口未购买，临时用假数据
         JSONObject weather = commonService.getTempWeatherDetails();
         return CommonResult.ok(weather);

@@ -1,5 +1,6 @@
 package com.jsy.community.task;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.RegionEntity;
@@ -16,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +75,9 @@ public class RegionTask {
 			char c = (char)('A'+i);
 			cityMap.put(String.valueOf(c), new LinkedList<>());
 		}
+		Map<String,Float> cityLonAndLatMap = new HashMap<>();
 		for (RegionEntity regionEntity : allRegion) {
+			//缓存单个地区ID:地区名
 			redisTemplate.opsForValue().set("RegionSingle:"+regionEntity.getId(),regionEntity.getName());
 			//找到所有零级区域(国家)
 			//if("0".equals(regionEntity.getPid())){
@@ -85,6 +87,9 @@ public class RegionTask {
 			//找到二级区域(市)
 			//if("2".equals(regionEntity.getLevel())){
 			if(regionEntity.getLevel() == 2){
+				cityLonAndLatMap.put("lon",regionEntity.getLng());
+				cityLonAndLatMap.put("lat",regionEntity.getLat());
+				redisTemplate.opsForValue().set("RegionLL:" + regionEntity.getName(),JSON.toJSONString(cityLonAndLatMap));
 				cityList.add(regionEntity);
 				if(!StringUtils.isEmpty(regionEntity.getInitials())){
 					cityMap.get(regionEntity.getInitials()).add(regionEntity);

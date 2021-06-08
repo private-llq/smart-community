@@ -23,4 +23,6 @@ public class WeatherForecastVO implements Serializable {
 	private String windDirDay; //风向
 	private String windLevelDay; //风力等级
 	private String updatetime;//更新时间
+	private String dayOfWeek; //周几
+	private String updateDay; //自定义格式化日期 如"06/07"
 }
