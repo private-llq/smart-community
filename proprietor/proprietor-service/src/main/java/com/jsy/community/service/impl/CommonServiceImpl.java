@@ -269,7 +269,11 @@ public class CommonServiceImpl implements ICommonService {
     **/
     @Override
     public List<RegionEntity> getHotCityList() {
-        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("hotCityList")), List.class);
+        List<RegionEntity> hotCityList = JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("hotCityList")), List.class);
+        if(CollectionUtils.isEmpty(hotCityList)){
+            return commonMapper.queryHotCity();
+        }
+        return hotCityList;
     }
 
     /**
