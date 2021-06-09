@@ -339,7 +339,7 @@ public interface PaymentEnum {
 
 		public static String getName(Integer index) {
 			for (SmsTmpltBusinessType value : SmsTmpltBusinessType.values()) {
-				if (index == value.getIndex()) {
+				if (index.equals(value.getIndex())) {
 					return value.getName();
 				}
 			}
