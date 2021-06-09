@@ -10,6 +10,7 @@ import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.UserAccountEntity;
 import com.jsy.community.entity.UserAccountRecordEntity;
 import com.jsy.community.entity.UserTicketEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.UserAccountMapper;
 import com.jsy.community.mapper.UserTicketMapper;
 import com.jsy.community.qo.BaseQO;
@@ -22,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -136,23 +138,36 @@ public class UserAccountServiceImpl implements IUserAccountService {
 		Page<UserTicketEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
 		UserTicketQO query = baseQO.getQuery();
-		QueryWrapper<UserTicketEntity> queryWrapper = new QueryWrapper<UserTicketEntity>().select("*").eq("uid", query.getUid());
-		//条件查询
-		if(query.getType() != null){
-			queryWrapper.eq("type",query.getType());
-		}
-		if(query.getStatus() != null){
-			queryWrapper.eq("status",query.getStatus());
-		}
+		Page<UserTicketEntity> pageResult = userTicketMapper.queryUserTicketPage(page, query);
+		//若是查询未过期的
 		if(UserTicketQO.TICKET_UNEXPIRED.equals(query.getExpired())){
-			queryWrapper.ge("expire_time",LocalDateTime.now());
+			for(UserTicketEntity ticketEntity : pageResult.getRecords()){
+				ticketEntity.setMoneyStr(ticketEntity.getMoney().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+				ticketEntity.setLeastConsumeStr(ticketEntity.getLeastConsume().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+				//减少循环判断，直接设为未过期
+				ticketEntity.setExpired(UserTicketQO.TICKET_UNEXPIRED);
+			}
 		}else if(UserTicketQO.TICKET_EXPIRED.equals(query.getExpired())){
-			queryWrapper.le("expire_time",LocalDateTime.now());
-		}
-		Page<UserTicketEntity> pageResult = userTicketMapper.selectPage(page, queryWrapper);
-		for(UserTicketEntity ticketEntity : pageResult.getRecords()){
-			ticketEntity.setMoneyStr(ticketEntity.getMoney().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
-			ticketEntity.setLeastConsumeStr(ticketEntity.getLeastConsume().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+			//若是查询已过期的
+			for(UserTicketEntity ticketEntity : pageResult.getRecords()){
+				ticketEntity.setMoneyStr(ticketEntity.getMoney().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+				ticketEntity.setLeastConsumeStr(ticketEntity.getLeastConsume().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+				//减少循环判断，直接设为已过期
+				ticketEntity.setExpired(UserTicketQO.TICKET_EXPIRED);
+			}
+		}else{
+			//若是查询全部
+			for(UserTicketEntity ticketEntity : pageResult.getRecords()){
+				ticketEntity.setMoneyStr(ticketEntity.getMoney().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+				ticketEntity.setLeastConsumeStr(ticketEntity.getLeastConsume().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+				if(LocalDateTime.now().isBefore(ticketEntity.getExpireTime())){
+					//未过期
+					ticketEntity.setExpired(UserTicketQO.TICKET_UNEXPIRED);
+				}else{
+					//已过期
+					ticketEntity.setExpired(UserTicketQO.TICKET_EXPIRED);
+				}
+			}
 		}
 		PageInfo<UserTicketEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageResult,pageInfo);
@@ -169,7 +184,19 @@ public class UserAccountServiceImpl implements IUserAccountService {
 	**/
 	@Override
 	public UserTicketEntity queryTicketById(Long id, String uid){
-		return userTicketMapper.selectOne(new QueryWrapper<UserTicketEntity>().select("*").eq("id",id).eq("uid",uid));
+		//查用户券t_user_ticket
+		UserTicketEntity userTicketEntity = userTicketMapper.selectOne(new QueryWrapper<UserTicketEntity>().select("ticket_id as id,status,expire_time").eq("id",id).eq("uid",uid));
+		if(userTicketEntity == null){
+			throw new ProprietorException(JSYError.BAD_REQUEST.getCode(),"查无此券");
+		}
+		//查券信息t_ticket
+		UserTicketEntity ticketEntity = userTicketMapper.queryTicketById(userTicketEntity.getId());
+		if(ticketEntity == null){
+			throw new ProprietorException(JSYError.BAD_REQUEST.getCode(),"平台已无该券，请联系管理员");
+		}
+		ticketEntity.setStatus(userTicketEntity.getStatus());
+		ticketEntity.setExpireTime(userTicketEntity.getExpireTime());
+		return ticketEntity;
 	}
 	
 	//TODO 券相关操作改为支付(账户操作)时抵用 结果由本平台计算 展示项目结束后修改

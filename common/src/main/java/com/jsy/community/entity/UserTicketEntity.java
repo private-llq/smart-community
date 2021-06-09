@@ -46,4 +46,7 @@ public class UserTicketEntity extends BaseEntity{
 	@ApiModelProperty(value = "过期时间")
 	private LocalDateTime expireTime;
 	
+	@ApiModelProperty(value = "是否过期 0.否 1.是")
+	private Integer expired;
+	
 }
