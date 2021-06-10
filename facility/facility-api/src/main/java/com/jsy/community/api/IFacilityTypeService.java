@@ -57,7 +57,7 @@ public interface IFacilityTypeService extends IService<FacilityTypeEntity> {
 	 * @Author lihao
 	 * @Description 根据id查询设备分类信息
 	 * @Date 2021/3/22 16:12
-	 * @Param [id]
+	 * @Param [id,communityId]
 	 **/
-	FacilityTypeEntity getFacilityType(Long id);
+	FacilityTypeEntity getFacilityType(Long id, Long communityId);
 }
