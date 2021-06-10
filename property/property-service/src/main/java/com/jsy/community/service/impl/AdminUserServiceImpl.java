@@ -571,8 +571,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserAuthEntity.setSalt(salt);
 		adminUserAuthEntity.setUpdateBy(uid);
 		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", adminUser.getMobile()));
-		//发短信通知初始密码
-		SmsUtil.sendSmsPassword(adminUser.getMobile(), randomPass);
+		//发短信通知新初始密码
+		SmsUtil.resetPassword(adminUser.getMobile(), randomPass);
 		return result == 1;
 	}
 	
