@@ -29,6 +29,9 @@ dubbo:
   protocol:
     name: dubbo
     port: -1
+    threadname: property-web
+    dispatcher: message
+    threads: 50
   application:
     name: ${spring.application.name}
   cloud:
