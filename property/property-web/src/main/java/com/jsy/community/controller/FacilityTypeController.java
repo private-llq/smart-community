@@ -35,7 +35,7 @@ import java.util.List;
 @Login
 public class FacilityTypeController {
 	
-	@DubboReference(version = Const.version, group = Const.group_facility, check = false)
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IFacilityTypeService facilityTypeService;
 
 	@ApiOperation("添加设备分类树")

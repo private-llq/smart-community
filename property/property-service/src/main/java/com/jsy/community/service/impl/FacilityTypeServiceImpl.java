@@ -28,7 +28,7 @@ import java.util.List;
  * @author lihao
  * @since 2021-03-12
  */
-@DubboService(version = Const.version, group = Const.group_facility)
+@DubboService(version = Const.version, group = Const.group_property)
 public class FacilityTypeServiceImpl extends ServiceImpl<FacilityTypeMapper, FacilityTypeEntity> implements IFacilityTypeService {
 	
 	@Resource
