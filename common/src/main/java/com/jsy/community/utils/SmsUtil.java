@@ -93,4 +93,14 @@ public class SmsUtil {
         sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.ADD_OPERATOR,JSON.toJSONString(map));
     }
     
+    /**
+     * 物业端操作员-重置密码
+     */
+    public static void resetPassword(String mobile,String password) {
+        Map<String,String> map = new HashMap<>();
+        map.put("phonenumber",mobile);
+        map.put("password",password);
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.RESET_PASSWORD,JSON.toJSONString(map));
+    }
+    
 }

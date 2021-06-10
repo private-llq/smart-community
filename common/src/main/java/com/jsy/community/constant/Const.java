@@ -38,6 +38,10 @@ public interface Const {
 		 * 物业端添加操作员-成功通知初始密码
 		 */
 		String ADD_OPERATOR = "SMS_218031262";
+		/**
+		 * 物业端操作员-重置密码
+		 */
+		String RESET_PASSWORD = "SMS_218172247";
 	}
 	
 }
