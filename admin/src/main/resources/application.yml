@@ -1,5 +1,5 @@
 server:
-  port: 9001
+  port: 9003
   servlet:
     context-path: /
 rabbitmq:
@@ -110,3 +110,15 @@ aliyun:
   url:
     #身份证照片识别
     id-card-ocr: https://dm-51.data.aliyun.com/rest/160601/ocr/ocr_idcard.json
+    #天气相关
+    weather:
+      #天气实况
+      now: http://aliv8.data.moji.com/whapi/json/aliweather/condition
+      #15天天气预报
+      days: http://aliv8.data.moji.com/whapi/json/aliweather/forecast15days
+      #24小时预报
+      hours: http://aliv8.data.moji.com/whapi/json/aliweather/forecast24hours
+      #空气质量
+      air: http://aliv8.data.moji.com/whapi/json/aliweather/aqi
+      #生活指数
+      living: http://aliv8.data.moji.com/whapi/json/aliweather/index

@@ -31,7 +31,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 * @Date 2021/5/11 12:55
 	 * @Param
 	 **/
-	List<FacilityEntity> listFacility(@Param("qo") FacilityQO facilityQO, @Param("page") Page<FacilityEntity> info);
+	Page<FacilityEntity> listFacility(@Param("qo") FacilityQO facilityQO, @Param("page") Page<FacilityEntity> info);
 	
 	/**
 	 * @return void
@@ -61,6 +61,16 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 **/
 	@Select("select status from t_facility_status where facility_id = #{id}")
 	int getStatus(Long id);
+	
+	/**
+	* @Description: 根据设备id获取设备状态 批量
+	 * @Param: [idList]
+	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.Long,java.lang.Integer>>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/11
+	**/
+	@MapKey("facility_id")
+	Map<Long,Map<Long,Integer>> getStatusBatch(@Param("idList")List<Long> idList);
 	
 	/**
 	 * @return void

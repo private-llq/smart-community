@@ -17,13 +17,13 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.util.facility.FacilityUtils;
+import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -54,9 +54,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Autowired
 	private UserMapper userMapper;
-	
-	@Autowired
-	private RedisTemplate redisTemplate;
 	
 	@Override
 	@Transactional
@@ -101,25 +98,26 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	
 	@Override
-	public PageInfo<FacilityEntity> listFacility(BaseQO<FacilityQO> facilityQO) {
-		Page<FacilityEntity> info = new Page<>(facilityQO.getPage(), facilityQO.getSize());
-		FacilityQO qo = facilityQO.getQuery();
-		List<FacilityEntity> facilityEntityList = facilityMapper.listFacility(qo, info);
-		for (FacilityEntity facilityEntity : facilityEntityList) {
-			
-			// 根据id判断其在线状态
-			Long id = facilityEntity.getId();
-			int status = facilityMapper.getStatus(id);
-			facilityEntity.setStatus(status);
-			
-			// 根据设备分类id查询设备分类名称
-			Long facilityTypeId = facilityEntity.getFacilityTypeId();
-			FacilityTypeEntity typeEntity = facilityTypeMapper.selectById(facilityTypeId);
-			facilityEntity.setFacilityTypeName(typeEntity.getName());
+	public PageInfo<FacilityEntity> listFacility(BaseQO<FacilityQO> baseQO) {
+		FacilityQO qo = baseQO.getQuery();
+		Page<FacilityEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		Page<FacilityEntity> pageData = facilityMapper.listFacility(qo, page);
+		ArrayList<Long> ids = new ArrayList<>();
+		Set<Long> typeIds = new HashSet<>();
+		for (FacilityEntity facilityEntity : pageData.getRecords()) {
+			ids.add(facilityEntity.getId());
+			typeIds.add(facilityEntity.getFacilityTypeId());
+		}
+		//查询和设置设备状态、设备类型名
+		Map<Long,Map<Long,Integer>> statusMap = facilityMapper.getStatusBatch(ids);
+		Map<Long,Map<Long,String>> typeNameMap = facilityTypeMapper.queryIdAndNameMap(typeIds);
+		for (FacilityEntity facilityEntity : pageData.getRecords()) {
+			facilityEntity.setStatus(statusMap.get(BigInteger.valueOf(facilityEntity.getId())) == null ? null : statusMap.get(BigInteger.valueOf(facilityEntity.getId())).get("status"));
+			facilityEntity.setFacilityTypeName(typeNameMap.get(BigInteger.valueOf(facilityEntity.getFacilityTypeId())) == null ? null : typeNameMap.get(BigInteger.valueOf(facilityEntity.getFacilityTypeId())).get("name"));
 		}
 		PageInfo<FacilityEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(info, pageInfo);
-		pageInfo.setRecords(facilityEntityList);
+		BeanUtils.copyProperties(pageData, pageInfo);
 		return pageInfo;
 	}
 	

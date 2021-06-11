@@ -98,5 +98,14 @@
         </foreach>
     </update>
 
+    <!-- 批量查询设备在线状态 -->
+    <select id="getStatusBatch" resultType="Map">
+        select facility_id,status from t_facility_status
+        where facility_id in
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
 
 </mapper>
