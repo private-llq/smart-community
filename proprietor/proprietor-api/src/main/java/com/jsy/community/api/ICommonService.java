@@ -138,21 +138,21 @@ public interface ICommonService {
 	
 	/**
 	* @Description: 首页天气
-	 * @Param: [lon, lat]
+	 * @Param: [cityName]
 	 * @Return: com.alibaba.fastjson.JSONObject
 	 * @Author: chq459799974
 	 * @Date: 2021/2/25
 	**/
-	JSONObject getWeather(double lon, double lat);
+	JSONObject getWeather(String cityName);
 	
 	/**
 	 * @Description: 天气详情整合接口
-	 * @Param: [lon, lat]
+	 * @Param: [cityName]
 	 * @Return: com.alibaba.fastjson.JSONObject
 	 * @Author: chq459799974
 	 * @Date: 2020/2/25
 	 **/
-	JSONObject getWeatherDetails(double lon, double lat);
+	JSONObject getWeatherDetails(String cityName);
 	
 	/**
 	 * 全文搜索 数据库 数据导入 Elasticsearch

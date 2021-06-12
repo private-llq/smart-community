@@ -36,4 +36,13 @@ public interface IWeChatLoginService {
      * @return:
      */
     UserAuthVo IosLogin(String sub);
+
+    /**
+     * @Description: 不绑定手机登录
+     * @author: Hu
+     * @since: 2021/6/7 11:36
+     * @Param:
+     * @return:
+     */
+    UserAuthVo loginNotMobile(String sub);
 }

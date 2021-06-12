@@ -8,6 +8,7 @@ import com.jsy.community.entity.PeopleTrackEntity;
 import com.jsy.community.mapper.PeopleTrackMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.PeopleTrackQO;
+import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -38,7 +39,8 @@ public class PeopleTrackServiceImpl extends ServiceImpl<PeopleTrackMapper, Peopl
 	
 	@Override
 	public PageInfo<PeopleTrackEntity> listPeopleTrack(BaseQO<PeopleTrackQO> qo) {
-		Page<PeopleTrackEntity> page = new Page<>(qo.getPage(),qo.getSize());
+		Page<PeopleTrackEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,qo);
 		List<PeopleTrackEntity> peopleTrackEntityList = peopleTrackMapper.listPeopleTrack(qo,page);
 		
 		PageInfo<PeopleTrackEntity> info = new PageInfo<>();

@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @TableName("t_user_auth")
 @ApiModel("业主认证表")
 public class UserAuthEntity extends BaseEntity {
-	public static final String CODE_TYPE_NOTE = "验证码类型，1注册，2登录，3忘记密码，4更换手机号，5三方登录绑定, 6修改密码";
+	public static final String CODE_TYPE_NOTE = "验证码类型，1注册，2登录，3忘记密码，4更换手机号，5三方登录绑定, 6修改密码, 7.修改支付密码";
 	
 	/**
 	 * 注册验证码
@@ -42,6 +42,11 @@ public class UserAuthEntity extends BaseEntity {
 	 * 修改密码
 	 */
 	public static final int CODE_TYPE_CHANGE_PWD = 6;
+	
+	/**
+	 * 修改支付密码
+	 */
+	public static final int CODE_TYPE_CHANGE_PAY_PWD = 7;
 	
 	@ApiModelProperty("业主ID")
 	private String uid;

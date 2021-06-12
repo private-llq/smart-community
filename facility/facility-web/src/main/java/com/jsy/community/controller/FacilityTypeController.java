@@ -6,6 +6,8 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IFacilityTypeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.hk.FacilityTypeEntity;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -40,8 +42,7 @@ public class FacilityTypeController {
 	@PostMapping("/addFacilityType")
 	public CommonResult addFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
 		facilityTypeEntity.setId(SnowFlake.nextId());
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		facilityTypeEntity.setCommunityId(communityId);
+		facilityTypeEntity.setCommunityId(UserUtils.getAdminCommunityId());
 		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.addFacilityTypeValidate.class);
 		facilityTypeService.addFacilityType(facilityTypeEntity);
 		return CommonResult.ok();
@@ -50,15 +51,17 @@ public class FacilityTypeController {
 	@ApiOperation("根据id查询设备分类")
 	@GetMapping("/getFacilityType")
 	public CommonResult getFacilityType(@RequestParam Long id) {
-		FacilityTypeEntity typeEntity = facilityTypeService.getFacilityType(id);
+		FacilityTypeEntity typeEntity = facilityTypeService.getFacilityType(id,UserUtils.getAdminCommunityId());
 		return CommonResult.ok(typeEntity);
 	}
 	
 	@ApiOperation("修改设备分类")
 	@PostMapping("/updateFacilityType")
 	public CommonResult updateFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		facilityTypeEntity.setCommunityId(communityId);
+		if (facilityTypeEntity.getId() == null) {
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请选择要修改的设备分类");
+		}
+		facilityTypeEntity.setCommunityId(UserUtils.getAdminCommunityId());
 		ValidatorUtils.validateEntity(facilityTypeEntity, FacilityTypeEntity.updateFacilityTypeValidate.class);
 		facilityTypeService.updateFacilityType(facilityTypeEntity);
 		return CommonResult.ok();
@@ -67,16 +70,14 @@ public class FacilityTypeController {
 	@ApiOperation("删除设备分类")
 	@GetMapping("/deleteFacilityType")
 	public CommonResult deleteFacilityType(@RequestParam Long id) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		facilityTypeService.deleteFacilityType(id,communityId);
+		facilityTypeService.deleteFacilityType(id,UserUtils.getAdminCommunityId());
 		return CommonResult.ok();
 	}
 	
 	@ApiOperation("树形结构查询设备分类")
 	@GetMapping("/listFacilityType")
 	public CommonResult<List<FacilityTypeVO>> listFacilityType() {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		List<FacilityTypeVO> facilityTypeVOS = facilityTypeService.listFacilityType(communityId);
+		List<FacilityTypeVO> facilityTypeVOS = facilityTypeService.listFacilityType(UserUtils.getAdminCommunityId());
 		return CommonResult.ok(facilityTypeVOS);
 	}
 	

@@ -158,7 +158,8 @@ public class UserAuthController {
 	@PostMapping("/register")
 	public CommonResult<UserAuthVo> register(@RequestBody RegisterQO qo) {
 		ValidatorUtils.validateEntity(qo);
-		
+		//验证码验证
+		commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 		String uid = userService.register(qo);
 		UserInfoVo userInfoVo = new UserInfoVo();
 		userInfoVo.setUid(uid);

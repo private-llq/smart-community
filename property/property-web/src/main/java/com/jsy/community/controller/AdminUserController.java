@@ -259,6 +259,7 @@ public class AdminUserController {
 	@Login
 	@PutMapping("")
 	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
+		adminUserEntity.setMobile(null);
 		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.updateOperatorValidatedGroup.class);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
 		adminUserEntity.setCommunityId(loginUser.getCommunityId());

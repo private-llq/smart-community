@@ -43,8 +43,7 @@ public class CarTrackController {
 		if (carQo.getQuery() == null) {
 			carQo.setQuery(new CarTrackQO());
 		}
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		carQo.getQuery().setCommunityId(communityId);
+		carQo.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 		PageInfo<CarTrackEntity> pageInfo = carTrackService.listCarTrack(carQo);
 		return CommonResult.ok(pageInfo);
 	}

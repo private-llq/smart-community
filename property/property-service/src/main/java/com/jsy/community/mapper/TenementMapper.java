@@ -21,7 +21,7 @@ public interface TenementMapper {
      * @Param:
      * @return:
      */
-    Long getTotal(PropertyRelationQO query, Long page, Long size);
+    Long getTotal(PropertyRelationQO query);
 
     /**
      * @Description: 分页查询

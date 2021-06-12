@@ -10,9 +10,11 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.RegionEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.mapper.WeatherIconMapper;
+import com.jsy.community.task.RegionTask;
 import com.jsy.community.utils.LunarCalendarFestivalUtils;
 import com.jsy.community.utils.WeatherUtils;
 import com.jsy.community.vo.WeatherForecastVO;
@@ -23,13 +25,18 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -55,6 +62,9 @@ public class CommonServiceImpl implements ICommonService {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
     
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+    
     @Autowired
     private WeatherUtils weatherUtils;
     
@@ -63,6 +73,12 @@ public class CommonServiceImpl implements ICommonService {
 
     @Override
     public void checkVerifyCode(String account, String code) {
+        
+        //苹果审核用账号
+        if("18183132010".equals(account)){
+            return;
+        }
+        
         Object oldCode = redisTemplate.opsForValue().get("vCode:" + account);
         if (oldCode == null) {
             throw new ProprietorException("验证码已失效");
@@ -71,9 +87,10 @@ public class CommonServiceImpl implements ICommonService {
         if (!oldCode.equals(code)) {
             throw new ProprietorException("验证码错误");
         }
-
+    
+        
         // 验证通过后删除验证码
-//        redisTemplate.delete(account);
+        redisTemplate.delete("vCode:" + account);
     }
 
     /**
@@ -252,7 +269,11 @@ public class CommonServiceImpl implements ICommonService {
     **/
     @Override
     public List<RegionEntity> getHotCityList() {
-        return JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("hotCityList")), List.class);
+        List<RegionEntity> hotCityList = JSONArray.parseObject(String.valueOf(redisTemplate.opsForValue().get("hotCityList")), List.class);
+        if(CollectionUtils.isEmpty(hotCityList)){
+            return commonMapper.queryHotCity();
+        }
+        return hotCityList;
     }
 
     /**
@@ -302,59 +323,145 @@ public class CommonServiceImpl implements ICommonService {
     
     /**
     * @Description: 首页天气
-     * @Param: [lon, lat]
+     * @Param: [cityName]
      * @Return: com.alibaba.fastjson.JSONObject
      * @Author: chq459799974
      * @Date: 2021/2/25
     **/
-    public JSONObject getWeather(double lon, double lat){
-        //接口调用
-        JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
-        List<WeatherForecastVO> weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
-        weatherNow.put("forecast",weatherForDays);
+    public JSONObject getWeather(String cityName){
+    
+        //走缓存数据
+        JSONObject jsonCache = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("CityWeatherInfo:" + cityName));
+        String cityNameLike = null;
+        RegionEntity cityLike = null;
+        if(jsonCache == null){
+            //尝试寻找相似地区
+            List<RegionEntity> cityLikeList = regionMapper.getCityNameLike(cityName);
+            if(cityLikeList != null && cityLikeList.size() == 1){
+                //找到相似地区且唯一，继续尝试从缓存获取数据
+                cityLike = cityLikeList.get(0);
+                jsonCache = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("CityWeatherInfo:" + cityLike.getName()));
+            }
+        }
+        if(jsonCache != null){
+            return jsonCache;
+        }
         
+        //缓存无数据
+        //1.根据传入的城市名称cityName获取经纬度
+        JSONObject lonAndLat = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("RegionLL:"+cityName));
+        double lon;
+        double lat;
+        if(lonAndLat != null){
+            lon = lonAndLat.getDoubleValue("lon");
+            lat = lonAndLat.getDoubleValue("lat");
+        }else{
+            //没有找到或找到多个相似城市
+            if(cityLike == null){
+                throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"暂不支持该城市！");
+            }
+            //使用相似城市
+            cityNameLike = cityLike.getName();
+            lon = cityLike.getLng();
+            lat = cityLike.getLat();
+        }
+        
+        //2.用经纬度调用三方天气接口
+        JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
+        JSONArray weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
+        weatherNow.put("forecast",weatherForDays);
+
         //处理数据
         WeatherUtils.dealForecastToAnyDays(weatherNow,3);  //截取未来3天天气预报
         WeatherUtils.addDayOfWeek(weatherNow); //补星期几
-        
+
+        //去除不需要属性
+        List<WeatherForecastVO> newForecastList = weatherForDays.toJavaList(WeatherForecastVO.class);
+        weatherNow.put("forecast",newForecastList);
+    
+        //放入缓存
+        //TODO 缓存时间写到配置
+        stringRedisTemplate.opsForValue().set("CityWeatherInfo:" + (cityNameLike != null ? cityNameLike : cityName),JSON.toJSONString(weatherNow),30, TimeUnit.MINUTES);
         return weatherNow;
     }
     
     /**
     * @Description: 天气详情整合接口
-     * @Param: [lon, lat]
+     * @Param: [cityName]
      * @Return: com.alibaba.fastjson.JSONObject
      * @Author: chq459799974
      * @Date: 2020/2/25
     **/
     @Override
-    public JSONObject getWeatherDetails(double lon, double lat){
+    public JSONObject getWeatherDetails(String cityName){
+    
+        //走缓存数据
+        JSONObject jsonCache = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("CityWeather:" + cityName));
+        String cityNameLike = null;
+        RegionEntity cityLike = null;
+        if(jsonCache == null){
+            //尝试寻找相似地区
+            List<RegionEntity> cityLikeList = regionMapper.getCityNameLike(cityName);
+            if(cityLikeList != null && cityLikeList.size() == 1){
+                //找到相似地区且唯一，继续尝试从缓存获取数据
+                cityLike = cityLikeList.get(0);
+                jsonCache = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("CityWeather:" + cityLike.getName()));
+            }
+        }
+        if(jsonCache != null){
+            return jsonCache;
+        }
+        
+        //根据城市名称获取经纬度
+        JSONObject lonAndLat = JSONObject.parseObject(stringRedisTemplate.opsForValue().get("RegionLL:"+cityName));
+        double lon;
+        double lat;
+        if(lonAndLat != null){
+            lon = lonAndLat.getDoubleValue("lon");
+            lat = lonAndLat.getDoubleValue("lat");
+        }else{
+            //没有找到或找到多个相似城市
+            if(cityLike == null){
+                throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"暂不支持该城市！");
+            }
+            //使用相似城市
+            cityNameLike = cityLike.getName();
+            lon = cityLike.getLng();
+            lat = cityLike.getLat();
+        }
+        
         try {
             //接口调用
             JSONObject weatherNow = getWeatherNow(lon, lat);  //天气实况
-            List<WeatherForecastVO> weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
+            JSONArray weatherForDays = getWeatherForDays(lon, lat);  //15天天气预报
             weatherNow.put("forecast",weatherForDays);
             List<WeatherHourlyVO> weatherFor24hours = getWeatherFor24hours(lon, lat);  //24h天气预报
             JSONObject airQuality = getAirQuality(lon, lat);  //空气质量
             ArrayList<WeatherLiveIndexVO> livingIndex = getLivingIndex(lon, lat);  //生活指数
-            
+
             //处理数据
             WeatherUtils.addDayOfWeek(weatherNow); //补星期几
-//            WeatherUtils.addAQINameByAQIValue(airQuality,lon,lat,null);  //补空气质量名称(优、良、轻度污染等)
+            //去除不需要属性
+            List<WeatherForecastVO> newForecastList = weatherForDays.toJavaList(WeatherForecastVO.class);
+            weatherNow.put("forecast",newForecastList);
+
             //查询天气图标
             Map<String,Map<String, String>> latestIcon = weatherIconMapper.getLatestIcon();
             for(int i=0;i<weatherFor24hours.size();i++){
                 weatherFor24hours.get(i).setIconUrl(latestIcon.get(weatherFor24hours.get(i).getIconDay()).get("url"));
             }
-            for(int i=0;i<weatherForDays.size();i++){
-                weatherForDays.get(i).setIconUrlDay(latestIcon.get(weatherForDays.get(i).getConditionIdDay()).get("url"));
-                weatherForDays.get(i).setIconUrlNight(latestIcon.get(weatherForDays.get(i).getConditionIdNight()).get("url"));
+            for(int i=0;i<newForecastList.size();i++){
+                newForecastList.get(i).setIconUrlDay(latestIcon.get(newForecastList.get(i).getConditionIdDay()).get("url"));
+                newForecastList.get(i).setIconUrlNight(latestIcon.get(newForecastList.get(i).getConditionIdNight()).get("url"));
             }
-            
+
             //组装返回
             weatherNow.put("hourly",weatherFor24hours);
-            weatherNow.put("aqi",airQuality.getJSONObject("aqi"));
+            weatherNow.put("aqi",airQuality);
             weatherNow.put("liveIndex",livingIndex);
+            
+            //放入缓存
+            stringRedisTemplate.opsForValue().set("CityWeather:" + (cityNameLike != null ? cityNameLike : cityName),JSON.toJSONString(weatherNow),30, TimeUnit.MINUTES);
             return weatherNow;
         }catch (Exception e){
             e.printStackTrace();
@@ -390,12 +497,10 @@ public class CommonServiceImpl implements ICommonService {
      * @Author: chq459799974
      * @Date: 2020/12/24
     **/
-    private List<WeatherForecastVO> getWeatherForDays(double lon, double lat){
+    private JSONArray getWeatherForDays(double lon, double lat){
         JSONObject weatherForDays = weatherUtils.getWeatherForDays(String.valueOf(lon), String.valueOf(lat));
         JSONArray forecast = weatherForDays.getJSONArray("forecast");
-        List<WeatherForecastVO> newForecastList = forecast.toJavaList(WeatherForecastVO.class);
-        return newForecastList;
-//        return weatherUtils.getWeatherForDays(String.valueOf(lon),String.valueOf(lat));
+        return forecast;
     }
     
     /**

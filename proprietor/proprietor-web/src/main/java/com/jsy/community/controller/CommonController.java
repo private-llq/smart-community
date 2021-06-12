@@ -285,23 +285,25 @@ public class CommonController {
         }
     }
     
-//    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气")
+    //    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气，调用限制用于经纬度接口，经纬度方式做不了缓存，由前端做缓存")
     @ApiOperation("首页天气")
     @GetMapping("weatherNow")
-    public CommonResult<JSONObject> getWeatherNow(@RequestParam double lon,@RequestParam double lat){
-//        JSONObject weather = commonService.getWeather(lon, lat);
-        //TODO 天气接口未购买，临时用假数据
-        JSONObject weather = commonService.getTempWeather();
+    public CommonResult<JSONObject> getWeatherNow(@RequestParam String cityName){
+        //真实数据
+        JSONObject weather = commonService.getWeather(cityName);
+        //假数据
+//        JSONObject weather = commonService.getTempWeather();
         return CommonResult.ok(weather);
     }
     
-//    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情")
+    //    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情，调用限制用于经纬度接口，经纬度方式做不了缓存，由前端做缓存")
     @ApiOperation("天气详情")
     @GetMapping("weatherDetails")
-    public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam double lon,@RequestParam double lat){
-//        JSONObject weather = commonService.getWeatherDetails(lon, lat);
-        //TODO 天气接口未购买，临时用假数据
-        JSONObject weather = commonService.getTempWeatherDetails();
+    public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam String cityName){
+        //真实数据
+        JSONObject weather = commonService.getWeatherDetails(cityName);
+        //假数据
+//        JSONObject weather = commonService.getTempWeatherDetails();
         return CommonResult.ok(weather);
     }
 

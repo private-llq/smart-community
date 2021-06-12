@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 
 import com.jsy.community.entity.FullTextSearchEntity;
+import com.jsy.community.entity.RegionEntity;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -131,4 +132,14 @@ public interface CommonMapper {
      * @return          返回房屋id + 房屋文本
      */
     List<Map<String, Object>> getHouseByFloor(Long id, String floor);
+    
+    /**
+    * @Description: 查询热门城市
+     * @Param: []
+     * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+     * @Author: chq459799974
+     * @Date: 2021/6/9
+    **/
+    @Select("select id,name from t_hot_city")
+    List<RegionEntity> queryHotCity();
 }

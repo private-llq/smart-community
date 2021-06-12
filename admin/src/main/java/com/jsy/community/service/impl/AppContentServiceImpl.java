@@ -96,7 +96,7 @@ public class AppContentServiceImpl implements AppContentService {
 					MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "image/png", IOUtils.toByteArray(in));
 					String name = multipartFile.getOriginalFilename();
 					String url = MinioUtils.upload(multipartFile, "weather-icon");
-					iconMap.put("num",name.substring(0,name.lastIndexOf(".")));
+					iconMap.put("num",name.substring(1,name.lastIndexOf(".")));
 					iconMap.put("url",url);
 					list.add(iconMap);
 					in.close();

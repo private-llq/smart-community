@@ -77,15 +77,12 @@ public class FacilityController {
 	
 	@ApiOperation("分页查询设备")
 	@PostMapping("/listFacility")
-	public CommonResult listFacility(@RequestBody BaseQO<FacilityQO> facilityQO) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		
-		if (facilityQO.getQuery() == null) {
-			facilityQO.setQuery(new FacilityQO());
+	public CommonResult listFacility(@RequestBody BaseQO<FacilityQO> baseQO) {
+		if (baseQO.getQuery() == null) {
+			baseQO.setQuery(new FacilityQO());
 		}
-		
-		facilityQO.getQuery().setCommunityId(communityId);
-		PageInfo<FacilityEntity> pageInfo = facilityService.listFacility(facilityQO);
+		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		PageInfo<FacilityEntity> pageInfo = facilityService.listFacility(baseQO);
 		return CommonResult.ok(pageInfo);
 	}
 	

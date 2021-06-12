@@ -90,7 +90,9 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
             return createAuthVoWithToken(userInfoVo);
         }
         if (entity!=null){
-            return createBindMobile(entity.getId());
+            UserAuthVo userAuthVo = createBindMobile(entity.getId());
+            userAuthVo.setToken("");
+            return userAuthVo;
         }
         UserThirdPlatformEntity platformEntity = new UserThirdPlatformEntity();
         platformEntity.setThirdPlatformId(openid);
@@ -101,6 +103,34 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
     }
 
 
+
+    /**
+     * @Description: 不绑定手机登录
+     * @author: Hu
+     * @since: 2021/6/7 11:36
+     * @Param: [sub]
+     * @return: com.jsy.community.vo.UserAuthVo
+     */
+    @Override
+    public UserAuthVo loginNotMobile(String sub) {
+        UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
+                .eq("third_platform_id", sub).eq("third_platform_type",4));
+        if(entity != null&&entity.getUid()!=null){
+            //返回token
+            UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+            userInfoVo.setIdCard(null);
+            return createAuthVoWithToken(userInfoVo);
+        }
+        if (entity != null){
+            return createNotBindMobile(entity.getId());
+        }
+        UserThirdPlatformEntity platformEntity = new UserThirdPlatformEntity();
+        platformEntity.setThirdPlatformId(sub);
+        platformEntity.setThirdPlatformType(4);
+        platformEntity.setId(SnowFlake.nextId());
+        userThirdPlatformMapper.insert(platformEntity);
+        return createNotBindMobile(platformEntity.getId());
+    }
     /**
      * @Description:
      * @author: Hu
@@ -175,6 +205,25 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         userInfoVo.setIsBindMobile(1);
         userAuthVo.setUserInfo(userInfoVo);
         String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(userInfoVo), expire, TimeUnit.SECONDS);
+        userAuthVo.setToken(token);
+        return userAuthVo;
+    }
+    /**
+     * @Description: 不绑定手机也能登陆的
+     * @author: Hu
+     * @since: 2021/5/21 14:00
+     * @Param:
+     * @return:
+     */
+    public UserAuthVo createNotBindMobile(Long id){
+        Date expireDate = new Date(new Date().getTime() + expire * 1000);
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setExpiredTime(LocalDateTimeUtil.of(expireDate));
+        UserInfoVo vo = new UserInfoVo();
+        vo.setThirdPlatformId(id);
+        vo.setIsBindMobile(0);
+        userAuthVo.setUserInfo(vo);
+        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
         userAuthVo.setToken(token);
         return userAuthVo;
     }

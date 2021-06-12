@@ -23,13 +23,15 @@ public class RegionEntity implements Serializable {
 		super();
 	}
 	
-	public RegionEntity(Integer id, String name, Integer pid, Integer level, String initials, String pinyin) {
+	public RegionEntity(Integer id, String name, Integer pid, Integer level, String initials, String pinyin, Float lng, Float lat) {
 		this.id = id;
 		this.name = name;
 		this.pid = pid;
 		this.level = level;
 		this.initials = initials;
 		this.pinyin = pinyin;
+		this.lng = lng;
+		this.lat = lat;
 	}
 	
 	public Integer getId() {

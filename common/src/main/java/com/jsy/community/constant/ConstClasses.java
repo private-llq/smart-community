@@ -72,9 +72,27 @@ public interface ConstClasses {
 	@Component
 	class AliYunDataEntity{
 		
+		public static String smsAccessKeyId;//阿里云短信子账号accessKeyId
+		public static String smsSecret;//阿里云短信子账号secret
+		
 		public static String appCode;//公司阿里云appCode
 		
 		public static String URL_ID_CARD_OCR;//身份证文字识别三方接口
+		
+		public static String URL_WEATHER_NOW;//天气实况三方接口
+		public static String URL_WEATHER_DAYS;//15天天气预报三方接口
+		public static String URL_WEATHER_HOURS;//24小时天气预报三方接口
+		public static String URL_WEATHER_AIR;//空气质量
+		public static String URL_WEATHER_LIVING;//生活指数
+		
+		@Value("${aliyun.sms.smsAccessKeyId}")
+		public void setSmsAccessKeyId(String smsAccessKeyId) {
+			AliYunDataEntity.smsAccessKeyId = AESOperator.decrypt(smsAccessKeyId);
+		}
+		@Value("${aliyun.sms.smsSecret}")
+		public void setSmsSecret(String smsSecret) {
+			AliYunDataEntity.smsSecret = AESOperator.decrypt(smsSecret);
+		}
 		
 		@Value("${aliyun.appCode}")
 		public void setAppCode(String appCode) {
@@ -84,6 +102,27 @@ public interface ConstClasses {
 		@Value("${aliyun.url.id-card-ocr}")
 		public void setUrlIdCardOcr(String urlIdCardOcr) {
 			AliYunDataEntity.URL_ID_CARD_OCR = urlIdCardOcr;
+		}
+		
+		@Value("${aliyun.url.weather.now}")
+		public void setUrlWeatherNow(String urlWeatherNow) {
+			AliYunDataEntity.URL_WEATHER_NOW = urlWeatherNow;
+		}
+		@Value("${aliyun.url.weather.days}")
+		public void setUrlWeatherDays(String urlWeatherDays) {
+			AliYunDataEntity.URL_WEATHER_DAYS = urlWeatherDays;
+		}
+		@Value("${aliyun.url.weather.hours}")
+		public void setUrlWeatherHours(String urlWeatherHours) {
+			AliYunDataEntity.URL_WEATHER_HOURS = urlWeatherHours;
+		}
+		@Value("${aliyun.url.weather.air}")
+		public void setUrlWeatherAir(String urlWeatherAir) {
+			AliYunDataEntity.URL_WEATHER_AIR = urlWeatherAir;
+		}
+		@Value("${aliyun.url.weather.living}")
+		public void setUrlWeatherLiving(String urlWeatherLiving) {
+			AliYunDataEntity.URL_WEATHER_LIVING = urlWeatherLiving;
 		}
 	}
 	

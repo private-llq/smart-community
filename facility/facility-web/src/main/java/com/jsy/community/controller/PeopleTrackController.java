@@ -43,8 +43,7 @@ public class PeopleTrackController {
 		if (peopleQo.getQuery() == null) {
 			peopleQo.setQuery(new PeopleTrackQO());
 		}
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		peopleQo.getQuery().setCommunityId(communityId);
+		peopleQo.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 		PageInfo<PeopleTrackEntity> pageInfo = peopleTrackService.listPeopleTrack(peopleQo);
 		return CommonResult.ok(pageInfo);
 	}
