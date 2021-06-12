@@ -207,6 +207,7 @@
         where
             t.community_id = #{query.communityId}
             and t.deleted = 0
+            and t.type = 4
             and tp.id is NULL
         <if test="query.name!=null and query.name!=''">
             and t.number like concat("%",#{query.name},"%")
