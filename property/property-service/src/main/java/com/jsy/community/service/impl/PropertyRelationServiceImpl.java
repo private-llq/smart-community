@@ -47,7 +47,8 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         RelationListQO qoQuery = baseQO.getQuery();
         qoQuery.setUid(adminInfoVo.getUid());
         qoQuery.setCommunityId(adminInfoVo.getCommunityId());
-        return propertyRelationMapper.getHouseId(qoQuery,baseQO.getPage(),baseQO.getSize());
+        Long page=(baseQO.getPage()-1)*baseQO.getSize();
+        return propertyRelationMapper.getHouseId(qoQuery,page,baseQO.getSize());
     }
 
 
@@ -66,7 +67,8 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         RelationListQO qoQuery = baseQO.getQuery();
         qoQuery.setUid(adminInfoVo.getUid());
         qoQuery.setCommunityId(adminInfoVo.getCommunityId());
-        return propertyRelationMapper.getBuildingId(qoQuery,baseQO.getPage(),baseQO.getSize());
+        Long page=(baseQO.getPage()-1)*baseQO.getSize();
+        return propertyRelationMapper.getBuildingId(qoQuery,page,baseQO.getSize());
     }
 
 
@@ -85,7 +87,8 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         RelationListQO qoQuery = baseQO.getQuery();
         qoQuery.setUid(adminInfoVo.getUid());
         qoQuery.setCommunityId(adminInfoVo.getCommunityId());
-        return propertyRelationMapper.getUnitId(qoQuery,baseQO.getPage(),baseQO.getSize());
+        Long page=(baseQO.getPage()-1)*baseQO.getSize();
+        return propertyRelationMapper.getUnitId(qoQuery,page,baseQO.getSize());
     }
 
 
@@ -101,7 +104,8 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
-        List<PropertyRelationVO> relationVOS = propertyRelationMapper.list(baseQO.getQuery(), baseQO.getPage(), baseQO.getSize());
+        Long page=(baseQO.getPage()-1)*baseQO.getSize();
+        List<PropertyRelationVO> relationVOS = propertyRelationMapper.list(baseQO.getQuery(), page, baseQO.getSize());
         for (PropertyRelationVO relationVO : relationVOS) {
             relationVO.setRelationName(BusinessEnum.RelationshipEnum.getCode(relationVO.getRelation()));
             relationVO.setHousing(replaceStr(relationVO.getHousing()));
@@ -110,7 +114,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 
         Map map = new HashMap<>();
         map.put("list",relationVOS);
-        map.put("total",propertyRelationMapper.getTotal(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize()));
+        map.put("total",propertyRelationMapper.getTotal(baseQO.getQuery()));
         return map;
     }
 

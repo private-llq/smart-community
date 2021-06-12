@@ -39,14 +39,15 @@ public class TenementServiceImpl implements ITenementService {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
-        List<PropertyTenementVO> relationVOS = tenementMapper.list(baseQO.getQuery(), baseQO.getPage(), baseQO.getSize());
+        Long page=(baseQO.getPage()-1)*baseQO.getSize();
+        List<PropertyTenementVO> relationVOS = tenementMapper.list(baseQO.getQuery(), page, baseQO.getSize());
         for (PropertyTenementVO relationVO : relationVOS) {
             relationVO.setHousing(replaceStr(relationVO.getHousing()));
             relationVO.setHouseTypeName(relationVO.getHouseType()==1?"商铺":relationVO.getHouseType()==2?"住宅":"");
         }
         Map map = new HashMap<>();
         map.put("list",relationVOS);
-        map.put("total",tenementMapper.getTotal(baseQO.getQuery(),baseQO.getPage(),baseQO.getSize()));
+        map.put("total",tenementMapper.getTotal(baseQO.getQuery()));
         return map;
     }
 

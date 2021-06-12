@@ -32,7 +32,7 @@ public interface PropertyRelationMapper {
      * @Param:
      * @return:
      */
-    Long getTotal(@Param("query") PropertyRelationQO query, @Param("page") Long page, @Param("size") Long size);
+    Long getTotal(@Param("query") PropertyRelationQO query);
 
     /**
      * @Description: 房屋下拉框
