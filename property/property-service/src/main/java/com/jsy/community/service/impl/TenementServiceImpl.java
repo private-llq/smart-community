@@ -39,7 +39,7 @@ public class TenementServiceImpl implements ITenementService {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
-        if ("".equals(baseQO.getPage())&&baseQO.getPage()==0) {
+        if ("".equals(baseQO.getPage())||baseQO.getPage()==0) {
             baseQO.setPage(1l);
         }
         Long page=(baseQO.getPage()-1)*baseQO.getSize();
