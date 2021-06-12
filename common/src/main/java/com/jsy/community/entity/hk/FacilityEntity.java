@@ -57,6 +57,7 @@ public class FacilityEntity extends BaseEntity {
 	private Integer isConnectData;
 	
 	@ApiModelProperty(value = "设备分类")
+	@TableField(exist = false)
 	private String facilityTypeName;
 	
 	@ApiModelProperty(value = "设备编号")

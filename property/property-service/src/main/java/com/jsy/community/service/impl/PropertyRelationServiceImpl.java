@@ -44,6 +44,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
+        if ("".equals(baseQO.getPage())||baseQO.getPage()==0) {
+            baseQO.setPage(1L);
+        }
         RelationListQO qoQuery = baseQO.getQuery();
         qoQuery.setUid(adminInfoVo.getUid());
         qoQuery.setCommunityId(adminInfoVo.getCommunityId());
@@ -63,6 +66,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     public List getBuildingId(BaseQO<RelationListQO> baseQO,AdminInfoVo adminInfoVo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
+        }
+        if ("".equals(baseQO.getPage())||baseQO.getPage()==0) {
+            baseQO.setPage(1l);
         }
         RelationListQO qoQuery = baseQO.getQuery();
         qoQuery.setUid(adminInfoVo.getUid());
@@ -84,6 +90,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
+        if ("".equals(baseQO.getPage())||baseQO.getPage()==0) {
+            baseQO.setPage(1l);
+        }
         RelationListQO qoQuery = baseQO.getQuery();
         qoQuery.setUid(adminInfoVo.getUid());
         qoQuery.setCommunityId(adminInfoVo.getCommunityId());
@@ -103,6 +112,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     public Map list(BaseQO<PropertyRelationQO> baseQO) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
+        }
+        if ("".equals(baseQO.getPage())||baseQO.getPage()==0) {
+            baseQO.setPage(1l);
         }
         Long page=(baseQO.getPage()-1)*baseQO.getSize();
         List<PropertyRelationVO> relationVOS = propertyRelationMapper.list(baseQO.getQuery(), page, baseQO.getSize());

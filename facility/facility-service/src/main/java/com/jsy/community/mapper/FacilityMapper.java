@@ -134,9 +134,9 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 * @Author 91李寻欢
 	 * @Description 根据设备分类id查询其下设备的id集合
 	 * @Date 2021/4/23 17:16
-	 * @Param [typeId]
+	 * @Param [typeId,communityId]
 	 **/
-	List<Long> getFacilityIdByTypeId(Long typeId);
+	List<Long> getFacilityIdByTypeId(@Param("typeId")Long typeId, @Param("communityId")Long communityId);
 	
 	/**
 	 * @return void

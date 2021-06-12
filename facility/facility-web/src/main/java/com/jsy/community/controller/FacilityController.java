@@ -63,7 +63,6 @@ public class FacilityController {
 	public CommonResult addFacility(@RequestBody FacilityEntity facilityEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		facilityEntity.setCommunityId(communityId);
-		facilityEntity.setId(SnowFlake.nextId());
 		
 		String userId = UserUtils.getAdminUserInfo().getUid();
 		String realName = UserUtils.getAdminUserInfo().getRealName();
@@ -90,7 +89,7 @@ public class FacilityController {
 	@GetMapping("/getCount")
 	// TODO: 2021/5/15 这个功能好像前端没有在强制刷新后调用这个接口  应该让他调的 后面让前端做下
 	public CommonResult getCount(@ApiParam("设备分类Id") @RequestParam("typeId") Long typeId) {
-		Map<String, Integer> map = facilityService.getCount(typeId);
+		Map<String, Integer> map = facilityService.getCount(typeId,UserUtils.getAdminCommunityId());
 		return CommonResult.ok(map);
 	}
 	
@@ -99,9 +98,8 @@ public class FacilityController {
 	// TODO: 2021/4/23 编辑的时候不能更改该摄像头的作用哈  因为摄像头的作用需要更改摄像头后台  开启相应的功能 比如你要开启人脸比对，摄像机应该去后台选择人脸比对模式
 	// TODO: 2021/4/23 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
-		//TODO 后续操作带小区id
-		facilityEntity.setCommunityId(communityId);
+		facilityEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		facilityEntity.setFacilityEffectId(null);
 		facilityService.updateFacility(facilityEntity);
 		return CommonResult.ok();
 	}
@@ -109,7 +107,7 @@ public class FacilityController {
 	@ApiOperation("删除设备")
 	@GetMapping("/deleteFacility")
 	public CommonResult deleteFacility(@RequestParam("id") Long id) {
-		facilityService.deleteFacility(id);
+		facilityService.deleteFacility(id,UserUtils.getAdminCommunityId());
 		return CommonResult.ok();
 	}
 	
@@ -119,7 +117,7 @@ public class FacilityController {
 	@ApiOperation("刷新设备")
 	@GetMapping("/flushFacility")
 	public CommonResult flushFacility(@RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("facilityTypeId") String facilityTypeId) {
-		facilityService.flushFacility(page, size, facilityTypeId);
+		facilityService.flushFacility(page,size,facilityTypeId,UserUtils.getAdminCommunityId());
 		return CommonResult.ok();
 	}
 	

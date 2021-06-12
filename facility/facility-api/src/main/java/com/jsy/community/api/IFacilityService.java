@@ -41,9 +41,9 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author lihao
 	 * @Description 删除设备
 	 * @Date 2021/3/15 9:40
-	 * @Param [id]
+	 * @Param [id,communityId]
 	 **/
-	void deleteFacility(Long id);
+	void deleteFacility(Long id,Long communityId);
 	
 	/**
 	 * @return void
@@ -59,9 +59,9 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author 91李寻欢
 	 * @Description 获取设备在线离线数
 	 * @Date 2021/4/23 17:03
-	 * @Param [communityId]
+	 * @Param [typeId,communityId]
 	 **/
-	Map<String, Integer> getCount(Long typeId);
+	Map<String, Integer> getCount(Long typeId,Long communityId);
 	
 	/**
 	 * @return void
@@ -70,7 +70,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date 2021/4/23 18:11
 	 * @Param [page, size]
 	 **/
-	void flushFacility(Integer page, Integer size, String facilityTypeId);
+	void flushFacility(Integer page, Integer size, String facilityTypeId, Long communityId);
 	
 	/**
 	 * @return com.jsy.community.entity.hk.FacilityEntity

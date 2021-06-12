@@ -53,7 +53,7 @@
     </update>
 
     <select id="getFacilityIdByTypeId" resultType="long">
-        select id from t_facility where facility_type_id = #{typeId}
+        select id from t_facility where community_id = #{communityId} and facility_type_id = #{typeId}
     </select>
 
     <update id="updateStatusByFacilityId">
