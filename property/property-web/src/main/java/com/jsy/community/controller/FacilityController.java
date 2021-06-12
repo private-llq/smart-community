@@ -65,7 +65,7 @@ public class FacilityController {
 	@GetMapping("/getCount")
 	// TODO: 2021/5/15 这个功能好像前端没有在强制刷新后调用这个接口  应该让他调的 后面让前端做下
 	public CommonResult getCount(@ApiParam("设备分类Id") @RequestParam("typeId") Long typeId) {
-		Map<String, Integer> map = facilityService.getCount(typeId);
+		Map<String, Integer> map = facilityService.getCount(typeId,UserUtils.getAdminCommunityId());
 		return CommonResult.ok(map);
 	}
 	

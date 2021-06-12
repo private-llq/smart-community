@@ -75,10 +75,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 	
 	@Override
-	public Map<String, Integer> getCount(Long typeId) {
+	public Map<String, Integer> getCount(Long typeId,Long communityId) {
 		// 根据设备分类id查询其下设备的id集合
-		//TODO 查询条件加社区id
-		List<Long> facilityIds = facilityMapper.getFacilityIdByTypeId(typeId);
+		List<Long> facilityIds = facilityMapper.getFacilityIdByTypeId(typeId,communityId);
 		
 		int onlineCount = 0;
 		int failCount = 0;

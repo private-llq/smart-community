@@ -59,9 +59,9 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author 91李寻欢
 	 * @Description 获取设备在线离线数
 	 * @Date 2021/4/23 17:03
-	 * @Param [communityId]
+	 * @Param [typeId,communityId]
 	 **/
-	Map<String, Integer> getCount(Long typeId);
+	Map<String, Integer> getCount(Long typeId,Long communityId);
 	
 	/**
 	 * @return void
