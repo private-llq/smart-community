@@ -117,7 +117,7 @@ public class FacilityController {
 	@ApiOperation("刷新设备")
 	@GetMapping("/flushFacility")
 	public CommonResult flushFacility(@RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("facilityTypeId") String facilityTypeId) {
-		facilityService.flushFacility(page, size, facilityTypeId);
+		facilityService.flushFacility(page,size,facilityTypeId,UserUtils.getAdminCommunityId());
 		return CommonResult.ok();
 	}
 	

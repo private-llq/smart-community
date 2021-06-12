@@ -231,13 +231,18 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Override
 //	@Transactional(rollbackFor = Exception.class)
-	public void flushFacility(Integer page, Integer size, String facilityTypeId) {
+	public void flushFacility(Integer page, Integer size, String facilityTypeId, Long communityId) {
 		//1. 获取当前页的数据
-		Page<FacilityEntity> entityPage = new Page<>(page, size);
-		
+		Page<FacilityEntity> entityPage = new Page<>();
+		if(page != null && page != 0){
+			entityPage.setCurrent(page);
+		}
+		if(size != null && size != 0){
+			entityPage.setSize(size);
+		}
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("community_id", communityId);
 		wrapper.eq("facility_type_id", facilityTypeId);
-		//TODO 查询条件带小区id
 		Page<FacilityEntity> facilityEntityPage = facilityMapper.selectPage(entityPage, wrapper);
 		List<FacilityEntity> list = facilityEntityPage.getRecords();
 		

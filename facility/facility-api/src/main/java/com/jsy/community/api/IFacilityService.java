@@ -70,7 +70,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date 2021/4/23 18:11
 	 * @Param [page, size]
 	 **/
-	void flushFacility(Integer page, Integer size, String facilityTypeId);
+	void flushFacility(Integer page, Integer size, String facilityTypeId, Long communityId);
 	
 	/**
 	 * @return com.jsy.community.entity.hk.FacilityEntity
