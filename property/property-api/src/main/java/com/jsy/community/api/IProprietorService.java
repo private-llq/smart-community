@@ -6,6 +6,8 @@ import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.qo.property.RelationListQO;
+import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 
@@ -86,4 +88,13 @@ public interface IProprietorService extends IService<ProprietorEntity> {
      * @return               真实名称
      */
     String getAdminRealName(String adminUid);
+
+    /**
+     * @author: Pipi
+     * @description: 查询未绑定房屋列表 
+     * @param: baseQO:  
+     * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
+     * @date: 2021/6/12 14:39
+     **/
+    List<HouseTypeVo> getUnboundHouseList(BaseQO<RelationListQO> baseQO);
 }

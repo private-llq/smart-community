@@ -23,23 +23,23 @@ import java.util.List;
 public class FinanceExcelImpl implements FinanceExcelHandler {
 
     // 结算单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] STATEMENT_TITLE_FIELD = {"结算单号", "结算时间段", "状态", "结算金额", "开户名称", "开户银行", "开户支行", "银行账号", "创建日期", "驳回原因"};
+    protected static final String[] STATEMENT_TITLE_FIELD = {"结算单号", "结算时间段", "状态", "结算金额", "开户名称", "开户银行", "开户支行", "银行账号", "创建日期", "驳回原因"};
 
     // 结算单关联账单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "收款金额", "收款时间", "收款渠道", "支付渠道单号"};
+    protected static final String[] ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "收款金额", "收款时间", "收款渠道", "支付渠道单号"};
 
     // 账单表字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] MASTER_ORDER_TITLE_FIELD = {"账单号", "状态", "账单日期", "账单类型", "应收金额", "房屋/车牌号", "业主姓名", "收款单号", "收款时间", "收款渠道", "支付渠道单号", "结算单号", "结算状态"};
+    protected static final String[] MASTER_ORDER_TITLE_FIELD = {"账单号", "状态", "账单日期", "账单类型", "应收金额", "房屋/车牌号", "业主姓名", "收款单号", "收款时间", "收款渠道", "支付渠道单号", "结算单号", "结算状态"};
 
     // 收款单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] RECEIPT_TITLE_FIELD = {"收款单号", "收款金额", "收款时间", "收款渠道", "收款渠道单号"};
+    protected static final String[] RECEIPT_TITLE_FIELD = {"收款单号", "收款金额", "收款时间", "收款渠道", "收款渠道单号"};
 
     // 收款单关联账单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] RECEIPT_ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "应收金额"};
+    protected static final String[] RECEIPT_ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "应收金额"};
 
-    public static final String DATE_FORMAT_STRING = "yyyy-MM-dd";
+    protected static final String DATE_FORMAT_STRING = "yyyy-MM-dd";
 
-    public static final String TIME_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
+    protected static final String TIME_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * @Author: Pipi

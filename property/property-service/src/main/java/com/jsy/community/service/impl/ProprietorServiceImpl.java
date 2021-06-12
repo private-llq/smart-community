@@ -13,11 +13,13 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.utils.CardUtil;
 import com.jsy.community.utils.DateUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.es.Operation;
+import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -168,6 +170,26 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         validHouseMember(userEntityList, houseVos, userHouseList);
         //3.录入家属信息至数据库
         return proprietorMapper.saveUserMemberBatch(userEntityList ,communityId);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询未绑定房屋列表
+     * @param: baseQO:
+     * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
+     * @date: 2021/6/12 14:34
+     */
+    @Override
+    public List<HouseTypeVo> getUnboundHouseList(BaseQO<RelationListQO> baseQO) {
+        if (baseQO.getPage() == null || baseQO.getPage() <= 0) {
+            baseQO.setPage(1L);
+        }
+        if (baseQO.getSize() == null || baseQO.getSize() <= 0) {
+            baseQO.setSize(10L);
+        }
+        Long page = baseQO.getPage() - 1;
+        Long pageStart = page > 0 ? page * baseQO.getSize() : 0L;
+        return proprietorMapper.getUnboundHouseList(baseQO.getQuery(), pageStart, baseQO.getSize());
     }
 
     /**

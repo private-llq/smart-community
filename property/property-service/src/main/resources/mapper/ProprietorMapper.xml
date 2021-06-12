@@ -197,4 +197,20 @@
     <select id="existHouse" resultType="java.lang.Integer">
         select count(*) from t_house where id = #{houseId} and community_id = #{communityId} and deleted = 0
     </select>
+    <!-- 查询未绑定房屋列表 -->
+    <select id="getUnboundHouseList" resultType="com.jsy.community.vo.HouseTypeVo">
+        SELECT
+            t.id AS id,
+            concat( t.number, "-", t.CODE ) AS NAME
+        FROM t_proprietor tp
+        right JOIN t_house t ON (t.id = tp.house_id and tp.deleted = 0)
+        where
+            t.community_id = #{query.communityId}
+            and t.deleted = 0
+            and tp.id is NULL
+        <if test="query.name!=null and query.name!=''">
+            and t.number like concat("%",#{query.name},"%")
+        </if>
+        limit #{page},#{pageSize}
+    </select>
 </mapper>

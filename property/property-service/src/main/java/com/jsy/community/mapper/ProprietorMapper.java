@@ -9,6 +9,8 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.qo.property.RelationListQO;
+import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.ibatis.annotations.Param;
@@ -115,6 +117,17 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @return                  返回影响行数
      */
     Integer saveUserMemberBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
+
+    /*
+     * @author: Pipi
+     * @description:  查询未绑定房屋列表
+     * @param: baseQO:
+     * @param: page:
+     * @param: pageSize:
+     * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
+     * @date: 2021/6/12 15:17
+     **/
+    List<HouseTypeVo> getUnboundHouseList(@Param("query") RelationListQO baseQO, @Param("page") Long page, @Param("pageSize") Long pageSize);
 
 
     /**
