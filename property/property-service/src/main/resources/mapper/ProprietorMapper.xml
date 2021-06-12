@@ -201,7 +201,16 @@
     <select id="getUnboundHouseList" resultType="com.jsy.community.vo.HouseTypeVo">
         SELECT
             t.id AS id,
-            concat( t.number, "-", t.CODE ) AS NAME
+            concat(
+                IFNULL(t.number,''),
+                "(",
+                IFNULL(t.building,''),
+                IFNULL(t.unit,''),
+                IFNULL(t.floor,''),
+                "层",
+                IFNULL(t.door,''),
+                ")"
+            ) AS name
         FROM t_proprietor tp
         right JOIN t_house t ON (t.id = tp.house_id and tp.deleted = 0)
         where
