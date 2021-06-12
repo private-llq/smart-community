@@ -41,9 +41,9 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author lihao
 	 * @Description 删除设备
 	 * @Date 2021/3/15 9:40
-	 * @Param [id]
+	 * @Param [id,communityId]
 	 **/
-	void deleteFacility(Long id);
+	void deleteFacility(Long id,Long communityId);
 	
 	/**
 	 * @return void

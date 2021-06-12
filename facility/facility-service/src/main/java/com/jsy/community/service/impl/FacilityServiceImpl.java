@@ -122,7 +122,13 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 	
 	@Override
-	public void deleteFacility(Long id) {
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteFacility(Long id, Long communityId) {
+		//验证物业操作的是否是自己社区设备,加社区id
+		Integer count = facilityMapper.selectCount(new QueryWrapper<FacilityEntity>().eq("id",id).eq("community_id",communityId));
+		if(count < 1){
+			throw new FacilityException("没有该设备");
+		}
 		// 根据设备id查询他的唯一布防句柄
 		int alarmHandle = facilityMapper.getAlarmHandle(id);
 		
