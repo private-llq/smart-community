@@ -3,7 +3,8 @@
 <mapper namespace="com.jsy.community.mapper.PropertyRelationMapper">
     <sql id="Query">
         <where>
-            thm.community_id=#{query.communityId} and thm.deleted=0 and tu.deleted=0 and th.deleted=0
+            (thm.deleted=0 and tu.deleted=0 and th.deleted=0) and
+            thm.community_id=#{query.communityId}
             <if test="query.name!=null and query.name!=''">
                 and thm.name like concat('%',#{query.name},'%')
             </if>

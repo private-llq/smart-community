@@ -44,7 +44,7 @@ public class PropertyRelationController {
     @Desensitization(type = {DesensitizationType.PHONE,DesensitizationType.ID_CARD,DesensitizationType.PHONE,DesensitizationType.ID_CARD}, field = {"mobile","idCard","ownerMobile","ownerIdCard"})
     public CommonResult list(@RequestBody BaseQO<PropertyRelationQO> baseQO){
         System.out.println(baseQO);
-        Map map=propertyRelationService.list(baseQO);
+        Map map=propertyRelationService.list(baseQO,UserUtils.getAdminUserInfo().getCommunityId());
         return CommonResult.ok(map);
     }
     @ApiOperation("房屋下拉框")

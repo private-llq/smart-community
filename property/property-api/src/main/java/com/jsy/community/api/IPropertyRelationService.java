@@ -22,7 +22,7 @@ public interface IPropertyRelationService {
      * @Param:
      * @return:
      */
-    Map list(BaseQO<PropertyRelationQO> baseQO);
+    Map list(BaseQO<PropertyRelationQO> baseQO,Long communityId);
 
     /**
      * @Description: 房屋下拉框

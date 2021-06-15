@@ -109,7 +109,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      * @return: java.util.Map
      */
     @Override
-    public Map list(BaseQO<PropertyRelationQO> baseQO) {
+    public Map list(BaseQO<PropertyRelationQO> baseQO,Long communityId) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }
@@ -117,7 +117,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
             baseQO.setPage(1l);
         }
         Long page=(baseQO.getPage()-1)*baseQO.getSize();
-        List<PropertyRelationVO> relationVOS = propertyRelationMapper.list(baseQO.getQuery(), page, baseQO.getSize());
+        PropertyRelationQO qoQuery = baseQO.getQuery();
+        qoQuery.setCommunityId(communityId);
+        List<PropertyRelationVO> relationVOS = propertyRelationMapper.list(qoQuery, page, baseQO.getSize());
         for (PropertyRelationVO relationVO : relationVOS) {
             relationVO.setRelationName(BusinessEnum.RelationshipEnum.getCode(relationVO.getRelation()));
             relationVO.setHousing(replaceStr(relationVO.getHousing()));
@@ -126,7 +128,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 
         Map map = new HashMap<>();
         map.put("list",relationVOS);
-        map.put("total",propertyRelationMapper.getTotal(baseQO.getQuery()));
+        map.put("total",propertyRelationMapper.getTotal(qoQuery));
         return map;
     }
 

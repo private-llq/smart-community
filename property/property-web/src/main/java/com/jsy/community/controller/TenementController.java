@@ -2,11 +2,13 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ITenementService;
 import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/tenement")
 @ApiJSYController
+@Login
 public class TenementController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ITenementService tenementService;
@@ -37,7 +40,8 @@ public class TenementController {
     @Desensitization(type = {DesensitizationType.PHONE,DesensitizationType.ID_CARD,DesensitizationType.PHONE,DesensitizationType.ID_CARD}, field = {"mobile","idCard","ownerMobile","ownerIdCard"})
     public CommonResult list(@RequestBody BaseQO<PropertyRelationQO> baseQO){
         System.out.println(baseQO);
-        Map map=tenementService.list(baseQO);
+        Long communityId = UserUtils.getAdminCommunityId();
+        Map map=tenementService.list(baseQO,UserUtils.getAdminUserInfo().getCommunityId());
         return CommonResult.ok(map);
     }
 }
