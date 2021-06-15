@@ -1,7 +1,9 @@
 package com.jsy.community.listener;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.config.RabbitMQCommonConfig;
+import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author chq459799974
@@ -36,6 +39,24 @@ public class TopicListener {
 		}catch (Exception e){
 			log.error("新增访客记录失败：" + historyEntity);
 			e.printStackTrace();
+		}
+		//手动确认
+		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+	}
+	
+	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_ADD_RESULT)
+	public void process1(Map mapBody, Message message, Channel channel) throws IOException {
+		log.info("监听到Add设备指令回复: \n" + mapBody.toString());
+		try {
+			JSONObject jsonObject = JSONObject.parseObject(mapBody.toString());
+			System.out.println("解析成功：\n" + jsonObject);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
+			log.info("收到的消息内容为: \n" + mapBody.toString());
+			//手动确认
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 		}
 		//手动确认
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);

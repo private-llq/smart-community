@@ -1,9 +1,12 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFacilityService;
+import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.mapper.FacilityMapper;
@@ -12,8 +15,10 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +41,20 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Autowired
 	private FacilityTypeMapper facilityTypeMapper;
 	
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
+	
 	@Override
-//	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void addFacility(FacilityEntity facilityEntity) {
+		//设备表新增数据，此时添加成功但设备未登录
+		facilityEntity.setId(SnowFlake.nextId());
+		facilityEntity.setIsConnectData(0);
+		facilityMapper.insert(facilityEntity);
+		//设备状态表新增数据，此时添加成功但设备未登录
+		facilityMapper.insertFacilityStatus(SnowFlake.nextId(), 0, -1, facilityEntity.getId(), -1);
+		//MQ通知小区服务器登录设备
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_ADD, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
 	}
 	
 	@Override

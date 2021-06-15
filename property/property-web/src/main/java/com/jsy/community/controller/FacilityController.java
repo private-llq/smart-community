@@ -12,7 +12,9 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -69,13 +71,16 @@ public class FacilityController {
 		return CommonResult.ok(map);
 	}
 	
-	/**
-	 * 添加设备功能：  1. 保存设备基本信息   2. 根据基本信息(账号密码...)开启设备相应功能   3. 保存设备状态信息
-	 **/
 	@ApiOperation("添加设备")
 	@PostMapping("/addFacility")
 	public CommonResult addFacility(@RequestBody FacilityEntity facilityEntity) {
-		return CommonResult.error("维护中");
+		AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+		facilityEntity.setCommunityId(adminInfoVo.getCommunityId());
+		facilityEntity.setPersonId(adminInfoVo.getUid());
+		facilityEntity.setCreatePerson(adminInfoVo.getRealName());
+		ValidatorUtils.validateEntity(facilityEntity, FacilityEntity.addFacilityValidate.class);
+		facilityService.addFacility(facilityEntity);
+		return CommonResult.ok("操作成功");
 	}
 	
 	@ApiOperation("编辑设备")
