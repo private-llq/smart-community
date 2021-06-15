@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.vo.PropertyTenementVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface TenementMapper {
      * @Param:
      * @return:
      */
-    Long getTotal(PropertyRelationQO query, Long page, Long size);
+    Long getTotal(@Param("query") PropertyRelationQO query);
 
     /**
      * @Description: 分页查询
@@ -30,5 +31,5 @@ public interface TenementMapper {
      * @Param:
      * @return:
      */
-    List<PropertyTenementVO> list(PropertyRelationQO query, Long page, Long size);
+    List<PropertyTenementVO> list(@Param("query") PropertyRelationQO query,@Param("page") Long page,@Param("size") Long size);
 }

@@ -179,10 +179,10 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 		signatureUserDTO.setTelephone(newMobile);
 		signatureUserDTO.setUuid(uid);
 		boolean b = signatureService.updateUser(signatureUserDTO);
-//		if(!b){
-//            log.error("更换手机号，签章用户同步失败，相关账户：" + uid + "，新手机号：" + newMobile);
-//            throw new ProprietorException(JSYError.INTERNAL.getCode(),"签章板块手机号同步失败，请联系管理员");
-//        }
+		if(!b){
+            log.error("更换手机号，签章用户同步失败，相关账户：" + uid + "，新手机号：" + newMobile);
+            throw new ProprietorException(JSYError.INTERNAL.getCode(),"签章板块手机号同步失败，请联系管理员");
+        }
 	}
 	
 	/**

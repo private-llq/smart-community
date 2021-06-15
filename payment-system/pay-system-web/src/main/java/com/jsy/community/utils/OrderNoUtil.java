@@ -45,4 +45,5 @@ public class OrderNoUtil {
         s+=(char) (Math.random() * 26 + 'A');
         return s;
     }
+
 }

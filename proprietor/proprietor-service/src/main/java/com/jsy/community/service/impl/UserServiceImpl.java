@@ -194,7 +194,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Transactional(rollbackFor = Exception.class)
     @Override
     public String register(RegisterQO qo) {
-        commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+//        commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 
         String uuid = UserUtils.randomUUID();
 
@@ -250,14 +250,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             signatureUserDTO.setTelephone(qo.getAccount());
         } else if (RegexUtils.isEmail(qo.getAccount())) { // 邮箱注册
             signatureUserDTO.setEmail(qo.getAccount());
+        } else { //苹果三方登录等无手机号注册
+            return uuid;
         }
         String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
         boolean signUserResult = signatureService.insertUser(signatureUserDTO);
-//        if(!signUserResult){
-//            log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
-//            throw new ProprietorException(JSYError.INTERNAL);
-//        }
+        if(!signUserResult){
+            log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
         return uuid;
     }
 
@@ -931,10 +933,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
         signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
         boolean b = signatureService.realNameUpdateUser(signatureUserDTO);
-//        if(!b){
-//            log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
-//                throw new ProprietorException(JSYError.INTERNAL);
-//        }
+        if(!b){
+            log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
+                throw new ProprietorException(JSYError.INTERNAL);
+        }
     }
 
     /**

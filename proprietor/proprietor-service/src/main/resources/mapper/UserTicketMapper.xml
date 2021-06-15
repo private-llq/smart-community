@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.UserTicketMapper">
+
+    <!-- 分页查询 -->
+    <select id="queryUserTicketPage" resultType="com.jsy.community.entity.UserTicketEntity">
+        select t.title,t.remark,t.type,t.money,t.least_consume,tu.id,tu.status,tu.expire_time from t_user_ticket tu
+        join t_ticket t
+        on tu.ticket_id = t.id
+        where tu.uid = #{qo.uid}
+        <if test="qo.type != null and qo.type != 0">and t.type = #{qo.type}</if>
+        <if test="qo.status == 0 or qo.status == 1">and tu.status = #{qo.status}</if>
+        <if test="qo.expired == 0">and expire_time >= now()</if>
+        <if test="qo.expired == 1">and expire_time <![CDATA[<=]]> now()</if>
+        order by status asc,expire_time,tu.create_time desc
+    </select>
+
+</mapper>

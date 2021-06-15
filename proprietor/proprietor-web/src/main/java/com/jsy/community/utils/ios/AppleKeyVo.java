@@ -1,11 +1,10 @@
 package com.jsy.community.utils.ios;
 /**
- * @Description:
+ * @program: com.jsy.community
+ * @description: 获取ios key封账类
  * @author: Hu
- * @since: 2021/5/31 15:45
- * @Param:
- * @return:
- */
+ * @create: 2021/6/1 14:59
+ **/
 public class AppleKeyVo {
 
     /**

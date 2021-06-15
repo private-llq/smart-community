@@ -74,7 +74,6 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
             throw new PaymentException("没有查询到用户钱包信息,请用户先进行钱包开户!");
         }
         // 添加银联支付订单数据
-        unionPayOrderRecordEntity.setOrderAmt(unionPayOrderRecordEntity.getOrderAmt());
         // unionPayOrderRecordEntity.setWalletId(unionPayWalletEntity.getWalletId());
         // todo 测试时使用银联给的测试钱包ID
         unionPayOrderRecordEntity.setWalletId("2060508000214890811");

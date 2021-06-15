@@ -3,6 +3,7 @@ package com.jsy.community.utils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.vo.WeatherForecastVO;
 import com.jsy.community.vo.WeatherHourlyVO;
 import com.jsy.community.vo.WeatherLiveIndexVO;
@@ -27,29 +28,28 @@ public class WeatherUtils {
 	
 	//天气实况
 	public JSONObject getWeatherNow(String lon,String lat){
-		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/condition");
+		return getWeather(lon,lat,ConstClasses.AliYunDataEntity.URL_WEATHER_NOW);
 	}
 	//天气预报15天
 	public JSONObject getWeatherForDays(String lon,String lat){
-		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/forecast15days");
+		return getWeather(lon,lat,ConstClasses.AliYunDataEntity.URL_WEATHER_DAYS);
 	}
 	//天气预报24小时
 	public JSONObject getWeatherFor24hours(String lon,String lat){
-		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/forecast24hours");
+		return getWeather(lon,lat,ConstClasses.AliYunDataEntity.URL_WEATHER_HOURS);
 	}
 	//空气质量
 	public JSONObject getAirQuality(String lon,String lat){
-		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/aqi");
+		return getWeather(lon,lat,ConstClasses.AliYunDataEntity.URL_WEATHER_AIR);
 	}
 	//生活指数
 	public JSONObject getLivingIndex(String lon,String lat){
-		return getWeather(lon,lat,"http://aliv8.data.moji.com/whapi/json/aliweather/index");
+		return getWeather(lon,lat,ConstClasses.AliYunDataEntity.URL_WEATHER_LIVING);
 	}
 	
-	//TODO 三方接口商家待定 暂时用墨迹天气
+	//三方接口使用墨迹天气
 	public JSONObject getWeather(String lon,String lat,String url){
 		
-		String appCode = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		//params参数
 		Map<String, String> paramsMap = new HashMap<>();
 		paramsMap.put("lon", lon);
@@ -57,7 +57,7 @@ public class WeatherUtils {
 		HttpPost httpPost = MyHttpUtils.httpPostWithoutBody(url,paramsMap);
 		//设置header
 		Map<String,String> headers = new HashMap<>();
-		headers.put("Authorization","APPCODE " + appCode);
+		headers.put("Authorization","APPCODE " + ConstClasses.AliYunDataEntity.appCode);
 		headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 		MyHttpUtils.setHeader(httpPost,headers);
 		//设置默认配置
@@ -105,6 +105,7 @@ public class WeatherUtils {
 		lunarCalendar.setCode(0);
 		lunarCalendar.setName("万年历");
 		lunarCalendar.setStatus(lunarCalendarUtils.getLunarMonth()+"月"+lunarCalendarUtils.getLunarDay());
+		tempData.getJSONArray("liveIndex").remove(lunarCalendar);
 		tempData.getJSONArray("liveIndex").add(0,lunarCalendar);
 		return tempData;
 	}
@@ -207,10 +208,10 @@ public class WeatherUtils {
 			FileReader fileReader2;
 			log.info("开始读取假天气数据");
 			if(System.getProperty("os.name").startsWith("Win")){
-//				fileReader = new FileReader(new File(getClassesPath() + "temp_weather.txt"));
-//				fileReader2 = new FileReader(new File(getClassesPath() + "temp_weather_details.txt"));
-				fileReader = new FileReader(new File("D:/" + "temp_weather.txt"));
-				fileReader2 = new FileReader(new File("D:/" + "temp_weather_details.txt"));
+				fileReader = new FileReader(new File(getClassesPath() + "temp_weather.txt"));
+				fileReader2 = new FileReader(new File(getClassesPath() + "temp_weather_details.txt"));
+//				fileReader = new FileReader(new File("D:/" + "temp_weather.txt"));
+//				fileReader2 = new FileReader(new File("D:/" + "temp_weather_details.txt"));
 			}else{
 				fileReader = new FileReader(new File(OS_LINUX_PATH + "temp_weather.txt"));
 				fileReader2 = new FileReader(new File(OS_LINUX_PATH + "temp_weather_details.txt"));

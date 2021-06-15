@@ -23,19 +23,23 @@ import java.util.List;
 public class FinanceExcelImpl implements FinanceExcelHandler {
 
     // 结算单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] STATEMENT_TITLE_FIELD = {"结算单号", "结算时间段", "状态", "结算金额", "开户名称", "开户银行", "开户支行", "银行账号", "创建日期", "驳回原因"};
+    protected static final String[] STATEMENT_TITLE_FIELD = {"结算单号", "结算时间段", "状态", "结算金额", "开户名称", "开户银行", "开户支行", "银行账号", "创建日期", "驳回原因"};
 
     // 结算单关联账单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "收款金额", "收款时间", "收款渠道", "支付渠道单号"};
+    protected static final String[] ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "收款金额", "收款时间", "收款渠道", "支付渠道单号"};
 
     // 账单表字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] MASTER_ORDER_TITLE_FIELD = {"账单号", "状态", "账单日期", "账单类型", "应收金额", "房屋/车牌号", "业主姓名", "收款单号", "收款时间", "收款渠道", "支付渠道单号", "结算单号", "结算状态"};
+    protected static final String[] MASTER_ORDER_TITLE_FIELD = {"账单号", "状态", "账单日期", "账单类型", "应收金额", "房屋/车牌号", "业主姓名", "收款单号", "收款时间", "收款渠道", "支付渠道单号", "结算单号", "结算状态"};
 
     // 收款单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] RECEIPT_TITLE_FIELD = {"收款单号", "收款金额", "收款时间", "收款渠道", "收款渠道单号"};
+    protected static final String[] RECEIPT_TITLE_FIELD = {"收款单号", "收款金额", "收款时间", "收款渠道", "收款渠道单号"};
 
     // 收款单关联账单表.xlsx 字段 如果增加字段  需要改变实现类逻辑
-    public static final String[] RECEIPT_ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "应收金额"};
+    protected static final String[] RECEIPT_ORDER_TITLE_FIELD = {"账单号", "账单日期", "账单类型", "应收金额"};
+
+    protected static final String DATE_FORMAT_STRING = "yyyy-MM-dd";
+
+    protected static final String TIME_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * @Author: Pipi
@@ -86,8 +90,8 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         break;
                     case 1:
                         // 结算时间段
-                        String startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(statementVO.getStartDate());
-                        String endDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(statementVO.getEndDate());
+                        String startDate = DateTimeFormatter.ofPattern(DATE_FORMAT_STRING).format(statementVO.getStartDate());
+                        String endDate = DateTimeFormatter.ofPattern(DATE_FORMAT_STRING).format(statementVO.getEndDate());
                         cell.setCellValue(startDate + "至" + endDate);
                         break;
                     case 2:
@@ -124,7 +128,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         break;
                     case 8:
                         // 创建日期
-                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(statementVO.getCreateTime()));
+                        cell.setCellValue(DateTimeFormatter.ofPattern(DATE_FORMAT_STRING).format(statementVO.getCreateTime()));
                         break;
                     case 9:
                         // 驳回原因
@@ -193,8 +197,8 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         break;
                     case 1:
                         // 结算时间段
-                        String startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(statementVO.getStartDate());
-                        String endDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(statementVO.getEndDate());
+                        String startDate = DateTimeFormatter.ofPattern(DATE_FORMAT_STRING).format(statementVO.getStartDate());
+                        String endDate = DateTimeFormatter.ofPattern(DATE_FORMAT_STRING).format(statementVO.getEndDate());
                         cell.setCellValue(startDate + "至" + endDate);
                         break;
                     case 2:
@@ -231,7 +235,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         break;
                     case 8:
                         // 创建日期
-                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(statementVO.getCreateTime()));
+                        cell.setCellValue(DateTimeFormatter.ofPattern(DATE_FORMAT_STRING).format(statementVO.getCreateTime()));
                         break;
                     case 9:
                         // 驳回原因
@@ -333,7 +337,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                     case 8:
                         // 收款时间
                         if (entity.getReceiptEntity() != null) {
-                            cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd: HH:mm:ss").format(entity.getReceiptEntity().getCreateTime()));
+                            cell.setCellValue(DateTimeFormatter.ofPattern(TIME_FORMAT_STRING).format(entity.getReceiptEntity().getCreateTime()));
                         }
                         break;
                     case 9:
@@ -428,7 +432,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         break;
                     case 2:
                         // 收款时间
-                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(entity.getCreateTime()));
+                        cell.setCellValue(DateTimeFormatter.ofPattern(TIME_FORMAT_STRING).format(entity.getCreateTime()));
                         break;
                     case 3:
                         // 收款渠道
@@ -504,7 +508,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         break;
                     case 2:
                         // 收款时间
-                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(entity.getCreateTime()));
+                        cell.setCellValue(DateTimeFormatter.ofPattern(TIME_FORMAT_STRING).format(entity.getCreateTime()));
                         break;
                     case 3:
                         // 收款渠道
@@ -625,7 +629,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         break;
                     case 1:
                         // 账单日期
-                        cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(statementOrderVO.getOrderTime()));
+                        cell.setCellValue(DateTimeFormatter.ofPattern(DATE_FORMAT_STRING).format(statementOrderVO.getOrderTime()));
                         break;
                     case 2:
                         // 账单类型
@@ -638,7 +642,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                     case 4:
                         // 收款时间
                         if (statementOrderVO.getPayTime() != null) {
-                            cell.setCellValue(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(statementOrderVO.getPayTime()));
+                            cell.setCellValue(DateTimeFormatter.ofPattern(DATE_FORMAT_STRING).format(statementOrderVO.getPayTime()));
                         }
                         break;
                     case 5:

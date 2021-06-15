@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.jsy.community.entity.RegionEntity;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -58,5 +59,15 @@ public interface RegionMapper {
 	 * @Param [id]
 	 **/
 	List<Long> getListPayTypeId(Long id);
+	
+	/**
+	* @Description: 查找名称相似城市(如重庆、重庆市)
+	 * @Param: [cityName]
+	 * @Return: java.util.List<com.jsy.community.entity.RegionEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/8
+	**/
+	@Select("select name,lng,lat from t_region where level = 2 and name like CONCAT(#{cityName},'_')")
+	List<RegionEntity> getCityNameLike(String cityName);
 	
 }

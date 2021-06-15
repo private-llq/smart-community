@@ -19,5 +19,5 @@ public interface ITenementService {
      * @Param:
      * @return:
      */
-    Map list(BaseQO<PropertyRelationQO> baseQO);
+    Map list(BaseQO<PropertyRelationQO> baseQO,Long communityId);
 }

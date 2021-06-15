@@ -1,7 +1,9 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.UserTicketEntity;
+import com.jsy.community.qo.UserTicketQO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -12,6 +14,25 @@ import org.apache.ibatis.annotations.Update;
  * @since 2021-01-28 13:59
  **/
 public interface UserTicketMapper extends BaseMapper<UserTicketEntity> {
+	
+	/**
+	* @Description: 现金券 分页查询
+	 * @Param: [page, qo]
+	 * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.UserTicketEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/9
+	**/
+	Page<UserTicketEntity> queryUserTicketPage(@Param("page")Page<UserTicketEntity> page, @Param("qo")UserTicketQO qo);
+	
+	/**
+	* @Description: ID单查券
+	 * @Param: [id]
+	 * @Return: com.jsy.community.entity.UserTicketEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/6/9
+	**/
+	@Select("select t.title,t.remark,t.type,t.money,t.least_consume from t_ticket t where id = #{id}")
+	UserTicketEntity queryTicketById(Long id);
 	
 	/**
 	* @Description: 统计用户可用券张数

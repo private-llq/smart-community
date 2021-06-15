@@ -51,12 +51,8 @@ public class CarTrackServiceImpl extends ServiceImpl<CarTrackMapper, CarTrackEnt
 		MyPageUtils.setPageAndSize(page,qo);
 		List<CarTrackEntity> carTrackEntityList = carTrackMapper.listCarTrack(qo,page);
 		for (CarTrackEntity carTrackEntity : carTrackEntityList) {
-			String carNumber = carTrackEntity.getCarNumber();
-			
 			// TODO: 2021/4/27  这是为了解决查询出来有乱码的问题[会在车牌后面多出几个空格]   可能是因为编码问题[解确认]  暂时用这种办法来解决
-			// 车牌
-			String trimCarNumber = carNumber.trim();
-			carTrackEntity.setCarNumber(trimCarNumber);
+			carTrackEntity.setCarNumber(carTrackEntity.getCarNumber().trim());
 		}
 		PageInfo<CarTrackEntity> info = new PageInfo<>();
 		BeanUtils.copyProperties(page,info);

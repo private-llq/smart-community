@@ -515,10 +515,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		BeanUtils.copyProperties(adminUserEntity,adminUserAuthEntity);
 		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
 		//发短信通知，并发送初始密码
-		boolean b = SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
-//		if(!b){
-//			throw new PropertyException(JSYError.INTERNAL.getCode(),"短信通知失败，用户添加失败");
-//		}
+		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
 		return result == 1;
 	}
 	
@@ -574,11 +571,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserAuthEntity.setSalt(salt);
 		adminUserAuthEntity.setUpdateBy(uid);
 		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", adminUser.getMobile()));
-		//发短信通知初始密码
-		boolean b = SmsUtil.sendSmsPassword(adminUser.getMobile(), randomPass);
-//		if(!b){
-//			throw new PropertyException(JSYError.INTERNAL.getCode(),"短信通知失败，用户添加失败");
-//		}
+		//发短信通知新初始密码
+		SmsUtil.resetPassword(adminUser.getMobile(), randomPass);
 		return result == 1;
 	}
 	

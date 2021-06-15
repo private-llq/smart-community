@@ -209,4 +209,12 @@
         ORDER BY
             DATE_FORMAT( create_time, "%Y-%m" ) ASC
     </select>
+    <insert id="saveList" parameterType="List">
+        insert into t_property_finance_order
+        (id,order_num,order_time,uid,house_id,community_id,property_fee,total_money,create_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.orderNum},#{item.orderTime},#{item.uid},#{item.houseId},#{item.communityId},#{item.propertyFee},#{item.totalMoney},now())
+        </foreach>
+    </insert>
 </mapper>

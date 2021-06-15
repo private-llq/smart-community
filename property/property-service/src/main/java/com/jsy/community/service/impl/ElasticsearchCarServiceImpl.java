@@ -137,7 +137,7 @@ public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
     @Override
     public void updateCars() {
         List<PropertyCarEntity> entities = propertyCarMapper.selectList(null);
-        ElasticsearchCarUtil.deleteDataAll(restHighLevelClient);
+//        ElasticsearchCarUtil.deleteDataAll(restHighLevelClient);
         for (PropertyCarEntity entity : entities) {
             ElasticsearchCarQO carQO = new ElasticsearchCarQO();
             BeanUtils.copyProperties(entity,carQO);

@@ -14,10 +14,12 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
+import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import io.swagger.annotations.Api;
@@ -412,5 +414,23 @@ public class ProprietorController {
         return isSuccess ? CommonResult.ok("删除成功!") : CommonResult.error("删除失败!");
     }
 
+    /**
+     * @author: Pipi
+     * @description: 查询未绑定房屋列表
+     * @param: baseQO:
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/6/12 11:57
+     **/
+    @Login
+    @PostMapping("/unboundHouseList")
+    @ApiOperation("查询未绑定房屋列表")
+    public CommonResult getUnboundHouseList(@RequestBody BaseQO<RelationListQO> baseQO) {
+        if (baseQO.getQuery() == null) {
+            baseQO.setQuery(new RelationListQO());
+        }
+        baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+        List<HouseTypeVo> unboundHouseList = iProprietorService.getUnboundHouseList(baseQO);
+        return CommonResult.ok(unboundHouseList);
+    }
 
 }

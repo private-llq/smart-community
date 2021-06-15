@@ -16,6 +16,11 @@
     <dependencies>
         <dependency>
             <groupId>com.jsy</groupId>
+            <artifactId>facility-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jsy</groupId>
             <artifactId>property-common</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -23,11 +28,6 @@
             <groupId>com.jsy</groupId>
             <artifactId>property-api</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jsy</groupId>
-            <artifactId>facility-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>

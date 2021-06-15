@@ -17,13 +17,13 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.util.facility.FacilityUtils;
+import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -54,9 +54,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Autowired
 	private UserMapper userMapper;
-	
-	@Autowired
-	private RedisTemplate redisTemplate;
 	
 	@Override
 	@Transactional
@@ -101,30 +98,40 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	
 	@Override
-	public PageInfo<FacilityEntity> listFacility(BaseQO<FacilityQO> facilityQO) {
-		Page<FacilityEntity> info = new Page<>(facilityQO.getPage(), facilityQO.getSize());
-		FacilityQO qo = facilityQO.getQuery();
-		List<FacilityEntity> facilityEntityList = facilityMapper.listFacility(qo, info);
-		for (FacilityEntity facilityEntity : facilityEntityList) {
-			
-			// 根据id判断其在线状态
-			Long id = facilityEntity.getId();
-			int status = facilityMapper.getStatus(id);
-			facilityEntity.setStatus(status);
-			
-			// 根据设备分类id查询设备分类名称
-			Long facilityTypeId = facilityEntity.getFacilityTypeId();
-			FacilityTypeEntity typeEntity = facilityTypeMapper.selectById(facilityTypeId);
-			facilityEntity.setFacilityTypeName(typeEntity.getName());
+	public PageInfo<FacilityEntity> listFacility(BaseQO<FacilityQO> baseQO) {
+		FacilityQO qo = baseQO.getQuery();
+		Page<FacilityEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		Page<FacilityEntity> pageData = facilityMapper.listFacility(qo, page);
+		if(pageData.getRecords().size() == 0){
+			return new PageInfo<>();
+		}
+		ArrayList<Long> ids = new ArrayList<>();
+		Set<Long> typeIds = new HashSet<>();
+		for (FacilityEntity facilityEntity : pageData.getRecords()) {
+			ids.add(facilityEntity.getId());
+			typeIds.add(facilityEntity.getFacilityTypeId());
+		}
+		//查询和设置设备状态、设备类型名
+		Map<Long,Map<Long,Integer>> statusMap = facilityMapper.getStatusBatch(ids);
+		Map<Long,Map<Long,String>> typeNameMap = facilityTypeMapper.queryIdAndNameMap(typeIds);
+		for (FacilityEntity facilityEntity : pageData.getRecords()) {
+			facilityEntity.setStatus(statusMap.get(BigInteger.valueOf(facilityEntity.getId())) == null ? null : statusMap.get(BigInteger.valueOf(facilityEntity.getId())).get("status"));
+			facilityEntity.setFacilityTypeName(typeNameMap.get(BigInteger.valueOf(facilityEntity.getFacilityTypeId())) == null ? null : typeNameMap.get(BigInteger.valueOf(facilityEntity.getFacilityTypeId())).get("name"));
 		}
 		PageInfo<FacilityEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(info, pageInfo);
-		pageInfo.setRecords(facilityEntityList);
+		BeanUtils.copyProperties(pageData, pageInfo);
 		return pageInfo;
 	}
 	
 	@Override
-	public void deleteFacility(Long id) {
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteFacility(Long id, Long communityId) {
+		//验证物业操作的是否是自己社区设备,加社区id
+		Integer count = facilityMapper.selectCount(new QueryWrapper<FacilityEntity>().eq("id",id).eq("community_id",communityId));
+		if(count < 1){
+			throw new FacilityException("没有该设备");
+		}
 		// 根据设备id查询他的唯一布防句柄
 		int alarmHandle = facilityMapper.getAlarmHandle(id);
 		
@@ -166,9 +173,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			facility.getPort().equals(facilityEntity.getPort())) {
 			facilityMapper.updateById(facilityEntity);
 		} else {
-			if (!facility.getFacilityEffectId().equals(facilityEntity.getFacilityEffectId())) {
-				throw new FacilityException("不可以改变设备作用功能");
-			}
 			//ip，账号，密码，端口号 有至少一个发生了改变    ——>需要重新登录设备，开启功能
 			String ip = facilityEntity.getIp();
 			String username = facilityEntity.getUsername();
@@ -207,10 +211,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 	
 	@Override
-	public Map<String, Integer> getCount(Long typeId) {
+	public Map<String, Integer> getCount(Long typeId, Long communityId) {
 		// 根据设备分类id查询其下设备的id集合
-		//TODO 查询条件加社区id
-		List<Long> facilityIds = facilityMapper.getFacilityIdByTypeId(typeId);
+		List<Long> facilityIds = facilityMapper.getFacilityIdByTypeId(typeId,communityId);
 		
 		int onlineCount = 0;
 		int failCount = 0;
@@ -231,13 +234,18 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Override
 //	@Transactional(rollbackFor = Exception.class)
-	public void flushFacility(Integer page, Integer size, String facilityTypeId) {
+	public void flushFacility(Integer page, Integer size, String facilityTypeId, Long communityId) {
 		//1. 获取当前页的数据
-		Page<FacilityEntity> entityPage = new Page<>(page, size);
-		
+		Page<FacilityEntity> entityPage = new Page<>();
+		if(page != null && page != 0){
+			entityPage.setCurrent(page);
+		}
+		if(size != null && size != 0){
+			entityPage.setSize(size);
+		}
 		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("community_id", communityId);
 		wrapper.eq("facility_type_id", facilityTypeId);
-		//TODO 查询条件带小区id
 		Page<FacilityEntity> facilityEntityPage = facilityMapper.selectPage(entityPage, wrapper);
 		List<FacilityEntity> list = facilityEntityPage.getRecords();
 		

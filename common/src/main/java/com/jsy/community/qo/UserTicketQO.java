@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 @Data
 public class UserTicketQO extends BaseQO {
 	
+	@ApiModelProperty(value = "券id")
+	private Long ticketId;
+	
 	@ApiModelProperty(value = "用户id")
 	private String uid;
 	
@@ -27,6 +30,9 @@ public class UserTicketQO extends BaseQO {
 	
 	@ApiModelProperty(value = "是否使用 0.未过期 1.已过期")
 	private Integer expired;
+	
+	public static final Integer TICKET_UNUSED = 0; //未使用
+	public static final Integer TICKET_USED = 1; //已使用
 	
 	public static final Integer TICKET_UNEXPIRED = 0; //未过期
 	public static final Integer TICKET_EXPIRED = 1; //已过期

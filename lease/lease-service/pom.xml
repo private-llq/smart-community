@@ -92,14 +92,6 @@
 		</dependency>
 		<!--*************  LCN	*************-->
 
-
-		<!--	websocket	-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
-		<!--	websocket	-->
-
 		<!-- 支付宝 -->
 		<dependency>
 			<groupId>com.alipay.sdk</groupId>

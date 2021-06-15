@@ -18,6 +18,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.jsy</groupId>
+			<artifactId>property-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jsy</groupId>
 			<artifactId>property-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -28,12 +33,7 @@
 			<artifactId>thumbnailator</artifactId>
 			<version>0.4.8</version>
 		</dependency>
-		<dependency>
-			<groupId>com.jsy</groupId>
-			<artifactId>property-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
+
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus-extension</artifactId>
@@ -87,12 +87,6 @@
 			<artifactId>kaptcha</artifactId>
 		</dependency>
 
-		<!--*************  websocket  *************-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
-		<!--*************  websocket  *************-->
 	</dependencies>
 
 	<build>

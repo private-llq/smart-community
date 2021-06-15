@@ -25,7 +25,14 @@ import java.util.List;
  **/
 public  class IOSUtil {
 
-    public static PublicKey getPublicKey() {
+    /**
+     * @Description: 获取ios PublicKey工具类
+     * @author: Hu
+     * @since: 2021/6/1 15:02
+     * @Param: [kid]
+     * @return: java.security.PublicKey
+     */
+    public static PublicKey getPublicKey(String kid) {
         String body=null;
         try {
             String url = "https://appleid.apple.com/auth/keys";
@@ -39,16 +46,18 @@ public  class IOSUtil {
             JSONObject jObject = JSONObject.parseObject(body);
             List<AppleKeyVo> appleKeyVos = JSONUtil.toList(JSONUtil.parseArray(jObject.get("keys")),AppleKeyVo.class);
             for (AppleKeyVo appleKeyVo : appleKeyVos) {
-                System.out.println(appleKeyVo);
+                if (kid.equals(appleKeyVo.getKid())){
                     BigInteger modulus = new BigInteger(1, Base64.decodeBase64(appleKeyVo.getN()));
                     BigInteger publicExponent = new BigInteger(1, Base64.decodeBase64(appleKeyVo.getE()));
                     RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, publicExponent);
                     KeyFactory kf = KeyFactory.getInstance("RSA");
                     return kf.generatePublic(spec);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
+
 }
