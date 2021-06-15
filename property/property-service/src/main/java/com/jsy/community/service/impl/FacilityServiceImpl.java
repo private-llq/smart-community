@@ -56,6 +56,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		Page<FacilityEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
 		Page<FacilityEntity> pageData = facilityMapper.listFacility(qo, page);
+		if(pageData.getRecords().size() == 0){
+			return new PageInfo<>();
+		}
 		ArrayList<Long> ids = new ArrayList<>();
 		Set<Long> typeIds = new HashSet<>();
 		for (FacilityEntity facilityEntity : pageData.getRecords()) {
