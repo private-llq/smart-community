@@ -173,7 +173,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/6/16
 	**/
-	@Select("update t_facility_status set status = #{status} where facility_id = #{facilityId}")
+	@Select("update t_facility_status set status = #{status},update_time = now() where facility_id = #{facilityId}")
 	void updateStatus(@Param("status")Integer status,@Param("facilityId")Long facilityId);
 	
 	/**
