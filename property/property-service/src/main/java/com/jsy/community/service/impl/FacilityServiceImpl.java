@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFacilityService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.hk.FacilityEntity;
@@ -24,6 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -48,7 +52,20 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	 * 更新在线状态(写库)
 	 */
 	@Override
-	public void changeStatus(Integer status,Long facilityId){
+	public void changeStatus(Integer status,Long facilityId,Long time){
+		//指令执行时间与最近修改时间/创建时间比较，若是最近修改时间之前的操作，则抛弃
+		FacilityEntity entity = facilityMapper.getStatusTime(facilityId);
+		if(entity == null){
+			throw new PropertyException("没有此设备状态信息，无法更新设备状态");
+		}
+		//指令执行时间与最近修改时间比较，若是最近修改时间之前的操作，则抛弃
+		if(entity.getUpdateTime() != null){
+			//获取时间戳，转化为LocalDateTime
+			LocalDateTime opTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
+			if(opTime.isBefore(entity.getUpdateTime())){
+				return;
+			}
+		}
 		facilityMapper.updateStatus(status,facilityId);
 	}
 	
@@ -59,18 +76,33 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		facilityEntity.setId(SnowFlake.nextId());
 		facilityMapper.insert(facilityEntity);
 		//设备状态表新增数据，此时添加成功但设备未登录
-		facilityMapper.insertFacilityStatus(SnowFlake.nextId(), 0, -1, facilityEntity.getId(), -1);
+		facilityMapper.insertFacilityStatus(SnowFlake.nextId(), 0, facilityEntity.getId());
 		//MQ通知小区服务器登录设备
 		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_ADD, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
 	}
 	
 	@Override
-	public void deleteFacility(Long id) {
+	public void deleteFacility(Long id,Long communityId) {
+		//验证设备是否归属本小区
+		Integer count = facilityMapper.selectCount(new QueryWrapper<FacilityEntity>().eq("id",id).eq("community_id",communityId));
+		if(count < 1){
+			throw new PropertyException("没有该设备");
+		}
+		//异步通知小区服务器撤防和注销
+		Map<String,Long> mapBody = new HashMap<>();
+		mapBody.put("id",id);
+		mapBody.put("communityId",communityId);
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_DEL,mapBody);
+		//直接删除设备，返回成功(反正也查不到了，不用等待异步注销成功)
+		facilityMapper.deleteFacilityById(id);
+		// 删除设备状态信息
+		facilityMapper.deleteMiddleFacility(id);
 	}
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void updateFacility(FacilityEntity facilityEntity) {
+		//TODO  更新t_facility_status update_time now()
 	}
 	
 	@Override

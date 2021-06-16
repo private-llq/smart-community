@@ -17,12 +17,12 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	
 	/**
 	* @Description: 单条更新设备状态
-	 * @Param: [facilityId, status]
+	 * @Param: [facilityId, status, time]
 	 * @Return: void
 	 * @Author: chq459799974
 	 * @Date: 2021/6/16
 	**/
-	void changeStatus(Integer status, Long facilityId);
+	void changeStatus(Integer status, Long facilityId, Long time);
 	
 	/**
 	 * @return void
@@ -47,9 +47,9 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author lihao
 	 * @Description 删除设备
 	 * @Date 2021/3/15 9:40
-	 * @Param [id]
+	 * @Param [id,communityId]
 	 **/
-	void deleteFacility(Long id);
+	void deleteFacility(Long id,Long communityId);
 	
 	/**
 	 * @return void

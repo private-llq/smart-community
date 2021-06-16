@@ -92,7 +92,8 @@ public class FacilityController {
 	@ApiOperation("删除设备")
 	@GetMapping("/deleteFacility")
 	public CommonResult deleteFacility(@RequestParam("id") Long id) {
-		return CommonResult.error("维护中");
+		facilityService.deleteFacility(id,UserUtils.getAdminCommunityId());
+		return CommonResult.ok("操作成功");
 	}
 	
 	/**

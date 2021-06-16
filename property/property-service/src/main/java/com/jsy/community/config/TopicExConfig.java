@@ -25,7 +25,6 @@ public class TopicExConfig {
 	
 	//监听topic名称
 	public final static String TOPIC_HK_CAMERA_ADD_RESULT = "topic.hk.camera.server.add.result"; //海康摄像机服务端添加结果反馈(监听用)
-	public final static String TOPIC_HK_CAMERA_DEL_RESULT = "topic.hk.camera.server.del.result"; //海康摄像机服务端删除结果反馈(监听用)
 	public final static String TOPIC_HK_CAMERA_UPDATE_RESULT = "topic.hk.camera.server.update.result"; //海康摄像机服务端修改结果反馈(监听用)
 	
 	//声明队列

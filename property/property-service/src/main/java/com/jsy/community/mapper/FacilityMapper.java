@@ -38,7 +38,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 * @Date 2021/5/11 12:55
 	 * @Param [id：设备id, status：设备在线状态, facilityHandle：设备用户句槟, facilityId：设备作用id, facilityAlarmHandle：设备报警布防句槟]
 	 **/
-	void insertFacilityStatus(@Param("id") long id, @Param("status") Integer status, @Param("facilityHandle") Integer facilityHandle, @Param("facilityId") Long facilityId, @Param("facilityAlarmHandle") int facilityAlarmHandle);
+	void insertFacilityStatus(@Param("id") long id, @Param("status") Integer status, @Param("facilityId") Long facilityId);
 	
 	/**
 	 * @return int
@@ -69,6 +69,16 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	**/
 	@MapKey("facility_id")
 	Map<Long,Map<Long,Integer>> getStatusBatch(@Param("idList") List<Long> idList);
+	
+	/**
+	* @Description: 单删(物理删除)
+	 * @Param: [id]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/16
+	**/
+	@Delete("delete from t_facility where id = #{id}")
+	void deleteFacilityById(Long id);
 	
 	/**
 	 * @return void
@@ -156,8 +166,24 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	//批量更新设备在线状态
 	void updateStatusByFacilityIdBatch(@Param("map") Map<Long, Integer> map);
 	
-	//单条更新在线状态
+	/**
+	* @Description: 单条更新在线状态
+	 * @Param: [status, facilityId]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/16
+	**/
 	@Select("update t_facility_status set status = #{status} where facility_id = #{facilityId}")
 	void updateStatus(@Param("status")Integer status,@Param("facilityId")Long facilityId);
+	
+	/**
+	* @Description: 获取设备状态创建和更新时间
+	 * @Param: [facilityId]
+	 * @Return: com.jsy.community.entity.hk.FacilityEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/6/16
+	**/
+	@Select("select id,update_time from t_facility_status where facility_id = #{facilityId}")
+	FacilityEntity getStatusTime(Long facilityId);
 	
 }
