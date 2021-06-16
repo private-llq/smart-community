@@ -66,5 +66,23 @@ public class TopicListener {
 		//手动确认
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 	}
+	
+	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_UPDATE_RESULT)
+	public void updateFacilityResult(Map mapBody, Message message, Channel channel) throws IOException {
+		log.info("监听到Update设备回复: \n" + mapBody.toString());
+		try {
+			JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(mapBody));
+			//修改设备在线状态
+			facilityService.changeStatus(jsonObject.getInteger("status"),jsonObject.getLong("facilityId"),jsonObject.getLong("time"));
+		}catch(Exception e){
+			e.printStackTrace();
+			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
+			log.info("收到的消息内容为: \n" + mapBody.toString());
+			//手动确认
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+		}
+		//手动确认
+		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+	}
 
 }

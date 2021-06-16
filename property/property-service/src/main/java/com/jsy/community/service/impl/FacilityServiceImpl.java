@@ -72,10 +72,10 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addFacility(FacilityEntity facilityEntity) {
-		//设备表新增数据，此时添加成功但设备未登录
+		//设备表新增数据
 		facilityEntity.setId(SnowFlake.nextId());
 		facilityMapper.insert(facilityEntity);
-		//设备状态表新增数据，此时添加成功但设备未登录
+		//设备状态表新增数据，此时添加成功但设备未登录，等待异步通知修改状态
 		facilityMapper.insertFacilityStatus(SnowFlake.nextId(), 0, facilityEntity.getId());
 		//MQ通知小区服务器登录设备
 		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_ADD, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
@@ -102,7 +102,33 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void updateFacility(FacilityEntity facilityEntity) {
-		//TODO  更新t_facility_status update_time now()
+		// 判断此次修改是否没有修改ip，账号，密码，端口号。若没有修改就只更新基本信息即可
+		Long facilityId = facilityEntity.getId();
+		FacilityEntity facility = facilityMapper.selectOne(new QueryWrapper<FacilityEntity>().eq("id",facilityId).eq("community_id",facilityEntity.getCommunityId()));
+		if (facility == null) {
+			throw new PropertyException("你选择的设备不存在");
+		}
+		//ip，账号，密码，端口号 有至少一个发生了改变    ——>需要通知小区服务器重新登录设备，开启功能
+		if (!facility.getIp().equals(facilityEntity.getIp()) ||
+			!facility.getUsername().equals(facilityEntity.getUsername()) ||
+			!facility.getPassword().equals(facilityEntity.getPassword()) ||
+			!facility.getPort().equals(facilityEntity.getPort()))
+		{
+			String ip = facilityEntity.getIp();
+			String username = facilityEntity.getUsername();
+			String password = facilityEntity.getPassword();
+			Short port = facilityEntity.getPort();
+			
+			//异步通知小区服务器
+			rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_UPDATE, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
+			
+			// 更新设备状态表[这里采用的不是更新表，而是直接删除原本条数据，重新新增数据]
+			facilityMapper.deleteMiddleFacility(facilityId);
+			//这里同新增一样 status暂时是0，等待异步通知修改状态
+			facilityMapper.insertFacilityStatus(SnowFlake.nextId(),0,facilityId);
+		}
+		// 更新设备信息表
+		facilityMapper.updateById(facilityEntity);
 	}
 	
 	@Override

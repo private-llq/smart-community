@@ -86,7 +86,12 @@ public class FacilityController {
 	@ApiOperation("编辑设备")
 	@PostMapping("/updateFacility")
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
-		return CommonResult.error("维护中");
+		// By:LH: 编辑的时候不能更改该摄像头的作用哈  因为摄像头的作用需要更改摄像头后台  开启相应的功能 比如你要开启人脸比对，摄像机应该去后台选择人脸比对模式
+		// By:LH: 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
+		facilityEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		facilityEntity.setFacilityEffectId(null); //设备作用根据摄像头后台[配置-系统-系统设置-智能模式切换] ，不允许直接修改设备作用
+		facilityService.updateFacility(facilityEntity);
+		return CommonResult.ok("操作成功");
 	}
 	
 	@ApiOperation("删除设备")
