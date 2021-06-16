@@ -111,23 +111,23 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		if (facility == null) {
 			throw new PropertyException("你选择的设备不存在");
 		}
+		// 更新设备信息表
+		facilityMapper.updateById(facilityEntity);
 		//ip，账号，密码，端口号 有至少一个发生了改变    ——>需要通知小区服务器重新登录设备，开启功能
 		if (!facility.getIp().equals(facilityEntity.getIp()) ||
 			!facility.getUsername().equals(facilityEntity.getUsername()) ||
 			!facility.getPassword().equals(facilityEntity.getPassword()) ||
 			!facility.getPort().equals(facilityEntity.getPort()))
 		{
-			//异步通知小区服务器
-			facilityEntity.setOp("update");
-			rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_OP, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
 			
 			// 更新设备状态表[这里采用的不是更新表，而是直接删除原本条数据，重新新增数据]
 			facilityMapper.deleteMiddleFacility(facilityId);
 			//这里同新增一样 status暂时是0，等待异步通知修改状态
 			facilityMapper.insertFacilityStatus(SnowFlake.nextId(),0,facilityId);
+			//异步通知小区服务器
+			facilityEntity.setOp("update");
+			rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_OP, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
 		}
-		// 更新设备信息表
-		facilityMapper.updateById(facilityEntity);
 	}
 	
 	@Override
