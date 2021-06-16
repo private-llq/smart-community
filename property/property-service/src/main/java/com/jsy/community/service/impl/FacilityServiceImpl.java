@@ -56,6 +56,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		//指令执行时间与最近修改时间/创建时间比较，若是最近修改时间之前的操作，则抛弃
 		FacilityEntity entity = facilityMapper.getStatusTime(facilityId);
 		if(entity == null){
+			//可能场景：前端连续操作添加-删除，小区服务器在前端已删除后 才联网收到添加和删除的连续指令
 			throw new PropertyException("没有此设备状态信息，无法更新设备状态");
 		}
 		//指令执行时间与最近修改时间比较，若是最近修改时间之前的操作，则抛弃
@@ -78,7 +79,8 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		//设备状态表新增数据，此时添加成功但设备未登录，等待异步通知修改状态
 		facilityMapper.insertFacilityStatus(SnowFlake.nextId(), 0, facilityEntity.getId());
 		//MQ通知小区服务器登录设备
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_ADD, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
+		facilityEntity.setOp("add");
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_OP, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
 	}
 	
 	@Override
@@ -89,10 +91,11 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			throw new PropertyException("没有该设备");
 		}
 		//异步通知小区服务器撤防和注销
-		Map<String,Long> mapBody = new HashMap<>();
-		mapBody.put("id",id);
-		mapBody.put("communityId",communityId);
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_DEL,mapBody);
+		FacilityEntity facilityEntity = new FacilityEntity();
+		facilityEntity.setId(id);
+		facilityEntity.setCommunityId(communityId);
+		facilityEntity.setOp("del");
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_OP,JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
 		//直接删除设备，返回成功(反正也查不到了，不用等待异步注销成功)
 		facilityMapper.deleteFacilityById(id);
 		// 删除设备状态信息
@@ -115,7 +118,8 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			!facility.getPort().equals(facilityEntity.getPort()))
 		{
 			//异步通知小区服务器
-			rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_UPDATE, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
+			facilityEntity.setOp("update");
+			rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_OP, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
 			
 			// 更新设备状态表[这里采用的不是更新表，而是直接删除原本条数据，重新新增数据]
 			facilityMapper.deleteMiddleFacility(facilityId);
