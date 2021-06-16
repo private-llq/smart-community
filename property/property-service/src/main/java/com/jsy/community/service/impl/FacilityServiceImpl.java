@@ -44,12 +44,19 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 	
+	/**
+	 * 更新在线状态(写库)
+	 */
+	@Override
+	public void changeStatus(Integer status,Long facilityId){
+		facilityMapper.updateStatus(status,facilityId);
+	}
+	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addFacility(FacilityEntity facilityEntity) {
 		//设备表新增数据，此时添加成功但设备未登录
 		facilityEntity.setId(SnowFlake.nextId());
-		facilityEntity.setIsConnectData(0);
 		facilityMapper.insert(facilityEntity);
 		//设备状态表新增数据，此时添加成功但设备未登录
 		facilityMapper.insertFacilityStatus(SnowFlake.nextId(), 0, -1, facilityEntity.getId(), -1);

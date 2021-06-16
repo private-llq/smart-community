@@ -16,6 +16,15 @@ import java.util.Map;
 public interface IFacilityService extends IService<FacilityEntity> {
 	
 	/**
+	* @Description: 单条更新设备状态
+	 * @Param: [facilityId, status]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/16
+	**/
+	void changeStatus(Integer status, Long facilityId);
+	
+	/**
 	 * @return void
 	 * @Author lihao
 	 * @Description 添加设备信息

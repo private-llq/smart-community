@@ -1,6 +1,8 @@
 package com.jsy.community.listener;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.config.RabbitMQCommonConfig;
 import com.jsy.community.config.TopicExConfig;
@@ -26,6 +28,9 @@ public class TopicListener {
 
 	@Resource
 	private IVisitorService visitorService;
+	
+	@Resource
+	private IFacilityService facilityService;
 
 	//监听来自APP的访客记录新增需求
 	@RabbitListener(queues = RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD)
@@ -46,11 +51,11 @@ public class TopicListener {
 	
 	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_ADD_RESULT)
 	public void process1(Map mapBody, Message message, Channel channel) throws IOException {
-		log.info("监听到Add设备指令回复: \n" + mapBody.toString());
+		log.info("监听到Add设备回复: \n" + mapBody.toString());
 		try {
-			JSONObject jsonObject = JSONObject.parseObject(mapBody.toString());
-			System.out.println("解析成功：\n" + jsonObject);
-			
+			JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(mapBody));
+			//修改设备在线状态
+			facilityService.changeStatus(jsonObject.getInteger("status"),jsonObject.getLong("facilityId"));
 		}catch(Exception e){
 			e.printStackTrace();
 			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
