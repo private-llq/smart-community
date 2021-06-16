@@ -114,11 +114,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			!facility.getPassword().equals(facilityEntity.getPassword()) ||
 			!facility.getPort().equals(facilityEntity.getPort()))
 		{
-			String ip = facilityEntity.getIp();
-			String username = facilityEntity.getUsername();
-			String password = facilityEntity.getPassword();
-			Short port = facilityEntity.getPort();
-			
 			//异步通知小区服务器
 			rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_UPDATE, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
 			
