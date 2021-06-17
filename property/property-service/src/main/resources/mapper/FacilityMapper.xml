@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.FacilityMapper">
     <select id="listFacility" resultType="com.jsy.community.entity.hk.FacilityEntity">
-        select f.id,number ,name ,facility_type_id,serial_number,ip,model_number,address,create_person,create_time,data_connect_time,remark,is_connect_data,username,password,port,facility_effect_id
+        select f.id,number ,name ,facility_type_id,serial_number,ip,model_number,address,create_person,f.create_time,data_connect_time,remark,is_connect_data,username,password,port,facility_effect_id
         from t_facility f,t_facility_status fs
         <where>
             <if test="qo.startTime!=null">
@@ -28,12 +28,12 @@
             </if>
             and deleted = 0 and community_id = #{qo.communityId} and f.id = facility_id
         </where>
-        order by create_time desc
+        order by f.create_time desc
     </select>
 
 
     <insert id="insertFacilityStatus">
-        insert into t_facility_status (id,facility_handle,status,facility_id,facility_alarm_handle) values (#{id},#{facilityHandle},#{status},#{facilityId},#{facilityAlarmHandle})
+        insert into t_facility_status (id,status,facility_id,create_time) values (#{id},#{status},#{facilityId},now())
     </insert>
 
     <select id="selectId" resultType="long">

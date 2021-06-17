@@ -105,6 +105,10 @@ public class FacilityEntity extends BaseEntity {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime dataConnectTime;
 	
+	@ApiModelProperty(value = "远程操作类型 add del update 等，和小区服务器对应")
+	@TableField(exist = false)
+	private String op;
+	
 	public interface addFacilityValidate {
 	}
 	

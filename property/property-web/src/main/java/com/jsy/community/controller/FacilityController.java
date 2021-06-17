@@ -12,7 +12,9 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -69,25 +71,34 @@ public class FacilityController {
 		return CommonResult.ok(map);
 	}
 	
-	/**
-	 * 添加设备功能：  1. 保存设备基本信息   2. 根据基本信息(账号密码...)开启设备相应功能   3. 保存设备状态信息
-	 **/
 	@ApiOperation("添加设备")
 	@PostMapping("/addFacility")
 	public CommonResult addFacility(@RequestBody FacilityEntity facilityEntity) {
-		return CommonResult.error("维护中");
+		AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+		facilityEntity.setCommunityId(adminInfoVo.getCommunityId());
+		facilityEntity.setPersonId(adminInfoVo.getUid());
+		facilityEntity.setCreatePerson(adminInfoVo.getRealName());
+		ValidatorUtils.validateEntity(facilityEntity, FacilityEntity.addFacilityValidate.class);
+		facilityService.addFacility(facilityEntity);
+		return CommonResult.ok("操作成功");
 	}
 	
 	@ApiOperation("编辑设备")
 	@PostMapping("/updateFacility")
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
-		return CommonResult.error("维护中");
+		// By:LH: 编辑的时候不能更改该摄像头的作用哈  因为摄像头的作用需要更改摄像头后台  开启相应的功能 比如你要开启人脸比对，摄像机应该去后台选择人脸比对模式
+		// By:LH: 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
+		facilityEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		facilityEntity.setFacilityEffectId(null); //设备作用根据摄像头后台[配置-系统-系统设置-智能模式切换] ，不允许直接修改设备作用
+		facilityService.updateFacility(facilityEntity);
+		return CommonResult.ok("操作成功");
 	}
 	
 	@ApiOperation("删除设备")
 	@GetMapping("/deleteFacility")
 	public CommonResult deleteFacility(@RequestParam("id") Long id) {
-		return CommonResult.error("维护中");
+		facilityService.deleteFacility(id,UserUtils.getAdminCommunityId());
+		return CommonResult.ok("操作成功");
 	}
 	
 	/**
