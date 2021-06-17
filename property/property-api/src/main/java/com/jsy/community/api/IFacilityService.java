@@ -25,6 +25,15 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	void changeStatus(Integer status, Long facilityId, Long time);
 	
 	/**
+	* @Description: 批量更新设备状态
+	 * @Param: [mapBody]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/17
+	**/
+	void changeStatusBatch(Map<String,Object> mapBody);
+	
+	/**
 	 * @return void
 	 * @Author lihao
 	 * @Description 添加设备信息
@@ -76,7 +85,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date 2021/4/23 18:11
 	 * @Param [page, size]
 	 **/
-	void flushFacility(Integer page, Integer size, String facilityTypeId);
+	void flushFacility(Integer page, Integer size, String facilityTypeId, Long communityId);
 	
 	/**
 	 * @return com.jsy.community.entity.hk.FacilityEntity

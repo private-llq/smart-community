@@ -85,17 +85,20 @@
 <!--    </update>-->
 
     <!-- 批量修改状态 -->
-    <update id="updateStatusByFacilityIdBatch" parameterType="java.util.Map">
+    <update id="updateStatusByFacilityIdBatch">
         update t_facility_status
         set status = case facility_id
         <foreach collection="map.entrySet()" index="key" item="value">
             when #{key} then #{value}
         </foreach>
         end
+        ,update_time = now()
         where facility_id in
         <foreach collection="map.entrySet()" index="key" separator="," open="(" close=")">
             #{key}
         </foreach>
+        and update_time is null
+        or (UNIX_TIMESTAMP(update_time) <![CDATA[<=]]> #{time})
     </update>
 
     <!-- 批量查询设备在线状态 -->

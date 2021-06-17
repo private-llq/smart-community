@@ -107,7 +107,14 @@ public class FacilityController {
 	@ApiOperation("刷新设备")
 	@GetMapping("/flushFacility")
 	public CommonResult flushFacility(@RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("facilityTypeId") String facilityTypeId) {
-		return CommonResult.error("维护中");
+		if(page == null || page == 0){
+			page = 1;
+		}
+		if(page == null || page == 0){
+			page = 10;
+		}
+		facilityService.flushFacility(page,size,facilityTypeId,UserUtils.getAdminCommunityId());
+		return CommonResult.ok("操作成功");
 	}
 	
 	/**
