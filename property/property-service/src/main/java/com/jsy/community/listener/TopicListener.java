@@ -87,7 +87,7 @@ public class TopicListener {
 	
 	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_FLUSH_RESULT)
 	public void flushFacilityResult(Map mapBody, Message message, Channel channel) throws IOException {
-		log.info("监听到Update设备回复: \n" + mapBody.toString());
+		log.info("监听到Flush设备回复: \n" + mapBody.toString());
 		try {
 //			JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(mapBody));
 			//修改设备在线状态
