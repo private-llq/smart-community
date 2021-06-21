@@ -771,7 +771,6 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		for (ShopLeaseEntity shopLeaseEntity : shopList) {
 			IndexShopVO indexShopVO = new IndexShopVO();
 			BeanUtils.copyProperties(shopLeaseEntity, indexShopVO);
-			
 			// 封装图片
 			QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();
 			imgWrapper.eq("shop_id", shopLeaseEntity.getId());

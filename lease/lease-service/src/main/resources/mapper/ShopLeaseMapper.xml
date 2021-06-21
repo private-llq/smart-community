@@ -60,11 +60,10 @@
                 and month_money &lt;= #{qo.query.housePriceMax}
             </if>
             <!-- 面积 -->
-            <if test="qo.query.houseSquareMeterMin != null and qo.query.houseSquareMeterMin != &quot;&quot; and qo.query.houseSquareMeterMin &gt; 0
-                and qo.query.houseSquareMeterMax != null and qo.query.houseSquareMeterMax != &quot;&quot; and qo.query.houseSquareMeterMax &gt; 0">
-                and shop_acreage &gt;= #{qo.query.houseSquareMeterMin} and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
+            <if test="qo.query.houseSquareMeterMin != null and qo.query.houseSquareMeterMin!=0">
+                and shop_acreage &gt;= #{qo.query.houseSquareMeterMin}
             </if>
-            <if test="qo.query.houseSquareMeterMin == 0 and qo.query.houseSquareMeterMax != null">
+            <if test="qo.query.houseSquareMeterMax != 0 and qo.query.houseSquareMeterMax != null">
                 and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
             </if>
             <!-- 所属类型id -->
