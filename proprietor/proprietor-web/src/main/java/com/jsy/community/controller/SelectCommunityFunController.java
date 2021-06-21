@@ -56,7 +56,8 @@ public class SelectCommunityFunController {
         if (communityFunEntity==null){
             return CommonResult.error("该条趣事已下线！");
         }
-        selectCommunityFunService.saveViewCount(id);
+        Integer count = selectCommunityFunService.saveViewCount(id);
+        communityFunEntity.setViewCount(count);
         return CommonResult.ok(communityFunEntity);
     }
 }

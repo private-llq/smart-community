@@ -38,5 +38,5 @@ public interface ISelectCommunityFunService extends IService<CommunityFunEntity>
      * @Param:
      * @return:
      */
-    void saveViewCount(Long id);
+    Integer saveViewCount(Long id);
 }
