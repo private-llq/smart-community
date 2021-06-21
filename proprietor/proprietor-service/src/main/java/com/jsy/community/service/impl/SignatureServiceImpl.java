@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Map;
 
@@ -24,33 +25,44 @@ import java.util.Map;
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class SignatureServiceImpl implements ISignatureService {
 	
-	private static final String protocolType = "http://";
-//		private static final String host = "192.168.12.37";
-	private static final String host = "222.178.212.29";
-	private static final String port = "13000";
+	@Value("${sign.user.protocol}")
+	private String SIGN_USER_PROTOCOL;
+	@Value("${sign.user.host}")
+	private String SIGN_USER_HOST;
+	@Value("${sign.user.port}")
+	private String SIGN_USER_PORT;
+	
+	@Value("${sign.user.api.insert}")
+	private String SIGN_USER_API_INSERT;
+	@Value("${sign.user.api.batch-insert}")
+	private String SIGN_USER_API_BATCH_INSERT;
+	@Value("${sign.user.api.update-realname}")
+	private String SIGN_USER_API_UPDATE_REALNAME;
+	@Value("${sign.user.api.update}")
+	private String SIGN_USER_API_UPDATE;
 	
 	//POST 新增用户信息
 	@Override
 	public boolean insertUser(SignatureUserDTO signatureUserDTO){
-		return sendRedbagByHttp(1, signatureUserDTO);
+		return sendRedbagByHttp(SignatureBehaveEnum.BEHAVE_INSERT_USER.getCode(), signatureUserDTO);
 	}
 	
 	//POST 批量新增用户信息(物业端批量导入时)
 	@Override
 	public boolean batchInsertUser(SignatureUserDTO signatureUserDTO){
-		return sendRedbagByHttp(2,signatureUserDTO);
+		return sendRedbagByHttp(SignatureBehaveEnum.BEHAVE_BATCH_INSERT_USER.getCode(),signatureUserDTO);
 	}
 	
 	//PUT 实名认证后修改签章用户信息
 	@Override
 	public boolean realNameUpdateUser(SignatureUserDTO signatureUserDTO){
-		return sendRedbagByHttp(3,signatureUserDTO);
+		return sendRedbagByHttp(SignatureBehaveEnum.BEHAVE_REALNAME_UPDATE_USER.getCode(),signatureUserDTO);
 	}
 	
 	//PUT 修改用户普通信息
 	@Override
 	public boolean updateUser(SignatureUserDTO signatureUserDTO){
-		return sendRedbagByHttp(4,signatureUserDTO);
+		return sendRedbagByHttp(SignatureBehaveEnum.BEHAVE_UPDATE_USER.getCode(),signatureUserDTO);
 	}
 	
 	/**
@@ -79,22 +91,22 @@ public class SignatureServiceImpl implements ISignatureService {
 		//远程服务调用id
 		switch(type){
 			case 1:
-				url = protocolType + host + ":" + port + "/zh-sign/contract-server/LongRange/insertUser";
+				url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + SIGN_USER_API_INSERT;
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_INSERT_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 2:
-				url = protocolType + host + ":" + port + "/zh-sign/contract-server/LongRange/batchInsertUser";
+				url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + SIGN_USER_API_BATCH_INSERT;
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_BATCH_INSERT_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 3:
-				url = protocolType + host + ":" + port + "/zh-sign/contract-server/LongRange/realNameUpdateUser";
+				url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + SIGN_USER_API_UPDATE_REALNAME;
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_REALNAME_UPDATE_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
 			case 4:
-				url = protocolType + host + ":" + port + "/zh-sign/contract-server/LongRange/updateUser";
+				url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + SIGN_USER_API_UPDATE;
 				log.info("ID：" + id + "签章服务 - 准备调用：" + SignatureBehaveEnum.BEHAVE_UPDATE_USER.getName());
 				log.info("用户：" + signatureUserDTO.getUuid());
 				break;
@@ -158,5 +170,8 @@ enum SignatureBehaveEnum {
 	}
 	public String getName() {
 		return name;
+	}
+	public Integer getCode() {
+		return code;
 	}
 }

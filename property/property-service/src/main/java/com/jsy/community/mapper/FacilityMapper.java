@@ -164,7 +164,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 //	void updateStatusByFacilityIdBatch(@Param("list")List<Map<Long, Integer>> map, @Param("ids")Set<Long> ids);
 	
 	//批量更新设备在线状态
-	void updateStatusByFacilityIdBatch(@Param("map") Map<Long, Integer> map);
+	void updateStatusByFacilityIdBatch(@Param("map") Map<Long, Integer> map,@Param("time")Long time);
 	
 	/**
 	* @Description: 单条更新在线状态

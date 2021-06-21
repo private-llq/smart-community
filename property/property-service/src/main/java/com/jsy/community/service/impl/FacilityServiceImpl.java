@@ -23,6 +23,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -68,6 +69,13 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			}
 		}
 		facilityMapper.updateStatus(status,facilityId);
+	}
+	
+	@Override
+	public void changeStatusBatch(Map<String,Object> messageMap){
+		Long time = (Long) messageMap.get("time");
+		Map<Long,Integer> data = (Map<Long, Integer>) messageMap.get("data");
+		facilityMapper.updateStatusByFacilityIdBatch(data,time);
 	}
 	
 	@Override
@@ -131,6 +139,30 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 	
 	@Override
+	public void flushFacility(Integer page, Integer size, String facilityTypeId, Long communityId) {
+		//查询当前页的数据
+		Page<FacilityEntity> entityPage = new Page<>(page, size);
+		QueryWrapper<FacilityEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("community_id", communityId);
+		wrapper.eq("facility_type_id", facilityTypeId);
+		Page<FacilityEntity> facilityEntityPage = facilityMapper.selectPage(entityPage, wrapper);
+		List<FacilityEntity> list = facilityEntityPage.getRecords();
+		if(CollectionUtils.isEmpty(list)){
+			return;
+		}
+		//组装批量入参id集合
+		List<Long> idList = new ArrayList<>();
+		for (FacilityEntity facilityEntity : list) {
+			idList.add(facilityEntity.getId());
+		}
+		//通知小区服务器刷新最新在线状态并同步到云端
+		Map map = new HashMap<>();
+		map.put("idList",idList);
+		map.put("communityId",communityId);
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_FLUSH, map);
+	}
+	
+	@Override
 	public PageInfo<FacilityEntity> listFacility(BaseQO<FacilityQO> baseQO) {
 		FacilityQO qo = baseQO.getQuery();
 		Page<FacilityEntity> page = new Page<>();
@@ -177,11 +209,6 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		map.put("onlineCount", onlineCount);
 		map.put("failCount", failCount);
 		return map;
-	}
-	
-	@Override
-//	@Transactional(rollbackFor = Exception.class)
-	public void flushFacility(Integer page, Integer size, String facilityTypeId) {
 	}
 	
 	@Override

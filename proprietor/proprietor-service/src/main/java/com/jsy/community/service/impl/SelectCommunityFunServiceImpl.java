@@ -11,10 +11,12 @@ import com.jsy.community.mapper.SelectCommunityFunMapper;
 import com.jsy.community.qo.proprietor.SelectCommunityFunQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: com.jsy.community
@@ -26,6 +28,12 @@ import java.util.Map;
 public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFunMapper, CommunityFunEntity> implements ISelectCommunityFunService {
     @Autowired
     private SelectCommunityFunMapper selectCommunityFunMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private final String COMMUNITY_FUN_COUNT="community_fun_count:";
+    private final String LOCK="community_fun_lock";
 
 
     /**
@@ -81,9 +89,23 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
      * @return: void
      */
     @Override
-    public void saveViewCount(Long id) {
-        CommunityFunEntity communityFunEntity = selectCommunityFunMapper.selectById(id);
+    public Integer saveViewCount(Long id) {
+        Object count = redisTemplate.opsForValue().get(COMMUNITY_FUN_COUNT + id);
+        if (count!=null){
+            int anInt = Integer.parseInt(String.valueOf(count))+1;
+            redisTemplate.opsForValue().set(COMMUNITY_FUN_COUNT + id,String.valueOf(anInt));
+            return anInt;
+        }
+        Boolean lock = redisTemplate.opsForValue().setIfAbsent(LOCK, "111",10, TimeUnit.SECONDS);
+        if (lock){
+            CommunityFunEntity communityFunEntity = selectCommunityFunMapper.selectById(id);
             communityFunEntity.setViewCount(communityFunEntity.getViewCount()+1);
-        selectCommunityFunMapper.updateById(communityFunEntity);
+            redisTemplate.opsForValue().set(COMMUNITY_FUN_COUNT + id,String.valueOf(communityFunEntity.getViewCount()));
+            redisTemplate.delete(LOCK);
+            return communityFunEntity.getViewCount();
+        }else {
+            saveViewCount(id);
+        }
+        return 1;
     }
 }

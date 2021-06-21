@@ -50,4 +50,8 @@ public class IndexShopVO implements Serializable {
 	
 	@ApiModelProperty(value = "月租金  字符串形式")
 	private String monthMoneyString;
+
+	@ApiModelProperty(value = "房源类型")
+	private String defrayType;
+
 }
