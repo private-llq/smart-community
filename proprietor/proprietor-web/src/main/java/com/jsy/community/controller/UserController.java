@@ -10,6 +10,7 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.ProprietorQO;
@@ -57,6 +58,9 @@ public class UserController {
     
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserUroraTagsService userUroraTagsService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserHouseService userHouseService;
     
     private static final String BUCKETNAME_ID_CARD = "id-card"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
     
@@ -420,5 +424,21 @@ public class UserController {
         UserEntity returnEntity = new UserEntity();
         returnEntity.setIsRealAuth(userEntity.getIsRealAuth()); //实名 0.否 1.已实名 2.已实人
         return CommonResult.ok(returnEntity,"查询成功");
+    }
+
+    /**
+     * @author: Pipi
+     * @description:  业主解绑房屋
+     * @param: userHouseEntity:
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/6/21 14:01
+     **/
+    @Login
+    @ApiOperation("业主解绑房屋")
+    @PostMapping("/untieHouse")
+    public CommonResult untieHouse(@RequestBody UserHouseEntity userHouseEntity) {
+        userHouseEntity.setUid(UserUtils.getUserId());
+        ValidatorUtils.validateEntity(userHouseEntity, UserHouseEntity.UntieHouse.class);
+        return userHouseService.untieHouse(userHouseEntity) ? CommonResult.ok("解绑成功!") : CommonResult.error("解绑失败!");
     }
 }

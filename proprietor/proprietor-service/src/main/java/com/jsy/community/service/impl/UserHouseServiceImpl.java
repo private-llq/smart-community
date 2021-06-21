@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
-import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.SnowFlake;
@@ -17,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -151,5 +147,22 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Override
 	public void update(UserHouseQo h, String uid) {
 		userHouseMapper.update(h, uid);
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 业主解绑房屋
+	 * @param: userHouseEntity:
+	 * @return: boolean
+	 * @date: 2021/6/21 10:33
+	 */
+	@Override
+	public boolean untieHouse(UserHouseEntity userHouseEntity) {
+		int delete = userHouseMapper.delete(new QueryWrapper<UserHouseEntity>()
+				.eq("house_id", userHouseEntity.getHouseId())
+				.eq("uid", userHouseEntity.getUid())
+				.eq("deleted", 0)
+		);
+		return delete == 1 ? true : false;
 	}
 }

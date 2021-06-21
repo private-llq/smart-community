@@ -100,4 +100,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @param uid	用户id
 	 */
 	void update(UserHouseQo h, String uid);
+
+	/**
+	 * @author: Pipi
+	 * @description: 业主解绑房屋
+	 * @param: userHouseEntity:
+	 * @return: boolean
+	 * @date: 2021/6/21 10:33
+	 **/
+	boolean untieHouse(UserHouseEntity userHouseEntity);
 }
