@@ -89,7 +89,6 @@ public class TopicListener {
 	public void flushFacilityResult(Map mapBody, Message message, Channel channel) throws IOException {
 		log.info("监听到Flush设备回复: \n" + mapBody.toString());
 		try {
-//			JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(mapBody));
 			//修改设备在线状态
 			facilityService.changeStatusBatch(mapBody);
 		}catch(Exception e){
