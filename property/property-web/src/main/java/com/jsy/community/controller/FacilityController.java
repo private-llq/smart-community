@@ -126,7 +126,8 @@ public class FacilityController {
 	@ApiOperation("根据设备id同步数据")
 	@GetMapping("/connectData")
 	public CommonResult connectData(@RequestParam("id") Long id) {
-		return CommonResult.error("维护中");
+		facilityService.syncFaceData(id, UserUtils.getAdminCommunityId());
+		return CommonResult.ok();
 	}
 }
 

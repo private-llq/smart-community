@@ -9,9 +9,12 @@ import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.mapper.FacilityMapper;
 import com.jsy.community.mapper.FacilityTypeMapper;
+import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.MyPageUtils;
@@ -24,7 +27,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -48,6 +53,12 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+	
+	@Autowired
+	private UserHouseMapper houseMapper;
+	
+	@Autowired
+	private UserMapper userMapper;
 	
 	/**
 	 * 更新在线状态(写库)
@@ -218,7 +229,22 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		return facilityMapper.selectOne(wrapper);
 	}
 	
+	/**
+	 * 同步人脸库数据
+	 */
 	@Override
-	public void connectData(Long id, Long communityId) {
+	public void syncFaceData(Long id, Long communityId) {
+		
+		//1. 查询该社区的所有已认证的用户id
+		Set<String> ids = houseMapper.listAuthUserId(communityId);
+		//2. 批量查询已认证的用户数据
+		List<UserEntity> userList = userMapper.listAuthUserInfo(ids);
+		
+		//通知小区服务器同步人脸
+		Map map = new HashMap<>();
+		map.put("id",id);
+		map.put("communityId",communityId);
+		map.put("userList",userList);
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA,TopicExConfig.TOPIC_HK_CAMERA_SYNC_FACE, JSON.toJSONString(map));
 	}
 }
