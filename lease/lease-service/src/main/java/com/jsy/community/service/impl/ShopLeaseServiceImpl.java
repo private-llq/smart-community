@@ -39,10 +39,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -760,11 +757,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		}
 		return userShopLeaseVOS;
 	}
+
 	
 	@Override
 	public PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO) {
 		Long page = baseQO.getPage();
 		Long size = baseQO.getSize();
+
 		Page<ShopLeaseEntity> info = new Page<>(page, size);
 		List<ShopLeaseEntity> shopList = shopLeaseMapper.getShopByCondition(baseQO, info);
 		ArrayList<IndexShopVO> shopVOS = new ArrayList<>();
