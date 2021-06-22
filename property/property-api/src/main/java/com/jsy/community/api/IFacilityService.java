@@ -101,7 +101,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author 91李寻欢
 	 * @Description 同步数据
 	 * @Date 2021/4/29 10:56
-	 * @Param [id]
+	 * @Param [id,communityId]
 	 **/
-	void connectData(Long id, Long communityId);
+	void syncFaceData(Long id, Long communityId);
 }

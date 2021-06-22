@@ -21,6 +21,7 @@ public class TopicExConfig {
 	//绑定topic名称
 	public final static String TOPIC_HK_CAMERA_OP = "topic.hk.camera.server.op"; //海康摄像机服务端增删改等操作(绑定用)(保证执行顺序云端现仅使用一条队列)
 	public final static String TOPIC_HK_CAMERA_FLUSH = "topic.hk.camera.server.flush"; //海康摄像机服务端刷新等操作(绑定用)
+	public final static String TOPIC_HK_CAMERA_SYNC_FACE = "topic.hk.camera.server.sync.face"; //海康摄像机服务端同步人脸库操作(绑定用)
 	
 	//监听topic名称
 	public final static String TOPIC_HK_CAMERA_ADD_RESULT = "topic.hk.camera.server.add.result"; //海康摄像机服务端添加结果反馈(监听用)
@@ -36,6 +37,10 @@ public class TopicExConfig {
 	public Queue queueOfHKCameraFlush() {
 		return new Queue(TOPIC_HK_CAMERA_FLUSH,true);
 	}
+	@Bean
+	public Queue queueOfHKCameraSyncFace() {
+		return new Queue(TOPIC_HK_CAMERA_SYNC_FACE,true);
+	}
 	//摄像头相关-声明交换机
 	@Bean
 	TopicExchange topicExOfHKCamera() {
@@ -50,6 +55,11 @@ public class TopicExConfig {
 	@Bean
 	Binding bindingExchangeOfHKCameraFlush() {
 		return BindingBuilder.bind(queueOfHKCameraFlush()).to(topicExOfHKCamera()).with(TOPIC_HK_CAMERA_FLUSH);
+	}
+	//摄像头相关-队列绑定交换机
+	@Bean
+	Binding bindingExchangeOfHKCameraSyncFace() {
+		return BindingBuilder.bind(queueOfHKCameraSyncFace()).to(topicExOfHKCamera()).with(TOPIC_HK_CAMERA_SYNC_FACE);
 	}
 	
 	//访客相关-声明交换机

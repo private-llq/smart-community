@@ -49,14 +49,14 @@
                 and title like concat ("%",#{qo.query.searchText},"%")
             </if>
             <!-- 地区 -->
-            <if test="qo.query.houseAreaId!=null">
+            <if test="qo.query.houseAreaId!=null and qo.query.houseAreaId!=0">
                 and area_id = #{qo.query.houseAreaId}
             </if>
             <!-- 租金范围 -->
-            <if test="qo.query.housePriceMin != null">
+            <if test="qo.query.housePriceMin != null and qo.query.housePriceMin != 0">
                 and month_money &gt;= #{qo.query.housePriceMin}
             </if>
-            <if test="qo.query.housePriceMax != null">
+            <if test="qo.query.housePriceMax != null and qo.query.housePriceMax != 0">
                 and month_money &lt;= #{qo.query.housePriceMax}
             </if>
             <!-- 面积 -->
@@ -67,12 +67,20 @@
                 and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
             </if>
             <!-- 所属类型id -->
-            <if test="qo.query.shopTypeId !=null">
-                and shop_type_id = #{qo.query.shopTypeId}
+            <if test="qo.query.shopBusinessIdArrays!=null">
+                and shop_business_id in (
+                <foreach collection="qo.query.shopBusinessIdArrays" item="id" separator=",">
+                    #{id}
+                </foreach>
+                )
             </if>
             <!-- 所属行业id -->
-            <if test="qo.query.shopBusinessId!=null">
-                and shop_business_id = #{qo.query.shopBusinessId}
+            <if test="qo.query.shopTypeIdArrays !=null">
+                and shop_type_id in (
+                <foreach collection="qo.query.shopTypeIdArrays" item="id" separator=",">
+                    #{id}
+                </foreach>
+                )
             </if>
             <!-- 来源 传3就是来源不限-->
             <if test="qo.query.houseSourceId!=null and qo.query.houseSourceId!=3">

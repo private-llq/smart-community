@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserHouseEntity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -22,5 +23,5 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @Date 2021/5/10 9:45
 	 * @Param [communityId]
 	 **/
-	List<String> listAuthUserId(Long communityId);
+	Set<String> listAuthUserId(Long communityId);
 }

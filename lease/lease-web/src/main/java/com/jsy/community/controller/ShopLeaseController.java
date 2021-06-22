@@ -469,6 +469,8 @@ public class ShopLeaseController {
 		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO);
 		return CommonResult.ok(pageInfo);
 	}
+
+
 }
 
 
