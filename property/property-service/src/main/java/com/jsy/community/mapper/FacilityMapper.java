@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 * @Param [id]
 	 **/
 	@Select("select status from t_facility_status where facility_id = #{id}")
-	int getStatus(Long id);
+	Integer getStatus(Long id);
 	
 	/**
 	* @Description: 根据设备id获取设备状态 批量

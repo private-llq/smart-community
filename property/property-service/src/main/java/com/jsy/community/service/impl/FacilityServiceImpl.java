@@ -189,10 +189,10 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			typeIds.add(facilityEntity.getFacilityTypeId());
 		}
 		//查询和设置设备状态、设备类型名
-		Map<Long,Map<Long,Integer>> statusMap = facilityMapper.getStatusBatch(ids);
+//		Map<Long,Map<Long,Integer>> statusMap = facilityMapper.getStatusBatch(ids);
 		Map<Long,Map<Long,String>> typeNameMap = facilityTypeMapper.queryIdAndNameMap(typeIds);
 		for (FacilityEntity facilityEntity : pageData.getRecords()) {
-			facilityEntity.setStatus(statusMap.get(BigInteger.valueOf(facilityEntity.getId())) == null ? null : statusMap.get(BigInteger.valueOf(facilityEntity.getId())).get("status"));
+//			facilityEntity.setStatus(statusMap.get(BigInteger.valueOf(facilityEntity.getId())) == null ? null : statusMap.get(BigInteger.valueOf(facilityEntity.getId())).get("status"));
 			facilityEntity.setFacilityTypeName(typeNameMap.get(BigInteger.valueOf(facilityEntity.getFacilityTypeId())) == null ? null : typeNameMap.get(BigInteger.valueOf(facilityEntity.getFacilityTypeId())).get("name"));
 		}
 		PageInfo<FacilityEntity> pageInfo = new PageInfo<>();
@@ -207,15 +207,17 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		
 		int onlineCount = 0;
 		int failCount = 0;
-		// 根据设备id查询设备状态表的状态
-		for (Long facilityId : facilityIds) {
-			int status = facilityMapper.getStatus(facilityId);
-			if (status == 0) {
+		
+		// 根据设备idList批量查询设备状态表的状态
+		Map<Long,Map<Long,Integer>> facilityWithStatus = facilityMapper.getStatusBatch(facilityIds);
+		for(Map<Long,Integer> map : facilityWithStatus.values() ){
+			if(map.values().contains(1)){
 				onlineCount += 1;
-			} else {
+			}else if(map.values().contains(0)){
 				failCount += 1;
 			}
 		}
+		
 		HashMap<String, Integer> map = new HashMap<>();
 		map.put("onlineCount", onlineCount);
 		map.put("failCount", failCount);
