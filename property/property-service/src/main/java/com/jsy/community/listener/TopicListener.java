@@ -6,6 +6,7 @@ import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.config.RabbitMQCommonConfig;
 import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +96,30 @@ public class TopicListener {
 			e.printStackTrace();
 			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
 			log.info("收到的消息内容为: \n" + mapBody.toString());
+			//手动确认
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+		}
+		//手动确认
+		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+	}
+	
+	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_SYNC_FACE_RESULT)
+	public void syncFaceResult(String mapStr, Message message, Channel channel) throws IOException {
+		log.info("监听到同步人脸库回复: \n" + mapStr);
+		try {
+			JSONObject jsonObject = JSONObject.parseObject(mapStr);
+			if("success".equals(jsonObject.getString("result"))){
+				//数据同步成功
+				facilityService.dealDataBysyncResult(PropertyConsts.FACILITY_SYNC_DONE,jsonObject.getLong("facilityId"));
+			}else if("fail".equals(jsonObject.getString("result"))){
+				//数据同步失败
+				facilityService.dealDataBysyncResult(PropertyConsts.FACILITY_SYNC_HAVA_NOT,jsonObject.getLong("facilityId"));
+			}
+			System.out.println(jsonObject);
+		}catch(Exception e){
+			e.printStackTrace();
+			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
+			log.info("收到的消息内容为: \n" + mapStr);
 			//手动确认
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 		}

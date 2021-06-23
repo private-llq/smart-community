@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.qo.hk.FacilityQO;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -187,4 +184,23 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	@Select("select id,update_time from t_facility_status where facility_id = #{facilityId}")
 	FacilityEntity getStatusTime(Long facilityId);
 	
+	/**
+	* @Description: 获取设备编号
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	**/
+	@Select("select number from t_facility where id = #{id}")
+	String queryFacilityNumberById(Long id);
+	
+	/**
+	* @Description: 修改数据同步状态
+	 * @Param: [syncStatus, id]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	**/
+	@Update("update t_facility set is_connect_data = #{syncStatus} where id = #{id}")
+	void updateDataConnectStatus(@Param("syncStatus")Integer syncStatus, @Param("id")Long id);
 }

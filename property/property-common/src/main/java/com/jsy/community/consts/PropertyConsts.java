@@ -24,4 +24,9 @@ public interface PropertyConsts {
 	
 	//======= 头像文件夹
 	String BUCKET_NAME_AVATAR = "admin-avatar";
+	
+	//======= 设备数据同步状态
+	Integer FACILITY_SYNC_HAVA_NOT = 0; //未同步
+	Integer FACILITY_SYNC_DONE = 1; //已同步
+	Integer FACILITY_SYNC_DOING = 2; //同步中
 }
