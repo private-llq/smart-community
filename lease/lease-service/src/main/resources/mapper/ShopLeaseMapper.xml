@@ -67,7 +67,7 @@
                 and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
             </if>
             <!-- 所属类型id -->
-            <if test="qo.query.shopBusinessIdArrays!=null">
+            <if test="qo.query.shopBusinessIdArrays!=null and qo.query.shopBusinessIdArrays.length!=0">
                 and shop_business_id in (
                 <foreach collection="qo.query.shopBusinessIdArrays" item="id" separator=",">
                     #{id}
@@ -75,7 +75,7 @@
                 )
             </if>
             <!-- 所属行业id -->
-            <if test="qo.query.shopTypeIdArrays !=null">
+            <if test="qo.query.shopTypeIdArrays !=null  and qo.query.shopTypeIdArrays.length!=0">
                 and shop_type_id in (
                 <foreach collection="qo.query.shopTypeIdArrays" item="id" separator=",">
                     #{id}
@@ -83,7 +83,7 @@
                 )
             </if>
             <!-- 来源 传3就是来源不限-->
-            <if test="qo.query.houseSourceId!=null and qo.query.houseSourceId!=3">
+            <if test="qo.query.houseSourceId!=null and qo.query.houseSourceId!=0">
                 and source = #{qo.query.houseSourceId}
             </if>
         </where>
