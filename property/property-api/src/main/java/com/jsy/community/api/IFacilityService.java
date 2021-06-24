@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.entity.hk.FacilitySyncRecordEntity;
@@ -108,12 +109,12 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	
 	/**
 	* @Description: 设备数据同步后处理
-	 * @Param: [resultCode,facilityId,communityId,msg]
+	 * @Param: [resultCode,jsonObject]
 	 * @Return: void
 	 * @Author: chq459799974
 	 * @Date: 2021/6/23
 	**/
-	void dealDataBysyncResult(Integer resultCode, Long facilityId, Long communityId, String msg);
+	void dealDataBysyncResult(Integer resultCode, JSONObject jsonObject);
 	
 	/**
 	* @Description: 分页查询数据同步记录 和 成功失败数统计

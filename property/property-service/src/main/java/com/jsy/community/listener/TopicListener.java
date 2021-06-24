@@ -110,10 +110,10 @@ public class TopicListener {
 			JSONObject jsonObject = JSONObject.parseObject(mapStr);
 			if("success".equals(jsonObject.getString("result"))){
 				//数据同步成功
-				facilityService.dealDataBysyncResult(PropertyConsts.FACILITY_SYNC_DONE,jsonObject.getLong("facilityId"),jsonObject.getLong("communityId"),jsonObject.getString("msg"));
+				facilityService.dealDataBysyncResult(PropertyConsts.FACILITY_SYNC_DONE,jsonObject);
 			}else if("fail".equals(jsonObject.getString("result"))){
 				//数据同步失败
-				facilityService.dealDataBysyncResult(PropertyConsts.FACILITY_SYNC_HAVA_NOT,jsonObject.getLong("facilityId"),jsonObject.getLong("communityId"),jsonObject.getString("msg"));
+				facilityService.dealDataBysyncResult(PropertyConsts.FACILITY_SYNC_HAVA_NOT,jsonObject);
 			}
 			System.out.println(jsonObject);
 		}catch(Exception e){

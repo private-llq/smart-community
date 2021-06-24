@@ -33,6 +33,7 @@ import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 /**
@@ -263,9 +264,15 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	 * @Date: 2021/6/23
 	**/
 	@Override
-	public void dealDataBysyncResult(Integer resultCode, Long facilityId, Long communityId, String msg){
+	public void dealDataBysyncResult(Integer resultCode, JSONObject jsonObject){
+		Long facilityId = jsonObject.getLong("facilityId");
+		Long communityId = jsonObject.getLong("communityId");
+		String msg = jsonObject.getString("msg");
+		Long time = jsonObject.getLong("time");
+		LocalDateTime localDateTime = new Date(time).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+		
 		//更新设备数据同步状态
-		facilityMapper.updateDataConnectStatus(resultCode,facilityId);
+		facilityMapper.updateDataConnectStatusAndTime(resultCode,facilityId,localDateTime);
 		//获取设备编号
 		String number = facilityMapper.queryFacilityNumberById(facilityId);
 		//添加设备同步记录
