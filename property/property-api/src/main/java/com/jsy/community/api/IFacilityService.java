@@ -16,7 +16,7 @@ import java.util.Map;
 public interface IFacilityService extends IService<FacilityEntity> {
 	
 	/**
-	* @Description: 单条更新设备状态
+	* @Description: 单条更新设备在线状态
 	 * @Param: [facilityId, status, time]
 	 * @Return: void
 	 * @Author: chq459799974
@@ -25,7 +25,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	void changeStatus(Integer status, Long facilityId, Long time);
 	
 	/**
-	* @Description: 批量更新设备状态
+	* @Description: 批量更新设备在线状态
 	 * @Param: [mapBody]
 	 * @Return: void
 	 * @Author: chq459799974
@@ -104,4 +104,13 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Param [id,communityId]
 	 **/
 	void syncFaceData(Long id, Long communityId);
+	
+	/**
+	* @Description: 设备数据同步后处理
+	 * @Param: [resultCode,facilityId]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	**/
+	void dealDataBysyncResult(Integer resultCode, Long facilityId);
 }

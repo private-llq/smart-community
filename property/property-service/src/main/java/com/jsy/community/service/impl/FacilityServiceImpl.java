@@ -9,12 +9,11 @@ import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.hk.FacilityEntity;
-import com.jsy.community.mapper.FacilityMapper;
-import com.jsy.community.mapper.FacilityTypeMapper;
-import com.jsy.community.mapper.UserHouseMapper;
-import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.entity.hk.FacilitySyncRecordEntity;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.MyPageUtils;
@@ -50,6 +49,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Autowired
 	private FacilityTypeMapper facilityTypeMapper;
+	
+	@Autowired
+	private FacilitySyncRecordMapper facilitySyncRecordMapper;
 	
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
@@ -232,7 +234,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	}
 	
 	/**
-	 * 同步人脸库数据
+	 * 单个摄像头同步(下发)人脸库数据
 	 */
 	@Override
 	public void syncFaceData(Long id, Long communityId) {
@@ -242,6 +244,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		//2. 批量查询已认证的用户数据
 		List<UserEntity> userList = userMapper.listAuthUserInfo(ids);
 		
+		//修改摄像头 is_connect_data 字段 为 同步中，在监听中修改带条件 where is_connect_data = 同步中
+		facilityMapper.updateDataConnectStatus(PropertyConsts.FACILITY_SYNC_DOING,id);
+		
 		//通知小区服务器同步人脸
 		Map map = new HashMap<>();
 		map.put("id",id);
@@ -249,4 +254,27 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		map.put("userList",userList);
 		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA,TopicExConfig.TOPIC_HK_CAMERA_SYNC_FACE, JSON.toJSONString(map));
 	}
+	
+	/**
+	* @Description: 设备数据同步后处理
+	 * @Param: [resultCode,facilityId]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	**/
+	@Override
+	public void dealDataBysyncResult(Integer resultCode, Long facilityId){
+		//更新设备数据同步状态
+		facilityMapper.updateDataConnectStatus(resultCode,facilityId);
+		//获取设备编号
+		String number = facilityMapper.queryFacilityNumberById(facilityId);
+		//添加设备同步记录
+		FacilitySyncRecordEntity recordEntity = new FacilitySyncRecordEntity();
+		recordEntity.setId(SnowFlake.nextId());
+		recordEntity.setFacility_id(facilityId);
+		recordEntity.setNumber(number);
+		recordEntity.setIsSuccess(resultCode);
+		facilitySyncRecordMapper.insert(recordEntity);
+	}
+	
 }

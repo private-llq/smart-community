@@ -1,9 +1,6 @@
 package com.jsy.community.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,6 +24,7 @@ public class TopicExConfig {
 	public final static String TOPIC_HK_CAMERA_ADD_RESULT = "topic.hk.camera.server.add.result"; //海康摄像机服务端添加结果反馈(监听用)
 	public final static String TOPIC_HK_CAMERA_UPDATE_RESULT = "topic.hk.camera.server.update.result"; //海康摄像机服务端修改结果反馈(监听用)
 	public final static String TOPIC_HK_CAMERA_FLUSH_RESULT = "topic.hk.camera.server.flush.result"; //海康摄像机服务端刷新结果反馈(监听用)
+	public final static String TOPIC_HK_CAMERA_SYNC_FACE_RESULT = "topic.hk.camera.server.sync.face.result"; //海康摄像机服务端同步人脸库操作结果返回(监听用)
 	
 	//摄像头相关-声明队列
 	@Bean
