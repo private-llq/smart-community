@@ -143,6 +143,10 @@ public class AdminLoginController {
 		if (StrUtil.isEmpty(form.getCode()) && StrUtil.isEmpty(form.getPassword())) {
 			throw new PropertyException("验证码和密码不能同时为空");
 		}
+		// 判断是不是验证码登陆,如果是,判断验证码正不正确
+		if(!StringUtils.isEmpty(form.getCode())){
+			checkVerifyCode(form.getAccount(),form.getCode());
+		}
 		log.info(form.getAccount() + "开始登录");
 		//用户信息
 		AdminUserAuthEntity user;
@@ -151,8 +155,6 @@ public class AdminLoginController {
 		//账号不存在、密码错误
 		if (user == null) {
 			return CommonResult.error("账号或密码不正确");
-		}else if(!StringUtils.isEmpty(form.getCode())){
-			checkVerifyCode(form.getAccount(),form.getCode());
 		}else if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())){
 			return CommonResult.error("账号或密码不正确");
 		}
