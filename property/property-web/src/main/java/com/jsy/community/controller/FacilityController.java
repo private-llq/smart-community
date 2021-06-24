@@ -136,5 +136,11 @@ public class FacilityController {
 		baseQO.setQuery(UserUtils.getAdminCommunityId());
 		return CommonResult.ok(facilityService.querySyncRecordPage(baseQO),"查询成功");
 	}
+	
+	@ApiOperation("根据数据同步状态统计设备数")
+	@GetMapping("/count")
+	public CommonResult queryDataRecord(@RequestParam Integer isConnectData) {
+		return CommonResult.ok(facilityService.countBySyncStatus(UserUtils.getAdminCommunityId(),isConnectData),"查询成功");
+	}
 }
 

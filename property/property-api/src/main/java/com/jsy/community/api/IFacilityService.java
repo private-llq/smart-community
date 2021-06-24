@@ -123,4 +123,13 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date: 2021/6/24
 	**/
 	Map<String,Object> querySyncRecordPage(BaseQO<Long> baseQO);
+	
+	/**
+	* @Description: 根据数据同步状态统计设备数
+	 * @Param: [communityId, syncStatus]
+	 * @Return: java.lang.Long
+	 * @Author: chq459799974
+	 * @Date: 2021/6/24
+	**/
+	Long countBySyncStatus(Long communityId,Integer syncStatus);
 }

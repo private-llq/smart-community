@@ -308,4 +308,15 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		map.put("count",countMap);
 		return map;
 	}
+	
+	/**
+	* @Description: 根据数据同步状态统计设备数
+	 * @Param: [communityId, syncStatus]
+	 * @Return: java.lang.Long
+	 * @Author: chq459799974
+	 * @Date: 2021/6/24
+	**/
+	public Long countBySyncStatus(Long communityId,Integer syncStatus){
+		return facilityMapper.countBySyncStatus(communityId, syncStatus);
+	}
 }
