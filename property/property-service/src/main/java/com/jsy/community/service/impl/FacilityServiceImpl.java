@@ -33,6 +33,7 @@ import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 /**
@@ -257,15 +258,21 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	/**
 	* @Description: 设备数据同步后处理
-	 * @Param: [resultCode,facilityId]
+	 * @Param: [resultCode,facilityId,communityId,msg]
 	 * @Return: void
 	 * @Author: chq459799974
 	 * @Date: 2021/6/23
 	**/
 	@Override
-	public void dealDataBysyncResult(Integer resultCode, Long facilityId){
+	public void dealDataBysyncResult(Integer resultCode, JSONObject jsonObject){
+		Long facilityId = jsonObject.getLong("facilityId");
+		Long communityId = jsonObject.getLong("communityId");
+		String msg = jsonObject.getString("msg");
+		Long time = jsonObject.getLong("time");
+		LocalDateTime localDateTime = new Date(time).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+		
 		//更新设备数据同步状态
-		facilityMapper.updateDataConnectStatus(resultCode,facilityId);
+		facilityMapper.updateDataConnectStatusAndTime(resultCode,facilityId,localDateTime);
 		//获取设备编号
 		String number = facilityMapper.queryFacilityNumberById(facilityId);
 		//添加设备同步记录
@@ -274,7 +281,49 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		recordEntity.setFacility_id(facilityId);
 		recordEntity.setNumber(number);
 		recordEntity.setIsSuccess(resultCode);
+		recordEntity.setCommunityId(communityId);
+		recordEntity.setRemark(msg);
 		facilitySyncRecordMapper.insert(recordEntity);
 	}
 	
+	/**
+	* @Description: 分页查询数据同步记录 和 成功失败数统计
+	 * @Param: [baseQO]
+	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/24
+	**/
+	public Map<String,Object> querySyncRecordPage(BaseQO<Long> baseQO){
+		Long communityId = baseQO.getQuery();
+		Page page = new Page();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		QueryWrapper queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("number,create_time,is_success,remark");
+		queryWrapper.eq("community_id",communityId);
+		//分页查询
+		Page<FacilitySyncRecordEntity> pageData = facilitySyncRecordMapper.selectPage(page,queryWrapper);
+		PageInfo<FacilitySyncRecordEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData,pageInfo);
+		//统计成功失败数
+		List<Map<String,Object>> count = facilitySyncRecordMapper.countSuccessAndFail(communityId);
+		Map countMap = new HashMap<>(count.size());
+		for(Map<String,Object> map : count){
+			countMap.put(map.get("type"),map.get("amount"));
+		}
+		Map<String,Object> map = new HashMap<>();
+		map.put("pageData",pageInfo);
+		map.put("count",countMap);
+		return map;
+	}
+	
+	/**
+	* @Description: 根据数据同步状态统计设备数
+	 * @Param: [communityId, syncStatus]
+	 * @Return: java.lang.Long
+	 * @Author: chq459799974
+	 * @Date: 2021/6/24
+	**/
+	public Long countBySyncStatus(Long communityId,Integer syncStatus){
+		return facilityMapper.countBySyncStatus(communityId, syncStatus);
+	}
 }

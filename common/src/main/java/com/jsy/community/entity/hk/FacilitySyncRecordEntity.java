@@ -18,6 +18,9 @@ import java.io.Serializable;
 @ApiModel(value="FacilitySyncRecordEntity对象", description="设备数据同步记录")
 public class FacilitySyncRecordEntity extends BaseEntity {
 	
+	@ApiModelProperty(value = "社区ID")
+	private Long communityId;
+	
 	@ApiModelProperty(value = "设备id")
 	private Long facility_id;
 	
@@ -26,5 +29,8 @@ public class FacilitySyncRecordEntity extends BaseEntity {
 	
 	@ApiModelProperty(value = "是否同步成功 0.失败 1.成功")
 	private Integer isSuccess;
+	
+	@ApiModelProperty(value = "备注")
+	private String remark;
 	
 }

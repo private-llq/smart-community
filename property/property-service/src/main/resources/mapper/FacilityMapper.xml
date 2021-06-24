@@ -11,9 +11,6 @@
             <if test="qo.endTime!=null">
                 and data_connect_time &lt;  #{qo.endTime}
             </if>
-            <if test="qo.isConnectData!=null">
-                and is_connect_data = #{qo.isConnectData}
-            </if>
             <!-- 设备在线状态 -->
             <if test="qo.status!=null">
                 and status = #{qo.status}

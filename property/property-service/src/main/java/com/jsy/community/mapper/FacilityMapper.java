@@ -6,6 +6,7 @@ import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.qo.hk.FacilityQO;
 import org.apache.ibatis.annotations.*;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -203,4 +204,24 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	**/
 	@Update("update t_facility set is_connect_data = #{syncStatus} where id = #{id}")
 	void updateDataConnectStatus(@Param("syncStatus")Integer syncStatus, @Param("id")Long id);
+	
+	/**
+	 * @Description: 修改数据同步状态和同步时间
+	 * @Param: [syncStatus, id]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	 **/
+	@Update("update t_facility set is_connect_data = #{syncStatus},data_connect_time = #{time} where id = #{id}")
+	void updateDataConnectStatusAndTime(@Param("syncStatus")Integer syncStatus, @Param("id")Long id, @Param("time") LocalDateTime time);
+	
+	/**
+	* @Description: 根据数据同步状态统计设备数
+	 * @Param: [communityId, syncStatus]
+	 * @Return: java.lang.Long
+	 * @Author: chq459799974
+	 * @Date: 2021/6/24
+	**/
+	@Select("select count(1) from t_facility where community_id = #{communityId} and is_connect_data = #{syncStatus}")
+	Long countBySyncStatus(@Param("communityId")Long communityId, @Param("syncStatus")Integer syncStatus);
 }

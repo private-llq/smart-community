@@ -129,5 +129,18 @@ public class FacilityController {
 		facilityService.syncFaceData(id, UserUtils.getAdminCommunityId());
 		return CommonResult.ok();
 	}
+	
+	@ApiOperation("分页查询设备数据同步记录")
+	@PostMapping("/connectData/record")
+	public CommonResult queryDataRecord(@RequestBody BaseQO<Long> baseQO) {
+		baseQO.setQuery(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(facilityService.querySyncRecordPage(baseQO),"查询成功");
+	}
+	
+	@ApiOperation("根据数据同步状态统计设备数")
+	@GetMapping("/count")
+	public CommonResult queryDataRecord(@RequestParam Integer isConnectData) {
+		return CommonResult.ok(facilityService.countBySyncStatus(UserUtils.getAdminCommunityId(),isConnectData),"查询成功");
+	}
 }
 
