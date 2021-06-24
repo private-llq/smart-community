@@ -146,9 +146,6 @@ public class AdminLoginController {
 		log.info(form.getAccount() + "开始登录");
 		//用户信息
 		AdminUserAuthEntity user;
-		if(!RegexUtils.isMobile(form.getAccount())){
-			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"非法手机号");
-		}
 		user = adminUserService.queryLoginUserByMobile(form.getAccount());
 		
 		//账号不存在、密码错误
