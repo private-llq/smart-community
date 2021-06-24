@@ -271,6 +271,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		Long communityId = shop.getCommunityId();
 		CommunityEntity community = communityService.getCommunityNameById(communityId);
+		if (area == null) {
+			area = "";
+		}
 		shopLeaseVo.setShopAddress(area + "  " + community.getName());
 		
 		
