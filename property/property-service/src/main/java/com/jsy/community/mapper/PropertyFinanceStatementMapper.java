@@ -2,8 +2,6 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
-import com.jsy.community.qo.property.StatementQO;
-import com.jsy.community.vo.StatementVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 

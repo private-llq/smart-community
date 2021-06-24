@@ -415,7 +415,6 @@
         SELECT
 	        h.id,
 	        concat(h.building,h.unit,h.floor,h.door) as mergeName
-
         FROM
 	        t_user_house AS uh
 	        RIGHT JOIN t_house AS h ON uh.house_id = h.id

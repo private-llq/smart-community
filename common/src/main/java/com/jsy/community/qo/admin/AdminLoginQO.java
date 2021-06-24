@@ -1,10 +1,12 @@
 package com.jsy.community.qo.admin;
 
+import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
  * 登录表单
@@ -17,6 +19,7 @@ public class AdminLoginQO {
 	
 	@ApiModelProperty(value = "账号")
 	@NotBlank(message = "账号不能为空")
+	@Pattern(regexp = RegexUtils.REGEX_MOBILE, message = "非法手机号")
 	private String account;
 	
 	@ApiModelProperty(value = "密码")
