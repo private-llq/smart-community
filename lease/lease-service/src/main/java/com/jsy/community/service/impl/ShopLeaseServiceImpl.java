@@ -183,6 +183,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("id", shopId);
+		wrapper.eq("deleted", 1);
 		ShopLeaseEntity shop = shopLeaseMapper.selectOne(wrapper);
 		
 		if (shop == null) {
