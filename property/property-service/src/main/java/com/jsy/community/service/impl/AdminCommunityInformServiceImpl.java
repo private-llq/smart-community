@@ -197,7 +197,6 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         PushInformQO query = qo.getQuery();
         Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
         queryWrapper.select("id,acct_id,push_title,inform_type,push_msg,browse_count,top_state,push_state,push_sub_title,create_by,create_time,update_by,update_time");
-        queryWrapper.eq("deleted", 0);
         queryWrapper.eq("acct_id", query.getAcctId());
         if (!StringUtils.isEmpty(query.getPushTitle())) {
             queryWrapper.like("push_title", query.getPushTitle());
