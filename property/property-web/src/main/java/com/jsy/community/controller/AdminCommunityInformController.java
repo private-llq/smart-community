@@ -48,9 +48,9 @@ public class AdminCommunityInformController {
     @ApiOperation("添加社区推送通知消息")
     public CommonResult<Boolean> addPushInform(HttpServletRequest request, @RequestBody PushInformQO qo) {
         ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidate.class);
-        if (qo.getPushState() == 0 && qo.getTopState() == 1) {
+        /*if (qo.getPushState() == 0 && qo.getTopState() == 1) {
             throw new JSYException(400, "参数错误!草稿不能置顶!");
-        }
+        }*/
         //获取操作员信息
         AdminInfoVo adminInfo = userUtils.getAdminInfo(request.getHeader("token"));
         if (adminInfo == null) {
