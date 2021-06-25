@@ -258,13 +258,13 @@ public class HouseLeaseQO implements Serializable {
      * 类型
      */
     private String shopTypeId;
-    private Long shopTypeIdArrays[];
+    private Long[] shopTypeIdArrays;
 
     /**
      * 行业
      */
     private String shopBusinessId;
-    private Long shopBusinessIdArrays[];
+    private Long[] shopBusinessIdArrays;
     /**
      * 来源
      */

@@ -385,7 +385,7 @@
 	        LEFT JOIN t_house_const AS e ON l.decoration_type_id = d.house_const_code
 	        AND d.house_const_type = 18
             WHERE
-	        l.id = #{houseId} and l.deleted = 0
+	        l.id = #{houseId}
     </select>
     <!-- 根据用户id和社区id 查出用户在这个社区下面所属的房源 -->
     <select id="ownerLeaseHouse" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
