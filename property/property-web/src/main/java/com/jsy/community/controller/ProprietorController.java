@@ -366,6 +366,7 @@ public class ProprietorController {
      * @param baseQo 查询参数实体
      * @return 返回删除是否成功
      */
+    @Login
     @PostMapping()
     @ApiOperation("分页查询业主信息")
     public CommonResult<Page<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> baseQo) {
@@ -374,6 +375,7 @@ public class ProprietorController {
         if (baseQo.getQuery() == null) {
             baseQo.setQuery(new ProprietorQO());
         }
+        baseQo.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
         //1.2 验证提交的参数 如果数字类型的 串 不允许 传双引号，
         ValidatorUtils.validateEntity(baseQo.getQuery(), ProprietorQO.PropertySearchValid.class);
         //2.查询信息返回
