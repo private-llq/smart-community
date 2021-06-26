@@ -77,10 +77,10 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "推送公告类型 站内、外部链接")
     private String informType;
 
-    @ApiModelProperty(value = "创建人")
+    @ApiModelProperty(value = "创建人Id")
     private String createBy;
 
-    @ApiModelProperty(value = "更新人")
+    @ApiModelProperty(value = "更新人Id")
     private String updateBy;
 
 

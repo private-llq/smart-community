@@ -37,7 +37,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      * @param id            推送消息id
      * @return              返回删除是否成功
      */
-    Boolean deletePushInform(Long id, AdminInfoVo adminInfo);
+    Boolean deletePushInform(Long id, String updateAdminId);
 
     /**
      *@Author: Pipi

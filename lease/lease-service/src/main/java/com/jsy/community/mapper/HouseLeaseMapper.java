@@ -233,11 +233,10 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     /**
      * 按用户id 和 房屋id 查询已发布 房源数量
      * @param userId        用户id
-     * @param houseId       用户id
      * @return              返回已发布数量
      */
-    @Select("select count(*) from t_house_lease where uid = #{userId} and house_id = #{houseId}")
-    Integer getPublishLease(String userId, Long houseId);
+    @Select("select count(*) from t_house_lease where uid = #{userId} and deleted = 0")
+    Integer getPublishLease(String userId);
 
 
     /**

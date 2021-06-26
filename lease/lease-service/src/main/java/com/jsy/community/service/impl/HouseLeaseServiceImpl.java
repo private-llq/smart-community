@@ -436,7 +436,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             throw new LeaseException(JSYError.BAD_REQUEST.getCode(), "您在此处未登记房产!");
         }
         if( operation == Operation.INSERT ){
-            Integer publishLeaseRow = houseLeaseMapper.getPublishLease(userId, houseId);
+            Integer publishLeaseRow = houseLeaseMapper.getPublishLease(userId);
             if( publishLeaseRow >= BusinessConst.USER_PUBLISH_LEASE_MAX){
                 throw new LeaseException(JSYError.NOT_IMPLEMENTED.getCode(), "您发布的房源已经达到最大发布数量!");
             }

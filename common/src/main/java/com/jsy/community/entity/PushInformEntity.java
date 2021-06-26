@@ -1,11 +1,17 @@
 package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 
 
 /**
@@ -59,6 +65,15 @@ public class PushInformEntity extends BaseEntity {
 
     @ApiModelProperty(value = "推送消息浏览次数")
     private Long browseCount;
+
+    @ApiModelProperty(value = "发布人")
+    private String publishBy;
+
+    @ApiModelProperty(value = "发布时间")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private LocalDateTime publishTime;
 
     public static PushInformEntity getInstance(){
         return new PushInformEntity();
