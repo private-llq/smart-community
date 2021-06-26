@@ -75,7 +75,7 @@ public class CommonServiceImpl implements ICommonService {
     public void checkVerifyCode(String account, String code) {
         
         //苹果审核用账号
-        if("18183132010".equals(account)){
+        if("18183132010".equals(account) || "18888888888".equals(account)){
             return;
         }
         
