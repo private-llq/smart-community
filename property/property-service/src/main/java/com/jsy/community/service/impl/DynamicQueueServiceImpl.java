@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.IDynamicQueueService;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.Properties;
  **/
 @Slf4j
 @Service
-public class DynamicQueueServiceImpl {
+public class DynamicQueueServiceImpl implements IDynamicQueueService {
 	
 	@Autowired
 	private RabbitAdmin rabbitAdmin;
@@ -59,6 +60,7 @@ public class DynamicQueueServiceImpl {
 	 * @Author: chq459799974
 	 * @Date: 2021/6/26
 	**/
+	@Override
 	public void createMQIfNotExist(String queueName, TopicExchange topicExchange){
 		Properties properties = rabbitAdmin.getQueueProperties(queueName);
 		if(properties == null){
