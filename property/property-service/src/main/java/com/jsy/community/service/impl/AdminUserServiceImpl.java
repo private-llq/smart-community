@@ -466,7 +466,9 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
 		Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
 		for(AdminUserEntity entity : pageData.getRecords()){
-			entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+			if (entity.getOrgId() != null) {
+				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+			}
 			entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
 			entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
 		}
