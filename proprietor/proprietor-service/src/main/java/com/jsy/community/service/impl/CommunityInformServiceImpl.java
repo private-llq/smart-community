@@ -60,6 +60,7 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         PushInformQO query = qo.getQuery();
         Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
         queryWrapper.select("id,acct_id,create_time,push_title,push_sub_title");
+        queryWrapper.eq("push_state", 1);
         queryWrapper.eq("acct_id", query.getAcctId());
         queryWrapper.eq("deleted", 0);
         queryWrapper.last("ORDER BY create_time desc");
