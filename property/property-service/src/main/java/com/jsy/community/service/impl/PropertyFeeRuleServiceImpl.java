@@ -114,7 +114,9 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         for (PropertyFeeRuleEntity entity : pageRecords) {
             if (!"".equals(entity.getUpdateBy())&&entity.getUpdateBy()!=null){
                 AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", entity.getUpdateBy()));
-                entity.setUpdateByName(userEntity.getRealName());
+                if (userEntity!=null){
+                    entity.setUpdateByName(userEntity.getRealName());
+                }
             }
         }
         Map<Object, Object> map = new HashMap<>();
