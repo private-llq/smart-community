@@ -131,12 +131,12 @@ public interface IAdminConfigService {
 	
 	/**
 	* @Description: 查询用户菜单id列表
-	 * @Param: [id]
+	 * @Param: [uid]
 	 * @Return: java.util.List<java.lang.String>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/9
 	**/
-	List<String> queryUserMenuIdList(Long id);
+	List<String> queryUserMenuIdList(String uid);
 	
 	/**
 	* @Description: 为用户分配菜单
