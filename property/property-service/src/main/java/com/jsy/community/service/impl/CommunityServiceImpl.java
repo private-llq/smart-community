@@ -90,6 +90,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		return communityMapper.queryCommunityBatch(idList);
 	}
 	
+	/**
+	 * 获取社区电子地图
+	 */
 	@Override
 	public Map<String, Object> getElectronicMap(Long communityId) {
 		HashMap<String, Object> hashMap = new HashMap<>();
@@ -124,5 +127,17 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		hashMap.put("count",userHouseCount+houseMemberCount);
 		
 		return hashMap;
+	}
+	
+	/**
+	* @Description: 查询所有小区ID
+	 * @Param: []
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/26
+	**/
+	@Override
+	public List<Long> queryAllCommunityIdList(){
+		return communityMapper.queryAllCommunityIdList();
 	}
 }

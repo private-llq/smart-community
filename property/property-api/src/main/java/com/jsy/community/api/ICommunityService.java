@@ -79,4 +79,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 **/
 	Map<String, Object> getElectronicMap(Long communityId);
 	
+	/**
+	* @Description: 查询所有小区id
+	 * @Param: []
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/26
+	**/
+	List<Long> queryAllCommunityIdList();
+	
 }
