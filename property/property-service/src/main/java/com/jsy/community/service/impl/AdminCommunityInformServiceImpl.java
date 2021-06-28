@@ -48,7 +48,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
     @Resource
     private CommunityMapper communityMapper;
 
-    @DubboReference(version = Const.version, group = Const.group_property)
+    @Autowired
     private IAdminUserService adminUserService;
 
     /**
@@ -76,10 +76,10 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
             // 新发布,添加发布人信息
             entity.setPublishBy(qo.getCreateBy());
             entity.setPublishTime(LocalDateTime.now());
-            if (qo.getTopState() == 1) {
-                // 且是置顶状态,将其他推送取消置顶
-                communityInformMapper.unpinned(qo.getCreateBy());
-            }
+        }
+        if (qo.getTopState() == 1) {
+            // 置顶状态,将其他推送取消置顶
+            communityInformMapper.unpinned(qo.getCreateBy());
         }
         //返回值为冗余
         boolean b = communityInformMapper.insert(entity) > BusinessConst.ZERO;
@@ -115,6 +115,14 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         entity.setCreateBy(pushInformEntity.getCreateBy());
         entity.setCreateTime(pushInformEntity.getCreateTime());
         entity.setBrowseCount(pushInformEntity.getBrowseCount());
+        entity.setUpdateTime(LocalDateTime.now());
+        if (qo.getPushState() == 1) {
+            // 如果新数据的发布状态是发布,添加发布人信息和发布时间
+            // 编辑只能是草稿状态或者撤销状态发布
+            // 所以状态只能发生情况为:草稿->发布、草稿->草稿、撤销->发布这三种状态
+            entity.setPublishBy(qo.getUpdateBy());
+            entity.setPublishTime(LocalDateTime.now());
+        }
         if (qo.getTopState() == 1) {
             communityInformMapper.unpinned(qo.getUpdateBy());
         }
@@ -165,6 +173,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      **/
     @Override
     public Boolean updatePushState(PushInformQO qo) {
+        // 如果状态为发布状态,表示由草稿状态变跟为发布状态,还需要更新发布人和发布时间
         Integer result = communityInformMapper.updatePushState(qo.getPushState(), qo.getId(), qo.getUpdateBy());
         return result > 0 ? true : false;
     }
@@ -238,7 +247,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
                 queryWrapper.eq("push_state", query.getPushState());
             }
             // 排序:发布的在最前,然后依次条件是发布时间,更新时间
-            queryWrapper.last("ORDER BY push_state asc,publish_time,update_time desc");
+            queryWrapper.last("ORDER BY push_state asc,publish_time desc,update_time desc");
         }
         Page<PushInformEntity> pushInformEntityPage = communityInformMapper.selectPage(objectPage, queryWrapper);
         if (CollectionUtil.isNotEmpty(pushInformEntityPage.getRecords())) {
