@@ -155,8 +155,12 @@ public class AdminLoginController {
 		//账号不存在、密码错误
 		if (user == null) {
 			return CommonResult.error("账号或密码不正确");
-		}else if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())){
-			return CommonResult.error("账号或密码不正确");
+		}
+		// 如果是密码登录,判断密码正不正确
+		if (StringUtils.isEmpty(form.getCode())) {
+			if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())){
+				return CommonResult.error("账号或密码不正确");
+			}
 		}
 		
 		//查询已加入小区id列表
@@ -219,6 +223,7 @@ public class AdminLoginController {
 		BeanUtils.copyProperties(user,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
+		adminInfoVo.setCommunityName(jsonObject.getString("communityName"));
 		//删除登录用的一次性key
 		redisTemplate.delete("Admin:CommunityKey:" + communityKey);
 		return CommonResult.ok(adminInfoVo);

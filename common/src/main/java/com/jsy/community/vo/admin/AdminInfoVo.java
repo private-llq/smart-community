@@ -19,7 +19,10 @@ public class AdminInfoVo implements Serializable {
 	 * 社区id
 	 */
 	private Long communityId;
-	
+	/**
+	 * 社区名
+	 */
+	private String communityName;
 	/**
 	 * 角色类型(第一版直接放进用户表)  1：超级管理员   2：普通用户
 	 */
