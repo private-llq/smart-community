@@ -19,7 +19,6 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,7 +125,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         if (qo.getTopState() == 1) {
             communityInformMapper.unpinned(qo.getUpdateBy());
         }
-        return baseMapper.updateById(entity) > 0 ? true : false;
+        return baseMapper.updateById(entity) > 0;
     }
 
     /**
@@ -142,7 +141,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         communityInformMapper.delUserReadInform(id);
         ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.INFORM, Operation.DELETE, null, null);
         // 逻辑删除消息信息,更新操作员
-        Integer integer = communityInformMapper.updateDeleted(id, updateAdminId);
+        var integer = communityInformMapper.updateDeleted(id, updateAdminId);
         return integer > 0;
     }
 
@@ -175,7 +174,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
     public Boolean updatePushState(PushInformQO qo) {
         // 如果状态为发布状态,表示由草稿状态变跟为发布状态,还需要更新发布人和发布时间
         Integer result = communityInformMapper.updatePushState(qo.getPushState(), qo.getId(), qo.getUpdateBy());
-        return result > 0 ? true : false;
+        return result == 1;
     }
 
     /**
