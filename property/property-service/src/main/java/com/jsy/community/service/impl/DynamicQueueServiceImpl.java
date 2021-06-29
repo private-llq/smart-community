@@ -49,7 +49,7 @@ public class DynamicQueueServiceImpl implements IDynamicQueueService {
 		}
 		for(Long communityId : communityIds){
 			//创建小区队列
-			createMQIfNotExist(TopicExConfig.QUEUE_COMMUNITY + "." + communityId,new TopicExchange(TopicExConfig.EX_TOPIC_COMMUNITY));
+			createMQIfNotExist(TopicExConfig.QUEUE_TO_COMMUNITY + "." + communityId,new TopicExchange(TopicExConfig.EX_TOPIC_TO_COMMUNITY));
 		}
 	}
 	
@@ -64,7 +64,7 @@ public class DynamicQueueServiceImpl implements IDynamicQueueService {
 	public void createMQIfNotExist(String queueName, TopicExchange topicExchange){
 		Properties properties = rabbitAdmin.getQueueProperties(queueName);
 		if(properties == null){
-			log.info("队列不存在，开始创建队列queueName...并绑定topic交换机");
+			log.info("队列不存在，开始创建队列queueName..." + queueName + "并绑定topic交换机：" + topicExchange.getName());
 			Queue queue = new Queue(queueName,true,false,false,null);
 //			TopicExchange topicExchange = new TopicExchange(exchangeName);
 			rabbitAdmin.declareQueue(queue);

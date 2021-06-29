@@ -102,7 +102,8 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		facilityMapper.insertFacilityStatus(SnowFlake.nextId(), 0, facilityEntity.getId());
 		//MQ通知小区服务器登录设备
 		facilityEntity.setOp("add");
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_OP, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
+		facilityEntity.setAct(PropertyConsts.ACT_HK_CAMERA);
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY, TopicExConfig.QUEUE_TO_COMMUNITY + "." + facilityEntity.getCommunityId(), JSON.toJSONString(facilityEntity));
 	}
 	
 	@Override
@@ -117,7 +118,8 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		facilityEntity.setId(id);
 		facilityEntity.setCommunityId(communityId);
 		facilityEntity.setOp("del");
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_OP,JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
+		facilityEntity.setAct(PropertyConsts.ACT_HK_CAMERA);
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY, TopicExConfig.QUEUE_TO_COMMUNITY + "." +communityId,JSON.toJSONString(facilityEntity));
 		//直接删除设备，返回成功(反正也查不到了，不用等待异步注销成功)
 		facilityMapper.deleteFacilityById(id);
 		// 删除设备状态信息
@@ -148,7 +150,8 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			facilityMapper.insertFacilityStatus(SnowFlake.nextId(),0,facilityId);
 			//异步通知小区服务器
 			facilityEntity.setOp("update");
-			rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_OP, JSONObject.parseObject(JSON.toJSONString(facilityEntity)));
+			facilityEntity.setAct(PropertyConsts.ACT_HK_CAMERA);
+			rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY, TopicExConfig.QUEUE_TO_COMMUNITY + "." +facilityEntity.getCommunityId(), JSON.toJSONString(facilityEntity));
 		}
 	}
 	
@@ -173,7 +176,8 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		Map map = new HashMap<>();
 		map.put("idList",idList);
 		map.put("communityId",communityId);
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA, TopicExConfig.TOPIC_HK_CAMERA_FLUSH, map);
+		map.put("act",PropertyConsts.ACT_HK_CAMERA);
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY, TopicExConfig.QUEUE_TO_COMMUNITY + "." + communityId, JSON.toJSONString(map));
 	}
 	
 	@Override
@@ -253,7 +257,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		map.put("id",id);
 		map.put("communityId",communityId);
 		map.put("userList",userList);
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_HK_CAMERA,TopicExConfig.TOPIC_HK_CAMERA_SYNC_FACE, JSON.toJSONString(map));
+		map.put("op","sync");
+		map.put("act",PropertyConsts.ACT_HK_CAMERA);
+		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY,TopicExConfig.QUEUE_TO_COMMUNITY + "." + communityId, JSON.toJSONString(map));
 	}
 	
 	/**
@@ -264,7 +270,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	 * @Date: 2021/6/23
 	**/
 	@Override
-	public void dealDataBysyncResult(Integer resultCode, JSONObject jsonObject){
+	public void dealDataBySyncResult(Integer resultCode, JSONObject jsonObject){
 		Long facilityId = jsonObject.getLong("facilityId");
 		Long communityId = jsonObject.getLong("communityId");
 		String msg = jsonObject.getString("msg");
@@ -325,5 +331,45 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	**/
 	public Long countBySyncStatus(Long communityId,Integer syncStatus){
 		return facilityMapper.countBySyncStatus(communityId, syncStatus);
+	}
+	
+	/**
+	* @Description: 处理小区返回到MQ上的结果
+	 * @Param: [jsonObject]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/29
+	**/
+	@Override
+	public void dealResultFromCommunity(JSONObject jsonObject){
+		String op = jsonObject.getString("op");
+		log.info("收到海康设备返回指令：" + op);
+		switch (op){
+			case "addResult":
+				//添加摄像头
+				changeStatus(jsonObject.getInteger("status"),jsonObject.getLong("facilityId"),jsonObject.getLong("time"));
+				break;
+			case "updateResult":
+				//编辑摄像头
+				changeStatus(jsonObject.getInteger("status"),jsonObject.getLong("facilityId"),jsonObject.getLong("time"));
+				break;
+			case "flushResult":
+				//刷新摄像头
+				changeStatusBatch(jsonObject.toJavaObject(jsonObject,Map.class));
+				break;
+			case "syncResult":
+				if("success".equals(jsonObject.getString("result"))){
+					//数据同步成功
+					dealDataBySyncResult(PropertyConsts.FACILITY_SYNC_DONE,jsonObject);
+				}else if("fail".equals(jsonObject.getString("result"))){
+					//数据同步失败
+					dealDataBySyncResult(PropertyConsts.FACILITY_SYNC_HAVA_NOT,jsonObject);
+				}
+				//同步摄像头
+				break;
+			default:
+				log.error("监听到小区无效海康指令：" + jsonObject.getString("op"));
+				break;
+		}
 	}
 }

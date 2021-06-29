@@ -109,6 +109,10 @@ public class FacilityEntity extends BaseEntity {
 	@TableField(exist = false)
 	private String op;
 	
+	@ApiModelProperty(value = "远程操作动作(主题) HKCamera XUFace 等，和小区服务器对应")
+	@TableField(exist = false)
+	private String act;
+	
 	public interface addFacilityValidate {
 	}
 	

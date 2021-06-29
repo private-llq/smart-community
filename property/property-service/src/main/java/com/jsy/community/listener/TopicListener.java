@@ -1,12 +1,10 @@
 package com.jsy.community.listener;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.config.RabbitMQCommonConfig;
 import com.jsy.community.config.TopicExConfig;
-import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author chq459799974
@@ -50,75 +47,33 @@ public class TopicListener {
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 	}
 	
-	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_ADD_RESULT)
-	public void addFacilityResult(Map mapBody, Message message, Channel channel) throws IOException {
-		log.info("监听到Add设备回复: \n" + mapBody.toString());
-		try {
-			JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(mapBody));
-			//修改设备在线状态
-			facilityService.changeStatus(jsonObject.getInteger("status"),jsonObject.getLong("facilityId"),jsonObject.getLong("time"));
-		}catch(Exception e){
-			e.printStackTrace();
-			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
-			log.info("收到的消息内容为: \n" + mapBody.toString());
-			//手动确认
-			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-		}
-		//手动确认
-		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-	}
-	
-	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_UPDATE_RESULT)
-	public void updateFacilityResult(Map mapBody, Message message, Channel channel) throws IOException {
-		log.info("监听到Update设备回复: \n" + mapBody.toString());
-		try {
-			JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(mapBody));
-			//修改设备在线状态
-			facilityService.changeStatus(jsonObject.getInteger("status"),jsonObject.getLong("facilityId"),jsonObject.getLong("time"));
-		}catch(Exception e){
-			e.printStackTrace();
-			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
-			log.info("收到的消息内容为: \n" + mapBody.toString());
-			//手动确认
-			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-		}
-		//手动确认
-		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-	}
-	
-	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_FLUSH_RESULT)
-	public void flushFacilityResult(Map mapBody, Message message, Channel channel) throws IOException {
-		log.info("监听到Flush设备回复: \n" + mapBody.toString());
-		try {
-			//修改设备在线状态
-			facilityService.changeStatusBatch(mapBody);
-		}catch(Exception e){
-			e.printStackTrace();
-			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
-			log.info("收到的消息内容为: \n" + mapBody.toString());
-			//手动确认
-			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-		}
-		//手动确认
-		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-	}
-	
-	@RabbitListener(queues = TopicExConfig.TOPIC_HK_CAMERA_SYNC_FACE_RESULT)
-	public void syncFaceResult(String mapStr, Message message, Channel channel) throws IOException {
-		log.info("监听到同步人脸库回复: \n" + mapStr);
+	/**
+	 * 小区消息监听
+	 */
+	@RabbitListener(queues = TopicExConfig.QUEUE_FROM_COMMUNITY)
+	public void msgFromCommunity(String mapStr, Message message, Channel channel) throws IOException {
+		log.info("监听到小区消息: \n" + mapStr);
 		try {
 			JSONObject jsonObject = JSONObject.parseObject(mapStr);
-			if("success".equals(jsonObject.getString("result"))){
-				//数据同步成功
-				facilityService.dealDataBysyncResult(PropertyConsts.FACILITY_SYNC_DONE,jsonObject);
-			}else if("fail".equals(jsonObject.getString("result"))){
-				//数据同步失败
-				facilityService.dealDataBysyncResult(PropertyConsts.FACILITY_SYNC_HAVA_NOT,jsonObject);
+			log.info("解析成功：" + jsonObject);
+			//判断操作
+			switch (jsonObject.getString("act")){
+				case "HKCamera":
+					//海康摄像机
+					facilityService.dealResultFromCommunity(jsonObject);
+					break;
+				case "XUFace":
+					//炫优人脸识别一体机
+					//TODO
+					
+					break;
+				default:
+					log.error("监听到云端到无效指令：" + jsonObject.getString("act"));
+					break;
 			}
-			System.out.println(jsonObject);
 		}catch(Exception e){
 			e.printStackTrace();
-			log.error("消息监听发生异常，线程号： " + Thread.currentThread().getId());
+			log.error("小区消息监听发生异常，线程号： " + Thread.currentThread().getId());
 			log.info("收到的消息内容为: \n" + mapStr);
 			//手动确认
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
