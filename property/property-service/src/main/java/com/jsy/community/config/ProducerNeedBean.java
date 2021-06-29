@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @since 2021-06-23 15:04
  **/
 @Component
-public class RabbitTemplateConfig {
+public class ProducerNeedBean {
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;

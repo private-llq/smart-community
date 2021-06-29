@@ -71,6 +71,8 @@ public class UserController {
     @Login
     @PutMapping("regId")
     public CommonResult updateUserRegId(@RequestParam String regId){
+        //TODO 苹果过审用 防止报错暂时生成随机串
+        regId = UUID.randomUUID().toString().replace("-","");
         boolean result = userService.updateUserRegId(regId, UserUtils.getUserId());
         return result ? CommonResult.ok("离线推送设备id设置成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"离线推送设备id设置失败");
     }

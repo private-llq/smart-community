@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAppVersionService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.AppVersionEntity;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author lihao
@@ -57,11 +60,15 @@ public class AppController {
 	
 	@ApiOperation("查询APP版本列表")
 	@GetMapping("/list/version")
-	public CommonResult queryAppVersionList(Integer sysType,String sysVersion){
+	public CommonResult queryAppVersionList(Integer sysType, String sysVersion){
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
 			sysType = null;
 		}
-		return CommonResult.ok(appVersionService.queryAppVersionList(sysType,sysVersion),"查询成功");
+		List<AppVersionEntity> list = appVersionService.queryAppVersionList(sysType,sysVersion);
+		if(list != null && list.size() == 1){
+			return CommonResult.ok(appVersionService.queryAppVersionList(sysType,sysVersion).get(0),"查询成功");
+		}
+		return CommonResult.ok(list,"查询成功");
 	}
 	
 	
