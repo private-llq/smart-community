@@ -114,7 +114,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/6/23
 	**/
-	void dealDataBysyncResult(Integer resultCode, JSONObject jsonObject);
+	void dealDataBySyncResult(Integer resultCode, JSONObject jsonObject);
 	
 	/**
 	* @Description: 分页查询数据同步记录 和 成功失败数统计
@@ -133,4 +133,13 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date: 2021/6/24
 	**/
 	Long countBySyncStatus(Long communityId,Integer syncStatus);
+	
+	/**
+	* @Description: 处理小区返回到MQ上的结果
+	 * @Param: [jsonObject]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/29
+	**/
+	void dealResultFromCommunity(JSONObject jsonObject);
 }

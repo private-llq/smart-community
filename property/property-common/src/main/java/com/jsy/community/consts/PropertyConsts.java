@@ -29,4 +29,8 @@ public interface PropertyConsts {
 	Integer FACILITY_SYNC_HAVA_NOT = 0; //未同步
 	Integer FACILITY_SYNC_DONE = 1; //已同步
 	Integer FACILITY_SYNC_DOING = 2; //同步中
+	
+	//======= 小区服务器下发动作(主题)
+	String ACT_HK_CAMERA = "HKCamera"; //海康摄像机
+	String ACT_XU_FACE = "XUFace"; //炫优人脸识别一体机
 }
