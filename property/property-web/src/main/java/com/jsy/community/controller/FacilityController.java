@@ -8,6 +8,7 @@ import com.jsy.community.api.IFacilityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.hk.FacilityEntity;
+import com.jsy.community.entity.hk.FacilitySyncRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.PageInfo;
@@ -21,6 +22,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -132,8 +134,11 @@ public class FacilityController {
 	
 	@ApiOperation("分页查询设备数据同步记录")
 	@PostMapping("/connectData/record")
-	public CommonResult queryDataRecord(@RequestBody BaseQO<Long> baseQO) {
-		baseQO.setQuery(UserUtils.getAdminCommunityId());
+	public CommonResult queryDataRecord(@RequestBody BaseQO<FacilitySyncRecordEntity> baseQO) {
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new FacilitySyncRecordEntity());
+		}
+		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 		return CommonResult.ok(facilityService.querySyncRecordPage(baseQO),"查询成功");
 	}
 	
