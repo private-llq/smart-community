@@ -123,7 +123,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/6/24
 	**/
-	Map<String,Object> querySyncRecordPage(BaseQO<Long> baseQO);
+	Map<String,Object> querySyncRecordPage(BaseQO<FacilitySyncRecordEntity> baseQO);
 	
 	/**
 	* @Description: 根据数据同步状态统计设备数

@@ -299,13 +299,18 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	 * @Author: chq459799974
 	 * @Date: 2021/6/24
 	**/
-	public Map<String,Object> querySyncRecordPage(BaseQO<Long> baseQO){
-		Long communityId = baseQO.getQuery();
+	@Override
+	public Map<String,Object> querySyncRecordPage(BaseQO<FacilitySyncRecordEntity> baseQO){
+		FacilitySyncRecordEntity qo = baseQO.getQuery();
+		Long communityId = qo.getCommunityId();
 		Page page = new Page();
 		MyPageUtils.setPageAndSize(page,baseQO);
 		QueryWrapper queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("number,create_time,is_success,remark");
 		queryWrapper.eq("community_id",communityId);
+		if(qo.getIsSuccess() != null){
+			queryWrapper.eq("is_success",qo.getIsSuccess());
+		}
 		//分页查询
 		Page<FacilitySyncRecordEntity> pageData = facilitySyncRecordMapper.selectPage(page,queryWrapper);
 		PageInfo<FacilitySyncRecordEntity> pageInfo = new PageInfo<>();
