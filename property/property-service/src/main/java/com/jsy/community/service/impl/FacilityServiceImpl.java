@@ -209,11 +209,17 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	
 	@Override
 	public Map<String, Integer> getCount(Long typeId,Long communityId) {
-		// 根据设备分类id查询其下设备的id集合
-		List<Long> facilityIds = facilityMapper.getFacilityIdByTypeId(typeId,communityId);
-		
+		HashMap<String, Integer> returnMap = new HashMap<>();
 		int onlineCount = 0;
 		int failCount = 0;
+		
+		// 根据设备分类id查询其下设备的id集合
+		List<Long> facilityIds = facilityMapper.getFacilityIdByTypeId(typeId,communityId);
+		if(CollectionUtils.isEmpty(facilityIds)){
+			returnMap.put("onlineCount", onlineCount);
+			returnMap.put("failCount", failCount);
+			return returnMap;
+		}
 		
 		// 根据设备idList批量查询设备状态表的状态
 		Map<Long,Map<Long,Integer>> facilityWithStatus = facilityMapper.getStatusBatch(facilityIds);
@@ -225,10 +231,9 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			}
 		}
 		
-		HashMap<String, Integer> map = new HashMap<>();
-		map.put("onlineCount", onlineCount);
-		map.put("failCount", failCount);
-		return map;
+		returnMap.put("onlineCount", onlineCount);
+		returnMap.put("failCount", failCount);
+		return returnMap;
 	}
 	
 	@Override
@@ -334,6 +339,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	 * @Author: chq459799974
 	 * @Date: 2021/6/24
 	**/
+	@Override
 	public Long countBySyncStatus(Long communityId,Integer syncStatus){
 		return facilityMapper.countBySyncStatus(communityId, syncStatus);
 	}
