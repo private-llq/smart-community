@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -7,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.config.RabbitMQCommonConfig;
+import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -127,8 +129,11 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //           || (visitorEntity.getIsBuildingAccess() != null && visitorEntity.getIsBuildingAccess() != 0)){
 //           return getVisitorEntry(visitorEntity);// 返回门禁权限VO
 //        }
+        
+        //把访客登记数据推送给小区
+        rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_VISITOR_TO_COMMUNITY,TopicExConfig.QUEUE_VISITOR_TO_COMMUNITY + "." + visitorEntity.getCommunityId(),JSON.toJSONString(visitorEntity));
+        
         //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
-        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
         if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())
             || BusinessEnum.BuildingAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsBuildingAccess())){
             //小区是否有二维码设备(目前只用炫优一体机判断)
@@ -136,6 +141,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             if(count < 1){
                 return null;
             }
+            VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
             visitorEntryVO.setId(visitorEntity.getId());
             return visitorEntryVO;
         }
@@ -162,7 +168,6 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         }
         //查询访客记录
         VisitorEntity visitorEntity = visitorMapper.selectById(visitorId);
-        System.out.println(visitorEntity);
         //无访客记录
         if(visitorEntity == null){
             returnMap.put("code","-1");
@@ -441,6 +446,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
                 queryWrapper.eq("contact",visitorQO.getContact());
             }
         }
+        queryWrapper.orderByDesc("create_time");
         Page<VisitorEntity> resultPage = visitorMapper.selectPage(page, queryWrapper);
         PageInfo<VisitorEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(resultPage,pageInfo);
