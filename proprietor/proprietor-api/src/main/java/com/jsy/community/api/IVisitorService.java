@@ -30,15 +30,15 @@ public interface IVisitorService extends IService<VisitorEntity> {
     **/
     VisitorEntryVO addVisitor(VisitorEntity visitorEntity);
     
-    /**
-    * @Description: 二维码开门验证
-     * @Param: [jsonObject, hardWareType]
-     * @Return: java.util.Map<java.lang.String,java.lang.Object>
-     * @Author: chq459799974
-     * @Date: 2021/5/6
-    **/
-//    void verifyQRCode(JSONObject jsonObject,Integer hardWareType);
-    Map<String,Object> verifyQRCode(JSONObject jsonObject, Integer hardWareType);
+//    /**
+//    * @Description: 二维码开门验证
+//     * @Param: [jsonObject, hardWareType]
+//     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+//     * @Author: chq459799974
+//     * @Date: 2021/5/6
+//    **/
+////    void verifyQRCode(JSONObject jsonObject,Integer hardWareType);
+//    Map<String,Object> verifyQRCode(JSONObject jsonObject, Integer hardWareType);
     
 //    /**
 //    * @Description: 访客门禁验证

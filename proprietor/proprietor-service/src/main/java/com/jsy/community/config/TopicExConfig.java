@@ -59,18 +59,10 @@ public class TopicExConfig {
 	public Queue queueOfXUFaceClient() {
 		return new Queue(TOPIC_FACE_XU_CLIENT,true);
 	}
-	@Bean
-	public Queue queueOfPropertyVisitor() {
-		return new Queue(RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD,true);
-	}
 	//声明交换机
 	@Bean
 	TopicExchange topicExOfXUFace() {
 		return new TopicExchange(EX_FACE_XU);
-	}
-	@Bean
-	TopicExchange topicExOfProperty() {
-		return new TopicExchange(RabbitMQCommonConfig.EX_PROPERTY);
 	}
 	//队列绑定交换机
 	@Bean
@@ -82,46 +74,5 @@ public class TopicExConfig {
 	Binding bindingExchangeMessage2() {
 		return BindingBuilder.bind(queueOfXUFaceClient()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_CLIENT);
 	}
-	//队列绑定交换机
-	@Bean
-	Binding bindingExchangeMessage3() {
-		return BindingBuilder.bind(queueOfPropertyVisitor()).to(topicExOfProperty()).with(RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD);
-	}
-	
-	
-	
-	//绑定键
-//	public final static String topic1 = "topic.t1";
-//	public final static String topic2 = "topic.t2";
-	
-//	@Bean
-//	public Queue firstQueue() {
-//		return new Queue(TopicExConfig.topic1,true);
-//	}
-//
-//	@Bean
-//	public Queue secondQueue() {
-//		return new Queue(TopicExConfig.topic2,true);
-//	}
-	
-//	@Bean
-//	TopicExchange topicEx1() {
-//		return new TopicExchange("topicEx1");
-//	}
-	
-	
-	//将firstQueue和topicExchange绑定,而且绑定的键值为topic.t1
-	//这样只要是消息携带的路由键是topic.t1,才会分发到该队列
-//	@Bean
-//	Binding bindingExchangeMessage() {
-//		return BindingBuilder.bind(firstQueue()).to(topicEx1()).with(topic1);
-//	}
-	
-	//将secondQueue和topicExchange绑定,而且绑定的键值为用上通配路由键规则topic.#
-	// 这样只要是消息携带的路由键是以topic.开头,都会分发到该队列
-//	@Bean
-//	Binding bindingExchangeMessage2() {
-//		return BindingBuilder.bind(secondQueue()).to(topicEx1()).with("topic.#");
-//	}
 	
 }

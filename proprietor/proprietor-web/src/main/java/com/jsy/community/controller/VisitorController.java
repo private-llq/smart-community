@@ -49,19 +49,20 @@ public class VisitorController {
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IVisitingCarService visitingCarService;
 	
-	/**
-	* @Description: 【访客】验证二维码
-	 * @Param: [jsonObject]
-	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
-	 * @Author: chq459799974
-	 * @Date: 2021/5/6
-	**/
-	@ApiOperation("【访客】验证二维码")
-	@PostMapping("/QRCode/verify")
-	@Login(allowAnonymous = true)
-	public Map<String,Object> verifyQRCode(@RequestBody JSONObject jsonObject){
-		return visitorService.verifyQRCode(jsonObject,jsonObject.getInteger("hardwareType"));
-	}
+//	/**
+//	* @Description: 【访客】验证二维码
+//	 * @Param: [jsonObject]
+//	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+//	 * @Author: chq459799974
+//	 * @Date: 2021/5/6
+//	**/
+//	@Deprecated
+//	@ApiOperation("【访客】验证二维码")
+//	@PostMapping("/QRCode/verify")
+//	@Login(allowAnonymous = true)
+//	public Map<String,Object> verifyQRCode(@RequestBody JSONObject jsonObject){
+//		return visitorService.verifyQRCode(jsonObject,jsonObject.getInteger("hardwareType"));
+//	}
 	
 	/**
 	 * @Description: 访客登记 新增

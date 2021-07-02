@@ -1,13 +1,11 @@
 package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
-import com.jsy.community.config.RabbitMQCommonConfig;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
@@ -29,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -148,79 +145,6 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         return null;
     }
     
-    /**
-     * @Description: 验证二维码
-     * @Param: [jsonObject, hardwareType]
-     * @Return: void
-     * @Author: chq459799974
-     * @Date: 2021/4/25
-     **/
-    @Override
-    public Map<String,Object> verifyQRCode(JSONObject jsonObject,Integer hardwareType){
-        Map<String, Object> returnMap = new HashMap<>();
-        returnMap.put("op","openDoor"); //二维码操作目前只有开门
-        Long visitorId = null; //访客登记ID
-        String hardwareId = null; //硬件ID
-        if(BusinessConst.HARDWARE_TYPE_XU_FACE.equals(hardwareType)){  //炫优人脸识别一体机
-            //机器传过来的二维码中的访客登记id
-            visitorId = jsonObject.getJSONObject("info").getJSONObject("QRCodeInfo").getLong("visitorId");
-            hardwareId = jsonObject.getJSONObject("info").getString("facesluiceId");
-        }
-        //查询访客记录
-        VisitorEntity visitorEntity = visitorMapper.selectById(visitorId);
-        //无访客记录
-        if(visitorEntity == null){
-            returnMap.put("code","-1");
-            returnMap.put("msg","访客登记记录查找失败");
-            return returnMap;
-        }
-        //小区不对
-        Long communityId = visitorEntity.getCommunityId();
-//        Long hareWareCommunityId = communityHardWareMapper.queryCommunityIdByHardWareIdAndType(hardwareId, hardwareType);
-        List<Long> hareWareCommunityId = communityHardWareMapper.queryCommunityIdByHardWareIdAndType(hardwareId, hardwareType);//测试用
-//        if(!communityId.equals(hareWareCommunityId)){
-        if(!hareWareCommunityId.contains(communityId)){ //测试用
-            returnMap.put("code","-1");
-            returnMap.put("msg","社区ID错误");
-            return returnMap;
-        }
-        //来访过早
-        if(LocalDate.now().isBefore(visitorEntity.getStartTime())){
-            returnMap.put("code","-1");
-            returnMap.put("msg","未到访问时间");
-            return returnMap;
-        }
-        if(visitorEntity.getEndTime() == null){ //无结束时间
-            if(LocalDate.now().isAfter(visitorEntity.getStartTime())){ //暂定二维码在访问开始时间内一天有效
-                returnMap.put("code","-1");
-                returnMap.put("msg","已超出访问时间");
-                return returnMap;
-            }
-        }else if(LocalDate.now().isAfter(visitorEntity.getEndTime())){ //有结束时间
-            returnMap.put("code","-1");
-            returnMap.put("msg","已超出访问时间");
-            return returnMap;
-        }
-        returnMap.put("code","0");
-        returnMap.put("msg","二维码验证通过");
-        returnMap.put("uid",visitorEntity.getUid());
-        returnMap.put("name",visitorEntity.getName());
-        
-        //MQ向物业端新增一条访客记录
-        VisitorHistoryEntity historyEntity = new VisitorHistoryEntity();
-        BeanUtils.copyProperties(visitorEntity,historyEntity);
-        historyEntity.setId(SnowFlake.nextId());
-        historyEntity.setVisitorId(visitorEntity.getId());
-        historyEntity.setAccessType(BusinessConst.ACCESS_TYPE_QRCODE);
-        pushVisitorRecord(historyEntity);
-        return returnMap;
-    }
-    
-    //推送访客记录
-    private void pushVisitorRecord(VisitorHistoryEntity historyEntity){
-        rabbitTemplate.convertAndSend(RabbitMQCommonConfig.EX_PROPERTY, RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD,historyEntity);
-    }
-    
 //    /**
 //     * @Description: 验证二维码
 //     * @Param: [jsonObject, hardwareType]
@@ -228,10 +152,11 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //     * @Author: chq459799974
 //     * @Date: 2021/4/25
 //     **/
+//    @Deprecated
 //    @Override
-//    public void verifyQRCode(JSONObject jsonObject,Integer hardwareType){
-//        JSONObject pushMap = new JSONObject();
-//        pushMap.put("op","openDoor"); //二维码操作目前只有开门
+//    public Map<String,Object> verifyQRCode(JSONObject jsonObject,Integer hardwareType){
+//        Map<String, Object> returnMap = new HashMap<>();
+//        returnMap.put("op","openDoor"); //二维码操作目前只有开门
 //        Long visitorId = null; //访客登记ID
 //        String hardwareId = null; //硬件ID
 //        if(BusinessConst.HARDWARE_TYPE_XU_FACE.equals(hardwareType)){  //炫优人脸识别一体机
@@ -243,10 +168,9 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //        VisitorEntity visitorEntity = visitorMapper.selectById(visitorId);
 //        //无访客记录
 //        if(visitorEntity == null){
-//            pushMap.put("code","-1");
-//            pushMap.put("msg","访客登记记录查找失败");
-//            pushMsg(pushMap);
-//            return;
+//            returnMap.put("code","-1");
+//            returnMap.put("msg","访客登记记录查找失败");
+//            return returnMap;
 //        }
 //        //小区不对
 //        Long communityId = visitorEntity.getCommunityId();
@@ -254,45 +178,47 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //        List<Long> hareWareCommunityId = communityHardWareMapper.queryCommunityIdByHardWareIdAndType(hardwareId, hardwareType);//测试用
 ////        if(!communityId.equals(hareWareCommunityId)){
 //        if(!hareWareCommunityId.contains(communityId)){ //测试用
-//            pushMap.put("code","-1");
-//            pushMap.put("msg","设备与小区不对应");
-//            pushMsg(pushMap);
-//            return;
+//            returnMap.put("code","-1");
+//            returnMap.put("msg","社区ID错误");
+//            return returnMap;
 //        }
 //        //来访过早
 //        if(LocalDate.now().isBefore(visitorEntity.getStartTime())){
-//            pushMap.put("code","-1");
-//            pushMap.put("msg","未到访问时间");
-//            pushMsg(pushMap);
-//            return;
+//            returnMap.put("code","-1");
+//            returnMap.put("msg","未到访问时间");
+//            return returnMap;
 //        }
 //        if(visitorEntity.getEndTime() == null){ //无结束时间
 //            if(LocalDate.now().isAfter(visitorEntity.getStartTime())){ //暂定二维码在访问开始时间内一天有效
-//                pushMap.put("code","-1");
-//                pushMap.put("msg","已超出访问时间");
-//                pushMsg(pushMap);
-//                return;
+//                returnMap.put("code","-1");
+//                returnMap.put("msg","已超出访问时间");
+//                return returnMap;
 //            }
 //        }else if(LocalDate.now().isAfter(visitorEntity.getEndTime())){ //有结束时间
-//            pushMap.put("code","-1");
-//            pushMap.put("msg","已超出访问时间");
-//            pushMsg(pushMap);
-//            return;
+//            returnMap.put("code","-1");
+//            returnMap.put("msg","已超出访问时间");
+//            return returnMap;
 //        }
-//        pushMap.put("code","0");
-//        pushMap.put("msg","二维码验证通过");
-//        pushMap.put("uid",visitorEntity.getUid());
-//        pushMap.put("name",visitorEntity.getName());
-//        pushMsg(pushMap);
-//        //插入访客记录(MQ)
+//        returnMap.put("code","0");
+//        returnMap.put("msg","二维码验证通过");
+//        returnMap.put("uid",visitorEntity.getUid());
+//        returnMap.put("name",visitorEntity.getName());
 //
+//        //MQ向物业端新增一条访客记录
+//        VisitorHistoryEntity historyEntity = new VisitorHistoryEntity();
+//        BeanUtils.copyProperties(visitorEntity,historyEntity);
+//        historyEntity.setId(SnowFlake.nextId());
+//        historyEntity.setVisitorId(visitorEntity.getId());
+//        historyEntity.setAccessType(BusinessConst.ACCESS_TYPE_QRCODE);
+//        pushVisitorRecord(historyEntity);
+//        return returnMap;
 //    }
-    
-    //推送返回结果
-//    private void pushMsg(Map map){
-//        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU,TopicExConfig.TOPIC_FACE_XU_SERVER,map);
+
+//    //推送访客记录
+//    private void pushVisitorRecord(VisitorHistoryEntity historyEntity){
+//        rabbitTemplate.convertAndSend(RabbitMQCommonConfig.EX_PROPERTY, RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD,historyEntity);
 //    }
-    
+
 //    /**
 //    * @Description: 设置门禁权限
 //     * @Param: [visitorEntity]
