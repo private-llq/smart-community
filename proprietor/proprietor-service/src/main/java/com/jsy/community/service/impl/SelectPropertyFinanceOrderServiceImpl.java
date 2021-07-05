@@ -37,7 +37,7 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
      * @return: void
      */
     @Override
-    public Map<String,List<PropertyFinanceOrderEntity>> list(String userId,Long communityId) {
+    public List<Map<String,Object>> list(String userId,Long communityId) {
 
         //查个人小区物业费账单(多房间)
         List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.selectByUserList(userId,communityId);
@@ -45,8 +45,8 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
             return null;
         }
 
-//        //最終返回封装数据
-//        List<Map<String,List<PropertyFinanceOrderEntity>>> returnList = new ArrayList<>();
+        //最終返回封装数据
+        List<Map<String,Object>> returnList = new ArrayList<>();
 
         //房间id集合
         Set<Long> ids = new HashSet<>();
@@ -54,19 +54,17 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
             ids.add(propertyFinanceOrderEntity.getHouseId());
         }
         //房间数据集合
-        Map<String,Map<String,Object>> aaa = houseMapper.getRoomMap(ids);
-        //最終返回封装数据
-        Map<String,List<PropertyFinanceOrderEntity>> houseMap = new HashMap<>();
-        LinkedList<Object> orderList;
+        Map<String,Map<String,Object>> roomMap = houseMapper.getRoomMap(ids);
+        
         for (PropertyFinanceOrderEntity entity : list) {
-            Map<String,Object> houseIdAndNameMap = aaa.get(BigInteger.valueOf(entity.getHouseId()));
-            if(houseMap.get(houseIdAndNameMap.get("roomName")) == null){
-                houseMap.put(String.valueOf(houseIdAndNameMap.get("roomName")),new ArrayList<>());
+            if(roomMap.get(BigInteger.valueOf(entity.getHouseId())).get("list") == null){
+                roomMap.get(BigInteger.valueOf(entity.getHouseId())).put("list",new ArrayList<>());
             }
-            houseMap.get(houseIdAndNameMap.get("roomName")).add(entity);
+            List dataList = (List) roomMap.get(BigInteger.valueOf(entity.getHouseId())).get("list");
+            dataList.add(entity);
         }
-
-        return houseMap;
+        returnList.addAll(roomMap.values());
+        return returnList;
 
 
 

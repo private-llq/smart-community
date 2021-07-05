@@ -19,6 +19,6 @@ public interface ISelectPropertyFinanceOrderService {
      * @Param: [userId]
      * @return: void
      */
-    Map<String, List<PropertyFinanceOrderEntity>> list(String userId, Long communityId);
+    List<Map<String,Object>> list(String userId, Long communityId);
 
 }
