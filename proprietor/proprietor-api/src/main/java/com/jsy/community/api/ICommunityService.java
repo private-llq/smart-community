@@ -60,4 +60,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Date: 2021/1/9
 	**/
 	CommunityEntity queryCommunityById(Long id);
+	
+	/**
+	 * @Description: 查询所有小区id
+	 * @Param: []
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/26
+	 **/
+	List<Long> queryAllCommunityIdList();
 }

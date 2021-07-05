@@ -19,23 +19,8 @@ public class TopicExConfig {
 	public final static String QUEUE_TO_COMMUNITY = "queue.2community"; //小区监听云端队列(根据社区id加后缀动态创建) 如小区id是1 创建出来就是queue.community.1 小区id是2 创建出来就是queue.community.2
 	
 	//监听topic名称
-	public final static String QUEUE_FROM_COMMUNITY = "queue.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区
-	
-	//访客相关-声明交换机
-	@Bean
-	TopicExchange topicExOfProperty() {
-		return new TopicExchange(RabbitMQCommonConfig.EX_PROPERTY);
-	}
-	//访客相关-声明队列
-	@Bean
-	public Queue queueOfPropertyVisitor() {
-		return new Queue(RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD,true);
-	}
-	//访客相关-队列绑定交换机
-	@Bean
-	Binding bindingOfVisitorRecord() {
-		return BindingBuilder.bind(queueOfPropertyVisitor()).to(topicExOfProperty()).with(RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD);
-	}
+	public final static String QUEUE_FROM_COMMUNITY = "queue.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区(摄像头相关)
+	public final static String QUEUE_VISITOR_HIS_FROM_COMMUNITY = "queue.visitor.his.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区(访客记录相关)
 	
 	//小区相关-声明交换机
 	@Bean

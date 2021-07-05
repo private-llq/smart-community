@@ -180,4 +180,16 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		return communityMapper.selectById(id);
 	}
 	
+	/**
+	 * @Description: 查询所有小区ID
+	 * @Param: []
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/26
+	 **/
+	@Override
+	public List<Long> queryAllCommunityIdList(){
+		return communityMapper.queryAllCommunityIdList();
+	}
+	
 }

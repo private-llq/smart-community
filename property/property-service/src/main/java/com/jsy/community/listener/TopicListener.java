@@ -3,9 +3,7 @@ package com.jsy.community.listener;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.IVisitorService;
-import com.jsy.community.config.RabbitMQCommonConfig;
 import com.jsy.community.config.TopicExConfig;
-import com.jsy.community.entity.VisitorHistoryEntity;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -30,18 +28,19 @@ public class TopicListener {
 	@Resource
 	private IFacilityService facilityService;
 
-	//监听来自APP的访客记录新增需求
-	@RabbitListener(queues = RabbitMQCommonConfig.TOPIC_PROPERTY_VISITOR_RECORD)
-	public void addVisitorRecord(VisitorHistoryEntity historyEntity, Message message, Channel channel) throws IOException {
-		log.info("监听到来自APP的访客记录新增topic消息: " + historyEntity.toString());
+	//监听来自小区的访客记录新增需求
+	@RabbitListener(queues = TopicExConfig.QUEUE_VISITOR_HIS_FROM_COMMUNITY)
+	public void addVisitorRecord(String msg, Message message, Channel channel) throws IOException {
+		log.info("监听到来自小区的访客记录新增topic消息: " + msg);
 		try {
-			boolean b = visitorService.addVisitorRecord(historyEntity);
-			if(!b){
-				log.error("新增访客记录失败：" + historyEntity);
-			}
+			JSONObject jsonObject = JSONObject.parseObject(msg);
+			log.info("解析成功：" + jsonObject);
+//			boolean b = visitorService.addVisitorRecord(historyEntity);
 		}catch (Exception e){
-			log.error("新增访客记录失败：" + historyEntity);
+			log.error("新增访客记录失败：" + msg);
 			e.printStackTrace();
+			//手动确认
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 		}
 		//手动确认
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);

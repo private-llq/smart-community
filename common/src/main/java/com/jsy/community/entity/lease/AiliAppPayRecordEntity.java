@@ -28,6 +28,10 @@ public class AiliAppPayRecordEntity extends BaseEntity {
 	@ApiModelProperty(value = "用户ID")
 	private String userid;
 	
+	@ApiModelProperty(value = "用户姓名")
+	@TableField(exist = false)
+	private String realName;
+	
 	@ApiModelProperty(value = "用户手机号")
 	private String phonenumber;
 	
