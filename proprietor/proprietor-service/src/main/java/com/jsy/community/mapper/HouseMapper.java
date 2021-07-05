@@ -2,7 +2,6 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.UserHouseEntity;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -46,5 +45,8 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	**/
 	@MapKey("id")
 	Map<String,Map<String,Object>> queryHouseByIdBatch(Collection<Long> list);
+
+	@MapKey("id")
+	Map<String,Map<String,Object>> getRoomMap(Collection ids);
 	
 }

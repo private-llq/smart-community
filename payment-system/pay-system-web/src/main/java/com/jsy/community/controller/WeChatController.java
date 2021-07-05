@@ -85,6 +85,11 @@ public class WeChatController {
             }
             map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
         }
+        if (weChatPayQO.getTradeFrom()==4){
+            if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
+                weChatPayQO.setDescriptionStr("物业缴费");
+            }
+        }
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);

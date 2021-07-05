@@ -94,4 +94,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Date: 2021/4/24 11:44
      **/
     Page<PropertyFinanceOrderEntity> queryPageByStatemenNum(BaseQO<StatementNumQO> baseQO);
+
+    /**
+     * @Description: 根据用户查询所有账单
+     * @author: Hu
+     * @since: 2021/7/5 11:19
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> selectByUserList(String userId,Long communityId);
 }

@@ -78,7 +78,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 orderVO.setId(propertyFinanceOrderEntity.getId());
                 orderVO.setOrderNum(propertyFinanceOrderEntity.getOrderNum());
                 orderVO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
-
                 objects.add(orderVO);
             }
             UserEntity userEntity = userService.queryUserDetailByUid(list.get(0).getUid());
@@ -539,6 +538,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             entity.setStatementEntity(statementEntityMap.get(entity.getStatementNum()) == null ? null : statementEntityMap.get(entity.getStatementNum()));
         }
         return orderEntities;
+    }
+
+
+    /**
+     * @Description: 根据用户查询所有账单
+     * @author: Hu
+     * @since: 2021/7/5 11:19
+     * @Param: [userId]
+     * @return: void
+     */
+    @Override
+    public List<PropertyFinanceOrderEntity> selectByUserList(String userId,Long communityId) {
+        return propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("uid", userId).eq("order_status", 0).eq("community_id",communityId));
     }
 
     /**
