@@ -32,7 +32,7 @@ public class AliAppPayCallbackController {
 	@Transactional(rollbackFor=Exception.class,timeout=3)
 	public String test(HttpServletRequest req){
 		Map<String, String> paramsMap = new HashMap<>();
-		Enumeration paramNames = req.getParameterNames();
+		Enumeration<String> paramNames = req.getParameterNames();
         while (paramNames.hasMoreElements())
         {
             String paramName = (String) paramNames.nextElement();

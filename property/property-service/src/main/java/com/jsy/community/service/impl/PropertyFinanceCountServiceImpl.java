@@ -1,17 +1,7 @@
 package com.jsy.community.service.impl;
-import com.google.common.collect.Lists;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IPropertyFinanceCountService;
-import com.jsy.community.api.IPropertyFinanceOrderService;
-import com.jsy.community.api.IPropertyFinanceReceiptService;
-import com.jsy.community.api.IPropertyFinanceStatementService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.property.PropertyFinanceCountEntity;
-import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
-import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
-import com.jsy.community.entity.property.TestEntity;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.mapper.PropertyFinanceReceiptMapper;
 import com.jsy.community.mapper.PropertyFinanceStatementMapper;
@@ -19,17 +9,12 @@ import com.jsy.community.utils.DateUtils;
 import com.jsy.community.vo.property.ContentVO;
 import com.jsy.community.vo.property.FinanceOrderEntityVO;
 import com.jsy.community.vo.property.StatisticsVO;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author chq459799974

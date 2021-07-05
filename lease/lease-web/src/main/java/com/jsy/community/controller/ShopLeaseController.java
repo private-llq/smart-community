@@ -249,7 +249,7 @@ public class ShopLeaseController {
 		if (monthMoney.doubleValue() > NORM_MONEY) {
 			String s = String.format("%.2f", monthMoney.doubleValue() / NORM_MONEY) + "万";
 			shop.setMonthMoneyString(s);
-		} else if (monthMoney.compareTo(new BigDecimal(MIN_MONEY)) == 0) {
+		} else if (monthMoney.compareTo(BigDecimal.valueOf(MIN_MONEY)) == 0) {
 			String s = "面议";
 			shop.setMonthMoneyString(s);
 		} else {
@@ -438,9 +438,7 @@ public class ShopLeaseController {
 		} finally {
 			try {
 				// 释放资源
-				if (httpClient != null) {
-					httpClient.close();
-				}
+				httpClient.close();
 				if (response != null) {
 					response.close();
 				}

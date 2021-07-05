@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.util.MapUtils;
 
@@ -203,12 +202,12 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
      *@Date: 2021/4/22 17:21
      **/
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.MANDATORY)
-    protected void batchInsertStatement(List<PropertyFinanceStatementEntity> statementEntities,
-                                        HashMap<String, List<Long>> statementOrderUpdateMap,
+    public void batchInsertStatement(List<PropertyFinanceStatementEntity> statementEntities,
+                                        Map<String, List<Long>> statementOrderUpdateMap,
                                         List<PropertyFinanceStatementRecordEntity> recordEntities
     ) {
         if (!CollectionUtils.isEmpty(statementEntities)) {
-            boolean b = this.saveBatch(statementEntities);
+            this.saveBatch(statementEntities);
         }
         if (!CollectionUtils.isEmpty(statementOrderUpdateMap)) {
             orderMapper.updateStatementStatusByIdS(statementOrderUpdateMap);
@@ -227,8 +226,8 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
      *@Date: 2021/4/22 17:45
      **/
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.MANDATORY)
-    protected void batchUpdateStatementStatus(ArrayList<Long> orderNumS,
-                                              HashSet<String> statementNumSet,
+    public void batchUpdateStatementStatus(List<Long> orderNumS,
+                                              Set<String> statementNumSet,
                                               List<PropertyFinanceStatementRecordEntity> recordEntities) {
         if (!CollectionUtils.isEmpty(orderNumS)) {
             orderMapper.updateRejectStatementStatusByIdS(orderNumS);
@@ -249,7 +248,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
      *@Date: 2021/4/22 15:18
      **/
     private String generateStatementId(Long communityId) {
-        StringBuffer statementId = new StringBuffer();
+        StringBuilder statementId = new StringBuilder();
         // 拼接社区主键后4位,如果不足4位用0在前面补齐
         String communityIdString = String.valueOf(communityId);
         if (communityIdString.length() < 4) {
@@ -268,7 +267,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         String substring = dateString.substring(dateString.length() - 10, dateString.length());
         statementId.append(substring);
         // 拼接2位随机数
-        String randomString = String.valueOf((int) (Math.random() * 99));
+        String randomString = String.valueOf(new Random().nextInt(100));
         if (randomString.length() == 1) {
             statementId.append("0").append(randomString);
         } else {
@@ -276,7 +275,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         }
         return statementId.toString();
     }
-    
+
     /**
     * @Description: 结算单号批量查 单号-结算单数据 映射
      * @Param: [nums]
@@ -449,8 +448,7 @@ public class IPropertyFinanceStatementServiceImpl extends ServiceImpl<PropertyFi
         }
         // 如果有账单号条件,先查相关的结算单号列表
         if (!StringUtils.isEmpty(query.getOrderNum())) {
-            List<String> statementNumS = new ArrayList<>();
-            statementNumS = orderMapper.queryStatementNumLikeOrderNum(query.getOrderNum());
+            List<String> statementNumS = orderMapper.queryStatementNumLikeOrderNum(query.getOrderNum());
             if (CollectionUtils.isEmpty(statementNumS)) {
                 statementNumS.add("0");
             }

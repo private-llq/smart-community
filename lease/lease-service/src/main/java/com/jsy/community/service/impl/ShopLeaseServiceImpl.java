@@ -804,7 +804,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			if (shopLeaseEntity.getMonthMoney().doubleValue() > NORM_MONEY) {
 				String s = String.format("%.2f", shopLeaseEntity.getMonthMoney().doubleValue() / NORM_MONEY) + "万";
 				indexShopVO.setMonthMoneyString(s);
-			} else if (shopLeaseEntity.getMonthMoney().compareTo(new BigDecimal(MIN_MONEY)) == 0) {
+			} else if (shopLeaseEntity.getMonthMoney().compareTo(BigDecimal.valueOf(MIN_MONEY)) == 0) {
 				String s = "面议";
 				indexShopVO.setMonthMoneyString(s);
 			} else {

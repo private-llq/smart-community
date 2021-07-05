@@ -84,23 +84,25 @@ public class UnionPayForeignController {
     public CommonResult bindBankCard(@RequestBody BindBankCardQO bindBankCardQO) {
         ValidatorUtils.validateEntity(bindBankCardQO);
         Integer oprtType = bindBankCardQO.getOprtType();
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getMobileNo())) {
-            throw new JSYException(400, "绑定银行卡时,手机号不能为空");
-        }
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getIdCard())) {
-            throw new JSYException(400, "绑定银行卡时,身份证不能为空");
-        }
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getBankAcctName())) {
-            throw new JSYException(400, "绑定银行卡时,银行账户户名不能为空,必须与用户姓名保持一致");
-        }
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getBankNo())) {
-            throw new JSYException(400, "绑定银行卡时,开户行号不能为空");
-        }
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getElecBankNo())) {
-            throw new JSYException(400, "绑定银行卡时,电子联行号不能为空");
-        }
-        if ((oprtType == 1 || oprtType == 2) && bindBankCardQO.getBankAcctType() == null) {
-            throw new JSYException(400, "绑定银行卡时,银行账户类型不能为空");
+        if (oprtType == 1 || oprtType == 2) {
+            if (StringUtils.isEmpty(bindBankCardQO.getMobileNo())) {
+                throw new JSYException(400, "绑定银行卡时,手机号不能为空");
+            }
+            if (StringUtils.isEmpty(bindBankCardQO.getBankAcctName())) {
+                throw new JSYException(400, "绑定银行卡时,身份证不能为空");
+            }
+            if (StringUtils.isEmpty(bindBankCardQO.getBankAcctName())) {
+                throw new JSYException(400, "绑定银行卡时,银行账户户名不能为空,必须与用户姓名保持一致");
+            }
+            if (StringUtils.isEmpty(bindBankCardQO.getBankNo())) {
+                throw new JSYException(400, "绑定银行卡时,开户行号不能为空");
+            }
+            if (StringUtils.isEmpty(bindBankCardQO.getElecBankNo())) {
+                throw new JSYException(400, "绑定银行卡时,电子联行号不能为空");
+            }
+            if (bindBankCardQO.getBankAcctType() == null) {
+                throw new JSYException(400, "绑定银行卡时,银行账户类型不能为空");
+            }
         }
         OpenApiResponseVO responseVO = unionPayService.bindBankCard(bindBankCardQO);
         return CommonResult.ok(responseVO);

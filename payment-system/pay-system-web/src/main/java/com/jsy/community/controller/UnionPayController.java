@@ -1,6 +1,6 @@
 package com.jsy.community.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.gnete.api.GneteSignatureAlgorithm;
 import com.gnete.api.internal.crypto.DefaultRsaSigner;
 import com.jsy.community.annotation.ApiJSYController;
@@ -102,23 +102,25 @@ public class UnionPayController {
     public CommonResult bindBankCard(@RequestBody BindBankCardQO bindBankCardQO) {
         ValidatorUtils.validateEntity(bindBankCardQO);
         Integer oprtType = bindBankCardQO.getOprtType();
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getMobileNo())) {
-            throw new JSYException(400, "绑定银行卡时,手机号不能为空");
-        }
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getIdCard())) {
-            throw new JSYException(400, "绑定银行卡时,身份证不能为空");
-        }
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getBankAcctName())) {
-            throw new JSYException(400, "绑定银行卡时,银行账户户名不能为空,必须与用户姓名保持一致");
-        }
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getBankNo())) {
-            throw new JSYException(400, "绑定银行卡时,开户行号不能为空");
-        }
-        if ((oprtType == 1 || oprtType == 2) && StringUtils.isEmpty(bindBankCardQO.getElecBankNo())) {
-            throw new JSYException(400, "绑定银行卡时,电子联行号不能为空");
-        }
-        if ((oprtType == 1 || oprtType == 2) && bindBankCardQO.getBankAcctType() == null) {
-            throw new JSYException(400, "绑定银行卡时,银行账户类型不能为空");
+        if (oprtType == 1 || oprtType == 2) {
+            if (StringUtils.isEmpty(bindBankCardQO.getMobileNo())) {
+                throw new JSYException(400, "绑定银行卡时,手机号不能为空");
+            }
+            if (StringUtils.isEmpty(bindBankCardQO.getBankAcctName())) {
+                throw new JSYException(400, "绑定银行卡时,身份证不能为空");
+            }
+            if (StringUtils.isEmpty(bindBankCardQO.getBankAcctName())) {
+                throw new JSYException(400, "绑定银行卡时,银行账户户名不能为空,必须与用户姓名保持一致");
+            }
+            if (StringUtils.isEmpty(bindBankCardQO.getBankNo())) {
+                throw new JSYException(400, "绑定银行卡时,开户行号不能为空");
+            }
+            if (StringUtils.isEmpty(bindBankCardQO.getElecBankNo())) {
+                throw new JSYException(400, "绑定银行卡时,电子联行号不能为空");
+            }
+            if (bindBankCardQO.getBankAcctType() == null) {
+                throw new JSYException(400, "绑定银行卡时,银行账户类型不能为空");
+            }
         }
         Boolean result = unionPayWalletService.bindBankCard(bindBankCardQO);
         return result ? CommonResult.ok("银行卡操作成功!") : CommonResult.error("银行卡操作失败!");
@@ -232,7 +234,7 @@ public class UnionPayController {
     @ApiOperation("银联消费支付回调接口")
     public void unionPayNotifyUrl(HttpServletRequest request) {
         // 获取回调参数
-        StringBuffer data = new StringBuffer();
+        StringBuilder data = new StringBuilder();
         String line = null;
         BufferedReader reader = null;
         try {
@@ -252,7 +254,7 @@ public class UnionPayController {
             }
         }
         // 转换为回调接参对象
-        ConsumeApplyOrderNotifyQO notifyQO = JSONObject.parseObject(String.valueOf(data), ConsumeApplyOrderNotifyQO.class);
+        ConsumeApplyOrderNotifyQO notifyQO = JSON.parseObject(String.valueOf(data), ConsumeApplyOrderNotifyQO.class);
         // 验签
         DefaultRsaSigner defaultRsaSigner = new DefaultRsaSigner(UnionPayConfig.PRIVATE_KEY, UnionPayConfig.VERIFY_PUBLIC_KEY, GneteSignatureAlgorithm.getAlgorithm("1"));
         ConsumeApplyOrderNotifyQO tempNotufyQO = new ConsumeApplyOrderNotifyQO();
@@ -261,7 +263,7 @@ public class UnionPayController {
         tempNotufyQO.setSign(null);
         tempNotufyQO.setSignAlg(null);
         // 转json字符串时会按字典序排序
-        String notifyString = JSONObject.toJSONString(tempNotufyQO);
+        String notifyString = JSON.toJSONString(tempNotufyQO);
         // 得到验签结果,为true时表示验签通过
         boolean verify = defaultRsaSigner.verify(notifyString, notifyQO.getSign(), "UTF-8");
         if (verify) {
@@ -325,7 +327,7 @@ public class UnionPayController {
     @ApiOperation("凭据异步回调接口")
     public void credentialNotifyUrl(HttpServletRequest request) {
         // 获取回调参数
-        StringBuffer data = new StringBuffer();
+        StringBuilder data = new StringBuilder();
         String line = null;
         BufferedReader reader = null;
         try {
@@ -345,9 +347,9 @@ public class UnionPayController {
             }
         }
         log.info("银联B端开户回调信息:{}", data);
-        UnionPayBaseQO baseQO = JSONObject.parseObject(String.valueOf(data), UnionPayBaseQO.class);
+        UnionPayBaseQO baseQO = JSON.parseObject(String.valueOf(data), UnionPayBaseQO.class);
         if (baseQO != null && baseQO.getMsgBody() != null) {
-            CredentialNotifyQO notifyQO = JSONObject.parseObject(baseQO.getMsgBody(), CredentialNotifyQO.class);
+            CredentialNotifyQO notifyQO = JSON.parseObject(baseQO.getMsgBody(), CredentialNotifyQO.class);
             notifyQO.setMsgType(baseQO.getMsgType());
             bApplyRecordService.updateBApplyRecord(notifyQO);
         }

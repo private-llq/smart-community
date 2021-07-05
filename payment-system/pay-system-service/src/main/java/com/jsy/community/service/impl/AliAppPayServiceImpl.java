@@ -105,8 +105,8 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 		} catch (AlipayApiException e) {
 			e.printStackTrace();
 		}
-		System.out.println(response.getBody());
-		if(response.isSuccess()){
+		if(response != null && response.isSuccess()){
+			System.out.println(response.getBody());
 			System.out.println("调用成功");
 		} else {
 			System.out.println("调用失败");

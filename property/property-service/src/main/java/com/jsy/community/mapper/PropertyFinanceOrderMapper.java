@@ -64,7 +64,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Return: java.lang.Integer
      *@Date: 2021/4/23 10:41
      **/
-    Integer updateStatementStatusByIdS(@Param("map")HashMap<String, List<Long>> statementOrderUpdateMap);
+    Integer updateStatementStatusByIdS(@Param("map")Map<String, List<Long>> statementOrderUpdateMap);
 
     /**
     * @Description: 根据收款单号批量查询列表

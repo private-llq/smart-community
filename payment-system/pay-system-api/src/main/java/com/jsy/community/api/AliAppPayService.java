@@ -1,7 +1,5 @@
 package com.jsy.community.api;
 
-import com.alipay.api.AlipayApiException;
-import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.qo.lease.AliAppPayQO;
 
 /**
