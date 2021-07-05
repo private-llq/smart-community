@@ -542,6 +542,36 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
 
     /**
+     * @Description: 修改已经支付了的物业账单状态
+     * @author: Hu
+     * @since: 2021/7/5 17:33
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void UpdateOrderStatus(Map<String, String> map, String[] ids) {
+        //根据传来的id集合查询账单
+        List<PropertyFinanceOrderEntity> list=propertyFinanceOrderMapper.selectByIdsList(ids);
+        for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
+            propertyFinanceOrderEntity.setPayType(1);
+            propertyFinanceOrderEntity.setTripartiteOrder(map.get("out_trade_no"));
+            propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
+        }
+    }
+
+    @Override
+    /**
+     * @Description: 查询物业账单总金额
+     * @author: Hu
+     * @since: 2021/7/5 16:12
+     * @Param: [orderIds]
+     * @return: java.math.BigDecimal
+     */
+    public BigDecimal getTotalMoney(Long[] orderIds) {
+        return propertyFinanceOrderMapper.getTotalMoney(orderIds);
+    }
+
+    /**
      * @Description: 根据用户查询所有账单
      * @author: Hu
      * @since: 2021/7/5 11:19

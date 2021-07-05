@@ -9,6 +9,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -103,4 +104,22 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     List<PropertyFinanceOrderEntity> selectByUserList(String userId,Long communityId);
+
+    /**
+     * @Description: 查询应缴总金额
+     * @author: Hu
+     * @since: 2021/7/5 16:11
+     * @Param:
+     * @return:
+     */
+    BigDecimal getTotalMoney(Long[] orderIds);
+
+    /**
+     * @Description: 修改物业账单状态
+     * @author: Hu
+     * @since: 2021/7/5 17:24
+     * @Param:
+     * @return:
+     */
+    void UpdateOrderStatus(Map<String, String> map, String[] ss);
 }
