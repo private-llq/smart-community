@@ -554,7 +554,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @return: java.lang.Object
      */
     @Override
-    public PropertyFinanceOrderEntity findOne(String userId, Long orderId) {
+    public PropertyFinanceOrderEntity findOne(Long orderId) {
         return propertyFinanceOrderMapper.selectById(orderId);
     }
 

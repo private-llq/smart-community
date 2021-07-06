@@ -130,5 +130,5 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    PropertyFinanceOrderEntity findOne(String userId, Long orderId);
+    PropertyFinanceOrderEntity findOne(Long orderId);
 }

@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.api.ISelectPropertyFinanceOrderService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.HouseMapper;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -31,8 +32,13 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
 
 
     @Override
-    public PropertyFinanceOrderEntity findOne(String userId, Long orderId) {
-        return propertyFinanceOrderService.findOne(userId,orderId);
+    public HashMap<String, Object> findOne(Long orderId) {
+        PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderService.findOne(orderId);
+        HouseEntity entity = houseMapper.selectById(propertyFinanceOrderEntity.getHouseId());
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("roomName",entity.getBuilding()+entity.getUnit()+entity.getFloor()+entity.getDoor());
+        map.put("entity",propertyFinanceOrderEntity);
+        return map;
     }
 
     /**
