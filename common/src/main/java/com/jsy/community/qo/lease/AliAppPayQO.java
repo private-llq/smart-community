@@ -2,6 +2,7 @@ package com.jsy.community.qo.lease;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -23,7 +24,7 @@ public class AliAppPayQO implements Serializable {
 	private String subject;
 	
 	@ApiModelProperty(value = "交易金额(RMB)")
-	@NotNull(groups = addOrderGroup.class, message = "缺少交易金额")
+//	@NotNull(groups = addOrderGroup.class, message = "缺少交易金额")
 	private BigDecimal totalAmount;
 	
 	@ApiModelProperty(value = "支付类型 1.APP 2.H5")
@@ -31,6 +32,7 @@ public class AliAppPayQO implements Serializable {
 	
 	@ApiModelProperty(value = "交易来源 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包7.红包退回")
 	@NotNull(groups = addOrderGroup.class, message = "缺少交易来源")
+	@Range(min = 1, max = 7, message = "缴费类型错误")
 	private Integer tradeFrom;
 	
 	@ApiModelProperty(value = "订单详情")
@@ -38,6 +40,9 @@ public class AliAppPayQO implements Serializable {
 	
 	@ApiModelProperty(value = "其他服务订单号 如 商城")
 	private String serviceOrderNo;
+	
+	@ApiModelProperty(value = "物业缴费账单数据id，逗号分隔")
+	private String ids;
 	
 	/**
 	 * 添加订单验证组

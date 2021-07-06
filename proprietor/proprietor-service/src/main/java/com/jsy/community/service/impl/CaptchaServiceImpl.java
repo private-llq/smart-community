@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.jsy.community.api.ICaptchaService;
 import com.jsy.community.api.IUserAuthService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.utils.SmsUtil;
@@ -56,7 +57,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
 		}
 		
 		//发短信
-		String code = SmsUtil.sendVcode(mobile);
+		String code = SmsUtil.sendVcode(mobile, BusinessConst.SMS_VCODE_LENGTH_DEFAULT);
 		//5分钟有效期
 		redisTemplate.opsForValue().set("vCode:" + mobile, code, mobileExpiredTime, TimeUnit.MINUTES);
 		

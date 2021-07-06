@@ -180,4 +180,21 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @return:
      */
     void saveList(@Param("list")List<PropertyFinanceOrderEntity> list);
+
+    /**
+     * @Description: 查询物业费金额
+     * @author: Hu
+     * @since: 2021/7/5 16:17
+     * @Param:
+     * @return:
+     */
+    BigDecimal getTotalMoney(String[] orderIds);
+    /**
+     * @Description: 根据传来的id集合查询账单
+     * @author: Hu
+     * @since: 2021/7/5 17:27
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> selectByIdsList(String[] ids);
 }

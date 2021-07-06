@@ -217,4 +217,19 @@
             (#{item.id},#{item.orderNum},#{item.orderTime},#{item.uid},#{item.houseId},#{item.communityId},#{item.propertyFee},#{item.totalMoney},now())
         </foreach>
     </insert>
+    <select id="getTotalMoney" resultType="java.math.BigDecimal">
+        select sum(total_money) from  t_property_finance_order where
+        id in (
+        <foreach collection="orderIds" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+    <select id="selectByIdsList" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
+        select * from   t_property_finance_order where id in(
+        <foreach collection="ids" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
 </mapper>

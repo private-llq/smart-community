@@ -11,6 +11,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
+import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.StatementNumQO;
@@ -49,6 +50,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserService userService;
 
+    @Autowired
+    private PropertyFeeRuleMapper propertyFeeRuleMapper;
+
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceReceiptService propertyFinanceReceiptService;
     
@@ -78,7 +82,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 orderVO.setId(propertyFinanceOrderEntity.getId());
                 orderVO.setOrderNum(propertyFinanceOrderEntity.getOrderNum());
                 orderVO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
-
                 objects.add(orderVO);
             }
             UserEntity userEntity = userService.queryUserDetailByUid(list.get(0).getUid());
@@ -539,6 +542,69 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             entity.setStatementEntity(statementEntityMap.get(entity.getStatementNum()) == null ? null : statementEntityMap.get(entity.getStatementNum()));
         }
         return orderEntities;
+    }
+
+
+
+    /**
+     * @Description: 查询一条物业账单详情
+     * @author: Hu
+     * @since: 2021/7/6 11:14
+     * @Param: [userId, orderId]
+     * @return: java.lang.Object
+     */
+    @Override
+    public PropertyFinanceOrderEntity findOne(Long orderId) {
+        return propertyFinanceOrderMapper.selectById(orderId);
+    }
+
+    /**
+     * @Description: 修改已经支付了的物业账单状态
+     * @author: Hu
+     * @since: 2021/7/5 17:33
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void UpdateOrderStatus(Map<String, String> map, String[] ids) {
+        //根据传来的id集合查询账单
+        List<PropertyFinanceOrderEntity> list=propertyFinanceOrderMapper.selectByIdsList(ids);
+        for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
+            propertyFinanceOrderEntity.setPayType(1);
+            propertyFinanceOrderEntity.setTripartiteOrder(map.get("out_trade_no"));
+            propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
+        }
+    }
+
+    @Override
+    /**
+     * @Description: 查询物业账单总金额
+     * @author: Hu
+     * @since: 2021/7/5 16:12
+     * @Param: [orderIds]
+     * @return: java.math.BigDecimal
+     */
+    public BigDecimal getTotalMoney(String ids) {
+        return propertyFinanceOrderMapper.getTotalMoney(ids.split(","));
+    }
+
+    /**
+     * @Description: 根据用户查询所有账单
+     * @author: Hu
+     * @since: 2021/7/5 11:19
+     * @Param: [userId]
+     * @return: void
+     */
+    @Override
+    public List<PropertyFinanceOrderEntity> selectByUserList(PropertyFinanceOrderEntity qo) {
+        QueryWrapper queryWrapper = new QueryWrapper<PropertyFinanceOrderEntity>()
+            .select("id,total_money,order_time,house_id")
+            .eq("uid", qo.getUid())
+            .eq("community_id",qo.getCommunityId());
+        if(qo.getOrderStatus() != null && (qo.getOrderStatus() == 0 || qo.getOrderStatus() == 1)){
+            queryWrapper.eq("order_status",qo.getOrderStatus());
+        }
+        return propertyFinanceOrderMapper.selectList(queryWrapper);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.api.IShoppingMallService;
 import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
@@ -39,11 +40,9 @@ import org.xmlpull.v1.XmlPullParserException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @program: pay
@@ -60,6 +59,11 @@ public class WeChatController {
     private IWeChatService weChatService;
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private IShoppingMallService shoppingMallService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFinanceOrderService propertyFinanceOrderService;
+
+
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -74,17 +78,10 @@ public class WeChatController {
      */
     @Login
     @PostMapping("/wxPay")
-    public CommonResult<JSONObject> wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+    public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //如果商城调用就先验证
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
-        if (weChatPayQO.getTradeFrom()==2){
-            Map<String, Object> objectMap = shoppingMallService.validateShopOrder(weChatPayQO.getOrderData(), UserUtils.getUserToken());
-            if(0 != (int)objectMap.get("code")){
-                throw new JSYException((int)objectMap.get("code"),String.valueOf(objectMap.get("msg")));
-            }
-            map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
-        }
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
@@ -95,6 +92,25 @@ public class WeChatController {
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback");
         map.put("amount",hashMap);
+        //商城业务逻辑
+        if (weChatPayQO.getTradeFrom()==2){
+            Map<String, Object> objectMap = shoppingMallService.validateShopOrder(weChatPayQO.getOrderData(), UserUtils.getUserToken());
+            if(0 != (int)objectMap.get("code")){
+                throw new JSYException((int)objectMap.get("code"),String.valueOf(objectMap.get("msg")));
+            }
+            map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
+        }
+        //物业费业务逻辑
+        if (weChatPayQO.getTradeFrom()==4){
+            if ("".equals(weChatPayQO.getIds())||weChatPayQO.getIds()==null){
+                return CommonResult.error("物业缴费账单id不能为空！");
+            }
+            if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
+                map.put("description", "物业缴费");
+            }
+            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
+            map.put("attach",4+","+weChatPayQO.getIds());
+        }
         //转json
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
 
@@ -128,6 +144,7 @@ public class WeChatController {
         object.put("orderNum",map.get("out_trade_no"));
         return CommonResult.ok(object);
     }
+
     /**
      * @Description: 支付成功回调地址
      * @author: Hu
@@ -148,10 +165,14 @@ public class WeChatController {
             if (split[0]==2+""){
                 shoppingMallService.completeShopOrder(split[1]);
             }
+            if (split[0]==4+""){
+                String[] ids = new String[split.length-1];
+                System.arraycopy(split, 1, ids, 0, ids.length);
+                propertyFinanceOrderService.UpdateOrderStatus(map,ids);
+            }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
     }
-
 
     /**
      * @Description: 提现
