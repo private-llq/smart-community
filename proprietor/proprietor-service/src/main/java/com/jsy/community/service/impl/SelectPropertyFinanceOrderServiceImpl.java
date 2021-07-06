@@ -38,10 +38,10 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
      * @return: void
      */
     @Override
-    public List<Map<String,Object>> list(String userId,Long communityId) {
+    public List<Map<String,Object>> list(PropertyFinanceOrderEntity qo) {
 
         //查个人小区物业费账单(多房间)
-        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.selectByUserList(userId,communityId);
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.selectByUserList(qo);
         if(CollectionUtils.isEmpty(list)){
             return null;
         }

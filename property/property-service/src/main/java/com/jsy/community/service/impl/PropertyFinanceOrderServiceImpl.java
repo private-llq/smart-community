@@ -579,8 +579,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @return: void
      */
     @Override
-    public List<PropertyFinanceOrderEntity> selectByUserList(String userId,Long communityId) {
-        return propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().select("*").eq("uid", userId).eq("order_status", 0).eq("community_id",communityId));
+    public List<PropertyFinanceOrderEntity> selectByUserList(PropertyFinanceOrderEntity qo) {
+        QueryWrapper queryWrapper = new QueryWrapper<PropertyFinanceOrderEntity>()
+            .select("*")
+            .eq("uid", qo.getUid())
+            .eq("community_id",qo.getCommunityId());
+        if(qo.getOrderStatus() != null && (qo.getOrderStatus() == 0 || qo.getOrderStatus() == 1)){
+            queryWrapper.eq("order_status",qo.getOrderStatus());
+        }
+        return propertyFinanceOrderMapper.selectList(queryWrapper);
     }
 
     /**

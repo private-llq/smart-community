@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ISelectPropertyFinanceOrderService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -26,15 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
 @ApiJSYController
 @Login
 public class SelectPropertyFinanceOrderController {
+    
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ISelectPropertyFinanceOrderService selectPropertyFinanceOrderService;
 
-
     @ApiOperation("查询物业账单")
     @GetMapping("/list")
-    public CommonResult getFinanceOrder(@RequestParam Long communityId){
-        String userId = UserUtils.getUserId();
-        return CommonResult.ok(selectPropertyFinanceOrderService.list(userId,communityId),"查询成功");
+    public CommonResult getFinanceOrder(@RequestParam Long communityId,Integer orderStatus){
+        PropertyFinanceOrderEntity qo = new PropertyFinanceOrderEntity();
+        qo.setUid(UserUtils.getUserId());
+        qo.setCommunityId(communityId);
+        qo.setOrderStatus(orderStatus);
+        return CommonResult.ok(selectPropertyFinanceOrderService.list(qo),"查询成功");
     }
 
 

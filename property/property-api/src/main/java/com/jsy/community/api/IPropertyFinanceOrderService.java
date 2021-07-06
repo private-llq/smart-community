@@ -103,7 +103,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    List<PropertyFinanceOrderEntity> selectByUserList(String userId,Long communityId);
+    List<PropertyFinanceOrderEntity> selectByUserList(PropertyFinanceOrderEntity qo);
 
     /**
      * @Description: 查询应缴总金额
