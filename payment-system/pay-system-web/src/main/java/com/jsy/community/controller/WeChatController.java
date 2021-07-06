@@ -101,15 +101,14 @@ public class WeChatController {
             map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
         }
         //物业费业务逻辑
-        if ("".equals(weChatPayQO.getIds())||weChatPayQO.getIds()==null){
-            return CommonResult.error("物业缴费账单id不能为空！");
-        }
         if (weChatPayQO.getTradeFrom()==4){
+            if ("".equals(weChatPayQO.getIds())||weChatPayQO.getIds()==null){
+                return CommonResult.error("物业缴费账单id不能为空！");
+            }
             if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
                 map.put("description", "物业缴费");
             }
             hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
-
             map.put("attach",4+","+weChatPayQO.getIds());
         }
         //转json
