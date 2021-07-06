@@ -21,6 +21,7 @@ import com.jsy.community.exception.JSYException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
 * @Description: 阿里云短信服务
@@ -74,7 +75,7 @@ public class SmsUtil {
     }
     
     /**
-     * 发送验证码
+     * 发送验证码-通用模板
      */
     public static String sendVcode(String mobile,Integer length){
         if(length == null){
@@ -85,6 +86,21 @@ public class SmsUtil {
         Map<String,String> map = new HashMap<>();
         map.put("code",code);
         sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.VCODE,JSON.toJSONString(map));
+        return code;
+    }
+    
+    /**
+     * 发送验证码-签章忘记密码
+     */
+    public static String forgetPasswordOfSign(String mobile,Integer length){
+        if(length == null){
+            //默认给四位数验证码
+            length = BusinessConst.SMS_VCODE_LENGTH_DEFAULT;
+        }
+        String code = MyMathUtils.randomCode(length);
+        Map<String,String> map = new HashMap<>();
+        map.put("code",code);
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.VCODE_SIGN_FORGET_PASSWORD,JSON.toJSONString(map));
         return code;
     }
     
