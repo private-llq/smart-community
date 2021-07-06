@@ -8,6 +8,9 @@ package com.jsy.community.constant;
  **/
 public interface BusinessConst {
     
+    //============================ 短信验证码默认长度 =============================
+    Integer SMS_VCODE_LENGTH_DEFAULT = 4;
+    
     //============================ 系统常量 =============================
     /**
      * 系统类型-安卓

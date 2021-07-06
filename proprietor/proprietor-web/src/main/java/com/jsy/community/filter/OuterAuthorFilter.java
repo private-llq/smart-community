@@ -32,15 +32,13 @@ import org.springframework.stereotype.Component;
  **/
 @Slf4j
 @Component
-//@WebFilter(urlPatterns = {"/api/v1/proprietor/out/pension/*"}, filterName = "pensionAuthorFilter")
-//TODO 所有请求都会进来 urlPatterns失效问题待解决
-@WebFilter(urlPatterns = {"/*"}, filterName = "outerAuthorFilter")
+@WebFilter(urlPatterns = {"/api/v1/proprietor/out/*"}, filterName = "outerAuthorFilter")
 public class OuterAuthorFilter implements Filter{
 	
 	//要校验IP的接口路径前缀
 	private static final Set<String> NEED_IP_AUTH_PREFIX_PATHS = Collections.unmodifiableSet(new HashSet<>(
-//			Arrays.asList("/api/v1/proprietor/out")));
-			Arrays.asList("/xxx")));
+			Arrays.asList("/api/v1/proprietor/out")));
+//			Arrays.asList("/xxx")));
 	
 	//允许IP前缀
 	private static final Set<String> ALLOWED_PREFIX_IP = Collections.unmodifiableSet(new HashSet<>(
@@ -48,7 +46,7 @@ public class OuterAuthorFilter implements Filter{
 	
 	//允许固定IP
 	private static final Set<String> ALLOWED_IP = Collections.unmodifiableSet(new HashSet<>(
-		Arrays.asList("222.178.212.29")));
+		Arrays.asList("222.178.212.29","222.178.212.28")));
 	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -81,13 +79,13 @@ public class OuterAuthorFilter implements Filter{
 					}
 				}
 			}
-//			if(!flag){
-//				log.error("接口" + path + "有非法访问尝试，来自IP：" + ip);
-//				response.setCharacterEncoding("UTF-8");
-//				PrintWriter out = response.getWriter();
-//				out.println(JSONObject.parseObject(JSON.toJSONString(CommonResult.error(JSYError.NOT_FOUND.getCode(), "别试了别试了，功能已经下线了"))));
-//				return;
-//			}
+			if(!flag){
+				log.error("接口" + path + "有非法访问尝试，来自IP：" + ip);
+				response.setCharacterEncoding("UTF-8");
+				PrintWriter out = response.getWriter();
+				out.println(JSONObject.parseObject(JSON.toJSONString(CommonResult.error(JSYError.NOT_FOUND.getCode(), "功能已关闭"))));
+				return;
+			}
 		}
 		chain.doFilter(request, response);
 	}
