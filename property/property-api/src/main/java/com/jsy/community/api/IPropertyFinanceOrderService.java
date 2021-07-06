@@ -122,4 +122,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     void UpdateOrderStatus(Map<String, String> map, String[] ss);
+
+    /**
+     * @Description: 查询一条物业账单详情
+     * @author: Hu
+     * @since: 2021/7/6 11:14
+     * @Param:
+     * @return:
+     */
+    PropertyFinanceOrderEntity findOne(String userId, Long orderId);
 }

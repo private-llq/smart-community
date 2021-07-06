@@ -21,4 +21,12 @@ public interface ISelectPropertyFinanceOrderService {
      */
     List<Map<String,Object>> list(PropertyFinanceOrderEntity qo);
 
+    /**
+     * @Description: 查询一条物业账单详情
+     * @author: Hu
+     * @since: 2021/7/6 11:13
+     * @Param:
+     * @return:
+     */
+    PropertyFinanceOrderEntity findOne(String userId, Long orderId);
 }

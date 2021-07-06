@@ -11,6 +11,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
+import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.StatementNumQO;
@@ -48,6 +49,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserService userService;
+
+    @Autowired
+    private PropertyFeeRuleMapper propertyFeeRuleMapper;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceReceiptService propertyFinanceReceiptService;
@@ -540,6 +544,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         return orderEntities;
     }
 
+
+
+    /**
+     * @Description: 查询一条物业账单详情
+     * @author: Hu
+     * @since: 2021/7/6 11:14
+     * @Param: [userId, orderId]
+     * @return: java.lang.Object
+     */
+    @Override
+    public PropertyFinanceOrderEntity findOne(String userId, Long orderId) {
+        return propertyFinanceOrderMapper.selectById(orderId);
+    }
 
     /**
      * @Description: 修改已经支付了的物业账单状态

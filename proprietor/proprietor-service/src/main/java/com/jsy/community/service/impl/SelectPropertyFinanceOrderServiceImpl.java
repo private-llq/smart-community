@@ -30,6 +30,11 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
     private HouseMapper houseMapper;
 
 
+    @Override
+    public PropertyFinanceOrderEntity findOne(String userId, Long orderId) {
+        return propertyFinanceOrderService.findOne(userId,orderId);
+    }
+
     /**
      * @Description: 查询物业账单
      * @author: Hu

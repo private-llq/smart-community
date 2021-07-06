@@ -40,6 +40,11 @@ public class SelectPropertyFinanceOrderController {
         qo.setOrderStatus(orderStatus);
         return CommonResult.ok(selectPropertyFinanceOrderService.list(qo),"查询成功");
     }
-
+    @ApiOperation("查询物业账单（详情）")
+    @GetMapping("/findOne")
+    public CommonResult findOne(@RequestParam("orderId") Long orderId){
+        String userId = UserUtils.getUserId();
+        return CommonResult.ok(selectPropertyFinanceOrderService.findOne(userId,orderId),"查询成功");
+    }
 
 }
