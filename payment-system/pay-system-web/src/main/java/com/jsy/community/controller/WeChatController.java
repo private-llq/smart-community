@@ -78,7 +78,7 @@ public class WeChatController {
      */
     @Login
     @PostMapping("/wxPay")
-    public CommonResult<JSONObject> wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+    public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         //如果商城调用就先验证
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
@@ -101,6 +101,9 @@ public class WeChatController {
             map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
         }
         //物业费业务逻辑
+        if ("".equals(weChatPayQO.getIds())||weChatPayQO.getIds()==null){
+            return CommonResult.error("物业缴费账单id不能为空！");
+        }
         if (weChatPayQO.getTradeFrom()==4){
             if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
                 map.put("description", "物业缴费");
