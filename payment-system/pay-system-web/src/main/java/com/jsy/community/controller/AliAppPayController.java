@@ -59,12 +59,7 @@ public class AliAppPayController {
 //			baseVO.setMsg("请传入正确的系统类型");
 //			return baseVO;
 //		}
-		//TODO 系统类型暂时写死
-		sysType = "1";
-		aliAppPayQO.setTotalAmount(aliAppPayQO.getTotalAmount().abs()); //支付金额
-		String orderNo = OrderNoUtil.getOrder();
-		aliAppPayQO.setOutTradeNo(OrderNoUtil.getOrder()); //本地订单号
-		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.tradeFromMap.get(aliAppPayQO.getTradeFrom())); //交易类型名称
+		
 		//缴物业费
 		if(PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(aliAppPayQO.getTradeFrom())){
 			//根据本次缴费月份和房间id 查出应缴金额
@@ -74,9 +69,11 @@ public class AliAppPayController {
 			BigDecimal propertyFee = propertyFinanceOrderService.getTotalMoney(aliAppPayQO.getIds());
 			log.info("支付宝 - 查询到物业费缴费金额：" + propertyFee);
 			aliAppPayQO.setTotalAmount(propertyFee.abs());
-		}
-		if(aliAppPayQO.getTotalAmount() == null){
-			throw new JSYException("缺少交易金额");
+		}else{
+			if(aliAppPayQO.getTotalAmount() == null){
+				throw new JSYException("缺少交易金额");
+			}
+			aliAppPayQO.setTotalAmount(aliAppPayQO.getTotalAmount().abs()); //支付金额
 		}
 		//商城订单支付，调用商城接口，校验订单
 		if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.getIndex().equals(aliAppPayQO.getTradeFrom())){
@@ -86,7 +83,12 @@ public class AliAppPayController {
 			}
 			aliAppPayQO.setServiceOrderNo(String.valueOf(aliAppPayQO.getOrderData().get("uuid")));
 		}
-
+		
+		//TODO 系统类型暂时写死
+		sysType = "1";
+		String orderNo = OrderNoUtil.getOrder();
+		aliAppPayQO.setOutTradeNo(OrderNoUtil.getOrder()); //本地订单号
+		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.tradeFromMap.get(aliAppPayQO.getTradeFrom())); //交易类型名称
 		//TODO 测试金额 0.01
 //		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
 		
