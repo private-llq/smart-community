@@ -598,7 +598,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     @Override
     public List<PropertyFinanceOrderEntity> selectByUserList(PropertyFinanceOrderEntity qo) {
         QueryWrapper queryWrapper = new QueryWrapper<PropertyFinanceOrderEntity>()
-            .select("*")
+            .select("id,total_money,order_time,house_id")
             .eq("uid", qo.getUid())
             .eq("community_id",qo.getCommunityId());
         if(qo.getOrderStatus() != null && (qo.getOrderStatus() == 0 || qo.getOrderStatus() == 1)){
