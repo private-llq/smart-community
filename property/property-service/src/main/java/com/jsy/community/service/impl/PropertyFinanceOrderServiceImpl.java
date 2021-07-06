@@ -584,8 +584,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @Param: [orderIds]
      * @return: java.math.BigDecimal
      */
-    public BigDecimal getTotalMoney(Long[] orderIds) {
-        return propertyFinanceOrderMapper.getTotalMoney(orderIds);
+    public BigDecimal getTotalMoney(String ids) {
+        return propertyFinanceOrderMapper.getTotalMoney(ids.split(","));
     }
 
     /**

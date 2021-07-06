@@ -24,7 +24,7 @@ public class WeChatPayQO {
     private Map<String,Object> orderData;
 
     @ApiModelProperty("订单id集合")
-    private Long[] orderIds;
+    private String ids;
 
 
 }

@@ -105,9 +105,9 @@ public class WeChatController {
             if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
                 map.put("description", "物业缴费");
             }
-            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getOrderIds()).multiply(new BigDecimal(100)));
-            String string = Arrays.toString(weChatPayQO.getOrderIds());
-            map.put("attach",4+","+string.substring(1, string.length() - 1));
+            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
+
+            map.put("attach",4+","+weChatPayQO.getIds());
         }
         //转json
         String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);

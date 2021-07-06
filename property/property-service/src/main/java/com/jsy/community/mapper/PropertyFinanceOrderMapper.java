@@ -188,7 +188,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    BigDecimal getTotalMoney(Long[] orderIds);
+    BigDecimal getTotalMoney(String[] orderIds);
     /**
      * @Description: 根据传来的id集合查询账单
      * @author: Hu

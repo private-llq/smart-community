@@ -112,7 +112,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    BigDecimal getTotalMoney(Long[] orderIds);
+    BigDecimal getTotalMoney(String ids);
 
     /**
      * @Description: 修改物业账单状态
