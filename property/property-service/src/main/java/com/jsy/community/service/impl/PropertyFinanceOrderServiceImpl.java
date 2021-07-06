@@ -570,6 +570,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         //根据传来的id集合查询账单
         List<PropertyFinanceOrderEntity> list=propertyFinanceOrderMapper.selectByIdsList(ids);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
+            propertyFinanceOrderEntity.setOrderStatus(1);
             propertyFinanceOrderEntity.setPayType(1);
             propertyFinanceOrderEntity.setTripartiteOrder(map.get("out_trade_no"));
             propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
