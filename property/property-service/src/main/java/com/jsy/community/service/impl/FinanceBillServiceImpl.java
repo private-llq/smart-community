@@ -101,8 +101,10 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                 }
             }
         }
-        //把封装好的list批量新增到数据库订单表
-        propertyFinanceOrderMapper.saveList(list);
+        if (list!=null&&list.size()!=0){
+            //把封装好的list批量新增到数据库订单表
+            propertyFinanceOrderMapper.saveList(list);
+        }
     }
 
 
