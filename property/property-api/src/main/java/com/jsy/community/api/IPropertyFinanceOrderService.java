@@ -122,7 +122,16 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     void UpdateOrderStatus(Map<String, String> map, String[] ids);
-
+    
+    /**
+    * @Description: 批量修改物业账单
+     * @Param: [payType, tripartiteOrder, ids]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2021/7/7
+    **/
+    void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids);
+    
     /**
      * @Description: 查询一条物业账单详情
      * @author: Hu

@@ -197,4 +197,13 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @return:
      */
     List<PropertyFinanceOrderEntity> selectByIdsList(String[] ids);
+    
+    /**
+    * @Description: 支付完成后-批量修改物业账单
+     * @Param: [payType, tripartiteOrder, ids]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2021/7/7
+    **/
+    int updateOrderBatch(@Param("payType")Integer payType, @Param("tripartiteOrder")String tripartiteOrder, @Param("ids")String[] ids);
 }

@@ -232,4 +232,19 @@
         </foreach>
         )
     </select>
+
+    <!-- 支付完成后-批量修改物业账单 -->
+    <update id="updateOrderBatch">
+        update t_property_finance_order
+        set
+        order_status = 1,
+        pay_time = now(),
+        update_time = now(),
+        pay_type = #{payType},
+        tripartite_order = #{tripartiteOrder}
+        where id in
+        <foreach collection="ids" separator="," open="(" close=")">
+            #{key}
+        </foreach>
+    </update>
 </mapper>
