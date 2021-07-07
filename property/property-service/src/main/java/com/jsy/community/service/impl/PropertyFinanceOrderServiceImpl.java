@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -573,6 +574,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
             propertyFinanceOrderEntity.setOrderStatus(1);
             propertyFinanceOrderEntity.setPayType(1);
+            propertyFinanceOrderEntity.setPayTime(LocalDateTime.now());
             propertyFinanceOrderEntity.setTripartiteOrder(map.get("out_trade_no"));
             propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
         }

@@ -10,6 +10,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
@@ -47,6 +48,8 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     private Integer statementStatus;
     @ApiModelProperty(value = "支付类型，1微信，2支付宝")
     private Integer payType;
+    @ApiModelProperty(value = "付款时间")
+    private LocalDateTime payTime;
     @ApiModelProperty(value = "三方单号")
     private String tripartiteOrder;
 

@@ -121,7 +121,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     @Transactional(rollbackFor = Exception.class)
     public void updatePenalSum(){
         QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
-        wrapper.select("DISTINCT no,community_id");
+        wrapper.select("DISTINCT community_id");
 //        wrapper.eq("check_status",1);
         //查出所有认证过的小区ID
         List<UserHouseEntity> entityList = userHouseMapper.selectList(wrapper);

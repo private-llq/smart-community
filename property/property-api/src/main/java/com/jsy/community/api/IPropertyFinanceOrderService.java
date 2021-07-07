@@ -121,7 +121,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    void UpdateOrderStatus(Map<String, String> map, String[] ss);
+    void UpdateOrderStatus(Map<String, String> map, String[] ids);
 
     /**
      * @Description: 查询一条物业账单详情
