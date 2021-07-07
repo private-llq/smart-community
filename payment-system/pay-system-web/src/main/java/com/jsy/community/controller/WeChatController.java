@@ -179,7 +179,7 @@ public class WeChatController {
                     log.error("微信物业费订单回调处理异常，订单号：" + map.get("out_trade_no"));
                     return;
                 }
-                propertyFinanceOrderService.UpdateOrderStatus(map,String.valueOf(ids).split(","));
+                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","));
             }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
