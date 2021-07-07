@@ -101,7 +101,7 @@ public class AliAppPayController {
 			aliAppPayQO.setServiceOrderNo(String.valueOf(aliAppPayQO.getOrderData().get("uuid")));
 		}
 		//TODO 测试金额 0.01
-//		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
+		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
 		
 		String orderStr = null;
 //		if(aliAppPayQO.getPayType() == 1){
