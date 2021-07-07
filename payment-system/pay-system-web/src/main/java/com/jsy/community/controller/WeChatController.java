@@ -161,7 +161,7 @@ public class WeChatController {
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.info("回调成功");
-        Map<String, String> map = PublicConfig.notifyParam(request, response, WechatConfig.API_V3_KEY);
+        Map<String, String> map = PublicConfig.notifyParam(request , WechatConfig.API_V3_KEY);
 //        weChatService.saveStatus(out_trade_no);
         log.info(String.valueOf(map));
 
@@ -169,11 +169,11 @@ public class WeChatController {
         if (map.get("attach")!=null){
             String[] split = map.get("attach").split(",");
             //处理商城支付回调后的业务逻辑
-            if (split[0]==2+""){
+            if (split[0].equals("2")){
                 shoppingMallService.completeShopOrder(split[1]);
             }
             //处理物业费支付回调后的业务逻辑
-            if (split[0]==4+""){
+            if (split[0].equals("4")){
                 Object ids = redisTemplate.opsForValue().get(PROPERTY_FEE + map.get("out_trade_no"));
                 if (ids == null){
                     log.error("微信物业费订单回调处理异常，订单号：" + map.get("out_trade_no"));
