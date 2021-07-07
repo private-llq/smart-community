@@ -34,6 +34,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.xmlpull.v1.XmlPullParserException;
@@ -68,6 +69,9 @@ public class WeChatController {
     private RedisTemplate redisTemplate;
     //物业费redis缓存分组key
     private final String PROPERTY_FEE="PropertyFee:";
+
+    @Value("${pay.order.timeout}")
+    private int payOrderTimeout;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -116,7 +120,7 @@ public class WeChatController {
             }
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
             //缓存物业缴费的账单id到redis
-            redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),2, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),payOrderTimeout, TimeUnit.HOURS);
             map.put("attach",4+","+map.get("out_trade_no"));
         }
 
