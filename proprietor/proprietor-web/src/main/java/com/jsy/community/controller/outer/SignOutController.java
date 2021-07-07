@@ -33,7 +33,7 @@ public class SignOutController {
 		if(length != null && (length < 4 || length > 6)){
 			throw new JSYException("验证码长度4-6");
 		}
-		return CommonResult.ok(SmsUtil.sendVcode(mobile,length),"发送成功");
+		return CommonResult.ok(SmsUtil.forgetPasswordOfSign(mobile,length),"发送成功");
 	}
 	
 }

@@ -34,15 +34,16 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.xmlpull.v1.XmlPullParserException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: pay
@@ -63,6 +64,10 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+    //物业费redis缓存分组key
+    private final String PROPERTY_FEE="PropertyFee:";
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -79,19 +84,20 @@ public class WeChatController {
     @Login
     @PostMapping("/wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
-        //如果商城调用就先验证
+        //封装微信支付下单请求参数
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
         //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
-        //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
-        hashMap.put("total",1);
-        hashMap.put("currency","CNY");
         map.put("appid", WechatConfig.APPID);
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
         map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback");
         map.put("amount",hashMap);
+        //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
+        hashMap.put("total",1);
+        hashMap.put("currency","CNY");
+
         //商城业务逻辑
         if (weChatPayQO.getTradeFrom()==2){
             Map<String, Object> objectMap = shoppingMallService.validateShopOrder(weChatPayQO.getOrderData(), UserUtils.getUserToken());
@@ -108,11 +114,11 @@ public class WeChatController {
             if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
                 map.put("description", "物业缴费");
             }
-            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
-            map.put("attach",4+","+weChatPayQO.getIds());
+//            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
+            //缓存物业缴费的账单id到redis
+            redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),2, TimeUnit.HOURS);
+            map.put("attach",4+","+map.get("out_trade_no"));
         }
-        //转json
-        String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
 
         //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
@@ -138,7 +144,7 @@ public class WeChatController {
             }
         });
         //第一步获取prepay_id
-        String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/app", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
+        String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/app", JSONUtil.toJsonStr(map), WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
         //第二步获取调起支付的参数
         JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
         object.put("orderNum",map.get("out_trade_no"));
@@ -155,20 +161,25 @@ public class WeChatController {
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.info("回调成功");
-        Map<String, String> map = PublicConfig.notifyParam(request, response, WechatConfig.API_V3_KEY);
+        Map<String, String> map = PublicConfig.notifyParam(request , WechatConfig.API_V3_KEY);
 //        weChatService.saveStatus(out_trade_no);
         log.info(String.valueOf(map));
 
         weChatService.orderStatus(map);
         if (map.get("attach")!=null){
             String[] split = map.get("attach").split(",");
-            if (split[0]==2+""){
+            //处理商城支付回调后的业务逻辑
+            if (split[0].equals("2")){
                 shoppingMallService.completeShopOrder(split[1]);
             }
-            if (split[0]==4+""){
-                String[] ids = new String[split.length-1];
-                System.arraycopy(split, 1, ids, 0, ids.length);
-                propertyFinanceOrderService.UpdateOrderStatus(map,ids);
+            //处理物业费支付回调后的业务逻辑
+            if (split[0].equals("4")){
+                Object ids = redisTemplate.opsForValue().get(PROPERTY_FEE + map.get("out_trade_no"));
+                if (ids == null){
+                    log.error("微信物业费订单回调处理异常，订单号：" + map.get("out_trade_no"));
+                    return;
+                }
+                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","));
             }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);

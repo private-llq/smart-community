@@ -35,6 +35,10 @@ public interface Const {
 		 */
 		String VCODE =  "SMS_217925309";
 		/**
+		 * 签章忘记密码
+		 */
+		String VCODE_SIGN_FORGET_PASSWORD =  "SMS_218896255";
+		/**
 		 * 物业端添加操作员-成功通知初始密码
 		 */
 		String ADD_OPERATOR = "SMS_218031262";

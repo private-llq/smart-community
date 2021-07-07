@@ -151,7 +151,7 @@ public class PublicConfig {
      * @param response
      * @param privateKey APIv3 32的秘钥
      */
-    public static Map<String, String> notifyParam(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
+    public static Map<String, String> notifyParam(HttpServletRequest request, String privateKey) throws Exception {
         Map<String, String> map = new HashMap<>(12);
         String result = readData(request);
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
@@ -182,21 +182,19 @@ public class PublicConfig {
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
         String plainText = verifyNotify(result, privateKey);
         if (StrUtil.isNotEmpty(plainText)) {
+            response.setStatus(200);
             map.put("code", "SUCCESS");
             map.put("message", "SUCCESS");
         } else {
+            response.setStatus(500);
             map.put("code", "ERROR");
             map.put("message", "签名错误");
-        }
-        if("SUCCESS".equals(map.get("code"))){
-            response.setStatus(200);
-        }else{
-            response.setStatus(500);
         }
         response.setHeader("Content-type", ContentType.JSON.toString());
         response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
         response.flushBuffer();
     }
+
 
 
     /**

@@ -61,7 +61,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         PropertyFinanceOrderEntity orderEntity=null;
         QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
         wrapper.select("DISTINCT community_id");
-        wrapper.eq("check_status",1);
+//        wrapper.eq("check_status",1);
         //查出所有认证过的小区ID
         List<UserHouseEntity> entityList = userHouseMapper.selectList(wrapper);
         for (UserHouseEntity userHouseEntity : entityList) {
@@ -101,8 +101,10 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                 }
             }
         }
-        //把封装好的list批量新增到数据库订单表
-        propertyFinanceOrderMapper.saveList(list);
+        if (list!=null&&list.size()!=0){
+            //把封装好的list批量新增到数据库订单表
+            propertyFinanceOrderMapper.saveList(list);
+        }
     }
 
 
@@ -119,8 +121,8 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     @Transactional(rollbackFor = Exception.class)
     public void updatePenalSum(){
         QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
-        wrapper.select("DISTINCT no,community_id");
-        wrapper.eq("check_status",1);
+        wrapper.select("DISTINCT community_id");
+//        wrapper.eq("check_status",1);
         //查出所有认证过的小区ID
         List<UserHouseEntity> entityList = userHouseMapper.selectList(wrapper);
         for (UserHouseEntity houseEntity : entityList) {

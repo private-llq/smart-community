@@ -20,6 +20,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -38,6 +40,7 @@ import java.util.*;
  * @author: Hu
  * @create: 2021-04-20 16:31
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
 public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinanceOrderMapper, PropertyFinanceOrderEntity> implements IPropertyFinanceOrderService {
@@ -570,9 +573,25 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         //根据传来的id集合查询账单
         List<PropertyFinanceOrderEntity> list=propertyFinanceOrderMapper.selectByIdsList(ids);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
+            propertyFinanceOrderEntity.setOrderStatus(1);
             propertyFinanceOrderEntity.setPayType(1);
+            propertyFinanceOrderEntity.setPayTime(LocalDateTime.now());
             propertyFinanceOrderEntity.setTripartiteOrder(map.get("out_trade_no"));
             propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
+        }
+    }
+    
+    /**
+    * @Description: 支付完成后-批量修改物业账单
+     * @Param: [payType, tripartiteOrder, ids]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2021/7/7
+    **/
+    public void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids) {
+        int rows = propertyFinanceOrderMapper.updateOrderBatch(payType,tripartiteOrder,ids);
+        if(rows != ids.length){
+            log.info("物业账单支付后处理失败，单号：" + tripartiteOrder + " 账单ID：" + Arrays.toString(ids));
         }
     }
 
@@ -585,7 +604,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @return: java.math.BigDecimal
      */
     public BigDecimal getTotalMoney(String ids) {
-        return propertyFinanceOrderMapper.getTotalMoney(ids.split(","));
+        BigDecimal totalMoney = propertyFinanceOrderMapper.getTotalMoney(ids.split(","));
+        return totalMoney == null ? new BigDecimal("0.00") : totalMoney;
     }
 
     /**

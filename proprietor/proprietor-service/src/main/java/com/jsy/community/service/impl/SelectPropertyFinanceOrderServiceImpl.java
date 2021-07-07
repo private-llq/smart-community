@@ -1,11 +1,14 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.api.ISelectPropertyFinanceOrderService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.HouseMapper;
+import com.jsy.community.mapper.UserMapper;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
 
     @Autowired
     private HouseMapper houseMapper;
+    @Autowired
+    private UserMapper userMapper;
 
 
     @Override
@@ -38,6 +43,10 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
         HashMap<String, Object> map = new HashMap<>();
         map.put("roomName",entity.getBuilding()+entity.getUnit()+entity.getFloor()+entity.getDoor());
         map.put("entity",propertyFinanceOrderEntity);
+        if (propertyFinanceOrderEntity.getPayType()!=null&&propertyFinanceOrderEntity.getTripartiteOrder()!=null&&propertyFinanceOrderEntity.getPayTime()!=null){
+            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
+            propertyFinanceOrderEntity.setRealName(userEntity.getRealName());
+        }
         return map;
     }
 
