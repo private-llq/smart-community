@@ -20,6 +20,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @ApiJSYController
@@ -47,6 +51,12 @@ public class AliAppPayController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyFinanceOrderService propertyFinanceOrderService;
 	
+	@Autowired
+	private RedisTemplate redisTemplate;
+	
+	@Value("${pay.order.timeout}")
+	private int payOrderTimeout;
+	
 	@ApiOperation("下单")
 	@PostMapping("order")
 	@Login
@@ -59,6 +69,11 @@ public class AliAppPayController {
 //			baseVO.setMsg("请传入正确的系统类型");
 //			return baseVO;
 //		}
+		//TODO 系统类型暂时写死
+		sysType = "1";
+		String orderNo = OrderNoUtil.getOrder();
+		aliAppPayQO.setOutTradeNo(OrderNoUtil.getOrder()); //本地订单号
+		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.tradeFromMap.get(aliAppPayQO.getTradeFrom())); //交易类型名称
 		
 		//缴物业费
 		if(PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(aliAppPayQO.getTradeFrom())){
@@ -69,6 +84,8 @@ public class AliAppPayController {
 			BigDecimal propertyFee = propertyFinanceOrderService.getTotalMoney(aliAppPayQO.getIds());
 			log.info("支付宝 - 查询到物业费缴费金额：" + propertyFee);
 			aliAppPayQO.setTotalAmount(propertyFee.abs());
+			//缓存缴费账单id
+			redisTemplate.opsForValue().set("PropertyFee:" + orderNo,aliAppPayQO.getIds(),payOrderTimeout, TimeUnit.MINUTES);
 		}else{
 			if(aliAppPayQO.getTotalAmount() == null){
 				throw new JSYException("缺少交易金额");
@@ -83,12 +100,6 @@ public class AliAppPayController {
 			}
 			aliAppPayQO.setServiceOrderNo(String.valueOf(aliAppPayQO.getOrderData().get("uuid")));
 		}
-		
-		//TODO 系统类型暂时写死
-		sysType = "1";
-		String orderNo = OrderNoUtil.getOrder();
-		aliAppPayQO.setOutTradeNo(OrderNoUtil.getOrder()); //本地订单号
-		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.tradeFromMap.get(aliAppPayQO.getTradeFrom())); //交易类型名称
 		//TODO 测试金额 0.01
 //		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
 		
