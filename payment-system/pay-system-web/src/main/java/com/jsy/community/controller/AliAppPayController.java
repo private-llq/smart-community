@@ -72,7 +72,7 @@ public class AliAppPayController {
 		//TODO 系统类型暂时写死
 		sysType = "1";
 		String orderNo = OrderNoUtil.getOrder();
-		aliAppPayQO.setOutTradeNo(OrderNoUtil.getOrder()); //本地订单号
+		aliAppPayQO.setOutTradeNo(orderNo); //本地订单号
 		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.tradeFromMap.get(aliAppPayQO.getTradeFrom())); //交易类型名称
 		
 		//缴物业费

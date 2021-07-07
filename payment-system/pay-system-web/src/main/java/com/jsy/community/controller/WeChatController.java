@@ -174,12 +174,15 @@ public class WeChatController {
             }
             //处理物业费支付回调后的业务逻辑
             if (split[0].equals("4")){
+	            log.info("开始处理物业费订单：" + map.get("out_trade_no"));
                 Object ids = redisTemplate.opsForValue().get(PROPERTY_FEE + map.get("out_trade_no"));
                 if (ids == null){
                     log.error("微信物业费订单回调处理异常，订单号：" + map.get("out_trade_no"));
                     return;
                 }
+                log.info("账单ids：" + String.valueOf(ids).split(","));
                 propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","));
+                log.info("处理完成");
             }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
