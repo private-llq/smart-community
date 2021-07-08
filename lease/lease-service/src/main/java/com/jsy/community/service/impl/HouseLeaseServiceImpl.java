@@ -273,9 +273,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //查询发布人聊天id(im_id)
         String imId = leaseUserService.queryIMIdByUid(uid);
         one.setImId(imId);
-        Map<String, Object> user = new HashMap<>();
-        user.put("imId",one);
-        vo.setUser(user);
+        vo.setUser(one);
         return vo;
     }
 
