@@ -89,5 +89,8 @@
         </where>
         order by create_time desc
     </select>
+    <select id="selectByShopId" resultType="com.jsy.community.entity.shop.ShopLeaseEntity">
+        select * from  t_shop_lease where id=#{shopId}
+    </select>
 
 </mapper>
