@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
@@ -21,7 +20,10 @@ import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserInfoVo;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -129,6 +131,23 @@ public class UserController {
     @GetMapping("switchHouse")
     public CommonResult<UserInfoVo> switchHouse(@RequestParam Long houseId) {
         return CommonResult.ok(userService.proprietorQuery(UserUtils.getUserId(), houseId));
+    }
+    
+    
+
+    /**
+     * @Description: 删除业主车辆
+     * @author: Hu
+     * @since: 2021/7/8 14:00
+     * @Param: [houseId]
+     * @return: com.jsy.community.vo.CommonResult<com.jsy.community.vo.UserInfoVo>
+     */
+    @Login
+    @ApiOperation("切换房屋选择房屋业主信息及业主家属信息查询接口")
+    @DeleteMapping("delCar")
+    public CommonResult deleteCar(@RequestParam Long id) {
+        userService.deleteCar(UserUtils.getUserId(), id);
+        return CommonResult.ok();
     }
 
 
