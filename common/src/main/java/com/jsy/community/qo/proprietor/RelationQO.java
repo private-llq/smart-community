@@ -4,6 +4,7 @@ import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
@@ -21,6 +22,7 @@ public class RelationQO implements Serializable {
     @ApiModelProperty(value = "家属姓名",required = true)
     @NotNull(groups = {RelationValidated.class},message = "姓名不能为空")
     @NotBlank(groups = {RelationValidated.class},message = "姓名不能为空")
+    @Length(min = 2, max = 20, message = "姓名长度2-20")
     private String name;
     @ApiModelProperty("性别")
     @NotNull(groups = {RelationValidated.class},message = "姓别不能为空")
