@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -561,25 +560,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         return propertyFinanceOrderMapper.selectById(orderId);
     }
 
-    /**
-     * @Description: 修改已经支付了的物业账单状态
-     * @author: Hu
-     * @since: 2021/7/5 17:33
-     * @Param:
-     * @return:
-     */
-    @Override
-    public void UpdateOrderStatus(Map<String, String> map, String[] ids) {
-        //根据传来的id集合查询账单
-        List<PropertyFinanceOrderEntity> list=propertyFinanceOrderMapper.selectByIdsList(ids);
-        for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
-            propertyFinanceOrderEntity.setOrderStatus(1);
-            propertyFinanceOrderEntity.setPayType(1);
-            propertyFinanceOrderEntity.setPayTime(LocalDateTime.now());
-            propertyFinanceOrderEntity.setTripartiteOrder(map.get("out_trade_no"));
-            propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
-        }
-    }
+
     
     /**
     * @Description: 支付完成后-批量修改物业账单

@@ -180,11 +180,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Override
 	public Map<String, Object> getShop(Long shopId) {
 		Map<String, Object> map = new HashMap<>();
-		
-		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("id", shopId);
-		wrapper.eq("deleted", 1);
-		ShopLeaseEntity shop = shopLeaseMapper.selectOne(wrapper);
+
+
+		ShopLeaseEntity shop = shopLeaseMapper.selectByShopId(shopId);
 		
 		if (shop == null) {
 			return null;

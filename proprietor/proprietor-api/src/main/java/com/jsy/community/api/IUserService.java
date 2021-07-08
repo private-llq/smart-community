@@ -3,8 +3,6 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserHouseEntity;
-import com.jsy.community.entity.UserThirdPlatformEntity;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.proprietor.LoginQO;
@@ -15,7 +13,6 @@ import com.jsy.community.vo.UserInfoVo;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 业主接口
@@ -216,4 +213,13 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Date: 2021/4/23
 	**/
 	List<String> queryUidOfNameLike(List<String> uids, String nameLike);
+
+	/**
+	 * @Description: 删除业主车辆
+	 * @author: Hu
+	 * @since: 2021/7/8 14:00
+	 * @Param: [houseId]
+	 * @return: com.jsy.community.vo.CommonResult<com.jsy.community.vo.UserInfoVo>
+	 */
+    void deleteCar(String userId, Long id);
 }

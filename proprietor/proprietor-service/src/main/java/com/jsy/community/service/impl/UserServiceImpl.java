@@ -953,7 +953,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return userMapper.queryNameByUidBatch(uids);
     }
-    
+
+    @Override
+    public void deleteCar(String userId, Long id) {
+        userMapper.delete(new QueryWrapper<UserEntity>().eq("uid",userId).eq("id",id));
+        rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.delete",id);
+    }
+
     /**
     * @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
      * @Param: [uids, nameLike]
