@@ -83,4 +83,20 @@ public class HouseFavoriteController {
         return iHouseFavoriteService.deleteFavorite(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
+    /**
+     * @author: Pipi
+     * @description: 用户取消收藏
+     * @param: id:  房屋ID或商铺ID
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/7/8 16:05
+     **/
+    @Login
+    @DeleteMapping("/cancelFavorite")
+    public CommonResult cancelFavorite(@RequestParam Long id) {
+        HouseFavoriteQO qo = new HouseFavoriteQO();
+        qo.setUid(UserUtils.getUserId());
+        qo.setFavoriteId(id);
+        return iHouseFavoriteService.cancelFavorite(qo) ? CommonResult.ok("取消收藏成功!") : CommonResult.error("取消收藏失败!");
+    }
+
 }

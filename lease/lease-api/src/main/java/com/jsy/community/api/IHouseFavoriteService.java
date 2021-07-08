@@ -60,4 +60,13 @@ public interface IHouseFavoriteService extends IService<HouseFavoriteEntity> {
      * @return              返回是否存在
      */
     boolean hasHouseOrShop(HouseFavoriteQO qo);
+
+    /**
+     * @author: Pipi
+     * @description: 用户取消收藏
+     * @param: qo:
+     * @return: java.lang.Integer
+     * @date: 2021/7/8 16:07
+     **/
+    boolean cancelFavorite(HouseFavoriteQO qo);
 }

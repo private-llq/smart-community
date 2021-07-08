@@ -124,4 +124,17 @@ public class HouseFavoriteServiceImpl extends ServiceImpl<HouseFavoriteMapper, H
         //出租房
         return houseFavoriteMapper.existHouse(qo.getFavoriteId()) > 0;
     }
+
+    /**
+     * @author: Pipi
+     * @description: 用户取消收藏
+     * @param: qo:
+     * @return: java.lang.Integer
+     * @date: 2021/7/8 16:07
+     */
+    @Override
+    public boolean cancelFavorite(HouseFavoriteQO qo) {
+        Integer integer = houseFavoriteMapper.cancelByUidAndFavoriteId(qo.getFavoriteId(), qo.getUid());
+        return integer > 0;
+    }
 }
