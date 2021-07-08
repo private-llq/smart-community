@@ -34,6 +34,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.xmlpull.v1.XmlPullParserException;
@@ -68,6 +69,9 @@ public class WeChatController {
     private RedisTemplate redisTemplate;
     //物业费redis缓存分组key
     private final String PROPERTY_FEE="PropertyFee:";
+
+    @Value("${pay.order.timeout}")
+    private int payOrderTimeout;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -116,7 +120,7 @@ public class WeChatController {
             }
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
             //缓存物业缴费的账单id到redis
-            redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),2, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),payOrderTimeout, TimeUnit.HOURS);
             map.put("attach",4+","+map.get("out_trade_no"));
         }
 
@@ -174,12 +178,15 @@ public class WeChatController {
             }
             //处理物业费支付回调后的业务逻辑
             if (split[0].equals("4")){
+	            log.info("开始处理物业费订单：" + map.get("out_trade_no"));
                 Object ids = redisTemplate.opsForValue().get(PROPERTY_FEE + map.get("out_trade_no"));
                 if (ids == null){
                     log.error("微信物业费订单回调处理异常，订单号：" + map.get("out_trade_no"));
                     return;
                 }
+                log.info("账单ids：" + String.valueOf(ids).split(","));
                 propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","));
+                log.info("处理完成");
             }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);

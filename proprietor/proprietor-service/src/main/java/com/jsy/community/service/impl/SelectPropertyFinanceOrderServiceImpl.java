@@ -44,7 +44,7 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
         map.put("roomName",entity.getBuilding()+entity.getUnit()+entity.getFloor()+entity.getDoor());
         map.put("entity",propertyFinanceOrderEntity);
         if (propertyFinanceOrderEntity.getPayType()!=null&&propertyFinanceOrderEntity.getTripartiteOrder()!=null&&propertyFinanceOrderEntity.getPayTime()!=null){
-            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
+            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", propertyFinanceOrderEntity.getUid()));
             propertyFinanceOrderEntity.setRealName(userEntity.getRealName());
         }
         return map;
