@@ -2,14 +2,12 @@ package com.jsy.community.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.IHouseConstService;
-import com.jsy.community.api.IHouseLeaseService;
-import com.jsy.community.api.LeaseException;
-import com.jsy.community.api.ILeaseUserService;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.HouseLeaseMapper;
@@ -51,6 +49,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private ILeaseUserService leaseUserService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IUserService userService;
 
     /**
      * 保存房屋图片标签
@@ -264,10 +265,16 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         }
         vo.setRedundancy(redundancy);
 
-        //2.0查询发布人聊天id(im_id)
-        String imId = leaseUserService.queryIMIdByUid(vo.getUid());
+        UserEntity one = userService.selectOne(vo.getUid());
+        // 详情页展示的业主名称是用户在发布的时候填写的昵称
+        // 详情页展示的电话是用户在发布的时候填写的电话
+        one.setRealName(vo.getAppellation());
+        one.setMobile(vo.getHouseContact());
+        //查询发布人聊天id(im_id)
+        String imId = leaseUserService.queryIMIdByUid(uid);
+        one.setImId(imId);
         Map<String, Object> user = new HashMap<>();
-        user.put("imId",imId);
+        user.put("imId",one);
         vo.setUser(user);
         return vo;
     }
