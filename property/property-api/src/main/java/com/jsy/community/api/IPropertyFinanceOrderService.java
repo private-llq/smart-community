@@ -114,14 +114,6 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      */
     BigDecimal getTotalMoney(String ids);
 
-    /**
-     * @Description: 修改物业账单状态
-     * @author: Hu
-     * @since: 2021/7/5 17:24
-     * @Param:
-     * @return:
-     */
-    void UpdateOrderStatus(Map<String, String> map, String[] ids);
     
     /**
     * @Description: 批量修改物业账单
