@@ -52,6 +52,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IUserService userService;
+    
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICommunityService communityService;
 
     /**
      * 保存房屋图片标签
@@ -74,6 +77,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean addWholeLeaseHouse(HouseLeaseQO qo) {
+        //查询社区经纬度
+        CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
+        qo.setHouseLon(community.getLon().doubleValue());
+        qo.setHouseLat(community.getLat().doubleValue());
         //1.保存房源数据
         qo.setId(SnowFlake.nextId());
         //保存房屋优势标签至中间表 随时入住、电梯楼、家电齐全等等
@@ -99,6 +106,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addSingleLeaseHouse(HouseLeaseQO qo) {
+        //查询社区经纬度
+        CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
+        qo.setHouseLon(community.getLon().doubleValue());
+        qo.setHouseLat(community.getLat().doubleValue());
         //单间新增房源 相对于 整租 只是多一个 公共设施 、 房间设施  相当于把整租的家具(houseFurnitureCode) 分成了两部分
         qo.setId(SnowFlake.nextId());
         //保存房屋优势标签至中间表 随时入住、电梯楼、家电齐全等等
@@ -130,6 +141,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     @Override
     @Transactional( rollbackFor = Exception.class)
     public boolean addCombineLeaseHouse(HouseLeaseQO qo) {
+        //查询社区经纬度
+        CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
+        qo.setHouseLon(community.getLon().doubleValue());
+        qo.setHouseLat(community.getLat().doubleValue());
         qo.setCommonFacilitiesId(null);
         qo.setRoommateExpectId(null);
         //单间新增房源 相对于 整租 只是多一个 公共设施 、 房间设施  相当于把整租的家具(houseFurnitureCode) 分成了两部分

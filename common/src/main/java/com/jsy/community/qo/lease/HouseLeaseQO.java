@@ -82,11 +82,11 @@ public class HouseLeaseQO implements Serializable {
     private Long houseAdvantageId;
 
 
-    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "经度不能为空!")
+//    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "经度不能为空!")
     @ApiModelProperty(value = "经度")
     private Double houseLon;
 
-    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "纬度不能为空!")
+//    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "纬度不能为空!")
     @ApiModelProperty(value = "纬度")
     private Double houseLat;
 

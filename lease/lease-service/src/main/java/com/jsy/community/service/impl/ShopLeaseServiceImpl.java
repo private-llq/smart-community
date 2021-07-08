@@ -159,6 +159,10 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		long peopleCode = MyMathUtils.getTypeCode(peopleTypeCodes);
 		baseShop.setShopPeople(peopleCode);
 		
+		//查询社区经纬度
+		CommunityEntity community = communityService.getCommunityNameById(baseShop.getCommunityId());
+		baseShop.setLon(community.getLon());
+		baseShop.setLat(community.getLat());
 		shopLeaseMapper.insert(baseShop);
 		
 		// 存储店铺图片集合
