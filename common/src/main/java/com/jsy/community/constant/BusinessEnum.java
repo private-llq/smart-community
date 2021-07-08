@@ -504,10 +504,10 @@ public interface BusinessEnum {
 	 * @Date: 2020/12/01
 	 **/
 	enum RelationshipEnum {
-		HUSBAND("丈夫",1),
-		WIFE("妻子",2),
-		SON("儿子",3),
-		DAUGHTER("女儿",4),
+//		HUSBAND("丈夫",1),
+//		WIFE("妻子",2),
+//		SON("儿子",3),
+//		DAUGHTER("女儿",4),
 		RELATIVES("亲属", 5),
 		TENANT("租客", 6);
 		private String name;
