@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.proprietor.RelationCarsQO;
 import com.jsy.community.qo.proprietor.RelationQO;
 import com.jsy.community.utils.MinioUtils;
@@ -59,10 +60,10 @@ public class RelationController {
         relationQo.setUserId(userId);
         UserHouseEntity entity=relationService.getHouse(relationQo);
         if (entity==null){
-            return CommonResult.error("请填写正确的社区或者房间！");
+            throw new JSYException("请填写正确的社区或者房间！");
         }
         if (entity.getCheckStatus()!=1){
-            return CommonResult.error("当前房屋未认证，请先认证！");
+            throw new JSYException("当前房屋未认证，请先认证！");
         }
         if (relationQo.getIdentificationType()==1){
             if (!relationQo.getIdCard().matches(ID_NUMBER)) {
