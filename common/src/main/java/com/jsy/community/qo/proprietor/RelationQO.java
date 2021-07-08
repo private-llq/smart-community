@@ -21,7 +21,6 @@ public class RelationQO implements Serializable {
     @ApiModelProperty(value = "家属姓名",required = true)
     @NotNull(groups = {RelationValidated.class},message = "姓名不能为空")
     @NotBlank(groups = {RelationValidated.class},message = "姓名不能为空")
-    @Pattern(groups = {RelationValidated.class},regexp = RegexUtils.REGEX_REAL_NAME,message = "非法姓名！")
     private String name;
     @ApiModelProperty("性别")
     @NotNull(groups = {RelationValidated.class},message = "姓别不能为空")
