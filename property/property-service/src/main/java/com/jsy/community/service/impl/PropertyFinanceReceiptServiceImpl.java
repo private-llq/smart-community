@@ -36,6 +36,18 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
     private IPropertyFinanceOrderService propertyFinanceOrderService;
     
     /**
+    * @Description: 新增收款单
+     * @Param: [entity]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2021/7/9
+    **/
+    @Override
+	public void add(PropertyFinanceReceiptEntity entity){
+		propertyFinanceReceiptMapper.insert(entity);
+	}
+	
+    /**
     * @Description: 分页查询
      * @Param: [baseQO]
      * @Return: com.jsy.community.utils.PageInfo

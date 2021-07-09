@@ -22,8 +22,11 @@ public class AiliAppPayRecordEntity extends BaseEntity {
 	@TableField(exist = false)
 	private Long id;
 	
-	@ApiModelProperty(value = "订单号")
+	@ApiModelProperty(value = "系统订单号")
 	private String orderNo;
+	
+	@ApiModelProperty(value = "支付宝渠道单号")
+	private String tradeNo;
 	
 	@ApiModelProperty(value = "用户ID")
 	private String userid;

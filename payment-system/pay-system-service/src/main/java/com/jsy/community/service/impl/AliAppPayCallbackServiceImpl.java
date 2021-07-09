@@ -7,6 +7,9 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
+import com.jsy.community.untils.OrderNoUtil;
 import com.jsy.community.utils.AlipayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -36,6 +39,9 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyFinanceOrderService propertyFinanceOrderService;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPropertyFinanceReceiptService propertyFinanceReceiptService;
 
 	@Autowired
 	private StringRedisTemplate redisTemplate;
@@ -61,12 +67,14 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			log.info("支付宝系统订单：" + paramsMap.get("out_trade_no") + "验签成功");
 			//按照支付结果异步通知中的描述，对支付结果中的业务内容进行1\2\3\4二次校验，校验成功后在response中返回success，校验失败返回failure
 			String outTradeNo = paramsMap.get("out_trade_no");//系统订单号
+			String tradeNo = paramsMap.get("trade_no");//支付宝渠道单号
 			String totalAmount = paramsMap.get("total_amount");//交易金额
 			String receiptAmount = paramsMap.get("receipt_amount");//实收金额
 			String sellerId = paramsMap.get("seller_id");//商家支付宝id
 			String sellerEmail = paramsMap.get("seller_email");//商家支付宝邮箱账号
 			String appId = paramsMap.get("app_id");//appid
 			log.info("系统订单号：" + outTradeNo);
+			log.info("支付宝渠道单号：" + tradeNo);
 			log.info("交易金额：" + totalAmount);
 			log.info("实收金额：" + receiptAmount);
 			log.info("商家支付宝id：" + sellerId);
@@ -82,6 +90,8 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 						log.info("商家验证通过");
 						if(ConstClasses.AliPayDataEntity.appid.equals(appId)){ // appid正确
 							log.info("appid验证通过");
+							//设置渠道单号
+							order.setTradeNo(tradeNo);
 							//处理订单
 							dealOrder(order);
 						}
@@ -108,7 +118,6 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void dealOrder(AiliAppPayRecordEntity order){
-		//TODO 是否再查账判断是否完成
 		log.info("支付宝回调 - 开始处理订单：" + order.getOrderNo());
 		if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex().equals(order.getTradeType())){  // 支出
 			log.info("开始处理支出订单");
@@ -129,6 +138,17 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 					log.error("回调处理物业费失败，账单ids未找到，已支付订单号：" + order.getOrderNo());
 					return;
 				}
+				//查询一条账单，获取社区id
+				PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(ids.split(",")[0]));
+				//新增收款单
+				PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
+				receiptEntity.setCommunityId(financeOrderEntity.getCommunityId());
+				receiptEntity.setReceiptNum(OrderNoUtil.getOrder());
+				receiptEntity.setTransactionNo(order.getTradeNo());
+				receiptEntity.setTransactionType(1);
+				receiptEntity.setReceiptMoney(order.getTradeAmount());
+				propertyFinanceReceiptService.add(receiptEntity);
+				//修改物业费账单
 				propertyFinanceOrderService.updateOrderStatusBatch(2,order.getOrderNo(),ids.split(","));
 			}
 		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(order.getTradeType())){  // 提现
