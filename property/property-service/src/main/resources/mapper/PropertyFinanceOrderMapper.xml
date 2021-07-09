@@ -30,8 +30,9 @@
         </foreach>
     </update>
 
+    <!-- 2021.7.9 去除查询条件 where check_status=1 -->
     <select id="communityIdList" resultType="java.lang.Long">
-        select distinct community_id from t_user_house where check_status=1
+        select distinct community_id from t_user_house
     </select>
 
     <!-- 获取上一个月的需要结算和被驳回的账单 -->

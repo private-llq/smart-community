@@ -41,11 +41,13 @@
         join t_house th on thm.house_id=th.id
         <include refid="Query"></include>
     </select>
+
+    <!-- 2021.7.9 去除查询条件 and tuh.check_status=1 -->
     <select id="getHouseId" resultMap="HouseTypeMap">
         select t.id as id,concat(t.number,"-",t.code) as name
         from t_user_house tuh
         join t_house t on t.id=tuh.house_id
-        where tuh.community_id=#{query.communityId} and tuh.check_status=1
+        where tuh.community_id=#{query.communityId}
         <if test="query.name!=null and query.name!=''">
             and t.number like concat("%",#{query.name},"%")
         </if>

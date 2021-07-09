@@ -63,15 +63,15 @@ public interface IProprietorService extends IService<ProprietorEntity> {
     List<HouseVo> queryHouseByCommunityId(long communityId);
 
 
-    /**
-     * [excel] 导入业主家属信息
-     * @param userEntityList    用户信息实体
-     * @param communityId       社区id
-     * @author YuLF
-     * @since  2020/12/25 14:47
-     * @return              返回影响行数
-     */
-    Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId);
+//    /**
+//     * [excel] 导入业主家属信息
+//     * @param userEntityList    用户信息实体
+//     * @param communityId       社区id
+//     * @author YuLF
+//     * @since  2020/12/25 14:47
+//     * @return              返回影响行数
+//     */
+//    Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId);
 
 
     /**

@@ -27,7 +27,8 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/16
 	**/
-	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid} order by create_time")
+//	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid} order by create_time")
+	@Select("select community_id,house_id from t_user_house where uid = #{uid} order by create_time")
 	List<UserHouseEntity> queryUserHouseIdsAndCommunityIds(String uid);
 	
 	/**
@@ -37,7 +38,8 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/17
 	**/
-	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid}")
+//	@Select("select community_id,house_id from t_user_house where check_status = 1 and uid = #{uid}")
+	@Select("select community_id,house_id from t_user_house where uid = #{uid}")
 	List<UserHouseEntity> queryUserHouses(String uid);
 
 	/**
@@ -47,7 +49,8 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/31
 	**/
-	@Select("select community_id from t_user_house where uid = #{uid} and check_status = 1")
+//	@Select("select community_id from t_user_house where uid = #{uid} and check_status = 1")
+	@Select("select community_id from t_user_house where uid = #{uid}")
 	Set<Long> queryUserHousesOfCommunityIds(String uid);
 
 

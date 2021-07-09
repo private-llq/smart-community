@@ -85,15 +85,15 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
     void registerHouseBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
 
 
-    /**
-     * 通过当前社区id查出的当前社区所有已登记的房屋
-     * @param communityId       社区id
-     * @param houseLevelMode    社区层级模式
-     * @author YuLF
-     * @since  2020/12/25 11:10
-     * @return          返回当前社区已经被登记的所有房屋信息
-     */
-    List<HouseVo> queryHouseByCommunityId(@Param("communityId") long communityId, @Param("houseLevelMode") Integer houseLevelMode);
+//    /**
+//     * 通过当前社区id查出的当前社区所有已登记的房屋
+//     * @param communityId       社区id
+//     * @param houseLevelMode    社区层级模式
+//     * @author YuLF
+//     * @since  2020/12/25 11:10
+//     * @return          返回当前社区已经被登记的所有房屋信息
+//     */
+//    List<HouseVo> queryHouseByCommunityId(@Param("communityId") long communityId, @Param("houseLevelMode") Integer houseLevelMode);
 
 
 
@@ -104,19 +104,20 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @since  2020/12/25 15:04
      * @return                  返回房屋id和用户uid的查询结果
      */
-    @Select("select uid,house_id  from t_user_house where community_id = #{communityId} and deleted = 0 and check_status = 1")
+//    @Select("select uid,house_id  from t_user_house where community_id = #{communityId} and deleted = 0 and check_status = 1")
+    @Select("select uid,house_id  from t_user_house where community_id = #{communityId} and deleted = 0")
     List<UserHouseEntity> queryUserHouseByCommunityId(@Param("communityId") long communityId);
 
 
-    /**
-     * [excel]批量导入业主家属信息
-     * @param userEntityList    用户信息实体
-     * @param communityId       社区id
-     * @author YuLF
-     * @since  2020/12/25 16:41
-     * @return                  返回影响行数
-     */
-    Integer saveUserMemberBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
+//    /**
+//     * [excel]批量导入业主家属信息
+//     * @param userEntityList    用户信息实体
+//     * @param communityId       社区id
+//     * @author YuLF
+//     * @since  2020/12/25 16:41
+//     * @return                  返回影响行数
+//     */
+//    Integer saveUserMemberBatch(@Param("userEntityList") List<UserEntity> userEntityList, @Param("communityId") Long communityId);
 
     /*
      * @author: Pipi
@@ -130,13 +131,13 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
     List<HouseTypeVo> getUnboundHouseList(@Param("query") RelationListQO baseQO, @Param("page") Long page, @Param("pageSize") Long pageSize);
 
 
-    /**
-     * 检查已认证房屋是否存在
-     * @param houseId       房屋id
-     * @return              返回查询行数
-     */
-    @Select("select count(house_id) from t_user_house where house_id = #{houseId} and check_status = 1 and deleted = 0 ")
-    Integer checkHouse(Long houseId);
+//    /**
+//     * 检查已认证房屋是否存在
+//     * @param houseId       房屋id
+//     * @return              返回查询行数
+//     */
+//    @Select("select count(house_id) from t_user_house where house_id = #{houseId} and check_status = 1 and deleted = 0 ")
+//    Integer checkHouse(Long houseId);
 
 
     /**

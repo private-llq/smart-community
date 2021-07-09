@@ -144,45 +144,46 @@
         </foreach>
     </insert>
 
+    <!-- 2021.7.9 去除查询条件 -->
     <!-- 通过社区id获得当前社区所有未登记的房屋信息 houseLevelMode = 社区所属层级机构 房屋层级模式：1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元 -->
-    <select id="queryHouseByCommunityId" resultType="com.jsy.community.vo.HouseVo">
-        SELECT
-	        h.id AS houseId,
-	        CONCAT(
-	        <choose>
-                <when test="houseLevelMode == 1 or houseLevelMode == 2">
-                    h.building, h.unit, h.floor, h.door
-                </when>
-                <when test="houseLevelMode == 3">
-                    h.building, h.floor, h.door
-                </when>
-                <when test="houseLevelMode == 4">
-                    h.unit, h.floor, h.door
-                </when>
-                <otherwise>
-                </otherwise>
-            </choose>
-	        ) AS mergeName
-        FROM
-	        t_house AS h
-	        LEFT JOIN t_user_house AS uh ON h.id = uh.house_id
-        WHERE
-	        uh.id IS NOT NULL
-	        AND uh.check_status = 1
-	        AND h.community_id = #{communityId}
-	        AND h.type = 4
-	        AND uh.deleted = 0
-	        AND h.deleted = 0
-    </select>
+<!--    <select id="queryHouseByCommunityId" resultType="com.jsy.community.vo.HouseVo">-->
+<!--        SELECT-->
+<!--	        h.id AS houseId,-->
+<!--	        CONCAT(-->
+<!--	        <choose>-->
+<!--                <when test="houseLevelMode == 1 or houseLevelMode == 2">-->
+<!--                    h.building, h.unit, h.floor, h.door-->
+<!--                </when>-->
+<!--                <when test="houseLevelMode == 3">-->
+<!--                    h.building, h.floor, h.door-->
+<!--                </when>-->
+<!--                <when test="houseLevelMode == 4">-->
+<!--                    h.unit, h.floor, h.door-->
+<!--                </when>-->
+<!--                <otherwise>-->
+<!--                </otherwise>-->
+<!--            </choose>-->
+<!--	        ) AS mergeName-->
+<!--        FROM-->
+<!--	        t_house AS h-->
+<!--	        LEFT JOIN t_user_house AS uh ON h.id = uh.house_id-->
+<!--        WHERE-->
+<!--	        uh.id IS NOT NULL-->
+<!--	        AND uh.check_status = 1-->
+<!--	        AND h.community_id = #{communityId}-->
+<!--	        AND h.type = 4-->
+<!--	        AND uh.deleted = 0-->
+<!--	        AND h.deleted = 0-->
+<!--    </select>-->
     <!-- 批量导入业主家属信息 -->
-    <insert id="saveUserMemberBatch">
-        INSERT IGNORE INTO t_house_member
-        ( id, householder_id, community_id, house_id, NAME, sex, mobile, identification_type, id_card, relation, create_time )
-        VALUES
-        <foreach collection="userEntityList" item="item" separator=",">
-            ( #{item.id}, #{item.uid}, #{communityId}, #{item.houseEntity.houseId}, #{item.realName}, #{item.sex}, #{item.mobile}, 1, #{item.idCard}, #{item.relationCode}, now() )
-        </foreach>
-    </insert>
+<!--    <insert id="saveUserMemberBatch">-->
+<!--        INSERT IGNORE INTO t_house_member-->
+<!--        ( id, householder_id, community_id, house_id, NAME, sex, mobile, identification_type, id_card, relation, create_time )-->
+<!--        VALUES-->
+<!--        <foreach collection="userEntityList" item="item" separator=",">-->
+<!--            ( #{item.id}, #{item.uid}, #{communityId}, #{item.houseEntity.houseId}, #{item.realName}, #{item.sex}, #{item.mobile}, 1, #{item.idCard}, #{item.relationCode}, now() )-->
+<!--        </foreach>-->
+<!--    </insert>-->
     <!-- 插入 物业 人员对 用户数据的 操作日志 -->
     <insert id="insertOperationLog">
         insert into t_admin_proprietor_log ( id,operation_by,operation_time,pid,operation_type )

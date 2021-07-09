@@ -2,6 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jsy.community.mapper.UserMapper">
+
+	<!-- 2021.7.9 去除查询内容 CASE uh.check_status
+			WHEN 0 THEN '未审核通过'
+			WHEN 1 THEN '审核通过'
+			WHEN 2 THEN '审核中' END as checkStatus -->
 	<!-- 查询用户拥有房屋 -->
 	<select id="queryUserHouseById" resultType="com.jsy.community.vo.HouseVo">
 		SELECT
@@ -9,11 +14,7 @@
 			h.building,
 			h.unit,
 			h.floor,
-			h.door,
-			CASE uh.check_status
-			WHEN 0 THEN '未审核通过'
-			WHEN 1 THEN '审核通过'
-			WHEN 2 THEN '审核中' END as checkStatus
+			h.door
 		FROM
 			t_house AS h
 			LEFT JOIN t_user_house AS uh ON h.id = uh.house_id AND uh.deleted = 0

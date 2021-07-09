@@ -267,79 +267,79 @@ public class ProprietorController {
     }
 
 
-    /**
-     * 下载录入业主家属成员信息excel、模板
-     *
-     * @return 返回Excel模板
-     */
-    @IpLimit(prefix = "excel", second = 60, count = 5, desc = "下载业主家属成员信息录入Excel")
-    @GetMapping(params = {"downloadMemberExcel"})
-    @ApiOperation("下载业主家属成员信息录入Excel")
-    public ResponseEntity<byte[]> downloadMemberExcel(@RequestParam long communityId) {
-        List<UserEntity> userEntityList = getUserInfo(communityId);
-        //获取excel 响应头信息
-        MultiValueMap<String, String> multiValueMap = ExcelUtil.setHeader(userEntityList.get(0).getNickname() + "家属成员登记表.xlsx");
-        try {
-            //存储 需要携带的信息
-            Map<String, Object> res = new HashMap<>(3);
-            //拿到当前社区 已登记的房屋信息List 如：1栋1单元1楼1-1
-            List<HouseVo> houseVos = iProprietorService.queryHouseByCommunityId(communityId);
-            //取出所有的小区房屋地址
-            List<String> communityHouseAddr = houseVos.stream().map(HouseVo::getMergeName).collect(Collectors.toList());
+//    /**
+//     * 下载录入业主家属成员信息excel、模板
+//     *
+//     * @return 返回Excel模板
+//     */
+//    @IpLimit(prefix = "excel", second = 60, count = 5, desc = "下载业主家属成员信息录入Excel")
+//    @GetMapping(params = {"downloadMemberExcel"})
+//    @ApiOperation("下载业主家属成员信息录入Excel")
+//    public ResponseEntity<byte[]> downloadMemberExcel(@RequestParam long communityId) {
+//        List<UserEntity> userEntityList = getUserInfo(communityId);
+//        //获取excel 响应头信息
+//        MultiValueMap<String, String> multiValueMap = ExcelUtil.setHeader(userEntityList.get(0).getNickname() + "家属成员登记表.xlsx");
+//        try {
+//            //存储 需要携带的信息
+//            Map<String, Object> res = new HashMap<>(3);
+//            //拿到当前社区 已登记的房屋信息List 如：1栋1单元1楼1-1
+//            List<HouseVo> houseVos = iProprietorService.queryHouseByCommunityId(communityId);
+//            //取出所有的小区房屋地址
+//            List<String> communityHouseAddr = houseVos.stream().map(HouseVo::getMergeName).collect(Collectors.toList());
+//
+//            res.put("name", userEntityList.get(0).getNickname() + "业主家属成员登记表");
+//            res.put("communityId", communityId);
+//            res.put("communityHouseAddr", communityHouseAddr);
+//
+//            //获得excel下载模板
+//            Workbook workbook = ProprietorExcelCommander.exportProprietorMember(userEntityList, res);
+//            //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+//            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+//        } catch (IOException e) {
+//            log.error("com.jsy.community.controller.ProprietorController.downloadMemberExcel：{}", e.getMessage());
+//            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+//        }
+//    }
 
-            res.put("name", userEntityList.get(0).getNickname() + "业主家属成员登记表");
-            res.put("communityId", communityId);
-            res.put("communityHouseAddr", communityHouseAddr);
-
-            //获得excel下载模板
-            Workbook workbook = ProprietorExcelCommander.exportProprietorMember(userEntityList, res);
-            //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
-            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
-        } catch (IOException e) {
-            log.error("com.jsy.community.controller.ProprietorController.downloadMemberExcel：{}", e.getMessage());
-            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
-        }
-    }
-
-    /**
-     * 按communityId 获取用户信息
-     *
-     * @return 返回查找到的信息
-     */
-    private List<UserEntity> getUserInfo(Long communityId) {
-        List<UserEntity> userEntityList = iHouseService.getCommunityNameAndUserInfo(communityId);
-        if (userEntityList == null || userEntityList.isEmpty()) {
-            throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), "目前这个小区没有任何用户信息!");
-        }
-        return userEntityList;
-    }
+//    /**
+//     * 按communityId 获取用户信息
+//     *
+//     * @return 返回查找到的信息
+//     */
+//    private List<UserEntity> getUserInfo(Long communityId) {
+//        List<UserEntity> userEntityList = iHouseService.getCommunityNameAndUserInfo(communityId);
+//        if (userEntityList == null || userEntityList.isEmpty()) {
+//            throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), "目前这个小区没有任何用户信息!");
+//        }
+//        return userEntityList;
+//    }
 
 
-    /**
-     * 【业主家属信息导入】
-     *
-     * @param proprietorExcel 用户上传的excel
-     * @param communityId     社区id
-     * @return 返回效验或登记结果
-     */
-    @PostMapping(params = {"importMemberExcel"})
-    @ApiOperation("导入业主家属信息信息excel")
-    public CommonResult<?> importMemberExcel(MultipartFile proprietorExcel, Long communityId) {
-        //参数验证
-        validFileSuffix(proprietorExcel, communityId);
-        //控制层需要传递给实现类的参数
-        List<UserEntity> userInfoList = getUserInfo(communityId);
-        //把List中的 realName 和uid 转换为Map存储
-        Map<String, Object> userInfoParams = ExcelUtil.getAllUidAndNameForList(userInfoList, "realName", "uid");
-        userInfoParams.put("communityId", communityId);
-        List<UserEntity> userEntityList = ProprietorExcelCommander.importMemberExcel(proprietorExcel, userInfoParams);
-
-        notNull(userEntityList);
-
-        //数据库信息写入
-        Integer row = iProprietorService.saveUserMemberBatch(userEntityList, communityId);
-        return CommonResult.ok("本次导入家属信息成功" + row + "条! 请至管理平台检查");
-    }
+//    /**
+//     * 【业主家属信息导入】
+//     *
+//     * @param proprietorExcel 用户上传的excel
+//     * @param communityId     社区id
+//     * @return 返回效验或登记结果
+//     */
+//    @PostMapping(params = {"importMemberExcel"})
+//    @ApiOperation("导入业主家属信息信息excel")
+//    public CommonResult<?> importMemberExcel(MultipartFile proprietorExcel, Long communityId) {
+//        //参数验证
+//        validFileSuffix(proprietorExcel, communityId);
+//        //控制层需要传递给实现类的参数
+//        List<UserEntity> userInfoList = getUserInfo(communityId);
+//        //把List中的 realName 和uid 转换为Map存储
+//        Map<String, Object> userInfoParams = ExcelUtil.getAllUidAndNameForList(userInfoList, "realName", "uid");
+//        userInfoParams.put("communityId", communityId);
+//        List<UserEntity> userEntityList = ProprietorExcelCommander.importMemberExcel(proprietorExcel, userInfoParams);
+//
+//        notNull(userEntityList);
+//
+//        //数据库信息写入
+//        Integer row = iProprietorService.saveUserMemberBatch(userEntityList, communityId);
+//        return CommonResult.ok("本次导入家属信息成功" + row + "条! 请至管理平台检查");
+//    }
 
     /**
      * excel 文件上传上来后 验证方法
