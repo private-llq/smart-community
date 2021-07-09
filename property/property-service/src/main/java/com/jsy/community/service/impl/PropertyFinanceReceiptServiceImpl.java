@@ -199,9 +199,6 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
 				if (!CollectionUtils.isEmpty(orderTotalList)) {
 					List<PropertyFinanceOrderEntity> orderList = new ArrayList<>();
 					for (PropertyFinanceOrderEntity orderEntity : orderTotalList) {
-						if ("8888".equals(orderEntity.getReceiptNum())) {
-							System.out.println(1);
-						}
 						if(orderEntity.getReceiptNum().equals(entity.getReceiptNum())){
 							orderList.add(orderEntity);
 						}
