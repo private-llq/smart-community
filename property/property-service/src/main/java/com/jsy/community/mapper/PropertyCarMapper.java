@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.PropertyCarEntity;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public interface PropertyCarMapper extends BaseMapper<PropertyCarEntity> {
      * @Param:
      * @return:
      */
-    void updateMap(Map<Long, ElasticsearchCarQO> map);
+    void updateMap(@Param("map")Map<Long, ElasticsearchCarQO> map);
 
     /**
      * @Description: 批量新增

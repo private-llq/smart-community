@@ -23,18 +23,18 @@
         <foreach collection="map.entrySet()" index="key" item="value">
             when #{key} then #{value.carPlate}
         </foreach>
-        end
+        end,
         car_type = case id
         <foreach collection="map.entrySet()" index="key" item="value">
             when #{key} then #{value.carType}
         </foreach>
-        end
+        end,
         driving_license_url = case id
         <foreach collection="map.entrySet()" index="key" item="value">
             when #{key} then #{value.drivingLicenseUrl}
         </foreach>
-        end
-        ,update_time = now()
+        end,
+        update_time = now()
         where id in
         <foreach collection="map.entrySet()" index="key" item="value" separator="," open="(" close=")">
             #{key}

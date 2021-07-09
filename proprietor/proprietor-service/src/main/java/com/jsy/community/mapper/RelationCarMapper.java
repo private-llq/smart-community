@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.RelationCarEntity;
 import com.jsy.community.qo.proprietor.RelationCarsQO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,5 +33,5 @@ public interface RelationCarMapper extends BaseMapper<RelationCarEntity> {
      * @Param:
      * @return:
      */
-    void updateList(HashMap<Long, RelationCarsQO> map);
+    void updateList(@Param("map")HashMap<Long, RelationCarsQO> map);
 }
