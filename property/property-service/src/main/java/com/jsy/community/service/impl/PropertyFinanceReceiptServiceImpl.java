@@ -11,6 +11,7 @@ import com.jsy.community.mapper.PropertyFinanceReceiptMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -44,6 +45,7 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
     **/
     @Override
 	public void add(PropertyFinanceReceiptEntity entity){
+	    entity.setId(SnowFlake.nextId());
 		propertyFinanceReceiptMapper.insert(entity);
 	}
 	
