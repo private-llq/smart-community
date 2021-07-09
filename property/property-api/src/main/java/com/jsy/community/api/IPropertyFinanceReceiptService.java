@@ -59,4 +59,5 @@ public interface IPropertyFinanceReceiptService {
 	 *@Date: 2021/4/26 9:34
 	 **/
 	List<PropertyFinanceReceiptEntity> queryExportReceiptList(PropertyFinanceReceiptEntity receiptEntity);
+
 }

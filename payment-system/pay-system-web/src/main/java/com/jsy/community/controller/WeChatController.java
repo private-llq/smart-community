@@ -4,12 +4,15 @@ import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceOrderService;
+import com.jsy.community.api.IPropertyFinanceReceiptService;
 import com.jsy.community.api.IShoppingMallService;
 import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
@@ -42,8 +45,12 @@ import org.xmlpull.v1.XmlPullParserException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -64,6 +71,10 @@ public class WeChatController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFinanceReceiptService propertyFinanceReceiptService;
+
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -121,7 +132,7 @@ public class WeChatController {
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
             //缓存物业缴费的账单id到redis
             redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),payOrderTimeout, TimeUnit.HOURS);
-            map.put("attach",4+","+map.get("out_trade_no"));
+            map.put("attach",4+","+map.get("out_trade_no")+","+propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()));
         }
 
         //新增数据库订单记录
@@ -186,6 +197,15 @@ public class WeChatController {
                 }
                 log.info("账单ids：" + String.valueOf(ids).split(","));
                 propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","));
+                //获取一条账单，得到社区id
+                PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(String.valueOf(ids).split(",")[0]));
+                PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
+                receiptEntity.setCommunityId(financeOrderEntity.getCommunityId());
+                receiptEntity.setReceiptNum(OrderNoUtil.getOrder());
+                receiptEntity.setTransactionNo(String.valueOf(map.get("transaction_id")));
+                receiptEntity.setTransactionType(2);
+                receiptEntity.setReceiptMoney(new BigDecimal(split[2]));
+                propertyFinanceReceiptService.add(receiptEntity);
                 log.info("处理完成");
             }
         }
