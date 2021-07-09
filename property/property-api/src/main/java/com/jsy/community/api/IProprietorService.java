@@ -53,14 +53,14 @@ public interface IProprietorService extends IService<ProprietorEntity> {
      */
     Integer saveUserBatch(List<ProprietorEntity> userEntityList, Long communityId);
 
-    /**
-     * 通过当前社区id查出的当前社区所有已登记的房屋
-     * @param communityId   社区id
-     * @author YuLF
-     * @since  2020/12/25 11:10
-     * @return          返回当前社区已经被登记的所有房屋信息
-     */
-    List<HouseVo> queryHouseByCommunityId(long communityId);
+//    /**
+//     * 通过当前社区id查出的当前社区所有已登记的房屋
+//     * @param communityId   社区id
+//     * @author YuLF
+//     * @since  2020/12/25 11:10
+//     * @return          返回当前社区已经被登记的所有房屋信息
+//     */
+//    List<HouseVo> queryHouseByCommunityId(long communityId);
 
 
 //    /**

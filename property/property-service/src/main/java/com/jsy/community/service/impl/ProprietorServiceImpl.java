@@ -136,20 +136,20 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return proprietorMapper.saveUserBatch(userEntityList, communityId);
     }
 
-    /**
-     * 通过当前社区id查出的当前社区所有已登记的房屋
-     *
-     * @return 返回当前社区已经被登记的所有房屋信息
-     * @author YuLF
-     * @Param
-     * @since 2020/12/25 11:10
-     */
-    @Override
-    public List<HouseVo> queryHouseByCommunityId(long communityId) {
-        //1.拿到的当前社区层级结构
-        Integer houseLevelMode = proprietorMapper.queryHouseLevelModeById(communityId);
-        return proprietorMapper.queryHouseByCommunityId(communityId, houseLevelMode);
-    }
+//    /**
+//     * 通过当前社区id查出的当前社区所有已登记的房屋
+//     *
+//     * @return 返回当前社区已经被登记的所有房屋信息
+//     * @author YuLF
+//     * @Param
+//     * @since 2020/12/25 11:10
+//     */
+//    @Override
+//    public List<HouseVo> queryHouseByCommunityId(long communityId) {
+//        //1.拿到的当前社区层级结构
+//        Integer houseLevelMode = proprietorMapper.queryHouseLevelModeById(communityId);
+//        return proprietorMapper.queryHouseByCommunityId(communityId, houseLevelMode);
+//    }
 
 //    /**
 //     * [excel] 导入业主家属信息
