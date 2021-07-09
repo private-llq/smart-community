@@ -286,7 +286,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         one.setRealName(vo.getAppellation());
         one.setMobile(vo.getHouseContact());
         //查询发布人聊天id(im_id)
-        String imId = leaseUserService.queryIMIdByUid(uid);
+        String imId = leaseUserService.queryIMIdByUid(vo.getUid());
         one.setImId(imId);
         vo.setUser(one);
         return vo;

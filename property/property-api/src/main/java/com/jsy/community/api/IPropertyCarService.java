@@ -3,6 +3,8 @@ package com.jsy.community.api;
 import com.jsy.community.entity.PropertyCarEntity;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 
+import java.util.List;
+
 /**
  * @program: com.jsy.community
  * @description:
@@ -16,4 +18,21 @@ public interface IPropertyCarService{
     void updateOne(ElasticsearchCarQO elasticsearchCarQO);
 
     void deleteById(String id);
+
+    /**
+     * @Description: 批量修改
+     * @author: Hu
+     * @since: 2021/7/9 12:52
+     * @Param:
+     * @return:
+     */
+    void updateList(List<ElasticsearchCarQO> cars);
+    /**
+     * @Description: 批量新增
+     * @author: Hu
+     * @since: 2021/7/9 12:52
+     * @Param:
+     * @return:
+     */
+    void insertList(List<ElasticsearchCarQO> cars);
 }

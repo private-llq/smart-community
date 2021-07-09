@@ -1,8 +1,8 @@
 package com.jsy.community.listener;
+
 import com.jsy.community.api.IPropertyCarService;
 import com.jsy.community.config.RabbitMqConfig;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.PropertyCarEntity;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import com.jsy.community.utils.es.ElasticsearchCarUtil;
 import com.rabbitmq.client.Channel;
@@ -10,11 +10,11 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -39,11 +39,9 @@ public class ElasticsearchCarListener {
      * @return:
      */
     @RabbitListener(queues = {RabbitMqConfig.QUEUE_CAR_INSERT})
-    public void QUEUE_CAR_INSERT(ElasticsearchCarQO elasticsearchCarQO, Message message, Channel channel)throws IOException {
-        ElasticsearchCarUtil.insertData(elasticsearchCarQO,restHighLevelClient);
-        PropertyCarEntity entity = new PropertyCarEntity();
-        BeanUtils.copyProperties(elasticsearchCarQO,entity);
-        propertyCarService.insertOne(entity);
+    public void QUEUE_CAR_INSERT(List<ElasticsearchCarQO> cars, Message message, Channel channel)throws IOException {
+        ElasticsearchCarUtil.insertData(cars,restHighLevelClient);
+        propertyCarService.insertList(cars);
         //手动确认
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
         System.out.println("新增车辆信息成功");
@@ -56,9 +54,9 @@ public class ElasticsearchCarListener {
      * @return:
      */
     @RabbitListener(queues = {RabbitMqConfig.QUEUE_CAR_UPDATE})
-    public void QUEUE_CAR_UPDATE (ElasticsearchCarQO elasticsearchCarQO, Message message, Channel channel)throws IOException {
-        ElasticsearchCarUtil.updateData(elasticsearchCarQO,restHighLevelClient);
-        propertyCarService.updateOne(elasticsearchCarQO);
+    public void QUEUE_CAR_UPDATE (List<ElasticsearchCarQO> cars, Message message, Channel channel)throws IOException {
+        ElasticsearchCarUtil.updateData(cars,restHighLevelClient);
+        propertyCarService.updateList(cars);
         //手动确认
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
         System.out.println("修改车辆信息成功");

@@ -27,6 +27,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -138,11 +139,13 @@ public class ElasticsearchCarServiceImpl implements IElasticsearchCarService {
     public void updateCars() {
         List<PropertyCarEntity> entities = propertyCarMapper.selectList(null);
 //        ElasticsearchCarUtil.deleteDataAll(restHighLevelClient);
+        ArrayList<ElasticsearchCarQO> list = new ArrayList<>();
         for (PropertyCarEntity entity : entities) {
             ElasticsearchCarQO carQO = new ElasticsearchCarQO();
             BeanUtils.copyProperties(entity,carQO);
-            ElasticsearchCarUtil.insertData(carQO,restHighLevelClient);
+            list.add(carQO);
         }
+        ElasticsearchCarUtil.insertData(list,restHighLevelClient);
     }
 
 

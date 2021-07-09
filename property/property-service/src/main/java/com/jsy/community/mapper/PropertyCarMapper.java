@@ -5,6 +5,9 @@ import com.jsy.community.entity.PropertyCarEntity;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @program: com.jsy.community
  * @description:
@@ -15,4 +18,23 @@ import org.apache.ibatis.annotations.Mapper;
 public interface PropertyCarMapper extends BaseMapper<PropertyCarEntity> {
 
     void updateOne(ElasticsearchCarQO elasticsearchCarQO);
+
+
+    /**
+     * @Description: 批量修改
+     * @author: Hu
+     * @since: 2021/7/9 12:57
+     * @Param:
+     * @return:
+     */
+    void updateMap(Map<Long, ElasticsearchCarQO> map);
+
+    /**
+     * @Description: 批量新增
+     * @author: Hu
+     * @since: 2021/7/9 12:57
+     * @Param:
+     * @return:
+     */
+    void insertList(List<ElasticsearchCarQO> cars);
 }

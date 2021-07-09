@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -80,29 +81,33 @@ public class RelationServiceImpl implements IRelationService {
      * @Param: car,relationQo,houseEntity
      * @return: ElasticsearchCarQO
      */
-    public ElasticsearchCarQO getInsetElasticsearchCarQO(RelationCarsQO car,RelationQO relationQo,HouseEntity houseEntity){
-        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
-        elasticsearchCarQO.setId(car.getId());
-        elasticsearchCarQO.setCommunityId(relationQo.getCommunityId());
-        elasticsearchCarQO.setCarPlate(car.getCarPlate());
-        elasticsearchCarQO.setCarType(car.getCarType());
-        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(car.getCarType()));
-        elasticsearchCarQO.setOwner(relationQo.getName());
-        elasticsearchCarQO.setIdCard(relationQo.getIdCard());
-        elasticsearchCarQO.setMobile(relationQo.getMobile());
-        elasticsearchCarQO.setOwnerType(2);
-        elasticsearchCarQO.setOwnerTypeText("家属");
-        elasticsearchCarQO.setRelationshipId(relationQo.getId()+"");
-        elasticsearchCarQO.setHouseId(relationQo.getHouseId());
-        elasticsearchCarQO.setBuilding(houseEntity.getBuilding());
-        elasticsearchCarQO.setFloor(houseEntity.getFloor());
-        elasticsearchCarQO.setUnit(houseEntity.getUnit());
-        elasticsearchCarQO.setNumber(houseEntity.getNumber());
-        elasticsearchCarQO.setHouseType(houseEntity.getHouseType());
-        elasticsearchCarQO.setHouseTypeText(houseEntity.getHouseType()==1?"商铺":"住宅");
-        elasticsearchCarQO.setCreateTime(LocalDateTime.now());
-        System.out.println(elasticsearchCarQO);
-        return elasticsearchCarQO;
+    public List<ElasticsearchCarQO> getInsetElasticsearchCarQO(List<RelationCarsQO> car,RelationQO relationQo,HouseEntity houseEntity){
+        ArrayList<ElasticsearchCarQO> list = new ArrayList<>();
+        ElasticsearchCarQO elasticsearchCarQO = null;
+        for (RelationCarsQO carsQO : car) {
+            elasticsearchCarQO=new ElasticsearchCarQO();
+            elasticsearchCarQO.setId(carsQO.getId());
+            elasticsearchCarQO.setCommunityId(relationQo.getCommunityId());
+            elasticsearchCarQO.setCarPlate(carsQO.getCarPlate());
+            elasticsearchCarQO.setCarType(carsQO.getCarType());
+            elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carsQO.getCarType()));
+            elasticsearchCarQO.setOwner(relationQo.getName());
+            elasticsearchCarQO.setIdCard(relationQo.getIdCard());
+            elasticsearchCarQO.setMobile(relationQo.getMobile());
+            elasticsearchCarQO.setOwnerType(2);
+            elasticsearchCarQO.setOwnerTypeText("家属");
+            elasticsearchCarQO.setRelationshipId(relationQo.getId()+"");
+            elasticsearchCarQO.setHouseId(relationQo.getHouseId());
+            elasticsearchCarQO.setBuilding(houseEntity.getBuilding());
+            elasticsearchCarQO.setFloor(houseEntity.getFloor());
+            elasticsearchCarQO.setUnit(houseEntity.getUnit());
+            elasticsearchCarQO.setNumber(houseEntity.getNumber());
+            elasticsearchCarQO.setHouseType(houseEntity.getHouseType());
+            elasticsearchCarQO.setHouseTypeText(houseEntity.getHouseType()==1?"商铺":"住宅");
+            elasticsearchCarQO.setCreateTime(LocalDateTime.now());
+            list.add(elasticsearchCarQO);
+        }
+        return list;
     }
     /**
      * @Description: 封装修改es车辆实体类方法
@@ -111,13 +116,16 @@ public class RelationServiceImpl implements IRelationService {
      * @Param: car
      * @return: ElasticsearchCarQO
      */
-    public ElasticsearchCarQO getUpdateElasticsearchCarQO(RelationCarsQO car){
-        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
-        elasticsearchCarQO.setId(car.getId());
-        elasticsearchCarQO.setCarPlate(car.getCarPlate());
-        elasticsearchCarQO.setCarType(car.getCarType());
-        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(car.getCarType()));
-        return elasticsearchCarQO;
+    public List<ElasticsearchCarQO> getUpdateElasticsearchCarQO(List<RelationCarsQO> car){
+        ArrayList<ElasticsearchCarQO> list = new ArrayList<>();
+        for (RelationCarsQO relationCarsQO : car) {
+            ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
+            elasticsearchCarQO.setId(relationCarsQO.getId());
+            elasticsearchCarQO.setCarPlate(relationCarsQO.getCarPlate());
+            elasticsearchCarQO.setCarType(relationCarsQO.getCarType());
+            elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(relationCarsQO.getCarType()));
+        }
+        return list;
     }
 
 
@@ -165,9 +173,9 @@ public class RelationServiceImpl implements IRelationService {
                     car.setIdCard(houseMemberEntity.getIdCard());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
                 }
-                for (RelationCarsQO car : cars) {
-                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(car,relationQo,houseEntity));
-                }
+
+                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(cars,relationQo,houseEntity));
+
                 relationMapper.addCars(cars);
             }
 
@@ -279,6 +287,9 @@ public class RelationServiceImpl implements IRelationService {
     public void updateUserRelationDetails(RelationQO relationQo) {
         relationMapper.updateUserRelationDetails(relationQo);
         List<RelationCarsQO> cars = relationQo.getCars();
+        List<RelationCarsQO> insert = new ArrayList<>();
+        List<RelationCarsQO> update = new ArrayList<>();
+        HashMap<Long, RelationCarsQO> map = new HashMap<>();
         HouseEntity houseEntity = houseMapper.selectById(relationQo.getHouseId());
         if(cars.size()>0){
             for (RelationCarsQO car : cars) {
@@ -292,12 +303,20 @@ public class RelationServiceImpl implements IRelationService {
                     car.setRelationshipId(relationQo.getId());
                     car.setIdCard(relationQo.getIdCard());
                     car.setDrivingLicenseUrl(car.getDrivingLicenseUrl());
-                    relationMapper.insertOne(car);
-                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(car,relationQo,houseEntity));
+                    insert.add(car);
                 }else {
-                    relationMapper.updateUserRelationCar(car);
-                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.update",getUpdateElasticsearchCarQO(car));
+                    update.add(car);
+                    map.put(car.getId(),car);
                 }
+            }
+
+            if (insert.size()!=0&&insert!=null){
+                relationCarMapper.insertList(insert);
+                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(insert,relationQo,houseEntity));
+            }
+            if (update.size()!=0&&update!=null){
+                relationCarMapper.updateList(map);
+                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.update",getUpdateElasticsearchCarQO(update));
             }
         }
     }
