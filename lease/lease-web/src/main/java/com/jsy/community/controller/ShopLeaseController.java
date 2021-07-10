@@ -464,6 +464,22 @@ public class ShopLeaseController {
 		if (baseQO.getQuery()==null){
 			baseQO.setQuery(new HouseLeaseQO());
 		}
+		HouseLeaseQO query = baseQO.getQuery();
+		if (query.getShopBusinessIdArrays()!=null){
+			for (Long array : query.getShopBusinessIdArrays()) {
+				if (array==9) {
+					query.setShopBusinessIdArrays(null);
+				}
+			}
+		}
+		if (query.getShopTypeIdArrays()!=null){
+			for (Long array : query.getShopBusinessIdArrays()) {
+				if (array==1) {
+					query.setShopTypeIdArrays(null);
+				}
+			}
+		}
+		baseQO.setQuery(query);
 		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO);
 		return CommonResult.ok(pageInfo);
 	}
