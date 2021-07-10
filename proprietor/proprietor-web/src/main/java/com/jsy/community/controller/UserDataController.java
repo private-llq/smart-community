@@ -91,8 +91,8 @@ public class UserDataController {
         try {
             String s = new String(nickname.getBytes("GBK"));
             if(!"".equals(nickname)&&nickname!=null){
-                if (s.length()<2||s.length()>16){
-                    return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉子！");
+                if (s.length()<=2||s.length()>=16){
+                    return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉字！");
                 }
                 if (BadWordUtil2.isContaintBadWord(nickname,BadWordUtil2.minMatchTYpe)){
                     return CommonResult.error("该名称不可用：名称中存在敏感字！");
