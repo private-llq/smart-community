@@ -172,7 +172,7 @@ public class UserController {
 
 
 
-
+    // TODO 接口已经废弃,不使用了,暂未彻底删除
     /**
      * 【用户】业主更新信息
      * PutMapping("update")
@@ -182,26 +182,26 @@ public class UserController {
      * @return 返回更新成功!
      * @since 2020/11/27 15:03
      */
-    @Login
-    @Deprecated
-	@ApiOperation("业主信息更新")
-    public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO qo) {
-		//3.更新业主房屋信息和车辆信息
-        qo.setUid(UserUtils.getUserId());
-        if( Objects.isNull(qo.getHasCar()) ){
-            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
-        }
-        //如果有车 则批量验证车辆信息
-        if( qo.getHasCar() ){
-            qo.getCars().forEach( car ->  ValidatorUtils.validateEntity(car, CarQO.CarValidated.class));
-        }
-        if( CollectionUtils.isEmpty(qo.getHouses()) ){
-            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "房屋未指定!");
-        }
-        //房屋数据业务唯一id、房屋id、社区id边界有效性验证
-        qo.getHouses().forEach( house -> ValidatorUtils.validateEntity( house, UserHouseQo.UpdateHouse.class ));
-        return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
-    }
+//    @Login
+//    @Deprecated
+//	@ApiOperation("业主信息更新")
+//    public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO qo) {
+//		//3.更新业主房屋信息和车辆信息
+//        qo.setUid(UserUtils.getUserId());
+//        if( Objects.isNull(qo.getHasCar()) ){
+//            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
+//        }
+//        //如果有车 则批量验证车辆信息
+//        if( qo.getHasCar() ){
+//            qo.getCars().forEach( car ->  ValidatorUtils.validateEntity(car, CarQO.CarValidated.class));
+//        }
+//        if( CollectionUtils.isEmpty(qo.getHouses()) ){
+//            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "房屋未指定!");
+//        }
+//        //房屋数据业务唯一id、房屋id、社区id边界有效性验证
+//        qo.getHouses().forEach( house -> ValidatorUtils.validateEntity( house, UserHouseQo.UpdateHouse.class ));
+//        return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+//    }
 
 
     @Login

@@ -82,10 +82,10 @@ public class CommonController {
     @Login
     public CommonResult<?> queryZone(@RequestParam Long id,
                                      @RequestParam Integer queryType,
-                                     @RequestParam(required = false, defaultValue = "0")Integer page,
+                                     @RequestParam(required = false, defaultValue = "1")Integer page,
                                      @RequestParam(required = false, defaultValue = "10")Integer size) {
         //验证分页参数
-        page = ValidatorUtils.isInteger(page) ? page : 0;
+        page = ValidatorUtils.isInteger(page) ? page : 1;
         size = ValidatorUtils.isInteger(size) ? size : 10;
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);
