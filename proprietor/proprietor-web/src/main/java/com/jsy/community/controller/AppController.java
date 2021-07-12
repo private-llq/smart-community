@@ -6,13 +6,16 @@ import com.jsy.community.api.IAppVersionService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppVersionEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -71,8 +74,32 @@ public class AppController {
 		return CommonResult.ok(list,"查询成功");
 	}
 	
-	
-	public static void main(String[] args) {
-		System.out.println(SnowFlake.nextId());
+	@ApiOperation("添加APP版本")
+	@PostMapping("/version")
+	public CommonResult addAppVersion(@RequestBody AppVersionEntity appVersionEntity){
+		ValidatorUtils.validateEntity(appVersionEntity);
+		appVersionService.addAppVersion(appVersionEntity);
+		return CommonResult.ok("操作成功");
 	}
+	
+	@ApiOperation("修改APP版本信息")
+	@PutMapping("/version")
+	public CommonResult updateAppVersion(@RequestBody AppVersionEntity appVersionEntity){
+		if(appVersionEntity.getId() == null){
+			return CommonResult.error("请传入id");
+		}
+		appVersionEntity.setCreateTime(null);
+		appVersionEntity.setSysType(null);
+		return appVersionService.updateById(appVersionEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	
+	@ApiOperation("删除APP版本")
+	@DeleteMapping("/version")
+	public CommonResult delAppVersion(@RequestParam Long id){
+		if(id == null){
+			return CommonResult.error("请传入id");
+		}
+		return appVersionService.removeById(id) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	
 }
