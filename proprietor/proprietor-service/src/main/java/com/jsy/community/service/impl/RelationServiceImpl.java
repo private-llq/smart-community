@@ -309,7 +309,8 @@ public class RelationServiceImpl implements IRelationService {
                     map.put(car.getId(),car);
                 }
             }
-
+            List<ElasticsearchCarQO> carQO = getInsetElasticsearchCarQO(insert, relationQo, houseEntity);
+            List<ElasticsearchCarQO> carQO1 = getUpdateElasticsearchCarQO(update);
             if (insert.size()!=0&&insert!=null){
                 relationCarMapper.insertList(insert);
                 rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsetElasticsearchCarQO(insert,relationQo,houseEntity));

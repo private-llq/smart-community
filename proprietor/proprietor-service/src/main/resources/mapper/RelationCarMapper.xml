@@ -5,7 +5,8 @@
         insert into t_relation_car
         (id,uid,community_id,car_plate,mobile,owner,id_card,car_type,relation_type,relationship_id,driving_license_url,create_time)
         values
-        <foreach collection="insert" separator="," item="car" open="(" close=")">
+        <foreach collection="insert" separator="," item="car">
+        (
             #{car.id},
             #{car.uid},
             #{car.communityId},
@@ -18,6 +19,7 @@
             #{car.relationshipId},
             #{car.drivingLicenseUrl},
             now()
+            )
         </foreach>
     </insert>
     <update id="updateList">

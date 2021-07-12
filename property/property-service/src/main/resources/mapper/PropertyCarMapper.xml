@@ -44,7 +44,8 @@
         insert into t_property_car
         (id,community_id,house_id,owner_type,owner,mobile,id_card,owner_type_text,relationship_id,car_type,car_type_text,car_plate,number,building,floor,unit,house_type,house_type_text,create_time)
         values
-        <foreach collection="cars" open="(" close=")" separator="," item="car">
+        <foreach collection="cars" separator="," item="car">
+        (
             #{car.id},
             #{car.communityId},
             #{car.houseId},
@@ -64,6 +65,7 @@
             #{car.houseType},
             #{car.houseTypeText},
             now()
+            )
         </foreach>
     </insert>
 </mapper>

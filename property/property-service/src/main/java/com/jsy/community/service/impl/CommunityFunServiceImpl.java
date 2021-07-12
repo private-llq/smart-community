@@ -248,28 +248,31 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
   }
 
 
-
-
-  /**
-   * @Description: 发布
-   * @author: Hu
-   * @since: 2021/5/21 11:15
-   * @Param: [id, adminInfoVo]
-   * @return: void
-   */
-  @Override
-  public void popUpOnline(Long id,AdminInfoVo adminInfoVo) {
-    CommunityFunEntity entity = communityFunMapper.selectById(id);
-    if (entity.getStatus()==1){
-      throw new PropertyException("该趣事已上线");
+    /**
+     * @Description: 发布
+     * @author: Hu
+     * @since: 2021/5/21 11:15
+     * @Param: [id, adminInfoVo]
+     * @return: void
+     */
+    @Override
+    public void popUpOnline(Long id,AdminInfoVo adminInfoVo) {
+        CommunityFunEntity entity = communityFunMapper.selectById(id);
+        if (entity==null){
+            throw new PropertyException("该趣事不存在！");
+        }
+        if (entity.getStatus()==1){
+            throw new PropertyException("该趣事已上线！");
+        }
+        entity.setStartName(adminInfoVo.getRealName());
+        entity.setRedactStatus(1);
+        entity.setStatus(1);
+        entity.setStartBy(adminInfoVo.getUid());
+        entity.setStartTime(LocalDateTime.now());
+        communityFunMapper.updateById(entity);
+        ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl(),entity.getCommunityId());
     }
-    entity.setStartName(adminInfoVo.getRealName());
-    entity.setRedactStatus(1);
-    entity.setStatus(1);
-    entity.setStartBy(adminInfoVo.getUid());
-    entity.setStartTime(LocalDateTime.now());
-    communityFunMapper.updateById(entity);
-    ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl(),entity.getCommunityId());
-  }
+
+
 
 }
