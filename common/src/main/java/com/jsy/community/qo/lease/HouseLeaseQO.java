@@ -72,7 +72,7 @@ public class HouseLeaseQO implements Serializable {
     private String houseAddress;
 
 
-    @Size(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class,  UpdateWholeLeaseHouse.class}, min = 1,  message = "房屋亮点标签至少需要一个!")
+    @Size(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class}, min = 1,  message = "房屋亮点标签至少需要一个!")
     @NotNull( groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class}, message = "房屋亮点标签至少一个!")
     @ApiModelProperty(value = "房屋租售亮点标签ID数组")
     private List<Long> houseAdvantageCode;
