@@ -52,7 +52,6 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
     private CommunityFunMapper communityFunMapper;
     @Autowired
     private AdminUserMapper adminUserMapper;
-
     @Resource
     private RedisTemplate redisTemplate;
 

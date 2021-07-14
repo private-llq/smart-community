@@ -473,7 +473,7 @@ public class ShopLeaseController {
 			}
 		}
 		if (query.getShopTypeIdArrays()!=null){
-			for (Long array : query.getShopBusinessIdArrays()) {
+			for (Long array : query.getShopTypeIdArrays()) {
 				if (array==1) {
 					query.setShopTypeIdArrays(null);
 				}

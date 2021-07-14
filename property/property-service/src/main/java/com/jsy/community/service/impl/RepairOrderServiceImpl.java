@@ -76,6 +76,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 			if (orderEntity.getAssignId() != null) {
 				QueryWrapper<AdminUserEntity> wrapper = new QueryWrapper<>();
 				wrapper.eq("uid", orderEntity.getAssignId());
+				wrapper.eq("community_id", orderEntity.getCommunityId());
 				AdminUserEntity adminUserEntity = adminUserMapper.selectOne(wrapper);
 				orderEntity.setAssignName(adminUserEntity.getRealName());
 				orderEntity.setAssignNameNumber(adminUserEntity.getNumber());
