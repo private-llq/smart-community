@@ -19,6 +19,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.MyCaptchaUtil;
+import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -154,11 +155,13 @@ public class AdminLoginController {
 		
 		//账号不存在、密码错误
 		if (user == null) {
+			log.error(form.getAccount() + "登录失败，原因：账号不存在");
 			return CommonResult.error("账号或密码不正确");
 		}
 		// 如果是密码登录,判断密码正不正确
 		if (StringUtils.isEmpty(form.getCode())) {
-			if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())){
+			if(!user.getPassword().equals(new Sha256Hash(RSAUtil.privateDecrypt(form.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), user.getSalt()).toHex())){
+				log.error(form.getAccount() + "登录失败，原因：密码不正确");
 				return CommonResult.error("账号或密码不正确");
 			}
 		}
