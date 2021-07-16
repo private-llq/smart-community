@@ -377,6 +377,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         return JSON.parseObject(response.getResponse().getMsgBody(), BalanceVO.class);
     }
 
+
     /**
      *@Author: Pipi
      *@Description: 查询开B端开户情况
