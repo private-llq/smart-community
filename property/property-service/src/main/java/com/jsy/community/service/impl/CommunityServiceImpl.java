@@ -90,6 +90,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		return communityMapper.queryCommunityBatch(idList);
 	}
 	
+	/**
+	 * 获取社区电子地图
+	 */
 	@Override
 	public Map<String, Object> getElectronicMap(Long communityId) {
 		HashMap<String, Object> hashMap = new HashMap<>();
@@ -111,12 +114,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		hashMap.put("lat",lat);
 		
 		//2. 获取社区总人数
-		QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("check_status",1);
-		
-		// TODO: 2021/4/19 问了组长 总人数是这么获取的
 		// 认证的业主总数【根据房屋认证表获取】
-		Integer userHouseCount = userHouseMapper.selectCount(wrapper);
+//		Integer userHouseCount = userHouseMapper.selectCount(new QueryWrapper<UserHouseEntity>().eq("check_status",1));
+		Integer userHouseCount = userHouseMapper.selectCount(new QueryWrapper<>());
 		
 		// 房间成员人数【不包含业主本人】
 		Integer houseMemberCount = houseMemberMapper.selectCount(null);
@@ -124,5 +124,17 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		hashMap.put("count",userHouseCount+houseMemberCount);
 		
 		return hashMap;
+	}
+	
+	/**
+	* @Description: 查询所有小区ID
+	 * @Param: []
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/26
+	**/
+	@Override
+	public List<Long> queryAllCommunityIdList(){
+		return communityMapper.queryAllCommunityIdList();
 	}
 }

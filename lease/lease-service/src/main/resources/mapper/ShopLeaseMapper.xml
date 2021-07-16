@@ -49,38 +49,49 @@
                 and title like concat ("%",#{qo.query.searchText},"%")
             </if>
             <!-- 地区 -->
-            <if test="qo.query.houseAreaId!=null">
+            <if test="qo.query.houseAreaId!=null and qo.query.houseAreaId!=0">
                 and area_id = #{qo.query.houseAreaId}
             </if>
             <!-- 租金范围 -->
-            <if test="qo.query.housePriceMin != null">
+            <if test="qo.query.housePriceMin != null and qo.query.housePriceMin != 0">
                 and month_money &gt;= #{qo.query.housePriceMin}
             </if>
-            <if test="qo.query.housePriceMax != null">
+            <if test="qo.query.housePriceMax != null and qo.query.housePriceMax != 0">
                 and month_money &lt;= #{qo.query.housePriceMax}
             </if>
             <!-- 面积 -->
-            <if test="qo.query.houseSquareMeterMin != null and qo.query.houseSquareMeterMin != &quot;&quot; and qo.query.houseSquareMeterMin &gt; 0
-                and qo.query.houseSquareMeterMax != null and qo.query.houseSquareMeterMax != &quot;&quot; and qo.query.houseSquareMeterMax &gt; 0">
-                and shop_acreage &gt;= #{qo.query.houseSquareMeterMin} and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
+            <if test="qo.query.houseSquareMeterMin != null and qo.query.houseSquareMeterMin!=0">
+                and shop_acreage &gt;= #{qo.query.houseSquareMeterMin}
             </if>
-            <if test="qo.query.houseSquareMeterMin == 0 and qo.query.houseSquareMeterMax != null">
+            <if test="qo.query.houseSquareMeterMax != 0 and qo.query.houseSquareMeterMax != null">
                 and shop_acreage &lt;= #{qo.query.houseSquareMeterMax}
             </if>
+
             <!-- 所属类型id -->
-            <if test="qo.query.shopTypeId !=null">
-                and shop_type_id = #{qo.query.shopTypeId}
+            <if test="qo.query.shopBusinessIdArrays!=null and qo.query.shopBusinessIdArrays.length!=0">
+                and shop_business_id in (
+                <foreach collection="qo.query.shopBusinessIdArrays" item="id" separator=",">
+                    #{id}
+                </foreach>
+                )
             </if>
             <!-- 所属行业id -->
-            <if test="qo.query.shopBusinessId!=null">
-                and shop_business_id = #{qo.query.shopBusinessId}
+            <if test="qo.query.shopTypeIdArrays !=null  and qo.query.shopTypeIdArrays.length!=0">
+                and shop_type_id in (
+                <foreach collection="qo.query.shopTypeIdArrays" item="id" separator=",">
+                    #{id}
+                </foreach>
+                )
             </if>
             <!-- 来源 传3就是来源不限-->
-            <if test="qo.query.houseSourceId!=null and qo.query.houseSourceId!=3">
+            <if test="qo.query.houseSourceId!=null and qo.query.houseSourceId!=0">
                 and source = #{qo.query.houseSourceId}
             </if>
         </where>
         order by create_time desc
+    </select>
+    <select id="selectByShopId" resultType="com.jsy.community.entity.shop.ShopLeaseEntity">
+        select * from  t_shop_lease where id=#{shopId}
     </select>
 
 </mapper>

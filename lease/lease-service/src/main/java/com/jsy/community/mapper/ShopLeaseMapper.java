@@ -49,4 +49,13 @@ public interface ShopLeaseMapper extends BaseMapper<ShopLeaseEntity> {
 	 * @Param [baseQO, info]
 	 **/
 	List<ShopLeaseEntity> getShopByCondition(@Param("qo") BaseQO<HouseLeaseQO> baseQO, @Param("info")Page<ShopLeaseEntity> info);
+
+	/**
+	 * @Description: 查询一条商铺详情
+	 * @author: Hu
+	 * @since: 2021/7/8 10:48
+	 * @Param:
+	 * @return:
+	 */
+    ShopLeaseEntity selectByShopId(Long shopId);
 }

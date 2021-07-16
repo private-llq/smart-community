@@ -3,12 +3,16 @@ package com.jsy.community.controller;
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IPropertyFinanceOrderService;
+import com.jsy.community.api.IPropertyFinanceReceiptService;
 import com.jsy.community.api.IShoppingMallService;
 import com.jsy.community.api.IWeChatService;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
@@ -33,17 +37,21 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.xmlpull.v1.XmlPullParserException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: pay
@@ -60,6 +68,22 @@ public class WeChatController {
     private IWeChatService weChatService;
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private IShoppingMallService shoppingMallService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFinanceOrderService propertyFinanceOrderService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFinanceReceiptService propertyFinanceReceiptService;
+
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+    //物业费redis缓存分组key
+    private final String PROPERTY_FEE="PropertyFee:";
+
+    @Value("${pay.order.timeout}")
+    private int payOrderTimeout;
+
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -74,10 +98,22 @@ public class WeChatController {
      */
     @Login
     @PostMapping("/wxPay")
-    public CommonResult<JSONObject> wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
-        //如果商城调用就先验证
+    public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+        //封装微信支付下单请求参数
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
+        //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
+        map.put("appid", WechatConfig.APPID);
+        map.put("mchid",WechatConfig.MCH_ID);
+        map.put("description", weChatPayQO.getDescriptionStr());
+        map.put("out_trade_no", OrderNoUtil.getOrder());
+        map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback");
+        map.put("amount",hashMap);
+        //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
+        hashMap.put("total",1);
+        hashMap.put("currency","CNY");
+
+        //商城业务逻辑
         if (weChatPayQO.getTradeFrom()==2){
             Map<String, Object> objectMap = shoppingMallService.validateShopOrder(weChatPayQO.getOrderData(), UserUtils.getUserToken());
             if(0 != (int)objectMap.get("code")){
@@ -85,18 +121,19 @@ public class WeChatController {
             }
             map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
         }
-        //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
-        //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
-        hashMap.put("total",1);
-        hashMap.put("currency","CNY");
-        map.put("appid", WechatConfig.APPID);
-        map.put("mchid",WechatConfig.MCH_ID);
-        map.put("description", weChatPayQO.getDescriptionStr());
-        map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback");
-        map.put("amount",hashMap);
-        //转json
-        String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
+        //物业费业务逻辑
+        if (weChatPayQO.getTradeFrom()==4){
+            if ("".equals(weChatPayQO.getIds())||weChatPayQO.getIds()==null){
+                return CommonResult.error("物业缴费账单id不能为空！");
+            }
+            if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
+                map.put("description", "物业缴费");
+            }
+//            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
+            //缓存物业缴费的账单id到redis
+            redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),payOrderTimeout, TimeUnit.HOURS);
+            map.put("attach",4+","+map.get("out_trade_no")+","+propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()));
+        }
 
         //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
@@ -122,12 +159,13 @@ public class WeChatController {
             }
         });
         //第一步获取prepay_id
-        String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/app", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
+        String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/app", JSONUtil.toJsonStr(map), WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
         //第二步获取调起支付的参数
         JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
         object.put("orderNum",map.get("out_trade_no"));
         return CommonResult.ok(object);
     }
+
     /**
      * @Description: 支付成功回调地址
      * @author: Hu
@@ -138,20 +176,41 @@ public class WeChatController {
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         log.info("回调成功");
-        Map<String, String> map = PublicConfig.notifyParam(request, response, WechatConfig.API_V3_KEY);
+        Map<String, String> map = PublicConfig.notifyParam(request , WechatConfig.API_V3_KEY);
 //        weChatService.saveStatus(out_trade_no);
         log.info(String.valueOf(map));
 
         weChatService.orderStatus(map);
         if (map.get("attach")!=null){
             String[] split = map.get("attach").split(",");
-            if (split[0]==2+""){
+            //处理商城支付回调后的业务逻辑
+            if (split[0].equals("2")){
                 shoppingMallService.completeShopOrder(split[1]);
+            }
+            //处理物业费支付回调后的业务逻辑
+            if (split[0].equals("4")){
+	            log.info("开始处理物业费订单：" + map.get("out_trade_no"));
+                Object ids = redisTemplate.opsForValue().get(PROPERTY_FEE + map.get("out_trade_no"));
+                if (ids == null){
+                    log.error("微信物业费订单回调处理异常，订单号：" + map.get("out_trade_no"));
+                    return;
+                }
+                log.info("账单ids：" + String.valueOf(ids).split(","));
+                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","));
+                //获取一条账单，得到社区id
+                PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(String.valueOf(ids).split(",")[0]));
+                PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
+                receiptEntity.setCommunityId(financeOrderEntity.getCommunityId());
+                receiptEntity.setReceiptNum(OrderNoUtil.getOrder());
+                receiptEntity.setTransactionNo(String.valueOf(map.get("transaction_id")));
+                receiptEntity.setTransactionType(2);
+                receiptEntity.setReceiptMoney(new BigDecimal(split[2]));
+                propertyFinanceReceiptService.add(receiptEntity);
+                log.info("处理完成");
             }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
     }
-
 
     /**
      * @Description: 提现

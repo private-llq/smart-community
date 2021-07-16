@@ -11,6 +11,7 @@ import com.jsy.community.mapper.PropertyFinanceReceiptMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -35,6 +36,19 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
     
+    /**
+    * @Description: 新增收款单
+     * @Param: [entity]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2021/7/9
+    **/
+    @Override
+	public void add(PropertyFinanceReceiptEntity entity){
+	    entity.setId(SnowFlake.nextId());
+		propertyFinanceReceiptMapper.insert(entity);
+	}
+	
     /**
     * @Description: 分页查询
      * @Param: [baseQO]
@@ -187,9 +201,6 @@ public class PropertyFinanceReceiptServiceImpl implements IPropertyFinanceReceip
 				if (!CollectionUtils.isEmpty(orderTotalList)) {
 					List<PropertyFinanceOrderEntity> orderList = new ArrayList<>();
 					for (PropertyFinanceOrderEntity orderEntity : orderTotalList) {
-						if ("8888".equals(orderEntity.getReceiptNum())) {
-							System.out.println(1);
-						}
 						if(orderEntity.getReceiptNum().equals(entity.getReceiptNum())){
 							orderList.add(orderEntity);
 						}

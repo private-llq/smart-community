@@ -23,6 +23,8 @@
 			id = #{h.id} and uid = #{uid} and deleted = 0
 		</where>
 	</update>
+
+	<!-- 2021.7.9 去除查询条件 AND check_status = 1 -->
 	<!-- 通过用户id查出用户房屋信息 -->
 	<select id="queryUserHouseList" resultType="com.jsy.community.vo.HouseVo">
 		SELECT
@@ -46,6 +48,5 @@
 		AND s.deleted = 0
 		AND c.deleted = 0
 		AND h.uid = #{userId}
-		AND check_status = 1
 	</select>
 </mapper>

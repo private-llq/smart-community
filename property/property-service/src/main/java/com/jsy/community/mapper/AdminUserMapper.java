@@ -118,7 +118,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
-	@Select("select community_id from t_admin_user where mobile = #{mobile}")
+	@Select("select community_id from t_admin_user where mobile = #{mobile} and deleted = 0")
 	List<Long> queryCommunityIdListByMobile(String mobile);
 	
 	/**

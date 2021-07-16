@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
@@ -10,6 +9,7 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.ProprietorQO;
@@ -20,7 +20,10 @@ import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserInfoVo;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -57,6 +60,9 @@ public class UserController {
     
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserUroraTagsService userUroraTagsService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserHouseService userHouseService;
     
     private static final String BUCKETNAME_ID_CARD = "id-card"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
     
@@ -67,6 +73,8 @@ public class UserController {
     @Login
     @PutMapping("regId")
     public CommonResult updateUserRegId(@RequestParam String regId){
+        //TODO 苹果过审用 防止报错暂时生成随机串
+        regId = UUID.randomUUID().toString().replace("-","");
         boolean result = userService.updateUserRegId(regId, UserUtils.getUserId());
         return result ? CommonResult.ok("离线推送设备id设置成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"离线推送设备id设置失败");
     }
@@ -124,6 +132,23 @@ public class UserController {
     public CommonResult<UserInfoVo> switchHouse(@RequestParam Long houseId) {
         return CommonResult.ok(userService.proprietorQuery(UserUtils.getUserId(), houseId));
     }
+    
+    
+
+    /**
+     * @Description: 删除业主车辆
+     * @author: Hu
+     * @since: 2021/7/8 14:00
+     * @Param: [houseId]
+     * @return: com.jsy.community.vo.CommonResult<com.jsy.community.vo.UserInfoVo>
+     */
+    @Login
+    @ApiOperation("切换房屋选择房屋业主信息及业主家属信息查询接口")
+    @DeleteMapping("delCar")
+    public CommonResult deleteCar(@RequestParam Long id) {
+        userService.deleteCar(UserUtils.getUserId(), id);
+        return CommonResult.ok();
+    }
 
 
     /**
@@ -147,7 +172,7 @@ public class UserController {
 
 
 
-
+    // TODO 接口已经废弃,不使用了,暂未彻底删除
     /**
      * 【用户】业主更新信息
      * PutMapping("update")
@@ -157,26 +182,26 @@ public class UserController {
      * @return 返回更新成功!
      * @since 2020/11/27 15:03
      */
-    @Login
-    @Deprecated
-	@ApiOperation("业主信息更新")
-    public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO qo) {
-		//3.更新业主房屋信息和车辆信息
-        qo.setUid(UserUtils.getUserId());
-        if( Objects.isNull(qo.getHasCar()) ){
-            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
-        }
-        //如果有车 则批量验证车辆信息
-        if( qo.getHasCar() ){
-            qo.getCars().forEach( car ->  ValidatorUtils.validateEntity(car, CarQO.CarValidated.class));
-        }
-        if( CollectionUtils.isEmpty(qo.getHouses()) ){
-            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "房屋未指定!");
-        }
-        //房屋数据业务唯一id、房屋id、社区id边界有效性验证
-        qo.getHouses().forEach( house -> ValidatorUtils.validateEntity( house, UserHouseQo.UpdateHouse.class ));
-        return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
-    }
+//    @Login
+//    @Deprecated
+//	@ApiOperation("业主信息更新")
+//    public CommonResult<Boolean> proprietorUpdate(@RequestBody ProprietorQO qo) {
+//		//3.更新业主房屋信息和车辆信息
+//        qo.setUid(UserUtils.getUserId());
+//        if( Objects.isNull(qo.getHasCar()) ){
+//            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "必须指定hasCar!");
+//        }
+//        //如果有车 则批量验证车辆信息
+//        if( qo.getHasCar() ){
+//            qo.getCars().forEach( car ->  ValidatorUtils.validateEntity(car, CarQO.CarValidated.class));
+//        }
+//        if( CollectionUtils.isEmpty(qo.getHouses()) ){
+//            throw new JSYException(JSYError.BAD_REQUEST.getCode(), "房屋未指定!");
+//        }
+//        //房屋数据业务唯一id、房屋id、社区id边界有效性验证
+//        qo.getHouses().forEach( house -> ValidatorUtils.validateEntity( house, UserHouseQo.UpdateHouse.class ));
+//        return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+//    }
 
 
     @Login
@@ -420,5 +445,21 @@ public class UserController {
         UserEntity returnEntity = new UserEntity();
         returnEntity.setIsRealAuth(userEntity.getIsRealAuth()); //实名 0.否 1.已实名 2.已实人
         return CommonResult.ok(returnEntity,"查询成功");
+    }
+
+    /**
+     * @author: Pipi
+     * @description:  业主解绑房屋
+     * @param: userHouseEntity:
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/6/21 14:01
+     **/
+    @Login
+    @ApiOperation("业主解绑房屋")
+    @PostMapping("/untieHouse")
+    public CommonResult untieHouse(@RequestBody UserHouseEntity userHouseEntity) {
+        userHouseEntity.setUid(UserUtils.getUserId());
+        ValidatorUtils.validateEntity(userHouseEntity, UserHouseEntity.UntieHouse.class);
+        return userHouseService.untieHouse(userHouseEntity) ? CommonResult.ok("解绑成功!") : CommonResult.error("解绑失败!");
     }
 }

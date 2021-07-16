@@ -145,7 +145,8 @@ public class RepairController {
 		repairEntity.setUserId(uid);
 		ValidatorUtils.validateEntity(repairEntity, RepairEntity.addRepairValidate.class);
 		repairService.addRepair(repairEntity);
-		
+
+		//利用redis处理垃圾图片
 		String repairImg = repairEntity.getRepairImg();
 		String[] split = repairImg.split(";");
 		for (String filePath : split) {

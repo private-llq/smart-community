@@ -39,10 +39,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -162,6 +159,10 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		long peopleCode = MyMathUtils.getTypeCode(peopleTypeCodes);
 		baseShop.setShopPeople(peopleCode);
 		
+		//查询社区经纬度
+		CommunityEntity community = communityService.getCommunityNameById(baseShop.getCommunityId());
+		baseShop.setLon(community.getLon());
+		baseShop.setLat(community.getLat());
 		shopLeaseMapper.insert(baseShop);
 		
 		// 存储店铺图片集合
@@ -183,10 +184,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 	@Override
 	public Map<String, Object> getShop(Long shopId) {
 		Map<String, Object> map = new HashMap<>();
-		
-		QueryWrapper<ShopLeaseEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("id", shopId);
-		ShopLeaseEntity shop = shopLeaseMapper.selectOne(wrapper);
+
+
+		ShopLeaseEntity shop = shopLeaseMapper.selectByShopId(shopId);
 		
 		if (shop == null) {
 			return null;
@@ -274,6 +274,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		
 		Long communityId = shop.getCommunityId();
 		CommunityEntity community = communityService.getCommunityNameById(communityId);
+		if (area == null) {
+			area = "";
+		}
 		shopLeaseVo.setShopAddress(area + "  " + community.getName());
 		
 		
@@ -760,18 +763,19 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 		}
 		return userShopLeaseVOS;
 	}
+
 	
 	@Override
 	public PageInfo<IndexShopVO> getShopByCondition(BaseQO<HouseLeaseQO> baseQO) {
 		Long page = baseQO.getPage();
 		Long size = baseQO.getSize();
+
 		Page<ShopLeaseEntity> info = new Page<>(page, size);
 		List<ShopLeaseEntity> shopList = shopLeaseMapper.getShopByCondition(baseQO, info);
 		ArrayList<IndexShopVO> shopVOS = new ArrayList<>();
 		for (ShopLeaseEntity shopLeaseEntity : shopList) {
 			IndexShopVO indexShopVO = new IndexShopVO();
 			BeanUtils.copyProperties(shopLeaseEntity, indexShopVO);
-			
 			// 封装图片
 			QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();
 			imgWrapper.eq("shop_id", shopLeaseEntity.getId());
@@ -802,7 +806,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 			if (shopLeaseEntity.getMonthMoney().doubleValue() > NORM_MONEY) {
 				String s = String.format("%.2f", shopLeaseEntity.getMonthMoney().doubleValue() / NORM_MONEY) + "万";
 				indexShopVO.setMonthMoneyString(s);
-			} else if (shopLeaseEntity.getMonthMoney().compareTo(new BigDecimal(MIN_MONEY)) == 0) {
+			} else if (shopLeaseEntity.getMonthMoney().compareTo(BigDecimal.valueOf(MIN_MONEY)) == 0) {
 				String s = "面议";
 				indexShopVO.setMonthMoneyString(s);
 			} else {

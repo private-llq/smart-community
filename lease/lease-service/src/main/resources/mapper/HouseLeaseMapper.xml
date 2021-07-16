@@ -65,6 +65,7 @@
         )
     </insert>
 
+    <!-- 2021.7.9 去掉了条件 AND h.check_status = 1 -->
     <!-- 按用户id获取所有小区名称 -->
     <select id="allCommunity" resultType="com.jsy.community.entity.CommunityEntity">
         SELECT DISTINCT
@@ -78,7 +79,6 @@
         WHERE
 	        c.deleted = 0
 	        AND h.deleted = 0
-	        AND h.check_status = 1
 	        AND h.uid = #{uid}
 	        AND c.city_id = #{cityId}
     </select>
@@ -385,7 +385,7 @@
 	        LEFT JOIN t_house_const AS e ON l.decoration_type_id = d.house_const_code
 	        AND d.house_const_type = 18
             WHERE
-	        l.id = #{houseId} and l.deleted = 0
+	        l.id = #{houseId}
     </select>
     <!-- 根据用户id和社区id 查出用户在这个社区下面所属的房源 -->
     <select id="ownerLeaseHouse" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
@@ -410,17 +410,17 @@
 	        LIMIT #{page},#{size}
     </select>
 
+    <!-- 2021.7.9 去除查询条件 uh.check_status = 1 and  -->
     <!-- 根据用户id 和社区id 查询用户在这个社区的可发布房源 -->
     <select id="ownerHouse" resultType="com.jsy.community.vo.HouseVo">
         SELECT
 	        h.id,
 	        concat(h.building,h.unit,h.floor,h.door) as mergeName
-
         FROM
 	        t_user_house AS uh
 	        RIGHT JOIN t_house AS h ON uh.house_id = h.id
         WHERE
-        uh.check_status = 1 and uh.uid = #{uid} and uh.community_id = #{communityId} and uh.deleted = 0 and h.type = 4 and uh.deleted = 0
+        uh.uid = #{uid} and uh.community_id = #{communityId} and uh.deleted = 0 and h.type = 4 and uh.deleted = 0
     </select>
 
     <!-- 按小区名或房屋出租标题或房屋地址模糊搜索匹配接口 -->

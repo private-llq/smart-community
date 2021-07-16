@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IShoppingMallService;
 import com.jsy.community.api.PaymentException;
@@ -58,7 +59,7 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 		try{
 			//执行请求，解析结果
 			httpResult = (String)MyHttpUtils.exec(httpPost,MyHttpUtils.ANALYZE_TYPE_STR);
-			result = JSONObject.parseObject(httpResult);
+			result = JSON.parseObject(httpResult);
 			if(0 == result.getIntValue("code")){
 				returnMap.put("code",0);
 				log.info("商城订单校验通过");
@@ -105,7 +106,7 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 		try{
 			//执行请求，解析结果
 			httpResult = (String)MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_STR);
-			result = JSONObject.parseObject(httpResult);
+			result = JSON.parseObject(httpResult);
 			if(0 == result.getIntValue("code")){
 				returnMap.put("code",0);
 				log.info("商城订单状态修改完成");

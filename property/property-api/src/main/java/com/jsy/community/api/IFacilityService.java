@@ -1,7 +1,9 @@
 package com.jsy.community.api;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.hk.FacilityEntity;
+import com.jsy.community.entity.hk.FacilitySyncRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.PageInfo;
@@ -16,13 +18,22 @@ import java.util.Map;
 public interface IFacilityService extends IService<FacilityEntity> {
 	
 	/**
-	* @Description: 单条更新设备状态
+	* @Description: 单条更新设备在线状态
 	 * @Param: [facilityId, status, time]
 	 * @Return: void
 	 * @Author: chq459799974
 	 * @Date: 2021/6/16
 	**/
 	void changeStatus(Integer status, Long facilityId, Long time);
+	
+	/**
+	* @Description: 批量更新设备在线状态
+	 * @Param: [mapBody]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/17
+	**/
+	void changeStatusBatch(Map<String,Object> mapBody);
 	
 	/**
 	 * @return void
@@ -76,7 +87,7 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Date 2021/4/23 18:11
 	 * @Param [page, size]
 	 **/
-	void flushFacility(Integer page, Integer size, String facilityTypeId);
+	void flushFacility(Integer page, Integer size, String facilityTypeId, Long communityId);
 	
 	/**
 	 * @return com.jsy.community.entity.hk.FacilityEntity
@@ -92,7 +103,43 @@ public interface IFacilityService extends IService<FacilityEntity> {
 	 * @Author 91李寻欢
 	 * @Description 同步数据
 	 * @Date 2021/4/29 10:56
-	 * @Param [id]
+	 * @Param [id,communityId]
 	 **/
-	void connectData(Long id, Long communityId);
+	void syncFaceData(Long id, Long communityId);
+	
+	/**
+	* @Description: 设备数据同步后处理
+	 * @Param: [resultCode,jsonObject]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	**/
+	void dealDataBySyncResult(Integer resultCode, JSONObject jsonObject);
+	
+	/**
+	* @Description: 分页查询数据同步记录 和 成功失败数统计
+	 * @Param: [baseQO]
+	 * @Return: java.util.Map<java.lang.String,java.lang.Object>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/24
+	**/
+	Map<String,Object> querySyncRecordPage(BaseQO<FacilitySyncRecordEntity> baseQO);
+	
+	/**
+	* @Description: 根据数据同步状态统计设备数
+	 * @Param: [communityId, syncStatus]
+	 * @Return: java.lang.Long
+	 * @Author: chq459799974
+	 * @Date: 2021/6/24
+	**/
+	Long countBySyncStatus(Long communityId,Integer syncStatus);
+	
+	/**
+	* @Description: 处理小区返回到MQ上的结果
+	 * @Param: [jsonObject]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/29
+	**/
+	void dealResultFromCommunity(JSONObject jsonObject);
 }

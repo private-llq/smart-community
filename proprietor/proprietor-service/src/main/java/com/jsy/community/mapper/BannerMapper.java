@@ -35,8 +35,8 @@ public interface BannerMapper extends BaseMapper<BannerEntity> {
 	**/
 //	@Select("select id,position,sort,url from t_banner where community_id = #{communityId} and position = #{position} \n" +
 //		"or community_id = 0 order by community_id desc,sort")
-	@Select("select id,position,sort,url from t_banner where community_id = #{communityId} and position = #{position} \n" +
-		"${condition} order by community_id desc,sort")
+	@Select("select id,position,sort,url from t_banner where (community_id = #{communityId} and position = #{position} \n" +
+		"${condition}) and (deleted = 0 and status = 1) order by community_id desc,sort")
 	List<BannerEntity> queryListByCommunityIdAndPosition(@Param("communityId")Long communityId,@Param("position")Integer position,@Param("condition")String condition);
 	
 }

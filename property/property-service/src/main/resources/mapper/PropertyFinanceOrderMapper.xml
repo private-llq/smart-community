@@ -30,8 +30,9 @@
         </foreach>
     </update>
 
+    <!-- 2021.7.9 去除查询条件 where check_status=1 -->
     <select id="communityIdList" resultType="java.lang.Long">
-        select distinct community_id from t_user_house where check_status=1
+        select distinct community_id from t_user_house
     </select>
 
     <!-- 获取上一个月的需要结算和被驳回的账单 -->
@@ -217,4 +218,34 @@
             (#{item.id},#{item.orderNum},#{item.orderTime},#{item.uid},#{item.houseId},#{item.communityId},#{item.propertyFee},#{item.totalMoney},now())
         </foreach>
     </insert>
+    <select id="getTotalMoney" resultType="java.math.BigDecimal">
+        select sum(total_money) from t_property_finance_order where
+        id in
+        <foreach collection="orderIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and order_status = 0
+    </select>
+    <select id="selectByIdsList" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
+        select * from   t_property_finance_order where id in(
+        <foreach collection="ids" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+    <!-- 支付完成后-批量修改物业账单 -->
+    <update id="updateOrderBatch">
+        update t_property_finance_order
+        set
+        order_status = 1,
+        pay_time = now(),
+        update_time = now(),
+        pay_type = #{payType},
+        tripartite_order = #{tripartiteOrder}
+        where id in
+        <foreach collection="ids" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
 </mapper>

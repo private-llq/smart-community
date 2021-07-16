@@ -7,13 +7,17 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
+import com.jsy.community.untils.OrderNoUtil;
 import com.jsy.community.utils.AlipayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -33,6 +37,15 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private IShoppingMallService shoppingMallService;
 	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPropertyFinanceOrderService propertyFinanceOrderService;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPropertyFinanceReceiptService propertyFinanceReceiptService;
+
+	@Autowired
+	private StringRedisTemplate redisTemplate;
+
 	/**
 	* @Description: 回调验签/订单处理
 	 * @Param: [paramsMap]
@@ -54,12 +67,14 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			log.info("支付宝系统订单：" + paramsMap.get("out_trade_no") + "验签成功");
 			//按照支付结果异步通知中的描述，对支付结果中的业务内容进行1\2\3\4二次校验，校验成功后在response中返回success，校验失败返回failure
 			String outTradeNo = paramsMap.get("out_trade_no");//系统订单号
+			String tradeNo = paramsMap.get("trade_no");//支付宝渠道单号
 			String totalAmount = paramsMap.get("total_amount");//交易金额
 			String receiptAmount = paramsMap.get("receipt_amount");//实收金额
 			String sellerId = paramsMap.get("seller_id");//商家支付宝id
 			String sellerEmail = paramsMap.get("seller_email");//商家支付宝邮箱账号
 			String appId = paramsMap.get("app_id");//appid
 			log.info("系统订单号：" + outTradeNo);
+			log.info("支付宝渠道单号：" + tradeNo);
 			log.info("交易金额：" + totalAmount);
 			log.info("实收金额：" + receiptAmount);
 			log.info("商家支付宝id：" + sellerId);
@@ -75,6 +90,8 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 						log.info("商家验证通过");
 						if(ConstClasses.AliPayDataEntity.appid.equals(appId)){ // appid正确
 							log.info("appid验证通过");
+							//设置渠道单号
+							order.setTradeNo(tradeNo);
 							//处理订单
 							dealOrder(order);
 						}
@@ -114,6 +131,25 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 					throw new PaymentException((int)shopOrderDealMap.get("code"),String.valueOf(shopOrderDealMap.get("msg")));
 				}
 				log.info("商城订单状态修改完成，订单号：" + order.getOrderNo());
+			}else if(PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(order.getTradeName())){
+				log.info("开始修改物业费账单状态，订单号：" + order.getOrderNo());
+				String ids = redisTemplate.opsForValue().get("PropertyFee:" + order.getOrderNo());
+				if(StringUtils.isEmpty(ids)){
+					log.error("回调处理物业费失败，账单ids未找到，已支付订单号：" + order.getOrderNo());
+					return;
+				}
+				//查询一条账单，获取社区id
+				PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(ids.split(",")[0]));
+				//新增收款单
+				PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
+				receiptEntity.setCommunityId(financeOrderEntity.getCommunityId());
+				receiptEntity.setReceiptNum(OrderNoUtil.getOrder());
+				receiptEntity.setTransactionNo(order.getTradeNo());
+				receiptEntity.setTransactionType(1);
+				receiptEntity.setReceiptMoney(order.getTradeAmount());
+				propertyFinanceReceiptService.add(receiptEntity);
+				//修改物业费账单
+				propertyFinanceOrderService.updateOrderStatusBatch(2,order.getOrderNo(),ids.split(","));
 			}
 		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(order.getTradeType())){  // 提现
 			log.info("开始处理提现订单");

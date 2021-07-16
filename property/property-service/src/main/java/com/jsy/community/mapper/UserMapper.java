@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,5 +23,5 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @Date 2021/5/10 9:49
 	 * @Param [ids]
 	 **/
-	List<UserEntity> listAuthUserInfo(List<String> ids);
+	List<UserEntity> listAuthUserInfo(Collection<String> ids);
 }

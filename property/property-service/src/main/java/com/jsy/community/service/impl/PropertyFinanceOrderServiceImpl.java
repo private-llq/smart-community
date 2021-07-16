@@ -11,6 +11,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
+import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.StatementNumQO;
@@ -19,6 +20,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -37,6 +39,7 @@ import java.util.*;
  * @author: Hu
  * @create: 2021-04-20 16:31
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
 public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinanceOrderMapper, PropertyFinanceOrderEntity> implements IPropertyFinanceOrderService {
@@ -48,6 +51,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserService userService;
+
+    @Autowired
+    private PropertyFeeRuleMapper propertyFeeRuleMapper;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceReceiptService propertyFinanceReceiptService;
@@ -78,7 +84,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 orderVO.setId(propertyFinanceOrderEntity.getId());
                 orderVO.setOrderNum(propertyFinanceOrderEntity.getOrderNum());
                 orderVO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
-
                 objects.add(orderVO);
             }
             UserEntity userEntity = userService.queryUserDetailByUid(list.get(0).getUid());
@@ -539,6 +544,68 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             entity.setStatementEntity(statementEntityMap.get(entity.getStatementNum()) == null ? null : statementEntityMap.get(entity.getStatementNum()));
         }
         return orderEntities;
+    }
+
+
+
+    /**
+     * @Description: 查询一条物业账单详情
+     * @author: Hu
+     * @since: 2021/7/6 11:14
+     * @Param: [userId, orderId]
+     * @return: java.lang.Object
+     */
+    @Override
+    public PropertyFinanceOrderEntity findOne(Long orderId) {
+        return propertyFinanceOrderMapper.selectById(orderId);
+    }
+
+
+    
+    /**
+    * @Description: 支付完成后-批量修改物业账单
+     * @Param: [payType, tripartiteOrder, ids]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2021/7/7
+    **/
+    public void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids) {
+        int rows = propertyFinanceOrderMapper.updateOrderBatch(payType,tripartiteOrder,ids);
+        if(rows != ids.length){
+            log.info("物业账单支付后处理失败，单号：" + tripartiteOrder + " 账单ID：" + Arrays.toString(ids));
+        }
+    }
+
+    @Override
+    /**
+     * @Description: 查询物业账单总金额
+     * @author: Hu
+     * @since: 2021/7/5 16:12
+     * @Param: [orderIds]
+     * @return: java.math.BigDecimal
+     */
+    public BigDecimal getTotalMoney(String ids) {
+        BigDecimal totalMoney = propertyFinanceOrderMapper.getTotalMoney(ids.split(","));
+        return totalMoney == null ? new BigDecimal("0.00") : totalMoney;
+    }
+
+    /**
+     * @Description: 根据用户查询所有账单
+     * @author: Hu
+     * @since: 2021/7/5 11:19
+     * @Param: [userId]
+     * @return: void
+     */
+    @Override
+    public List<PropertyFinanceOrderEntity> selectByUserList(PropertyFinanceOrderEntity qo) {
+        QueryWrapper queryWrapper = new QueryWrapper<PropertyFinanceOrderEntity>()
+            .select("id,total_money,order_time,house_id")
+            .eq("uid", qo.getUid())
+            .eq("community_id",qo.getCommunityId());
+        if(qo.getOrderStatus() != null && (qo.getOrderStatus() == 0 || qo.getOrderStatus() == 1)){
+            queryWrapper.eq("order_status",qo.getOrderStatus());
+        }
+        return propertyFinanceOrderMapper.selectList(queryWrapper);
     }
 
     /**

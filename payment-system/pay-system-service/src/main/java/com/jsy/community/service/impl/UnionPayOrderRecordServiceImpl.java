@@ -1,6 +1,6 @@
 package com.jsy.community.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -65,7 +65,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UnionPayOrderVO generateOrder(UnionPayOrderRecordEntity unionPayOrderRecordEntity) {
-        UnionPayOrderVO unionPayOrderVO = new UnionPayOrderVO();
+        UnionPayOrderVO unionPayOrderVO;
         // 查询用户钱包ID
         QueryWrapper<UnionPayWalletEntity> walletEntityQueryWrapper = new QueryWrapper<>();
         walletEntityQueryWrapper.eq("uid", unionPayOrderRecordEntity.getUid());
@@ -106,11 +106,11 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
             log.info("银联下单失败!");
             throw new JSYException("银联下单失败!");
         }
-        unionPayOrderVO = JSONObject.parseObject(response.getResponse().getMsgBody(), UnionPayOrderVO.class);
+        unionPayOrderVO = JSON.parseObject(response.getResponse().getMsgBody(), UnionPayOrderVO.class);
         if (unionPayOrderVO == null || !UnionPayConfig.SUCCESS_CODE.equals(unionPayOrderVO.getRspCode())) {
-            log.info("银联下单失败!{}", unionPayOrderVO.getRspResult());
-            throw new PaymentException("银联下单失败!" + unionPayOrderVO.getRspResult());
+            throw new PaymentException("银联下单失败!");
         }
+        log.info("银联下单失败!{}", unionPayOrderVO.getRspResult());
         unionPayOrderRecordEntity.setMctOrderNo(unionPayOrderVO.getMctOrderNo());
         unionPayOrderRecordEntity.setPayH5Url(unionPayOrderVO.getPayH5Url());
         baseMapper.insert(unionPayOrderRecordEntity);
@@ -168,7 +168,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
             log.info("查询交易明细失败!");
             return unionPayTransListVO;
         }
-        return JSONObject.parseObject(response.getResponse().getMsgBody(), UnionPayTransListVO.class);
+        return JSON.parseObject(response.getResponse().getMsgBody(), UnionPayTransListVO.class);
     }
 
     /**
@@ -197,6 +197,6 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
             log.info("账单查询失败!");
             return queryBillInfoListVO;
         }
-        return JSONObject.parseObject(response.getResponse().getMsgBody(), QueryBillInfoListVO.class);
+        return JSON.parseObject(response.getResponse().getMsgBody(), QueryBillInfoListVO.class);
     }
 }

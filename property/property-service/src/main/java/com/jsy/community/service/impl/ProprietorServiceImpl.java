@@ -136,41 +136,41 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return proprietorMapper.saveUserBatch(userEntityList, communityId);
     }
 
-    /**
-     * 通过当前社区id查出的当前社区所有已登记的房屋
-     *
-     * @return 返回当前社区已经被登记的所有房屋信息
-     * @author YuLF
-     * @Param
-     * @since 2020/12/25 11:10
-     */
-    @Override
-    public List<HouseVo> queryHouseByCommunityId(long communityId) {
-        //1.拿到的当前社区层级结构
-        Integer houseLevelMode = proprietorMapper.queryHouseLevelModeById(communityId);
-        return proprietorMapper.queryHouseByCommunityId(communityId, houseLevelMode);
-    }
+//    /**
+//     * 通过当前社区id查出的当前社区所有已登记的房屋
+//     *
+//     * @return 返回当前社区已经被登记的所有房屋信息
+//     * @author YuLF
+//     * @Param
+//     * @since 2020/12/25 11:10
+//     */
+//    @Override
+//    public List<HouseVo> queryHouseByCommunityId(long communityId) {
+//        //1.拿到的当前社区层级结构
+//        Integer houseLevelMode = proprietorMapper.queryHouseLevelModeById(communityId);
+//        return proprietorMapper.queryHouseByCommunityId(communityId, houseLevelMode);
+//    }
 
-    /**
-     * [excel] 导入业主家属信息
-     *
-     * @author YuLF
-     * @Param userEntityList     用户家属信息
-     * @since 2020/12/25 14:47
-     */
-    @Transactional(rollbackFor = {Exception.class})
-    @Override
-    public Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId) {
-        //1.验证所有家属信息 选择的 业主 是否拥有当前房产
-        //1.1 拿到当前社区所有已被业主登记的房屋文本信息 如 1栋2单元2层1-2 和  ID  用于作为excel选择的所属房屋 取出 他对应的houseId
-        List<HouseVo> houseVos = queryHouseByCommunityId(communityId);
-        //2. 验证当前家属信息 房屋信息 和当前选择的业主及房屋信息 是否和数据库的信息一致 如果不一致 说明物业选择有误
-        //2.1 拿到数据库当前社区已登记并且已审核 的 房屋houseId 和 uid 用于验证当前信息是否在数据库存在
-        List<UserHouseEntity> userHouseList = queryUserHouseByCommunityId(communityId);
-        validHouseMember(userEntityList, houseVos, userHouseList);
-        //3.录入家属信息至数据库
-        return proprietorMapper.saveUserMemberBatch(userEntityList ,communityId);
-    }
+//    /**
+//     * [excel] 导入业主家属信息
+//     *
+//     * @author YuLF
+//     * @Param userEntityList     用户家属信息
+//     * @since 2020/12/25 14:47
+//     */
+//    @Transactional(rollbackFor = {Exception.class})
+//    @Override
+//    public Integer saveUserMemberBatch(List<UserEntity> userEntityList, long communityId) {
+//        //1.验证所有家属信息 选择的 业主 是否拥有当前房产
+//        //1.1 拿到当前社区所有已被业主登记的房屋文本信息 如 1栋2单元2层1-2 和  ID  用于作为excel选择的所属房屋 取出 他对应的houseId
+//        List<HouseVo> houseVos = queryHouseByCommunityId(communityId);
+//        //2. 验证当前家属信息 房屋信息 和当前选择的业主及房屋信息 是否和数据库的信息一致 如果不一致 说明物业选择有误
+//        //2.1 拿到数据库当前社区已登记并且已审核 的 房屋houseId 和 uid 用于验证当前信息是否在数据库存在
+//        List<UserHouseEntity> userHouseList = queryUserHouseByCommunityId(communityId);
+//        validHouseMember(userEntityList, houseVos, userHouseList);
+//        //3.录入家属信息至数据库
+//        return proprietorMapper.saveUserMemberBatch(userEntityList ,communityId);
+//    }
 
     /**
      * @author: Pipi
@@ -201,19 +201,19 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return proprietorMapper.selectUidById(id);
     }
 
-    @Deprecated
-    private void checkHouse(Long communityId, Long houseId, Operation operation) {
-        Integer resRow = proprietorMapper.existHouse(communityId, houseId);
-        if ( resRow == 0 ){
-            throw new PropertyException("房屋不存在!");
-        }
-        if( operation == Operation.INSERT ){
-            Integer resRow1 = proprietorMapper.checkHouse(houseId);
-            if( resRow1 >= 1 ){
-                throw new PropertyException("选择的房屋已被认证!");
-            }
-        }
-    }
+//    @Deprecated
+//    private void checkHouse(Long communityId, Long houseId, Operation operation) {
+//        Integer resRow = proprietorMapper.existHouse(communityId, houseId);
+//        if ( resRow == 0 ){
+//            throw new PropertyException("房屋不存在!");
+//        }
+//        if( operation == Operation.INSERT ){
+//            Integer resRow1 = proprietorMapper.checkHouse(houseId);
+//            if( resRow1 >= 1 ){
+//                throw new PropertyException("选择的房屋已被认证!");
+//            }
+//        }
+//    }
 
     /**
      * 验证excel 业主家属信息 录入 业主 和 家属所属房屋 是否能在数据库匹配 如果不匹配则选择有误

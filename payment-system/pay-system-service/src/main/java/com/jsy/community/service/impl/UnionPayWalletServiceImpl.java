@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.PaymentException;
@@ -28,6 +27,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -61,6 +61,9 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     @DubboReference(version = Const.version, group = Const.group_payment, check = false, timeout = 1200000)
     private UnionPayService unionPayService;
 
+    // 银联成功状态码
+    private static final String SUCCESS_STATUS_CODE = "00000";
+
     /**
      * @Author: Pipi
      * @Description: C端用户开户
@@ -87,11 +90,11 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
             log.info("开户失败!");
             return false;
         }
-        OpenAccountForCVO openAccountForCVO = JSONObject.parseObject(response.getResponse().getMsgBody(), OpenAccountForCVO.class);
+        OpenAccountForCVO openAccountForCVO = JSON.parseObject(response.getResponse().getMsgBody(), OpenAccountForCVO.class);
         if (openAccountForCVO == null || !UnionPayConfig.SUCCESS_CODE.equals(openAccountForCVO.getRspCode())) {
-            log.info("开户失败!{}", openAccountForCVO.getRspResult());
             return false;
         }
+        log.info("开户失败!{}", openAccountForCVO.getRspResult());
         if ("1".equals(openAccountForCVO.getIsExistedAcct())) {
             log.info("重复的开户操作,直接返回成功!");
             return true;
@@ -121,21 +124,20 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     @Override
     public String getPlugRandomKey() {
         // 从缓存中取出随机因子
-        Set union_pay_plugRandomKey = redisTemplate.opsForSet().members("union_pay_plugRandomKey");
+        Set unionPayPlugRandomKey = redisTemplate.opsForSet().members("union_pay_plugRandomKey");
         // 判断是否还有可用的随机因子
-        if (union_pay_plugRandomKey != null && union_pay_plugRandomKey.size() > 0) {
-            for (Object plugRandomKey : union_pay_plugRandomKey) {
-                redisTemplate.boundSetOps("union_pay_plugRandomKey").remove(plugRandomKey);
-                return plugRandomKey.toString();
-            }
+        if (!CollectionUtils.isEmpty(unionPayPlugRandomKey)) {
+            Object plugRandomKey = unionPayPlugRandomKey.iterator().next();
+            redisTemplate.boundSetOps("union_pay_plugRandomKey").remove(plugRandomKey);
+            return plugRandomKey.toString();
         }
         // 如果缓存中没有,则调用接口获取随机因子
         OpenApiResponseVO response = unionPayService.getPlugRandomKey(100);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             throw new JSYException("获取控件随机因子失败!请稍候重试!");
         }
-        PlugRandomMsgBodyVO msgBodyVO = JSONArray.parseObject(response.getResponse().getMsgBody(), PlugRandomMsgBodyVO.class);
-        if (msgBodyVO.getList() == null || msgBodyVO.getList().size() <= 0) {
+        PlugRandomMsgBodyVO msgBodyVO = JSON.parseObject(response.getResponse().getMsgBody(), PlugRandomMsgBodyVO.class);
+        if (msgBodyVO.getList().isEmpty()) {
             throw new JSYException("获取控件随机因子失败!请稍候重试!");
         }
         // 获取第一个随机因子在随后返回
@@ -195,11 +197,14 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
             unionPayWalletBankMapper.updateIsDefaultByWalletIdAndBankAcctNo(bindBankCardQO.getWalletId(), bindBankCardQO.getBankAcctNo());
         }
         OpenApiResponseVO response = unionPayService.bindBankCard(bindBankCardQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             throw new JSYException("银行卡操作失败!");
         }
-        UnionPayBaseVO unionPayBaseVO = JSONObject.parseObject(response.getResponse().getMsgBody(), UnionPayBaseVO.class);
-        if (unionPayBaseVO == null || !"00000".equals(unionPayBaseVO.getRspCode())) {
+        UnionPayBaseVO unionPayBaseVO = JSON.parseObject(response.getResponse().getMsgBody(), UnionPayBaseVO.class);
+        if (unionPayBaseVO == null) {
+            throw new JSYException("银行卡操作失败!");
+        }
+        if (!SUCCESS_STATUS_CODE.equals(unionPayBaseVO.getRspCode())) {
             log.info("银行卡操作失败!{}", unionPayBaseVO.getRspResult());
             throw new JSYException("银行卡操作失败!");
         }
@@ -216,11 +221,14 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     @Override
     public Boolean sendSmsAuthCode(SendSmsAuthCodeQO sendSmsAuthCodeQO) {
         OpenApiResponseVO response = unionPayService.sendSmsAuthCode(sendSmsAuthCodeQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             return false;
         }
-        UnionPayBaseVO unionPayBaseVO = JSONObject.parseObject(response.getResponse().getMsgBody(), UnionPayBaseVO.class);
-        if (unionPayBaseVO == null || !"00000".equals(unionPayBaseVO.getRspCode())) {
+        UnionPayBaseVO unionPayBaseVO = JSON.parseObject(response.getResponse().getMsgBody(), UnionPayBaseVO.class);
+        if (unionPayBaseVO == null) {
+            return false;
+        }
+        if (!SUCCESS_STATUS_CODE.equals(unionPayBaseVO.getRspCode())) {
             log.info("短信验证码发送失败!{}", unionPayBaseVO.getRspResult());
             return false;
         }
@@ -241,11 +249,14 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         baseMapper.updateMobileNoByWalletId(modifyUserMobileQO.getMobileNo(), modifyUserMobileQO.getWalletId());
         // 向银联发送更新信息
         OpenApiResponseVO response = unionPayService.modifyUserMobile(modifyUserMobileQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             throw new JSYException("修改用户手机号失败!");
         }
-        UnionPayBaseVO unionPayBaseVO = JSONObject.parseObject(response.getResponse().getMsgBody(), UnionPayBaseVO.class);
-        if (unionPayBaseVO == null || !"00000".equals(unionPayBaseVO.getRspCode())) {
+        UnionPayBaseVO unionPayBaseVO = JSON.parseObject(response.getResponse().getMsgBody(), UnionPayBaseVO.class);
+        if (unionPayBaseVO == null) {
+            throw new JSYException("修改用户手机号失败!");
+        }
+        if (!SUCCESS_STATUS_CODE.equals(unionPayBaseVO.getRspCode())) {
             log.info("修改用户手机号失败!{}", unionPayBaseVO.getRspResult());
             throw new JSYException("修改用户手机号失败!");
         }
@@ -264,11 +275,14 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         AcctInfoVO acctInfoVO = new AcctInfoVO();
         // 获取钱包基本信息
         OpenApiResponseVO response = unionPayService.queryAcctInfo(walletIdQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             return acctInfoVO;
         }
-        AcctInfoVO baseAcctInfo = JSONObject.parseObject(response.getResponse().getMsgBody(), AcctInfoVO.class);
-        if (baseAcctInfo == null || !"00000".equals(baseAcctInfo.getRspCode())) {
+        AcctInfoVO baseAcctInfo = JSON.parseObject(response.getResponse().getMsgBody(), AcctInfoVO.class);
+        if (baseAcctInfo == null) {
+            return acctInfoVO;
+        }
+        if (!SUCCESS_STATUS_CODE.equals(baseAcctInfo.getRspCode())) {
             log.info("获取钱包基本账户信息失败!{}", baseAcctInfo.getRspResult());
             return acctInfoVO;
         }
@@ -276,11 +290,14 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         //获取钱包关联信息(只允许查询C端)
         String relationMsgBody = unionPayUtils.buildMsgBody(walletIdQO);
         OpenApiResponseVO relationResponse = unionPayUtils.queryApi(relationMsgBody, UnionPayConfig.QUERY_ACCT_RELATED_INFO);
-        if (relationResponse.getResponse() == null || !"00000".equals(relationResponse.getCode())) {
+        if (relationResponse.getResponse() == null || !SUCCESS_STATUS_CODE.equals(relationResponse.getCode())) {
             return acctInfoVO;
         }
-        AcctInfoVO relationAcctInfo = JSONObject.parseObject(relationResponse.getResponse().getMsgBody(), AcctInfoVO.class);
-        if (relationAcctInfo == null || !"00000".equals(relationAcctInfo.getRspCode())) {
+        AcctInfoVO relationAcctInfo = JSON.parseObject(relationResponse.getResponse().getMsgBody(), AcctInfoVO.class);
+        if (relationAcctInfo == null) {
+            return acctInfoVO;
+        }
+        if (!SUCCESS_STATUS_CODE.equals(relationAcctInfo.getRspCode())) {
             log.info("获取钱包账户关联信息失败!{}", relationAcctInfo.getRspResult());
             return acctInfoVO;
         }
@@ -310,10 +327,10 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     public List<BindBankCardVO> queryBindBankCardList(WalletIdQO walletIdQO) {
         List<BindBankCardVO> bindBankCardVOS = new ArrayList<>();
         OpenApiResponseVO response = unionPayService.queryBindBankCardList(walletIdQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             return bindBankCardVOS;
         }
-        BindBankCardListVO bindBankCardListVO = JSONObject.parseObject(response.getResponse().getMsgBody(), BindBankCardListVO.class);
+        BindBankCardListVO bindBankCardListVO = JSON.parseObject(response.getResponse().getMsgBody(), BindBankCardListVO.class);
         return bindBankCardListVO.getRowList();
     }
 
@@ -327,12 +344,15 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     @Override
     public Boolean modifyPwd(ModifyPwdQO modifyPwdQO) {
         OpenApiResponseVO response = unionPayService.modifyPwd(modifyPwdQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             log.info("修改支付密码失败!");
             return false;
         }
-        UnionPayBaseVO unioPayBaseVO = JSONObject.parseObject(response.getResponse().getMsgBody(), UnionPayBaseVO.class);
-        if (unioPayBaseVO == null || !"00000".equals(unioPayBaseVO.getRspCode())) {
+        UnionPayBaseVO unioPayBaseVO = JSON.parseObject(response.getResponse().getMsgBody(), UnionPayBaseVO.class);
+        if (unioPayBaseVO == null) {
+            return false;
+        }
+        if (!SUCCESS_STATUS_CODE.equals(unioPayBaseVO.getRspCode())) {
             log.info("修改支付密码失败!{}", unioPayBaseVO.getRspResult());
             return false;
         }
@@ -350,11 +370,11 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     public BalanceVO queryBalance(BalanceQO balanceQO) {
         BalanceVO balanceVO = new BalanceVO();
         OpenApiResponseVO response = unionPayService.queryBalance(balanceQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             log.info("查询钱包余额失败!");
             return balanceVO;
         }
-        return JSONObject.parseObject(response.getResponse().getMsgBody(), BalanceVO.class);
+        return JSON.parseObject(response.getResponse().getMsgBody(), BalanceVO.class);
     }
 
     /**
@@ -368,11 +388,11 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     public BEndAccountOpeningVO queryWalletByBizLicNo(BizLicNoQO bizLicNoQO) {
         BEndAccountOpeningVO openingVO = new BEndAccountOpeningVO();
         OpenApiResponseVO response = unionPayService.queryWalletByBizLicNo(bizLicNoQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             log.info("查询开B端开户情况失败!");
             return openingVO;
         }
-        openingVO = JSONObject.parseObject(response.getResponse().getMsgBody(), BEndAccountOpeningVO.class);
+        openingVO = JSON.parseObject(response.getResponse().getMsgBody(), BEndAccountOpeningVO.class);
         return openingVO;
     }
 
@@ -410,12 +430,15 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         amount = amount.multiply(BigDecimal.valueOf(100)).setScale(0);
         withdrawQO.setAmount(amount.toString());
         OpenApiResponseVO response = unionPayService.withdrawApply(withdrawQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             log.info("提现申请失败!{}", response.getResponse());
             throw new JSYException("提现申请失败!");
         }
-        WithdrawVO withdrawVO = JSONObject.parseObject(response.getResponse().getMsgBody(), WithdrawVO.class);
-        if (withdrawVO == null || !"00000".equals(withdrawVO.getRspCode())) {
+        WithdrawVO withdrawVO = JSON.parseObject(response.getResponse().getMsgBody(), WithdrawVO.class);
+        if (withdrawVO == null) {
+            throw new PaymentException("提现申请失败!");
+        }
+        if (!SUCCESS_STATUS_CODE.equals(withdrawVO.getRspCode())) {
             log.info("提现申请失败!{}", withdrawVO.getRspResult());
             throw new PaymentException("提现申请失败!" + withdrawVO.getRspResult());
         }
@@ -432,12 +455,15 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     @Override
     public ActiveAcctVO activeAcct(ActiveAcctQO activeAcctQO) {
         OpenApiResponseVO response = unionPayService.activeAcct(activeAcctQO);
-        if (response.getResponse() == null || !"00000".equals(response.getCode())) {
+        if (response.getResponse() == null || !SUCCESS_STATUS_CODE.equals(response.getCode())) {
             log.info("激活账户失败!{}", response.getResponse());
             throw new JSYException("激活账户失败!");
         }
-        ActiveAcctVO activeAcctVO = JSONObject.parseObject(response.getResponse().getMsgBody(), ActiveAcctVO.class);
-        if (activeAcctVO == null || !"00000".equals(activeAcctVO.getRspCode())) {
+        ActiveAcctVO activeAcctVO = JSON.parseObject(response.getResponse().getMsgBody(), ActiveAcctVO.class);
+        if (activeAcctVO == null) {
+            throw new PaymentException("激活账户失败!");
+        }
+        if (!SUCCESS_STATUS_CODE.equals(activeAcctVO.getRspCode())) {
             log.info("激活账户失败!{}", activeAcctVO.getRspResult());
             throw new PaymentException("激活账户失败!" + activeAcctVO.getRspResult());
         }

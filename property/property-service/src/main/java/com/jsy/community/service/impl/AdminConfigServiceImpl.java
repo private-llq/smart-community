@@ -329,15 +329,13 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	/**
 	* @Description: 查询用户菜单id列表
-	 * @Param: [id]
+	 * @Param: [uid]
 	 * @Return: java.util.List<java.lang.String>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/9
 	**/
 	@Override
-	public List<String> queryUserMenuIdList(Long id){
-		//查询操作员UID
-		String uid = adminUserService.queryUidById(id);
+	public List<String> queryUserMenuIdList(String uid){
 		//返回UID对应菜单列表
 		return adminUserMenuMapper.queryUserMenuIdList(uid);
 	}

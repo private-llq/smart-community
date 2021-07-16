@@ -10,6 +10,7 @@
         (select id,inform_id,uid,acct_id from t_user_inform where uid = #{uid} and inform_id = #{informId});
     </insert>
 
+    <!-- 2021.7.9 去除查询条件 AND h.check_status = 1 -->
     <!-- 按用户ID查出用户所在社区id列表 其中这个社区推送id并没有被当前用户屏蔽、 -->
     <select id="queryUserAllCommunityId" resultType="java.lang.Long">
        SELECT DISTINCT
@@ -17,7 +18,7 @@
         FROM
 	        t_push_inform AS i
 	    JOIN t_user_house AS h ON h.community_id = i.acct_id
-	    AND h.check_status = 1
+	    and i.push_state = 1
 	    AND h.deleted = 0
 	    AND i.deleted = 0
         WHERE
@@ -34,6 +35,7 @@
 	        t_push_inform AS i
         WHERE
 	        i.push_target = 0
+	        and i.push_state = 1
 	    AND i.deleted = 0
 	    AND ( SELECT count( 1 ) FROM t_push_inform_del AS d WHERE d.uid = #{uid} AND d.acct_id = i.acct_id ) = 0
     </select>
@@ -49,7 +51,7 @@
         FROM
 	        t_push_inform
         WHERE
-	        acct_id = #{id} and deleted = 0
+	        acct_id = #{id} and deleted = 0 and push_state = 1
         ORDER BY
 	        create_time DESC
 	        LIMIT 1

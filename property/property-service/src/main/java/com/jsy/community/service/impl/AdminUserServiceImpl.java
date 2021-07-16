@@ -399,6 +399,21 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		}
 		return adminUserMapper.queryNameByUidBatch(uidList);
 	}
+	
+	/**
+	 * @Description: 查询用户菜单id列表
+	 * @Param: [id]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/9
+	 **/
+	@Override
+	public List<String> queryUserMenuIdList(Long id){
+		//查询操作员UID
+		String uid = queryUidById(id);
+		//返回UID对应菜单列表
+		return adminConfigService.queryUserMenuIdList(uid);
+	}
 	//================ 用户登录相关end =================
 	
 	//============== 操作员管理相关begin ===============
@@ -466,7 +481,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
 		Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
 		for(AdminUserEntity entity : pageData.getRecords()){
-			entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+			if (entity.getOrgId() != null) {
+				// 允许组织机构为空
+				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+			}
 			entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
 			entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
 		}

@@ -79,8 +79,9 @@ public class ShopLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "起租月数")
     private Integer startLease;
 
-    @ApiModelProperty(value = "押付方式")
+    @ApiModelProperty(value = "房源类型，1可短租，2邻地铁，3押一付一，4配套齐全，5精装修，6南北通透，7有阳台")
     private String defrayType;
+
 
     @ApiModelProperty(value = "店铺状态 0空置中 1经营中")
     private Integer status;

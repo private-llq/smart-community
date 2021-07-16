@@ -1,6 +1,10 @@
 package com.jsy.community.qo.proprietor;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.jsy.community.annotation.FieldValid;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 /**
@@ -77,10 +82,10 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty(value = "推送公告类型 站内、外部链接")
     private String informType;
 
-    @ApiModelProperty(value = "创建人")
+    @ApiModelProperty(value = "创建人Id")
     private String createBy;
 
-    @ApiModelProperty(value = "更新人")
+    @ApiModelProperty(value = "更新人Id")
     private String updateBy;
 
 
@@ -104,6 +109,15 @@ public class PushInformQO implements Serializable {
     @ApiModelProperty("发布日期结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDate endUpdateTime;
+
+    @ApiModelProperty(value = "发布人")
+    private String publishBy;
+
+    @ApiModelProperty(value = "发布时间")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private LocalDateTime publishTime;
 
     /**
      * 添加推送消息验证接口

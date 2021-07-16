@@ -48,8 +48,8 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
      * @return:
      */
     @Override
-    public void saveStatus(String out_trade_no) {
-        iLivingPaymentOperationService.saveStatus(out_trade_no);
+    public void saveStatus(String outTradeNo) {
+        iLivingPaymentOperationService.saveStatus(outTradeNo);
     }
 
     /**

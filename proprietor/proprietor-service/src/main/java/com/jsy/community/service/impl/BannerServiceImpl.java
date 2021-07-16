@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -67,6 +68,10 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 		}else{
 			//小区配置了不显示系统广告(轮播图)
 			entityList = bannerMapper.queryListByCommunityIdAndPosition(bannerQO.getCommunityId(),bannerQO.getPosition(),null);
+			//小区屏蔽了系统轮播图，自己又没有轮播图，则依然展示系统轮播图
+			if(CollectionUtils.isEmpty(entityList)){
+				entityList = bannerMapper.queryListByCommunityIdAndPosition(bannerQO.getCommunityId(),bannerQO.getPosition(),"or community_id = 0");
+			}
 		}
 		List<BannerVO> returnList = new ArrayList<>(entityList.size());
 		BannerVO bannerVO;

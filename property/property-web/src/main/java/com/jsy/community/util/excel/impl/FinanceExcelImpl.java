@@ -303,7 +303,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         if (entity.getOrderStatus() != null) {
                             if (entity.getOrderStatus() == 0) {
                                 cell.setCellValue("待收款");
-                            } else if (entity.getOrderStatus() == 0) {
+                            } else if (entity.getOrderStatus() == 1) {
                                 cell.setCellValue("已收款");
                             }
                         }
@@ -342,13 +342,11 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                         break;
                     case 9:
                         // 收款渠道
-                        if (entity.getReceiptEntity() != null) {
-                            if (entity.getReceiptEntity().getTransactionType() != null) {
-                                if (entity.getReceiptEntity().getTransactionType() == 1) {
-                                    cell.setCellValue("支付宝");
-                                } else if (entity.getReceiptEntity().getTransactionType() == 2) {
-                                    cell.setCellValue("微信");
-                                }
+                        if (entity.getReceiptEntity() != null && entity.getReceiptEntity().getTransactionType() != null) {
+                            if (entity.getReceiptEntity().getTransactionType() == 1) {
+                                cell.setCellValue("支付宝");
+                            } else if (entity.getReceiptEntity().getTransactionType() == 2) {
+                                cell.setCellValue("微信");
                             }
                         }
                         break;

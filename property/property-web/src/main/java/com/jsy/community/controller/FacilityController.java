@@ -8,6 +8,7 @@ import com.jsy.community.api.IFacilityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.hk.FacilityEntity;
+import com.jsy.community.entity.hk.FacilitySyncRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.utils.PageInfo;
@@ -21,6 +22,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -107,7 +109,14 @@ public class FacilityController {
 	@ApiOperation("刷新设备")
 	@GetMapping("/flushFacility")
 	public CommonResult flushFacility(@RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("facilityTypeId") String facilityTypeId) {
-		return CommonResult.error("维护中");
+		if(page == null || page == 0){
+			page = 1;
+		}
+		if(page == null || page == 0){
+			page = 10;
+		}
+		facilityService.flushFacility(page,size,facilityTypeId,UserUtils.getAdminCommunityId());
+		return CommonResult.ok("操作成功");
 	}
 	
 	/**
@@ -119,7 +128,24 @@ public class FacilityController {
 	@ApiOperation("根据设备id同步数据")
 	@GetMapping("/connectData")
 	public CommonResult connectData(@RequestParam("id") Long id) {
-		return CommonResult.error("维护中");
+		facilityService.syncFaceData(id, UserUtils.getAdminCommunityId());
+		return CommonResult.ok();
+	}
+	
+	@ApiOperation("分页查询设备数据同步记录")
+	@PostMapping("/connectData/record")
+	public CommonResult queryDataRecord(@RequestBody BaseQO<FacilitySyncRecordEntity> baseQO) {
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new FacilitySyncRecordEntity());
+		}
+		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(facilityService.querySyncRecordPage(baseQO),"查询成功");
+	}
+	
+	@ApiOperation("根据数据同步状态统计设备数")
+	@GetMapping("/count")
+	public CommonResult queryDataRecord(@RequestParam Integer isConnectData) {
+		return CommonResult.ok(facilityService.countBySyncStatus(UserUtils.getAdminCommunityId(),isConnectData),"查询成功");
 	}
 }
 

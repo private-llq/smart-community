@@ -2,15 +2,10 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
-import com.jsy.community.qo.property.StatementQO;
-import com.jsy.community.vo.StatementVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: Pipi
@@ -26,7 +21,7 @@ public interface PropertyFinanceStatementMapper extends BaseMapper<PropertyFinan
      *@Return: java.lang.Integer
      *@Date: 2021/4/22 17:48
      **/
-    Integer batchUpdateStatementStatusByStatementNum(HashSet<String> statementNumSet);
+    Integer batchUpdateStatementStatusByStatementNum(Set<String> statementNumSet);
     
     /**
     * @Description: 结算单号批量查 单号-结算单数据 映射

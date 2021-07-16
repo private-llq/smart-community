@@ -12,8 +12,7 @@
     <groupId>com.jsy</groupId>
     <artifactId>proprietor-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>proprietor-common</name>
-    <description>业主端公共模块</description>
+    <name>业主端公共模块</name>
     <properties>
         <java.version>11</java.version>
     </properties>

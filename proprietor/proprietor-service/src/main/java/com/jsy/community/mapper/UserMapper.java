@@ -113,7 +113,8 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @param uid 				用户id
 	 * @return			返回最新的用户房屋id 可能为空
 	 */
-	@Select("select house_id as householderId from t_user_house  where check_status = 1 and deleted = 0 and uid = #{uid} ORDER BY create_time DESC limit 1")
+//	@Select("select house_id as householderId from t_user_house  where check_status = 1 and deleted = 0 and uid = #{uid} ORDER BY create_time DESC limit 1")
+	@Select("select house_id as householderId from t_user_house  where deleted = 0 and uid = #{uid} ORDER BY create_time DESC limit 1")
 	Long getLatestHouseId(String uid);
 
 

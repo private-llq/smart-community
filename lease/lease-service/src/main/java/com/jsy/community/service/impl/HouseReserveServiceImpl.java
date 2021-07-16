@@ -1,7 +1,5 @@
 package com.jsy.community.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
@@ -117,7 +115,7 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     @Override
     public List<HouseReserveVO> whole(BaseQO<HouseReserveQO> qo, String uid) {
         qo.setPage((qo.getPage() - 1) * qo.getSize());
-        List<HouseReserveVO> reserveVos = new ArrayList<>();
+        List<HouseReserveVO> reserveVos;
         if (qo.getQuery().getRequestType() == 1) {
             //1.查出我的预约信息
             reserveVos = houseReserveMapper.meReserveHouse(qo, uid);

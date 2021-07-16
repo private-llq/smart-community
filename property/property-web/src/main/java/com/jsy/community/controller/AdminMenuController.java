@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.api.IAdminConfigService;
+import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.exception.JSYError;
@@ -25,6 +26,9 @@ public class AdminMenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IAdminUserService adminUserService;
 	
 	//TODO 准备挪到大后台，物业端不提供该接口
 //	/**
@@ -83,7 +87,7 @@ public class AdminMenuController {
 		List<AdminMenuEntity> allMenu = adminConfigService.listOfMenu();
 		returnMap.put("allMenu",allMenu);
 		if(id != null){
-			List<String> userMenu = adminConfigService.queryUserMenuIdList(id);
+			List<String> userMenu = adminUserService.queryUserMenuIdList(id);
 			returnMap.put("userMenu",userMenu);
 		}
 		return CommonResult.ok(returnMap,"查询成功");

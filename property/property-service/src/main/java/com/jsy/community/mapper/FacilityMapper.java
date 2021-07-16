@@ -4,11 +4,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.hk.FacilityEntity;
 import com.jsy.community.qo.hk.FacilityQO;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	 * @Param [id]
 	 **/
 	@Select("select status from t_facility_status where facility_id = #{id}")
-	int getStatus(Long id);
+	Integer getStatus(Long id);
 	
 	/**
 	* @Description: 根据设备id获取设备状态 批量
@@ -164,7 +163,7 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 //	void updateStatusByFacilityIdBatch(@Param("list")List<Map<Long, Integer>> map, @Param("ids")Set<Long> ids);
 	
 	//批量更新设备在线状态
-	void updateStatusByFacilityIdBatch(@Param("map") Map<Long, Integer> map);
+	void updateStatusByFacilityIdBatch(@Param("map") Map<Long, Integer> map,@Param("time")Long time);
 	
 	/**
 	* @Description: 单条更新在线状态
@@ -186,4 +185,43 @@ public interface FacilityMapper extends BaseMapper<FacilityEntity> {
 	@Select("select id,update_time from t_facility_status where facility_id = #{facilityId}")
 	FacilityEntity getStatusTime(Long facilityId);
 	
+	/**
+	* @Description: 获取设备编号
+	 * @Param: [id]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	**/
+	@Select("select number from t_facility where id = #{id}")
+	String queryFacilityNumberById(Long id);
+	
+	/**
+	* @Description: 修改数据同步状态
+	 * @Param: [syncStatus, id]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	**/
+	@Update("update t_facility set is_connect_data = #{syncStatus} where id = #{id}")
+	void updateDataConnectStatus(@Param("syncStatus")Integer syncStatus, @Param("id")Long id);
+	
+	/**
+	 * @Description: 修改数据同步状态和同步时间
+	 * @Param: [syncStatus, id]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/6/23
+	 **/
+	@Update("update t_facility set is_connect_data = #{syncStatus},data_connect_time = #{time} where id = #{id}")
+	void updateDataConnectStatusAndTime(@Param("syncStatus")Integer syncStatus, @Param("id")Long id, @Param("time") LocalDateTime time);
+	
+	/**
+	* @Description: 根据数据同步状态统计设备数
+	 * @Param: [communityId, syncStatus]
+	 * @Return: java.lang.Long
+	 * @Author: chq459799974
+	 * @Date: 2021/6/24
+	**/
+	@Select("select count(1) from t_facility where community_id = #{communityId} and is_connect_data = #{syncStatus}")
+	Long countBySyncStatus(@Param("communityId")Long communityId, @Param("syncStatus")Integer syncStatus);
 }

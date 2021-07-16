@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.RelationCarMapper">
+    <insert id="insertList">
+        insert into t_relation_car
+        (id,uid,community_id,car_plate,mobile,owner,id_card,car_type,relation_type,relationship_id,driving_license_url,create_time)
+        values
+        <foreach collection="insert" separator="," item="car">
+        (
+            #{car.id},
+            #{car.uid},
+            #{car.communityId},
+            #{car.carPlate},
+            #{car.mobile},
+            #{car.owner},
+            #{car.idCard},
+            #{car.carType},
+            #{car.relationType},
+            #{car.relationshipId},
+            #{car.drivingLicenseUrl},
+            now()
+            )
+        </foreach>
+    </insert>
+    <update id="updateList">
+        UPDATE t_relation_car SET
+        car_plate = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then #{value.carPlate}
+        </foreach>
+        end,
+        car_type = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then #{value.carType}
+        </foreach>
+        end,
+        driving_license_url = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then #{value.drivingLicenseUrl}
+        </foreach>
+        end,
+        update_time = now()
+        where id in
+        <foreach collection="map.entrySet()" index="key" item="value" separator="," open="(" close=")">
+            #{key}
+        </foreach>
+    </update>
+</mapper>

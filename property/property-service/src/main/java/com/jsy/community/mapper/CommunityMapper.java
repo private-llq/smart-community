@@ -34,4 +34,14 @@ public interface CommunityMapper extends BaseMapper<CommunityEntity> {
 	 * @Date: 2021/3/25
 	**/
 	List<CommunityEntity> queryCommunityBatch(List<Long> list);
+	
+	/**
+	* @Description: 查询所有小区ID
+	 * @Param: []
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/6/26
+	**/
+	@Select("select id from t_community where deleted = 0")
+	List<Long> queryAllCommunityIdList();
 }

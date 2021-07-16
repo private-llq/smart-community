@@ -16,6 +16,15 @@ import java.util.Map;
 public interface IPropertyFinanceReceiptService {
 	
 	/**
+	* @Description: 新增收款单
+	 * @Param: [entity]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/7/9
+	**/
+	void add(PropertyFinanceReceiptEntity entity);
+	
+	/**
 	* @Description: 分页查询
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo
@@ -50,4 +59,5 @@ public interface IPropertyFinanceReceiptService {
 	 *@Date: 2021/4/26 9:34
 	 **/
 	List<PropertyFinanceReceiptEntity> queryExportReceiptList(PropertyFinanceReceiptEntity receiptEntity);
+
 }

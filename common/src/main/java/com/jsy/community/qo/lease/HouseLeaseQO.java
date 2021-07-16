@@ -12,10 +12,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -71,22 +68,18 @@ public class HouseLeaseQO implements Serializable {
     @NotBlank(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "未填写房屋租售详细地址")
     private String houseAddress;
 
-
-    @Size(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class,  UpdateWholeLeaseHouse.class}, min = 1,  message = "房屋亮点标签至少需要一个!")
-    @NotNull( groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class}, message = "房屋亮点标签至少一个!")
+    @NotEmpty( groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class}, message = "房屋亮点标签至少一个!")
     @ApiModelProperty(value = "房屋租售亮点标签ID数组")
     private List<Long> houseAdvantageCode;
-
 
     @ApiModelProperty(value = "房屋租售优势ID")
     private Long houseAdvantageId;
 
-
-    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "经度不能为空!")
+//    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "经度不能为空!")
     @ApiModelProperty(value = "经度")
     private Double houseLon;
 
-    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "纬度不能为空!")
+//    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "纬度不能为空!")
     @ApiModelProperty(value = "纬度")
     private Double houseLat;
 
@@ -257,12 +250,14 @@ public class HouseLeaseQO implements Serializable {
     /**
      * 类型
      */
-    private Long shopTypeId;
+    private String shopTypeId;
+    private Long[] shopTypeIdArrays;
 
     /**
      * 行业
      */
-    private Long shopBusinessId;
+    private String shopBusinessId;
+    private Long[] shopBusinessIdArrays;
     /**
      * 来源
      */

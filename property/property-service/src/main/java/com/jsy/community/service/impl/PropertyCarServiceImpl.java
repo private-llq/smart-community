@@ -9,6 +9,10 @@ import com.jsy.community.qo.property.ElasticsearchCarQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @program: com.jsy.community
  * @description:
@@ -19,6 +23,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class PropertyCarServiceImpl extends ServiceImpl<PropertyCarMapper, PropertyCarEntity> implements IPropertyCarService {
     @Autowired
     private PropertyCarMapper propertyCarMapper;
+
+    @Override
+    public void updateList(List<ElasticsearchCarQO> cars) {
+        Map<Long, ElasticsearchCarQO> map = new HashMap<>();
+        for (ElasticsearchCarQO car : cars) {
+            map.put(car.getId(),car);
+        }
+        propertyCarMapper.updateMap(map);
+    }
+
+    @Override
+    public void insertList(List<ElasticsearchCarQO> cars) {
+        propertyCarMapper.insertList(cars);
+    }
 
     @Override
     public void deleteById(String id) {

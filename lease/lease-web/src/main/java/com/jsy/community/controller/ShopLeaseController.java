@@ -249,7 +249,7 @@ public class ShopLeaseController {
 		if (monthMoney.doubleValue() > NORM_MONEY) {
 			String s = String.format("%.2f", monthMoney.doubleValue() / NORM_MONEY) + "万";
 			shop.setMonthMoneyString(s);
-		} else if (monthMoney.compareTo(new BigDecimal(MIN_MONEY)) == 0) {
+		} else if (monthMoney.compareTo(BigDecimal.valueOf(MIN_MONEY)) == 0) {
 			String s = "面议";
 			shop.setMonthMoneyString(s);
 		} else {
@@ -438,9 +438,7 @@ public class ShopLeaseController {
 		} finally {
 			try {
 				// 释放资源
-				if (httpClient != null) {
-					httpClient.close();
-				}
+				httpClient.close();
 				if (response != null) {
 					response.close();
 				}
@@ -466,9 +464,27 @@ public class ShopLeaseController {
 		if (baseQO.getQuery()==null){
 			baseQO.setQuery(new HouseLeaseQO());
 		}
+		HouseLeaseQO query = baseQO.getQuery();
+		if (query.getShopBusinessIdArrays()!=null){
+			for (Long array : query.getShopBusinessIdArrays()) {
+				if (array==9) {
+					query.setShopBusinessIdArrays(null);
+				}
+			}
+		}
+		if (query.getShopTypeIdArrays()!=null){
+			for (Long array : query.getShopTypeIdArrays()) {
+				if (array==1) {
+					query.setShopTypeIdArrays(null);
+				}
+			}
+		}
+		baseQO.setQuery(query);
 		PageInfo<IndexShopVO> pageInfo = shopLeaseService.getShopByCondition(baseQO);
 		return CommonResult.ok(pageInfo);
 	}
+
+
 }
 
 

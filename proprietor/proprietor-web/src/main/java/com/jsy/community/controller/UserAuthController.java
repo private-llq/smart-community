@@ -98,6 +98,12 @@ public class UserAuthController {
 		return b ? CommonResult.ok() : CommonResult.error("验证码发送失败");
 	}
 	
+	@ApiOperation("游客登录")
+	@GetMapping("/login/tourist")
+	public CommonResult getTouristToken(){
+		return CommonResult.ok("00000tourist","登录成功");
+	}
+	
 	@ApiOperation("登录")
 	@PostMapping("/login")
 	public CommonResult<UserAuthVo> login(@RequestBody LoginQO qo) {

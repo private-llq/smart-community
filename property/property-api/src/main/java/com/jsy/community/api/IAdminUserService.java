@@ -175,6 +175,15 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList);
 	
 	/**
+	 * @Description: 查询用户菜单id列表
+	 * @Param: [id]
+	 * @Return: java.util.List<java.lang.String>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/9
+	 **/
+	List<String> queryUserMenuIdList(Long id);
+	
+	/**
 	* @Description: 更新用户头像
 	 * @Param: [url, uid]
 	 * @Return: boolean

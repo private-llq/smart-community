@@ -11,12 +11,10 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.utils.*;
-import com.jsy.community.vo.BannerVO;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.catalina.User;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,7 +22,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 
@@ -118,7 +115,7 @@ public class BannerController {
 		}
 		String filePath = MinioUtils.upload(file, BUCKETNAME);
 		redisTemplate.opsForSet().add("banner_img_part",filePath);
-		return CommonResult.ok(filePath);
+		return CommonResult.ok(filePath,"上传成功！");
 	}
 
 //	/**

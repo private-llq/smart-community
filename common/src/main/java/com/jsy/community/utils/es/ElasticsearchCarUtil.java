@@ -94,23 +94,25 @@ public class ElasticsearchCarUtil {
      * @Param:
      * @return:
      */
-    public static void updateData(ElasticsearchCarQO elasticsearchCarQO,RestHighLevelClient restHighLevelClient) {
-        //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
-        UpdateRequest updateRequest = new UpdateRequest();
-        updateRequest.index(BusinessConst.INDEX_CAR);
-        //docAsUpsert表示 如果文档不存在则创建
-        updateRequest.docAsUpsert(true);
-        updateRequest.id(elasticsearchCarQO.getId()+"");
-        //转换为json串发给elasticsearch
-        updateRequest.doc(JSON.toJSONString(elasticsearchCarQO), XContentType.JSON);
-        UpdateResponse update = null;
-        try {
-            update = restHighLevelClient.update(updateRequest, ElasticsearchConfig.COMMON_OPTIONS);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("修改失败："+e.getMessage());
+    public static void updateData(List<ElasticsearchCarQO> cars,RestHighLevelClient restHighLevelClient) {
+        for (ElasticsearchCarQO car : cars) {
+            //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
+            UpdateRequest updateRequest = new UpdateRequest();
+            updateRequest.index(BusinessConst.INDEX_CAR);
+            //docAsUpsert表示 如果文档不存在则创建
+            updateRequest.docAsUpsert(true);
+            updateRequest.id(car.getId()+"");
+            //转换为json串发给elasticsearch
+            updateRequest.doc(JSON.toJSONString(car), XContentType.JSON);
+            UpdateResponse update = null;
+            try {
+                update = restHighLevelClient.update(updateRequest, ElasticsearchConfig.COMMON_OPTIONS);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.info("修改失败："+e.getMessage());
+            }
+            DocWriteResponse.Result result = update.getResult();
         }
-        DocWriteResponse.Result result = update.getResult();
     }
 
     /**
@@ -120,22 +122,24 @@ public class ElasticsearchCarUtil {
      * @Param:
      * @return:
      */
-    public static void insertData(ElasticsearchCarQO elasticsearchCarQO,RestHighLevelClient restHighLevelClient){
+    public static void insertData(List<ElasticsearchCarQO> cars, RestHighLevelClient restHighLevelClient){
         //构造函数传入索引名、其他两个构造函数传入type和id的已停止使用，
-        IndexRequest indexRequest = new IndexRequest(BusinessConst.INDEX_CAR);
-        indexRequest.create(true);
-        indexRequest.id(elasticsearchCarQO.getId()+"");
-        //转换为json串发给elasticsearch
-        indexRequest.source(JSON.toJSONString(elasticsearchCarQO), XContentType.JSON);
-        //发送保存 第一个参数是构造的请求，第二个参数是请求头需要的一些操作如验证token
-        IndexResponse indexResponse = null;
-        try {
-            indexResponse = restHighLevelClient.index(indexRequest, ElasticsearchConfig.COMMON_OPTIONS);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("新增失败："+e.getMessage());
+        for (ElasticsearchCarQO car : cars) {
+            IndexRequest indexRequest = new IndexRequest(BusinessConst.INDEX_CAR);
+            indexRequest.create(true);
+            indexRequest.id(car.getId()+"");
+            //转换为json串发给elasticsearch
+            indexRequest.source(JSON.toJSONString(car), XContentType.JSON);
+            //发送保存 第一个参数是构造的请求，第二个参数是请求头需要的一些操作如验证token
+            IndexResponse indexResponse = null;
+            try {
+                indexResponse = restHighLevelClient.index(indexRequest, ElasticsearchConfig.COMMON_OPTIONS);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.info("新增失败："+e.getMessage());
+            }
+            DocWriteResponse.Result result = indexResponse.getResult();
         }
-        DocWriteResponse.Result result = indexResponse.getResult();
     }
 
     /**

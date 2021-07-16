@@ -22,7 +22,10 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,12 +46,36 @@ import static java.util.regex.Pattern.compile;
 @DubboService(version = Const.version, group = Const.group_property)
 public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, CommunityFunEntity> implements ICommunityFunService {
 
+    //缓存key，分组+id
+    private final String COMMUNITY_FUN_COUNT="community_fun_count:";
     @Autowired
     private CommunityFunMapper communityFunMapper;
     @Autowired
     private AdminUserMapper adminUserMapper;
+    @Resource
+    private RedisTemplate redisTemplate;
 
 
+    /**
+     * @Description: 每天查询所有已发布的社区趣事并更新浏览量
+     * @author: Hu
+     * @since: 2021/6/17 16:24
+     * @Param: []
+     * @return: void
+     */
+    @Override
+    @Transactional
+    public void listByUpdate() {
+        List<CommunityFunEntity> entities = communityFunMapper.selectList(new QueryWrapper<CommunityFunEntity>().eq("status", 1));
+        for (CommunityFunEntity entity : entities) {
+            Object count = redisTemplate.opsForValue().get(COMMUNITY_FUN_COUNT + entity.getId());
+            if (count!=null){
+                int parseInt = Integer.parseInt(String.valueOf(count));
+                entity.setViewCount(parseInt);
+                communityFunMapper.updateById(entity);
+            }
+        }
+    }
 
     /**
      * @Description: 分页查询
@@ -128,6 +155,7 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
         communityFunMapper.updateById(entity);
         ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.DELETE, null, null);
     }
+
 
 
     /**
@@ -219,28 +247,31 @@ public class CommunityFunServiceImpl extends ServiceImpl<CommunityFunMapper, Com
   }
 
 
-
-
-  /**
-   * @Description: 发布
-   * @author: Hu
-   * @since: 2021/5/21 11:15
-   * @Param: [id, adminInfoVo]
-   * @return: void
-   */
-  @Override
-  public void popUpOnline(Long id,AdminInfoVo adminInfoVo) {
-    CommunityFunEntity entity = communityFunMapper.selectById(id);
-    if (entity.getStatus()==1){
-      throw new PropertyException("该趣事已上线");
+    /**
+     * @Description: 发布
+     * @author: Hu
+     * @since: 2021/5/21 11:15
+     * @Param: [id, adminInfoVo]
+     * @return: void
+     */
+    @Override
+    public void popUpOnline(Long id,AdminInfoVo adminInfoVo) {
+        CommunityFunEntity entity = communityFunMapper.selectById(id);
+        if (entity==null){
+            throw new PropertyException("该趣事不存在！");
+        }
+        if (entity.getStatus()==1){
+            throw new PropertyException("该趣事已上线！");
+        }
+        entity.setStartName(adminInfoVo.getRealName());
+        entity.setRedactStatus(1);
+        entity.setStatus(1);
+        entity.setStartBy(adminInfoVo.getUid());
+        entity.setStartTime(LocalDateTime.now());
+        communityFunMapper.updateById(entity);
+        ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl(),entity.getCommunityId());
     }
-    entity.setStartName(adminInfoVo.getRealName());
-    entity.setRedactStatus(1);
-    entity.setStatus(1);
-    entity.setStartBy(adminInfoVo.getUid());
-    entity.setStartTime(LocalDateTime.now());
-    communityFunMapper.updateById(entity);
-    ElasticsearchImportProvider.elasticOperationSingle(id, RecordFlag.FUN, Operation.INSERT, entity.getTitleName(), entity.getSmallImageUrl(),entity.getCommunityId());
-  }
+
+
 
 }

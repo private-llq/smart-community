@@ -16,6 +16,7 @@ import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.mapper.UserThirdPlatformMapper;
@@ -93,6 +94,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Autowired
     private IUserUroraTagsService userUroraTagsService;
+
+    @Autowired
+    private CarMapper carMapper;
 
     @Autowired
     private IHouseService houseService;
@@ -486,17 +490,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 //批量新增车辆
                 carService.addProprietorCarForList(any, qo.getUid());
                 //循环保存车辆到es
-                any.forEach(x ->{
-                    rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo.getUid(),qo.getHouses(),x));
-                });
+
+                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo.getUid(),qo.getHouses(),any));
+
             }
             //批量更新车辆信息
             cars.forEach( c -> {
                 carService.update(c, qo.getUid());
-                //循环更新车辆
-                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.update",getUpdateElasticsearchCar(c));
+
                 }
             );
+            if (cars!=null&&cars.size()!=0){
+                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.update",getUpdateElasticsearchCar(cars));
+            }
         }
     }
 
@@ -507,30 +513,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Param:
      * @return:
      */
-    public ElasticsearchCarQO getInsertElasticsearchCar(String uid,List<UserHouseQo> qo,CarQO carQO){
+    public List<ElasticsearchCarQO> getInsertElasticsearchCar(String uid,List<UserHouseQo> qo,List<CarQO> carQO){
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
         HouseEntity entity = houseService.getById(qo.get(0).getHouseId());
-        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
-        elasticsearchCarQO.setId(carQO.getId());
-        elasticsearchCarQO.setCommunityId(qo.get(0).getCommunityId());
-        elasticsearchCarQO.setCarPlate(carQO.getCarPlate());
-        elasticsearchCarQO.setCarType(carQO.getCarType());
-        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carQO.getCarType()));
-        elasticsearchCarQO.setOwner(userEntity.getRealName());
-        elasticsearchCarQO.setIdCard(userEntity.getIdCard());
-        elasticsearchCarQO.setMobile(userEntity.getMobile());
-        elasticsearchCarQO.setOwnerType(1);
-        elasticsearchCarQO.setOwnerTypeText("用户");
-        elasticsearchCarQO.setRelationshipId(userEntity.getUid());
-        elasticsearchCarQO.setHouseId(qo.get(0).getHouseId());
-        elasticsearchCarQO.setBuilding(entity.getBuilding());
-        elasticsearchCarQO.setFloor(entity.getFloor());
-        elasticsearchCarQO.setUnit(entity.getUnit());
-        elasticsearchCarQO.setNumber(entity.getNumber());
-        elasticsearchCarQO.setHouseType(entity.getHouseType());
-        elasticsearchCarQO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
-        elasticsearchCarQO.setCreateTime(LocalDateTime.now());
-        return elasticsearchCarQO;
+        LinkedList<ElasticsearchCarQO> list = new LinkedList<>();
+        ElasticsearchCarQO elasticsearchCarQO = null;
+        for (CarQO car : carQO) {
+            elasticsearchCarQO=new ElasticsearchCarQO();
+            elasticsearchCarQO.setId(car.getId());
+            elasticsearchCarQO.setCommunityId(qo.get(0).getCommunityId());
+            elasticsearchCarQO.setCarPlate(car.getCarPlate());
+            elasticsearchCarQO.setCarType(car.getCarType());
+            elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(car.getCarType()));
+            elasticsearchCarQO.setOwner(userEntity.getRealName());
+            elasticsearchCarQO.setIdCard(userEntity.getIdCard());
+            elasticsearchCarQO.setMobile(userEntity.getMobile());
+            elasticsearchCarQO.setOwnerType(1);
+            elasticsearchCarQO.setOwnerTypeText("用户");
+            elasticsearchCarQO.setRelationshipId(userEntity.getUid());
+            elasticsearchCarQO.setHouseId(qo.get(0).getHouseId());
+            elasticsearchCarQO.setBuilding(entity.getBuilding());
+            elasticsearchCarQO.setFloor(entity.getFloor());
+            elasticsearchCarQO.setUnit(entity.getUnit());
+            elasticsearchCarQO.setNumber(entity.getNumber());
+            elasticsearchCarQO.setHouseType(entity.getHouseType());
+            elasticsearchCarQO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
+            elasticsearchCarQO.setCreateTime(LocalDateTime.now());
+            list.add(elasticsearchCarQO);
+        }
+        return list;
     }
     /**
      * @Description: 修改车辆到es的qo封装方法
@@ -539,13 +550,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Param:
      * @return:
      */
-    public ElasticsearchCarQO getUpdateElasticsearchCar(CarQO carQO){
-        ElasticsearchCarQO elasticsearchCarQO = new ElasticsearchCarQO();
-        elasticsearchCarQO.setId(carQO.getId());
-        elasticsearchCarQO.setCarPlate(carQO.getCarPlate());
-        elasticsearchCarQO.setCarType(carQO.getCarType());
-        elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(carQO.getCarType()));
-        return elasticsearchCarQO;
+    public List<ElasticsearchCarQO> getUpdateElasticsearchCar(List<CarQO> carQO){
+        ElasticsearchCarQO elasticsearchCarQO = null;
+        LinkedList<ElasticsearchCarQO> list = new LinkedList<>();
+        for (CarQO qo : carQO) {
+            elasticsearchCarQO=new ElasticsearchCarQO();
+            elasticsearchCarQO.setId(qo.getId());
+            elasticsearchCarQO.setCarPlate(qo.getCarPlate());
+            elasticsearchCarQO.setCarType(qo.getCarType());
+            elasticsearchCarQO.setCarTypeText(BusinessEnum.CarTypeEnum.getCode(qo.getCarType()));
+            list.add(elasticsearchCarQO);
+        }
+        return list;
     }
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -953,7 +969,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return userMapper.queryNameByUidBatch(uids);
     }
-    
+
+    @Override
+    public void deleteCar(String userId, Long id) {
+        carMapper.delete(new QueryWrapper<CarEntity>().eq("uid",userId).eq("id",id));
+        rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.delete",id);
+    }
+
     /**
     * @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
      * @Param: [uids, nameLike]

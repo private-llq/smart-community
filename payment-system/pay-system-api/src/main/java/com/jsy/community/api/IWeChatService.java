@@ -27,7 +27,7 @@ public interface IWeChatService extends IService<WeChatOrderEntity> {
      * @Param:
      * @return:
      */
-    void saveStatus(String out_trade_no);
+    void saveStatus(String outTradeNo);
 
     /**
      * @Description: 微信订单状态

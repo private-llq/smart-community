@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.AppVersionEntity;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  * @description APP版本查询Service
  * @since 2021-05-31 13:57
  **/
-public interface IAppVersionService {
+public interface IAppVersionService extends IService<AppVersionEntity> {
 	
 	/**
 	* @Description: 查询APP版本列表 1.安卓 2.IOS
@@ -19,4 +20,13 @@ public interface IAppVersionService {
 	 * @Date: 2021/5/31
 	**/
 	List<AppVersionEntity> queryAppVersionList(Integer sysType,String sysVersion);
+	
+	/**
+	* @Description: 添加APP版本
+	 * @Param: [appVersionEntity]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/7/12
+	**/
+	void addAppVersion(AppVersionEntity appVersionEntity);
 }

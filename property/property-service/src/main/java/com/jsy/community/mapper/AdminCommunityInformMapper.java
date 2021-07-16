@@ -24,7 +24,7 @@ public interface AdminCommunityInformMapper extends BaseMapper<PushInformEntity>
      * @param id  社区消息ID
      */
     @Delete("delete from t_user_inform where inform_id = #{id}")
-    void delUserReadInform(@Param("id") Long id);
+    void  delUserReadInform(@Param("id") Long id);
 
 
     /**

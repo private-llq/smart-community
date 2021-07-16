@@ -124,6 +124,11 @@ public class WeatherUtils {
 			}else if(type == 2){
 				day.put("updatetime",sdf.format(System.currentTimeMillis() - oneDay + oneDay*(i)));
 			}
+			try {
+				day.put("predictDate",sdf.format(sdf.parse(day.getString("updatetime")).getTime()));
+			} catch (ParseException e) {
+				log.error("假天气数据处理-动态修改时间出错：" + e.getMessage());
+			}
 		}
 	}
 	
@@ -170,7 +175,7 @@ public class WeatherUtils {
 		Date dayDate = null;
 		for(int i = 0;i<forecast.size();i++){
 			JSONObject day = forecast.getJSONObject(i);
-			String dayStr = day.getString("updatetime");
+			String dayStr = day.getString("predictDate").concat(" 00:00:00");
 			try {
 				dayDate = sdf.parse(dayStr);
 			} catch (ParseException e) {

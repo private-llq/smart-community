@@ -64,7 +64,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Return: java.lang.Integer
      *@Date: 2021/4/23 10:41
      **/
-    Integer updateStatementStatusByIdS(@Param("map")HashMap<String, List<Long>> statementOrderUpdateMap);
+    Integer updateStatementStatusByIdS(@Param("map")Map<String, List<Long>> statementOrderUpdateMap);
 
     /**
     * @Description: 根据收款单号批量查询列表
@@ -180,4 +180,30 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @return:
      */
     void saveList(@Param("list")List<PropertyFinanceOrderEntity> list);
+
+    /**
+     * @Description: 查询物业费金额
+     * @author: Hu
+     * @since: 2021/7/5 16:17
+     * @Param:
+     * @return:
+     */
+    BigDecimal getTotalMoney(String[] orderIds);
+    /**
+     * @Description: 根据传来的id集合查询账单
+     * @author: Hu
+     * @since: 2021/7/5 17:27
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> selectByIdsList(String[] ids);
+    
+    /**
+    * @Description: 支付完成后-批量修改物业账单
+     * @Param: [payType, tripartiteOrder, ids]
+     * @Return: int
+     * @Author: chq459799974
+     * @Date: 2021/7/7
+    **/
+    int updateOrderBatch(@Param("payType")Integer payType, @Param("tripartiteOrder")String tripartiteOrder, @Param("ids")String[] ids);
 }

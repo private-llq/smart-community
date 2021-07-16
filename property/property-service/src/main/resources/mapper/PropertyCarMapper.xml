@@ -17,4 +17,55 @@
         </set>
         where id=#{id}
     </update>
+    <update id="updateMap">
+        UPDATE t_property_car SET
+        car_plate = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then #{value.carPlate}
+        </foreach>
+        end,
+        car_type = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then #{value.carType}
+        </foreach>
+        end,
+        driving_license_url = case id
+        <foreach collection="map.entrySet()" index="key" item="value">
+            when #{key} then #{value.drivingLicenseUrl}
+        </foreach>
+        end,
+        update_time = now()
+        where id in
+        <foreach collection="map.entrySet()" index="key" item="value" separator="," open="(" close=")">
+            #{key}
+        </foreach>
+    </update>
+    <insert id="insertList">
+        insert into t_property_car
+        (id,community_id,house_id,owner_type,owner,mobile,id_card,owner_type_text,relationship_id,car_type,car_type_text,car_plate,number,building,floor,unit,house_type,house_type_text,create_time)
+        values
+        <foreach collection="cars" separator="," item="car">
+        (
+            #{car.id},
+            #{car.communityId},
+            #{car.houseId},
+            #{car.ownerType},
+            #{car.owner},
+            #{car.mobile},
+            #{car.idCard},
+            #{car.ownerTypeText},
+            #{car.relationshipId},
+            #{car.carType},
+            #{car.carTypeText},
+            #{car.carPlate},
+            #{car.number},
+            #{car.building},
+            #{car.floor},
+            #{car.unit},
+            #{car.houseType},
+            #{car.houseTypeText},
+            now()
+            )
+        </foreach>
+    </insert>
 </mapper>

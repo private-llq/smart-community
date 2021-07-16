@@ -15,6 +15,7 @@ import com.jsy.community.vo.admin.AdminInfoVo;
  * @create: 2020-12-09 10:49
  **/
 public interface ICommunityFunService extends IService<CommunityFunEntity> {
+
     /**
      * @Description: 分页查询
      * @author: Hu
@@ -23,6 +24,7 @@ public interface ICommunityFunService extends IService<CommunityFunEntity> {
      * @return: com.jsy.community.utils.PageInfo
      */
     PageInfo findList(BaseQO<CommunityFunQO> baseQO);
+
     /**
      * @Description: 下线
      * @author: Hu
@@ -76,4 +78,13 @@ public interface ICommunityFunService extends IService<CommunityFunEntity> {
      * @return:
      */
     void insetOne(CommunityFunOperationQO communityFunOperationQO,AdminInfoVo adminInfoVo);
+
+    /**
+     * @Description: 每天查询所有已发布的社区趣事并更新浏览量
+     * @author: Hu
+     * @since: 2021/6/17 16:23
+     * @Param:
+     * @return:
+     */
+    void listByUpdate();
 }

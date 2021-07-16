@@ -11,11 +11,9 @@ import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,9 +33,6 @@ public class AdminCommunityInformController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IAdminCommunityInformService communityInformService;
 
-    @Autowired
-    private UserUtils userUtils;
-
     /**
      * (物业端)新增推送通知消息
      * @param qo 新增推送消息
@@ -48,15 +43,10 @@ public class AdminCommunityInformController {
     @ApiOperation("添加社区推送通知消息")
     public CommonResult<Boolean> addPushInform(HttpServletRequest request, @RequestBody PushInformQO qo) {
         ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidate.class);
-        if (qo.getPushState() == 0 && qo.getTopState() == 1) {
+        /*if (qo.getPushState() == 0 && qo.getTopState() == 1) {
             throw new JSYException(400, "参数错误!草稿不能置顶!");
-        }
-        //获取操作员信息
-        AdminInfoVo adminInfo = userUtils.getAdminInfo(request.getHeader("token"));
-        if (adminInfo == null) {
-            throw new JSYException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED);
-        }
-        qo.setCreateBy(adminInfo.getRealName());
+        }*/
+        qo.setCreateBy(UserUtils.getAdminUserInfo().getUid());
         // 设置推送用户信息
         qo.setAcctId(UserUtils.getAdminCommunityId());
         return communityInformService.addPushInform(qo) ? CommonResult.ok("添加成功!") : CommonResult.error("添加失败!");
@@ -71,12 +61,7 @@ public class AdminCommunityInformController {
     @DeleteMapping("/delete")
     @ApiOperation("删除推送通知消息")
     public CommonResult<Boolean> deletePushInform(HttpServletRequest request, @RequestParam Long id) {
-        //获取操作员信息
-        AdminInfoVo adminInfo = userUtils.getAdminInfo(request.getHeader("token"));
-        if (adminInfo == null) {
-            throw new JSYException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED);
-        }
-        return communityInformService.deletePushInform(id, adminInfo) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return communityInformService.deletePushInform(id, UserUtils.getAdminUserInfo().getUid()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     /**
@@ -91,12 +76,7 @@ public class AdminCommunityInformController {
     @PostMapping("/updateTopState")
     @ApiOperation("更新置顶状态")
     public CommonResult<Boolean> updateTopState(HttpServletRequest request, @RequestBody PushInformQO qo) {
-        //获取操作员信息
-        AdminInfoVo adminInfo = userUtils.getAdminInfo(request.getHeader("token"));
-        if (adminInfo == null) {
-            throw new JSYException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED);
-        }
-        qo.setUpdateBy(adminInfo.getRealName());
+        qo.setUpdateBy(UserUtils.getAdminUserInfo().getUid());
         ValidatorUtils.validateEntity(qo, PushInformQO.UpdateTopStateValidate.class);
         return communityInformService.updateTopState(qo) ? CommonResult.ok("操作成功!") : CommonResult.error("操作失败!");
     }
@@ -113,12 +93,7 @@ public class AdminCommunityInformController {
     @PostMapping("/updatePushState")
     @ApiOperation("更新发布状态")
     public CommonResult<Boolean> updatePushState(HttpServletRequest request, @RequestBody PushInformQO qo) {
-        //获取操作员信息
-        AdminInfoVo adminInfo = userUtils.getAdminInfo(request.getHeader("token"));
-        if (adminInfo == null) {
-            throw new JSYException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED);
-        }
-        qo.setUpdateBy(adminInfo.getRealName());
+        qo.setUpdateBy(UserUtils.getAdminUserInfo().getUid());
         ValidatorUtils.validateEntity(qo, PushInformQO.UpdatePushStateValidate.class);
         if (qo.getPushState() < 1) {
             // 发布状态只能在发布与撤销间反复横跳
@@ -163,7 +138,7 @@ public class AdminCommunityInformController {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
         ValidatorUtils.validateEntity(qo.getQuery(), PushInformQO.CommunityPushInformValidate.class);
-        qo.getQuery().setUid(UserUtils.getUserId());
+        qo.getQuery().setUid(UserUtils.getAdminUserInfo().getUid());
         return CommonResult.ok(communityInformService.queryCommunityInform(qo), "查询成功!");
     }
 
@@ -193,12 +168,7 @@ public class AdminCommunityInformController {
     @ApiOperation("(物业端)更新消息接口")
     public CommonResult updateDetail(HttpServletRequest request, @RequestBody PushInformQO qo) {
         ValidatorUtils.validateEntity(PushInformQO.UpdateDetailValidate.class);
-        //获取操作员信息
-        AdminInfoVo adminInfo = userUtils.getAdminInfo(request.getHeader("token"));
-        if (adminInfo == null) {
-            throw new JSYException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED);
-        }
-        qo.setUpdateBy(adminInfo.getRealName());
+        qo.setUpdateBy(UserUtils.getAdminUserInfo().getUid());
         // 设置推送用户信息
         qo.setAcctId(UserUtils.getAdminCommunityId());
         return communityInformService.updatePushInform(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败");

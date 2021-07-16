@@ -23,5 +23,8 @@ public class WeChatPayQO {
     @ApiModelProperty("商城订单")
     private Map<String,Object> orderData;
 
+    @ApiModelProperty("订单id集合")
+    private String ids;
+
 
 }

@@ -123,11 +123,11 @@ public class ShopQO implements Serializable {
 	private Integer status;
 	
 	@ApiModelProperty(value = "经度")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "经度不能为空")
+//	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "经度不能为空")
 	private BigDecimal lon;
 	
 	@ApiModelProperty(value = "纬度")
-	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "纬度不能为空")
+//	@NotNull(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "纬度不能为空")
 	private BigDecimal lat;
 	
 	@ApiModelProperty(value = "来源 1业主 2物业")

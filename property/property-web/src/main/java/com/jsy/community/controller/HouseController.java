@@ -187,7 +187,7 @@ public class HouseController {
 
 	@Login
 	@ApiOperation("下载房屋信息模板")
-	@GetMapping("/downloadHouseExcelTemplate")
+	@PostMapping("/downloadHouseExcelTemplate")
 	public ResponseEntity<byte[]> downloadHouseExcelTemplate() {
 		//设置excel 响应头信息
 		MultiValueMap<String, String> multiValueMap = new HttpHeaders();
@@ -214,8 +214,8 @@ public class HouseController {
 	 **/
 	@Login
 	@ApiOperation("导入房屋信息")
-	@PostMapping("/importHoustExcel")
-	public CommonResult importHoustExcel(MultipartFile excel) {
+	@PostMapping("/importHouseExcel")
+	public CommonResult importHouseExcel(MultipartFile excel) {
 		//参数验证
 		validFileSuffix(excel);
 		Long adminCommunityId = UserUtils.getAdminCommunityId();

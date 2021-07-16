@@ -12,6 +12,10 @@
             <if test="pushState == 2">
                 top_state = 0
             </if>
+            <if test="pushState == 1">
+                publish_by = #{updateBy},
+                publish_time = now()
+            </if>
         </set>
         where id = #{id}
     </update>

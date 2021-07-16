@@ -19,6 +19,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.MyCaptchaUtil;
+import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -143,21 +144,26 @@ public class AdminLoginController {
 		if (StrUtil.isEmpty(form.getCode()) && StrUtil.isEmpty(form.getPassword())) {
 			throw new PropertyException("验证码和密码不能同时为空");
 		}
+		// 判断是不是验证码登陆,如果是,判断验证码正不正确
+		if(!StringUtils.isEmpty(form.getCode())){
+			checkVerifyCode(form.getAccount(),form.getCode());
+		}
 		log.info(form.getAccount() + "开始登录");
 		//用户信息
 		AdminUserAuthEntity user;
-		if(!RegexUtils.isMobile(form.getAccount())){
-			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"非法手机号");
-		}
 		user = adminUserService.queryLoginUserByMobile(form.getAccount());
 		
 		//账号不存在、密码错误
 		if (user == null) {
+			log.error(form.getAccount() + "登录失败，原因：账号不存在");
 			return CommonResult.error("账号或密码不正确");
-		}else if(!StringUtils.isEmpty(form.getCode())){
-			checkVerifyCode(form.getAccount(),form.getCode());
-		}else if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())){
-			return CommonResult.error("账号或密码不正确");
+		}
+		// 如果是密码登录,判断密码正不正确
+		if (StringUtils.isEmpty(form.getCode())) {
+			if(!user.getPassword().equals(new Sha256Hash(RSAUtil.privateDecrypt(form.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), user.getSalt()).toHex())){
+				log.error(form.getAccount() + "登录失败，原因：密码不正确");
+				return CommonResult.error("账号或密码不正确");
+			}
 		}
 		
 		//查询已加入小区id列表
@@ -220,6 +226,7 @@ public class AdminLoginController {
 		BeanUtils.copyProperties(user,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
+		adminInfoVo.setCommunityName(jsonObject.getString("communityName"));
 		//删除登录用的一次性key
 		redisTemplate.delete("Admin:CommunityKey:" + communityKey);
 		return CommonResult.ok(adminInfoVo);

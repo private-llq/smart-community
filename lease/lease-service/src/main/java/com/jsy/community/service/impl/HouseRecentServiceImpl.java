@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseRecentService;
@@ -74,10 +75,21 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
         }
         //保存至用户 租赁最近浏览表t_house_recent
         if (!Objects.isNull(houseRecentEntity)) {
-            houseRecentEntity.setId(SnowFlake.nextId());
-            houseRecentEntity.setUid(uid);
+            // 根据house_id和uid判断浏览记录是否存在
+            HouseRecentEntity recentEntity = houseRecentMapper.selectOne(new QueryWrapper<HouseRecentEntity>().eq("house_id", houseRecentEntity.getHouseId()).eq("uid", uid));
             houseRecentEntity.setCreateTime(LocalDateTime.now());
-            houseRecentMapper.insert(houseRecentEntity);
+            if (recentEntity != null) {
+                // 如果存在则更新
+                houseRecentEntity.setId(recentEntity.getId());
+                houseRecentMapper.update(houseRecentEntity, new UpdateWrapper<HouseRecentEntity>().eq("id", recentEntity.getId()));
+            } else {
+                // 如果不存在,先执行新增
+                // 再删除各类型超过25条的旧历史
+                houseRecentEntity.setId(SnowFlake.nextId());
+                houseRecentEntity.setUid(uid);
+                houseRecentMapper.insert(houseRecentEntity);
+                houseRecentMapper.deleteByGtFiftyAndUid(uid, 20);
+            }
         }
     }
 

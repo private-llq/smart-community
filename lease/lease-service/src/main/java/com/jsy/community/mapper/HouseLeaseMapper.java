@@ -130,7 +130,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param houseId               房屋id
      * @return                      返回是否存在结果
      */
-    @Select("select count(*) from t_user_house as uh LEFT JOIN t_house as h on uh.house_id = h.id where uh.uid = #{userId} and uh.check_status = 1 and uh.community_id = #{houseCommunityId} and uh.deleted = 0 and h.id = #{houseId} and h.type =4 and h.deleted = 0")
+    @Select("select count(1) from t_user_house as uh LEFT JOIN t_house as h on uh.house_id = h.id where uh.uid = #{userId} and uh.community_id = #{houseCommunityId} and uh.deleted = 0 and h.id = #{houseId} and h.type =4 and h.deleted = 0")
     Integer isExistUserHouse(@Param("userId") String userId, @Param("houseCommunityId") Long houseCommunityId, @Param("houseId") Long houseId);
 
 
@@ -233,11 +233,10 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     /**
      * 按用户id 和 房屋id 查询已发布 房源数量
      * @param userId        用户id
-     * @param houseId       用户id
      * @return              返回已发布数量
      */
-    @Select("select count(*) from t_house_lease where uid = #{userId} and house_id = #{houseId}")
-    Integer getPublishLease(String userId, Long houseId);
+    @Select("select count(*) from t_house_lease where uid = #{userId} and deleted = 0")
+    Integer getPublishLease(String userId);
 
 
     /**
