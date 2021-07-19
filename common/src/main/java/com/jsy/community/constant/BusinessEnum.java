@@ -508,8 +508,8 @@ public interface BusinessEnum {
 //		WIFE("妻子",2),
 //		SON("儿子",3),
 //		DAUGHTER("女儿",4),
-		RELATIVES("亲属", 5),
-		TENANT("租客", 6);
+		RELATIVES("亲属", 6),
+		TENANT("租客", 7);
 		private String name;
 		private Integer code;
 		

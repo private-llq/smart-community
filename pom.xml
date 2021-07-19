@@ -7,7 +7,7 @@
     <groupId>com.jsy</groupId>
     <artifactId>com.jsy.community</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>com.jsy.community</name>
+    <name>smart-community</name>
     <description>智慧社区</description>
     
     <parent>

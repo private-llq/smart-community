@@ -57,7 +57,7 @@ public class RepairOrderController {
 	@PostMapping("/listRepairOrder")
 	public CommonResult<PageInfo<RepairOrderEntity>> listRepairOrder(@RequestBody BaseQO<RepairOrderQO> repairOrderQO) {
 		if (repairOrderQO.getQuery() != null) {
-			repairOrderQO.getQuery().setCommunityId(UserUtils.getAdminUserInfo().getCommunityId());
+			repairOrderQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 			PageInfo<RepairOrderEntity> pageInfo = repairOrderService.listRepairOrder(repairOrderQO);
 			return CommonResult.ok(pageInfo);
 		} else {
