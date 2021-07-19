@@ -373,6 +373,7 @@
 	        l.decoration_type_id,
 	        l.roommate_expect_id,
 	        l.roommate_sex,
+	        l.deleted,
 	        c.house_const_name AS houseLeaseMode,
 	        d.house_const_name AS houseLeaseDeposit,
 	        e.house_const_name as decorationType

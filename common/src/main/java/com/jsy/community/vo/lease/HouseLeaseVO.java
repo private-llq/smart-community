@@ -204,5 +204,8 @@ public class HouseLeaseVO implements Serializable {
 
     @ApiModelProperty("发布人信息")
     private UserEntity user;
+
+    // 逻辑删除,1为删除
+    private Integer deleted;
     
 }
