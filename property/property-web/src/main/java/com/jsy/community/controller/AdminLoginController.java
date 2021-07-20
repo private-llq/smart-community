@@ -29,6 +29,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
@@ -179,7 +180,10 @@ public class AdminLoginController {
 //		returnMap.put("communityKey",communityKey);
 		
 		//有权限的小区id列表
-		List<String> communityIdList = Arrays.asList(user.getCommunityIds().split(","));
+//		String[] ids = user.getCommunityIds().split(",");
+//		List<String> communityIdList = Arrays.asList(user.getCommunityIds().split(","));
+		Long[] communityIds =  (Long[])ConvertUtils.convert(user.getCommunityIds().split(","),Long.class);
+		List<Long> communityIdList = Arrays.asList(communityIds);
 		
 		//查询该社区下用户资料、用户菜单，并返回token
 		//用户资料
