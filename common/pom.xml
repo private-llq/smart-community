@@ -246,7 +246,13 @@
 			<artifactId>poi-ooxml-schemas</artifactId>
 			<version>4.1.0</version>
 		</dependency>
-		<!--	poi	-->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--	poi	-->
 	</dependencies>
 <!--	&lt;!&ndash;引入本地资源&ndash;&gt;-->
 <!--	<build>-->
