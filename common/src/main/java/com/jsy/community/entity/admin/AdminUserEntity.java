@@ -31,7 +31,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 有权限的社区ids(List)
 	 */
-	private List<String> communityIdList;
+	private List<Long> communityIdList;
 	
 	/**
 	 * 用户id
