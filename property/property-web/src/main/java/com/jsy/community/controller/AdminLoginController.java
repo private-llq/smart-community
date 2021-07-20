@@ -178,8 +178,9 @@ public class AdminLoginController {
 //		returnMap.put("communityList",communityList);
 //		returnMap.put("communityKey",communityKey);
 		
-		//查询已加入小区id列表
-		String[] communityIds = user.getCommunityIds().split(",");
+		//有权限的小区id列表
+		List<String> communityIdList = Arrays.asList(user.getCommunityIds().split(","));
+		
 		//查询该社区下用户资料、用户菜单，并返回token
 		//用户资料
 		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
@@ -193,7 +194,7 @@ public class AdminLoginController {
 		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
 		redisTemplate.delete("Admin:Login:" + oldToken);
 		//创建token，保存redis
-		userData.setCommunityIds(user.getCommunityIds());
+		userData.setCommunityIdList(communityIdList);
 		String token = adminUserTokenService.createToken(userData);
 		userData.setToken(token);
 		AdminInfoVo adminInfoVo = new AdminInfoVo();

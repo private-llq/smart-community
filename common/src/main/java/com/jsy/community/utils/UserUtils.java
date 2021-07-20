@@ -14,6 +14,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +30,7 @@ public class UserUtils {
 	public static final String USER_KEY = "userId";
 	public static final String USER_INFO = "userInfo";
 	public static final String USER_COMMUNITY = "communityId";
-	public static final String USER_COMMUNITY_IDS = "communityIds";
+	public static final String USER_COMMUNITY_ID_LIST = "communityIds";
 	
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -144,16 +146,32 @@ public class UserUtils {
 	}
 	
 	/**
-	 * @Description: 获取物业端登录用户有权限的社区IDS
+	 * @Description: 获取物业端登录用户有权限的社区IDList
 	 * @Param: []
 	 * @Return: java.lang.String
 	 * @Author: chq459799974
 	 * @Date: 2021/7/20
 	 **/
-	public static String getAdminCommunityIds() {
+	public static List<String> getAdminCommunityIdList() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
-		return (String) request.getAttribute(USER_COMMUNITY_IDS);
+		return (List<String>) request.getAttribute(USER_COMMUNITY_ID_LIST);
+	}
+	
+	/**
+	* @Description: 校验当前登录用户小区权限
+	 * @Param: [communityIdStr]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/7/20
+	**/
+	//TODO 大多数接口都需要校验，在过滤器添加例外接口路径，其他则调用此方法校验
+	public static void validateUser(String communityIdStr){
+		List<String> communityList = getAdminCommunityIdList();
+//		List<String> communityList = Arrays.asList(communityIds.split(","));
+		if(!communityList.contains(communityIdStr)){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"没有该社区权限！");
+		}
 	}
 	
 	/**
