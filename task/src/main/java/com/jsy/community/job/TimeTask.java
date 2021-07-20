@@ -158,8 +158,6 @@ public class TimeTask implements Job {
 				}
 			}
 		}
-		
-		
 		System.out.println("没有可删除的图片");
 	}
 }

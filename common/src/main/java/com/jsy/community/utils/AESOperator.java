@@ -12,6 +12,7 @@ import java.util.Base64;
  * @Date: 2021/1/12
 **/
 public class AESOperator {
+
 	/*
 	 * 加密用的Key 可以用26个字母和数字组成 此处使用AES-128-CBC加密模式，key需要为16位。
 	 */
@@ -35,7 +36,6 @@ public class AESOperator {
 			e.printStackTrace();
 		}
 		return result;
-		
 	}
 	
 	// 解密

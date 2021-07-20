@@ -13,12 +13,12 @@ public class JSYException extends RuntimeException {
 		super(message);
 		this.code = code;
 	}
-	
 	public JSYException(String message) {
 		super(message);
 		this.code = ConstError.NORMAL;
 	}
-	
+
+
 	public JSYException() {
 		this(JSYError.INTERNAL);
 	}

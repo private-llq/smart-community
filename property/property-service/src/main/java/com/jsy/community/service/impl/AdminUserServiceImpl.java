@@ -370,7 +370,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public AdminUserEntity queryUserByMobile(String mobile,Long communityId){
-		return adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("*").eq("mobile",mobile).eq("community_id",communityId));
+		QueryWrapper queryWrapper = new QueryWrapper<AdminUserEntity>();
+		queryWrapper.select("*");
+		queryWrapper.eq("mobile",mobile);
+		if(communityId != null){
+			queryWrapper.eq("community_id",communityId);
+		}
+		return adminUserMapper.selectOne(queryWrapper);
 	}
 	
 	/**

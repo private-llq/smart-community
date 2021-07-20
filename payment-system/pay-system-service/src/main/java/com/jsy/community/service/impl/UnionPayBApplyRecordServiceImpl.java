@@ -125,6 +125,7 @@ public class UnionPayBApplyRecordServiceImpl extends ServiceImpl<UnionPayBApplyR
         }
     }
 
+
     /**
      * @Author: Pipi
      * @Description: B端钱包重置支付密码

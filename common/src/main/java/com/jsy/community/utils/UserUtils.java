@@ -28,6 +28,7 @@ public class UserUtils {
 	public static final String USER_KEY = "userId";
 	public static final String USER_INFO = "userInfo";
 	public static final String USER_COMMUNITY = "communityId";
+	public static final String USER_COMMUNITY_IDS = "communityIds";
 	
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -67,7 +68,7 @@ public class UserUtils {
 		if(StringUtils.isEmpty(loginToken)){
 			return null;
 		}
-		String str = null;
+		String str;
 		try {
 			str = stringRedisTemplate.opsForValue().get("Admin:Login:" + loginToken);
 		} catch (Exception e) {
@@ -140,6 +141,19 @@ public class UserUtils {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
 		return (Long) request.getAttribute(USER_COMMUNITY);
+	}
+	
+	/**
+	 * @Description: 获取物业端登录用户有权限的社区IDS
+	 * @Param: []
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021/7/20
+	 **/
+	public static String getAdminCommunityIds() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+			.getRequest();
+		return (String) request.getAttribute(USER_COMMUNITY_IDS);
 	}
 	
 	/**
