@@ -210,6 +210,8 @@ public class RSAUtil {
         Map<String, String> keyMap = RSAUtil.createKeys(2048);
         String publicKey = keyMap.get("publicKey");
         String privateKey = keyMap.get("privateKey");
+        publicKey = COMMON_PUBLIC_KEY;
+        privateKey = COMMON_PRIVATE_KEY;
         System.out.println("公钥: \n\r" + publicKey);
         System.out.println("私钥： \n\r" + privateKey);
 

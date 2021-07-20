@@ -81,28 +81,28 @@ public class AdminLoginController {
 	//	@Value("${loginExpireHour}")
 	private long loginExpireHour = 12;
 	
-	/**
-	 * 防频繁调用验证码
-	 */
-	@GetMapping("captcha.jpg")
-	public void captcha(HttpServletResponse response, String uuid) throws IOException {
-		if (StrUtil.isBlank(uuid)) {
-			throw new JSYException("uuid不能为空");
-		}
-		response.setHeader("Cache-Control", "no-store, no-cache");
-		response.setContentType("image/jpeg");
-		//获取图片验证码
-		Map<String, Object> captchaMap = captchaUtil.getCaptcha();
-		//保存验证码
-		AdminCaptchaEntity captchaEntity = new AdminCaptchaEntity();
-		captchaEntity.setUuid(uuid);
-		captchaEntity.setCode(String.valueOf(captchaMap.get("code")));
-		adminCaptchaService.saveCaptcha(captchaEntity);
-
-		ServletOutputStream out = response.getOutputStream();
-		ImageIO.write((BufferedImage)captchaMap.get("image"), "jpg", out);
-		IoUtil.close(out);
-	}
+//	/**
+//	 * 防频繁调用验证码
+//	 */
+//	@GetMapping("captcha.jpg")
+//	public void captcha(HttpServletResponse response, String uuid) throws IOException {
+//		if (StrUtil.isBlank(uuid)) {
+//			throw new JSYException("uuid不能为空");
+//		}
+//		response.setHeader("Cache-Control", "no-store, no-cache");
+//		response.setContentType("image/jpeg");
+//		//获取图片验证码
+//		Map<String, Object> captchaMap = captchaUtil.getCaptcha();
+//		//保存验证码
+//		AdminCaptchaEntity captchaEntity = new AdminCaptchaEntity();
+//		captchaEntity.setUuid(uuid);
+//		captchaEntity.setCode(String.valueOf(captchaMap.get("code")));
+//		adminCaptchaService.saveCaptcha(captchaEntity);
+//
+//		ServletOutputStream out = response.getOutputStream();
+//		ImageIO.write((BufferedImage)captchaMap.get("image"), "jpg", out);
+//		IoUtil.close(out);
+//	}
 	
 	/**
 	 * 发送手机验证码
@@ -127,7 +127,7 @@ public class AdminLoginController {
 	}
 	
 	/**
-	* @Description: 登录获取小区列表
+	* @Description: 登录获取小区列表  tips.7.20号改直接登录 不在选择小区列表
 	 * @Param: [form]
 	 * @Return: com.jsy.community.vo.CommonResult<?>
 	 * @Author: chq459799974
@@ -166,71 +166,91 @@ public class AdminLoginController {
 			}
 		}
 		
+//		//查询已加入小区id列表
+//		List<Long> idList = adminUserService.queryCommunityIdList(form.getAccount());
+//		//查询已加入小区列表详情
+//		List<CommunityEntity> communityList = communityService.queryCommunityBatch(idList);
+//		//生成验证key，保存redis，验证完毕后即销毁
+//		String communityKey = UUID.randomUUID().toString().replace("-", "");
+//		redisTemplate.opsForValue().set("Admin:CommunityKey:" + communityKey, form.getAccount(),12,TimeUnit.HOURS);
+//		//返回小区列表和下一个接口验证用的一次性key
+//		Map<String, Object> returnMap = new HashMap<>();
+//		returnMap.put("communityList",communityList);
+//		returnMap.put("communityKey",communityKey);
+		
 		//查询已加入小区id列表
-		List<Long> idList = adminUserService.queryCommunityIdList(form.getAccount());
-		//查询已加入小区列表详情
-		List<CommunityEntity> communityList = communityService.queryCommunityBatch(idList);
-		//生成验证key，保存redis，验证完毕后即销毁
-		String communityKey = UUID.randomUUID().toString().replace("-", "");
-		redisTemplate.opsForValue().set("Admin:CommunityKey:" + communityKey, form.getAccount(),12,TimeUnit.HOURS);
-		//返回小区列表和下一个接口验证用的一次性key
-		Map<String, Object> returnMap = new HashMap<>();
-		returnMap.put("communityList",communityList);
-		returnMap.put("communityKey",communityKey);
-		//清空该账号已之前的token(踢下线)
-		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
-		redisTemplate.delete("Admin:Login:" + oldToken);
-		//存入手机已登录状态
-		redisTemplate.opsForValue().set("Admin:LoginAccount:" + form.getAccount(), "0", loginExpireHour, TimeUnit.HOURS); //0是初始值 选择小区后该值为登录token
-		return CommonResult.ok(returnMap);
-	}
-	
-	/**
-	* @Description: 登入小区
-	 * @Param: [account, communityId, communityKey]
-	 * @Return: com.jsy.community.vo.CommonResult
-	 * @Author: chq459799974
-	 * @Date: 2021/3/25
-	**/
-	@PostMapping("sys/enter")
-	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
-		String communityKey = jsonObject.getString("communityKey");
-		String account = jsonObject.getString("account");
-		Long communityId = jsonObject.getLong("communityId");
-		//验证
-		String catchedAccount = redisTemplate.opsForValue().get("Admin:CommunityKey:" + communityKey);
-		if(StringUtils.isEmpty(catchedAccount)){
-			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"登录过期，请重新登录");
-		}
-		if(!account.equals(catchedAccount)){
-			log.error("账户试图非法访问：" + account);
-			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"非法访问，已拦截");
-		}
-		List<Long> idList = adminUserService.queryCommunityIdList(account);
-		if(!idList.contains(communityId)){
-			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"没有该社区权限");
-		}
+		String[] communityIds = user.getCommunityIds().split(",");
 		//查询该社区下用户资料、用户菜单，并返回token
 		//用户资料
-		AdminUserEntity user = adminUserService.queryUserByMobile(account, communityId);
-		if(user.getStatus() == 1){
+		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
+		if(userData.getStatus() == 1){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
 		}
 		//用户菜单
-		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(user.getUid());
-		user.setMenuList(userMenu);
+		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(userData.getUid());
+		userData.setMenuList(userMenu);
+		//清空该账号已之前的token(踢下线)
+		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
+		redisTemplate.delete("Admin:Login:" + oldToken);
 		//创建token，保存redis
-		String token = adminUserTokenService.createToken(user);
-		user.setToken(token);
+		String token = adminUserTokenService.createToken(userData);
+		userData.setToken(token);
 		AdminInfoVo adminInfoVo = new AdminInfoVo();
-		BeanUtils.copyProperties(user,adminInfoVo);
+		BeanUtils.copyProperties(userData,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
-		adminInfoVo.setCommunityName(jsonObject.getString("communityName"));
-		//删除登录用的一次性key
-		redisTemplate.delete("Admin:CommunityKey:" + communityKey);
+//		adminInfoVo.setCommunityName(jsonObject.getString("communityName"));
+		//存入手机已登录状态
+		redisTemplate.opsForValue().set("Admin:LoginAccount:" + form.getAccount(), token, loginExpireHour, TimeUnit.HOURS); //0是初始值 选择小区后该值为登录token
 		return CommonResult.ok(adminInfoVo);
 	}
+	
+//	/**
+//	* @Description: 登入小区
+//	 * @Param: [account, communityId, communityKey]
+//	 * @Return: com.jsy.community.vo.CommonResult
+//	 * @Author: chq459799974
+//	 * @Date: 2021/3/25
+//	**/
+//	@PostMapping("sys/enter")
+//	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
+//		String communityKey = jsonObject.getString("communityKey");
+//		String account = jsonObject.getString("account");
+//		Long communityId = jsonObject.getLong("communityId");
+//		//验证
+//		String catchedAccount = redisTemplate.opsForValue().get("Admin:CommunityKey:" + communityKey);
+//		if(StringUtils.isEmpty(catchedAccount)){
+//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"登录过期，请重新登录");
+//		}
+//		if(!account.equals(catchedAccount)){
+//			log.error("账户试图非法访问：" + account);
+//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"非法访问，已拦截");
+//		}
+//		List<Long> idList = adminUserService.queryCommunityIdList(account);
+//		if(!idList.contains(communityId)){
+//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"没有该社区权限");
+//		}
+//		//查询该社区下用户资料、用户菜单，并返回token
+//		//用户资料
+//		AdminUserEntity user = adminUserService.queryUserByMobile(account, communityId);
+//		if(user.getStatus() == 1){
+//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
+//		}
+//		//用户菜单
+//		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(user.getUid());
+//		user.setMenuList(userMenu);
+//		//创建token，保存redis
+//		String token = adminUserTokenService.createToken(user);
+//		user.setToken(token);
+//		AdminInfoVo adminInfoVo = new AdminInfoVo();
+//		BeanUtils.copyProperties(user,adminInfoVo);
+//		adminInfoVo.setUid(null);
+//		adminInfoVo.setStatus(null);
+//		adminInfoVo.setCommunityName(jsonObject.getString("communityName"));
+//		//删除登录用的一次性key
+//		redisTemplate.delete("Admin:CommunityKey:" + communityKey);
+//		return CommonResult.ok(adminInfoVo);
+//	}
 	
 	/**
 	 * 检查手机验证码
