@@ -193,6 +193,7 @@ public class AdminLoginController {
 		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
 		redisTemplate.delete("Admin:Login:" + oldToken);
 		//创建token，保存redis
+		userData.setCommunityIds(user.getCommunityIds());
 		String token = adminUserTokenService.createToken(userData);
 		userData.setToken(token);
 		AdminInfoVo adminInfoVo = new AdminInfoVo();

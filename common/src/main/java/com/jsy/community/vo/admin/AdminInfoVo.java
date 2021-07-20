@@ -20,6 +20,10 @@ public class AdminInfoVo implements Serializable {
 	 */
 	private Long communityId;
 	/**
+	 * 有权限的社区ids
+	 */
+	private String communityIds;
+	/**
 	 * 社区名
 	 */
 	private String communityName;
