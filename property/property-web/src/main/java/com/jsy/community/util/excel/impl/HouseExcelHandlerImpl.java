@@ -185,12 +185,12 @@ public class HouseExcelHandlerImpl implements HouseExcelHandler {
                             break;
                         case 8:
                             // 房产类型
-                            if (StringUtils.isNotBlank(cellValue)) {
+                            /*if (StringUtils.isNotBlank(cellValue)) {
                                 houseEntity.setPropertyType(PropertyEnum.PropertyTypeEnum.getCode(cellValue));
                             } else {
                                 addResolverError(errorVos, dataRow, "请选择正确的房产类型!");
                                 hasError = true;
-                            }
+                            }*/
                             break;
                         case 9:
                             // 装修情况
@@ -294,7 +294,7 @@ public class HouseExcelHandlerImpl implements HouseExcelHandler {
                         break;
                     case 8:
                         // 房产类型
-                        cell.setCellValue(vo.getPropertyType());
+//                        cell.setCellValue(vo.getPropertyType());
                         break;
                     case 9:
                         // 装修情况

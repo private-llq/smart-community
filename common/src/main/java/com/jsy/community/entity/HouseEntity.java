@@ -93,8 +93,8 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private String houseTypeStr;
     
     @ApiModelProperty(value = "房产类型1.商品房 2.房改房 3.集资房 4.经适房 5.廉租房 6.公租房 7.安置房 8.小产权房")
-    @NotNull(groups = addRoomValidatedGroup.class, message = "缺少房产类型")
-    @Range(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, min = 1, max = 8 , message = "非法房产类型")
+    // @NotNull(groups = addRoomValidatedGroup.class, message = "缺少房产类型")
+    // @Range(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, min = 1, max = 8 , message = "非法房产类型")
     private Integer propertyType;
     
     @ApiModelProperty(value = "房产类型字符串")
@@ -102,6 +102,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private String propertyTypeStr;
     
     @ApiModelProperty(value = "装修情况1.样板间 2.毛坯 3.简装 4.精装")
+    @NotNull(groups = addRoomValidatedGroup.class, message = "请填写装修情况")
     private Integer decoration;
     
     @ApiModelProperty(value = "装修情况字符串")
@@ -179,5 +180,4 @@ public class HouseEntity extends BaseEntity implements Serializable {
      * 修改house验证组
      */
     public interface updateHouseValidatedGroup{}
-
 }

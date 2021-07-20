@@ -469,7 +469,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         else if (BusinessConst.BUILDING_TYPE_DOOR == query.getType()) {
             for (HouseEntity houseEntity : pageData.getRecords()) {
                 houseEntity.setHouseTypeStr(PropertyEnum.HouseTypeEnum.HOUSE_TYPE_MAP.get(houseEntity.getHouseType()));
-                houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
+                // houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
                 houseEntity.setDecorationStr(PropertyEnum.DecorationEnum.DECORATION_MAP.get(houseEntity.getDecoration()));
                 if ("00000000".equals(houseEntity.getHouseTypeCode())) {
                     houseEntity.setHouseTypeCodeStr("单间配套");
