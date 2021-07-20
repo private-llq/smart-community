@@ -152,10 +152,10 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/20
 	 **/
-	public static List<String> getAdminCommunityIdList() {
+	public static List<Long> getAdminCommunityIdList() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
-		return (List<String>) request.getAttribute(USER_COMMUNITY_ID_LIST);
+		return (List<Long>) request.getAttribute(USER_COMMUNITY_ID_LIST);
 	}
 	
 	/**
@@ -166,9 +166,8 @@ public class UserUtils {
 	 * @Date: 2021/7/20
 	**/
 	//TODO 大多数接口都需要校验，在过滤器添加例外接口路径，其他则调用此方法校验
-	public static void validateUser(String communityIdStr){
-		List<String> communityList = getAdminCommunityIdList();
-//		List<String> communityList = Arrays.asList(communityIds.split(","));
+	public static void validateUser(Long communityIdStr){
+		List<Long> communityList = getAdminCommunityIdList();
 		if(!communityList.contains(communityIdStr)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"没有该社区权限！");
 		}
