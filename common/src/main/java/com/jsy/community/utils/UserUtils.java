@@ -14,6 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -165,11 +166,12 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/20
 	**/
-	//TODO 大多数接口都需要校验，在过滤器添加例外接口路径，其他则调用此方法校验
-	public static void validateUser(Long communityIdStr){
-		List<Long> communityList = getAdminCommunityIdList();
-		if(!communityList.contains(communityIdStr)){
-			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"没有该社区权限！");
+	public static void validateCommunityIds(List<Long> communityIds){
+		List<Long> communityIdList = getAdminCommunityIdList();
+		for(Long communityId : communityIds){
+			if(!communityIdList.contains(communityId)){
+				throw new JSYException(JSYError.BAD_REQUEST.getCode(),"社区权限校验失败！");
+			}
 		}
 	}
 	
