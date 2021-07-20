@@ -24,6 +24,10 @@ public class AdminUserAuthEntity extends BaseEntity {
 	 * 盐
 	 */
 	private String salt;
+	/**
+	 * 有权限的社区ids
+	 */
+	private String communityIds;
 	
 	private String token;//登录token
 	
