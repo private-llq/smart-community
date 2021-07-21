@@ -8,6 +8,7 @@ import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.admin.AdminCaptchaEntity;
@@ -150,7 +151,7 @@ public class AdminLoginController {
 			checkVerifyCode(form.getAccount(),form.getCode());
 		}
 		log.info(form.getAccount() + "开始登录");
-		//用户信息
+		//查询用户账号密码
 		AdminUserAuthEntity user;
 		user = adminUserService.queryLoginUserByMobile(form.getAccount());
 		
@@ -166,6 +167,11 @@ public class AdminLoginController {
 				return CommonResult.error("账号或密码不正确");
 			}
 		}
+		//用户资料
+		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
+		if(userData.getStatus() == 1){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
+		}
 		
 //		//查询已加入小区id列表
 //		List<Long> idList = adminUserService.queryCommunityIdList(form.getAccount());
@@ -180,20 +186,29 @@ public class AdminLoginController {
 //		returnMap.put("communityKey",communityKey);
 		
 		//有权限的小区id列表
-//		String[] ids = user.getCommunityIds().split(",");
-//		List<String> communityIdList = Arrays.asList(user.getCommunityIds().split(","));
 		Long[] communityIds =  (Long[])ConvertUtils.convert(user.getCommunityIds().split(","),Long.class);
 		List<Long> communityIdList = Arrays.asList(communityIds);
 		
-		//查询该社区下用户资料、用户菜单，并返回token
-		//用户资料
-		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
-		if(userData.getStatus() == 1){
-			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
-		}
 		//用户菜单
-		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(userData.getUid());
+		List<AdminMenuEntity> userMenu;
+		//返回VO
+		AdminInfoVo adminInfoVo = new AdminInfoVo();
+		//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
+		if(communityIds.length == 1){
+			//小区管理员账号 直接登入小区菜单
+			userData.setCommunityId(communityIds[0]);
+			userMenu = adminConfigService.queryMenuByUid(userData.getUid(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
+			//设置登录类型
+			adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_COMMUNITY);
+		}else{
+			//物业公司账号 进入物业公司管理菜单
+			userMenu = adminConfigService.queryMenuByUid(userData.getUid(),PropertyConsts.LOGIN_TYPE_PROPERTY);
+			//设置登录类型
+			adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
+		}
+		//设置菜单
 		userData.setMenuList(userMenu);
+		
 		//清空该账号已之前的token(踢下线)
 		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
 		redisTemplate.delete("Admin:Login:" + oldToken);
@@ -201,7 +216,8 @@ public class AdminLoginController {
 		userData.setCommunityIdList(communityIdList);
 		String token = adminUserTokenService.createToken(userData);
 		userData.setToken(token);
-		AdminInfoVo adminInfoVo = new AdminInfoVo();
+		
+		//返回VO属性封装
 		BeanUtils.copyProperties(userData,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
@@ -211,52 +227,32 @@ public class AdminLoginController {
 		return CommonResult.ok(adminInfoVo);
 	}
 	
-//	/**
-//	* @Description: 登入小区
-//	 * @Param: [account, communityId, communityKey]
-//	 * @Return: com.jsy.community.vo.CommonResult
-//	 * @Author: chq459799974
-//	 * @Date: 2021/3/25
-//	**/
-//	@PostMapping("sys/enter")
-//	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
-//		String communityKey = jsonObject.getString("communityKey");
-//		String account = jsonObject.getString("account");
-//		Long communityId = jsonObject.getLong("communityId");
-//		//验证
-//		String catchedAccount = redisTemplate.opsForValue().get("Admin:CommunityKey:" + communityKey);
-//		if(StringUtils.isEmpty(catchedAccount)){
-//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"登录过期，请重新登录");
-//		}
-//		if(!account.equals(catchedAccount)){
-//			log.error("账户试图非法访问：" + account);
-//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"非法访问，已拦截");
-//		}
-//		List<Long> idList = adminUserService.queryCommunityIdList(account);
-//		if(!idList.contains(communityId)){
-//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"没有该社区权限");
-//		}
-//		//查询该社区下用户资料、用户菜单，并返回token
-//		//用户资料
-//		AdminUserEntity user = adminUserService.queryUserByMobile(account, communityId);
-//		if(user.getStatus() == 1){
-//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
-//		}
-//		//用户菜单
-//		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(user.getUid());
-//		user.setMenuList(userMenu);
-//		//创建token，保存redis
-//		String token = adminUserTokenService.createToken(user);
-//		user.setToken(token);
-//		AdminInfoVo adminInfoVo = new AdminInfoVo();
-//		BeanUtils.copyProperties(user,adminInfoVo);
-//		adminInfoVo.setUid(null);
-//		adminInfoVo.setStatus(null);
-//		adminInfoVo.setCommunityName(jsonObject.getString("communityName"));
-//		//删除登录用的一次性key
-//		redisTemplate.delete("Admin:CommunityKey:" + communityKey);
-//		return CommonResult.ok(adminInfoVo);
-//	}
+	/**
+	* @Description: 登入小区
+	 * @Param: [account, communityId, communityKey]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	**/
+	@PostMapping("sys/enter")
+	@Login
+	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
+		Long communityId = jsonObject.getLong("communityId");
+		UserUtils.validateCommunityIds(communityId);
+		//创建token，保存redis
+		AdminUserEntity user = new AdminUserEntity();
+		//用户菜单
+		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminUserInfo().getUid(),PropertyConsts.LOGIN_TYPE_COMMUNITY);
+		//设置小区级菜单
+		user.setMenuList(userMenu);
+		String token = adminUserTokenService.createToken(user);
+		user.setToken(token);
+		AdminInfoVo adminInfoVo = new AdminInfoVo();
+		BeanUtils.copyProperties(user,adminInfoVo);
+		adminInfoVo.setUid(null);
+		adminInfoVo.setStatus(null);
+		return CommonResult.ok(adminInfoVo);
+	}
 	
 	/**
 	 * 检查手机验证码

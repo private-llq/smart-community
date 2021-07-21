@@ -33,4 +33,8 @@ public interface PropertyConsts {
 	//======= 小区服务器下发动作(主题)
 	String ACT_HK_CAMERA = "HKCamera"; //海康摄像机
 	String ACT_XU_FACE = "XUFace"; //炫优人脸识别一体机
+	
+	//======= 登录类型
+	Integer LOGIN_TYPE_PROPERTY = 1; //物业公司账号
+	Integer LOGIN_TYPE_COMMUNITY = 2; //小区管理员
 }

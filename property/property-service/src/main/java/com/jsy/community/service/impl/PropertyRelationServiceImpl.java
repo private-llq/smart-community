@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.mapper.PropertyRelationMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
@@ -142,5 +143,45 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
             m.appendReplacement(buf, pinyin);
         }
         return m.appendTail(buf).toString();
+    }
+
+
+
+    /**
+     * @Description: 新增
+     * @author: Hu
+     * @since: 2021/7/21 16:36
+     * @Param: [houseMemberEntity]
+     * @return: void
+     */
+    @Override
+    public void save(HouseMemberEntity houseMemberEntity) {
+        propertyRelationMapper.insert(houseMemberEntity);
+    }
+
+
+    /**
+     * @Description: 修改
+     * @author: Hu
+     * @since: 2021/7/21 16:36
+     * @Param: [houseMemberEntity]
+     * @return: void
+     */
+    @Override
+    public void update(HouseMemberEntity houseMemberEntity) {
+        propertyRelationMapper.updateById(houseMemberEntity);
+    }
+
+
+    /**
+     * @Description: 单查
+     * @author: Hu
+     * @since: 2021/7/21 16:36
+     * @Param: [id]
+     * @return: com.jsy.community.entity.HouseMemberEntity
+     */
+    @Override
+    public HouseMemberEntity findOne(Long id) {
+        return propertyRelationMapper.selectById(id);
     }
 }

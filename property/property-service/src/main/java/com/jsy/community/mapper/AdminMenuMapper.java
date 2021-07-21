@@ -76,7 +76,7 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
-	List<AdminMenuEntity> queryMenuBatch(List<Long> list);
+	List<AdminMenuEntity> queryMenuBatch(@Param("list")List<Long> list,@Param("loginType")Integer loginType);
 	
 	/**
 	 * @Description: 清空用户菜单

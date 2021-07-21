@@ -166,12 +166,10 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/20
 	**/
-	public static void validateCommunityIds(List<Long> communityIds){
+	public static void validateCommunityIds(Long communityId){
 		List<Long> communityIdList = getAdminCommunityIdList();
-		for(Long communityId : communityIds){
-			if(!communityIdList.contains(communityId)){
-				throw new JSYException(JSYError.BAD_REQUEST.getCode(),"社区权限校验失败！");
-			}
+		if(!communityIdList.contains(communityId)){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无该社区权限！");
 		}
 	}
 	
