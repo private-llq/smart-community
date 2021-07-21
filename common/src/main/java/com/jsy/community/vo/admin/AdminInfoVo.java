@@ -76,5 +76,10 @@ public class AdminInfoVo implements Serializable {
 	 * 编号
 	 */
 	private String number;
+	
+	/**
+	 * 本次登录类型 1.物业公司登录 2.小区管理员登录
+	 */
+	private Integer loginType;
 
 }

@@ -17,6 +17,8 @@ import java.util.List;
 @TableName("t_admin_menu")
 public class AdminMenuEntity extends BaseEntity {
 	
+	private Integer loginType;//用户本次登录类型 1.物业公司管理员 2.小区管理员
+	
 	private String icon;//菜单图标
 	
 	@NotBlank(message = "菜单名不能为空")

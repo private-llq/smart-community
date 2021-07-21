@@ -118,7 +118,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
-	List<AdminMenuEntity> queryMenuByUid(String uid);
+	List<AdminMenuEntity> queryMenuByUid(String uid, Integer loginType);
 	
 	/**
 	* @Description: 统计用户菜单数

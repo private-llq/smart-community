@@ -283,14 +283,14 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2021/3/25
 	**/
 	@Override
-	public List<AdminMenuEntity> queryMenuByUid(String uid){
+	public List<AdminMenuEntity> queryMenuByUid(String uid, Integer loginType){
 		//查ID
 		List<Long> menuIdList = adminUserMenuMapper.queryUserMenu(uid);
 		if(CollectionUtils.isEmpty(menuIdList)){
 			return null;
 		}
 		//查实体
-		List<AdminMenuEntity> menuEntityList = adminMenuMapper.queryMenuBatch(menuIdList);
+		List<AdminMenuEntity> menuEntityList = adminMenuMapper.queryMenuBatch(menuIdList,loginType);
 		//组装数据
 		List<AdminMenuEntity> returnList = new ArrayList<>();
 		for(AdminMenuEntity adminMenuEntity : menuEntityList){

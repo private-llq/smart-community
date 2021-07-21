@@ -34,6 +34,7 @@
 	<select id="queryMenuBatch" resultType="com.jsy.community.entity.admin.AdminMenuEntity">
 		select * from t_admin_menu
 		where deleted = 0
+		and login_type = #{loginType}
 		and id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
