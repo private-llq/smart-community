@@ -22,10 +22,7 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -150,6 +147,7 @@ public class ElasticsearchCarUtil {
      * @return:
      */
     public static Map<String, Object> search(BaseQO<ElasticsearchCarSearchQO> baseQO, AdminInfoVo info,RestHighLevelClient restHighLevelClient){
+        List<Long> idList = info.getCommunityIdList();
         ElasticsearchCarSearchQO query = baseQO.getQuery();
         SearchRequest searchRequest = new SearchRequest(BusinessConst.INDEX_CAR);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
@@ -164,7 +162,9 @@ public class ElasticsearchCarUtil {
             boolQuery.must(new TermQueryBuilder("carType", query.getCarType()));
         }
         //只查询当前的小区的车辆
-        boolQuery.must(new TermQueryBuilder("communityId", info.getCommunityId()));
+//        Long[] strArrNum = (Long[]) ConvertUtils.convert(communityIds,Long.class);
+        Object[] array = idList.toArray();
+        boolQuery.must(new TermsQueryBuilder("communityId", array));
 
         //创建时间排序
         sourceBuilder.sort(new FieldSortBuilder("createTime").order(SortOrder.DESC));

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,38 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     @Autowired
     private AdminUserMapper adminUserMapper;
 
+
+
+    /**
+     * @Description: 新增缴费规则
+     * @author: Hu
+     * @since: 2021/7/20 14:26
+     * @Param: [communityId, propertyFeeRuleEntity]
+     * @return: void
+     */
+    @Override
+    public void saveOne(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
+        propertyFeeRuleEntity.setCommunityId(userInfo.getCommunityId());
+        propertyFeeRuleEntity.setCreateBy(userInfo.getUid());
+        propertyFeeRuleEntity.setStatus(0);
+        propertyFeeRuleEntity.setCreateTime(LocalDateTime.now());
+        Integer size = propertyFeeRuleMapper.selectCount(new QueryWrapper<PropertyFeeRuleEntity>().eq("community_id", userInfo.getCommunityId()));
+        String value = String.valueOf(size);
+        if (value.length()==1){
+            propertyFeeRuleEntity.setSerialNumber("000"+value);
+        }else {
+            if(value.length()==2){
+                propertyFeeRuleEntity.setSerialNumber("00"+value);
+            }else {
+                if (value.length()==3){
+                    propertyFeeRuleEntity.setSerialNumber("0"+value);
+                }else {
+                    propertyFeeRuleEntity.setSerialNumber(value);
+                }
+            }
+        }
+        propertyFeeRuleMapper.insert(propertyFeeRuleEntity);
+    }
 
     /**
      * @Description: 修改

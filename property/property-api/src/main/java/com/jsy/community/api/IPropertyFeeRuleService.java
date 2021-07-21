@@ -51,4 +51,12 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      */
     void updateOneRule(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity);
 
+    /**
+     * @Description: 新增缴费规则
+     * @author: Hu
+     * @since: 2021/7/20 14:26
+     * @Param:
+     * @return:
+     */
+    void saveOne(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity);
 }

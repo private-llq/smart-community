@@ -508,6 +508,7 @@ public interface BusinessEnum {
 //		WIFE("妻子",2),
 //		SON("儿子",3),
 //		DAUGHTER("女儿",4),
+		PROPRIETOR("业主", 1),
 		RELATIVES("亲属", 6),
 		TENANT("租客", 7);
 		private String name;

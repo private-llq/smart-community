@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 @TableName("t_property_fee_rule")
 public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "1物业费，2车位费")
+    @NotNull(message = "费用类型不能为空",groups = PropertyFeeRule.class)
     private Integer type;
     @ApiModelProperty(value = "社区id")
     private Long communityId;
@@ -28,14 +30,19 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "名称")
     private String name;
     @ApiModelProperty(value = "周期1日，2周，3月，4季，5年")
+    @NotNull(message = "计费周期不能为空！",groups = PropertyFeeRule.class)
     private Integer period;
     @ApiModelProperty(value = "计费方式1面积，2定额")
+    @NotNull(message = "计费方式不能为空！",groups = PropertyFeeRule.class)
     private Integer chargeMode;
     @ApiModelProperty(value = "金额")
+    @NotNull(message = "收费金额不能为空！",groups = PropertyFeeRule.class)
     private BigDecimal monetaryUnit;
     @ApiModelProperty(value = "违约金")
+    @NotNull(message = "违约金不能为空！",groups = PropertyFeeRule.class)
     private BigDecimal penalSum;
     @ApiModelProperty(value = "违约金多少天开始计费")
+    @NotNull(message = "违约天数不能为空！",groups = PropertyFeeRule.class)
     private Integer penalDays;
     @ApiModelProperty(value = "状态0未启用，1启用")
     private Integer status;
@@ -46,4 +53,6 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "修改人名称")
     @TableField(exist = false)
     private String updateByName;
+
+    public interface PropertyFeeRule{}
 }

@@ -8,6 +8,7 @@ import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
@@ -65,6 +66,16 @@ public class PropertyFeeRuleController {
     public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("修改")
+    @PostMapping("/save")
+    @Login
+    public CommonResult save(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
+        ValidatorUtils.validateEntity(propertyFeeRuleEntity, PropertyFeeRuleEntity.PropertyFeeRule.class);
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFeeRuleService.saveOne(userInfo,propertyFeeRuleEntity);
         return CommonResult.ok();
     }
 
