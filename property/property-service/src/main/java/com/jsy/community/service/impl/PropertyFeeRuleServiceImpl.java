@@ -52,6 +52,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         propertyFeeRuleEntity.setStatus(0);
         propertyFeeRuleEntity.setCreateTime(LocalDateTime.now());
         Integer size = propertyFeeRuleMapper.selectCount(new QueryWrapper<PropertyFeeRuleEntity>().eq("community_id", userInfo.getCommunityId()));
+        size++;
         String value = String.valueOf(size);
         if (value.length()==1){
             propertyFeeRuleEntity.setSerialNumber("000"+value);

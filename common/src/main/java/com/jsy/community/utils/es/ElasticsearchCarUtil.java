@@ -161,10 +161,8 @@ public class ElasticsearchCarUtil {
         if (query.getCarType()!=null&&query.getCarType()!=0) {
             boolQuery.must(new TermQueryBuilder("carType", query.getCarType()));
         }
-        //只查询当前的小区的车辆
-//        Long[] strArrNum = (Long[]) ConvertUtils.convert(communityIds,Long.class);
-        Object[] array = idList.toArray();
-        boolQuery.must(new TermsQueryBuilder("communityId", array));
+
+        boolQuery.must(new TermsQueryBuilder("communityId", idList.toArray()));
 
         //创建时间排序
         sourceBuilder.sort(new FieldSortBuilder("createTime").order(SortOrder.DESC));

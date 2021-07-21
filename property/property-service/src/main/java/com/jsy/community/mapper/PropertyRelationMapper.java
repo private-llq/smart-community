@@ -1,5 +1,7 @@
 package com.jsy.community.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.HouseTypeVo;
@@ -16,7 +18,7 @@ import java.util.List;
  * @create: 2021-03-05 11:21
  **/
 @Mapper
-public interface PropertyRelationMapper {
+public interface PropertyRelationMapper extends BaseMapper<HouseMemberEntity> {
     /**
      * @Description: 分页查询
      * @author: Hu

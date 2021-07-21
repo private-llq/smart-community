@@ -6,6 +6,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
@@ -15,10 +16,7 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,28 @@ public class PropertyRelationController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyRelationService propertyRelationService;
 
+    @ApiOperation("新增")
+    @PostMapping("/save")
+    @Login
+    public CommonResult save(@RequestBody HouseMemberEntity houseMemberEntity){
+        propertyRelationService.save(houseMemberEntity);
+        return CommonResult.ok();
+    }
+    @ApiOperation("修改")
+    @PutMapping("/update")
+    @Login
+    public CommonResult update(@RequestBody HouseMemberEntity houseMemberEntity){
+        propertyRelationService.update(houseMemberEntity);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("查询一条")
+    @GetMapping("/findOne")
+    @Login
+    public CommonResult findOne(@RequestParam Long id){
+        HouseMemberEntity entity = propertyRelationService.findOne(id);
+        return CommonResult.ok(entity);
+    }
     @ApiOperation("查询成员列表")
     @PostMapping("/list")
     @Login

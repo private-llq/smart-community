@@ -1,5 +1,6 @@
 package com.jsy.community.api;
 
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
@@ -48,4 +49,31 @@ public interface IPropertyRelationService {
      * @return:
      */
     List getUnitId(BaseQO<RelationListQO> baseQO,AdminInfoVo adminInfoVo);
+
+    /**
+     * @Description: 新增
+     * @author: Hu
+     * @since: 2021/7/21 16:35
+     * @Param:
+     * @return:
+     */
+    void save(HouseMemberEntity houseMemberEntity);
+
+    /**
+     * @Description: 修改
+     * @author: Hu
+     * @since: 2021/7/21 16:35
+     * @Param:
+     * @return:
+     */
+    void update(HouseMemberEntity houseMemberEntity);
+
+    /**
+     * @Description: 单查
+     * @author: Hu
+     * @since: 2021/7/21 16:35
+     * @Param:
+     * @return:
+     */
+    HouseMemberEntity findOne(Long id);
 }
