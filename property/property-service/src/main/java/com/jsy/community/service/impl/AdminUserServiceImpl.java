@@ -9,6 +9,8 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.consts.PropertyConstsEnum;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
@@ -66,6 +68,9 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	
 	@Autowired
 	private AdminUserAuthMapper adminUserAuthMapper;
+	
+	@Autowired
+	private UserUtils userUtils;
 	
 	
 	/**
@@ -414,6 +419,9 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	public List<String> queryUserMenuIdList(Long id){
 		//查询操作员UID
 		String uid = queryUidById(id);
+		if(StringUtils.isEmpty(uid)){
+			return null;
+		}
 		//返回UID对应菜单列表
 		return adminConfigService.queryUserMenuIdList(uid);
 	}
@@ -444,9 +452,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		AdminUserQO query = baseQO.getQuery();
 		Page<AdminUserEntity> page = new Page();
 		MyPageUtils.setPageAndSize(page,baseQO);
-//		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,number,real_name,mobile,id_card,status,role_type,org_id,job,create_by,create_time,update_by,update_time");
 		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,real_name,mobile,create_time");
-//		queryWrapper.eq("community_id",query.getCommunityId());
 		//是否查详情
 		Integer menuCount = null;
 		if(query.getId() != null){
@@ -458,47 +464,15 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		
 		if(!StringUtils.isEmpty(query.getName())){
 			queryWrapper.and(wrapper -> wrapper
-//				.like("number",query.getName())
-//				.or().like("real_name",query.getName())
 				.like("real_name",query.getName())
 				.or().like("mobile",query.getName())
-//				.or().like("id_card",query.getName())
 			);
 		}
-//		if(query.getStatus() != null){
-//			queryWrapper.eq("status",query.getStatus());
-//		}
-//		queryWrapper.orderByAsc("role_type","status");
 		queryWrapper.orderByDesc("create_time");
 		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
 		if(CollectionUtils.isEmpty(pageData.getRecords())){
 			return new PageInfo<>();
 		}
-//		//补创建人和更新人姓名
-//		Set<String> createUidSet = new HashSet<>();
-//		Set<String> updateUidSet = new HashSet<>();
-//		//补组织机构名称
-//		Set<Long> orgIdSet = new HashSet<>();
-//		for(AdminUserEntity entity : pageData.getRecords()){
-//			orgIdSet.add(entity.getOrgId());
-//			createUidSet.add(entity.getCreateBy());
-//			updateUidSet.add(entity.getUpdateBy());
-//		}
-//		Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(orgIdSet);
-//		Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
-//		Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
-//		for(AdminUserEntity entity : pageData.getRecords()){
-//			if (entity.getOrgId() != null) {
-//				// 允许组织机构为空
-//				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
-//			}
-//			entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
-//			entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
-//		}
-//		//查详情 已授权菜单数统计
-//		if(query.getId() != null){
-//			pageData.getRecords().get(0).setMenuCount(menuCount);
-//		}
 		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
@@ -513,15 +487,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean addOperator(AdminUserEntity adminUserEntity){
-//		//查询组织机构是否存在
-//		if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
-//			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
-//		}
-//		//生成随机密码
-//		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
-//		//TODO 测试阶段暂时生成固定密码
-//		randomPass = "11111111";
+	public void addOperator(AdminUserEntity adminUserEntity){
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		//生成UUID 和 ID
@@ -529,11 +495,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserEntity.setId(SnowFlake.nextId());
 		adminUserEntity.setUid(uid);
 		//t_admin_user用户资料表插入数据
-//		adminUserEntity.setStatus(adminUserEntity.getStatus() != null ? adminUserEntity.getStatus() : 0);
-//		adminUserEntity.setPassword(new Sha256Hash(randomPass, salt).toHex());
-		adminUserEntity.setPassword(new Sha256Hash(adminUserEntity.getPassword(), salt).toHex());
+		adminUserEntity.setPassword(new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex());
+//		adminUserEntity.setPassword(new Sha256Hash(adminUserEntity.getPassword(), salt).toHex());
 		adminUserEntity.setSalt(salt);
-		int result = adminUserMapper.addOperator(adminUserEntity);
+		adminUserMapper.addOperator(adminUserEntity);
 		// TODO 变为添加角色
 //		//t_admin_user_menu添加菜单权限
 //		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
@@ -543,11 +508,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
 //		//发短信通知，并发送初始密码
 //		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
-		//TODO 添加社区权限
+		//添加社区权限
 		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
-		
+			adminConfigService.updateAdminCommunityBatch(adminUserEntity.getCommunityIdList(),uid);
 		}
-		return result == 1;
 	}
 	
 	/**
@@ -559,66 +523,80 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean updateOperator(AdminUserEntity adminUserEntity){
+	public void updateOperator(AdminUserEntity adminUserEntity){
 		//查询uid
-		String uid = adminUserMapper.queryUidById(adminUserEntity.getId());
-		if(StringUtils.isEmpty(uid)){
+		UserEntity user = adminUserMapper.queryUidById(adminUserEntity.getId());
+		if(user == null){
 			throw new PropertyException("用户不存在！");
 		}
-		//更新资料
-		adminUserMapper.updateOperator(adminUserEntity);
 		//更新密码
 		if(!StringUtils.isEmpty(adminUserEntity.getPassword())){
 			//生成盐值并对密码加密
 			String salt = RandomStringUtils.randomAlphanumeric(20);
-//			String password = new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex();
-			String password = new Sha256Hash(adminUserEntity.getPassword(), salt).toHex();
+			String password = new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex();
+//			String password = new Sha256Hash(adminUserEntity.getPassword(), salt).toHex();
 			//更新
 			AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
 			adminUserAuthEntity.setPassword(password);
 			adminUserAuthEntity.setSalt(salt);
-			adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("uid",uid));
+			adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile",user.getMobile()));
 		}
 		//更新社区权限
 		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
-		
+			adminConfigService.updateAdminCommunityBatch(adminUserEntity.getCommunityIdList(),user.getUid());
+		}
+		//修改手机号
+		if(!StringUtils.isEmpty(adminUserEntity.getMobile())){
+			//用户是否已注册
+			boolean exists = checkUserExists(adminUserEntity.getMobile());
+			if(exists){
+				throw new PropertyException(JSYError.DUPLICATE_KEY.getCode(),"该手机号已被注册");
+			}
+			//更换手机号操作
+			boolean b = changeMobile(adminUserEntity.getMobile(), user.getMobile());
+			if(b){
+				//旧手机账号退出登录
+				userUtils.destroyToken("Admin:Login",String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + user.getMobile())));
+				userUtils.destroyToken("Admin:LoginAccount",user.getMobile());
+			}
 		}
 		//更新菜单权限
 //		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
-		return false;
+		//更新资料
+		adminUserMapper.updateOperator(adminUserEntity);
 	}
 	
-	/**
-	* @Description: 重置密码(随机)
-	 * @Param: [id, uid]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2021/3/18
-	**/
-	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public boolean resetPassword(Long id,String uid){
-		AdminUserEntity adminUser = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile").eq("id", id));
-		if(adminUser == null){
-			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"用户不存在");
-		}
-		//生成随机密码
-		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
-		//TODO 测试阶段暂时生成固定密码
-		randomPass = "22222222";
-		//生成盐值并对密码加密
-		String salt = RandomStringUtils.randomAlphanumeric(20);
-		String password = new Sha256Hash(randomPass, salt).toHex();
-		//更新
-		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
-		adminUserAuthEntity.setPassword(password);
-		adminUserAuthEntity.setSalt(salt);
-		adminUserAuthEntity.setUpdateBy(uid);
-		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", adminUser.getMobile()));
-		//发短信通知新初始密码
-		SmsUtil.resetPassword(adminUser.getMobile(), randomPass);
-		return result == 1;
-	}
+//	/**
+//	* @Description: 重置密码(随机)
+//	 * @Param: [id, uid]
+//	 * @Return: boolean
+//	 * @Author: chq459799974
+//	 * @Date: 2021/3/18
+//	**/
+//	@Override
+//	@Transactional(rollbackFor = Exception.class)
+//	public boolean resetPassword(Long id,String uid){
+//		AdminUserEntity adminUser = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().select("mobile").eq("id", id));
+//		if(adminUser == null){
+//			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"用户不存在");
+//		}
+//		//生成随机密码
+//		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
+//		//TODO 测试阶段暂时生成固定密码
+//		randomPass = "22222222";
+//		//生成盐值并对密码加密
+//		String salt = RandomStringUtils.randomAlphanumeric(20);
+//		String password = new Sha256Hash(randomPass, salt).toHex();
+//		//更新
+//		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
+//		adminUserAuthEntity.setPassword(password);
+//		adminUserAuthEntity.setSalt(salt);
+//		adminUserAuthEntity.setUpdateBy(uid);
+//		int result = adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile", adminUser.getMobile()));
+//		//发短信通知新初始密码
+//		SmsUtil.resetPassword(adminUser.getMobile(), randomPass);
+//		return result == 1;
+//	}
 	
 	/**
 	* @Description: 根据id查询uid
@@ -629,7 +607,11 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public String queryUidById(Long id){
-		return adminUserMapper.queryUidById(id);
+		UserEntity user = adminUserMapper.queryUidById(id);
+		if(user == null){
+			return null;
+		}
+		return user.getUid();
 	}
 	
 	/**
@@ -641,7 +623,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	public boolean checkUserExists(String mobile){
-		return adminUserMapper.selectCount(new QueryWrapper<AdminUserEntity>().eq("mobile",mobile)) == 1;
+		return adminUserMapper.countUser(mobile) != null;
 	}
 	
 	/**

@@ -9,6 +9,7 @@ import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -88,7 +89,9 @@ public class AdminMenuController {
 		returnMap.put("allMenu",allMenu);
 		if(id != null){
 			List<String> userMenu = adminUserService.queryUserMenuIdList(id);
-			returnMap.put("userMenu",userMenu);
+			if(!CollectionUtils.isEmpty(userMenu)){
+				returnMap.put("userMenu",userMenu);
+			}
 		}
 		return CommonResult.ok(returnMap,"查询成功");
 	}

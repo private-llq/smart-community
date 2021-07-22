@@ -1,6 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import org.apache.ibatis.annotations.*;
 
@@ -108,8 +109,8 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
-	@Select("select uid from t_admin_user where id = #{id} where deleted = 0")
-	String queryUidById(Long id);
+	@Select("select uid,mobile from t_admin_user where id = #{id} and deleted = 0")
+	UserEntity queryUidById(Long id);
 	
 	/**
 	* @Description: 查询登录用户(操作员)已加入小区idList
@@ -162,6 +163,16 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Date: 2021/3/17
 	**/
 	int updateOperator(@Param("entity") AdminUserEntity entity);
+	
+	/**
+	* @Description: 根据手机号查询用户数
+	 * @Param: [mobile]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/7/22
+	**/
+	@Select("select id from t_admin_user where deleted = 0 and mobile = #{mobile} limit 1")
+	Long countUser(String mobile);
 	//========操作员增删改查end ==========
 	
 	//========用户拓展start ==========

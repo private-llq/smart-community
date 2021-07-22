@@ -84,6 +84,9 @@ public class JSYExceptionHandler {
 		if(e.getMessage() != null && e.getMessage().contains("DataIntegrityViolationException")){
 			return CommonResult.error(JSYError.REQUEST_PARAM);
 		}
+		if(e.getMessage() != null && e.getMessage().contains("RSAUtil")){
+			return CommonResult.error(JSYError.REQUEST_PARAM);
+		}
 		return CommonResult.error(JSYError.INTERNAL);
 
 	}

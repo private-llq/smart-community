@@ -20,7 +20,7 @@ public interface AdminUserAuthMapper extends BaseMapper<AdminUserAuthEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
-	@Insert("insert ignore into t_admin_user_auth (id,mobile,password,salt,create_by,create_time)\n" +
+	@Insert("insert into t_admin_user_auth (id,mobile,password,salt,create_by,create_time)\n" +
 		"values(#{en.id},#{en.mobile},#{en.password},#{en.salt},#{en.createBy},now());")
 	void createLoginUser(@Param("en") AdminUserAuthEntity en);
 	

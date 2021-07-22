@@ -14,10 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -166,10 +163,26 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/20
 	**/
-	public static void validateCommunityIds(Long communityId){
+	public static void validateCommunityId(Long communityId){
 		List<Long> communityIdList = getAdminCommunityIdList();
 		if(!communityIdList.contains(communityId)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无该社区权限！");
+		}
+	}
+	
+	/**
+	 * @Description: 校验当前登录用户小区权限
+	 * @Param: [communityIdStr]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/7/20
+	 **/
+	public static void validateCommunityIds(Collection<Long> communityIds){
+		List<Long> communityIdList = getAdminCommunityIdList();
+		for(Long communityId : communityIds){
+			if(!communityIdList.contains(communityId)){
+				throw new JSYException(JSYError.BAD_REQUEST.getCode(),"部分社区无权限！");
+			}
 		}
 	}
 	
