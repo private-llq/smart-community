@@ -235,32 +235,32 @@ public class AdminLoginController {
 		return CommonResult.ok(adminInfoVo);
 	}
 	
-	/**
-	* @Description: 登入小区
-	 * @Param: [account, communityId, communityKey]
-	 * @Return: com.jsy.community.vo.CommonResult
-	 * @Author: chq459799974
-	 * @Date: 2021/3/25
-	**/
-	@PostMapping("sys/enter")
-	@Login
-	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
-		Long communityId = jsonObject.getLong("communityId");
-		UserUtils.validateCommunityIds(communityId);
-		//创建token，保存redis
-		AdminUserEntity user = new AdminUserEntity();
-		//用户菜单
-		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminUserInfo().getUid(),PropertyConsts.LOGIN_TYPE_COMMUNITY);
-		//设置小区级菜单
-		user.setMenuList(userMenu);
-		String token = adminUserTokenService.createToken(user);
-		user.setToken(token);
-		AdminInfoVo adminInfoVo = new AdminInfoVo();
-		BeanUtils.copyProperties(user,adminInfoVo);
-		adminInfoVo.setUid(null);
-		adminInfoVo.setStatus(null);
-		return CommonResult.ok(adminInfoVo);
-	}
+//	/**
+//	* @Description: 登入小区
+//	 * @Param: [account, communityId, communityKey]
+//	 * @Return: com.jsy.community.vo.CommonResult
+//	 * @Author: chq459799974
+//	 * @Date: 2021/3/25
+//	**/
+//	@PostMapping("sys/enter")
+//	@Login
+//	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
+//		Long communityId = jsonObject.getLong("communityId");
+//		UserUtils.validateCommunityIds(communityId);
+//		//创建token，保存redis
+//		AdminUserEntity user = new AdminUserEntity();
+//		//用户菜单
+//		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminUserInfo().getUid(),PropertyConsts.LOGIN_TYPE_COMMUNITY);
+//		//设置小区级菜单
+//		user.setMenuList(userMenu);
+//		String token = adminUserTokenService.createToken(user);
+//		user.setToken(token);
+//		AdminInfoVo adminInfoVo = new AdminInfoVo();
+//		BeanUtils.copyProperties(user,adminInfoVo);
+//		adminInfoVo.setUid(null);
+//		adminInfoVo.setStatus(null);
+//		return CommonResult.ok(adminInfoVo);
+//	}
 	
 	/**
 	 * 检查手机验证码
