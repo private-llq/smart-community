@@ -196,7 +196,19 @@ public class UserUtils {
 		redisTemplate.opsForValue().set(typeName + ":" + userToken,o);
 		return userToken;
 	}
-	
+
+	/**
+	 * @author: Pipi
+	 * @description: 更新token内容
+	 * @param typeName: token类型
+     * @param o: token对应值
+	 * @return: void
+	 * @date: 2021/7/22 15:04
+	 **/
+	public void updateRedisByToken(String typeName, Object o, String token) {
+		redisTemplate.opsForValue().set(typeName + ":" + token, o);
+	}
+
 	/**
 	* @Description: 设置token(带过期时间)
 	 * @Param: [typeName, o, time, timeUnit]

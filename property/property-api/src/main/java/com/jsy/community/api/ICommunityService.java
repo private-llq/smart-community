@@ -2,6 +2,9 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.property.PropertyCommunityListVO;
 
 import java.util.List;
 import java.util.Map;
@@ -95,5 +98,15 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @return: java.lang.Integer
 	 * @date: 2021/7/21 17:57
 	 **/
-	Integer addCommunity(CommunityEntity communityEntity, String uid);
+	Long addCommunity(CommunityEntity communityEntity, String uid);
+
+	/**
+	 * @author: Pipi
+	 * @description: 分页查询小区列表
+	 * @param baseQO: 查询条件
+     * @param uid: 登录用户uid
+	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.vo.property.PropertyCommunityListVO>
+	 * @date: 2021/7/22 11:46
+	 **/
+	PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, String uid);
 }

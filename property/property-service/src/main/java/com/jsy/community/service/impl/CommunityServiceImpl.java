@@ -11,7 +11,10 @@ import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.property.PropertyCommunityListVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,12 +156,25 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	 **/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public Integer addCommunity(CommunityEntity communityEntity, String uid) {
+	public Long addCommunity(CommunityEntity communityEntity, String uid) {
 		communityEntity.setId(SnowFlake.nextId());
 		int insert = communityMapper.insert(communityEntity);
 		if (insert > 0) {
 			adminConfigService.addAdminCommunity(uid, communityEntity.getId());
 		}
-		return insert;
+		return communityEntity.getId();
+	}
+
+	/**
+	 * @param baseQO : 查询条件
+	 * @param uid    : 登录用户uid
+	 * @author: Pipi
+	 * @description: 分页查询小区列表
+	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.vo.property.PropertyCommunityListVO>
+	 * @date: 2021/7/22 11:46
+	 **/
+	@Override
+	public PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, String uid) {
+		return null;
 	}
 }
