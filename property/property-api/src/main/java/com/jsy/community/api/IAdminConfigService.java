@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 
+import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.qo.admin.AdminMenuQO;
@@ -146,5 +147,23 @@ public interface IAdminConfigService {
 	 * @Date: 2021/3/23
 	**/
 	void setUserMenus(List<Long> menuIds,String uid);
+	
+	/**
+	* @Description: 管理员社区权限列表查询
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminCommunityEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/7/22
+	**/
+	List<AdminCommunityEntity> listAdminCommunity(String uid);
+	
+	/**
+	* @Description: 管理员社区权限id列表查询
+	 * @Param: [uid]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/7/22
+	**/
+	List<Long> queryAdminCommunityIdListByUid(String uid);
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

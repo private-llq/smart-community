@@ -447,57 +447,61 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		AdminUserQO query = baseQO.getQuery();
 		Page<AdminUserEntity> page = new Page();
 		MyPageUtils.setPageAndSize(page,baseQO);
-		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,number,real_name,mobile,id_card,status,role_type,org_id,job,create_by,create_time,update_by,update_time");
-		queryWrapper.eq("community_id",query.getCommunityId());
+//		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,number,real_name,mobile,id_card,status,role_type,org_id,job,create_by,create_time,update_by,update_time");
+		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,real_name,mobile,create_time");
+//		queryWrapper.eq("community_id",query.getCommunityId());
 		//是否查详情
 		Integer menuCount = null;
 		if(query.getId() != null){
 			queryWrapper.eq("id",query.getId());
-			String uid = adminUserMapper.queryUidById(query.getId());
-			menuCount = adminConfigService.countUserMenu(uid);
+			//TODO 换成查角色 回显到详情
+//			String uid = adminUserMapper.queryUidById(query.getId());
+//			menuCount = adminConfigService.countUserMenu(uid);
 		}
 		
 		if(!StringUtils.isEmpty(query.getName())){
-			queryWrapper.and(wrapper -> wrapper.like("number",query.getName())
-				.or().like("real_name",query.getName())
+			queryWrapper.and(wrapper -> wrapper
+//				.like("number",query.getName())
+//				.or().like("real_name",query.getName())
+				.like("real_name",query.getName())
 				.or().like("mobile",query.getName())
-				.or().like("id_card",query.getName())
+//				.or().like("id_card",query.getName())
 			);
 		}
-		if(query.getStatus() != null){
-			queryWrapper.eq("status",query.getStatus());
-		}
-		queryWrapper.orderByAsc("role_type","status");
+//		if(query.getStatus() != null){
+//			queryWrapper.eq("status",query.getStatus());
+//		}
+//		queryWrapper.orderByAsc("role_type","status");
 		queryWrapper.orderByDesc("create_time");
 		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
 		if(CollectionUtils.isEmpty(pageData.getRecords())){
 			return new PageInfo<>();
 		}
-		//补创建人和更新人姓名
-		Set<String> createUidSet = new HashSet<>();
-		Set<String> updateUidSet = new HashSet<>();
-		//补组织机构名称
-		Set<Long> orgIdSet = new HashSet<>();
-		for(AdminUserEntity entity : pageData.getRecords()){
-			orgIdSet.add(entity.getOrgId());
-			createUidSet.add(entity.getCreateBy());
-			updateUidSet.add(entity.getUpdateBy());
-		}
-		Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(orgIdSet);
-		Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
-		Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
-		for(AdminUserEntity entity : pageData.getRecords()){
-			if (entity.getOrgId() != null) {
-				// 允许组织机构为空
-				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
-			}
-			entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
-			entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
-		}
-		//查详情 已授权菜单数统计
-		if(query.getId() != null){
-			pageData.getRecords().get(0).setMenuCount(menuCount);
-		}
+//		//补创建人和更新人姓名
+//		Set<String> createUidSet = new HashSet<>();
+//		Set<String> updateUidSet = new HashSet<>();
+//		//补组织机构名称
+//		Set<Long> orgIdSet = new HashSet<>();
+//		for(AdminUserEntity entity : pageData.getRecords()){
+//			orgIdSet.add(entity.getOrgId());
+//			createUidSet.add(entity.getCreateBy());
+//			updateUidSet.add(entity.getUpdateBy());
+//		}
+//		Map<Long, Map<Long, Object>> orgMap = organizationService.queryOrganizationNameByIdBatch(orgIdSet);
+//		Map<String, Map<String,String>> createUserMap = queryNameByUidBatch(createUidSet);
+//		Map<String, Map<String,String>> updateUserMap = queryNameByUidBatch(updateUidSet);
+//		for(AdminUserEntity entity : pageData.getRecords()){
+//			if (entity.getOrgId() != null) {
+//				// 允许组织机构为空
+//				entity.setOrgName(String.valueOf(orgMap.get(BigInteger.valueOf(entity.getOrgId())).get("name")));
+//			}
+//			entity.setCreateBy(createUserMap.get(entity.getCreateBy()) == null ? null : createUserMap.get(entity.getCreateBy()).get("name"));
+//			entity.setUpdateBy(updateUserMap.get(entity.getUpdateBy()) == null ? null : updateUserMap.get(entity.getUpdateBy()).get("name"));
+//		}
+//		//查详情 已授权菜单数统计
+//		if(query.getId() != null){
+//			pageData.getRecords().get(0).setMenuCount(menuCount);
+//		}
 		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
@@ -513,14 +517,14 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean addOperator(AdminUserEntity adminUserEntity){
-		//查询组织机构是否存在
-		if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
-			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
-		}
-		//生成随机密码
-		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
-		//TODO 测试阶段暂时生成固定密码
-		randomPass = "11111111";
+//		//查询组织机构是否存在
+//		if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
+//			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
+//		}
+//		//生成随机密码
+//		String randomPass = RandomStringUtils.randomAlphanumeric(8).toLowerCase();
+//		//TODO 测试阶段暂时生成固定密码
+//		randomPass = "11111111";
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
 		//生成UUID 和 ID
@@ -528,18 +532,20 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserEntity.setId(SnowFlake.nextId());
 		adminUserEntity.setUid(uid);
 		//t_admin_user用户资料表插入数据
-		adminUserEntity.setStatus(adminUserEntity.getStatus() != null ? adminUserEntity.getStatus() : 0);
-		adminUserEntity.setPassword(new Sha256Hash(randomPass, salt).toHex());
+//		adminUserEntity.setStatus(adminUserEntity.getStatus() != null ? adminUserEntity.getStatus() : 0);
+//		adminUserEntity.setPassword(new Sha256Hash(randomPass, salt).toHex());
+		adminUserEntity.setPassword(new Sha256Hash(adminUserEntity.getPassword(), salt).toHex());
 		adminUserEntity.setSalt(salt);
 		int result = adminUserMapper.addOperator(adminUserEntity);
-		//t_admin_user_menu更新菜单权限
-		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
+		// TODO 变为添加角色
+//		//t_admin_user_menu添加菜单权限
+//		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
 		//t_admin_user_auth用户登录表插入数据
 		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
 		BeanUtils.copyProperties(adminUserEntity,adminUserAuthEntity);
 		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
-		//发短信通知，并发送初始密码
-		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
+//		//发短信通知，并发送初始密码
+//		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
 		return result == 1;
 	}
 	

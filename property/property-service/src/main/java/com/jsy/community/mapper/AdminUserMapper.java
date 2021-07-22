@@ -150,8 +150,8 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	@Insert("insert into t_admin_user(id,uid,community_id,number,real_name,status,mobile,id_card,job,org_id,create_by,create_time,role_type) " +
-		"values(#{entity.id},#{entity.uid},#{entity.communityId},#{entity.number},#{entity.realName},#{entity.status},#{entity.mobile},#{entity.idCard},#{entity.job},#{entity.orgId},#{entity.createBy},now(),2)")
+	@Insert("insert into t_admin_user(id,uid,number,real_name,status,mobile,id_card,job,org_id,create_by,create_time,role_type) " +
+		"values(#{entity.id},#{entity.uid},#{entity.number},#{entity.realName},#{entity.status},#{entity.mobile},#{entity.idCard},#{entity.job},#{entity.orgId},#{entity.createBy},now(),2)")
 	int addOperator(@Param("entity") AdminUserEntity entity);
 	
 	/**

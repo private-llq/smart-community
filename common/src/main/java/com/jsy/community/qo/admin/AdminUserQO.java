@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author chq459799974
@@ -18,6 +19,9 @@ public class AdminUserQO implements Serializable {
 	
 	@ApiModelProperty(value = "社区ID")
 	private Long communityId;
+	
+	@ApiModelProperty(value = "有权限的社区ids(List)")
+	private List<Long> communityIdList;
 	
 	@ApiModelProperty(value = "查询条件 name")
 	private String name;

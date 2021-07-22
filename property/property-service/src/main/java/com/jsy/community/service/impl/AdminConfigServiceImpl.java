@@ -7,10 +7,12 @@ import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.entity.admin.AdminUserMenuEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.AdminCommunityMapper;
 import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.mapper.AdminRoleMapper;
 import com.jsy.community.mapper.AdminUserMenuMapper;
@@ -51,6 +53,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;
+	
+	@Autowired
+	private AdminCommunityMapper adminCommunityMapper;
 	
 	//==================================================== Menu菜单 (旧) ===============================================================
 	/**
@@ -435,6 +440,28 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 				setChildren(childrenList,new LinkedList<AdminMenuEntity>());
 			}
 		}
+	}
+	
+	/**
+	* @Description: 管理员社区权限列表查询
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminCommunityEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/7/22
+	**/
+	public List<AdminCommunityEntity> listAdminCommunity(String uid){
+		return adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("id,community_id").eq("uid",uid));
+	}
+	
+	/**
+	 * @Description: 管理员社区权限id列表查询
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminCommunityEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021/7/22
+	 **/
+	public List<Long> queryAdminCommunityIdListByUid(String uid){
+		return adminCommunityMapper.queryAdminCommunityIdListByUid(uid);
 	}
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

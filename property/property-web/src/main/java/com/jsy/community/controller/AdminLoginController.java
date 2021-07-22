@@ -11,10 +11,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserAuthEntity;
-import com.jsy.community.entity.admin.AdminCaptchaEntity;
-import com.jsy.community.entity.admin.AdminMenuEntity;
-import com.jsy.community.entity.admin.AdminUserAuthEntity;
-import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.entity.admin.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
@@ -37,6 +34,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -169,9 +167,9 @@ public class AdminLoginController {
 		}
 		//用户资料
 		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
-		if(userData.getStatus() == 1){
-			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
-		}
+//		if(userData.getStatus() == 1){
+//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
+//		}
 		
 //		//查询已加入小区id列表
 //		List<Long> idList = adminUserService.queryCommunityIdList(form.getAccount());
@@ -186,17 +184,23 @@ public class AdminLoginController {
 //		returnMap.put("communityKey",communityKey);
 		
 		//有权限的小区id列表
-		Long[] communityIds =  (Long[])ConvertUtils.convert(user.getCommunityIds().split(","),Long.class);
-		List<Long> communityIdList = Arrays.asList(communityIds);
+//		Long[] communityIds =  (Long[])ConvertUtils.convert(user.getCommunityIds().split(","),Long.class);
+//		List<Long> communityIdList = Arrays.asList(communityIds);
+		List<AdminCommunityEntity> adminCommunityList = adminConfigService.listAdminCommunity(userData.getUid());
+		
 		
 		//用户菜单
 		List<AdminMenuEntity> userMenu;
 		//返回VO
 		AdminInfoVo adminInfoVo = new AdminInfoVo();
+		//判断有无任一社区权限
+		if(CollectionUtils.isEmpty(adminCommunityList)){
+			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无社区管理权限，请联系管理员添加社区权限");
+		}
 		//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
-		if(communityIds.length == 1){
+		if(adminCommunityList.size() > 1){
 			//小区管理员账号 直接登入小区菜单
-			userData.setCommunityId(communityIds[0]);
+			userData.setCommunityId(adminCommunityList.get(0).getCommunityId());
 			userMenu = adminConfigService.queryMenuByUid(userData.getUid(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
 			//设置登录类型
 			adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_COMMUNITY);
@@ -213,6 +217,10 @@ public class AdminLoginController {
 		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
 		redisTemplate.delete("Admin:Login:" + oldToken);
 		//创建token，保存redis
+		List communityIdList = new ArrayList<>();
+		for(AdminCommunityEntity entity : adminCommunityList){
+			communityIdList.add(entity.getCommunityId());
+		}
 		userData.setCommunityIdList(communityIdList);
 		String token = adminUserTokenService.createToken(userData);
 		userData.setToken(token);

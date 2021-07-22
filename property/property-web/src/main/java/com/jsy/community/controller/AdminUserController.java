@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
+import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
@@ -35,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,6 +64,12 @@ public class AdminUserController {
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IAdminConfigService adminConfigService;
+	
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICommunityService communityService;
 
 //	/**
 //	* @Description: 设置用户角色
@@ -217,7 +226,8 @@ public class AdminUserController {
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new AdminUserQO());
 		}
-		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+//		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		baseQO.getQuery().setCommunityIdList(UserUtils.getAdminCommunityIdList());
 		return CommonResult.ok(adminUserService.queryOperator(baseQO));
 	}
 	
@@ -232,12 +242,12 @@ public class AdminUserController {
 	@PostMapping("")
 	public CommonResult addOperator(@RequestBody AdminUserEntity adminUserEntity){
 		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.addOperatorValidatedGroup.class);
-		if(CollectionUtils.isEmpty(adminUserEntity.getMenuIdList())){
-			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少功能授权");
-		}
-		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
-		adminUserEntity.setCommunityId(loginUser.getCommunityId());
-		adminUserEntity.setCreateBy(loginUser.getUid());
+//		if(CollectionUtils.isEmpty(adminUserEntity.getMenuIdList())){
+//			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少功能授权");
+//		}
+//		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+//		adminUserEntity.setCommunityId(loginUser.getCommunityId());
+//		adminUserEntity.setCreateBy(loginUser.getUid());
 		return adminUserService.addOperator(adminUserEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
 	}
 	
@@ -275,6 +285,23 @@ public class AdminUserController {
 		}
 		String uid = UserUtils.getUserId();
 		return adminUserService.resetPassword(map.get("id"),uid) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	
+	/**
+	* @Description: 查询管理员有权限的社区列表
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/7/22
+	**/
+	@Login
+	@GetMapping("/community/list")
+	public CommonResult queryUserCommunityList(){
+		List<Long> adminCommunityIdList = adminConfigService.queryAdminCommunityIdListByUid(UserUtils.getUserId());
+		if(CollectionUtils.isEmpty(adminCommunityIdList)){
+			return CommonResult.ok("暂无数据");
+		}
+		return CommonResult.ok(communityService.queryCommunityBatch(adminCommunityIdList),"查询成功");
 	}
 	//============== 操作员管理相关end ===============
 	
