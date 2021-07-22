@@ -198,7 +198,7 @@ public class AdminLoginController {
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无社区管理权限，请联系管理员添加社区权限");
 		}
 		//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
-		if(adminCommunityList.size() > 1){
+		if(adminCommunityList.size() == 1){
 			//小区管理员账号 直接登入小区菜单
 			userData.setCommunityId(adminCommunityList.get(0).getCommunityId());
 			userMenu = adminConfigService.queryMenuByUid(userData.getUid(), PropertyConsts.LOGIN_TYPE_COMMUNITY);

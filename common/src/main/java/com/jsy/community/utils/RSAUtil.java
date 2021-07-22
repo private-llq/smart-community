@@ -191,7 +191,9 @@ public class RSAUtil {
                 offSet = i * maxBlock;
             }
         } catch (Exception e) {
-            throw new RuntimeException("加解密阀值为[" + maxBlock + "]的数据时发生异常", e);
+            log.error("加解密阀值为[" + maxBlock + "]的数据时发生异常", e);
+            throw new JSYException(JSYError.REQUEST_PARAM);
+//            throw new RuntimeException("加解密阀值为[" + maxBlock + "]的数据时发生异常", e);
         }
         byte[] resultDatas = out.toByteArray();
         try {

@@ -242,13 +242,12 @@ public class AdminUserController {
 	@PostMapping("")
 	public CommonResult addOperator(@RequestBody AdminUserEntity adminUserEntity){
 		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.addOperatorValidatedGroup.class);
-//		if(CollectionUtils.isEmpty(adminUserEntity.getMenuIdList())){
-//			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少功能授权");
-//		}
-//		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
-//		adminUserEntity.setCommunityId(loginUser.getCommunityId());
-//		adminUserEntity.setCreateBy(loginUser.getUid());
-		return adminUserService.addOperator(adminUserEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
+		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
+			//验证社区权限
+			UserUtils.validateCommunityIds(adminUserEntity.getCommunityIdList());
+		}
+		adminUserService.addOperator(adminUserEntity);
+		return CommonResult.ok("添加成功");
 	}
 	
 	/**
@@ -261,29 +260,13 @@ public class AdminUserController {
 	@Login
 	@PutMapping("")
 	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
-		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
-		adminUserEntity.setCommunityId(loginUser.getCommunityId());
-		adminUserEntity.setUpdateBy(loginUser.getUid());
-		boolean b = adminUserService.updateOperator(adminUserEntity);
-		return b ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
+			//验证社区权限
+			UserUtils.validateCommunityIds(adminUserEntity.getCommunityIdList());
+		}
+		adminUserService.updateOperator(adminUserEntity);
+		return CommonResult.ok("操作成功");
 	}
-	
-//	/**
-//	* @Description: 重置密码(随机)
-//	 * @Param: [id]
-//	 * @Return: com.jsy.community.vo.CommonResult
-//	 * @Author: chq459799974
-//	 * @Date: 2021/3/18
-//	**/
-//	@Login
-//	@PutMapping("pass/reset")
-//	public CommonResult resetPass(@RequestBody Map<String,Long> map){
-//		if(map.get("id") == null){
-//			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少ID参数");
-//		}
-//		String uid = UserUtils.getUserId();
-//		return adminUserService.resetPassword(map.get("id"),uid) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
-//	}
 	
 	/**
 	* @Description: 查询管理员有权限的社区列表

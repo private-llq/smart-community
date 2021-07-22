@@ -3,14 +3,14 @@
  
 <mapper namespace="com.jsy.community.mapper.AdminCommunityMapper">
 
-	<!-- 批量添加用户菜单 -->
-<!--	<insert id="addAdminCommunityBatch" parameterType="java.util.Set">-->
-<!--		insert into t_admin_community(uid,community_id)-->
-<!--		values-->
-<!--		<foreach collection="collection" item="item" separator=",">-->
-<!--			(#{uid},#{item})-->
-<!--		</foreach>-->
-<!--	</insert>-->
+	<!-- 批量添加用户社区权限 -->
+	<insert id="addAdminCommunityBatch">
+		insert into t_admin_community(uid,community_id)
+		values
+		<foreach collection="ids" item="item" separator=",">
+			(#{uid},#{item})
+		</foreach>
+	</insert>
 
 
 </mapper>

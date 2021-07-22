@@ -472,15 +472,15 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	/**
 	 * 管理员社区权限批量修改
 	 */
-//	@Override
+	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void updateAdminCommunityBatch(List<Long> communityIds,String uid){
 		//清空
 		adminCommunityMapper.clearAdminCommunityByUid(uid);
 		//去重
 		Set<Long> communityIdsSet = new HashSet<>(communityIds);
-		
-//		adminMenuMapper.addUserMenuBatch(menuIdsSet, uid);
+		//添加
+		adminCommunityMapper.addAdminCommunityBatch(communityIdsSet,uid);
 	}
 
 	/**

@@ -237,7 +237,7 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	boolean addOperator(AdminUserEntity adminUserEntity);
+	void addOperator(AdminUserEntity adminUserEntity);
 	
 	/**
 	* @Description: 编辑操作员
@@ -246,16 +246,16 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/18
 	**/
-	boolean updateOperator(AdminUserEntity adminUserEntity);
+	void updateOperator(AdminUserEntity adminUserEntity);
 	
-	/**
-	* @Description: 重置密码
-	 * @Param: [id, uid]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2021/3/18
-	**/
-	boolean resetPassword(Long id,String uid);
+//	/**
+//	* @Description: 重置密码
+//	 * @Param: [id, uid]
+//	 * @Return: boolean
+//	 * @Author: chq459799974
+//	 * @Date: 2021/3/18
+//	**/
+//	boolean resetPassword(Long id,String uid);
 	
 	/**
 	* @Description: 根据id查询uid

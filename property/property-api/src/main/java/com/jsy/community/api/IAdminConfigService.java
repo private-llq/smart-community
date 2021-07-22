@@ -176,5 +176,14 @@ public interface IAdminConfigService {
 	 **/
 	Integer addAdminCommunity(String uid, Long communityId);
 
+	
+	/**
+	* @Description: 批量添加用户社区权限
+	 * @Param: [communityIds, uid]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021/7/22
+	**/
+	void updateAdminCommunityBatch(List<Long> communityIds,String uid);
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }
