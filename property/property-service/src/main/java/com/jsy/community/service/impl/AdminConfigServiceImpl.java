@@ -24,6 +24,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -450,7 +451,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2021/7/22
 	**/
 	public List<AdminCommunityEntity> listAdminCommunity(String uid){
-		return adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("id,community_id").eq("uid",uid));
+		return adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id").eq("uid",uid));
 	}
 	
 	/**
@@ -462,6 +463,20 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	public List<Long> queryAdminCommunityIdListByUid(String uid){
 		return adminCommunityMapper.queryAdminCommunityIdListByUid(uid);
+	}
+	
+	/**
+	 * 管理员社区权限批量修改
+	 */
+//	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateAdminCommunityBatch(List<Long> communityIds,String uid){
+		//清空
+		adminCommunityMapper.clearAdminCommunityByUid(uid);
+		//去重
+		Set<Long> communityIdsSet = new HashSet<>(communityIds);
+		
+//		adminMenuMapper.addUserMenuBatch(menuIdsSet, uid);
 	}
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

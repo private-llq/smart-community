@@ -108,7 +108,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
-	@Select("select uid from t_admin_user where id = #{id}")
+	@Select("select uid from t_admin_user where id = #{id} where deleted = 0")
 	String queryUidById(Long id);
 	
 	/**

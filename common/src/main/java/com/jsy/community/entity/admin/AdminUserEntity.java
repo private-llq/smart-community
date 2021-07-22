@@ -83,7 +83,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 手机号
 	 */
-	@Pattern(groups = {addOperatorValidatedGroup.class, updateOperatorValidatedGroup.class}, regexp = RegexUtils.REGEX_MOBILE, message = "电话号码错误，只支持电信|联通|移动")
+	@Pattern(groups = addOperatorValidatedGroup.class, regexp = RegexUtils.REGEX_MOBILE, message = "电话号码错误，只支持电信|联通|移动")
 	@NotBlank(groups = addOperatorValidatedGroup.class, message = "缺少手机号")
 	private String mobile;
 	
@@ -103,7 +103,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 真实姓名
 	 */
 //	@Pattern(groups = {addOperatorValidatedGroup.class, updateOperatorValidatedGroup.class}, regexp = RegexUtils.REGEX_REAL_NAME, message = "请输入一个正确的姓名")
-	@Length( groups = {addOperatorValidatedGroup.class, updateOperatorValidatedGroup.class}, min = 2, max = 20, message = "姓名长度2-20!")
+	@Length( groups = addOperatorValidatedGroup.class, min = 2, max = 20, message = "姓名长度2-20!")
 	@NotBlank(groups = {inviteUserValidatedGroup.class,addOperatorValidatedGroup.class}, message = "用户姓名不能为空")
 	private String realName;
 	

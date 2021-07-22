@@ -261,8 +261,6 @@ public class AdminUserController {
 	@Login
 	@PutMapping("")
 	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
-		adminUserEntity.setMobile(null);
-		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.updateOperatorValidatedGroup.class);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
 		adminUserEntity.setCommunityId(loginUser.getCommunityId());
 		adminUserEntity.setUpdateBy(loginUser.getUid());
@@ -270,22 +268,22 @@ public class AdminUserController {
 		return b ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
-	/** 
-	* @Description: 重置密码(随机)
-	 * @Param: [id]
-	 * @Return: com.jsy.community.vo.CommonResult
-	 * @Author: chq459799974
-	 * @Date: 2021/3/18
-	**/
-	@Login
-	@PutMapping("pass/reset")
-	public CommonResult resetPass(@RequestBody Map<String,Long> map){
-		if(map.get("id") == null){
-			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少ID参数");
-		}
-		String uid = UserUtils.getUserId();
-		return adminUserService.resetPassword(map.get("id"),uid) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
-	}
+//	/**
+//	* @Description: 重置密码(随机)
+//	 * @Param: [id]
+//	 * @Return: com.jsy.community.vo.CommonResult
+//	 * @Author: chq459799974
+//	 * @Date: 2021/3/18
+//	**/
+//	@Login
+//	@PutMapping("pass/reset")
+//	public CommonResult resetPass(@RequestBody Map<String,Long> map){
+//		if(map.get("id") == null){
+//			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少ID参数");
+//		}
+//		String uid = UserUtils.getUserId();
+//		return adminUserService.resetPassword(map.get("id"),uid) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+//	}
 	
 	/**
 	* @Description: 查询管理员有权限的社区列表

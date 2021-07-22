@@ -546,6 +546,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
 //		//发短信通知，并发送初始密码
 //		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
+		//TODO 添加社区权限
+		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
+		
+		}
 		return result == 1;
 	}
 	
@@ -557,21 +561,34 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Date: 2021/3/17
 	**/
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public boolean updateOperator(AdminUserEntity adminUserEntity){
-		if(adminUserEntity.getOrgId() != null){
-			//查询组织机构是否存在
-			if(!organizationService.isExists(adminUserEntity.getOrgId(),adminUserEntity.getCommunityId())){
-				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"组织机构不存在！");
-			}
-		}
 		//查询uid
 		String uid = adminUserMapper.queryUidById(adminUserEntity.getId());
 		if(StringUtils.isEmpty(uid)){
 			throw new PropertyException("用户不存在！");
 		}
+		//更新资料
+		adminUserMapper.updateOperator(adminUserEntity);
+		//更新密码
+		if(!StringUtils.isEmpty(adminUserEntity.getPassword())){
+			//生成盐值并对密码加密
+			String salt = RandomStringUtils.randomAlphanumeric(20);
+//			String password = new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex();
+			String password = new Sha256Hash(adminUserEntity.getPassword(), salt).toHex();
+			//更新
+			AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
+			adminUserAuthEntity.setPassword(password);
+			adminUserAuthEntity.setSalt(salt);
+			adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("uid",uid));
+		}
+		//更新社区权限
+		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
+		
+		}
 		//更新菜单权限
-		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
-		return adminUserMapper.updateOperator(adminUserEntity) == 1;
+//		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
+		return false;
 	}
 	
 	/**

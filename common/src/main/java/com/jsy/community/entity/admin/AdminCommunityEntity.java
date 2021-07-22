@@ -14,8 +14,6 @@ import java.io.Serializable;
 @TableName("t_admin_community")
 public class AdminCommunityEntity implements Serializable {
 	
-	//id
-	private Long id;
 	//管理员uid
 	private String uid;
 	//社区id
