@@ -104,9 +104,9 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @author: Pipi
 	 * @description: 分页查询小区列表
 	 * @param baseQO: 查询条件
-     * @param uid: 登录用户uid
+     * @param communityIds: 登录用户uid
 	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.vo.property.PropertyCommunityListVO>
 	 * @date: 2021/7/22 11:46
 	 **/
-	PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, String uid);
+	PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, List<Long> communityIds);
 }

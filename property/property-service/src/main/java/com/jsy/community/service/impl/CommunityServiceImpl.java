@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.IAdminConfigService;
@@ -12,15 +13,22 @@ import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.property.PropertyCommunityListVO;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.http.util.LangUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +50,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	
 	@Autowired
 	private HouseMemberMapper houseMemberMapper;
+
+	@Autowired
+	private RedisTemplate redisTemplate;
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
@@ -167,14 +178,62 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 
 	/**
 	 * @param baseQO : 查询条件
-	 * @param uid    : 登录用户uid
+	 * @param communityIds    : 登录用户uid
 	 * @author: Pipi
 	 * @description: 分页查询小区列表
 	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.vo.property.PropertyCommunityListVO>
 	 * @date: 2021/7/22 11:46
 	 **/
 	@Override
-	public PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, String uid) {
-		return null;
+	public PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, List<Long> communityIds) {
+		PageInfo<PropertyCommunityListVO> communityListVOPageInfo = new PageInfo<>();
+		Page<CommunityEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page, baseQO);
+		QueryWrapper<CommunityEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("id, name, province_id, city_id, area_id, detail_address, property_id");
+		queryWrapper.orderByDesc("id");
+		CommunityEntity query = baseQO.getQuery();
+		if (StringUtils.isNotBlank(query.getName())) {
+			queryWrapper.like("name", query.getName());
+		}
+		if (query.getProvinceId() != null) {
+			queryWrapper.eq("province_id", query.getProvinceId());
+		}
+		if (query.getCityId() != null) {
+			queryWrapper.eq("city_id", query.getProvinceId());
+		}
+		if (query.getAreaId() != null) {
+			queryWrapper.eq("area_id", query.getProvinceId());
+		}
+		if (!CollectionUtils.isEmpty(communityIds)) {
+			queryWrapper.in("id", communityIds);
+		} else {
+			// 如果登录用户有权限的社区为null,直接返回空
+			return communityListVOPageInfo;
+		}
+		Page<CommunityEntity> entityPage = communityMapper.selectPage(page, queryWrapper);
+		if (!CollectionUtils.isEmpty(entityPage.getRecords())) {
+			for (CommunityEntity record : entityPage.getRecords()) {
+				PropertyCommunityListVO communityVO = new PropertyCommunityListVO();
+				BeanUtils.copyProperties(record, communityVO);
+				communityVO.setPropertyName("纵横物业");
+				String province = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getProvinceId()));
+				String city = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getCityId()));
+				String area = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getAreaId()));
+				province = StringUtils.isNotBlank(province) ? province : "";
+				city = StringUtils.isNotBlank(city) ? city : "";
+				area = StringUtils.isNotBlank(area) ? area : "";
+				communityVO.setAddress(province + city + area + record.getDetailAddress());
+				communityVO.setIdStr(String.valueOf(record.getId()));
+				if (communityListVOPageInfo.getRecords().size() > 0) {
+					communityListVOPageInfo.getRecords().add(communityVO);
+				} else {
+					ArrayList<PropertyCommunityListVO> arrayList = new ArrayList<>();
+					arrayList.add(communityVO);
+					communityListVOPageInfo.setRecords(arrayList);
+				}
+			}
+		}
+		return communityListVOPageInfo;
 	}
 }

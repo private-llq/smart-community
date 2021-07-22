@@ -10,7 +10,8 @@ import java.io.Serializable;
  **/
 public class PropertyCommunityListVO implements Serializable {
     // 社区ID
-    private String communityId;
+    private Long id;
+    private String idStr;
     // 社区名称
     private String name;
     // 社区地址
@@ -19,15 +20,21 @@ public class PropertyCommunityListVO implements Serializable {
     private String propertyName;
     // 物业ID
     private String propertyId;
-    // 社区类型;1:小区;2:出租公寓
-    private Integer communityType;
 
-    public String getCommunityId() {
-        return communityId;
+    public Long getId() {
+        return id;
     }
 
-    public void setCommunityId(String communityId) {
-        this.communityId = communityId;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getIdStr() {
+        return idStr;
+    }
+
+    public void setIdStr(String idStr) {
+        this.idStr = idStr;
     }
 
     public String getName() {
@@ -62,20 +69,16 @@ public class PropertyCommunityListVO implements Serializable {
         this.propertyId = propertyId;
     }
 
-    public Integer getCommunityType() {
-        return communityType;
-    }
-
-    public void setCommunityType(Integer communityType) {
-        this.communityType = communityType;
-    }
-
-    public PropertyCommunityListVO(String communityId, String name, String address, String propertyName, String propertyId, Integer communityType) {
-        this.communityId = communityId;
-        this.name = name;
-        this.address = address;
-        this.propertyName = propertyName;
-        this.propertyId = propertyId;
-        this.communityType = communityType;
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("PropertyCommunityListVO{");
+        sb.append("id=").append(id);
+        sb.append(", idStr='").append(idStr).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", address='").append(address).append('\'');
+        sb.append(", propertyName='").append(propertyName).append('\'');
+        sb.append(", propertyId='").append(propertyId).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

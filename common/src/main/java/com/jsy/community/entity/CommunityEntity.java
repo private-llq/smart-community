@@ -71,11 +71,6 @@ public class CommunityEntity extends BaseEntity {
     @ApiModelProperty(value = "推广人id")
     private String promoter;
 
-
-    // 社区类型;1:小区;2:出租公寓
-    @NotNull(groups = ProperyuAddValidatedGroup.class, message = "请选择社区类型;1:小区;2:出租公寓")
-    private Integer communityType;
-
     // 物业id
     @NotBlank(groups = ProperyuAddValidatedGroup.class, message = "请填写物业信息")
     private String propertyId;
