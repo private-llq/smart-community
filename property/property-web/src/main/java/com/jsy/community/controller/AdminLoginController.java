@@ -78,8 +78,8 @@ public class AdminLoginController {
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
 	
-	//	@Value("${loginExpireHour}")
-	private long loginExpireHour = 12;
+	//	@Value("${propertyLoginExpireHour}")
+//	private long loginExpireHour = 12;
 	
 //	/**
 //	 * 防频繁调用验证码
@@ -167,27 +167,9 @@ public class AdminLoginController {
 		}
 		//用户资料
 		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
-//		if(userData.getStatus() == 1){
-//			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"账户已被禁用");
-//		}
 		
-//		//查询已加入小区id列表
-//		List<Long> idList = adminUserService.queryCommunityIdList(form.getAccount());
-//		//查询已加入小区列表详情
-//		List<CommunityEntity> communityList = communityService.queryCommunityBatch(idList);
-//		//生成验证key，保存redis，验证完毕后即销毁
-//		String communityKey = UUID.randomUUID().toString().replace("-", "");
-//		redisTemplate.opsForValue().set("Admin:CommunityKey:" + communityKey, form.getAccount(),12,TimeUnit.HOURS);
-//		//返回小区列表和下一个接口验证用的一次性key
-//		Map<String, Object> returnMap = new HashMap<>();
-//		returnMap.put("communityList",communityList);
-//		returnMap.put("communityKey",communityKey);
-		
-		//有权限的小区id列表
-//		Long[] communityIds =  (Long[])ConvertUtils.convert(user.getCommunityIds().split(","),Long.class);
-//		List<Long> communityIdList = Arrays.asList(communityIds);
+		//有权限的小区列表
 		List<AdminCommunityEntity> adminCommunityList = adminConfigService.listAdminCommunity(userData.getUid());
-		
 		
 		//用户菜单
 		List<AdminMenuEntity> userMenu;
@@ -229,38 +211,8 @@ public class AdminLoginController {
 		BeanUtils.copyProperties(userData,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
-//		adminInfoVo.setCommunityName(jsonObject.getString("communityName"));
-		//存入手机已登录状态
-		redisTemplate.opsForValue().set("Admin:LoginAccount:" + form.getAccount(), token, loginExpireHour, TimeUnit.HOURS); //0是初始值 选择小区后该值为登录token
 		return CommonResult.ok(adminInfoVo);
 	}
-	
-//	/**
-//	* @Description: 登入小区
-//	 * @Param: [account, communityId, communityKey]
-//	 * @Return: com.jsy.community.vo.CommonResult
-//	 * @Author: chq459799974
-//	 * @Date: 2021/3/25
-//	**/
-//	@PostMapping("sys/enter")
-//	@Login
-//	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
-//		Long communityId = jsonObject.getLong("communityId");
-//		UserUtils.validateCommunityIds(communityId);
-//		//创建token，保存redis
-//		AdminUserEntity user = new AdminUserEntity();
-//		//用户菜单
-//		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminUserInfo().getUid(),PropertyConsts.LOGIN_TYPE_COMMUNITY);
-//		//设置小区级菜单
-//		user.setMenuList(userMenu);
-//		String token = adminUserTokenService.createToken(user);
-//		user.setToken(token);
-//		AdminInfoVo adminInfoVo = new AdminInfoVo();
-//		BeanUtils.copyProperties(user,adminInfoVo);
-//		adminInfoVo.setUid(null);
-//		adminInfoVo.setStatus(null);
-//		return CommonResult.ok(adminInfoVo);
-//	}
 	
 	/**
 	 * 检查手机验证码
