@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtils {
 	
-//	@Value("${loginExpireHour}")
+	@Value("${propertyLoginExpireHour}")
 	private long loginExpireHour = 12;
 	
 	@Autowired

@@ -1,6 +1,8 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -29,6 +31,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -72,6 +75,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Autowired
 	private UserUtils userUtils;
 	
+	@Value("${propertyLoginExpireHour}")
+	private long loginExpireHour = 12;
 	
 	/**
 	* @Description: 设置用户角色
@@ -544,6 +549,16 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		//更新社区权限
 		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
 			adminConfigService.updateAdminCommunityBatch(adminUserEntity.getCommunityIdList(),user.getUid());
+			//刷新token中的社区权限
+			String token = String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + user.getMobile()));
+			String tokenValue = String.valueOf(redisTemplate.opsForValue().get("Admin:Login:" + token));
+			AdminUserEntity userData = JSONObject.parseObject(tokenValue,AdminUserEntity.class);
+			//如果此时token刚好过期，则不操作
+			if(userData != null){
+				userData.setCommunityIdList(adminUserEntity.getCommunityIdList());
+				redisTemplate.opsForValue().set("Admin:Login:" + token , JSON.toJSONString(userData) , loginExpireHour ,TimeUnit.HOURS);
+				redisTemplate.opsForValue().set("Admin:LoginAccount:" + user.getMobile() , token , loginExpireHour ,TimeUnit.HOURS);
+			}
 		}
 		//修改手机号
 		if(!StringUtils.isEmpty(adminUserEntity.getMobile())){
