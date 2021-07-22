@@ -46,9 +46,6 @@ import java.util.concurrent.TimeUnit;
 @DubboService(version = Const.version, group = Const.group_property)
 public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUserEntity> implements IAdminUserService {
 	
-	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private ICommunityService communityService;
-	
 //	@Value("${email.linkExpiretime}")
 	public long emailLinkExpiretime = 24;
 	

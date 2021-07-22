@@ -18,6 +18,7 @@ import com.jsy.community.mapper.AdminRoleMapper;
 import com.jsy.community.mapper.AdminUserMenuMapper;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
+import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -54,6 +55,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;
+
 	
 	@Autowired
 	private AdminCommunityMapper adminCommunityMapper;
@@ -450,6 +452,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/22
 	**/
+	@Override
 	public List<AdminCommunityEntity> listAdminCommunity(String uid){
 		return adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id").eq("uid",uid));
 	}
@@ -461,6 +464,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/22
 	 **/
+	@Override
 	public List<Long> queryAdminCommunityIdListByUid(String uid){
 		return adminCommunityMapper.queryAdminCommunityIdListByUid(uid);
 	}
@@ -478,5 +482,22 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		
 //		adminMenuMapper.addUserMenuBatch(menuIdsSet, uid);
 	}
+
+	/**
+	 * @param uid         : 用户id
+	 * @param communityId : 社区id
+	 * @author: Pipi
+	 * @description: 新增用户与小区权限数据
+	 * @return: java.lang.Integer
+	 * @date: 2021/7/22 10:35
+	 **/
+	@Override
+	public Integer addAdminCommunity(String uid, Long communityId) {
+		AdminCommunityEntity adminCommunityEntity = new AdminCommunityEntity();
+		adminCommunityEntity.setUid(uid);
+		adminCommunityEntity.setCommunityId(communityId);
+		return adminCommunityMapper.insert(adminCommunityEntity);
+	}
+
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

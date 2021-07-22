@@ -87,5 +87,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Date: 2021/6/26
 	**/
 	List<Long> queryAllCommunityIdList();
-	
+
+	/**
+	 * @author: Pipi
+	 * @description: 物业端新增社区
+	 * @param communityEntity:
+	 * @return: java.lang.Integer
+	 * @date: 2021/7/21 17:57
+	 **/
+	Integer addCommunity(CommunityEntity communityEntity, String uid);
 }

@@ -5,14 +5,14 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -48,7 +48,7 @@ public class CommunityController {
 		communityService.addCommunityEntity();
 		return CommonResult.ok();
 	}
-	
+
 	@ApiOperation("获取社区电子地图")
 	@GetMapping
 	public CommonResult getElectronicMap(){
@@ -56,7 +56,22 @@ public class CommunityController {
 		Map<String, Object> map = communityService.getElectronicMap(communityId);
 		return CommonResult.ok(map);
 	}
-	
+
+	/**
+	 * @author: Pipi
+	 * @description: 物业端添加社区
+	 * @param communityEntity:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/7/22 9:37
+	 **/
+	@Login
+	@PostMapping("/addCommunity")
+	public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity) {
+		ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
+		communityEntity.setHouseLevelMode(1);
+		return communityService.addCommunity(communityEntity, UserUtils.getUserId()) > 0 ? CommonResult.ok("添加成功!") : CommonResult.error("添加失败!");
+	}
+
 	
 }
 

@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
+import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
@@ -10,6 +11,8 @@ import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.utils.SnowFlake;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +39,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	
 	@Autowired
 	private HouseMemberMapper houseMemberMapper;
+
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IAdminConfigService adminConfigService;
 	
 	@Override
 	public List<CommunityEntity> listCommunityByName(String query,Integer areaId) {
@@ -136,5 +142,23 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	@Override
 	public List<Long> queryAllCommunityIdList(){
 		return communityMapper.queryAllCommunityIdList();
+	}
+
+	/**
+	 * @param communityEntity :
+	 * @author: Pipi
+	 * @description: 物业端新增社区
+	 * @return: java.lang.Integer
+	 * @date: 2021/7/21 17:57
+	 **/
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public Integer addCommunity(CommunityEntity communityEntity, String uid) {
+		communityEntity.setId(SnowFlake.nextId());
+		int insert = communityMapper.insert(communityEntity);
+		if (insert > 0) {
+			adminConfigService.addAdminCommunity(uid, communityEntity.getId());
+		}
+		return insert;
 	}
 }

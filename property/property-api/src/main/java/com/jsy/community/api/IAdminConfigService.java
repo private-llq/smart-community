@@ -165,5 +165,16 @@ public interface IAdminConfigService {
 	 * @Date: 2021/7/22
 	**/
 	List<Long> queryAdminCommunityIdListByUid(String uid);
+
+	/**
+	 * @author: Pipi
+	 * @description: 新增用户与小区权限数据
+	 * @param uid: 用户id
+     * @param communityId: 社区id
+	 * @return: java.lang.Integer
+	 * @date: 2021/7/22 10:35
+	 **/
+	Integer addAdminCommunity(String uid, Long communityId);
+
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

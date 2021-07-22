@@ -27,7 +27,7 @@ public class CommunityEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "社区名称")
-    @NotBlank(groups = {sysAddValidatedGroup.class}, message = "社区名称不能为空")
+    @NotBlank(groups = {sysAddValidatedGroup.class, ProperyuAddValidatedGroup.class}, message = "社区名称不能为空")
     private String name;
     
     @ApiModelProperty(value = "社区图标url", hidden = true)
@@ -40,27 +40,27 @@ public class CommunityEntity extends BaseEntity {
     private BigDecimal acreage;
     
     @ApiModelProperty(value = "省份ID")
-    @NotNull(groups = {sysAddValidatedGroup.class}, message = "所属省份ID不能为空")
+    @NotNull(groups = {sysAddValidatedGroup.class, ProperyuAddValidatedGroup.class}, message = "所属省份ID不能为空")
     private Integer provinceId;
 
     @ApiModelProperty(value = "城市ID")
-    @NotNull(groups = {sysAddValidatedGroup.class}, message = "所属城市ID不能为空")
+    @NotNull(groups = {sysAddValidatedGroup.class, ProperyuAddValidatedGroup.class}, message = "所属城市ID不能为空")
     private Integer cityId;
 
     @ApiModelProperty(value = "区ID")
-    @NotNull(groups = {sysAddValidatedGroup.class}, message = "所属区域ID不能为空")
+    @NotNull(groups = {sysAddValidatedGroup.class, ProperyuAddValidatedGroup.class}, message = "所属区域ID不能为空")
     private Integer areaId;
 
     @ApiModelProperty(value = "详细地址")
-    @NotBlank(groups = {sysAddValidatedGroup.class}, message = "社区详细地址不能为空")
+    @NotBlank(groups = {sysAddValidatedGroup.class, ProperyuAddValidatedGroup.class}, message = "社区详细地址不能为空")
     private String detailAddress;
 
     @ApiModelProperty(value = "经度")
-    @NotNull(groups = {sysAddValidatedGroup.class}, message = "社区经度不能为空")
+    @NotNull(groups = {sysAddValidatedGroup.class, ProperyuAddValidatedGroup.class}, message = "社区经度不能为空")
     private BigDecimal lon;
 
     @ApiModelProperty(value = "纬度")
-    @NotNull(groups = {sysAddValidatedGroup.class}, message = "社区纬度不能为空")
+    @NotNull(groups = {sysAddValidatedGroup.class, ProperyuAddValidatedGroup.class}, message = "社区纬度不能为空")
     private BigDecimal lat;
     
     @ApiModelProperty(value = "社区房屋层级模式 1.楼栋单元 2.单元楼栋 3.单楼栋 4.单单元")
@@ -70,6 +70,21 @@ public class CommunityEntity extends BaseEntity {
     
     @ApiModelProperty(value = "推广人id")
     private String promoter;
+
+
+    // 社区类型;1:小区;2:出租公寓
+    @NotNull(groups = ProperyuAddValidatedGroup.class, message = "请选择社区类型;1:小区;2:出租公寓")
+    private Integer communityType;
+
+    // 物业id
+    @NotBlank(groups = ProperyuAddValidatedGroup.class, message = "请填写物业信息")
+    private String propertyId;
+
+    // 联系人
+    private String contact;
+
+    // 联系电话
+    private String contactMobile;
     
     //返回字段
     @TableField(exist=false)
@@ -84,5 +99,10 @@ public class CommunityEntity extends BaseEntity {
      * 大后台新增社区验证组
      */
     public interface sysAddValidatedGroup{}
+
+    /**
+     * 物业端新增小区验证
+     */
+    public interface ProperyuAddValidatedGroup{}
 
 }
