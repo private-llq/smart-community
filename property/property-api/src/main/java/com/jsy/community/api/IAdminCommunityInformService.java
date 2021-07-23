@@ -21,7 +21,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      * @param qo  参数实体
      * @return    返回新增 insert 行数 > 0 的结果
      */
-    Integer addPushInform(PushInformQO qo);
+    Boolean addPushInform(PushInformQO qo);
 
     /**
      *@Author: Pipi

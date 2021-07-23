@@ -10,9 +10,11 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.PushInformEntity;
+import com.jsy.community.entity.property.InformAcctEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.mapper.CommunityMapper;
+import com.jsy.community.mapper.InformAcctMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
@@ -51,45 +53,61 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
     @Autowired
     private IAdminUserService adminUserService;
 
+    @Autowired
+    private InformAcctMapper informAcctMapper;
+
     /**
      * 添加社区推送消息
      * @param qo    接收消息参数的对象
      */
     @Override
-    public Integer addPushInform(PushInformQO qo){
-        List<PushInformEntity> informEntities = new ArrayList<>();
-        // 获取社区信息
-        QueryWrapper<CommunityEntity> communityEntityQueryWrapper = new QueryWrapper<>();
-        communityEntityQueryWrapper.in("id", qo.getCommunityIds());
-        List<CommunityEntity> communityEntityList = communityMapper.selectList(communityEntityQueryWrapper);
-        if (CollectionUtil.isNotEmpty(communityEntityList)) {
-            for (CommunityEntity communityEntity : communityEntityList) {
-                PushInformEntity entity = PushInformEntity.getInstance();
-                entity.setAcctId(communityEntity.getId());
-                entity.setAcctName(communityEntity.getName());
-                entity.setAcctAvatar(communityEntity.getIconUrl());
-                entity.setPushTitle(qo.getPushTitle());
-                entity.setPushMsg(qo.getPushMsg());
-                entity.setPushTarget(qo.getPushTarget());
-                entity.setPushState(1);
-                entity.setPushTag(qo.getPushTag());
-                entity.setInformType("站内");
-                entity.setCreateBy(qo.getUid());
-                entity.setBrowseCount(0L);
-                entity.setPublishBy(qo.getUid());
-                entity.setPublishTime(LocalDateTime.now());
-                entity.setCreateTime(LocalDateTime.now());
-                entity.setId(SnowFlake.nextId());
-                informEntities.add(entity);
-                //当某个推送号有新消息发布时：用户之前已经删除的 推送号 又会被拉取出来 同时通知有未读消息
-                //清除推送消息屏蔽表
-                communityInformMapper.clearPushDel(communityEntity.getId());
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean addPushInform(PushInformQO qo){
+        // 组装消息数据
+        PushInformEntity entity = PushInformEntity.getInstance();
+        entity.setPushTitle(qo.getPushTitle());
+        entity.setPushMsg(qo.getPushMsg());
+        entity.setPushTarget(qo.getPushTarget());
+        entity.setPushState(1);
+        entity.setPushTag(qo.getPushTag());
+        entity.setInformType("站内");
+        entity.setCreateBy(qo.getUid());
+        entity.setBrowseCount(0L);
+        entity.setPublishBy(qo.getUid());
+        entity.setPublishTime(LocalDateTime.now());
+        entity.setCreateTime(LocalDateTime.now());
+        entity.setId(SnowFlake.nextId());
+        int insert = communityInformMapper.insert(entity);
+        if (insert > 0) {
+            // 消息新增成功时
+            List<InformAcctEntity> informAcctEntities = new ArrayList<>();
+            // 获取社区信息
+            QueryWrapper<CommunityEntity> communityEntityQueryWrapper = new QueryWrapper<>();
+            communityEntityQueryWrapper.in("id", qo.getCommunityIds());
+            List<CommunityEntity> communityEntityList = communityMapper.selectList(communityEntityQueryWrapper);
+            if (CollectionUtil.isNotEmpty(communityEntityList)) {
+                for (CommunityEntity communityEntity : communityEntityList) {
+                    // 组装消息与推送号的关系数据
+                    InformAcctEntity informAcctEntity = new InformAcctEntity();
+                    informAcctEntity.setId(String.valueOf(SnowFlake.nextId()));
+                    informAcctEntity.setInformId(String.valueOf(entity.getId()));
+                    informAcctEntity.setAcctId(String.valueOf(communityEntity.getId()));
+                    informAcctEntity.setAcctName(communityEntity.getName());
+                    informAcctEntity.setAcctAvatar(communityEntity.getIconUrl());
+                    informAcctEntities.add(informAcctEntity);
+                    //当某个推送号有新消息发布时：用户之前已经删除的 推送号 又会被拉取出来 同时通知有未读消息
+                    //清除推送消息屏蔽表
+                    communityInformMapper.clearPushDel(communityEntity.getId());
+                }
             }
+            if (CollectionUtil.isNotEmpty(informAcctEntities)) {
+                // 新增消息与推送号的关系数据
+                informAcctMapper.insertBatch(informAcctEntities);
+            }
+            return true;
+        } else {
+            return false;
         }
-        if (CollectionUtil.isNotEmpty(informEntities)) {
-            return communityInformMapper.insertBatch(informEntities);
-        }
-        return 0;
     }
 
     /**

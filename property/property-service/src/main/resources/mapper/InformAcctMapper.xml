@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.InformAcctMapper">
+    <!-- 批量新增推送消息与推送者关系数据 -->
+    <insert id="insertBatch">
+        insert into t_push_inform_acct (
+            id,
+            inform_id,
+            acct_id,
+            acct_name
+        ) VALUES
+        <foreach collection="list" separator="," item="informAcctEntity">
+            (
+                #{informAcctEntity.id},
+                #{informAcctEntity.informId},
+                #{informAcctEntity.acctId},
+                #{informAcctEntity.acctName}
+            )
+        </foreach>
+    </insert>
+</mapper>

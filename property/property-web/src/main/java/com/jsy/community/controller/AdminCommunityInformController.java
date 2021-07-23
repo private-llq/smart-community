@@ -50,7 +50,7 @@ public class AdminCommunityInformController {
         }
         ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidateGroup.class);
         qo.setUid(UserUtils.getUserId());
-        return communityInformService.addPushInform(qo) > 0 ? CommonResult.ok("添加成功!") : CommonResult.error("添加失败!");
+        return communityInformService.addPushInform(qo) ? CommonResult.ok("添加成功!") : CommonResult.error("添加失败!");
     }
 
     /**
