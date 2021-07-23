@@ -8,7 +8,6 @@ import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.UserHouseMapper;
@@ -20,7 +19,6 @@ import com.jsy.community.vo.property.PropertyCommunityListVO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.http.util.LangUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -235,5 +233,17 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 			}
 		}
 		return communityListVOPageInfo;
+	}
+
+	/**
+	 * @param communityEntity :
+	 * @author: Pipi
+	 * @description: 物业端更新社区信息
+	 * @return: java.lang.Integer
+	 * @date: 2021/7/22 18:04
+	 **/
+	@Override
+	public Integer updateCommunity(CommunityEntity communityEntity) {
+		return communityMapper.updateById(communityEntity);
 	}
 }

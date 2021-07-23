@@ -109,4 +109,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @date: 2021/7/22 11:46
 	 **/
 	PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, List<Long> communityIds);
+
+	/**
+	 * @author: Pipi
+	 * @description: 物业端更新社区信息
+	 * @param communityEntity:
+	 * @return: java.lang.Integer
+	 * @date: 2021/7/22 18:04
+	 **/
+	Integer updateCommunity(CommunityEntity communityEntity);
 }

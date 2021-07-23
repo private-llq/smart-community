@@ -6,6 +6,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -218,8 +219,8 @@ public class UserUtils {
 	 * @return: void
 	 * @date: 2021/7/22 15:04
 	 **/
-	public void updateRedisByToken(String typeName, Object o, String token) {
-		redisTemplate.opsForValue().set(typeName + ":" + token, o);
+	public void updateRedisByToken(String typeName, Object o, String token, Long expireTime) {
+		redisTemplate.opsForValue().set(typeName + ":" + token, o, expireTime ,TimeUnit.HOURS);
 	}
 
 	/**

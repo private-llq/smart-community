@@ -6,6 +6,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -17,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +49,9 @@ public class CommunityController {
 
 	@Autowired
 	private UserUtils userUtils;
+
+	@Value("${propertyLoginExpireHour}")
+	private long loginExpireHour = 12;
 	
 	/**
 	 * @return com.jsy.community.vo.CommonResult<java.util.List < com.jsy.community.vo.BannerVO>>
@@ -90,7 +95,7 @@ public class CommunityController {
 		adminUserInfo.getCommunityIdList().add(communityId);
 		String token = request.getHeader("token");
 		// 根据token,更新Redis数据
-		userUtils.updateRedisByToken("Admin:Login", JSON.toJSONString(adminUserInfo), token);
+		userUtils.updateRedisByToken("Admin:Login", JSON.toJSONString(adminUserInfo), token, loginExpireHour);
 		return CommonResult.ok("添加成功!");
 	}
 
@@ -116,6 +121,29 @@ public class CommunityController {
 		PageInfo<PropertyCommunityListVO> communityListVOPageInfo = communityService.queryPropertyCommunityList(baseQO, UserUtils.getAdminUserInfo().getCommunityIdList());
 		return CommonResult.ok(communityListVOPageInfo);
 	}
-	
+
+	/**
+	 * @author: Pipi
+	 * @description: 物业端更新社区信息
+	 * @param communityEntity:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/7/22 18:03
+	 **/
+	@Login
+	@PutMapping("/updateCommunity")
+	public CommonResult updateCommunity(@RequestBody CommunityEntity communityEntity) {
+		if (communityEntity.getId() == null) {
+			throw new JSYException(400, "社区ID不能为空!");
+		}
+		// 需要判定用户有权限的社区是否包含该社区
+		AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
+		if (!adminUserInfo.getCommunityIdList().contains(communityEntity.getId())) {
+			throw new JSYException(400, "你没有该社区的操作权限!");
+		}
+		ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
+		// 设置默认的社区房屋层级模式
+		communityEntity.setHouseLevelMode(1);
+		return communityService.updateCommunity(communityEntity) > 0 ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");
+	}
 }
 
