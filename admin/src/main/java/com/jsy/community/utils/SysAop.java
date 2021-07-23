@@ -1,6 +1,6 @@
 package com.jsy.community.utils;
 
-import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -38,7 +38,7 @@ public class SysAop {
     public void sysInformAddStart( JoinPoint joinPoint )
     {
         Object[] args = joinPoint.getArgs();
-        PushInformQO qo = (PushInformQO) args[0];
+        OldPushInformQO qo = (OldPushInformQO) args[0];
         qo.setAcctId(this.sysInformId);
         qo.setAcctAvatar(this.sysInformIcon);
         qo.setAcctName(this.sysInformName);

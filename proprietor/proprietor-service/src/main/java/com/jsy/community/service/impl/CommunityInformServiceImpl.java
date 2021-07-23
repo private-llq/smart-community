@@ -14,7 +14,7 @@ import com.jsy.community.mapper.CommunityConfigMapper;
 import com.jsy.community.mapper.CommunityInformMapper;
 import com.jsy.community.mapper.UserInformMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -54,10 +54,10 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
      */
     @Transactional(rollbackFor = {Exception.class})
     @Override
-    public List<PushInformEntity> queryCommunityInform(BaseQO<PushInformQO> qo) {
+    public List<PushInformEntity> queryCommunityInform(BaseQO<OldPushInformQO> qo) {
         //1.查出推送号列表基本列表数据
         QueryWrapper<PushInformEntity>  queryWrapper = new QueryWrapper<>();
-        PushInformQO query = qo.getQuery();
+        OldPushInformQO query = qo.getQuery();
         Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
         queryWrapper.select("id,acct_id,create_time,push_title,push_sub_title,publish_time");
         queryWrapper.eq("push_state", 1);

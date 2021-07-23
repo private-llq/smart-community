@@ -5,7 +5,7 @@ import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.service.ISysInformService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -50,8 +50,8 @@ public class SysInformController {
     @Login
     @ApiOperation("系统消息新增")
     @PostMapping()
-    public CommonResult<Boolean> add( @RequestBody PushInformQO qo){
-        ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidate.class);
+    public CommonResult<Boolean> add( @RequestBody OldPushInformQO qo){
+        ValidatorUtils.validateEntity(qo, OldPushInformQO.AddPushInformValidate.class);
         return iSysInformService.add(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
@@ -77,10 +77,10 @@ public class SysInformController {
     @Login
     @ApiOperation("系统消息列表")
     @PostMapping("/list")
-    public CommonResult<List<PushInformEntity>> query(@RequestBody BaseQO<PushInformQO> qo){
+    public CommonResult<List<PushInformEntity>> query(@RequestBody BaseQO<OldPushInformQO> qo){
         ValidatorUtils.validatePageParam(qo);
         if(qo.getQuery() == null){
-            qo.setQuery(new PushInformQO());
+            qo.setQuery(new OldPushInformQO());
         }
         qo.getQuery().setId(sysInformId);
         return CommonResult.ok(iSysInformService.query(qo));

@@ -7,7 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -85,12 +85,12 @@ public class CommunityInformController {
     @Login
     @PostMapping(value = "/page", produces = "application/json;charset=utf-8")
     @ApiOperation("查询社区通知消息")
-    public CommonResult<?> listCommunityInform(@RequestBody BaseQO<PushInformQO> qo) {
+    public CommonResult<?> listCommunityInform(@RequestBody BaseQO<OldPushInformQO> qo) {
         ValidatorUtils.validatePageParam(qo);
         if (qo.getQuery() == null) {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
-        ValidatorUtils.validateEntity(qo.getQuery(), PushInformQO.CommunityPushInformValidate.class);
+        ValidatorUtils.validateEntity(qo.getQuery(), OldPushInformQO.CommunityPushInformValidate.class);
         qo.getQuery().setUid(UserUtils.getUserId());
         return CommonResult.ok(communityInformService.queryCommunityInform(qo), "查询成功!");
     }

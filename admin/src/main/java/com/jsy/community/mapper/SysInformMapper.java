@@ -3,7 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -17,5 +17,5 @@ import java.util.List;
 @Mapper
 public interface SysInformMapper extends BaseMapper<PushInformEntity> {
 
-    List<PushInformEntity> query(BaseQO<PushInformQO> baseQO);
+    List<PushInformEntity> query(BaseQO<OldPushInformQO> baseQO);
 }

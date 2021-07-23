@@ -46,4 +46,43 @@
             (${@com.jsy.community.utils.SnowFlake@nextId()},#{acctId},#{id},#{uid},now())
         </foreach>
     </insert>
+    <!-- 批量新增推送消息数据 -->
+    <insert id="insertBatch">
+        insert into t_push_inform(
+            id,
+            acct_id,
+            acct_name,
+            acct_avatar,
+            push_title,
+            push_msg,
+            push_target,
+            push_tag,
+            push_state,
+            inform_type,
+            create_by,
+            create_time,
+            browse_count,
+            publish_by,
+            publish_time
+        )values
+        <foreach collection="list" item="informEntity" separator=",">
+            (
+                #{informEntity.id},
+                #{informEntity.acctId},
+                #{informEntity.acctName},
+                #{informEntity.acctAvatar},
+                #{informEntity.pushTitle},
+                #{informEntity.pushMsg},
+                #{informEntity.pushTarget},
+                #{informEntity.pushTag},
+                #{informEntity.pushState},
+                #{informEntity.informType},
+                #{informEntity.createBy},
+                #{informEntity.createTime},
+                #{informEntity.browseCount},
+                #{informEntity.publishBy},
+                #{informEntity.publishTime}
+            )
+        </foreach>
+    </insert>
 </mapper>

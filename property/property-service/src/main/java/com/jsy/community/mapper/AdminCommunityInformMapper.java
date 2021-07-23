@@ -93,4 +93,13 @@ public interface AdminCommunityInformMapper extends BaseMapper<PushInformEntity>
      **/
     @Update("update t_push_inform set deleted = 1, top_state = 0, update_by = #{updateBy}, update_time = now() where id = #{id}")
     Integer updateDeleted(@Param("id") Long id, @Param("updateBy") String updateBy);
+
+    /**
+     * @author: Pipi
+     * @description: 批量新增推送消息数据
+     * @param pushInformEntities:
+     * @return: java.lang.Integer
+     * @date: 2021/7/23 11:23
+     **/
+    Integer insertBatch(List<PushInformEntity> pushInformEntities);
 }

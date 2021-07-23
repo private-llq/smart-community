@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
-import com.jsy.community.vo.admin.AdminInfoVo;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      * @param qo  参数实体
      * @return    返回新增 insert 行数 > 0 的结果
      */
-    Boolean addPushInform(PushInformQO qo);
+    Integer addPushInform(PushInformQO qo);
 
     /**
      *@Author: Pipi
@@ -30,7 +30,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      *@Return: java.lang.Boolean
      *@Date: 2021/4/20 16:38
      **/
-    Boolean updatePushInform(PushInformQO qo);
+    Boolean updatePushInform(OldPushInformQO qo);
 
     /**
      * 根据id删除社区推送通知消息
@@ -46,7 +46,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      *@Return: java.lang.Boolean
      *@Date: 2021/4/20 15:15
      **/
-    Boolean updateTopState(PushInformQO qo);
+    Boolean updateTopState(OldPushInformQO qo);
 
     /**
      *@Author: Pipi
@@ -55,14 +55,14 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      *@Return: java.lang.Boolean
      *@Date: 2021/4/20 15:57
      **/
-    Boolean updatePushState(PushInformQO qo);
+    Boolean updatePushState(OldPushInformQO qo);
 
     /**
      * 分页查询社区消息服务提供接口
      * @param qo                参数实体对象
      * @return                  返回查询分页结果
      */
-    List<PushInformEntity> queryCommunityInform(BaseQO<PushInformQO> qo);
+    List<PushInformEntity> queryCommunityInform(BaseQO<OldPushInformQO> qo);
 
     /**
      *@Author: Pipi
@@ -71,7 +71,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      *@Return: java.util.List<com.jsy.community.entity.PushInformEntity>
      *@Date: 2021/4/20 13:53
      **/
-    Page<PushInformEntity> queryInformList(BaseQO<PushInformQO> qo);
+    Page<PushInformEntity> queryInformList(BaseQO<OldPushInformQO> qo);
 
     /**
      *@Author: Pipi

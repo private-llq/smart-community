@@ -3,7 +3,7 @@ package com.jsy.community.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface ISysInformService extends IService<PushInformEntity> {
      * @since  2021/1/13 17:37
      * @return  返回是否添加成功
      */
-    boolean add(PushInformQO sysInformQo);
+    boolean add(OldPushInformQO sysInformQo);
 
     /**
      * 根据消息id删除
@@ -29,7 +29,7 @@ public interface ISysInformService extends IService<PushInformEntity> {
      */
     boolean delete(Long informId);
 
-    List<PushInformEntity> query(BaseQO<PushInformQO> baseQo);
+    List<PushInformEntity> query(BaseQO<OldPushInformQO> baseQo);
 
     boolean deleteBatchByIds(List<Long> informIds);
 }

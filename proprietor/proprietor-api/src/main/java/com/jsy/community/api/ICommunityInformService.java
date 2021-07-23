@@ -3,7 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public interface ICommunityInformService extends IService<PushInformEntity> {
      * @param qo                参数实体对象
      * @return                  返回查询分页结果
      */
-    List<PushInformEntity> queryCommunityInform(BaseQO<PushInformQO> qo);
+    List<PushInformEntity> queryCommunityInform(BaseQO<OldPushInformQO> qo);
 
 
 

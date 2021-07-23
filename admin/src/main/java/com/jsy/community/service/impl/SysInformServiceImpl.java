@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.mapper.SysInformMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.service.ISysInformService;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticsearchImportProvider;
@@ -32,7 +32,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 
 	@Override
-	public boolean add(PushInformQO qo) {
+	public boolean add(OldPushInformQO qo) {
 		PushInformEntity sysInformEntity = PushInformEntity.getInstance();
 		BeanUtils.copyProperties(qo, sysInformEntity);
 		sysInformEntity.setId(SnowFlake.nextId());
@@ -48,7 +48,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 	}
 
 	@Override
-	public List<PushInformEntity> query(BaseQO<PushInformQO> baseQo) {
+	public List<PushInformEntity> query(BaseQO<OldPushInformQO> baseQo) {
 		baseQo.setPage((baseQo.getPage() - 1 ) * baseQo.getSize());
 		return sysInformMapper.query(baseQo);
 	}

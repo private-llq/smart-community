@@ -14,6 +14,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticsearchImportProvider;
@@ -54,39 +55,41 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      * 添加社区推送消息
      * @param qo    接收消息参数的对象
      */
-    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Boolean addPushInform(PushInformQO qo){
-        PushInformEntity entity = PushInformEntity.getInstance();
+    public Integer addPushInform(PushInformQO qo){
+        List<PushInformEntity> informEntities = new ArrayList<>();
         // 获取社区信息
-        CommunityEntity communityEntity = communityMapper.selectById(qo.getAcctId());
-        if (communityEntity == null) {
-            throw new JSYException("未获取到推送账户信息");
+        QueryWrapper<CommunityEntity> communityEntityQueryWrapper = new QueryWrapper<>();
+        communityEntityQueryWrapper.in("id", qo.getCommunityIds());
+        List<CommunityEntity> communityEntityList = communityMapper.selectList(communityEntityQueryWrapper);
+        if (CollectionUtil.isNotEmpty(communityEntityList)) {
+            for (CommunityEntity communityEntity : communityEntityList) {
+                PushInformEntity entity = PushInformEntity.getInstance();
+                entity.setAcctId(communityEntity.getId());
+                entity.setAcctName(communityEntity.getName());
+                entity.setAcctAvatar(communityEntity.getIconUrl());
+                entity.setPushTitle(qo.getPushTitle());
+                entity.setPushMsg(qo.getPushMsg());
+                entity.setPushTarget(qo.getPushTarget());
+                entity.setPushState(1);
+                entity.setPushTag(qo.getPushTag());
+                entity.setInformType("站内");
+                entity.setCreateBy(qo.getUid());
+                entity.setBrowseCount(0L);
+                entity.setPublishBy(qo.getUid());
+                entity.setPublishTime(LocalDateTime.now());
+                entity.setCreateTime(LocalDateTime.now());
+                entity.setId(SnowFlake.nextId());
+                informEntities.add(entity);
+                //当某个推送号有新消息发布时：用户之前已经删除的 推送号 又会被拉取出来 同时通知有未读消息
+                //清除推送消息屏蔽表
+                communityInformMapper.clearPushDel(communityEntity.getId());
+            }
         }
-        qo.setAcctName(communityEntity.getName());
-        qo.setAcctAvatar(communityEntity.getIconUrl());
-        BeanUtils.copyProperties(qo, entity);
-        entity.setId(SnowFlake.nextId());
-        //当某个推送号有新消息发布时：用户之前已经删除的 推送号 又会被拉取出来 同时通知有未读消息
-        //清除推送消息屏蔽表
-        communityInformMapper.clearPushDel(qo.getAcctId());
-        // 当为新发布
-        if (qo.getPushState() == 1) {
-            // 新发布,添加发布人信息
-            entity.setPublishBy(qo.getCreateBy());
-            entity.setPublishTime(LocalDateTime.now());
+        if (CollectionUtil.isNotEmpty(informEntities)) {
+            return communityInformMapper.insertBatch(informEntities);
         }
-        if (qo.getTopState() == 1) {
-            // 置顶状态,将其他推送取消置顶
-            communityInformMapper.unpinned(qo.getCreateBy());
-        }
-        //返回值为冗余
-        boolean b = communityInformMapper.insert(entity) > BusinessConst.ZERO;
-        //0表示推送目标为所有社区
-        if(b && qo.getPushTarget().equals(BusinessConst.ZERO)){
-            ElasticsearchImportProvider.elasticOperationSingle(entity.getId(), RecordFlag.INFORM, Operation.INSERT, qo.getPushTitle(), qo.getAcctAvatar());
-        }
-        return b;
+        return 0;
     }
 
     /**
@@ -98,7 +101,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean updatePushInform(PushInformQO qo) {
+    public Boolean updatePushInform(OldPushInformQO qo) {
         // 查询原始数据
         PushInformEntity pushInformEntity = baseMapper.selectById(qo.getId());
         PushInformEntity entity = PushInformEntity.getInstance();
@@ -154,7 +157,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean updateTopState(PushInformQO qo) {
+    public Boolean updateTopState(OldPushInformQO qo) {
         if (qo.getTopState() == 1) {
             // 如果是置顶,将其他置顶取消
             communityInformMapper.unpinned(qo.getUpdateBy());
@@ -171,7 +174,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      *@Date: 2021/4/20 15:57
      **/
     @Override
-    public Boolean updatePushState(PushInformQO qo) {
+    public Boolean updatePushState(OldPushInformQO qo) {
         // 如果状态为发布状态,表示由草稿状态变跟为发布状态,还需要更新发布人和发布时间
         Integer result = communityInformMapper.updatePushState(qo.getPushState(), qo.getId(), qo.getUpdateBy());
         return result == 1;
@@ -184,10 +187,10 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public List<PushInformEntity> queryCommunityInform(BaseQO<PushInformQO> qo) {
+    public List<PushInformEntity> queryCommunityInform(BaseQO<OldPushInformQO> qo) {
         //1.查出推送号列表基本列表数据
         QueryWrapper<PushInformEntity>  queryWrapper = new QueryWrapper<>();
-        PushInformQO query = qo.getQuery();
+        OldPushInformQO query = qo.getQuery();
         Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
         queryWrapper.select("id,acct_id,create_time,push_title,push_sub_title");
         queryWrapper.eq("acct_id", query.getAcctId());
@@ -210,9 +213,9 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      *@Date: 2021/4/20 13:53
      **/
     @Override
-    public Page<PushInformEntity> queryInformList(BaseQO<PushInformQO> qo) {
+    public Page<PushInformEntity> queryInformList(BaseQO<OldPushInformQO> qo) {
         QueryWrapper<PushInformEntity>  queryWrapper = new QueryWrapper<>();
-        PushInformQO query = qo.getQuery();
+        OldPushInformQO query = qo.getQuery();
         Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
         queryWrapper.select("id,acct_id,push_title,inform_type,push_msg,browse_count,top_state,push_state,push_sub_title,create_by,create_time,update_by,update_time,publish_by,publish_time");
         queryWrapper.eq("acct_id", query.getAcctId());

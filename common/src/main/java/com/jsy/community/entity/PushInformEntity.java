@@ -75,6 +75,9 @@ public class PushInformEntity extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime publishTime;
 
+    // 推送开关,0关闭推送,1开启推送
+    private Integer pushTag;
+
     public static PushInformEntity getInstance(){
         return new PushInformEntity();
     }
