@@ -30,4 +30,14 @@ public class HouseMemberQO implements Serializable {
      * 与业主关系 1.业主 6.亲属，7租户
      */
     private Integer relation;
+
+    /**
+     * 房间id
+     */
+    private Long houseId;
+
+    /**
+     * 标签
+     */
+    private Integer tally;
 }

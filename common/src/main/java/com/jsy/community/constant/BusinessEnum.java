@@ -547,6 +547,57 @@ public interface BusinessEnum {
 			sourceMap.put("familyType",familyTypeList);
 		}
 	}
+
+	/**
+	 * @Description: 户口类型
+	 * @Author: chq459799974
+	 * @Date: 2020/12/01
+	 **/
+	enum MaritalStatusEnum {
+		SECRECY("保密", 0),
+		MARRIED("已婚", 1),
+		SPINSTERHOOD("未婚", 2);
+		private String name;
+		private Integer code;
+
+		MaritalStatusEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static final List<Map<String, Object>> maritalStatusList = new ArrayList<>();
+
+		static {
+			for (MaritalStatusEnum entryTypeEnum : MaritalStatusEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", entryTypeEnum.getCode());
+				map.put("name", entryTypeEnum.getName());
+				maritalStatusList.add(map);
+			}
+			sourceMap.put("maritalStatus",maritalStatusList);
+		}
+	}
 	
 	/**
 	 * @Description: 亲属关系枚举

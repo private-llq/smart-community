@@ -67,6 +67,52 @@
         </if>
         limit #{page},#{size}
     </select>
+    <select id="pageList" resultType="com.jsy.community.vo.property.HouseMemberVO">
+        SELECT thm.id as id,thm.house_id as houseId,tu.real_name as realName,tu.mobile as mobile,CONCAT(th.building,th.unit,th.number) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
+        FROM t_house_member thm
+        LEFT JOIN t_user tu
+        on thm.householder_id=tu.uid
+        left JOIN t_house th
+        on thm.house_id=th.id
+        <include refid="memberQuery"></include>
+        ORDER BY thm.house_id
+        DESC limit #{page},#{size}
+    </select>
+    <select id="pageListTotal" resultType="java.lang.Long">
+        SELECT count(*)
+        FROM t_house_member thm
+        LEFT JOIN t_user tu
+        on thm.householder_id=tu.uid
+        left JOIN t_house th
+        on thm.house_id=th.id
+        <include refid="memberQuery"></include>
+    </select>
+    <update id="emigrations">
+        update t_house_member set status=2 where id in
+        <foreach collection="ids" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+    </update>
+    <sql id="memberQuery">
+        <where>
+            thm.deleted=0 and tu.deleted=0 and th.deleted=0 and thm.community_id=#{query.communityId}
+            <if test="query.key!=null and query.key!=''">
+                and (thm.name like concat("%",#{query.key},"%") or thm.mobile like concat("%",#{query.key},"%") or th.number like concat("%",#{query.key},"%"))
+            </if>
+            <if test="query.status!=null and query.status!=0">
+                and thm.status=#{query.status}
+            </if>
+            <if test="query.relation!=null and query.relation!=0">
+                and thm.relation=#{query.relation}
+            </if>
+            <if test="query.houseId!=null and query.houseId!=0">
+                and thm.houseId=#{query.houseId}
+            </if>
+            <if test="query.tally!=null and query.tally!=0">
+                and thm.tally=#{query.tally}
+            </if>
+        </where>
+    </sql>
 
 
     <resultMap id="PropertyRelationMap" type="com.jsy.community.vo.PropertyRelationVO">

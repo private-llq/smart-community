@@ -2,10 +2,12 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.PropertyRelationVO;
+import com.jsy.community.vo.property.HouseMemberVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -63,4 +65,30 @@ public interface PropertyRelationMapper extends BaseMapper<HouseMemberEntity> {
      */
     List<HouseTypeVo> getUnitId(@Param("query")RelationListQO query, @Param("page")Long page,@Param("size")Long size);
 
+    /**
+     * @Description: 分页查询
+     * @author: Hu
+     * @since: 2021/7/24 14:09
+     * @Param:
+     * @return:
+     */
+    List<HouseMemberVO> pageList(@Param("page") Long page, @Param("size")Long size, @Param("query")HouseMemberQO query);
+
+    /**
+     * @Description: 总条数
+     * @author: Hu
+     * @since: 2021/4/21 17:02
+     * @Param:
+     * @return:
+     */
+    Long pageListTotal(@Param("query") HouseMemberQO query);
+
+    /**
+     * @Description: 批量迁出
+     * @author: Hu
+     * @since: 2021/7/24 15:28
+     * @Param:
+     * @return:
+     */
+    void emigrations(Long[] ids);
 }

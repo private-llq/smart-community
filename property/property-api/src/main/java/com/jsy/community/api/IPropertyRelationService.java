@@ -103,5 +103,14 @@ public interface IPropertyRelationService {
      * @Param:
      * @return:
      */
-    void pageList(BaseQO<HouseMemberQO> baseQO);
+    Map<String, Object> pageList(BaseQO<HouseMemberQO> baseQO);
+
+    /**
+     * @Description: 批量迁出
+     * @author: Hu
+     * @since: 2021/7/24 15:27
+     * @Param:
+     * @return:
+     */
+    void emigrations(Long[] ids);
 }

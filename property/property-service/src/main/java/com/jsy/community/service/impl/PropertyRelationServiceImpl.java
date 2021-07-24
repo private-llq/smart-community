@@ -12,6 +12,7 @@ import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.PropertyRelationVO;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.HouseMemberVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -211,8 +212,13 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      * @return: void
      */
     @Override
-    public void pageList(BaseQO<HouseMemberQO> baseQO) {
-
+    public Map<String, Object> pageList(BaseQO<HouseMemberQO> baseQO) {
+        Map<String, Object> map = new HashMap<>();
+        List<HouseMemberVO> list=propertyRelationMapper.pageList(baseQO.getPage(),baseQO.getSize(),baseQO.getQuery());
+        Long total = propertyRelationMapper.pageListTotal(baseQO.getQuery());
+        map.put("list",list);
+        map.put("total",total);
+        return map;
     }
 
     /**
@@ -228,5 +234,10 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         if (entity!=null){
             entity.setStatus(2);
         }
+    }
+
+    @Override
+    public void emigrations(Long[] ids) {
+        propertyRelationMapper.emigrations(ids);
     }
 }

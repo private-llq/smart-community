@@ -52,7 +52,7 @@ public class HouseMemberEntity extends BaseEntity {
     /**
      * 标签：1独居，2孤寡，3残疾，4留守
      */
-    private String tally;
+    private Integer tally;
     /**
      * 出生日期
      */
@@ -154,6 +154,15 @@ public class HouseMemberEntity extends BaseEntity {
      * 身份证照片
      */
     private String idCardPicture;
+    /**
+     * 身份证照片
+     */
+    private LocalDateTime loginTime;
+
+    /**
+     * 身份证照片
+     */
+    private LocalDateTime validTime;
 
 
 }

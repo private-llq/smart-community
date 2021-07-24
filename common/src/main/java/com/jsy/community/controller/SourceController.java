@@ -42,6 +42,7 @@ public class SourceController {
 		System.out.println(PaymentEnum.TradeFromEnum.tradeFromList);
 		System.out.println(BusinessEnum.FamilyTypeEnum.familyTypeList);
 		System.out.println(BusinessEnum.MemberTallyEnum.tallyList);
+		System.out.println(BusinessEnum.MaritalStatusEnum.maritalStatusList);
 	}
 	
 	@ApiOperation("字典资源查询")

@@ -44,8 +44,7 @@ public class PropertyRelationController {
     @PostMapping("/pageList")
     @Login
     public CommonResult pageList(@RequestBody BaseQO<HouseMemberQO> baseQO){
-    propertyRelationService.pageList(baseQO);
-    return CommonResult.ok();
+    return CommonResult.ok(propertyRelationService.pageList(baseQO));
     }
 
     @ApiOperation("迁入")
@@ -61,6 +60,14 @@ public class PropertyRelationController {
     @Login
     public CommonResult emigration(@RequestParam Long id){
         propertyRelationService.emigration(id);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("批量迁出")
+    @PostMapping("/emigrations")
+    @Login
+    public CommonResult emigrations(@RequestParam Long[] ids){
+        propertyRelationService.emigrations(ids);
         return CommonResult.ok();
     }
 
