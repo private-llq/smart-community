@@ -1,4 +1,4 @@
-package com.jsy.community.entity.property;
+package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 

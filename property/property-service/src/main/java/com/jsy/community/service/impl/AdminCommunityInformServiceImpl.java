@@ -9,7 +9,7 @@ import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.PushInformEntity;
-import com.jsy.community.entity.property.InformAcctEntity;
+import com.jsy.community.entity.InformAcctEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.mapper.CommunityMapper;
@@ -288,8 +288,30 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      *@Date: 2021/4/20 16:23
      **/
     @Override
-    public PushInformEntity getDetail(Long id) {
-        return baseMapper.selectById(id);
+    public PushInfromVO getDetail(Long id) {
+        PushInformEntity pushInformEntity = communityInformMapper.selectById(id);
+        PushInfromVO pushInfromVO = new PushInfromVO();
+        if (pushInformEntity == null) {
+            return pushInfromVO;
+        }
+        BeanUtils.copyProperties(pushInformEntity, pushInfromVO);
+        // 查询消息的社区列表
+        QueryWrapper<InformAcctEntity> informAcctQueryWrapper = new QueryWrapper<>();
+        informAcctQueryWrapper.eq("inform_id", id);
+        List<InformAcctEntity> informAcctEntities = informAcctMapper.selectList(informAcctQueryWrapper);
+        if (CollectionUtil.isNotEmpty(informAcctEntities)) {
+            for (InformAcctEntity informAcctEntity : informAcctEntities) {
+                if (CollectionUtil.isNotEmpty(pushInfromVO.getAcctName())) {
+                    pushInfromVO.getAcctName().add(informAcctEntity.getAcctName());
+                } else {
+                    List<String> acctName = new ArrayList<>();
+                    acctName.add(informAcctEntity.getAcctName());
+                    pushInfromVO.setAcctName(acctName);
+                }
+
+            }
+        }
+        return pushInfromVO;
     }
 
 

@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.property.InformAcctEntity;
+import com.jsy.community.entity.InformAcctEntity;
 
 import java.util.List;
 

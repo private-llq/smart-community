@@ -82,6 +82,6 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      *@Return: com.jsy.community.entity.PushInformEntity
      *@Date: 2021/4/20 16:23
      **/
-    PushInformEntity getDetail(Long id);
+    PushInfromVO getDetail(Long id);
 
 }
