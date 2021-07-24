@@ -255,24 +255,6 @@ public interface BusinessConst {
      */
     Integer BEHAVIOR_BACK = 3;
 
-    //========= 社区房屋层级模式 ==========
-    /**
-     * 社区模式-楼栋单元
-     */
-    Integer COMMUNITY_MODE_BUILDING_UNIT = 1;
-    /**
-     * 社区模式-单元楼栋
-     */
-    Integer COMMUNITY_MODE_UNIT_BUILDING = 2;
-    /**
-     * 社区模式-单楼栋
-     */
-    Integer COMMUNITY_MODE_BUILDING = 3;
-    /**
-     * 社区模式-单单元
-     */
-    Integer COMMUNITY_MODE_UNIT = 4;
-
     //========= 楼宇单位 ==========
     /**
      * 楼栋

@@ -14,10 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>
- * 社区楼栋 Mapper 接口
- * </p>
- *
+ * 物业端社区楼栋 Mapper 接口
  * @author jsy
  * @since 2020-11-20
  */

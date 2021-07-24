@@ -13,10 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>
- * 社区楼栋 服务类
- * </p>
- *
+ * 物业端社区楼栋Service
  * @author qq459799974
  * @since 2020-11-20
  */
@@ -158,4 +155,13 @@ public interface IHouseService extends IService<HouseEntity> {
 	 *@Date: 2021/5/21 17:17
 	 **/
 	List<HouseEntity> getAllHouse(Long communityId);
+	
+	/**
+	* @Description: 检查楼栋单元数据真实性
+	 * @Param: [buildingId, unitId, communityId]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	void checkBuildingAndUnit(Long buildingId, Long unitId, Long communityId);
 }

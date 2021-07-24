@@ -782,4 +782,63 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
     public List<HouseEntity> getAllHouse(Long communityId) {
         return houseMapper.getAllHouse(communityId);
     }
+    
+    /**
+    * @Description: 检查楼栋单元数据真实性
+     * @Param: [buildingId, unitId, communityId]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2021-07-24
+    **/
+    public void checkBuildingAndUnit(Long buildingId, Long unitId, Long communityId){
+        //楼栋和单元都要检查
+        if(buildingId != null && unitId != null){
+            List<Long> list = new ArrayList<>();
+            list.add(buildingId);
+            list.add(unitId);
+            //查出两条数据
+            List<HouseEntity> buildingAndUnit = houseMapper.selectList(new QueryWrapper<HouseEntity>().select("id,pid,type")
+                .in("id",list)
+                .eq("community_id",communityId)
+            );
+            //检查数据
+            if(CollectionUtils.isEmpty(buildingAndUnit)){
+                throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"未找到楼栋及单元");
+            }else if(buildingAndUnit.size() == 1){  //只找到
+                if(buildingAndUnit.get(0).getType().equals(BusinessConst.BUILDING_TYPE_BUILDING)){
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"未找到单元");
+                }else if(buildingAndUnit.get(0).getType().equals(BusinessConst.BUILDING_TYPE_UNIT)){
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"未找到楼栋");
+                }
+            }
+            HouseEntity data1 = buildingAndUnit.get(0);
+            HouseEntity data2 = buildingAndUnit.get(1);
+            //检查pid关联
+            if(data1.getType().equals(BusinessConst.BUILDING_TYPE_BUILDING) && data2.getType().equals(BusinessConst.BUILDING_TYPE_UNIT)){
+                //数据1是楼栋，数据2是单元
+                if(!data2.getPid().equals(data1.getId())){
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"楼栋与单元无关联");
+                }
+            }else if(data1.getType().equals(BusinessConst.BUILDING_TYPE_UNIT) && data2.getType().equals(BusinessConst.BUILDING_TYPE_BUILDING)){
+                //数据1是单元，数据2是楼栋
+                if(!data1.getPid().equals(data2.getId())){
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"楼栋与单元无关联");
+                }
+            }else{
+                log.error("数据检查错误，接收到楼栋ID：" + buildingId + "单元ID：" + unitId + "社区：" + communityId);
+                throw new PropertyException(JSYError.INTERNAL.getCode(),"后台数据有误，请联系管理员");
+            }
+        }else if(buildingId != null){  //只检查楼栋
+            Integer count = houseMapper.selectCount(new QueryWrapper<HouseEntity>().eq("id",buildingId).eq("community_id",communityId));
+            if(count < 1){
+                throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"未找到楼栋");
+            }
+        }else if(unitId != null){   //只检查单元
+            Integer count = houseMapper.selectCount(new QueryWrapper<HouseEntity>().eq("id",unitId).eq("community_id",communityId));
+            if(count < 1){
+                throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"未找到单元");
+            }
+        }
+    }
+    
 }
