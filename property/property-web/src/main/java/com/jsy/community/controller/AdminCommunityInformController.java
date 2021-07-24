@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -113,15 +114,18 @@ public class AdminCommunityInformController {
     @Login
     @PostMapping("/list")
     @ApiOperation("按条件查询公告列表")
-    public CommonResult<?> listInform(@RequestBody BaseQO<OldPushInformQO> qo) {
-        ValidatorUtils.validatePageParam(qo);
-        if (qo.getQuery() == null) {
-            return CommonResult.error(JSYError.BAD_REQUEST);
+    public CommonResult<?> listInform(@RequestBody BaseQO<PushInformQO> baseQO) {
+        if (baseQO.getSize() == null || baseQO.getSize() <= 0) {
+            baseQO.setSize(10L);
         }
-        ValidatorUtils.validateEntity(qo.getQuery(), OldPushInformQO.PropertyInformListValidate.class);
-        qo.getQuery().setAcctId(UserUtils.getAdminCommunityId());
-//        List<PushInformEntity> pushInformEntities = communityInformService.queryInformList(qo);
-        return CommonResult.ok(communityInformService.queryInformList(qo));
+        if (baseQO.getPage() == null || baseQO.getPage() <= 0) {
+            baseQO.setPage(1L);
+        }
+        if (baseQO.getQuery() == null) {
+            baseQO.setQuery(new PushInformQO());
+        }
+        baseQO.getQuery().setCommunityIds(UserUtils.getAdminUserInfo().getCommunityIdList());
+        return CommonResult.ok(communityInformService.queryInformList(baseQO));
     }
 
     /**

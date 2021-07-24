@@ -6,6 +6,8 @@ import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.property.PushInfromVO;
 
 import java.util.List;
 
@@ -71,7 +73,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      *@Return: java.util.List<com.jsy.community.entity.PushInformEntity>
      *@Date: 2021/4/20 13:53
      **/
-    Page<PushInformEntity> queryInformList(BaseQO<OldPushInformQO> qo);
+    PageInfo<PushInfromVO> queryInformList(BaseQO<PushInformQO> qo);
 
     /**
      *@Author: Pipi

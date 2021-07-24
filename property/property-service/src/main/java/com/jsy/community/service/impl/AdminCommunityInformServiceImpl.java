@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.api.IAdminUserService;
-import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.PushInformEntity;
@@ -18,10 +17,13 @@ import com.jsy.community.mapper.InformAcctMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
+import com.jsy.community.vo.property.PushInfromVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -231,61 +233,51 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
      *@Date: 2021/4/20 13:53
      **/
     @Override
-    public Page<PushInformEntity> queryInformList(BaseQO<OldPushInformQO> qo) {
+    public PageInfo<PushInfromVO> queryInformList(BaseQO<PushInformQO> qo) {
+        PushInformQO query = qo.getQuery();
+        PageInfo<PushInfromVO> pageInfo = new PageInfo<>();
+        if (CollectionUtil.isEmpty(query.getCommunityIds())) {
+            return pageInfo;
+        }
+        Page<PushInformEntity> page = new Page<>();
+        MyPageUtils.setPageAndSize(page, qo);
+        // 先查社区下的消息ID列表
+        QueryWrapper<InformAcctEntity> informAcctQueryWrapper = new QueryWrapper<>();
+        informAcctQueryWrapper.in("acct_id", query.getCommunityIds());
+        List<InformAcctEntity> informAcctEntities = informAcctMapper.selectList(informAcctQueryWrapper);
+        if (CollectionUtil.isEmpty(informAcctEntities)) {
+            // 如果结果为空,表示没有推送消息
+            return pageInfo;
+        }
+        List<String> infromIds = new ArrayList<>();
+        Map<String, List<String>> infromIdsAcctMap = new HashMap<>();
+        for (InformAcctEntity informAcctEntity : informAcctEntities) {
+            infromIds.add(informAcctEntity.getInformId());
+            if (infromIdsAcctMap.containsKey(informAcctEntity.getInformId())) {
+                infromIdsAcctMap.get(informAcctEntity.getInformId()).add(informAcctEntity.getAcctName());
+            } else {
+                List<String> acctNames = new ArrayList<>();
+                acctNames.add(informAcctEntity.getAcctName());
+                infromIdsAcctMap.put(informAcctEntity.getInformId(), acctNames);
+            }
+        }
         QueryWrapper<PushInformEntity>  queryWrapper = new QueryWrapper<>();
-        OldPushInformQO query = qo.getQuery();
-        Page<PushInformEntity> objectPage = new Page<>(qo.getPage(), qo.getSize());
-        queryWrapper.select("id,acct_id,push_title,inform_type,push_msg,browse_count,top_state,push_state,push_sub_title,create_by,create_time,update_by,update_time,publish_by,publish_time");
-        queryWrapper.eq("acct_id", query.getAcctId());
+        queryWrapper.select("id, push_title, push_msg, create_time");
+        queryWrapper.in("id", infromIds);
         if (!StringUtils.isEmpty(query.getPushTitle())) {
             queryWrapper.like("push_title", query.getPushTitle());
         }
-        if (!StringUtils.isEmpty(query.getPushMsg())) {
-            queryWrapper.like("push_msg", query.getPushMsg());
+        queryWrapper.orderByDesc("create_time");
+        Page<PushInformEntity> informEntityPage = communityInformMapper.selectPage(page, queryWrapper);
+        List<PushInfromVO> pushInfromVOS = new ArrayList<>();
+        for (PushInformEntity record : informEntityPage.getRecords()) {
+            PushInfromVO pushInfromVO = new PushInfromVO();
+            BeanUtils.copyProperties(record, pushInfromVO);
+            pushInfromVO.setAcctName(infromIdsAcctMap.get(record.getIdStr()));
+            pushInfromVOS.add(pushInfromVO);
         }
-        if (query.getStartCreateTime() != null) {
-            queryWrapper.ge("DATE(create_time)", query.getStartCreateTime());
-        }
-        if (query.getEndCreateTime() != null) {
-            queryWrapper.le("DATE(create_time)", query.getEndCreateTime());
-        }
-        if (query.getStartUpdateTime() != null) {
-            queryWrapper.ge("DATE(update_time)", query.getStartUpdateTime());
-        }
-        if (query.getEndUpdateTime() != null) {
-            queryWrapper.le("DATE(update_time)", query.getEndUpdateTime());
-        }
-        if (query.getPageState() == 0) {
-            // 草稿页面
-            queryWrapper.eq("push_state", query.getPageState());
-            queryWrapper.last("ORDER BY create_time desc");
-        } else {
-            // 保证发布页面不会查出草稿
-            queryWrapper.ge("push_state", query.getPageState());
-            if (query.getPushState() != null) {
-                // 发布页面
-                queryWrapper.eq("push_state", query.getPushState());
-            }
-            // 排序:发布的在最前,然后依次条件是发布时间,更新时间
-            queryWrapper.last("ORDER BY push_state asc,publish_time desc,update_time desc");
-        }
-        Page<PushInformEntity> pushInformEntityPage = communityInformMapper.selectPage(objectPage, queryWrapper);
-        if (CollectionUtil.isNotEmpty(pushInformEntityPage.getRecords())) {
-            //补创建人和更新人和发布人姓名
-            Set<String> uidSet = new HashSet<>();
-            for (PushInformEntity record : pushInformEntityPage.getRecords()) {
-                uidSet.add(record.getCreateBy());
-                uidSet.add(record.getUpdateBy());
-                uidSet.add(record.getPublishBy());
-            }
-            Map<String, Map<String, String>> userInfoMap = adminUserService.queryNameByUidBatch(uidSet);
-            for (PushInformEntity record : pushInformEntityPage.getRecords()) {
-                record.setCreateBy(userInfoMap.get(record.getCreateBy()) == null ? null : userInfoMap.get(record.getCreateBy()).get("name"));
-                record.setUpdateBy(userInfoMap.get(record.getUpdateBy()) == null ? null : userInfoMap.get(record.getUpdateBy()).get("name"));
-                record.setPublishBy(userInfoMap.get(record.getPublishBy()) == null ? null : userInfoMap.get(record.getPublishBy()).get("name"));
-            }
-        }
-        return pushInformEntityPage;
+        pageInfo.setRecords(pushInfromVOS);
+        return pageInfo;
     }
 
     /**
