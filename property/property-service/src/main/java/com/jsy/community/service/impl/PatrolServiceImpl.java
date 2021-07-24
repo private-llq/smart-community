@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IPatrolService;
 import com.jsy.community.constant.Const;
@@ -65,6 +64,9 @@ public class PatrolServiceImpl implements IPatrolService {
 		QueryWrapper queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("id,number,name");
 		PatrolEquipEntity query = baseQO.getQuery();
+		if(!StringUtils.isEmpty(query.getId())){
+			queryWrapper.eq("id",query.getId());
+		}
 		if(!StringUtils.isEmpty(query.getName())){
 			queryWrapper.like("name",query.getName());
 		}
