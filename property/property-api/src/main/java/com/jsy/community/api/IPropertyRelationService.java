@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.admin.AdminInfoVo;
@@ -76,4 +77,31 @@ public interface IPropertyRelationService {
      * @return:
      */
     HouseMemberEntity findOne(Long id);
+
+    /**
+     * @Description: 迁入
+     * @author: Hu
+     * @since: 2021/7/23 17:26
+     * @Param:
+     * @return:
+     */
+    void immigration(Long id);
+
+    /**
+     * @Description: 迁出
+     * @author: Hu
+     * @since: 2021/7/23 17:26
+     * @Param:
+     * @return:
+     */
+    void emigration(Long id);
+
+    /**
+     * @Description: 分页查询
+     * @author: Hu
+     * @since: 2021/7/23 17:54
+     * @Param:
+     * @return:
+     */
+    void pageList(BaseQO<HouseMemberQO> baseQO);
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,8 @@ public class SourceController {
 		System.out.println(BusinessEnum.RelationshipEnum.relationshipList);
 		System.out.println(BusinessEnum.EntryTypeEnum.entryTypeList);
 		System.out.println(PaymentEnum.TradeFromEnum.tradeFromList);
+		System.out.println(BusinessEnum.FamilyTypeEnum.familyTypeList);
+		System.out.println(BusinessEnum.MemberTallyEnum.tallyList);
 	}
 	
 	@ApiOperation("字典资源查询")
@@ -50,5 +53,19 @@ public class SourceController {
 		}
 		return CommonResult.ok(maps);
 	}
-	
+	@ApiOperation("字典资源查询")
+	@GetMapping("typeSources")
+	public CommonResult typeSources(@RequestParam String typeKey){
+		HashMap<String, Object> map = new HashMap<>();
+		String[] split = typeKey.split(",");
+		if (split!=null){
+			for (String s : split) {
+				List<Map<String, Object>> maps = BusinessEnum.sourceMap.get(s);
+				if(!CollectionUtils.isEmpty(maps)){
+					 map.put(s,BusinessEnum.sourceMap.get(s));
+				}
+			}
+		}
+		return CommonResult.ok(map);
+	}
 }

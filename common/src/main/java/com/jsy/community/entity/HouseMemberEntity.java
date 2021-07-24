@@ -46,9 +46,13 @@ public class HouseMemberEntity extends BaseEntity {
      */
     private String mobile;
     /**
-     * 与业主关系 1.业主 6.亲属，7租户
+     * 与业主关系 0.临时，1.业主，6.亲属，7租户
      */
     private Integer relation;
+    /**
+     * 标签：1独居，2孤寡，3残疾，4留守
+     */
+    private String tally;
     /**
      * 出生日期
      */
@@ -57,6 +61,11 @@ public class HouseMemberEntity extends BaseEntity {
      * 银行卡号
      */
     private String creditCard;
+
+    /**
+     * 单位
+     */
+    private String unit;
     /**
      * 入驻时间
      */
@@ -78,9 +87,17 @@ public class HouseMemberEntity extends BaseEntity {
      */
     private String wechat;
     /**
+     * 邮箱
+     */
+    private String email;
+    /**
      * 家庭电话
      */
     private String homeMobile;
+    /**
+     * 紧急联系人
+     */
+    private String exigencyName;
     /**
      * 紧急联系人
      */
@@ -94,6 +111,10 @@ public class HouseMemberEntity extends BaseEntity {
      */
     private String politicsStatus;
     /**
+     * 婚姻状况0保密，1已婚，2未婚
+     */
+    private Integer maritalStatus;
+    /**
      * 证件类型1.身份证 2.护照
      */
     private Integer identificationType;
@@ -106,6 +127,10 @@ public class HouseMemberEntity extends BaseEntity {
      */
     private Integer familyType;
     /**
+     * 户口地址
+     */
+    private String familySite;
+    /**
      * 详细地址
      */
     private String site;
@@ -113,6 +138,10 @@ public class HouseMemberEntity extends BaseEntity {
      * 暂住号码
      */
     private String stayNum;
+    /**
+     * 居住类型
+     */
+    private Integer liveType;
     /**
      * 宠物
      */

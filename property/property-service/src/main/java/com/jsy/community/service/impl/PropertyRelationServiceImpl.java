@@ -6,6 +6,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.mapper.PropertyRelationMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.HouseTypeVo;
@@ -183,5 +184,49 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     @Override
     public HouseMemberEntity findOne(Long id) {
         return propertyRelationMapper.selectById(id);
+    }
+
+
+    /**
+     * @Description: 迁入
+     * @author: Hu
+     * @since: 2021/7/23 17:26
+     * @Param: [id]
+     * @return: void
+     */
+    @Override
+    public void immigration(Long id) {
+        HouseMemberEntity entity = propertyRelationMapper.selectById(id);
+        if (entity!=null){
+            entity.setStatus(1);
+        }
+    }
+
+
+    /**
+     * @Description: 分页查询
+     * @author: Hu
+     * @since: 2021/7/23 17:55
+     * @Param: [baseQO]
+     * @return: void
+     */
+    @Override
+    public void pageList(BaseQO<HouseMemberQO> baseQO) {
+
+    }
+
+    /**
+     * @Description: 迁出
+     * @author: Hu
+     * @since: 2021/7/23 17:26
+     * @Param: [id]
+     * @return: void
+     */
+    @Override
+    public void emigration(Long id) {
+        HouseMemberEntity entity = propertyRelationMapper.selectById(id);
+        if (entity!=null){
+            entity.setStatus(2);
+        }
     }
 }

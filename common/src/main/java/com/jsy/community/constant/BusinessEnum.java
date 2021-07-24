@@ -497,6 +497,56 @@ public interface BusinessEnum {
 			sourceMap.put("entryType",entryTypeList);
 		}
 	}
+
+	/**
+	 * @Description: 户口类型
+	 * @Author: chq459799974
+	 * @Date: 2020/12/01
+	 **/
+	enum FamilyTypeEnum {
+		COUNTRY("农村户口", 1),
+		CILTES("城镇户口", 2);
+		private String name;
+		private Integer code;
+
+		FamilyTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static final List<Map<String, Object>> familyTypeList = new ArrayList<>();
+
+		static {
+			for (FamilyTypeEnum entryTypeEnum : FamilyTypeEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", entryTypeEnum.getCode());
+				map.put("name", entryTypeEnum.getName());
+				familyTypeList.add(map);
+			}
+			sourceMap.put("familyType",familyTypeList);
+		}
+	}
 	
 	/**
 	 * @Description: 亲属关系枚举
@@ -504,10 +554,7 @@ public interface BusinessEnum {
 	 * @Date: 2020/12/01
 	 **/
 	enum RelationshipEnum {
-//		HUSBAND("丈夫",1),
-//		WIFE("妻子",2),
-//		SON("儿子",3),
-//		DAUGHTER("女儿",4),
+		TEMPORARY("临时",0),
 		PROPRIETOR("业主", 1),
 		RELATIVES("亲属", 6),
 		TENANT("租客", 7);
@@ -561,6 +608,69 @@ public interface BusinessEnum {
 				relationshipMap.put(relationshipEnum.getCode(), relationshipEnum.getName());
 			}
 			sourceMap.put("relationship",relationshipList);
+		}
+	}
+
+	/**
+	 * @Description: 业主标签
+	 * @Author: chq459799974
+	 * @Date: 2020/12/01
+	 **/
+	enum MemberTallyEnum {
+		SOLITUDE("独居",1),
+		ORPHANS("孤寡", 2),
+		DISABILITY("残疾", 3),
+		LEFT("留守", 4);
+		private String name;
+		private Integer code;
+
+		MemberTallyEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static final List<Map<String, Object>> tallyList = new ArrayList<>();
+		public static final Map<Integer, String> tallyMap = new HashMap<>();
+
+		public static String getCode(Integer code){
+			MemberTallyEnum[] values = MemberTallyEnum.values();
+			for(MemberTallyEnum c : values){
+				if( c.code.equals(code) ){
+					return c.name;
+				}
+			}
+			return null;
+		}
+		static {
+			for (MemberTallyEnum tallyEnum : MemberTallyEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", tallyEnum.getCode());
+				map.put("name", tallyEnum.getName());
+				tallyList.add(map);
+				tallyMap.put(tallyEnum.getCode(), tallyEnum.getName());
+			}
+			sourceMap.put("memberTally",tallyList);
 		}
 	}
 	
