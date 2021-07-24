@@ -232,6 +232,8 @@ public class AdminLoginController {
 		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getUserId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
 		//设置小区级菜单
 		user.setMenuList(userMenu);
+		//设置小区ID
+		user.setCommunityId(communityId);
 		//创建token，保存redis
 		String token = adminUserTokenService.createToken(user);
 		user.setToken(token);
@@ -239,7 +241,6 @@ public class AdminLoginController {
 		BeanUtils.copyProperties(user,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
-		adminInfoVo.setCommunityId(communityId);
 		return CommonResult.ok(adminInfoVo);
 	}
 	
