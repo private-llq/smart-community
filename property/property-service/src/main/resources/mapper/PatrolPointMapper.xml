@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.PatrolPointMapper">
+
+    <!-- 修改 -->
+    <update id="updatePoint">
+        update t_patrol_point
+        <set>
+            update_time = now()
+            <if test="entity.number != null and entity.number != ''">,number = #{entity.number}</if>
+            <if test="entity.name != null and entity.name != ''">,name = #{entity.name}</if>
+            <if test="entity.address != null and entity.address != ''">,address = #{entity.address}</if>
+            <if test="entity.remark != null and entity.remark != ''">,remark = #{entity.remark}</if>
+            <if test="entity.lon != null">,lon = #{entity.lon}</if>
+            <if test="entity.lat != null">,lat = #{entity.lat}</if>
+            <if test="entity.buildingId != null and entity.buildingId != 0">,building_id = #{entity.buildingId}</if>
+            <if test="entity.unitId != null and entity.unitId != 0">,unit_id = #{entity.unitId}</if>
+        </set>
+        where id = #{entity.id} and community_id = #{entity.communityId}
+    </update>
+
+</mapper>

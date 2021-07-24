@@ -2,9 +2,11 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IPatrolService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PatrolEquipEntity;
+import com.jsy.community.entity.property.PatrolPointEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.TestUtil;
 import com.jsy.community.utils.UserUtils;
@@ -30,6 +32,9 @@ public class PatrolController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPatrolService patrolService;
 	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IHouseService houseService;
+	
 	//======================= 设备start ===========================
 	/**
 	* @Description: 添加巡检设备
@@ -39,11 +44,10 @@ public class PatrolController {
 	 * @Date: 2021-07-23
 	**/
 	@PostMapping("/equip")
-	public CommonResult addEquip(@RequestBody PatrolEquipEntity PatrolEquipEntity){
-		ValidatorUtils.validateEntity(PatrolEquipEntity);
-		PatrolEquipEntity.setCommunityId(UserUtils.getAdminCommunityId());
-		boolean b = patrolService.addEquip(PatrolEquipEntity);
-		return b ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
+	public CommonResult addEquip(@RequestBody PatrolEquipEntity patrolEquipEntity){
+		ValidatorUtils.validateEntity(patrolEquipEntity);
+		patrolEquipEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		return patrolService.addEquip(patrolEquipEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
 	}
 	
 	/**
@@ -88,11 +92,78 @@ public class PatrolController {
 	**/
 	@DeleteMapping("/equip")
 	public CommonResult deleteEquip(@RequestParam Long id){
-		patrolService.deleteEquip(id,UserUtils.getAdminCommunityId());
-		return CommonResult.ok("操作成功");
+		return patrolService.deleteEquip(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	//======================= 设备end ===========================
 	
+	//======================= 点位start ===========================
+	/**
+	* @Description: 添加巡检点位
+	 * @Param: [patrolPointEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	@PostMapping("/point")
+	public CommonResult addEquip(@RequestBody PatrolPointEntity patrolPointEntity){
+		ValidatorUtils.validateEntity(patrolPointEntity);
+		if(patrolPointEntity.getBuildingId() == null && patrolPointEntity.getUnitId() == null){
+			return CommonResult.error("请至少选择楼栋或单元");
+		}
+		Long communityId = UserUtils.getAdminCommunityId();
+		//检查楼栋单元
+		houseService.checkBuildingAndUnit(patrolPointEntity.getBuildingId(),patrolPointEntity.getUnitId(),communityId);
+		patrolPointEntity.setCommunityId(communityId);
+		return patrolService.addPoint(patrolPointEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
+	}
+	
+	/**
+	* @Description: 巡检点位 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	@PostMapping("/point/page")
+	public CommonResult queryPointPage(@RequestBody BaseQO<PatrolPointEntity> baseQO){
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new PatrolPointEntity());
+		}
+		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(patrolService.queryPointPage(baseQO),"查询成功");
+	}
+	
+	/**
+	* @Description: 修改巡检点位
+	 * @Param: [patrolPointEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	@PutMapping("/point")
+	public CommonResult updateEquip(@RequestBody PatrolPointEntity patrolPointEntity){
+		if(patrolPointEntity.getId() == null){
+			return CommonResult.error("缺少id");
+		}
+		Long communityId = UserUtils.getAdminCommunityId();
+		//检查楼栋单元
+		houseService.checkBuildingAndUnit(patrolPointEntity.getBuildingId(),patrolPointEntity.getUnitId(),communityId);
+		patrolPointEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		return patrolService.updatePoint(patrolPointEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	
+	/**
+	* @Description: 删除巡检点位
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	@DeleteMapping("/point")
+	public CommonResult deletePoint(@RequestParam Long id){
+		return patrolService.deletePoint(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	//======================= 点位end ===========================
 	
 	
 	//==================== 接收硬件数据 =========================

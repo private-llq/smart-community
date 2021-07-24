@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.property.PatrolEquipEntity;
+import com.jsy.community.entity.property.PatrolPointEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 
@@ -45,5 +46,41 @@ public interface IPatrolService {
 	 * @Author: chq459799974
 	 * @Date: 2021-07-23
 	**/
-	void deleteEquip(Long id,Long communityId);
+	boolean deleteEquip(Long id,Long communityId);
+	
+	/**
+	* @Description: 新增巡检点位
+	 * @Param: [entity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	boolean addPoint(PatrolPointEntity entity);
+	
+	/**
+	* @Description: 巡检点位 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PatrolPointEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	PageInfo<PatrolPointEntity> queryPointPage(BaseQO<PatrolPointEntity> baseQO);
+	
+	/**
+	* @Description: 修改巡检点位
+	 * @Param: [entity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	boolean updatePoint(PatrolPointEntity entity);
+	
+	/**
+	* @Description: 删除巡检点位
+	 * @Param: [id, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	**/
+	boolean deletePoint(Long id,Long communityId);
 }

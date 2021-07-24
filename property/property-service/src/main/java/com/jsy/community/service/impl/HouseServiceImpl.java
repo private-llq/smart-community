@@ -632,7 +632,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
     }
 
     /**
-     * @Description: 房屋ids 批量查 id-address对应关系
+     * @Description: ids 批量查 id-entity对应关系
      * @Param: [ids]
      * @Return: java.util.Map<java.lang.Long, com.jsy.community.entity.HouseEntity>
      * @Author: chq459799974

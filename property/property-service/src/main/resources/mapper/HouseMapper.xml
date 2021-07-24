@@ -193,7 +193,7 @@
 
 	<!-- 查房屋id与房屋映射关系 -->
 	<select id="queryIdAndHouseMap" resultType="com.jsy.community.entity.HouseEntity">
-		select id as houseId,concat(building,unit,floor,door) as address from t_house
+		select id as houseId,concat(building,unit,floor,door) as address,building,unit from t_house
 		where id in
 		<foreach collection="houseIds" item="item" open="(" separator="," close=")">
 			#{item}
