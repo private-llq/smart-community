@@ -239,6 +239,7 @@ public class AdminLoginController {
 		BeanUtils.copyProperties(user,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
+		adminInfoVo.setCommunityId(communityId);
 		return CommonResult.ok(adminInfoVo);
 	}
 	
