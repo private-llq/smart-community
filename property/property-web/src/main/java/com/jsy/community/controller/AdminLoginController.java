@@ -226,7 +226,8 @@ public class AdminLoginController {
 	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
 		Long communityId = jsonObject.getLong("communityId");
 		UserUtils.validateCommunityId(communityId);
-		AdminUserEntity user = new AdminUserEntity();
+		//用户资料
+		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
 		//用户菜单
 		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getUserId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
 		//设置小区级菜单
