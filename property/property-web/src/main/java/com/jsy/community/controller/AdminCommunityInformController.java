@@ -115,12 +115,6 @@ public class AdminCommunityInformController {
     @PostMapping("/list")
     @ApiOperation("按条件查询公告列表")
     public CommonResult<?> listInform(@RequestBody BaseQO<PushInformQO> baseQO) {
-        if (baseQO.getSize() == null || baseQO.getSize() <= 0) {
-            baseQO.setSize(10L);
-        }
-        if (baseQO.getPage() == null || baseQO.getPage() <= 0) {
-            baseQO.setPage(1L);
-        }
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new PushInformQO());
         }

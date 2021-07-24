@@ -232,6 +232,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 				}
 			}
 		}
+		communityListVOPageInfo.setTotal(entityPage.getTotal());
+		communityListVOPageInfo.setCurrent(entityPage.getCurrent());
+		communityListVOPageInfo.setSize(entityPage.getSize());
 		return communityListVOPageInfo;
 	}
 

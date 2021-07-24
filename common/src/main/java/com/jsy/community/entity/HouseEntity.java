@@ -102,7 +102,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private String propertyTypeStr;
     
     @ApiModelProperty(value = "装修情况1.样板间 2.毛坯 3.简装 4.精装")
-    @NotNull(groups = addRoomValidatedGroup.class, message = "请填写装修情况")
+    // @NotNull(groups = addRoomValidatedGroup.class, message = "请填写装修情况")
     private Integer decoration;
     
     @ApiModelProperty(value = "装修情况字符串")

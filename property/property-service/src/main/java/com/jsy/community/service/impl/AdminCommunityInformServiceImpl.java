@@ -277,6 +277,9 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
             pushInfromVOS.add(pushInfromVO);
         }
         pageInfo.setRecords(pushInfromVOS);
+        pageInfo.setCurrent(informEntityPage.getCurrent());
+        pageInfo.setSize(informEntityPage.getSize());
+        pageInfo.setTotal(informEntityPage.getTotal());
         return pageInfo;
     }
 
