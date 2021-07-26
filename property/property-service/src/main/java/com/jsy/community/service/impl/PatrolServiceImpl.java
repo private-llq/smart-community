@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IPatrolService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PatrolEquipEntity;
+import com.jsy.community.entity.property.PatrolLineEntity;
 import com.jsy.community.entity.property.PatrolPointEntity;
 import com.jsy.community.mapper.PatrolEquipMapper;
 import com.jsy.community.mapper.PatrolLineMapper;
@@ -19,6 +21,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -192,8 +196,122 @@ public class PatrolServiceImpl implements IPatrolService {
 		//TODO 检查是否已被添加到巡检线路
 		return patrolPointMapper.delete(new QueryWrapper<PatrolPointEntity>().eq("id",id).eq("community_id",communityId)) == 1;
 	}
+	
+	/**
+	 * 检查巡检点位数据真实性
+	 */
+	private void checkPointList(List<Long> idList,Long communityId){
+		Integer count = patrolPointMapper.selectCount(new QueryWrapper<PatrolPointEntity>().in("id", idList).eq("community_id", communityId));
+		if(count != idList.size()){
+			throw new PropertyException("巡检点数据有误，请检查");
+		}
+	}
 	//===================== 巡检点位end ======================
 	
 	//===================== 巡检线路start ======================
+	/**
+	 * @Description: 添加巡检线路
+	 * @Param: [entity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	 **/
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean addLine(PatrolLineEntity entity){
+		entity.setId(SnowFlake.nextId());
+		//TODO 硬件品牌ID暂时固定为1
+		entity.setBrandId(1L);
+		int lineAddResult = patrolLineMapper.insert(entity);
+		//添加巡检点
+		if(!CollectionUtils.isEmpty(entity.getPointIdList())){
+			//验证巡检点数据真实性
+			checkPointList(entity.getPointIdList(),entity.getCommunityId());
+			//绑定巡检点位
+			patrolLineMapper.addLinePoint(entity.getId(),entity.getPointIdList());
+		}
+		return lineAddResult == 1;
+	}
+	
+	/**
+	* @Description: 巡检线路 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PatrolLineEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	@Override
+	public PageInfo<PatrolLineEntity> queryLinePage(BaseQO<PatrolLineEntity> baseQO){
+		Page<PatrolLineEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		QueryWrapper queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("id,name,start_time,end_time,remark");
+		PatrolLineEntity query = baseQO.getQuery();
+		if(!StringUtils.isEmpty(query.getId())){
+			//查详情
+			queryWrapper.eq("id",query.getId());
+		}
+		if(!StringUtils.isEmpty(query.getName())){
+			queryWrapper.like("name",query.getName());
+		}
+		queryWrapper.eq("community_id",query.getCommunityId());
+		Page<PatrolLineEntity> pageData = patrolLineMapper.selectPage(page,queryWrapper);
+		if(!CollectionUtils.isEmpty(pageData.getRecords())){
+			if(!StringUtils.isEmpty(query.getId())){
+				//查询并设置线路已绑定的巡更点
+				pageData.getRecords().get(0).setPointIdList(patrolLineMapper.queryBindPointList(query.getId()));
+			}
+		}
+		PageInfo<PatrolLineEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData,pageInfo);
+		return pageInfo;
+	}
+	
+	/**
+	 * @Description: 修改巡检线路
+	 * @Param: [entity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	 **/
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean updateLine(PatrolLineEntity entity){
+		//修改
+		boolean updateResult = patrolLineMapper.updateLine(entity) == 1;
+		if(!updateResult){
+			return false;
+		}
+		//修改绑定的巡检点位
+		if(!CollectionUtils.isEmpty(entity.getPointIdList())){
+			//验证巡检点数据真实性
+			checkPointList(entity.getPointIdList(),entity.getCommunityId());
+			//清空原有的
+			patrolLineMapper.clearLinePoint(entity.getId());
+			//绑定新的
+			patrolLineMapper.addLinePoint(entity.getId(),entity.getPointIdList());
+		}
+		return true;
+	}
+	
+	/**
+	 * @Description: 删除巡检线路
+	 * @Param: [id, communityId]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021-07-24
+	 **/
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean deleteLine(Long id,Long communityId){
+		//删除线路
+		boolean deleteResult = patrolLineMapper.delete(new QueryWrapper<PatrolLineEntity>().eq("id", id).eq("community_id", communityId)) == 1;
+		if(!deleteResult){
+			return false;
+		}
+		//删除已绑定的巡检点
+		patrolLineMapper.clearLinePoint(id);
+		return true;
+	}
 	//===================== 巡检线路end ======================
 }

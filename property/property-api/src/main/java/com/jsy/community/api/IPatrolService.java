@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.property.PatrolEquipEntity;
+import com.jsy.community.entity.property.PatrolLineEntity;
 import com.jsy.community.entity.property.PatrolPointEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
@@ -83,4 +84,40 @@ public interface IPatrolService {
 	 * @Date: 2021-07-24
 	**/
 	boolean deletePoint(Long id,Long communityId);
+	
+	/**
+	* @Description: 新增巡检线路
+	 * @Param: [entity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	boolean addLine(PatrolLineEntity entity);
+	
+	/**
+	* @Description: 巡检线路 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PatrolLineEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	PageInfo<PatrolLineEntity> queryLinePage(BaseQO<PatrolLineEntity> baseQO);
+	
+	/**
+	* @Description: 修改巡检线路
+	 * @Param: [entity]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	boolean updateLine(PatrolLineEntity entity);
+	
+	/**
+	* @Description: 删除巡检线路
+	 * @Param: [id, communityId]
+	 * @Return: boolean
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	boolean deleteLine(Long id,Long communityId);
 }

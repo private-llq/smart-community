@@ -29,13 +29,13 @@ public class PatrolPointEntity extends BaseEntity {
 	/**
 	 * 巡检点位名称
 	 */
-	@NotBlank(message = "巡更点名称不能为空")
+	@NotBlank(message = "缺少巡更点名称")
 	private String name;
 	
 	/**
 	 * 点位编号(钮号)
 	 */
-	@NotBlank(message = "设备编号(钮号)不能为空")
+	@NotBlank(message = "缺少设备编号(钮号)")
 	private String number;
 	
 	/**
@@ -58,13 +58,13 @@ public class PatrolPointEntity extends BaseEntity {
 	/**
 	 * 经度
 	 */
-	@NotNull(message = "经度不能为空")
+	@NotNull(message = "缺少经度")
 	private Double lon;
 	
 	/**
 	 * 纬度
 	 */
-	@NotNull(message = "纬度不能为空")
+	@NotNull(message = "缺少纬度")
 	private Double lat;
 	
 	/**

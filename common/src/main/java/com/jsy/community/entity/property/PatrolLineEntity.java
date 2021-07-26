@@ -1,15 +1,21 @@
 package com.jsy.community.entity.property;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 /**
  * @author chq459799974
@@ -33,23 +39,30 @@ public class PatrolLineEntity extends BaseEntity {
 	/**
 	 * 巡检线路名称
 	 */
+	@NotBlank(message = "缺少路线名称")
 	private String name;
+	
+	/**
+	 * 巡检点位ID集合
+	 */
+	@TableField(exist = false)
+	private List<Long> pointIdList;
 	
 	/**
 	 * 巡检开始时间
 	 */
-	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
-	@JsonSerialize(using = LocalDateTimeSerializer.class)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
-	private LocalDateTime startTime;
+	@JsonDeserialize(using = LocalTimeDeserializer.class)
+	@JsonSerialize(using = LocalTimeSerializer.class)
+	@JsonFormat(pattern = "HH:mm",timezone = "GMT+8")
+	private LocalTime startTime;
 	
 	/**
 	 * 巡检结束时间
 	 */
-	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
-	@JsonSerialize(using = LocalDateTimeSerializer.class)
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
-	private LocalDateTime endTime;
+	@JsonDeserialize(using = LocalTimeDeserializer.class)
+	@JsonSerialize(using = LocalTimeSerializer.class)
+	@JsonFormat(pattern = "HH:mm",timezone = "GMT+8")
+	private LocalTime endTime;
 	
 	/**
 	 * 备注

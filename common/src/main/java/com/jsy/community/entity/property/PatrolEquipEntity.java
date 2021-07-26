@@ -35,13 +35,13 @@ public class PatrolEquipEntity extends BaseEntity {
 	/**
 	 * 设备编号
 	 */
-	@NotBlank(message = "设备编号不能为空")
+	@NotBlank(message = "缺少设备编号")
 	private String number;
 	
 	/**
 	 * 设备名称
 	 */
-	@NotBlank(message = "设备名称不能为空")
+	@NotBlank(message = "缺少设备名称")
 	private String name;
 	
 }

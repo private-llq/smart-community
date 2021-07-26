@@ -6,6 +6,7 @@ import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IPatrolService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PatrolEquipEntity;
+import com.jsy.community.entity.property.PatrolLineEntity;
 import com.jsy.community.entity.property.PatrolPointEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.TestUtil;
@@ -13,10 +14,13 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author chq459799974
@@ -79,8 +83,7 @@ public class PatrolController {
 			return CommonResult.error("缺少id");
 		}
 		patrolEquipEntity.setCommunityId(UserUtils.getAdminCommunityId());
-		boolean b = patrolService.updateEquip(patrolEquipEntity);
-		return b ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+		return patrolService.updateEquip(patrolEquipEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
 	/**
@@ -148,7 +151,7 @@ public class PatrolController {
 		Long communityId = UserUtils.getAdminCommunityId();
 		//检查楼栋单元
 		houseService.checkBuildingAndUnit(patrolPointEntity.getBuildingId(),patrolPointEntity.getUnitId(),communityId);
-		patrolPointEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		patrolPointEntity.setCommunityId(communityId);
 		return patrolService.updatePoint(patrolPointEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
@@ -164,6 +167,66 @@ public class PatrolController {
 		return patrolService.deletePoint(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	//======================= 点位end ===========================
+	
+	//======================= 线路start ===========================
+	/**
+	* @Description: 新增巡检线路
+	 * @Param: [patrolLineEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	@PostMapping("/line")
+	public CommonResult addLine(@RequestBody PatrolLineEntity patrolLineEntity){
+		ValidatorUtils.validateEntity(patrolLineEntity);
+		patrolLineEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		return patrolService.addLine(patrolLineEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
+	}
+	
+	/**
+	* @Description: 巡检线路 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	@PostMapping("/line/page")
+	public CommonResult queryLinePage(@RequestBody BaseQO<PatrolLineEntity> baseQO){
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new PatrolLineEntity());
+		}
+		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(patrolService.queryLinePage(baseQO),"查询成功");
+	}
+	
+	/**
+	* @Description: 修改巡检线路
+	 * @Param: [patrolLineEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	@PutMapping("/line")
+	public CommonResult updateLine(@RequestBody PatrolLineEntity patrolLineEntity){
+		if(patrolLineEntity.getId() == null){
+			return CommonResult.error("缺少id");
+		}
+		patrolLineEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		return patrolService.updateLine(patrolLineEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	
+	/**
+	* @Description: 删除巡检线路
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	@DeleteMapping("/line")
+	public CommonResult deleteLine(@RequestParam Long id){
+		return patrolService.deleteLine(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	//======================= 线路end ===========================
 	
 	
 	//==================== 接收硬件数据 =========================
