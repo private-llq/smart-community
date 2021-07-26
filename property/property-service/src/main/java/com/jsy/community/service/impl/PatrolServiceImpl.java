@@ -10,6 +10,7 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PatrolEquipEntity;
 import com.jsy.community.entity.property.PatrolLineEntity;
 import com.jsy.community.entity.property.PatrolPointEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.PatrolEquipMapper;
 import com.jsy.community.mapper.PatrolLineMapper;
 import com.jsy.community.mapper.PatrolPointMapper;
@@ -85,6 +86,7 @@ public class PatrolServiceImpl implements IPatrolService {
 			queryWrapper.like("name",query.getName());
 		}
 		queryWrapper.eq("community_id",query.getCommunityId());
+		queryWrapper.orderByDesc("create_time");
 		Page<PatrolEquipEntity> pageData = patrolEquipMapper.selectPage(page,queryWrapper);
 		PageInfo<PatrolEquipEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);
@@ -155,6 +157,7 @@ public class PatrolServiceImpl implements IPatrolService {
 			queryWrapper.like("name",query.getName());
 		}
 		queryWrapper.eq("community_id",query.getCommunityId());
+		queryWrapper.orderByDesc("create_time");
 		Page<PatrolPointEntity> pageData = patrolPointMapper.selectPage(page,queryWrapper);
 		//查询楼栋、单元名称
 		Set<Long> idSet =  new HashSet<>();
@@ -192,9 +195,18 @@ public class PatrolServiceImpl implements IPatrolService {
 	 * @Date: 2021-07-24
 	**/
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public boolean deletePoint(Long id,Long communityId){
-		//TODO 检查是否已被添加到巡检线路
-		return patrolPointMapper.delete(new QueryWrapper<PatrolPointEntity>().eq("id",id).eq("community_id",communityId)) == 1;
+		boolean deleteResult = patrolPointMapper.delete(new QueryWrapper<PatrolPointEntity>().eq("id", id).eq("community_id", communityId)) == 1;
+		if(!deleteResult){
+			return false;
+		}
+		//解除与巡检线路关联
+		boolean unbindResult = patrolLineMapper.unbindPoint(id) == 1;
+		if(!unbindResult){
+			throw new PropertyException(JSYError.INTERNAL.getCode(),"解绑线路失败，删除失败");
+		}
+		return true;
 	}
 	
 	/**
@@ -203,7 +215,7 @@ public class PatrolServiceImpl implements IPatrolService {
 	private void checkPointList(List<Long> idList,Long communityId){
 		Integer count = patrolPointMapper.selectCount(new QueryWrapper<PatrolPointEntity>().in("id", idList).eq("community_id", communityId));
 		if(count != idList.size()){
-			throw new PropertyException("巡检点数据有误，请检查");
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"巡检点数据有误，请检查");
 		}
 	}
 	//===================== 巡检点位end ======================
@@ -255,6 +267,7 @@ public class PatrolServiceImpl implements IPatrolService {
 			queryWrapper.like("name",query.getName());
 		}
 		queryWrapper.eq("community_id",query.getCommunityId());
+		queryWrapper.orderByDesc("create_time");
 		Page<PatrolLineEntity> pageData = patrolLineMapper.selectPage(page,queryWrapper);
 		if(!CollectionUtils.isEmpty(pageData.getRecords())){
 			if(!StringUtils.isEmpty(query.getId())){

@@ -45,7 +45,23 @@ public interface PatrolLineMapper extends BaseMapper<PatrolLineEntity> {
 	@Select("select point_id from t_patrol_line_point where line_id = #{lineId}")
 	List<Long> queryBindPointList(Long lineId);
 	
-	//修改巡检线路
+	/**
+	* @Description: 修改巡检线路
+	 * @Param: [entity]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
 	int updateLine(@Param("entity")PatrolLineEntity entity);
+	
+	/**
+	* @Description: 巡检点解除与巡检线路关联
+	 * @Param: [pointId]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021-07-26
+	**/
+	@Delete("delete from t_patrol_line_point where point_id = #{pointId}")
+	int unbindPoint(Long pointId);
 	
 }
