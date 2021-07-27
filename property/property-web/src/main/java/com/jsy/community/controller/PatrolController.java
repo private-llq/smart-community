@@ -291,4 +291,20 @@ public class PatrolController {
 		return patrolService.addRecord(recordList,1L,equipNumberStr);
 	}
 	
+	//==================== 巡检记录查询 =========================
+	/**
+	* @Description: 巡检记录 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-27
+	**/
+	@PostMapping("/record/page")
+	public CommonResult queryRecordPage(@RequestBody BaseQO<PatrolRecordEntity> baseQO){
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new PatrolRecordEntity());
+		}
+		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(patrolService.queryRecordPage(baseQO),"查询成功");
+	}
 }

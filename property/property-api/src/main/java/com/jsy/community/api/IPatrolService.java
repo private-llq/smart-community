@@ -132,4 +132,13 @@ public interface IPatrolService {
 	 * @Date: 2021-07-27
 	**/
 	String addRecord(List<PatrolRecordEntity> recordList, Long brandId, String equipNumer);
+	
+	/**
+	* @Description: 巡检记录 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PatrolRecordEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-07-27
+	**/
+	PageInfo<PatrolRecordEntity> queryRecordPage(BaseQO<PatrolRecordEntity> baseQO);
 }

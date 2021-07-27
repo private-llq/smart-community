@@ -1,9 +1,18 @@
 package com.jsy.community.entity.property;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -44,6 +53,24 @@ public class PatrolRecordEntity implements Serializable {
 	 * 打卡时间
 	 */
 	private LocalDateTime patrolTime;
+	
+	/**
+	 * 查询条件 开始时间
+	 */
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+	@TableField(exist = false)
+	private LocalDate startTime;
+	
+	/**
+	 * 查询条件 结束时间
+	 */
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+	@TableField(exist = false)
+	private LocalDate endTime;
 	
 	/**
 	 * 设备编号

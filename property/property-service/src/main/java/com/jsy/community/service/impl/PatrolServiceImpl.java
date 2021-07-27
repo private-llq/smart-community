@@ -397,5 +397,32 @@ public class PatrolServiceImpl implements IPatrolService {
 		patrolRecordMapper.addBatch(recordList);
 		return "OK";
 	}
+	
+	/**
+	* @Description: 巡检记录 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.PatrolRecordEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-07-27
+	**/
+	public PageInfo<PatrolRecordEntity> queryRecordPage(BaseQO<PatrolRecordEntity> baseQO){
+		Page<PatrolRecordEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		PatrolRecordEntity query = baseQO.getQuery();
+		QueryWrapper<PatrolRecordEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("*");
+		queryWrapper.eq("community_id",query.getCommunityId());
+		if(query.getStartTime() != null){
+			queryWrapper.ge("DATE(patrol_time)",query.getStartTime());
+		}
+		if(query.getEndTime() != null){
+			queryWrapper.le("DATE(patrol_time)",query.getEndTime());
+		}
+		queryWrapper.orderByDesc("patrol_time");
+		Page<PatrolRecordEntity> pageData = patrolRecordMapper.selectPage(page, queryWrapper);
+		PageInfo<PatrolRecordEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData,pageInfo);
+		return pageInfo;
+	}
 	//===================== 巡检记录end ======================
 }
