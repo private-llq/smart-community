@@ -10,14 +10,17 @@ import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PatrolEquipEntity;
 import com.jsy.community.entity.property.PatrolLineEntity;
 import com.jsy.community.entity.property.PatrolPointEntity;
+import com.jsy.community.entity.property.PatrolRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.PatrolEquipMapper;
 import com.jsy.community.mapper.PatrolLineMapper;
 import com.jsy.community.mapper.PatrolPointMapper;
+import com.jsy.community.mapper.PatrolRecordMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -33,6 +37,7 @@ import java.util.*;
  * @description 物业巡检实现类
  * @since 2021-07-23 15:41
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 public class PatrolServiceImpl implements IPatrolService {
 	
@@ -47,6 +52,9 @@ public class PatrolServiceImpl implements IPatrolService {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IHouseService houseService;
+	
+	@Autowired
+	private PatrolRecordMapper patrolRecordMapper;
 	
 	//===================== 巡检设备start ======================
 	/**
@@ -116,6 +124,16 @@ public class PatrolServiceImpl implements IPatrolService {
 	@Override
 	public boolean deleteEquip(Long id,Long communityId){
 		return patrolEquipMapper.delete(new QueryWrapper<PatrolEquipEntity>().eq("id",id).eq("community_id",communityId)) == 1;
+	}
+	
+	/**
+	 * 品牌和number(设备编号)查设备名称及设备所属社区ID
+	 */
+	private PatrolEquipEntity queryEquipNameAndCommunityId(Long brandId, String number){
+		PatrolEquipEntity entity = patrolEquipMapper.selectOne(new QueryWrapper<PatrolEquipEntity>()
+			.select("name,community_id").eq("number", number).eq("brand_id", brandId)
+		);
+		return entity;
 	}
 	//===================== 巡检设备end ======================
 	//===================== 巡检点位start ======================
@@ -210,6 +228,13 @@ public class PatrolServiceImpl implements IPatrolService {
 	}
 	
 	/**
+	 * 批量查询编号与实体对应关系
+	 */
+	private Map<String, PatrolPointEntity> queryPointByNumberBatch(Collection<String> nums, Long brandId){
+		return patrolPointMapper.queryByNumberBatch(nums, brandId);
+	}
+	
+	/**
 	 * 检查巡检点位数据真实性
 	 */
 	private void checkPointList(List<Long> idList,Long communityId){
@@ -219,7 +244,6 @@ public class PatrolServiceImpl implements IPatrolService {
 		}
 	}
 	//===================== 巡检点位end ======================
-	
 	//===================== 巡检线路start ======================
 	/**
 	 * @Description: 添加巡检线路
@@ -327,4 +351,51 @@ public class PatrolServiceImpl implements IPatrolService {
 		return true;
 	}
 	//===================== 巡检线路end ======================
+	//===================== 巡检记录start ======================
+	/**
+	* @Description: 巡检记录入库
+	 * @Param: [recordList, brandId, equipNumer]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021-07-27
+	**/
+	@Override
+	public String addRecord(List<PatrolRecordEntity> recordList, Long brandId, String equipNumber){
+		//查设备社区ID和设备名称
+		PatrolEquipEntity patrolEquipEntity = queryEquipNameAndCommunityId(brandId, equipNumber);
+		if(patrolEquipEntity == null){
+			log.error("系统无该设备编号：" + equipNumber + "，品牌ID：" + brandId);
+			return "OK";
+		}
+		//批量查巡检点名称与编号对应关系，并设置
+		Set<String> pointNumberSet = new HashSet<>();
+		for(PatrolRecordEntity recordEntity : recordList){
+			pointNumberSet.add(recordEntity.getPointNumber());
+		}
+		Map<String, PatrolPointEntity> pointMap = queryPointByNumberBatch(pointNumberSet, brandId);
+		ArrayList<String> errorList = new ArrayList<>();
+		for(PatrolRecordEntity recordEntity : recordList){
+			recordEntity.setId(SnowFlake.nextId());
+			PatrolPointEntity pointEntity = pointMap.get(recordEntity.getPointNumber());
+			//为空表示系统没有录入该巡检点
+			//没有终止所有操作：批量操作为了不影响其他数据入库
+			//本条数据也依然入库：为了记录没有录入系统的巡检点编号
+			if(pointEntity != null){
+				recordEntity.setPointName(pointMap.get(recordEntity.getPointNumber()).getName());
+				recordEntity.setPointAddress(pointMap.get(recordEntity.getPointNumber()).getAddress());
+			}else{
+				errorList.add(recordEntity.getPointNumber());
+			}
+			//设置设备名称和小区ID
+			recordEntity.setCommunityId(patrolEquipEntity.getCommunityId());
+			recordEntity.setEquipName(patrolEquipEntity.getName());
+		}
+		if(!CollectionUtils.isEmpty(errorList)){
+			log.error("系统无以下巡检点：" + errorList);
+		}
+		//批量新增
+		patrolRecordMapper.addBatch(recordList);
+		return "OK";
+	}
+	//===================== 巡检记录end ======================
 }

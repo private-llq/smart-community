@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.PatrolRecordMapper">
+
+    <!-- 批量新增 -->
+    <insert id="addBatch">
+        insert into t_patrol_record
+        values
+        <foreach collection="recordList" item="record" separator=",">
+            (#{record.id},#{record.communityId},#{record.pointNumber},#{record.pointName},#{record.pointAddress},#{record.patrolTime},#{record.equipNumber},#{record.equipName})
+        </foreach>
+    </insert>
+
+</mapper>

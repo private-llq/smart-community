@@ -3,8 +3,11 @@ package com.jsy.community.api;
 import com.jsy.community.entity.property.PatrolEquipEntity;
 import com.jsy.community.entity.property.PatrolLineEntity;
 import com.jsy.community.entity.property.PatrolPointEntity;
+import com.jsy.community.entity.property.PatrolRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+
+import java.util.List;
 
 /**
  * @author chq459799974
@@ -120,4 +123,13 @@ public interface IPatrolService {
 	 * @Date: 2021-07-26
 	**/
 	boolean deleteLine(Long id,Long communityId);
+	
+	/**
+	* @Description: 巡检记录入库
+	 * @Param: [recordList, brandId, equipNumer]
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2021-07-27
+	**/
+	String addRecord(List<PatrolRecordEntity> recordList, Long brandId, String equipNumer);
 }

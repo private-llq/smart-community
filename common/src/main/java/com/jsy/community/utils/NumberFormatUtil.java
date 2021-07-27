@@ -9,7 +9,7 @@ import java.util.Locale;
  * @description TODO
  * @since 2021-07-23 10:42
  **/
-public class TestUtil {
+public class NumberFormatUtil {
 	private final static char[] mChars = "0123456789ABCDEF".toCharArray();
 	private final static String mHexStr = "0123456789ABCDEF";
 	
@@ -408,6 +408,9 @@ public class TestUtil {
 	}
 	public static int hexStrToInt(String hex) {
 		return new BigInteger(hex,16).intValue();
+	}
+	public static long hexStrToLong(String hex) {
+		return new BigInteger(hex,16).longValue();
 	}
 	public static String hexStrToStr(String hex) {
 		return String.valueOf(hexStrToInt(hex));

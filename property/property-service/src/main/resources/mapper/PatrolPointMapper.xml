@@ -19,4 +19,14 @@
         where id = #{entity.id} and community_id = #{entity.communityId}
     </update>
 
+    <!-- 批量查询编号与实体对应关系 -->
+    <select id="queryByNumberBatch" resultType="com.jsy.community.entity.property.PatrolPointEntity">
+        select number,name,address from t_patrol_point
+        where number in
+        <foreach collection="nums" item="num" separator="," open="(" close=")">
+            #{num}
+        </foreach>
+        and brand_id = #{brandId}
+    </select>
+
 </mapper>

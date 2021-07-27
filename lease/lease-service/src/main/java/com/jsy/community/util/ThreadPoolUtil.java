@@ -11,11 +11,11 @@ import java.util.concurrent.*;
  **/
 @Slf4j
 public class ThreadPoolUtil {
-	public static ThreadPoolExecutor threadpool = new ThreadPoolExecutor(50, 500, 5, TimeUnit.SECONDS,
+	public static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(50, 500, 5, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(100000));
 	
 	public static void main(String[] args) {
-		Future<?> submit = ThreadPoolUtil.threadpool.submit(new Runnable() {
+		Future<?> submit = ThreadPoolUtil.threadPool.submit(new Runnable() {
 			@Override
 			public void run() {
 				System.out.println(1);

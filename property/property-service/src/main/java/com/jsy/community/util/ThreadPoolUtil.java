@@ -1,4 +1,4 @@
-package com.jsy.community.utils;
+package com.jsy.community.util;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,7 +11,7 @@ import java.util.concurrent.*;
  **/
 @Slf4j
 public class ThreadPoolUtil {
-	public static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(50, 500, 5, TimeUnit.SECONDS,
+	public final static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(50, 500, 5, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(100000));
 	
 	public static void main(String[] args) {
