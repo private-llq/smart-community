@@ -296,7 +296,7 @@ public class PatrolServiceImpl implements IPatrolService {
 		if(!CollectionUtils.isEmpty(pageData.getRecords())){
 			if(!StringUtils.isEmpty(query.getId())){
 				//查询并设置线路已绑定的巡更点
-				pageData.getRecords().get(0).setPointIdList(patrolLineMapper.queryBindPointList(query.getId()));
+				pageData.getRecords().get(0).setPointIdStrList(patrolLineMapper.queryBindPointIdStrList(query.getId()));
 			}
 		}
 		PageInfo<PatrolLineEntity> pageInfo = new PageInfo<>();

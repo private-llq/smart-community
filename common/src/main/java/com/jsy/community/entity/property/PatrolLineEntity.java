@@ -49,6 +49,12 @@ public class PatrolLineEntity extends BaseEntity {
 	private List<Long> pointIdList;
 	
 	/**
+	 * 巡检点位IDStr集合
+	 */
+	@TableField(exist = false)
+	private List<String> pointIdStrList;
+	
+	/**
 	 * 巡检开始时间
 	 */
 	@JsonDeserialize(using = LocalTimeDeserializer.class)

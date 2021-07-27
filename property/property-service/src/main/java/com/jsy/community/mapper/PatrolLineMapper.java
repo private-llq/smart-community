@@ -36,14 +36,14 @@ public interface PatrolLineMapper extends BaseMapper<PatrolLineEntity> {
 	void addLinePoint(@Param("lineId")Long lineId, @Param("pointIds")Collection<Long> pointIds);
 	
 	/**
-	* @Description: 查询线路绑定的巡更点id
+	* @Description: 查询线路绑定的巡更点idStr
 	 * @Param: [lineId]
-	 * @Return: java.util.List<java.lang.Long>
+	 * @Return: java.util.List<java.lang.String>
 	 * @Author: chq459799974
 	 * @Date: 2021-07-26
 	**/
 	@Select("select point_id from t_patrol_line_point where line_id = #{lineId}")
-	List<Long> queryBindPointList(Long lineId);
+	List<String> queryBindPointIdStrList(Long lineId);
 	
 	/**
 	* @Description: 修改巡检线路
