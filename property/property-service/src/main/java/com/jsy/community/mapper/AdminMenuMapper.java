@@ -54,7 +54,6 @@ public interface AdminMenuMapper extends BaseMapper<AdminMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
-	@Deprecated
 	List<Long> getIdBelongList(List<Long> ids);
 	
 	/**

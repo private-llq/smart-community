@@ -1,6 +1,7 @@
 package com.jsy.community.entity.admin;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -13,7 +14,7 @@ import java.util.List;
  **/
 @Data
 @TableName("t_admin_role_menu")
-public class AdminRoleMenuEntity {
+public class AdminRoleMenuEntity extends BaseEntity {
 	
 	@NotNull(message = "缺少角色ID")
 	private Long roleId;//角色ID

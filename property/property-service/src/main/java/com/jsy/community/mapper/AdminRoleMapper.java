@@ -18,7 +18,7 @@ import java.util.Set;
 @Mapper
 public interface AdminRoleMapper extends BaseMapper<AdminRoleEntity> {
 	/**
-	 * @Description: 备份角色菜单
+	 * @Description: 查询角色菜单ids
 	 * @Param: [roleId]
 	 * @Return: java.util.List<java.lang.Long>
 	 * @Author: chq459799974

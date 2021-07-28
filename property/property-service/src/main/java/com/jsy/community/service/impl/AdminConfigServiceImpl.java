@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyException;
@@ -16,8 +17,11 @@ import com.jsy.community.mapper.AdminCommunityMapper;
 import com.jsy.community.mapper.AdminMenuMapper;
 import com.jsy.community.mapper.AdminRoleMapper;
 import com.jsy.community.mapper.AdminUserMenuMapper;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -27,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -55,7 +60,6 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;
-
 	
 	@Autowired
 	private AdminCommunityMapper adminCommunityMapper;
@@ -161,7 +165,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		return false;
 	}
 	
-	//==================================================== Role角色 (旧) ===============================================================
+	//==================================================== Role角色 ===============================================================
 	/**
 	 * @Description: 添加角色
 	 * @Param: [sysRoleEntity]
@@ -170,12 +174,14 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public boolean addRole(AdminRoleEntity sysRoleEntity){
-		int result = adminRoleMapper.insert(sysRoleEntity);
-		if(result == 1){
-			return true;
+	@Transactional(rollbackFor = Exception.class)
+	public boolean addRole(AdminRoleEntity adminRoleEntity){
+		adminRoleEntity.setId(SnowFlake.nextId());
+		//设置角色菜单
+		if(!CollectionUtils.isEmpty(adminRoleEntity.getMenuIds())){
+			setRoleMenus(adminRoleEntity.getMenuIds(),adminRoleEntity.getId());
 		}
-		return false;
+		return adminRoleMapper.insert(adminRoleEntity) == 1;
 	}
 	
 	/**
@@ -186,12 +192,8 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public boolean delRole(Long id){
-		int result = adminRoleMapper.deleteById(id);
-		if(result == 1){
-			return true;
-		}
-		return false;
+	public boolean delRole(Long id, Long communityId){
+		return adminRoleMapper.delete(new QueryWrapper<AdminRoleEntity>().eq("id",id).eq("community_id",communityId)) == 1;
 	}
 	
 	/**
@@ -202,29 +204,52 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public boolean updateRole(AdminRoleQO sysRoleOQ){
+	@Transactional(rollbackFor = Exception.class)
+	public boolean updateRole(AdminRoleQO adminRoleOQ){
 		AdminRoleEntity entity = new AdminRoleEntity();
-		BeanUtils.copyProperties(sysRoleOQ,entity);
-		int result = adminRoleMapper.updateById(entity);
-		if(result == 1){
-			return true;
+		BeanUtils.copyProperties(adminRoleOQ,entity);
+		entity.setCommunityId(null);
+		//更新角色菜单
+		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
+			setRoleMenus(entity.getMenuIds(),entity.getId());
 		}
-		return false;
+		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("community_id",adminRoleOQ.getCommunityId())) == 1;
 	}
 	
 	/**
-	 * @Description: 角色列表
+	 * @Description: 角色列表 分页查询
 	 * @Param: []
 	 * @Return: java.util.List<com.jsy.community.entity.sys.SysRoleEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public List<AdminRoleEntity> listOfRole(){
-		return adminRoleMapper.selectList(new QueryWrapper<AdminRoleEntity>().select("*"));
+	public PageInfo<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO){
+		Page<AdminRoleEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		AdminRoleEntity query = baseQO.getQuery();
+		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("id,name,remark,create_time");
+		queryWrapper.eq("community_id",query.getCommunityId());
+		if(!StringUtils.isEmpty(query.getName())){
+			queryWrapper.like("name",query.getName());
+		}
+		if(query.getId() != null){
+			//查详情
+			queryWrapper.eq("id",query.getId());
+		}
+		Page<AdminRoleEntity> pageData = adminRoleMapper.selectPage(page,queryWrapper);
+		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+			//查菜单权限
+			AdminRoleEntity entity = pageData.getRecords().get(0);
+			entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getId()));
+		}
+		PageInfo<AdminRoleEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData,pageInfo);
+		return pageInfo;
 	}
 	
-	//==================================================== 角色-菜单 (旧) ===============================================================
+	//==================================================== 角色-菜单 ===============================================================
 	/**
 	 * @Description: 为角色设置菜单
 	 * @Param: [menuIds, roleId]
@@ -232,40 +257,19 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
-	@Deprecated
 	@Override
-	public boolean setRoleMenus(List<Long> menuIds,Long roleId){
+	public void setRoleMenus(List<Long> menuIds,Long roleId){
 		//设置子菜单
 		if(!CollectionUtils.isEmpty(menuIds)){
-//			List<Long> subIdList = sysMenuMapper.getSubIdList(menuIds);
 			List<Long> idBelongList = adminMenuMapper.getIdBelongList(menuIds);
 			menuIds.addAll(idBelongList);
 		}
 		//去重
 		Set<Long> menuIdsSet = new HashSet<>(menuIds);
-		//备份
-		List<Long> menuBackup = adminRoleMapper.getRoleMenu(roleId);
 		//清空
 		adminRoleMapper.clearRoleMenu(roleId);
 		//新增
-		int rows = 0;
-		try{
-			rows = adminRoleMapper.addRoleMenuBatch(menuIdsSet, roleId);
-		}catch (Exception e){
-			//还原
-			log.error("设置角色菜单出错：" + roleId + "成功条数：" + rows);
-			adminRoleMapper.clearRoleMenu(roleId);
-			adminRoleMapper.addRoleMenuBatch(new HashSet<>(menuBackup), roleId);
-			return false;
-		}
-		//还原
-		if(rows != menuIdsSet.size()){
-			log.error("设置角色菜单异常：" + roleId + "成功条数：" + rows);
-			adminRoleMapper.clearRoleMenu(roleId);
-			adminRoleMapper.addRoleMenuBatch(new HashSet<>(menuBackup), roleId);
-			return false;
-		}
-		return true;
+		adminRoleMapper.addRoleMenuBatch(menuIdsSet, roleId);
 	}
 	
 	//==================================================== 用户-菜单 (旧) ===============================================================
@@ -398,7 +402,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	@Override
 	public List<AdminMenuEntity> listOfMenu() {
-		List<AdminMenuEntity> list = null;
+		List<AdminMenuEntity> list;
 		try{
 			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
 		}catch (Exception e){
@@ -429,7 +433,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	private List<AdminMenuEntity> queryMenu(){
 		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*").eq("pid", 0));
-		setChildren(menuList,new LinkedList<AdminMenuEntity>());
+		setChildren(menuList,new LinkedList<>());
 		return menuList;
 	}
 	/**
@@ -440,7 +444,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			for(AdminMenuEntity adminMenuEntity : parentList){
 				childrenList = adminMenuMapper.getChildrenList(adminMenuEntity.getId());
 				adminMenuEntity.setChildren(childrenList);
-				setChildren(childrenList,new LinkedList<AdminMenuEntity>());
+				setChildren(childrenList,new LinkedList<>());
 			}
 		}
 	}

@@ -4,8 +4,10 @@ package com.jsy.community.api;
 import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.List;
 
@@ -70,7 +72,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean delRole(Long id);
+	boolean delRole(Long id, Long communityId);
 	
 	/**
 	* @Description: 修改角色
@@ -82,13 +84,13 @@ public interface IAdminConfigService {
 	boolean updateRole(AdminRoleQO adminRoleQO);
 	
 	/**
-	* @Description: 角色列表
+	* @Description: 角色列表 分页查询
 	 * @Param: []
 	 * @Return: java.util.List<com.jsy.community.entity.sys.SysRoleEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	List<AdminRoleEntity> listOfRole();
+	PageInfo<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO);
 	
 	//==================================================== 角色-菜单 ===============================================================
 	
@@ -99,7 +101,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
-	boolean setRoleMenus(List<Long> menuIds, Long roleId);
+	void setRoleMenus(List<Long> menuIds, Long roleId);
 	
 	//==================================================== 用户-菜单 ===============================================================
 	/**
