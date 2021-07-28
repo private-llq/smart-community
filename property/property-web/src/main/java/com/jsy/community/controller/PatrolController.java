@@ -11,19 +11,26 @@ import com.jsy.community.entity.property.PatrolPointEntity;
 import com.jsy.community.entity.property.PatrolRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.NumberFormatUtil;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author chq459799974
@@ -291,7 +298,7 @@ public class PatrolController {
 		return patrolService.addRecord(recordList,1L,equipNumberStr);
 	}
 	
-	//==================== 巡检记录查询 =========================
+	//==================== 巡检记录start =========================
 	/**
 	* @Description: 巡检记录 分页查询
 	 * @Param: [baseQO]
@@ -305,6 +312,76 @@ public class PatrolController {
 			baseQO.setQuery(new PatrolRecordEntity());
 		}
 		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
-		return CommonResult.ok(patrolService.queryRecordPage(baseQO),"查询成功");
+		return CommonResult.ok(patrolService.queryRecordPage(baseQO,0),"查询成功");
 	}
+	
+	//巡检记录 导出
+	@RequestMapping("/record/export")
+	public void exportRecord(HttpServletResponse response, @RequestBody BaseQO<PatrolRecordEntity> baseQO) throws UnsupportedEncodingException{
+		
+		/*导出(写)*/
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("Sheet1");
+		
+		//表单样式
+		sheet.setDefaultRowHeightInPoints(20);
+		//sheet.addMergedRegion(new CellRangeAddress(0, 0, 8, 9));//合并
+		int[] width = {20,50,20};
+		for(int k=0;k<width.length;k++){
+			sheet.setColumnWidth(k, 256*width[k]+184);//设置列宽
+		}
+		
+		//字体样式
+		HSSFFont font = wb.createFont();
+		font.setBold(true);//粗体
+		font.setFontHeightInPoints((short) 13);//字体高度
+		//行列样式
+		HSSFCellStyle cellStyle = wb.createCellStyle();
+		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);//设置填充
+		cellStyle.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());//设置前景色LIGHT_TURQUOISE
+//		cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_BLUE.getIndex());//设置背景色SKY_BLUE
+		cellStyle.setFont(font);//设置字体
+		
+		//设置表头
+		HSSFRow row2 = sheet.createRow(0);
+		String[] title = {"巡更点名称","地址","巡检时间"};
+		for(int y=0;y<title.length;y++){
+			HSSFCell cell = row2.createCell(y);
+			cell.setCellValue(title[y]);
+			cell.setCellStyle(cellStyle);
+		}
+		
+		String fileName = "巡更记录.xls";
+		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		List<PatrolRecordEntity> recordList = (List<PatrolRecordEntity>) patrolService.queryRecordPage(baseQO,1);
+		for(int i=0;i<recordList.size();i++){
+			PatrolRecordEntity record = recordList.get(i);
+			HSSFRow row3 = sheet.createRow(1+i);
+			row3.createCell(0).setCellValue(record.getPointName());
+			row3.createCell(1).setCellValue(record.getPointAddress());
+			row3.createCell(2).setCellValue(record.getPatrolTime().toString().replace("T"," "));
+		}
+		
+		response.setContentType("application/octets/stream");
+		response.setHeader("Content-Disposition","attachment;filename="+new String(fileName.getBytes("gb2312"),"ISO8859-1"));
+		OutputStream output = null;
+		try {
+			output= response.getOutputStream();
+			wb.write(output);
+			output.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally{
+			try {
+				if(output != null){
+					output.close();
+					System.out.println("导出完成");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	//==================== 巡检记录end =========================
 }
