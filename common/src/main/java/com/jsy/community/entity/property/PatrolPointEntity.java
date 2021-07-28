@@ -42,12 +42,20 @@ public class PatrolPointEntity extends BaseEntity {
 	 * 所属楼栋
 	 */
 	private Long buildingId;
+	private String buildingIdStr;
+	public String getBuildingIdStr(){
+		return String.valueOf(buildingId);
+	}
 	private String buildingName;
 	
 	/**
 	 * 所属单元
 	 */
 	private Long unitId;
+	private String unitIdStr;
+	public String getUnitIdStr(){
+		return String.valueOf(unitId);
+	}
 	private String unitName;
 	
 	/**
