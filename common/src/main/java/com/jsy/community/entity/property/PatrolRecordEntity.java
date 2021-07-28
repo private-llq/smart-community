@@ -52,9 +52,6 @@ public class PatrolRecordEntity implements Serializable {
 	/**
 	 * 打卡时间
 	 */
-	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonSerialize(using = LocalDateSerializer.class)
-	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
 	private LocalDateTime patrolTime;
 	
 	/**
