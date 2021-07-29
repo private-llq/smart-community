@@ -257,8 +257,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	 **/
-	@Override
-	public void setRoleMenus(List<Long> menuIds,Long roleId){
+	private void setRoleMenus(List<Long> menuIds,Long roleId){
 		//设置子菜单
 		/*if(!CollectionUtils.isEmpty(menuIds)){
 			List<Long> idBelongList = adminMenuMapper.getIdBelongList(menuIds);
@@ -311,20 +310,33 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			}
 		}
 		menuEntityList.removeAll(returnList);
-		for(AdminMenuEntity adminMenuEntity : menuEntityList){
-			for(AdminMenuEntity fatherEntity : returnList){
-				if(adminMenuEntity.getPid().equals(fatherEntity.getId())){
-					if(!CollectionUtils.isEmpty(fatherEntity.getChildren())){
-						fatherEntity.getChildren().add(adminMenuEntity);
+		setChildrenMenu(returnList,menuEntityList);
+		return returnList;
+	}
+	
+	/**
+	 * 组装子菜单
+	 */
+	private void setChildrenMenu(List<AdminMenuEntity> childrenList,List<AdminMenuEntity> childrenCopy){
+		List<AdminMenuEntity> selected = new ArrayList<>();
+		for(AdminMenuEntity child : childrenList){
+			for(AdminMenuEntity entity : childrenCopy){
+				if(entity.getPid().equals(child.getId())){
+					if(!CollectionUtils.isEmpty(child.getChildren())){
+						child.getChildren().add(entity);
 					}else{
-						List<AdminMenuEntity> childrenList = new ArrayList<>();
-						childrenList.add(adminMenuEntity);
-						fatherEntity.setChildren(childrenList);
+						List<AdminMenuEntity> childOfChild = new ArrayList<>();
+						childOfChild.add(entity);
+						child.setChildren(childOfChild);
 					}
+					selected.add(entity);
 				}
 			}
+			if(!CollectionUtils.isEmpty(child.getChildren())){
+				setChildrenMenu(child.getChildren(),childrenCopy);
+			}
+		childrenCopy.removeAll(selected);
 		}
-		return returnList;
 	}
 	
 	/**

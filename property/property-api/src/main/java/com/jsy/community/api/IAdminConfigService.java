@@ -92,17 +92,6 @@ public interface IAdminConfigService {
 	**/
 	PageInfo<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO);
 	
-	//==================================================== 角色-菜单 ===============================================================
-	
-	/**
-	* @Description: 为角色设置菜单
-	 * @Param: [menuIds, roleId]
-	 * @Return: boolean
-	 * @Author: chq459799974
-	 * @Date: 2020/12/15
-	**/
-	void setRoleMenus(List<Long> menuIds, Long roleId);
-	
 	//==================================================== 用户-菜单 ===============================================================
 	/**
 	* @Description: 查询用户菜单权限(老接口，暂时弃用)
