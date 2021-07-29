@@ -5,18 +5,13 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminRoleEntity;
-import com.jsy.community.entity.admin.AdminRoleMenuEntity;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author chq459799974
@@ -42,7 +37,7 @@ public class AdminRoleController {
 	@PostMapping("")
 	public CommonResult addRole(@RequestBody AdminRoleEntity adminRoleEntity){
 		ValidatorUtils.validateEntity(adminRoleEntity);
-		adminRoleEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		adminRoleEntity.setCompanyId(UserUtils.getAdminCompanyId());
 		return adminConfigService.addRole(adminRoleEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
 	}
 	
@@ -55,7 +50,7 @@ public class AdminRoleController {
 	**/
 	@DeleteMapping("")
 	public CommonResult delRole(@RequestParam("id") Long id){
-		return adminConfigService.delRole(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
+		return adminConfigService.delRole(id,UserUtils.getAdminCompanyId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
 	
 	/**
@@ -70,7 +65,7 @@ public class AdminRoleController {
 		if(adminRoleQO.getId() == null){
 			return CommonResult.error("缺少ID");
 		}
-		adminRoleQO.setCommunityId(UserUtils.getAdminCommunityId());
+		adminRoleQO.setCompanyId(UserUtils.getAdminCompanyId());
 		return adminConfigService.updateRole(adminRoleQO) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
@@ -86,7 +81,7 @@ public class AdminRoleController {
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new AdminRoleEntity());
 		}
-		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
 		return CommonResult.ok(adminConfigService.queryPage(baseQO),"查询成功");
 	}
 }

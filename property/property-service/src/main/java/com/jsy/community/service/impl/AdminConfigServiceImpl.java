@@ -192,8 +192,8 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public boolean delRole(Long id, Long communityId){
-		return adminRoleMapper.delete(new QueryWrapper<AdminRoleEntity>().eq("id",id).eq("community_id",communityId)) == 1;
+	public boolean delRole(Long id, Long companyId){
+		return adminRoleMapper.delete(new QueryWrapper<AdminRoleEntity>().eq("id",id).eq("company_id",companyId)) == 1;
 	}
 	
 	/**
@@ -208,12 +208,12 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	public boolean updateRole(AdminRoleQO adminRoleOQ){
 		AdminRoleEntity entity = new AdminRoleEntity();
 		BeanUtils.copyProperties(adminRoleOQ,entity);
-		entity.setCommunityId(null);
+		entity.setCompanyId(null);
 		//更新角色菜单
 		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
 			setRoleMenus(entity.getMenuIds(),entity.getId());
 		}
-		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("community_id",adminRoleOQ.getCommunityId())) == 1;
+		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
 	}
 	
 	/**
@@ -230,7 +230,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		AdminRoleEntity query = baseQO.getQuery();
 		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("id,name,remark,create_time");
-		queryWrapper.eq("community_id",query.getCommunityId());
+		queryWrapper.eq("company_id",query.getCompanyId());
 		if(!StringUtils.isEmpty(query.getName())){
 			queryWrapper.like("name",query.getName());
 		}

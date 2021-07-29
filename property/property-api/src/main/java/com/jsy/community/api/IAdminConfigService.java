@@ -72,7 +72,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean delRole(Long id, Long communityId);
+	boolean delRole(Long id, Long companyId);
 	
 	/**
 	* @Description: 修改角色

@@ -17,7 +17,7 @@ import java.util.List;
 @TableName("t_admin_role")
 public class AdminRoleEntity extends BaseEntity {
 	
-	private Long communityId;//社区ID
+	private Long companyId;//物业公司ID
 	
 	@NotBlank(message = "角色名不能为空")
 	private String name;//角色名

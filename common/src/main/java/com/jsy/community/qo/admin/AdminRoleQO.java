@@ -18,8 +18,8 @@ public class AdminRoleQO implements Serializable {
 	@ApiModelProperty(value = "ID")
 	private Long id;
 	
-	@ApiModelProperty(value = "社区ID")
-	private Long communityId;
+	@ApiModelProperty(value = "物业公司ID")
+	private Long companyId;
 	
 	@ApiModelProperty(value = "角色名")
 	private String name;
