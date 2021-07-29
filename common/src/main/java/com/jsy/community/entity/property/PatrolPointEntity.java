@@ -1,5 +1,6 @@
 package com.jsy.community.entity.property;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
@@ -42,20 +43,24 @@ public class PatrolPointEntity extends BaseEntity {
 	 * 所属楼栋
 	 */
 	private Long buildingId;
+	@TableField(exist = false)
 	private String buildingIdStr;
 	public String getBuildingIdStr(){
 		return String.valueOf(buildingId);
 	}
+	@TableField(exist = false)
 	private String buildingName;
 	
 	/**
 	 * 所属单元
 	 */
 	private Long unitId;
+	@TableField(exist = false)
 	private String unitIdStr;
 	public String getUnitIdStr(){
 		return String.valueOf(unitId);
 	}
+	@TableField(exist = false)
 	private String unitName;
 	
 	/**
