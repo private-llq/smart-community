@@ -109,6 +109,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	}
 	
 	/**
+	* @Description: id单查小区
+	 * @Param: [communityId]
+	 * @Return: com.jsy.community.entity.CommunityEntity
+	 * @Author: chq459799974
+	 * @Date: 2021-07-29
+	**/
+	@Override
+	public CommunityEntity queryDetails(Long communityId){
+		return communityMapper.selectOne(new QueryWrapper<CommunityEntity>().select("*").eq("id",communityId));
+	}
+	
+	/**
 	 * 获取社区电子地图
 	 */
 	@Override

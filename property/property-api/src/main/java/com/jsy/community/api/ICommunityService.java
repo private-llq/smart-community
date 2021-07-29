@@ -74,6 +74,15 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	List<CommunityEntity> queryCommunityBatch(List<Long> idList);
 	
 	/**
+	* @Description: id单查小区
+	 * @Param: [communityId]
+	 * @Return: com.jsy.community.entity.CommunityEntity
+	 * @Author: chq459799974
+	 * @Date: 2021-07-29
+	**/
+	CommunityEntity queryDetails(Long communityId);
+	
+	/**
 	 * @return java.util.Map<java.lang.String,java.lang.Object>
 	 * @Author lihao
 	 * @Description 查询电子地图

@@ -74,6 +74,19 @@ public class CommunityController {
 		Map<String, Object> map = communityService.getElectronicMap(communityId);
 		return CommonResult.ok(map);
 	}
+	
+	/**
+	* @Description: id单查详情
+	 * @Param: []
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-07-29
+	**/
+	@ApiOperation("id单查详情")
+	@GetMapping("/details")
+	public CommonResult queryDetails(){
+		return CommonResult.ok(communityService.queryDetails(UserUtils.getAdminCommunityId()));
+	}
 
 	/**
 	 * @author: Pipi
