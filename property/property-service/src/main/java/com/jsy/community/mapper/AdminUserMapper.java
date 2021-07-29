@@ -141,6 +141,17 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	**/
 	@Update("update t_admin_user set mobile = #{newMobile} where mobile = #{oldMobile}")
 	int changeMobile(@Param("newMobile")String newMobile, @Param("oldMobile")String oldMobile);
+
+	/**
+	 * @author: Pipi
+	 * @description: 根据用户uid查询单条物业公司ID
+	 * @param uid: 用户uid
+	 * @return: java.lang.Long
+	 * @date: 2021/7/29 11:13
+	 **/
+	@Select("select company_id from t_admin_user_company where uid = #{uid} limit 1")
+	Long queryCompanyId(String uid);
+
 	//========资料或账户相关start ==========
 	
 	//========操作员增删改查start ==========
@@ -185,5 +196,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 **/
 	List<Map<String, Object>> getRepairPerson(@Param("condition")String condition, @Param("communityId") Long communityId);
 	//========用户拓展end ==========
-	
+
+
+
 }

@@ -30,7 +30,8 @@ public class UserUtils {
 	public static final String USER_INFO = "userInfo";
 	public static final String USER_COMMUNITY = "communityId";
 	public static final String USER_COMMUNITY_ID_LIST = "communityIds";
-	
+	public static final String USER_COMPANY_ID = "companyId";
+
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 	
@@ -142,6 +143,19 @@ public class UserUtils {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
 		return (Long) request.getAttribute(USER_COMMUNITY);
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 获取物业端登陆用户物业公司ID
+	 * @param :
+	 * @return: java.lang.Long
+	 * @date: 2021/7/29 11:20
+	 **/
+	public static Long getAdminCompanyId() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+				.getRequest();
+		return (Long) request.getAttribute(USER_COMPANY_ID);
 	}
 	
 	/**

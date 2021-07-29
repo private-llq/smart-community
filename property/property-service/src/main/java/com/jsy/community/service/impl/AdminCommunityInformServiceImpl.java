@@ -311,7 +311,6 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
                     acctName.add(informAcctEntity.getAcctName());
                     pushInfromVO.setAcctName(acctName);
                 }
-
             }
         }
         return pushInfromVO;

@@ -383,7 +383,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		if(communityId != null){
 			queryWrapper.eq("community_id",communityId);
 		}
-		return adminUserMapper.selectOne(queryWrapper);
+		AdminUserEntity adminUserEntity = adminUserMapper.selectOne(queryWrapper);
+		Long companyId = adminUserMapper.queryCompanyId(adminUserEntity.getUid());
+		adminUserEntity.setCompanyId(companyId);
+		return adminUserEntity;
 	}
 	
 	/**

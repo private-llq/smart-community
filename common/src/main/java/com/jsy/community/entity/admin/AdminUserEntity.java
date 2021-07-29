@@ -28,6 +28,10 @@ public class AdminUserEntity extends BaseEntity {
 	 */
 	@TableField(exist = false)
 	private Long communityId;
+
+	// 物业公司ID
+	@TableField(exist = false)
+	private Long companyId;
 	
 	/**
 	 * 有权限的社区ids(List)

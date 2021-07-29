@@ -90,3 +90,4 @@ public class AdminRoleController {
 		return CommonResult.ok(adminConfigService.queryPage(baseQO),"查询成功");
 	}
 }
+
