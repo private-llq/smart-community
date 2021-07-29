@@ -260,10 +260,10 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	@Override
 	public void setRoleMenus(List<Long> menuIds,Long roleId){
 		//设置子菜单
-		if(!CollectionUtils.isEmpty(menuIds)){
+		/*if(!CollectionUtils.isEmpty(menuIds)){
 			List<Long> idBelongList = adminMenuMapper.getIdBelongList(menuIds);
 			menuIds.addAll(idBelongList);
-		}
+		}*/
 		//去重
 		Set<Long> menuIdsSet = new HashSet<>(menuIds);
 		//清空
