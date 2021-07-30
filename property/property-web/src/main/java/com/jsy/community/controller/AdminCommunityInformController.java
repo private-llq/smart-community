@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminCommunityInformService;
@@ -118,7 +119,9 @@ public class AdminCommunityInformController {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new PushInformQO());
         }
-        baseQO.getQuery().setCommunityIds(UserUtils.getAdminUserInfo().getCommunityIdList());
+        if (CollectionUtil.isEmpty(baseQO.getQuery().getCommunityIds())) {
+            baseQO.getQuery().setCommunityIds(UserUtils.getAdminUserInfo().getCommunityIdList());
+        }
         return CommonResult.ok(communityInformService.queryInformList(baseQO));
     }
 
