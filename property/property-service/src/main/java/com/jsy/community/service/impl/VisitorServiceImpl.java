@@ -166,7 +166,7 @@ public class VisitorServiceImpl implements IVisitorService {
 		MultipartFile multipartFile = Base64Util.base64StrToMultipartFile(picBase64.substring(picBase64.indexOf(",") + 1));
 		String snapUrl = null;
 		if(multipartFile != null){
-			snapUrl = MinioUtils.uploadByFaceMachine(multipartFile, "test");
+			snapUrl = MinioUtils.uploadByFaceMachine(multipartFile, "stranger");
 		}
 		long snapTime = jsonObject.getLongValue("snapTime");
 		VisitorStrangerEntity entity = new VisitorStrangerEntity();
