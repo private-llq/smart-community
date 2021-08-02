@@ -58,12 +58,12 @@ public class MinioUtils {
 
 
 	/**
-	 * 文件上传
+	 * 扫脸机 人脸上传
 	 * @param file
 	 * @return
 	 * @throws Exception
 	 */
-	public static String uploadPic(MultipartFile file, String bucketName) {
+	public static String uploadByFaceMachine(MultipartFile file, String bucketName) {
 		try {
 			//获取minio客户端实例
 			minioClient = getMinioClientInstance();
@@ -81,10 +81,7 @@ public class MinioUtils {
 			}else{
 				objectName = getRandomFileName("");
 			}
-			String picType = PicUtil.getPicType(file);
-			if(PicUtil.TYPE_UNKNOWN.equals(picType)){
-				throw new JSYException(JSYError.BAD_REQUEST.getCode(),"非法图片格式！");
-			}
+			String picType = "png"; //base64数据转的，可在base64前缀查看格式，暂时给个PNG能用
 			objectName += "." + picType;
 			// 存储文件
 			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());

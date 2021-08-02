@@ -31,13 +31,25 @@ public class TopicListener {
 	//监听来自小区的访客记录新增需求
 	@RabbitListener(queues = TopicExConfig.QUEUE_VISITOR_HIS_FROM_COMMUNITY)
 	public void addVisitorRecord(String msg, Message message, Channel channel) throws IOException {
-		log.info("监听到来自小区的访客记录新增topic消息: " + msg);
+//		log.info("监听到来自小区的访客进出记录新增topic消息: " + msg);
+		log.info("监听到来自小区的访客进出记录新增topic消息: ");
 		try {
 			JSONObject jsonObject = JSONObject.parseObject(msg);
-			log.info("解析成功：" + jsonObject);
-//			boolean b = visitorService.addVisitorRecord(historyEntity);
+//			log.info("解析成功：" + jsonObject);
+			log.info("解析成功：");
+			switch (jsonObject.getString("op")){
+				case "visitorSync":
+					//访客记录同步
+					break;
+				case "StrangerPush":
+					//陌生人脸推送
+					System.out.println("陌生人脸");
+					visitorService.saveStranger(jsonObject);
+					break;
+			}
+			visitorService.addVisitorRecordBatch(jsonObject);
 		}catch (Exception e){
-			log.error("新增访客记录失败：" + msg);
+			log.error("批量新增访客进出记录失败：" + msg);
 			e.printStackTrace();
 			//手动确认
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
