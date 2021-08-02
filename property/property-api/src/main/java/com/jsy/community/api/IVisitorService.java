@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.jsy.community.entity.VisitorPersonRecordEntity;
+import com.jsy.community.entity.VisitorStrangerEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 
@@ -51,5 +52,14 @@ public interface IVisitorService {
 	 * @Date: 2021-08-02
 	**/
 	void saveStranger(JSONObject jsonObject);
+	
+	/**
+	* @Description: 陌生人记录 分页查询
+	 * @Param: [qo]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorStrangerEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-08-02
+	**/
+	PageInfo<VisitorStrangerEntity> queryStrangerPage(BaseQO<VisitorStrangerEntity> qo);
 	
 }

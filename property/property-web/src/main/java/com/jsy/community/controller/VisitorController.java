@@ -6,6 +6,7 @@ import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorHistoryEntity;
+import com.jsy.community.entity.VisitorStrangerEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -54,6 +55,22 @@ public class VisitorController {
 	@GetMapping("follow")
 	public CommonResult queryFollowPersonListByVisitorId(@RequestParam Long visitorId){
 		return CommonResult.ok(visitorService.queryFollowPersonListByVisitorId(visitorId),"查询成功");
+	}
+	
+	/**
+	* @Description: 陌生人记录 分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021-08-02
+	**/
+	@PostMapping("stranger/page")
+	public CommonResult queryStrangerPage(@RequestBody BaseQO<VisitorStrangerEntity> baseQO){
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new VisitorStrangerEntity());
+		}
+		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(visitorService.queryStrangerPage(baseQO));
 	}
 	
 }

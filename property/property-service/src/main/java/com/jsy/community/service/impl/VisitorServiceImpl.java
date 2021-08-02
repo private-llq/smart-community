@@ -179,4 +179,28 @@ public class VisitorServiceImpl implements IVisitorService {
 		visitorStrangerMapper.insert(entity);
 	}
 	
+	/**
+	* @Description: 陌生人记录 分页查询
+	 * @Param: [qo]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorStrangerEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-08-02
+	**/
+	@Override
+	public PageInfo<VisitorStrangerEntity> queryStrangerPage(BaseQO<VisitorStrangerEntity> qo){
+		Page<VisitorStrangerEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,qo);
+		VisitorStrangerEntity query = qo.getQuery();
+		QueryWrapper<VisitorStrangerEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("id,snap_time,snap_url,machine_name");
+		queryWrapper.eq("community_id",query.getCommunityId());
+		if(!StringUtils.isEmpty(query.getMachineName())){
+			queryWrapper.like("machine_name",query.getMachineName());
+		}
+		Page<VisitorStrangerEntity> pageData = visitorStrangerMapper.selectPage(page,queryWrapper);
+		PageInfo<VisitorStrangerEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData,pageInfo);
+		return pageInfo;
+	}
+	
 }
