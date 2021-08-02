@@ -20,6 +20,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -119,8 +121,12 @@ public class AdminCommunityInformController {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new PushInformQO());
         }
-        if (CollectionUtil.isEmpty(baseQO.getQuery().getCommunityIds())) {
+        if (CollectionUtil.isNotEmpty(UserUtils.getAdminUserInfo().getCommunityIdList())) {
             baseQO.getQuery().setCommunityIds(UserUtils.getAdminUserInfo().getCommunityIdList());
+        }else {
+            List<Long> communityIds = new ArrayList<>();
+            communityIds.add(UserUtils.getAdminCommunityId());
+            baseQO.getQuery().setCommunityIds(communityIds);
         }
         return CommonResult.ok(communityInformService.queryInformList(baseQO));
     }
