@@ -1,12 +1,18 @@
 package com.jsy.community.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceTicketTemplateFieldService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FinanceTicketTemplateFieldEntity;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +33,23 @@ public class PropertyFinanceTicketTemplateFieldController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceTicketTemplateFieldService ticketTemplateFieldService;
 
+    /**
+     * @author: Pipi
+     * @description: 设置票据字段
+     * @param ticketTemplateFieldEntities: 票据字段列表
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/8/3 13:59
+     **/
+    @Login
+    @PostMapping("/addTicketTemplateField")
     public CommonResult addTicketTemplateField(@RequestBody List<FinanceTicketTemplateFieldEntity> ticketTemplateFieldEntities) {
-        return null;
+        if (CollectionUtil.isEmpty(ticketTemplateFieldEntities)) {
+            throw new JSYException(400, "请选择票据字段");
+        }
+        for (FinanceTicketTemplateFieldEntity ticketTemplateFieldEntity : ticketTemplateFieldEntities) {
+            ValidatorUtils.validateEntity(ticketTemplateFieldEntity);
+            ticketTemplateFieldEntity.setId(String.valueOf(SnowFlake.nextId()));
+        }
+        return ticketTemplateFieldService.insertTicketTemplateField(ticketTemplateFieldEntities) > 0 ? CommonResult.ok("保存成功!") : CommonResult.error("保存失败!");
     }
 }
