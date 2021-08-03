@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IPropertyFeeRuleConstService;
 import com.jsy.community.api.IPropertyFeeRuleService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
@@ -32,6 +33,9 @@ public class PropertyFeeRuleController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFeeRuleService propertyFeeRuleService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFeeRuleConstService propertyFeeRuleConstService;
 
     @ApiOperation("查询当前小区物业收费规则")
     @PostMapping("/list")
@@ -77,6 +81,12 @@ public class PropertyFeeRuleController {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.saveOne(userInfo,propertyFeeRuleEntity);
         return CommonResult.ok();
+    }
+    @ApiOperation("查询公共常量")
+    @PostMapping("/getConst")
+//    @Login
+    public CommonResult getConst(){
+        return CommonResult.ok(propertyFeeRuleConstService.listAll());
     }
 
 }

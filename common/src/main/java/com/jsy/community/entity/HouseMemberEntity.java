@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -49,6 +50,11 @@ public class HouseMemberEntity extends BaseEntity {
      * 与业主关系 0.临时，1.业主，6.亲属，7租户
      */
     private Integer relation;
+    /**
+     * 与业主关系 0.临时，1.业主，6.亲属，7租户
+     */
+    @TableField(exist = false)
+    private String relationName;
     /**
      * 标签：1独居，2孤寡，3残疾，4留守
      */

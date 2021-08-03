@@ -1077,4 +1077,166 @@ public interface BusinessEnum {
 		}
 	}
 
+	/**
+	 * @Description:  缴费项目计费方式
+	 * @author: Hu
+	 * @since: 2021/7/30 9:28
+	 * @Param: 
+	 * @return: 
+	 */
+	enum ChargeModeEnum {
+		AREA("按面积", 1),
+		AUANTITY("按量", 2),
+		FAMILY("按户", 3);
+		private String name;
+		private Integer code;
+
+		ChargeModeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static final List<Map<String, Object>> maritalStatusList = new ArrayList<>();
+
+		static {
+			for (ChargeModeEnum entryTypeEnum : ChargeModeEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", entryTypeEnum.getCode());
+				map.put("name", entryTypeEnum.getName());
+				maritalStatusList.add(map);
+			}
+			sourceMap.put("chargeMode",maritalStatusList);
+		}
+	}
+
+	/**
+	 * @Description: 缴费项目类型
+	 * @author: Hu
+	 * @since: 2021/7/30 9:28
+	 * @Param:
+	 * @return:
+	 */
+	enum ProjectTypeEnum {
+		PERIOD("周期", 1),
+		TEMPORARY("临时", 2);
+		private String name;
+		private Integer code;
+
+		ProjectTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static final List<Map<String, Object>> maritalStatusList = new ArrayList<>();
+
+		static {
+			for (ProjectTypeEnum entryTypeEnum : ProjectTypeEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", entryTypeEnum.getCode());
+				map.put("name", entryTypeEnum.getName());
+				maritalStatusList.add(map);
+			}
+			sourceMap.put("projectType",maritalStatusList);
+		}
+	}
+
+	/**
+	 * @Description: 面积计费项目名称
+	 * @author: Hu
+	 * @since: 2021/7/30 9:28
+	 * @Param:
+	 * @return:
+	 */
+	enum AreaCalculationEnum {
+		HIGH_RISE_PROPERTY_FEE("高层物业服务费", 1),
+		LOW_LEVEL_PROPERTY_FEE("低层物业服务费", 2),
+		VILLA_PROPERTY_FEE("别墅物业服务费", 3),
+		PROPERTY_MANAGEMENT_FEES("底商物业服务费", 4),
+		HEATING_FEE("供暖费", 5),
+		AREA_OF_STRUCTURE("建筑面积", 6),
+		CUSTOM("自定义名称", 7);
+		private String name;
+		private Integer code;
+
+		AreaCalculationEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static final List<Map<String, Object>> maritalStatusList = new ArrayList<>();
+
+		static {
+			for (AreaCalculationEnum entryTypeEnum : AreaCalculationEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", entryTypeEnum.getCode());
+				map.put("name", entryTypeEnum.getName());
+				maritalStatusList.add(map);
+			}
+			sourceMap.put("areaCalculation",maritalStatusList);
+		}
+	}
+
 }

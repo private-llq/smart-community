@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.PropertyRelationMapper">
+
     <sql id="Query">
         <where>
-            (thm.deleted=0 and tu.deleted=0 and th.deleted=0) and
-            thm.community_id=#{query.communityId}
+            (thm.deleted=0 and tu.deleted=0 and th.deleted=0)
+            <if test="query.communityId!=null and query.communityId!=0">
+                and thm.community_id=#{query.communityId}
+            </if>
             <if test="query.name!=null and query.name!=''">
                 and thm.name like concat('%',#{query.name},'%')
             </if>
@@ -68,7 +71,7 @@
         limit #{page},#{size}
     </select>
     <select id="pageList" resultType="com.jsy.community.vo.property.HouseMemberVO">
-        SELECT thm.id as id,thm.house_id as houseId,tu.real_name as realName,tu.mobile as mobile,CONCAT(th.building,th.unit,th.number) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
+        SELECT thm.id as id,thm.house_id as houseId,tu.real_name as name,tu.mobile as mobile,CONCAT(th.building,th.unit,th.number) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
         FROM t_house_member thm
         LEFT JOIN t_user tu
         on thm.householder_id=tu.uid
@@ -95,7 +98,10 @@
     </update>
     <sql id="memberQuery">
         <where>
-            thm.deleted=0 and tu.deleted=0 and th.deleted=0 and thm.community_id=#{query.communityId}
+            thm.deleted=0 and tu.deleted=0 and th.deleted=0
+            <if test="query.communityId!=null and query.communityId!=0">
+                and thm.community_id=#{query.communityId}
+            </if>
             <if test="query.key!=null and query.key!=''">
                 and (thm.name like concat("%",#{query.key},"%") or thm.mobile like concat("%",#{query.key},"%") or th.number like concat("%",#{query.key},"%"))
             </if>

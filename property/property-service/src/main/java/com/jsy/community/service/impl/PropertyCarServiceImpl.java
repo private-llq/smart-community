@@ -27,10 +27,12 @@ public class PropertyCarServiceImpl extends ServiceImpl<PropertyCarMapper, Prope
     @Override
     public void updateList(List<ElasticsearchCarQO> cars) {
         Map<Long, ElasticsearchCarQO> map = new HashMap<>();
-        for (ElasticsearchCarQO car : cars) {
-            map.put(car.getId(),car);
+        if (cars!=null&&cars.size()!=0){
+            for (ElasticsearchCarQO car : cars) {
+                map.put(car.getId(),car);
+            }
+            propertyCarMapper.updateMap(map);
         }
-        propertyCarMapper.updateMap(map);
     }
 
     @Override

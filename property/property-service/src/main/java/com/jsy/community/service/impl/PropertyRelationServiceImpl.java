@@ -184,7 +184,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      */
     @Override
     public HouseMemberEntity findOne(Long id) {
-        return propertyRelationMapper.selectById(id);
+        HouseMemberEntity memberEntity = propertyRelationMapper.selectById(id);
+        memberEntity.setRelationName(BusinessEnum.RelationshipEnum.getCode(memberEntity.getRelation()));
+        return memberEntity;
     }
 
 
@@ -214,7 +216,15 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     @Override
     public Map<String, Object> pageList(BaseQO<HouseMemberQO> baseQO) {
         Map<String, Object> map = new HashMap<>();
-        List<HouseMemberVO> list=propertyRelationMapper.pageList(baseQO.getPage(),baseQO.getSize(),baseQO.getQuery());
+        if (baseQO.getPage()==null&&baseQO.getPage()==0)
+        {
+            baseQO.setPage(1L);
+        }
+
+        List<HouseMemberVO> list=propertyRelationMapper.pageList((baseQO.getPage()-1) * baseQO.getSize(),baseQO.getSize(),baseQO.getQuery());
+        for (HouseMemberVO houseMemberVO : list) {
+            houseMemberVO.setRelationName(BusinessEnum.RelationshipEnum.getCode(houseMemberVO.getRelation()));
+        }
         Long total = propertyRelationMapper.pageListTotal(baseQO.getQuery());
         map.put("list",list);
         map.put("total",total);
