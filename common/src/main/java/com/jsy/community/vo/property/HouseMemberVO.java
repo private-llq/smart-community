@@ -27,7 +27,7 @@ public class HouseMemberVO implements Serializable {
     /**
      * 业主姓名
      */
-    private String realName;
+    private String name;
 
     /**
      * 手机号码
@@ -43,6 +43,10 @@ public class HouseMemberVO implements Serializable {
      * 与业主关系 0.临时，1.业主，6.亲属，7租户
      */
     private Integer relation;
+    /**
+     * 与业主关系 0.临时，1.业主，6.亲属，7租户
+     */
+    private String relationName;
 
     /**
      * 租户有效时间
