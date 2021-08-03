@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IVisitorService;
@@ -7,19 +8,23 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.jsy.community.entity.VisitorPersonRecordEntity;
+import com.jsy.community.entity.VisitorStrangerEntity;
 import com.jsy.community.mapper.VisitorHistoryMapper;
 import com.jsy.community.mapper.VisitorMapper;
 import com.jsy.community.mapper.VisitorPersonRecordMapper;
+import com.jsy.community.mapper.VisitorStrangerMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.*;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +46,10 @@ public class VisitorServiceImpl implements IVisitorService {
 	
 	@Autowired
 	private VisitorHistoryMapper visitorHistoryMapper;
+	
+	@Autowired
+	private VisitorStrangerMapper visitorStrangerMapper;
+	
 	
 	/**
 	 * @Description: 访客记录 分页查询(现在主表数据是t_visitor,连表查询，以后主表可能会改为t_visitor_history)
@@ -133,15 +142,65 @@ public class VisitorServiceImpl implements IVisitorService {
 //	}
 	
 	/**
-	* @Description: 新增访客进出记录(数据来自机器)
-	 * @Param: [historyEntity]
-	 * @Return: boolean
+	* @Description: 批量新增访客进出记录
+	 * @Param: [jsonObject]
+	 * @Return: void
 	 * @Author: chq459799974
-	 * @Date: 2021/5/7
+	 * @Date: 2021/7/2
 	**/
 	@Override
-	public boolean addVisitorRecord(VisitorHistoryEntity historyEntity){
-		return visitorHistoryMapper.insert(historyEntity) == 1;
+	public void addVisitorRecordBatch(JSONObject jsonObject){
+		System.out.println(jsonObject);
+		//TODO mybatisplus批量插入
+	}
+	
+	/**
+	* @Description: 陌生人脸上传
+	 * @Param: [jsonObject]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021-08-02
+	**/
+	public void saveStranger(JSONObject jsonObject){
+		String picBase64 = jsonObject.getString("picBase64");
+		MultipartFile multipartFile = Base64Util.base64StrToMultipartFile(picBase64.substring(picBase64.indexOf(",") + 1));
+		String snapUrl = null;
+		if(multipartFile != null){
+			snapUrl = MinioUtils.uploadByFaceMachine(multipartFile, "stranger");
+		}
+		long snapTime = jsonObject.getLongValue("snapTime");
+		VisitorStrangerEntity entity = new VisitorStrangerEntity();
+		entity.setId(SnowFlake.nextId());
+		entity.setCommunityId(jsonObject.getLong("communityId"));
+		entity.setSnapUrl(snapUrl);
+		entity.setSnapTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(snapTime), ZoneId.of("GMT+8")));
+		entity.setMachineId(jsonObject.getString("machineId"));
+		//TODO 查询设备名称
+		visitorStrangerMapper.insert(entity);
+	}
+	
+	/**
+	* @Description: 陌生人记录 分页查询
+	 * @Param: [qo]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorStrangerEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-08-02
+	**/
+	@Override
+	public PageInfo<VisitorStrangerEntity> queryStrangerPage(BaseQO<VisitorStrangerEntity> qo){
+		Page<VisitorStrangerEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,qo);
+		VisitorStrangerEntity query = qo.getQuery();
+		QueryWrapper<VisitorStrangerEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("id,snap_time,snap_url,machine_name");
+		queryWrapper.eq("community_id",query.getCommunityId());
+		if(!StringUtils.isEmpty(query.getMachineName())){
+			queryWrapper.like("machine_name",query.getMachineName());
+		}
+		Page<VisitorStrangerEntity> pageData = visitorStrangerMapper.selectPage(page,queryWrapper);
+		PageInfo<VisitorStrangerEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData,pageInfo);
+		return pageInfo;
 	}
 	
 }

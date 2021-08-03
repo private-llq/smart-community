@@ -315,7 +315,13 @@ public class PatrolController {
 		return CommonResult.ok(patrolService.queryRecordPage(baseQO,0),"查询成功");
 	}
 	
-	//巡检记录 导出
+	/** 
+	* @Description: 巡检记录 导出
+	 * @Param: [response, baseQO]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021-08-02
+	**/
 	@RequestMapping("/record/export")
 	public void exportRecord(HttpServletResponse response, @RequestBody BaseQO<PatrolRecordEntity> baseQO) throws UnsupportedEncodingException{
 		

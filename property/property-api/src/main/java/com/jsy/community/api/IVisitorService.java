@@ -1,8 +1,10 @@
 package com.jsy.community.api;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.jsy.community.entity.VisitorPersonRecordEntity;
+import com.jsy.community.entity.VisitorStrangerEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 
@@ -34,12 +36,30 @@ public interface IVisitorService {
 	List<VisitorPersonRecordEntity> queryFollowPersonListByVisitorId(Long visitorId);
 	
 	/**
-	* @Description: 新增访客进出记录(数据来自机器)
-	 * @Param: [historyEntity]
-	 * @Return: boolean
+	* @Description: 批量新增访客进出记录
+	 * @Param: [jsonObject]
+	 * @Return: void
 	 * @Author: chq459799974
-	 * @Date: 2021/5/7
+	 * @Date: 2021/7/2
 	**/
-	boolean addVisitorRecord(VisitorHistoryEntity historyEntity);
+	void addVisitorRecordBatch(JSONObject jsonObject);
+	
+	/**
+	* @Description: 陌生人脸上传
+	 * @Param: [jsonObject]
+	 * @Return: void
+	 * @Author: chq459799974
+	 * @Date: 2021-08-02
+	**/
+	void saveStranger(JSONObject jsonObject);
+	
+	/**
+	* @Description: 陌生人记录 分页查询
+	 * @Param: [qo]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorStrangerEntity>
+	 * @Author: chq459799974
+	 * @Date: 2021-08-02
+	**/
+	PageInfo<VisitorStrangerEntity> queryStrangerPage(BaseQO<VisitorStrangerEntity> qo);
 	
 }
