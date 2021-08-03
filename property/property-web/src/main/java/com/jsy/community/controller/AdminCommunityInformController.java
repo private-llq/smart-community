@@ -5,7 +5,6 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -174,11 +173,9 @@ public class AdminCommunityInformController {
     @Login
     @PutMapping("/updateDetail")
     @ApiOperation("(物业端)更新消息接口")
-    public CommonResult updateDetail(HttpServletRequest request, @RequestBody OldPushInformQO qo) {
-        ValidatorUtils.validateEntity(OldPushInformQO.UpdateDetailValidate.class);
-        qo.setUpdateBy(UserUtils.getAdminUserInfo().getUid());
-        // 设置推送用户信息
-        qo.setAcctId(UserUtils.getAdminCommunityId());
+    public CommonResult updateDetail(HttpServletRequest request, @RequestBody PushInformQO qo) {
+        ValidatorUtils.validateEntity(qo, PushInformQO.UpdateDetailValidate.class);
+        qo.setUid(UserUtils.getUserId());
         return communityInformService.updatePushInform(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败");
     }
 }

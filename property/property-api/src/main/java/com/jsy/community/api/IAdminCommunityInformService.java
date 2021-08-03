@@ -32,7 +32,7 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      *@Return: java.lang.Boolean
      *@Date: 2021/4/20 16:38
      **/
-    Boolean updatePushInform(OldPushInformQO qo);
+    Boolean updatePushInform(PushInformQO qo);
 
     /**
      * 根据id删除社区推送通知消息

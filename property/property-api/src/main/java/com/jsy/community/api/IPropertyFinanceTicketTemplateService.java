@@ -10,4 +10,12 @@ import com.jsy.community.entity.FinanceTicketTemplateEntity;
  * @Version: 1.0
  **/
 public interface IPropertyFinanceTicketTemplateService extends IService<FinanceTicketTemplateEntity> {
+    /**
+     * @author: Pipi
+     * @description: 添加打印模板
+     * @param templateEntity: 打印模板实体
+     * @return: java.lang.Integer
+     * @date: 2021/8/3 9:28
+     **/
+    String insertTicketTemplate(FinanceTicketTemplateEntity templateEntity);
 }
