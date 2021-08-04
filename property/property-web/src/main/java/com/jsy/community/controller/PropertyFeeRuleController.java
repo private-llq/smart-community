@@ -49,9 +49,8 @@ public class PropertyFeeRuleController {
     @ApiOperation("查询当前小区物业收费规则")
     @GetMapping("/selectOne")
     @Login
-    public CommonResult selectOne(@RequestParam("type")Integer type){
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        PropertyFeeRuleEntity propertyFeeRuleEntity=propertyFeeRuleService.selectByOne(userInfo.getCommunityId(),type);
+    public CommonResult selectOne(@RequestParam("id")Long id){
+        PropertyFeeRuleEntity propertyFeeRuleEntity=propertyFeeRuleService.selectByOne(id);
         return CommonResult.ok(propertyFeeRuleEntity);
     }
 
@@ -73,7 +72,7 @@ public class PropertyFeeRuleController {
         return CommonResult.ok();
     }
 
-    @ApiOperation("修改")
+    @ApiOperation("新增")
     @PostMapping("/save")
     @Login
     public CommonResult save(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
@@ -82,6 +81,7 @@ public class PropertyFeeRuleController {
         propertyFeeRuleService.saveOne(userInfo,propertyFeeRuleEntity);
         return CommonResult.ok();
     }
+
     @ApiOperation("查询公共常量")
     @PostMapping("/getConst")
 //    @Login

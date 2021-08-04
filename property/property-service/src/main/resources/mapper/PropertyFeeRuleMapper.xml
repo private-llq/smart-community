@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.PropertyFeeRuleMapper">
-<!--&lt;!&ndash;    -<select id="findList" resultType="com.jsy.community.entity.property.PropertyFeeRuleEntity">&ndash;&gt;-->
-<!--    &lt;!&ndash;        select tpfr.id,tpfr.type,tpfr.serial_number,tpfr.name,tpfr.period,tpfr.charge_mode,tpfr.monetary_unit,tpfr.penal_sum,tpfr.penal_days,tpfr.status,tpfr.create_by,tpfr.update_by,tau.real_name as updateByName,tpfr.update_time&ndash;&gt;-->
-<!--    &lt;!&ndash;        from t_property_fee_rule tpfr&ndash;&gt;-->
-<!--    &lt;!&ndash;        left join t_admin_user tau&ndash;&gt;-->
-<!--    &lt;!&ndash;        on tpfr.update_by=tau.uid&ndash;&gt;-->
-<!--    &lt;!&ndash;        where tpfr.id=#{communityId}&ndash;&gt;-->
-<!--    &lt;!&ndash;    </select>->-->
+
+    <select id="findList" resultType="com.jsy.community.vo.property.FeeRuleVO">
+        select id,status,name,formula,charge_mode,monetary_unit,period,create_time,disposable from t_property_fee_rule order by create_time desc limit #{page},#{size}
+    </select>
+    <select id="findTotal" resultType="java.lang.Integer">
+        select count (*) from  t_property_fee_rule
+    </select>
 </mapper>

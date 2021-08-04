@@ -9,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.PropertyRelationVO;
 import com.jsy.community.vo.admin.AdminInfoVo;
@@ -157,7 +158,10 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      * @return: void
      */
     @Override
-    public void save(HouseMemberEntity houseMemberEntity) {
+    public void save(HouseMemberEntity houseMemberEntity,String uid) {
+//        houseMemberEntity.setStatus(1);
+        houseMemberEntity.setId(SnowFlake.nextId());
+        houseMemberEntity.setHouseholderId(uid);
         propertyRelationMapper.insert(houseMemberEntity);
     }
 
@@ -203,6 +207,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         if (entity!=null){
             entity.setStatus(1);
         }
+        propertyRelationMapper.updateById(entity);
     }
 
 
@@ -244,6 +249,32 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         if (entity!=null){
             entity.setStatus(2);
         }
+        propertyRelationMapper.updateById(entity);
+    }
+
+
+    /**
+     * @Description: 删除
+     * @author: Hu
+     * @since: 2021/8/4 9:15
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void delete(Long id) {
+        propertyRelationMapper.deleteById(id);
+    }
+
+    /**
+     * @Description: 批量删除
+     * @author: Hu
+     * @since: 2021/8/3 17:20
+     * @Param: [longAry]
+     * @return: void
+     */
+    @Override
+    public void deletes(Long[] longAry) {
+        propertyRelationMapper.deletes(longAry);
     }
 
     @Override

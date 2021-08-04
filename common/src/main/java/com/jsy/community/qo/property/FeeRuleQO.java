@@ -13,5 +13,5 @@ import java.io.Serializable;
 @Data
 public class FeeRuleQO implements Serializable {
 
-    private String key;
+//    private String key;
 }
