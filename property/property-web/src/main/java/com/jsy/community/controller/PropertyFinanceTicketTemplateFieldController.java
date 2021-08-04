@@ -12,10 +12,7 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -51,5 +48,38 @@ public class PropertyFinanceTicketTemplateFieldController {
             ticketTemplateFieldEntity.setId(String.valueOf(SnowFlake.nextId()));
         }
         return ticketTemplateFieldService.insertTicketTemplateField(ticketTemplateFieldEntities) > 0 ? CommonResult.ok("保存成功!") : CommonResult.error("保存失败!");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 更新票据字段
+     * @param ticketTemplateFieldEntities: 票据字段列表
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/8/4 14:05
+     **/
+    @Login
+    @PostMapping("/updateTicketTemplateField")
+    public CommonResult updateTicketTemplateField(@RequestBody List<FinanceTicketTemplateFieldEntity> ticketTemplateFieldEntities) {
+        if (CollectionUtil.isEmpty(ticketTemplateFieldEntities)) {
+            throw new JSYException(400, "请选择票据字段");
+        }
+        for (FinanceTicketTemplateFieldEntity ticketTemplateFieldEntity : ticketTemplateFieldEntities) {
+            ValidatorUtils.validateEntity(ticketTemplateFieldEntity);
+        }
+        ticketTemplateFieldService.updateTicketTemplateField(ticketTemplateFieldEntities);
+        return CommonResult.ok("修改成功!");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 获取打印模板字段列表
+     * @param templateId: 打印模板ID
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/8/4 15:13
+     **/
+    @Login
+    @GetMapping("/ticketTemplateFieldList")
+    public CommonResult ticketTemplateFieldList(@RequestParam("templateId") String templateId) {
+        return CommonResult.ok(ticketTemplateFieldService.getTicketTemplateFieldList(templateId), "查询成功!");
     }
 }

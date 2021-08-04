@@ -247,6 +247,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         for (PushInformEntity record : informEntityPage.getRecords()) {
             PushInfromVO pushInfromVO = new PushInfromVO();
             BeanUtils.copyProperties(record, pushInfromVO);
+            pushInfromVO.setId(String.valueOf(record.getId()));
             pushInfromVO.setAcctName(infromIdsAcctMap.get(record.getIdStr()));
             pushInfromVOS.add(pushInfromVO);
         }

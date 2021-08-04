@@ -20,4 +20,22 @@ public interface IPropertyFinanceTicketTemplateFieldService extends IService<Fin
      * @date: 2021/8/3 14:23
      **/
     Integer insertTicketTemplateField(List<FinanceTicketTemplateFieldEntity> ticketTemplateFieldEntities);
+
+    /**
+     * @author: Pipi
+     * @description: 更新票据字段
+     * @param ticketTemplateFieldEntities: 票据字段列表
+     * @return: java.lang.Integer
+     * @date: 2021/8/4 14:07
+     **/
+    Integer updateTicketTemplateField(List<FinanceTicketTemplateFieldEntity> ticketTemplateFieldEntities);
+
+    /**
+     * @author: Pipi
+     * @description: 获取打印模板字段列表
+     * @param templateId: 打印模板ID
+     * @return: java.util.List<com.jsy.community.entity.FinanceTicketTemplateFieldEntity>
+     * @date: 2021/8/4 15:14
+     **/
+    List<FinanceTicketTemplateFieldEntity> getTicketTemplateFieldList(String templateId);
 }

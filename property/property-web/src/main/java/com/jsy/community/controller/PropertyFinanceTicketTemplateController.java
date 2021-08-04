@@ -13,10 +13,7 @@ import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author: Pipi
@@ -83,5 +80,18 @@ public class PropertyFinanceTicketTemplateController {
         templateEntity.setCommunityId(String.valueOf(UserUtils.getAdminCommunityId()));
         ticketTemplateService.updateTicketTemplate(templateEntity);
         return CommonResult.ok("修改成功!");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 删除打印模板
+     * @param templateId: 打印模板ID
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/8/4 16:46
+     **/
+    @Login
+    @DeleteMapping("/deleteTicketTemplate")
+    public CommonResult deleteTicketTemplate(@RequestParam("templateId") String templateId) {
+        return ticketTemplateService.deleteTicketTemplate(templateId, UserUtils.getAdminCommunityId()) > 0 ? CommonResult.ok("删除成功!") : CommonResult.error("删除失败!");
     }
 }

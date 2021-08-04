@@ -84,4 +84,19 @@ public class IPropertyFinanceTicketTemplateServiceImpl extends ServiceImpl<Finan
         queryWrapper.eq("community_id", templateEntity.getCommunityId());
         return ticketTemplateMapper.update(templateEntity, queryWrapper);
     }
+
+    /**
+     * @param templateId : 打印模板ID
+     * @author: Pipi
+     * @description: 删除打印模板
+     * @return: java.lang.Integer
+     * @date: 2021/8/4 16:46
+     **/
+    @Override
+    public Integer deleteTicketTemplate(String templateId, Long communityId) {
+        QueryWrapper<FinanceTicketTemplateEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", templateId);
+        queryWrapper.eq("community_id", communityId);
+        return ticketTemplateMapper.delete(queryWrapper);
+    }
 }

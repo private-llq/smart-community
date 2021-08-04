@@ -39,4 +39,13 @@ public interface IPropertyFinanceTicketTemplateService extends IService<FinanceT
      * @date: 2021/8/4 11:33
      **/
     Integer updateTicketTemplate(FinanceTicketTemplateEntity templateEntity);
+
+    /**
+     * @author: Pipi
+     * @description:  删除打印模板
+     * @param templateId: 打印模板ID
+     * @return: java.lang.Integer
+     * @date: 2021/8/4 16:46
+     **/
+    Integer deleteTicketTemplate(String templateId, Long communityId);
 }
