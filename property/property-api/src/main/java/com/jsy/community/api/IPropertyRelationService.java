@@ -58,7 +58,7 @@ public interface IPropertyRelationService {
      * @Param:
      * @return:
      */
-    void save(HouseMemberEntity houseMemberEntity);
+    void save(HouseMemberEntity houseMemberEntity,String uid);
 
     /**
      * @Description: 修改
@@ -113,4 +113,22 @@ public interface IPropertyRelationService {
      * @return:
      */
     void emigrations(Long[] ids);
+
+    /**
+     * @Description: 批量删除
+     * @author: Hu
+     * @since: 2021/8/3 17:20
+     * @Param:
+     * @return:
+     */
+    void deletes(Long[] longAry);
+
+    /**
+     * @Description: 删除
+     * @author: Hu
+     * @since: 2021/8/4 9:15
+     * @Param:
+     * @return:
+     */
+    void delete(Long id);
 }

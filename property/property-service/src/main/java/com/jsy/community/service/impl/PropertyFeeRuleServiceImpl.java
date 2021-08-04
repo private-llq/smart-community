@@ -1,17 +1,17 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyFeeRuleService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.FeeRuleVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -47,7 +47,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      */
     @Override
     public void saveOne(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
-        propertyFeeRuleEntity.setCommunityId(userInfo.getCommunityId());
+//        propertyFeeRuleEntity.setCommunityId(userInfo.getCommunityId());
         propertyFeeRuleEntity.setCreateBy(userInfo.getUid());
         propertyFeeRuleEntity.setStatus(0);
         propertyFeeRuleEntity.setCreateTime(LocalDateTime.now());
@@ -120,8 +120,8 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      * @return: com.jsy.community.entity.property.PropertyFeeRuleEntity
      */
     @Override
-    public PropertyFeeRuleEntity selectByOne(Long communityId, Integer type) {
-        return propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type",type).eq("community_id",communityId));
+    public PropertyFeeRuleEntity selectByOne(Long id) {
+        return propertyFeeRuleMapper.selectById(id);
     }
 
 
@@ -139,23 +139,28 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
             baseQO.setSize(10L);
         }
         QueryWrapper<PropertyFeeRuleEntity> wrapper=new QueryWrapper<PropertyFeeRuleEntity>();
-        wrapper.eq("community_id", communityId);
-        if (!"".equals(query.getKey())&&query.getKey()!=null){
-            wrapper.like("name", query.getKey()).or().like("serial_number", query.getKey());
-        }
-        Page<PropertyFeeRuleEntity> page = propertyFeeRuleMapper.selectPage(new Page<>(baseQO.getPage(), baseQO.getSize()), wrapper);
-        List<PropertyFeeRuleEntity> pageRecords = page.getRecords();
-        for (PropertyFeeRuleEntity entity : pageRecords) {
-            if (!"".equals(entity.getUpdateBy())&&entity.getUpdateBy()!=null){
-                AdminUserEntity userEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("uid", entity.getUpdateBy()));
-                if (userEntity!=null){
-                    entity.setUpdateByName(userEntity.getRealName());
+        List<FeeRuleVO> page = propertyFeeRuleMapper.findList((baseQO.getPage()-1)*baseQO.getSize(),baseQO.getSize(),baseQO.getQuery());
+        for (FeeRuleVO feeRuleVO : page) {
+            feeRuleVO.setPeriodName(BusinessEnum.FeeRulePeriodEnum.getName(feeRuleVO.getPeriod()));
+            feeRuleVO.setChargeModeName(feeRuleVO.getChargeMode()==1?"面积":"固定金额");
+            if (feeRuleVO.getChargeMode()==1){
+                if (feeRuleVO.getDisposable()==1){
+                    feeRuleVO.setFormulaName("单价*面积");
+                }else {
+                    feeRuleVO.setFormulaName("单价*面积*周期");
+                }
+            }else {
+                if (feeRuleVO.getDisposable()==1){
+                    feeRuleVO.setFormulaName("固定金额");
+                }else {
+                    feeRuleVO.setFormulaName("单价*周期");
                 }
             }
         }
+        Integer total = propertyFeeRuleMapper.findTotal(baseQO.getQuery());
         Map<Object, Object> map = new HashMap<>();
-        map.put("total",page.getTotal());
-        map.put("list",pageRecords);
+        map.put("total",total);
+        map.put("list",page);
         return map;
     }
 }

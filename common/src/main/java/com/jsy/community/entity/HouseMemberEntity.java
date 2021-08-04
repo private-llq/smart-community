@@ -161,12 +161,12 @@ public class HouseMemberEntity extends BaseEntity {
      */
     private String idCardPicture;
     /**
-     * 身份证照片
+     * 登录时间
      */
     private LocalDateTime loginTime;
 
     /**
-     * 身份证照片
+     * 有效时间
      */
     private LocalDateTime validTime;
 

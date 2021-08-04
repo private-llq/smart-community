@@ -31,7 +31,7 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      * @Param:
      * @return:
      */
-    PropertyFeeRuleEntity selectByOne(Long communityId, Integer type);
+    PropertyFeeRuleEntity selectByOne(Long id);
 
     /**
      * @Description: 启用或者停用
