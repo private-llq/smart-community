@@ -1,14 +1,23 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyFinanceTicketTemplateService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FinanceTicketTemplateEntity;
 import com.jsy.community.mapper.FinanceTicketTemplateMapper;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 /**
  * @Author: Pipi
@@ -32,5 +41,47 @@ public class IPropertyFinanceTicketTemplateServiceImpl extends ServiceImpl<Finan
     public String insertTicketTemplate(FinanceTicketTemplateEntity templateEntity) {
         templateEntity.setId(SnowFlake.nextId());
         return ticketTemplateMapper.insert(templateEntity) == 1 ? String.valueOf(templateEntity.getId()) : null;
+    }
+
+    /**
+     * @param baseQO :
+     * @author: Pipi
+     * @description: 查询打印模板分页列表
+     * @return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.FinanceTicketTemplateEntity>
+     * @date: 2021/8/3 17:16
+     **/
+    @Override
+    public PageInfo<FinanceTicketTemplateEntity> ticketTemplatePage(BaseQO<FinanceTicketTemplateEntity> baseQO) {
+        Page<FinanceTicketTemplateEntity> page = new Page<>();
+        MyPageUtils.setPageAndSize(page, baseQO);
+        QueryWrapper<FinanceTicketTemplateEntity> queryWrapper = new QueryWrapper<>();
+        FinanceTicketTemplateEntity query = baseQO.getQuery();
+        queryWrapper.eq("community_id", query.getCommunityId());
+        if (!StringUtils.isEmpty(query.getName())) {
+            queryWrapper.like("name", query.getName());
+        }
+        if (query.getTemplateType() != null) {
+            queryWrapper.eq("template_type", query.getTemplateType());
+        }
+        queryWrapper.orderByDesc("create_time");
+        PageInfo<FinanceTicketTemplateEntity> pageInfo = new PageInfo<>();
+        Page<FinanceTicketTemplateEntity> templateEntityPage = ticketTemplateMapper.selectPage(page, queryWrapper);
+        BeanUtils.copyProperties(page, pageInfo);
+        return pageInfo;
+    }
+
+    /**
+     * @param templateEntity : 打印模板实体
+     * @author: Pipi
+     * @description: 修改打印模板名称
+     * @return: java.lang.Integer
+     * @date: 2021/8/4 11:33
+     **/
+    @Override
+    public Integer updateTicketTemplate(FinanceTicketTemplateEntity templateEntity) {
+        QueryWrapper<FinanceTicketTemplateEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", templateEntity.getId());
+        queryWrapper.eq("community_id", templateEntity.getCommunityId());
+        return ticketTemplateMapper.update(templateEntity, queryWrapper);
     }
 }
