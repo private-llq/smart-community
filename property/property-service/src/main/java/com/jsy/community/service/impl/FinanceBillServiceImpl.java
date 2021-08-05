@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,58 +58,115 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDays(){
-        List<PropertyFinanceOrderEntity> list=new LinkedList();
-        PropertyFinanceOrderEntity orderEntity=null;
-        QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
-        wrapper.select("DISTINCT community_id");
-//        wrapper.eq("check_status",1);
-        //查出所有认证过的小区ID
-        List<UserHouseEntity> entityList = userHouseMapper.selectList(wrapper);
-        for (UserHouseEntity userHouseEntity : entityList) {
-            //查出当前小区的收费规则
-            PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("community_id",userHouseEntity.getCommunityId()));
-            if (entity != null) {
-                //查出当前小区所有已认证过的房屋
-                List<HouseEntity> entities = houseMapper.selectHouseAll(userHouseEntity.getCommunityId());
-                //根据收费规则循环封装当前小区所有房屋账单
-                for (HouseEntity houseEntity : entities) {
-                    //根据period计费周期封装账单数据   1日，2周，3月，4季，5年  测试阶段只有按天计费的和按月计费的
-                    if (entity.getPeriod() == 1) {
-                        orderEntity = new PropertyFinanceOrderEntity();
-                        orderEntity.setOrderNum(getOrderNum(userHouseEntity.getCommunityId()+"",entity.getSerialNumber()));
-                        orderEntity.setOrderTime(LocalDate.now());
-                        orderEntity.setCommunityId(userHouseEntity.getCommunityId());
-                        orderEntity.setUid(houseEntity.getUid());
-                        orderEntity.setHouseId(houseEntity.getId());
-                        orderEntity.setPropertyFee(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
-                        orderEntity.setTotalMoney(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
-                        orderEntity.setId(SnowFlake.nextId());
-                        list.add(orderEntity);
+        List<PropertyFinanceOrderEntity> orderList = new LinkedList<>();
+        PropertyFinanceOrderEntity entity=null;
+        //查询当前天所要生成订单的缴费项目
+        List<PropertyFeeRuleEntity> feeRuleEntities = propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("bill_day", LocalDateTime.now().getDayOfMonth()));
+        for (PropertyFeeRuleEntity feeRuleEntity : feeRuleEntities) {
+            //获取当前缴费项目关联的房间或者车位id集合
+            String[] split = feeRuleEntity.getRelevance().split(",");
+            //如果chargeMode=1表示按面积计算
+            if (feeRuleEntity.getChargeMode()==1) {
+                //disposable=1表示临时
+                if (feeRuleEntity.getDisposable()==1){
+                        //查询所有未空置的房间生成账单
+                        List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
+                        for (HouseEntity houseEntity : list) {
+                            entity = new PropertyFinanceOrderEntity();
+                            entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
+                            entity.setCommunityId(feeRuleEntity.getCommunityId());
+                            entity.setOrderTime(LocalDate.now());
+                            entity.setUid("");
+                            entity.setHouseId(houseEntity.getHouseId());
+                            entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
+                            entity.setPenalSum(new BigDecimal("0"));
+                            entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
+                            entity.setOrderStatus(0);
+                            entity.setId(SnowFlake.nextId());
+                            entity.setCreateTime(LocalDateTime.now());
+                            orderList.add(entity);
                     }
-                    //如果不是按天计费就获取当前日期如果是一号就新增账单
-                    else if (LocalDate.now().getDayOfMonth() == 1) {
-                        orderEntity = new PropertyFinanceOrderEntity();
-                        orderEntity.setOrderNum(getOrderNum(userHouseEntity.getCommunityId()+"",entity.getSerialNumber()));
-                        orderEntity.setOrderTime(LocalDate.now());
-                        orderEntity.setCommunityId(userHouseEntity.getCommunityId());
-                        orderEntity.setUid(houseEntity.getUid());
-                        orderEntity.setHouseId(houseEntity.getId());
-                        orderEntity.setPropertyFee(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
-                        orderEntity.setTotalMoney(new BigDecimal(houseEntity.getBuildArea()).multiply(entity.getMonetaryUnit()));
-                        orderEntity.setId(SnowFlake.nextId());
-                        list.add(orderEntity);
+                }
+                //disposable!=1表示周期
+                else {
+                    //leisure=1表示要生成空置房间的账单
+                    if (feeRuleEntity.getLeisure()==1){
+                        //查询缴费项目关联的所有房间（不管房间是否已经有业主认证，只要关联的都生成订单）
+                        List<HouseEntity> list=houseMapper.selectInIds(split);
+                        for (HouseEntity houseEntity : list) {
+                            entity = new PropertyFinanceOrderEntity();
+                            entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
+                            entity.setCommunityId(feeRuleEntity.getCommunityId());
+                            entity.setOrderTime(LocalDate.now());
+                            entity.setUid("");
+                            entity.setHouseId(houseEntity.getHouseId());
+                            entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
+                            entity.setPenalSum(new BigDecimal("0"));
+                            entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
+                            entity.setOrderStatus(0);
+                            entity.setId(SnowFlake.nextId());
+                            entity.setCreateTime(LocalDateTime.now());
+                            orderList.add(entity);
+                        }
+                    }
+                    //leisure！=1表示不生成空置房间的账单
+                    else {
+                        //查询缴费项目关联的所有房间中未空置的房间（房屋已有业主认证表示未空置）
+                        List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
+                        for (HouseEntity houseEntity : list) {
+                            entity = new PropertyFinanceOrderEntity();
+                            entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
+                            entity.setCommunityId(feeRuleEntity.getCommunityId());
+                            entity.setOrderTime(LocalDate.now());
+                            entity.setUid("");
+                            entity.setHouseId(houseEntity.getHouseId());
+                            entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
+                            entity.setPenalSum(new BigDecimal("0"));
+                            entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
+                            entity.setOrderStatus(0);
+                            entity.setId(SnowFlake.nextId());
+                            entity.setCreateTime(LocalDateTime.now());
+                            orderList.add(entity);
+                        }
                     }
                 }
             }
+            //如果chargeMode！=1表示按户计算
+            else {
+                //disposable=1表示临时
+                if (feeRuleEntity.getDisposable()==1){
+                    //查询所有未空置的房间生成账单(临时是根据缴费项目固定金额生成账单)
+                    List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
+                    for (HouseEntity houseEntity : list) {
+                        entity = new PropertyFinanceOrderEntity();
+                        entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
+                        entity.setCommunityId(feeRuleEntity.getCommunityId());
+                        entity.setOrderTime(LocalDate.now());
+                        entity.setUid("");
+                        entity.setHouseId(houseEntity.getHouseId());
+                        entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
+                        entity.setPenalSum(new BigDecimal("0"));
+                        entity.setTotalMoney(feeRuleEntity.getMonetaryUnit());
+                        entity.setOrderStatus(0);
+                        entity.setId(SnowFlake.nextId());
+                        entity.setCreateTime(LocalDateTime.now());
+                        orderList.add(entity);
+                    }
+
+                } else {
+                    //车位费暂时空置
+
+                }
+            }
         }
-        if (list!=null&&list.size()!=0){
+
+        if (orderList!=null&&orderList.size()!=0){
             //把封装好的list批量新增到数据库订单表
-            propertyFinanceOrderMapper.saveList(list);
+            propertyFinanceOrderMapper.saveList(orderList);
         }
     }
 
-
-
+    
 
     /**
      * @Description: 更新所有小区账单

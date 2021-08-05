@@ -75,7 +75,7 @@ public class HouseMemberEntity extends BaseEntity {
     /**
      * 入驻时间
      */
-    private LocalDateTime enterTime;
+    private LocalDate enterTime;
     /**
      * 入驻理由
      */

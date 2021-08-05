@@ -83,6 +83,9 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "0不生成空置房间账单，1生成空置房间账单")
     private Integer leisure;
 
+    @ApiModelProperty(value = "关联车位id,0表示当前小区全部")
+    private String relevance;
+
     @ApiModelProperty(value = "创建人")
     private String createBy;
 
