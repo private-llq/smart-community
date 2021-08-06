@@ -8,15 +8,9 @@ import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.admin.AdminCommunityEntity;
-import com.jsy.community.entity.admin.AdminMenuEntity;
-import com.jsy.community.entity.admin.AdminRoleEntity;
-import com.jsy.community.entity.admin.AdminUserMenuEntity;
+import com.jsy.community.entity.admin.*;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.mapper.AdminCommunityMapper;
-import com.jsy.community.mapper.AdminMenuMapper;
-import com.jsy.community.mapper.AdminRoleMapper;
-import com.jsy.community.mapper.AdminUserMenuMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
@@ -63,7 +57,13 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	
 	@Autowired
 	private AdminCommunityMapper adminCommunityMapper;
-	
+
+	@Autowired
+	private AdminUserRoleMapper adminUserRoleMapper;
+
+	@Autowired
+	private AdminRoleMenuMapper adminRoleMenuMapper;
+
 	//==================================================== Menu菜单 (旧) ===============================================================
 	/**
 	* @Description: 新增菜单
@@ -270,7 +270,24 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		//新增
 		adminRoleMapper.addRoleMenuBatch(menuIdsSet, roleId);
 	}
-	
+	//==================================================== 用户-角色 ===============================================================
+
+	/**
+	 * @param uid : 用户uid
+	 * @author: Pipi
+	 * @description: 根据用户uid查询用户的角色id
+	 * @return: java.lang.Long
+	 * @date: 2021/8/6 10:50
+	 **/
+	@Override
+	public AdminUserRoleEntity queryRoleIdByUid(String uid) {
+		QueryWrapper<AdminUserRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("uid,role_id");
+		queryWrapper.eq("uid", uid);
+		return adminUserRoleMapper.selectOne(queryWrapper);
+	}
+
+
 	//==================================================== 用户-菜单 (旧) ===============================================================
 	/**
 	* @Description: 查询用户菜单权限(老接口，暂时弃用)
@@ -294,9 +311,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2021/3/25
 	**/
 	@Override
-	public List<AdminMenuEntity> queryMenuByUid(String uid, Integer loginType){
+	public List<AdminMenuEntity> queryMenuByUid(Long roleId, Integer loginType){
 		//查ID
-		List<Long> menuIdList = adminUserMenuMapper.queryUserMenu(uid);
+		List<Long> menuIdList = adminRoleMenuMapper.queryRoleMuneIds(roleId, loginType);
 		if(CollectionUtils.isEmpty(menuIdList)){
 			return null;
 		}

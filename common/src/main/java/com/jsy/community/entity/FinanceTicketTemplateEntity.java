@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -26,6 +27,15 @@ public class FinanceTicketTemplateEntity extends BaseEntity {
     private Integer chargeType;
     // 社区ID
     private String communityId;
+
+
+    // 模板类型字符串
+    @TableField(exist = false)
+    private String templateTypeStr;
+
+    // 收费类型收费类型字符
+    @TableField(exist = false)
+    private String chargeTypeStr;
 
     public interface AddTicketTemplateValidate{}
     public interface UpdateTicketTemplateValidate{}

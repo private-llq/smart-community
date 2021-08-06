@@ -86,4 +86,7 @@ public class AdminInfoVo implements Serializable {
 	 */
 	private Integer loginType;
 
+	// 用户角色id
+	private Long roleId;
+
 }

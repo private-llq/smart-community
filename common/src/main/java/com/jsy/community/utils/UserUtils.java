@@ -31,6 +31,7 @@ public class UserUtils {
 	public static final String USER_COMMUNITY = "communityId";
 	public static final String USER_COMMUNITY_ID_LIST = "communityIds";
 	public static final String USER_COMPANY_ID = "companyId";
+	public static final String USER_ROLE_ID = "roleId";
 
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -156,6 +157,19 @@ public class UserUtils {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 				.getRequest();
 		return (Long) request.getAttribute(USER_COMPANY_ID);
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 获取物业端登陆用户角色ID
+	 * @param :
+	 * @return: java.lang.Long
+	 * @date: 2021/8/6 14:28
+	 **/
+	public static Long getAdminRoleId() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+				.getRequest();
+		return (Long) request.getAttribute(USER_ROLE_ID);
 	}
 	
 	/**

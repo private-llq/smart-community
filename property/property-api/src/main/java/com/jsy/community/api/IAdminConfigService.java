@@ -4,6 +4,7 @@ package com.jsy.community.api;
 import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.entity.admin.AdminMenuEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
+import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
@@ -91,6 +92,16 @@ public interface IAdminConfigService {
 	 * @Date: 2020/12/14
 	**/
 	PageInfo<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO);
+
+	//==================================================== 用户-角色 ===============================================================
+	/**
+	 * @author: Pipi
+	 * @description: 根据用户uid查询用户的角色id
+	 * @param uid: 用户uid
+	 * @return: java.lang.Long
+	 * @date: 2021/8/6 10:50
+	 **/
+	AdminUserRoleEntity queryRoleIdByUid(String uid);
 	
 	//==================================================== 用户-菜单 ===============================================================
 	/**
@@ -110,7 +121,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
-	List<AdminMenuEntity> queryMenuByUid(String uid, Integer loginType);
+	List<AdminMenuEntity> queryMenuByUid(Long roleId, Integer loginType);
 	
 	/**
 	* @Description: 统计用户菜单数

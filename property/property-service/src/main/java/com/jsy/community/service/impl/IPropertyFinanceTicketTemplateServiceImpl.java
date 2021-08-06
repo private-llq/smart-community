@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyFinanceTicketTemplateService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.FinanceTicketTemplateEntity;
 import com.jsy.community.mapper.FinanceTicketTemplateMapper;
 import com.jsy.community.qo.BaseQO;
@@ -67,6 +68,10 @@ public class IPropertyFinanceTicketTemplateServiceImpl extends ServiceImpl<Finan
         PageInfo<FinanceTicketTemplateEntity> pageInfo = new PageInfo<>();
         Page<FinanceTicketTemplateEntity> templateEntityPage = ticketTemplateMapper.selectPage(page, queryWrapper);
         BeanUtils.copyProperties(page, pageInfo);
+        for (FinanceTicketTemplateEntity templateEntity : pageInfo.getRecords()) {
+            templateEntity.setChargeTypeStr(PropertyConstsEnum.ChargeTypeEnum.getName(templateEntity.getChargeType()));
+            templateEntity.setTemplateTypeStr(PropertyConstsEnum.TemplateTypeEnum.getName(templateEntity.getTemplateType()));
+        }
         return pageInfo;
     }
 

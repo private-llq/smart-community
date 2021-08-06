@@ -65,7 +65,7 @@ public class AdminCommunityInformController {
     @DeleteMapping("/delete")
     @ApiOperation("删除推送通知消息")
     public CommonResult<Boolean> deletePushInform(HttpServletRequest request, @RequestParam Long id) {
-        return communityInformService.deletePushInform(id, UserUtils.getAdminUserInfo().getUid()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return communityInformService.deletePushInform(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     /**
@@ -80,7 +80,7 @@ public class AdminCommunityInformController {
     @PostMapping("/updateTopState")
     @ApiOperation("更新置顶状态")
     public CommonResult<Boolean> updateTopState(HttpServletRequest request, @RequestBody OldPushInformQO qo) {
-        qo.setUpdateBy(UserUtils.getAdminUserInfo().getUid());
+        qo.setUpdateBy(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdateTopStateValidate.class);
         return communityInformService.updateTopState(qo) ? CommonResult.ok("操作成功!") : CommonResult.error("操作失败!");
     }
@@ -97,7 +97,7 @@ public class AdminCommunityInformController {
     @PostMapping("/updatePushState")
     @ApiOperation("更新发布状态")
     public CommonResult<Boolean> updatePushState(HttpServletRequest request, @RequestBody OldPushInformQO qo) {
-        qo.setUpdateBy(UserUtils.getAdminUserInfo().getUid());
+        qo.setUpdateBy(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdatePushStateValidate.class);
         if (qo.getPushState() < 1) {
             // 发布状态只能在发布与撤销间反复横跳
@@ -120,7 +120,8 @@ public class AdminCommunityInformController {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new PushInformQO());
         }
-        if (CollectionUtil.isNotEmpty(UserUtils.getAdminUserInfo().getCommunityIdList())) {
+
+        if (CollectionUtil.isNotEmpty(UserUtils.getAdminCommunityIdList())) {
             baseQO.getQuery().setCommunityIds(UserUtils.getAdminUserInfo().getCommunityIdList());
         }else {
             List<Long> communityIds = new ArrayList<>();
@@ -145,7 +146,7 @@ public class AdminCommunityInformController {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
         ValidatorUtils.validateEntity(qo.getQuery(), OldPushInformQO.CommunityPushInformValidate.class);
-        qo.getQuery().setUid(UserUtils.getAdminUserInfo().getUid());
+        qo.getQuery().setUid(UserUtils.getUserId());
         return CommonResult.ok(communityInformService.queryCommunityInform(qo), "查询成功!");
     }
 
