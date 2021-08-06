@@ -8,10 +8,12 @@ import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PropertyEnum;
+import com.jsy.community.entity.HouseBuildingTypeEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.HouseBuildingTypeQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.util.excel.impl.HouseExcelHandlerImpl;
 import com.jsy.community.utils.*;
@@ -105,15 +107,17 @@ public class HouseController {
 	**/
 	@Login
 	@ApiOperation("【楼宇房屋】新增楼栋、单元、房屋")
-	@PostMapping("")
+	@PostMapping("/add")
 	public CommonResult addHouse(@RequestBody HouseEntity houseEntity){
 		if(houseEntity.getType() == null){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
 		}
 		if(BusinessConst.BUILDING_TYPE_DOOR == houseEntity.getType()){
 			ValidatorUtils.validateEntity(houseEntity,HouseEntity.addRoomValidatedGroup.class);
-		}else{
-			ValidatorUtils.validateEntity(houseEntity,HouseEntity.addHouseValidatedGroup.class);
+		}else if (BusinessConst.BUILDING_TYPE_BUILDING == houseEntity.getType()){
+			ValidatorUtils.validateEntity(houseEntity,HouseEntity.addBuildingGroup.class);
+		}else if (BusinessConst.BUILDING_TYPE_UNIT == houseEntity.getType()){
+			ValidatorUtils.validateEntity(houseEntity,HouseEntity.addUnitGroup.class);
 		}
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
 		houseEntity.setCommunityId(loginUser.getCommunityId());
@@ -131,7 +135,7 @@ public class HouseController {
 	**/
 	@Login
 	@ApiOperation("【楼宇房屋】修改")
-	@PutMapping("")
+	@PutMapping("/update")
 	public CommonResult updateHouse(@RequestBody HouseEntity houseEntity){
 		ValidatorUtils.validateEntity(houseEntity, HouseEntity.updateHouseValidatedGroup.class);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
@@ -178,13 +182,81 @@ public class HouseController {
 	**/
 	@Login
 	@ApiOperation("【楼宇房屋】删除")
-	@DeleteMapping("")
+	@DeleteMapping("/delete")
 	public CommonResult deleteHouse(@RequestParam Long id){
 		return houseService.deleteHouse(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
 	// ============================================ 物业端产品原型确定后新加的 结束  ===========================================================
-
-
+	
+	/**
+	 * @Description: 【楼宇房屋】新增楼宇分类
+	 * @Param: [houseBuildingTypeEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/05
+	 **/
+	@Login
+	@ApiOperation("【楼宇房屋】新增楼宇分类")
+	@PostMapping("/building/type/add")
+	public CommonResult addHouseBuildingType(@RequestBody HouseBuildingTypeEntity houseBuildingTypeEntity){
+		ValidatorUtils.validateEntity(houseBuildingTypeEntity,HouseBuildingTypeEntity.addHouseBuildingTypeGroup.class);
+		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+		houseBuildingTypeEntity.setCommunityId(loginUser.getCommunityId());
+		return houseService.addHouseBuildingType(houseBuildingTypeEntity)
+			? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增楼宇分类失败");
+	}
+	
+	/**
+	 * @Description: 【楼宇房屋】修改楼宇分类
+	 * @Param: [houseBuildingTypeEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/05
+	 **/
+	@Login
+	@ApiOperation("【楼宇房屋】修改楼宇分类")
+	@PostMapping("/building/type/update")
+	public CommonResult updateHouseBuildingType(@RequestBody HouseBuildingTypeEntity houseBuildingTypeEntity){
+		ValidatorUtils.validateEntity(houseBuildingTypeEntity);
+		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+		houseBuildingTypeEntity.setCommunityId(loginUser.getCommunityId());
+		return houseService.updateHouseBuildingType(houseBuildingTypeEntity)
+			? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改楼宇分类失败");
+	}
+	
+	/**
+	 * @Description: 【楼宇房屋】删除楼宇分类
+	 * @Param: [houseBuildingTypeEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/05
+	 **/
+	@Login
+	@ApiOperation("【楼宇房屋】删除楼宇分类")
+	@DeleteMapping("/building/type/delete")
+	public CommonResult deleteHouseBuildingType(@RequestParam Long id){
+		return houseService.deleteHouseBuildingType(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
+	}
+	
+	/**
+	 * @Description: 【楼宇房屋】楼宇分类分页查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseBuildingTypeEntity>>
+	 * @Author: DKS
+	 * @Date: 2021/08/05
+	 **/
+	@Login
+	@ApiOperation("【楼宇房屋】楼宇分类分页查询")
+	@PostMapping("/building/type/query")
+	public CommonResult<PageInfo<HouseBuildingTypeEntity>> queryHouseBuildingType(@RequestBody BaseQO<HouseBuildingTypeQO> baseQO) {
+		HouseBuildingTypeQO query = baseQO.getQuery();
+		if(query == null){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+		}
+		query.setCommunityId(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(houseService.queryHouseBuildingType(baseQO));
+	}
+	
 	@Login
 	@ApiOperation("下载房屋信息模板")
 	@PostMapping("/downloadHouseExcelTemplate")

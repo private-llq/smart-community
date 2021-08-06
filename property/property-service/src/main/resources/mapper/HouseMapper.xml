@@ -65,10 +65,17 @@
 		</foreach>
 	</update>
 
+	<!-- 更新单元数据 -->
+	<update id="unitBindBuildingUpdate">
+		update t_house
+		set total_floor = #{entity.totalFloor}, building = #{entity.building}
+		where id = #{entity.id}
+	</update>
+
 	<!-- 添加房屋 -->
 	<insert id="addRoom">
-		insert into t_house(id,code,community_id,number,build_area,house_type_code,house_type,property_type,building,unit,floor,door,pid,type,comment,create_by,create_time)
-		select #{houseEntity.id},#{houseEntity.code},community_id,#{houseEntity.number},#{houseEntity.buildArea},#{houseEntity.houseTypeCode},#{houseEntity.houseType},#{houseEntity.propertyType},
+		insert into t_house(id,code,community_id,number,total_floor,build_area,house_type_code,house_type,property_type,building,unit,floor,door,pid,type,comment,create_by,create_time)
+		select #{houseEntity.id},#{houseEntity.code},community_id,#{houseEntity.number},#{houseEntity.totalFloor},#{houseEntity.buildArea},#{houseEntity.houseTypeCode},#{houseEntity.houseType},#{houseEntity.propertyType},
 		if(building != '',building,#{houseEntity.building}),
 		if(unit != '',unit,#{houseEntity.unit}),
 		#{houseEntity.floor},
@@ -138,6 +145,7 @@
 		<set>
 			<if test="entity.building != null and entity.building != ''">,building = #{entity.building}</if>
 			<if test="entity.unit != null and entity.unit != ''">,unit = #{entity.unit}</if>
+			<if test="entity.totalFloor != null and entity.totalFloor != ''">,total_floor = #{entity.totalFloor}</if>
 			where id in
 			<foreach collection="list" item="item" separator="," open="(" close=")">
 				#{item}
@@ -171,6 +179,7 @@
 			<if test="entity.unit != null and entity.unit != ''">,h.unit = #{entity.unit}</if>
 			<if test="entity.door != null and entity.door != ''">,h.door = #{entity.door}</if>
 			<if test="entity.pid != null and entity.pid != 0">,h.pid = #{entity.pid}</if>
+			<if test="entity.buildingType != null and entity.buildingType != 0">,h.building_type = #{entity.buildingType}</if>
 			<if test="entity.houseTypeCode != null and entity.houseTypeCode != ''">,h.house_type_code = #{entity.houseTypeCode}</if>
 			<if test="entity.houseType != null and entity.houseType != 0">,h.house_type = #{entity.houseType}</if>
 			<if test="entity.propertyType != null and entity.propertyType != 0">,h.property_type = #{entity.propertyType}</if>
