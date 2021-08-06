@@ -32,4 +32,6 @@ public class AdminMenuEntity extends BaseEntity {
 	
 	private Long createBy;//创建人
 	private Long updateBy;//修改人
+	// name的别名
+	private String label;
 }

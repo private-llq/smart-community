@@ -1,9 +1,11 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.HouseBuildingTypeEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.HouseBuildingTypeQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.property.ProprietorVO;
@@ -74,6 +76,42 @@ public interface IHouseService extends IService<HouseEntity> {
 	**/
 	boolean deleteHouse(Long id,Long communityId);
 	//=========================== 基础增删改查 结束 ==============================
+	
+	/**
+	 * @Description: 新增楼宇分类
+	 * @Param: [houseBuildingTypeEntity]
+	 * @Return: boolean
+	 * @Author: DKS
+	 * @Date: 2021/08/05
+	 **/
+	boolean addHouseBuildingType(HouseBuildingTypeEntity houseBuildingTypeEntity);
+	
+	/**
+	 * @Description: 修改楼宇分类
+	 * @Param: [houseBuildingTypeEntity]
+	 * @Return: boolean
+	 * @Author: DKS
+	 * @Date: 2021/08/05
+	 **/
+	boolean updateHouseBuildingType(HouseBuildingTypeEntity houseBuildingTypeEntity);
+	
+	/**
+	 * @Description: 删除楼宇分类
+	 * @Param: [id,communityId]
+	 * @Return: boolean
+	 * @Author: DKS
+	 * @Date: 2021/08/05
+	 **/
+	boolean deleteHouseBuildingType(Long id,Long communityId);
+	
+	/**
+	 * @Description: 查询楼宇分类
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseBuildingTypeEntity>
+	 * @Author: DKS
+	 * @Date: 2021/08/05
+	 **/
+	PageInfo<HouseBuildingTypeEntity> queryHouseBuildingType(BaseQO<HouseBuildingTypeQO> baseQO);
 
 	/**
 	 * 通过社区ID查出所有 房屋编号

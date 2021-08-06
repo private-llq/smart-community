@@ -95,6 +95,15 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	int unitBindBuilding(@Param("list") List<Long> unitIdList,@Param("entity") HouseEntity houseEntity);
 	
 	/**
+	 * @Description: 更新单元数据
+	 * @Param: [houseEntity]
+	 * @Return: int
+	 * @Author: DKS
+	 * @Date: 2021/8/6
+	 **/
+	int unitBindBuildingUpdate(@Param("entity") HouseEntity houseEntity);
+	
+	/**
 	* @Description: 单元解绑楼栋
 	 * @Param: [id]
 	 * @Return: void
