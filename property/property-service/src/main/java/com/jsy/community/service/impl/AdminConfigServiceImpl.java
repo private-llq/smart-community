@@ -461,7 +461,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/15
 	 **/
 	private List<AdminMenuEntity> queryMenu(){
-		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*").eq("pid", 0));
+		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*,name as label").eq("pid", 0));
 		setChildren(menuList,new LinkedList<>());
 		return menuList;
 	}
