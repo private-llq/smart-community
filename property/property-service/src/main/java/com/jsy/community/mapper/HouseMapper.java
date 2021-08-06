@@ -216,4 +216,22 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Date: 2021/5/21 16:48
 	 **/
 	Integer saveHouseBatch(@Param("list") List<HouseEntity> houseEntityList);
+
+	/**
+	 * @Description: 传入id数组查询房间
+	 * @author: Hu
+	 * @since: 2021/8/5 16:11
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> selectInIds(@Param("split") String[] split);
+
+	/**
+	 * @Description: 查询认证的房间数据
+	 * @author: Hu
+	 * @since: 2021/8/5 16:48
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> selectUserHouseAuth(@Param("split") String[] split);
 }

@@ -231,5 +231,17 @@
 			and deleted = 0
 		</where>
 	</select>
+	<select id="selectInIds" resultType="com.jsy.community.entity.HouseEntity">
+        select * from  t_house where id in
+        <foreach collection="split" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+    </select>
+	<select id="selectUserHouseAuth" resultType="com.jsy.community.entity.HouseEntity">
+        SELECT * FROM t_house tu JOIN t_user_house tuh on tu.id=tuh.house_id where tuh.house_id in
+		<foreach collection="split" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+    </select>
 
 </mapper>
