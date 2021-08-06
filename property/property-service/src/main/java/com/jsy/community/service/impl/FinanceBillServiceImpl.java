@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IFinanceBillService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.HouseMapper;
@@ -20,8 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -63,6 +65,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         //查询当前天所要生成订单的缴费项目
         List<PropertyFeeRuleEntity> feeRuleEntities = propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("bill_day", LocalDateTime.now().getDayOfMonth()));
         for (PropertyFeeRuleEntity feeRuleEntity : feeRuleEntities) {
+            LocalDate date = LocalDate.now().withMonth(LocalDate.now().getMonthValue()-1);
             //获取当前缴费项目关联的房间或者车位id集合
             String[] split = feeRuleEntity.getRelevance().split(",");
             //如果chargeMode=1表示按面积计算
@@ -73,11 +76,16 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                         List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
                         for (HouseEntity houseEntity : list) {
                             entity = new PropertyFinanceOrderEntity();
+                            entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
+                            entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
+                            entity.setHid(1);
+                            entity.setFeeRuleId(feeRuleEntity.getId());
                             entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
                             entity.setCommunityId(feeRuleEntity.getCommunityId());
                             entity.setOrderTime(LocalDate.now());
-                            entity.setUid("");
-                            entity.setHouseId(houseEntity.getHouseId());
+                            entity.setAssociatedType(1);
+                            entity.setUid(houseEntity.getUid());
+                            entity.setTargetId(houseEntity.getHouseId());
                             entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
                             entity.setPenalSum(new BigDecimal("0"));
                             entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
@@ -95,11 +103,16 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                         List<HouseEntity> list=houseMapper.selectInIds(split);
                         for (HouseEntity houseEntity : list) {
                             entity = new PropertyFinanceOrderEntity();
+                            entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
+                            entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
+                            entity.setHid(1);
+                            entity.setFeeRuleId(feeRuleEntity.getId());
                             entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
                             entity.setCommunityId(feeRuleEntity.getCommunityId());
                             entity.setOrderTime(LocalDate.now());
-                            entity.setUid("");
-                            entity.setHouseId(houseEntity.getHouseId());
+                            entity.setAssociatedType(1);
+                            entity.setUid(houseEntity.getUid());
+                            entity.setTargetId(houseEntity.getHouseId());
                             entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
                             entity.setPenalSum(new BigDecimal("0"));
                             entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
@@ -115,11 +128,16 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                         List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
                         for (HouseEntity houseEntity : list) {
                             entity = new PropertyFinanceOrderEntity();
+                            entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
+                            entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
+                            entity.setHid(1);
+                            entity.setFeeRuleId(feeRuleEntity.getId());
                             entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
                             entity.setCommunityId(feeRuleEntity.getCommunityId());
                             entity.setOrderTime(LocalDate.now());
-                            entity.setUid("");
-                            entity.setHouseId(houseEntity.getHouseId());
+                            entity.setAssociatedType(1);
+                            entity.setUid(houseEntity.getUid());
+                            entity.setTargetId(houseEntity.getHouseId());
                             entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
                             entity.setPenalSum(new BigDecimal("0"));
                             entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
@@ -139,11 +157,16 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
                     for (HouseEntity houseEntity : list) {
                         entity = new PropertyFinanceOrderEntity();
+                        entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
+                        entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
+                        entity.setHid(1);
+                        entity.setFeeRuleId(feeRuleEntity.getId());
                         entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
                         entity.setCommunityId(feeRuleEntity.getCommunityId());
                         entity.setOrderTime(LocalDate.now());
-                        entity.setUid("");
-                        entity.setHouseId(houseEntity.getHouseId());
+                        entity.setAssociatedType(1);
+                        entity.setUid(houseEntity.getUid());
+                        entity.setTargetId(houseEntity.getHouseId());
                         entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
                         entity.setPenalSum(new BigDecimal("0"));
                         entity.setTotalMoney(feeRuleEntity.getMonetaryUnit());
@@ -164,9 +187,8 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
             //把封装好的list批量新增到数据库订单表
             propertyFinanceOrderMapper.saveList(orderList);
         }
-    }
 
-    
+    }
 
     /**
      * @Description: 更新所有小区账单
@@ -178,27 +200,23 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePenalSum(){
-        QueryWrapper<UserHouseEntity> wrapper = new QueryWrapper<>();
-        wrapper.select("DISTINCT community_id");
-//        wrapper.eq("check_status",1);
-        //查出所有认证过的小区ID
-        List<UserHouseEntity> entityList = userHouseMapper.selectList(wrapper);
-        for (UserHouseEntity houseEntity : entityList) {
-            //查询当前小区的收费规则
-            PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("status", 1).eq("community_id",houseEntity.getCommunityId()));
-            if (entity != null) {
-                //查询当前小区所有未结算的账单
-                List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("community_id", houseEntity.getCommunityId()).eq("order_status",0));
-                for (PropertyFinanceOrderEntity orderEntity : entities) {
-                    //根据小区缴费规则生成违约金
-                    if (orderEntity.getOrderTime().plusDays(entity.getPenalDays()).isBefore(LocalDate.now())) {
-                        orderEntity.setPenalSum(orderEntity.getPenalSum().add(orderEntity.getPropertyFee().multiply(entity.getPenalSum())));
-                        orderEntity.setTotalMoney(orderEntity.getPropertyFee().multiply(entity.getPenalSum()).add(orderEntity.getTotalMoney()));
-                        propertyFinanceOrderMapper.updateById(orderEntity);
-                    }
-                }
+        Map<Long, PropertyFeeRuleEntity> map = new HashMap<>();
+        //查询所有缴费项目封装到map里面
+        List<PropertyFeeRuleEntity> ruleEntities = propertyFeeRuleMapper.selectList(null);
+        for (PropertyFeeRuleEntity ruleEntity : ruleEntities) {
+            map.put(ruleEntity.getId(),ruleEntity);
+        }
+        //查詢所有未缴费的订单
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("order_status", 0));
+        for (PropertyFinanceOrderEntity entity : list) {
+            //如果超过违约天数还未缴就生成违约金
+            if (entity.getOrderTime().plusDays(map.get(entity.getFeeRuleId()).getPenalDays()).isBefore(LocalDate.now())) {
+                entity.setPenalSum(entity.getPenalSum().add(entity.getPropertyFee().multiply(map.get(entity.getFeeRuleId()).getPenalSum())));
+                entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()));
+                propertyFinanceOrderMapper.updateById(entity);
             }
         }
+
     }
 
     /**

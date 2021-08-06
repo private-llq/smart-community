@@ -23,7 +23,13 @@ import java.time.LocalDateTime;
 @TableName("t_property_finance_order")
 public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "账单号")
+    private Long feeRuleId;
+    @ApiModelProperty(value = "关联类型1房屋，2车位")
+    private Integer associatedType;
+    @ApiModelProperty(value = "账单号")
     private String orderNum;
+    @ApiModelProperty(value = "生成类型1系统生成，2其他")
+    private String buildType;
     @ApiModelProperty(value = "支付单号")
     private Long communityId;
     @ApiModelProperty(value = "应缴月份")
@@ -31,11 +37,15 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "用户id")
     private String uid;
     @ApiModelProperty(value = "房间id")
-    private Long houseId;
+    private Long targetId;
     @ApiModelProperty(value = "物业费")
     private BigDecimal propertyFee;
     @ApiModelProperty(value = "违约金")
     private BigDecimal penalSum;
+    @ApiModelProperty(value = "优惠金额")
+    private BigDecimal coupon;
+    @ApiModelProperty(value = "预存款抵扣")
+    private BigDecimal deduction;
     @ApiModelProperty(value = "总金额")
     private BigDecimal totalMoney;
     @ApiModelProperty(value = "账单状态 0.待收款 1.已收款  (关联收款单)")
@@ -53,9 +63,21 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "三方单号")
     private String tripartiteOrder;
 
+    @ApiModelProperty(value = "账单开始时间")
+    private LocalDate beginTime;
+    @ApiModelProperty(value = "账单结束时间")
+    private LocalDate overTime;
+    @ApiModelProperty(value = "状态1显示，2隐藏")
+    private Integer hid;
+
+
     @ApiModelProperty(value = "房屋全称",hidden = true)
     @TableField(exist = false)
     private String address;
+
+    @ApiModelProperty(value = "缴费项目名称",hidden = true)
+    @TableField(exist = false)
+    private String feeRuleName;
     
     @ApiModelProperty(value = "业主姓名",hidden = true)
     @TableField(exist = false)

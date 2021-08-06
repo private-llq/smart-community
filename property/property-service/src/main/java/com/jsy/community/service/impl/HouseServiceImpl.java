@@ -1,9 +1,5 @@
 package com.jsy.community.service.impl;
 
-import com.google.common.collect.Lists;
-
-import java.time.LocalDateTime;
-
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -782,7 +779,20 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
     public List<HouseEntity> getAllHouse(Long communityId) {
         return houseMapper.getAllHouse(communityId);
     }
-    
+
+
+    /**
+     * @Description: 查询所有房间
+     * @author: Hu
+     * @since: 2021/8/6 16:22
+     * @Param: []
+     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+     */
+    @Override
+    public List<HouseEntity> selectAll() {
+        return houseMapper.selectList(null);
+    }
+
     /**
     * @Description: 检查楼栋单元数据真实性
      * @Param: [buildingId, unitId, communityId]

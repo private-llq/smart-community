@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFinanceCountEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.vo.StatementOrderVO;
 import com.jsy.community.vo.property.FinanceOrderEntityVO;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
@@ -206,4 +207,22 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @Date: 2021/7/7
     **/
     int updateOrderBatch(@Param("payType")Integer payType, @Param("tripartiteOrder")String tripartiteOrder, @Param("ids")String[] ids);
+
+    /**
+     * @Description: 查询所有账单
+     * @author: Hu
+     * @since: 2021/8/6 15:48
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> findList(@Param("page") long page, @Param("size") Long size, @Param("query") FinanceOrderQO query);
+
+    /**
+     * @Description: 查询总条数
+     * @author: Hu
+     * @since: 2021/8/6 16:18
+     * @Param:
+     * @return:
+     */
+    Integer getTotal(@Param("query") FinanceOrderQO query);
 }

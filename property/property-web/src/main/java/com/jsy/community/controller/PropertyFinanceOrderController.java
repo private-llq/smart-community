@@ -7,6 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.util.excel.impl.FinanceExcelImpl;
 import com.jsy.community.utils.ExcelUtil;
@@ -52,11 +53,11 @@ public class PropertyFinanceOrderController {
     private FinanceExcelImpl financeExcel;
 
     @ApiOperation("查询房屋所有未缴账单")
-    @GetMapping("/houseCost")
+    @PostMapping("/list")
     @Login
-    public CommonResult houseCost(@RequestParam("houseId") Long houseId){
+    public CommonResult list(@RequestBody BaseQO<FinanceOrderQO> baseQO){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        Map<String, Object> map=propertyFinanceOrderService.houseCost(userInfo,houseId);
+        Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
         return CommonResult.ok(map);
     }
     @ApiOperation("查询一条已交账单详情")

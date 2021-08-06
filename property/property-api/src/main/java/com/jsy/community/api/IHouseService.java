@@ -164,4 +164,5 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021-07-24
 	**/
 	void checkBuildingAndUnit(Long buildingId, Long unitId, Long communityId);
+
 }
