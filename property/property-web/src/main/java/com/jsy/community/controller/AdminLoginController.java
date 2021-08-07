@@ -173,6 +173,7 @@ public class AdminLoginController {
 		}
 		if (adminUserRoleEntity != null) {
 			adminInfoVo.setRoleId(adminUserRoleEntity.getRoleId());
+			userData.setRoleId(adminUserRoleEntity.getRoleId());
 			//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
 			if(adminCommunityList.size() == 1){
 				//小区管理员账号 直接登入小区菜单
