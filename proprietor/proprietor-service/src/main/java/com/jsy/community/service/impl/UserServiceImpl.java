@@ -533,7 +533,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             elasticsearchCarQO.setRelationshipId(userEntity.getUid());
             elasticsearchCarQO.setHouseId(qo.get(0).getHouseId());
             elasticsearchCarQO.setBuilding(entity.getBuilding());
-            elasticsearchCarQO.setFloor(entity.getFloor());
+            elasticsearchCarQO.setFloor(String.valueOf(entity.getFloor()));
             elasticsearchCarQO.setUnit(entity.getUnit());
             elasticsearchCarQO.setNumber(entity.getNumber());
             elasticsearchCarQO.setHouseType(entity.getHouseType());

@@ -28,6 +28,12 @@ public class HouseBuildingTypeEntity extends BaseEntity implements Serializable 
     @NotNull(groups = {addHouseBuildingTypeGroup.class}, message = "缺少楼宇分类名称")
     private String propertyTypeName;
     
+    @ApiModelProperty(value = "创建人")
+    private String createBy;
+    
+    @ApiModelProperty(value = "最近更新人")
+    private String updateBy;
+    
     /**
      * 新增楼宇分类验证组
      */

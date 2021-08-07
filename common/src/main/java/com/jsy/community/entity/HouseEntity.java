@@ -63,7 +63,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "楼层名",hidden = true)
     @Length(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "楼层名称过长")
     @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少楼层名称")
-    private String floor;
+    private Integer floor;
 
     @ApiModelProperty(value = "门牌名",hidden = true)
 //    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "门牌名称过长")
@@ -162,6 +162,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "楼宇分类")
     @NotNull(groups = {addBuildingGroup.class}, message = "缺少楼宇分类")
     private Integer buildingType;
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "楼宇分类名称")
+    private String buildingTypeName;
     
     @TableField(exist = false)
     @ApiModelProperty(value = "单元ID列表")

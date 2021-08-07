@@ -540,7 +540,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             for (HouseEntity houseEntity : pageData.getRecords()) {
                 Map<String, Long> countMap = bindMap.get(houseEntity.getId());
                 houseEntity.setHouseNumber(countMap != null ? countMap.get("count") : 0L);
-                houseEntity.setStatus(houseEntity.getHouseNumber() == 0 ? "空置" : "使用");
+                houseEntity.setStatus(houseEntity.getHouseNumber() == 0 ? "空置" : "入住");
             }
         }
         //补创建人和更新人姓名
@@ -555,6 +555,11 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         for (HouseEntity houseEntity : pageData.getRecords()) {
             houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
             houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
+        }
+        //补楼宇分类名称
+        HouseBuildingTypeEntity houseBuildingTypeEntity = houseBuildingTypeMapper.selectById(query.getBuildingType());
+        for (HouseEntity houseEntity : pageData.getRecords()) {
+            houseEntity.setBuildingTypeName(houseBuildingTypeEntity.getPropertyTypeName());
         }
         PageInfo<HouseEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData, pageInfo);
@@ -809,51 +814,56 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         List<HouseEntity> addHouseEntityList = new ArrayList<>();
         for (HouseEntity houseEntity : houseEntityList) {
             // 楼栋
-            if (!buildingNumMap.containsKey(houseEntity.getBuildingNumber())) {
+            if (!buildingNumMap.containsKey(houseEntity.getBuilding())) {
                 HouseEntity buildingHouseEntity = new HouseEntity();
-                buildingHouseEntity.setNumber(houseEntity.getBuildingNumber());
+//                buildingHouseEntity.setNumber(houseEntity.getBuildingNumber());
                 buildingHouseEntity.setCommunityId(communityId);
                 buildingHouseEntity.setBuilding(houseEntity.getBuilding());
+                buildingHouseEntity.setTotalFloor(houseEntity.getTotalFloor());
                 buildingHouseEntity.setPid(0L);
                 buildingHouseEntity.setType(1);
-                buildingHouseEntity.setPropertyType(houseEntity.getPropertyType());
+//                buildingHouseEntity.setPropertyType(houseEntity.getPropertyType());
                 buildingHouseEntity.setCreateBy(uid);
                 buildingHouseEntity.setId(SnowFlake.nextId());
                 buildingHouseEntity.setDeleted(0);
                 buildingHouseEntity.setCreateTime(LocalDateTime.now());
                 buildingHouseEntity.setUpdateTime(LocalDateTime.now());
-                buildingNumMap.put(houseEntity.getBuildingNumber(), buildingHouseEntity);
+                buildingNumMap.put(houseEntity.getBuilding(), buildingHouseEntity);
             }
             // 单元
-            if (!unitNumMap.containsKey(houseEntity.getUnitNumber())) {
+            if (!unitNumMap.containsKey(houseEntity.getUnit())) {
                 HouseEntity unitHouseEntity = new HouseEntity();
-                unitHouseEntity.setNumber(houseEntity.getUnitNumber());
+//                unitHouseEntity.setNumber(houseEntity.getUnitNumber());
                 unitHouseEntity.setCommunityId(communityId);
                 unitHouseEntity.setBuilding(houseEntity.getBuilding());
+                unitHouseEntity.setTotalFloor(houseEntity.getTotalFloor());
                 unitHouseEntity.setUnit(houseEntity.getUnit());
                 unitHouseEntity.setType(2);
-                unitHouseEntity.setPropertyType(houseEntity.getPropertyType());
+//                unitHouseEntity.setPropertyType(houseEntity.getPropertyType());
                 unitHouseEntity.setCreateBy(uid);
-                unitHouseEntity.setBuildingNumber(houseEntity.getBuildingNumber());
+//                unitHouseEntity.setBuildingNumber(houseEntity.getBuildingNumber());
                 unitHouseEntity.setId(SnowFlake.nextId());
                 unitHouseEntity.setDeleted(0);
                 unitHouseEntity.setCreateTime(LocalDateTime.now());
                 unitHouseEntity.setUpdateTime(LocalDateTime.now());
-                unitNumMap.put(houseEntity.getUnitNumber(), unitHouseEntity);
+                unitNumMap.put(houseEntity.getBuilding() + houseEntity.getUnit(), unitHouseEntity);
             }
             // 房屋
             HouseEntity addHouseEntity = new HouseEntity();
-            addHouseEntity.setNumber(houseEntity.getNumber());
+//            addHouseEntity.setNumber(houseEntity.getNumber());
             addHouseEntity.setCommunityId(communityId);
             addHouseEntity.setBuilding(houseEntity.getBuilding());
+            addHouseEntity.setTotalFloor(houseEntity.getTotalFloor());
             addHouseEntity.setUnit(houseEntity.getUnit());
-            addHouseEntity.setUnitNumber(houseEntity.getUnitNumber());
+            addHouseEntity.setDoor(houseEntity.getDoor());
+//            addHouseEntity.setUnitNumber(houseEntity.getUnitNumber());
             addHouseEntity.setFloor(houseEntity.getFloor());
             addHouseEntity.setType(4);
             addHouseEntity.setBuildArea(houseEntity.getBuildArea());
-            addHouseEntity.setHouseType(houseEntity.getHouseType());
-            addHouseEntity.setPropertyType(houseEntity.getPropertyType());
-            addHouseEntity.setDecoration(houseEntity.getDecoration());
+            addHouseEntity.setPracticalArea(houseEntity.getPracticalArea());
+//            addHouseEntity.setHouseType(houseEntity.getHouseType());
+//            addHouseEntity.setPropertyType(houseEntity.getPropertyType());
+//            addHouseEntity.setDecoration(houseEntity.getDecoration());
             addHouseEntity.setComment(houseEntity.getComment());
             addHouseEntity.setCreateBy(uid);
             addHouseEntity.setId(SnowFlake.nextId());
@@ -869,29 +879,29 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         if (CollectionUtil.isNotEmpty(allExistHouseEntities)) {
             for (HouseEntity houseEntity : allExistHouseEntities) {
                 if (houseEntity.getType() == 1) {
-                    buildingNumSet.add(houseEntity.getNumber());
+                    buildingNumSet.add(houseEntity.getBuilding());
                 }
                 if (houseEntity.getType() == 2) {
-                    unitNumSet.add(houseEntity.getNumber());
+                    unitNumSet.add(houseEntity.getBuilding() + houseEntity.getUnit());
                 }
             }
         }
         // 需要添加的楼栋实体
         List<HouseEntity> addBuildingHouseEntityList = new ArrayList<>();
-        for (String number : buildingNumMap.keySet()) {
-            if (!buildingNumSet.contains(number)) {
-                addBuildingHouseEntityList.add(buildingNumMap.get(number));
+        for (String building : buildingNumMap.keySet()) {
+            if (!buildingNumSet.contains(building)) {
+                addBuildingHouseEntityList.add(buildingNumMap.get(building));
             }
         }
         // 需要添加的单元实体
         List<HouseEntity> addUnitHouseEntityList = new ArrayList<>();
         allExistHouseEntities.addAll(addBuildingHouseEntityList);
         for (String number : unitNumMap.keySet()) {
-            if (!buildingNumSet.contains(number)) {
+            if (!unitNumSet.contains(number)) {
                 // 新增单元,比对原有的楼栋和新增的楼栋,获取楼栋id
                 for (HouseEntity houseEntity : allExistHouseEntities) {
                     if (houseEntity.getType() == 1) {
-                        if (houseEntity.getNumber().equals(unitNumMap.get(number).getBuildingNumber())) {
+                        if (houseEntity.getBuilding().equals(unitNumMap.get(number).getBuilding())) {
                             HouseEntity unitHouseEntity = unitNumMap.get(number).setPid(houseEntity.getId());
                             addUnitHouseEntityList.add(unitHouseEntity);
                         }
@@ -904,7 +914,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         for (HouseEntity houseEntity : addHouseEntityList) {
             for (HouseEntity allExistHouseEntity : allExistHouseEntities) {
                 if (allExistHouseEntity.getType() == 2) {
-                    if (houseEntity.getUnitNumber().equals(allExistHouseEntity.getNumber())) {
+                    if ((houseEntity.getBuilding() + houseEntity.getUnit()).equals(allExistHouseEntity.getBuilding() + allExistHouseEntity.getUnit())) {
                         houseEntity.setPid(allExistHouseEntity.getId());
                     }
                 }

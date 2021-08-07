@@ -99,7 +99,7 @@ public class RelationServiceImpl implements IRelationService {
             elasticsearchCarQO.setRelationshipId(relationQo.getId()+"");
             elasticsearchCarQO.setHouseId(relationQo.getHouseId());
             elasticsearchCarQO.setBuilding(houseEntity.getBuilding());
-            elasticsearchCarQO.setFloor(houseEntity.getFloor());
+            elasticsearchCarQO.setFloor(String.valueOf(houseEntity.getFloor()));
             elasticsearchCarQO.setUnit(houseEntity.getUnit());
             elasticsearchCarQO.setNumber(houseEntity.getNumber());
             elasticsearchCarQO.setHouseType(houseEntity.getHouseType());

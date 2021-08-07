@@ -7,7 +7,6 @@ import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
-import com.jsy.community.constant.PropertyEnum;
 import com.jsy.community.entity.HouseBuildingTypeEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.exception.JSYError;
@@ -202,6 +201,7 @@ public class HouseController {
 		ValidatorUtils.validateEntity(houseBuildingTypeEntity,HouseBuildingTypeEntity.addHouseBuildingTypeGroup.class);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
 		houseBuildingTypeEntity.setCommunityId(loginUser.getCommunityId());
+		houseBuildingTypeEntity.setCreateBy(UserUtils.getUserId());
 		return houseService.addHouseBuildingType(houseBuildingTypeEntity)
 			? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增楼宇分类失败");
 	}
@@ -220,6 +220,7 @@ public class HouseController {
 		ValidatorUtils.validateEntity(houseBuildingTypeEntity);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
 		houseBuildingTypeEntity.setCommunityId(loginUser.getCommunityId());
+		houseBuildingTypeEntity.setUpdateBy(UserUtils.getUserId());
 		return houseService.updateHouseBuildingType(houseBuildingTypeEntity)
 			? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改楼宇分类失败");
 	}
@@ -277,12 +278,63 @@ public class HouseController {
 		}
 	}
 
+//	/**
+//	 *@Author: Pipi
+//	 *@Description: 导入房屋信息
+//	 *@Param: excel:
+//	 *@Return: com.jsy.community.vo.CommonResult
+//	 *@Date: 2021/5/19 11:38
+//	 **/
+//	@Login
+//	@ApiOperation("导入房屋信息")
+//	@PostMapping("/importHouseExcel")
+//	public CommonResult importHouseExcel(MultipartFile excel) {
+//		//参数验证
+//		validFileSuffix(excel);
+//		Long adminCommunityId = UserUtils.getAdminCommunityId();
+//		String userId = UserUtils.getUserId();
+//		ArrayList<HouseImportErrorVO> errorVos = new ArrayList<>(32);
+//		List<HouseEntity> houseEntities = houseExcelHandler.importHouseExcel(excel, errorVos);
+//		List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);
+//		// 通过物业提交的数据 和 数据库该社区已存在的数据进行效验
+//		Iterator<HouseEntity> iterator = houseEntities.iterator();
+//		while (iterator.hasNext()) {
+//			HouseEntity houseEntity = iterator.next();
+//			for (HouseEntity entity : allHouse) {
+//				// 类型是房屋,房屋编号已经存在
+//				if (entity.getNumber().equals(houseEntity.getNumber()) && entity.getType() == 4) {
+//					iterator.remove();
+//					HouseImportErrorVO errorVO = new HouseImportErrorVO();
+//					BeanUtils.copyProperties(houseEntity, errorVO);
+//					errorVO.setHouseType(PropertyEnum.HouseTypeEnum.getName(houseEntity.getHouseType()));
+//					errorVO.setPropertyType(PropertyEnum.PropertyTypeEnum.getName(houseEntity.getPropertyType()));
+//					errorVO.setDecoration(PropertyEnum.DecorationEnum.getName(houseEntity.getDecoration()));
+//					errorVO.setRemark("房屋编号已经存在!");
+//					errorVos.add(errorVO);
+//				}
+//			}
+//		}
+//		Integer row = 0;
+//		if (CollectionUtil.isNotEmpty(houseEntities)) {
+//			//获取管理员姓名 用于标识每条业主数据的创建人
+//			row = houseService.saveHouseBatch(houseEntities, adminCommunityId, userId);
+//		}
+//		//excel导入失败的信息明细 文件下载地址
+//		String errorExcelAddr = null;
+//		//错误excel写入远程服务器 让物业人员可以直接下载
+//		if( CollectionUtil.isNotEmpty(errorVos) ){
+//			errorExcelAddr = uploadErrorExcel(errorVos);
+//		}
+//		//构造返回对象
+//		return CommonResult.ok(new HouseImportErrorVO(row, errorVos.size(), errorExcelAddr));
+//	}
+	
 	/**
-	 *@Author: Pipi
+	 *@Author: DKS
 	 *@Description: 导入房屋信息
 	 *@Param: excel:
 	 *@Return: com.jsy.community.vo.CommonResult
-	 *@Date: 2021/5/19 11:38
+	 *@Date: 2021/8/7 13:38
 	 **/
 	@Login
 	@ApiOperation("导入房屋信息")
@@ -300,15 +352,22 @@ public class HouseController {
 		while (iterator.hasNext()) {
 			HouseEntity houseEntity = iterator.next();
 			for (HouseEntity entity : allHouse) {
-				// 类型是房屋,房屋编号已经存在
-				if (entity.getNumber().equals(houseEntity.getNumber()) && entity.getType() == 4) {
+				// 类型是房屋,房屋已经存在
+				if (entity.getBuilding().equals(houseEntity.getBuilding()) && entity.getUnit().equals(houseEntity.getUnit()) && entity.getFloor().equals(houseEntity.getFloor())
+					&& entity.getDoor().equals(houseEntity.getDoor()) && entity.getType() == 4) {
 					iterator.remove();
 					HouseImportErrorVO errorVO = new HouseImportErrorVO();
 					BeanUtils.copyProperties(houseEntity, errorVO);
-					errorVO.setHouseType(PropertyEnum.HouseTypeEnum.getName(houseEntity.getHouseType()));
-					errorVO.setPropertyType(PropertyEnum.PropertyTypeEnum.getName(houseEntity.getPropertyType()));
-					errorVO.setDecoration(PropertyEnum.DecorationEnum.getName(houseEntity.getDecoration()));
-					errorVO.setRemark("房屋编号已经存在!");
+//					errorVO.setHouseType(PropertyEnum.HouseTypeEnum.getName(houseEntity.getHouseType()));
+//					errorVO.setPropertyType(PropertyEnum.PropertyTypeEnum.getName(houseEntity.getPropertyType()));
+//					errorVO.setDecoration(PropertyEnum.DecorationEnum.getName(houseEntity.getDecoration()));
+					errorVO.setDoor(houseEntity.getDoor());
+					errorVO.setBuilding(houseEntity.getBuilding());
+					errorVO.setTotalFloor(houseEntity.getTotalFloor());
+					errorVO.setUnit(houseEntity.getUnit());
+					errorVO.setFloor(houseEntity.getFloor());
+					errorVO.setBuildArea(houseEntity.getBuildArea());
+					errorVO.setRemark("房屋已经存在!");
 					errorVos.add(errorVO);
 				}
 			}
