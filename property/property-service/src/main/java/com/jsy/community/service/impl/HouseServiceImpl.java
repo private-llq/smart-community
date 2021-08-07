@@ -523,6 +523,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         }
         //查询类型为房屋，设置房屋类型、房产类型、装修情况、户型
         else if (BusinessConst.BUILDING_TYPE_DOOR == query.getType()) {
+            List<Long> paramList = new ArrayList<>();
             for (HouseEntity houseEntity : pageData.getRecords()) {
                 houseEntity.setHouseTypeStr(PropertyEnum.HouseTypeEnum.HOUSE_TYPE_MAP.get(houseEntity.getHouseType()));
                 // houseEntity.setPropertyTypeStr(PropertyEnum.PropertyTypeEnum.PROPERTY_TYPE_MAP.get(houseEntity.getPropertyType()));
@@ -532,6 +533,14 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                     continue;
                 }
                 setHouseTypeCodeStr(houseEntity);
+                paramList.add(houseEntity.getId());
+            }
+            //查询住户数量
+            Map<Long, Map<String, Long>> bindMap = houseMapper.selectHouseNumberCount(paramList);
+            for (HouseEntity houseEntity : pageData.getRecords()) {
+                Map<String, Long> countMap = bindMap.get(houseEntity.getId());
+                houseEntity.setHouseNumber(countMap != null ? countMap.get("count") : 0L);
+                houseEntity.setStatus(houseEntity.getHouseNumber() == 0 ? "空置" : "使用");
             }
         }
         //补创建人和更新人姓名
@@ -919,7 +928,20 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
     public List<HouseEntity> getAllHouse(Long communityId) {
         return houseMapper.getAllHouse(communityId);
     }
-    
+
+
+    /**
+     * @Description: 查询所有房间
+     * @author: Hu
+     * @since: 2021/8/6 16:22
+     * @Param: []
+     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+     */
+    @Override
+    public List<HouseEntity> selectAll() {
+        return houseMapper.selectList(null);
+    }
+
     /**
     * @Description: 检查楼栋单元数据真实性
      * @Param: [buildingId, unitId, communityId]

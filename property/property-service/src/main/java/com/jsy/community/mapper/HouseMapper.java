@@ -243,4 +243,14 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @return:
 	 */
 	List<HouseEntity> selectUserHouseAuth(@Param("split") String[] split);
+	
+	/**
+	 * @Description: 查询住户数量
+	 * @author: DKS
+	 * @since: 2021/8/6 16:38
+	 * @Param:
+	 * @return:
+	 */
+	@MapKey("houseId")
+	Map<Long,Map<String,Long>> selectHouseNumberCount(@Param("list") Collection<Long> houseIds);
 }

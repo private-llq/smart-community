@@ -76,7 +76,7 @@ public interface IHouseService extends IService<HouseEntity> {
 	**/
 	boolean deleteHouse(Long id,Long communityId);
 	//=========================== 基础增删改查 结束 ==============================
-	
+
 	/**
 	 * @Description: 新增楼宇分类
 	 * @Param: [houseBuildingTypeEntity]
@@ -85,7 +85,7 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021/08/05
 	 **/
 	boolean addHouseBuildingType(HouseBuildingTypeEntity houseBuildingTypeEntity);
-	
+
 	/**
 	 * @Description: 修改楼宇分类
 	 * @Param: [houseBuildingTypeEntity]
@@ -94,7 +94,7 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021/08/05
 	 **/
 	boolean updateHouseBuildingType(HouseBuildingTypeEntity houseBuildingTypeEntity);
-	
+
 	/**
 	 * @Description: 删除楼宇分类
 	 * @Param: [id,communityId]
@@ -103,7 +103,7 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021/08/05
 	 **/
 	boolean deleteHouseBuildingType(Long id,Long communityId);
-	
+
 	/**
 	 * @Description: 查询楼宇分类
 	 * @Param: [baseQO]
@@ -202,4 +202,13 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021-07-24
 	**/
 	void checkBuildingAndUnit(Long buildingId, Long unitId, Long communityId);
+
+	/**
+	 * @Description: 查询所有房间
+	 * @author: Hu
+	 * @since: 2021/8/6 16:21
+	 * @Param:
+	 * @return:
+	 */
+    List<HouseEntity> selectAll();
 }
