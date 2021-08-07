@@ -253,4 +253,13 @@
 		</foreach>
     </select>
 
+	<!-- 查询住户数量 -->
+	<select id="selectHouseNumberCount" resultType="Map">
+		select house_id as houseId,count(0) as count from t_house_member
+		where house_id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		group by house_id
+	</select>
 </mapper>

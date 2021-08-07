@@ -89,6 +89,17 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @NotNull(groups = {addRoomValidatedGroup.class}, message = "缺少建筑面积")
     private Double buildArea;
     
+    @ApiModelProperty(value = "实用面积(㎡)")
+    private Double practicalArea;
+    
+    @ApiModelProperty(value = "状态")
+    @TableField(exist = false)
+    private String status;
+    
+    @ApiModelProperty(value = "住户数量")
+    @TableField(exist = false)
+    private Long houseNumber;
+    
     @ApiModelProperty(value = "房屋类型1.商铺 2.住宅")
 //    @NotNull(groups = addRoomValidatedGroup.class, message = "缺少房屋类型")
 //    @Range(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, min = 1, max = 2 , message = "非法房屋类型")
