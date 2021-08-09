@@ -57,5 +57,5 @@ public class HouseQO implements Serializable {
     private Integer totalFloor;
     
     @ApiModelProperty(value = "楼宇分类")
-    private Integer buildingType;
+    private Long buildingType;
 }

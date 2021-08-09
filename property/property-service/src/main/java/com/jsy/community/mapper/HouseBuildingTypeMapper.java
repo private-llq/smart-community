@@ -21,11 +21,11 @@ public interface HouseBuildingTypeMapper extends BaseMapper<HouseBuildingTypeEnt
 	/**
 	 * @Description: 批量查询楼宇分类名称
 	 * @Param: [ids]
-	 * @Return: java.util.Map<java.lang.Integer,java.util.Map<java.lang.String,java.lang.String>>
+	 * @Return: java.util.Map<java.lang.Long,java.util.Map<java.lang.String,java.lang.String>>
 	 * @Author: DKS
 	 * @Date: 2021/8/9
 	 **/
 	@MapKey("id")
-	Map<Integer, Map<String,String>> queryHouseBuildingType(@Param("list") List<Integer> ids);
+	Map<Long, Map<String,String>> queryHouseBuildingType(@Param("list") List<Long> ids);
 	
 }
