@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.PageInfo;
@@ -77,7 +78,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    PropertyFinanceOrderVO getOrderNum(AdminInfoVo userInfo, String orderNum);
+    PropertyFinanceOrderVO getOrderNum(AdminInfoVo userInfo, Long id);
 
     /**
     * @Description: 分页查询已缴费 (缴费模块)
@@ -160,5 +161,23 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    void deletes(String ids);
+    void deletes(FinanceOrderOperationQO financeOrderOperationQO);
+
+    /**
+     * @Description: 修改一条订单状态
+     * @author: Hu
+     * @since: 2021/8/9 14:09
+     * @Param:
+     * @return:
+     */
+    void update(Long id);
+
+    /**
+     * @Description: 条件修改订单状态
+     * @author: Hu
+     * @since: 2021/8/9 14:09
+     * @Param:
+     * @return:
+     */
+    void updates(FinanceOrderOperationQO financeOrderOperationQO);
 }

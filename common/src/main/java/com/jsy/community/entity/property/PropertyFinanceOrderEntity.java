@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "账单号")
     private Long feeRuleId;
+    @ApiModelProperty(value = "账单类型")
+    private Integer type;
     @ApiModelProperty(value = "关联类型1房屋，2车位")
     private Integer associatedType;
     @ApiModelProperty(value = "账单号")

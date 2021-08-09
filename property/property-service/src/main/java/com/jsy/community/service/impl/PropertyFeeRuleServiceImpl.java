@@ -10,6 +10,7 @@ import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FeeRuleVO;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -48,6 +49,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     @Override
     public void saveOne(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
 //        propertyFeeRuleEntity.setCommunityId(userInfo.getCommunityId());
+        propertyFeeRuleEntity.setId(SnowFlake.nextId());
         propertyFeeRuleEntity.setCreateBy(userInfo.getUid());
         propertyFeeRuleEntity.setStatus(0);
         propertyFeeRuleEntity.setCreateTime(LocalDateTime.now());

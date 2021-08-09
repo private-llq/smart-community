@@ -7,6 +7,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.util.excel.impl.FinanceExcelImpl;
@@ -80,17 +81,33 @@ public class PropertyFinanceOrderController {
     @ApiOperation("删除多条条账单")
     @DeleteMapping("/deletes")
     @Login
-    public CommonResult deletes(@RequestParam("ids") String ids){
+    public CommonResult deletes(@RequestBody FinanceOrderOperationQO financeOrderOperationQO){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        propertyFinanceOrderService.deletes(ids);
+        propertyFinanceOrderService.deletes(financeOrderOperationQO);
+        return CommonResult.ok();
+    }
+    @ApiOperation("修改一条订单状态")
+    @PutMapping("/update")
+    @Login
+    public CommonResult update(@RequestParam("id") Long id){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.update(id);
+        return CommonResult.ok();
+    }
+    @ApiOperation("条件修改订单状态")
+    @PutMapping("/updates")
+    @Login
+    public CommonResult updates(@RequestBody FinanceOrderOperationQO financeOrderOperationQO){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.updates(financeOrderOperationQO);
         return CommonResult.ok();
     }
     @ApiOperation("查询一条已交账单详情")
     @GetMapping("/getOrderNum")
     @Login
-    public CommonResult getOrderNum(@RequestParam("orderNum") String orderNum){
+    public CommonResult getOrderNum(@RequestParam("id") Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        PropertyFinanceOrderVO propertyFinanceOrderVO=propertyFinanceOrderService.getOrderNum(userInfo,orderNum);
+        PropertyFinanceOrderVO propertyFinanceOrderVO=propertyFinanceOrderService.getOrderNum(userInfo,id);
         return CommonResult.ok(propertyFinanceOrderVO);
     }
     

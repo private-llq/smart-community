@@ -13,6 +13,7 @@ import com.jsy.community.entity.property.PropertyFinanceStatementEntity;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.MyPageUtils;
@@ -118,8 +119,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @return: com.jsy.community.vo.property.PropertyFinanceOrderVO
      */
     @Override
-    public PropertyFinanceOrderVO getOrderNum(AdminInfoVo userInfo, String orderNum) {
-        PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectOne(new QueryWrapper<PropertyFinanceOrderEntity>().eq("order_num", orderNum));
+    public PropertyFinanceOrderVO getOrderNum(AdminInfoVo userInfo, Long id) {
+        PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(id);
         HouseEntity houseEntity = houseService.getOne(new QueryWrapper<HouseEntity>().eq("id", propertyFinanceOrderEntity.getTargetId()));
         PropertyFinanceOrderVO financeOrderVO = new PropertyFinanceOrderVO();
         BeanUtils.copyProperties(propertyFinanceOrderEntity,financeOrderVO);
@@ -542,6 +543,21 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     }
 
 
+    @Override
+    public void update(Long id) {
+        propertyFinanceOrderMapper.updateStatus(id);
+    }
+
+    @Override
+    public void updates(FinanceOrderOperationQO financeOrderOperationQO) {
+        if (financeOrderOperationQO.getOrderTimeOver()!=null){
+            financeOrderOperationQO.setOrderTimeOver(financeOrderOperationQO.getOrderTimeOver().plusDays(1));
+        }
+        if (financeOrderOperationQO.getOverTime()!=null){
+            financeOrderOperationQO.setOverTime(financeOrderOperationQO.getOverTime().plusMonths(1));
+        }
+        propertyFinanceOrderMapper.updates(financeOrderOperationQO);
+    }
 
     /**
      * @Description: 删除多条账单
@@ -551,8 +567,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @return: void
      */
     @Override
-    public void deletes(String ids) {
-        propertyFinanceOrderMapper.delete(new QueryWrapper<PropertyFinanceOrderEntity>().in("id",ids.split(",")));
+    public void deletes(FinanceOrderOperationQO financeOrderOperationQO) {
+        QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
+        if (financeOrderOperationQO.getOrderTimeBegin()!=null){
+            wrapper.ge("order_time",financeOrderOperationQO.getOrderTimeBegin());
+        }
+        if (financeOrderOperationQO.getOrderTimeOver()!=null){
+            financeOrderOperationQO.setOrderTimeOver(financeOrderOperationQO.getOrderTimeOver().plusDays(1));
+            wrapper.le("order_time",financeOrderOperationQO.getOrderTimeOver());
+        }
+        if (financeOrderOperationQO.getType()!=null){
+            wrapper.eq("type",financeOrderOperationQO.getType());
+        }
+        propertyFinanceOrderMapper.delete(wrapper);
     }
 
     /**

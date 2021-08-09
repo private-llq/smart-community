@@ -34,7 +34,7 @@ public class FinanceOrderQO implements Serializable {
     private String orderNum;
 
     /**
-     * 收费单号
+     * 生成时间
      */
     private LocalDate orderTime;
 
