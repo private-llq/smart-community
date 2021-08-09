@@ -1,6 +1,7 @@
 package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 /**
  * @Author: Pipi
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  * @Date: 2021/8/7 16:43
  * @Version: 1.0
  **/
+@Data
 @TableName("t_property_finance_ticket_optional_type_field")
 public class FinanceTicketOptionalTypeFieldEntity {
     // 模板类型;1:缴费单;2:收据'
