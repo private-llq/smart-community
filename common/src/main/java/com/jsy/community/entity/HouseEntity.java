@@ -161,7 +161,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     
     @ApiModelProperty(value = "楼宇分类")
     @NotNull(groups = {addBuildingGroup.class}, message = "缺少楼宇分类")
-    private Integer buildingType;
+    private Long buildingType;
     
     @TableField(exist = false)
     @ApiModelProperty(value = "楼宇分类名称")

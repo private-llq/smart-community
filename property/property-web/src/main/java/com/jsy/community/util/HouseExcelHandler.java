@@ -42,4 +42,13 @@ public interface HouseExcelHandler {
      *@Date: 2021/5/21 17:51
      **/
     Workbook exportErrorExcel(List<HouseImportErrorVO> errorVos);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出房屋信息表
+     *@Param: :
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/9 14:46
+     **/
+    Workbook exportHouse(List<?> entityList);
 }

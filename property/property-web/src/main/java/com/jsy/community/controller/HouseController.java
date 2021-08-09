@@ -167,7 +167,9 @@ public class HouseController {
 			query.setUnit(query.getName());
 		}else if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
 			query.setDoor(query.getName());
-		}else{
+		}else if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == query.getType()) {
+		
+		} else {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"非法查询类型");
 		}
 		return CommonResult.ok(houseService.queryHouse(baseQO));
@@ -443,7 +445,7 @@ public class HouseController {
 		//设置响应的文件mime类型为 xls类型
 		multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
 		Workbook workbook = new XSSFWorkbook();
-//		workbook = houseExcelHandler.exportMaterOrder(houseEntities);
+		workbook = houseExcelHandler.exportHouse(houseEntities);
 		//把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
 		try {
 			return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
