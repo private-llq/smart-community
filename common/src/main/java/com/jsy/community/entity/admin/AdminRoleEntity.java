@@ -31,4 +31,7 @@ public class AdminRoleEntity extends BaseEntity {
 	@TableField(exist = false)
 	private List<Long> menuIds;//菜单ID列表
 
+	@TableField(exist = false)
+	private List<AdminMenuEntity> menuList;//菜单ID列表
+
 }

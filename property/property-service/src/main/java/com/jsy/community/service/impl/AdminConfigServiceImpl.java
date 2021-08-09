@@ -248,7 +248,43 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
 	}
-	
+
+	/**
+	 * @param roleId : 角色ID
+	 * @param companyId : 物业公司ID
+	 * @author: Pipi
+	 * @description: 查询角色详情
+	 * @return: com.jsy.community.entity.admin.AdminRoleEntity
+	 * @date: 2021/8/9 10:33
+	 **/
+	@Override
+	public AdminRoleEntity queryRoleDetail(Long roleId, Long companyId) {
+		// 查询角色信息
+		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id", roleId);
+		queryWrapper.eq("company_id", companyId);
+		AdminRoleEntity adminRoleEntity = adminRoleMapper.selectOne(queryWrapper);
+		if (adminRoleEntity == null) {
+			return adminRoleEntity;
+		}
+		// 查询分配的菜单列表
+		List<Long> roleMuneIds = adminRoleMenuMapper.queryRoleMuneIdsByRoleId(roleId);
+		// 查询所有菜单
+		QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
+		menuEntityQueryWrapper.select("*, name as label");
+		List<AdminMenuEntity> menuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
+		for (AdminMenuEntity menuEntity : menuEntities) {
+			if (roleMuneIds.contains(menuEntity.getId())) {
+				menuEntity.setChecked(true);
+			} else {
+				menuEntity.setChecked(false);
+			}
+		}
+		List<AdminMenuEntity> returnMenuEntities = assemblyMenuData(menuEntities);
+		adminRoleEntity.setMenuList(returnMenuEntities);
+		return adminRoleEntity;
+	}
+
 	//==================================================== 角色-菜单 ===============================================================
 	/**
 	 * @Description: 为角色设置菜单
@@ -313,13 +349,32 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	@Override
 	public List<AdminMenuEntity> queryMenuByUid(Long roleId, Integer loginType){
 		//查ID
-		List<Long> menuIdList = adminRoleMenuMapper.queryRoleMuneIds(roleId, loginType);
+		List<Long> menuIdList = adminRoleMenuMapper.queryRoleMuneIdsByRoleIdAndLoginType(roleId, loginType);
 		if(CollectionUtils.isEmpty(menuIdList)){
 			return null;
 		}
 		//查实体
 		List<AdminMenuEntity> menuEntityList = adminMenuMapper.queryMenuBatch(menuIdList,loginType);
 		//组装数据
+		List<AdminMenuEntity> returnList = new ArrayList<>();
+		for(AdminMenuEntity adminMenuEntity : menuEntityList){
+			if(adminMenuEntity.getPid() == 0L){
+				returnList.add(adminMenuEntity);
+			}
+		}
+		menuEntityList.removeAll(returnList);
+		setChildrenMenu(returnList,menuEntityList);
+		return returnList;
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 组装菜单数据
+	 * @param menuEntityList: 需要组装的数据
+	 * @return: java.util.List<com.jsy.community.entity.admin.AdminMenuEntity>
+	 * @date: 2021/8/9 11:19
+	 **/
+	private List<AdminMenuEntity> assemblyMenuData(List<AdminMenuEntity> menuEntityList) {
 		List<AdminMenuEntity> returnList = new ArrayList<>();
 		for(AdminMenuEntity adminMenuEntity : menuEntityList){
 			if(adminMenuEntity.getPid() == 0L){

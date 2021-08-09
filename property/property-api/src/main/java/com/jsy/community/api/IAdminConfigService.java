@@ -93,6 +93,16 @@ public interface IAdminConfigService {
 	**/
 	PageInfo<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO);
 
+	/**
+	 * @author: Pipi
+	 * @description: 查询角色详情
+	 * @param roleId: 角色ID
+	 * @param companyId: 物业公司ID
+	 * @return: com.jsy.community.entity.admin.AdminRoleEntity
+	 * @date: 2021/8/9 10:33
+	 **/
+	AdminRoleEntity queryRoleDetail(Long roleId, Long companyId);
+
 	//==================================================== 用户-角色 ===============================================================
 	/**
 	 * @author: Pipi

@@ -21,5 +21,14 @@ public interface AdminRoleMenuMapper extends BaseMapper<AdminRoleMenuEntity> {
      * @return: java.util.List<java.lang.Long>
      * @date: 2021/8/6 14:09
      **/
-    List<Long> queryRoleMuneIds(@Param("roleId") Long roleId, @Param("loginType") Integer loginType);
+    List<Long> queryRoleMuneIdsByRoleIdAndLoginType(@Param("roleId") Long roleId, @Param("loginType") Integer loginType);
+
+    /**
+     * @author: Pipi
+     * @description: 查询角色的菜单ID列表
+     * @param roleId: 角色ID
+     * @return: java.util.List<java.lang.Long>
+     * @date: 2021/8/9 10:57
+     **/
+    List<Long> queryRoleMuneIdsByRoleId(Long roleId);
 }
