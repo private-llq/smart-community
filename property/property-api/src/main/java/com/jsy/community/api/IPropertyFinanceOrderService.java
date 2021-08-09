@@ -135,4 +135,30 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
     PropertyFinanceOrderEntity findOne(Long orderId);
 
 
+    /**
+     * @Description: 修改订单优惠金额
+     * @author: Hu
+     * @since: 2021/8/7 14:24
+     * @Param:
+     * @return:
+     */
+    void updateOrder(Long id, BigDecimal coupon);
+
+    /**
+     * @Description: 删除一条账单信息
+     * @author: Hu
+     * @since: 2021/8/7 14:34
+     * @Param:
+     * @return:
+     */
+    void delete(Long id);
+
+    /**
+     * @Description: 删除多条账单
+     * @author: Hu
+     * @since: 2021/8/7 14:36
+     * @Param:
+     * @return:
+     */
+    void deletes(String ids);
 }

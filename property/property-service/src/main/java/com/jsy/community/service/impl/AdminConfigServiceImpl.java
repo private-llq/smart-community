@@ -39,22 +39,22 @@ import java.util.*;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 public class AdminConfigServiceImpl implements IAdminConfigService {
-	
+
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
-	
+
 	@Resource
 	private AdminMenuMapper adminMenuMapper;
-	
+
 	@Resource
 	private AdminRoleMapper adminRoleMapper;
-	
+
 	@Resource
 	private AdminUserMenuMapper adminUserMenuMapper;
-	
+
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;
-	
+
 	@Autowired
 	private AdminCommunityMapper adminCommunityMapper;
 
@@ -66,12 +66,12 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 
 	//==================================================== Menu菜单 (旧) ===============================================================
 	/**
-	* @Description: 新增菜单
+	 * @Description: 新增菜单
 	 * @Param: [sysMenuEntity]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
-	**/
+	 **/
 	@Deprecated
 	@Override
 	public boolean addMenu(AdminMenuEntity adminMenuEntity){
@@ -101,7 +101,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return false;
 	}
-	
+
 	//寻找顶级菜单ID
 //	private void setBelongTo(AdminMenuEntity sysMenuEntity,AdminMenuEntity parent){
 //		if(0L != parent.getPid()){ //要新增的菜单非顶级
@@ -113,14 +113,14 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //			}
 //		}
 //	}
-	
+
 	/**
-	* @Description: 级联删除
+	 * @Description: 级联删除
 	 * @Param: [id]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
-	**/
+	 **/
 	@Override
 	public boolean delMenu(Long id){
 		List<Long> idList = new LinkedList<>(); // 级联出的要删除的id
@@ -136,7 +136,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return false;
 	}
-	
+
 	//组装全部需要删除的id
 //	private void setDeleteIds(List<Long> idList, List<Long> subIdList) {
 //		if(!CollectionUtils.isEmpty(subIdList)){
@@ -145,14 +145,14 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //			setDeleteIds(idList,sysMenuMapper.getSubIdList(subIdList));
 //		}
 //	}
-	
+
 	/**
-	* @Description: 修改菜单
+	 * @Description: 修改菜单
 	 * @Param: [sysMenuQO]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
-	**/
+	 **/
 	@Override
 	public boolean updateMenu(AdminMenuQO sysMenuQO){
 		AdminMenuEntity entity = new AdminMenuEntity();
@@ -164,7 +164,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return false;
 	}
-	
+
 	//==================================================== Role角色 ===============================================================
 	/**
 	 * @Description: 添加角色
@@ -183,7 +183,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return adminRoleMapper.insert(adminRoleEntity) == 1;
 	}
-	
+
 	/**
 	 * @Description: 删除角色
 	 * @Param: [id]
@@ -195,7 +195,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	public boolean delRole(Long id, Long companyId){
 		return adminRoleMapper.delete(new QueryWrapper<AdminRoleEntity>().eq("id",id).eq("company_id",companyId)) == 1;
 	}
-	
+
 	/**
 	 * @Description: 修改角色
 	 * @Param: [sysRoleQO]
@@ -215,7 +215,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
 	}
-	
+
 	/**
 	 * @Description: 角色列表 分页查询
 	 * @Param: []
@@ -248,6 +248,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
 	}
+
 
 	/**
 	 * @param roleId : 角色ID
@@ -326,26 +327,26 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 
 	//==================================================== 用户-菜单 (旧) ===============================================================
 	/**
-	* @Description: 查询用户菜单权限(老接口，暂时弃用)
+	 * @Description: 查询用户菜单权限(老接口，暂时弃用)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
-	**/
+	 **/
 	@Deprecated
 	@Override
 	public List<AdminMenuEntity> queryUserMenu(Long uid){
 		return adminMenuMapper.queryUserMenu(uid);
 	}
-	
+
 	//================================================== 新版物业端原型 - 用户-菜单start =========================================================================
 	/**
-	* @Description: 查询用户菜单权限(新接口)
+	 * @Description: 查询用户菜单权限(新接口)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
-	**/
+	 **/
 	@Override
 	public List<AdminMenuEntity> queryMenuByUid(Long roleId, Integer loginType){
 		//查ID
@@ -367,6 +368,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		return returnList;
 	}
 
+
 	/**
 	 * @author: Pipi
 	 * @description: 组装菜单数据
@@ -385,7 +387,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		setChildrenMenu(returnList,menuEntityList);
 		return returnList;
 	}
-	
+
 	/**
 	 * 组装子菜单
 	 */
@@ -407,42 +409,42 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			if(!CollectionUtils.isEmpty(child.getChildren())){
 				setChildrenMenu(child.getChildren(),childrenCopy);
 			}
-		childrenCopy.removeAll(selected);
+			childrenCopy.removeAll(selected);
 		}
 	}
-	
+
 	/**
-	* @Description: 统计用户菜单数
+	 * @Description: 统计用户菜单数
 	 * @Param: [uid]
 	 * @Return: java.lang.Integer
 	 * @Author: chq459799974
 	 * @Date: 2021/4/8
-	**/
+	 **/
 	@Override
 	public Integer countUserMenu(String uid){
 		return adminUserMenuMapper.selectCount(new QueryWrapper<AdminUserMenuEntity>().eq("uid",uid));
 	}
-	
+
 	/**
-	* @Description: 查询用户菜单id列表
+	 * @Description: 查询用户菜单id列表
 	 * @Param: [uid]
 	 * @Return: java.util.List<java.lang.String>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/9
-	**/
+	 **/
 	@Override
 	public List<String> queryUserMenuIdList(String uid){
 		//返回UID对应菜单列表
 		return adminUserMenuMapper.queryUserMenuIdList(uid);
 	}
-	
+
 	/**
-	* @Description: 为用户分配菜单
+	 * @Description: 为用户分配菜单
 	 * @Param: [menuIds, uid]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2021/3/23
-	**/
+	 **/
 	@Override
 	public void setUserMenus(List<Long> menuIds,String uid){
 		//备份
@@ -476,7 +478,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 //		return true;
 	}
-	
+
 	/**
 	 * @Description: (功能授权)菜单列表
 	 * @Param: []
@@ -489,13 +491,16 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		List<AdminMenuEntity> list;
 		try{
 			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
+			if (list == null) {
+				return queryMenu();//从mysql获取
+			}
 		}catch (Exception e){
 			log.error("redis获取菜单失败");
 			return queryMenu();//从mysql获取
 		}
 		return list;
 	}
-	
+
 	/**
 	 * @Description: 缓存菜单到redis
 	 * @Param: []
@@ -507,7 +512,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	private void cacheMenuToRedis(){
 		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(queryMenu()));
 	}
-	
+
 	/**
 	 * @Description: 查询全部菜单
 	 * @Param: []
@@ -518,6 +523,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	private List<AdminMenuEntity> queryMenu(){
 		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*,name as label").eq("pid", 0));
 		setChildren(menuList,new LinkedList<>());
+		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(menuList));
 		return menuList;
 	}
 	/**
@@ -532,19 +538,19 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			}
 		}
 	}
-	
+
 	/**
-	* @Description: 管理员社区权限列表查询
+	 * @Description: 管理员社区权限列表查询
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminCommunityEntity>
 	 * @Author: chq459799974
 	 * @Date: 2021/7/22
-	**/
+	 **/
 	@Override
 	public List<AdminCommunityEntity> listAdminCommunity(String uid){
 		return adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id").eq("uid",uid));
 	}
-	
+
 	/**
 	 * @Description: 管理员社区权限id列表查询
 	 * @Param: [uid]
@@ -556,7 +562,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	public List<Long> queryAdminCommunityIdListByUid(String uid){
 		return adminCommunityMapper.queryAdminCommunityIdListByUid(uid);
 	}
-	
+
 	/**
 	 * 管理员社区权限批量修改
 	 */
@@ -589,3 +595,4 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }
+

@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -83,6 +84,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             if (entity.getAssociatedType()==1){
                 entity.setAddress(map.get(entity.getTargetId()));
             }
+            entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()).subtract(entity.getCoupon()).subtract(entity.getDeduction()));
         }
         Integer total = propertyFinanceOrderMapper.getTotal(baseQO.getQuery());
         Map<String, Object> hashMap = new HashMap<>();
@@ -542,6 +544,47 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
 
     /**
+     * @Description: 删除多条账单
+     * @author: Hu
+     * @since: 2021/8/7 14:37
+     * @Param: [ids]
+     * @return: void
+     */
+    @Override
+    public void deletes(String ids) {
+        propertyFinanceOrderMapper.delete(new QueryWrapper<PropertyFinanceOrderEntity>().in("id",ids.split(",")));
+    }
+
+    /**
+     * @Description: 删除一条账单信息
+     * @author: Hu
+     * @since: 2021/8/7 14:35
+     * @Param: [id]
+     * @return: void
+     */
+    @Override
+    public void delete(Long id) {
+        propertyFinanceOrderMapper.deleteById(id);
+    }
+
+    /**
+     * @Description: 修改订单优惠金额
+     * @author: Hu
+     * @since: 2021/8/7 14:24
+     * @Param: [id, coupon]
+     * @return: void
+     */
+    @Override
+    public void updateOrder(Long id, BigDecimal coupon) {
+        PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(id);
+        if (orderEntity!=null){
+            orderEntity.setTotalMoney(coupon);
+            orderEntity.setUpdateTime(LocalDateTime.now());
+            propertyFinanceOrderMapper.updateById(orderEntity);
+        }
+    }
+
+    /**
      * @Description: 查询一条物业账单详情
      * @author: Hu
      * @since: 2021/7/6 11:14
@@ -554,7 +597,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     }
 
 
-    
+
     /**
     * @Description: 支付完成后-批量修改物业账单
      * @Param: [payType, tripartiteOrder, ids]
@@ -569,7 +612,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
     }
 
-    @Override
     /**
      * @Description: 查询物业账单总金额
      * @author: Hu
@@ -577,6 +619,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @Param: [orderIds]
      * @return: java.math.BigDecimal
      */
+    @Override
     public BigDecimal getTotalMoney(String ids) {
         BigDecimal totalMoney = propertyFinanceOrderMapper.getTotalMoney(ids.split(","));
         return totalMoney == null ? new BigDecimal("0.00") : totalMoney;
