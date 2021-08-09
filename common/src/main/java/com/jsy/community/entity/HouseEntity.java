@@ -32,7 +32,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
 //    @NotBlank(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
 //    @Length(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "编号过长")
     @NotBlank(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
-    @Length(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "编号过长")
+    @Length(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, max = 20, message = "编号过长")
     private String number;
     
     @ApiModelProperty(value = "房间code",hidden = true)
@@ -61,7 +61,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private String unit;
 
     @ApiModelProperty(value = "楼层名",hidden = true)
-    @Length(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "楼层名称过长")
+//    @Length(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "楼层名称过长")
     @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少楼层名称")
     private Integer floor;
 
