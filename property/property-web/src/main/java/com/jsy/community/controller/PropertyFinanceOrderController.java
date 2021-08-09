@@ -29,6 +29,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -59,6 +60,30 @@ public class PropertyFinanceOrderController {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
         return CommonResult.ok(map);
+    }
+    @ApiOperation("修改订单优惠金额")
+    @PutMapping("/updateOrder")
+    @Login
+    public CommonResult updateOrder(@RequestParam("id") Long id, @RequestParam("coupon")BigDecimal coupon){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.updateOrder(id,coupon);
+        return CommonResult.ok();
+    }
+    @ApiOperation("删除一条账单")
+    @DeleteMapping("/delete")
+    @Login
+    public CommonResult delete(@RequestParam("id") Long id){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.delete(id);
+        return CommonResult.ok();
+    }
+    @ApiOperation("删除多条条账单")
+    @DeleteMapping("/deletes")
+    @Login
+    public CommonResult deletes(@RequestParam("ids") String ids){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.deletes(ids);
+        return CommonResult.ok();
     }
     @ApiOperation("查询一条已交账单详情")
     @GetMapping("/getOrderNum")
