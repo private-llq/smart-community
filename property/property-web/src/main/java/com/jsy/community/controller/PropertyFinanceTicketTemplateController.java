@@ -39,7 +39,7 @@ public class PropertyFinanceTicketTemplateController {
     @Login
     @PostMapping("/addTicketTemplate")
     public CommonResult addTicketTemplate(@RequestBody FinanceTicketTemplateEntity templateEntity) {
-        ValidatorUtils.validateEntity(templateEntity);
+        ValidatorUtils.validateEntity(templateEntity, FinanceTicketTemplateEntity.AddTicketTemplateValidate.class);
         templateEntity.setDeleted(0);
         templateEntity.setCommunityId(String.valueOf(UserUtils.getAdminCommunityId()));
         String id = ticketTemplateService.insertTicketTemplate(templateEntity);

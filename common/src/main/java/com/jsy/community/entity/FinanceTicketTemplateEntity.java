@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @Author: Pipi
@@ -36,6 +38,11 @@ public class FinanceTicketTemplateEntity extends BaseEntity {
     // 收费类型收费类型字符
     @TableField(exist = false)
     private String chargeTypeStr;
+
+    // 字段列表
+    @TableField(exist = false)
+    @NotEmpty(groups = AddTicketTemplateValidate.class, message = "请选择字段")
+    private List<FinanceTicketTemplateFieldEntity> templateFieldEntities;
 
     public interface AddTicketTemplateValidate{}
     public interface UpdateTicketTemplateValidate{}

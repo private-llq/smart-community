@@ -270,12 +270,12 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		// 查询分配的菜单列表
 		List<Long> roleMuneIds = adminRoleMenuMapper.queryRoleMuneIdsByRoleId(roleId);
-		QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
+		/*QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
 		menuEntityQueryWrapper.select("*, name as label");
 		menuEntityQueryWrapper.in("id", roleMuneIds);
 		List<AdminMenuEntity> adminMenuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
 		// 查询所有菜单
-		/*QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
+		QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
 		menuEntityQueryWrapper.select("*, name as label");
 		List<AdminMenuEntity> menuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
 		for (AdminMenuEntity menuEntity : menuEntities) {
@@ -284,9 +284,10 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			} else {
 				menuEntity.setChecked(false);
 			}
-		}*/
+		}
 		List<AdminMenuEntity> returnMenuEntities = assemblyMenuData(adminMenuEntities);
-		adminRoleEntity.setMenuList(returnMenuEntities);
+		adminRoleEntity.setMenuList(returnMenuEntities);*/
+		adminRoleEntity.setMenuIds(roleMuneIds);
 		return adminRoleEntity;
 	}
 
