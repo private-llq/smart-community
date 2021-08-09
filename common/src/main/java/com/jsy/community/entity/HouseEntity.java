@@ -31,8 +31,8 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "编号")
 //    @NotBlank(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
 //    @Length(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "编号过长")
-    @NotBlank(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
-    @Length(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, max = 20, message = "编号过长")
+//    @NotBlank(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
+//    @Length(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, max = 20, message = "编号过长")
     private String number;
     
     @ApiModelProperty(value = "房间code",hidden = true)

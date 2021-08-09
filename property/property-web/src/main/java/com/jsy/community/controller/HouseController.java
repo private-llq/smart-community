@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -419,6 +420,36 @@ public class HouseController {
 		boolean extension = FilenameUtils.isExtension(file.getOriginalFilename(), ExcelUtil.SUPPORT_EXCEL_EXTENSION);
 		if (!extension) {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "只支持excel文件!");
+		}
+	}
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 导出房屋信息
+	 *@Param: excel:
+	 *@Return: com.jsy.community.vo.CommonResult
+	 *@Date: 2021/8/7 13:38
+	 **/
+	@Login
+	@ApiOperation("导出房屋信息")
+	@PostMapping("/downloadHouseList")
+	public ResponseEntity<byte[]> downloadOrderList(@RequestBody HouseEntity houseEntity) {
+		houseEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		List<HouseEntity> houseEntities = houseService.queryExportHouseExcel(houseEntity);
+		//设置excel 响应头信息
+		MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+		//设置响应类型为附件类型直接下载这种
+		multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("房屋信息表.xlsx", StandardCharsets.UTF_8));
+		//设置响应的文件mime类型为 xls类型
+		multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+		Workbook workbook = new XSSFWorkbook();
+//		workbook = houseExcelHandler.exportMaterOrder(houseEntities);
+		//把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+		try {
+			return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
 		}
 	}
 }

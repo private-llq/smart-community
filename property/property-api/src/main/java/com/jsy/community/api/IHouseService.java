@@ -211,4 +211,13 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @return:
 	 */
     List<HouseEntity> selectAll();
+	
+	/**
+	 * @Description: 查询楼栋、单元、房屋导出数据
+	 * @Param: HouseEntity
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
+	 * @Author: DKS
+	 * @Date: 2021/8/9
+	 **/
+	List<HouseEntity> queryExportHouseExcel(HouseEntity houseEntity);
 }
