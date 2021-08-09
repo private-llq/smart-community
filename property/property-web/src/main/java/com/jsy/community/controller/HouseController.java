@@ -167,7 +167,8 @@ public class HouseController {
 			query.setUnit(query.getName());
 		}else if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
 			query.setDoor(query.getName());
-		}else if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == query.getType()) {
+		}else if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == query.getType() || BusinessConst.BUILDING_TYPE_DOOR_BUILDING == query.getType()
+			|| BusinessConst.BUILDING_TYPE_DOOR_UNIT == query.getType() || BusinessConst.BUILDING_TYPE_DOOR_BUILDING_UNIT == query.getType()) {
 		
 		} else {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"非法查询类型");
