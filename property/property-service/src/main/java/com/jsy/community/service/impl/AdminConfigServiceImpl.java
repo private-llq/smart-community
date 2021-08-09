@@ -270,8 +270,12 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		// 查询分配的菜单列表
 		List<Long> roleMuneIds = adminRoleMenuMapper.queryRoleMuneIdsByRoleId(roleId);
-		// 查询所有菜单
 		QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
+		menuEntityQueryWrapper.select("*, name as label");
+		menuEntityQueryWrapper.in("id", roleMuneIds);
+		List<AdminMenuEntity> adminMenuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
+		// 查询所有菜单
+		/*QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
 		menuEntityQueryWrapper.select("*, name as label");
 		List<AdminMenuEntity> menuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
 		for (AdminMenuEntity menuEntity : menuEntities) {
@@ -280,8 +284,8 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			} else {
 				menuEntity.setChecked(false);
 			}
-		}
-		List<AdminMenuEntity> returnMenuEntities = assemblyMenuData(menuEntities);
+		}*/
+		List<AdminMenuEntity> returnMenuEntities = assemblyMenuData(adminMenuEntities);
 		adminRoleEntity.setMenuList(returnMenuEntities);
 		return adminRoleEntity;
 	}
@@ -490,7 +494,8 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	public List<AdminMenuEntity> listOfMenu() {
 		List<AdminMenuEntity> list;
 		try{
-			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
+			// todo 此菜单Redis键名因为与线上环境调用一直,故在本地测试时键名改为Admin:MenuLocal,上传至线上时改为Admin:Menu
+			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:MenuLocal"),List.class);
 			if (list == null) {
 				return queryMenu();//从mysql获取
 			}
@@ -510,7 +515,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	@PostConstruct
 	private void cacheMenuToRedis(){
-		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(queryMenu()));
+		stringRedisTemplate.opsForValue().set("Admin:MenuLocal", JSON.toJSONString(queryMenu()));
 	}
 
 	/**
@@ -523,7 +528,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	private List<AdminMenuEntity> queryMenu(){
 		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*,name as label").eq("pid", 0));
 		setChildren(menuList,new LinkedList<>());
-		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(menuList));
+		stringRedisTemplate.opsForValue().set("Admin:MenuLocal", JSON.toJSONString(menuList));
 		return menuList;
 	}
 	/**
