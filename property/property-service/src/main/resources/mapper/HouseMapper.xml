@@ -141,6 +141,38 @@
 			#{houseEntity.updateTime})
 		</foreach>
 	</insert>
+
+	<!-- 批量新增楼栋数据 -->
+	<insert id="saveBuildingBatch">
+		insert into t_house (
+		id,
+		community_id,
+		total_floor,
+		type,
+		building,
+		pid,
+		building_type,
+		deleted,
+		create_by,
+		create_time,
+		update_time
+		)
+		values
+		<foreach collection="list" separator="," item="houseEntity">
+			(#{houseEntity.id},
+			#{houseEntity.communityId},
+			#{houseEntity.totalFloor},
+			#{houseEntity.type},
+			#{houseEntity.building},
+			#{houseEntity.pid},
+			#{houseEntity.buildingType},
+			#{houseEntity.deleted},
+			#{houseEntity.createBy},
+			#{houseEntity.createTime},
+			#{houseEntity.updateTime})
+		</foreach>
+	</insert>
+
 	<!-- 批量更新次级节点冗余的父级名称 -->
 	<update id="updateSub">
 		update t_house
@@ -203,7 +235,7 @@
 	<!-- ============================================ 物业端产品原型确定后新加的 结束  =========================================================== -->
 
 	<!-- 查房屋id与房屋映射关系 -->
-	<select id="queryIdAndHouseMap" resultType="com.jsy.community.entity.HouseEntity">
+	<select id="queryIdAndHouseMap" resultType="java.util.Map">
 		select id as houseId,concat(building,unit,floor,door) as address,building,unit from t_house
 		where id in
 		<foreach collection="houseIds" item="item" open="(" separator="," close=")">
@@ -226,6 +258,18 @@
 		from t_house
 		<where>
 			type in (1,2)
+			and community_id = #{communityId}
+			and deleted = 0
+		</where>
+	</select>
+
+	<!-- 通过社区ID查询出所有楼栋 -->
+	<select id="getBuildingList" resultType="com.jsy.community.entity.HouseEntity">
+		select
+		*
+		from t_house
+		<where>
+			type = 1
 			and community_id = #{communityId}
 			and deleted = 0
 		</where>

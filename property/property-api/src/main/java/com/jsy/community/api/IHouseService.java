@@ -105,7 +105,7 @@ public interface IHouseService extends IService<HouseEntity> {
 	boolean deleteHouseBuildingType(Long id,Long communityId);
 
 	/**
-	 * @Description: 查询楼宇分类
+	 * @Description: 分页查询楼宇分类
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseBuildingTypeEntity>
 	 * @Author: DKS
@@ -184,6 +184,15 @@ public interface IHouseService extends IService<HouseEntity> {
      *@Date: 2021/5/21 14:26
      **/
 	Integer saveHouseBatch(List<HouseEntity> houseEntityList, Long communityId, String uid);
+	
+	/**
+	 *@Author: DKS
+	 *@Description: excel导入时,批量新增楼栋数据
+	 *@Param: houseEntityList:
+	 *@Return: java.lang.Integer
+	 *@Date: 2021/8/10 11:26
+	 **/
+	Integer saveBuildingBatch(List<HouseEntity> houseEntityList, Long communityId, String uid);
 
 	/**
 	 *@Author: Pipi
@@ -220,4 +229,28 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021/8/9
 	 **/
 	List<HouseEntity> queryExportHouseExcel(HouseEntity houseEntity);
+	
+	/**
+	 * @Description: 查询楼宇分类
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseBuildingTypeEntity>
+	 * @Author: DKS
+	 * @Date: 2021/08/10
+	 **/
+	List<HouseBuildingTypeEntity> selectHouseBuildingType(Long communityId);
+	
+	/**
+	 * @Description: 批量查询楼宇分类id
+	 * @Author: DKS
+	 * @Date: 2021/08/10
+	 **/
+	Map<String, Map<String,Long>> queryHouseBuildingTypeId(List<String> buildingTypeNames);
+	
+	/**
+	 * @Description: 查询社区下所有楼栋
+	 * @author: DKS
+	 * @since: 2021/8/10 14:22
+	 * @Param: communityId
+	 * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 */
+	List<HouseEntity> selectAllBuilding(Long communityId);
 }
