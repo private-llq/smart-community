@@ -80,6 +80,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         for (HouseEntity houseEntity : list) {
             map.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getNumber());
         }
+        if(baseQO.getPage()==null||baseQO.getPage()==0){
+            baseQO.setPage(1L);
+        }
         List<PropertyFinanceOrderEntity> orderEntities = propertyFinanceOrderMapper.findList((baseQO.getPage()-1)*baseQO.getSize(),baseQO.getSize(),baseQO.getQuery());
         for (PropertyFinanceOrderEntity entity : orderEntities) {
             if (entity.getAssociatedType()==1){

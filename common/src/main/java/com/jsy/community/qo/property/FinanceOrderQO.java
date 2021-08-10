@@ -50,5 +50,5 @@ public class FinanceOrderQO implements Serializable {
     /**
      * 状态1显示，2隐藏
      */
-    private Integer hid;
+    private Integer hide;
 }
