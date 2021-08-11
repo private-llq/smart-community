@@ -144,20 +144,6 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         List<FeeRuleVO> page = propertyFeeRuleMapper.findList((baseQO.getPage()-1)*baseQO.getSize(),baseQO.getSize(),baseQO.getQuery());
         for (FeeRuleVO feeRuleVO : page) {
             feeRuleVO.setPeriodName(BusinessEnum.FeeRulePeriodEnum.getName(feeRuleVO.getPeriod()));
-            feeRuleVO.setChargeModeName(feeRuleVO.getChargeMode()==1?"面积":"固定金额");
-            if (feeRuleVO.getChargeMode()==1){
-                if (feeRuleVO.getDisposable()==1){
-                    feeRuleVO.setFormulaName("单价*面积");
-                }else {
-                    feeRuleVO.setFormulaName("单价*面积*周期");
-                }
-            }else {
-                if (feeRuleVO.getDisposable()==1){
-                    feeRuleVO.setFormulaName("固定金额");
-                }else {
-                    feeRuleVO.setFormulaName("单价*周期");
-                }
-            }
         }
         Integer total = propertyFeeRuleMapper.findTotal(baseQO.getQuery());
         Map<Object, Object> map = new HashMap<>();

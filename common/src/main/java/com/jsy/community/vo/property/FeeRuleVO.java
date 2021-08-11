@@ -21,7 +21,7 @@ public class FeeRuleVO implements Serializable {
     /**
      * 启用状态
      */
-    private String status;
+    private Integer status;
 
     /**
      * 项目名称
@@ -29,27 +29,14 @@ public class FeeRuleVO implements Serializable {
     private String name;
 
     /**
-     * 1固定金额~单价*面积，2单价*面积~单价*面积*周期
-     */
-    private Integer formula;
-
-    /**
      * 计费公式
      */
-    private String formulaName;
+    private String formula;
 
     /**
-     * 计费方式1面积，2定额
+     * 计价方式
      */
-    private Integer chargeMode;
-    /**
-     * 计费方式
-     */
-    private Integer disposable;
-    /**
-     * 计费方式
-     */
-    private String chargeModeName;
+    private String valuation;
 
     /**
      * 单价
@@ -65,4 +52,16 @@ public class FeeRuleVO implements Serializable {
      * 周期，1月，2季，3半年，4
      */
     private String periodName;
+
+    /**
+     * 周期，1月，2季，3半年，4
+     */
+    private String relevance;
+
+    /**
+     * 报表展示0不展示，1展示
+     */
+    private Integer reportStatus;
+
+
 }
