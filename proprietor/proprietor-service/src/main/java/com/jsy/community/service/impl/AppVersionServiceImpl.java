@@ -10,6 +10,7 @@ import com.jsy.community.entity.AppVersionEntity;
 import com.jsy.community.mapper.AppVersionMapper;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.elasticsearch.client.security.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.util.StringUtils;

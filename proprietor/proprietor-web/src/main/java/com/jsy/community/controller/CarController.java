@@ -43,7 +43,6 @@ public class CarController {
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private ICarService carService;
 
-
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
 

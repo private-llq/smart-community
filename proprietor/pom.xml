@@ -21,6 +21,8 @@
 		<module>proprietor-service</module>
 		<module>proprietor-common</module>
 	</modules>
+
+
 	
 	<dependencies>
 		<dependency>
