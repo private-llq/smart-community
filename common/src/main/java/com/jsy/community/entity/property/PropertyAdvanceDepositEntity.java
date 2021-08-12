@@ -22,7 +22,7 @@ public class PropertyAdvanceDepositEntity extends BaseEntity {
 	private Long communityId;
 	
 	@ApiModelProperty(value = "房屋id")
-	private Long house_id;
+	private Long houseId;
 	
 	@ApiModelProperty(value = "充值余额")
 	private BigDecimal balance;

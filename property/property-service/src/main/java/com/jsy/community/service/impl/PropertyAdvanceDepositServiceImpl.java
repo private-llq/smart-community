@@ -63,7 +63,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
         // 查询手机号绑定房屋的id
         List<Long> houseIdList = proprietorMapper.queryBindHouseBymobile(propertyAdvanceDepositEntity.getMobile(), propertyAdvanceDepositEntity.getCommunityId());
         for (Long houseId : houseIdList) {
-            if (houseId == propertyAdvanceDepositEntity.getHouse_id()) {
+            if (houseId.equals(propertyAdvanceDepositEntity.getHouseId())) {
                 propertyAdvanceDepositEntity.setId(SnowFlake.nextId());
                 row = propertyAdvanceDepositMapper.insert(propertyAdvanceDepositEntity);
             }
@@ -123,14 +123,14 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
         }
         // 补充房屋地址
         for (PropertyAdvanceDepositEntity propertyAdvanceDepositEntity : pageData.getRecords()) {
-            HouseEntity houseEntity = houseMapper.selectById(propertyAdvanceDepositEntity.getHouse_id());
+            HouseEntity houseEntity = houseMapper.selectById(propertyAdvanceDepositEntity.getHouseId());
             if (houseEntity != null) {
                 propertyAdvanceDepositEntity.setAddress(houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor());
             }
         }
         // 补充真实姓名、电话
         for (PropertyAdvanceDepositEntity propertyAdvanceDepositEntity : pageData.getRecords()) {
-            ProprietorEntity proprietorEntity = proprietorMapper.queryNameAndMobileByHouseId(propertyAdvanceDepositEntity.getHouse_id(), propertyAdvanceDepositEntity.getCommunityId());
+            ProprietorEntity proprietorEntity = proprietorMapper.queryNameAndMobileByHouseId(propertyAdvanceDepositEntity.getHouseId(), propertyAdvanceDepositEntity.getCommunityId());
             if (proprietorEntity != null) {
                 propertyAdvanceDepositEntity.setRealName(proprietorEntity.getRealName());
                 propertyAdvanceDepositEntity.setMobile(proprietorEntity.getMobile());

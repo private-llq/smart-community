@@ -62,7 +62,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "楼层名",hidden = true)
 //    @Length(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "楼层名称过长")
-    @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少楼层名称")
+//    @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少楼层名称")
     private Integer floor;
 
     @ApiModelProperty(value = "门牌名",hidden = true)
