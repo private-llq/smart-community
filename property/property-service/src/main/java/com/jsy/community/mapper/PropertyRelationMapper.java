@@ -91,4 +91,13 @@ public interface PropertyRelationMapper extends BaseMapper<HouseMemberEntity> {
      * @return:
      */
     void emigrations(Long[] ids);
+
+    /**
+     * @Description: 批量删除
+     * @author: Hu
+     * @since: 2021/8/3 17:20
+     * @Param:
+     * @return:
+     */
+    void deletes(@Param("longAry") Long[] longAry);
 }

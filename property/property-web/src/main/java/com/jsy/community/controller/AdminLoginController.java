@@ -1,21 +1,16 @@
 package com.jsy.community.controller;
 
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.admin.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
-import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.MyCaptchaUtil;
 import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.RegexUtils;
@@ -27,12 +22,10 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -41,12 +34,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -167,30 +155,38 @@ public class AdminLoginController {
 		}
 		//用户资料
 		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
-		
+
+		// 查询用户角色
+		AdminUserRoleEntity adminUserRoleEntity = adminConfigService.queryRoleIdByUid(userData.getUid());
+
 		//有权限的小区列表
 		List<AdminCommunityEntity> adminCommunityList = adminConfigService.listAdminCommunity(userData.getUid());
 		
 		//用户菜单
-		List<AdminMenuEntity> userMenu;
+		List<AdminMenuEntity> userMenu = new ArrayList<>();
 		//返回VO
 		AdminInfoVo adminInfoVo = new AdminInfoVo();
+
 		//判断有无任一社区权限
 		if(CollectionUtils.isEmpty(adminCommunityList)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无社区管理权限，请联系管理员添加社区权限");
 		}
-		//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
-		if(adminCommunityList.size() == 1){
-			//小区管理员账号 直接登入小区菜单
-			userData.setCommunityId(adminCommunityList.get(0).getCommunityId());
-			userMenu = adminConfigService.queryMenuByUid(userData.getUid(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
-			//设置登录类型
-			adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_COMMUNITY);
-		}else{
-			//物业公司账号 进入物业公司管理菜单
-			userMenu = adminConfigService.queryMenuByUid(userData.getUid(),PropertyConsts.LOGIN_TYPE_PROPERTY);
-			//设置登录类型
-			adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
+		if (adminUserRoleEntity != null) {
+			adminInfoVo.setRoleId(adminUserRoleEntity.getRoleId());
+			userData.setRoleId(adminUserRoleEntity.getRoleId());
+			//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
+			if(adminCommunityList.size() == 1){
+				//小区管理员账号 直接登入小区菜单
+				userData.setCommunityId(adminCommunityList.get(0).getCommunityId());
+				userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
+				//设置登录类型
+				adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_COMMUNITY);
+			}else{
+				//物业公司账号 进入物业公司管理菜单
+				userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(),PropertyConsts.LOGIN_TYPE_PROPERTY);
+				//设置登录类型
+				adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
+			}
 		}
 		//设置菜单
 		userData.setMenuList(userMenu);
@@ -229,7 +225,7 @@ public class AdminLoginController {
 		//用户资料
 		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
 		//用户菜单
-		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getUserId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
+		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
 		//设置小区级菜单
 		user.setMenuList(userMenu);
 		//设置小区ID

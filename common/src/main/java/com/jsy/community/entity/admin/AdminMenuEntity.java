@@ -1,5 +1,6 @@
 package com.jsy.community.entity.admin;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsy.community.entity.BaseEntity;
@@ -28,8 +29,15 @@ public class AdminMenuEntity extends BaseEntity {
 	private Long pid;//父级id
 	@JsonIgnore
 	private Long belongTo;//顶级菜单id
+	@TableField(exist = false)
 	private List<AdminMenuEntity> children;//子菜单
 	
 	private Long createBy;//创建人
 	private Long updateBy;//修改人
+	// name的别名
+	@TableField(exist = false)
+	private String label;
+	// 是否选中,true为选中
+	@TableField(exist = false)
+	private Boolean checked;
 }

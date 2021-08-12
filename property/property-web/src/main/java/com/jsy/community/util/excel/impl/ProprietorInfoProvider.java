@@ -84,9 +84,9 @@ public class ProprietorInfoProvider {
                     break;
                 //TITLE_FIELD 索引4为楼层
                 case 4:
-                    String floor = houseEntity.getFloor();
-                    if (StrUtil.isNotEmpty(floor)) {
-                        set.add(floor);
+                    Integer floor = houseEntity.getFloor();
+                    if (floor != null) {
+                        set.add(String.valueOf(floor));
                     }
                     break;
                 //TITLE_FIELD 索引5为门牌

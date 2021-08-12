@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.PropertyFinanceCountEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.qo.property.FinanceOrderOperationQO;
+import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.vo.StatementOrderVO;
 import com.jsy.community.vo.property.FinanceOrderEntityVO;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.UserPropertyFinanceOrderVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -206,4 +209,41 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @Date: 2021/7/7
     **/
     int updateOrderBatch(@Param("payType")Integer payType, @Param("tripartiteOrder")String tripartiteOrder, @Param("ids")String[] ids);
+
+    /**
+     * @Description: 查询所有账单
+     * @author: Hu
+     * @since: 2021/8/6 15:48
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> findList(@Param("page") long page, @Param("size") Long size, @Param("query") FinanceOrderQO query);
+
+    /**
+     * @Description: 查询总条数
+     * @author: Hu
+     * @since: 2021/8/6 16:18
+     * @Param:
+     * @return:
+     */
+    Integer getTotal(@Param("query") FinanceOrderQO query);
+
+    /**
+     * @Description: 修改一条订单状态
+     * @author: Hu
+     * @since: 2021/8/9 14:10
+     * @Param:
+     * @return:
+     */
+    @Update("update t_property_finance_order set hide=2 where id=#{id}")
+    void updateStatus(Long id);
+
+    /**
+     * @Description: 条件修改订单状态
+     * @author: Hu
+     * @since: 2021/8/9 14:13
+     * @Param:
+     * @return:
+     */
+    void updates(FinanceOrderOperationQO financeOrderOperationQO);
 }

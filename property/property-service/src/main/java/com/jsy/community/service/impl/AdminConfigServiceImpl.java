@@ -8,15 +8,9 @@ import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.admin.AdminCommunityEntity;
-import com.jsy.community.entity.admin.AdminMenuEntity;
-import com.jsy.community.entity.admin.AdminRoleEntity;
-import com.jsy.community.entity.admin.AdminUserMenuEntity;
+import com.jsy.community.entity.admin.*;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.mapper.AdminCommunityMapper;
-import com.jsy.community.mapper.AdminMenuMapper;
-import com.jsy.community.mapper.AdminRoleMapper;
-import com.jsy.community.mapper.AdminUserMenuMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
@@ -45,33 +39,39 @@ import java.util.*;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 public class AdminConfigServiceImpl implements IAdminConfigService {
-	
+
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
-	
+
 	@Resource
 	private AdminMenuMapper adminMenuMapper;
-	
+
 	@Resource
 	private AdminRoleMapper adminRoleMapper;
-	
+
 	@Resource
 	private AdminUserMenuMapper adminUserMenuMapper;
-	
+
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;
-	
+
 	@Autowired
 	private AdminCommunityMapper adminCommunityMapper;
-	
+
+	@Autowired
+	private AdminUserRoleMapper adminUserRoleMapper;
+
+	@Autowired
+	private AdminRoleMenuMapper adminRoleMenuMapper;
+
 	//==================================================== Menu菜单 (旧) ===============================================================
 	/**
-	* @Description: 新增菜单
+	 * @Description: 新增菜单
 	 * @Param: [sysMenuEntity]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
-	**/
+	 **/
 	@Deprecated
 	@Override
 	public boolean addMenu(AdminMenuEntity adminMenuEntity){
@@ -101,7 +101,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return false;
 	}
-	
+
 	//寻找顶级菜单ID
 //	private void setBelongTo(AdminMenuEntity sysMenuEntity,AdminMenuEntity parent){
 //		if(0L != parent.getPid()){ //要新增的菜单非顶级
@@ -113,14 +113,14 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //			}
 //		}
 //	}
-	
+
 	/**
-	* @Description: 级联删除
+	 * @Description: 级联删除
 	 * @Param: [id]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
-	**/
+	 **/
 	@Override
 	public boolean delMenu(Long id){
 		List<Long> idList = new LinkedList<>(); // 级联出的要删除的id
@@ -136,7 +136,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return false;
 	}
-	
+
 	//组装全部需要删除的id
 //	private void setDeleteIds(List<Long> idList, List<Long> subIdList) {
 //		if(!CollectionUtils.isEmpty(subIdList)){
@@ -145,14 +145,14 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //			setDeleteIds(idList,sysMenuMapper.getSubIdList(subIdList));
 //		}
 //	}
-	
+
 	/**
-	* @Description: 修改菜单
+	 * @Description: 修改菜单
 	 * @Param: [sysMenuQO]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
-	**/
+	 **/
 	@Override
 	public boolean updateMenu(AdminMenuQO sysMenuQO){
 		AdminMenuEntity entity = new AdminMenuEntity();
@@ -164,7 +164,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return false;
 	}
-	
+
 	//==================================================== Role角色 ===============================================================
 	/**
 	 * @Description: 添加角色
@@ -183,7 +183,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return adminRoleMapper.insert(adminRoleEntity) == 1;
 	}
-	
+
 	/**
 	 * @Description: 删除角色
 	 * @Param: [id]
@@ -195,7 +195,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	public boolean delRole(Long id, Long companyId){
 		return adminRoleMapper.delete(new QueryWrapper<AdminRoleEntity>().eq("id",id).eq("company_id",companyId)) == 1;
 	}
-	
+
 	/**
 	 * @Description: 修改角色
 	 * @Param: [sysRoleQO]
@@ -215,7 +215,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
 	}
-	
+
 	/**
 	 * @Description: 角色列表 分页查询
 	 * @Param: []
@@ -248,7 +248,49 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
 	}
-	
+
+
+	/**
+	 * @param roleId : 角色ID
+	 * @param companyId : 物业公司ID
+	 * @author: Pipi
+	 * @description: 查询角色详情
+	 * @return: com.jsy.community.entity.admin.AdminRoleEntity
+	 * @date: 2021/8/9 10:33
+	 **/
+	@Override
+	public AdminRoleEntity queryRoleDetail(Long roleId, Long companyId) {
+		// 查询角色信息
+		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id", roleId);
+		queryWrapper.eq("company_id", companyId);
+		AdminRoleEntity adminRoleEntity = adminRoleMapper.selectOne(queryWrapper);
+		if (adminRoleEntity == null) {
+			return adminRoleEntity;
+		}
+		// 查询分配的菜单列表
+		List<Long> roleMuneIds = adminRoleMenuMapper.queryRoleMuneIdsByRoleId(roleId);
+		/*QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
+		menuEntityQueryWrapper.select("*, name as label");
+		menuEntityQueryWrapper.in("id", roleMuneIds);
+		List<AdminMenuEntity> adminMenuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
+		// 查询所有菜单
+		QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
+		menuEntityQueryWrapper.select("*, name as label");
+		List<AdminMenuEntity> menuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
+		for (AdminMenuEntity menuEntity : menuEntities) {
+			if (roleMuneIds.contains(menuEntity.getId())) {
+				menuEntity.setChecked(true);
+			} else {
+				menuEntity.setChecked(false);
+			}
+		}
+		List<AdminMenuEntity> returnMenuEntities = assemblyMenuData(adminMenuEntities);
+		adminRoleEntity.setMenuList(returnMenuEntities);*/
+		adminRoleEntity.setMenuIds(roleMuneIds);
+		return adminRoleEntity;
+	}
+
 	//==================================================== 角色-菜单 ===============================================================
 	/**
 	 * @Description: 为角色设置菜单
@@ -270,33 +312,50 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		//新增
 		adminRoleMapper.addRoleMenuBatch(menuIdsSet, roleId);
 	}
-	
+	//==================================================== 用户-角色 ===============================================================
+
+	/**
+	 * @param uid : 用户uid
+	 * @author: Pipi
+	 * @description: 根据用户uid查询用户的角色id
+	 * @return: java.lang.Long
+	 * @date: 2021/8/6 10:50
+	 **/
+	@Override
+	public AdminUserRoleEntity queryRoleIdByUid(String uid) {
+		QueryWrapper<AdminUserRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("uid,role_id");
+		queryWrapper.eq("uid", uid);
+		return adminUserRoleMapper.selectOne(queryWrapper);
+	}
+
+
 	//==================================================== 用户-菜单 (旧) ===============================================================
 	/**
-	* @Description: 查询用户菜单权限(老接口，暂时弃用)
+	 * @Description: 查询用户菜单权限(老接口，暂时弃用)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.sys.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
-	**/
+	 **/
 	@Deprecated
 	@Override
 	public List<AdminMenuEntity> queryUserMenu(Long uid){
 		return adminMenuMapper.queryUserMenu(uid);
 	}
-	
+
 	//================================================== 新版物业端原型 - 用户-菜单start =========================================================================
 	/**
-	* @Description: 查询用户菜单权限(新接口)
+	 * @Description: 查询用户菜单权限(新接口)
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminMenuEntity>
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
-	**/
+	 **/
 	@Override
-	public List<AdminMenuEntity> queryMenuByUid(String uid, Integer loginType){
+	public List<AdminMenuEntity> queryMenuByUid(Long roleId, Integer loginType){
 		//查ID
-		List<Long> menuIdList = adminUserMenuMapper.queryUserMenu(uid);
+		List<Long> menuIdList = adminRoleMenuMapper.queryRoleMuneIdsByRoleIdAndLoginType(roleId, loginType);
 		if(CollectionUtils.isEmpty(menuIdList)){
 			return null;
 		}
@@ -313,7 +372,27 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		setChildrenMenu(returnList,menuEntityList);
 		return returnList;
 	}
-	
+
+
+	/**
+	 * @author: Pipi
+	 * @description: 组装菜单数据
+	 * @param menuEntityList: 需要组装的数据
+	 * @return: java.util.List<com.jsy.community.entity.admin.AdminMenuEntity>
+	 * @date: 2021/8/9 11:19
+	 **/
+	private List<AdminMenuEntity> assemblyMenuData(List<AdminMenuEntity> menuEntityList) {
+		List<AdminMenuEntity> returnList = new ArrayList<>();
+		for(AdminMenuEntity adminMenuEntity : menuEntityList){
+			if(adminMenuEntity.getPid() == 0L){
+				returnList.add(adminMenuEntity);
+			}
+		}
+		menuEntityList.removeAll(returnList);
+		setChildrenMenu(returnList,menuEntityList);
+		return returnList;
+	}
+
 	/**
 	 * 组装子菜单
 	 */
@@ -335,42 +414,42 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			if(!CollectionUtils.isEmpty(child.getChildren())){
 				setChildrenMenu(child.getChildren(),childrenCopy);
 			}
-		childrenCopy.removeAll(selected);
+			childrenCopy.removeAll(selected);
 		}
 	}
-	
+
 	/**
-	* @Description: 统计用户菜单数
+	 * @Description: 统计用户菜单数
 	 * @Param: [uid]
 	 * @Return: java.lang.Integer
 	 * @Author: chq459799974
 	 * @Date: 2021/4/8
-	**/
+	 **/
 	@Override
 	public Integer countUserMenu(String uid){
 		return adminUserMenuMapper.selectCount(new QueryWrapper<AdminUserMenuEntity>().eq("uid",uid));
 	}
-	
+
 	/**
-	* @Description: 查询用户菜单id列表
+	 * @Description: 查询用户菜单id列表
 	 * @Param: [uid]
 	 * @Return: java.util.List<java.lang.String>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/9
-	**/
+	 **/
 	@Override
 	public List<String> queryUserMenuIdList(String uid){
 		//返回UID对应菜单列表
 		return adminUserMenuMapper.queryUserMenuIdList(uid);
 	}
-	
+
 	/**
-	* @Description: 为用户分配菜单
+	 * @Description: 为用户分配菜单
 	 * @Param: [menuIds, uid]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2021/3/23
-	**/
+	 **/
 	@Override
 	public void setUserMenus(List<Long> menuIds,String uid){
 		//备份
@@ -404,7 +483,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 //		return true;
 	}
-	
+
 	/**
 	 * @Description: (功能授权)菜单列表
 	 * @Param: []
@@ -416,14 +495,18 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	public List<AdminMenuEntity> listOfMenu() {
 		List<AdminMenuEntity> list;
 		try{
-			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:Menu"),List.class);
+			// todo 此菜单Redis键名因为与线上环境调用一直,故在本地测试时键名改为Admin:MenuLocal,上传至线上时改为Admin:Menu
+			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Admin:MenuLocal"),List.class);
+			if (list == null) {
+				return queryMenu();//从mysql获取
+			}
 		}catch (Exception e){
 			log.error("redis获取菜单失败");
 			return queryMenu();//从mysql获取
 		}
 		return list;
 	}
-	
+
 	/**
 	 * @Description: 缓存菜单到redis
 	 * @Param: []
@@ -433,9 +516,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	@PostConstruct
 	private void cacheMenuToRedis(){
-		stringRedisTemplate.opsForValue().set("Admin:Menu", JSON.toJSONString(queryMenu()));
+		stringRedisTemplate.opsForValue().set("Admin:MenuLocal", JSON.toJSONString(queryMenu()));
 	}
-	
+
 	/**
 	 * @Description: 查询全部菜单
 	 * @Param: []
@@ -444,8 +527,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/15
 	 **/
 	private List<AdminMenuEntity> queryMenu(){
-		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*").eq("pid", 0));
+		List<AdminMenuEntity> menuList = adminMenuMapper.selectList(new QueryWrapper<AdminMenuEntity>().select("*,name as label").eq("pid", 0));
 		setChildren(menuList,new LinkedList<>());
+		stringRedisTemplate.opsForValue().set("Admin:MenuLocal", JSON.toJSONString(menuList));
 		return menuList;
 	}
 	/**
@@ -460,19 +544,19 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			}
 		}
 	}
-	
+
 	/**
-	* @Description: 管理员社区权限列表查询
+	 * @Description: 管理员社区权限列表查询
 	 * @Param: [uid]
 	 * @Return: java.util.List<com.jsy.community.entity.admin.AdminCommunityEntity>
 	 * @Author: chq459799974
 	 * @Date: 2021/7/22
-	**/
+	 **/
 	@Override
 	public List<AdminCommunityEntity> listAdminCommunity(String uid){
 		return adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id").eq("uid",uid));
 	}
-	
+
 	/**
 	 * @Description: 管理员社区权限id列表查询
 	 * @Param: [uid]
@@ -484,7 +568,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	public List<Long> queryAdminCommunityIdListByUid(String uid){
 		return adminCommunityMapper.queryAdminCommunityIdListByUid(uid);
 	}
-	
+
 	/**
 	 * 管理员社区权限批量修改
 	 */
@@ -517,3 +601,4 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }
+

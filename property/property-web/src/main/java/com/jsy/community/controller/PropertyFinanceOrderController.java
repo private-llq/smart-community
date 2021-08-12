@@ -7,6 +7,8 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FinanceOrderOperationQO;
+import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.util.excel.impl.FinanceExcelImpl;
 import com.jsy.community.utils.ExcelUtil;
@@ -28,6 +30,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -52,19 +55,59 @@ public class PropertyFinanceOrderController {
     private FinanceExcelImpl financeExcel;
 
     @ApiOperation("查询房屋所有未缴账单")
-    @GetMapping("/houseCost")
+    @PostMapping("/list")
     @Login
-    public CommonResult houseCost(@RequestParam("houseId") Long houseId){
+    public CommonResult list(@RequestBody BaseQO<FinanceOrderQO> baseQO){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        Map<String, Object> map=propertyFinanceOrderService.houseCost(userInfo,houseId);
+        Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
         return CommonResult.ok(map);
+    }
+    @ApiOperation("修改订单优惠金额")
+    @PutMapping("/updateOrder")
+    @Login
+    public CommonResult updateOrder(@RequestParam("id") Long id, @RequestParam("coupon")BigDecimal coupon){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.updateOrder(id,coupon);
+        return CommonResult.ok();
+    }
+    @ApiOperation("删除一条账单")
+    @DeleteMapping("/delete")
+    @Login
+    public CommonResult delete(@RequestParam("id") Long id){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.delete(id);
+        return CommonResult.ok();
+    }
+    @ApiOperation("删除多条条账单")
+    @DeleteMapping("/deletes")
+    @Login
+    public CommonResult deletes(@RequestBody FinanceOrderOperationQO financeOrderOperationQO){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.deletes(financeOrderOperationQO);
+        return CommonResult.ok();
+    }
+    @ApiOperation("修改一条订单状态")
+    @PutMapping("/update")
+    @Login
+    public CommonResult update(@RequestParam("id") Long id){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.update(id);
+        return CommonResult.ok();
+    }
+    @ApiOperation("条件修改订单状态")
+    @PutMapping("/updates")
+    @Login
+    public CommonResult updates(@RequestBody FinanceOrderOperationQO financeOrderOperationQO){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.updates(financeOrderOperationQO);
+        return CommonResult.ok();
     }
     @ApiOperation("查询一条已交账单详情")
     @GetMapping("/getOrderNum")
     @Login
-    public CommonResult getOrderNum(@RequestParam("orderNum") String orderNum){
+    public CommonResult getOrderNum(@RequestParam("id") Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        PropertyFinanceOrderVO propertyFinanceOrderVO=propertyFinanceOrderService.getOrderNum(userInfo,orderNum);
+        PropertyFinanceOrderVO propertyFinanceOrderVO=propertyFinanceOrderService.getOrderNum(userInfo,id);
         return CommonResult.ok(propertyFinanceOrderVO);
     }
     

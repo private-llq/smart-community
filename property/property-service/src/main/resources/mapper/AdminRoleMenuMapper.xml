@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.AdminRoleMenuMapper">
+    <!-- 查询角色的菜单ID列表 -->
+    <select id="queryRoleMuneIdsByRoleIdAndLoginType" resultType="java.lang.Long">
+        select
+            rm.menu_id
+        from t_admin_role_menu rm
+        left join t_admin_menu m on rm.menu_id = m.id
+        where rm.role_id = #{roleId}
+        and m.login_type = #{loginType}
+        and m.deleted = 0
+    </select>
+    <!-- 查询角色的菜单ID列表 -->
+    <select id="queryRoleMuneIdsByRoleId" resultType="java.lang.Long">
+        select menu_id from t_admin_role_menu where role_id = #{roleId}
+    </select>
+</mapper>

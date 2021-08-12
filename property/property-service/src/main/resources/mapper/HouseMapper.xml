@@ -65,10 +65,17 @@
 		</foreach>
 	</update>
 
+	<!-- 更新单元数据 -->
+	<update id="unitBindBuildingUpdate">
+		update t_house
+		set total_floor = #{entity.totalFloor}, building = #{entity.building}
+		where id = #{entity.id}
+	</update>
+
 	<!-- 添加房屋 -->
 	<insert id="addRoom">
-		insert into t_house(id,code,community_id,number,build_area,house_type_code,house_type,property_type,building,unit,floor,door,pid,type,comment,create_by,create_time)
-		select #{houseEntity.id},#{houseEntity.code},community_id,#{houseEntity.number},#{houseEntity.buildArea},#{houseEntity.houseTypeCode},#{houseEntity.houseType},#{houseEntity.propertyType},
+		insert into t_house(id,code,community_id,number,total_floor,build_area,house_type_code,house_type,property_type,building,unit,floor,door,pid,type,comment,create_by,create_time)
+		select #{houseEntity.id},#{houseEntity.code},community_id,#{houseEntity.number},#{houseEntity.totalFloor},#{houseEntity.buildArea},#{houseEntity.houseTypeCode},#{houseEntity.houseType},#{houseEntity.propertyType},
 		if(building != '',building,#{houseEntity.building}),
 		if(unit != '',unit,#{houseEntity.unit}),
 		#{houseEntity.floor},
@@ -94,6 +101,7 @@
 			door,
 			pid,
 			build_area,
+			practical_area,
 			house_type,
 			property_type,
 			decoration,
@@ -120,6 +128,7 @@
 			#{houseEntity.door},
 			#{houseEntity.pid},
 			#{houseEntity.buildArea},
+			#{houseEntity.practicalArea},
 			#{houseEntity.houseType},
 			#{houseEntity.propertyType},
 			#{houseEntity.decoration},
@@ -132,12 +141,45 @@
 			#{houseEntity.updateTime})
 		</foreach>
 	</insert>
+
+	<!-- 批量新增楼栋数据 -->
+	<insert id="saveBuildingBatch">
+		insert into t_house (
+		id,
+		community_id,
+		total_floor,
+		type,
+		building,
+		pid,
+		building_type,
+		deleted,
+		create_by,
+		create_time,
+		update_time
+		)
+		values
+		<foreach collection="list" separator="," item="houseEntity">
+			(#{houseEntity.id},
+			#{houseEntity.communityId},
+			#{houseEntity.totalFloor},
+			#{houseEntity.type},
+			#{houseEntity.building},
+			#{houseEntity.pid},
+			#{houseEntity.buildingType},
+			#{houseEntity.deleted},
+			#{houseEntity.createBy},
+			#{houseEntity.createTime},
+			#{houseEntity.updateTime})
+		</foreach>
+	</insert>
+
 	<!-- 批量更新次级节点冗余的父级名称 -->
 	<update id="updateSub">
 		update t_house
 		<set>
 			<if test="entity.building != null and entity.building != ''">,building = #{entity.building}</if>
 			<if test="entity.unit != null and entity.unit != ''">,unit = #{entity.unit}</if>
+			<if test="entity.totalFloor != null and entity.totalFloor != ''">,total_floor = #{entity.totalFloor}</if>
 			where id in
 			<foreach collection="list" item="item" separator="," open="(" close=")">
 				#{item}
@@ -171,6 +213,7 @@
 			<if test="entity.unit != null and entity.unit != ''">,h.unit = #{entity.unit}</if>
 			<if test="entity.door != null and entity.door != ''">,h.door = #{entity.door}</if>
 			<if test="entity.pid != null and entity.pid != 0">,h.pid = #{entity.pid}</if>
+			<if test="entity.buildingType != null and entity.buildingType != 0">,h.building_type = #{entity.buildingType}</if>
 			<if test="entity.houseTypeCode != null and entity.houseTypeCode != ''">,h.house_type_code = #{entity.houseTypeCode}</if>
 			<if test="entity.houseType != null and entity.houseType != 0">,h.house_type = #{entity.houseType}</if>
 			<if test="entity.propertyType != null and entity.propertyType != 0">,h.property_type = #{entity.propertyType}</if>
@@ -192,7 +235,7 @@
 	<!-- ============================================ 物业端产品原型确定后新加的 结束  =========================================================== -->
 
 	<!-- 查房屋id与房屋映射关系 -->
-	<select id="queryIdAndHouseMap" resultType="com.jsy.community.entity.HouseEntity">
+	<select id="queryIdAndHouseMap" resultType="java.util.Map">
 		select id as houseId,concat(building,unit,floor,door) as address,building,unit from t_house
 		where id in
 		<foreach collection="houseIds" item="item" open="(" separator="," close=")">
@@ -220,6 +263,18 @@
 		</where>
 	</select>
 
+	<!-- 通过社区ID查询出所有楼栋 -->
+	<select id="getBuildingList" resultType="com.jsy.community.entity.HouseEntity">
+		select
+		*
+		from t_house
+		<where>
+			type = 1
+			and community_id = #{communityId}
+			and deleted = 0
+		</where>
+	</select>
+
 	<!-- 查询小区下所有的房间 -->
 	<select id="getAllHouse" resultType="com.jsy.community.entity.HouseEntity">
 		select
@@ -231,5 +286,26 @@
 			and deleted = 0
 		</where>
 	</select>
+	<select id="selectInIds" resultType="com.jsy.community.entity.HouseEntity">
+        select * from  t_house where id in
+        <foreach collection="split" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+    </select>
+	<select id="selectUserHouseAuth" resultType="com.jsy.community.entity.HouseEntity">
+        SELECT tu.*,tuh.uid FROM t_house tu JOIN t_user_house tuh on tu.id=tuh.house_id where tuh.house_id in
+		<foreach collection="split" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+    </select>
 
+	<!-- 查询住户数量 -->
+	<select id="selectHouseNumberCount" resultType="Map">
+		select house_id as houseId,count(0) as count from t_house_member
+		where house_id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		group by house_id
+	</select>
 </mapper>

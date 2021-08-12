@@ -52,4 +52,10 @@ public class HouseQO implements Serializable {
     
     @ApiModelProperty(value = "单元ID")
     private Long unitId;
+    
+    @ApiModelProperty(value = "楼栋总层数")
+    private Integer totalFloor;
+    
+    @ApiModelProperty(value = "楼宇分类")
+    private Long buildingType;
 }

@@ -29,8 +29,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty(value = "编号")
-    @NotBlank(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
-    @Length(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "编号过长")
+//    @NotBlank(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
+//    @Length(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "编号过长")
+//    @NotBlank(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少编号")
+//    @Length(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, max = 20, message = "编号过长")
     private String number;
     
     @ApiModelProperty(value = "房间code",hidden = true)
@@ -44,8 +46,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     
     @ApiModelProperty(value = "名称")
     @TableField(exist = false)
-    @Length(groups = {addHouseValidatedGroup.class,updateHouseValidatedGroup.class}, max = 10, message = "名称过长")
-    @NotBlank(groups = {addHouseValidatedGroup.class}, message = "缺少名称")
+//    @Length(groups = {addHouseValidatedGroup.class,updateHouseValidatedGroup.class}, max = 10, message = "名称过长")
+    @Length(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 10, message = "名称过长")
+//    @NotBlank(groups = {addHouseValidatedGroup.class}, message = "缺少名称")
+    @NotBlank(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少名称")
     private String name;
     
     @ApiModelProperty(value = "楼栋名",hidden = true)
@@ -57,9 +61,9 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private String unit;
 
     @ApiModelProperty(value = "楼层名",hidden = true)
-    @Length(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "楼层名称过长")
+//    @Length(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "楼层名称过长")
     @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少楼层名称")
-    private String floor;
+    private Integer floor;
 
     @ApiModelProperty(value = "门牌名",hidden = true)
 //    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "门牌名称过长")
@@ -71,21 +75,34 @@ public class HouseEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "父级id")
 //    @NotNull(groups = {addHouseValidatedGroup.class}, message = "缺少父级ID")
-    @NotNull(groups = {addRoomValidatedGroup.class}, message = "缺少父级ID")
+    @NotNull(groups = {addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少父级ID")
     private Long pid;
 
     @ApiModelProperty(value = "1.楼栋 2.单元 3.楼层 4.门牌")
-    @NotNull(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少类型")
-    @Range(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, min = 1, max = 4, message = "楼宇类型错误")
+//    @NotNull(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少类型")
+//    @Range(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, min = 1, max = 4, message = "楼宇类型错误")
+    @NotNull(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少类型")
+    @Range(groups = {addBuildingGroup.class,addUnitGroup.class,addRoomValidatedGroup.class}, min = 1, max = 4, message = "楼宇类型错误")
     private Integer type;
     
     @ApiModelProperty(value = "建筑面积(㎡)")
     @NotNull(groups = {addRoomValidatedGroup.class}, message = "缺少建筑面积")
     private Double buildArea;
     
+    @ApiModelProperty(value = "实用面积(㎡)")
+    private Double practicalArea;
+    
+    @ApiModelProperty(value = "状态")
+    @TableField(exist = false)
+    private String status;
+    
+    @ApiModelProperty(value = "住户数量")
+    @TableField(exist = false)
+    private Long houseNumber;
+    
     @ApiModelProperty(value = "房屋类型1.商铺 2.住宅")
-    @NotNull(groups = addRoomValidatedGroup.class, message = "缺少房屋类型")
-    @Range(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, min = 1, max = 2 , message = "非法房屋类型")
+//    @NotNull(groups = addRoomValidatedGroup.class, message = "缺少房屋类型")
+//    @Range(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, min = 1, max = 2 , message = "非法房屋类型")
     private Integer houseType;
     
     @ApiModelProperty(value = "房屋类型字符串")
@@ -110,7 +127,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private String decorationStr;
     
     @ApiModelProperty(value = "户型code：单间配套00000000  如01020304代表1室2厅3厨4卫")
-    @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少户型")
+//    @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少户型")
     private String houseTypeCode;
     
     @ApiModelProperty(value = "户型字符串")
@@ -139,7 +156,16 @@ public class HouseEntity extends BaseEntity implements Serializable {
     private String updateBy;
     
     @ApiModelProperty(value = "总层数")
+    @NotNull(groups = {addBuildingGroup.class}, message = "缺少楼栋层数")
     private Integer totalFloor;
+    
+    @ApiModelProperty(value = "楼宇分类")
+    @NotNull(groups = {addBuildingGroup.class}, message = "缺少楼宇分类")
+    private Long buildingType;
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "楼宇分类名称")
+    private String buildingTypeName;
     
     @TableField(exist = false)
     @ApiModelProperty(value = "单元ID列表")
@@ -180,4 +206,14 @@ public class HouseEntity extends BaseEntity implements Serializable {
      * 修改house验证组
      */
     public interface updateHouseValidatedGroup{}
+    
+    /**
+     * 新增楼宇验证组
+     */
+    public interface addBuildingGroup{}
+    
+    /**
+     * 新增单元验证组
+     */
+    public interface addUnitGroup{}
 }

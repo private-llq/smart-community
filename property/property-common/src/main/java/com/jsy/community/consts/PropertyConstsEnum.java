@@ -1,5 +1,7 @@
 package com.jsy.community.consts;
 
+import com.jsy.community.constant.PaymentEnum;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,6 +113,97 @@ public interface PropertyConstsEnum {
 				ORDER_STATUS_LIST.add(map);
 				ORDER_STATUS_MAP.put(orderStatusEnum.getCode(), orderStatusEnum.getName());
 			}
+		}
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 模板类型枚举
+	 * @date: 2021/8/6 14:46
+	 **/
+	enum TemplateTypeEnum{
+		PAYMENT_SLIP("缴费单", 1),
+		RECEIPT("收据", 2);
+		private String name;
+		private Integer code;
+
+		TemplateTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static String getName(Integer code) {
+			for (TemplateTypeEnum value : TemplateTypeEnum.values()) {
+				if (code.equals(value.getCode())) {
+					return value.getName();
+				}
+			}
+			return null;
+		}
+	}
+
+	enum ChargeTypeEnum{
+		UTILITIES_PAYMENT_TEMPLATE("水电气缴费模板", 1),
+		RENTAL_MANAGEMENT_FEE_TEMPLATE("租金管理费模板", 2),
+		PROPERTY_FEE_MANAGEMENT_FEE_TEMPLATE("物业费/管理费模板", 3),
+		GENERAL_TEMPLATES("通用模板", 4);
+		private String name;
+		private Integer code;
+
+		ChargeTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static String getName(Integer code) {
+			for (ChargeTypeEnum value : ChargeTypeEnum.values()) {
+				if (code.equals(value.getCode())) {
+					return value.getName();
+				}
+			}
+			return null;
 		}
 	}
 }

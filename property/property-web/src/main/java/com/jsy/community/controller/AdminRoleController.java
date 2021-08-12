@@ -84,5 +84,18 @@ public class AdminRoleController {
 		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
 		return CommonResult.ok(adminConfigService.queryPage(baseQO),"查询成功");
 	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 查询角色详情
+	 * @param roleId: 角色ID
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/9 10:23
+	 **/
+	@Login
+	@GetMapping("/roleDetail")
+	public CommonResult roleDetail(@RequestParam("roleId") Long roleId) {
+		return CommonResult.ok(adminConfigService.queryRoleDetail(roleId, UserUtils.getAdminCompanyId()), "查询成功!");
+	}
 }
 

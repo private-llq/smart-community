@@ -209,6 +209,9 @@ public class AdminUserEntity extends BaseEntity {
 	 */
 	@TableField(exist = false)
 	private String token;
+
+	@TableField(exist = false)
+	private Long roleId;
 	
 	/**
 	 * 注册邀请传参验证

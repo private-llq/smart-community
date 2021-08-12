@@ -5,7 +5,6 @@ import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * @author chq459799974
@@ -18,5 +17,5 @@ public class AdminRoleMenuEntity extends BaseEntity {
 	
 	@NotNull(message = "缺少角色ID")
 	private Long roleId;//角色ID
-	private List<Long> menuIds;//菜单ID
+	private Long menuId;//菜单ID
 }

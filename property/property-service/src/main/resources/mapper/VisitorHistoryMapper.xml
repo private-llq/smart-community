@@ -37,4 +37,12 @@
         order by vs.start_time
     </select>
 
+    <!-- 批量新增访客记录 -->
+    <insert id="insertBatch">
+        insert into t_visitor_history(id,community_id,visitorId,name,access_type,create_time) values
+        <foreach collection="dataList" item="item">
+            #{item.}
+        </foreach>
+    </insert>
+    
 </mapper>

@@ -39,7 +39,7 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
     @Override
     public HashMap<String, Object> findOne(Long orderId) {
         PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderService.findOne(orderId);
-        HouseEntity entity = houseMapper.selectById(propertyFinanceOrderEntity.getHouseId());
+        HouseEntity entity = houseMapper.selectById(propertyFinanceOrderEntity.getTargetId());
         HashMap<String, Object> map = new HashMap<>();
         map.put("roomName",entity.getBuilding()+entity.getUnit()+entity.getFloor()+entity.getDoor());
         map.put("entity",propertyFinanceOrderEntity);
@@ -72,13 +72,13 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
         //房间id集合
         Set<Long> ids = new HashSet<>();
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
-            ids.add(propertyFinanceOrderEntity.getHouseId());
+            ids.add(propertyFinanceOrderEntity.getTargetId());
         }
         //房间数据集合
         Map<String,Map<String,Object>> roomMaps = houseMapper.getRoomMap(ids);
         for (PropertyFinanceOrderEntity entity : list) {
             //取相应房间map
-            Map<String, Object> roomMap = roomMaps.get(BigInteger.valueOf(entity.getHouseId()));
+            Map<String, Object> roomMap = roomMaps.get(BigInteger.valueOf(entity.getTargetId()));
             //在相应房间节点下添加物业费数据
             List dataList = (List) roomMap.get("list");
             if(dataList == null){

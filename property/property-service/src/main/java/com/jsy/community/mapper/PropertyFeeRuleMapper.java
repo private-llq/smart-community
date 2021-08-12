@@ -2,6 +2,11 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
+import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.vo.property.FeeRuleVO;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -11,12 +16,22 @@ import com.jsy.community.entity.property.PropertyFeeRuleEntity;
  **/
 public interface PropertyFeeRuleMapper extends BaseMapper<PropertyFeeRuleEntity> {
     /**
-     * @Description: 查询当前小区收费规则
+     * @Description: 分页查询
      * @author: Hu
-     * @since: 2021/4/21 17:09
+     * @since: 2021/8/4 14:37
      * @Param:
      * @return:
      */
-//    List<PropertyFeeRuleEntity> findList(Long communityId);
+    List<FeeRuleVO> findList(@Param("page") long page, @Param("size") Long size, @Param("query") FeeRuleQO query);
+
+    /**
+     * @Description: 查询条数
+     * @author: Hu
+     * @since: 2021/8/4 14:37
+     * @Param:
+     * @return:
+     */
+    Integer findTotal(FeeRuleQO query);
+
 
 }

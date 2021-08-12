@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.FinanceOrderOperationQO;
+import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
@@ -49,7 +51,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    Map<String, Object> houseCost(AdminInfoVo userInfo, Long houseId);
+    Map<String, Object> findList(AdminInfoVo userInfo, BaseQO<FinanceOrderQO> baseQO);
 
     /**
     * @Description: 分页查询 (财务模块)
@@ -76,7 +78,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Param:
      * @return:
      */
-    PropertyFinanceOrderVO getOrderNum(AdminInfoVo userInfo, String orderNum);
+    PropertyFinanceOrderVO getOrderNum(AdminInfoVo userInfo, Long id);
 
     /**
     * @Description: 分页查询已缴费 (缴费模块)
@@ -133,4 +135,49 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      */
     PropertyFinanceOrderEntity findOne(Long orderId);
 
+
+    /**
+     * @Description: 修改订单优惠金额
+     * @author: Hu
+     * @since: 2021/8/7 14:24
+     * @Param:
+     * @return:
+     */
+    void updateOrder(Long id, BigDecimal coupon);
+
+    /**
+     * @Description: 删除一条账单信息
+     * @author: Hu
+     * @since: 2021/8/7 14:34
+     * @Param:
+     * @return:
+     */
+    void delete(Long id);
+
+    /**
+     * @Description: 删除多条账单
+     * @author: Hu
+     * @since: 2021/8/7 14:36
+     * @Param:
+     * @return:
+     */
+    void deletes(FinanceOrderOperationQO financeOrderOperationQO);
+
+    /**
+     * @Description: 修改一条订单状态
+     * @author: Hu
+     * @since: 2021/8/9 14:09
+     * @Param:
+     * @return:
+     */
+    void update(Long id);
+
+    /**
+     * @Description: 条件修改订单状态
+     * @author: Hu
+     * @since: 2021/8/9 14:09
+     * @Param:
+     * @return:
+     */
+    void updates(FinanceOrderOperationQO financeOrderOperationQO);
 }

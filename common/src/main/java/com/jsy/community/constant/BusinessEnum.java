@@ -608,7 +608,7 @@ public interface BusinessEnum {
 		TEMPORARY("临时",0),
 		PROPRIETOR("业主", 1),
 		RELATIVES("亲属", 6),
-		TENANT("租客", 7);
+		TENANT("租户", 7);
 		private String name;
 		private Integer code;
 		
@@ -1183,24 +1183,21 @@ public interface BusinessEnum {
 	}
 
 	/**
-	 * @Description: 面积计费项目名称
+	 * @Description: 物业缴费项目生成周期
 	 * @author: Hu
 	 * @since: 2021/7/30 9:28
 	 * @Param:
 	 * @return:
 	 */
-	enum AreaCalculationEnum {
-		HIGH_RISE_PROPERTY_FEE("高层物业服务费", 1),
-		LOW_LEVEL_PROPERTY_FEE("低层物业服务费", 2),
-		VILLA_PROPERTY_FEE("别墅物业服务费", 3),
-		PROPERTY_MANAGEMENT_FEES("底商物业服务费", 4),
-		HEATING_FEE("供暖费", 5),
-		AREA_OF_STRUCTURE("建筑面积", 6),
-		CUSTOM("自定义名称", 7);
+	enum FeeRulePeriodEnum {
+		MONTH("月", 1),
+		QUARTER("季度", 2),
+		SEMI_ANNUAL("半年", 3),
+		YEAR("一年", 4);
 		private String name;
 		private Integer code;
 
-		AreaCalculationEnum(String name, Integer code) {
+		FeeRulePeriodEnum(String name, Integer code) {
 			this.name = name;
 			this.code = code;
 		}
@@ -1228,14 +1225,23 @@ public interface BusinessEnum {
 
 		public static final List<Map<String, Object>> maritalStatusList = new ArrayList<>();
 
+		public static String getName(Integer code) {
+			FeeRulePeriodEnum[] values = FeeRulePeriodEnum.values();
+			for (FeeRulePeriodEnum c : values) {
+				if (c.code.equals(code)) {
+					return c.name;
+				}
+			}
+			return null;
+		}
 		static {
-			for (AreaCalculationEnum entryTypeEnum : AreaCalculationEnum.values()) {
+			for (FeeRulePeriodEnum entryTypeEnum : FeeRulePeriodEnum.values()) {
 				HashMap<String, Object> map = new HashMap<>();
 				map.put("code", entryTypeEnum.getCode());
 				map.put("name", entryTypeEnum.getName());
 				maritalStatusList.add(map);
 			}
-			sourceMap.put("areaCalculation",maritalStatusList);
+			sourceMap.put("feeRulePeriod",maritalStatusList);
 		}
 	}
 

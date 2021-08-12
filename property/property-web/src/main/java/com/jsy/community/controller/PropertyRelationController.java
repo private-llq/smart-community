@@ -64,10 +64,15 @@ public class PropertyRelationController {
     }
 
     @ApiOperation("批量迁出")
-    @PostMapping("/emigrations")
+    @GetMapping("/emigrations")
     @Login
-    public CommonResult emigrations(@RequestParam Long[] ids){
-        propertyRelationService.emigrations(ids);
+    public CommonResult emigrations(@RequestParam String ids){
+        String[] split = ids.split(",");
+        Long[] longAry= new Long[split.length];
+        for(int i = 0, len = split.length; i < len; i++){
+            longAry[i] = Long.parseLong(split[i]);
+        }
+        propertyRelationService.emigrations(longAry);
         return CommonResult.ok();
     }
 
@@ -75,7 +80,8 @@ public class PropertyRelationController {
     @PostMapping("/save")
     @Login
     public CommonResult save(@RequestBody HouseMemberEntity houseMemberEntity){
-        propertyRelationService.save(houseMemberEntity);
+
+        propertyRelationService.save(houseMemberEntity,UserUtils.getAdminUserInfo().getUid());
         return CommonResult.ok();
     }
     @ApiOperation("修改")
@@ -83,6 +89,25 @@ public class PropertyRelationController {
     @Login
     public CommonResult update(@RequestBody HouseMemberEntity houseMemberEntity){
         propertyRelationService.update(houseMemberEntity);
+        return CommonResult.ok();
+    }
+    @ApiOperation("批量删除")
+    @DeleteMapping("/deletes")
+    @Login
+    public CommonResult deletes(@RequestParam String ids){
+        String[] split = ids.split(",");
+        Long[] longAry= new Long[split.length];
+        for(int i = 0, len = split.length; i < len; i++){
+            longAry[i] = Long.parseLong(split[i]);
+        }
+        propertyRelationService.deletes(longAry);
+        return CommonResult.ok();
+    }
+    @ApiOperation("删除")
+    @DeleteMapping("/delete")
+    @Login
+    public CommonResult delete(@RequestParam Long id){
+        propertyRelationService.delete(id);
         return CommonResult.ok();
     }
 

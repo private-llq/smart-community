@@ -76,13 +76,22 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
     List<HouseEntity> getCommunityHouseNumber(@Param("communityId") long communityId);
 
     /**
-     *@Author: Pipi
-     *@Description: 通过社区ID查询出所有楼栋和单元
-     *@Param: communityId:
-     *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
-     *@Date: 2021/5/19 15:35
-     **/
-    List<HouseEntity> getBuildingAndUnitList(@Param("communityId") long communityId);
+	 *@Author: Pipi
+	 *@Description: 通过社区ID查询出所有楼栋和单元
+	 *@Param: communityId:
+	 *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 *@Date: 2021/5/19 15:35
+	 **/
+	List<HouseEntity> getBuildingAndUnitList(@Param("communityId") Long communityId);
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 通过社区ID查询出所有楼栋
+	 *@Param: communityId:
+	 *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 *@Date: 2021/8/10 11:35
+	 **/
+	List<HouseEntity> getBuildingList(@Param("communityId") Long communityId);
 
     //============================================ 物业端产品原型确定后新加的 开始  ===========================================================
 	/**
@@ -93,6 +102,15 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Date: 2021/3/8
 	**/
 	int unitBindBuilding(@Param("list") List<Long> unitIdList,@Param("entity") HouseEntity houseEntity);
+	
+	/**
+	 * @Description: 更新单元数据
+	 * @Param: [houseEntity]
+	 * @Return: int
+	 * @Author: DKS
+	 * @Date: 2021/8/6
+	 **/
+	int unitBindBuildingUpdate(@Param("entity") HouseEntity houseEntity);
 	
 	/**
 	* @Description: 单元解绑楼栋
@@ -216,4 +234,41 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Date: 2021/5/21 16:48
 	 **/
 	Integer saveHouseBatch(@Param("list") List<HouseEntity> houseEntityList);
+	
+	/**
+	 * @Author: DKS
+	 * @Description: 批量新增楼栋数据
+	 * @Param: houseEntityList:
+	 * @Return: java.lang.Integer
+	 * @Date: 2021/8/10 14:00
+	 **/
+	Integer saveBuildingBatch(@Param("list") List<HouseEntity> houseEntityList);
+
+	/**
+	 * @Description: 传入id数组查询房间
+	 * @author: Hu
+	 * @since: 2021/8/5 16:11
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> selectInIds(@Param("split") String[] split);
+
+	/**
+	 * @Description: 查询认证的房间数据
+	 * @author: Hu
+	 * @since: 2021/8/5 16:48
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> selectUserHouseAuth(@Param("split") String[] split);
+	
+	/**
+	 * @Description: 查询住户数量
+	 * @author: DKS
+	 * @since: 2021/8/6 16:38
+	 * @Param:
+	 * @return:
+	 */
+	@MapKey("houseId")
+	Map<Long,Map<String,Long>> selectHouseNumberCount(@Param("list") Collection<Long> houseIds);
 }
