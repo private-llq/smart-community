@@ -191,6 +191,20 @@ public class HouseController {
 	public CommonResult deleteHouse(@RequestParam Long id){
 		return houseService.deleteHouse(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
+	
+	/**
+	 * @Description: 【楼宇房屋】批量删除
+	 * @Param: [ids]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/12
+	 **/
+	@ApiOperation("【楼宇房屋】批量删除")
+	@DeleteMapping("/deletes")
+	public CommonResult deletesHouse(@RequestParam List<Long> ids) {
+		boolean result = houseService.deletesHouse(ids);
+		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "【楼宇房屋】 批量删除失败");
+	}
 	// ============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 	
 	/**

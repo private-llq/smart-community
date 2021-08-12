@@ -75,6 +75,15 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021/3/15
 	**/
 	boolean deleteHouse(Long id,Long communityId);
+	
+	/**
+	 * @Description: 【楼宇房屋】批量删除
+	 * @Param: [ids]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/12
+	 **/
+	boolean deletesHouse(List<Long> ids);
 	//=========================== 基础增删改查 结束 ==============================
 
 	/**

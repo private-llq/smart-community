@@ -1,6 +1,5 @@
 package com.jsy.community.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.HouseEntity;
@@ -11,7 +10,6 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.HouseTypeVo;
-import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -217,4 +215,22 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @return                  返回影响行数
      */
     Integer saveUserBatch(@Param("list") List<ProprietorEntity> userEntityList, @Param("communityId") Long communityId);
+    
+    /**
+     * @Description: 根据手机号查询绑定房屋的id
+     * @Param: [mobile]
+     * @Return:
+     * @Author: DKS
+     * @Date: 2021/08/11
+     **/
+    List<Long> queryBindHouseBymobile(@Param("mobile") String mobile, @Param("communityId") Long communityId);
+    
+    /**
+     * @Description: 根据房屋的id查询真实姓名手机号
+     * @Param: [houseId]
+     * @Return:
+     * @Author: DKS
+     * @Date: 2021/08/12
+     **/
+    ProprietorEntity queryNameAndMobileByHouseId(@Param("houseId") Long houseId, @Param("communityId") Long communityId);
 }
