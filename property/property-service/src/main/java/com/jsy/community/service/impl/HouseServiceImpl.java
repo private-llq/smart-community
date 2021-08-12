@@ -437,6 +437,13 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             }
             //若类型为房屋，且要更改房屋所属的单元，同步修改单元的名称
         } else if (BusinessConst.BUILDING_TYPE_DOOR == entity.getType()) {
+            //查询要改单元下的更改房屋楼层是否已经存在
+            List<HouseEntity> houseEntities = houseMapper.queryBindDoorList(houseEntity.getPid());
+            for (HouseEntity houseUnitEntity : houseEntities) {
+                if (houseUnitEntity.getDoor().equals(houseEntity.getName()) && houseUnitEntity.getFloor().equals(houseEntity.getFloor()) && houseUnitEntity.getPid().equals(houseEntity.getPid())) {
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "要更改房屋已存在，修改失败");
+                }
+            }
             if (!StringUtils.isEmpty(houseEntity.getName())) {
                 houseEntity.setDoor(houseEntity.getName());
             }

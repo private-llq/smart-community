@@ -219,6 +219,8 @@
 			<if test="entity.propertyType != null and entity.propertyType != 0">,h.property_type = #{entity.propertyType}</if>
 			<if test="entity.decoration != null and entity.decoration != 0">,h.decoration = #{entity.decoration}</if>
 			<if test="entity.floor != null and entity.floor != ''">,h.floor = #{entity.floor}</if>
+			<if test="entity.practicalArea != null and entity.practicalArea != ''">,h.practical_area = #{entity.practicalArea}</if>
+			<if test="entity.comment != null and entity.comment != ''">,h.comment = #{entity.comment}</if>
 			,update_time = now()
 		</set>
 		where id = #{entity.id}
