@@ -74,8 +74,8 @@
 
 	<!-- 添加房屋 -->
 	<insert id="addRoom">
-		insert into t_house(id,code,community_id,number,total_floor,build_area,house_type_code,house_type,property_type,building,unit,floor,door,pid,type,comment,create_by,create_time)
-		select #{houseEntity.id},#{houseEntity.code},community_id,#{houseEntity.number},#{houseEntity.totalFloor},#{houseEntity.buildArea},#{houseEntity.houseTypeCode},#{houseEntity.houseType},#{houseEntity.propertyType},
+		insert into t_house(id,code,community_id,number,total_floor,build_area,practical_area,house_type_code,house_type,property_type,building,unit,floor,door,pid,type,comment,create_by,create_time)
+		select #{houseEntity.id},#{houseEntity.code},community_id,#{houseEntity.number},#{houseEntity.totalFloor},#{houseEntity.buildArea},#{houseEntity.practicalArea},#{houseEntity.houseTypeCode},#{houseEntity.houseType},#{houseEntity.propertyType},
 		if(building != '',building,#{houseEntity.building}),
 		if(unit != '',unit,#{houseEntity.unit}),
 		#{houseEntity.floor},

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyAdvanceDepositService;
-import com.jsy.community.api.ProprietorException;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.ProprietorEntity;
@@ -59,6 +59,11 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
      **/
     @Override
     public boolean addRechargePropertyAdvanceDeposit(PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
+        PropertyAdvanceDepositEntity entity = propertyAdvanceDepositMapper.selectOne(new QueryWrapper<PropertyAdvanceDepositEntity>()
+            .eq("house_id", propertyAdvanceDepositEntity.getHouseId()).eq("community_id", propertyAdvanceDepositEntity.getCommunityId()));
+        if (entity != null) {
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"房屋地址已存在！");
+        }
         int row = 0;
         // 查询手机号绑定房屋的id
         List<Long> houseIdList = proprietorMapper.queryBindHouseBymobile(propertyAdvanceDepositEntity.getMobile(), propertyAdvanceDepositEntity.getCommunityId());
@@ -81,16 +86,19 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
     @Override
     public boolean updateRechargePropertyAdvanceDeposit(PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
         if (propertyAdvanceDepositEntity.getId() == null) {
-            throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"请传入id！");
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"请传入id！");
         }
         PropertyAdvanceDepositEntity entity = propertyAdvanceDepositMapper.selectById(propertyAdvanceDepositEntity.getId());
         if (entity.getBalance().add(propertyAdvanceDepositEntity.getBalance()).compareTo(BigDecimal.ZERO) == -1) {
-            throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"余额不足！");
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"余额不足！");
         } else {
             propertyAdvanceDepositEntity.setBalance(entity.getBalance().add(propertyAdvanceDepositEntity.getBalance()));
         }
         propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
         int row = propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
+        if (row == 1) {
+            // TODO:充值成功后，立即生成预存款变更明细记录
+        }
         return row == 1;
     }
     
