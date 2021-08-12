@@ -591,15 +591,18 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                     if (unitEntity != null) {
                         if (unitEntity.getPid().equals(0)) {
                             houseEntity.setBuildingId(unitEntity.getId());
+                            houseEntity.setBuildingIdStr(String.valueOf(unitEntity.getId()));
                         } else {
                             HouseEntity buildingEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>()
                                 .eq("id", unitEntity.getPid()).eq("community_id", houseEntity.getCommunityId()));
                             if (buildingEntity != null) {
                                 houseEntity.setBuildingId(buildingEntity.getId());
+                                houseEntity.setBuildingIdStr(String.valueOf(buildingEntity.getId()));
                             }
                         }
                     }
                 }
+                houseEntity.setPidStr(String.valueOf(houseEntity.getPid()));
                 paramList.add(houseEntity.getId());
             }
             //查询住户数量
@@ -1287,15 +1290,18 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 		            if (unitEntity != null) {
 			            if (unitEntity.getPid().equals(0)) {
 				            houseEntity.setBuildingId(unitEntity.getId());
+                            houseEntity.setBuildingIdStr(String.valueOf(unitEntity.getId()));
 			            } else {
 				            HouseEntity buildingEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>()
 					            .eq("id", unitEntity.getPid()).eq("community_id", houseEntity.getCommunityId()));
 				            if (buildingEntity != null) {
 					            houseEntity.setBuildingId(buildingEntity.getId());
+                                houseEntity.setBuildingIdStr(String.valueOf(buildingEntity.getId()));
 				            }
 			            }
 		            }
 	            }
+                houseEntity.setPidStr(String.valueOf(houseEntity.getPid()));
                 paramList.add(houseEntity.getId());
             }
             //查询住户数量
