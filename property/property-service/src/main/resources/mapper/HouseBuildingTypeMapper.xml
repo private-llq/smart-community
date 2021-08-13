@@ -11,4 +11,27 @@
         group by id
     </select>
 
+    <!-- 全查询楼宇分类名称 -->
+    <select id="selectHouseBuildingTypeName" resultType="com.jsy.community.entity.HouseBuildingTypeEntity">
+        select id,
+        community_id as communityId,
+        property_type_name as propertyTypeName,
+        create_by as createBy,
+        create_time as createTime,
+        update_by as updateBy,
+        update_time as updateTime
+        from t_house_building_type
+        where community_id = #{communityId}
+        and deleted = 0
+    </select>
+
+    <!-- 批量查询楼宇分类id -->
+    <select id="queryHouseBuildingTypeId" resultType="Map">
+        select id,property_type_name as propertyTypeName from t_house_building_type where property_type_name in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and deleted = 0
+    </select>
+
 </mapper>

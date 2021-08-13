@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IFinanceBillService;
 import com.jsy.community.api.IPropertyFeeRuleConstService;
 import com.jsy.community.api.IPropertyFeeRuleService;
 import com.jsy.community.constant.Const;
@@ -36,6 +37,9 @@ public class PropertyFeeRuleController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFeeRuleConstService propertyFeeRuleConstService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IFinanceBillService financeBillService;
 
     @ApiOperation("查询当前小区物业收费规则")
     @PostMapping("/list")
@@ -87,6 +91,13 @@ public class PropertyFeeRuleController {
 //    @Login
     public CommonResult getConst(){
         return CommonResult.ok(propertyFeeRuleConstService.listAll());
+    }
+    @ApiOperation("查询公共常量")
+    @PostMapping("/get")
+//    @Login
+    public CommonResult get(){
+        financeBillService.updateDays();
+        return CommonResult.ok();
     }
 
 }

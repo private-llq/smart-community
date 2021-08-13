@@ -78,7 +78,8 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
-                            entity.setHid(1);
+                            entity.setHide(1);
+                            entity.setType(feeRuleEntity.getType());
                             entity.setFeeRuleId(feeRuleEntity.getId());
                             entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
                             entity.setCommunityId(feeRuleEntity.getCommunityId());
@@ -90,6 +91,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                             entity.setPenalSum(new BigDecimal("0"));
                             entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
                             entity.setOrderStatus(0);
+                            entity.setBuildType(1);
                             entity.setId(SnowFlake.nextId());
                             entity.setCreateTime(LocalDateTime.now());
                             orderList.add(entity);
@@ -105,19 +107,21 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
-                            entity.setHid(1);
+                            entity.setHide(1);
+                            entity.setType(feeRuleEntity.getType());
                             entity.setFeeRuleId(feeRuleEntity.getId());
                             entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
                             entity.setCommunityId(feeRuleEntity.getCommunityId());
                             entity.setOrderTime(LocalDate.now());
                             entity.setAssociatedType(1);
                             entity.setUid(houseEntity.getUid());
-                            entity.setTargetId(houseEntity.getHouseId());
+                            entity.setTargetId(houseEntity.getId());
                             entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
                             entity.setPenalSum(new BigDecimal("0"));
                             entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
                             entity.setOrderStatus(0);
                             entity.setId(SnowFlake.nextId());
+                            entity.setBuildType(1);;
                             entity.setCreateTime(LocalDateTime.now());
                             orderList.add(entity);
                         }
@@ -130,7 +134,8 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
-                            entity.setHid(1);
+                            entity.setHide(1);
+                            entity.setType(feeRuleEntity.getType());
                             entity.setFeeRuleId(feeRuleEntity.getId());
                             entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
                             entity.setCommunityId(feeRuleEntity.getCommunityId());
@@ -142,6 +147,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                             entity.setPenalSum(new BigDecimal("0"));
                             entity.setTotalMoney(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())));
                             entity.setOrderStatus(0);
+                            entity.setBuildType(1);
                             entity.setId(SnowFlake.nextId());
                             entity.setCreateTime(LocalDateTime.now());
                             orderList.add(entity);
@@ -159,7 +165,9 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                         entity = new PropertyFinanceOrderEntity();
                         entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                         entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
-                        entity.setHid(1);
+                        entity.setHide(1);
+                        entity.setType(feeRuleEntity.getType());
+                        entity.setBuildType(1);
                         entity.setFeeRuleId(feeRuleEntity.getId());
                         entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
                         entity.setCommunityId(feeRuleEntity.getCommunityId());

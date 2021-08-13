@@ -101,8 +101,11 @@ public class DepartmentStaffController {
 		try {
 			// 获取Excel中的数据，每一行数据封装成一个String[]，将一个工作簿里面的每行数据封装成一个List<String[]>
 			List<String[]> strings = POIUtils.readExcel(file);
+
 			Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+
 			Map<String, Object> map = departmentStaffService.addLinkByExcel(strings, communityId);
+
 			return CommonResult.ok(map);
 		} catch (IOException e) {
 			e.printStackTrace();

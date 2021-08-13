@@ -16,6 +16,7 @@
 	
 	<dependencies>
 
+
 		<dependency>
 			<groupId>com.jsy</groupId>
 			<artifactId>proprietor-api</artifactId>
@@ -73,6 +74,44 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
         </dependency>
+
+		<!--xLs(03)-->
+
+		<dependency>
+
+			<groupId>org.apache.poi</groupId>
+
+			<artifactId>poi</artifactId>
+
+			<version>4.1.2</version>
+
+		</dependency>
+
+
+		<!--xLsx(07)-->
+
+		<dependency>
+
+			<groupId>org.apache.poi</groupId>
+
+			<artifactId>poi-ooxml</artifactId>
+
+			<version>4.1.2</version>
+
+		</dependency>
+
+
+		<!--日期格式化工具-->
+
+		<dependency>
+
+			<groupId>joda-time</groupId>
+
+			<artifactId>joda-time</artifactId>
+
+			<version>2.10.1</version>
+
+		</dependency>
 
     </dependencies>
 

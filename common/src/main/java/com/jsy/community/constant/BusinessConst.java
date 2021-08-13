@@ -277,6 +277,21 @@ public interface BusinessConst {
      * 单元里面查楼栋
      */
     int BUILDING_TYPE_UNIT_BUILDING = 5;
+    
+    /**
+     * 房屋里面查楼栋
+     */
+    int BUILDING_TYPE_DOOR_BUILDING = 6;
+    
+    /**
+     * 房屋里面查单元
+     */
+    int BUILDING_TYPE_DOOR_UNIT = 7;
+    
+    /**
+     * 房屋里面查楼栋和单元
+     */
+    int BUILDING_TYPE_DOOR_BUILDING_UNIT = 8;
 
     //========= 文件上传 文件夹分类名称 ==========
     /**

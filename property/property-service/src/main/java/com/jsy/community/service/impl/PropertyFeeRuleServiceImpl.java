@@ -10,6 +10,7 @@ import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FeeRuleVO;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -48,6 +49,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     @Override
     public void saveOne(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
 //        propertyFeeRuleEntity.setCommunityId(userInfo.getCommunityId());
+        propertyFeeRuleEntity.setId(SnowFlake.nextId());
         propertyFeeRuleEntity.setCreateBy(userInfo.getUid());
         propertyFeeRuleEntity.setStatus(0);
         propertyFeeRuleEntity.setCreateTime(LocalDateTime.now());
@@ -142,20 +144,6 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         List<FeeRuleVO> page = propertyFeeRuleMapper.findList((baseQO.getPage()-1)*baseQO.getSize(),baseQO.getSize(),baseQO.getQuery());
         for (FeeRuleVO feeRuleVO : page) {
             feeRuleVO.setPeriodName(BusinessEnum.FeeRulePeriodEnum.getName(feeRuleVO.getPeriod()));
-            feeRuleVO.setChargeModeName(feeRuleVO.getChargeMode()==1?"面积":"固定金额");
-            if (feeRuleVO.getChargeMode()==1){
-                if (feeRuleVO.getDisposable()==1){
-                    feeRuleVO.setFormulaName("单价*面积");
-                }else {
-                    feeRuleVO.setFormulaName("单价*面积*周期");
-                }
-            }else {
-                if (feeRuleVO.getDisposable()==1){
-                    feeRuleVO.setFormulaName("固定金额");
-                }else {
-                    feeRuleVO.setFormulaName("单价*周期");
-                }
-            }
         }
         Integer total = propertyFeeRuleMapper.findTotal(baseQO.getQuery());
         Map<Object, Object> map = new HashMap<>();

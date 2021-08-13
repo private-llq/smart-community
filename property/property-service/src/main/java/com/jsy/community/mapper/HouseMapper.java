@@ -76,13 +76,22 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
     List<HouseEntity> getCommunityHouseNumber(@Param("communityId") long communityId);
 
     /**
-     *@Author: Pipi
-     *@Description: 通过社区ID查询出所有楼栋和单元
-     *@Param: communityId:
-     *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
-     *@Date: 2021/5/19 15:35
-     **/
-    List<HouseEntity> getBuildingAndUnitList(@Param("communityId") long communityId);
+	 *@Author: Pipi
+	 *@Description: 通过社区ID查询出所有楼栋和单元
+	 *@Param: communityId:
+	 *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 *@Date: 2021/5/19 15:35
+	 **/
+	List<HouseEntity> getBuildingAndUnitList(@Param("communityId") Long communityId);
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 通过社区ID查询出所有楼栋
+	 *@Param: communityId:
+	 *@Return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 *@Date: 2021/8/10 11:35
+	 **/
+	List<HouseEntity> getBuildingList(@Param("communityId") Long communityId);
 
     //============================================ 物业端产品原型确定后新加的 开始  ===========================================================
 	/**
@@ -171,6 +180,16 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	List<Long> queryBindUnitList(Long id);
 	
 	/**
+	 * @Description: 查询单元已绑定房屋列表
+	 * @Param: [id]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: DKS
+	 * @Date: 2021/8/12
+	 **/
+	@Select("select * from t_house where pid = #{id} and type = 4")
+	List<HouseEntity> queryBindDoorList(Long id);
+	
+	/**
 	* @Description: 验证是否有房屋关联数据
 	 * @Param: [id]
 	 * @Return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
@@ -225,6 +244,15 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Date: 2021/5/21 16:48
 	 **/
 	Integer saveHouseBatch(@Param("list") List<HouseEntity> houseEntityList);
+	
+	/**
+	 * @Author: DKS
+	 * @Description: 批量新增楼栋数据
+	 * @Param: houseEntityList:
+	 * @Return: java.lang.Integer
+	 * @Date: 2021/8/10 14:00
+	 **/
+	Integer saveBuildingBatch(@Param("list") List<HouseEntity> houseEntityList);
 
 	/**
 	 * @Description: 传入id数组查询房间

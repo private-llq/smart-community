@@ -59,8 +59,14 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "状态0未启用，1启用")
     private Integer status;
 
-    @ApiModelProperty(value = "1固定金额~单价*面积，2单价*面积~单价*面积*周期")
-    private Integer formula;
+    @ApiModelProperty(value = "计算方式")
+    private String formula;
+
+    @ApiModelProperty(value = "计价方式")
+    private String valuation;
+
+    @ApiModelProperty(value = "报表展示0不展示，1展示")
+    private Integer reportStatus;
 
     @ApiModelProperty(value = "每月生成账单的那天")
     private Integer billDay;

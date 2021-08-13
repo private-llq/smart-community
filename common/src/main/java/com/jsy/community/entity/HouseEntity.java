@@ -62,7 +62,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "楼层名",hidden = true)
 //    @Length(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "楼层名称过长")
-    @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少楼层名称")
+//    @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少楼层名称")
     private Integer floor;
 
     @ApiModelProperty(value = "门牌名",hidden = true)
@@ -77,6 +77,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
 //    @NotNull(groups = {addHouseValidatedGroup.class}, message = "缺少父级ID")
     @NotNull(groups = {addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少父级ID")
     private Long pid;
+    
+    @ApiModelProperty(value = "父级idStr")
+    @TableField(exist = false)
+    private String pidStr;
 
     @ApiModelProperty(value = "1.楼栋 2.单元 3.楼层 4.门牌")
 //    @NotNull(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少类型")
@@ -148,6 +152,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @TableField(exist = false)
     @ApiModelProperty(value = "顶级父节点id(楼栋/单元之类)", hidden = true)
     private Long buildingId;
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "顶级父节点idStr(楼栋/单元之类)", hidden = true)
+    private String buildingIdStr;
     
     @ApiModelProperty(value = "创建人")
     private String createBy;

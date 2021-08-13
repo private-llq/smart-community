@@ -212,10 +212,13 @@
     </select>
     <insert id="saveList" parameterType="List">
         insert into t_property_finance_order
-        (id,order_num,order_time,uid,house_id,community_id,property_fee,total_money,create_time)
+        (id,order_num,order_time,uid,target_id,community_id,property_fee,total_money,create_time,associated_type,begin_time,over_time,
+        hide,coupon,deduction,build_type,type,fee_rule_id)
         values
         <foreach collection="list" item="item" separator=",">
-            (#{item.id},#{item.orderNum},#{item.orderTime},#{item.uid},#{item.houseId},#{item.communityId},#{item.propertyFee},#{item.totalMoney},now())
+            (#{item.id},#{item.orderNum},#{item.orderTime},#{item.uid},#{item.targetId},#{item.communityId},#{item.propertyFee},#{item.totalMoney},now(),
+            #{item.associatedType},#{item.beginTime},#{item.overTime},#{item.hide},#{item.coupon},#{item.deduction},#{item.buildType},#{item.type},#{item.feeRuleId}
+            )
         </foreach>
     </insert>
     <select id="getTotalMoney" resultType="java.math.BigDecimal">
@@ -271,20 +274,40 @@
             <if test="query.overTime!=null">
                 and tp.over_time &lt;= #{query.overTime}
             </if>
-            <if test="query.hid!=null and query.hid!=0">
-                and tp.hid = #{query.hid}
+            <if test="query.hide!=null and query.hide!=0">
+                and tp.hide = #{query.hide}
             </if>
         </where>
     </sql>
     <select id="findList" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
         select tp.id,tf.name as feeRuleName,tp.associated_type,tp.begin_time,tp.over_time,tp.hide,
-        tp.property_fee,tp.penal_sum,tp.coupon,tp.deduction,tp.total_money,tp.order_time,tp.buildType
+        tp.property_fee,tp.penal_sum,tp.coupon,tp.deduction,tp.total_money,tp.order_time,tp.build_type
         from  t_property_finance_order tp join t_property_fee_rule tf on tp.fee_rule_id=tf.id
         <include refid="query"></include>
         limit #{page},#{size}
     </select>
     <select id="getTotal" resultType="java.lang.Integer">
-        select count (*) from   t_property_finance_order tp join t_property_fee_rule tf on tp.fee_rule_id=tf.id
+        select count(*) from   t_property_finance_order tp join t_property_fee_rule tf on tp.fee_rule_id=tf.id
         <include refid="query"></include>
     </select>
+    <update id="updates">
+        update t_property_finance_order set hide=2
+        <where>
+            <if test="orderTimeBegin!=null">
+               and order_time &gt;= #{orderTimeBegin}
+            </if>
+            <if test="orderTimeOver!=null">
+               and order_time &lt;= #{orderTimeOver}
+            </if>
+            <if test="beginTime!=null">
+               and order_time &gt;= #{beginTime}
+            </if>
+            <if test="overTime!=null">
+               and order_time &gt;= #{overTime}
+            </if>
+            <if test="type!=null">
+               and type = #{type}
+            </if>
+        </where>
+    </update>
 </mapper>

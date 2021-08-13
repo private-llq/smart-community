@@ -24,12 +24,14 @@ import java.time.LocalDateTime;
 public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "账单号")
     private Long feeRuleId;
+    @ApiModelProperty(value = "账单类型")
+    private Integer type;
     @ApiModelProperty(value = "关联类型1房屋，2车位")
     private Integer associatedType;
     @ApiModelProperty(value = "账单号")
     private String orderNum;
     @ApiModelProperty(value = "生成类型1系统生成，2其他")
-    private String buildType;
+    private Integer buildType;
     @ApiModelProperty(value = "支付单号")
     private Long communityId;
     @ApiModelProperty(value = "应缴月份")
@@ -68,7 +70,7 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "账单结束时间")
     private LocalDate overTime;
     @ApiModelProperty(value = "状态1显示，2隐藏")
-    private Integer hid;
+    private Integer hide;
 
 
     @ApiModelProperty(value = "房屋全称",hidden = true)

@@ -224,4 +224,12 @@
         </if>
         limit #{page},#{pageSize}
     </select>
+
+    <select id="queryBindHouseBymobile" resultType="java.lang.Long">
+        select house_id from t_proprietor where mobile = #{mobile} and community_id = #{communityId} and deleted = 0
+    </select>
+
+    <select id="queryNameAndMobileByHouseId" resultType="com.jsy.community.entity.ProprietorEntity">
+        select real_name,mobile from t_proprietor where house_id = #{houseId} and community_id = #{communityId} and deleted = 0
+    </select>
 </mapper>

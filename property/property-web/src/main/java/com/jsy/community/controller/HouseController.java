@@ -18,6 +18,7 @@ import com.jsy.community.util.excel.impl.HouseExcelHandlerImpl;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.BuildingImportErrorVO;
 import com.jsy.community.vo.property.HouseImportErrorVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,6 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -167,7 +169,8 @@ public class HouseController {
 			query.setUnit(query.getName());
 		}else if(BusinessConst.BUILDING_TYPE_DOOR == query.getType()){
 			query.setDoor(query.getName());
-		}else if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == query.getType()) {
+		}else if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == query.getType() || BusinessConst.BUILDING_TYPE_DOOR_BUILDING == query.getType()
+			|| BusinessConst.BUILDING_TYPE_DOOR_UNIT == query.getType() || BusinessConst.BUILDING_TYPE_DOOR_BUILDING_UNIT == query.getType()) {
 		
 		} else {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"非法查询类型");
@@ -187,6 +190,20 @@ public class HouseController {
 	@DeleteMapping("/delete")
 	public CommonResult deleteHouse(@RequestParam Long id){
 		return houseService.deleteHouse(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
+	}
+	
+	/**
+	 * @Description: 【楼宇房屋】批量删除
+	 * @Param: [ids]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/12
+	 **/
+	@ApiOperation("【楼宇房屋】批量删除")
+	@DeleteMapping("/deletes")
+	public CommonResult deletesHouse(@RequestParam List<Long> ids) {
+		boolean result = houseService.deletesHouse(ids);
+		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "【楼宇房屋】 批量删除失败");
 	}
 	// ============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 	
@@ -261,8 +278,13 @@ public class HouseController {
 		return CommonResult.ok(houseService.queryHouseBuildingType(baseQO));
 	}
 	
+	/**
+	 *@Author: DKS
+	 *@Description: 下载房屋信息导入模板
+	 *@Date: 2021/8/10 9:10
+	 **/
 	@Login
-	@ApiOperation("下载房屋信息模板")
+	@ApiOperation("下载房屋信息导入模板")
 	@PostMapping("/downloadHouseExcelTemplate")
 	public ResponseEntity<byte[]> downloadHouseExcelTemplate() {
 		//设置excel 响应头信息
@@ -408,6 +430,25 @@ public class HouseController {
 		}
 		return null;
 	}
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 写入楼栋信息导入错误信息 和 把错误信息excel文件上传至文件服务器
+	 *@Param: errorVos:
+	 *@Return: java.lang.String:  返回excel文件下载地址
+	 *@Date: 2021/8/10 10:48
+	 **/
+	public String uploadBuildingErrorExcel(List<BuildingImportErrorVO> errorVos) {
+		Workbook workbook = houseExcelHandler.exportBuildingErrorExcel(errorVos);
+		try {
+			byte[] bytes = ExcelUtil.readWorkbook(workbook);
+			MultipartFile multipartFile = new MockMultipartFile("file", "houseErrorExcel", "application/vnd.ms-excel", bytes);
+			return MinioUtils.upload(multipartFile, "house-error-excel");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	/**
 	 * excel 文件上传上来后 验证方法
@@ -453,6 +494,95 @@ public class HouseController {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
 		}
+	}
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 下载楼栋信息导入模板
+	 *@Date: 2021/8/10 9:10
+	 **/
+	@Login
+	@ApiOperation("下载楼栋信息导入模板")
+	@PostMapping("/downloadBuildingExcelTemplate")
+	public ResponseEntity<byte[]> downloadBuildingExcelTemplate() {
+		List<HouseBuildingTypeEntity> houseBuildingTypeEntities = houseService.selectHouseBuildingType(UserUtils.getAdminCommunityId());
+		//设置excel 响应头信息
+		MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+		//设置响应类型为附件类型直接下载这种
+		multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("智慧小区-楼宇导入模板.xlsx", StandardCharsets.UTF_8));
+		//设置响应的文件mime类型为 xls类型
+		multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+		Workbook workbook = houseExcelHandler.exportBuildingTemplate(houseBuildingTypeEntities);
+		//把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+		try {
+			return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+		}
+	}
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 导入楼栋信息
+	 *@Param: excel:
+	 *@Return: com.jsy.community.vo.CommonResult
+	 *@Date: 2021/8/10 10:38
+	 **/
+	@Login
+	@ApiOperation("导入楼栋信息")
+	@PostMapping("/importBuildingExcel")
+	public CommonResult importBuildingExcel(MultipartFile excel) {
+		//参数验证
+		validFileSuffix(excel);
+		Long adminCommunityId = UserUtils.getAdminCommunityId();
+		String userId = UserUtils.getUserId();
+		ArrayList<BuildingImportErrorVO> errorVos = new ArrayList<>(32);
+		List<HouseEntity> houseEntities = houseExcelHandler.importBuildingExcel(excel, errorVos);
+		List<HouseEntity> allBuilding = houseService.selectAllBuilding(adminCommunityId);
+		List<String> buildingTypeNames = new ArrayList<>();
+		for (int i = 0; i < houseEntities.size(); i++) {
+			buildingTypeNames.add(houseEntities.get(i).getBuildingTypeName());
+		}
+		Map<String, Map<String, Long>> buildingTypeIdMap = houseService.queryHouseBuildingTypeId(buildingTypeNames);
+		//补楼宇分类名称id
+		for (HouseEntity houseEntity : houseEntities) {
+			if (houseEntity.getBuildingTypeName() != null) {
+				Map<String, Long> countMap = buildingTypeIdMap.get(houseEntity.getBuildingTypeName());
+				houseEntity.setBuildingType(countMap == null ? null : countMap.get("id"));
+			}
+		}
+		// 通过物业提交的数据 和 数据库该社区已存在的数据进行效验
+		Iterator<HouseEntity> iterator = houseEntities.iterator();
+		while (iterator.hasNext()) {
+			HouseEntity houseEntity = iterator.next();
+			for (HouseEntity entity : allBuilding) {
+				// 类型是楼栋,楼栋已经存在
+				if (entity.getBuilding().equals(houseEntity.getBuilding()) && entity.getType() == 1) {
+					iterator.remove();
+					BuildingImportErrorVO errorVO = new BuildingImportErrorVO();
+					BeanUtils.copyProperties(houseEntity, errorVO);
+					errorVO.setBuilding(houseEntity.getBuilding());
+					errorVO.setTotalFloor(houseEntity.getTotalFloor());
+					errorVO.setBuildingTypeName(houseEntity.getBuildingTypeName());
+					errorVO.setRemark("楼栋已经存在!");
+					errorVos.add(errorVO);
+				}
+			}
+		}
+		Integer row = 0;
+		if (CollectionUtil.isNotEmpty(houseEntities)) {
+			//获取管理员姓名 用于标识每条业主数据的创建人
+			row = houseService.saveBuildingBatch(houseEntities, adminCommunityId, userId);
+		}
+		//excel导入失败的信息明细 文件下载地址
+		String errorExcelAddr = null;
+		//错误excel写入远程服务器 让物业人员可以直接下载
+		if( CollectionUtil.isNotEmpty(errorVos) ){
+			errorExcelAddr = uploadBuildingErrorExcel(errorVos);
+		}
+		//构造返回对象
+		return CommonResult.ok(new BuildingImportErrorVO(row, errorVos.size(), errorExcelAddr));
 	}
 }
 
