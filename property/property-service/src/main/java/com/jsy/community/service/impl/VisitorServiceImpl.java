@@ -1,10 +1,13 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IVisitorService;
+import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.jsy.community.entity.VisitorPersonRecordEntity;
@@ -16,6 +19,7 @@ import com.jsy.community.mapper.VisitorStrangerMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -25,10 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author chq459799974
@@ -49,6 +50,9 @@ public class VisitorServiceImpl implements IVisitorService {
 	
 	@Autowired
 	private VisitorStrangerMapper visitorStrangerMapper;
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 	
 	
 	/**
@@ -80,7 +84,35 @@ public class VisitorServiceImpl implements IVisitorService {
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
 	}
-	
+
+	/**
+	 * @param baseQO : 分页参数
+	 * @author: Pipi
+	 * @description: 访客管理分页查询
+	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorEntity>
+	 * @date: 2021/8/13 17:26
+	 **/
+	@Override
+	public PageInfo<VisitorEntity> visitorPage(BaseQO<VisitorEntity> baseQO) {
+		Page<VisitorEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		VisitorEntity query = baseQO.getQuery();
+		QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
+		if (!StringUtils.isEmpty(query.getName())) {
+			queryWrapper.like("name", query.getName());
+		}
+		if (query.getBuildingId() != null) {
+			queryWrapper.eq("building_id", query.getBuildingId());
+		}
+		if (query.getCheckType() != null) {
+			queryWrapper.eq("check_type", query.getCheckType());
+		}
+		Page<VisitorEntity> visitorEntityPage = visitorMapper.selectPage(page, queryWrapper);
+		PageInfo<VisitorEntity> visitorEntityPageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(visitorEntityPage, visitorEntityPageInfo);
+		return visitorEntityPageInfo;
+	}
+
 	/**
 	* @Description: 查询单次访客邀请的随行人员列表
 	 * @Param: [visitorId]
@@ -161,6 +193,7 @@ public class VisitorServiceImpl implements IVisitorService {
 	 * @Author: chq459799974
 	 * @Date: 2021-08-02
 	**/
+	@Override
 	public void saveStranger(JSONObject jsonObject){
 		String picBase64 = jsonObject.getString("picBase64");
 		MultipartFile multipartFile = Base64Util.base64StrToMultipartFile(picBase64.substring(picBase64.indexOf(",") + 1));
@@ -202,5 +235,31 @@ public class VisitorServiceImpl implements IVisitorService {
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
 	}
-	
+
+	/**
+	 * @param visitorEntity : 访客表实体
+	 * @author: Pipi
+	 * @description: 添加访客邀请
+	 * @return: java.lang.Integer
+	 * @date: 2021/8/13 14:17
+	 **/
+	@Override
+	public Integer addVisitor(VisitorEntity visitorEntity) {
+		visitorEntity.setId(SnowFlake.nextId());
+		int resultNum = visitorMapper.insert(visitorEntity);
+		// 添加成功且有人脸信息
+		if (!StringUtils.isEmpty(visitorEntity.getFaceUrl()) && resultNum > 0) {
+			JSONObject pushMap = new JSONObject();
+			pushMap.put("op","editPerson");
+			pushMap.put("uid",visitorEntity.getContact());
+			pushMap.put("faceUrl",visitorEntity.getFaceUrl());
+			HashSet<Object> hashSet = new HashSet<>();
+			hashSet.add(visitorEntity.getCommunityId());
+			pushMap.put("communityIdSet", hashSet);
+			pushMap.put("sex", 0);
+			pushMap.put("realName",visitorEntity.getName());
+			rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, pushMap);
+		}
+		return resultNum;
+	}
 }

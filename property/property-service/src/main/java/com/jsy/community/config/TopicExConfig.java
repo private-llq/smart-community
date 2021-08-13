@@ -20,7 +20,7 @@ public class TopicExConfig {
 	
 	//监听topic名称
 	public final static String QUEUE_FROM_COMMUNITY = "queue.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区(摄像头相关)
-	public final static String QUEUE_VISITOR_HIS_FROM_COMMUNITY = "queue.visitor.his.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区(访客记录相关)
+	public final static String QUEUE_VISITOR_HIS_FROM_COMMUNITY = "queue.visitor.his.2cloudA"; //云端监听小区队列，根据参数communityId判断是哪个小区(访客记录相关)
 	
 	//小区相关-声明交换机
 	@Bean
@@ -37,4 +37,39 @@ public class TopicExConfig {
 	Binding bindingOfTopicEx2CommunityAndQueue2Community() {
 		return BindingBuilder.bind(queueOf2Community()).to(topicExOfToCommunity()).with(QUEUE_TO_COMMUNITY);
 	}
+
+
+	//交换机名称
+	public final static String EX_FACE_XU = "topicExOfXUFace"; //炫优人脸识别一体机 - 交换机
+
+	//topic名称
+	public final static String TOPIC_FACE_XU_SERVER = "topic.face.xu.server"; //炫优人脸识别一体机 - topic - server
+	//topic名称
+	public final static String TOPIC_FACE_XU_CLIENT = "topic.face.xu.client"; //炫优人脸识别一体机 - topic - client
+
+	//声明队列
+	@Bean
+	public Queue queueOfXUFaceServer() {
+		return new Queue(TOPIC_FACE_XU_SERVER,true);
+	}
+	@Bean
+	public Queue queueOfXUFaceClient() {
+		return new Queue(TOPIC_FACE_XU_CLIENT,true);
+	}
+	//声明交换机
+	@Bean
+	TopicExchange topicExOfXUFace() {
+		return new TopicExchange(EX_FACE_XU);
+	}
+	//队列绑定交换机
+	@Bean
+	Binding bindingExchangeMessage1() {
+		return BindingBuilder.bind(queueOfXUFaceServer()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_SERVER);
+	}
+	//队列绑定交换机
+	@Bean
+	Binding bindingExchangeMessage2() {
+		return BindingBuilder.bind(queueOfXUFaceClient()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_CLIENT);
+	}
+
 }
