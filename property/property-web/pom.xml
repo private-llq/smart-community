@@ -87,6 +87,7 @@
 			<artifactId>kaptcha</artifactId>
 		</dependency>
 
+
 	</dependencies>
 
 	<build>
