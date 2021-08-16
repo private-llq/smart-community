@@ -55,6 +55,24 @@ public class MinioUtils {
 		}
 		return upload(file, bucketName);
 	}
+	
+	/**
+	 * @Description: 文件上传方法重载
+	 * @Param: [file, bucketName]
+	 * @Return: java.lang.String
+	 * @Author: DKS
+	 * @Date: 2021/8/16
+	 **/
+	public static String uploadDeposit(byte[] byteData, String bucketName){
+		InputStream inputStream = new ByteArrayInputStream(byteData);
+		MultipartFile file = null;
+		try {
+			file = new MockMultipartFile(" ", " ", ContentType.IMAGE_PNG.toString(), inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return upload(file, bucketName);
+	}
 
 
 	/**
