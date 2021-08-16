@@ -31,7 +31,6 @@ public class SignatureServiceImpl implements ISignatureService {
 	private String SIGN_USER_HOST;
 	@Value("${sign.user.port}")
 	private String SIGN_USER_PORT;
-	
 	@Value("${sign.user.api.insert}")
 	private String SIGN_USER_API_INSERT;
 	@Value("${sign.user.api.batch-insert}")
@@ -112,6 +111,7 @@ public class SignatureServiceImpl implements ISignatureService {
 				break;
 			default:
 		}
+
 		//获取加密对象
 //		OpenParam openParam = AESUtil.returnOpenParam(redbagQO);
 		//组装请求body

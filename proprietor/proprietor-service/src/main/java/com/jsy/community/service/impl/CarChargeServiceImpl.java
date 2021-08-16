@@ -17,6 +17,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
 
     @Override
+    @Transactional
     public Integer SaveCarCharge(CarChargeEntity carChargeEntity) {
         carChargeEntity.setUid(UserUtils.randomUUID());
         int insert = carChargeMapper.insert(carChargeEntity);
@@ -35,12 +37,14 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     }
 
     @Override
+    @Transactional
     public Integer UpdateCarCharge(CarChargeEntity carChargeEntity) {
         int update = carChargeMapper.update(carChargeEntity, new UpdateWrapper<CarChargeEntity>().eq("uid", carChargeEntity.getUid()));
         return update;
     }
 
     @Override
+    @Transactional
     public Integer DelCarCharge(String uid) {
         int del = carChargeMapper.delete(new QueryWrapper<CarChargeEntity>().eq("uid", uid));
         return del;
