@@ -202,6 +202,7 @@ public class HouseController {
 		boolean result = houseService.deletesHouse(ids);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "【楼宇房屋】 批量删除失败");
 	}
+
 	// ============================================ 物业端产品原型确定后新加的 结束  ===========================================================
 	
 	/**
@@ -405,6 +406,7 @@ public class HouseController {
 		if( CollectionUtil.isNotEmpty(errorVos) ){
 			errorExcelAddr = uploadErrorExcel(errorVos);
 		}
+
 		//构造返回对象
 		return CommonResult.ok(new HouseImportErrorVO(row, errorVos.size(), errorExcelAddr));
 	}
@@ -461,6 +463,7 @@ public class HouseController {
 		if (!extension) {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "只支持excel文件!");
 		}
+
 	}
 	
 	/**

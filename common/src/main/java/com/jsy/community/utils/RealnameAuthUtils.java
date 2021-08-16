@@ -86,6 +86,7 @@ public class RealnameAuthUtils {
 			e.printStackTrace();
 		}
 		return result;
+
 	}
 	
 	/**
@@ -214,6 +215,7 @@ public class RealnameAuthUtils {
 		}
 		returnMap.put("code", "-1");
 		returnMap.put("msg","未取得远程数据，实名认证失败");
+
 		return returnMap;
 	}
 	

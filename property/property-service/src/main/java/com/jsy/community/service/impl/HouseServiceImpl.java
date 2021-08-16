@@ -1160,6 +1160,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             if(count < 1){
                 throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"未找到单元");
             }
+
+
         }
     }
     

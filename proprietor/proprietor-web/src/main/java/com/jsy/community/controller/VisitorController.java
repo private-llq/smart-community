@@ -39,7 +39,6 @@ import java.util.Map;
 @Login
 @ApiJSYController
 public class VisitorController {
-	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IVisitorService visitorService;
 	
@@ -64,13 +63,13 @@ public class VisitorController {
 //		return visitorService.verifyQRCode(jsonObject,jsonObject.getInteger("hardwareType"));
 //	}
 	
-	/**
-	 * @Description: 访客登记 新增
-	 * @Param: [visitorEntity]
-	 * @Return: com.jsy.community.vo.CommonResult
-	 * @Author: chq459799974
-	 * @Date: 2020/11/11
-	 **/
+//	/**
+//	 * @Description: 访客登记 新增
+//	 * @Param: [visitorEntity]
+//	 * @Return: com.jsy.community.vo.CommonResult
+//	 * @Author: chq459799974
+//	 * @Date: 2020/11/11
+//	 **/
 	//TODO 权限和一次访客登记对应还是和每个随行人员一一对应？
 	@ApiOperation("【访客】新增")
 	@PostMapping("")

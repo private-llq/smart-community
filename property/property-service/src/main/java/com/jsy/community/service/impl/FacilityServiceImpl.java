@@ -24,6 +24,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -266,7 +267,8 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		map.put("act",PropertyConsts.ACT_HK_CAMERA);
 		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY,TopicExConfig.QUEUE_TO_COMMUNITY + "." + communityId, JSON.toJSONString(map));
 	}
-	
+
+
 	/**
 	* @Description: 设备数据同步后处理
 	 * @Param: [resultCode,facilityId,communityId,msg]

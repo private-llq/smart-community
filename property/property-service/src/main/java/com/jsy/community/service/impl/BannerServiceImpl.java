@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminUserService;
@@ -35,7 +34,7 @@ import java.util.*;
  */
 @DubboService(version = Const.version, group = Const.group_property)
 public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> implements IBannerService {
-	
+
 	@Autowired
 	private BannerMapper bannerMapper;
 	

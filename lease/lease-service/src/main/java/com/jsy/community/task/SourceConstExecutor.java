@@ -77,7 +77,7 @@ public class SourceConstExecutor {
      * @since  2020/12/11 14:19
      */
     @Scheduled(cron = CRON)
-    @DistributedLock(lockKey = "houseConst", waitTimout = 30)
+    @DistributedLock(lockKey = "houseCo0nst", waitTimout = 30)
     public void updateSourceConst(){
         //如果当前执行时间已经超过 指定 执行时间
         if(DateUtils.notNeedImplemented(CRON)){
