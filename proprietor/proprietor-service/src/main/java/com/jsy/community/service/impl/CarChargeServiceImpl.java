@@ -62,7 +62,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      * @return
      */
     @Override
-    public PageInfo listCarChargePage(BaseQO<Integer> baseQO) {
+    public PageInfo listCarChargePage(BaseQO baseQO) {
         Page<CarChargeEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
         PageInfo<CarChargeEntity> pageInfo = new PageInfo<>();
         Page<CarChargeEntity> selectPage = carChargeMapper.selectPage(page,new QueryWrapper<CarChargeEntity>().eq(baseQO.getQuery()!=null,"type", baseQO.getQuery()));
