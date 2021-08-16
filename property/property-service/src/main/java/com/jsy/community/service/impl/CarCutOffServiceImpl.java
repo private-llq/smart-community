@@ -9,6 +9,7 @@ import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.entity.property.CarProprietorEntity;
 import com.jsy.community.mapper.CarCutOffMapper;
 import com.jsy.community.qo.property.CarCutOffQO;
+import com.jsy.community.utils.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -21,28 +22,33 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
    private CarCutOffMapper carCutOffMapper;
 
     @Override
-    public Page<CarCutOffEntity> selectPage(CarCutOffQO carCutOffQO, Long adminCommunityId) {
+    public PageInfo<CarCutOffEntity> selectPage(CarCutOffQO carCutOffQO, Long adminCommunityId) {
 
         QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
-        if (!StringUtils.isEmpty(carCutOffQO.getCarNumber())){
+        if (StringUtils.isNotBlank(carCutOffQO.getCarNumber())){
             queryWrapper.like("car_number",carCutOffQO.getCarNumber());
         }
-        if (!StringUtils.isEmpty(carCutOffQO.getCarType())){
+        if (StringUtils.isNotBlank(carCutOffQO.getCarType())){
             queryWrapper.like("car_type",carCutOffQO.getCarType());
         }
-        if (!StringUtils.isEmpty(carCutOffQO.getAccess())){
+        if (StringUtils.isNotBlank(carCutOffQO.getAccess())){
             queryWrapper.like("access",carCutOffQO.getAccess());
         }
         queryWrapper.eq("community_id",adminCommunityId);
 
-        Page<CarCutOffEntity> page = new Page<CarCutOffEntity>();
-        if (carCutOffQO.getPage() == 0 || carCutOffQO.getPage() == null){
+        Page<CarCutOffEntity> page = new Page<CarCutOffEntity>(carCutOffQO.getPage(),carCutOffQO.getSize());
+        /*if (carCutOffQO.getPage() == 0 || carCutOffQO.getPage() == null){
             carCutOffQO.setPage(10L);
-        }
-        page.setPages(carCutOffQO.getPage());
-        page.setSize(carCutOffQO.getSize());
+        }*/
+
         Page<CarCutOffEntity> selectPage = carCutOffMapper.selectPage(page, queryWrapper);
 
-        return selectPage;
+        PageInfo<CarCutOffEntity> pageInfo = new PageInfo<>();
+        page.setTotal(selectPage.getTotal());
+        page.setRecords(page.getRecords());
+        page.setCurrent(page.getCurrent());
+        page.setSize(page.getSize());
+
+        return pageInfo;
     }
 }

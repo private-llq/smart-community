@@ -1,6 +1,5 @@
 package com.jsy.community.qo.property;
 
-import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.qo.BaseQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

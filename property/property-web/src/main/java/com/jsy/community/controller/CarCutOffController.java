@@ -7,15 +7,12 @@ import com.jsy.community.api.ICarCutOffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.qo.property.CarCutOffQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cutOff")
@@ -26,12 +23,9 @@ public class CarCutOffController{
     private ICarCutOffService carCutOffService;
 
     @Login
-    @PostMapping("/selectPage")
-    private CommonResult selectPage(@RequestBody CarCutOffQO carCutOffQO){
-        System.out.println(carCutOffQO);
-        System.out.println(carCutOffQO.getPage());
-        System.out.println(carCutOffQO.getSize());
-       Page<CarCutOffEntity> page =  carCutOffService.selectPage(carCutOffQO, UserUtils.getAdminCommunityId());
-        return CommonResult.ok(page,"查询成功");
+    @GetMapping("/selectPage")
+    public CommonResult select2Page(@RequestBody CarCutOffQO carCutOffQO){
+        PageInfo<CarCutOffEntity> pageInfo = carCutOffService.selectPage(carCutOffQO, UserUtils.getAdminCommunityId());
+        return CommonResult.ok(pageInfo,"查询成功");
     }
 }

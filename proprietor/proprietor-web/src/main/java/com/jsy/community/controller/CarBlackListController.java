@@ -20,21 +20,40 @@ public class CarBlackListController {
     private ICarBlackListService blackListService;
 
 
+
+    /**
+     * 分页查询 黑名单
+     * @param baseQO 车牌号
+     * @return
+     */
     @GetMapping("carBlackListPage")
-    CommonResult<PageInfo> carBlackListPage(@RequestBody BaseQO<String> baseQO){
+    public CommonResult<PageInfo> carBlackListPage(@RequestBody BaseQO<String> baseQO){
         PageInfo<CarBlackListEntity> pageInfo = blackListService.carBlackListPage(baseQO);
         return CommonResult.ok(pageInfo);
     }
 
+
+
+    /**
+     * 添加进入黑名单
+     * @param carBlackListEntity
+     * @return
+     */
     @PostMapping("saveBlackList")
-    CommonResult saveBlackList(@RequestBody CarBlackListEntity carBlackListEntity){
+    public CommonResult saveBlackList(@RequestBody CarBlackListEntity carBlackListEntity){
         blackListService.saveBlackList(carBlackListEntity);
         return CommonResult.ok();
 
     }
 
+
+    /**
+     * 移除黑名单
+     * @param uid
+     * @return
+     */
     @DeleteMapping("delBlackList")
-    CommonResult delBlackList(@RequestParam("uid") String uid){
+    public CommonResult delBlackList(@RequestParam("uid") String uid){
         blackListService.delBlackList(uid);
         return CommonResult.ok();
     }

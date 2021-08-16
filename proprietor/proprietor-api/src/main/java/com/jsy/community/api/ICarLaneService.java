@@ -19,7 +19,5 @@ public interface ICarLaneService {
 
     PageInfo FindByLaneNamePage(BaseQO<String> baseQO);
 
-    PageInfo FindByLaneNamePage2(BaseQO<String> baseQO);
-
 
 }

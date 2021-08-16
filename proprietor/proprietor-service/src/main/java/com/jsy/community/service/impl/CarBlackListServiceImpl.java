@@ -23,6 +23,11 @@ public class CarBlackListServiceImpl implements ICarBlackListService {
     public CarBlackListMapper carBlackListMapper;
 
 
+    /**
+     * 分页查询 黑名单
+     * @param baseQO 车牌号
+     * @return
+     */
     @Override
     public PageInfo<CarBlackListEntity> carBlackListPage(BaseQO<String> baseQO) {
         Page<CarBlackListEntity> Page = new Page<>(baseQO.getPage(),baseQO.getSize());

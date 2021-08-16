@@ -62,15 +62,4 @@ public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity
         return pageInfo;
     }
 
-    @Override
-    public PageInfo FindByLaneNamePage2(BaseQO<String> baseQO) {
-        Page<CarLaneEntity> page = new Page<>(baseQO.getPage(),baseQO.getSize());
-        PageInfo<CarLaneEntity> pageInfo = new PageInfo<>();
-        IPage<CarLaneEntity> selectAllByPage = carLaneMapper.findAllByPage(page,baseQO);
-        pageInfo.setRecords(selectAllByPage.getRecords());
-        pageInfo.setTotal(selectAllByPage.getTotal());
-        pageInfo.setCurrent(selectAllByPage.getCurrent());
-        pageInfo.setSize(selectAllByPage.getSize());
-        return pageInfo;
-    }
 }
