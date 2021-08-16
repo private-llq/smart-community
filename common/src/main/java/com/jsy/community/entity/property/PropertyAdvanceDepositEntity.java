@@ -27,6 +27,10 @@ public class PropertyAdvanceDepositEntity extends BaseEntity {
 	@ApiModelProperty(value = "充值余额")
 	private BigDecimal balance;
 	
+	@ApiModelProperty(value = "充值余额明细")
+	@TableField(exist = false)
+	private BigDecimal balanceRecord;
+	
 	@ApiModelProperty(value = "备注")
 	private String comment;
 	
@@ -47,4 +51,16 @@ public class PropertyAdvanceDepositEntity extends BaseEntity {
 	@ApiModelProperty(value = "真实姓名")
 	@TableField(exist = false)
 	private String realName;
+	
+	@ApiModelProperty(value = "房屋号码")
+	@TableField(exist = false)
+	private String door;
+	
+	@ApiModelProperty(value = "付款金额")
+	@TableField(exist = false)
+	private BigDecimal payAmount;
+	
+	@ApiModelProperty(value = "到账金额")
+	@TableField(exist = false)
+	private BigDecimal receivedAmount;
 }

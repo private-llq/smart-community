@@ -310,4 +310,8 @@
 		</foreach>
 		group by house_id
 	</select>
+
+	<select id="selectAllBuildingUnitDoor" resultType="com.jsy.community.entity.HouseEntity">
+		select * from t_house where community_id = #{communityId} and deleted = 0
+	</select>
 </mapper>

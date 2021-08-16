@@ -281,4 +281,13 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 */
 	@MapKey("houseId")
 	Map<Long,Map<String,Long>> selectHouseNumberCount(@Param("list") Collection<Long> houseIds);
+	
+	/**
+	 * @Description: 查询小区下所有楼栋、单元、房屋
+	 * @author: DKS
+	 * @since: 2021/8/13 14:08
+	 * @Param: communityId
+	 * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 */
+	List<HouseEntity> selectAllBuildingUnitDoor(Long communityId);
 }

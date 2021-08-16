@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.PropertyAdvanceDepositMapper">
+
+    <!-- 批量新增预存款充值余额-->
+    <insert id="saveAdvanceDeposit">
+        insert into t_property_advance_deposit (
+        id,
+        community_id,
+        house_id,
+        balance,
+        comment,
+        deleted,
+        create_by,
+        create_time,
+        update_by,
+        update_time
+        )
+        values
+        <foreach collection="list" separator="," item="propertyAdvanceDepositEntity">
+            (#{propertyAdvanceDepositEntity.id},
+            #{propertyAdvanceDepositEntity.communityId},
+            #{propertyAdvanceDepositEntity.houseId},
+            #{propertyAdvanceDepositEntity.balance},
+            #{propertyAdvanceDepositEntity.comment},
+            #{propertyAdvanceDepositEntity.deleted},
+            #{propertyAdvanceDepositEntity.createBy},
+            #{propertyAdvanceDepositEntity.createTime},
+            #{propertyAdvanceDepositEntity.updateBy},
+            #{propertyAdvanceDepositEntity.updateTime})
+        </foreach>
+    </insert>
+
+    <select id="queryAdvanceDepositByHouseId" resultType="com.jsy.community.entity.property.PropertyAdvanceDepositEntity">
+        select * from t_property_advance_deposit where house_id = #{houseId} and community_id = #{communityId} and deleted = 0
+    </select>
+
+    <update id="UpdateAdvanceDeposit">
+        <foreach collection="list" separator="," item="propertyAdvanceDepositEntity">
+        update t_property_advance_deposit
+        set balance = #{propertyAdvanceDepositEntity.balance},
+            comment = #{propertyAdvanceDepositEntity.comment}
+        where house_id = #{propertyAdvanceDepositEntity.houseId}
+        and community_id = #{propertyAdvanceDepositEntity.communityId}
+        </foreach>
+        and deleted = 0
+    </update>
+
+</mapper>

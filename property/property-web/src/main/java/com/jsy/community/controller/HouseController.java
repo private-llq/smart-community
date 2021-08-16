@@ -39,10 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -583,6 +580,25 @@ public class HouseController {
 		}
 		//构造返回对象
 		return CommonResult.ok(new BuildingImportErrorVO(row, errorVos.size(), errorExcelAddr));
+	}
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 显示楼栋、单元、房屋树形结构
+	 *@Param: excel:
+	 *@Return: com.jsy.community.vo.CommonResult
+	 *@Date: 2021/8/10 10:38
+	 **/
+	@Login
+	@ApiOperation("显示楼栋、单元、房屋树形结构")
+	@PostMapping("/tree")
+	public CommonResult getHouseTree() {
+		Map<String, Object> returnMap = new HashMap<>();
+		HouseTreeUtil menuTree = new HouseTreeUtil();
+		List<HouseEntity> allHouse = houseService.selectAllBuildingUnitDoor(UserUtils.getAdminCommunityId());
+		List<Object> menuList = menuTree.menuList(allHouse);
+		returnMap.put("list", menuList);
+		return CommonResult.ok(returnMap);
 	}
 }
 

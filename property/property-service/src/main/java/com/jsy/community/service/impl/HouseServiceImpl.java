@@ -905,6 +905,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
      * @Return: java.lang.Integer
      * @Date: 2021/5/21 14:26
      */
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public Integer saveHouseBatch(List<HouseEntity> houseEntityList, Long communityId, String uid) {
         // 需要验证社区下这个编号的楼栋或者单元是否存在,如果不存在,则新增楼栋或者单元
@@ -1035,6 +1036,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
      *@Return: java.lang.Integer
      *@Date: 2021/8/10 11:26
      **/
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public Integer saveBuildingBatch(List<HouseEntity> houseEntityList, Long communityId, String uid) {
         // 需要验证社区下这个编号的楼栋是否存在,如果不存在,则新增楼栋
@@ -1367,4 +1369,16 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 	public List<HouseEntity> selectAllBuilding(Long communityId) {
 		return houseMapper.getBuildingList(communityId);
 	}
+    
+    /**
+     * @Description: 查询小区下所有楼栋、单元、房屋
+     * @author: DKS
+     * @since: 2021/8/13 14:08
+     * @Param: communityId
+     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+     */
+    @Override
+    public List<HouseEntity> selectAllBuildingUnitDoor(Long communityId) {
+	    return houseMapper.selectAllBuildingUnitDoor(communityId);
+    }
 }

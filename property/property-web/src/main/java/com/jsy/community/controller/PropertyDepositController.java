@@ -48,7 +48,7 @@ public class PropertyDepositController {
         if(propertyDepositEntity.getDepositType() == null || propertyDepositEntity.getDepositTargetId() == null || propertyDepositEntity.getPayService() == null || propertyDepositEntity.getBillMoney() == null){
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
         }
-        ValidatorUtils.validateEntity(propertyDepositEntity,PropertyDepositEntity.addPropertyDepositGroup.class);
+        ValidatorUtils.validateEntity(propertyDepositEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
         propertyDepositEntity.setCommunityId(loginUser.getCommunityId());
         propertyDepositEntity.setCreateBy(loginUser.getUid());
