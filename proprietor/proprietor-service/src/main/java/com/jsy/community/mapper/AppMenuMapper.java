@@ -35,5 +35,13 @@ public interface AppMenuMapper extends BaseMapper<AppMenuEntity> {
 	 * @Param [communityId]
 	 **/
 	List<Long> getMenuIdByCommunityId(Long communityId);
-	
+
+	/**
+	 * @Description: 排序查询菜单
+	 * @author: Hu
+	 * @since: 2021/8/12 14:54
+	 * @Param:
+	 * @return:
+	 */
+	List<AppMenuEntity> selectByIds(@Param("menuIds") List<Long> menuIds);
 }
