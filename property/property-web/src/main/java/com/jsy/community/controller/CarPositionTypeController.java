@@ -37,7 +37,6 @@ public class CarPositionTypeController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionTypeService iCarPositionTypeService;
 
-
     @ApiOperation("新增车位类型")
     @Login
     @RequestMapping(value = "/insterCartPositionType", method = RequestMethod.POST)
