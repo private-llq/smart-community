@@ -43,7 +43,7 @@ public class CarEquipmentManageController {
      * @Author: Tian
      * @Date: 2021/8/9-11:22
      **/
-    @GetMapping("/equipmentPage")
+    @PostMapping("/equipmentPage")
     @Login
     public CommonResult equipmentPage(@RequestBody  BaseQO<CarEquipmentManageEntity> baseQO){
         Long communityId = UserUtils.getAdminCommunityId();
