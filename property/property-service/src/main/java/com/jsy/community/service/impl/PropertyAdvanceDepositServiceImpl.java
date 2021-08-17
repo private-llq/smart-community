@@ -163,8 +163,20 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
         }
         //是否查房屋id
         if (query.getHouseId() != null) {
-            queryWrapper.like("house_id",query.getHouseId());
+            queryWrapper.eq("house_id", query.getHouseId());
         }
+//        else {
+//            QueryWrapper<HouseEntity> houseQueryWrapper = new QueryWrapper<>();
+//            houseQueryWrapper.like("building", query.getAddress()).or().like("unit", query.getAddress()).or().like("door", query.getAddress());
+//            List<HouseEntity> houseEntities = houseMapper.selectList(houseQueryWrapper);
+//            List<Long> houseIds = new ArrayList<>();
+//            for (HouseEntity houseEntity : houseEntities) {
+//                houseIds.add(houseEntity.getId());
+//            }
+//            if (houseIds.size() > 0) {
+//                queryWrapper.in("house_id", houseIds);
+//            }
+//        }
         queryWrapper.orderByDesc("create_time");
         Page<PropertyAdvanceDepositEntity> pageData = propertyAdvanceDepositMapper.selectPage(page, queryWrapper);
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
@@ -217,19 +229,21 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 addPropertyAdvanceDepositEntity.setHouseId(propertyAdvanceDepositEntity.getHouseId());
                 addPropertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getReceivedAmount());
                 addPropertyAdvanceDepositEntity.setComment(propertyAdvanceDepositEntity.getComment());
+                addPropertyAdvanceDepositEntity.setDeleted(0);
                 addPropertyAdvanceDepositEntity.setCreateBy(uid);
                 addPropertyAdvanceDepositEntity.setCreateTime(LocalDateTime.now());
                 addPropertyAdvanceDepositEntityList.add(addPropertyAdvanceDepositEntity);
                 // 生成预存款变更明细记录
                 PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
                 propertyAdvanceDepositRecordEntity.setId(SnowFlake.nextId());
-                propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
+                propertyAdvanceDepositRecordEntity.setCommunityId(communityId);
                 propertyAdvanceDepositRecordEntity.setType(2);
                 propertyAdvanceDepositRecordEntity.setDepositAmount(propertyAdvanceDepositEntity.getReceivedAmount());
                 propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositEntity.getReceivedAmount());
                 propertyAdvanceDepositRecordEntity.setAdvanceDepositId(addPropertyAdvanceDepositEntity.getId());
                 propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
-                propertyAdvanceDepositRecordEntity.setCreateBy(propertyAdvanceDepositEntity.getCreateBy());
+                propertyAdvanceDepositRecordEntity.setDeleted(0);
+                propertyAdvanceDepositRecordEntity.setCreateBy(uid);
                 propertyAdvanceDepositRecordEntity.setCreateTime(LocalDateTime.now());
                 addPropertyAdvanceDepositRecordEntityList.add(propertyAdvanceDepositRecordEntity);
             } else {
@@ -237,6 +251,8 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 // 根据houseId查询预存款余额
                 PropertyAdvanceDepositEntity entity1 = queryAdvanceDepositByHouseId(propertyAdvanceDepositEntity.getHouseId(), communityId);
                 PropertyAdvanceDepositEntity updatePropertyAdvanceDepositEntity = new PropertyAdvanceDepositEntity();
+                updatePropertyAdvanceDepositEntity.setHouseId(propertyAdvanceDepositEntity.getHouseId());
+                updatePropertyAdvanceDepositEntity.setCommunityId(communityId);
                 updatePropertyAdvanceDepositEntity.setBalance(entity1.getBalance().add(propertyAdvanceDepositEntity.getReceivedAmount()));
                 updatePropertyAdvanceDepositEntity.setComment(propertyAdvanceDepositEntity.getComment());
                 updatePropertyAdvanceDepositEntity.setUpdateBy(uid);
@@ -246,9 +262,9 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
                 // 查最新一次记录并设置余额明细
                 PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
-                    entity1.getId(), propertyAdvanceDepositEntity.getCommunityId());
+                    entity1.getId(), communityId);
                 propertyAdvanceDepositRecordEntity.setId(SnowFlake.nextId());
-                propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
+                propertyAdvanceDepositRecordEntity.setCommunityId(communityId);
                 propertyAdvanceDepositRecordEntity.setType(2);
                 if (propertyAdvanceDepositEntity.getReceivedAmount().compareTo(BigDecimal.ZERO) == 1) {
                     propertyAdvanceDepositRecordEntity.setDepositAmount(propertyAdvanceDepositEntity.getReceivedAmount());
@@ -258,15 +274,22 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getReceivedAmount()));
                 propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositRecordEntity1.getAdvanceDepositId());
                 propertyAdvanceDepositRecordEntity.setComment(updatePropertyAdvanceDepositEntity.getComment());
+                propertyAdvanceDepositRecordEntity.setDeleted(0);
                 propertyAdvanceDepositRecordEntity.setUpdateBy(uid);
                 propertyAdvanceDepositRecordEntity.setUpdateTime(LocalDateTime.now());
                 addPropertyAdvanceDepositRecordEntityList.add(propertyAdvanceDepositRecordEntity);
             }
         }
         // 批量新增预存款充值
-        Integer saveAdvanceDepositRow = propertyAdvanceDepositMapper.saveAdvanceDeposit(addPropertyAdvanceDepositEntityList);
+        Integer saveAdvanceDepositRow = 0;
+        Integer updateAdvanceDepositRow = 0;
+        if (addPropertyAdvanceDepositEntityList.size() > 0) {
+            saveAdvanceDepositRow = propertyAdvanceDepositMapper.saveAdvanceDeposit(addPropertyAdvanceDepositEntityList);
+        }
         // 批量修改预存款充值
-        Integer updateAdvanceDepositRow = propertyAdvanceDepositMapper.UpdateAdvanceDeposit(UpdatePropertyAdvanceDepositEntityList);
+        if (UpdatePropertyAdvanceDepositEntityList.size() > 0) {
+            updateAdvanceDepositRow = propertyAdvanceDepositMapper.UpdateAdvanceDeposit(UpdatePropertyAdvanceDepositEntityList);
+        }
         // 批量新增预存款充值明细记录
         propertyAdvanceDepositRecordMapper.saveAdvanceDepositRecord(addPropertyAdvanceDepositRecordEntityList);
         return saveAdvanceDepositRow + updateAdvanceDepositRow;
