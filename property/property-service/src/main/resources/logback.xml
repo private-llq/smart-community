@@ -5,7 +5,7 @@
     <property name="log_dir" value="../logs/property-service" />
     <!-- 日志最大的历史 文件数量-1 -->
 <!--    <property name="maxHistory" value="2" />-->
-    <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+    <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符  -->
     <property name="CONSOLE_LOG_PATTERN"
               value="%yellow(%date{yyyy-MM-dd HH:mm:ss}) |%highlight(%-5level) |%blue(%thread) |%blue(%file:%line) |%green(%logger) |%cyan(%msg%n)"/>
     <property name="FILE_LOG_PATTERN"

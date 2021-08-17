@@ -263,8 +263,6 @@
                 <artifactId>spring-security-test</artifactId>
                 <scope>test</scope>
             </dependency>
-
-    
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
@@ -307,6 +305,4 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
-
 </project>

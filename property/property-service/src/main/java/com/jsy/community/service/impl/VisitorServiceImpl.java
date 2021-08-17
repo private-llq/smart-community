@@ -8,6 +8,7 @@ import com.jsy.community.api.IUserService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
+import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.VisitorHistoryMapper;
@@ -118,8 +119,10 @@ public class VisitorServiceImpl implements IVisitorService {
 		Page<VisitorEntity> visitorEntityPage = visitorMapper.selectPage(page, queryWrapper);
 		if (!CollectionUtils.isEmpty(visitorEntityPage.getRecords())) {
 			for (VisitorEntity visitorEntity : visitorEntityPage.getRecords()) {
+				visitorEntity.setCheckStatusStr(PropertyConstsEnum.CheckStatusEnum.getName(visitorEntity.getCheckStatus()));
 				if (visitorEntity.getUid() != null) {
 					if (visitorEntity.getCheckType() == 1) {
+						visitorEntity.setCheckTypeStr(PropertyConstsEnum.CheckTypeEnum.getName(visitorEntity.getCheckType()));
 						//业主审核,查询业主信息
 						UserEntity userEntity = userService.selectOne(visitorEntity.getUid());
 						if (userEntity != null) {

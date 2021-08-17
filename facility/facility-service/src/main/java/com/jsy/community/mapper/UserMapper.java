@@ -13,7 +13,7 @@ import java.util.List;
  * @author YuLF
  * @since 2020-11-25
  */
-public interface UserMapper extends BaseMapper<UserEntity> {
+public interface  UserMapper extends BaseMapper<UserEntity> {
 	
 	/**
 	 * @return java.util.List<com.jsy.community.entity.UserEntity>
