@@ -1,15 +1,12 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import com.jsy.community.vo.UserHouseVO;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -109,4 +106,40 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @date: 2021/6/21 10:33
 	 **/
 	boolean untieHouse(UserHouseEntity userHouseEntity);
+
+	/**
+	 * @Description: 查询当前登录人员所认证的所有房屋
+	 * @author: Hu
+	 * @since: 2021/8/16 15:29
+	 * @Param:
+	 * @return:
+	 */
+	List<UserHouseEntity> selectUserHouse(Long communityId, String uid);
+
+	/**
+	 * @Description: 查询房间成员信息
+	 * @author: Hu
+	 * @since: 2021/8/17 15:10
+	 * @Param:
+	 * @return:
+	 */
+    UserHouseVO userHouseDetails(Long communityId, Long houseId, String userId);
+
+    /**
+     * @Description: 房屋认证
+     * @author: Hu
+     * @since: 2021/8/17 15:40
+     * @Param:
+     * @return:
+     */
+	void attestation(Long communityId, Long houseId, String userId);
+
+	/**
+	 * @Description: 查询业主当前小区下所有认证的房屋
+	 * @author: Hu
+	 * @since: 2021/8/17 15:57
+	 * @Param:
+	 * @return:
+	 */
+	List<UserHouseVO> selectHouse(Long communityId, String userId);
 }

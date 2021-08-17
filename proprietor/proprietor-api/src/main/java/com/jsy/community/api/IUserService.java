@@ -7,6 +7,7 @@ import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
+import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 
@@ -55,6 +56,16 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return 登录信息
 	 */
 	String register(RegisterQO qo);
+
+
+	/**
+	 * @Description: 第二版注册
+	 * @author: Hu
+	 * @since: 2021/8/17 13:55
+	 * @Param:
+	 * @return:
+	 */
+	String registerV2(RegisterQO qo);
 
 	/**
 	* @Description: 三方登录
@@ -162,7 +173,7 @@ public interface IUserService extends IService<UserEntity> {
 	/**
 	 * 根据id获取用户实名认证信息和最新的房屋id
 	 * @param userId 		用户id
-	 * @return			返回实名认证状态 和 最新的一个房屋id
+	 * @return			返回状态 和 最新的一个房屋id
 	 */
 	UserEntity getRealAuthAndHouseId(String userId);
 
@@ -222,4 +233,14 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return: com.jsy.community.vo.CommonResult<com.jsy.community.vo.UserInfoVo>
 	 */
     void deleteCar(String userId, Long id);
+
+    /**
+     * @Description: 获取当前登录用户权限
+     * @author: Hu
+     * @since: 2021/8/16 15:14
+     * @Param:
+     * @return:
+     */
+	ControlVO control(Long communityId, String uid);
+
 }

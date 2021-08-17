@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author: Hu
  * @create: 2021-07-05 10:53
  **/
-@Api(tags = "社区趣事控制器")
+@Api(tags = "物业账单")
 @RestController
 @RequestMapping("/FinanceOrder")
 @ApiJSYController

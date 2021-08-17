@@ -70,8 +70,9 @@
         </if>
         limit #{page},#{size}
     </select>
+
     <select id="pageList" resultType="com.jsy.community.vo.property.HouseMemberVO">
-        SELECT thm.id as id,thm.house_id as houseId,thm.name as name,thm.mobile as mobile,CONCAT(th.building,th.unit,th.number) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
+        SELECT thm.id as id,thm.house_id as houseId,thm.name as name,thm.mobile as mobile,CONCAT(th.building,th.unit,th.door) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
         FROM t_house_member thm
         LEFT JOIN t_admin_user tu
         on thm.householder_id=tu.uid
@@ -118,7 +119,7 @@
                 and thm.relation=#{query.relation}
             </if>
             <if test="query.houseId!=null and query.houseId!=0">
-                and thm.houseId=#{query.houseId}
+                and thm.house_id=#{query.houseId}
             </if>
             <if test="query.tally!=null and query.tally!=0">
                 and thm.tally=#{query.tally}
