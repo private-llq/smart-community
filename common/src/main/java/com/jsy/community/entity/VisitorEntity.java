@@ -97,7 +97,7 @@ public class VisitorEntity extends BaseEntity {
     
     @ApiModelProperty(value = "是否审核，0未审核，1通过，2拒绝")
     private Integer checkStatus;
-    
+
     @ApiModelProperty(value = "审核时间",hidden = true)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime checkTime;
@@ -149,6 +149,14 @@ public class VisitorEntity extends BaseEntity {
     // 有效分钟数
     @TableField(exist = false)
     private Integer effectiveMinutes;
+
+    // 审核方式字符串
+    @TableField(exist = false)
+    private String checkTypeStr;
+
+    // 审核状态字符串
+    @TableField(exist = false)
+    private String checkStatusStr;
 
     public interface addVisitorValidate{}
     
