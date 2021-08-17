@@ -25,6 +25,15 @@ public interface IVisitorService {
 	 * @Date: 2021/4/14
 	**/
 	PageInfo<VisitorHistoryEntity> queryVisitorPage(BaseQO<VisitorHistoryEntity> baseQO);
+
+	/**
+	 * @author: Pipi
+	 * @description: 访客管理分页查询
+	 * @param baseQO: 分页参数
+	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorEntity>
+	 * @date: 2021/8/13 17:26
+	 **/
+	PageInfo<VisitorEntity> visitorPage(BaseQO<VisitorEntity> baseQO);
 	
 	/** 
 	* @Description: 查询单次访客邀请的随行人员列表
@@ -61,5 +70,13 @@ public interface IVisitorService {
 	 * @Date: 2021-08-02
 	**/
 	PageInfo<VisitorStrangerEntity> queryStrangerPage(BaseQO<VisitorStrangerEntity> qo);
-	
+
+	/**
+	 * @author: Pipi
+	 * @description: 添加访客邀请
+	 * @param visitorEntity: 访客表实体
+	 * @return: java.lang.Integer
+	 * @date: 2021/8/13 14:17
+	 **/
+	Integer addVisitor(VisitorEntity visitorEntity);
 }

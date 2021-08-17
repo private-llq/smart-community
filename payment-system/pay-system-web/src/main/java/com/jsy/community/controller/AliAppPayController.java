@@ -16,7 +16,6 @@ import com.jsy.community.utils.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -138,5 +137,18 @@ public class AliAppPayController {
 //		aliAppPayService.transferByCert();
 //		return "success";
 //	}
-	
+
+	/**
+	 * @author: Pipi
+	 * @description: 租房订单查询支付订单支付状态
+	 * @param orderNo: 支付订单号
+     * @param serviceOrderNo: 租房合同号
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/17 10:17
+	 **/
+	@Login
+	@GetMapping("/v2/checkPayTradeStatus")
+	public CommonResult checkPayTradeStatus(@RequestParam("orderNo") String orderNo, @RequestParam("serviceOrderNo") String serviceOrderNo) {
+		return CommonResult.ok(ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo),"查询成功");
+	}
 }

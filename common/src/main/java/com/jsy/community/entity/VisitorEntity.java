@@ -11,10 +11,10 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,27 +32,19 @@ public class VisitorEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     
-    @ApiModelProperty(value = "随行人员记录")
-    @TableField(exist = false)
-    private List<VisitorPersonRecordEntity> visitorPersonRecordList;
-    
-    @ApiModelProperty(value = "随行车辆记录")
-    @TableField(exist = false)
-    private List<VisitingCarRecordEntity> visitingCarRecordList;
-    
     @ApiModelProperty(value = "社区ID")
     @NotNull(message = "缺少社区ID")
     private Long communityId;
     
     @ApiModelProperty(value = "楼栋ID")
-    @NotNull(message = "缺少楼栋ID")
+    @NotNull(groups = {addVisitorValidate.class}, message = "缺少楼栋ID")
     private Long buildingId;
     
     @ApiModelProperty(value = "业主ID", hidden = true)
     private String uid;
 
     @ApiModelProperty(value = "来访人姓名")
-    @NotEmpty(message = "缺少来访人姓名")
+    @NotBlank(groups = {addVisitorValidate.class}, message = "缺少来访人姓名")
     private String name;
 
     @ApiModelProperty(value = "来访地址")
@@ -62,22 +54,20 @@ public class VisitorEntity extends BaseEntity {
     @ApiModelProperty(value = "来访事由ID 1.一般来访 2.应聘来访 3.走亲访友 4.客户来访")
     private Integer reason;
     
-    @ApiModelProperty(value = "来访事由名")
-    @TableField(exist = false)
-    private String reasonStr;
-    
     @ApiModelProperty(value = "预期来访开始时间")
-    @NotNull(message = "缺少预期来访时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startTime;
+    @NotNull(groups = {addVisitorValidate.class}, message = "缺少预期来访时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startTime;
     
     @ApiModelProperty(value = "预期来访结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonIgnore
-    private LocalDate endTime;
+    @NotNull(groups = {addVisitorValidate.class}, message = "缺少预期来访结束时间")
+    private LocalDateTime endTime;
 
     @ApiModelProperty(value = "来访人联系方式")
     @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+    @NotBlank(groups = {addVisitorValidate.class}, message = "缺少来访人联系方式")
     private String contact;
     
     @ApiModelProperty(value = "来访人身份证", hidden = true)
@@ -91,17 +81,9 @@ public class VisitorEntity extends BaseEntity {
     @Range(min = 0,max = 2, message = "社区门禁授权选择出错")
     private Integer isCommunityAccess;
     
-    @ApiModelProperty(value = "是否授予来访人社区门禁权限 文字描述", hidden = true)
-    @TableField(exist = false)
-    private String isCommunityAccessStr;
-    
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1二维码通行证，2可视对讲")
     @Range(min = 0,max = 2, message = "楼栋门禁授权选择出错")
     private Integer isBuildingAccess;
-    
-    @ApiModelProperty(value = "是否授予来访人楼栋门禁权限 文字描述", hidden = true)
-    @TableField(exist = false)
-    private String isBuildingAccessStr;
     
     @ApiModelProperty(value = "来访车辆车牌", hidden = true)
     private String carPlate;
@@ -110,14 +92,10 @@ public class VisitorEntity extends BaseEntity {
     @Range(min = 1, max = 6, message = "车辆类型不正确")
     private Integer carType;
     
-    @ApiModelProperty(value = "来访车辆类型名", hidden = true)
-    @TableField(exist = false)
-    private String carTypeStr;
-    
-    @ApiModelProperty(value = "审核方式，1业主审核，2物业审核",hidden = true)
+    @ApiModelProperty(value = "审核方式，1业主审核，2物业审核")
     private Integer checkType;
     
-    @ApiModelProperty(value = "是否审核，0未审核，1通过，2拒绝", hidden = true)
+    @ApiModelProperty(value = "是否审核，0未审核，1通过，2拒绝")
     private Integer checkStatus;
     
     @ApiModelProperty(value = "审核时间",hidden = true)
@@ -129,9 +107,49 @@ public class VisitorEntity extends BaseEntity {
     
     @ApiModelProperty(value = "状态 1.待入园 2.已入园 3.已出园 4.已失效", hidden = true)
     private Integer status;
+
+    // 人脸图片地址
+    private String faceUrl;
+
+    @ApiModelProperty(value = "来访事由名")
+    @TableField(exist = false)
+    private String reasonStr;
+
+    @ApiModelProperty(value = "是否授予来访人社区门禁权限 文字描述", hidden = true)
+    @TableField(exist = false)
+    private String isCommunityAccessStr;
+
+    @ApiModelProperty(value = "是否授予来访人楼栋门禁权限 文字描述", hidden = true)
+    @TableField(exist = false)
+    private String isBuildingAccessStr;
+
+    @ApiModelProperty(value = "来访车辆类型名", hidden = true)
+    @TableField(exist = false)
+    private String carTypeStr;
     
     @ApiModelProperty(value = "创建时间别称", hidden = true)
     @TableField(exist = false)
     private LocalDateTime vCreateTime;
+
+    @ApiModelProperty(value = "随行人员记录")
+    @TableField(exist = false)
+    private List<VisitorPersonRecordEntity> visitorPersonRecordList;
+
+    @ApiModelProperty(value = "随行车辆记录")
+    @TableField(exist = false)
+    private List<VisitingCarRecordEntity> visitingCarRecordList;
+
+    // 授权人姓名
+    @TableField(exist = false)
+    private String nameOfAuthorizedPerson;
+
+    // 授权人手机
+    @TableField(exist = false)
+    private String mobileOfAuthorizedPerson;
+    // 有效分钟数
+    @TableField(exist = false)
+    private Integer effectiveMinutes;
+
+    public interface addVisitorValidate{}
     
 }

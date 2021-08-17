@@ -71,5 +71,26 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 		record.setRealName(user == null ? null : user.getRealName());
 		return record;
 	}
-	
+
+	/**
+	 * @param orderNo        : 支付订单号
+	 * @param serviceOrderNo : 租房合同号
+	 * @author: Pipi
+	 * @description: 租房订单查询支付订单支付状态
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/17 10:17
+	 **/
+	@Override
+	public Boolean checkPayTradeStatus(String orderNo, String serviceOrderNo) {
+		QueryWrapper<AiliAppPayRecordEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("trade_status");
+		queryWrapper.eq("order_no", orderNo);
+		queryWrapper.eq("service_order_no", serviceOrderNo);
+		AiliAppPayRecordEntity recordEntity = ailiAppPayRecordDao.selectOne(queryWrapper);
+		if (recordEntity != null && recordEntity.getTradeStatus() == PaymentEnum.TradeStatusEnum.ORDER_COMPLETED.getIndex()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
