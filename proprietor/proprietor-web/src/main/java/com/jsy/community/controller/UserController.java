@@ -469,7 +469,7 @@ public class UserController {
     public CommonResult control(@RequestParam("communityId") Long communityId) {
         ControlVO control = userService.control(communityId, UserUtils.getUserId());
         savePermissions(UserUtils.getUserId(),control);
-        return CommonResult.ok();
+        return CommonResult.ok(control);
     }
 
     /**

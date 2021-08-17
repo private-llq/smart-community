@@ -5,14 +5,12 @@ import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -60,7 +58,7 @@ public class UserHouseController {
     }
 
     /**
-     * @Description: 我的房屋编辑
+     * @Description: 编辑查询 and 切换房屋查询
      * @author: Hu
      * @since: 2021/8/17 14:52
      * @Param:
@@ -71,6 +69,20 @@ public class UserHouseController {
     public CommonResult update(@RequestParam Long communityId){
         List<UserHouseVO> houseMemberVOS = userHouseService.selectHouse(communityId, UserUtils.getUserId());
         return CommonResult.ok(houseMemberVOS);
+    }
+
+    /**
+     * @Description: 家属或者租客更新
+     * @author: Hu
+     * @since: 2021/8/17 14:52
+     * @Param:
+     * @return:
+     */
+    @ApiOperation("家属或者租客更新")
+    @PutMapping("members/update")
+    public CommonResult membersUpdate(@RequestBody List<MembersVO> members){
+        userHouseService.membersUpdate(members, UserUtils.getUserId());
+        return CommonResult.ok();
     }
 
 

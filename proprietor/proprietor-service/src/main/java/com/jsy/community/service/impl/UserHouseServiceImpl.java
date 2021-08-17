@@ -187,6 +187,25 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	}
 
 
+	/**
+	 * @Description: 家属或者租客更新
+	 * @author: Hu
+	 * @since: 2021/8/17 17:31
+	 * @Param: members,userId
+	 * @return: void
+	 */
+	@Override
+	public void membersUpdate(List<MembersVO> members, String userId) {
+		LinkedList<MembersVO> save = new LinkedList<>();
+		LinkedList<MembersVO> update = new LinkedList<>();
+		for (MembersVO member : members) {
+			if (member.getId()!=null){
+				update.add(member);
+			}else {
+				save.add(member);
+			}
+		}
+	}
 
 	/**
 	 * @Description: 查询业主当前小区下所有认证的房屋

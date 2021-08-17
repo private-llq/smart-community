@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
+import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
 
 import java.util.List;
@@ -142,4 +143,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @return:
 	 */
 	List<UserHouseVO> selectHouse(Long communityId, String userId);
+
+	/**
+	 * @Description: 家属或者租客更新
+	 * @author: Hu
+	 * @since: 2021/8/17 17:31
+	 * @Param:
+	 * @return:
+	 */
+	void membersUpdate(List<MembersVO> members, String userId);
 }
