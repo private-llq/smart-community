@@ -1,6 +1,7 @@
 package com.jsy.community.util.excel.impl;
 
 import com.jsy.community.entity.property.PropertyAdvanceDepositEntity;
+import com.jsy.community.entity.property.PropertyAdvanceDepositRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.AdvanceDepositExcelHandler;
@@ -35,6 +36,8 @@ public class AdvanceDepositExcelHandlerImpl implements AdvanceDepositExcelHandle
     // 充值余额导入模板字段 如果增加字段 需要改变实现类逻辑
     public static final String[] EXPORT_ADVANCE_DEPOSIT_TEMPLATE = {"姓名", "手机", "房屋地址(楼宇单元房屋号码)", "房屋号码", "付款金额/(元)", "到账金额/(元)"};
     public static final String[] EXPORT_ADVANCE_DEPOSIT_ERROR_INFO = {"姓名", "手机", "房屋地址(楼宇单元房屋号码)", "房屋号码", "付款金额/(元)", "到账金额/(元)", "错误提示"};
+    
+    public static final String[] ADVANCE_DEPOSIT_TITLE_FIELD = {"流水单号", "类型", "关联账单号", "存入金额", "支出金额", " 余额", "备注", "时间"};
     
     /**
      * @Author: DKS
@@ -376,6 +379,90 @@ public class AdvanceDepositExcelHandlerImpl implements AdvanceDepositExcelHandle
                     case 6:
                         // 错误提示
                         cell.setCellValue(vo.getRemark());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出预存款明细记录
+     *@Param: excel:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/8/17 9:33
+     **/
+    @Override
+    public Workbook exportAdvanceDeposit(List<?> entityList) {
+        //工作表名称
+        String titleName = "预存款明细记录表";
+        //1.创建excel 工作簿
+        Workbook workbook = new XSSFWorkbook();
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = ADVANCE_DEPOSIT_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        // 设置列宽
+        sheet.setColumnWidth(0, 5000);
+        sheet.setColumnWidth(1, 5000);
+        sheet.setColumnWidth(2, 3000);
+        sheet.setColumnWidth(3, 3000);
+        sheet.setColumnWidth(4, 3000);
+        sheet.setColumnWidth(5, 4000);
+        sheet.setColumnWidth(6, 4000);
+        sheet.setColumnWidth(7, 6000);
+        for (int index = 0; index < entityList.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < ADVANCE_DEPOSIT_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyAdvanceDepositRecordEntity entity = (PropertyAdvanceDepositRecordEntity) entityList.get(index);
+                switch (j) {
+                    case 0:
+                        // ID
+                        cell.setCellValue(entity.getId());
+                        break;
+                    case 1:
+                        // 类型
+                        cell.setCellValue(entity.getTypeName());
+                        break;
+                    case 2:
+                        // 关联账单号
+                        if (entity.getOrderId() ==null) {
+                            cell.setCellValue("");
+                        } else {
+                            cell.setCellValue(entity.getOrderId());
+                        }
+                        break;
+                    case 3:
+                        // 存入金额
+                        cell.setCellValue(String.valueOf(entity.getDepositAmount()));
+                        break;
+                    case 4:
+                        // 支出金额
+                        cell.setCellValue(String.valueOf(entity.getPayAmount()));
+                        break;
+                    case 5:
+                        // 余额
+                        cell.setCellValue(String.valueOf(entity.getBalanceRecord()));
+                        break;
+                    case 6:
+                        // 备注
+                        cell.setCellValue(entity.getComment());
+                        break;
+                    case 7:
+                        // 时间
+                        cell.setCellValue(String.valueOf(entity.getCreateTime()));
                         break;
                     default:
                         break;

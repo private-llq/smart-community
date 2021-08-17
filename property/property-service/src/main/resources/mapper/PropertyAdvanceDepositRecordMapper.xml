@@ -22,28 +22,28 @@
         balance_record,
         advance_deposit_id,
         comment,
-        deleted,
         create_by,
         create_time,
         update_by,
-        update_time
+        update_time,
+        deleted
         )
         values
         <foreach collection="list" separator="," item="propertyAdvanceDepositRecordEntity">
             (#{propertyAdvanceDepositRecordEntity.id},
             #{propertyAdvanceDepositRecordEntity.communityId},
             #{propertyAdvanceDepositRecordEntity.type},
-            #{propertyAdvanceDepositRecordEntity.order_id},
-            #{propertyAdvanceDepositRecordEntity.deposit_amount},
-            #{propertyAdvanceDepositRecordEntity.pay_amount},
-            #{propertyAdvanceDepositRecordEntity.balance_record},
-            #{propertyAdvanceDepositRecordEntity.advance_deposit_id},
+            #{propertyAdvanceDepositRecordEntity.orderId},
+            #{propertyAdvanceDepositRecordEntity.depositAmount},
+            #{propertyAdvanceDepositRecordEntity.payAmount},
+            #{propertyAdvanceDepositRecordEntity.balanceRecord},
+            #{propertyAdvanceDepositRecordEntity.advanceDepositId},
             #{propertyAdvanceDepositRecordEntity.comment},
-            #{propertyAdvanceDepositRecordEntity.deleted},
             #{propertyAdvanceDepositRecordEntity.createBy},
             #{propertyAdvanceDepositRecordEntity.createTime},
             #{propertyAdvanceDepositRecordEntity.updateBy},
-            #{propertyAdvanceDepositRecordEntity.updateTime})
+            #{propertyAdvanceDepositRecordEntity.updateTime},
+            #{propertyAdvanceDepositRecordEntity.deleted})
         </foreach>
     </insert>
 

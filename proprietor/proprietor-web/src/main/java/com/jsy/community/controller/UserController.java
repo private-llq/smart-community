@@ -377,7 +377,7 @@ public class UserController {
         System.out.println("==========2=======");
         return jsonObject;
     }
-    
+
     /**
     * @Description: 眨眼版实人查询结果
      * @Param: [realnameBlinkQueryQO]

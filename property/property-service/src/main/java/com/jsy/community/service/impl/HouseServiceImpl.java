@@ -1174,7 +1174,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
      **/
     @Override
     public List<HouseEntity> queryExportHouseExcel(HouseEntity entity) {
-        List<HouseEntity> houseEntities = new ArrayList<>();
+        List<HouseEntity> houseEntities;
         QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
         if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == entity.getType()) {
             queryWrapper.eq("type", BusinessConst.BUILDING_TYPE_UNIT);

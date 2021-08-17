@@ -26,12 +26,22 @@ public class CarLaneController {
     public ICarLaneService carLaneService;
 
 
+    /**
+     * 新增收费设置
+     * @param CarLaneEntity
+     * @return
+     */
     @PostMapping("SaveCarLane")
     public CommonResult SaveCarLane(@RequestBody CarLaneEntity CarLaneEntity) {
         carLaneService.SaveCarLane(CarLaneEntity);
         return CommonResult.ok();
     }
 
+    /**
+     * 修改收费设置
+     * @param carLaneEntity
+     * @return
+     */
     @PutMapping("UpdateCarLane")
     public CommonResult UpdateCarLane(@RequestBody CarLaneEntity carLaneEntity) {
         carLaneService.UpdateCarLane(carLaneEntity);
@@ -39,7 +49,11 @@ public class CarLaneController {
     }
 
 
-
+    /**
+     * 删除收费设置
+     * @param uid
+     * @return
+     */
     @DeleteMapping("DelCarLane")
     public CommonResult DelCarLane(@RequestParam("uid") String uid) {
         carLaneService.DelCarLane(uid);
@@ -47,17 +61,17 @@ public class CarLaneController {
     }
 
 
-
+    /**
+     *分页查询
+     * @param baseQO query:"车道名称"
+     * @return
+     */
     @GetMapping("FindByLaneNamePage")
     public CommonResult<PageInfo> FindByLaneNamePage(@RequestBody BaseQO baseQO) {
         PageInfo pageInfo = carLaneService.FindByLaneNamePage(baseQO);
         return CommonResult.ok(pageInfo);
     }
 
-    @GetMapping("FindByLaneNamePage2")
-    public CommonResult<PageInfo> FindByLaneNamePage2(@RequestBody BaseQO baseQO) {
-        PageInfo pageInfo = carLaneService.FindByLaneNamePage2(baseQO);
-        return CommonResult.ok(pageInfo);
-    }
+
 
 }

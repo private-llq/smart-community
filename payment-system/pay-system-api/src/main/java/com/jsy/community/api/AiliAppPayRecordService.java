@@ -12,4 +12,14 @@ public interface AiliAppPayRecordService {
 	void completeAliAppPayRecord(String outTradeNo);//订单完成
 	AiliAppPayRecordEntity getAliAppPayByOutTradeNo(String outTradeNo);//订单查询
 	AiliAppPayRecordEntity queryPropertyFeeByOutTradeNo(String outTradeNo);//订单查询(查物业费缴费记录)
+
+	/**
+	 * @author: Pipi
+	 * @description: 租房订单查询支付订单支付状态
+	 * @param orderNo: 支付订单号
+	 * @param serviceOrderNo: 租房合同号
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/17 10:17
+	 **/
+	Boolean checkPayTradeStatus(String orderNo, String serviceOrderNo);
 }

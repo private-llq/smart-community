@@ -17,6 +17,7 @@ import java.util.Map;
 @Component
 public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
+
     Integer SaveMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle);
 
     Integer UpdateMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle);

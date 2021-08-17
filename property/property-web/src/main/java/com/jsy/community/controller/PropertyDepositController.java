@@ -3,12 +3,15 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyDepositService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyDepositEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyDepositQO;
+import com.jsy.community.util.QRCodeGenerator;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -17,6 +20,7 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -104,5 +108,30 @@ public class PropertyDepositController {
         }
         query.setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyDepositService.queryPropertyDeposit(baseQO));
+    }
+    
+    /**
+     * @Description: 生成押金凭证二维码
+     * @Param: [url]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/08/16
+     **/
+    @Login
+    @ApiOperation("生成押金凭证二维码")
+    @GetMapping("/generate/qr/code")
+    public CommonResult GenerateQRCode(String url) {
+        // TODO:url是app路径地址,后面需要写死路径，没有入参，前端只需要返回qrCodeUrl
+        String qrCodeUrl = "";
+        try {
+            byte[] bytes = QRCodeGenerator.generateQRCode(url, 300, 300);
+            qrCodeUrl = MinioUtils.uploadDeposit(bytes, BusinessConst.DEPOSIT_QR_CODE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (StringUtils.isEmpty(qrCodeUrl)) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"生成押金凭证二维码失败");
+        }
+        return CommonResult.ok(qrCodeUrl);
     }
 }
