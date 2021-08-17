@@ -24,7 +24,6 @@ public class LeaseExceptionHandler extends JSYExceptionHandler {
 		return CommonResult.error(JSYError.REQUEST_PARAM);
 	}
 
-
 	@ExceptionHandler(LeaseException.class)
 	public CommonResult<Boolean> handlerProprietorException(LeaseException e) {
 		return CommonResult.error(e.getCode(), e.getMessage());
