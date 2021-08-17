@@ -10,11 +10,11 @@
         house_id,
         balance,
         comment,
-        deleted,
         create_by,
         create_time,
         update_by,
-        update_time
+        update_time,
+        deleted
         )
         values
         <foreach collection="list" separator="," item="propertyAdvanceDepositEntity">
@@ -23,11 +23,11 @@
             #{propertyAdvanceDepositEntity.houseId},
             #{propertyAdvanceDepositEntity.balance},
             #{propertyAdvanceDepositEntity.comment},
-            #{propertyAdvanceDepositEntity.deleted},
             #{propertyAdvanceDepositEntity.createBy},
             #{propertyAdvanceDepositEntity.createTime},
             #{propertyAdvanceDepositEntity.updateBy},
-            #{propertyAdvanceDepositEntity.updateTime})
+            #{propertyAdvanceDepositEntity.updateTime},
+            #{propertyAdvanceDepositEntity.deleted})
         </foreach>
     </insert>
 
@@ -36,14 +36,17 @@
     </select>
 
     <update id="UpdateAdvanceDeposit">
-        <foreach collection="list" separator="," item="propertyAdvanceDepositEntity">
+        <foreach collection="list" item="propertyAdvanceDepositEntity" index="index" separator=";">
         update t_property_advance_deposit
-        set balance = #{propertyAdvanceDepositEntity.balance},
-            comment = #{propertyAdvanceDepositEntity.comment}
+        <set>
+            <if test="propertyAdvanceDepositEntity.comment != null and propertyAdvanceDepositEntity.comment != ''">comment = #{propertyAdvanceDepositEntity.comment},</if>
+            <if test="propertyAdvanceDepositEntity.balance != null and propertyAdvanceDepositEntity.balance != ''">balance = #{propertyAdvanceDepositEntity.balance},</if>
+            update_time = now()
+        </set>
         where house_id = #{propertyAdvanceDepositEntity.houseId}
         and community_id = #{propertyAdvanceDepositEntity.communityId}
-        </foreach>
         and deleted = 0
+        </foreach>
     </update>
 
 </mapper>

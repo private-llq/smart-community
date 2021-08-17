@@ -121,6 +121,7 @@ public class PropertyDepositController {
     @ApiOperation("生成押金凭证二维码")
     @GetMapping("/generate/qr/code")
     public CommonResult GenerateQRCode(String url) {
+        // TODO:url是app路径地址,后面需要写死路径，没有入参，前端只需要返回qrCodeUrl
         String qrCodeUrl = "";
         try {
             byte[] bytes = QRCodeGenerator.generateQRCode(url, 300, 300);

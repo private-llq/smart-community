@@ -9,6 +9,8 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyAdvanceDepositRecordQO;
+import com.jsy.community.util.excel.impl.AdvanceDepositExcelHandlerImpl;
+import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -17,10 +19,22 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -37,6 +51,9 @@ public class PropertyAdvanceDepositRecordController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyAdvanceDepositRecordService propertyAdvanceDepositRecordService;
+	
+	@Autowired
+	private AdvanceDepositExcelHandlerImpl advanceDepositExcelHandler;
     
     /**
      * @program: com.jsy.community
@@ -83,4 +100,34 @@ public class PropertyAdvanceDepositRecordController {
         query.setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyAdvanceDepositRecordService.queryPropertyAdvanceDepositRecord(baseQO));
     }
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 导出预存款明细记录
+	 *@Param: excel:
+	 *@Return: com.jsy.community.vo.CommonResult
+	 *@Date: 2021/8/17 9:05
+	 **/
+	@Login
+	@ApiOperation("导出预存款明细记录")
+	@PostMapping("/downloadAdvanceDepositList")
+	public ResponseEntity<byte[]> downloadOrderList(@RequestBody PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity) {
+		propertyAdvanceDepositRecordEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		List<PropertyAdvanceDepositRecordEntity> propertyAdvanceDepositRecordEntities = propertyAdvanceDepositRecordService.queryExportHouseExcel(propertyAdvanceDepositRecordEntity);
+		//设置excel 响应头信息
+		MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+		//设置响应类型为附件类型直接下载这种
+		multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("预存款明细记录表.xlsx", StandardCharsets.UTF_8));
+		//设置响应的文件mime类型为 xls类型
+		multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+		Workbook workbook = new XSSFWorkbook();
+		workbook = advanceDepositExcelHandler.exportAdvanceDeposit(propertyAdvanceDepositRecordEntities);
+		//把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+		try {
+			return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+		}
+	}
 }

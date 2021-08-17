@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.List;
+
 /**
  * @program: com.jsy.community
  * @description: 物业预存款余额明细记录表
@@ -93,4 +95,32 @@ public class PropertyAdvanceDepositRecordServiceImpl extends ServiceImpl<Propert
         BeanUtils.copyProperties(pageData, pageInfo);
         return pageInfo;
     }
+	
+	/**
+	 * @Description: 查询预存款明细记录导出数据
+	 * @Param: PropertyAdvanceDepositRecordEntity
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
+	 * @Author: DKS
+	 * @Date: 2021/8/17
+	 **/
+	@Override
+	public List<PropertyAdvanceDepositRecordEntity> queryExportHouseExcel(PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity) {
+		List<PropertyAdvanceDepositRecordEntity> propertyAdvanceDepositRecordEntities;
+		QueryWrapper<PropertyAdvanceDepositRecordEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("community_id", propertyAdvanceDepositRecordEntity.getCommunityId());
+		//是否查详情
+		if (propertyAdvanceDepositRecordEntity.getAdvanceDepositId() != null) {
+			queryWrapper.eq("advance_deposit_id", propertyAdvanceDepositRecordEntity.getAdvanceDepositId());
+		}
+		queryWrapper.orderByDesc("create_time");
+		propertyAdvanceDepositRecordEntities = propertyAdvanceDepositRecordMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(propertyAdvanceDepositRecordEntities)) {
+			return propertyAdvanceDepositRecordEntities;
+		}
+		for (PropertyAdvanceDepositRecordEntity entity : propertyAdvanceDepositRecordEntities) {
+			// 补充类型名称
+			entity.setTypeName(entity.getType() == 1 ? "预存款支付" : "预存款充值：后台充值");
+		}
+		return propertyAdvanceDepositRecordEntities;
+	}
 }
