@@ -8,6 +8,8 @@ import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorHistoryEntity;
 import com.jsy.community.entity.VisitorStrangerEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.PicUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -15,6 +17,7 @@ import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -58,7 +61,7 @@ public class VisitorController {
 	 **/
 	@PostMapping("/visitorPage")
 	public CommonResult visitorPage(@RequestBody BaseQO<VisitorEntity> baseQO) {
-		return CommonResult.ok(visitorService.visitorPage(baseQO), "查询成功!");
+		return CommonResult.ok(visitorService.visitorPage(baseQO));
 	}
 	
 	/**
@@ -116,6 +119,24 @@ public class VisitorController {
 		// 默认入园状态为待入园
 		visitorEntity.setStatus(1);
 		return visitorService.addVisitor(visitorEntity) > 0 ? CommonResult.ok("邀请成功!") : CommonResult.error("邀请失败!");
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 访客人脸上传
+	 * @param file:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/17 14:25
+	 **/
+	@Login
+	@PostMapping("/v2/uploadVisitorFace")
+	public CommonResult uploadVisitorFace(MultipartFile file) {
+		PicUtil.imageQualified(file);
+		String url = MinioUtils.upload(file, "visitor-face");
+		if(!StringUtils.isEmpty(url)){
+			return CommonResult.ok(url);
+		}
+		return CommonResult.error("上传失败");
 	}
 	
 }

@@ -1,23 +1,22 @@
 package com.jsy.community.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.api.IAdminUserService;
+import com.jsy.community.api.IUserService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
-import com.jsy.community.consts.PropertyConsts;
-import com.jsy.community.entity.VisitorEntity;
-import com.jsy.community.entity.VisitorHistoryEntity;
-import com.jsy.community.entity.VisitorPersonRecordEntity;
-import com.jsy.community.entity.VisitorStrangerEntity;
+import com.jsy.community.entity.*;
+import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.VisitorHistoryMapper;
 import com.jsy.community.mapper.VisitorMapper;
 import com.jsy.community.mapper.VisitorPersonRecordMapper;
 import com.jsy.community.mapper.VisitorStrangerMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -53,6 +52,14 @@ public class VisitorServiceImpl implements IVisitorService {
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+
+	// @DubboReference(version = Const.version, group = Const.group_property, check = false)
+	@Autowired
+	private IUserService userService;
+
+	// @DubboReference(version = Const.version, group = Const.group_property, check = false)
+	@Autowired
+	private IAdminUserService adminUserService;
 	
 	
 	/**
@@ -96,8 +103,9 @@ public class VisitorServiceImpl implements IVisitorService {
 	public PageInfo<VisitorEntity> visitorPage(BaseQO<VisitorEntity> baseQO) {
 		Page<VisitorEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
-		VisitorEntity query = baseQO.getQuery();
+		VisitorEntity query = baseQO.getQuery() == null ? new VisitorEntity() : baseQO.getQuery();
 		QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("*, TIMESTAMPDIFF(MINUTE, start_time, end_time) as effectiveMinutes");
 		if (!StringUtils.isEmpty(query.getName())) {
 			queryWrapper.like("name", query.getName());
 		}
@@ -108,8 +116,31 @@ public class VisitorServiceImpl implements IVisitorService {
 			queryWrapper.eq("check_type", query.getCheckType());
 		}
 		Page<VisitorEntity> visitorEntityPage = visitorMapper.selectPage(page, queryWrapper);
+		if (!CollectionUtils.isEmpty(visitorEntityPage.getRecords())) {
+			for (VisitorEntity visitorEntity : visitorEntityPage.getRecords()) {
+				if (visitorEntity.getUid() != null) {
+					if (visitorEntity.getCheckType() == 1) {
+						//业主审核,查询业主信息
+						UserEntity userEntity = userService.selectOne(visitorEntity.getUid());
+						if (userEntity != null) {
+							visitorEntity.setNameOfAuthorizedPerson(userEntity.getRealName());
+							visitorEntity.setMobileOfAuthorizedPerson(userEntity.getMobile());
+						}
+					} else {
+						// 物业审核,查询物业管理员信息
+						AdminUserEntity adminUserEntity = adminUserService.queryByUid(visitorEntity.getUid());
+						if (adminUserEntity != null) {
+							visitorEntity.setNameOfAuthorizedPerson(adminUserEntity.getRealName());
+							visitorEntity.setMobileOfAuthorizedPerson(adminUserEntity.getMobile());
+						}
+					}
+				}
+
+			}
+		}
 		PageInfo<VisitorEntity> visitorEntityPageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(visitorEntityPage, visitorEntityPageInfo);
+
 		return visitorEntityPageInfo;
 	}
 

@@ -56,14 +56,14 @@ public class VisitorEntity extends BaseEntity {
     
     @ApiModelProperty(value = "预期来访开始时间")
     @NotNull(groups = {addVisitorValidate.class}, message = "缺少预期来访时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startTime;
     
     @ApiModelProperty(value = "预期来访结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonIgnore
     @NotNull(groups = {addVisitorValidate.class}, message = "缺少预期来访结束时间")
-    private LocalDate endTime;
+    private LocalDateTime endTime;
 
     @ApiModelProperty(value = "来访人联系方式")
     @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
@@ -92,10 +92,10 @@ public class VisitorEntity extends BaseEntity {
     @Range(min = 1, max = 6, message = "车辆类型不正确")
     private Integer carType;
     
-    @ApiModelProperty(value = "审核方式，1业主审核，2物业审核",hidden = true)
+    @ApiModelProperty(value = "审核方式，1业主审核，2物业审核")
     private Integer checkType;
     
-    @ApiModelProperty(value = "是否审核，0未审核，1通过，2拒绝", hidden = true)
+    @ApiModelProperty(value = "是否审核，0未审核，1通过，2拒绝")
     private Integer checkStatus;
     
     @ApiModelProperty(value = "审核时间",hidden = true)
@@ -138,6 +138,17 @@ public class VisitorEntity extends BaseEntity {
     @ApiModelProperty(value = "随行车辆记录")
     @TableField(exist = false)
     private List<VisitingCarRecordEntity> visitingCarRecordList;
+
+    // 授权人姓名
+    @TableField(exist = false)
+    private String nameOfAuthorizedPerson;
+
+    // 授权人手机
+    @TableField(exist = false)
+    private String mobileOfAuthorizedPerson;
+    // 有效分钟数
+    @TableField(exist = false)
+    private Integer effectiveMinutes;
 
     public interface addVisitorValidate{}
     
