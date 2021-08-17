@@ -84,4 +84,6 @@ public interface IAdminCommunityInformService extends IService<PushInformEntity>
      **/
     PushInfromVO getDetail(Long id);
 
+
+
 }

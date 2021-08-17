@@ -46,6 +46,7 @@ public class CarTrackController {
 		carQo.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 		PageInfo<CarTrackEntity> pageInfo = carTrackService.listCarTrack(carQo);
 		return CommonResult.ok(pageInfo);
+
 	}
 }
 

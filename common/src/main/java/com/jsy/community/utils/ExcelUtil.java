@@ -644,6 +644,7 @@ public class ExcelUtil {
         {
             for (Object o : (List<?>) obj)
             {
+
                 result.add((String) o);
             }
             return result;

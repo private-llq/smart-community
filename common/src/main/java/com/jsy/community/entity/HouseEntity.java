@@ -40,10 +40,11 @@ public class HouseEntity extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
+
     
     @ApiModelProperty(value = "是否有电梯 0.无 1.有")
     private Integer hasElevator;
-    
+
     @ApiModelProperty(value = "名称")
     @TableField(exist = false)
 //    @Length(groups = {addHouseValidatedGroup.class,updateHouseValidatedGroup.class}, max = 10, message = "名称过长")

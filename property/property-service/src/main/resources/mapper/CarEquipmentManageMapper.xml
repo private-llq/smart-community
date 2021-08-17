@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.CarEquipmentManageMapper">
+    <select id="pageList" resultType="com.jsy.community.entity.property.CarEquipmentManageEntity">
+        select tm.*,tl.equipment_location as patternName,tp.location_pattern as locationName
+        from  t_car_equipment_manage tm
+        join t_car_equipment_location tl on tm.location_id = tl.location_id
+        join t_car_equipment_pattern tp on tm.pattern_id = tp.pattern_id
+        limit #{page},#{size}
+    </select>
+    <select id="equipmentPage" resultMap="CarEquipmentManageEntityMap">
+        select tm.id as id,tm.uid as uid,tm.community_id as communityId,
+               tm.equipment_name as equipmentName,tm.equipment_number asinternetNumber,
+               tm.internet_number as internetNumber,
+               tm.pattern_id as patternId ,tm.location_id as locationId,tm.state as state,
+               tm.create_time as createTime,tm.update_time as updateTime,
+               tl.equipment_location as locationName, tp.location_pattern as patternName
+        from t_car_equipment_manage tm
+        left join t_car_equipment_pattern tp on tm.pattern_id = tp.pattern_id
+        left join t_car_equipment_location tl on tm.location_id = tl.location_id
+        where tm.community_id=#{query.communityId}
+        limit #{page},#{size}
+    </select>
+
+    <select id="findTotal" resultType="java.lang.Long">
+        select count(*) from t_car_equipment_manage tm
+        where tm.community_id=#{query.communityId}
+    </select>
+
+    <resultMap id="CarEquipmentManageEntityMap" type="com.jsy.community.entity.property.CarEquipmentManageEntity">
+        <result column="id" property="id"/>
+        <result column="communityId" property="communityId"/>
+        <result column="equipmentName" property="equipmentName"></result>
+        <result column="internetNumber" property="internetNumber"></result>
+        <result column="locationId" property="locationId"></result>
+        <result column="patternId" property="patternId"></result>
+        <result column="state" property="state"></result>
+        <result column="uid" property="uid"></result>
+        <result column="createTime" property="createTime"></result>
+        <result column="updateTime" property="updateTime"></result>
+        <result column="deleted" property="deleted"></result>
+        <result column="patternName" property="patternName"></result>
+        <result column="locationName" property="locationName"></result>
+    </resultMap>
+</mapper>

@@ -49,7 +49,6 @@ public class TimingTaskConfig{
                 .withSchedule(cronScheduleBuilder)
                 .build();
     }
-
     /**
      * @Description: 每天查询数据库生成财务账单或者生成违约费
      * @author: Hu
@@ -115,4 +114,5 @@ public class TimingTaskConfig{
                 .withSchedule(cronScheduleBuilder)
                 .build();
     }
+
 }

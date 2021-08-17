@@ -29,7 +29,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 * 首页展示的菜单数   本来原先需求是说每个社区首页展示的菜单数可有物业控制(可以有1个2个3个...)   最新产品暂定的需求：每个社区首页最多有3个菜单  其中有个菜单是固定的(我的房屋) pS:应该在社区入驻的同事为其添加一条菜单(我的房屋)   应该是写在大后台的
 	 * 菜单可以考虑做缓存  暂时没做了 因为需求变得快   之前原本我是做了缓存的
 	 **/
-	private static final Integer INDEX_MENU_COUNT = 3;
+	private static final Integer INDEX_MENU_COUNT = 7;
 	
 	@Override
 	public List<AppMenuEntity> listIndexMenu(Long communityId) {
@@ -43,7 +43,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 		}
 		// TODO: 2021/2/5 如果该小区没有菜单，暂时也给他返回小区  原因：现阶段便于测试人员测试   后面上线要删掉这里
 		
-		return appMenuMapper.selectBatchIds(menuIds);
+		return appMenuMapper.selectByIds(menuIds);
 	}
 	
 	@Override

@@ -8,6 +8,16 @@
     </select>
 
 
+    <select id="selectByIds" resultType="com.jsy.community.entity.AppMenuEntity">
+        SELECT *
+        FROM t_app_menu
+        where id in
+        <foreach collection="menuIds" separator="," close=")" open="(" item="id">
+            #{id}
+        </foreach>
+    </select>
+
+
     <select id="getMenuIdByCommunityId" resultType="long">
         SELECT menu_id
         FROM t_menu_community

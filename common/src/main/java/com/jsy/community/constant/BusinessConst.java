@@ -308,6 +308,11 @@ public interface BusinessConst {
      * 用户头像 人脸头像
      */
     String FAVE_AVATAR_BUCKET_NAME = "user-face-avatar";
+    
+    /**
+     * 物业押金凭证二维码
+     */
+    String DEPOSIT_QR_CODE = "deposit-qr-code-avatar";
     //车辆存储相关
     /**
      * 车辆图片 上传 至 文件服务器 的 bucket Name

@@ -223,7 +223,7 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @Author: DKS
      * @Date: 2021/08/11
      **/
-    List<Long> queryBindHouseBymobile(@Param("mobile") String mobile, @Param("communityId") Long communityId);
+    List<Long> queryBindHouseByMobile(@Param("mobile") String mobile, @Param("communityId") Long communityId);
     
     /**
      * @Description: 根据房屋的id查询真实姓名手机号

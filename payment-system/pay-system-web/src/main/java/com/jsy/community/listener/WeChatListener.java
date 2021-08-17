@@ -53,8 +53,7 @@ public class WeChatListener{
             }
         }
         //手动确认
-        channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-
+        //channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
     }
 
 

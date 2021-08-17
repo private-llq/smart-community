@@ -28,6 +28,7 @@ public class MinioController {
 //		}
 //		return CommonResult.error("上传失败");
 //	}
+
 //
 //
 //	@ApiOperation("删除文件")

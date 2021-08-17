@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.PropertyAdvanceDepositRecordMapper">
+
+    <select id="queryMaxCreateTimeRecord" resultType="com.jsy.community.entity.property.PropertyAdvanceDepositRecordEntity">
+        select * from t_property_advance_deposit_record
+        where create_time &lt;= now()
+        and advance_deposit_id = #{advanceDepositId}
+        order by create_time desc
+        limit 1
+    </select>
+
+    <!-- 批量新增预存款充值余额-->
+    <insert id="saveAdvanceDepositRecord">
+        insert into t_property_advance_deposit_record (
+        id,
+        community_id,
+        type,
+        order_id,
+        deposit_amount,
+        pay_amount,
+        balance_record,
+        advance_deposit_id,
+        comment,
+        deleted,
+        create_by,
+        create_time,
+        update_by,
+        update_time
+        )
+        values
+        <foreach collection="list" separator="," item="propertyAdvanceDepositRecordEntity">
+            (#{propertyAdvanceDepositRecordEntity.id},
+            #{propertyAdvanceDepositRecordEntity.communityId},
+            #{propertyAdvanceDepositRecordEntity.type},
+            #{propertyAdvanceDepositRecordEntity.order_id},
+            #{propertyAdvanceDepositRecordEntity.deposit_amount},
+            #{propertyAdvanceDepositRecordEntity.pay_amount},
+            #{propertyAdvanceDepositRecordEntity.balance_record},
+            #{propertyAdvanceDepositRecordEntity.advance_deposit_id},
+            #{propertyAdvanceDepositRecordEntity.comment},
+            #{propertyAdvanceDepositRecordEntity.deleted},
+            #{propertyAdvanceDepositRecordEntity.createBy},
+            #{propertyAdvanceDepositRecordEntity.createTime},
+            #{propertyAdvanceDepositRecordEntity.updateBy},
+            #{propertyAdvanceDepositRecordEntity.updateTime})
+        </foreach>
+    </insert>
+
+</mapper>

@@ -31,7 +31,7 @@ public class TimeTask implements Job {
 		Set<String> repair_difference = redisTemplate.opsForSet().difference("repair_img_part", "repair_img_all");
 		Set<String> shop_difference = redisTemplate.opsForSet().difference("shop_img_part", "shop_img_all");
 		Set<String> shop_comment_difference = redisTemplate.opsForSet().difference("repair_comment_img_part", "repair_comment_img_all");
-		
+
 		if (menu_difference != null) {
 			// 2. 删除差值图片
 			for (String s : menu_difference) {

@@ -179,4 +179,6 @@ public class AdminCommunityInformController {
         qo.setUid(UserUtils.getUserId());
         return communityInformService.updatePushInform(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败");
     }
+
+
 }

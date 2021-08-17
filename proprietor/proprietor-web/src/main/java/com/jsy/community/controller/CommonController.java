@@ -87,6 +87,7 @@ public class CommonController {
         //验证分页参数
         page = ValidatorUtils.isInteger(page) ? page : 1;
         size = ValidatorUtils.isInteger(size) ? size : 10;
+
         //通过查询类型ID找到对应的 服务方法
         CommunityType communityType = CommunityType.valueOf(queryType);
         //当枚举类并没有这个查询类型时，抛出400请求参数错误异常

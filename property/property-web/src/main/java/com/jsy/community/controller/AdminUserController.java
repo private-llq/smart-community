@@ -303,8 +303,10 @@ public class AdminUserController {
 		String url = MinioUtils.upload(file, PropertyConsts.BUCKET_NAME_AVATAR);
 		boolean result = adminUserService.updateAvatar(url,UserUtils.getUserId());
 		return result ? CommonResult.ok(url,"操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
+
+
 	}
-	
+
 	/**
 	* @Description: 个人资料查询
 	 * @Param: []
@@ -324,6 +326,7 @@ public class AdminUserController {
 	 * @Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/19
+	 *
 	**/
 	@ApiOperation("修改/忘记密码")
 	@PutMapping("password")
@@ -373,6 +376,8 @@ public class AdminUserController {
 		if (StrUtil.isEmpty(newCode)) {
 			throw new JSYException("新手机号验证码不能为空");
 		}
+		
+
 		//从请求获取uid
 		String uid = UserUtils.getUserId();
 		//获取当前用户手机号
@@ -389,6 +394,7 @@ public class AdminUserController {
 		if(!"0".equals(returnMap2.get("result"))){
 			throw new PropertyException(JSYError.BAD_REQUEST.getCode(),"新手机"+returnMap2.get("msg"));
 		}
+
 		//用户是否已注册
 		boolean exists = adminUserService.checkUserExists(newMobile);
 		if(exists){
@@ -427,6 +433,7 @@ public class AdminUserController {
 		return returnMap;
 		// 验证通过后删除验证码
 //        redisTemplate.delete(account);
+
 	}
 	//============== 通用end ==========================
 	//==================================== 物业端（新）end ====================================

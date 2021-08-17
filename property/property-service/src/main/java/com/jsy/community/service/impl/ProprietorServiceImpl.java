@@ -8,7 +8,10 @@ import com.jsy.community.api.IProprietorService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.ProprietorEntity;
+import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
@@ -17,8 +20,6 @@ import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.utils.CardUtil;
 import com.jsy.community.utils.DateUtils;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
@@ -28,7 +29,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 业主 服务实现类。
@@ -276,6 +280,18 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
             houseEntityList.remove(matchHouse);
         }
         return flag;
+    }
+    
+    /**
+     * @Description: 根据手机号查询绑定房屋的id
+     * @Param: [mobile]
+     * @Return:
+     * @Author: DKS
+     * @Date: 2021/08/16
+     **/
+    @Override
+    public List<Long> queryBindHouseByMobile(String mobile, Long communityId) {
+        return proprietorMapper.queryBindHouseByMobile(mobile, communityId);
     }
 
 }
