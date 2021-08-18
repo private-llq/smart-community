@@ -30,7 +30,7 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     private Integer associatedType;
     @ApiModelProperty(value = "账单号")
     private String orderNum;
-    @ApiModelProperty(value = "生成类型1系统生成，2其他")
+    @ApiModelProperty(value = "生成类型1系统生成，2临时收费")
     private Integer buildType;
     @ApiModelProperty(value = "支付单号")
     private Long communityId;
