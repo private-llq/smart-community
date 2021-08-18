@@ -125,4 +125,35 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @TableField(exist = false)
     private String orderType;
     
+    @ApiModelProperty(value = "所有违约应收金额")
+    @TableField(exist = false)
+    private BigDecimal receivablePenalMoney;
+    
+    @ApiModelProperty(value = "所有优惠金额")
+    @TableField(exist = false)
+    private BigDecimal couponMoney;
+    
+    @ApiModelProperty(value = "所有预存款金额")
+    @TableField(exist = false)
+    private BigDecimal deductionMoney;
+    
+    @ApiModelProperty(value = "已支付违约金=违约实收金额")
+    @TableField(exist = false)
+    private BigDecimal collectPenalMoney;
+    
+    @ApiModelProperty(value = "线上收费、合计实收=所有已支付账单")
+    @TableField(exist = false)
+    private BigDecimal communityOnlineCharging;
+    
+    @ApiModelProperty(value = "往月欠收=往月所有账单待支付")
+    @TableField(exist = false)
+    private BigDecimal arrearsMoney;
+    
+    @ApiModelProperty(value = "合计欠收=往月欠收+本月欠收")
+    @TableField(exist = false)
+    private BigDecimal arrearsMoneySum;
+    
+    @ApiModelProperty(value = "本月欠收=本月所有账单待支付")
+    @TableField(exist = false)
+    private BigDecimal thisMonthArrearsMoney;
 }

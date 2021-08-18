@@ -261,13 +261,23 @@ public class PropertyFinanceOrderController {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
         }
         propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        // 按账单生成时间
-        if (propertyFinanceFormChargeEntity.getType() == 1) {
-            return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityChargeByOrderGenerateTime(propertyFinanceFormChargeEntity),"查询成功");
-        } else if (propertyFinanceFormChargeEntity.getType() == 2) {
-            // 按账单周期时间
-            return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityChargeByOrderPeriodTime(propertyFinanceFormChargeEntity),"查询成功");
+        
+        List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = null;
+        switch (propertyFinanceFormChargeEntity.getType()) {
+            case 1:
+                // 按账单生成时间
+                propertyFinanceFormChargeEntityList = propertyFinanceOrderService.getFinanceFormCommunityChargeByOrderGenerateTime(propertyFinanceFormChargeEntity);
+                break;
+            case 2:
+                // 按账单周期时间
+                propertyFinanceFormChargeEntityList = propertyFinanceOrderService.getFinanceFormCommunityChargeByOrderPeriodTime(propertyFinanceFormChargeEntity);
+                break;
+            default:
+                break;
         }
-        return CommonResult.error(JSYError.NOT_FOUND.getCode(),"查询类型错误，未查到数据");
+        if (propertyFinanceFormChargeEntityList == null) {
+            throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
+        }
+        return CommonResult.ok(propertyFinanceFormChargeEntityList,"查询成功");
     }
 }

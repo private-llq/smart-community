@@ -16,6 +16,9 @@ import java.time.LocalDate;
 @Data
 @ApiModel("物业财务报表-小区收费报表")
 public class PropertyFinanceFormChargeEntity implements Serializable {
+	@ApiModelProperty(value = "账单号")
+	private Long feeRuleId;
+	
 	@ApiModelProperty(value = "社区ID")
 	private Long communityId;
 	
@@ -60,4 +63,7 @@ public class PropertyFinanceFormChargeEntity implements Serializable {
 	
 	@ApiModelProperty(value = "1.按账单生成时间，2.按账单周期时间")
 	private Integer type;
+	
+	@ApiModelProperty(value = "项目名称")
+	private String feeRuleName;
 }

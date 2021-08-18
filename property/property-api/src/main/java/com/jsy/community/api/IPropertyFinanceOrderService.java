@@ -196,17 +196,17 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Author: DKS
      *@Description: 获取财务报表-小区收费报表-账单生成时间
      *@Param:
-     *@Return: com.jsy.community.vo.CommonResult
+     *@Return: PropertyFinanceFormChargeEntity
      *@Date: 2021/8/18 11:08
      **/
-    PropertyFinanceFormChargeEntity getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity);
+    List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity);
     
     /**
      *@Author: DKS
      *@Description: 获取财务报表-小区收费报表-账单周期时间
      *@Param:
-     *@Return: com.jsy.community.vo.CommonResult
+     *@Return: PropertyFinanceFormChargeEntity
      *@Date: 2021/8/18 11:08
      **/
-    PropertyFinanceFormChargeEntity getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity);
+    List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity);
 }

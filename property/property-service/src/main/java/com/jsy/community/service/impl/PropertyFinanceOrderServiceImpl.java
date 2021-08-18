@@ -788,188 +788,192 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Author: DKS
      *@Description: 获取财务报表-小区收费报表-账单生成时间
      *@Param:
-     *@Return: com.jsy.community.vo.CommonResult
+     *@Return: PropertyFinanceFormChargeEntity
      *@Date: 2021/8/18 11:08
      **/
     @Override
-    public PropertyFinanceFormChargeEntity getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity qo) {
+    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity qo) {
         // 返回给前端实体
-        PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity = new PropertyFinanceFormChargeEntity();
+        List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
+        
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as totalMoney,SUM( penal_sum ) as receivablePenalMoney,SUM( coupon ) as couponMoney,SUM( deduction ) as deductionMoney");
         queryWrapper.ge("create_time", qo.getStartTime());
         queryWrapper.le("create_time", qo.getEndTime());
         queryWrapper.eq("community_id", qo.getCommunityId());
+        queryWrapper.groupBy("fee_rule_id");
         // 小区账单查询
         List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(queryWrapper);
-        // 所有优惠金额
-        BigDecimal couponMoney = new BigDecimal("0.00");
-        // 所有滞纳金（违约金）
-        BigDecimal receivablePenalMoney = new BigDecimal("0.00");
-        // 所有账单总金额
-        BigDecimal totalMoney = new BigDecimal("0.00");
-        // 所有预存款抵扣
-        BigDecimal deductionMoney = new BigDecimal("0.00");
+        PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity;
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : propertyFinanceOrderEntities) {
-            totalMoney = totalMoney.add(propertyFinanceOrderEntity.getTotalMoney());
-            couponMoney = couponMoney.add(propertyFinanceOrderEntity.getCoupon());
-            receivablePenalMoney = receivablePenalMoney.add(propertyFinanceOrderEntity.getPenalSum());
-            deductionMoney = deductionMoney.add(propertyFinanceOrderEntity.getDeduction());
+            propertyFinanceFormChargeEntity = new PropertyFinanceFormChargeEntity();
+            propertyFinanceFormChargeEntity.setFeeRuleId(propertyFinanceOrderEntity.getFeeRuleId());
+            propertyFinanceFormChargeEntity.setTotalMoney(propertyFinanceOrderEntity.getTotalMoney());
+            propertyFinanceFormChargeEntity.setCouponMoney(propertyFinanceOrderEntity.getCouponMoney());
+            propertyFinanceFormChargeEntity.setReceivablePenalMoney(propertyFinanceOrderEntity.getReceivablePenalMoney());
+            propertyFinanceFormChargeEntity.setDeductionMoney(propertyFinanceOrderEntity.getDeductionMoney());
+            propertyFinanceFormChargeEntityList.add(propertyFinanceFormChargeEntity);
         }
-        // 合计应收、本月应收
-        propertyFinanceFormChargeEntity.setTotalMoney(totalMoney);
-        // 优惠金额
-        propertyFinanceFormChargeEntity.setCouponMoney(couponMoney);
-        // 违约应收
-        propertyFinanceFormChargeEntity.setReceivablePenalMoney(receivablePenalMoney);
-        // 预存款抵扣
-        propertyFinanceFormChargeEntity.setDeductionMoney(deductionMoney);
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
+        wrapper.select("fee_rule_id as feeRuleId,SUM( penal_sum ) as collectPenalMoney,SUM( total_money ) as communityOnlineCharging");
         wrapper.ge("create_time", qo.getStartTime());
         wrapper.le("create_time", qo.getEndTime());
         wrapper.eq("community_id", qo.getCommunityId());
         wrapper.eq("order_status",1);
+        wrapper.groupBy("fee_rule_id");
         // 小区已支付账单查询
         List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(wrapper);
-        // 已支付账单违约金
-        BigDecimal collectPenalMoney = new BigDecimal("0.00");
-        // 所有已支付账单
-        BigDecimal communityOnlineCharging = new BigDecimal("0.00");
         for (PropertyFinanceOrderEntity entity : entities) {
-            collectPenalMoney = collectPenalMoney.add(entity.getPenalSum());
-            communityOnlineCharging = communityOnlineCharging.add(entity.getTotalMoney());
+            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                if (financeFormChargeEntity.getFeeRuleId().equals(entity.getFeeRuleId())) {
+                    financeFormChargeEntity.setCollectPenalMoney(entity.getCollectPenalMoney());
+                    financeFormChargeEntity.setCommunityOnlineCharging(entity.getCommunityOnlineCharging());
+                }
+            }
         }
-        // 违约实收
-        propertyFinanceFormChargeEntity.setCollectPenalMoney(collectPenalMoney);
-        // 线上收款、合计实收
-        propertyFinanceFormChargeEntity.setCommunityOnlineCharging(communityOnlineCharging);
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderQueryWrapper = new QueryWrapper<>();
+        financeOrderQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as arrearsMoney");
         financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
         financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
         financeOrderQueryWrapper.eq("order_status",0);
+        financeOrderQueryWrapper.groupBy("fee_rule_id");
         // 小区往月待支付账单查询
         List<PropertyFinanceOrderEntity> lastMonthEntities = propertyFinanceOrderMapper.selectList(financeOrderQueryWrapper);
-        // 往月所有待支付的总金额
-        BigDecimal arrearsMoney = new BigDecimal("0.00");
         for (PropertyFinanceOrderEntity lastMonthEntity : lastMonthEntities) {
-            arrearsMoney = arrearsMoney.add(lastMonthEntity.getTotalMoney());
+            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                if (financeFormChargeEntity.getFeeRuleId().equals(lastMonthEntity.getFeeRuleId())) {
+                    financeFormChargeEntity.setArrearsMoney(lastMonthEntity.getArrearsMoney());
+                }
+            }
         }
-        // 往月欠收
-        propertyFinanceFormChargeEntity.setArrearsMoney(arrearsMoney);
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderEntityQueryWrapper = new QueryWrapper<>();
+        financeOrderEntityQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as thisMonthArrearsMoney");
         financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
         financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
         financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
         financeOrderEntityQueryWrapper.eq("order_status",0);
+        financeOrderEntityQueryWrapper.groupBy("fee_rule_id");
         // 小区本月待支付账单查询
         List<PropertyFinanceOrderEntity> entityList = propertyFinanceOrderMapper.selectList(financeOrderEntityQueryWrapper);
-        // 本月欠收
-        BigDecimal thisMonthArrearsMoney = new BigDecimal("0.00");
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entityList) {
-            thisMonthArrearsMoney = thisMonthArrearsMoney.add(propertyFinanceOrderEntity.getTotalMoney());
+            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
+                    for (PropertyFinanceOrderEntity lastMonthEntity : lastMonthEntities) {
+                        if (lastMonthEntity.getFeeRuleId().equals(financeFormChargeEntity.getFeeRuleId())){
+                            financeFormChargeEntity.setArrearsMoneySum(propertyFinanceOrderEntity.getThisMonthArrearsMoney().add(lastMonthEntity.getArrearsMoney()));
+                        }
+                    }
+                }
+            }
         }
-        // 合计欠收
-        propertyFinanceFormChargeEntity.setArrearsMoneySum(arrearsMoney.add(thisMonthArrearsMoney));
-        
-        return propertyFinanceFormChargeEntity;
+        // 补充项目名称
+        List<Long> paramList = new ArrayList<>();
+        for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+            paramList.add(financeFormChargeEntity.getFeeRuleId());
+        }
+        Map<String, Map<String, Object>> longMapMap = propertyFeeRuleMapper.selectFeeRuleIdName(paramList);
+        for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+            Map<String, Object> countMap = longMapMap.get(financeFormChargeEntity.getFeeRuleId());
+            financeFormChargeEntity.setFeeRuleName(countMap != null ? String.valueOf(countMap.get("name")) : "");
+        }
+    
+        return propertyFinanceFormChargeEntityList;
     }
     
     /**
      *@Author: DKS
      *@Description: 获取财务报表-小区收费报表-账单周期时间
      *@Param:
-     *@Return: com.jsy.community.vo.CommonResult
+     *@Return: PropertyFinanceFormChargeEntity
      *@Date: 2021/8/18 11:08
      **/
     @Override
-    public PropertyFinanceFormChargeEntity getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity qo) {
+    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity qo) {
         // 返回给前端实体
-        PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity = new PropertyFinanceFormChargeEntity();
+        List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
+    
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as totalMoney,SUM( penal_sum ) as receivablePenalMoney,SUM( coupon ) as couponMoney,SUM( deduction ) as deductionMoney");
         queryWrapper.ge("create_time", qo.getStartTime());
         queryWrapper.le("create_time", qo.getEndTime());
         queryWrapper.eq("community_id", qo.getCommunityId());
-        queryWrapper.ne("build_type", 2);
-        // 小区账单查询不包含临时收费
+        queryWrapper.ne("build_type",2);
+        queryWrapper.groupBy("fee_rule_id");
+        // 小区账单查询
         List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(queryWrapper);
-        // 所有优惠金额
-        BigDecimal couponMoney = new BigDecimal("0.00");
-        // 所有滞纳金（违约金）
-        BigDecimal receivablePenalMoney = new BigDecimal("0.00");
-        // 所有账单总金额
-        BigDecimal totalMoney = new BigDecimal("0.00");
-        // 所有预存款抵扣
-        BigDecimal deductionMoney = new BigDecimal("0.00");
+        PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity;
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : propertyFinanceOrderEntities) {
-            totalMoney = totalMoney.add(propertyFinanceOrderEntity.getTotalMoney());
-            couponMoney = couponMoney.add(propertyFinanceOrderEntity.getCoupon());
-            receivablePenalMoney = receivablePenalMoney.add(propertyFinanceOrderEntity.getPenalSum());
-            deductionMoney = deductionMoney.add(propertyFinanceOrderEntity.getDeduction());
+            propertyFinanceFormChargeEntity = new PropertyFinanceFormChargeEntity();
+            propertyFinanceFormChargeEntity.setFeeRuleId(propertyFinanceOrderEntity.getFeeRuleId());
+            propertyFinanceFormChargeEntity.setTotalMoney(propertyFinanceOrderEntity.getTotalMoney());
+            propertyFinanceFormChargeEntity.setCouponMoney(propertyFinanceOrderEntity.getCouponMoney());
+            propertyFinanceFormChargeEntity.setReceivablePenalMoney(propertyFinanceOrderEntity.getReceivablePenalMoney());
+            propertyFinanceFormChargeEntity.setDeductionMoney(propertyFinanceOrderEntity.getDeductionMoney());
+            propertyFinanceFormChargeEntityList.add(propertyFinanceFormChargeEntity);
         }
-        // 合计应收、本月应收
-        propertyFinanceFormChargeEntity.setTotalMoney(totalMoney);
-        // 优惠金额
-        propertyFinanceFormChargeEntity.setCouponMoney(couponMoney);
-        // 违约应收
-        propertyFinanceFormChargeEntity.setReceivablePenalMoney(receivablePenalMoney);
-        // 预存款抵扣
-        propertyFinanceFormChargeEntity.setDeductionMoney(deductionMoney);
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
+        wrapper.select("fee_rule_id as feeRuleId,SUM( penal_sum ) as collectPenalMoney,SUM( total_money ) as communityOnlineCharging");
         wrapper.ge("create_time", qo.getStartTime());
         wrapper.le("create_time", qo.getEndTime());
         wrapper.eq("community_id", qo.getCommunityId());
         wrapper.eq("order_status",1);
-        wrapper.ne("build_type", 2);
-        // 小区已支付账单查询不包含临时收费
+        wrapper.ne("build_type",2);
+        wrapper.groupBy("fee_rule_id");
+        // 小区已支付账单查询
         List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(wrapper);
-        // 已支付账单违约金
-        BigDecimal collectPenalMoney = new BigDecimal("0.00");
-        // 所有已支付账单
-        BigDecimal communityOnlineCharging = new BigDecimal("0.00");
         for (PropertyFinanceOrderEntity entity : entities) {
-            collectPenalMoney = collectPenalMoney.add(entity.getPenalSum());
-            communityOnlineCharging = communityOnlineCharging.add(entity.getTotalMoney());
+            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                if (financeFormChargeEntity.getFeeRuleId().equals(entity.getFeeRuleId())) {
+                    financeFormChargeEntity.setCollectPenalMoney(entity.getCollectPenalMoney());
+                    financeFormChargeEntity.setCommunityOnlineCharging(entity.getCommunityOnlineCharging());
+                }
+            }
         }
-        // 违约实收
-        propertyFinanceFormChargeEntity.setCollectPenalMoney(collectPenalMoney);
-        // 线上收款、合计实收
-        propertyFinanceFormChargeEntity.setCommunityOnlineCharging(communityOnlineCharging);
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderQueryWrapper = new QueryWrapper<>();
+        financeOrderQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as arrearsMoney");
         financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
         financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
         financeOrderQueryWrapper.eq("order_status",0);
-        financeOrderQueryWrapper.ne("build_type", 2);
-        // 小区往月待支付账单查询不包含临时收费
+        financeOrderQueryWrapper.ne("build_type",2);
+        financeOrderQueryWrapper.groupBy("fee_rule_id");
+        // 小区往月待支付账单查询
         List<PropertyFinanceOrderEntity> lastMonthEntities = propertyFinanceOrderMapper.selectList(financeOrderQueryWrapper);
-        // 往月所有待支付的总金额
-        BigDecimal arrearsMoney = new BigDecimal("0.00");
         for (PropertyFinanceOrderEntity lastMonthEntity : lastMonthEntities) {
-            arrearsMoney = arrearsMoney.add(lastMonthEntity.getTotalMoney());
+            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                if (financeFormChargeEntity.getFeeRuleId().equals(lastMonthEntity.getFeeRuleId())) {
+                    financeFormChargeEntity.setArrearsMoney(lastMonthEntity.getArrearsMoney());
+                }
+            }
         }
-        // 往月欠收
-        propertyFinanceFormChargeEntity.setArrearsMoney(arrearsMoney);
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderEntityQueryWrapper = new QueryWrapper<>();
+        financeOrderEntityQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as thisMonthArrearsMoney");
         financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
         financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
         financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
         financeOrderEntityQueryWrapper.eq("order_status",0);
-        financeOrderEntityQueryWrapper.ne("build_type", 2);
-        // 小区本月待支付账单查询不包含临时收费
+        financeOrderEntityQueryWrapper.ne("build_type",2);
+        financeOrderEntityQueryWrapper.groupBy("fee_rule_id");
+        // 小区本月待支付账单查询
         List<PropertyFinanceOrderEntity> entityList = propertyFinanceOrderMapper.selectList(financeOrderEntityQueryWrapper);
-        // 本月欠收
-        BigDecimal thisMonthArrearsMoney = new BigDecimal("0.00");
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entityList) {
-            thisMonthArrearsMoney = thisMonthArrearsMoney.add(propertyFinanceOrderEntity.getTotalMoney());
+            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
+                    for (PropertyFinanceOrderEntity lastMonthEntity : lastMonthEntities) {
+                        if (lastMonthEntity.getFeeRuleId().equals(financeFormChargeEntity.getFeeRuleId())){
+                            financeFormChargeEntity.setArrearsMoneySum(propertyFinanceOrderEntity.getThisMonthArrearsMoney().add(lastMonthEntity.getArrearsMoney()));
+                        }
+                    }
+                }
+            }
         }
-        // 合计欠收
-        propertyFinanceFormChargeEntity.setArrearsMoneySum(arrearsMoney.add(thisMonthArrearsMoney));
-    
-        return propertyFinanceFormChargeEntity;
+        
+        return propertyFinanceFormChargeEntityList;
     }
 }
 
