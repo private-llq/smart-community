@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.api.ICarBlackListService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarBlackListEntity;
 import com.jsy.community.mapper.CarBlackListMapper;

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarMonthlyVehicle;
 import com.jsy.community.exception.JSYException;

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ICarLaneService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarLaneEntity;
 import com.jsy.community.mapper.CarLaneMapper;
