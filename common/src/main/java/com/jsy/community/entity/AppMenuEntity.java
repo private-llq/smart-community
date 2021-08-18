@@ -43,6 +43,9 @@ public class AppMenuEntity extends BaseEntity {
 
     @ApiModelProperty(value = "描述信息")
     private String descr;
+
+    @ApiModelProperty(value = "版本号")
+    private String version;
     
     @ApiModelProperty(value = "社区id")
     @NotNull(groups = {addAdmin.class},message = "社区id不能为空")

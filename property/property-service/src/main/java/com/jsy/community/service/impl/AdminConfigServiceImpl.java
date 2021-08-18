@@ -269,7 +269,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			return adminRoleEntity;
 		}
 		// 查询分配的菜单列表
-		List<Long> roleMuneIds = adminRoleMenuMapper.queryRoleMuneIdsByRoleId(roleId);
+		List<Long> roleMenuIds = adminRoleMenuMapper.queryRoleMuneIdsByRoleId(roleId);
 		/*QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
 		menuEntityQueryWrapper.select("*, name as label");
 		menuEntityQueryWrapper.in("id", roleMuneIds);
@@ -287,7 +287,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		}
 		List<AdminMenuEntity> returnMenuEntities = assemblyMenuData(adminMenuEntities);
 		adminRoleEntity.setMenuList(returnMenuEntities);*/
-		adminRoleEntity.setMenuIds(roleMuneIds);
+		adminRoleEntity.setMenuIds(roleMenuIds);
 		return adminRoleEntity;
 	}
 

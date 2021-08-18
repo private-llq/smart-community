@@ -6,6 +6,8 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyAdvanceDepositRecordQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.List;
+
 /**
  * @program: com.jsy.community
  * @description: 物业预存款余额明细记录表
@@ -31,4 +33,13 @@ public interface IPropertyAdvanceDepositRecordService extends IService<PropertyA
 	 * @Date: 2021/08/12
 	 **/
 	PageInfo<PropertyAdvanceDepositRecordEntity> queryPropertyAdvanceDepositRecord(BaseQO<PropertyAdvanceDepositRecordQO> baseQO);
+	
+	/**
+	 * @Description: 查询预存款明细记录导出数据
+	 * @Param: PropertyAdvanceDepositRecordEntity
+	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
+	 * @Author: DKS
+	 * @Date: 2021/8/17
+	 **/
+	List<PropertyAdvanceDepositRecordEntity> queryExportHouseExcel(PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity);
 }

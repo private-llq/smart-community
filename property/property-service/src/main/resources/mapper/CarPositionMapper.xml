@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.CarPositionMapper">
+
+<insert id="seavefile" parameterType="CarPositionEntity">
+
+    insert into t_car_position(
+                               community_id,
+                               uid,
+                               type_id,
+                               car_position,
+                               car_pos_status,
+                               area,
+                               belong_house,
+                               owner_phone,
+                               user_name,
+                               remark,
+                               binding_status,
+                               begin_time,
+                               end_time,
+                               price,
+                               monthly_price)
+    values
+    <foreach collection="list" item="listRelation" separator="," open="" close="">
+
+    (   #{listRelation.communityId},
+        (select com.uid from t_user as com where com.mobile=#{listRelation.ownerPhone} and  com.real_name=#{listRelation.userName}),
+        (select ty.id from t_car_position_type  as ty where ty.description=#{listRelation.typeCarPosition}),
+        #{listRelation.carPosition},
+        #{listRelation.carPosStatus},
+        #{listRelation.area},
+        #{listRelation.belongHouse},
+        #{listRelation.ownerPhone},
+        #{listRelation.userName},
+        #{listRelation.remark},
+        #{listRelation.bindingStatus},
+        #{listRelation.beginTime,javaType=DATE},
+        #{listRelation.endTime,javaType=DATE},
+        #{listRelation.price},
+        #{listRelation.monthlyPrice}   )
+    </foreach>
+</insert>
+
+
+    <sql id="carPosition_select">
+        <if test="area != null">
+            AND car.area = #{area}
+        </if>
+        <if test="userName != ''">
+            /*AND car.user_name  like concat('%',#{userName},'%')*/
+             /*AND car.user_name  like '%${userName}%'*/
+             AND car.user_name  like "%"#{userName}"%"
+        </if>
+    </sql>
+
+    <!-- 使用sql片段 -->
+    <select id="selectCarPosition" parameterType="CarPositionEntity" resultType="CarPositionEntity">
+        SELECT * FROM t_car_position as car
+        <where>
+            <include refid="carPosition_select"></include>
+        </where>
+    </select>
+
+
+
+
+
+</mapper>

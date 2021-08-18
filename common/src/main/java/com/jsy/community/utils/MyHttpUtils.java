@@ -111,6 +111,9 @@ public class MyHttpUtils {
 	public static HttpPost httpPostWithoutParams(String url, Map<String,Object> bodyMap){
 		return httpPost(url,null,bodyMap);
 	}
+	public static HttpPost httpPostWithoutParams(String url, String body){
+		return httpStringPost(url,null,body);
+	}
 	public static HttpPost httpPostWithoutBody(String url, Map<String,String> paramsMap){
 		return httpPost(url,paramsMap,null);
 	}
@@ -130,6 +133,26 @@ public class MyHttpUtils {
 		}
 		if(bodyMap != null){
 			String body = JSON.toJSONString(bodyMap);
+			httpPost.setEntity(new StringEntity(body, "utf-8"));
+		}
+		return httpPost;
+	}
+
+	public static HttpPost httpStringPost(String url, Map<String,String> paramsMap, String body){
+		URIBuilder uriBuilder = buildURL(url);
+		//设置params
+		if(paramsMap != null){
+			for(Map.Entry<String,String> entry : paramsMap.entrySet()){
+				uriBuilder.setParameter(entry.getKey(),entry.getValue());
+			}
+		}
+		HttpPost httpPost = null;
+		try {
+			httpPost = new HttpPost(uriBuilder.build());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		if(body != null){
 			httpPost.setEntity(new StringEntity(body, "utf-8"));
 		}
 		return httpPost;

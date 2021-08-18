@@ -13,6 +13,7 @@ public interface ICarCutOffService extends IService<CarCutOffEntity> {
      * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.property.CarCutOffEntity>
      * @Author: Tian
      * @Date: 2021/8/16-11:58
-     **/
+     *
+     * @return*/
     PageInfo<CarCutOffEntity> selectPage(CarCutOffQO carCutOffQO, Long adminCommunityId);
 }

@@ -36,6 +36,9 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private IShoppingMallService shoppingMallService;
+
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
+	private HousingRentalOrderService housingRentalOrderService;
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyFinanceOrderService propertyFinanceOrderService;
@@ -131,10 +134,18 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 					throw new PaymentException((int)shopOrderDealMap.get("code"),String.valueOf(shopOrderDealMap.get("msg")));
 				}
 				log.info("商城订单状态修改完成，订单号：" + order.getOrderNo());
-			}else if(PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(order.getTradeName())){
+			} else if (PaymentEnum.TradeFromEnum.HOUSE_RENT_PAYMENT.getIndex().equals(order.getTradeName())) {
+				// 房屋押金/房租缴费
+				log.info("开始修改房屋押金/房租缴费订单状态，订单号：" + order.getOrderNo());
+				Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(order.getOrderNo(), order.getServiceOrderNo());
+				if(0 != (int)map.get("code")){
+					throw new PaymentException((int)map.get("code"),String.valueOf(map.get("msg")));
+				}
+				log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + order.getOrderNo());
+			} else if (PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(order.getTradeName())) {
 				log.info("开始修改物业费账单状态，订单号：" + order.getOrderNo());
 				String ids = redisTemplate.opsForValue().get("PropertyFee:" + order.getOrderNo());
-				if(StringUtils.isEmpty(ids)){
+				if (StringUtils.isEmpty(ids)) {
 					log.error("回调处理物业费失败，账单ids未找到，已支付订单号：" + order.getOrderNo());
 					return;
 				}
@@ -149,7 +160,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				receiptEntity.setReceiptMoney(order.getTradeAmount());
 				propertyFinanceReceiptService.add(receiptEntity);
 				//修改物业费账单
-				propertyFinanceOrderService.updateOrderStatusBatch(2,order.getOrderNo(),ids.split(","));
+				propertyFinanceOrderService.updateOrderStatusBatch(2, order.getOrderNo(), ids.split(","));
 			}
 		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(order.getTradeType())){  // 提现
 			log.info("开始处理提现订单");

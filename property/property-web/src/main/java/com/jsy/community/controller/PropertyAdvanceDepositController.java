@@ -180,7 +180,7 @@ public class PropertyAdvanceDepositController {
             }
             List<Long> houseIdLists = new ArrayList<>();
             // 查询手机号绑定房屋的id
-            List<Long> houseIdList = proprietorService.queryBindHouseByMobile(propertyAdvanceDepositEntity.getMobile(), propertyAdvanceDepositEntity.getCommunityId());
+            List<Long> houseIdList = proprietorService.queryBindHouseByMobile(propertyAdvanceDepositEntity.getMobile(), adminCommunityId);
             for (Long houseId : houseIdList) {
                 if (houseId.equals(propertyAdvanceDepositEntity.getHouseId())) {
                     houseIdLists.add(houseId);
@@ -188,7 +188,7 @@ public class PropertyAdvanceDepositController {
             }
             List<PropertyAdvanceDepositEntity> entities = new ArrayList<>();
             // 根据houseId查询预存款余额
-            PropertyAdvanceDepositEntity entity1 = propertyAdvanceDepositService.queryAdvanceDepositByHouseId(propertyAdvanceDepositEntity.getHouseId(), propertyAdvanceDepositEntity.getCommunityId());
+            PropertyAdvanceDepositEntity entity1 = propertyAdvanceDepositService.queryAdvanceDepositByHouseId(propertyAdvanceDepositEntity.getHouseId(), adminCommunityId);
             if (entity1 != null) {
                 if (entity1.getBalance().add(propertyAdvanceDepositEntity.getReceivedAmount()).compareTo(BigDecimal.ZERO) == -1) {
                     entities.add(entity1);

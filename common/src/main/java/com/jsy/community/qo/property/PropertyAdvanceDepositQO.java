@@ -21,4 +21,7 @@ public class PropertyAdvanceDepositQO implements Serializable {
     
     @ApiModelProperty(value = "房屋id")
     private Long houseId;
+    
+    @ApiModelProperty(value = "房屋地址")
+    private String address;
 }

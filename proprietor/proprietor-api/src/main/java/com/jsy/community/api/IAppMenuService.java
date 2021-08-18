@@ -22,6 +22,7 @@ public interface IAppMenuService extends IService<AppMenuEntity> {
 	 * @Date 2021/2/3 13:50
 	 * @Param [communityId：社区id]
 	 **/
+	@Deprecated
 	List<AppMenuEntity> listIndexMenu(Long communityId);
 
 	/**
@@ -31,5 +32,24 @@ public interface IAppMenuService extends IService<AppMenuEntity> {
 	 * @Date 2021/2/3 14:12
 	 * @Param [communityId：社区id]
 	 **/
+	@Deprecated
 	List<AppMenuEntity>  moreIndexMenu(Long communityId);
+
+	/**
+	 * @Description: 查询所有菜单   v2版
+	 * @author: Hu
+	 * @since: 2021/8/16 9:22
+	 * @Param:
+	 * @return:
+	 */
+	List<AppMenuEntity> listAppMenu(Long communityId);
+
+	/**
+	 * @Description: 更多菜单   v2版
+	 * @author: Hu
+	 * @since: 2021/8/16 9:22
+	 * @Param:
+	 * @return:
+	 */
+	List<AppMenuEntity> listAppMenuAll(Long communityId);
 }

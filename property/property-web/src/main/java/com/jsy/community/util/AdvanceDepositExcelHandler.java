@@ -41,4 +41,13 @@ public interface AdvanceDepositExcelHandler {
      *@Date: 2021/8/16 13:50
      **/
     Workbook exportAdvanceDepositErrorExcel(List<AdvanceDepositImportErrorVO> errorVos);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出预存款明细记录
+     *@Param: excel:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/8/17 9:33
+     **/
+    Workbook exportAdvanceDeposit(List<?> entityList);
 }
