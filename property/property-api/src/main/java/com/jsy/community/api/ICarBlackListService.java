@@ -6,9 +6,9 @@ import com.jsy.community.utils.PageInfo;
 
 public interface ICarBlackListService {
 
-    PageInfo <CarBlackListEntity> carBlackListPage(BaseQO<String> baseQO);
+    PageInfo <CarBlackListEntity> carBlackListPage(BaseQO<String> baseQO, Long communityId);
 
-    Integer saveBlackList(CarBlackListEntity carBlackListEntity);
+    Integer saveBlackList(CarBlackListEntity carBlackListEntity, Long communityId);
 
     Integer delBlackList(String uid);
 }

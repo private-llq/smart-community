@@ -26,6 +26,10 @@ public class CarLaneEntity implements Serializable {
      */
     private String uid;
     /**
+     * 所属小区id
+     */
+    private Long communityId;
+    /**
      * 设备名称
      */
     private String equipmentName;

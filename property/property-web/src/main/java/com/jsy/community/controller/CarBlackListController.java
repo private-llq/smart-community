@@ -1,10 +1,12 @@
 package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarBlackListService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarBlackListEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -26,9 +28,10 @@ public class CarBlackListController {
      * @param baseQO 车牌号
      * @return
      */
-    @GetMapping("carBlackListPage")
+    @Login
+    @PostMapping("carBlackListPage")
     public CommonResult<PageInfo> carBlackListPage(@RequestBody BaseQO<String> baseQO){
-        PageInfo<CarBlackListEntity> pageInfo = blackListService.carBlackListPage(baseQO);
+        PageInfo<CarBlackListEntity> pageInfo = blackListService.carBlackListPage(baseQO, UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo);
     }
 
@@ -39,9 +42,10 @@ public class CarBlackListController {
      * @param carBlackListEntity
      * @return
      */
+    @Login
     @PostMapping("saveBlackList")
     public CommonResult saveBlackList(@RequestBody CarBlackListEntity carBlackListEntity){
-        blackListService.saveBlackList(carBlackListEntity);
+        blackListService.saveBlackList(carBlackListEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
 
     }

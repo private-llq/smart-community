@@ -28,6 +28,12 @@ public class CarMonthlyVehicle implements Serializable {
      * uuid
      */
     private String uid;
+
+    /**
+     * 所属小区id
+     */
+    private Long communityId;
+
     /**
      * 车牌号
      */

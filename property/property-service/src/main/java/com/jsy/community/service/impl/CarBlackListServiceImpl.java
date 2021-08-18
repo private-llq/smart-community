@@ -2,7 +2,6 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jsy.community.api.ICarBlackListService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarBlackListEntity;
 import com.jsy.community.mapper.CarBlackListMapper;
@@ -29,10 +28,14 @@ public class CarBlackListServiceImpl implements ICarBlackListService {
      * @return
      */
     @Override
-    public PageInfo<CarBlackListEntity> carBlackListPage(BaseQO<String> baseQO) {
+    public PageInfo<CarBlackListEntity> carBlackListPage(BaseQO<String> baseQO,Long communityId) {
         Page<CarBlackListEntity> Page = new Page<>(baseQO.getPage(),baseQO.getSize());
         PageInfo<CarBlackListEntity> pageInfo = new PageInfo<>();
-        Page<CarBlackListEntity> selectPage = carBlackListMapper.selectPage(Page, new QueryWrapper<CarBlackListEntity>().eq(StringUtils.isNoneBlank(baseQO.getQuery()),"car_number", baseQO.getQuery()));
+        Page<CarBlackListEntity> selectPage = carBlackListMapper.selectPage(Page,
+                new QueryWrapper<CarBlackListEntity>()
+                        .eq(StringUtils.isNoneBlank(baseQO.getQuery()),"car_number", baseQO.getQuery())
+                        .eq("community_id",communityId)
+        );
         pageInfo.setTotal(selectPage.getTotal());
         pageInfo.setCurrent(selectPage.getCurrent());
         pageInfo.setSize(selectPage.getSize());
@@ -59,9 +62,11 @@ public class CarBlackListServiceImpl implements ICarBlackListService {
      */
     @Override
     @Transactional
-    public Integer saveBlackList(CarBlackListEntity carBlackListEntity) {
+    public Integer saveBlackList(CarBlackListEntity carBlackListEntity,Long communityId) {
         carBlackListEntity.setUid(UserUtils.randomUUID());
         carBlackListEntity.setAddTime(LocalDateTime.now());
+        carBlackListEntity.setCommunityId(communityId);
+
         int insert = carBlackListMapper.insert(carBlackListEntity);
         return insert;
     }

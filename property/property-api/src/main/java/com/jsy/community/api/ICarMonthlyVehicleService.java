@@ -1,13 +1,10 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.proprietor.CarLaneEntity;
 import com.jsy.community.entity.proprietor.CarMonthlyVehicle;
-import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,13 +15,13 @@ import java.util.Map;
 public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
 
-    Integer SaveMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle);
+    Integer SaveMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle, Long communityId);
 
     Integer UpdateMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle);
 
     Integer DelMonthlyVehicle(String uid);
 
-    PageInfo FindByMultiConditionPage(CarMonthlyVehicleQO carMonthlyVehicleQO);
+    PageInfo FindByMultiConditionPage(CarMonthlyVehicleQO carMonthlyVehicleQO, Long communityId);
 
     /**
      * 延期 0 按天  1 按月
@@ -34,8 +31,8 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
     void monthlyChange(String uid, Integer type);
 
-    Map<String, Object> addLinkByExcel(List<String[]> strings);
+    Map<String, Object> addLinkByExcel(List<String[]> strings, Long communityId);
 
-    List<CarMonthlyVehicle> selectList();
+    List<CarMonthlyVehicle> selectList(Long communityId);
 
 }

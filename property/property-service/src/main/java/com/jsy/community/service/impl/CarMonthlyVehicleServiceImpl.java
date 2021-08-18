@@ -1,20 +1,22 @@
 package com.jsy.community.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarMonthlyVehicle;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.CarMonthlyVehicleMapper;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
-import com.jsy.community.utils.*;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -36,8 +38,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @return
      */
     @Override
-    public Integer SaveMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle) {
+    public Integer SaveMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle,Long communityId) {
         carMonthlyVehicle.setUid(UserUtils.randomUUID());
+        carMonthlyVehicle.setCommunityId(communityId);
         int insert = carMonthlyVehicleMapper.insert(carMonthlyVehicle);
         return insert;
     }
@@ -77,7 +80,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @return
      */
     @Override
-    public PageInfo FindByMultiConditionPage(CarMonthlyVehicleQO carMonthlyVehicleQO) {
+    public PageInfo FindByMultiConditionPage(CarMonthlyVehicleQO carMonthlyVehicleQO,Long communityId) {
+        carMonthlyVehicleQO.setCommunityId(communityId);
         Long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
         Page<CarMonthlyVehicle> page = new Page<>(carMonthlyVehicleQO.getPage(),carMonthlyVehicleQO.getSize());
         IPage<CarMonthlyVehicle> iPage = carMonthlyVehicleMapper.FindByMultiConditionPage(page, carMonthlyVehicleQO);
@@ -159,7 +163,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      */
     @Override
     @Transactional
-    public Map<String, Object> addLinkByExcel(List<String[]> strings) {
+    public Map<String, Object> addLinkByExcel(List<String[]> strings,Long communityId) {
 
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -260,6 +264,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             //车位编号
             String carPosition=string[9];
             vehicle.setCarPosition(carPosition);
+            //社区ID
+            Long getCommunityId=communityId;
+            vehicle.setCommunityId(getCommunityId);
 
             success += 1;
             carMonthlyVehicleMapper.insert(vehicle);
@@ -273,8 +280,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     /**
      * 查询所有数据，返回list
      */
-    public List<CarMonthlyVehicle> selectList() {
-        List<CarMonthlyVehicle> list = carMonthlyVehicleMapper.selectList(null);
+    public List<CarMonthlyVehicle> selectList(Long communityId) {
+        List<CarMonthlyVehicle> list = carMonthlyVehicleMapper.selectList(
+                new QueryWrapper<CarMonthlyVehicle>().eq("community_id",communityId));
         return list;
     }
 

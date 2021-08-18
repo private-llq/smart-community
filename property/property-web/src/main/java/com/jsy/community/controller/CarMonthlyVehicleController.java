@@ -1,27 +1,26 @@
 package com.jsy.community.controller;
 
-import com.alibaba.excel.EasyExcel;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
-import com.jsy.community.utils.ExcelListener;
-import com.jsy.community.utils.POIUtil;
-import com.jsy.community.utils.POIUtils;
+import com.jsy.community.util.POIUtil;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.elasticsearch.common.recycler.Recycler;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +39,10 @@ public class CarMonthlyVehicleController {
      * @return
      */
 
+    @Login
     @PostMapping("SaveMonthlyVehicle")
     public CommonResult SaveMonthlyVehicle(@RequestBody CarMonthlyVehicle carMonthlyVehicle) {
-       vehicleService.SaveMonthlyVehicle(carMonthlyVehicle);
+       vehicleService.SaveMonthlyVehicle(carMonthlyVehicle, UserUtils.getAdminCommunityId());
        return CommonResult.ok();
     }
 
@@ -76,9 +76,10 @@ public class CarMonthlyVehicleController {
      * @return
      */
 
-    @GetMapping("FindByMultiConditionPage")
+    @Login
+    @PostMapping("FindByMultiConditionPage")
     public CommonResult<PageInfo> FindByMultiConditionPage(@RequestBody CarMonthlyVehicleQO carMonthlyVehicleQO) {
-        PageInfo pageInfo = vehicleService.FindByMultiConditionPage(carMonthlyVehicleQO);
+        PageInfo pageInfo = vehicleService.FindByMultiConditionPage(carMonthlyVehicleQO,UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo);
     }
 
@@ -108,11 +109,12 @@ public class CarMonthlyVehicleController {
     /**
      * 数据录入
      */
+    @Login
     @PostMapping("dataImport")
     public CommonResult dataImport(MultipartFile file){
         try {
             List<String[]> strings = POIUtil.ReadMessage(file);
-            Map<String,Object> map= vehicleService.addLinkByExcel(strings);
+            Map<String,Object> map= vehicleService.addLinkByExcel(strings,UserUtils.getAdminCommunityId());
             return CommonResult.ok(map);
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,9 +125,10 @@ public class CarMonthlyVehicleController {
     /**
      * 数据导出
      */
+    @Login
     @RequestMapping("dataExport")
     public CommonResult dataExport( HttpServletResponse response){
-        List<CarMonthlyVehicle> vehicleList = vehicleService.selectList();
+        List<CarMonthlyVehicle> vehicleList = vehicleService.selectList(UserUtils.getAdminCommunityId());
         List<String[]> list=new ArrayList<>();//封装返回的数据
         String[] strings0=new String[10];
         strings0[0]=  "车牌号";
