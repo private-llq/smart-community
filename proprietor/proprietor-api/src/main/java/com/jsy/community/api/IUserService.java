@@ -243,4 +243,12 @@ public interface IUserService extends IService<UserEntity> {
      */
 	ControlVO control(Long communityId, String uid);
 
+	/**
+	 * @Description: 查询业主是否实名认证
+	 * @author: Hu
+	 * @since: 2021/8/18 15:16
+	 * @Param:
+	 * @return:
+	 */
+	Integer userIsRealAuth(String userId);
 }

@@ -2,6 +2,7 @@ package com.jsy.community.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * @create: 2021-08-17 14:58
  **/
 @Data
-public class UserHouseVO {
+public class UserHouseVO implements Serializable {
 
     /**
      * 业主名称
@@ -26,6 +27,15 @@ public class UserHouseVO {
      * @return:
      */
     private String relationText;
+
+    /**
+     * @Description: 关系
+     * @author: Hu
+     * @since: 2021/8/17 15:02
+     * @Param:
+     * @return:
+     */
+    private Integer relation;
 
     /**
      * @Description: 房间id

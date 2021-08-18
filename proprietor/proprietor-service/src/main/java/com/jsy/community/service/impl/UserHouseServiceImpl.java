@@ -13,6 +13,7 @@ import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.UserHouseMapper;
 import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseVo;
@@ -21,8 +22,10 @@ import com.jsy.community.vo.UserHouseVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -187,6 +190,20 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	}
 
 
+
+
+	/**
+	 * @Description: 业主家属删除接口
+	 * @author: Hu
+	 * @since: 2021/8/18 9:07
+	 * @Param: [ids, userId]
+	 * @return: void
+	 */
+	@Override
+	public void membersDelete(String ids, String userId) {
+		houseMemberMapper.deleteBatchIds(Arrays.asList(ids.split(",")));
+	}
+
 	/**
 	 * @Description: 家属或者租客更新
 	 * @author: Hu
@@ -195,15 +212,30 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 * @return: void
 	 */
 	@Override
-	public void membersUpdate(List<MembersVO> members, String userId) {
-		LinkedList<MembersVO> save = new LinkedList<>();
-		LinkedList<MembersVO> update = new LinkedList<>();
-		for (MembersVO member : members) {
+	@Transactional
+	public void membersUpdate(UserHouseQO userHouse, String userId) {
+		HouseMemberEntity entity = null;
+		LinkedList<HouseMemberEntity> save = new LinkedList<>();
+		for (MembersVO member : userHouse.getMembers()) {
 			if (member.getId()!=null){
-				update.add(member);
+				entity = new HouseMemberEntity();
+				entity.setHouseholderId(userId);
+				entity.setCommunityId(userHouse.getCommunityId());
+				entity.setHouseId(userHouse.getHouseId());
+				BeanUtils.copyProperties(member,entity);
+				houseMemberMapper.updateById(entity);
 			}else {
-				save.add(member);
+				entity=new HouseMemberEntity();
+				entity.setHouseholderId(userId);
+				entity.setCommunityId(userHouse.getCommunityId());
+				entity.setHouseId(userHouse.getHouseId());
+				BeanUtils.copyProperties(member,entity);
+				entity.setId(SnowFlake.nextId());
+				save.add(entity);
 			}
+		}
+		if (save.size()!=0){
+			houseMemberMapper.saveBatch(save);
 		}
 	}
 
@@ -220,9 +252,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		UserHouseVO userHouseVO=null;
 		List<UserHouseEntity> list = userHouseMapper.selectList(new QueryWrapper<UserHouseEntity>().eq("community_id", communityId).eq("uid", userId));
 		if (list!=null){
-			LinkedList<Long> ids = new LinkedList<>();
+			List<Long> ids = new LinkedList<>();
 			for (UserHouseEntity entity : list) {
-				ids.add(entity.getId());
+				ids.add(entity.getHouseId());
 			}
 			List<HouseEntity> houseEntities = houseMapper.selectBatchIds(ids);
 			for (HouseEntity entity : houseEntities) {
@@ -244,18 +276,18 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 * @return: void
 	 */
 	@Override
-	public void attestation(Long communityId, Long houseId, String userId) {
-		HouseEntity entity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("community_id",communityId).eq("house_id",houseId));
+	public void attestation(UserHouseQO userHouseQO, String userId) {
+		HouseEntity entity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("community_id",userHouseQO.getCommunityId()).eq("id",userHouseQO.getHouseId()));
 		if (entity!=null){
-			UserHouseEntity userHouseEntity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", houseId).eq("community_id", communityId));
+			UserHouseEntity userHouseEntity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()));
 			if (userHouseEntity!=null){
 				throw new ProprietorException("当前房屋已被认证，若非本人认证请联系管理员！");
 			}else {
 				//房屋认证表里添加数据
 				UserHouseEntity houseEntity = new UserHouseEntity();
 				houseEntity.setUid(userId);
-				houseEntity.setCommunityId(communityId);
-				houseEntity.setHouseId(houseId);
+				houseEntity.setCommunityId(userHouseQO.getCommunityId());
+				houseEntity.setHouseId(userHouseQO.getHouseId());
 				houseEntity.setCheckStatus(1);
 				houseEntity.setId(SnowFlake.nextId());
 				userHouseMapper.insert(houseEntity);
@@ -264,9 +296,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 				UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
 				HouseMemberEntity memberEntity = new HouseMemberEntity();
 				memberEntity.setUid(userId);
-				memberEntity.setHouseholderId(userId);
-				memberEntity.setCommunityId(communityId);
-				memberEntity.setHouseId(houseId);
+				memberEntity.setCommunityId(userHouseQO.getCommunityId());
+				memberEntity.setHouseId(userHouseQO.getHouseId());
 				memberEntity.setName(userEntity.getRealName());
 				memberEntity.setSex(userEntity.getSex());
 				memberEntity.setMobile(userEntity.getMobile());
@@ -288,18 +319,20 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 * @return: com.jsy.community.vo.UserHouseVO
 	 */
 	@Override
-	public UserHouseVO userHouseDetails(Long communityId, Long houseId, String userId) {
-		UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", houseId).eq("community_id", communityId).eq("uid", userId));
+	public UserHouseVO userHouseDetails(UserHouseQO userHouseQO, String userId) {
+		UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()).eq("uid", userId));
 		UserHouseVO houseVO = new UserHouseVO();
 		if (entity!=null){
 			MembersVO vo = null;
 			List<MembersVO> objects = new LinkedList<>();
 			UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-			HouseEntity houseEntity = houseMapper.selectById(houseId);
+			HouseEntity houseEntity = houseMapper.selectById(userHouseQO.getHouseId());
 			houseVO.setName(userEntity.getRealName());
-			houseVO.setHouseId(houseEntity.getHouseId());
+			houseVO.setHouseId(houseEntity.getId());
+			houseVO.setRelation(1);
+			houseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(houseVO.getRelation()));
 			houseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
-			List<HouseMemberEntity> list = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("householder_id", userId).eq("house_id", houseId).eq("community_id", communityId));
+			List<HouseMemberEntity> list = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("householder_id", userId).eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()));
 			if (list.size()!=0){
 				for (HouseMemberEntity houseMemberEntity : list) {
 					vo=new MembersVO();
@@ -313,6 +346,25 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 		}
 		throw new ProprietorException("当前房屋未认证或者不是您的哦！");
+	}
+
+	@Override
+	public UserHouseVO memberHouseDetails(UserHouseQO userHouseQO, String userId,String mobile) {
+		UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()).eq("uid", userId));
+		UserHouseVO houseVO = new UserHouseVO();
+		if (entity!=null){
+			HouseMemberEntity one = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("uid", userId).eq("mobile", mobile));
+			if (one != null) {
+				HouseEntity houseEntity = houseMapper.selectById(userHouseQO.getHouseId());
+				houseVO.setName(one.getName());
+				houseVO.setHouseId(houseEntity.getId());
+				houseVO.setRelation(one.getRelation());
+				houseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(one.getRelation()));
+				houseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+			}
+			return houseVO;
+		}
+		throw new ProprietorException("当前房屋不存在！");
 	}
 
 	/**

@@ -12,5 +12,14 @@
 		</foreach>
         and person_type = 1 and deleted = 0
 	</select>
+	<insert id="saveBatch">
+		insert into t_house_member (id,householder_id,community_id,house_id,name,mobile,relation,create_time)
+		values
+		<foreach collection="save" item="item" separator=",">
+			(
+			#{item.id},#{item.householderId},#{item.communityId},#{item.houseId},#{item.name},#{item.mobile},#{item.relation},now()
+			)
+		</foreach>
+	</insert>
 
 </mapper>

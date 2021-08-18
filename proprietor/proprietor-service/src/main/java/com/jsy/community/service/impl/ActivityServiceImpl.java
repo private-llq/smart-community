@@ -63,7 +63,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
         ActivityEntity activityEntity = activityMapper.selectById(id);
         ActivityUserEntity entity = activityUserMapper.selectOne(new QueryWrapper<ActivityUserEntity>().eq("activity_id", id).eq("uid", userId));
         if (activityEntity!=null){
-            if (activityEntity.getBeginActivityTime().minusHours(12).isAfter(LocalDateTime.now())){
+            if (activityEntity.getBeginActivityTime().minusHours(12).isBefore(LocalDateTime.now())){
                 throw new ProprietorException("活动开始前十二个小时不能取消活动!");
             }
         }
@@ -83,12 +83,19 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
     @Override
     public void apply(ActivityUserEntity activityUserEntity) {
         activityUserEntity.setId(SnowFlake.nextId());
-        Integer count = activityUserMapper.selectCount(new QueryWrapper<ActivityUserEntity>().eq("activity_id", activityUserEntity.getActivityId()));
         ActivityEntity entity = activityMapper.selectById(activityUserEntity.getActivityId());
-        if (entity.getCount()>count){
-            throw new ProprietorException("当前活动报名人数已满!");
+
+        ActivityUserEntity one = activityUserMapper.selectOne(new QueryWrapper<ActivityUserEntity>().eq("uid", activityUserEntity.getUid()).eq("activity_id", activityUserEntity.getActivityId()));
+        if (one!=null){
+            throw new ProprietorException("当前活动您已报名，请勿重复参加!");
         }
-        activityUserMapper.insert(activityUserEntity);
+        if (entity!=null){
+            Integer count = activityUserMapper.selectCount(new QueryWrapper<ActivityUserEntity>().eq("activity_id", activityUserEntity.getActivityId()));
+            if (entity.getCount()<count){
+                throw new ProprietorException("当前活动报名人数已满!");
+            }
+            activityUserMapper.insert(activityUserEntity);
+        }
     }
 
 
