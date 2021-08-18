@@ -51,7 +51,7 @@ public class VisitorEntity extends BaseEntity {
     private String name;
 
     @ApiModelProperty(value = "来访地址")
-    @NotEmpty(message = "缺少详细地址")
+    @NotEmpty(groups = {addVisitorValidate.class}, message = "缺少详细地址")
     private String address;
 
     @ApiModelProperty(value = "来访事由ID 1.一般来访 2.应聘来访 3.走亲访友 4.客户来访")
@@ -68,7 +68,6 @@ public class VisitorEntity extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonIgnore
     @NotNull(groups = {addVisitorValidate.class}, message = "缺少预期来访结束时间")
     private LocalDateTime endTime;
 
