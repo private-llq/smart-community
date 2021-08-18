@@ -110,7 +110,7 @@ public class VisitorServiceImpl implements IVisitorService {
 		if (!StringUtils.isEmpty(query.getName())) {
 			queryWrapper.like("name", query.getName());
 		}
-		if (query.getBuildingId() != null) {
+		if (!StringUtils.isEmpty(query.getBuildingId())) {
 			queryWrapper.eq("building_id", query.getBuildingId());
 		}
 		if (query.getCheckType() != null) {
