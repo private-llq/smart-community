@@ -1,5 +1,6 @@
 package com.jsy.community.entity.property;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,11 +11,11 @@ import java.time.LocalDate;
 
 /**
  * @author DKS
- * @description 物业财务报表-小区收入
+ * @description 物业财务报表实体
  * @since 2021/8/17  14:46
  **/
 @Data
-@ApiModel("物业财务报表-小区收入")
+@ApiModel("物业财务报表实体")
 public class PropertyFinanceFormEntity implements Serializable {
 	@ApiModelProperty(value = "社区ID")
 	private Long communityId;
@@ -53,9 +54,11 @@ public class PropertyFinanceFormEntity implements Serializable {
 	private BigDecimal advanceDepositTotal;
 	
 	@ApiModelProperty(value = "支付开始时间")
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
 	private LocalDate startTime;
 	
 	@ApiModelProperty(value = "支付结束时间")
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
 	private LocalDate endTime;
 	
 	@ApiModelProperty(value = "按年查询")

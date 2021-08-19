@@ -156,4 +156,32 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "本月欠收=本月所有账单待支付")
     @TableField(exist = false)
     private BigDecimal thisMonthArrearsMoney;
+    
+    @ApiModelProperty(value = "微信支付")
+    @TableField(exist = false)
+    private BigDecimal weChatPaySum;
+    
+    @ApiModelProperty(value = "支付宝支付")
+    @TableField(exist = false)
+    private BigDecimal aliPaySum;
+    
+    @ApiModelProperty(value = "余额支付")
+    @TableField(exist = false)
+    private BigDecimal balancePaySum;
+    
+    @ApiModelProperty(value = "现金支付")
+    @TableField(exist = false)
+    private BigDecimal cashPaySum;
+    
+    @ApiModelProperty(value = "银联刷卡支付")
+    @TableField(exist = false)
+    private BigDecimal UnionPaySum;
+    
+    @ApiModelProperty(value = "银行代扣支付")
+    @TableField(exist = false)
+    private BigDecimal bankPaySum;
+    
+    @ApiModelProperty(value = "合计支付")
+    @TableField(exist = false)
+    private BigDecimal totalSum;
 }
