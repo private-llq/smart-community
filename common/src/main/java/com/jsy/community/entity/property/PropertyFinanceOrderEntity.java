@@ -30,7 +30,7 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     private Integer associatedType;
     @ApiModelProperty(value = "账单号")
     private String orderNum;
-    @ApiModelProperty(value = "生成类型1系统生成，2其他")
+    @ApiModelProperty(value = "生成类型1系统生成，2临时收费")
     private Integer buildType;
     @ApiModelProperty(value = "支付单号")
     private Long communityId;
@@ -125,4 +125,63 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @TableField(exist = false)
     private String orderType;
     
+    @ApiModelProperty(value = "所有违约应收金额")
+    @TableField(exist = false)
+    private BigDecimal receivablePenalMoney;
+    
+    @ApiModelProperty(value = "所有优惠金额")
+    @TableField(exist = false)
+    private BigDecimal couponMoney;
+    
+    @ApiModelProperty(value = "所有预存款金额")
+    @TableField(exist = false)
+    private BigDecimal deductionMoney;
+    
+    @ApiModelProperty(value = "已支付违约金=违约实收金额")
+    @TableField(exist = false)
+    private BigDecimal collectPenalMoney;
+    
+    @ApiModelProperty(value = "线上收费、合计实收=所有已支付账单")
+    @TableField(exist = false)
+    private BigDecimal communityOnlineCharging;
+    
+    @ApiModelProperty(value = "往月欠收=往月所有账单待支付")
+    @TableField(exist = false)
+    private BigDecimal arrearsMoney;
+    
+    @ApiModelProperty(value = "合计欠收=往月欠收+本月欠收")
+    @TableField(exist = false)
+    private BigDecimal arrearsMoneySum;
+    
+    @ApiModelProperty(value = "本月欠收=本月所有账单待支付")
+    @TableField(exist = false)
+    private BigDecimal thisMonthArrearsMoney;
+    
+    @ApiModelProperty(value = "微信支付")
+    @TableField(exist = false)
+    private BigDecimal weChatPaySum;
+    
+    @ApiModelProperty(value = "支付宝支付")
+    @TableField(exist = false)
+    private BigDecimal aliPaySum;
+    
+    @ApiModelProperty(value = "余额支付")
+    @TableField(exist = false)
+    private BigDecimal balancePaySum;
+    
+    @ApiModelProperty(value = "现金支付")
+    @TableField(exist = false)
+    private BigDecimal cashPaySum;
+    
+    @ApiModelProperty(value = "银联刷卡支付")
+    @TableField(exist = false)
+    private BigDecimal UnionPaySum;
+    
+    @ApiModelProperty(value = "银行代扣支付")
+    @TableField(exist = false)
+    private BigDecimal bankPaySum;
+    
+    @ApiModelProperty(value = "合计支付")
+    @TableField(exist = false)
+    private BigDecimal totalSum;
 }

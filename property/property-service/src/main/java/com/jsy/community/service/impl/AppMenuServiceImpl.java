@@ -143,7 +143,12 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 //			throw new PropertyException("请先删除所有子菜单");
 //		}
 //	}
-	
+
+	@Override
+	public boolean save(AppMenuEntity entity) {
+		return false;
+	}
+
 	@Override
 	public List<AppMenuEntity> listMenu(Long communityId) {
 		// 1. 查询所有APP支持菜单

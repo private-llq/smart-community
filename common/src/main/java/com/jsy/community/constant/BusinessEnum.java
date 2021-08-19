@@ -608,7 +608,7 @@ public interface BusinessEnum {
 		TEMPORARY("临时",0),
 		PROPRIETOR("业主", 1),
 		RELATIVES("亲属", 6),
-		TENANT("租户", 7);
+		TENANT("租客", 7);
 		private String name;
 		private Integer code;
 		

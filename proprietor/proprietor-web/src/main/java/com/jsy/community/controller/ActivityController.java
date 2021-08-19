@@ -5,12 +5,14 @@ import com.jsy.community.api.IActivityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.entity.proprietor.ActivityUserEntity;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -51,8 +53,15 @@ public class ActivityController {
     }
 
     @ApiOperation("查询一条活动详情")
-    @DeleteMapping("/selectOne")
+    @GetMapping("/selectOne")
     public CommonResult selectOne(@RequestParam("id") Long id){
         return CommonResult.ok(activityService.selectOne(id,UserUtils.getUserId()));
+    }
+
+    @ApiOperation("上传图片")
+    @PostMapping("/file")
+    public CommonResult file(@RequestParam MultipartFile file){
+        String upload = MinioUtils.upload(file, "activity");
+        return CommonResult.ok(upload);
     }
 }

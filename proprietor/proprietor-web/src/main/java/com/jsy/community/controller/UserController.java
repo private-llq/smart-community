@@ -19,6 +19,7 @@ import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -63,6 +64,7 @@ public class UserController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserHouseService userHouseService;
+
     
     private static final String BUCKETNAME_ID_CARD = "id-card"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
     
@@ -168,8 +170,6 @@ public class UserController {
     public CommonResult<UserInfoVo> userInfoDetails(@RequestParam Long cid, @RequestParam Long hid){
         return CommonResult.ok(userService.userInfoDetails(cid, hid, UserUtils.getUserId()));
     }
-
-
 
 
     // TODO 接口已经废弃,不使用了,暂未彻底删除
@@ -396,7 +396,7 @@ public class UserController {
         System.out.println("==========2=======");
         if("0000".equals(blinkResult.getString("code"))){
             if("T".equals(blinkResult.getString("passed"))){
-            //实名认证后修改用户信息
+            //后修改用户信息
                 UserEntity userEntity = new UserEntity();
                 userEntity.setUid(UserUtils.getUserId());
                 userEntity.setRealName(blinkResult.getString("certName"));
@@ -461,5 +461,29 @@ public class UserController {
         userHouseEntity.setUid(UserUtils.getUserId());
         ValidatorUtils.validateEntity(userHouseEntity, UserHouseEntity.UntieHouse.class);
         return userHouseService.untieHouse(userHouseEntity) ? CommonResult.ok("解绑成功!") : CommonResult.error("解绑失败!");
+    }
+
+    @Login
+    @ApiOperation("获取权限")
+    @GetMapping("/control")
+    public CommonResult control(@RequestParam("communityId") Long communityId) {
+        ControlVO control = userService.control(communityId, UserUtils.getUserId());
+        savePermissions(UserUtils.getUserId(),control);
+        return CommonResult.ok(control);
+    }
+
+    /**
+     * @Description: 保存权限到redis
+     * @author: Hu
+     * @since: 2021/8/17 9:27
+     * @Param:
+     * @return:
+     */
+    public void savePermissions(String uid,ControlVO control){
+        Object o = redisTemplate.opsForValue().get("Permissions" + uid);
+        if (o!=null){
+            redisTemplate.delete("Permissions"+uid);
+        }
+        redisTemplate.opsForValue().set("Permissions:" + uid,JSONObject.toJSONString(control));
     }
 }

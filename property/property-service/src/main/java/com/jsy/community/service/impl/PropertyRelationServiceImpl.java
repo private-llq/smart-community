@@ -3,7 +3,9 @@ package com.jsy.community.service.impl;
 import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.mapper.PropertyRelationMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
@@ -33,6 +35,9 @@ import java.util.regex.Pattern;
 public class PropertyRelationServiceImpl implements IPropertyRelationService {
     @Autowired
     private PropertyRelationMapper propertyRelationMapper;
+
+    @Autowired
+    private HouseMapper houseMapper;
 
 
 
@@ -189,6 +194,8 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     @Override
     public HouseMemberEntity findOne(Long id) {
         HouseMemberEntity memberEntity = propertyRelationMapper.selectById(id);
+        HouseEntity entity = houseMapper.selectById(memberEntity.getHouseId());
+        memberEntity.setHouseSite(entity.getBuilding()+entity.getUnit()+entity.getDoor());
         memberEntity.setRelationName(BusinessEnum.RelationshipEnum.getCode(memberEntity.getRelation()));
         return memberEntity;
     }

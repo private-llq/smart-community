@@ -4,9 +4,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.qo.property.FeeRuleQO;
 import com.jsy.community.vo.property.FeeRuleVO;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -32,6 +35,14 @@ public interface PropertyFeeRuleMapper extends BaseMapper<PropertyFeeRuleEntity>
      * @return:
      */
     Integer findTotal(FeeRuleQO query);
-
-
+    
+    /**
+     * @Description: 查询项目名称
+     * @author: DKS
+     * @since: 2021/8/18 17:19
+     * @Param:
+     * @return:
+     */
+    @MapKey("id")
+    Map<String, Map<String,Object>> selectFeeRuleIdName(@Param("list") Collection<Long> feeRuleIds);
 }

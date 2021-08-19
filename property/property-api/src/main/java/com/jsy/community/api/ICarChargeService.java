@@ -2,11 +2,10 @@ package com.jsy.community.api;
 
 import com.jsy.community.entity.proprietor.CarChargeEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.vo.CommonResult;
 
 import java.util.List;
+
 /**
  * 收费设置服务
  */
@@ -17,7 +16,7 @@ public interface ICarChargeService {
      * @param carChargeEntity
      * @return
      */
-    Integer SaveCarCharge(CarChargeEntity carChargeEntity);
+    Integer SaveCarCharge(CarChargeEntity carChargeEntity, Long communityId);
 
     /**
      * 修改收费设置
@@ -38,12 +37,12 @@ public interface ICarChargeService {
      * @param type
      * @return
      */
-    List<CarChargeEntity> selectCharge(Integer type);
+    List<CarChargeEntity> selectCharge(Integer type, Long communityId);
 
     /**
      * 分页展示所有收费设置
      * @param baseQO
      * @return
      */
-    PageInfo listCarChargePage(BaseQO<Integer> baseQO);
+    PageInfo listCarChargePage(BaseQO<Integer> baseQO, Long communityId);
 }

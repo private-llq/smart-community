@@ -1,17 +1,16 @@
 package com.jsy.community.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarChargeService;
-import com.jsy.community.api.ICarService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarChargeEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,21 +25,23 @@ public class CarChargeController {
     private ICarChargeService carChargeService;
 
 
+    @Login
     @GetMapping("/listPage")
     public CommonResult<PageInfo> listPage(@RequestBody BaseQO baseQO){
 
-        PageInfo pageInfo= carChargeService.listCarChargePage(baseQO);
+        PageInfo pageInfo= carChargeService.listCarChargePage(baseQO, UserUtils.getAdminCommunityId());
 
         return  CommonResult.ok(pageInfo);
     }
 
+    @Login
     @PostMapping("/save")
     public CommonResult save(@RequestBody CarChargeEntity carChargeEntity){
-        carChargeService.SaveCarCharge(carChargeEntity);
+        carChargeService.SaveCarCharge(carChargeEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     CommonResult update(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.UpdateCarCharge(carChargeEntity);
         return CommonResult.ok();
@@ -57,9 +58,10 @@ public class CarChargeController {
      * @param type
      * @return
      */
+    @Login
     @GetMapping("/getTypeList")
     CommonResult getTypeList(@RequestParam Integer type){
-        List<CarChargeEntity> list = carChargeService.selectCharge(type);
+        List<CarChargeEntity> list = carChargeService.selectCharge(type,UserUtils.getAdminCommunityId());
         return CommonResult.ok(list);
     }
 }

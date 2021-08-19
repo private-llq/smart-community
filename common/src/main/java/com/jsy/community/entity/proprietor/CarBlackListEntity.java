@@ -23,6 +23,10 @@ public class CarBlackListEntity implements Serializable {
      */
     private String uid;
     /**
+     * 所属小区id
+     */
+    private Long communityId;
+    /**
      * 车牌号
      */
     private String carNumber;

@@ -1,22 +1,20 @@
 package com.jsy.community.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarLaneService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.CarLaneEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "停车收费设置")
+@Api(tags = "车道管理")
 @RestController
 @RequestMapping("carLane")
 @ApiJSYController
@@ -27,18 +25,19 @@ public class CarLaneController {
 
 
     /**
-     * 新增收费设置
+     * 新增
      * @param CarLaneEntity
      * @return
      */
+    @Login
     @PostMapping("SaveCarLane")
     public CommonResult SaveCarLane(@RequestBody CarLaneEntity CarLaneEntity) {
-        carLaneService.SaveCarLane(CarLaneEntity);
+        carLaneService.SaveCarLane(CarLaneEntity, UserUtils.getAdminCommunityId());
         return CommonResult.ok();
     }
 
     /**
-     * 修改收费设置
+     * 修改
      * @param carLaneEntity
      * @return
      */
@@ -50,7 +49,7 @@ public class CarLaneController {
 
 
     /**
-     * 删除收费设置
+     * 删除
      * @param uid
      * @return
      */
@@ -66,9 +65,10 @@ public class CarLaneController {
      * @param baseQO query:"车道名称"
      * @return
      */
-    @GetMapping("FindByLaneNamePage")
+    @Login
+    @PostMapping("FindByLaneNamePage")
     public CommonResult<PageInfo> FindByLaneNamePage(@RequestBody BaseQO baseQO) {
-        PageInfo pageInfo = carLaneService.FindByLaneNamePage(baseQO);
+        PageInfo pageInfo = carLaneService.FindByLaneNamePage(baseQO,UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo);
     }
 
