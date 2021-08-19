@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.CarEquipmentManageEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarEquipMentQO;
+import com.jsy.community.qo.property.CarEquipmentManageQO;
 
 import java.util.List;
 import java.util.Map;
@@ -47,4 +48,13 @@ public interface ICarEquipmentManageService extends IService<CarEquipmentManageE
      * @Date: 2021/8/10-14:20
      **/
     List<CarEquipmentManageEntity> equipmentList(Long communityId);
+
+    /**
+     * @Description: 修改设备管理
+     * @Param: [carEquipMentQO, adminCommunityId, userId]
+     * @Return: boolean
+     * @Author: Tian
+     * @Date: 2021/8/19-9:35
+     **/
+    boolean updateEquipment(CarEquipMentQO carEquipMentQO, Long adminCommunityId, String userId);
 }

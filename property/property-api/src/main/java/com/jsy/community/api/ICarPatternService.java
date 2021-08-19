@@ -15,7 +15,7 @@ public interface ICarPatternService extends IService<CarPatternEntity> {
      **/
     List<CarPatternEntity> listPattern(Long communityId);
 
-    CarPatternEntity findOne(Long patternId);
+    CarPatternEntity findOne(String patternId);
     /**
      * @Description: 添加设备管理--临时车模式
      * @Param: [locationPattern]
@@ -33,7 +33,7 @@ public interface ICarPatternService extends IService<CarPatternEntity> {
      * @Date: 2021/8/7-13:59
      **/
 
-    boolean updatePattern(String locationPattern, Long locationId, Long communityId);
+    boolean updatePattern(String locationPattern, String locationId, Long communityId);
 
     /**
      * @Description: 删除临时车模式
@@ -42,5 +42,5 @@ public interface ICarPatternService extends IService<CarPatternEntity> {
      * @Author: Tian
      * @Date: 2021/8/9-14:03
      **/
-    boolean deletePattern(Long patternId, Long adminCommunityId);
+    boolean deletePattern(String patternId, Long adminCommunityId);
 }

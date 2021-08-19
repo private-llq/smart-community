@@ -9,6 +9,9 @@ import java.io.Serializable;
 @ApiModel("车禁模块-设备管理接收参数")
 @Data
 public class CarEquipMentQO implements Serializable {
+    @ApiModelProperty
+    private  String id;
+
     @ApiModelProperty("设备名称")
     private  String equipmentName;
 
@@ -19,9 +22,9 @@ public class CarEquipMentQO implements Serializable {
     private  String internetNumber;
 
     @ApiModelProperty("设备位置id")
-    private  Long locationId;
+    private  String locationId;
 
     @ApiModelProperty("临时车模式")
-    private  Long patternId;
+    private  String patternId;
 
 }

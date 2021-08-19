@@ -1,5 +1,6 @@
 package com.jsy.community.qo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,11 +19,14 @@ import java.io.Serializable;
 public class BaseQO<T> implements Serializable {
 	
 	@ApiModelProperty("分页查询当前页")
+	@TableField(exist = false)
 	private Long page;
 	
 	@ApiModelProperty("分页查询每页数据条数")
+	@TableField(exist = false)
 	private Long size;
-	
+
+	@TableField(exist = false)
 	private T query;
 
 }
