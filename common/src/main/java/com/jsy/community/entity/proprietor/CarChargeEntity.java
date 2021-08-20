@@ -16,10 +16,15 @@ public class CarChargeEntity implements Serializable {
      */
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    /**
+     * 所属小区id
+     */
+    private Long communityId;
+
     /**
      * uuid
      */
-
     private String uid;
     /**
      * 收费名称

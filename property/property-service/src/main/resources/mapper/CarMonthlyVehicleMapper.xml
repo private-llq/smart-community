@@ -3,9 +3,12 @@
 <mapper namespace="com.jsy.community.mapper.CarMonthlyVehicleMapper">
 
 
-    <select id="FindByMultiConditionPage" resultType="com.jsy.community.entity.proprietor.CarMonthlyVehicle">
+    <select id="FindByMultiConditionPage" resultType="com.baomidou.mybatisplus.core.metadata.IPage">
         SELECT cm.* FROM t_car_monthly_vehicle as cm
         <where>
+            <if test="query.communityId!=null and query.communityId!=''">
+                AND cm.community_id = #{query.communityId}
+            </if>
             <if test="query.carNumber!=null and query.carNumber!=''">
                 AND cm.car_number = #{query.carNumber}
             </if>

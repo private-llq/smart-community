@@ -26,6 +26,7 @@ public class CarBasicsEntity extends BaseEntity {
   @ApiModelProperty(value = "id")
   private Long id;
 
+
   @ApiModelProperty(value = "uid")
   private String uid;
 
@@ -53,24 +54,24 @@ public class CarBasicsEntity extends BaseEntity {
   @ApiModelProperty(value = "未缴物业费是否允许包月（0：不允许  1：允许）")
  private Integer whetherAllowMonth;
 
-  @ApiModelProperty(value = "创建时间")
-  @TableField(exist = false)
-  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-  @JsonFormat(
-          pattern = "yyyy-MM-dd HH:mm:ss",
-          timezone = "GMT+8")
- private LocalDateTime createTime;
-
-  @ApiModelProperty(value = "更新时间")
-  @TableField(exist = false)
-  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-  @JsonFormat(
-          pattern = "yyyy-MM-dd HH:mm:ss",
-          timezone = "GMT+8")
- private LocalDateTime updateTime;
-
-  @ApiModelProperty(value = "逻辑删除")
-  @TableLogic(value = "0",delval = "1")
-  private  Integer deleted;
+//  @ApiModelProperty(value = "创建时间")
+//  @TableField(exist = false)
+//  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//  @JsonFormat(
+//          pattern = "yyyy-MM-dd HH:mm:ss",
+//          timezone = "GMT+8")
+// private LocalDateTime createTime;
+//
+//  @ApiModelProperty(value = "更新时间")
+//  @TableField(exist = false)
+//  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//  @JsonFormat(
+//          pattern = "yyyy-MM-dd HH:mm:ss",
+//          timezone = "GMT+8")
+// private LocalDateTime updateTime;
+//
+//  @ApiModelProperty(value = "逻辑删除")
+//  @TableLogic(value = "0",delval = "1")
+//  private  Integer deleted;
 
  }

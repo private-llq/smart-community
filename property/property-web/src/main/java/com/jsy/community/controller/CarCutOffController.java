@@ -23,8 +23,8 @@ public class CarCutOffController{
     private ICarCutOffService carCutOffService;
 
     @Login
-    @GetMapping("/selectPage")
-    public CommonResult select2Page(@RequestBody CarCutOffQO carCutOffQO){
+    @PostMapping("/selectPage")
+    public CommonResult selectPage(@RequestBody CarCutOffQO carCutOffQO){
         PageInfo<CarCutOffEntity> pageInfo = carCutOffService.selectPage(carCutOffQO, UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo,"查询成功");
     }

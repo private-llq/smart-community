@@ -1,7 +1,7 @@
+
 package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarLaneService;
@@ -26,8 +26,9 @@ public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity
 
     @Override
     @Transactional
-    public Integer SaveCarLane(CarLaneEntity CarLaneEntity) {
+    public Integer SaveCarLane(CarLaneEntity CarLaneEntity,Long communityId) {
         CarLaneEntity.setUid((UserUtils.randomUUID()));
+        CarLaneEntity.setCommunityId(communityId);
         int insert = carLaneMapper.insert(CarLaneEntity);
         return insert;
     }
@@ -49,11 +50,13 @@ public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity
 
 
     @Override
-    public PageInfo FindByLaneNamePage(BaseQO<String> baseQO) {
+    public PageInfo FindByLaneNamePage(BaseQO<String> baseQO,Long communityId) {
         Page<CarLaneEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
         PageInfo<CarLaneEntity> pageInfo = new PageInfo<>();
         Page<CarLaneEntity> selectPage = carLaneMapper.selectPage(page,new QueryWrapper<CarLaneEntity>()
-                        .like(StringUtils.isNoneBlank(baseQO.getQuery()),"lane_name",baseQO.getQuery()));
+                        .like(StringUtils.isNoneBlank(baseQO.getQuery()),"lane_name",baseQO.getQuery())
+                        .eq("community_id",communityId)
+        );
         pageInfo.setRecords(selectPage.getRecords());
         pageInfo.setTotal(selectPage.getTotal());
         pageInfo.setCurrent(selectPage.getCurrent());

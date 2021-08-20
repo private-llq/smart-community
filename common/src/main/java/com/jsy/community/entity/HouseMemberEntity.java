@@ -23,6 +23,11 @@ public class HouseMemberEntity extends BaseEntity {
      */
     private String uid;
     /**
+     * 房屋地址
+     */
+    @TableField(exist = false)
+    private String houseSite;
+    /**
      * 业主ID
      */
     private String householderId;

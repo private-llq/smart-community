@@ -42,9 +42,10 @@ public class CarProprietorController {
      * @Date: 2021/8/11-15:08
      **/
     @Login
-    @GetMapping("/listPage")
-    public CommonResult listPage(@RequestBody BaseQO<CarProprietorEntity> baseQO,Long phone){
-        Page<CarProprietorEntity> listPage = carProprietorService.listPage(baseQO,UserUtils.getAdminCommunityId(),phone);
+    @PostMapping("/listPage")
+    public CommonResult listPage(@RequestBody BaseQO<CarProprietorEntity> baseQO){
+
+        Page<CarProprietorEntity> listPage = carProprietorService.listPage(baseQO,UserUtils.getAdminCommunityId());
         return CommonResult.ok(listPage,"查询成功");
     }
 

@@ -134,9 +134,9 @@ public class VisitorController {
 		PicUtil.imageQualified(file);
 		String url = MinioUtils.upload(file, "visitor-face");
 		if(!StringUtils.isEmpty(url)){
-			return CommonResult.ok(url);
+			return CommonResult.ok(url, "上传成功!");
 		}
-		return CommonResult.error("上传失败");
+		return CommonResult.error("上传失败!");
 	}
 	
 }

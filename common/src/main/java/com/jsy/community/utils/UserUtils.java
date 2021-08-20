@@ -3,10 +3,10 @@ package com.jsy.community.utils;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
+import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -93,6 +95,8 @@ public class UserUtils {
 			.getRequest();
 		return (UserInfoVo)request.getAttribute(USER_INFO);
 	}
+
+
 	
 	/**
 	 * @Description: 获取request域中用户信息(登录用户自己的信息)
@@ -287,5 +291,23 @@ public class UserUtils {
 		Boolean result2 = stringRedisTemplate.delete(typeName + ":" + token);
         return result1 || result2;
     }
-	
+
+
+	/**
+	 * @Description: 获取当前小区权限
+	 * @author: Hu
+	 * @since: 2021/8/17 9:11
+	 * @Param: null
+	 * @return:
+	 */
+	public static ControlVO getPermissions(String uid, RedisTemplate redisTemplate) {
+		String str;
+		try {
+			str=(String) redisTemplate.opsForValue().get("Permissions:" + uid);
+		} catch (Exception e) {
+			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
+		}
+		ControlVO controlVO = JSONObject.parseObject(str, ControlVO.class);
+		return controlVO;
+	}
 }

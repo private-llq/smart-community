@@ -1,13 +1,16 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarEquipmentManageService;
+import com.jsy.community.api.IFacilityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarEquipmentManageEntity;
 import com.jsy.community.mapper.CarEquipmentManageMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarEquipMentQO;
+import com.jsy.community.qo.property.CarEquipmentManageQO;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -32,20 +35,21 @@ public class CarEquipmentManageServiceImpl extends ServiceImpl<CarEquipmentManag
     @Override
     public Map<String, Object> equipmentPage(BaseQO<CarEquipmentManageEntity> baseQO, Long communityId) {
         if (baseQO.getSize() == null || baseQO.getSize() == 0){
-           baseQO.setSize(10l);
+            baseQO.setSize(10l);
         }
 
-        CarEquipmentManageEntity qoQuery = baseQO.getQuery();
-        qoQuery.setCommunityId(communityId);
-        Long page  = baseQO.getPage() ;
+        CarEquipmentManageEntity query = baseQO.getQuery();
 
+        Long page  = baseQO.getPage() ;
         if (page == 0){
             page++;
         }
         page =(baseQO.getPage()-1)*baseQO.getSize();
 
-       List<CarEquipmentManageEntity>  carEquipment  =  manageMapper.equipmentPage(page,baseQO.getSize(),qoQuery);
-       Long total =  manageMapper.findTotal(baseQO.getQuery());
+        query.setCommunityId(communityId);
+
+        List<CarEquipmentManageEntity>  carEquipment  =  manageMapper.equipmentPage(page,baseQO.getSize(),query);
+        Long total =  manageMapper.findTotal(query);
         Map<String,Object> map = new HashMap<>();
         map.put("total",total);
         map.put("list",carEquipment);
@@ -98,6 +102,18 @@ public class CarEquipmentManageServiceImpl extends ServiceImpl<CarEquipmentManag
         queryWrapper.eq("community_id",communityId);
         List<CarEquipmentManageEntity> list = manageMapper.selectList(queryWrapper);
         return  list;
+    }
+
+    @Override
+    public boolean updateEquipment(CarEquipMentQO carEquipMentQO, Long adminCommunityId, String userId) {
+        System.out.println(carEquipMentQO);
+        QueryWrapper<CarEquipmentManageEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id",carEquipMentQO.getId())
+        .eq("community_id",adminCommunityId);
+        CarEquipmentManageEntity manageEntity = new CarEquipmentManageEntity();
+        BeanUtils.copyProperties(carEquipMentQO,manageEntity);
+        manageMapper.update(manageEntity,queryWrapper);
+        return false;
     }
 
 

@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarEquipmentManageService;
@@ -11,6 +12,7 @@ import com.jsy.community.entity.property.CarLocationEntity;
 import com.jsy.community.entity.property.CarPatternEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarEquipMentQO;
+import com.jsy.community.qo.property.CarEquipmentManageQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -43,14 +45,13 @@ public class CarEquipmentManageController {
      * @Author: Tian
      * @Date: 2021/8/9-11:22
      **/
-    @GetMapping("/equipmentPage")
+    @PostMapping("/equipmentPage")
     @Login
-    public CommonResult equipmentPage(@RequestBody  BaseQO<CarEquipmentManageEntity> baseQO){
+    public CommonResult equipmentPage(@RequestBody BaseQO<CarEquipmentManageEntity> baseQO){
         Long communityId = UserUtils.getAdminCommunityId();
         if (baseQO.getQuery() == null){
             baseQO.setQuery(new CarEquipmentManageEntity());
         }
-        //Page<CarEquipmentManageEntity> manageEntityPage = equipmentManageService.equipmentPage(baseQO, communityId);
 
         Map<String, Object> map =  equipmentManageService.equipmentPage(baseQO, communityId);
         return CommonResult.ok(map,"查询成功");
@@ -83,6 +84,19 @@ public class CarEquipmentManageController {
     public CommonResult addEquipment(@RequestBody CarEquipMentQO carEquipMentQO){
      boolean b =  equipmentManageService.addEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
      return CommonResult.ok("添加成功");
+    }
+    /**
+     * @Description: 修改设备管理
+     * @Param: [carEquipMentQO]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: Tian
+     * @Date: 2021/8/19-9:31
+     **/
+    @PostMapping("/updateEquipment")
+    @Login
+    public CommonResult updateEquipment(@RequestBody CarEquipMentQO carEquipMentQO){
+        boolean b =  equipmentManageService.updateEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
+        return CommonResult.ok("修改成功");
     }
 
     /**
@@ -141,7 +155,7 @@ public class CarEquipmentManageController {
      **/
     @Login
     @PostMapping("/updatePattern")
-    public  CommonResult updatePattern(@RequestParam("location_pattern")String locationPattern,@RequestParam("pattern_id")Long patternId){
+    public  CommonResult updatePattern(@RequestParam("location_pattern")String locationPattern,@RequestParam("pattern_id")String patternId){
 
         boolean b = patternService.updatePattern(locationPattern,patternId,UserUtils.getAdminCommunityId());
         return CommonResult.ok("修改成功");
@@ -156,24 +170,34 @@ public class CarEquipmentManageController {
      **/
     @Login
     @DeleteMapping("/deletePattern")
-    public  CommonResult deletePattern(@RequestParam("pattern_id")Long patternId){
+    public  CommonResult deletePattern(@RequestParam("pattern_id")String patternId){
         boolean b = patternService.deletePattern(patternId,UserUtils.getAdminCommunityId());
         return CommonResult.ok("修改成功");
     }
 
     /**
-     * @Description: 查询设备位置
+     * @Description: 分页查询设备位置
      * @Param: []
      * @Return: com.jsy.community.vo.CommonResult
      * @Author: Tian
      * @Date: 2021/8/9-11:23
      **/
     @Login
-    @GetMapping("/listLocation")
-    public  CommonResult listLocation(){
-        List<CarLocationEntity> locationEntityList = locationService.listLocation(UserUtils.getAdminCommunityId());
+    @PostMapping("/listLocation")
+    public  CommonResult listLocation(@RequestBody  BaseQO<CarLocationEntity> baseQO){
+        Page<CarLocationEntity> locationEntityList = locationService.listLocation(baseQO,UserUtils.getAdminCommunityId());
+        System.out.println(UserUtils.getAdminCommunityId());
         return CommonResult.ok(locationEntityList,"查询成功");
     }
+
+    @Login
+    @GetMapping("/selectList")
+    public  CommonResult selectList(){
+        List<CarLocationEntity> locationEntityList = locationService.selectList(UserUtils.getAdminCommunityId());
+
+        return CommonResult.ok(locationEntityList,"查询成功");
+    }
+
 
     /**
      * @Description: 添加设备位置
@@ -199,7 +223,7 @@ public class CarEquipmentManageController {
      **/
     @Login
     @PostMapping("/updateLocation")
-    public  CommonResult updateLocation(@RequestParam("equipment_location")String equipmentLocation,@RequestParam("location_id")Long locationId){
+    public  CommonResult updateLocation(@RequestParam("equipment_location")String equipmentLocation,@RequestParam("location_id")String locationId){
 
         boolean b = locationService.updateLocation(equipmentLocation,locationId,UserUtils.getAdminCommunityId());
         return CommonResult.ok("修改成功");
@@ -214,7 +238,7 @@ public class CarEquipmentManageController {
      **/
     @Login
     @DeleteMapping("/deleteLocation")
-    public  CommonResult deleteLocation(@RequestParam("location_id")Long locationId){
+    public  CommonResult deleteLocation(@RequestParam("location_id")String locationId){
         boolean b = locationService.deleteLocation(locationId,UserUtils.getAdminCommunityId());
         return CommonResult.ok("修改成功");
     }

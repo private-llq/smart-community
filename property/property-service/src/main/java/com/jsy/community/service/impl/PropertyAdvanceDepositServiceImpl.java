@@ -239,6 +239,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 propertyAdvanceDepositRecordEntity.setCommunityId(communityId);
                 propertyAdvanceDepositRecordEntity.setType(2);
                 propertyAdvanceDepositRecordEntity.setDepositAmount(propertyAdvanceDepositEntity.getReceivedAmount());
+                propertyAdvanceDepositRecordEntity.setPayAmount(new BigDecimal("0.00"));
                 propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositEntity.getReceivedAmount());
                 propertyAdvanceDepositRecordEntity.setAdvanceDepositId(addPropertyAdvanceDepositEntity.getId());
                 propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
@@ -268,7 +269,9 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 propertyAdvanceDepositRecordEntity.setType(2);
                 if (propertyAdvanceDepositEntity.getReceivedAmount().compareTo(BigDecimal.ZERO) == 1) {
                     propertyAdvanceDepositRecordEntity.setDepositAmount(propertyAdvanceDepositEntity.getReceivedAmount());
+                    propertyAdvanceDepositRecordEntity.setPayAmount(new BigDecimal("0.00"));
                 } else if (propertyAdvanceDepositEntity.getReceivedAmount().compareTo(BigDecimal.ZERO) == -1) {
+                    propertyAdvanceDepositRecordEntity.setDepositAmount(new BigDecimal("0.00"));
                     propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getReceivedAmount().abs());
                 }
                 propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getReceivedAmount()));

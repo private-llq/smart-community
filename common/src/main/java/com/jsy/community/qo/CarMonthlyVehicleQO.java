@@ -23,7 +23,7 @@ public class CarMonthlyVehicleQO extends BaseQO<String>  {
     private Integer monthlyMethod;
 
     /**
-     * 到期状态
+     * 到期状态 0：到期 1：未到期
      */
     private Integer expirationStatus;
 
@@ -31,5 +31,10 @@ public class CarMonthlyVehicleQO extends BaseQO<String>  {
      * 车位编号
      */
     private String carPosition;
+
+    /**
+     * Long communityId
+     */
+    private Long communityId;
 
 }

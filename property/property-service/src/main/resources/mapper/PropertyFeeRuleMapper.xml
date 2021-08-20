@@ -8,4 +8,14 @@
     <select id="findTotal" resultType="java.lang.Integer">
         select count(*) from  t_property_fee_rule
     </select>
+
+    <!-- 查询项目名称 -->
+    <select id="selectFeeRuleIdName" resultType="Map">
+        select id,name from t_property_fee_rule
+        where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and deleted = 0
+    </select>
 </mapper>
