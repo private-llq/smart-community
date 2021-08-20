@@ -63,7 +63,7 @@ public class CarEquipmentManageController {
      * @Author: Tian
      * @Date: 2021/8/9-11:22
      **/
-    @GetMapping("/s")
+    @GetMapping("/equipmentList")
     @Login
     public CommonResult equipmentList(){
         Long communityId = UserUtils.getAdminCommunityId();

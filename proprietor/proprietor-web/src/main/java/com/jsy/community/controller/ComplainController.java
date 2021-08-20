@@ -142,7 +142,7 @@ public class ComplainController {
     public CommonResult selectComplain(){
         String userId = UserUtils.getUserId();
         List<ComplainVO> complainEntities=complainService.selectComplain(userId);
-        return CommonResult.ok(complainEntities);
+        return CommonResult.ok(complainEntities,"查询成功");
     }
 
 
