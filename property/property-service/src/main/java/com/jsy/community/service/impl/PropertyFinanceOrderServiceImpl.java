@@ -727,8 +727,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         PropertyFinanceFormEntity propertyFinanceFormEntity = new PropertyFinanceFormEntity();
         // 押金查询
         QueryWrapper<PropertyDepositEntity> DepositWrapper = new QueryWrapper<>();
-        DepositWrapper.ge("create_time", qo.getStartTime());
-        DepositWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            DepositWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            DepositWrapper.le("create_time", qo.getEndTime());
+        }
         DepositWrapper.eq("community_id", qo.getCommunityId());
         DepositWrapper.eq("deleted", 0);
         // 查询一段时间内押金实体
@@ -752,8 +756,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         // 预存款查询
         QueryWrapper<PropertyAdvanceDepositRecordEntity> advanceDepositRecordWrapper = new QueryWrapper<>();
-        advanceDepositRecordWrapper.ge("create_time", qo.getStartTime());
-        advanceDepositRecordWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            advanceDepositRecordWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            advanceDepositRecordWrapper.le("create_time", qo.getEndTime());
+        }
         advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
         advanceDepositRecordWrapper.eq("deleted", 0);
         // 查询一段时间内预存款实体
@@ -779,8 +787,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         
         // 小区账单查询
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderWrapper = new QueryWrapper<>();
-        financeOrderWrapper.ge("create_time", qo.getStartTime());
-        financeOrderWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            financeOrderWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            financeOrderWrapper.le("create_time", qo.getEndTime());
+        }
         financeOrderWrapper.eq("community_id", qo.getCommunityId());
         financeOrderWrapper.eq("deleted", 0);
         // 查询一段时间内小区账单实体
@@ -863,8 +875,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as totalMoney,SUM( penal_sum ) as receivablePenalMoney,SUM( coupon ) as couponMoney,SUM( deduction ) as deductionMoney");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
         queryWrapper.eq("community_id", qo.getCommunityId());
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
@@ -883,8 +899,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
         wrapper.select("fee_rule_id as feeRuleId,SUM( penal_sum ) as collectPenalMoney,SUM( total_money ) as communityOnlineCharging");
-        wrapper.ge("create_time", qo.getStartTime());
-        wrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            wrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            wrapper.le("create_time", qo.getEndTime());
+        }
         wrapper.eq("community_id", qo.getCommunityId());
         wrapper.eq("order_status",1);
         wrapper.eq("deleted",0);
@@ -902,7 +922,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderQueryWrapper = new QueryWrapper<>();
         financeOrderQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as arrearsMoney");
-        financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
+        if (qo.getStartTime() != null) {
+            financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
+        }
         financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
         financeOrderQueryWrapper.eq("order_status",0);
         financeOrderQueryWrapper.eq("deleted",0);
@@ -919,8 +941,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderEntityQueryWrapper = new QueryWrapper<>();
         financeOrderEntityQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as thisMonthArrearsMoney");
-        financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
-        financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        }
         financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
         financeOrderEntityQueryWrapper.eq("order_status",0);
         financeOrderEntityQueryWrapper.eq("deleted",0);
@@ -976,8 +1002,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as totalMoney,SUM( penal_sum ) as receivablePenalMoney,SUM( coupon ) as couponMoney,SUM( deduction ) as deductionMoney");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
         queryWrapper.eq("community_id", qo.getCommunityId());
         queryWrapper.eq("deleted", 0);
         queryWrapper.ne("build_type",2);
@@ -997,8 +1027,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
         wrapper.select("fee_rule_id as feeRuleId,SUM( penal_sum ) as collectPenalMoney,SUM( total_money ) as communityOnlineCharging");
-        wrapper.ge("create_time", qo.getStartTime());
-        wrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            wrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            wrapper.le("create_time", qo.getEndTime());
+        }
         wrapper.eq("community_id", qo.getCommunityId());
         wrapper.eq("order_status",1);
         wrapper.eq("deleted",0);
@@ -1017,7 +1051,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderQueryWrapper = new QueryWrapper<>();
         financeOrderQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as arrearsMoney");
-        financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
+        if (qo.getStartTime() != null) {
+            financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
+        }
         financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
         financeOrderQueryWrapper.eq("order_status",0);
         financeOrderQueryWrapper.eq("deleted",0);
@@ -1032,14 +1068,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 }
             }
         }
-        //合计欠收
-        for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-            financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getArrearsMoney().add(financeFormChargeEntity.getThisMonthArrearsMoney()));
-        }
+        
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderEntityQueryWrapper = new QueryWrapper<>();
         financeOrderEntityQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as thisMonthArrearsMoney");
-        financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
-        financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        }
         financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
         financeOrderEntityQueryWrapper.eq("order_status",0);
         financeOrderEntityQueryWrapper.eq("deleted",0);
@@ -1052,6 +1089,18 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
                     financeFormChargeEntity.setThisMonthArrearsMoney(propertyFinanceOrderEntity.getThisMonthArrearsMoney());
                 }
+            }
+        }
+        //合计欠收
+        for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+            if (financeFormChargeEntity.getArrearsMoney() == null && financeFormChargeEntity.getThisMonthArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(new BigDecimal("0.00"));
+            } else if (financeFormChargeEntity.getArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getThisMonthArrearsMoney());
+            } else if (financeFormChargeEntity.getThisMonthArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getArrearsMoney());
+            } else {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getArrearsMoney().add(financeFormChargeEntity.getThisMonthArrearsMoney()));
             }
         }
         // 补充项目名称
@@ -1084,8 +1133,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS totalSum");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
         queryWrapper.eq("community_id", qo.getCommunityId());
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
@@ -1101,8 +1154,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> query = new QueryWrapper<>();
         query.select("fee_rule_id as feeRuleId,SUM(total_money) AS weChatPaySum");
-        query.ge("create_time", qo.getStartTime());
-        query.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            query.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            query.le("create_time", qo.getEndTime());
+        }
         query.eq("community_id", qo.getCommunityId());
         query.eq("deleted", 0);
         query.eq("pay_type", 1);
@@ -1119,8 +1176,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
         wrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS aliPaySum");
-        wrapper.ge("create_time", qo.getStartTime());
-        wrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            wrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            wrapper.le("create_time", qo.getEndTime());
+        }
         wrapper.eq("community_id", qo.getCommunityId());
         wrapper.eq("deleted", 0);
         wrapper.eq("pay_type", 2);
@@ -1137,8 +1198,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> entityQueryWrapper = new QueryWrapper<>();
         entityQueryWrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS balancePaySum");
-        entityQueryWrapper.ge("create_time", qo.getStartTime());
-        entityQueryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            entityQueryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            entityQueryWrapper.le("create_time", qo.getEndTime());
+        }
         entityQueryWrapper.eq("community_id", qo.getCommunityId());
         entityQueryWrapper.eq("deleted", 0);
         entityQueryWrapper.eq("pay_type", 3);
@@ -1155,8 +1220,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> orderEntityQueryWrapper = new QueryWrapper<>();
         orderEntityQueryWrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS cashPaySum");
-        orderEntityQueryWrapper.ge("create_time", qo.getStartTime());
-        orderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            orderEntityQueryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            orderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        }
         orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
         orderEntityQueryWrapper.eq("deleted", 0);
         orderEntityQueryWrapper.eq("pay_type", 4);
@@ -1173,8 +1242,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper1 = new QueryWrapper<>();
         wrapper1.select("fee_rule_id as feeRuleId,SUM(total_money) AS UnionPaySum");
-        wrapper1.ge("create_time", qo.getStartTime());
-        wrapper1.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            wrapper1.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            wrapper1.le("create_time", qo.getEndTime());
+        }
         wrapper1.eq("community_id", qo.getCommunityId());
         wrapper1.eq("deleted", 0);
         wrapper1.eq("pay_type", 5);
@@ -1191,8 +1264,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.select("fee_rule_id as feeRuleId,SUM(total_money) AS bankPaySum");
-        queryWrapper1.ge("create_time", qo.getStartTime());
-        queryWrapper1.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            queryWrapper1.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper1.le("create_time", qo.getEndTime());
+        }
         queryWrapper1.eq("community_id", qo.getCommunityId());
         queryWrapper1.eq("deleted", 0);
         queryWrapper1.eq("pay_type", 6);
@@ -1236,8 +1313,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("order_status AS orderStatus,SUM(total_money) AS totalMoney");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
         if (qo.getTargetId() != null) {
             queryWrapper.eq("target_id", qo.getTargetId());
         }
@@ -1286,8 +1367,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("order_status AS orderStatus,SUM(total_money) AS totalMoney");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
         if (qo.getTargetId() != null) {
             queryWrapper.eq("target_id", qo.getTargetId());
         }
@@ -1307,8 +1392,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             }
         }
         // 总计-应收
-        propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementCollectMoney().add(propertyCollectionFormEntity.getStatementReceivableMoney()));
-    
+        if (propertyCollectionFormEntity.getStatementCollectMoney() == null) {
+            propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementArrearsMoney());
+        } else if (propertyCollectionFormEntity.getStatementArrearsMoney() == null) {
+            propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementCollectMoney());
+        } else {
+            propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementCollectMoney().add(propertyCollectionFormEntity.getStatementArrearsMoney()));
+        }
         // 补充房屋名称
         HouseEntity houseEntity = houseMapper.selectById(propertyCollectionFormEntity.getTargetId());
         if (houseEntity != null) {

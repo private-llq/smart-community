@@ -232,9 +232,9 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         ValidatorUtils.validateEntity(propertyFinanceFormEntity);
-        if (propertyFinanceFormEntity.getStartTime() == null && propertyFinanceFormEntity.getEndTime() == null) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
-        }
+//        if (propertyFinanceFormEntity.getStartTime() == null && propertyFinanceFormEntity.getEndTime() == null) {
+//            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+//        }
         propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityIncome(propertyFinanceFormEntity),"查询成功");
     }
@@ -261,7 +261,7 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         ValidatorUtils.validateEntity(propertyFinanceFormChargeEntity);
-        if (propertyFinanceFormChargeEntity.getStartTime() == null || propertyFinanceFormChargeEntity.getEndTime() == null || propertyFinanceFormChargeEntity.getType() == null) {
+        if (propertyFinanceFormChargeEntity.getType() == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
         }
         propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
@@ -321,9 +321,9 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         ValidatorUtils.validateEntity(propertyCollectionFormEntity);
-        if (propertyCollectionFormEntity.getStartTime() == null && propertyCollectionFormEntity.getEndTime() == null) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
-        }
+//        if (propertyCollectionFormEntity.getStartTime() == null && propertyCollectionFormEntity.getEndTime() == null) {
+//            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+//        }
         propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity),"查询成功");
     }
@@ -356,7 +356,7 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         ValidatorUtils.validateEntity(propertyCollectionFormEntity);
-        if (propertyCollectionFormEntity.getStartTime() == null || propertyCollectionFormEntity.getEndTime() == null || propertyCollectionFormEntity.getType() == null) {
+        if (propertyCollectionFormEntity.getType() == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
         }
         propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
