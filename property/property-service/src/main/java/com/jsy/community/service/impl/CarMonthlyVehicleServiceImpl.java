@@ -210,7 +210,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
             if ("地上".equals(monthlyMethod)){
                 vehicle.setMonthlyMethod(0);
-            }else if ("地下".equals(monthlyMethod)){
                 vehicle.setMonthlyMethod(1);
             }else {
                 HashMap<String, String> hashMap = new HashMap<>();
