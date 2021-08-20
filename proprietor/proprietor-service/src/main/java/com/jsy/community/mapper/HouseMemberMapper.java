@@ -2,6 +2,8 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.vo.MembersVO;
+import com.jsy.community.vo.UserHouseVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -54,4 +56,21 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 */
     void saveBatch(@Param("save") LinkedList<HouseMemberEntity> save);
 
+    /**
+     * @Description: 查询当前登录人员信息
+     * @author: Hu
+     * @since: 2021/8/19 16:51
+     * @Param:
+     * @return:
+     */
+    UserHouseVO selectLoginUser(@Param("uid") String uid, @Param("communityId") Long communityId, @Param("houseId") Long houseId, @Param("relation") int relation);
+
+    /**
+     * @Description: 条件查询当前房屋下所有的成员
+     * @author: Hu
+     * @since: 2021/8/19 16:52
+     * @Param:
+     * @return:
+     */
+	List<MembersVO> selectRelation(@Param("communityId") Long communityId, @Param("houseId") Long houseId, @Param("relation") int relation);
 }

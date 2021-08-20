@@ -20,6 +20,16 @@ public class UserHouseVO implements Serializable {
     private String name;
 
     /**
+     * 电话
+     */
+    private String mobile;
+
+    /**
+     * 头像
+     */
+    private String avatarUrl;
+
+    /**
      * @Description: 关系
      * @author: Hu
      * @since: 2021/8/17 15:02
@@ -27,6 +37,24 @@ public class UserHouseVO implements Serializable {
      * @return:
      */
     private String relationText;
+
+    /**
+     * @Description: 社区id
+     * @author: Hu
+     * @since: 2021/8/17 15:02
+     * @Param:
+     * @return:
+     */
+    private Long communityId;
+
+    /**
+     * @Description: 社区名称
+     * @author: Hu
+     * @since: 2021/8/17 15:02
+     * @Param:
+     * @return:
+     */
+    private String communityText;
 
     /**
      * @Description: 关系

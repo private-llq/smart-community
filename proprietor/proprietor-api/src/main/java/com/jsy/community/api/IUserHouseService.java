@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
@@ -117,14 +118,6 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 */
 	List<UserHouseEntity> selectUserHouse(Long communityId, String uid);
 
-	/**
-	 * @Description: 查询房间成员信息
-	 * @author: Hu
-	 * @since: 2021/8/17 15:10
-	 * @Param:
-	 * @return:
-	 */
-    UserHouseVO userHouseDetails(UserHouseQO userHouseQO, String userId);
 
     /**
      * @Description: 房屋认证
@@ -151,7 +144,7 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @Param:
 	 * @return:
 	 */
-	void membersUpdate(UserHouseQO userHouse, String userId);
+	void membersSave(MembersQO membersQO, String userId);
 
 	/**
 	 * @Description: 业主家属删除接口
@@ -163,11 +156,29 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	void membersDelete(String ids, String userId);
 
 	/**
-	 * @Description: 查询房间成员信息
+	 * @Description: 业主权限查询房屋成员
+	 * @author: Hu
+	 * @since: 2021/8/17 15:10
+	 * @Param:
+	 * @return:
+	 */
+	UserHouseVO userHouseDetails(UserHouseQO userHouseQO, String userId);
+
+	/**
+	 * @Description: 家属权限查询房屋成员
 	 * @author: Hu
 	 * @since: 2021/8/18 15:48
 	 * @Param:
 	 * @return:
 	 */
-	UserHouseVO memberHouseDetails(UserHouseQO userHouseQO, String userId,String mobile);
+	UserHouseVO memberHouseDetails(UserHouseQO userHouseQO, String userId);
+
+	/**
+	 * @Description: 租户权限查询房屋成员
+	 * @author: Hu
+	 * @since: 2021/8/17 15:10
+	 * @Param:
+	 * @return:
+	 */
+	UserHouseVO lesseeHouseDetails(UserHouseQO userHouseQO, String userId);
 }

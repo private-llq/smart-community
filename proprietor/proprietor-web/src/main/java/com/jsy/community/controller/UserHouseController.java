@@ -5,8 +5,10 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.IUserService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserHouseVO;
@@ -57,24 +59,24 @@ public class UserHouseController {
                 return CommonResult.error(40001,"未实名认证");
             }
         }
+        //查询所有权限
         ControlVO controlVO = UserUtils.getPermissions(UserUtils.getUserId(), redisTemplate);
-        if (userHouseQO.getHouseId().equals(controlVO.getHouseId())){
-            if (controlVO.getAccessLevel().equals(1)){
-                UserHouseVO houseVO = userHouseService.userHouseDetails(userHouseQO, UserUtils.getUserId());
-                return CommonResult.ok(houseVO);
-            }else {
-                UserHouseVO houseVO = userHouseService.memberHouseDetails(userHouseQO, UserUtils.getUserId(),UserUtils.getUserInfo().getMobile());
-                return CommonResult.ok(houseVO);
-            }
-        }else {
-            for (ControlVO vo : controlVO.getPermissions()) {
-                if (vo.getHouseId().equals(userHouseQO.getHouseId())){
-                    if (vo.getAccessLevel().equals(1)){
-                        UserHouseVO houseVO = userHouseService.userHouseDetails(userHouseQO, UserUtils.getUserId());
-                        return CommonResult.ok(houseVO);
+
+        for (ControlVO permission : controlVO.getPermissions()) {
+            //找到当前房间权限
+            if (userHouseQO.getHouseId().equals(permission.getHouseId())){
+                //如果等于1代表业主
+                if (permission.getAccessLevel()==1){
+                    return CommonResult.ok(userHouseService.userHouseDetails(userHouseQO, UserUtils.getUserId()));
+                } else {
+                    //如果等于2代表家属
+                    if (permission.getAccessLevel()==2){
+                        return CommonResult.ok(userHouseService.memberHouseDetails(userHouseQO, UserUtils.getUserId()));
                     } else {
-                        UserHouseVO houseVO = userHouseService.memberHouseDetails(userHouseQO, UserUtils.getUserId(),UserUtils.getUserInfo().getMobile());
-                        return CommonResult.ok(houseVO);
+                        //如果等于3代表租户
+                        if (permission.getAccessLevel()==3){
+                            return CommonResult.ok(userHouseService.lesseeHouseDetails(userHouseQO, UserUtils.getUserId()));
+                        }
                     }
                 }
             }
@@ -118,9 +120,10 @@ public class UserHouseController {
      * @return:
      */
     @ApiOperation("家属或者租客更新")
-    @PutMapping("members/update")
-    public CommonResult membersUpdate(@RequestBody UserHouseQO userHouse){
-        userHouseService.membersUpdate(userHouse, UserUtils.getUserId());
+    @PutMapping("members/save")
+    public CommonResult membersUpdate(@RequestBody MembersQO membersQO){
+        ValidatorUtils.validateEntity(membersQO,MembersQO.MembersVerify.class);
+        userHouseService.membersSave(membersQO, UserUtils.getUserId());
         return CommonResult.ok();
     }
     /**
