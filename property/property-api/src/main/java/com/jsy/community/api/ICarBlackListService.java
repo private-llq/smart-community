@@ -1,5 +1,5 @@
 package com.jsy.community.api;
-import com.jsy.community.entity.proprietor.CarBlackListEntity;
+import com.jsy.community.entity.property.CarBlackListEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 

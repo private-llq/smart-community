@@ -3,7 +3,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarBlackListService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.CarBlackListEntity;
+import com.jsy.community.entity.property.CarBlackListEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;

@@ -6,7 +6,7 @@ import com.jsy.community.api.IActivityService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.ActivityEntity;
-import com.jsy.community.entity.proprietor.ActivityUserEntity;
+import com.jsy.community.entity.property.ActivityUserEntity;
 import com.jsy.community.mapper.ActivityMapper;
 import com.jsy.community.mapper.ActivityUserMapper;
 import com.jsy.community.utils.SnowFlake;

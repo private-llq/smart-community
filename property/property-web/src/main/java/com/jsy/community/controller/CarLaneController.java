@@ -5,7 +5,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarLaneService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.CarLaneEntity;
+import com.jsy.community.entity.property.CarLaneEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;

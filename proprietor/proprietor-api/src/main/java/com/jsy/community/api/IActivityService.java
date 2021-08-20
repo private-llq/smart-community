@@ -1,7 +1,7 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.proprietor.ActivityEntity;
-import com.jsy.community.entity.proprietor.ActivityUserEntity;
+import com.jsy.community.entity.property.ActivityUserEntity;
 
 import java.util.List;
 

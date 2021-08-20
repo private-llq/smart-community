@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.CarMonthlyVehicle;
+import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.CarMonthlyVehicleMapper;
 import com.jsy.community.qo.CarMonthlyVehicleQO;

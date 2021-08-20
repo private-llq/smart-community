@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarChargeService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.CarChargeEntity;
+import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;

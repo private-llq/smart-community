@@ -1,6 +1,6 @@
 package com.jsy.community.api;
 
-import com.jsy.community.entity.proprietor.CarLaneEntity;
+import com.jsy.community.entity.property.CarLaneEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import org.springframework.stereotype.Component;

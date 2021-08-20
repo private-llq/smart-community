@@ -4,7 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.CarMonthlyVehicle;
+import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.util.POIUtil;
 import com.jsy.community.utils.PageInfo;
@@ -18,9 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

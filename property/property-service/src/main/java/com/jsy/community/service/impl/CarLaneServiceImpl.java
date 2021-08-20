@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarLaneService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.CarLaneEntity;
+import com.jsy.community.entity.property.CarLaneEntity;
 import com.jsy.community.mapper.CarLaneMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;

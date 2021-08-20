@@ -1,4 +1,4 @@
-package com.jsy.community.entity.proprietor;
+package com.jsy.community.entity.property;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
