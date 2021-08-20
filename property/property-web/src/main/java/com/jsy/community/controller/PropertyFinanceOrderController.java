@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.property.PropertyCollectionFormEntity;
 import com.jsy.community.entity.property.PropertyFinanceFormChargeEntity;
 import com.jsy.community.entity.property.PropertyFinanceFormEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
@@ -37,8 +38,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -279,5 +283,100 @@ public class PropertyFinanceOrderController {
             throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
         }
         return CommonResult.ok(propertyFinanceFormChargeEntityList,"查询成功");
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 获取收款报表-收款报表
+     *@Param:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/8/19 9:31
+     **/
+    @Login
+    @ApiOperation("获取收款报表-收款报表")
+    @PostMapping("/getCollectionForm/collection")
+    public CommonResult getCollectionFormCollection(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        try {
+            if (propertyCollectionFormEntity.getYear() != null) {
+                String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (propertyCollectionFormEntity.getMonth() != null) {
+                String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                String lastMouthDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (propertyCollectionFormEntity.getDay() != null) {
+                ZoneId zone = ZoneId.systemDefault();
+                Instant instant = propertyCollectionFormEntity.getDay().atStartOfDay().atZone(zone).toInstant();
+                String firstDate = DateCalculateUtil.getFirstDate(Date.from(instant));
+                String lastDate = DateCalculateUtil.getLastDate(Date.from(instant));
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ValidatorUtils.validateEntity(propertyCollectionFormEntity);
+        if (propertyCollectionFormEntity.getStartTime() == null && propertyCollectionFormEntity.getEndTime() == null) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+        }
+        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity),"查询成功");
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 获取收款报表-账单统计
+     *@Param:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/8/19 11:24
+     **/
+    @Login
+    @ApiOperation("获取收款报表-账单统计")
+    @PostMapping("/getCollectionForm/order")
+    public CommonResult getCollectionFormOrder(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        try {
+            if (propertyCollectionFormEntity.getYear() != null) {
+                String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (propertyCollectionFormEntity.getMonth() != null) {
+                String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                String lastMouthDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ValidatorUtils.validateEntity(propertyCollectionFormEntity);
+        if (propertyCollectionFormEntity.getStartTime() == null || propertyCollectionFormEntity.getEndTime() == null || propertyCollectionFormEntity.getType() == null) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+        }
+        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+    
+        PropertyCollectionFormEntity propertyCollectionFormEntityList = null;
+        switch (propertyCollectionFormEntity.getType()) {
+            case 1:
+                // 按账单生成时间
+                propertyCollectionFormEntityList = propertyFinanceOrderService.getCollectionFormOrderByOrderGenerateTime(propertyCollectionFormEntity);
+                break;
+            case 2:
+                // 按账单周期时间
+                propertyCollectionFormEntityList = propertyFinanceOrderService.getCollectionFormOrderByOrderPeriodTime(propertyCollectionFormEntity);
+                break;
+            default:
+                break;
+        }
+        if (propertyCollectionFormEntityList == null) {
+            throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
+        }
+        return CommonResult.ok(propertyCollectionFormEntityList,"查询成功");
     }
 }

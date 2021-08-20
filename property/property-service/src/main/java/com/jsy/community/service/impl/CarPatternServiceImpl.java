@@ -12,6 +12,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.UUID;
 
 @DubboService(version = Const.version, group = Const.group_property)
 @Slf4j
@@ -34,7 +35,7 @@ public class CarPatternServiceImpl extends ServiceImpl<CarPatternMapper, CarPatt
      * @Date: 2021/8/9-14:53
      **/
     @Override
-    public CarPatternEntity findOne(Long patternId) {
+    public CarPatternEntity findOne(String patternId) {
         QueryWrapper<CarPatternEntity> queryWrapper = new QueryWrapper<CarPatternEntity>().eq("pattern_id", patternId);
         CarPatternEntity carPatternEntity = carPatternMapper.selectOne(queryWrapper);
         return carPatternEntity;
@@ -43,14 +44,14 @@ public class CarPatternServiceImpl extends ServiceImpl<CarPatternMapper, CarPatt
     @Override
     public boolean addPattern(String locationPattern,Long communityId) {
         CarPatternEntity carPatternEntity = new CarPatternEntity();
-        carPatternEntity.setPatternId(SnowFlake.nextId());
+        carPatternEntity.setPatternId(UUID.randomUUID().toString());
         carPatternEntity.setCommunityId(communityId);
         carPatternEntity.setLocationPattern(locationPattern);
         return  carPatternMapper.insert(carPatternEntity) == 1;
     }
 
     @Override
-    public boolean updatePattern(String locationPattern, Long patternId, Long adminCommunityId) {
+    public boolean updatePattern(String locationPattern, String patternId, Long adminCommunityId) {
         QueryWrapper<CarPatternEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("pattern_id",patternId)
                 .eq("community_id",adminCommunityId);
@@ -60,7 +61,7 @@ public class CarPatternServiceImpl extends ServiceImpl<CarPatternMapper, CarPatt
     }
 
     @Override
-    public boolean deletePattern(Long patternId, Long adminCommunityId) {
+    public boolean deletePattern(String patternId, Long adminCommunityId) {
         QueryWrapper<CarPatternEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("pattern_id",patternId)
                 .eq("community_id",adminCommunityId);

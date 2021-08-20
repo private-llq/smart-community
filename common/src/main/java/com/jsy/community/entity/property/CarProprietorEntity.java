@@ -5,19 +5,27 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
+import com.jsy.community.qo.BaseQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @ApiModel("业主车辆")
 @TableName("t_car_proprietor")
-public class CarProprietorEntity extends BaseEntity {
+public class CarProprietorEntity extends BaseQO implements Serializable {
     @ApiModelProperty(value = "id")
     private Long id;
+
+    @TableField(exist = false)
+    private String idStr;
+    public String getIdStr(){
+        return String.valueOf(id);
+    }
 
     @ApiModelProperty(value = "社区id")
     private  Long communityId;

@@ -26,7 +26,7 @@ public interface ICarProprietorService extends IService<CarProprietorEntity> {
      * @Author: Tian
      * @Date: 2021/8/11-10:36
      **/
-    Page<CarProprietorEntity> listPage(BaseQO<CarProprietorEntity> baseQO, Long adminCommunityId,Long phone);
+    Page<CarProprietorEntity> listPage(BaseQO<CarProprietorEntity> baseQO, Long adminCommunityId);
 
     /**
      * @Description: 添加业主车辆

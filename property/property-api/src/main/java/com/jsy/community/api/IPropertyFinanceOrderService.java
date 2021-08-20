@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.property.PropertyCollectionFormEntity;
 import com.jsy.community.entity.property.PropertyFinanceFormChargeEntity;
 import com.jsy.community.entity.property.PropertyFinanceFormEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
@@ -209,4 +210,31 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Date: 2021/8/18 11:08
      **/
     List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity);
+    
+    /**
+     *@Author: DKS
+     *@Description: 获取收款报表-收款报表
+     *@Param:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/8/19 9:31
+     **/
+    List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity propertyCollectionFormEntity);
+    
+    /**
+     *@Author: DKS
+     *@Description: 获取收款报表-账单统计-账单生成时间
+     *@Param:
+     *@Return: PropertyFinanceFormChargeEntity
+     *@Date: 2021/8/19 11:08
+     **/
+    PropertyCollectionFormEntity getCollectionFormOrderByOrderGenerateTime(PropertyCollectionFormEntity propertyCollectionFormEntity);
+    
+    /**
+     *@Author: DKS
+     *@Description: 获取收款报表-账单统计-账单周期时间
+     *@Param:
+     *@Return: PropertyFinanceFormChargeEntity
+     *@Date: 2021/8/19 11:08
+     **/
+    PropertyCollectionFormEntity getCollectionFormOrderByOrderPeriodTime(PropertyCollectionFormEntity propertyCollectionFormEntity);
 }

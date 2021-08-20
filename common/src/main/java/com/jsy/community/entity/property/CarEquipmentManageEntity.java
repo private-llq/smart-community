@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
+import com.jsy.community.qo.BaseQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
  /**
@@ -20,9 +22,15 @@ import java.time.LocalDateTime;
 @Data
 @ApiModel("车禁模块-设备管理")
 @TableName("t_car_equipment_manage")
-public class CarEquipmentManageEntity extends BaseEntity {
+public class CarEquipmentManageEntity extends BaseQO implements Serializable {
     @ApiModelProperty(value = "id")
     private Long id;
+
+     @TableField(exist = false)
+     private String idStr;
+     public String getIdStr(){
+         return String.valueOf(id);
+     }
 
     @ApiModelProperty(value = "uid")
     private String uid;
@@ -40,21 +48,21 @@ public class CarEquipmentManageEntity extends BaseEntity {
     private  String internetNumber;
 
     @ApiModelProperty("设备位置id")
-    private  Long locationId;
+    private  String locationId;
 
     @ApiModelProperty("设备位置")
     @TableField(exist = false)
     private  String locationName;
 
     @ApiModelProperty("临时车模式id")
-    private  Long patternId;
+    private  String patternId;
 
     @ApiModelProperty("临时车模式")
     @TableField(exist = false)
     private  String patternName;
 
     @ApiModelProperty("设备状态 0：下线  1：上线")
-    private Integer state;
+    private String state;
 
 
     @ApiModelProperty(value = "创建时间")
