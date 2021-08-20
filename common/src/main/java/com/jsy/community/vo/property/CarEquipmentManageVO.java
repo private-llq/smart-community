@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Data
 @ApiModel("设备管理返回参数")
-public class CarEquipmentManageVO implements Serializable {
+public class CarEquipmentManageVO  implements Serializable {
     @ApiModelProperty("设备名称")
     private  String equipmentName;
 
@@ -19,5 +19,5 @@ public class CarEquipmentManageVO implements Serializable {
     private  String equipmentNumber;
 
     @ApiModelProperty("设备状态 0：下线  1：上线")
-    private Integer state;
+    private String state;
 }

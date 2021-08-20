@@ -2,9 +2,9 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserHouseEntity;
+import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
-import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
 
 import java.util.List;
@@ -124,7 +124,7 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @Param:
 	 * @return:
 	 */
-    UserHouseVO userHouseDetails(Long communityId, Long houseId, String userId);
+    UserHouseVO userHouseDetails(UserHouseQO userHouseQO, String userId);
 
     /**
      * @Description: 房屋认证
@@ -133,7 +133,7 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
      * @Param:
      * @return:
      */
-	void attestation(Long communityId, Long houseId, String userId);
+	void attestation(UserHouseQO userHouseQO, String userId);
 
 	/**
 	 * @Description: 查询业主当前小区下所有认证的房屋
@@ -151,5 +151,23 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @Param:
 	 * @return:
 	 */
-	void membersUpdate(List<MembersVO> members, String userId);
+	void membersUpdate(UserHouseQO userHouse, String userId);
+
+	/**
+	 * @Description: 业主家属删除接口
+	 * @author: Hu
+	 * @since: 2021/8/18 9:07
+	 * @Param:
+	 * @return:
+	 */
+	void membersDelete(String ids, String userId);
+
+	/**
+	 * @Description: 查询房间成员信息
+	 * @author: Hu
+	 * @since: 2021/8/18 15:48
+	 * @Param:
+	 * @return:
+	 */
+	UserHouseVO memberHouseDetails(UserHouseQO userHouseQO, String userId,String mobile);
 }

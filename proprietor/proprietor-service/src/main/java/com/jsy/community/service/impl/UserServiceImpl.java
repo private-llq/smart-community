@@ -1075,6 +1075,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
+    @Override
+    public Integer userIsRealAuth(String userId) {
+        return userMapper.getRealAuthStatus(userId);
+    }
+
     /**
      * @Description: 获取当前登录用户权限
      * @author: Hu
@@ -1090,7 +1095,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         List<HouseMemberEntity> memberEntities = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("community_id",communityId).eq("uid",uid));
 
         if (list!=null&&list.size()!=0){
-            UserHouseEntity entity = list.get(1);
+            UserHouseEntity entity = list.get(0);
             controlVO.setAccessLevel(1);
             controlVO.setCommunityId(entity.getCommunityId());
             controlVO.setHouseId(entity.getHouseId());
@@ -1101,21 +1106,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                         control.setAccessLevel(1);
                         control.setCommunityId(memberEntity.getCommunityId());
                         control.setHouseId(memberEntity.getHouseId());
-                        control.getPermissions().add(control);
+                        controlVO.getPermissions().add(control);
                     }
                     if (memberEntity.getRelation()==6){
                         control=new ControlVO();
                         control.setAccessLevel(2);
                         control.setCommunityId(memberEntity.getCommunityId());
                         control.setHouseId(memberEntity.getHouseId());
-                        control.getPermissions().add(control);
+                        controlVO.getPermissions().add(control);
                     }
                     if (memberEntity.getRelation()==7){
                         control=new ControlVO();
                         control.setAccessLevel(3);
                         control.setCommunityId(memberEntity.getCommunityId());
                         control.setHouseId(memberEntity.getHouseId());
-                        control.getPermissions().add(control);
+                        controlVO.getPermissions().add(control);
                     }
                 }
             }

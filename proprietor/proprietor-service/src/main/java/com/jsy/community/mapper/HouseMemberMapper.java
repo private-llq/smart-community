@@ -5,9 +5,9 @@ import com.jsy.community.entity.HouseMemberEntity;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +43,15 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	**/
 	@MapKey("id")
 	Map<Long,HouseMemberEntity> queryByIdsBatch(Collection<Long> list);
-	
-	
+
+
+	/**
+	 * @Description: 批量新增
+	 * @author: Hu
+	 * @since: 2021/8/18 9:23
+	 * @Param:
+	 * @return:
+	 */
+    void saveBatch(@Param("save") LinkedList<HouseMemberEntity> save);
+
 }
