@@ -2,16 +2,20 @@
 package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ICarEquipmentManageService;
 import com.jsy.community.api.ICarLaneService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.property.CarEquipmentManageEntity;
 import com.jsy.community.entity.property.CarLaneEntity;
 import com.jsy.community.mapper.CarLaneMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +26,9 @@ public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity
 
     @Autowired
     public CarLaneMapper carLaneMapper;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    public ICarEquipmentManageService carEquipmentManageService;
 
 
     @Override
@@ -53,15 +60,11 @@ public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity
     public PageInfo FindByLaneNamePage(BaseQO<String> baseQO,Long communityId) {
         Page<CarLaneEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
         PageInfo<CarLaneEntity> pageInfo = new PageInfo<>();
-        Page<CarLaneEntity> selectPage = carLaneMapper.selectPage(page,new QueryWrapper<CarLaneEntity>()
-                        .like(StringUtils.isNoneBlank(baseQO.getQuery()),"lane_name",baseQO.getQuery())
-                        .eq("community_id",communityId)
-        );
+        IPage<CarLaneEntity> selectPage = carLaneMapper.SelectByPage2(page, baseQO, communityId);
         pageInfo.setRecords(selectPage.getRecords());
         pageInfo.setTotal(selectPage.getTotal());
         pageInfo.setCurrent(selectPage.getCurrent());
         pageInfo.setSize(selectPage.getSize());
-
         return pageInfo;
     }
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.CarLaneMapper">
+    <select id="SelectByPage2" resultType="com.jsy.community.entity.property.CarLaneEntity">
+        SELECT c.*,e.equipment_name FROM t_car_lane c LEFT JOIN t_car_equipment_manage e ON c.equipment_id=e.id
+        <where>
+            <if test="community_id!=null and community_id!=''">
+                and community_id =#{communityId}
+            </if>
+            <if test="lane_name!=null and lane_name!='' ">
+                AND lane_name LIKE CONCAT('%',#{baseQO.query},'%')
+            </if>
+        </where>
+
+    </select>
+
+</mapper>

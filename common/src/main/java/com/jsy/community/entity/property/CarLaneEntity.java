@@ -1,6 +1,7 @@
 package com.jsy.community.entity.property;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -32,11 +33,15 @@ public class CarLaneEntity implements Serializable {
     /**
      * 设备名称
      */
+    @TableField(exist = false)
     private String equipmentName;
+    /**
+     * 设备id
+     */
+    private Long equipmentId;
     /**
      * 车道名称
      */
-
     private String laneName;
     /**
      * 车道类型 0:入口 1：出口

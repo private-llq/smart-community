@@ -11,6 +11,9 @@ import org.apache.ibatis.annotations.Param;
 public interface CarLaneMapper extends BaseMapper<CarLaneEntity> {
 
 
-    IPage<CarLaneEntity> findAllByPage(Page<CarLaneEntity> page, @Param("baseQO") BaseQO<String> baseQO);
+    IPage<CarLaneEntity> SelectByPage2(
+            Page<CarLaneEntity> page
+            , @Param("baseQO") BaseQO<String> baseQO
+            ,@Param("communityId") Long communityId);
 
 }
