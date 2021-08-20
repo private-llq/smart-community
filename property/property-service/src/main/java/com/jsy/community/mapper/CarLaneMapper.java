@@ -13,7 +13,7 @@ public interface CarLaneMapper extends BaseMapper<CarLaneEntity> {
 
     IPage<CarLaneEntity> SelectByPage2(
             Page<CarLaneEntity> page
-            , @Param("baseQO") BaseQO<String> baseQO
+            ,@Param("baseQO") BaseQO<String> baseQO
             ,@Param("communityId") Long communityId);
 
 }

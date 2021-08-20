@@ -4,10 +4,10 @@
     <select id="SelectByPage2" resultType="com.jsy.community.entity.property.CarLaneEntity">
         SELECT c.*,e.equipment_name FROM t_car_lane c LEFT JOIN t_car_equipment_manage e ON c.equipment_id=e.id
         <where>
-            <if test="community_id!=null and community_id!=''">
-                and community_id =#{communityId}
+            <if test="communityId!=null and communityId!=''">
+                and c.community_id=#{communityId}
             </if>
-            <if test="lane_name!=null and lane_name!='' ">
+            <if test="baseQO.query!=null and baseQO.query!='' ">
                 AND lane_name LIKE CONCAT('%',#{baseQO.query},'%')
             </if>
         </where>
