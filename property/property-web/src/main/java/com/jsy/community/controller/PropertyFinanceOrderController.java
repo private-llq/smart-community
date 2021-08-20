@@ -235,7 +235,7 @@ public class PropertyFinanceOrderController {
 //        if (propertyFinanceFormEntity.getStartTime() == null && propertyFinanceFormEntity.getEndTime() == null) {
 //            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 //        }
-        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityIncome(propertyFinanceFormEntity),"查询成功");
     }
     
@@ -264,7 +264,7 @@ public class PropertyFinanceOrderController {
         if (propertyFinanceFormChargeEntity.getType() == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
         }
-        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
         
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = null;
         switch (propertyFinanceFormChargeEntity.getType()) {
@@ -324,7 +324,7 @@ public class PropertyFinanceOrderController {
 //        if (propertyCollectionFormEntity.getStartTime() == null && propertyCollectionFormEntity.getEndTime() == null) {
 //            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 //        }
-        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity),"查询成功");
     }
     
@@ -359,7 +359,7 @@ public class PropertyFinanceOrderController {
         if (propertyCollectionFormEntity.getType() == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
         }
-        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
     
         PropertyCollectionFormEntity propertyCollectionFormEntityList = null;
         switch (propertyCollectionFormEntity.getType()) {
@@ -391,7 +391,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出财务报表-小区收入")
     @PostMapping("/downloadFinanceFormList")
     public ResponseEntity<byte[]> downloadFinanceFormList(@RequestBody PropertyFinanceFormEntity propertyFinanceFormEntity) {
-        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         List<PropertyFinanceFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelFinanceFormList(propertyFinanceFormEntity);
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
@@ -421,7 +421,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出财务报表-小区收费报表")
     @PostMapping("/downloadChargeList")
     public ResponseEntity<byte[]> downloadChargeList(@RequestBody PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
-        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
         List<PropertyFinanceFormChargeEntity> orderEntities = propertyFinanceOrderService.queryExportExcelChargeList(propertyFinanceFormChargeEntity);
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
@@ -451,7 +451,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出收款报表-收款报表")
     @PostMapping("/downloadCollectionFormList")
     public ResponseEntity<byte[]> downloadCollectionFormList(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
-        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormList(propertyCollectionFormEntity);
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
@@ -481,7 +481,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出收款报表-账单统计")
     @PostMapping("/downloadCollectionFormOrderList")
     public ResponseEntity<byte[]> downloadCollectionFormOrderList(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
-        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormOrderList(propertyCollectionFormEntity);
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();

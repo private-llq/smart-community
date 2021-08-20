@@ -733,7 +733,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             DepositWrapper.le("create_time", qo.getEndTime());
         }
-        DepositWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            DepositWrapper.eq("community_id", qo.getCommunityId());
+        }
         DepositWrapper.eq("deleted", 0);
         // 查询一段时间内押金实体
         List<PropertyDepositEntity> propertyDepositEntities = propertyDepositMapper.selectList(DepositWrapper);
@@ -762,7 +764,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             advanceDepositRecordWrapper.le("create_time", qo.getEndTime());
         }
-        advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
+        }
         advanceDepositRecordWrapper.eq("deleted", 0);
         // 查询一段时间内预存款实体
         List<PropertyAdvanceDepositRecordEntity> propertyAdvanceDepositRecordEntities = propertyAdvanceDepositRecordMapper.selectList(advanceDepositRecordWrapper);
@@ -793,7 +797,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             financeOrderWrapper.le("create_time", qo.getEndTime());
         }
-        financeOrderWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            financeOrderWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderWrapper.eq("deleted", 0);
         // 查询一段时间内小区账单实体
         List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(financeOrderWrapper);
@@ -881,7 +887,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             queryWrapper.le("create_time", qo.getEndTime());
         }
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
         // 小区账单查询
@@ -905,7 +913,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             wrapper.le("create_time", qo.getEndTime());
         }
-        wrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            wrapper.eq("community_id", qo.getCommunityId());
+        }
         wrapper.eq("order_status",1);
         wrapper.eq("deleted",0);
         wrapper.groupBy("fee_rule_id");
@@ -925,7 +935,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getStartTime() != null) {
             financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
         }
-        financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderQueryWrapper.eq("order_status",0);
         financeOrderQueryWrapper.eq("deleted",0);
         financeOrderQueryWrapper.groupBy("fee_rule_id");
@@ -947,7 +959,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
         }
-        financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderEntityQueryWrapper.eq("order_status",0);
         financeOrderEntityQueryWrapper.eq("deleted",0);
         financeOrderEntityQueryWrapper.groupBy("fee_rule_id");
@@ -1008,7 +1022,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             queryWrapper.le("create_time", qo.getEndTime());
         }
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.ne("build_type",2);
         queryWrapper.groupBy("fee_rule_id");
@@ -1033,7 +1049,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             wrapper.le("create_time", qo.getEndTime());
         }
-        wrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            wrapper.eq("community_id", qo.getCommunityId());
+        }
         wrapper.eq("order_status",1);
         wrapper.eq("deleted",0);
         wrapper.ne("build_type",2);
@@ -1054,7 +1072,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getStartTime() != null) {
             financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
         }
-        financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderQueryWrapper.eq("order_status",0);
         financeOrderQueryWrapper.eq("deleted",0);
         financeOrderQueryWrapper.ne("build_type",2);
@@ -1077,7 +1097,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
         }
-        financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderEntityQueryWrapper.eq("order_status",0);
         financeOrderEntityQueryWrapper.eq("deleted",0);
         financeOrderEntityQueryWrapper.ne("build_type",2);
@@ -1139,7 +1161,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             queryWrapper.le("create_time", qo.getEndTime());
         }
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
         // 查询合计支付
@@ -1160,7 +1184,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             query.le("create_time", qo.getEndTime());
         }
-        query.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            query.eq("community_id", qo.getCommunityId());
+        }
         query.eq("deleted", 0);
         query.eq("pay_type", 1);
         query.groupBy("fee_rule_id");
@@ -1182,7 +1208,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             wrapper.le("create_time", qo.getEndTime());
         }
-        wrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            wrapper.eq("community_id", qo.getCommunityId());
+        }
         wrapper.eq("deleted", 0);
         wrapper.eq("pay_type", 2);
         wrapper.groupBy("fee_rule_id");
@@ -1204,7 +1232,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             entityQueryWrapper.le("create_time", qo.getEndTime());
         }
-        entityQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            entityQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         entityQueryWrapper.eq("deleted", 0);
         entityQueryWrapper.eq("pay_type", 3);
         entityQueryWrapper.groupBy("fee_rule_id");
@@ -1226,7 +1256,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             orderEntityQueryWrapper.le("create_time", qo.getEndTime());
         }
-        orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         orderEntityQueryWrapper.eq("deleted", 0);
         orderEntityQueryWrapper.eq("pay_type", 4);
         orderEntityQueryWrapper.groupBy("fee_rule_id");
@@ -1248,7 +1280,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             wrapper1.le("create_time", qo.getEndTime());
         }
-        wrapper1.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            wrapper1.eq("community_id", qo.getCommunityId());
+        }
         wrapper1.eq("deleted", 0);
         wrapper1.eq("pay_type", 5);
         wrapper1.groupBy("fee_rule_id");
@@ -1270,7 +1304,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getEndTime() != null) {
             queryWrapper1.le("create_time", qo.getEndTime());
         }
-        queryWrapper1.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            queryWrapper1.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper1.eq("deleted", 0);
         queryWrapper1.eq("pay_type", 6);
         queryWrapper1.groupBy("fee_rule_id");
@@ -1322,7 +1358,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getTargetId() != null) {
             queryWrapper.eq("target_id", qo.getTargetId());
         }
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("order_status");
         // 查询账单统计
@@ -1376,7 +1414,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getTargetId() != null) {
             queryWrapper.eq("target_id", qo.getTargetId());
         }
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.ne("build_type",2);
         queryWrapper.groupBy("order_status");
