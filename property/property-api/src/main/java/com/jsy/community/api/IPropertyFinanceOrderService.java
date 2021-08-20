@@ -237,4 +237,40 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Date: 2021/8/19 11:08
      **/
     PropertyCollectionFormEntity getCollectionFormOrderByOrderPeriodTime(PropertyCollectionFormEntity propertyCollectionFormEntity);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收入数据
+     *@Param: propertyFinanceFormEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceFormEntity>
+     *@Date: 2021/8/19 15:52
+     **/
+    List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收费报表
+     *@Param: propertyFinanceFormChargeEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceFormChargeEntity>
+     *@Date: 2021/8/19 15:52
+     **/
+    List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity);
+
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-收款报表
+     *@Param: propertyCollectionFormEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyCollectionFormEntity>
+     *@Date: 2021/8/19 15:52
+     **/
+    List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity);
+
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-账单统计
+     *@Param: propertyCollectionFormEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyCollectionFormEntity>
+     *@Date: 2021/8/19 15:52
+     **/
+    List<PropertyCollectionFormEntity> queryExportExcelCollectionFormOrderList(PropertyCollectionFormEntity propertyCollectionFormEntity);
 }

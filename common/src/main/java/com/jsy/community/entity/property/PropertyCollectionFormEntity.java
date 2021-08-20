@@ -70,6 +70,9 @@ public class PropertyCollectionFormEntity implements Serializable {
 	@ApiModelProperty(value = "房屋id或者车辆id")
 	private Long targetId;
 	
+	@ApiModelProperty(value = "房屋名称或者车辆编号")
+	private String targetIdName;
+	
 	@ApiModelProperty(value = "收款报表账单统计应收金额")
 	private BigDecimal StatementReceivableMoney;
 	

@@ -31,6 +31,9 @@ public class PropertyFinanceFormChargeEntity implements Serializable {
 	@ApiModelProperty(value = "合计欠收=往月欠收+本月欠收")
 	private BigDecimal arrearsMoneySum;
 	
+	@ApiModelProperty(value = "本月欠收=本月所有账单待支付")
+	private BigDecimal thisMonthArrearsMoney;
+	
 	@ApiModelProperty(value = "所有优惠金额")
 	private BigDecimal couponMoney;
 	

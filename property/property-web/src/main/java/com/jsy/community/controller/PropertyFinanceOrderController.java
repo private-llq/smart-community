@@ -379,4 +379,124 @@ public class PropertyFinanceOrderController {
         }
         return CommonResult.ok(propertyCollectionFormEntityList,"查询成功");
     }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收入
+     *@Param: :
+     *@Return: org.springframework.http.ResponseEntity<byte[]>
+     *@Date: 2021/8/19 15:49
+     **/
+    @Login
+    @ApiOperation("导出财务报表-小区收入")
+    @PostMapping("/downloadFinanceFormList")
+    public ResponseEntity<byte[]> downloadFinanceFormList(@RequestBody PropertyFinanceFormEntity propertyFinanceFormEntity) {
+        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyFinanceFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelFinanceFormList(propertyFinanceFormEntity);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("财务报表-小区收入.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportFinanceForm(orderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收费报表
+     *@Param: :
+     *@Return: org.springframework.http.ResponseEntity<byte[]>
+     *@Date: 2021/8/19 16:09
+     **/
+    @Login
+    @ApiOperation("导出财务报表-小区收费报表")
+    @PostMapping("/downloadChargeList")
+    public ResponseEntity<byte[]> downloadChargeList(@RequestBody PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
+        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyFinanceFormChargeEntity> orderEntities = propertyFinanceOrderService.queryExportExcelChargeList(propertyFinanceFormChargeEntity);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("财务报表-小区收费报表.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportCharge(orderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
+
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-收款报表
+     *@Param: :
+     *@Return: org.springframework.http.ResponseEntity<byte[]>
+     *@Date: 2021/8/19 16:11
+     **/
+    @Login
+    @ApiOperation("导出收款报表-收款报表")
+    @PostMapping("/downloadCollectionFormList")
+    public ResponseEntity<byte[]> downloadCollectionFormList(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormList(propertyCollectionFormEntity);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("收款报表-收款报表.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportCollectionForm(orderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
+
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-账单统计
+     *@Param: :
+     *@Return: org.springframework.http.ResponseEntity<byte[]>
+     *@Date: 2021/8/19 15:49
+     **/
+    @Login
+    @ApiOperation("导出收款报表-账单统计")
+    @PostMapping("/downloadCollectionFormOrderList")
+    public ResponseEntity<byte[]> downloadCollectionFormOrderList(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormOrderList(propertyCollectionFormEntity);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("收款报表-账单统计.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportCollectionFormOrder(orderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
 }

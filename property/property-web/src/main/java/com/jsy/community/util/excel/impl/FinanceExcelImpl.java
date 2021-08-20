@@ -1,15 +1,15 @@
 package com.jsy.community.util.excel.impl;
 
-import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
-import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
+import com.jsy.community.entity.property.*;
 import com.jsy.community.util.FinanceExcelHandler;
 import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.vo.StatementOrderVO;
 import com.jsy.community.vo.StatementVO;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -40,7 +40,19 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
     protected static final String DATE_FORMAT_STRING = "yyyy-MM-dd";
 
     protected static final String TIME_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
-
+    
+    // 财务报表-小区收入字段 如果增加字段  需要改变实现类逻辑
+    protected static final String[] FINANCE_FORM_TITLE_FIELD = {"类型", "线上收费", "线下收费", "退款/提现", "合计收入"};
+    
+    // 财务报表-小区收费字段 如果增加字段  需要改变实现类逻辑
+    protected static final String[] CHARGE_TITLE_FIELD = {"收费项目名称", "本月应收", "往月欠收", "优惠金额", "滞纳应收", "滞纳实收", "线上收款", "线下收款", "合计应收", "合计实收", "预存款抵扣", "合计欠收"};
+    
+    // 财务报表-小区收费字段 如果增加字段  需要改变实现类逻辑
+    protected static final String[] COLLECTION_FORM_TITLE_FIELD = {"收费项目名称", "微信支付", "支付宝支付", "余额支付", "现金支付", "银联刷卡", "银行代扣", "合计"};
+    
+    // 财务报表-小区收费字段 如果增加字段  需要改变实现类逻辑
+    protected static final String[] COLLECTION_FORM_ORDER_TITLE_FIELD = {"楼宇", "应收", "实收", "欠缴"};
+    
     /**
      * @Author: Pipi
      * @Description: 导出结算单主表
@@ -662,5 +674,494 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                 }
             }
         }
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收入
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/19 15:46
+     **/
+    @Override
+    public Workbook exportFinanceForm(List<?> entityList) {
+        //工作表名称
+        String titleName = "财务报表-小区收入";
+        //1.创建excel 工作簿
+        Workbook workbook = new XSSFWorkbook();
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = FINANCE_FORM_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        // 设置列宽
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 3000);
+        sheet.setColumnWidth(2, 3000);
+        sheet.setColumnWidth(3, 3000);
+        sheet.setColumnWidth(4, 3000);
+        for (int index = 0; index < 4; index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < FINANCE_FORM_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyFinanceFormEntity entity = (PropertyFinanceFormEntity) entityList.get(0);
+                switch (j) {
+                    case 0:
+                        // 类型
+                        if (index == 0) {
+                            cell.setCellValue("预存款充值");
+                        } else if (index == 1) {
+                            cell.setCellValue("小区收费");
+                        } else if (index == 2) {
+                            cell.setCellValue("押金");
+                        } else if (index == 3) {
+                            cell.setCellValue("合计");
+                        }
+                        break;
+                    case 1:
+                        // 线上收费
+                        if (index == 0) {
+                            if (entity.getAdvanceDepositOnlineCharging() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getAdvanceDepositOnlineCharging()));
+                            }
+                        } else if (index == 1) {
+                            if (entity.getCommunityOnlineCharging() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getCommunityOnlineCharging()));
+                            }
+                        } else if (index == 2) {
+                            if (entity.getDepositOnlineCharging() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getDepositOnlineCharging()));
+                            }
+                        } else if (index == 3) {
+                            if (entity.getOnlineChargingSum() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getOnlineChargingSum()));
+                            }
+                        }
+                        break;
+                    case 2:
+                        // 线下收费
+                        if (index == 0) {
+                            if (entity.getAdvanceDepositOfflineCharging() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getAdvanceDepositOfflineCharging()));
+                            }
+                        } else if (index == 1) {
+                            if (entity.getCommunityOfflineCharging() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getCommunityOfflineCharging()));
+                            }
+                        } else if (index == 2) {
+                            if (entity.getDepositOfflineCharging() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getDepositOfflineCharging()));
+                            }
+                        } else if (index == 3) {
+                            if (entity.getOfflineChargingSum() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getOfflineChargingSum()));
+                            }
+                        }
+                        break;
+                    case 3:
+                        // 退款/提现
+                        if (index == 0) {
+                            if (entity.getAdvanceDepositWithdrawal() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getAdvanceDepositWithdrawal()));
+                            }
+                        } else if (index == 1) {
+                            cell.setCellValue(String.valueOf(new BigDecimal("0.00")));
+                        } else if (index == 2) {
+                            if (entity.getDepositRefund() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getDepositRefund()));
+                            }
+                        } else if (index == 3) {
+                            if (entity.getRefundOrWithdrawalSum() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getRefundOrWithdrawalSum()));
+                            }
+                        }
+                        break;
+                    case 4:
+                        // 合计收入
+                        if (index == 0) {
+                            if (entity.getAdvanceDepositTotal() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getAdvanceDepositTotal()));
+                            }
+                        } else if (index == 1) {
+                            if (entity.getCommunityTotal() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getCommunityTotal()));
+                            }
+                        } else if (index == 2) {
+                            if (entity.getDepositTotal() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getDepositTotal()));
+                            }
+                        } else if (index == 3) {
+                            if (entity.getTotalSum() == null) {
+                                cell.setCellValue("0.00");
+                            } else {
+                                cell.setCellValue(String.valueOf(entity.getTotalSum()));
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收费报表
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/20 10:31
+     **/
+    @Override
+    public Workbook exportCharge(List<?> entityList) {
+        //工作表名称
+        String titleName = "财务报表-小区收费";
+        //1.创建excel 工作簿
+        Workbook workbook = new XSSFWorkbook();
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = CHARGE_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        // 设置列宽
+        sheet.setColumnWidth(0, 4000);
+        sheet.setColumnWidth(1, 3000);
+        sheet.setColumnWidth(2, 3000);
+        sheet.setColumnWidth(3, 3000);
+        sheet.setColumnWidth(4, 3000);
+        sheet.setColumnWidth(5, 3000);
+        sheet.setColumnWidth(6, 3000);
+        sheet.setColumnWidth(7, 3000);
+        sheet.setColumnWidth(8, 3000);
+        sheet.setColumnWidth(9, 3000);
+        sheet.setColumnWidth(10, 3000);
+        sheet.setColumnWidth(11, 3000);
+        for (int index = 0; index < entityList.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < CHARGE_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyFinanceFormChargeEntity entity = (PropertyFinanceFormChargeEntity) entityList.get(index);
+                switch (j) {
+                    case 0:
+                        // 收费项目名称
+                        cell.setCellValue(entity.getFeeRuleName());
+                        break;
+                    case 1:
+                        // 本月应收
+                        if (entity.getTotalMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getTotalMoney()));
+                        }
+                        break;
+                    case 2:
+                        // 往月欠收
+                        if (entity.getArrearsMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getArrearsMoney()));
+                        }
+                        break;
+                    case 3:
+                        // 优惠金额
+                        if (entity.getCouponMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getCouponMoney()));
+                        }
+                        break;
+                    case 4:
+                        // 滞纳应收
+                        if (entity.getReceivablePenalMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getReceivablePenalMoney()));
+                        }
+                        break;
+                    case 5:
+                        // 滞纳实收
+                        if (entity.getCollectPenalMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getCollectPenalMoney()));
+                        }
+                        break;
+                    case 6:
+                        // 线上收款
+                        if (entity.getCommunityOnlineCharging() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getCommunityOnlineCharging()));
+                        }
+                        break;
+                    case 7:
+                        // 线下收款
+                        if (entity.getCommunityOfflineCharging() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getCommunityOfflineCharging()));
+                        }
+                        break;
+                    case 8:
+                        // 合计应收
+                        if (entity.getTotalMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getTotalMoney()));
+                        }
+                        break;
+                    case 9:
+                        // 合计实收
+                        if (entity.getCommunityOnlineCharging() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getCommunityOnlineCharging()));
+                        }
+                        break;
+                    case 10:
+                        // 预存款抵扣
+                        if (entity.getDeductionMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getDeductionMoney()));
+                        }
+                        break;
+                    case 11:
+                        // 合计欠收
+                        if (entity.getArrearsMoneySum() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getArrearsMoneySum()));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-收款报表
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/20 10:59
+     **/
+    @Override
+    public Workbook exportCollectionForm(List<?> entityList) {
+        //工作表名称
+        String titleName = "收款报表-收款报表";
+        //1.创建excel 工作簿
+        Workbook workbook = new XSSFWorkbook();
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = COLLECTION_FORM_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        // 设置列宽
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 3000);
+        sheet.setColumnWidth(2, 3000);
+        sheet.setColumnWidth(3, 3000);
+        sheet.setColumnWidth(4, 3000);
+        sheet.setColumnWidth(5, 3000);
+        sheet.setColumnWidth(6, 3000);
+        sheet.setColumnWidth(7, 3000);
+        for (int index = 0; index < entityList.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < COLLECTION_FORM_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyCollectionFormEntity entity = (PropertyCollectionFormEntity) entityList.get(index);
+                switch (j) {
+                    case 0:
+                        // 收费项目名称
+                        cell.setCellValue(entity.getFeeRuleName());
+                        break;
+                    case 1:
+                        // 微信支付
+                        if (entity.getWeChatPaySum() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getWeChatPaySum()));
+                        }
+                        break;
+                    case 2:
+                        // 支付宝支付
+                        if (entity.getAliPaySum() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getAliPaySum()));
+                        }
+                        break;
+                    case 3:
+                        // 余额支付
+                        if (entity.getBalancePaySum() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getBalancePaySum()));
+                        }
+                        break;
+                    case 4:
+                        // 现金支付
+                        if (entity.getCashPaySum() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getCashPaySum()));
+                        }
+                        break;
+                    case 5:
+                        // 银联刷卡
+                        if (entity.getUnionPaySum() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getUnionPaySum()));
+                        }
+                        break;
+                    case 6:
+                        // 银行代扣
+                        if (entity.getBankPaySum() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getBankPaySum()));
+                        }
+                        break;
+                    case 7:
+                        // 合计
+                        if (entity.getTotalSum() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getTotalSum()));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-账单统计
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/20 10:59
+     **/
+    @Override
+    public Workbook exportCollectionFormOrder(List<?> entityList) {
+        //工作表名称
+        String titleName = "收款报表-账单统计";
+        //1.创建excel 工作簿
+        Workbook workbook = new XSSFWorkbook();
+        //2.创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        String[] titleField = COLLECTION_FORM_ORDER_TITLE_FIELD;
+        //4.创建excel标题行头(最大的那个标题)
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+        //5.创建excel 字段列  (表示具体的数据列字段)
+        ExcelUtil.createExcelField(workbook, sheet, titleField);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        // 设置列宽
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 3000);
+        sheet.setColumnWidth(2, 3000);
+        sheet.setColumnWidth(3, 3000);
+        for (int index = 0; index < entityList.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < COLLECTION_FORM_ORDER_TITLE_FIELD.length; j++) {
+                cell = row.createCell(j);
+                PropertyCollectionFormEntity entity = (PropertyCollectionFormEntity) entityList.get(index);
+                switch (j) {
+                    case 0:
+                        // 楼宇
+                        cell.setCellValue(entity.getTargetIdName());
+                        break;
+                    case 1:
+                        // 应收
+                        if (entity.getStatementReceivableMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getStatementReceivableMoney()));
+                        }
+                        break;
+                    case 2:
+                        // 实收
+                        if (entity.getStatementCollectMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getStatementCollectMoney()));
+                        }
+                        break;
+                    case 3:
+                        // 欠缴
+                        if (entity.getStatementArrearsMoney() == null) {
+                            cell.setCellValue("0.00");
+                        } else {
+                            cell.setCellValue(String.valueOf(entity.getStatementArrearsMoney()));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
     }
 }
