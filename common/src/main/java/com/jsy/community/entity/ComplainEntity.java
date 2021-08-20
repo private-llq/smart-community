@@ -29,12 +29,27 @@ public class ComplainEntity implements Serializable {
     private String serialNumber;
     @ApiModelProperty(value = "社区id")
     private String communityId;
-    @NotNull(message = "类型不能为空")
+
+   /**
+    * @Param:   新版本 没有这个字段  暂时注释掉
+    *            加了一个新字段  电话号码
+    * @Return:
+    * @Author: Tian
+    * @Date: 2021/8/20-10:53
+    **/
+    //@NotNull(message = "类型不能为空")
     @ApiModelProperty(value = "类型，1投诉，2建议")
     private Integer type;
+
     @NotNull(message = "类容不能为空")
     @ApiModelProperty(value = "内容")
     private String content;
+
+    @NotNull(message = "电话不能为空")
+    @ApiModelProperty(value = "电话")
+    private String phone;
+
+
     @ApiModelProperty(hidden = true)
     private Integer deleted;
     @ApiModelProperty(hidden = true)
