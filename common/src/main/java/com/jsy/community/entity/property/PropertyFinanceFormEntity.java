@@ -67,4 +67,15 @@ public class PropertyFinanceFormEntity implements Serializable {
 	@ApiModelProperty(value = "按月查询")
 	private Integer month;
 	
+	@ApiModelProperty(value = "线上收费合计")
+	private BigDecimal OnlineChargingSum;
+	
+	@ApiModelProperty(value = "线下收费合计")
+	private BigDecimal OfflineChargingSum;
+	
+	@ApiModelProperty(value = "退款或提现合计")
+	private BigDecimal refundOrWithdrawalSum;
+	
+	@ApiModelProperty(value = "总合计")
+	private BigDecimal totalSum;
 }

@@ -8,14 +8,14 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.*;
-import com.jsy.community.mapper.PropertyAdvanceDepositRecordMapper;
-import com.jsy.community.mapper.PropertyDepositMapper;
-import com.jsy.community.mapper.PropertyFeeRuleMapper;
-import com.jsy.community.mapper.PropertyFinanceOrderMapper;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
+import com.jsy.community.utils.DateCalculateUtil;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
@@ -31,7 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -67,6 +71,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
     @Autowired
     private PropertyAdvanceDepositRecordMapper propertyAdvanceDepositRecordMapper;
+    
+    @Autowired
+    private HouseMapper houseMapper;
 
     /**
      * @Description: 查询房间所有未缴账单
@@ -720,9 +727,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         PropertyFinanceFormEntity propertyFinanceFormEntity = new PropertyFinanceFormEntity();
         // 押金查询
         QueryWrapper<PropertyDepositEntity> DepositWrapper = new QueryWrapper<>();
-        DepositWrapper.ge("create_time", qo.getStartTime());
-        DepositWrapper.le("create_time", qo.getEndTime());
-        DepositWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            DepositWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            DepositWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            DepositWrapper.eq("community_id", qo.getCommunityId());
+        }
         DepositWrapper.eq("deleted", 0);
         // 查询一段时间内押金实体
         List<PropertyDepositEntity> propertyDepositEntities = propertyDepositMapper.selectList(DepositWrapper);
@@ -741,13 +754,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 押金退款
         propertyFinanceFormEntity.setDepositRefund(depositRefund);
         // 押金合计
-        propertyFinanceFormEntity.setAdvanceDepositTotal(depositSum);
+        propertyFinanceFormEntity.setDepositTotal(depositSum);
     
         // 预存款查询
         QueryWrapper<PropertyAdvanceDepositRecordEntity> advanceDepositRecordWrapper = new QueryWrapper<>();
-        advanceDepositRecordWrapper.ge("create_time", qo.getStartTime());
-        advanceDepositRecordWrapper.le("create_time", qo.getEndTime());
-        advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            advanceDepositRecordWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            advanceDepositRecordWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
+        }
         advanceDepositRecordWrapper.eq("deleted", 0);
         // 查询一段时间内预存款实体
         List<PropertyAdvanceDepositRecordEntity> propertyAdvanceDepositRecordEntities = propertyAdvanceDepositRecordMapper.selectList(advanceDepositRecordWrapper);
@@ -756,8 +775,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 预存款提现
         BigDecimal advanceDepositWithdrawal = new BigDecimal("0.00");
         for (PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity : propertyAdvanceDepositRecordEntities) {
-            advanceDepositSum = advanceDepositSum.add(propertyAdvanceDepositRecordEntity.getDepositAmount());
-            advanceDepositWithdrawal = advanceDepositWithdrawal.add(propertyAdvanceDepositRecordEntity.getPayAmount());
+            if (propertyAdvanceDepositRecordEntity.getDepositAmount() != null) {
+                advanceDepositSum = advanceDepositSum.add(propertyAdvanceDepositRecordEntity.getDepositAmount());
+            }
+            if (propertyAdvanceDepositRecordEntity.getPayAmount() != null) {
+                advanceDepositWithdrawal = advanceDepositWithdrawal.add(propertyAdvanceDepositRecordEntity.getPayAmount());
+            }
         }
         // 预存款线上收费
         propertyFinanceFormEntity.setAdvanceDepositOnlineCharging(advanceDepositSum);
@@ -768,21 +791,78 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         
         // 小区账单查询
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderWrapper = new QueryWrapper<>();
-        financeOrderWrapper.ge("create_time", qo.getStartTime());
-        financeOrderWrapper.le("create_time", qo.getEndTime());
-        financeOrderWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            financeOrderWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            financeOrderWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            financeOrderWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderWrapper.eq("deleted", 0);
         // 查询一段时间内小区账单实体
         List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(financeOrderWrapper);
         // 小区账单线上收费合计
         BigDecimal communitySum = new BigDecimal("0.00");
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : propertyFinanceOrderEntities) {
-            communitySum = communitySum.add(propertyFinanceOrderEntity.getTotalMoney());
+            if (propertyFinanceOrderEntity.getTotalMoney() != null) {
+                communitySum = communitySum.add(propertyFinanceOrderEntity.getTotalMoney());
+            }
         }
         // 小区账单线上收费
         propertyFinanceFormEntity.setCommunityOnlineCharging(communitySum);
         // 小区账单合计
         propertyFinanceFormEntity.setCommunityTotal(communitySum);
+        
+        // 线上收费合计
+        if (communitySum == null && advanceDepositSum == null && depositSum == null) {
+            propertyFinanceFormEntity.setOnlineChargingSum(new BigDecimal("0.00"));
+        } else if (communitySum == null && advanceDepositSum == null) {
+            propertyFinanceFormEntity.setOnlineChargingSum(depositSum);
+        } else if (communitySum == null && depositSum == null) {
+            propertyFinanceFormEntity.setOnlineChargingSum(advanceDepositSum);
+        } else if (advanceDepositSum == null && depositSum == null) {
+            propertyFinanceFormEntity.setOnlineChargingSum(communitySum);
+        } else if (communitySum == null) {
+            propertyFinanceFormEntity.setOnlineChargingSum(advanceDepositSum.add(depositSum));
+        } else if (advanceDepositSum == null) {
+            propertyFinanceFormEntity.setOnlineChargingSum(communitySum.add(depositSum));
+        } else if (depositSum == null) {
+            propertyFinanceFormEntity.setOnlineChargingSum(communitySum.add(advanceDepositSum));
+        } else {
+            propertyFinanceFormEntity.setOnlineChargingSum(communitySum.add(advanceDepositSum).add(depositSum));
+        }
+        
+        // 退款或提现合计
+        if (depositRefund == null && advanceDepositWithdrawal == null) {
+            propertyFinanceFormEntity.setRefundOrWithdrawalSum(new BigDecimal("0.00"));
+        } else if (depositRefund == null) {
+            propertyFinanceFormEntity.setRefundOrWithdrawalSum(advanceDepositWithdrawal);
+        } else if (advanceDepositWithdrawal == null) {
+            propertyFinanceFormEntity.setRefundOrWithdrawalSum(depositRefund);
+        } else {
+            propertyFinanceFormEntity.setRefundOrWithdrawalSum(depositRefund.add(advanceDepositWithdrawal));
+        }
+        
+        // 总合计
+        if (propertyFinanceFormEntity.getAdvanceDepositTotal() == null && propertyFinanceFormEntity.getCommunityTotal() == null && propertyFinanceFormEntity.getDepositTotal() ==null) {
+            propertyFinanceFormEntity.setTotalSum(new BigDecimal("0.00"));
+        } else if (propertyFinanceFormEntity.getAdvanceDepositTotal() == null && propertyFinanceFormEntity.getCommunityTotal() == null) {
+            propertyFinanceFormEntity.setTotalSum(propertyFinanceFormEntity.getDepositTotal());
+        } else if (propertyFinanceFormEntity.getCommunityTotal() == null && propertyFinanceFormEntity.getDepositTotal() ==null) {
+            propertyFinanceFormEntity.setTotalSum(propertyFinanceFormEntity.getAdvanceDepositTotal());
+        } else if (propertyFinanceFormEntity.getAdvanceDepositTotal() == null && propertyFinanceFormEntity.getDepositTotal() ==null) {
+            propertyFinanceFormEntity.setTotalSum(propertyFinanceFormEntity.getCommunityTotal());
+        } else if (propertyFinanceFormEntity.getAdvanceDepositTotal() == null) {
+            propertyFinanceFormEntity.setTotalSum(propertyFinanceFormEntity.getCommunityTotal().add(propertyFinanceFormEntity.getDepositTotal()));
+        } else if (propertyFinanceFormEntity.getCommunityTotal() == null) {
+            propertyFinanceFormEntity.setTotalSum(propertyFinanceFormEntity.getAdvanceDepositTotal().add(propertyFinanceFormEntity.getDepositTotal()));
+        } else if (propertyFinanceFormEntity.getDepositTotal() ==null) {
+            propertyFinanceFormEntity.setTotalSum(propertyFinanceFormEntity.getAdvanceDepositTotal().add(propertyFinanceFormEntity.getCommunityTotal()));
+        } else {
+            propertyFinanceFormEntity.setTotalSum(propertyFinanceFormEntity.getAdvanceDepositTotal().add(propertyFinanceFormEntity.getCommunityTotal()).add(propertyFinanceFormEntity.getDepositTotal()));
+        }
         
         return propertyFinanceFormEntity;
     }
@@ -801,9 +881,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as totalMoney,SUM( penal_sum ) as receivablePenalMoney,SUM( coupon ) as couponMoney,SUM( deduction ) as deductionMoney");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
         // 小区账单查询
@@ -821,9 +907,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
         wrapper.select("fee_rule_id as feeRuleId,SUM( penal_sum ) as collectPenalMoney,SUM( total_money ) as communityOnlineCharging");
-        wrapper.ge("create_time", qo.getStartTime());
-        wrapper.le("create_time", qo.getEndTime());
-        wrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            wrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            wrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            wrapper.eq("community_id", qo.getCommunityId());
+        }
         wrapper.eq("order_status",1);
         wrapper.eq("deleted",0);
         wrapper.groupBy("fee_rule_id");
@@ -840,8 +932,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderQueryWrapper = new QueryWrapper<>();
         financeOrderQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as arrearsMoney");
-        financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
-        financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
+        }
+        if (qo.getCommunityId() != null) {
+            financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderQueryWrapper.eq("order_status",0);
         financeOrderQueryWrapper.eq("deleted",0);
         financeOrderQueryWrapper.groupBy("fee_rule_id");
@@ -857,9 +953,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderEntityQueryWrapper = new QueryWrapper<>();
         financeOrderEntityQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as thisMonthArrearsMoney");
-        financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
-        financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
-        financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderEntityQueryWrapper.eq("order_status",0);
         financeOrderEntityQueryWrapper.eq("deleted",0);
         financeOrderEntityQueryWrapper.groupBy("fee_rule_id");
@@ -868,12 +970,20 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entityList) {
             for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
                 if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
-                    for (PropertyFinanceOrderEntity lastMonthEntity : lastMonthEntities) {
-                        if (lastMonthEntity.getFeeRuleId().equals(financeFormChargeEntity.getFeeRuleId())){
-                            financeFormChargeEntity.setArrearsMoneySum(propertyFinanceOrderEntity.getThisMonthArrearsMoney().add(lastMonthEntity.getArrearsMoney()));
-                        }
-                    }
+                    financeFormChargeEntity.setThisMonthArrearsMoney(propertyFinanceOrderEntity.getThisMonthArrearsMoney());
                 }
+            }
+        }
+        //合计欠收
+        for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+            if (financeFormChargeEntity.getArrearsMoney() == null && financeFormChargeEntity.getThisMonthArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(new BigDecimal("0.00"));
+            } else if (financeFormChargeEntity.getArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getThisMonthArrearsMoney());
+            } else if (financeFormChargeEntity.getThisMonthArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getArrearsMoney());
+            } else {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getArrearsMoney().add(financeFormChargeEntity.getThisMonthArrearsMoney()));
             }
         }
         // 补充项目名称
@@ -881,10 +991,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
             paramList.add(financeFormChargeEntity.getFeeRuleId());
         }
-        Map<String, Map<String, Object>> longMapMap = propertyFeeRuleMapper.selectFeeRuleIdName(paramList);
-        for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-            Map<String, Object> countMap = longMapMap.get(financeFormChargeEntity.getFeeRuleId());
-            financeFormChargeEntity.setFeeRuleName(countMap != null ? String.valueOf(countMap.get("name")) : "");
+        if (paramList.size() > 0) {
+            Map<String, Map<String, Object>> longMapMap = propertyFeeRuleMapper.selectFeeRuleIdName(paramList);
+            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                Map<String, Object> countMap = longMapMap.get(financeFormChargeEntity.getFeeRuleId());
+                financeFormChargeEntity.setFeeRuleName(countMap != null ? String.valueOf(countMap.get("name")) : "");
+            }
         }
     
         return propertyFinanceFormChargeEntityList;
@@ -904,9 +1016,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as totalMoney,SUM( penal_sum ) as receivablePenalMoney,SUM( coupon ) as couponMoney,SUM( deduction ) as deductionMoney");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.ne("build_type",2);
         queryWrapper.groupBy("fee_rule_id");
@@ -925,9 +1043,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
         wrapper.select("fee_rule_id as feeRuleId,SUM( penal_sum ) as collectPenalMoney,SUM( total_money ) as communityOnlineCharging");
-        wrapper.ge("create_time", qo.getStartTime());
-        wrapper.le("create_time", qo.getEndTime());
-        wrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            wrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            wrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            wrapper.eq("community_id", qo.getCommunityId());
+        }
         wrapper.eq("order_status",1);
         wrapper.eq("deleted",0);
         wrapper.ne("build_type",2);
@@ -945,8 +1069,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderQueryWrapper = new QueryWrapper<>();
         financeOrderQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as arrearsMoney");
-        financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
-        financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            financeOrderQueryWrapper.lt("create_time", qo.getStartTime());
+        }
+        if (qo.getCommunityId() != null) {
+            financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderQueryWrapper.eq("order_status",0);
         financeOrderQueryWrapper.eq("deleted",0);
         financeOrderQueryWrapper.ne("build_type",2);
@@ -960,12 +1088,18 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 }
             }
         }
-    
+        
         QueryWrapper<PropertyFinanceOrderEntity> financeOrderEntityQueryWrapper = new QueryWrapper<>();
         financeOrderEntityQueryWrapper.select("fee_rule_id as feeRuleId,SUM( total_money ) as thisMonthArrearsMoney");
-        financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
-        financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
-        financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            financeOrderEntityQueryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            financeOrderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         financeOrderEntityQueryWrapper.eq("order_status",0);
         financeOrderEntityQueryWrapper.eq("deleted",0);
         financeOrderEntityQueryWrapper.ne("build_type",2);
@@ -975,12 +1109,20 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entityList) {
             for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
                 if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
-                    for (PropertyFinanceOrderEntity lastMonthEntity : lastMonthEntities) {
-                        if (lastMonthEntity.getFeeRuleId().equals(financeFormChargeEntity.getFeeRuleId())){
-                            financeFormChargeEntity.setArrearsMoneySum(propertyFinanceOrderEntity.getThisMonthArrearsMoney().add(lastMonthEntity.getArrearsMoney()));
-                        }
-                    }
+                    financeFormChargeEntity.setThisMonthArrearsMoney(propertyFinanceOrderEntity.getThisMonthArrearsMoney());
                 }
+            }
+        }
+        //合计欠收
+        for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+            if (financeFormChargeEntity.getArrearsMoney() == null && financeFormChargeEntity.getThisMonthArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(new BigDecimal("0.00"));
+            } else if (financeFormChargeEntity.getArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getThisMonthArrearsMoney());
+            } else if (financeFormChargeEntity.getThisMonthArrearsMoney() == null) {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getArrearsMoney());
+            } else {
+                financeFormChargeEntity.setArrearsMoneySum(financeFormChargeEntity.getArrearsMoney().add(financeFormChargeEntity.getThisMonthArrearsMoney()));
             }
         }
         // 补充项目名称
@@ -988,10 +1130,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
             paramList.add(financeFormChargeEntity.getFeeRuleId());
         }
-        Map<String, Map<String, Object>> longMapMap = propertyFeeRuleMapper.selectFeeRuleIdName(paramList);
-        for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-            Map<String, Object> countMap = longMapMap.get(financeFormChargeEntity.getFeeRuleId());
-            financeFormChargeEntity.setFeeRuleName(countMap != null ? String.valueOf(countMap.get("name")) : "");
+        if (paramList.size() > 0) {
+            Map<String, Map<String, Object>> longMapMap = propertyFeeRuleMapper.selectFeeRuleIdName(paramList);
+            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                Map<String, Object> countMap = longMapMap.get(financeFormChargeEntity.getFeeRuleId());
+                financeFormChargeEntity.setFeeRuleName(countMap != null ? String.valueOf(countMap.get("name")) : "");
+            }
         }
         
         return propertyFinanceFormChargeEntityList;
@@ -1011,12 +1155,18 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS totalSum");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
-        // 查询合计支付次数
+        // 查询合计支付
         List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(queryWrapper);
         PropertyCollectionFormEntity propertyCollectionFormEntity;
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : propertyFinanceOrderEntities) {
@@ -1028,13 +1178,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> query = new QueryWrapper<>();
         query.select("fee_rule_id as feeRuleId,SUM(total_money) AS weChatPaySum");
-        query.ge("create_time", qo.getStartTime());
-        query.le("create_time", qo.getEndTime());
-        query.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            query.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            query.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            query.eq("community_id", qo.getCommunityId());
+        }
         query.eq("deleted", 0);
         query.eq("pay_type", 1);
         query.groupBy("fee_rule_id");
-        // 查询微信支付次数
+        // 查询微信支付
         List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(query);
         for (PropertyFinanceOrderEntity entity : entities) {
             for (PropertyCollectionFormEntity collectionFormEntity : propertyCollectionFormEntityList) {
@@ -1046,13 +1202,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper = new QueryWrapper<>();
         wrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS aliPaySum");
-        wrapper.ge("create_time", qo.getStartTime());
-        wrapper.le("create_time", qo.getEndTime());
-        wrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            wrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            wrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            wrapper.eq("community_id", qo.getCommunityId());
+        }
         wrapper.eq("deleted", 0);
         wrapper.eq("pay_type", 2);
         wrapper.groupBy("fee_rule_id");
-        // 查询支付宝支付次数
+        // 查询支付宝支付
         List<PropertyFinanceOrderEntity> entities1 = propertyFinanceOrderMapper.selectList(wrapper);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entities1) {
             for (PropertyCollectionFormEntity collectionFormEntity : propertyCollectionFormEntityList) {
@@ -1064,13 +1226,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> entityQueryWrapper = new QueryWrapper<>();
         entityQueryWrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS balancePaySum");
-        entityQueryWrapper.ge("create_time", qo.getStartTime());
-        entityQueryWrapper.le("create_time", qo.getEndTime());
-        entityQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            entityQueryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            entityQueryWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            entityQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         entityQueryWrapper.eq("deleted", 0);
         entityQueryWrapper.eq("pay_type", 3);
         entityQueryWrapper.groupBy("fee_rule_id");
-        // 查询余额支付次数
+        // 查询余额支付
         List<PropertyFinanceOrderEntity> entities2 = propertyFinanceOrderMapper.selectList(entityQueryWrapper);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entities2) {
             for (PropertyCollectionFormEntity collectionFormEntity : propertyCollectionFormEntityList) {
@@ -1082,13 +1250,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> orderEntityQueryWrapper = new QueryWrapper<>();
         orderEntityQueryWrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS cashPaySum");
-        orderEntityQueryWrapper.ge("create_time", qo.getStartTime());
-        orderEntityQueryWrapper.le("create_time", qo.getEndTime());
-        orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            orderEntityQueryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            orderEntityQueryWrapper.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        }
         orderEntityQueryWrapper.eq("deleted", 0);
         orderEntityQueryWrapper.eq("pay_type", 4);
         orderEntityQueryWrapper.groupBy("fee_rule_id");
-        // 查询现金支付次数
+        // 查询现金支付
         List<PropertyFinanceOrderEntity> entities3 = propertyFinanceOrderMapper.selectList(orderEntityQueryWrapper);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entities3) {
             for (PropertyCollectionFormEntity collectionFormEntity : propertyCollectionFormEntityList) {
@@ -1100,13 +1274,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> wrapper1 = new QueryWrapper<>();
         wrapper1.select("fee_rule_id as feeRuleId,SUM(total_money) AS UnionPaySum");
-        wrapper1.ge("create_time", qo.getStartTime());
-        wrapper1.le("create_time", qo.getEndTime());
-        wrapper1.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            wrapper1.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            wrapper1.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            wrapper1.eq("community_id", qo.getCommunityId());
+        }
         wrapper1.eq("deleted", 0);
         wrapper1.eq("pay_type", 5);
         wrapper1.groupBy("fee_rule_id");
-        // 查询银联刷卡支付次数
+        // 查询银联刷卡支付
         List<PropertyFinanceOrderEntity> entities4 = propertyFinanceOrderMapper.selectList(wrapper1);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entities4) {
             for (PropertyCollectionFormEntity collectionFormEntity : propertyCollectionFormEntityList) {
@@ -1118,13 +1298,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.select("fee_rule_id as feeRuleId,SUM(total_money) AS bankPaySum");
-        queryWrapper1.ge("create_time", qo.getStartTime());
-        queryWrapper1.le("create_time", qo.getEndTime());
-        queryWrapper1.eq("community_id", qo.getCommunityId());
+        if (qo.getStartTime() != null) {
+            queryWrapper1.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper1.le("create_time", qo.getEndTime());
+        }
+        if (qo.getCommunityId() != null) {
+            queryWrapper1.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper1.eq("deleted", 0);
         queryWrapper1.eq("pay_type", 6);
         queryWrapper1.groupBy("fee_rule_id");
-        // 查询银行代扣支付次数
+        // 查询银行代扣支付
         List<PropertyFinanceOrderEntity> entities5 = propertyFinanceOrderMapper.selectList(queryWrapper1);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entities5) {
             for (PropertyCollectionFormEntity collectionFormEntity : propertyCollectionFormEntityList) {
@@ -1163,12 +1349,18 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("order_status AS orderStatus,SUM(total_money) AS totalMoney");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
         if (qo.getTargetId() != null) {
             queryWrapper.eq("target_id", qo.getTargetId());
         }
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("order_status");
         // 查询账单统计
@@ -1190,7 +1382,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementCollectMoney().add(propertyCollectionFormEntity.getStatementArrearsMoney()));
         }
-    
+        // 补充房屋名称
+        HouseEntity houseEntity = houseMapper.selectById(propertyCollectionFormEntity.getTargetId());
+        if (houseEntity != null) {
+            propertyCollectionFormEntity.setTargetIdName(houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor());
+        }
+        
         return propertyCollectionFormEntity;
     }
     
@@ -1208,12 +1405,18 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("order_status AS orderStatus,SUM(total_money) AS totalMoney");
-        queryWrapper.ge("create_time", qo.getStartTime());
-        queryWrapper.le("create_time", qo.getEndTime());
+        if (qo.getStartTime() != null) {
+            queryWrapper.ge("create_time", qo.getStartTime());
+        }
+        if (qo.getEndTime() != null) {
+            queryWrapper.le("create_time", qo.getEndTime());
+        }
         if (qo.getTargetId() != null) {
             queryWrapper.eq("target_id", qo.getTargetId());
         }
-        queryWrapper.eq("community_id", qo.getCommunityId());
+        if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
         queryWrapper.eq("deleted", 0);
         queryWrapper.ne("build_type",2);
         queryWrapper.groupBy("order_status");
@@ -1229,9 +1432,185 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             }
         }
         // 总计-应收
-        propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementCollectMoney().add(propertyCollectionFormEntity.getStatementReceivableMoney()));
+        if (propertyCollectionFormEntity.getStatementCollectMoney() == null) {
+            propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementArrearsMoney());
+        } else if (propertyCollectionFormEntity.getStatementArrearsMoney() == null) {
+            propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementCollectMoney());
+        } else {
+            propertyCollectionFormEntity.setStatementReceivableMoney(propertyCollectionFormEntity.getStatementCollectMoney().add(propertyCollectionFormEntity.getStatementArrearsMoney()));
+        }
+        // 补充房屋名称
+        HouseEntity houseEntity = houseMapper.selectById(propertyCollectionFormEntity.getTargetId());
+        if (houseEntity != null) {
+            propertyCollectionFormEntity.setTargetIdName(houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor());
+        }
     
         return propertyCollectionFormEntity;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收入数据
+     *@Param: propertyFinanceFormEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceFormEntity>
+     *@Date: 2021/8/19 15:52
+     **/
+    @Override
+    public List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity) {
+        List<PropertyFinanceFormEntity> propertyFinanceFormEntityList = new LinkedList<>();
+        try {
+        if (propertyFinanceFormEntity.getYear() != null) {
+            String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyFinanceFormEntity.getYear());
+            String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(propertyFinanceFormEntity.getYear());
+            propertyFinanceFormEntity.setStartTime(LocalDate.parse(firstYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            propertyFinanceFormEntity.setEndTime(LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        }
+        if (propertyFinanceFormEntity.getMonth() != null) {
+            String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyFinanceFormEntity.getMonth());
+            String lastMouthDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(propertyFinanceFormEntity.getMonth());
+            propertyFinanceFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            propertyFinanceFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        PropertyFinanceFormEntity financeFormCommunityIncome = getFinanceFormCommunityIncome(propertyFinanceFormEntity);
+        propertyFinanceFormEntityList.add(financeFormCommunityIncome);
+        if (propertyFinanceFormEntityList.size() <= 0) {
+            throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
+        }
+        return propertyFinanceFormEntityList;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收费报表
+     *@Param: propertyFinanceFormChargeEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceFormChargeEntity>
+     *@Date: 2021/8/19 15:52
+     **/
+    @Override
+    public List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
+        List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
+        try {
+            if (propertyFinanceFormChargeEntity.getYear() != null) {
+                String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyFinanceFormChargeEntity.getYear());
+                String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(propertyFinanceFormChargeEntity.getYear());
+                propertyFinanceFormChargeEntity.setStartTime(LocalDate.parse(firstYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyFinanceFormChargeEntity.setEndTime(LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (propertyFinanceFormChargeEntity.getMonth() != null) {
+                String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyFinanceFormChargeEntity.getMonth());
+                String lastMouthDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(propertyFinanceFormChargeEntity.getMonth());
+                propertyFinanceFormChargeEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyFinanceFormChargeEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        switch (propertyFinanceFormChargeEntity.getType()) {
+            case 1:
+                // 按账单生成时间
+                propertyFinanceFormChargeEntityList = getFinanceFormCommunityChargeByOrderGenerateTime(propertyFinanceFormChargeEntity);
+                break;
+            case 2:
+                // 按账单周期时间
+                propertyFinanceFormChargeEntityList = getFinanceFormCommunityChargeByOrderPeriodTime(propertyFinanceFormChargeEntity);
+                break;
+            default:
+                break;
+        }
+        if (propertyFinanceFormChargeEntityList == null || propertyFinanceFormChargeEntityList.size() <= 0) {
+            throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
+        }
+        return propertyFinanceFormChargeEntityList;
+    }
+
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-收款报表
+     *@Param: propertyCollectionFormEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyCollectionFormEntity>
+     *@Date: 2021/8/19 15:52
+     **/
+    @Override
+    public List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        try {
+            if (propertyCollectionFormEntity.getYear() != null) {
+                String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (propertyCollectionFormEntity.getMonth() != null) {
+                String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                String lastMouthDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (propertyCollectionFormEntity.getDay() != null) {
+                ZoneId zone = ZoneId.systemDefault();
+                Instant instant = propertyCollectionFormEntity.getDay().atStartOfDay().atZone(zone).toInstant();
+                String firstDate = DateCalculateUtil.getFirstDate(Date.from(instant));
+                String lastDate = DateCalculateUtil.getLastDate(Date.from(instant));
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<PropertyCollectionFormEntity> propertyFinanceFormEntityList = getCollectionFormCollection(propertyCollectionFormEntity);
+        if (propertyFinanceFormEntityList == null || propertyFinanceFormEntityList.size() <= 0) {
+            throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
+        }
+        return propertyFinanceFormEntityList;
+    }
+
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-账单统计
+     *@Param: propertyCollectionFormEntity:
+     *@Return: java.util.List<com.jsy.community.entity.property.PropertyCollectionFormEntity>
+     *@Date: 2021/8/19 15:52
+     **/
+    @Override
+    public List<PropertyCollectionFormEntity> queryExportExcelCollectionFormOrderList(PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        List<PropertyCollectionFormEntity> propertyCollectionFormEntityList = new LinkedList<>();
+        try {
+            if (propertyCollectionFormEntity.getYear() != null) {
+                String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (propertyCollectionFormEntity.getMonth() != null) {
+                String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                String lastMouthDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        PropertyCollectionFormEntity entity = new PropertyCollectionFormEntity();
+        switch (propertyCollectionFormEntity.getType()) {
+            case 1:
+                // 按账单生成时间
+                entity = getCollectionFormOrderByOrderGenerateTime(propertyCollectionFormEntity);
+                break;
+            case 2:
+                // 按账单周期时间
+                entity = getCollectionFormOrderByOrderPeriodTime(propertyCollectionFormEntity);
+                break;
+            default:
+                break;
+        }
+        propertyCollectionFormEntityList.add(entity);
+        if (propertyCollectionFormEntityList.size() <= 0) {
+            throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
+        }
+        
+        return propertyCollectionFormEntityList;
     }
 }
 

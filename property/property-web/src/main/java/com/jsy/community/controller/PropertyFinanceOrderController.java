@@ -232,10 +232,10 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         ValidatorUtils.validateEntity(propertyFinanceFormEntity);
-        if (propertyFinanceFormEntity.getStartTime() == null && propertyFinanceFormEntity.getEndTime() == null) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
-        }
-        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        if (propertyFinanceFormEntity.getStartTime() == null && propertyFinanceFormEntity.getEndTime() == null) {
+//            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+//        }
+//        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityIncome(propertyFinanceFormEntity),"查询成功");
     }
     
@@ -261,10 +261,10 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         ValidatorUtils.validateEntity(propertyFinanceFormChargeEntity);
-        if (propertyFinanceFormChargeEntity.getStartTime() == null || propertyFinanceFormChargeEntity.getEndTime() == null || propertyFinanceFormChargeEntity.getType() == null) {
+        if (propertyFinanceFormChargeEntity.getType() == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
         }
-        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
         
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = null;
         switch (propertyFinanceFormChargeEntity.getType()) {
@@ -321,10 +321,10 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         ValidatorUtils.validateEntity(propertyCollectionFormEntity);
-        if (propertyCollectionFormEntity.getStartTime() == null && propertyCollectionFormEntity.getEndTime() == null) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
-        }
-        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        if (propertyCollectionFormEntity.getStartTime() == null && propertyCollectionFormEntity.getEndTime() == null) {
+//            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+//        }
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity),"查询成功");
     }
     
@@ -356,10 +356,10 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         ValidatorUtils.validateEntity(propertyCollectionFormEntity);
-        if (propertyCollectionFormEntity.getStartTime() == null || propertyCollectionFormEntity.getEndTime() == null || propertyCollectionFormEntity.getType() == null) {
+        if (propertyCollectionFormEntity.getType() == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
         }
-        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
     
         PropertyCollectionFormEntity propertyCollectionFormEntityList = null;
         switch (propertyCollectionFormEntity.getType()) {
@@ -378,5 +378,125 @@ public class PropertyFinanceOrderController {
             throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
         }
         return CommonResult.ok(propertyCollectionFormEntityList,"查询成功");
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收入
+     *@Param: :
+     *@Return: org.springframework.http.ResponseEntity<byte[]>
+     *@Date: 2021/8/19 15:49
+     **/
+    @Login
+    @ApiOperation("导出财务报表-小区收入")
+    @PostMapping("/downloadFinanceFormList")
+    public ResponseEntity<byte[]> downloadFinanceFormList(@RequestBody PropertyFinanceFormEntity propertyFinanceFormEntity) {
+//        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyFinanceFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelFinanceFormList(propertyFinanceFormEntity);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("财务报表-小区收入.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportFinanceForm(orderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收费报表
+     *@Param: :
+     *@Return: org.springframework.http.ResponseEntity<byte[]>
+     *@Date: 2021/8/19 16:09
+     **/
+    @Login
+    @ApiOperation("导出财务报表-小区收费报表")
+    @PostMapping("/downloadChargeList")
+    public ResponseEntity<byte[]> downloadChargeList(@RequestBody PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
+//        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyFinanceFormChargeEntity> orderEntities = propertyFinanceOrderService.queryExportExcelChargeList(propertyFinanceFormChargeEntity);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("财务报表-小区收费报表.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportCharge(orderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
+
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-收款报表
+     *@Param: :
+     *@Return: org.springframework.http.ResponseEntity<byte[]>
+     *@Date: 2021/8/19 16:11
+     **/
+    @Login
+    @ApiOperation("导出收款报表-收款报表")
+    @PostMapping("/downloadCollectionFormList")
+    public ResponseEntity<byte[]> downloadCollectionFormList(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormList(propertyCollectionFormEntity);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("收款报表-收款报表.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportCollectionForm(orderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
+
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-账单统计
+     *@Param: :
+     *@Return: org.springframework.http.ResponseEntity<byte[]>
+     *@Date: 2021/8/19 15:49
+     **/
+    @Login
+    @ApiOperation("导出收款报表-账单统计")
+    @PostMapping("/downloadCollectionFormOrderList")
+    public ResponseEntity<byte[]> downloadCollectionFormOrderList(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormOrderList(propertyCollectionFormEntity);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("收款报表-账单统计.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportCollectionFormOrder(orderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
     }
 }

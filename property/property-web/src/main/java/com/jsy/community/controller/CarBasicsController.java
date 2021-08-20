@@ -43,7 +43,7 @@ public class CarBasicsController {
      public CommonResult findSpecial(){
          System.out.println(UserUtils.getAdminCommunityId());
          CarBasicsEntity  carBasicsEntity = carBasics.findOne(UserUtils.getAdminCommunityId());
-         return CommonResult.ok(carBasicsEntity,"操作成功");
+         return CommonResult.ok(carBasicsEntity);
      }
 
      @ApiOperation("添加火修改特殊车辆是否收费")
