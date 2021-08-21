@@ -49,4 +49,13 @@ public interface IPropertyDepositService extends IService<PropertyDepositEntity>
 	 * @Date: 2021/08/11
 	 **/
 	PageInfo<PropertyDepositEntity> queryPropertyDeposit(BaseQO<PropertyDepositQO> baseQO);
+	
+	/**
+	 * @Description: 通过id获取押金凭证数据
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/20
+	 **/
+	PropertyDepositEntity getDepositById(Long id);
 }

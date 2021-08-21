@@ -86,4 +86,40 @@ public interface ICarService extends IService<CarEntity> {
      * @param uid           用户id
      */
     void update(CarQO c, String uid);
+
+    /**
+     * @Description: 新app添加车辆
+     * @author: Hu
+     * @since: 2021/8/21 10:08
+     * @Param:
+     * @return:
+     */
+    void addRelationCar(CarEntity carEntity);
+
+    /**
+     * @Description: 新app添加车辆
+     * @author: Hu
+     * @since: 2021/8/21 10:08
+     * @Param:
+     * @return:
+     */
+    void updateRelationCar(CarEntity carEntity);
+
+    /**
+     * @Description: 新app查询车辆
+     * @author: Hu
+     * @since: 2021/8/21 10:17
+     * @Param:
+     * @return:
+     */
+    List<CarEntity> getCars(Long communityId,String uid);
+
+    /**
+     * @Description: 新app删除车辆
+     * @author: Hu
+     * @since: 2021/8/21 10:39
+     * @Param:
+     * @return:
+     */
+    void delete(Long id, String userId);
 }

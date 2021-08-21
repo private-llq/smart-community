@@ -40,13 +40,13 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
-    @Range(groups = {AddCarValidated.class}, min = 1, message = "社区id不合法")
-    @NotNull(groups = {AddCarValidated.class}, message = "社区不能为空")
+    @Range(groups = {AddCarValidated.class,SaveCarValidated.class}, min = 1, message = "社区id不合法")
+    @NotNull(groups = {AddCarValidated.class,SaveCarValidated.class}, message = "社区不能为空")
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
 
-    @Pattern(groups = {AddCarValidated.class, ProprietorCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
-    @NotNull(groups = {AddCarValidated.class, ProprietorCarValidated.class}, message = "车牌不能为空!")
+    @Pattern(groups = {AddCarValidated.class, ProprietorCarValidated.class,SaveCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
+    @NotNull(groups = {AddCarValidated.class, ProprietorCarValidated.class,SaveCarValidated.class}, message = "车牌不能为空!")
     @ApiModelProperty(value = "车辆牌照")
     private String carPlate;
 
@@ -100,6 +100,13 @@ public class CarEntity extends BaseEntity {
      * 单独[业主]登记车辆前端参数验证接口
      */
     public interface AddCarValidated {}
+
+    /**
+     * 新app添加修改车辆
+     */
+    public interface SaveCarValidated {}
+
+
 
 
 

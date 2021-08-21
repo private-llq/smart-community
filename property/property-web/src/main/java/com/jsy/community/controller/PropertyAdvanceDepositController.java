@@ -76,15 +76,18 @@ public class PropertyAdvanceDepositController {
     @ApiOperation("新增预存款充值余额")
     @PostMapping("/add/recharge")
     public CommonResult addRechargePropertyAdvanceDeposit(@RequestBody PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
-        if(propertyAdvanceDepositEntity.getBalance() == null || propertyAdvanceDepositEntity.getHouseId() == null || propertyAdvanceDepositEntity.getMobile() == null){
+        if(propertyAdvanceDepositEntity.getHouseId() == null || propertyAdvanceDepositEntity.getMobile() == null){
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
+        }
+        if (propertyAdvanceDepositEntity.getBalance() == null && propertyAdvanceDepositEntity.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请输入正确的金额");
         }
         ValidatorUtils.validateEntity(propertyAdvanceDepositEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
         propertyAdvanceDepositEntity.setCommunityId(loginUser.getCommunityId());
         propertyAdvanceDepositEntity.setCreateBy(loginUser.getUid());
         boolean result = propertyAdvanceDepositService.addRechargePropertyAdvanceDeposit(propertyAdvanceDepositEntity);
-        return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增物业押金账单失败");
+        return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增预存款充值余额失败");
     }
     
     /**
@@ -97,6 +100,9 @@ public class PropertyAdvanceDepositController {
     @ApiOperation("修改预存款充值余额")
     @PutMapping("/update/recharge")
     public CommonResult updateRechargePropertyAdvanceDeposit(@RequestBody PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
+        if (propertyAdvanceDepositEntity.getBalance() == null && propertyAdvanceDepositEntity.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请输入正确的金额");
+        }
         ValidatorUtils.validateEntity(propertyAdvanceDepositEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
         propertyAdvanceDepositEntity.setCommunityId(loginUser.getCommunityId());
