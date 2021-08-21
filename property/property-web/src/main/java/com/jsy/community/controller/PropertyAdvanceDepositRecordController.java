@@ -26,10 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -129,5 +126,19 @@ public class PropertyAdvanceDepositRecordController {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
 		}
+	}
+	
+	/**
+	 * @Description: 通过id获取预存款明细记录打印信息
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/20
+	 **/
+	@Login
+	@ApiOperation("通过id获取预存款明细记录")
+	@GetMapping("/getAdvanceDepositRecordById")
+	public CommonResult getAdvanceDepositRecordById(Long id) {
+		return CommonResult.ok(propertyAdvanceDepositRecordService.getAdvanceDepositRecordById(id, UserUtils.getAdminCommunityId()));
 	}
 }

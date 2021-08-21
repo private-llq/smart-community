@@ -134,4 +134,20 @@ public class PropertyDepositController {
         }
         return CommonResult.ok(qrCodeUrl);
     }
+    
+    /**
+     * @Description: 通过id获取押金凭证数据
+     * @Param: [id]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/08/20
+     **/
+    @Login
+    @ApiOperation("通过id获取押金凭证数据")
+    @GetMapping("/getDepositById")
+    public CommonResult getDepositById(Long id) {
+        PropertyDepositEntity propertyDepositEntity = new PropertyDepositEntity();
+        propertyDepositEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(propertyDepositService.getDepositById(id));
+    }
 }

@@ -5,8 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyAdvanceDepositRecordService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.ProprietorEntity;
+import com.jsy.community.entity.property.PropertyAdvanceDepositEntity;
 import com.jsy.community.entity.property.PropertyAdvanceDepositRecordEntity;
-import com.jsy.community.mapper.PropertyAdvanceDepositRecordMapper;
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyAdvanceDepositRecordQO;
 import com.jsy.community.utils.MyPageUtils;
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -35,6 +40,18 @@ public class PropertyAdvanceDepositRecordServiceImpl extends ServiceImpl<Propert
     
     @Autowired
     private PropertyAdvanceDepositRecordMapper propertyAdvanceDepositRecordMapper;
+	
+	@Autowired
+	private PropertyAdvanceDepositMapper propertyAdvanceDepositMapper;
+	
+	@Autowired
+	private HouseMapper houseMapper;
+	
+	@Autowired
+	private ProprietorMapper proprietorMapper;
+	
+	@Autowired
+	private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
 	
 	/**
 	 * @Description: 新增预存款变更明细记录
@@ -122,5 +139,43 @@ public class PropertyAdvanceDepositRecordServiceImpl extends ServiceImpl<Propert
 			entity.setTypeName(entity.getType() == 1 ? "预存款支付" : "预存款充值：后台充值");
 		}
 		return propertyAdvanceDepositRecordEntities;
+	}
+	
+	/**
+	 * @Description: 通过id获取预存款明细记录打印信息
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/20
+	 **/
+	@Override
+	public PropertyAdvanceDepositRecordEntity getAdvanceDepositRecordById(Long id, Long communityId) {
+		PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = propertyAdvanceDepositRecordMapper.selectById(id);
+		// 通过预存款id查询房屋id再查询房屋地址
+		PropertyAdvanceDepositEntity entity = propertyAdvanceDepositMapper.selectById(propertyAdvanceDepositRecordEntity.getAdvanceDepositId());
+		// 补充房屋地址数据
+		HouseEntity houseEntity = houseMapper.selectById(entity.getHouseId());
+		propertyAdvanceDepositRecordEntity.setHouseAddress(houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor());
+		// 补充收款人真实姓名数据
+		ProprietorEntity proprietorEntity = proprietorMapper.queryNameAndMobileByHouseId(entity.getHouseId(), communityId);
+		if (proprietorEntity.getRealName() != null) {
+			propertyAdvanceDepositRecordEntity.setRealName(proprietorEntity.getRealName());
+		}
+		// 补充收款方式
+		if (propertyAdvanceDepositRecordEntity.getType() == 2) {
+			if (propertyAdvanceDepositRecordEntity.getDepositAmount() != null || propertyAdvanceDepositRecordEntity.getDepositAmount().compareTo(BigDecimal.ZERO) == 1) {
+				propertyAdvanceDepositRecordEntity.setPayTypeName("充值");
+			} else if (propertyAdvanceDepositRecordEntity.getPayAmount() != null || propertyAdvanceDepositRecordEntity.getPayAmount().compareTo(BigDecimal.ZERO) == 1) {
+				propertyAdvanceDepositRecordEntity.setPayTypeName("提现");
+			}
+		} else if (propertyAdvanceDepositRecordEntity.getType() == 1) {
+			PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(propertyAdvanceDepositRecordEntity.getOrderId());
+			if (propertyFinanceOrderEntity.getPayType() != null) {
+				propertyAdvanceDepositRecordEntity.setPayTypeName(propertyFinanceOrderEntity.getPayType() == 1 ? "微信支付" :
+					propertyFinanceOrderEntity.getPayType() == 2 ? "支付宝支付" : propertyFinanceOrderEntity.getPayType() == 3 ? "余额支付" :
+						propertyFinanceOrderEntity.getPayType() == 4 ? "现金支付" : propertyFinanceOrderEntity.getPayType() == 5 ? "银联刷卡" : propertyFinanceOrderEntity.getPayType() == 6 ? "银行代扣" : "");
+			}
+		}
+		return propertyAdvanceDepositRecordEntity;
 	}
 }
