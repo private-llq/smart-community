@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.IPropertyCompanyService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.qo.BaseQO;
@@ -15,6 +17,7 @@ import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.DistanceUtil;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	
 	@Autowired
 	private IUserHouseService userHouseService;
+
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPropertyCompanyService propertyCompanyService;
 	
 	@Override
 	public PageInfo<CommunityEntity> queryCommunity(BaseQO<CommunityQO> baseQO){
@@ -179,7 +185,24 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	public CommunityEntity queryCommunityById(Long id){
 		return communityMapper.selectById(id);
 	}
-	
+
+
+	/**
+	 * @Description: 查询当前小区物业公司信息
+	 * @author: Hu
+	 * @since: 2021/8/20 15:16
+	 * @Param: [id]
+	 * @return: com.jsy.community.entity.PropertyCompanyEntity
+	 */
+	@Override
+	public PropertyCompanyEntity getCompany(Long id) {
+		CommunityEntity entity = communityMapper.selectById(id);
+		if (entity != null) {
+			return propertyCompanyService.findOne(entity.getPropertyId());
+		}
+		return null;
+	}
+
 	/**
 	 * @Description: 查询所有小区ID
 	 * @Param: []
