@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @TableName("t_car_charge")
@@ -35,7 +36,7 @@ public class CarChargeEntity implements Serializable {
      */
     private Integer type;
     /**
-     * 位置
+     * 位置 0:地上 1：地下
      */
     private String position;
     /**
@@ -43,8 +44,21 @@ public class CarChargeEntity implements Serializable {
      */
     private BigDecimal money;
 
-
-
-
+    /**
+     * 临时->车牌类型 0 黄牌 1 蓝牌
+     */
+    private Integer plateType;
+    /**
+     * 临时->免费时间 单位/分钟
+     */
+    private Integer freeTime;
+    /**
+     * 临时->收费价格 元/时
+     */
+    private BigDecimal chargePrice;
+    /**
+     * 临时->封顶费用 单位/元
+     */
+    private BigDecimal cappingFee;
 
 }

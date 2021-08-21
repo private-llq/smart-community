@@ -3,7 +3,7 @@
 <mapper namespace="com.jsy.community.mapper.CarMonthlyVehicleMapper">
 
 
-    <select id="FindByMultiConditionPage" resultType="com.baomidou.mybatisplus.core.metadata.IPage">
+    <select id="FindByMultiConditionPage" resultType="com.jsy.community.entity.property.CarMonthlyVehicle">
         SELECT cm.* FROM t_car_monthly_vehicle as cm
         <where>
             <if test="query.communityId!=null and query.communityId!=''">

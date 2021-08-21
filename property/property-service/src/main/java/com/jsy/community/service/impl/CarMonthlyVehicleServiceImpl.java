@@ -47,7 +47,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     }
 
     /**
-     * 只能修改 车牌号，车主姓名，电话，备注
+     * 修改
      * @param carMonthlyVehicle
      * @return
      */
@@ -55,11 +55,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Transactional
     public Integer UpdateMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle) {
         int update = carMonthlyVehicleMapper.update(carMonthlyVehicle,
-                new UpdateWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle)
-                        .set("car_number",carMonthlyVehicle.getCarNumber())
-                        .set("owner_name",carMonthlyVehicle.getOwnerName())
-                        .set("phone",carMonthlyVehicle.getPhone())
-                        .set("remarks",carMonthlyVehicle.getRemarks()));
+                new QueryWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle.getUid()));
+
         return update;
     }
 
@@ -149,6 +146,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @param uid
      * @param type
      */
+    //TODO 该接口已舍弃
     @Override
     @Transactional
     public void monthlyChange(String uid, Integer type) {

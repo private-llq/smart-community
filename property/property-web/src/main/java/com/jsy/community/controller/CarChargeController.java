@@ -6,6 +6,7 @@ import com.jsy.community.api.ICarChargeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.CarChargeQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -13,6 +14,7 @@ import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Api(tags = "停车收费设置")
@@ -26,7 +28,7 @@ public class CarChargeController {
 
 
     @Login
-    @GetMapping("/listPage")
+    @PostMapping("/listPage")
     public CommonResult<PageInfo> listPage(@RequestBody BaseQO baseQO){
 
         PageInfo pageInfo= carChargeService.listCarChargePage(baseQO, UserUtils.getAdminCommunityId());
@@ -42,13 +44,13 @@ public class CarChargeController {
     }
 
     @PutMapping("/update")
-    CommonResult update(@RequestBody CarChargeEntity carChargeEntity){
+    public CommonResult update(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.UpdateCarCharge(carChargeEntity);
         return CommonResult.ok();
 
     }
     @DeleteMapping("/del")
-    CommonResult delete(@RequestParam("uid") String uid){
+    public CommonResult delete(@RequestParam("uid") String uid){
         carChargeService.DelCarCharge(uid);
         return CommonResult.ok();
     }
@@ -60,8 +62,33 @@ public class CarChargeController {
      */
     @Login
     @GetMapping("/getTypeList")
-    CommonResult getTypeList(@RequestParam Integer type){
+    public CommonResult getTypeList(@RequestParam Integer type){
         List<CarChargeEntity> list = carChargeService.selectCharge(type,UserUtils.getAdminCommunityId());
         return CommonResult.ok(list);
     }
+
+
+    /**
+     * 临时停车收费设置 save
+     */
+    @Login
+    @PostMapping("/temporaryParkingSet")
+    public CommonResult temporaryParkingSet(@RequestBody CarChargeEntity carChargeEntity){
+        Integer integer = carChargeService.temporaryParkingSet(carChargeEntity, UserUtils.getAdminCommunityId());
+        return CommonResult.ok();
+    }
+
+    /**
+     * 计算该项设置的收费 Test charge
+     */
+
+    @Login
+    @PostMapping("/TestCharge")
+    public CommonResult TestCharge(@RequestBody CarChargeQO carChargeQO){
+       BigDecimal charge =carChargeService.testCharge(carChargeQO);
+        return CommonResult.ok(charge);
+    }
+
+
+
 }

@@ -34,7 +34,7 @@ public class CarBlackListServiceImpl implements ICarBlackListService {
         PageInfo<CarBlackListEntity> pageInfo = new PageInfo<>();
         Page<CarBlackListEntity> selectPage = carBlackListMapper.selectPage(Page,
                 new QueryWrapper<CarBlackListEntity>()
-                        .eq(StringUtils.isNoneBlank(baseQO.getQuery()),"car_number", baseQO.getQuery())
+                        .like(StringUtils.isNoneBlank(baseQO.getQuery()),"car_number", baseQO.getQuery())
                         .eq("community_id",communityId)
         );
         pageInfo.setTotal(selectPage.getTotal());

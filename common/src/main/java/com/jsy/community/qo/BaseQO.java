@@ -20,11 +20,11 @@ public class BaseQO<T> implements Serializable {
 	
 	@ApiModelProperty("分页查询当前页")
 	@TableField(exist = false)
-	private Long page;
+	private Long page=1L;
 	
 	@ApiModelProperty("分页查询每页数据条数")
 	@TableField(exist = false)
-	private Long size;
+	private Long size=10L;
 
 	@TableField(exist = false)
 	private T query;
