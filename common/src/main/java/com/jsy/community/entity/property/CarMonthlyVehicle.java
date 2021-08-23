@@ -44,7 +44,7 @@ public class CarMonthlyVehicle implements Serializable {
      */
     private String phone;
     /**
-     * 包月方式 0:地上 1：地下
+     * 包月方式 1:地上 2：地下
      */
     private Integer monthlyMethod;
     /**
