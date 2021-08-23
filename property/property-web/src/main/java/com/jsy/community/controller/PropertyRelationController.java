@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.constant.Const;
@@ -79,6 +80,7 @@ public class PropertyRelationController {
     @ApiOperation("新增")
     @PostMapping("/save")
     @Login
+    @businessLog(operation = "新增",content = "新增了【物业家属】")
     public CommonResult save(@RequestBody HouseMemberEntity houseMemberEntity){
 
         propertyRelationService.save(houseMemberEntity,UserUtils.getAdminUserInfo().getUid());
@@ -87,6 +89,7 @@ public class PropertyRelationController {
     @ApiOperation("修改")
     @PutMapping("/update")
     @Login
+    @businessLog(operation = "编辑",content = "更新了【物业家属】")
     public CommonResult update(@RequestBody HouseMemberEntity houseMemberEntity){
         propertyRelationService.update(houseMemberEntity);
         return CommonResult.ok();
@@ -94,6 +97,7 @@ public class PropertyRelationController {
     @ApiOperation("批量删除")
     @DeleteMapping("/deletes")
     @Login
+    @businessLog(operation = "删除",content = "删除了【批量物业家属】")
     public CommonResult deletes(@RequestParam String ids){
         String[] split = ids.split(",");
         Long[] longAry= new Long[split.length];
@@ -106,6 +110,7 @@ public class PropertyRelationController {
     @ApiOperation("删除")
     @DeleteMapping("/delete")
     @Login
+    @businessLog(operation = "删除",content = "删除了【物业家属】")
     public CommonResult delete(@RequestParam Long id){
         propertyRelationService.delete(id);
         return CommonResult.ok();
@@ -122,6 +127,7 @@ public class PropertyRelationController {
     @ApiOperation("新增入住图")
     @PostMapping("/enterPicture")
     @Login
+    @businessLog(operation = "新增",content = "新增了【物业家属入住图】")
     public CommonResult enterPicture(@RequestParam("file") MultipartFile file) {
         if(PicUtil.checkSizeAndType(file,2048)){
             String upload = MinioUtils.upload(file, "enterimge");
@@ -132,6 +138,7 @@ public class PropertyRelationController {
     @ApiOperation("新增身份证图")
     @PostMapping("/idCardImage")
     @Login
+    @businessLog(operation = "新增",content = "新增了【物业家属身份证图】")
     public CommonResult idCardImage(@RequestParam("file") MultipartFile file) {
         if(PicUtil.checkSizeAndType(file,2048)){
             String upload = MinioUtils.upload(file, "idcardimage");

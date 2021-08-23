@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyDepositService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
@@ -48,6 +49,7 @@ public class PropertyDepositController {
     @Login
     @ApiOperation("新增物业押金账单")
     @PostMapping("/add")
+    @businessLog(operation = "新增",content = "新增了【物业押金账单】")
     public CommonResult addPropertyDeposit(@RequestBody PropertyDepositEntity propertyDepositEntity){
         if(propertyDepositEntity.getDepositType() == null || propertyDepositEntity.getDepositTargetId() == null || propertyDepositEntity.getPayService() == null || propertyDepositEntity.getBillMoney() == null){
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
@@ -69,6 +71,7 @@ public class PropertyDepositController {
     @Login
     @ApiOperation("修改物业押金账单")
     @PutMapping("/update")
+    @businessLog(operation = "编辑",content = "更新了【物业押金账单】")
     public CommonResult updatePropertyDeposit(@RequestBody PropertyDepositEntity propertyDepositEntity){
         ValidatorUtils.validateEntity(propertyDepositEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
@@ -87,6 +90,7 @@ public class PropertyDepositController {
     @Login
     @ApiOperation("删除物业押金账单")
     @DeleteMapping("/delete")
+    @businessLog(operation = "删除",content = "删除了【物业押金账单】")
     public CommonResult deletePropertyDeposit(@RequestParam Long id){
         return propertyDepositService.deletePropertyDeposit(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
     }
