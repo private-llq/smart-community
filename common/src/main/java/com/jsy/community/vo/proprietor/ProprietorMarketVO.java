@@ -1,33 +1,19 @@
-package com.jsy.community.entity.proprietor;
+package com.jsy.community.vo.proprietor;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.jsy.community.entity.BaseEntity;
-import com.jsy.community.entity.CarEntity;
-import com.jsy.community.qo.BaseQO;
+import com.jsy.community.vo.BaseVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
-@ApiModel("社区集市实体类")
+@ApiModel("我的发布商品返回参数")
 @EqualsAndHashCode(callSuper = false)
-@TableName("t_proprietor_market")
-public class ProprietorMarketEntity extends BaseEntity {
-
-    @ApiModelProperty(value = "发布人uid")
-    private String uid;
-
-    @ApiModelProperty(value = "社区id")
-    private  Long communityId;
-
+public class ProprietorMarketVO extends BaseVO {
     @ApiModelProperty(value = "商品名")
     private String goodsName;
 
@@ -41,25 +27,11 @@ public class ProprietorMarketEntity extends BaseEntity {
     @ApiModelProperty(value = "是否面议（0不面议 1面议  默认1）")
     private Integer negotiable;
 
-    @ApiModelProperty(value = "标签id")
-    private String labelId;
-
     @ApiModelProperty(value = "上下架（0下架  1上架）")
     private Integer state;
 
-    @ApiModelProperty(value = "商品类别id")
-    private String categoryId;
-
-    @ApiModelProperty(value = "点击率")
-    private Integer click;
-
-
     @ApiModelProperty(value = "手机号")
     private String phone;
-
-
-    @ApiModelProperty(value = "图片")
-    private String images;
 
     @TableField(exist = false)
     @ApiModelProperty("标签名")
@@ -68,6 +40,4 @@ public class ProprietorMarketEntity extends BaseEntity {
     @ApiModelProperty("类别名")
     @TableField(exist = false)
     private String categoryName;
-
-
 }
