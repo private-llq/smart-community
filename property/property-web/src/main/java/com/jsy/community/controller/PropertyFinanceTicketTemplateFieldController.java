@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyFinanceTicketTemplateFieldService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FinanceTicketTemplateFieldEntity;
@@ -39,6 +40,7 @@ public class PropertyFinanceTicketTemplateFieldController {
      **/
     @Login
     @PostMapping("/addTicketTemplateField")
+    @businessLog(operation = "新增",content = "新增了【票据字段】")
     public CommonResult addTicketTemplateField(@RequestBody List<FinanceTicketTemplateFieldEntity> ticketTemplateFieldEntities) {
         if (CollectionUtil.isEmpty(ticketTemplateFieldEntities)) {
             throw new JSYException(400, "请选择票据字段");
@@ -59,6 +61,7 @@ public class PropertyFinanceTicketTemplateFieldController {
      **/
     @Login
     @PostMapping("/updateTicketTemplateField")
+    @businessLog(operation = "编辑",content = "更新了【票据字段】")
     public CommonResult updateTicketTemplateField(@RequestBody List<FinanceTicketTemplateFieldEntity> ticketTemplateFieldEntities) {
         if (CollectionUtil.isEmpty(ticketTemplateFieldEntities)) {
             throw new JSYException(400, "请选择票据字段");

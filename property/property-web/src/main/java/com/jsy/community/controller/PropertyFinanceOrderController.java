@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyCollectionFormEntity;
@@ -75,6 +76,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("修改订单优惠金额")
     @PutMapping("/updateOrder")
     @Login
+    @businessLog(operation = "编辑",content = "更新了【订单优惠金额】")
     public CommonResult updateOrder(@RequestParam("id") Long id, @RequestParam("coupon")BigDecimal coupon){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.updateOrder(id,coupon);
@@ -83,6 +85,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("删除一条账单")
     @DeleteMapping("/delete")
     @Login
+    @businessLog(operation = "删除",content = "删除了【一条物业房间账单】")
     public CommonResult delete(@RequestParam("id") Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.delete(id);
@@ -91,6 +94,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("删除多条条账单")
     @DeleteMapping("/deletes")
     @Login
+    @businessLog(operation = "删除",content = "删除了【多条物业房间账单】")
     public CommonResult deletes(@RequestBody FinanceOrderOperationQO financeOrderOperationQO){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.deletes(financeOrderOperationQO);
@@ -99,6 +103,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("修改一条订单状态")
     @PutMapping("/update")
     @Login
+    @businessLog(operation = "编辑",content = "更新了【一条物业房间账单状态】")
     public CommonResult update(@RequestParam("id") Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.update(id);
@@ -107,6 +112,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("条件修改订单状态")
     @PutMapping("/updates")
     @Login
+    @businessLog(operation = "编辑",content = "更新了【多条物业房间账单状态】")
     public CommonResult updates(@RequestBody FinanceOrderOperationQO financeOrderOperationQO){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.updates(financeOrderOperationQO);

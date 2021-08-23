@@ -10,6 +10,6 @@ import org.apache.ibatis.annotations.Param;
 
 public interface CarMonthlyVehicleMapper extends BaseMapper<CarMonthlyVehicle> {
 
-    IPage FindByMultiConditionPage(@Param("page") Page page, @Param("query") CarMonthlyVehicleQO carMonthlyVehicleQO);
+    IPage<CarMonthlyVehicle> FindByMultiConditionPage(@Param("page") Page page, @Param("query") CarMonthlyVehicleQO carMonthlyVehicleQO);
 
 }

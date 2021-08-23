@@ -1383,4 +1383,23 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
     public List<HouseEntity> selectAllBuildingUnitDoor(Long communityId) {
 	    return houseMapper.selectAllBuildingUnitDoor(communityId);
     }
+    /**
+     * 根据楼栋id和社区id查询楼栋名字集合
+     * @param strings
+     * @return
+     */
+    @Override
+    public List<String> selectBuildingNameByIdList(List<String> strings, Long communityId) {
+        System.out.println(strings.toString()+communityId);
+        List<String> list=new ArrayList<>();
+        for (String string : strings) {
+            long l = Long.parseLong(string);
+            HouseEntity houseEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("community_id", communityId).eq("id", l));
+            String building = houseEntity.getBuilding();
+            list.add(building);
+        }
+        return list;
+    }
+
+
 }

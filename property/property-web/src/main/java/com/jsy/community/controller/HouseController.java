@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.BusinessConst;
@@ -107,6 +108,7 @@ public class HouseController {
 	@Login
 	@ApiOperation("【楼宇房屋】新增楼栋、单元、房屋")
 	@PostMapping("/add")
+	@businessLog(operation = "新增",content = "新增了【楼宇房屋】")
 	public CommonResult addHouse(@RequestBody HouseEntity houseEntity){
 		if(houseEntity.getType() == null){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
@@ -135,6 +137,7 @@ public class HouseController {
 	@Login
 	@ApiOperation("【楼宇房屋】修改")
 	@PutMapping("/update")
+	@businessLog(operation = "编辑",content = "更新了【楼宇房屋】")
 	public CommonResult updateHouse(@RequestBody HouseEntity houseEntity){
 		ValidatorUtils.validateEntity(houseEntity, HouseEntity.updateHouseValidatedGroup.class);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
@@ -185,6 +188,7 @@ public class HouseController {
 	@Login
 	@ApiOperation("【楼宇房屋】删除")
 	@DeleteMapping("/delete")
+	@businessLog(operation = "删除",content = "删除了【楼宇房屋】")
 	public CommonResult deleteHouse(@RequestParam Long id){
 		return houseService.deleteHouse(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
@@ -198,6 +202,7 @@ public class HouseController {
 	 **/
 	@ApiOperation("【楼宇房屋】批量删除")
 	@DeleteMapping("/deletes")
+	
 	public CommonResult deletesHouse(@RequestParam List<Long> ids) {
 		boolean result = houseService.deletesHouse(ids);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "【楼宇房屋】 批量删除失败");
@@ -215,6 +220,7 @@ public class HouseController {
 	@Login
 	@ApiOperation("【楼宇房屋】新增楼宇分类")
 	@PostMapping("/building/type/add")
+	@businessLog(operation = "新增",content = "新增了【楼宇分类】")
 	public CommonResult addHouseBuildingType(@RequestBody HouseBuildingTypeEntity houseBuildingTypeEntity){
 		ValidatorUtils.validateEntity(houseBuildingTypeEntity,HouseBuildingTypeEntity.addHouseBuildingTypeGroup.class);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
@@ -234,6 +240,7 @@ public class HouseController {
 	@Login
 	@ApiOperation("【楼宇房屋】修改楼宇分类")
 	@PostMapping("/building/type/update")
+	@businessLog(operation = "编辑",content = "更新了【楼宇分类】")
 	public CommonResult updateHouseBuildingType(@RequestBody HouseBuildingTypeEntity houseBuildingTypeEntity){
 		ValidatorUtils.validateEntity(houseBuildingTypeEntity);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
@@ -253,6 +260,7 @@ public class HouseController {
 	@Login
 	@ApiOperation("【楼宇房屋】删除楼宇分类")
 	@DeleteMapping("/building/type/delete")
+	@businessLog(operation = "删除",content = "删除了【楼宇分类】")
 	public CommonResult deleteHouseBuildingType(@RequestParam Long id){
 		return houseService.deleteHouseBuildingType(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
@@ -603,5 +611,10 @@ public class HouseController {
 		returnMap.put("list", menuList);
 		return CommonResult.ok(returnMap);
 	}
+
+
+
+
+
 }
 

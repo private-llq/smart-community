@@ -14,11 +14,14 @@ import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserHouseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.Data;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -81,7 +84,7 @@ public class UserHouseController {
                 }
             }
         }
-        return null;
+        return CommonResult.error(1,"房间不存在");
     }
 
     /**
@@ -99,16 +102,30 @@ public class UserHouseController {
     }
 
     /**
-     * @Description: 编辑查询 and 切换房屋查询
+     * @Description: 我的房屋
      * @author: Hu
      * @since: 2021/8/17 14:52
      * @Param:
      * @return:
      */
-    @ApiOperation("编辑查询 and 切换房屋查询")
+    @ApiOperation("我的房屋")
     @GetMapping("selectHouse")
-    public CommonResult update(@RequestParam Long communityId){
-        List<UserHouseVO> houseMemberVOS = userHouseService.selectHouse(communityId, UserUtils.getUserId());
+    public CommonResult meHouse(){
+        List<UserHouseVO> houseMemberVOS = userHouseService.meHouse(UserUtils.getUserId());
+        return CommonResult.ok(houseMemberVOS);
+    }
+
+    /**
+     * @Description: 切换房屋
+     * @author: Hu
+     * @since: 2021/8/17 14:52
+     * @Param:
+     * @return:
+     */
+    @ApiOperation("切换房屋")
+    @GetMapping("switchoverHouse")
+    public CommonResult switchoverHouse(){
+        List<UserHouseVO> houseMemberVOS = userHouseService.selectHouse(UserUtils.getUserId());
         return CommonResult.ok(houseMemberVOS);
     }
 
@@ -138,6 +155,60 @@ public class UserHouseController {
     public CommonResult membersDelete(@RequestParam String ids){
         userHouseService.membersDelete(ids, UserUtils.getUserId());
         return CommonResult.ok();
+    }
+
+    /**
+     * @Description: 获取公共常量接口
+     * @author: Hu
+     * @since: 2021/8/17 14:52
+     * @Param:
+     * @return:
+     */
+    @ApiOperation("获取公共常量接口")
+    @GetMapping("getSource")
+    public CommonResult getSource(@RequestParam Long houseId){
+        LinkedList<Relation> list = new LinkedList<>();
+        Relation relation;
+        ControlVO permissions = UserUtils.getPermissions(UserUtils.getUserId(), redisTemplate);
+        for (ControlVO permission : permissions.getPermissions()) {
+            if (houseId.equals(permission.getHouseId())){
+                if (permission.getAccessLevel().equals(1)){
+                    relation = new Relation();
+                    relation.setCode(6);
+                    relation.setName("家属");
+                    list.add(relation);
+                    relation = new Relation();
+                    relation.setCode(7);
+                    relation.setName("租客");
+                    list.add(relation);
+                    return CommonResult.ok(list);
+                }else {
+                    if(permission.getAccessLevel().equals(2)){
+                        relation = new Relation();
+                        relation.setCode(7);
+                        relation.setName("租客");
+                        list.add(relation);
+                        return CommonResult.ok(list);
+                    }
+                }
+            }
+        }
+        return CommonResult.ok(list);
+    }
+
+
+
+    /**
+     * @Description: 公共常量返回类
+     * @author: Hu
+     * @since: 2021/8/20 10:01
+     * @Param:
+     * @return:
+     */
+    @Data
+    class Relation implements Serializable {
+        private Integer code;
+        private String name;
     }
 
 

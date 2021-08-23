@@ -2,8 +2,10 @@ package com.jsy.community.api;
 
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.CarChargeQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -45,4 +47,14 @@ public interface ICarChargeService {
      * @return
      */
     PageInfo listCarChargePage(BaseQO<Integer> baseQO, Long communityId);
+
+    /**
+     * 临时停车收费设置
+     * @param carChargeEntity
+     * @param adminCommunityId
+     * @return
+     */
+    Integer temporaryParkingSet(CarChargeEntity carChargeEntity, Long adminCommunityId);
+
+    BigDecimal testCharge(CarChargeQO carChargeQO);
 }

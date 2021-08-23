@@ -129,13 +129,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	void attestation(UserHouseQO userHouseQO, String userId);
 
 	/**
-	 * @Description: 查询业主当前小区下所有认证的房屋
+	 * @Description: 切换房屋
 	 * @author: Hu
 	 * @since: 2021/8/17 15:57
 	 * @Param:
 	 * @return:
 	 */
-	List<UserHouseVO> selectHouse(Long communityId, String userId);
+	List<UserHouseVO> selectHouse(String userId);
 
 	/**
 	 * @Description: 家属或者租客更新
@@ -181,4 +181,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @return:
 	 */
 	UserHouseVO lesseeHouseDetails(UserHouseQO userHouseQO, String userId);
+
+	/**
+	 * @Description: 我的认证房屋
+	 * @author: Hu
+	 * @since: 2021/8/20 15:46
+	 * @Param:
+	 * @return:
+	 */
+	List<UserHouseVO> meHouse(String userId);
 }

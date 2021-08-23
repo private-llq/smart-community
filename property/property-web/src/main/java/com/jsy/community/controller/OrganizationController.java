@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IOrganizationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.OrganizationEntity;
@@ -44,6 +45,7 @@ public class OrganizationController {
 	
 	@ApiOperation("新增组织机构")
 	@PostMapping("/addOrganization")
+	@businessLog(operation = "新增",content = "新增了【组织机构】")
 	public CommonResult addOrganization(@RequestBody OrganizationEntity organizationEntity) {
 		organizationEntity.setCommunityId(UserUtils.getAdminUserInfo().getCommunityId());
 		organizationEntity.setId(SnowFlake.nextId());
@@ -55,6 +57,7 @@ public class OrganizationController {
 	
 	@ApiOperation("删除组织机构")
 	@GetMapping("/deleteOrganization")
+	@businessLog(operation = "删除",content = "删除了【组织机构】")
 	public CommonResult deleteOrganization(@RequestParam Long id) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		organizationService.deleteOrganization(id, communityId);
@@ -71,6 +74,7 @@ public class OrganizationController {
 	
 	@ApiOperation("修改组织机构")
 	@PostMapping("/updateOrganization")
+	@businessLog(operation = "编辑",content = "更新了【组织机构】")
 	public CommonResult updateOrganization(@RequestBody OrganizationEntity organization) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		organization.setCommunityId(communityId);

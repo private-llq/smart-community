@@ -3,10 +3,9 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.ICarPositionService;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarPositionTypeService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.property.UpdateCartPositionTypeQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -15,8 +14,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
@@ -37,10 +34,10 @@ public class CarPositionTypeController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionTypeService iCarPositionTypeService;
 
-
     @ApiOperation("新增车位类型")
     @Login
     @RequestMapping(value = "/insterCartPositionType", method = RequestMethod.POST)
+    @businessLog(operation = "新增",content = "新增了【车位类型】")
     public CommonResult<Boolean> insterCartPositionType(@RequestParam("description") String description) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
         Boolean aBoolean = iCarPositionTypeService.insterCartPositionType(description,adminCommunityId);
@@ -52,6 +49,7 @@ public class CarPositionTypeController {
 
     @ApiOperation("修改车位类型")
     @RequestMapping(value = "/updateCartPositionType", method = RequestMethod.POST)
+    @businessLog(operation = "编辑",content = "更新了【车位类型】")
     public CommonResult<Boolean> updateCartPositionType(@RequestBody UpdateCartPositionTypeQO qo) {
       boolean aBoolean=  iCarPositionTypeService.updateCartPositionType(qo);
         if (aBoolean) {
@@ -72,6 +70,7 @@ public class CarPositionTypeController {
     @ApiOperation("删除小区的车位分类")
     @Login
     @RequestMapping(value = "/deleteCartPositionType", method = RequestMethod.POST)
+    @businessLog(operation = "删除",content = "删除了【车位类型】")
     public CommonResult<Boolean> udeleteCartPositionType(@RequestParam("id")String id) {
         Boolean aBoolean= iCarPositionTypeService.deleteCartPositionType(id);
         if (aBoolean) {

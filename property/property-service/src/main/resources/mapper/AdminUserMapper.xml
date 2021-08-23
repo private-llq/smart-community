@@ -78,4 +78,7 @@
 		</where>
 	</select>
 
+	<select id="queryUidListByRealName" resultType="String">
+		SELECT uid FROM t_admin_user WHERE real_name LIKE CONCAT(CONCAT('%', #{userName}), '%') AND deleted = 0
+	</select>
 </mapper>

@@ -231,44 +231,62 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			qo.setName(membersQO.getName());
 			entity.setUid(userService.registerV2(qo));
 		}
+		entity.setUid(userEntity.getUid());
 
 		houseMemberMapper.insert(entity);
 
 	}
 
+	@Override
+	public List<UserHouseVO> meHouse(String userId) {
+		List<UserHouseVO> list = userHouseMapper.meHouse(userId);
+		if (list != null) {
+			return list;
+		}
+		throw new ProprietorException("你还没有认证房屋哦！");
+	}
+
 	/**
-	 * @Description: 查询业主当前小区下所有认证的房屋
+	 * @Description: 切换房屋
 	 * @author: Hu
 	 * @since: 2021/8/17 15:57
 	 * @Param: [communityId, userId]
 	 * @return: java.util.List<com.jsy.community.vo.property.HouseMemberVO>
 	 */
 	@Override
-	public List<UserHouseVO> selectHouse(Long communityId, String userId) {
+	public List<UserHouseVO> selectHouse(String userId) {
 		List<UserHouseVO> linkedList = new LinkedList<>();
-		//存储房间名称  id未键房间名称为value
-		Map<Long, String> map = new HashMap<>();
+		//存储房间名称  id为key房间名称为value
+		Map<Long, String> houseMap = new HashMap<>();
+		//存储社区名称
+		Map<Long, String> communityMap = new HashMap<>();
 		//成员表所有房间id集合
 		Set<Long> ids = new HashSet<>();
+		//社区id集合
+		Set<Long> communityIds = new HashSet<>();
 		UserHouseVO userHouseVO=null;
-		List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("community_id", communityId).eq("uid", userId));
-
+		List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid", userId));
 
 		//房间成员
 		for (HouseMemberEntity memberEntity : entityList) {
 			//房间成员所有房间id
 			ids.add(memberEntity.getHouseId());
+			communityIds.add(memberEntity.getCommunityId());
 		}
-		//查询小区下所有房间
+		//查询登录人员所有房间
 		List<HouseEntity> houseEntities = houseMapper.selectBatchIds(ids);
 		for (HouseEntity entity : houseEntities) {
-			map.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
+			houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
 		}
-		CommunityEntity communityEntity = communityMapper.selectById(communityId);
+		//查询当前登录人员所有小区
+		List<CommunityEntity> list = communityMapper.selectBatchIds(communityIds);
+		for (CommunityEntity communityEntity : list) {
+			communityMap.put(communityEntity.getId(),communityEntity.getName());
+		}
 		for (HouseMemberEntity entity : entityList) {
 			userHouseVO = new UserHouseVO();
-			userHouseVO.setHouseSite(map.get(entity.getHouseId()));
-			userHouseVO.setCommunityText(communityEntity.getName());
+			userHouseVO.setHouseSite(houseMap.get(entity.getHouseId()));
+			userHouseVO.setCommunityText(communityMap.get(entity.getCommunityId()));
 			userHouseVO.setRelation(entity.getRelation());
 			userHouseVO.setHouseId(entity.getHouseId());
 			userHouseVO.setCommunityId(entity.getCommunityId());
@@ -388,7 +406,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 				UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(),6);
 				userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(userHouseVO.getRelation()));
 				userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
-				userHouseVO.setName(communityEntity.getName());
+				userHouseVO.setCommunityText(communityEntity.getName());
 
 
 				//当前房屋下业主的信息  一个房间只能有一个业主

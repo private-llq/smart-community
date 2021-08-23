@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommonConstService;
 import com.jsy.community.api.IFacilityService;
 import com.jsy.community.constant.Const;
@@ -22,7 +23,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +75,7 @@ public class FacilityController {
 	
 	@ApiOperation("添加设备")
 	@PostMapping("/addFacility")
+	@businessLog(operation = "新增",content = "新增了【设备】")
 	public CommonResult addFacility(@RequestBody FacilityEntity facilityEntity) {
 		AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
 		facilityEntity.setCommunityId(adminInfoVo.getCommunityId());
@@ -87,6 +88,7 @@ public class FacilityController {
 	
 	@ApiOperation("编辑设备")
 	@PostMapping("/updateFacility")
+	@businessLog(operation = "编辑",content = "更新了【设备】")
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
 		// By:LH: 编辑的时候不能更改该摄像头的作用哈  因为摄像头的作用需要更改摄像头后台  开启相应的功能 比如你要开启人脸比对，摄像机应该去后台选择人脸比对模式
 		// By:LH: 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
@@ -98,6 +100,7 @@ public class FacilityController {
 	
 	@ApiOperation("删除设备")
 	@GetMapping("/deleteFacility")
+	@businessLog(operation = "删除",content = "删除了【设备】")
 	public CommonResult deleteFacility(@RequestParam("id") Long id) {
 		facilityService.deleteFacility(id,UserUtils.getAdminCommunityId());
 		return CommonResult.ok("操作成功");

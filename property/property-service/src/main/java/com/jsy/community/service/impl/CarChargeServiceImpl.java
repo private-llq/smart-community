@@ -5,16 +5,26 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarChargeService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.exception.JSYExceptionHandler;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.CarChargeQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @DubboService(version = Const.version, group = Const.group)
@@ -56,6 +66,9 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         return list;
     }
 
+
+
+
     /**
      * 根据类型查找并分页
      * @param baseQO
@@ -67,7 +80,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         PageInfo<CarChargeEntity> pageInfo = new PageInfo<>();
         Page<CarChargeEntity> selectPage = carChargeMapper.selectPage(page,
                 new QueryWrapper<CarChargeEntity>()
-                        .eq(baseQO.getQuery()!=null,"type", baseQO.getQuery())
+                        .eq(StringUtils.isNoneBlank((CharSequence) baseQO.getQuery()),"type", baseQO.getQuery())
                         .eq("community_id",communityId)
         );
         pageInfo.setRecords(selectPage.getRecords());
@@ -76,6 +89,74 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         pageInfo.setSize(selectPage.getSize());
         return pageInfo;
     }
+
+
+    /**
+     * 临时停车收费设置
+     * @param carChargeEntity
+     * @param adminCommunityId
+     * @return
+     */
+    @Override
+    public Integer temporaryParkingSet(CarChargeEntity carChargeEntity, Long adminCommunityId) {
+        carChargeEntity.setCommunityId(adminCommunityId);
+        carChargeEntity.setUid(UserUtils.randomUUID());
+        int insert = carChargeMapper.insert(carChargeEntity);
+        return insert;
+    }
+
+    /**
+     * 计算该项设置的收费 Test charge
+     */
+    @Override
+    public BigDecimal testCharge(CarChargeQO carChargeQO) {
+        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", carChargeQO.getUuid()));
+        //封顶费用 单位/元
+        BigDecimal cappingFee = carChargeEntity.getCappingFee();
+        //免费时间 单位/分钟
+        Integer freeTime = carChargeEntity.getFreeTime();
+        //收费价格 元/时
+        BigDecimal chargePrice = carChargeEntity.getChargePrice();
+
+        /**
+         * 出场时间-（入场时间+免费时间）
+         */
+        LocalDateTime insertTime = carChargeQO.getInTime().plusMinutes(freeTime);//入场时间+免费时间
+        Long hours = Duration.between(insertTime,carChargeQO.getReTime()).toHours();//相差的小时数
+
+        Long minutes = Duration.between(insertTime,carChargeQO.getReTime()).toMinutes();//相差的分钟
+
+        /**
+         * 超过小时整点 自动加一小时
+         */
+        if (minutes%60>0){
+           hours+=1;
+           throw new PropertyException();
+        }
+        /**
+         * 乘 收费价格
+         */
+        BigDecimal pic=new BigDecimal(hours).multiply(chargePrice);
+
+        /**
+         * 停车不足一个小时 按一个小时收费
+         */
+        if (hours<1L){
+           pic= new BigDecimal(1).multiply(chargePrice);
+        }
+
+        /**
+         * 不超过封顶费用 超过按封顶费用计算
+         */
+        if (cappingFee.compareTo(pic)==-1){
+            return cappingFee;
+        }
+        return pic;
+    }
+
+
+
+
 }
 
 

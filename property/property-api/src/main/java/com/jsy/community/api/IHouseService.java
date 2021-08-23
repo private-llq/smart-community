@@ -271,4 +271,13 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @return: java.util.List<com.jsy.community.entity.HouseEntity>
 	 */
 	List<HouseEntity> selectAllBuildingUnitDoor(Long communityId);
+
+	/**
+	 * 根据楼栋id和社区id查询楼栋名字集合
+	 * @param strings
+	 * @return
+	 */
+	List<String> selectBuildingNameByIdList(List<String> strings,Long communityId);
+
+
 }

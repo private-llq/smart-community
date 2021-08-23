@@ -18,7 +18,10 @@ import java.util.List;
  * @since 2020-11-25
  */
 public interface IUserHouseService extends IService<UserHouseEntity> {
-	
+
+
+
+
 	/**
 	 * @return com.jsy.community.utils.PageInfo<com.jsy.community.vo.UserHouseVO>
 	 * @Author lihao

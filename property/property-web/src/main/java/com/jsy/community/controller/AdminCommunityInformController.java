@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
@@ -45,6 +46,7 @@ public class AdminCommunityInformController {
     @Login
     @PostMapping("/add")
     @ApiOperation("添加社区推送通知消息")
+    @businessLog(operation = "新增",content = "新增了【社区推送通知消息】")
     public CommonResult<Boolean> addPushInform(@RequestBody PushInformQO qo) {
         qo.setPushTarget(1);
         if (qo.getPushTag() == null) {
@@ -64,6 +66,7 @@ public class AdminCommunityInformController {
     @Login
     @DeleteMapping("/delete")
     @ApiOperation("删除推送通知消息")
+    @businessLog(operation = "删除",content = "删除了【社区推送通知消息】")
     public CommonResult<Boolean> deletePushInform(HttpServletRequest request, @RequestParam Long id) {
         return communityInformService.deletePushInform(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
@@ -79,6 +82,7 @@ public class AdminCommunityInformController {
     @Login
     @PostMapping("/updateTopState")
     @ApiOperation("更新置顶状态")
+    @businessLog(operation = "编辑",content = "更新了【社区消息置顶状态】")
     public CommonResult<Boolean> updateTopState(HttpServletRequest request, @RequestBody OldPushInformQO qo) {
         qo.setUpdateBy(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdateTopStateValidate.class);
@@ -96,6 +100,7 @@ public class AdminCommunityInformController {
     @Login
     @PostMapping("/updatePushState")
     @ApiOperation("更新发布状态")
+    @businessLog(operation = "编辑",content = "更新了【社区消息发布状态】")
     public CommonResult<Boolean> updatePushState(HttpServletRequest request, @RequestBody OldPushInformQO qo) {
         qo.setUpdateBy(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdatePushStateValidate.class);
@@ -174,6 +179,7 @@ public class AdminCommunityInformController {
     @Login
     @PutMapping("/updateDetail")
     @ApiOperation("(物业端)更新消息接口")
+    @businessLog(operation = "编辑",content = "更新了【社区消息接口】")
     public CommonResult updateDetail(HttpServletRequest request, @RequestBody PushInformQO qo) {
         ValidatorUtils.validateEntity(qo, PushInformQO.UpdateDetailValidate.class);
         qo.setUid(UserUtils.getUserId());

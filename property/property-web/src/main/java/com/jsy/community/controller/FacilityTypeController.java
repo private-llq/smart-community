@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IFacilityTypeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.hk.FacilityTypeEntity;
@@ -40,6 +41,7 @@ public class FacilityTypeController {
 
 	@ApiOperation("添加设备分类树")
 	@PostMapping("/addFacilityType")
+	@businessLog(operation = "新增",content = "新增了【设备分类】")
 	public CommonResult addFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
 		facilityTypeEntity.setId(SnowFlake.nextId());
 		facilityTypeEntity.setCommunityId(UserUtils.getAdminCommunityId());
@@ -57,6 +59,7 @@ public class FacilityTypeController {
 	
 	@ApiOperation("修改设备分类")
 	@PostMapping("/updateFacilityType")
+	@businessLog(operation = "编辑",content = "更新了【设备分类】")
 	public CommonResult updateFacilityType(@RequestBody FacilityTypeEntity facilityTypeEntity) {
 		if (facilityTypeEntity.getId() == null) {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请选择要修改的设备分类");
@@ -69,6 +72,7 @@ public class FacilityTypeController {
 	
 	@ApiOperation("删除设备分类")
 	@GetMapping("/deleteFacilityType")
+	@businessLog(operation = "删除",content = "删除了【设备分类】")
 	public CommonResult deleteFacilityType(@RequestParam Long id) {
 		facilityTypeService.deleteFacilityType(id,UserUtils.getAdminCommunityId());
 		return CommonResult.ok();
