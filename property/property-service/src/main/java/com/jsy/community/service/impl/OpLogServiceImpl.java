@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IOpLogService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.OpLogEntity;
+import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.OpLogMapper;
 import com.jsy.community.qo.BaseQO;
@@ -74,6 +75,11 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 		Page<OpLogEntity> pageData = opLogMapper.selectPage(page, queryWrapper);
 		if (CollectionUtils.isEmpty(pageData.getRecords())) {
 			return new PageInfo<>();
+		}
+		// 补充用户名
+		for (OpLogEntity entity : pageData.getRecords()) {
+			AdminUserEntity adminUserEntity = adminUserMapper.queryByUid(entity.getUserId());
+			entity.setUserName(adminUserEntity.getRealName());
 		}
 		
 		PageInfo<OpLogEntity> pageInfo = new PageInfo<>();

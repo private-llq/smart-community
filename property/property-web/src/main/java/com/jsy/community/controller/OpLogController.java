@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/op/log")
 @ApiJSYController
 public class OpLogController {
+	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IOpLogService opLogService;
-	
 	
 	/**
 	 * @Description: 操作日志分页查询
