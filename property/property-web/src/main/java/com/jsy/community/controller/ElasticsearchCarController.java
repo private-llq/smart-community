@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IElasticsearchCarService;
 import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.constant.BusinessEnum;
@@ -58,6 +59,7 @@ public class ElasticsearchCarController {
 
     @ApiOperation("车辆批量更新")
     @PostMapping("/updateAll")
+    @businessLog(operation = "编辑",content = "更新了【物业车辆】")
     public CommonResult updateAll() {
         elasticsearchCarService.updateCars();
         return CommonResult.ok();
@@ -65,6 +67,7 @@ public class ElasticsearchCarController {
 
     @ApiOperation("全部删除")
     @PostMapping("/deleteAll")
+    @businessLog(operation = "删除",content = "删除了【物业车辆】")
     public CommonResult deleteAll() {
         ElasticsearchCarUtil.deleteDataAll(restHighLevelClient);
         return CommonResult.ok();

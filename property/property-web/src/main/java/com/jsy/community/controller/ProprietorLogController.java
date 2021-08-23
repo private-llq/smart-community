@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IProprietorLogService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.log.ProprietorLog;
@@ -36,6 +37,7 @@ public class ProprietorLogController {
 	
 	@ApiOperation("保存业主操作记录")
 	@PostMapping("/saveProprietorLog")
+	@businessLog(operation = "新增",content = "新增了【业主操作记录】")
 	public CommonResult saveProprietorLog(@RequestBody ProprietorLog proprietorLog){
 		proprietorLog.setId(SnowFlake.nextId());
 		proprietorLogService.saveProprietorLog(proprietorLog);

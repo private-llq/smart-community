@@ -26,10 +26,8 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 	 * @since 2021/8/21  14:45
 	 **/
 	@Override
-	public boolean saveOpLog(OpLogEntity opLogEntity) {
-		int row;
+	public void saveOpLog(OpLogEntity opLogEntity) {
 		opLogEntity.setId(SnowFlake.nextId());
-		row = opLogMapper.insert(opLogEntity);
-		return row == 1;
+		opLogMapper.insert(opLogEntity);
 	}
 }

@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyAdvanceDepositRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyAdvanceDepositRecordEntity;
@@ -61,6 +62,7 @@ public class PropertyAdvanceDepositRecordController {
     @Login
     @ApiOperation("新增预存款变更明细记录")
     @PostMapping("/add")
+    @businessLog(operation = "新增",content = "新增了【预存款变更明细记录】")
     public CommonResult addPropertyAdvanceDepositRecord(@RequestBody PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity){
 	    if(propertyAdvanceDepositRecordEntity.getType() == null){
 		    throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");

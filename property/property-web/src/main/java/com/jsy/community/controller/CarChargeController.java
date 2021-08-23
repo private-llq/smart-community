@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarChargeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
@@ -38,18 +39,21 @@ public class CarChargeController {
 
     @Login
     @PostMapping("/save")
+    @businessLog(operation = "新增",content = "新增了【停车收费设置】")
     public CommonResult save(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.SaveCarCharge(carChargeEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
     }
 
     @PutMapping("/update")
+    @businessLog(operation = "编辑",content = "更新了【停车收费设置】")
     public CommonResult update(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.UpdateCarCharge(carChargeEntity);
         return CommonResult.ok();
 
     }
     @DeleteMapping("/del")
+    @businessLog(operation = "删除",content = "删除了【停车收费设置】")
     public CommonResult delete(@RequestParam("uid") String uid){
         carChargeService.DelCarCharge(uid);
         return CommonResult.ok();
@@ -73,6 +77,7 @@ public class CarChargeController {
      */
     @Login
     @PostMapping("/temporaryParkingSet")
+    @businessLog(operation = "新增",content = "新增了【临时停车收费设置】")
     public CommonResult temporaryParkingSet(@RequestBody CarChargeEntity carChargeEntity){
         Integer integer = carChargeService.temporaryParkingSet(carChargeEntity, UserUtils.getAdminCommunityId());
         return CommonResult.ok();

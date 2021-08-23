@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IPropertyAdvanceDepositService;
 import com.jsy.community.api.IProprietorService;
@@ -75,6 +76,7 @@ public class PropertyAdvanceDepositController {
     @Login
     @ApiOperation("新增预存款充值余额")
     @PostMapping("/add/recharge")
+    @businessLog(operation = "新增",content = "新增了【预存款充值余额】")
     public CommonResult addRechargePropertyAdvanceDeposit(@RequestBody PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
         if(propertyAdvanceDepositEntity.getHouseId() == null || propertyAdvanceDepositEntity.getMobile() == null){
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
@@ -99,6 +101,7 @@ public class PropertyAdvanceDepositController {
     @Login
     @ApiOperation("修改预存款充值余额")
     @PutMapping("/update/recharge")
+    @businessLog(operation = "编辑",content = "更新了【预存款充值余额】")
     public CommonResult updateRechargePropertyAdvanceDeposit(@RequestBody PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
         if (propertyAdvanceDepositEntity.getBalance() == null && propertyAdvanceDepositEntity.getBalance().compareTo(BigDecimal.ZERO) == 0) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请输入正确的金额");

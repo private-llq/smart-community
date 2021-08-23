@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitorEntity;
@@ -100,6 +101,7 @@ public class VisitorController {
 	 * @date: 2021/8/13 10:47
 	 **/
 	@PostMapping("/addPropertyVisitor")
+	@businessLog(operation = "新增",content = "新增了【访客邀请】")
 	public CommonResult addVisitor(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addVisitorValidate.class);
 		visitorEntity.setCommunityId(UserUtils.getAdminCommunityId());

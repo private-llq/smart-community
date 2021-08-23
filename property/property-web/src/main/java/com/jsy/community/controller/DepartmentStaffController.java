@@ -7,6 +7,7 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IDepartmentStaffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentStaffEntity;
@@ -62,6 +63,7 @@ public class DepartmentStaffController {
 	
 	@ApiOperation("添加员工")
 	@PostMapping("/addDepartmentStaff")
+	@businessLog(operation = "新增",content = "新增了【社区员工】")
 	// TODO: 2021/3/22 添加员工这里 我觉得姓名应该是唯一的  不过需求没要求唯一
 	// // TODO: 2021/4/14 今天做Excel添加时  当时问的经理 说是同一个部门 有一个人姓名相同,电话号码有一个相同  就算重复 不能添加成功
 	// // TODO: 2021/4/14 但是原型上面没有体现出来这个需求啊，没说。  好吧所以需求应该是员工（姓名相同，电话号码有一个以上相同就属于是同一个员工就不应该让其添加成功）
@@ -78,6 +80,7 @@ public class DepartmentStaffController {
 	
 	@ApiOperation("修改员工信息")
 	@PostMapping("/updateDepartmentStaff")
+	@businessLog(operation = "编辑",content = "更新了【社区员工】")
 	public CommonResult updateDepartmentStaff(@RequestBody DepartmentStaffQO departmentStaffEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentStaffEntity.setCommunityId(communityId);
@@ -88,6 +91,7 @@ public class DepartmentStaffController {
 	
 	@ApiOperation("删除员工")
 	@GetMapping("/deleteDepartmentStaff")
+	@businessLog(operation = "删除",content = "删除了【社区员工】")
 	public CommonResult deleteStaffByIds(@ApiParam("员工id") Long id) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentStaffService.deleteStaffByIds(id, communityId);

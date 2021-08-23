@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IPatrolService;
 import com.jsy.community.constant.Const;
@@ -11,13 +12,11 @@ import com.jsy.community.entity.property.PatrolPointEntity;
 import com.jsy.community.entity.property.PatrolRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.NumberFormatUtil;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +27,6 @@ import java.io.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +56,7 @@ public class PatrolController {
 	 * @Date: 2021-07-23
 	**/
 	@PostMapping("/equip")
+	@businessLog(operation = "新增",content = "新增了【巡检设备】")
 	public CommonResult addEquip(@RequestBody PatrolEquipEntity patrolEquipEntity){
 		ValidatorUtils.validateEntity(patrolEquipEntity);
 		patrolEquipEntity.setCommunityId(UserUtils.getAdminCommunityId());
@@ -88,6 +87,7 @@ public class PatrolController {
 	 * @Date: 2021-07-23
 	**/
 	@PutMapping("/equip")
+	@businessLog(operation = "编辑",content = "更新了【巡检设备】")
 	public CommonResult updateEquip(@RequestBody PatrolEquipEntity patrolEquipEntity){
 		if(patrolEquipEntity.getId() == null){
 			return CommonResult.error("缺少id");
@@ -104,6 +104,7 @@ public class PatrolController {
 	 * @Date: 2021-07-23
 	**/
 	@DeleteMapping("/equip")
+	@businessLog(operation = "删除",content = "删除了【巡检设备】")
 	public CommonResult deleteEquip(@RequestParam Long id){
 		return patrolService.deleteEquip(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
@@ -118,6 +119,7 @@ public class PatrolController {
 	 * @Date: 2021-07-24
 	**/
 	@PostMapping("/point")
+	@businessLog(operation = "新增",content = "新增了【巡检点位】")
 	public CommonResult addEquip(@RequestBody PatrolPointEntity patrolPointEntity){
 		ValidatorUtils.validateEntity(patrolPointEntity);
 		if(patrolPointEntity.getBuildingId() == null && patrolPointEntity.getUnitId() == null){
@@ -154,6 +156,7 @@ public class PatrolController {
 	 * @Date: 2021-07-24
 	**/
 	@PutMapping("/point")
+	@businessLog(operation = "编辑",content = "更新了【巡检点位】")
 	public CommonResult updateEquip(@RequestBody PatrolPointEntity patrolPointEntity){
 		if(patrolPointEntity.getId() == null){
 			return CommonResult.error("缺少id");
@@ -173,6 +176,7 @@ public class PatrolController {
 	 * @Date: 2021-07-24
 	**/
 	@DeleteMapping("/point")
+	@businessLog(operation = "删除",content = "删除了【巡检点位】")
 	public CommonResult deletePoint(@RequestParam Long id){
 		return patrolService.deletePoint(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
@@ -187,6 +191,7 @@ public class PatrolController {
 	 * @Date: 2021-07-26
 	**/
 	@PostMapping("/line")
+	@businessLog(operation = "新增",content = "新增了【巡检线路】")
 	public CommonResult addLine(@RequestBody PatrolLineEntity patrolLineEntity){
 		ValidatorUtils.validateEntity(patrolLineEntity);
 		patrolLineEntity.setCommunityId(UserUtils.getAdminCommunityId());
@@ -217,6 +222,7 @@ public class PatrolController {
 	 * @Date: 2021-07-26
 	**/
 	@PutMapping("/line")
+	@businessLog(operation = "编辑",content = "更新了【巡检线路】")
 	public CommonResult updateLine(@RequestBody PatrolLineEntity patrolLineEntity){
 		if(patrolLineEntity.getId() == null){
 			return CommonResult.error("缺少id");
@@ -233,6 +239,7 @@ public class PatrolController {
 	 * @Date: 2021-07-26
 	**/
 	@DeleteMapping("/line")
+	@businessLog(operation = "删除",content = "删除了【巡检线路】")
 	public CommonResult deleteLine(@RequestParam Long id){
 		return patrolService.deleteLine(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}

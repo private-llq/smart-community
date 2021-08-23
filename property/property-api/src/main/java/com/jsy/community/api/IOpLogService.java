@@ -16,5 +16,5 @@ public interface IOpLogService extends IService<OpLogEntity> {
 	 * @Author: DKS
 	 * @Date: 2021/08/21
 	 **/
-	boolean saveOpLog(OpLogEntity opLogEntity);
+	void saveOpLog(OpLogEntity opLogEntity);
 }

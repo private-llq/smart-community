@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.ICommunityService;
@@ -19,7 +20,6 @@ import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -240,6 +240,7 @@ public class AdminUserController {
 	**/
 	@Login
 	@PostMapping("")
+	@businessLog(operation = "新增",content = "新增了【操作员】")
 	public CommonResult addOperator(@RequestBody AdminUserEntity adminUserEntity){
 		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.addOperatorValidatedGroup.class);
 		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
@@ -259,6 +260,7 @@ public class AdminUserController {
 	**/
 	@Login
 	@PutMapping("")
+	@businessLog(operation = "编辑",content = "更新了【操作员】")
 	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
 		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
 			//验证社区权限
@@ -296,6 +298,7 @@ public class AdminUserController {
 	**/
 	@Login
 	@PutMapping("avatar")
+	@businessLog(operation = "编辑",content = "更新了【用户头像】")
 	public CommonResult uploadAvatar(MultipartFile file){
 		if(!PicUtil.checkSizeAndType(file,5*1024)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"图片格式错误");
@@ -332,6 +335,7 @@ public class AdminUserController {
 	@PutMapping("password")
 	@Auth
 	@Login(allowAnonymous = true)
+	@businessLog(operation = "编辑",content = "更新了【用户密码】")
 	public CommonResult<Boolean> updatePassword(@RequestAttribute(value = "body") String body) {
 		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
 		String uid = UserUtils.getUserId();
@@ -359,6 +363,7 @@ public class AdminUserController {
 	@ApiOperation("更换手机号")
 	@PutMapping("mobile")
 	@Login
+	@businessLog(operation = "编辑",content = "更新了【用户手机号】")
 	public CommonResult changeMobile(@RequestBody Map<String,String> map){
 		//入参验证
 		String newMobile = map.get("newMobile");
