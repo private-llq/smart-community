@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * @return
@@ -23,7 +24,7 @@ import javax.validation.constraints.NotNull;
 @Accessors(chain = true)
 @TableName("t_user_house")
 @ApiModel(value="UserHouse对象", description="业主房屋认证")
-public class UserHouseEntity extends BaseEntity {
+public class UserHouseEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

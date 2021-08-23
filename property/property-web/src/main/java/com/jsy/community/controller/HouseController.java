@@ -611,5 +611,10 @@ public class HouseController {
 		returnMap.put("list", menuList);
 		return CommonResult.ok(returnMap);
 	}
+
+
+
+
+
 }
 
