@@ -57,7 +57,10 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 		Page<OpLogEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
 		QueryWrapper<OpLogEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("community_id", query.getCommunityId());
+		// 查小区
+		if (query.getCommunityId() != null) {
+			queryWrapper.eq("community_id", query.getCommunityId());
+		}
 		// 查操作
 		if (query.getOperation() != null) {
 			queryWrapper.like("operation", query.getOperation());

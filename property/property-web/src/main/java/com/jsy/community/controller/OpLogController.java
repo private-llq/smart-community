@@ -10,7 +10,6 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.OpLogQO;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,7 +48,7 @@ public class OpLogController {
 		if(query == null){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 		}
-		query.setCommunityId(UserUtils.getAdminCommunityId());
+//		query.setCommunityId(UserUtils.getAdminCommunityId());
 		return CommonResult.ok(opLogService.queryOpLogPage(baseQO));
 	}
 }

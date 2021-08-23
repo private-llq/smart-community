@@ -44,7 +44,7 @@ public class OpLogAop extends BaseAop {
 	//切面 配置通知
 	@AfterReturning("opLogPointCut()")
 	public void saveOpLog(JoinPoint joinPoint) {
-		System.out.println("---进入切面---");
+		System.out.println("---进入用户操作日志切面---");
 		//保存日志
 		OpLogEntity opLog = new OpLogEntity();
 		
