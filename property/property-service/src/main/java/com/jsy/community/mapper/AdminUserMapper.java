@@ -196,7 +196,13 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 **/
 	List<Map<String, Object>> getRepairPerson(@Param("condition")String condition, @Param("communityId") Long communityId);
 	//========用户拓展end ==========
-
-
-
+	
+	/**
+	 * @Description: 获取uid根据姓名模糊查询
+	 * @Param: [userName]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: DKS
+	 * @Date: 2021/8/23 14:16
+	 **/
+	List<String> queryUidListByRealName(@Param("userName")String userName);
 }

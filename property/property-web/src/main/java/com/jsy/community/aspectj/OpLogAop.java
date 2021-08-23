@@ -8,6 +8,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.OpLogEntity;
 import com.jsy.community.utils.HttpUtils;
 import com.jsy.community.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -64,7 +65,9 @@ public class OpLogAop extends BaseAop {
 			String content = businessLog.content();
 			opLog.setOperation(operation);//保存获取的操作
 			String adminRealName = proprietorService.getAdminRealName(UserUtils.getUserId());
-			opLog.setContent(adminRealName + content);//保存获取的内容
+			if (StringUtils.isNotBlank(adminRealName)) {
+				opLog.setContent(adminRealName + content);//保存获取的内容
+			}
 		}
 		
 		//获取请求的类名
