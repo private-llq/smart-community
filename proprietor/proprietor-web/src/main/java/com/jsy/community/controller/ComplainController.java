@@ -5,10 +5,12 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IComplainService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ComplainEntity;
+import com.jsy.community.qo.proprietor.ComplainQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.proprietor.ComplainVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -61,6 +63,7 @@ public class ComplainController {
         complainService.addComplain(complainEntity);
         return CommonResult.ok();
     }
+
     /**
      * @Description: 查询用户所有的投诉建议
      * @author: Hu
@@ -108,6 +111,39 @@ public class ComplainController {
         return CommonResult.ok(split,"上传成功");
     }
 
+/*******************************************************************************************************************************************************/
+    /**
+     * @Description: 新投诉建议接口
+     * @Param: [complainEntity]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: Tian
+     * @Date: 2021/8/20-11:06
+     **/
+    @Login
+    @ApiOperation("新用户投诉建议接口")
+    @PostMapping("/appendComplain")
+    public CommonResult appendComplain(@RequestBody ComplainQO complainQO){
+        String userInfo = UserUtils.getUserId();
+        complainQO.setUid(userInfo);
+        boolean b = complainService.appendComplain(complainQO);
+        return CommonResult.ok("投诉成功");
+    }
+
+    /**
+     * @Description: 查询用户所有的投诉建议
+     * @author: Hu
+     * @since: 2020/12/23 11:30
+     * @Param:
+     * @return:
+     */
+    @Login
+    @ApiOperation("用户查询所有投诉建议")
+    @GetMapping("/selectComplain")
+    public CommonResult selectComplain(){
+        String userId = UserUtils.getUserId();
+        List<ComplainVO> complainEntities=complainService.selectComplain(userId);
+        return CommonResult.ok(complainEntities,"查询成功");
+    }
 
 
 }

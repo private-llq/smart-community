@@ -4,7 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IActivityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.ActivityEntity;
-import com.jsy.community.entity.proprietor.ActivityUserEntity;
+import com.jsy.community.entity.property.ActivityUserEntity;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;

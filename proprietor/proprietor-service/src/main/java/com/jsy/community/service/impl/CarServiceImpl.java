@@ -9,12 +9,15 @@ import com.jsy.community.api.ICarService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.CarMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -32,6 +35,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @Resource
     private CarMapper carMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 根据提供的参数对车辆进行分页查询
@@ -126,6 +132,60 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         columnMap.put("uid", userId);
         columnMap.put("community_id", communityId);
         return carMapper.selectByMap(columnMap);
+    }
+
+
+    /**
+     * @Description: 新app删除车辆
+     * @author: Hu
+     * @since: 2021/8/21 10:40
+     * @Param: [id, userId]
+     * @return: void
+     */
+    @Override
+    public void delete(Long id, String userId) {
+        carMapper.delete(new QueryWrapper<CarEntity>().eq("uid",userId).eq("id",id));
+    }
+
+
+    /**
+     * @Description: 新app查询车辆
+     * @author: Hu
+     * @since: 2021/8/21 10:40
+     * @Param: [communityId, uid]
+     * @return: java.util.List<com.jsy.community.entity.CarEntity>
+     */
+    @Override
+    public List<CarEntity> getCars(Long communityId,String uid) {
+        return carMapper.selectList(new QueryWrapper<CarEntity>().select("id,car_plate,community_id").eq("community_id",communityId).eq("uid",uid));
+    }
+
+    /**
+     * @Description: 新app修改车辆
+     * @author: Hu
+     * @since: 2021/8/21 10:08
+     * @Param: [carEntity]
+     * @return: void
+     */
+    @Override
+    public void updateRelationCar(CarEntity carEntity) {
+        carMapper.updateById(carEntity);
+    }
+
+    /**
+     * @Description: 新app添加车辆
+     * @author: Hu
+     * @since: 2021/8/21 10:08
+     * @Param: [carEntity]
+     * @return: void
+     */
+    @Override
+    public void addRelationCar(CarEntity carEntity) {
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+        carEntity.setId(SnowFlake.nextId());
+        carEntity.setContact(userEntity.getMobile());
+        carEntity.setOwner(userEntity.getRealName());
+        carMapper.insert(carEntity);
     }
 
     @Override

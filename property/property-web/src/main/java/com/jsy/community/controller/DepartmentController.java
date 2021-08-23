@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IDepartmentService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentEntity;
@@ -45,6 +46,7 @@ public class DepartmentController {
 	
 	@ApiOperation("新增部门")
 	@PostMapping("/addDepartment")
+	@businessLog(operation = "新增",content = "新增了【社区部门】")
 	public CommonResult addDepartment(@RequestBody DepartmentQO departmentEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentEntity.setCommunityId(communityId);
@@ -65,6 +67,7 @@ public class DepartmentController {
 	
 	@ApiOperation("修改部门")
 	@PostMapping("/updateDepartment")
+	@businessLog(operation = "编辑",content = "更新了【社区部门】")
 	public CommonResult updateDepartment(@RequestBody DepartmentQO departmentEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentEntity.setCommunityId(communityId);
@@ -75,6 +78,7 @@ public class DepartmentController {
 	
 	@ApiOperation("删除部门")
 	@GetMapping("/deleteDepartment")
+	@businessLog(operation = "删除",content = "删除了【社区部门】")
 	public CommonResult deleteDepartment(@RequestParam Long departmentId) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentService.deleteDepartment(departmentId, communityId);

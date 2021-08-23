@@ -280,8 +280,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
         // 组装user表数据
         UserEntity user = new UserEntity();
-        user.setUid(uuid);
         user.setId(SnowFlake.nextId());
+        user.setUid(uuid);
+        user.setAvatarUrl("http://222.178.212.29:9000/avatar/dc2bf10509ec4636a2515708c372c849");
+        user.setRealName(qo.getName());
 
         // 账户数据(user_auth表)
         UserAuthEntity userAuth = new UserAuthEntity();
@@ -302,12 +304,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             //添加账户(user_auth表)
             userAuthService.save(userAuth);
 
-            HouseMemberEntity entity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("mobile", qo.getAccount()));
-            //如果房间成员表不为空就位房间成员设置uid
-            if (entity!=null){
-                entity.setUid(uuid);
-                houseMemberMapper.updateById(entity);
-            }
         }catch (DuplicateKeyException e){
             throw new ProprietorException("该用户已注册");
         }
@@ -1094,7 +1090,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         List<UserHouseEntity> list = userHouseService.selectUserHouse(communityId, uid);
         List<HouseMemberEntity> memberEntities = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("community_id",communityId).eq("uid",uid));
 
-        if (list!=null&&list.size()!=0){
+        if (uid.equals("00000tourist")){
+            controlVO.setAccessLevel(5);
+            controlVO.setCommunityId(communityId);
+            controlVO.setHouseId(null);
+            return controlVO;
+        }
+
+        if (list.size()!=0){
             UserHouseEntity entity = list.get(0);
             controlVO.setAccessLevel(1);
             controlVO.setCommunityId(entity.getCommunityId());
@@ -1126,47 +1129,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             }
             return controlVO;
         } else {
-            if (memberEntities!=null&&memberEntities.size()!=0){
+            if (memberEntities.size()!=0){
                 //查询当前角色最高权限
                 for (HouseMemberEntity memberEntity : memberEntities) {
                     if (memberEntity.getRelation()==6){
                         controlVO.setAccessLevel(2);
                         controlVO.setCommunityId(memberEntity.getCommunityId());
                         controlVO.setHouseId(memberEntity.getHouseId());
-                        break;
-                    }
-                    if (memberEntity.getRelation()==7){
-                        controlVO.setAccessLevel(3);
-                        controlVO.setCommunityId(memberEntity.getCommunityId());
-                        controlVO.setHouseId(memberEntity.getHouseId());
-                        break;
+                        for (HouseMemberEntity userHouseEntity : memberEntities) {
+                            control=new ControlVO();
+                            control.setHouseId(userHouseEntity.getHouseId());
+                            control.setCommunityId(userHouseEntity.getCommunityId());
+                            if (memberEntity.getRelation().equals(6)){
+                                control.setAccessLevel(2);
+                            }else {
+                                control.setAccessLevel(3);
+                            }
+                            controlVO.getPermissions().add(control);
+                        }
+                        return controlVO;
                     }
                 }
-                //查询当前角色所拥有的所有角色
                 for (HouseMemberEntity memberEntity : memberEntities) {
-                    if (memberEntity.getRelation()==6){
-                        control=new ControlVO();
-                        controlVO.setAccessLevel(2);
-                        controlVO.setCommunityId(memberEntity.getCommunityId());
-                        controlVO.setHouseId(memberEntity.getHouseId());
-                        controlVO.getPermissions().add(control);
-                    }
                     if (memberEntity.getRelation()==7){
-                        control=new ControlVO();
                         controlVO.setAccessLevel(3);
                         controlVO.setCommunityId(memberEntity.getCommunityId());
                         controlVO.setHouseId(memberEntity.getHouseId());
-                        controlVO.getPermissions().add(control);
+                        for (HouseMemberEntity userHouseEntity : memberEntities) {
+                            control=new ControlVO();
+                            control.setHouseId(userHouseEntity.getHouseId());
+                            control.setCommunityId(userHouseEntity.getCommunityId());
+                            if (memberEntity.getRelation().equals(6)){
+                                control.setAccessLevel(2);
+                            }else {
+                                control.setAccessLevel(3);
+                            }
+                            controlVO.getPermissions().add(control);
+                        }
+                        return controlVO;
                     }
                 }
             }
         }
-        if (uid.equals("00000tourist")){
-            controlVO.setAccessLevel(5);
-            controlVO.setCommunityId(communityId);
-            controlVO.setHouseId(null);
-            return controlVO;
-        }
+
         controlVO.setAccessLevel(4);
         controlVO.setCommunityId(communityId);
         controlVO.setHouseId(null);

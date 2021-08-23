@@ -2,9 +2,10 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.CarMonthlyVehicle;
+import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.util.POIUtil;
 import com.jsy.community.utils.PageInfo;
@@ -18,9 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +40,7 @@ public class CarMonthlyVehicleController {
 
     @Login
     @PostMapping("SaveMonthlyVehicle")
+    @businessLog(operation = "新增",content = "新增了【月租停车收费设置】")
     public CommonResult SaveMonthlyVehicle(@RequestBody CarMonthlyVehicle carMonthlyVehicle) {
        vehicleService.SaveMonthlyVehicle(carMonthlyVehicle, UserUtils.getAdminCommunityId());
        return CommonResult.ok();
@@ -52,6 +52,7 @@ public class CarMonthlyVehicleController {
      * @return
      */
     @PutMapping("UpdateMonthlyVehicle")
+    @businessLog(operation = "编辑",content = "更新了【月租停车收费设置】")
     public CommonResult UpdateMonthlyVehicle(@RequestBody CarMonthlyVehicle carMonthlyVehicle) {
         vehicleService.UpdateMonthlyVehicle(carMonthlyVehicle);
         return CommonResult.ok();
@@ -64,6 +65,7 @@ public class CarMonthlyVehicleController {
      */
 
     @DeleteMapping("DelMonthlyVehicle")
+    @businessLog(operation = "删除",content = "删除了【月租停车收费设置】")
     public CommonResult DelMonthlyVehicle(@RequestParam("uid") String uid) {
         vehicleService.DelMonthlyVehicle(uid);
         return CommonResult.ok();

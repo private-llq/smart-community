@@ -42,4 +42,13 @@ public interface IPropertyAdvanceDepositRecordService extends IService<PropertyA
 	 * @Date: 2021/8/17
 	 **/
 	List<PropertyAdvanceDepositRecordEntity> queryExportHouseExcel(PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity);
+	
+	/**
+	 * @Description: 通过id获取预存款明细记录打印信息
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/08/20
+	 **/
+	PropertyAdvanceDepositRecordEntity getAdvanceDepositRecordById(Long id, Long communityId);
 }

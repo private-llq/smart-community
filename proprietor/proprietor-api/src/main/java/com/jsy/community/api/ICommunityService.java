@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.PageInfo;
@@ -69,4 +70,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Date: 2021/6/26
 	 **/
 	List<Long> queryAllCommunityIdList();
+
+	/**
+	 * @Description: 查询当前小区的物业公司
+	 * @author: Hu
+	 * @since: 2021/8/20 15:12
+	 * @Param:
+	 * @return:
+	 */
+	PropertyCompanyEntity getCompany(Long id);
 }

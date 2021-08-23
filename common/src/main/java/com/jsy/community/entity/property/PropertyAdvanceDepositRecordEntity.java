@@ -51,4 +51,16 @@ public class PropertyAdvanceDepositRecordEntity extends BaseEntity {
 	
 	@ApiModelProperty(value = "最近更新人")
 	private String updateBy;
+	
+	@ApiModelProperty(value = "房屋地址")
+	@TableField(exist = false)
+	private String houseAddress;
+	
+	@ApiModelProperty(value = "真实名称")
+	@TableField(exist = false)
+	private String realName;
+	
+	@ApiModelProperty(value = "收款方式")
+	@TableField(exist = false)
+	private String payTypeName;
 }

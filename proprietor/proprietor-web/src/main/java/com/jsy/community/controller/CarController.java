@@ -36,7 +36,6 @@ import java.util.*;
 @RequestMapping("/car")
 @Slf4j
 @ApiJSYController
-@Deprecated
 public class CarController {
 	
 	
@@ -48,6 +47,47 @@ public class CarController {
 
 	@Resource
 	private DrivingLicense drivingLicense;
+
+	@Login
+	@ApiOperation("新app新增车辆")
+	@PostMapping("add")
+	public CommonResult addRelationCar(@RequestBody CarEntity carEntity) {
+		//0.从JWT取uid
+		carEntity.setUid(UserUtils.getUserId());
+		//1.效验前端新增车辆参数合法性
+		ValidatorUtils.validateEntity(carEntity, CarEntity.SaveCarValidated.class);
+		carService.addRelationCar(carEntity);
+		return CommonResult.ok();
+	}
+
+	@Login
+	@ApiOperation("新app修改车辆")
+	@PutMapping("update")
+	public CommonResult updateRelationCar(@RequestBody CarEntity carEntity) {
+		//0.从JWT取uid
+//		carEntity.setUid(UserUtils.getUserId());
+		//1.效验前端新增车辆参数合法性
+		ValidatorUtils.validateEntity(carEntity, CarEntity.SaveCarValidated.class);
+		carService.updateRelationCar(carEntity);
+		return CommonResult.ok();
+	}
+
+	@Login
+	@ApiOperation("新app修改车辆")
+	@GetMapping("getCars")
+	public CommonResult getCars(@RequestParam Long communityId) {
+		List<CarEntity> carEntities = carService.getCars(communityId,UserUtils.getUserId());
+		return CommonResult.ok(carEntities);
+	}
+
+	@Login
+	@ApiOperation("新app删除车辆")
+	@DeleteMapping("delete")
+	public CommonResult delete(@RequestParam Long id) {
+		carService.delete(id,UserUtils.getUserId());
+		return CommonResult.ok();
+	}
+
 	
 	
 	/**

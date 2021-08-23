@@ -1,15 +1,12 @@
-package com.jsy.community.entity.proprietor;
+package com.jsy.community.entity.property;
 
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jsy.community.config.web.LocalDateTimeConverter;
 import lombok.Data;
-import nonapi.io.github.classgraph.json.Id;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

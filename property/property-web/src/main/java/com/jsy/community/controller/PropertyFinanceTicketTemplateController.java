@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyFinanceTicketTemplateService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FinanceTicketTemplateEntity;
@@ -38,6 +39,7 @@ public class PropertyFinanceTicketTemplateController {
      **/
     @Login
     @PostMapping("/addTicketTemplate")
+    @businessLog(operation = "新增",content = "新增了【票据打印模板】")
     public CommonResult addTicketTemplate(@RequestBody FinanceTicketTemplateEntity templateEntity) {
         ValidatorUtils.validateEntity(templateEntity, FinanceTicketTemplateEntity.AddTicketTemplateValidate.class);
         templateEntity.setDeleted(0);
@@ -72,6 +74,7 @@ public class PropertyFinanceTicketTemplateController {
      **/
     @Login
     @PostMapping("/updateTicketTemplate")
+    @businessLog(operation = "编辑",content = "更新了【票据打印模板】")
     public CommonResult updateTicketTemplate(@RequestBody FinanceTicketTemplateEntity templateEntity) {
         ValidatorUtils.validateEntity(templateEntity, FinanceTicketTemplateEntity.UpdateTicketTemplateValidate.class);
         if (templateEntity.getId() == null) {
@@ -91,6 +94,7 @@ public class PropertyFinanceTicketTemplateController {
      **/
     @Login
     @DeleteMapping("/deleteTicketTemplate")
+    @businessLog(operation = "删除",content = "删除了【票据打印模板】")
     public CommonResult deleteTicketTemplate(@RequestParam("templateId") String templateId) {
         return ticketTemplateService.deleteTicketTemplate(templateId, UserUtils.getAdminCommunityId()) > 0 ? CommonResult.ok("删除成功!") : CommonResult.error("删除失败!");
     }

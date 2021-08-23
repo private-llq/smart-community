@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ILeaseConstService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
@@ -35,12 +36,14 @@ public class LeaseConstController {
 
     @ApiOperation("常量修改接口")
     @PutMapping()
+    @businessLog(operation = "编辑",content = "更新了【房屋租赁常量】")
     public CommonResult<Boolean> update(@RequestBody HouseLeaseConstQO qo){
         return null;
     }
 
     @ApiOperation("常量新增接口")
     @PostMapping()
+    @businessLog(operation = "新增",content = "新增了【房屋租赁常量】")
     public CommonResult<Boolean> save(@RequestBody HouseLeaseConstQO qo){
         return null;
     }

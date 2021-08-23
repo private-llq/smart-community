@@ -3,13 +3,13 @@ package com.jsy.community.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.IpLimit;
+import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ProprietorEntity;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -20,7 +20,6 @@ import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseTypeVo;
-import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,11 +41,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 /**
  * @author YuLF
@@ -386,6 +386,7 @@ public class ProprietorController {
     @Login
     @PutMapping()
     @ApiOperation("更新业主信息")
+    @businessLog(operation = "编辑",content = "更新了【业主信息】")
     public CommonResult<Boolean> update(@RequestBody ProprietorQO qo) {
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyUpdateValid.class);
         return iProprietorService.update(qo, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
@@ -395,6 +396,7 @@ public class ProprietorController {
     @Login
     @PostMapping("/addUser")
     @ApiOperation("添加业主信息")
+    @businessLog(operation = "新增",content = "新增了【业主信息】")
     public CommonResult<Boolean> addUser(@RequestBody ProprietorQO qo) {
         qo.setCommunityId(UserUtils.getAdminCommunityId());
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyAddValid.class);
@@ -410,6 +412,7 @@ public class ProprietorController {
     @Login
     @DeleteMapping()
     @ApiOperation("删除业主信息")
+    @businessLog(operation = "删除",content = "删除了【业主信息】")
     public CommonResult<Boolean> del(@RequestParam Long id) {
         //TODO : 验证物业人员是否具有管理这个社区的权限
         Boolean isSuccess = iProprietorService.unbindHouse(id);

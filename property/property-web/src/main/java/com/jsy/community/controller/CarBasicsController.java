@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarBasicsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarBasicsEntity;
@@ -32,6 +33,7 @@ public class CarBasicsController {
      @Login
      @ApiOperation("添加或修改临时车规则")
      @PostMapping("/addBasics")
+     @businessLog(operation = "编辑",content = "更新了【临时车规则】")
     public CommonResult addBasics(@RequestBody CarBasicsRuleQO carBasicsRuleQO){
          boolean b = carBasics.addBasics(carBasicsRuleQO,UserUtils.getUserId(),UserUtils.getAdminCommunityId());
          return CommonResult.ok("操作成功");
@@ -43,12 +45,13 @@ public class CarBasicsController {
      public CommonResult findSpecial(){
          System.out.println(UserUtils.getAdminCommunityId());
          CarBasicsEntity  carBasicsEntity = carBasics.findOne(UserUtils.getAdminCommunityId());
-         return CommonResult.ok(carBasicsEntity,"操作成功");
+         return CommonResult.ok(carBasicsEntity);
      }
 
      @ApiOperation("添加火修改特殊车辆是否收费")
      @PostMapping("/exceptionCar")
      @Login
+     @businessLog(operation = "编辑",content = "更新了【特殊车辆是否收费】")
      public CommonResult addExceptionCar(@RequestParam("exceptionCar") Integer exceptionCar){
          String userId = UserUtils.getUserId();
          Long communityId = UserUtils.getAdminCommunityId();
@@ -58,6 +61,7 @@ public class CarBasicsController {
       @ApiOperation("添加或修改包月选项")
       @PostMapping("/monthlyPayment")
       @Login
+      @businessLog(operation = "编辑",content = "更新了【包月选项】")
      public CommonResult addMonthlyPayment(@RequestBody CarBasicsMonthQO carBasicsMonthQO){
          boolean b = carBasics.addMonthlyPayment(carBasicsMonthQO,UserUtils.getUserId(),UserUtils.getAdminCommunityId());
         return CommonResult.ok("操作成功");

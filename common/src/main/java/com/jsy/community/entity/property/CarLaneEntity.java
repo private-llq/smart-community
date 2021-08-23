@@ -1,9 +1,11 @@
-package com.jsy.community.entity.proprietor;
+package com.jsy.community.entity.property;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,13 +16,22 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("t_car_lane")
-public class CarLaneEntity implements Serializable {
+public class CarLaneEntity  implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
      * id
      */
     @TableId(type = IdType.AUTO)
     private Long id;
+
+
+    //兼容H5，使用字符串格式， 针对js long型长度不够的问题
+    @TableField(exist = false)
+    private String idStr;
+    public String getIdStr(){
+        return String.valueOf(equipmentId);
+    }
+
     /**
      * uuid
      */
@@ -32,11 +43,15 @@ public class CarLaneEntity implements Serializable {
     /**
      * 设备名称
      */
+    @TableField(exist = false)
     private String equipmentName;
+    /**
+     * 设备id
+     */
+    private Long equipmentId;
     /**
      * 车道名称
      */
-
     private String laneName;
     /**
      * 车道类型 0:入口 1：出口

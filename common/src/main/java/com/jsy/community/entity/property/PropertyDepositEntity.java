@@ -67,4 +67,7 @@ public class PropertyDepositEntity extends BaseEntity {
 	@ApiModelProperty(value = "小区名")
 	@TableField(exist = false)
 	private String communityName;
+	
+	@ApiModelProperty(value = "押金凭证号")
+	private String depositVoucher;
 }

@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.alibaba.fastjson.JSON;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
@@ -97,6 +98,7 @@ public class CommunityController {
 	 **/
 	@Login
 	@PostMapping("/addCommunity")
+	@businessLog(operation = "新增",content = "新增了【物业社区】")
 	public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity, HttpServletRequest request) {
 		ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
 		// 设置默认的社区房屋层级模式
@@ -135,6 +137,7 @@ public class CommunityController {
 	 **/
 	@Login
 	@PutMapping("/updateCommunity")
+	@businessLog(operation = "编辑",content = "更新了【物业社区】")
 	public CommonResult updateCommunity(@RequestBody CommunityEntity communityEntity) {
 		if (communityEntity.getId() == null) {
 			throw new JSYException(400, "社区ID不能为空!");

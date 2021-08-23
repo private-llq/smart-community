@@ -1,6 +1,6 @@
 package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.proprietor.CarBlackListEntity;
+import com.jsy.community.entity.property.CarBlackListEntity;
 import org.springframework.stereotype.Component;
 
 @Component

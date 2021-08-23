@@ -9,8 +9,10 @@ import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyDepositEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.mapper.PropertyDepositMapper;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * @program: com.jsy.community
@@ -48,6 +51,9 @@ public class PropertyDepositServiceImpl extends ServiceImpl<PropertyDepositMappe
     
     @Autowired
     private CommunityMapper communityMapper;
+    
+    @Autowired
+    private CarPositionMapper carPositionMapper;
     
     /**
      * @Description: 新增物业押金账单
@@ -146,7 +152,10 @@ public class PropertyDepositServiceImpl extends ServiceImpl<PropertyDepositMappe
                 }
             } else if (propertyDepositEntity.getDepositType() == 2) {
                 // 如果关联类型为2.车位
-                // TODO:通过车位id查询车位实体，再把车位实体中的车位编号放入关联目标名称
+                CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyDepositEntity.getDepositTargetId());
+                if (carPositionEntity != null) {
+                    propertyDepositEntity.setDepositTargetIdName(carPositionEntity.getCarPosition());
+                }
             }
             // 补充小区名
             CommunityEntity communityEntity = communityMapper.selectById(propertyDepositEntity.getCommunityId());
@@ -157,6 +166,51 @@ public class PropertyDepositServiceImpl extends ServiceImpl<PropertyDepositMappe
         PageInfo<PropertyDepositEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData, pageInfo);
         return pageInfo;
+    }
+    
+    /**
+     * @Description: 通过id获取押金凭证数据
+     * @Param: [id]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/08/20
+     **/
+    @Override
+    public PropertyDepositEntity getDepositById(Long id) {
+        PropertyDepositEntity propertyDepositEntity = propertyDepositMapper.selectById(id);
+        // 如果关联类型为1.房屋
+        if (propertyDepositEntity.getDepositType() == 1) {
+            HouseEntity houseEntity = houseMapper.selectById(propertyDepositEntity.getDepositTargetId());
+            if (houseEntity != null) {
+                propertyDepositEntity.setDepositTargetIdName(houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor());
+            }
+            propertyDepositEntity.setDepositTypeName("房屋");
+        } else if (propertyDepositEntity.getDepositType() == 2) {
+            // 如果关联类型为2.车位
+            CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyDepositEntity.getDepositTargetId());
+            if (carPositionEntity != null) {
+                propertyDepositEntity.setDepositTargetIdName(carPositionEntity.getCarPosition());
+            }
+            propertyDepositEntity.setDepositTypeName("车位");
+        }
+        // 补充小区名
+        CommunityEntity communityEntity = communityMapper.selectById(propertyDepositEntity.getCommunityId());
+        if (communityEntity != null) {
+            propertyDepositEntity.setCommunityName(communityEntity.getName());
+        }
+        if (propertyDepositEntity.getDepositVoucher() == null) {
+            // 补充凭证号:目标id+时间戳（8）+押金id最后4位+随机码3位-->17+8+4+3=32位
+            String subTargetId = String.valueOf(propertyDepositEntity.getDepositTargetId());
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            String subTimestamp = timestamp.substring(timestamp.length() - 8);
+            String idStr = String.valueOf(id);
+            String subIdStr = idStr.substring(idStr.length() - 4);
+            String subRandomStr = UUID.randomUUID().toString().substring(0, 3);
+            propertyDepositEntity.setDepositVoucher(subTargetId + subTimestamp + subIdStr + subRandomStr);
+            // 凭证号存数据库
+            propertyDepositMapper.updateById(propertyDepositEntity);
+        }
+        return propertyDepositEntity;
     }
 }
 

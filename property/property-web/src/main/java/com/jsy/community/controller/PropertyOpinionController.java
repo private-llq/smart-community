@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyOpinionService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PropertyOpinionEntity;
@@ -35,6 +36,7 @@ public class PropertyOpinionController {
     @ApiOperation("创建意见反馈")
     @PostMapping("/create")
     @Login
+    @businessLog(operation = "新增",content = "新增了【意见反馈】")
     public CommonResult create(@RequestBody PropertyOpinionEntity propertyOpinionEntity){
         ValidatorUtils.validateEntity(propertyOpinionEntity,PropertyOpinionEntity.PropertyOpinionValidated.class);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();

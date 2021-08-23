@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
@@ -56,6 +57,7 @@ public class CommunityFunController {
     @ApiOperation("新增")
     @PostMapping("/save")
     @Login
+    @businessLog(operation = "新增",content = "新增了【物业社区趣事】")
     public CommonResult save(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
         AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
@@ -66,6 +68,7 @@ public class CommunityFunController {
     @ApiOperation("新增缩略图")
     @PostMapping("/smallImge")
     @Login
+    @businessLog(operation = "新增",content = "新增了【物业社区趣事缩略图】")
     public CommonResult upload(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -79,6 +82,7 @@ public class CommunityFunController {
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
     @Login
+    @businessLog(operation = "新增",content = "新增了【物业社区趣事封面图片】")
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -110,6 +114,7 @@ public class CommunityFunController {
     @ApiOperation("新增内容图片")
     @PostMapping("/contentImge")
     @Login
+    @businessLog(operation = "新增",content = "新增了【物业社区趣事内容图片】")
     public CommonResult content(@RequestParam("file") MultipartFile file){
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -126,6 +131,7 @@ public class CommunityFunController {
     @ApiOperation("修改")
     @PutMapping("/update")
     @Login
+    @businessLog(operation = "编辑",content = "更新了【物业社区趣事】")
     public CommonResult update(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
         AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
@@ -136,6 +142,7 @@ public class CommunityFunController {
     @ApiOperation("删除")
     @DeleteMapping("/delete")
     @Login
+    @businessLog(operation = "删除",content = "删除了【物业社区趣事】")
     public CommonResult delete(@ApiParam("社区趣事id")
                                @RequestParam("id") Long id) {
         communityFunService.deleteById(id);

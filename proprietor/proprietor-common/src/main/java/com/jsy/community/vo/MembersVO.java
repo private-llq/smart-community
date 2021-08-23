@@ -29,6 +29,11 @@ public class MembersVO implements Serializable {
     private String mobile;
 
     /**
+     * 头像
+     */
+    private String avatarUrl;
+
+    /**
      * 关系
      */
     private Integer relation;
@@ -36,4 +41,7 @@ public class MembersVO implements Serializable {
      * 关系
      */
     private String relationText;
+
+
+
 }

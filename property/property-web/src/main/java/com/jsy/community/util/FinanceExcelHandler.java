@@ -58,4 +58,40 @@ public interface FinanceExcelHandler {
      *@Date: 2021/4/26 11:26
      **/
     Workbook exportMasterSlaveReceipt(List<?> entityList);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收入
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/19 15:46
+     **/
+    Workbook exportFinanceForm(List<?> entityList);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出财务报表-小区收费报表
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/20 10:31
+     **/
+    Workbook exportCharge(List<?> entityList);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-收款报表
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/20 10:59
+     **/
+    Workbook exportCollectionForm(List<?> entityList);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出收款报表-账单统计
+     *@Param: entityList:
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/8/20 11:12
+     **/
+    Workbook exportCollectionFormOrder(List<?> entityList);
 }

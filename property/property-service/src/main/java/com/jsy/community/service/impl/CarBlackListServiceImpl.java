@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.ICarBlackListService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.CarBlackListEntity;
+import com.jsy.community.entity.property.CarBlackListEntity;
 import com.jsy.community.mapper.CarBlackListMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
@@ -34,7 +34,7 @@ public class CarBlackListServiceImpl implements ICarBlackListService {
         PageInfo<CarBlackListEntity> pageInfo = new PageInfo<>();
         Page<CarBlackListEntity> selectPage = carBlackListMapper.selectPage(Page,
                 new QueryWrapper<CarBlackListEntity>()
-                        .eq(StringUtils.isNoneBlank(baseQO.getQuery()),"car_number", baseQO.getQuery())
+                        .like(StringUtils.isNoneBlank(baseQO.getQuery()),"car_number", baseQO.getQuery())
                         .eq("community_id",communityId)
         );
         pageInfo.setTotal(selectPage.getTotal());

@@ -1,7 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jsy.community.entity.proprietor.ActivityUserEntity;
+import com.jsy.community.entity.property.ActivityUserEntity;
 
 /**
  * @program: com.jsy.community

@@ -49,4 +49,8 @@
 		AND c.deleted = 0
 		AND h.uid = #{userId}
 	</select>
+    <select id="meHouse" resultType="com.jsy.community.vo.UserHouseVO">
+        select tuh.id as houseId,concat(tu.building,tu.unit,tu.door) as houseSite,tc.name as communityText,tc.id as communityId from t_user_house tuh join  t_house tu on tuh.house_id=tu.id join t_community tc on tuh.community_id=tc.id
+        where tuh.uid=#{uid} and tuh.deleted=0 and tu.deleted=0 and tc.deleted=0
+    </select>
 </mapper>

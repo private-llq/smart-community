@@ -1,34 +1,30 @@
 package com.jsy.community.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
+import com.jsy.community.api.IUserService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserHouseEntity;
-import com.jsy.community.mapper.HouseMapper;
-import com.jsy.community.mapper.HouseMemberMapper;
-import com.jsy.community.mapper.UserHouseMapper;
-import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.entity.*;
+import com.jsy.community.mapper.*;
+import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.UserHouseQO;
+import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author chq459799974
@@ -48,7 +44,13 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	private HouseMapper houseMapper;
 
 	@Autowired
+	private CommunityMapper communityMapper;
+
+	@Autowired
 	private HouseMemberMapper houseMemberMapper;
+
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private IUserService userService;
 	
 	/**
 	 * @return java.lang.Boolean
@@ -213,59 +215,85 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 */
 	@Override
 	@Transactional
-	public void membersUpdate(UserHouseQO userHouse, String userId) {
-		HouseMemberEntity entity = null;
-		LinkedList<HouseMemberEntity> save = new LinkedList<>();
-		for (MembersVO member : userHouse.getMembers()) {
-			if (member.getId()!=null){
-				entity = new HouseMemberEntity();
-				entity.setHouseholderId(userId);
-				entity.setCommunityId(userHouse.getCommunityId());
-				entity.setHouseId(userHouse.getHouseId());
-				BeanUtils.copyProperties(member,entity);
-				houseMemberMapper.updateById(entity);
-			}else {
-				entity=new HouseMemberEntity();
-				entity.setHouseholderId(userId);
-				entity.setCommunityId(userHouse.getCommunityId());
-				entity.setHouseId(userHouse.getHouseId());
-				BeanUtils.copyProperties(member,entity);
-				entity.setId(SnowFlake.nextId());
-				save.add(entity);
-			}
+	public void membersSave(MembersQO membersQO, String userId) {
+		//添加成员表数据
+		HouseMemberEntity entity = new HouseMemberEntity();
+		BeanUtils.copyProperties(membersQO,entity);
+		entity.setId(SnowFlake.nextId());
+		entity.setHouseholderId(userId);
+
+		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", membersQO.getMobile()));
+
+		if (userEntity==null||userEntity.equals(null)){
+			//注册
+			RegisterQO qo = new RegisterQO();
+			qo.setAccount(membersQO.getMobile());
+			qo.setName(membersQO.getName());
+			entity.setUid(userService.registerV2(qo));
 		}
-		if (save.size()!=0){
-			houseMemberMapper.saveBatch(save);
+		entity.setUid(userEntity.getUid());
+
+		houseMemberMapper.insert(entity);
+
+	}
+
+	@Override
+	public List<UserHouseVO> meHouse(String userId) {
+		List<UserHouseVO> list = userHouseMapper.meHouse(userId);
+		if (list != null) {
+			return list;
 		}
+		throw new ProprietorException("你还没有认证房屋哦！");
 	}
 
 	/**
-	 * @Description: 查询业主当前小区下所有认证的房屋
+	 * @Description: 切换房屋
 	 * @author: Hu
 	 * @since: 2021/8/17 15:57
 	 * @Param: [communityId, userId]
 	 * @return: java.util.List<com.jsy.community.vo.property.HouseMemberVO>
 	 */
 	@Override
-	public List<UserHouseVO> selectHouse(Long communityId, String userId) {
-		LinkedList<UserHouseVO> linkedList = new LinkedList<>();
+	public List<UserHouseVO> selectHouse(String userId) {
+		List<UserHouseVO> linkedList = new LinkedList<>();
+		//存储房间名称  id为key房间名称为value
+		Map<Long, String> houseMap = new HashMap<>();
+		//存储社区名称
+		Map<Long, String> communityMap = new HashMap<>();
+		//成员表所有房间id集合
+		Set<Long> ids = new HashSet<>();
+		//社区id集合
+		Set<Long> communityIds = new HashSet<>();
 		UserHouseVO userHouseVO=null;
-		List<UserHouseEntity> list = userHouseMapper.selectList(new QueryWrapper<UserHouseEntity>().eq("community_id", communityId).eq("uid", userId));
-		if (list!=null){
-			List<Long> ids = new LinkedList<>();
-			for (UserHouseEntity entity : list) {
-				ids.add(entity.getHouseId());
-			}
-			List<HouseEntity> houseEntities = houseMapper.selectBatchIds(ids);
-			for (HouseEntity entity : houseEntities) {
-				userHouseVO = new UserHouseVO();
-				userHouseVO.setHouseId(entity.getId());
-				userHouseVO.setHouseSite(entity.getBuilding()+entity.getUnit()+entity.getDoor());
-				linkedList.add(userHouseVO);
-			}
-			return linkedList;
+		List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid", userId));
+
+		//房间成员
+		for (HouseMemberEntity memberEntity : entityList) {
+			//房间成员所有房间id
+			ids.add(memberEntity.getHouseId());
+			communityIds.add(memberEntity.getCommunityId());
 		}
-		return null;
+		//查询登录人员所有房间
+		List<HouseEntity> houseEntities = houseMapper.selectBatchIds(ids);
+		for (HouseEntity entity : houseEntities) {
+			houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
+		}
+		//查询当前登录人员所有小区
+		List<CommunityEntity> list = communityMapper.selectBatchIds(communityIds);
+		for (CommunityEntity communityEntity : list) {
+			communityMap.put(communityEntity.getId(),communityEntity.getName());
+		}
+		for (HouseMemberEntity entity : entityList) {
+			userHouseVO = new UserHouseVO();
+			userHouseVO.setHouseSite(houseMap.get(entity.getHouseId()));
+			userHouseVO.setCommunityText(communityMap.get(entity.getCommunityId()));
+			userHouseVO.setRelation(entity.getRelation());
+			userHouseVO.setHouseId(entity.getHouseId());
+			userHouseVO.setCommunityId(entity.getCommunityId());
+			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(entity.getRelation()));
+			linkedList.add(userHouseVO);
+		}
+		return linkedList;
 	}
 
 	/**
@@ -312,7 +340,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	}
 
 	/**
-	 * @Description: 查询我的房屋列表
+	 * @Description: 业主权限查询我的房屋
 	 * @author: Hu
 	 * @since: 2021/8/17 15:26
 	 * @Param: [communityId, houseId, userId]
@@ -321,50 +349,127 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Override
 	public UserHouseVO userHouseDetails(UserHouseQO userHouseQO, String userId) {
 		UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()).eq("uid", userId));
-		UserHouseVO houseVO = new UserHouseVO();
+		LinkedList<MembersVO> list = new LinkedList<>();
 		if (entity!=null){
-			MembersVO vo = null;
-			List<MembersVO> objects = new LinkedList<>();
-			UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
 			HouseEntity houseEntity = houseMapper.selectById(userHouseQO.getHouseId());
-			houseVO.setName(userEntity.getRealName());
-			houseVO.setHouseId(houseEntity.getId());
-			houseVO.setRelation(1);
-			houseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(houseVO.getRelation()));
-			houseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
-			List<HouseMemberEntity> list = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("householder_id", userId).eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()));
-			if (list.size()!=0){
-				for (HouseMemberEntity houseMemberEntity : list) {
-					vo=new MembersVO();
-					vo.setRelationText(BusinessEnum.RelationshipEnum.getCode(houseMemberEntity.getRelation()));
-					BeanUtils.copyProperties(houseMemberEntity,vo);
-					objects.add(vo);
+			CommunityEntity communityEntity = communityMapper.selectById(userHouseQO.getCommunityId());
+
+
+			//当前登录人员为业主
+			UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 1);
+			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(userHouseVO.getRelation()));
+			userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+			userHouseVO.setCommunityText(communityEntity.getName());
+
+			//查询房屋下所有成员
+			List<MembersVO> voList = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 0);
+			for (MembersVO membersVO : voList) {
+				if (!membersVO.getRelation().equals(1)){
+					membersVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(membersVO.getRelation()));
+					list.add(membersVO);
 				}
-				houseVO.setMembers(objects);
+
 			}
-			return houseVO;
+			userHouseVO.setMembers(list);
+			return userHouseVO;
 
 		}
 		throw new ProprietorException("当前房屋未认证或者不是您的哦！");
 	}
 
+	/**
+	 * @Description: 家属权限查询我的房屋
+	 * @author: Hu
+	 * @since: 2021/8/17 15:26
+	 * @Param: [communityId, houseId, userId]
+	 * @return: com.jsy.community.vo.UserHouseVO
+	 */
 	@Override
-	public UserHouseVO memberHouseDetails(UserHouseQO userHouseQO, String userId,String mobile) {
-		UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()).eq("uid", userId));
-		UserHouseVO houseVO = new UserHouseVO();
-		if (entity!=null){
-			HouseMemberEntity one = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("uid", userId).eq("mobile", mobile));
-			if (one != null) {
+	public UserHouseVO memberHouseDetails(UserHouseQO userHouseQO, String userId) {
+		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>()
+				.eq("house_id", userHouseQO.getHouseId())
+				.eq("community_id", userHouseQO.getCommunityId())
+				.eq("uid", userId)
+				.eq("relation", 6));
+
+		if (memberEntity != null) {
+			//查询当前房屋是否存在
+			UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()).eq("uid", memberEntity.getHouseholderId()));
+
+			LinkedList<MembersVO> list = new LinkedList<>();
+			if (entity!=null){
 				HouseEntity houseEntity = houseMapper.selectById(userHouseQO.getHouseId());
-				houseVO.setName(one.getName());
-				houseVO.setHouseId(houseEntity.getId());
-				houseVO.setRelation(one.getRelation());
-				houseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(one.getRelation()));
-				houseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+				CommunityEntity communityEntity = communityMapper.selectById(userHouseQO.getCommunityId());
+
+
+				//查询当前登录人员信息
+				UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(),6);
+				userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(userHouseVO.getRelation()));
+				userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+				userHouseVO.setCommunityText(communityEntity.getName());
+
+
+				//当前房屋下业主的信息  一个房间只能有一个业主
+				List<MembersVO> user = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(),1);
+				MembersVO membersVO = user.get(0);
+				membersVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(membersVO.getRelation()));
+				list.add(membersVO);
+
+
+				//当前房屋下所有关系为租户的成员
+				List<MembersVO> members = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 7);
+				for (MembersVO member : members) {
+					member.setRelationText(BusinessEnum.RelationshipEnum.getCode(member.getRelation()));
+					list.add(member);
+				}
+				userHouseVO.setMembers(list);
+				return userHouseVO;
 			}
-			return houseVO;
+			throw new ProprietorException("当前房屋不存在！");
 		}
-		throw new ProprietorException("当前房屋不存在！");
+		return new UserHouseVO();
+	}
+
+	/**
+	 * @Description: 租户权限查询我的房屋
+	 * @author: Hu
+	 * @since: 2021/8/17 15:26
+	 * @Param: [communityId, houseId, userId]
+	 * @return: com.jsy.community.vo.UserHouseVO
+	 */
+	@Override
+	public UserHouseVO lesseeHouseDetails(UserHouseQO userHouseQO, String userId) {
+		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>()
+				.eq("house_id", userHouseQO.getHouseId())
+				.eq("community_id", userHouseQO.getCommunityId())
+				.eq("uid", userId)
+				.eq("relation", 7));
+
+		if (memberEntity != null) {
+			UserHouseEntity entity = userHouseMapper.selectOne(new QueryWrapper<UserHouseEntity>().eq("house_id", userHouseQO.getHouseId()).eq("community_id", userHouseQO.getCommunityId()).eq("uid", memberEntity.getHouseholderId()));
+			LinkedList<MembersVO> list = new LinkedList<>();
+			if (entity!=null){
+				HouseEntity houseEntity = houseMapper.selectById(userHouseQO.getHouseId());
+				CommunityEntity communityEntity = communityMapper.selectById(userHouseQO.getCommunityId());
+
+
+				//当前登录人员为租客
+				UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 7);
+				userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(userHouseVO.getRelation()));
+				userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+				userHouseVO.setCommunityText(communityEntity.getName());
+
+				//查询当前房屋业主
+				List<MembersVO> voList = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 1);
+				MembersVO vo = voList.get(0);
+				vo.setRelationText(BusinessEnum.RelationshipEnum.getCode(vo.getRelation()));
+				list.add(vo);
+				userHouseVO.setMembers(list);
+				return userHouseVO;
+			}
+			throw new ProprietorException("当前房屋未认证或者不是您的哦！");
+		}
+		return new UserHouseVO();
 	}
 
 	/**

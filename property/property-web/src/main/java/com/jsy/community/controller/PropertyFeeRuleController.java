@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IFinanceBillService;
 import com.jsy.community.api.IPropertyFeeRuleConstService;
 import com.jsy.community.api.IPropertyFeeRuleService;
@@ -70,6 +71,7 @@ public class PropertyFeeRuleController {
     @ApiOperation("修改")
     @PutMapping("/updateById")
     @Login
+    @businessLog(operation = "编辑",content = "更新了【物业收费规则】")
     public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);
@@ -79,6 +81,7 @@ public class PropertyFeeRuleController {
     @ApiOperation("新增")
     @PostMapping("/save")
     @Login
+    @businessLog(operation = "新增",content = "新增了【物业收费规则】")
     public CommonResult save(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         ValidatorUtils.validateEntity(propertyFeeRuleEntity, PropertyFeeRuleEntity.PropertyFeeRule.class);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();

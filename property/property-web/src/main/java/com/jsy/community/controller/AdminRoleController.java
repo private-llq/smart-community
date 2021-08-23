@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminRoleEntity;
@@ -35,6 +36,7 @@ public class AdminRoleController {
 	 * @Date: 2020/12/14
 	**/
 	@PostMapping("")
+	@businessLog(operation = "新增",content = "新增了【角色】")
 	public CommonResult addRole(@RequestBody AdminRoleEntity adminRoleEntity){
 		ValidatorUtils.validateEntity(adminRoleEntity);
 		adminRoleEntity.setCompanyId(UserUtils.getAdminCompanyId());
@@ -49,6 +51,7 @@ public class AdminRoleController {
 	 * @Date: 2020/12/14
 	**/
 	@DeleteMapping("")
+	@businessLog(operation = "删除",content = "删除了【角色】")
 	public CommonResult delRole(@RequestParam("id") Long id){
 		return adminConfigService.delRole(id,UserUtils.getAdminCompanyId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
@@ -61,6 +64,7 @@ public class AdminRoleController {
 	 * @Date: 2020/12/14
 	**/
 	@PutMapping("")
+	@businessLog(operation = "编辑",content = "更新了【角色】")
 	public CommonResult updateRole(@RequestBody AdminRoleQO adminRoleQO){
 		if(adminRoleQO.getId() == null){
 			return CommonResult.error("缺少ID");
