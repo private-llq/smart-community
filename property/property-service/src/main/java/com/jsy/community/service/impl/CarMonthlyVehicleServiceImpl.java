@@ -352,34 +352,33 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             Long getCommunityId=communityId;
             vehicle.setCommunityId(getCommunityId);
 
-            // 如果Excel中有与数据库中 有相同社区下的同一条数据则不能添加成功
-            CarMonthlyVehicle reMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber));
-            if (vehicle.equals(reMonthlyVehicle)){
-                HashMap<String, String> hashMap = new HashMap<>();
-                hashMap.put("车牌号",string[0]);
-                hashMap.put("车主姓名",string[1]);
-                hashMap.put("联系电话",string[2]);
-                hashMap.put("包月方式",string[3]);
-                hashMap.put("开始时间",string[4]);
-                hashMap.put("结束时间",string[5]);
-                hashMap.put("包月费用",string[6]);
-                hashMap.put("下发状态",string[7]);
-                hashMap.put("备注",string[8]);
-                hashMap.put("车位编号",string[9]);
-                failStaffList.add(hashMap);
-                fail += 1;//失败数据累加
-                continue;
+            // 如果Excel中有与数据库中 有相同社区下的同一条数据则不能添加成功 （用停车的开始时间和结束时间来区分）
+            CarMonthlyVehicle reMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id",communityId));
+            if (vehicle.getStartTime().equals(reMonthlyVehicle.getStartTime())){
+                if (vehicle.getEndTime().equals(reMonthlyVehicle.getEndTime())){
+                    HashMap<String, String> hashMap = new HashMap<>();
+                    hashMap.put("车牌号",string[0]);
+                    hashMap.put("车主姓名",string[1]);
+                    hashMap.put("联系电话",string[2]);
+                    hashMap.put("包月方式",string[3]);
+                    hashMap.put("开始时间",string[4]);
+                    hashMap.put("结束时间",string[5]);
+                    hashMap.put("包月费用",string[6]);
+                    hashMap.put("下发状态",string[7]);
+                    hashMap.put("备注",string[8]);
+                    hashMap.put("车位编号",string[9]);
+                    failStaffList.add(hashMap);
+                    fail += 1;//失败数据累加
+                    continue;
+                }
             }
             //成功数累加
             success += 1;
             carMonthlyVehicleMapper.insert(vehicle);
-
         }
         resultMap.put("success", "成功" + success + "条");
         resultMap.put("fail", "失败" + fail + "条");
         resultMap.put("failData", failStaffList);
         return resultMap;
     }
-
-
 }

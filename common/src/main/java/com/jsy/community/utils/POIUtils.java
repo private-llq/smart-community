@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * @return
- * @Author lihao
+ * @Author 李进
  * @Description POI工具类
  * @Date 2021/3/4 15:06
  * @Param
@@ -150,32 +150,23 @@ public class POIUtils {
 				return cellValue;
 			}
 		}
-		//如果当前单元格内容为日期类型，需要特殊处理
-		if (cell.getCellStyle().getDataFormat() ==HSSFDataFormat.getBuiltinFormat("yyyy-MM-dd HH:mm:ss")
-				||cell.getCellStyle().getDataFormat() ==HSSFDataFormat.getBuiltinFormat("yyyy-mm-dd hh:mm:ss") ){
 
-			Date date = cell.getDateCellValue();
-			if (date != null) {
-				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				cellValue=format.format(date);
-				return cellValue;
+		//判断是否问数字、日期类型
+		if (cell.getCellType()==CellType.NUMERIC){
+			//如果当前单元格内容为日期类型，需要特殊处理
+			if (HSSFDateUtil.isCellDateFormatted(cell)){
+				Date date = cell.getDateCellValue();
+				if (date != null) {
+					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					cellValue=format.format(date);
+					return cellValue;
+				}
 			}
-		}
-
-		/*if (dataFormatString.equals("yyyy-mm-dd hh:mm:ss") *//*|| HSSFDateUtil.isCellDateFormatted(cell)*//*) {
-			cell.getCellType();
-			Date date = cell.getDateCellValue();
-			if (date != null) {
-				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				cellValue=format.format(date);
-				return cellValue;
-			}
-		}*/
-		//若该单元格是数字，把数字当成String来读，避免出现1读成1.0的情况
-		if (cell.getCellType() == CellType.NUMERIC) {
+			//若该单元格是数字，把数字当成String来读，避免出现1读成1.0的情况
 			double numericCellValue = cell.getNumericCellValue();
 			cell.setCellType(CellType.STRING);
 			cellValue = String.valueOf(cell.getStringCellValue());
+
 		} else {
 			cellValue = String.valueOf(cell.getStringCellValue());
 		}
