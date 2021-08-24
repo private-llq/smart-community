@@ -49,10 +49,12 @@ public class SelectCommunityFunServiceImpl extends ServiceImpl<SelectCommunityFu
         if (communityFunQO.getSize()==0||communityFunQO.getSize()==null){
             communityFunQO.setSize(10L);
         }
+
         QueryWrapper<CommunityFunEntity> wrapper = new QueryWrapper<CommunityFunEntity>().eq("status",1);
         if (communityFunQO.getHeadline()!=null&&!"".equals(communityFunQO.getHeadline())) {
             wrapper.like("title_name", communityFunQO.getHeadline());
         }
+
 //        wrapper.eq("community_id",communityFunQO.getCommunityId());
         wrapper.orderByDesc("start_time");
 

@@ -103,6 +103,7 @@ public class CarController {
 		carEntity.setUid(UserUtils.getUserId());
 		//1.效验前端新增车辆参数合法性
 		ValidatorUtils.validateEntity(carEntity, CarEntity.AddCarValidated.class);
+
 		Integer integer = carService.addProprietorCar(carEntity);
 		String filePath = carEntity.getCarImageUrl();
 		if (!StringUtils.isEmpty(filePath)) {

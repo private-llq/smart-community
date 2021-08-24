@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarChargeService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.exception.JSYExceptionHandler;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
@@ -119,8 +122,17 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
          * 出场时间-（入场时间+免费时间）
          */
         LocalDateTime insertTime = carChargeQO.getInTime().plusMinutes(freeTime);//入场时间+免费时间
-        long hours = Duration.between(insertTime,carChargeQO.getReTime()).toHours();//相差的小时数
+        Long hours = Duration.between(insertTime,carChargeQO.getReTime()).toHours();//相差的小时数
 
+        Long minutes = Duration.between(insertTime,carChargeQO.getReTime()).toMinutes();//相差的分钟
+
+        /**
+         * 超过小时整点 自动加一小时
+         */
+        if (minutes%60>0){
+           hours+=1;
+           throw new PropertyException();
+        }
         /**
          * 乘 收费价格
          */
@@ -139,9 +151,6 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         if (cappingFee.compareTo(pic)==-1){
             return cappingFee;
         }
-
-
-
         return pic;
     }
 

@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Data
 @ApiModel("设备管理-设备位置")
 @TableName("t_car_equipment_location")
-public class CarLocationEntity extends BaseQO implements Serializable {
+public class CarLocationEntity implements Serializable{
     @ApiModelProperty("主键id")
         private Long id;
 
@@ -55,4 +55,15 @@ public class CarLocationEntity extends BaseQO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime updateTime;
 
+
+    @ApiModelProperty("分页查询当前页")
+    @TableField(exist = false)
+    private Long page;
+
+    @ApiModelProperty("分页查询每页数据条数")
+    @TableField(exist = false)
+    private Long size;
+
+    @TableField(exist = false)
+    private CarLocationEntity query;
 }

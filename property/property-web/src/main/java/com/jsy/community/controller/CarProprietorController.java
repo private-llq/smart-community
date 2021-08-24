@@ -41,7 +41,7 @@ public class CarProprietorController {
      **/
     @Login
     @PostMapping("/listPage")
-    public CommonResult listPage(@RequestBody BaseQO<CarProprietorEntity> baseQO){
+    public CommonResult listPage(@RequestBody CarProprietorEntity baseQO){
 
         Page<CarProprietorEntity> listPage = carProprietorService.listPage(baseQO,UserUtils.getAdminCommunityId());
         return CommonResult.ok(listPage,"查询成功");

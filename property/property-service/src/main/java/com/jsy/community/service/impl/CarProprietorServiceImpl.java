@@ -46,18 +46,19 @@ public class CarProprietorServiceImpl extends ServiceImpl<CarProprietorMapper,Ca
      * @Date: 2021/8/11-10:36
      **/
     @Override
-    public Page<CarProprietorEntity> listPage(BaseQO<CarProprietorEntity> baseQO, Long adminCommunityId) {
+    public Page<CarProprietorEntity> listPage(CarProprietorEntity baseQO, Long adminCommunityId) {
 
         Page<CarProprietorEntity> page = new Page<CarProprietorEntity>(baseQO.getPage(), baseQO.getSize());
 
-        CarProprietorEntity query = baseQO.getQuery();
-        query.setCommunityId(adminCommunityId);
+//        CarProprietorEntity query = baseQO.getQuery();
+//        query.setCommunityId(adminCommunityId);
+        System.out.println(baseQO.getPage());
+        System.out.println(baseQO.getSize());
         QueryWrapper<CarProprietorEntity> queryWrapper = new QueryWrapper<CarProprietorEntity>().eq("community_id", adminCommunityId);
-        if (query.getPhone()!=null){
-            queryWrapper.like("phone",query.getPhone());
+        if (baseQO.getQuery().getPhone()!=null){
+            queryWrapper.like("phone",baseQO.getQuery().getPhone());
         }
         Page<CarProprietorEntity> selectPage = carProprietorMapper.selectPage(page, queryWrapper);
-
         return selectPage;
 
     }

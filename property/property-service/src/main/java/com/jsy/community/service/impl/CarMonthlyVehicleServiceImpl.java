@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarMonthlyVehicleService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.exception.JSYException;
@@ -110,20 +111,20 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     public void delay(String uid,Integer type,Integer dayNum, BigDecimal fee) {
 
         if (Objects.isNull(type)){
-            throw new JSYException(-1,"请先选择按天还是按月!");
+            throw new PropertyException(-1,"请先选择按天还是按月!");
         }
 
         if (Objects.isNull(fee)){
-            throw new JSYException(-1,"费用必填项!");
+            throw new PropertyException(-1,"费用必填项!");
         }
 
         if (BigDecimal.ZERO.compareTo(fee)==0 || BigDecimal.ZERO.compareTo(fee)==1){
-            throw new JSYException(-1,"费用不能小于0或者等于0!");
+            throw new PropertyException(-1,"费用不能小于0或者等于0!");
         }
 
         CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid));
         if (Objects.isNull(carMonthlyVehicle)){
-            throw new JSYException(-1,"uid错误,这条数据不存在！");
+            throw new PropertyException(-1,"uid错误,这条数据不存在！");
         }
         BigDecimal monthlyFee = carMonthlyVehicle.getMonthlyFee();
         LocalDateTime endTime = carMonthlyVehicle.getEndTime();
