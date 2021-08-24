@@ -8,6 +8,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.util.POIUtil;
+import com.jsy.community.utils.POIUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -107,6 +108,33 @@ public class CarMonthlyVehicleController {
         vehicleService.monthlyChange(uid,type);
         return CommonResult.ok();
     }
+    /**
+     * 下载数据导入模板
+     */
+    @RequestMapping("dataExportTempe")
+    public CommonResult dataExportTempe(HttpServletResponse response){
+        List<String[]> list=new ArrayList<>();//封装返回的数据
+        String[] strings0=new String[10];
+        strings0[0]=  "车牌号";
+        strings0[1]= "车主姓名";
+        strings0[2]= "联系电话";
+        strings0[3]= "包月方式";
+        strings0[4]= "开始时间";
+        strings0[5]= "结束时间";
+        strings0[6]= "包月费用";
+        strings0[7]= "下发状态";
+        strings0[8]= "备注";
+        strings0[9]= "车位编号";
+        list.add(strings0);//添加第一排excel属性名
+
+        try {
+            POIUtil.writePoi(list,"我的文件",2,response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return CommonResult.ok(-1,"服务器异常！");
+    }
 
     /**
      * 数据录入
@@ -121,8 +149,29 @@ public class CarMonthlyVehicleController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-       return CommonResult.ok(-1,"服务器异常！");
+       return CommonResult.ok("添加失败,请联系管理员");
     }
+
+    /**
+     * 数据录入2.0
+     */
+    @Login
+    @PostMapping("dataImport2")
+    public CommonResult dataImport2(MultipartFile file){
+        try {
+            List<String[]> strings = POIUtils.readExcel(file);
+            Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+            Map<String, Object> map =vehicleService.addLinkByExcel2(strings,communityId);
+            return CommonResult.ok(map);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return CommonResult.ok("添加失败,请联系管理员");
+        }
+
+    }
+
+
 
     /**
      * 数据导出
