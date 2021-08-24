@@ -1,8 +1,11 @@
 package com.jsy.community.entity.property;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jsy.community.utils.RegexUtils;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
@@ -30,11 +33,15 @@ public class ActivityUserEntity implements Serializable {
     /**
      * 报名人员电话
      */
+    @NotBlank(message = "电话不能为空！",groups ={ActivityUserVerification.class})
+    @Pattern(regexp = RegexUtils.REGEX_MOBILE,message = "请输入正确的手机号！",groups ={ActivityUserVerification.class})
     private String mobile;
     /**
      * 报名人员名称
      */
+    @NotBlank(message = "姓名不能为空！",groups ={ActivityUserVerification.class})
     private String name;
 
+    public interface ActivityUserVerification{}
 
 }

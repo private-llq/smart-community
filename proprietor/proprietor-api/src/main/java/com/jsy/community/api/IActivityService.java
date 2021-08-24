@@ -1,9 +1,10 @@
 package com.jsy.community.api;
 
-import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.entity.property.ActivityUserEntity;
+import com.jsy.community.entity.proprietor.ActivityEntity;
+import com.jsy.community.qo.BaseQO;
 
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * @program: com.jsy.community
@@ -19,7 +20,7 @@ public interface IActivityService {
      * @Param:
      * @return:
      */
-    List<ActivityEntity> list(Long communityId);
+    HashMap<String, Object> list(BaseQO<ActivityEntity> baseQO);
 
     /**
      * @Description: 活动报名

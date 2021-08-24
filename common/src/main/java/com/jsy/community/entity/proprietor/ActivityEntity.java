@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @TableName("t_activity")
 public class ActivityEntity extends BaseEntity {
     /**
-     * 活动主题
+     * 社区id
      */
     private Long communityId;
     /**
@@ -48,6 +48,12 @@ public class ActivityEntity extends BaseEntity {
      * 活动总人数
      */
     private Integer count;
+
+    /**
+     * 状态1已报名0未报名
+     */
+    @TableField(exist = false)
+    private Integer status;
     /**
      * 活动图片
      */

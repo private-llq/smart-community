@@ -11,6 +11,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.CarMapper;
+import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
@@ -38,6 +39,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private HouseMemberMapper houseMemberMapper;
 
     /**
      * 根据提供的参数对车辆进行分页查询
@@ -156,8 +160,8 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return: java.util.List<com.jsy.community.entity.CarEntity>
      */
     @Override
-    public List<CarEntity> getCars(Long communityId,String uid) {
-        return carMapper.selectList(new QueryWrapper<CarEntity>().select("id,car_plate,community_id").eq("community_id",communityId).eq("uid",uid));
+    public List<CarEntity> getCars(String uid) {
+        return carMapper.selectList(new QueryWrapper<CarEntity>().select("id,car_plate,community_id").eq("uid",uid));
     }
 
     /**
@@ -169,7 +173,8 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public void updateRelationCar(CarEntity carEntity) {
-        carMapper.updateById(carEntity);
+            carMapper.updateById(carEntity);
+
     }
 
     /**
@@ -181,11 +186,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public void addRelationCar(CarEntity carEntity) {
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
-        carEntity.setId(SnowFlake.nextId());
-        carEntity.setContact(userEntity.getMobile());
-        carEntity.setOwner(userEntity.getRealName());
-        carMapper.insert(carEntity);
+            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+            carEntity.setId(SnowFlake.nextId());
+            carEntity.setContact(userEntity.getMobile());
+            carEntity.setOwner(userEntity.getRealName());
+            carMapper.insert(carEntity);
     }
 
     @Override

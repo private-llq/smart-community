@@ -1,20 +1,22 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IActivityService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.entity.property.ActivityUserEntity;
+import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.mapper.ActivityMapper;
 import com.jsy.community.mapper.ActivityUserMapper;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * @program: com.jsy.community
@@ -46,6 +48,9 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
         if (entity!=null){
             activityEntity.setMobile(entity.getMobile());
             activityEntity.setName(entity.getName());
+            activityEntity.setStatus(1);
+        }else {
+            activityEntity.setStatus(0);
         }
         return activityEntity;
 
@@ -107,7 +112,15 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
      * @return: java.util.List<com.jsy.community.entity.proprietor.ActivityEntity>
      */
     @Override
-    public List<ActivityEntity> list(Long communityId) {
-        return activityMapper.selectList(new QueryWrapper<ActivityEntity>().eq("community_id",communityId));
+    public HashMap<String, Object> list(BaseQO<ActivityEntity> baseQO) {
+        if (baseQO.getPage()==0){
+            baseQO.setPage(1L);
+        }
+        Page<ActivityEntity> entityPage = activityMapper.selectPage(new Page<ActivityEntity>(baseQO.getPage(), baseQO.getSize()), new QueryWrapper<ActivityEntity>().eq("community_id", baseQO.getQuery().getCommunityId()));
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("total",entityPage.getTotal());
+        map.put("list",entityPage.getRecords());
+
+        return map;
     }
 }

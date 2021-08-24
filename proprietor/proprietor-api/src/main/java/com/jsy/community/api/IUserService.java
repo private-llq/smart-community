@@ -251,4 +251,22 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	Integer userIsRealAuth(String userId);
+
+	/**
+	 * @Description: 查询人脸
+	 * @author: Hu
+	 * @since: 2021/8/23 13:46
+	 * @Param:
+	 * @return:
+	 */
+    String getFace(String userId);
+
+    /**
+     * @Description: 修改用户人脸
+     * @author: Hu
+     * @since: 2021/8/23 13:51
+     * @Param:
+     * @return:
+     */
+	void saveFace(String userId,String faceUrl);
 }
