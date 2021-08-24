@@ -7,11 +7,11 @@ import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.mapper.CommunityMapper;
-import com.jsy.community.mapper.HouseMemberMapper;
-import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.entity.*;
+import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.DateCalculateUtil;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +53,19 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 
 	@Autowired
 	private RedisTemplate redisTemplate;
+	
+	@Autowired
+	private HouseMapper houseMapper;
+	
+	@Autowired
+	private CarMapper carMapper;
 
+	@Autowired
+	private CarPositionMapper carPositionMapper;
+	
+	@Autowired
+	private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
+	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
 	
@@ -260,5 +274,54 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	@Override
 	public Integer updateCommunity(CommunityEntity communityEntity) {
 		return communityMapper.updateById(communityEntity);
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取小区概况
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/24 11:52
+	 **/
+	@Override
+	public CommunitySurveyEntity getCommunitySurvey(Integer month, Long adminCommunityId) {
+		LocalDate startTime = null;
+		LocalDate endTime = null;
+		try {
+			String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(month);
+			String lastYearDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(month);
+			startTime = LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			endTime = LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// 返回给前端实体
+		CommunitySurveyEntity communitySurveyEntity = new CommunitySurveyEntity();
+		// 查小区下所有房屋总数和楼栋总数
+		List<HouseEntity> allHouse = houseMapper.getAllHouse(adminCommunityId);
+		List<HouseEntity> buildingList = houseMapper.getBuildingList(adminCommunityId);
+		communitySurveyEntity.setHouseSum(allHouse.size());
+		communitySurveyEntity.setBuildingSum(buildingList.size());
+		
+		// 查小区下业主数量和租户数量
+		List<HouseMemberEntity> allOwner = houseMemberMapper.getAllOwnerByCommunity(adminCommunityId);
+		List<HouseMemberEntity> allTenant = houseMemberMapper.getAllTenantByCommunity(adminCommunityId);
+		communitySurveyEntity.setOwnerCount(allOwner.size());
+		communitySurveyEntity.setTenantCount(allTenant.size());
+		
+		// 查询小区下所有车位和车辆
+		List<CarPositionEntity> allCarPosition = carPositionMapper.getAllCarPositionByCommunity(adminCommunityId);
+		List<CarEntity> allCar = carMapper.getAllCarByCommunity(adminCommunityId);
+		communitySurveyEntity.setCarPositionCount(allCarPosition.size());
+		communitySurveyEntity.setCarCount(allCar.size());
+		
+		// 小区月收费统计
+		if (startTime != null && endTime != null) {
+			List<Map<String, BigDecimal>> maps = propertyFinanceOrderMapper.chargeByDate(startTime, endTime, adminCommunityId);
+			communitySurveyEntity.setDateByPropertyFee(maps);
+			BigDecimal monthByPropertyFee = propertyFinanceOrderMapper.chargeByMonth(startTime, endTime, adminCommunityId);
+			communitySurveyEntity.setMonthByPropertyFee(monthByPropertyFee);
+		}
+		
+		return communitySurveyEntity;
 	}
 }

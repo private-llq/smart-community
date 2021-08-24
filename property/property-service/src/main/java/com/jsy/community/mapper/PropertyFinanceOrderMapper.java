@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -246,4 +247,21 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @return:
      */
     void updates(FinanceOrderOperationQO financeOrderOperationQO);
+    
+    /**
+     *@Author: DKS
+     *@Description: 根据时间段查询小区当月每天费用总计
+     *@Param: startTime,endTime,communityId:
+     *@Return: java.util.List<>
+     *@Date: 2021/8/24 15:55
+     **/
+    List<Map<String,BigDecimal>> chargeByDate(LocalDate startTime, LocalDate endTime, Long communityId);
+    
+    /**
+     *@Author: DKS
+     *@Description: 根据时间段查询小区月费用总计
+     *@Param: startTime,endTime,communityId:
+     *@Date: 2021/8/24 15:55
+     **/
+    BigDecimal chargeByMonth(LocalDate startTime, LocalDate endTime, Long communityId);
 }
