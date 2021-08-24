@@ -1072,6 +1072,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
 
     @Override
+    @Transactional
+    public void saveFace(String userId,String faceUrl) {
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+        if (userEntity!=null){
+            userEntity.setFaceUrl(faceUrl);
+            userMapper.updateById(userEntity);
+        }
+    }
+
+    @Override
+    public String getFace(String userId) {
+        UserEntity entity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+        if (entity!=null){
+            return entity.getFaceUrl();
+        }
+        throw new ProprietorException("当前用户不存在！");
+    }
+
+    @Override
     public Integer userIsRealAuth(String userId) {
         return userMapper.getRealAuthStatus(userId);
     }

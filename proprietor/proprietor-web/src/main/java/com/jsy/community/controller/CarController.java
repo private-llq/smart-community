@@ -73,10 +73,10 @@ public class CarController {
 	}
 
 	@Login
-	@ApiOperation("新app修改车辆")
+	@ApiOperation("新app查询车辆")
 	@GetMapping("getCars")
-	public CommonResult getCars(@RequestParam Long communityId) {
-		List<CarEntity> carEntities = carService.getCars(communityId,UserUtils.getUserId());
+	public CommonResult getCars() {
+		List<CarEntity> carEntities = carService.getCars(UserUtils.getUserId());
 		return CommonResult.ok(carEntities);
 	}
 
@@ -103,6 +103,7 @@ public class CarController {
 		carEntity.setUid(UserUtils.getUserId());
 		//1.效验前端新增车辆参数合法性
 		ValidatorUtils.validateEntity(carEntity, CarEntity.AddCarValidated.class);
+
 		Integer integer = carService.addProprietorCar(carEntity);
 		String filePath = carEntity.getCarImageUrl();
 		if (!StringUtils.isEmpty(filePath)) {

@@ -37,7 +37,6 @@ public class CarEquipmentManageServiceImpl extends ServiceImpl<CarEquipmentManag
         if (baseQO.getSize() == null || baseQO.getSize() == 0){
             baseQO.setSize(10l);
         }
-
         CarEquipmentManageEntity query = baseQO.getQuery();
 
         Long page  = baseQO.getPage() ;

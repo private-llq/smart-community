@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @ApiModel("业主车辆")
 @TableName("t_car_proprietor")
-public class CarProprietorEntity extends BaseQO implements Serializable {
+public class CarProprietorEntity  implements Serializable {
     @ApiModelProperty(value = "id")
     private Long id;
 
@@ -58,5 +58,16 @@ public class CarProprietorEntity extends BaseQO implements Serializable {
     @ApiModelProperty(value = "逻辑删除")
     @TableLogic(value = "0",delval = "1")
     private  Integer deleted;
+
+    @ApiModelProperty("分页查询当前页")
+	@TableField(exist = false)
+    private Long page;
+
+    @ApiModelProperty("分页查询每页数据条数")
+	@TableField(exist = false)
+    private Long size;
+
+    @TableField(exist = false)
+    private CarProprietorEntity query;
 
 }

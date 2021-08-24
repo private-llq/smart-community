@@ -85,5 +85,15 @@ public class CarEquipmentManageEntity extends BaseQO implements Serializable {
     @TableLogic(value = "0",delval = "1")
     private  Integer deleted;
 
+     @ApiModelProperty("分页查询当前页")
+	@TableField(exist = false)
+     private Long page;
+
+     @ApiModelProperty("分页查询每页数据条数")
+	@TableField(exist = false)
+     private Long size;
+
+     @TableField(exist = false)
+     private CarEquipmentManageEntity query;
 
 }
