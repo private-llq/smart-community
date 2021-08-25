@@ -726,7 +726,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/17 16:00
      **/
     @Override
-    public PropertyFinanceFormEntity getFinanceFormCommunityIncome(PropertyFinanceFormEntity qo) {
+    public PropertyFinanceFormEntity getFinanceFormCommunityIncome(PropertyFinanceFormEntity qo, List<Long> communityIdList) {
         // 返回给前端实体
         PropertyFinanceFormEntity propertyFinanceFormEntity = new PropertyFinanceFormEntity();
         // 押金查询
@@ -739,6 +739,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             DepositWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            DepositWrapper.in("community_id", communityIdList);
         }
         DepositWrapper.eq("deleted", 0);
         // 查询一段时间内押金实体
@@ -770,6 +772,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            advanceDepositRecordWrapper.in("community_id", communityIdList);
         }
         advanceDepositRecordWrapper.eq("deleted", 0);
         // 查询一段时间内预存款实体
@@ -803,6 +807,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             financeOrderWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            financeOrderWrapper.in("community_id", communityIdList);
         }
         financeOrderWrapper.eq("deleted", 0);
         // 查询一段时间内小区账单实体
@@ -879,7 +885,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/18 11:08
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity qo) {
+    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity qo, List<Long> communityIdList) {
         // 返回给前端实体
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
         
@@ -893,6 +899,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             queryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            queryWrapper.in("community_id", communityIdList);
         }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
@@ -919,6 +927,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             wrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            wrapper.in("community_id", communityIdList);
         }
         wrapper.eq("order_status",1);
         wrapper.eq("deleted",0);
@@ -941,6 +951,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            financeOrderQueryWrapper.in("community_id", communityIdList);
         }
         financeOrderQueryWrapper.eq("order_status",0);
         financeOrderQueryWrapper.eq("deleted",0);
@@ -965,6 +977,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            financeOrderEntityQueryWrapper.in("community_id", communityIdList);
         }
         financeOrderEntityQueryWrapper.eq("order_status",0);
         financeOrderEntityQueryWrapper.eq("deleted",0);
@@ -1014,7 +1028,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/18 11:08
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity qo) {
+    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity qo, List<Long> communityIdList) {
         // 返回给前端实体
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
     
@@ -1028,6 +1042,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             queryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            queryWrapper.in("community_id", communityIdList);
         }
         queryWrapper.eq("deleted", 0);
         queryWrapper.ne("build_type",2);
@@ -1055,6 +1071,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             wrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            wrapper.in("community_id", communityIdList);
         }
         wrapper.eq("order_status",1);
         wrapper.eq("deleted",0);
@@ -1078,6 +1096,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             financeOrderQueryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            financeOrderQueryWrapper.in("community_id", communityIdList);
         }
         financeOrderQueryWrapper.eq("order_status",0);
         financeOrderQueryWrapper.eq("deleted",0);
@@ -1103,6 +1123,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             financeOrderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            financeOrderEntityQueryWrapper.in("community_id", communityIdList);
         }
         financeOrderEntityQueryWrapper.eq("order_status",0);
         financeOrderEntityQueryWrapper.eq("deleted",0);
@@ -1153,7 +1175,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 9:31
      **/
     @Override
-    public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo) {
+    public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo ,List<Long> communityIdList) {
         // 返回前端实体
         List<PropertyCollectionFormEntity> propertyCollectionFormEntityList = new LinkedList<>();
     
@@ -1167,6 +1189,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             queryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            queryWrapper.in("community_id", communityIdList);
         }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
@@ -1190,6 +1214,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             query.eq("community_id", qo.getCommunityId());
+        } else {
+            query.in("community_id", communityIdList);
         }
         query.eq("deleted", 0);
         query.eq("pay_type", 1);
@@ -1214,6 +1240,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             wrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            wrapper.in("community_id", communityIdList);
         }
         wrapper.eq("deleted", 0);
         wrapper.eq("pay_type", 2);
@@ -1238,6 +1266,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             entityQueryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            entityQueryWrapper.in("community_id", communityIdList);
         }
         entityQueryWrapper.eq("deleted", 0);
         entityQueryWrapper.eq("pay_type", 3);
@@ -1262,6 +1292,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
+        } else {
+            orderEntityQueryWrapper.in("community_id", communityIdList);
         }
         orderEntityQueryWrapper.eq("deleted", 0);
         orderEntityQueryWrapper.eq("pay_type", 4);
@@ -1286,6 +1318,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             wrapper1.eq("community_id", qo.getCommunityId());
+        } else {
+            wrapper1.in("community_id", communityIdList);
         }
         wrapper1.eq("deleted", 0);
         wrapper1.eq("pay_type", 5);
@@ -1310,6 +1344,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         if (qo.getCommunityId() != null) {
             queryWrapper1.eq("community_id", qo.getCommunityId());
+        } else {
+            queryWrapper1.in("community_id", communityIdList);
         }
         queryWrapper1.eq("deleted", 0);
         queryWrapper1.eq("pay_type", 6);
@@ -1478,7 +1514,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity) {
+    public List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList) {
         List<PropertyFinanceFormEntity> propertyFinanceFormEntityList = new LinkedList<>();
         try {
         if (propertyFinanceFormEntity.getYear() != null) {
@@ -1496,7 +1532,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } catch (Exception e) {
             e.printStackTrace();
         }
-        PropertyFinanceFormEntity financeFormCommunityIncome = getFinanceFormCommunityIncome(propertyFinanceFormEntity);
+        PropertyFinanceFormEntity financeFormCommunityIncome = getFinanceFormCommunityIncome(propertyFinanceFormEntity, communityIdList);
         propertyFinanceFormEntityList.add(financeFormCommunityIncome);
         if (propertyFinanceFormEntityList.size() <= 0) {
             throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
@@ -1512,7 +1548,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
+    public List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<Long> communityIdList) {
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
         try {
             if (propertyFinanceFormChargeEntity.getYear() != null) {
@@ -1533,11 +1569,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         switch (propertyFinanceFormChargeEntity.getType()) {
             case 1:
                 // 按账单生成时间
-                propertyFinanceFormChargeEntityList = getFinanceFormCommunityChargeByOrderGenerateTime(propertyFinanceFormChargeEntity);
+                propertyFinanceFormChargeEntityList = getFinanceFormCommunityChargeByOrderGenerateTime(propertyFinanceFormChargeEntity, communityIdList);
                 break;
             case 2:
                 // 按账单周期时间
-                propertyFinanceFormChargeEntityList = getFinanceFormCommunityChargeByOrderPeriodTime(propertyFinanceFormChargeEntity);
+                propertyFinanceFormChargeEntityList = getFinanceFormCommunityChargeByOrderPeriodTime(propertyFinanceFormChargeEntity, communityIdList);
                 break;
             default:
                 break;
@@ -1556,7 +1592,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity) {
+    public List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity, List<Long> communityIdList) {
         try {
             if (propertyCollectionFormEntity.getYear() != null) {
                 String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
@@ -1581,7 +1617,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } catch (Exception e) {
             e.printStackTrace();
         }
-        List<PropertyCollectionFormEntity> propertyFinanceFormEntityList = getCollectionFormCollection(propertyCollectionFormEntity);
+        List<PropertyCollectionFormEntity> propertyFinanceFormEntityList = getCollectionFormCollection(propertyCollectionFormEntity, communityIdList);
         if (propertyFinanceFormEntityList == null || propertyFinanceFormEntityList.size() <= 0) {
             throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
         }

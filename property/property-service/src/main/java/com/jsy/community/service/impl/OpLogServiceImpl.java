@@ -78,8 +78,8 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 		}
 		// 补充用户名
 		for (OpLogEntity entity : pageData.getRecords()) {
-			AdminUserEntity adminUserEntity = adminUserMapper.queryByUid(entity.getUserId());
-			if (adminUserEntity.getRealName() != null) {
+			if (entity.getUserId() != null) {
+				AdminUserEntity adminUserEntity = adminUserMapper.queryByUid(entity.getUserId());
 				entity.setUserName(adminUserEntity.getRealName());
 			}
 		}

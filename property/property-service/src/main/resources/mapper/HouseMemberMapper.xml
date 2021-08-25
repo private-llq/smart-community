@@ -23,4 +23,11 @@
             and deleted = 0
         </where>
     </select>
+
+    <select id="selectAllPeopleByCommunityIds" resultType="java.lang.Integer">
+        select count(0) from t_house_member where community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

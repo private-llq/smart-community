@@ -25,6 +25,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -169,6 +170,24 @@ public class CommunityController {
         }
 		Long adminCommunityId = UserUtils.getAdminCommunityId();
 		return CommonResult.ok(communityService.getCommunitySurvey(month, adminCommunityId));
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取物业控制台
+	 * @param year:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/25 13:45
+	 **/
+	@Login
+	@GetMapping("/getPropertySurvey")
+	public CommonResult getPropertySurvey(Integer year) {
+		Long companyId = UserUtils.getAdminCompanyId();
+		List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+		if (year == null) {
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+		}
+		return CommonResult.ok(communityService.getPropertySurvey(year, companyId, communityIdList));
 	}
 }
 

@@ -9,12 +9,10 @@ import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.entity.property.ConsoleEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.DateCalculateUtil;
-import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.property.PropertyCommunityListVO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -323,5 +321,45 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		}
 		
 		return communitySurveyEntity;
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取物业控制台
+	 * @param year:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/25 13:45
+	 **/
+	@Override
+	public ConsoleEntity getPropertySurvey(Integer year, Long companyId, List<Long> communityIdList) {
+		LocalDate startTime = null;
+		LocalDate endTime = null;
+		try {
+			String firstMouthDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(year);
+			String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(year);
+			startTime = LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			endTime = LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		// 返回给前端实体
+		ConsoleEntity consoleEntity = new ConsoleEntity();
+		// 查该物业公司所属小区
+		List<CommunityEntity> communityEntities = communityMapper.queryCommunityByCompanyId(companyId);
+		// 设置物业所属小区数量
+		consoleEntity.setCommunityNumber(communityEntities.size());
+		// 查询物业房屋总数量
+		consoleEntity.setHouseSum(houseMapper.selectAllHouseByCommunityIds(communityIdList));
+		// 查询物业居住人数
+		consoleEntity.setLiveSum(houseMemberMapper.selectAllPeopleByCommunityIds(communityIdList));
+		// 查询物业车位总数
+		consoleEntity.setCarPositionSum(carPositionMapper.selectAllCarPositionByCommunityIds(communityIdList));
+		// 查询年每月的物业费统计
+		consoleEntity.setMonthByPropertyFee(propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityIds(communityIdList, startTime, endTime));
+		// 查询年总计物业费收入统计
+		consoleEntity.setYearByPropertyFee(propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityIdList));
+		
+		return consoleEntity;
 	}
 }

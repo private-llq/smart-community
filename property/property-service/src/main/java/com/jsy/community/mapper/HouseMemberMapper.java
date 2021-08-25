@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseMemberEntity;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -31,4 +32,13 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 *@Date: 2021/8/24 13:44
 	 **/
 	List<HouseMemberEntity> getAllTenantByCommunity(Long communityId);
+	
+	/**
+	 * @Description: 查询communityIds下所有居住人数数量
+	 * @author: DKS
+	 * @since: 2021/8/25 14:39
+	 * @Param: communityIdList
+	 * @return: Integer
+	 */
+	Integer selectAllPeopleByCommunityIds(@Param("list") List<Long> communityIdList);
 }
