@@ -41,5 +41,5 @@ public interface IProprietorMarketLabelService extends IService<ProprietorMarket
      * @Author: Tian
      * @Date: 2021/8/21-9:44
      **/
-    List<ProprietorMarketLabelEntity> selectMarketLabel(Long communityId);
+    List<ProprietorMarketLabelEntity> selectMarketLabel();
 }
