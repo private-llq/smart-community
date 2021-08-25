@@ -269,4 +269,13 @@ public interface IUserService extends IService<UserEntity> {
      * @return:
      */
 	void saveFace(String userId,String faceUrl);
+
+	/**
+	 * @Description: 删除业主人脸
+	 * @author: Hu
+	 * @since: 2021/8/24 16:58
+	 * @Param:
+	 * @return:
+	 */
+    void deleteFaceAvatar(String userId);
 }

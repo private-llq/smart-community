@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.ICarService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.mapper.CarMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.mapper.UserMapper;
@@ -17,11 +19,15 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +45,10 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @Autowired
     private UserMapper userMapper;
+
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarPositionService carPositionService;
 
     @Autowired
     private HouseMemberMapper houseMemberMapper;
@@ -160,9 +170,65 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return: java.util.List<com.jsy.community.entity.CarEntity>
      */
     @Override
-    public List<CarEntity> getCars(String uid) {
-        return carMapper.selectList(new QueryWrapper<CarEntity>().select("id,car_plate,community_id").eq("uid",uid));
+    public List<CarEntity> getCars(CarEntity carEntity,String uid) {
+        Map<Long,String> map = null;
+        QueryWrapper<CarEntity> wrapper = null;
+        //type = 3则把所有车辆全部查出来
+        if (carEntity.getType()==3){
+            wrapper = new QueryWrapper<CarEntity>()
+                    .select("id,car_plate,community_id")
+                    .eq("uid", uid);
+        }else {
+            //type = 2则当前小区的月租车辆
+            if (carEntity.getType()==2){
+                wrapper = new QueryWrapper<CarEntity>()
+                        .select("id,car_plate,community_id,begin_time,over_time,type,car_position_id")
+                        .eq("uid", uid)
+                        .eq("community_id",carEntity.getCommunityId())
+                        .eq("type",carEntity.getType());
+            }else {
+                //type = 1则当前小区的临时车辆
+                wrapper = new QueryWrapper<CarEntity>()
+                        .select("id,car_plate,community_id")
+                        .eq("uid", uid)
+                        .eq("type",carEntity.getType());
+            }
+        }
+        //如果查询的是月租车则要查询车位编号
+        List<CarEntity> list = carMapper.selectList(wrapper);
+        if (carEntity.getType()==2){
+            if (list.size()!=0){
+                //封装车位id
+                LinkedList<Long> positionIds = new LinkedList<>();
+                for (CarEntity entity : list) {
+                    positionIds.add(entity.getCarPositionId());
+                }
+                List<CarPositionEntity> carPositionEntities = carPositionService.getByIds(positionIds);
+                if (carPositionEntities!=null){
+                    map=new HashMap<>();
+                    //把车位信息封装到map  key未车位id  value为车位编号
+                    for (CarPositionEntity carPositionEntity : carPositionEntities) {
+                        map.put(carPositionEntity.getId(),carPositionEntity.getCarPosition());
+                    }
+                    for (CarEntity entity : list) {
+                        entity.setCarPositionText(map.get(entity.getCarPositionId()));
+                        entity.setTypeText("月租车");
+                        //计算当前月租车所剩天数
+                        long until = LocalDate.now().until(entity.getOverTime(), ChronoUnit.DAYS);
+                        if (until>0){
+                            entity.setRemainingDays(until);
+                        }else {
+                            entity.setRemainingDays(0L);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return list;
     }
+
 
     /**
      * @Description: 新app修改车辆
@@ -186,11 +252,18 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public void addRelationCar(CarEntity carEntity) {
-            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+        CarEntity entity = carMapper.selectOne(new QueryWrapper<CarEntity>().eq("car_plate", carEntity.getCarPlate()).eq("uid",carEntity.getUid()));
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+        if (entity!=null){
+            entity.setType(2);
+            carMapper.updateById(entity);
+        }else{
             carEntity.setId(SnowFlake.nextId());
             carEntity.setContact(userEntity.getMobile());
             carEntity.setOwner(userEntity.getRealName());
+            carEntity.setType(carEntity.getType());
             carMapper.insert(carEntity);
+        }
     }
 
     @Override
