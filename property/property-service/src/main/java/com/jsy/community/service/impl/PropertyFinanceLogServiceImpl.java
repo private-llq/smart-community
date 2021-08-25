@@ -66,7 +66,11 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 		// 模糊查询用户名
 		if (query.getUserName() != null) {
 			List<String> uidList = adminUserMapper.queryUidListByRealName(query.getUserName());
-			queryWrapper.in("user_id", uidList);
+			if (uidList.size() > 0) {
+				queryWrapper.in("user_id", uidList);
+			} else {
+				queryWrapper.eq("user_id", 0);
+			}
 		}
 		
 		// 查时间段
