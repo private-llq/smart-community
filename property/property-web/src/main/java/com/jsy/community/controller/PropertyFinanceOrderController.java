@@ -315,9 +315,9 @@ public class PropertyFinanceOrderController {
                 propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                 propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
-            if (propertyCollectionFormEntity.getDay() != null) {
+            if (propertyCollectionFormEntity.getDateTime() != null) {
                 ZoneId zone = ZoneId.systemDefault();
-                Instant instant = propertyCollectionFormEntity.getDay().atStartOfDay().atZone(zone).toInstant();
+                Instant instant = propertyCollectionFormEntity.getDateTime().atStartOfDay().atZone(zone).toInstant();
                 String firstDate = DateCalculateUtil.getFirstDate(Date.from(instant));
                 String lastDate = DateCalculateUtil.getLastDate(Date.from(instant));
                 propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));

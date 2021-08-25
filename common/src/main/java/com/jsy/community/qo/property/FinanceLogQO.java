@@ -1,5 +1,6 @@
 package com.jsy.community.qo.property;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -23,8 +24,10 @@ public class FinanceLogQO implements Serializable {
 	private Long communityId;
 	
 	@ApiModelProperty(value = "开始时间")
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
 	private LocalDate startTime;
 	
 	@ApiModelProperty(value = "结束时间")
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
 	private LocalDate endTime;
 }

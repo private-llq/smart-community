@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYError;
@@ -74,6 +75,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
     @Autowired
     private HouseMapper houseMapper;
+    
+    @Autowired
+    private CommunityMapper communityMapper;
 
     /**
      * @Description: 查询房间所有未缴账单
@@ -1339,6 +1343,16 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 }
             }
         }
+        
+        // 补充小区名称
+        if (qo.getCommunityId() == null) {
+            for (PropertyCollectionFormEntity entity : propertyCollectionFormEntityList) {
+                PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(entity.getFeeRuleId());
+                CommunityEntity communityEntity = communityMapper.selectById(propertyFeeRuleEntity.getCommunityId());
+                entity.setCommunityName(communityEntity.getName());
+            }
+        }
+        
     
         return propertyCollectionFormEntityList;
     }
@@ -1556,9 +1570,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                 propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
-            if (propertyCollectionFormEntity.getDay() != null) {
+            if (propertyCollectionFormEntity.getDateTime() != null) {
                 ZoneId zone = ZoneId.systemDefault();
-                Instant instant = propertyCollectionFormEntity.getDay().atStartOfDay().atZone(zone).toInstant();
+                Instant instant = propertyCollectionFormEntity.getDateTime().atStartOfDay().atZone(zone).toInstant();
                 String firstDate = DateCalculateUtil.getFirstDate(Date.from(instant));
                 String lastDate = DateCalculateUtil.getLastDate(Date.from(instant));
                 propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
