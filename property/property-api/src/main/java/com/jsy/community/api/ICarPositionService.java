@@ -4,6 +4,8 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.qo.property.InsterCarPositionQO;
+import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
 
 import java.util.LinkedList;
@@ -30,6 +32,14 @@ public interface ICarPositionService extends IService<CarPositionEntity> {
     List<CarPositionEntity> selectCarPosition(CarPositionEntity qo);
 
     List<CarPositionEntity> getAll(Long adminCommunityId);
+
+    Boolean insterCarPosition(InsterCarPositionQO qo ,Long adminCommunityId);
+
+    Boolean moreInsterCarPosition(MoreInsterCarPositionQO qo, Long adminCommunityId);
+
+    Boolean relieve(Long id);
+
+    Boolean deletedCarPosition(Long id);
 
     /**
      * @Description: 根据id查询车位
