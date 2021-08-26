@@ -35,7 +35,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -56,6 +59,8 @@ public class AdminLoginController {
 	private ICaptchaService captchaService;
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private ICommunityService communityService;
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPropertyCompanyService iPropertyCompanyService;
 	
 	@Autowired
 	private MyCaptchaUtil captchaUtil;
@@ -190,6 +195,9 @@ public class AdminLoginController {
 		}
 		//设置菜单
 		userData.setMenuList(userMenu);
+		
+		//设置物业公司名称
+		adminInfoVo.setCompanyName(iPropertyCompanyService.getCompanyNameByCompanyId(userData.getCompanyId()));
 		
 		//清空该账号已之前的token(踢下线)
 		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());

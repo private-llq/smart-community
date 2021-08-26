@@ -14,6 +14,7 @@ import com.jsy.community.qo.property.SelectCarPositionPagingQO;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -72,6 +73,19 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
         List<CarPositionEntity>   carPositionEntity= carPositionMapper.selectCarPosition(qo);
 
         return carPositionEntity;
+    }
+
+
+    /**
+     * @Description: 根据id查询车位
+     * @author: Hu
+     * @since: 2021/8/25 11:13
+     * @Param: [positionIds]
+     * @return: java.util.List<com.jsy.community.entity.property.CarPositionEntity>
+     */
+    @Override
+    public List<CarPositionEntity> getByIds(LinkedList<Long> positionIds) {
+        return carPositionMapper.selectBatchIds(positionIds);
     }
 
     @Override

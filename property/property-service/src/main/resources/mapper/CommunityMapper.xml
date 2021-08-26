@@ -11,4 +11,7 @@
         </foreach>
     </select>
 
+    <select id="queryCommunityByCompanyId" resultType="com.jsy.community.entity.CommunityEntity">
+        select * from t_community where property_id = #{companyId}
+    </select>
 </mapper>

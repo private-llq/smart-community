@@ -76,8 +76,8 @@ public class ProprietorMarketCategoryController {
     @GetMapping("/selectMarketCategory")
     @ApiOperation("查询社区集市商品类别")
     @Login
-    public CommonResult selectMarketcategory(@RequestParam("communityId") Long communityId){
-        List<ProprietorMarketCategoryEntity> list = categoryService.selectMarketCategory(communityId);
+    public CommonResult selectMarketcategory(){
+        List<ProprietorMarketCategoryEntity> list = categoryService.selectMarketCategory();
         return CommonResult.ok(list,"查询成功");
     }
 

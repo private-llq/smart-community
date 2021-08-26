@@ -38,4 +38,16 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
                 "\tcreate_time,\n" +
                 "\tupdate_time ").eq("id",id));
     }
+    
+    /**
+     * @author: DKS
+     * @description: 根据物业公司id获取物业公司名称
+     * @param companyId :
+     * @return: com.jsy.community.entity.PropertyCompanyEntity
+     * @date: 2021/8/25 16:32
+     **/
+    @Override
+    public String getCompanyNameByCompanyId(Long companyId) {
+        return propertyCompanyMapper.selectCompanyNameByCompanyId(companyId);
+    }
 }

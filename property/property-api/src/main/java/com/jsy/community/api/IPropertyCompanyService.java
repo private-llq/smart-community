@@ -17,4 +17,13 @@ public interface IPropertyCompanyService {
      * @return:
      */
     PropertyCompanyEntity findOne(Long id);
+    
+    /**
+     * @author: DKS
+     * @description: 根据物业公司id获取物业公司名称
+     * @param companyId :
+     * @return: com.jsy.community.entity.PropertyCompanyEntity
+     * @date: 2021/8/25 16:32
+     **/
+    String getCompanyNameByCompanyId(Long companyId);
 }

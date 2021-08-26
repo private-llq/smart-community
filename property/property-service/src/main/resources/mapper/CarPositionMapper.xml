@@ -61,8 +61,20 @@
         </where>
     </select>
 
+    <select id="getAllCarPositionByCommunity" resultType="com.jsy.community.entity.property.CarPositionEntity">
+        select
+        *
+        from t_car_position
+        <where>
+            community_id = #{communityId}
+            and deleted = 0
+        </where>
+    </select>
 
-
-
-
+    <select id="selectAllCarPositionByCommunityIds" resultType="java.lang.Integer">
+        select count(0) from t_car_position where community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

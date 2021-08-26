@@ -74,9 +74,9 @@ public class CarController {
 
 	@Login
 	@ApiOperation("新app查询车辆")
-	@GetMapping("getCars")
-	public CommonResult getCars() {
-		List<CarEntity> carEntities = carService.getCars(UserUtils.getUserId());
+	@PostMapping("getCars")
+	public CommonResult getCars(@RequestBody CarEntity carEntity) {
+		List<CarEntity> carEntities = carService.getCars(carEntity,UserUtils.getUserId());
 		return CommonResult.ok(carEntities);
 	}
 

@@ -261,6 +261,17 @@ public class UserController {
         PicUtil.imageQualified(faceAvatar);
         return CommonResult.ok(MinioUtils.upload(faceAvatar, BusinessConst.FAVE_AVATAR_BUCKET_NAME), "上传成功!");
     }
+    /**
+     * @author YuLF
+     * @since  2021/2/23 17:23
+     */
+    @Login
+    @ApiOperation("删除业主人脸接口")
+    @DeleteMapping("deleteFaceAvatar")
+    public CommonResult deleteFaceAvatar() {
+        userService.deleteFaceAvatar(UserUtils.getUserId());
+        return CommonResult.ok();
+    }
 
     @Login
     @ApiOperation("业主人脸上传")

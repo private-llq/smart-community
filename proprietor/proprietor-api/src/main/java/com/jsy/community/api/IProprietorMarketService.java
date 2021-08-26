@@ -70,4 +70,6 @@ public interface IProprietorMarketService extends IService<ProprietorMarketEntit
      * @Date: 2021/8/23-14:06
      **/
     ProprietorMarketVO findOne(Long id);
+
+    Map<String, Object> selectMarketLikePage(BaseQO<ProprietorMarketQO> baseQO);
 }
