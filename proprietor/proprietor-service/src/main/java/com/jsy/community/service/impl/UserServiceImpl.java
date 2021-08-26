@@ -1070,6 +1070,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return userMapper.queryUidOfNameLike(uids,nameLike);
     }
 
+    /**
+     * @Description: 删除业主人脸
+     * @author: Hu
+     * @since: 2021/8/24 16:59
+     * @Param: [userId]
+     * @return: void
+     */
+    @Override
+    public void deleteFaceAvatar(String userId) {
+        userMapper.deleteFaceAvatar(userId);
+    }
+
+
 
     @Override
     @Transactional

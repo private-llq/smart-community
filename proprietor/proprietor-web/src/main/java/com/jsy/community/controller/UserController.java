@@ -352,6 +352,19 @@ public class UserController {
     public CommonResult queryUroraTags(){
         return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
     }
+
+
+    /**
+     * @author YuLF
+     * @since  2021/2/23 17:23
+     */
+    @Login
+    @ApiOperation("删除业主人脸接口")
+    @DeleteMapping("deleteFaceAvatar")
+    public CommonResult deleteFaceAvatar() {
+        userService.deleteFaceAvatar(UserUtils.getUserId());
+        return CommonResult.ok();
+    }
     
     /**
     * @Description: 身份证照片识别

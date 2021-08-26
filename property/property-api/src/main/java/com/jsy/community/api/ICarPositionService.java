@@ -8,9 +8,8 @@ import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.property.InsterCarPositionQO;
 import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**

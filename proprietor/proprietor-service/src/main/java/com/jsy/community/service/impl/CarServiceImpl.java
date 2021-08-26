@@ -224,8 +224,8 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
             if (userEntity != null) {
                 carEntity.setId(SnowFlake.nextId());
-                carEntity.setBeginTime(LocalDate.now());
-                carEntity.setOverTime(LocalDate.now().plusMonths(carEntity.getMonth()));
+                carEntity.setBeginTime(LocalDateTime.now());
+                carEntity.setOverTime(LocalDateTime.now().plusMonths(carEntity.getMonth()));
                 carEntity.setType(2);
                 carEntity.setOwner(userEntity.getRealName());
                 carEntity.setContact(userEntity.getMobile());
@@ -351,7 +351,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public void updateRelationCar(CarEntity carEntity) {
-            carMapper.updateById(carEntity);
+        carMapper.updateById(carEntity);
 
     }
 

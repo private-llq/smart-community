@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,7 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.management.JMException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**

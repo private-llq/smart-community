@@ -17,7 +17,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -40,7 +40,6 @@ public class CarEntity extends BaseEntity {
     private Long houseMemberId;
 
     @ApiModelProperty(value = "车位ID")
-    @NotNull(groups = {BindingMonthCarValidated.class}, message = "车位不能为空哦！")
     private Long carPositionId;
 
     @ApiModelProperty(value = "车位编号")
@@ -98,9 +97,9 @@ public class CarEntity extends BaseEntity {
     @TableField(exist = false)
     private String typeText;
     @ApiModelProperty(value = "月租开始时间")
-    private LocalDate beginTime;
+    private LocalDateTime beginTime;
     @ApiModelProperty(value = "月租结束时间")
-    private LocalDate overTime;
+    private LocalDateTime overTime;
 
     @ApiModelProperty(value = "剩余天数")
     @TableField(exist = false)

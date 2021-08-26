@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -47,11 +46,11 @@ public class CarOrderEntity extends BaseEntity {
     /**
      *  周期开始时间
      */
-    private LocalDate beginTime;
+    private LocalDateTime beginTime;
     /**
      *  周期结束时间
      */
-    private LocalDate overTime;
+    private LocalDateTime overTime;
     /**
      *  1线上支付，2线下支付
      */
