@@ -71,6 +71,20 @@
         </where>
     </select>
 
+    <update id="relieve" parameterType="Long"  >
+    UPDATE t_car_position as par
+    set par.uid=null,
+    par.car_pos_status=0,
+    par.belong_house=null,
+    par.owner_phone=null,
+    par.binding_status=0,
+    par.begin_time=null,
+    par.end_time=null,
+    par.user_name=null
+
+    WHERE id=#{id}
+    </update>
+
     <select id="selectAllCarPositionByCommunityIds" resultType="java.lang.Integer">
         select count(0) from t_car_position where community_id in
         <foreach collection="list" item="item" open="(" separator="," close=")">

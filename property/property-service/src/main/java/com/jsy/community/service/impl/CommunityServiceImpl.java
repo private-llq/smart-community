@@ -12,10 +12,7 @@ import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.ConsoleEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.DateCalculateUtil;
-import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.property.PropertyCommunityListVO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -356,6 +353,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		consoleEntity.setHouseSum(houseMapper.selectAllHouseByCommunityIds(communityIdList));
 		// 查询物业居住人数
 		consoleEntity.setLiveSum(houseMemberMapper.selectAllPeopleByCommunityIds(communityIdList));
+
 		// 查询物业车位总数
 		consoleEntity.setCarPositionSum(carPositionMapper.selectAllCarPositionByCommunityIds(communityIdList));
 		// 查询年每月的物业费统计
