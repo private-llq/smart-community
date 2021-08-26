@@ -7,8 +7,9 @@ import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.property.InsterCarPositionQO;
 import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.LinkedList;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -40,13 +41,4 @@ public interface ICarPositionService extends IService<CarPositionEntity> {
     Boolean relieve(Long id);
 
     Boolean deletedCarPosition(Long id);
-
-    /**
-     * @Description: 根据id查询车位
-     * @author: Hu
-     * @since: 2021/8/25 11:12
-     * @Param:
-     * @return:
-     */
-    List<CarPositionEntity> getByIds(LinkedList<Long> positionIds);
 }

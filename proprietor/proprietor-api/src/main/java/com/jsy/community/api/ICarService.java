@@ -112,7 +112,7 @@ public interface ICarService extends IService<CarEntity> {
      * @Param:
      * @return:
      */
-    List<CarEntity> getCars(CarEntity carEntity,String uid);
+    List<CarEntity> getCars(String uid);
 
     /**
      * @Description: 新app删除车辆

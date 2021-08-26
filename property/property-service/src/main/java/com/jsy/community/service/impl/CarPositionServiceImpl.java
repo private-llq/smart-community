@@ -1,19 +1,24 @@
 package com.jsy.community.service.impl;
 
 
-
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarPositionService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.mapper.CarPositionMapper;
+import com.jsy.community.qo.property.InsterCarPositionQO;
+import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.management.JMException;
 import java.util.List;
 
 /**
@@ -27,7 +32,7 @@ import java.util.List;
 @DubboService(version = Const.version, group = Const.group_property)
 public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPositionEntity> implements ICarPositionService {
     @Resource
-    private     CarPositionMapper carPositionMapper;
+    private CarPositionMapper carPositionMapper;
 
     @Override
     public List<CarPositionEntity> selectCarPostionBystatustatus() {
@@ -71,19 +76,6 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
         List<CarPositionEntity> carPositionEntity = carPositionMapper.selectCarPosition(qo);
 
         return carPositionEntity;
-    }
-
-
-    /**
-     * @Description: 根据id查询车位
-     * @author: Hu
-     * @since: 2021/8/25 11:13
-     * @Param: [positionIds]
-     * @return: java.util.List<com.jsy.community.entity.property.CarPositionEntity>
-     */
-    @Override
-    public List<CarPositionEntity> getByIds(LinkedList<Long> positionIds) {
-        return carPositionMapper.selectBatchIds(positionIds);
     }
 
     @Override

@@ -55,7 +55,7 @@ public class ProprietorMarketLabelServiceImpl extends ServiceImpl<ProprietorMark
     }
 
     @Override
-    public List<ProprietorMarketLabelEntity> selectMarketLabel() {
-        return labelMapper.selectList(new QueryWrapper<ProprietorMarketLabelEntity>());
+    public List<ProprietorMarketLabelEntity> selectMarketLabel(Long communityId) {
+        return labelMapper.selectList(new QueryWrapper<ProprietorMarketLabelEntity>().eq("community_id",communityId));
     }
 }

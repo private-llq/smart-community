@@ -1,17 +1,20 @@
 package com.jsy.community.entity.property;
+
+
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode
+@ToString
 @TableName("t_car_monthly_vehicle")
 public class CarMonthlyVehicle implements Serializable {
     private static final long serialVersionUID = 1L;

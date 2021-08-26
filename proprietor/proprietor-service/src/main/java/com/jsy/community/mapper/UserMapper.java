@@ -2,11 +2,11 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.UserInfoVo;
 import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -153,14 +153,4 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @Date: 2021/4/23
 	**/
 	List<String> queryUidOfNameLike(@Param("uids")Collection<String> uids, @Param("nameLike")String nameLike);
-
-	/**
-	 * @Description: 删除业主人脸
-	 * @author: Hu
-	 * @since: 2021/8/24 16:59
-	 * @Param:
-	 * @return:
-	 */
-	@Update("update t_user set face_url=null where uid = #{uid}")
-    void deleteFaceAvatar(@Param("uid") String uid);
 }

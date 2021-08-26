@@ -27,35 +27,19 @@
         (select com.uid from t_user as com where com.mobile=#{listRelation.ownerPhone} and  com.real_name=#{listRelation.userName}),
         (select ty.id from t_car_position_type  as ty where ty.description=#{listRelation.typeCarPosition}),
         #{listRelation.carPosition},
-        0,
+        #{listRelation.carPosStatus},
         #{listRelation.area},
         #{listRelation.belongHouse},
         #{listRelation.ownerPhone},
         #{listRelation.userName},
         #{listRelation.remark},
-        0,
+        #{listRelation.bindingStatus},
         #{listRelation.beginTime,javaType=DATE},
         #{listRelation.endTime,javaType=DATE},
         #{listRelation.price},
         #{listRelation.monthlyPrice}   )
     </foreach>
 </insert>
-
-    <update id="relieve" parameterType="Long"  >
-        UPDATE t_car_position as par
-        set par.uid=null,
-            par.car_pos_status=0,
-            par.belong_house=null,
-            par.owner_phone=null,
-            par.binding_status=0,
-            par.begin_time=null,
-            par.end_time=null,
-            par.user_name=null
-
-        WHERE id=#{id}
-
-
-    </update>
 
 
     <sql id="carPosition_select">
@@ -77,20 +61,24 @@
         </where>
     </select>
 
-    <select id="getAllCarPositionByCommunity" resultType="com.jsy.community.entity.property.CarPositionEntity">
-        select
-        *
-        from t_car_position
-        <where>
-            community_id = #{communityId}
-            and deleted = 0
-        </where>
-    </select>
 
-    <select id="selectAllCarPositionByCommunityIds" resultType="java.lang.Integer">
-        select count(0) from t_car_position where community_id in
-        <foreach collection="list" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </select>
+    <update id="relieve" parameterType="Long"  >
+        UPDATE t_car_position as par
+        set par.uid=null,
+            par.car_pos_status=0,
+            par.belong_house=null,
+            par.owner_phone=null,
+            par.binding_status=0,
+            par.begin_time=null,
+            par.end_time=null,
+            par.user_name=null
+
+        WHERE id=#{id}
+
+
+    </update>
+
+
+
+
 </mapper>

@@ -38,11 +38,11 @@ public class OpLogController {
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.OpLogEntity>>
 	 * @Author: DKS
-	 * @Date: 2021/08/23 11:56
+	 * @Date: 2021/08/05
 	 **/
 	@Login
 	@ApiOperation("操作日志分页查询")
-	@PostMapping("/query")
+	@PostMapping("/building/type/query")
 	public CommonResult<PageInfo<OpLogEntity>> queryOpLogPage(@RequestBody BaseQO<OpLogQO> baseQO) {
 		OpLogQO query = baseQO.getQuery();
 		if(query == null){

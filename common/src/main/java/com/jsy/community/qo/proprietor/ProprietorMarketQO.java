@@ -40,8 +40,6 @@ public class ProprietorMarketQO extends BaseQO {
     @ApiModelProperty(value = "商品名")
     private String goodsName;
 
-    @ApiModelProperty(value = "点击率")
-    private Integer click;
 
     @Range(min = 0,message = "交易金额错误")
     @ApiModelProperty(value = "价格")

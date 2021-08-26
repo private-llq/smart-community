@@ -9,9 +9,7 @@ import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
-import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.mapper.CarMonthlyVehicleMapper;
-import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -32,8 +30,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
     @Autowired
     private CarMonthlyVehicleMapper carMonthlyVehicleMapper;
-    @Autowired
-    private CarPositionMapper carPositionMapper;
 
 
     /**
@@ -43,40 +39,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      */
     @Override
     public Integer SaveMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle,Long communityId) {
-        if (Objects.isNull(carMonthlyVehicle.getStartTime())){
-            throw new PropertyException("开始时间不能为空！");
-        }
-        if (Objects.isNull(carMonthlyVehicle.getEndTime())){
-            throw new PropertyException("结束时间不能为空！");
-        }
-        if (Objects.isNull(carMonthlyVehicle.getMonthlyFee())){
-            throw new PropertyException("包月费用不能为空！");
-        }
-        if (Objects.isNull(carMonthlyVehicle.getPhone())){
-            throw new PropertyException("手机号码不能为空！");
-        }
-        if (Objects.isNull(carMonthlyVehicle.getCarNumber())){
-            throw new PropertyException("车牌号不能为空！");
-        }
-        if (Objects.isNull(carMonthlyVehicle.getOwnerName())){
-            throw new PropertyException("车主姓名不能为空！");
-        }
-        if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
-            throw new PropertyException("车位号不能为空！");
-        }
-
         carMonthlyVehicle.setUid(UserUtils.randomUUID());
         carMonthlyVehicle.setCommunityId(communityId);
         int insert = carMonthlyVehicleMapper.insert(carMonthlyVehicle);
-
-        //修改车位的信息：为已绑定 开始结束时间变更
-        CarPositionEntity carPositionEntity = new CarPositionEntity();
-        carPositionEntity.setCarPosStatus(2);//租赁状态
-        carPositionEntity.setOwnerPhone(carMonthlyVehicle.getPhone());//联系电话
-        carPositionEntity.setRemark(carMonthlyVehicle.getRemarks());//备注
-        carPositionEntity.setUserName(carMonthlyVehicle.getOwnerName());//租户姓名
-        carPositionMapper.update(carPositionEntity,new QueryWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
-
         return insert;
     }
 
@@ -88,7 +53,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Override
     @Transactional
     public Integer UpdateMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle) {
-        int update = carMonthlyVehicleMapper.update(carMonthlyVehicle, new QueryWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle.getUid()));
+        int update = carMonthlyVehicleMapper.update(carMonthlyVehicle,
+                new QueryWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle.getUid()));
 
         return update;
     }
@@ -101,9 +67,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Override
     @Transactional
     public Integer DelMonthlyVehicle(String uid) {
-        int delete = carMonthlyVehicleMapper.delete(new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid));
-        //修改车位的信息：为已绑定 开始结束时间变更
-        return delete;
+        carMonthlyVehicleMapper.delete(new QueryWrapper<CarMonthlyVehicle>().eq("uid",uid));
+        return null;
     }
 
     /**
@@ -134,6 +99,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         pageInfo.setTotal(iPage.getTotal());
         return pageInfo;
     }
+
     /**
      * 包月延期 0 按天 1 按月
      * @param fee
@@ -172,8 +138,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             LocalDateTime time = endTime.plusDays(dayNum);
             carMonthlyVehicleMapper.update(carMonthlyVehicle,new UpdateWrapper<CarMonthlyVehicle>().eq("uid",uid).set("end_time",time).set("monthly_fee",monthlyFee.add(fee)));
         }
-
-        //修改车位的信息：为已绑定 开始结束时间变更
     }
 
     /**
@@ -287,7 +251,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 hashMap.put("下发状态",string[7]);
                 hashMap.put("备注",string[8]);
                 hashMap.put("车位编号",string[9]);
-                hashMap.put("失败原因","这条数据已存在，请勿重复导入");
                 failStaffList.add(hashMap);
                 fail += 1;
                 continue;
@@ -327,7 +290,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @return
      */
     @Override
-    @Transactional
     public Map<String, Object> addLinkByExcel2(List<String[]> strings, Long communityId) {
         // 成功数
         int success = 0;
@@ -340,12 +302,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         //返回MAP
         Map<String, Object> resultMap = new HashMap<>();
 
-        labe:for (String[] string : strings) {
-            for (int i = 0; i <string.length; i++) {
-                if (StringUtils.isBlank(string[i])){
-                    throw new PropertyException("数据表格中不能存在空值");
-                }
-            }
+        for (String[] string : strings) {
+
             CarMonthlyVehicle vehicle = new CarMonthlyVehicle();
             //uuid
             vehicle.setUid(UserUtils.randomUUID());
@@ -394,38 +352,34 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             Long getCommunityId=communityId;
             vehicle.setCommunityId(getCommunityId);
 
-            // 如果Excel中有与数据库中 有相同社区下的同一条数据则不能添加成功 （用停车的开始时间和结束时间来区分）
-            List<CarMonthlyVehicle> recarMonthlyVehicles = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", communityId));
-            for (CarMonthlyVehicle carMonthlyVehicle : recarMonthlyVehicles) {
-                if (!Objects.isNull(carMonthlyVehicle)){
-                    if (vehicle.getStartTime().equals(carMonthlyVehicle.getStartTime())){
-                        if (vehicle.getEndTime().equals(carMonthlyVehicle.getEndTime())){
-                            HashMap<String, String> hashMap = new HashMap<>();
-                            hashMap.put("车牌号",string[0]);
-                            hashMap.put("车主姓名",string[1]);
-                            hashMap.put("联系电话",string[2]);
-                            hashMap.put("包月方式",string[3]);
-                            hashMap.put("开始时间",string[4]);
-                            hashMap.put("结束时间",string[5]);
-                            hashMap.put("包月费用",string[6]);
-                            hashMap.put("下发状态",string[7]);
-                            hashMap.put("备注",string[8]);
-                            hashMap.put("车位编号",string[9]);
-                            failStaffList.add(hashMap);
-                            fail += 1;//失败数据累加
-                            continue labe;
-                        }
-                    }
-             }
-
+            // 如果Excel中有与数据库中 有相同社区下的同一条数据则不能添加成功
+            CarMonthlyVehicle reMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber));
+            if (vehicle.equals(reMonthlyVehicle)){
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("车牌号",string[0]);
+                hashMap.put("车主姓名",string[1]);
+                hashMap.put("联系电话",string[2]);
+                hashMap.put("包月方式",string[3]);
+                hashMap.put("开始时间",string[4]);
+                hashMap.put("结束时间",string[5]);
+                hashMap.put("包月费用",string[6]);
+                hashMap.put("下发状态",string[7]);
+                hashMap.put("备注",string[8]);
+                hashMap.put("车位编号",string[9]);
+                failStaffList.add(hashMap);
+                fail += 1;//失败数据累加
+                continue;
             }
             //成功数累加
             success += 1;
             carMonthlyVehicleMapper.insert(vehicle);
+
         }
         resultMap.put("success", "成功" + success + "条");
         resultMap.put("fail", "失败" + fail + "条");
         resultMap.put("failData", failStaffList);
         return resultMap;
     }
+
+
 }

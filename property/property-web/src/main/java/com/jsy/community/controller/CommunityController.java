@@ -7,7 +7,6 @@ import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
@@ -25,7 +24,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -153,41 +151,6 @@ public class CommunityController {
 		// 设置默认的社区房屋层级模式
 		communityEntity.setHouseLevelMode(1);
 		return communityService.updateCommunity(communityEntity) > 0 ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");
-	}
-	
-	/**
-	 * @author: DKS
-	 * @description: 获取小区概况
-	 * @param month:
-	 * @return: com.jsy.community.vo.CommonResult
-	 * @date: 2021/8/24 11:52
-	 **/
-	@Login
-	@GetMapping("/getCommunitySurvey")
-	public CommonResult getCommunitySurvey(Integer month) {
-		if (month == null) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
-        }
-		Long adminCommunityId = UserUtils.getAdminCommunityId();
-		return CommonResult.ok(communityService.getCommunitySurvey(month, adminCommunityId));
-	}
-	
-	/**
-	 * @author: DKS
-	 * @description: 获取物业控制台
-	 * @param year:
-	 * @return: com.jsy.community.vo.CommonResult
-	 * @date: 2021/8/25 13:45
-	 **/
-	@Login
-	@GetMapping("/getPropertySurvey")
-	public CommonResult getPropertySurvey(Integer year) {
-		Long companyId = UserUtils.getAdminCompanyId();
-		List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
-		if (year == null) {
-			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
-		}
-		return CommonResult.ok(communityService.getPropertySurvey(year, companyId, communityIdList));
 	}
 }
 

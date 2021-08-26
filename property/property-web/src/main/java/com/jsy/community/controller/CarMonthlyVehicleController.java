@@ -8,7 +8,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.util.POIUtil;
-import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.POIUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -19,11 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +48,7 @@ public class CarMonthlyVehicleController {
     }
 
     /**
-     * 车主姓名、开始时间不能更改
+     * 只能修改 车牌号，车主姓名，电话，备注
      * @param carMonthlyVehicle
      * @return
      */
@@ -113,24 +109,31 @@ public class CarMonthlyVehicleController {
         return CommonResult.ok();
     }
     /**
-     * 上传数据导入模板
-     *
-     */
-    @PostMapping("uploadTemplate")
-    public CommonResult uploadTempe(MultipartFile file){
-        String templatePath = MinioUtils.upload(file, "template");
-        return CommonResult.ok(templatePath);
-    }
-
-
-
-    /**
      * 下载数据导入模板
      */
-    @PostMapping("dataExportTemplate")
-    public String downTemplate(){
+    @RequestMapping("dataExportTempe")
+    public CommonResult dataExportTempe(HttpServletResponse response){
+        List<String[]> list=new ArrayList<>();//封装返回的数据
+        String[] strings0=new String[10];
+        strings0[0]=  "车牌号";
+        strings0[1]= "车主姓名";
+        strings0[2]= "联系电话";
+        strings0[3]= "包月方式";
+        strings0[4]= "开始时间";
+        strings0[5]= "结束时间";
+        strings0[6]= "包月费用";
+        strings0[7]= "下发状态";
+        strings0[8]= "备注";
+        strings0[9]= "车位编号";
+        list.add(strings0);//添加第一排excel属性名
 
-        return "http://222.178.212.29:9000/template/adb4f055b0384319b26aef942b583c70";
+        try {
+            POIUtil.writePoi(list,"我的文件",2,response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return CommonResult.ok(-1,"服务器异常！");
     }
 
     /**
@@ -159,11 +162,6 @@ public class CarMonthlyVehicleController {
             List<String[]> strings = POIUtils.readExcel(file);
             Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
             Map<String, Object> map =vehicleService.addLinkByExcel2(strings,communityId);
-            String fail = map.get("fail").toString().substring(2,3);
-
-            if (Integer.valueOf(fail)>0){
-                return CommonResult.error(-1,map);
-            }
             return CommonResult.ok(map);
 
         } catch (IOException e) {
@@ -179,7 +177,7 @@ public class CarMonthlyVehicleController {
      * 数据导出
      */
     @Login
-    @PostMapping("dataExport")
+    @RequestMapping("dataExport")
     public CommonResult dataExport( HttpServletResponse response){
         List<CarMonthlyVehicle> vehicleList = vehicleService.selectList(UserUtils.getAdminCommunityId());
         List<String[]> list=new ArrayList<>();//封装返回的数据

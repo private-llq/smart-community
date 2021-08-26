@@ -41,10 +41,6 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
-    @ApiModelProperty(value = "车位编号")
-    @TableField(exist = false)
-    private String carPositionText;
-
     @Range(groups = {AddCarValidated.class}, min = 1, message = "社区id不合法")
     @NotNull(groups = {AddCarValidated.class}, message = "社区不能为空")
     @ApiModelProperty(value = "社区ID")
@@ -91,18 +87,10 @@ public class CarEntity extends BaseEntity {
 
     @ApiModelProperty(value = "1临时，2月租")
     private Integer type;
-
-    @ApiModelProperty(value = "1临时，2月租")
-    @TableField(exist = false)
-    private String typeText;
     @ApiModelProperty(value = "月租开始时间")
     private LocalDate beginTime;
     @ApiModelProperty(value = "月租结束时间")
     private LocalDate overTime;
-
-    @ApiModelProperty(value = "剩余天数")
-    @TableField(exist = false)
-    private Long remainingDays;
 
 
     public static CarEntity getInstance() {

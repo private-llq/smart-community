@@ -11,21 +11,5 @@ public interface CarPositionMapper extends BaseMapper<CarPositionEntity> {
 
     List<CarPositionEntity> selectCarPosition(CarPositionEntity qo);
 
-    /**
-     *@Author: DKS
-     *@Description: 查询小区下所有的车位
-     *@Param: communityId:
-     *@Return: java.util.List<com.jsy.community.entity.CarPositionEntity>
-     *@Date: 2021/8/24 13:44
-     **/
-    List<CarPositionEntity> getAllCarPositionByCommunity(Long communityId);
-
-    /**
-     * @Description: 查询communityIds下所有车位数量
-     * @author: DKS
-     * @since: 2021/8/25 14:44
-     * @Param: communityIdList
-     * @return: Integer
-     */
-    Integer selectAllCarPositionByCommunityIds(@Param("list") List<Long> communityIdList);
+    int relieve(Long id);
 }
