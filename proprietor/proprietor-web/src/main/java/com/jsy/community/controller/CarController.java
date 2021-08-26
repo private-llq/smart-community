@@ -7,6 +7,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.DrivingLicense;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
@@ -74,6 +75,14 @@ public class CarController {
 		ValidatorUtils.validateEntity(carEntity, CarEntity.BindingMonthCarValidated.class);
 		carService.bindingMonthCar(carEntity);
 		return CommonResult.ok();
+	}
+
+	@Login
+	@ApiOperation("查询月租缴费")
+	@GetMapping("getMonthOrder")
+	public CommonResult MonthOrder(@RequestParam Long communityId) {
+		List<CarOrderEntity> list = carService.MonthOrder(communityId,UserUtils.getUserId());
+		return CommonResult.ok(list);
 	}
 
 	@Login

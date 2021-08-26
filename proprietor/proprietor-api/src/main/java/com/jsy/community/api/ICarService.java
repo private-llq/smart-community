@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
@@ -159,4 +160,13 @@ public interface ICarService extends IService<CarEntity> {
      * @return:
      */
     BigDecimal payPositionFees(CarEntity carEntity);
+
+    /**
+     * @Description: 查询月租缴费订单
+     * @author: Hu
+     * @since: 2021/8/26 17:31
+     * @Param:
+     * @return:
+     */
+    List<CarOrderEntity> MonthOrder(Long communityId, String userId);
 }

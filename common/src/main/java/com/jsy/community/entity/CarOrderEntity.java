@@ -20,6 +20,10 @@ public class CarOrderEntity extends BaseEntity {
      */
     private Long carId;
     /**
+     *  业主uid
+     */
+    private String uid;
+    /**
      *  社区id
      */
     private Long communityId;

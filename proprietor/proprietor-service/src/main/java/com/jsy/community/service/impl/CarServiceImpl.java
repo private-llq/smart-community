@@ -60,7 +60,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionService carPositionService;
 
-    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    @DubboReference(version = Const.version,  group = Const.group, check = false)
     private ICarChargeService carChargeService;
 
     @Autowired
@@ -164,6 +164,18 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
 
     /**
+     * @Description: 查询月租缴费订单
+     * @author: Hu
+     * @since: 2021/8/26 17:32
+     * @Param: [communityId, userId]
+     * @return: java.util.List<com.jsy.community.entity.CarOrderEntity>
+     */
+    @Override
+    public List<CarOrderEntity> MonthOrder(Long communityId, String userId) {
+        return appCarOrderMapper.selectList(new QueryWrapper<CarOrderEntity>().select("id,order_num,begin_time,over_time,money,car_plate,car_position_id,type").eq("community_id",communityId).eq("uid",userId).eq("type",2));
+    }
+
+    /**
      * @Description: 获取车位费
      * @author: Hu
      * @since: 2021/8/26 14:42
@@ -173,7 +185,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public BigDecimal payPositionFees(CarEntity carEntity) {
         CarChargeEntity carChargeEntity = carChargeService.selectOne(carEntity.getCommunityId());
-        return carChargeEntity.getMoney().multiply(carEntity.getMoney());
+        return carChargeEntity.getMoney().multiply(new BigDecimal(carEntity.getMonth()));
     }
 
     /**
@@ -199,6 +211,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         carOrderEntity.setCommunityId(entity.getCommunityId());
         carOrderEntity.setCarPositionId(entity.getCarPositionId());
         carOrderEntity.setType(2);
+        carOrderEntity.setUid(carEntity.getUid());
         carOrderEntity.setOrderTime(LocalDateTime.now());
         carOrderEntity.setBeginTime(entity.getBeginTime());
         carOrderEntity.setOverTime(entity.getOverTime());
@@ -240,6 +253,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setCommunityId(carEntity.getCommunityId());
                 carOrderEntity.setCarPositionId(carEntity.getCarPositionId());
                 carOrderEntity.setType(2);
+                carOrderEntity.setUid(carEntity.getUid());
                 carOrderEntity.setPayType(1);
                 carOrderEntity.setOrderTime(LocalDateTime.now());
                 carOrderEntity.setBeginTime(carEntity.getBeginTime());
