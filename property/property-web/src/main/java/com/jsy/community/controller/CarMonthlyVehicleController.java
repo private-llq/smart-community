@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +52,7 @@ public class CarMonthlyVehicleController {
     }
 
     /**
-     * 只能修改 车牌号，车主姓名，电话，备注
+     * 车主姓名、开始时间不能更改
      * @param carMonthlyVehicle
      * @return
      */
@@ -124,9 +127,10 @@ public class CarMonthlyVehicleController {
     /**
      * 下载数据导入模板
      */
-    @RequestMapping("dataExportTemplate")
-    public CommonResult downTemplate(){
-        return CommonResult.ok("http://222.178.212.29:9000/template/adb4f055b0384319b26aef942b583c70");
+    @PostMapping("dataExportTemplate")
+    public String downTemplate(){
+
+        return "http://222.178.212.29:9000/template/adb4f055b0384319b26aef942b583c70";
     }
 
     /**
@@ -155,6 +159,11 @@ public class CarMonthlyVehicleController {
             List<String[]> strings = POIUtils.readExcel(file);
             Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
             Map<String, Object> map =vehicleService.addLinkByExcel2(strings,communityId);
+            String fail = map.get("fail").toString().substring(2,3);
+
+            if (Integer.valueOf(fail)>0){
+                return CommonResult.error(-1,map);
+            }
             return CommonResult.ok(map);
 
         } catch (IOException e) {
@@ -170,7 +179,7 @@ public class CarMonthlyVehicleController {
      * 数据导出
      */
     @Login
-    @RequestMapping("dataExport")
+    @PostMapping("dataExport")
     public CommonResult dataExport( HttpServletResponse response){
         List<CarMonthlyVehicle> vehicleList = vehicleService.selectList(UserUtils.getAdminCommunityId());
         List<String[]> list=new ArrayList<>();//封装返回的数据
