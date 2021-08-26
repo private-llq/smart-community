@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
@@ -75,6 +76,39 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
         return carPositionEntity;
     }
 
+
+
+    /**
+     * @Description: 业主车位绑定车辆后修改状态
+     * @author: Hu
+     * @since: 2021/8/26 11:19
+     * @Param: [entity]
+     * @return: void
+     */
+    @Override
+    public void bindingMonthCar(CarEntity entity) {
+        CarPositionEntity positionEntity = carPositionMapper.selectById(entity.getCarPositionId());
+        if (positionEntity != null) {
+            positionEntity.setCarPosStatus(2);
+            positionEntity.setOwnerPhone(entity.getContact());
+            positionEntity.setBindingStatus(1);
+            positionEntity.setBeginTime(entity.getBeginTime());
+            positionEntity.setEndTime(entity.getOverTime());
+            carPositionMapper.updateById(positionEntity);
+        }
+    }
+
+    /**
+     * @Description: 获取当前小区空置车位
+     * @author: Hu
+     * @since: 2021/8/25 15:46
+     * @Param: [communityId]
+     * @return: java.util.List<com.jsy.community.entity.property.CarPositionEntity>
+     */
+    @Override
+    public List<CarPositionEntity> getPosition(Long communityId) {
+        return carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().select("id,car_position").eq("community_id",communityId).eq("car_pos_status",0).eq("type_id",13));
+    }
 
     /**
      * @Description: 根据id查询车位

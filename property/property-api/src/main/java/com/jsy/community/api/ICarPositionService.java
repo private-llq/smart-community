@@ -3,6 +3,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
 
@@ -39,4 +40,22 @@ public interface ICarPositionService extends IService<CarPositionEntity> {
      * @return:
      */
     List<CarPositionEntity> getByIds(LinkedList<Long> positionIds);
+
+    /**
+     * @Description: 获取当前小区空置车位
+     * @author: Hu
+     * @since: 2021/8/25 15:45
+     * @Param:
+     * @return:
+     */
+    List<CarPositionEntity> getPosition(Long communityId);
+
+    /**
+     * @Description: 业主绑定车辆后修改车位状态
+     * @author: Hu
+     * @since: 2021/8/26 11:19
+     * @Param:
+     * @return:
+     */
+    void bindingMonthCar(CarEntity entity);
 }

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -138,14 +139,14 @@ public class CarPositionEntity implements Serializable {
      */
     @ExcelProperty("起始时间")
     @DateTimeFormat("yyyy-MM-dd")
-    private Date beginTime;
+    private LocalDate beginTime;
 
     /**
      * 到期时间
      */
     @ExcelProperty("到期时间")
     @DateTimeFormat("yyyy-MM-dd")
-    private Date endTime;
+    private LocalDate endTime;
     /**
      * 售价
      */

@@ -3,9 +3,11 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -122,4 +124,39 @@ public interface ICarService extends IService<CarEntity> {
      * @return:
      */
     void delete(Long id, String userId);
+
+    /**
+     * @Description: 获取当前小区空置车位
+     * @author: Hu
+     * @since: 2021/8/25 15:44
+     * @Param:
+     * @return:
+     */
+    List<CarPositionEntity> getPosition(Long communityId);
+
+    /**
+     * @Description: 绑定月租车辆
+     * @author: Hu
+     * @since: 2021/8/26 11:12
+     * @Param:
+     * @return:
+     */
+    void bindingMonthCar(CarEntity carEntity);
+
+    /**
+     * @Description: 续费月租车辆
+     * @author: Hu
+     * @since: 2021/8/26 11:51
+     * @Param:
+     * @return:
+     */
+    void renewMonthCar(CarEntity carEntity);
+    /**
+     * @Description: 获取车位费
+     * @author: Hu
+     * @since: 2021/8/26 14:42
+     * @Param:
+     * @return:
+     */
+    BigDecimal payPositionFees(CarEntity carEntity);
 }

@@ -8,8 +8,6 @@ import com.jsy.community.api.ICarChargeService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
-import com.jsy.community.exception.JSYException;
-import com.jsy.community.exception.JSYExceptionHandler;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
@@ -17,14 +15,12 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @DubboService(version = Const.version, group = Const.group)
@@ -103,6 +99,19 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         carChargeEntity.setUid(UserUtils.randomUUID());
         int insert = carChargeMapper.insert(carChargeEntity);
         return insert;
+    }
+
+
+    /**
+     * @Description: 按社区查询一条缴费规则
+     * @author: Hu
+     * @since: 2021/8/26 14:47
+     * @Param: [communityId]
+     * @return: com.jsy.community.entity.property.CarChargeEntity
+     */
+    @Override
+    public CarChargeEntity selectOne(Long communityId) {
+        return carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id",communityId).eq("position","地上").eq("type",0));
     }
 
     /**

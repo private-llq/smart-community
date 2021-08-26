@@ -21,6 +21,10 @@ public class CarOrderEntity extends BaseEntity {
      */
     private Long carId;
     /**
+     *  社区id
+     */
+    private Long communityId;
+    /**
      *  车位id
      */
     private Long carPositionId;
