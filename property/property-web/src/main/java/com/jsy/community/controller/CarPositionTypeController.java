@@ -64,7 +64,7 @@ public class CarPositionTypeController {
     public CommonResult<List<SelectCartPositionTypeVO>> selectCartPositionType() {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
         List<SelectCartPositionTypeVO> vo = iCarPositionTypeService.selectCartPositionType(adminCommunityId);
-        return CommonResult.ok(vo,"查询小区车位类型集合成功") ;
+        return CommonResult.ok(vo) ;
     }
 
     @ApiOperation("删除小区的车位分类")

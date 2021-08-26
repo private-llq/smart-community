@@ -45,6 +45,7 @@ public interface CommunityMapper extends BaseMapper<CommunityEntity> {
 	@Select("select id from t_community where deleted = 0")
 	List<Long> queryAllCommunityIdList();
 	
+	
 	/**
 	 * @Description: 通过物业id查询物业所属小区
 	 * @Param: [companyId]

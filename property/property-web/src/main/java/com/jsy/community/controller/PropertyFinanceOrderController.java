@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyFinanceOrderService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyCollectionFormEntity;
 import com.jsy.community.entity.property.PropertyFinanceFormChargeEntity;
@@ -510,5 +511,28 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
+    }
+    
+    /**
+     * @Description: 新增物业账单临时收费
+     * @Param: [propertyFinanceOrderEntity]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/08/26 09:35
+     **/
+    @Login
+    @ApiOperation("新增物业账单临时收费")
+    @PostMapping("/temporary/charges")
+    @businessLog(operation = "新增",content = "新增了【物业账单临时收费】")
+    public CommonResult addTemporaryCharges(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity){
+        if(propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleId() == null
+            || propertyFinanceOrderEntity.getPropertyFee() == null || propertyFinanceOrderEntity.getBeginTime() == null || propertyFinanceOrderEntity.getOverTime() == null){
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
+        }
+        ValidatorUtils.validateEntity(propertyFinanceOrderEntity);
+        AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderEntity.setCommunityId(loginUser.getCommunityId());
+        return propertyFinanceOrderService.addTemporaryCharges(propertyFinanceOrderEntity)
+            ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增物业账单临时收费失败");
     }
 }

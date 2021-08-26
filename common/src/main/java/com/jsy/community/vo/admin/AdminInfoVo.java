@@ -24,7 +24,7 @@ public class AdminInfoVo implements Serializable {
 	private Long companyId;
 	// 物业公司名称
 	private String companyName;
-
+	
 	/**
 	 * 有权限的社区ids(List)
 	 */

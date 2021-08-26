@@ -291,6 +291,7 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 */
 	List<HouseEntity> selectAllBuildingUnitDoor(Long communityId);
 	
+	
 	/**
 	 * @Description: 查询communityIds下所有房屋数量
 	 * @author: DKS

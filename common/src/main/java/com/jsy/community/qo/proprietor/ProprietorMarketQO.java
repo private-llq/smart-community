@@ -40,8 +40,6 @@ public class ProprietorMarketQO extends BaseQO {
     @ApiModelProperty(value = "商品名")
     private String goodsName;
 
-    @ApiModelProperty(value = "点击率")
-    private Integer click;
 
     @Range(min = 0,message = "交易金额错误")
     @ApiModelProperty(value = "价格")
@@ -79,6 +77,9 @@ public class ProprietorMarketQO extends BaseQO {
     @TableField(exist = false)
     private String categoryName;
 
+    @ApiModelProperty(value = "点击率")
+    private Integer click;
+
     @ApiModelProperty("分页查询当前页")
     @TableField(exist = false)
     private Long page;
@@ -89,6 +90,7 @@ public class ProprietorMarketQO extends BaseQO {
 
     @TableField(exist = false)
     private T query;
+
 
     public interface proprietorMarketValidated{}
 }

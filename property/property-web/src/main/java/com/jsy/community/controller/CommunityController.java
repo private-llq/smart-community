@@ -5,6 +5,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.IPropertyCompanyService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.exception.JSYError;
@@ -46,6 +47,9 @@ public class CommunityController {
 	// TODO: 2021/4/16 这里的group没有改成  property是因为目前  group这种写法不知道其他人调ICommunityService时  人家是不是没有改成  property  所以我这里也先不动
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private ICommunityService communityService;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPropertyCompanyService propertyCompanyService;
 
 	@Autowired
 	private RedisTemplate redisTemplate;
@@ -188,6 +192,19 @@ public class CommunityController {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 		}
 		return CommonResult.ok(communityService.getPropertySurvey(year, companyId, communityIdList));
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取物业通用顶部
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/26 11:49
+	 **/
+	@ApiOperation("获取物业通用顶部")
+	@GetMapping("/property/top/details")
+	@Login
+	public CommonResult getCompanyNameByCompanyId(){
+		return CommonResult.ok(propertyCompanyService.getCompanyNameByCompanyId(UserUtils.getAdminCompanyId()));
 	}
 }
 

@@ -24,4 +24,6 @@ public interface ICarPositionTypeService extends IService<CarPositionTypeEntity>
     List<SelectCartPositionTypeVO> selectCartPositionType(Long adminCommunityId);
 
     Boolean deleteCartPositionType(String id);
+
+    List<CarPositionTypeEntity> getAllType();
 }

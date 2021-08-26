@@ -2,8 +2,6 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.entity.CommunitySurveyEntity;
-import com.jsy.community.entity.property.ConsoleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.property.PropertyCommunityListVO;
@@ -129,21 +127,4 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @date: 2021/7/22 18:04
 	 **/
 	Integer updateCommunity(CommunityEntity communityEntity);
-	
-	/**
-	 * @author: DKS
-	 * @description: 获取小区概况
-	 * @return: com.jsy.community.vo.CommonResult
-	 * @date: 2021/8/24 11:52
-	 **/
-	CommunitySurveyEntity getCommunitySurvey(Integer month, Long adminCommunityId);
-	
-	/**
-	 * @author: DKS
-	 * @description: 获取物业控制台
-	 * @param year:
-	 * @return: com.jsy.community.vo.CommonResult
-	 * @date: 2021/8/25 13:45
-	 **/
-	ConsoleEntity getPropertySurvey(Integer year, Long companyId, List<Long> communityIdList);
 }

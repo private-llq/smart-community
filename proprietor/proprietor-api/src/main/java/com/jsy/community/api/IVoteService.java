@@ -1,9 +1,10 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.proprietor.VoteEntity;
+import com.jsy.community.entity.proprietor.VoteOptionEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.VoteQO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public interface IVoteService {
      * @Param:
      * @return:
      */
-    VoteEntity getVote(Long id,String uid);
+    VoteEntity getVote(Long id);
 
     /**
      * @Description: 投票进度
@@ -38,14 +39,5 @@ public interface IVoteService {
      * @Param:
      * @return:
      */
-    Map<String, Object> getPlan(Long id);
-
-    /**
-     * @Description: 业主投票
-     * @author: Hu
-     * @since: 2021/8/24 10:15
-     * @Param:
-     * @return:
-     */
-    void userVote(VoteQO voteQO,String uid);
+    List<VoteOptionEntity> getPlan(Long id);
 }

@@ -6,6 +6,7 @@ import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -25,11 +26,6 @@ public class VoteEntity extends BaseEntity {
      */
     private String theme;
     /**
-     * 0当前用户未投票，1当前用户已投票
-     */
-    @TableField(exist = false)
-    private Integer status;
-    /**
      * 开始时间
      */
     private LocalDateTime beginTime;
@@ -46,14 +42,13 @@ public class VoteEntity extends BaseEntity {
      */
     private Integer choose;
     /**
-     * 当前投票能参与的最大人数
-     */
-    private Integer total;
-    /**
-     * 投票题目
+     * @Description: 投票选项
+     * @author: Hu
+     * @since: 2021/8/23 16:50
+     * @Param:
+     * @return:
      */
     @TableField(exist = false)
-    private VoteTopicEntity voteTopicEntity;
-
+    private List<VoteOptionEntity> options;
 
 }

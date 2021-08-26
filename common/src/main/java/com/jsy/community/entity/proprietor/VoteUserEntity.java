@@ -15,23 +15,19 @@ import java.io.Serializable;
 @TableName("t_vote_user")
 public class VoteUserEntity implements Serializable {
     /**
-     * id
-     */
-    private Long id;
-    /**
      * 用户id
      */
     private String uid;
     /**
      * 投票id
      */
-    private Long voteId;
+    private String voteId;
     /**
      * 投票id
      */
-    private Long topicId;
+    private String topicId;
     /**
      * 答案id
      */
-    private Long optionId;
+    private String optionId;
 }

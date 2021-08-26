@@ -310,32 +310,4 @@
             </if>
         </where>
     </update>
-
-    <select id="chargeByDate" resultType="java.util.Map">
-        select order_time AS time,sum(total_money) AS totalMoneyByDate from t_property_finance_order
-        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and community_id = #{communityId} and order_status = 1 and deleted = 0
-        group by order_time
-    </select>
-
-    <select id="chargeByMonth" resultType="java.math.BigDecimal">
-        select sum(total_money) AS totalMoneyByMonth from t_property_finance_order
-        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and order_status = 1 and community_id = #{communityId} and deleted = 0
-    </select>
-
-    <select id="selectMonthPropertyFeeByCommunityIds" resultType="java.util.Map">
-        select mid(order_time,1,7) as month,SUM(total_money) as totalMoney from t_property_finance_order
-        where order_time &gt;= #{startTime} and order_time &lt;= #{endTime} and order_status = 1 and deleted = 0 and community_id in
-        <foreach collection="list" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-        group by month
-    </select>
-
-    <select id="chargeByYear" resultType="java.math.BigDecimal">
-        select sum(total_money) AS totalMoneyByYear from t_property_finance_order
-        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and order_status = 1 and deleted = 0 and community_id in
-        <foreach collection="list" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </select>
 </mapper>

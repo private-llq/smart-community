@@ -2,8 +2,10 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IProprietorMarketCategoryService;
 import com.jsy.community.api.IProprietorMarketService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -33,8 +35,12 @@ public class ProprietorMarketController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IProprietorMarketService marketService;
 
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IProprietorMarketCategoryService categoryService;
+
     private final String[] img ={"jpg","png","jpeg"};
     private static final String BUCKET_NAME = "market";
+    private static final String CATEGORY_NAME = "热门商品";
 
     /**
      * @Description: 发布新商品
@@ -48,13 +54,13 @@ public class ProprietorMarketController {
     @Login
     public CommonResult addMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
-        int i = marketQO.getPrice().compareTo(BigDecimal.ZERO);
-        if (marketQO.getNegotiable()==0){  //如果为不面议  价格必须>=0
-            if (i<0){
-                throw new JSYException("价格有误,请重新输入");
-            }
-        }else {  //面议  价格都设为0
-           marketQO.setPrice(BigDecimal.ZERO);
+        int i = marketQO.getPrice().compareTo(BigDecimal.valueOf(BigDecimal.ROUND_DOWN));
+        if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
+                if (i<0){
+                    throw new JSYException("价格有误,请重新输入");
+                }
+        }else {
+            marketQO.setPrice(new BigDecimal(0));  //面议价格设为0
         }
         ValidatorUtils.validateEntity(marketQO,ProprietorMarketQO.proprietorMarketValidated.class);
         boolean b = marketService.addMarket(marketQO,userId);
@@ -72,13 +78,13 @@ public class ProprietorMarketController {
     @Login
     public CommonResult updateMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
-       int i = marketQO.getPrice().compareTo(BigDecimal.ZERO);
-       if (marketQO.getNegotiable()==0){  //如果为不面议  价格必须>=0
+       int i = marketQO.getPrice().compareTo(BigDecimal.valueOf(BigDecimal.ROUND_DOWN));
+       if (marketQO.getNegotiable()==0){
            if (i<0){
                throw new JSYException("价格有误,请重新输入");
            }
-       }else {  //面议  价格都设为0
-           marketQO.setPrice(BigDecimal.ZERO);
+       }else {
+           marketQO.setPrice(new BigDecimal(0));
        }
         boolean b = marketService.updateMarket(marketQO,userId);
         return CommonResult.ok("修改成功");
@@ -147,35 +153,23 @@ public class ProprietorMarketController {
         ValidatorUtils.validatePageParam(baseQO);
         if (baseQO.getQuery()==null){
             baseQO.setQuery(new ProprietorMarketQO());
-        }
-        if (baseQO.getQuery().getCategoryId()==null){
             Map<String,Object> map =  marketService.selectMarketLikePage(baseQO);
+            System.out.println("首页");
+            return CommonResult.ok(map,"查询成功");
+        }
+
+        ProprietorMarketCategoryEntity categoryEntity =  categoryService.findOne(baseQO.getQuery().getCategoryId());
+        if (categoryEntity.getCategory().equals(CATEGORY_NAME)){
+            Map<String,Object> map = marketService.selectMarketLikePage(baseQO);//热门商品
+            System.out.println("热门");
             return CommonResult.ok(map,"查询成功");
         }else {
             Map<String,Object> map = marketService.selectMarketAllPage(baseQO);
+            System.out.println("分类");
             return CommonResult.ok(map,"查询成功");
         }
-
     }
 
-    /**
-     * @Description: 查询所有已发布的商品
-     * @Param: [id]
-     * @Return: com.jsy.community.vo.CommonResult
-     * @Author: Tian
-     * @Date: 2021/8/21-15:44
-     **/
-    @PostMapping("/selectMarketLikePage")
-    @ApiOperation("社区集市所有已发布商品")
-    @Login
-    public CommonResult selectMarketLikePage(@RequestBody  BaseQO baseQO){
-        ValidatorUtils.validatePageParam(baseQO);
-//        if (baseQO.getQuery()==null){
-//            baseQO.setQuery(new ProprietorMarketQO());
-//        }
-        Map<String,Object> map = marketService.selectMarketLikePage(baseQO);
-        return CommonResult.ok(map,"查询成功");
-    }
     /**
      * @Description: 修改上下架商品
      * @Param: [id]

@@ -43,4 +43,6 @@ public interface IProprietorMarketCategoryService extends IService<ProprietorMar
      * @Date: 2021/8/21-9:44
      **/
     List<ProprietorMarketCategoryEntity> selectMarketCategory();
+
+    ProprietorMarketCategoryEntity findOne(String categoryId);
 }

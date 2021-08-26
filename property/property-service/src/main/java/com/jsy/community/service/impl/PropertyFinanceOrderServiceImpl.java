@@ -19,6 +19,7 @@ import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.DateCalculateUtil;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -1175,7 +1177,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 9:31
      **/
     @Override
-    public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo ,List<Long> communityIdList) {
+    public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo, List<Long> communityIdList) {
         // 返回前端实体
         List<PropertyCollectionFormEntity> propertyCollectionFormEntityList = new LinkedList<>();
     
@@ -1371,15 +1373,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 collectionFormEntity.setFeeRuleName(countMap != null ? String.valueOf(countMap.get("name")) : "");
             }
         }
-        // 如果筛选条件有收费项目，从结果集剔除其他收费项目
-        if (qo.getFeeRuleId() != null) {
-            for (PropertyCollectionFormEntity entity : propertyCollectionFormEntityList) {
-                if (!entity.getFeeRuleId().equals(qo.getFeeRuleId())) {
-                    propertyCollectionFormEntityList.remove(entity);
-                }
-            }
-        }
-        
+    
         // 补充小区名称
         if (qo.getCommunityId() == null) {
             for (PropertyCollectionFormEntity entity : propertyCollectionFormEntityList) {
@@ -1388,7 +1382,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 entity.setCommunityName(communityEntity.getName());
             }
         }
-        
     
         return propertyCollectionFormEntityList;
     }
@@ -1669,6 +1662,32 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         
         return propertyCollectionFormEntityList;
+    }
+    
+    /**
+     * @Description: 新增物业账单临时收费
+     * @Param: [propertyFinanceOrderEntity]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/08/26 09:35
+     **/
+    @Override
+    public boolean addTemporaryCharges(PropertyFinanceOrderEntity propertyFinanceOrderEntity) {
+        // 设置id
+        propertyFinanceOrderEntity.setId(SnowFlake.nextId());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String dateNow = sdf.format(new Date());
+        // 设置账单日期
+        propertyFinanceOrderEntity.setOrderTime(LocalDate.parse(dateNow, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(propertyFinanceOrderEntity.getFeeRuleId());
+        // 设置账单号
+        propertyFinanceOrderEntity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFinanceOrderEntity.getCommunityId()), propertyFeeRuleEntity.getSerialNumber()));
+        // 设置总金额
+        propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee());
+        // 设置临时收费类型
+        propertyFinanceOrderEntity.setBuildType(2);
+        int row = propertyFinanceOrderMapper.insert(propertyFinanceOrderEntity);
+        return row == 1;
     }
 }
 

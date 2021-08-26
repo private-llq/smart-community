@@ -25,7 +25,8 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Param [uid]
 	 **/
 	UserEntity selectOne(String uid);
-	
+
+
 	/**
 	* @Description: uids批量查询 uid-姓名映射
 	 * @Param: [uids]
@@ -45,4 +46,13 @@ public interface IUserService extends IService<UserEntity> {
 	List<String> queryUidOfNameLike(List<String> uids, String nameLike);
 
 	UserEntity queryUserDetailByUid(String uid);
+
+	/**
+	 * 根据电话和姓名获取uid
+	 * @param phone
+	 * @param username
+	 * @return
+	 */
+	String selectUserUID(String phone,String username);
+
 }

@@ -1,6 +1,5 @@
 package com.jsy.community.entity.proprietor;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
@@ -24,11 +23,6 @@ public class VoteOptionEntity extends BaseEntity {
      */
     private String content;
     /**
-     * 答案总投票人数
-     */
-    @TableField(exist = false)
-    private Integer number;
-    /**
      * 投票题目id
      */
     private Long topicId;
@@ -37,10 +31,5 @@ public class VoteOptionEntity extends BaseEntity {
      * 1一选项，2而选项，3三选项。。。。。
      */
     private Integer code;
-    /**
-     * 0未选，1选中
-     */
-    @TableField(exist = false)
-    private Integer status;
 
 }

@@ -1071,19 +1071,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
-
-    /**
-     * @Description: 删除业主人脸
-     * @author: Hu
-     * @since: 2021/8/24 16:59
-     * @Param: [userId]
-     * @return: void
-     */
-    @Override
-    public void deleteFaceAvatar(String userId) {
-        userMapper.deleteFaceAvatar(userId);
-    }
-
     @Override
     @Transactional
     public void saveFace(String userId,String faceUrl) {

@@ -20,8 +20,8 @@ public class ProprietorMarketVO extends BaseVO {
     @ApiModelProperty(value = "价格")
     private BigDecimal price;
 
-    @ApiModelProperty(value = "点击率")
-    private Integer click;
+    @ApiModelProperty(value = "图片")
+    private String images;
 
     @ApiModelProperty(value = "商品说明")
     private String goodsExplain;
@@ -43,6 +43,11 @@ public class ProprietorMarketVO extends BaseVO {
     @TableField(exist = false)
     private String categoryName;
 
-    @ApiModelProperty(value = "图片")
-    private String images;
+    @ApiModelProperty(value = "标签id")
+    private String labelId;
+
+    @ApiModelProperty(value = "商品类别id")
+    private String categoryId;
+    @ApiModelProperty(value = "点击率")
+    private Integer click;
 }
