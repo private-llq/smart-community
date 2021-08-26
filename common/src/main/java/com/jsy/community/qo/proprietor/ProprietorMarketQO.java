@@ -77,6 +77,9 @@ public class ProprietorMarketQO extends BaseQO {
     @TableField(exist = false)
     private String categoryName;
 
+    @ApiModelProperty(value = "点击率")
+    private Integer click;
+
     @ApiModelProperty("分页查询当前页")
     @TableField(exist = false)
     private Long page;
@@ -87,6 +90,7 @@ public class ProprietorMarketQO extends BaseQO {
 
     @TableField(exist = false)
     private T query;
+
 
     public interface proprietorMarketValidated{}
 }

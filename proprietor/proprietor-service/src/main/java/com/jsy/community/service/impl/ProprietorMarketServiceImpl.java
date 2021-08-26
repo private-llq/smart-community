@@ -15,11 +15,8 @@ import com.jsy.community.mapper.ProprietorMarketMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.proprietor.ProprietorMarketVO;
-import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -109,10 +106,10 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
     public boolean updateState(Long id,Integer state) {
         ProprietorMarketEntity marketEntity = new ProprietorMarketEntity();
         if (state==STATE_ZERO){
-            marketEntity.setState(STATE_ONE);
+            marketEntity.setState(STATE_ZERO);
         }else
         {
-            marketEntity.setState(STATE_ZERO);
+            marketEntity.setState(STATE_ONE);
         }
         return marketMapper.update(marketEntity,new UpdateWrapper<ProprietorMarketEntity>().eq("id",id)) == 1;
     }
@@ -127,11 +124,8 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
     @Override
     public Map<String, Object> selectMarketPage(BaseQO<ProprietorMarketEntity> baseQO, String userId) {
         Page<ProprietorMarketQO> page = new Page<>(baseQO.getPage(), baseQO.getSize());
-
         ProprietorMarketEntity query = baseQO.getQuery();
-
         query.setUid(userId);
-
         if (baseQO.getSize()==0 || baseQO.getSize()==null){
             baseQO.setSize(10l);
         }
@@ -172,28 +166,24 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
         if (baseQO.getSize()==0 || baseQO.getSize()==null){
             baseQO.setSize(10l);
         }
-/*        ProprietorMarketQO query = baseQO.getQuery();*/
-
 
         Long page1  = baseQO.getPage() ;
         if (page1 == 0){
             page1++;
         }
         page1 =(baseQO.getPage()-1)*baseQO.getSize();
-
-
+        ProprietorMarketQO query = baseQO.getQuery();
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
-        List<ProprietorMarketQO> list =  marketMapper.selectMarketAllPage(page1,baseQO.getSize());
-
-        /*for (ProprietorMarketQO li : list){
+        List<ProprietorMarketQO> list =  marketMapper.selectMarketAllPage(page1,baseQO.getSize(),query);
+        for (ProprietorMarketQO li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
             BeanUtils.copyProperties(li,marketVO);
             arrayList.add(marketVO);
-        }*/
-        Long total = marketMapper.findTotals();
+        }
+        Long total = marketMapper.findTotals(query);
         HashMap<String, Object> map = new HashMap<>();
         map.put("total",total);
-        map.put("list",list);
+        map.put("list",arrayList);
         return map;
     }
 
@@ -214,6 +204,41 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
         marketVO.setLabelName(labelEntity.getLabel());
         marketVO.setCategoryName(categoryEntity.getCategory());
         return marketVO;
+    }
+
+    /**
+     * @Description: 热门商品
+     * @Param: [baseQO]
+     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Author: Tian
+     * @Date: 2021/8/26-14:30
+     **/
+    @Override
+    public Map<String, Object> selectMarketLikePage(BaseQO<ProprietorMarketQO> baseQO) {
+        Page<ProprietorMarketQO> page = new Page<>(baseQO.getPage(), baseQO.getSize());
+
+        if (baseQO.getSize()==0 || baseQO.getSize()==null){
+            baseQO.setSize(10l);
+        }
+
+        Long page1  = baseQO.getPage() ;
+        if (page1 == 0){
+            page1++;
+        }
+        page1 =(baseQO.getPage()-1)*baseQO.getSize();
+
+        ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
+        List<ProprietorMarketQO> list =  marketMapper.selectMarketLikePage(page1,baseQO.getSize());
+        for (ProprietorMarketQO li : list){
+            ProprietorMarketVO marketVO = new ProprietorMarketVO();
+            BeanUtils.copyProperties(li,marketVO);
+            arrayList.add(marketVO);
+        }
+        Long total = marketMapper.findLikeTotals();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("total",total);
+        map.put("list",arrayList);
+        return map;
     }
 
 }
