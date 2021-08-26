@@ -224,6 +224,14 @@ public class ProprietorMarketController {
         return CommonResult.ok(split,"上传成功");
     }
 
+    @Login
+    @ApiOperation("社区集市商品图片删除")
+    @DeleteMapping(value = "/deleteMarketImages")
+    public CommonResult deleteMarketImages(@RequestParam("images") String images) throws Exception {
+        //返回文件上传地址
+        MinioUtils.removeFile(images);
 
+        return CommonResult.ok("删除成功");
+    }
 
 }
