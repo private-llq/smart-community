@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.CarPositionEntity;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

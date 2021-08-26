@@ -54,7 +54,7 @@
     </sql>
 
     <!-- 使用sql片段 -->
-    <select id="selectCarPosition" parameterType="CarPositionEntity" resultType="CarPositionEntity">
+    <select id="selectCarPosition" parameterType="CarPositionEntity" resultType="com.jsy.community.entity.property.CarPositionEntity">
         SELECT * FROM t_car_position as car
         <where>
             <include refid="carPosition_select"></include>
