@@ -48,6 +48,7 @@
         where tm.deleted = 0
           and tm.state =#{query.state}
           and tm.uid = #{query.uid}
+
     </select>
 
 
@@ -56,6 +57,7 @@
         select count(*) from t_proprietor_market tm
         where tm.deleted = 0
           and tm.state =1
+          and tm.category_id=#{query.categoryId}
     </select>
 
     <!--所有发布商品-->
@@ -70,6 +72,27 @@
                  left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
         where tm.deleted = 0
           and tm.state = 1
+            and tm.category_id=#{query.categoryId}
+        limit #{page},#{size}
+    </select>
+    <select id="findLikeTotals" resultType="java.lang.Long">
+        select count(*) from t_proprietor_market tm
+        where tm.deleted = 0
+          and tm.state =1
+    </select>
+
+    <select id="selectMarketLikePage" resultType="com.jsy.community.qo.proprietor.ProprietorMarketQO">
+        select tm.id, tm.community_id , tm.uid, tm.goods_name as goodsName, tm.price, tm.goods_explain as goodsExplain,
+               tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId,
+               tm.click as click, tm.phone as phone,tm.images as images,
+               tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,
+               tpml.label as labelName,tpmc.category  as categoryName
+        from t_proprietor_market tm
+                 left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
+                 left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
+        where tm.deleted = 0
+          and tm.state = 1
+        order by tm.click desc
         limit #{page},#{size}
     </select>
 

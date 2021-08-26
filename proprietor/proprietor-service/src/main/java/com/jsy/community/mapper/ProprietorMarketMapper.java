@@ -40,7 +40,7 @@ public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntit
      * @Author: Tian
      * @Date: 2021/8/23-10:48
      **/
-    List<ProprietorMarketQO> selectMarketAllPage(@Param("page") Long page, @Param("size") Long size);
+    List<ProprietorMarketQO> selectMarketAllPage(@Param("page") Long page, @Param("size") Long size, ProprietorMarketQO query);
 
     /**
      * @Description: 查询所有发布的商品的条数
@@ -48,7 +48,12 @@ public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntit
      * @Return: java.lang.Long
      * @Author: Tian
      * @Date: 2021/8/23-10:50
-     **/
-    Long findTotals();
+     *
+     * @param query*/
+    Long findTotals(@Param("query") ProprietorMarketQO query);
+
+    List<ProprietorMarketQO> selectMarketLikePage(@Param("page") Long page, @Param("size") Long size);
+
+    Long findLikeTotals();
 
 }

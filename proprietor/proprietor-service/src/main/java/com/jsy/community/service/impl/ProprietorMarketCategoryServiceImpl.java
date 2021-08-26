@@ -57,7 +57,13 @@ public class ProprietorMarketCategoryServiceImpl extends ServiceImpl<ProprietorM
     }
 
     @Override
-    public List<ProprietorMarketCategoryEntity> selectMarketCategory(Long communityId) {
-        return categoryMapper.selectList(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("community_id",communityId));
+    public List<ProprietorMarketCategoryEntity> selectMarketCategory() {
+        return categoryMapper.selectList(new QueryWrapper<ProprietorMarketCategoryEntity>().orderByAsc("category_id"));
+    }
+
+    @Override
+    public ProprietorMarketCategoryEntity findOne(String categoryId) {
+        ProprietorMarketCategoryEntity categoryEntity = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("category_id", categoryId));
+        return  categoryEntity;
     }
 }
