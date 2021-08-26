@@ -55,12 +55,12 @@ public class ProprietorMarketController {
     public CommonResult addMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
         int i = marketQO.getPrice().compareTo(BigDecimal.valueOf(BigDecimal.ROUND_DOWN));
-        if (marketQO.getNegotiable()==0){
+        if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
                 if (i<0){
                     throw new JSYException("价格有误,请重新输入");
                 }
         }else {
-            marketQO.setPrice(new BigDecimal(0));
+            marketQO.setPrice(new BigDecimal(0));  //面议价格设为0
         }
         ValidatorUtils.validateEntity(marketQO,ProprietorMarketQO.proprietorMarketValidated.class);
         boolean b = marketService.addMarket(marketQO,userId);
@@ -153,13 +153,19 @@ public class ProprietorMarketController {
         ValidatorUtils.validatePageParam(baseQO);
         if (baseQO.getQuery()==null){
             baseQO.setQuery(new ProprietorMarketQO());
+            Map<String,Object> map =  marketService.selectMarketLikePage(baseQO);
+            System.out.println("首页");
+            return CommonResult.ok(map,"查询成功");
         }
+
         ProprietorMarketCategoryEntity categoryEntity =  categoryService.findOne(baseQO.getQuery().getCategoryId());
         if (categoryEntity.getCategory().equals(CATEGORY_NAME)){
             Map<String,Object> map = marketService.selectMarketLikePage(baseQO);//热门商品
+            System.out.println("热门");
             return CommonResult.ok(map,"查询成功");
         }else {
             Map<String,Object> map = marketService.selectMarketAllPage(baseQO);
+            System.out.println("分类");
             return CommonResult.ok(map,"查询成功");
         }
     }

@@ -70,6 +70,13 @@ public interface IProprietorMarketService extends IService<ProprietorMarketEntit
      * @Date: 2021/8/23-14:06
      **/
     ProprietorMarketVO findOne(Long id);
-
+    /**
+     * @Description: 热门商品
+     * @Param: [baseQO]
+     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Author: Tian
+     * @Date: 2021/8/26-14:30
+     **/
     Map<String, Object> selectMarketLikePage(BaseQO<ProprietorMarketQO> baseQO);
+
 }

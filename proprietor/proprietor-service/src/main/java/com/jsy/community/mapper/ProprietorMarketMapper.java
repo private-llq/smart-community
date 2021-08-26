@@ -52,8 +52,21 @@ public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntit
      * @param query*/
     Long findTotals(@Param("query") ProprietorMarketQO query);
 
+    /**
+     * @Description: 热门商品
+     * @Param: [baseQO]
+     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Author: Tian
+     * @Date: 2021/8/26-14:30
+     **/
     List<ProprietorMarketQO> selectMarketLikePage(@Param("page") Long page, @Param("size") Long size);
-
+    /**
+     * @Description: 热门商品条数
+     * @Param: [baseQO]
+     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Author: Tian
+     * @Date: 2021/8/26-14:30
+     **/
     Long findLikeTotals();
 
 }

@@ -206,6 +206,13 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
         return marketVO;
     }
 
+    /**
+     * @Description: 热门商品
+     * @Param: [baseQO]
+     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Author: Tian
+     * @Date: 2021/8/26-14:30
+     **/
     @Override
     public Map<String, Object> selectMarketLikePage(BaseQO<ProprietorMarketQO> baseQO) {
         Page<ProprietorMarketQO> page = new Page<>(baseQO.getPage(), baseQO.getSize());
