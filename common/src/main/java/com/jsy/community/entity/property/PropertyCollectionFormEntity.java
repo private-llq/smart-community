@@ -23,6 +23,9 @@ public class PropertyCollectionFormEntity implements Serializable {
 	@ApiModelProperty(value = "社区ID")
 	private Long communityId;
 	
+	@ApiModelProperty(value = "社区名称")
+	private String communityName;
+	
 	@ApiModelProperty(value = "微信支付")
 	private BigDecimal weChatPaySum;
 	
@@ -59,7 +62,8 @@ public class PropertyCollectionFormEntity implements Serializable {
 	private Integer month;
 	
 	@ApiModelProperty(value = "按日查询")
-	private LocalDate day;
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+	private LocalDate dateTime;
 	
 	@ApiModelProperty(value = "1.按账单生成时间，2.按账单周期时间")
 	private Integer type;

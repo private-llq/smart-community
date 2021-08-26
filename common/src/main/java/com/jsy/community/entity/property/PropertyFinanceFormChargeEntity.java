@@ -1,5 +1,6 @@
 package com.jsy.community.entity.property;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -53,9 +54,11 @@ public class PropertyFinanceFormChargeEntity implements Serializable {
 	private BigDecimal deductionMoney;
 	
 	@ApiModelProperty(value = "支付开始时间")
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
 	private LocalDate startTime;
 	
 	@ApiModelProperty(value = "支付结束时间")
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
 	private LocalDate endTime;
 	
 	@ApiModelProperty(value = "按年查询")
