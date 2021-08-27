@@ -46,9 +46,13 @@ public class CarMonthlyVehicle implements Serializable {
      */
     private String phone;
     /**
-     * 包月方式 1:地上 2：地下
+     * 包月方式 ID:接受收费标准的uid
      */
-    private Integer monthlyMethod;
+    private String monthlyMethodId;
+    /**
+     * 包月方式：收费设置里面的收费标准名字
+     */
+    private String monthlyMethodName;
     /**
      * 开始时间
      */

@@ -164,6 +164,28 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     }
 
 
+    /**
+     * 查询包月车辆所有收费设置标准
+     * @param adminCommunityId
+     * @return
+     */
+    @Override
+    public List<CarChargeEntity> ListCharge(Long adminCommunityId) {
+        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>().eq("community_id", adminCommunityId));
+        return chargeEntityList;
+    }
+
+    /**
+     * 查询包月车辆单个收费设置标准
+     * @param uid
+     * @param adminCommunityId
+     * @return
+     */
+    @Override
+    public CarChargeEntity selectOneCharge(String uid, Long adminCommunityId) {
+        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", uid).eq("community_id", adminCommunityId));
+        return carChargeEntity;
+    }
 
 
 }

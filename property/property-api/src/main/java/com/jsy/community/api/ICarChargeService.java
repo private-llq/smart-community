@@ -66,4 +66,9 @@ public interface ICarChargeService {
      * @return:
      */
     CarChargeEntity selectOne(Long communityId);
+
+    List<CarChargeEntity> ListCharge(Long adminCommunityId);
+
+    CarChargeEntity selectOneCharge(String uid, Long adminCommunityId);
+
 }

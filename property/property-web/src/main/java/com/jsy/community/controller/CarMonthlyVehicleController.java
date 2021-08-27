@@ -8,6 +8,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.util.POIUtil;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.POIUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -103,42 +104,53 @@ public class CarMonthlyVehicleController {
     /**
      * 包月变更： 0:地上 1：地下
      */
+    //todo 该接口已舍弃
     @PutMapping("monthlyChange")
     public CommonResult monthlyChange(@RequestParam("uid") String uid,@RequestParam("type") Integer type){
         vehicleService.monthlyChange(uid,type);
         return CommonResult.ok();
     }
     /**
-     * 下载数据导入模板
+     * 同步按钮 (下发业务)
      */
-    @RequestMapping("dataExportTempe")
-    public CommonResult dataExportTempe(HttpServletResponse response){
-        List<String[]> list=new ArrayList<>();//封装返回的数据
-        String[] strings0=new String[10];
-        strings0[0]=  "车牌号";
-        strings0[1]= "车主姓名";
-        strings0[2]= "联系电话";
-        strings0[3]= "包月方式";
-        strings0[4]= "开始时间";
-        strings0[5]= "结束时间";
-        strings0[6]= "包月费用";
-        strings0[7]= "下发状态";
-        strings0[8]= "备注";
-        strings0[9]= "车位编号";
-        list.add(strings0);//添加第一排excel属性名
-
+    @GetMapping("issue")
+    @Login
+    public CommonResult issue(@RequestParam("uid") String uid){
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
         try {
-            POIUtil.writePoi(list,"我的文件",2,response);
-        } catch (IOException e) {
+            vehicleService.issue(uid,adminCommunityId);
+            return CommonResult.ok("下发成功");
+        } catch (Exception e) {
             e.printStackTrace();
+            return CommonResult.ok("下发失败，请联系管理员");
+
         }
 
-        return CommonResult.ok(-1,"服务器异常！");
+    }
+
+    /**
+     * 上传模板
+     */
+    @PostMapping("uploadTemplate")
+    public  String uploadTemplate(MultipartFile file){
+        String path = MinioUtils.upload(file, "template");
+        return path;
+
+    }
+
+
+    /**
+     * 下载模板
+     */
+    @PostMapping("dataExportTemplate")
+    public String dataExportTemplate(){
+        return "http://222.178.212.29:9000/template/0fb57cc95c9c4a1b9a7892c66b99a2f6";
     }
 
     /**
      * 数据录入
      */
+    //todo 已舍弃
     @Login
     @PostMapping("dataImport")
     public CommonResult dataImport(MultipartFile file){
@@ -163,10 +175,9 @@ public class CarMonthlyVehicleController {
             Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
             Map<String, Object> map =vehicleService.addLinkByExcel2(strings,communityId);
             return CommonResult.ok(map);
-
         } catch (IOException e) {
             e.printStackTrace();
-            return CommonResult.ok("添加失败,请联系管理员");
+            return CommonResult.ok("添加失败,请联系管理员！");
         }
 
     }
@@ -199,14 +210,7 @@ public class CarMonthlyVehicleController {
             strings1[0]= String.valueOf( carMonthlyVehicle.getCarNumber());
             strings1[1]= String.valueOf(carMonthlyVehicle.getOwnerName());
             strings1[2]= String.valueOf(carMonthlyVehicle.getPhone());
-
-            Integer monthlyMethod = carMonthlyVehicle.getMonthlyMethod();
-            if (0==monthlyMethod){
-                strings1[3]= ("地上");
-            }
-            if (1==monthlyMethod){
-                strings1[3]= ("地下");
-            }
+            strings1[3]=String.valueOf(carMonthlyVehicle.getMonthlyMethodName());
             strings1[4]= String.valueOf(carMonthlyVehicle.getStartTime());
             strings1[5]= String.valueOf(carMonthlyVehicle.getEndTime());
             strings1[6]= String.valueOf(carMonthlyVehicle.getMonthlyFee());

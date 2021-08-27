@@ -36,4 +36,6 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
     List<CarMonthlyVehicle> selectList(Long communityId);
 
     Map<String, Object> addLinkByExcel2(List<String[]> strings, Long communityId);
+
+    void issue(String uid, Long adminCommunityId);
 }
