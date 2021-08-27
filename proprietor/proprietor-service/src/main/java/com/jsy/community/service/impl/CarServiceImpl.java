@@ -12,19 +12,18 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.CarOrderEntity;
+import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
-import com.jsy.community.mapper.AppCarOrderMapper;
-import com.jsy.community.mapper.CarMapper;
-import com.jsy.community.mapper.HouseMemberMapper;
-import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +54,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @Autowired
     private AppCarOrderMapper appCarOrderMapper;
+
+    @Autowired
+    private CarOrderRecordMapper carOrderRecordMapper;
 
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -171,8 +173,33 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return: java.util.List<com.jsy.community.entity.CarOrderEntity>
      */
     @Override
-    public List<CarOrderEntity> MonthOrder(Long communityId, String userId) {
-        return appCarOrderMapper.selectList(new QueryWrapper<CarOrderEntity>().select("id,order_num,begin_time,over_time,money,car_plate,car_position_id,type").eq("community_id",communityId).eq("uid",userId).eq("type",2));
+    public Map<String, Object> MonthOrder(BaseQO<CarEntity> baseQO, String userId) {
+        LinkedList<Long> ids = new LinkedList<>();
+        Map<Long,String> positionMap = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
+        Page<CarOrderEntity> page = appCarOrderMapper.selectPage(new Page<CarOrderEntity>(baseQO.getPage(), baseQO.getSize()), new QueryWrapper<CarOrderEntity>()
+                .select("id,order_num,month,begin_time,over_time,money,car_plate,car_position_id,type")
+                .eq("community_id", baseQO.getQuery().getCommunityId())
+                .eq("uid", userId)
+                .eq("type", 2));
+        List<CarOrderEntity> records = page.getRecords();
+        if (records.size()!=0){
+            for (CarOrderEntity record : records) {
+                ids.add(record.getCarPositionId());
+            }
+            List<CarPositionEntity> service = carPositionService.getByIds(ids);
+            for (CarPositionEntity entity : service) {
+                positionMap.put(entity.getId(),entity.getCarPosition());
+            }
+            for (CarOrderEntity record : records) {
+                record.setCarPositionText(positionMap.get(record.getCarPositionId()));
+                record.setTypeText("月租车");
+            }
+            map.put("total",page.getTotal());
+            map.put("list",records);
+            return map;
+        }
+        return null;
     }
 
     /**
@@ -188,6 +215,60 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         return carChargeEntity.getMoney().multiply(new BigDecimal(carEntity.getMonth()));
     }
 
+
+    /**
+     * @Description: 查询一条停车缴费临时订单
+     * @author: Hu
+     * @since: 2021/8/27 13:57
+     * @Param: [id]
+     * @return: com.jsy.community.entity.CarOrderRecordEntity
+     */
+    @Override
+    public CarOrderRecordEntity findOne(Long id) {
+        return carOrderRecordMapper.selectById(id);
+    }
+
+    /**
+     * @Description: 绑定月租临时订单记录表
+     * @author: Hu
+     * @since: 2021/8/26 14:42
+     * @Param: [carEntity]
+     * @return: java.math.BigDecimal
+     */
+    @Override
+    public Long bindingRecord(CarEntity carEntity) {
+        CarOrderRecordEntity entity = new CarOrderRecordEntity();
+        entity.setId(SnowFlake.nextId());
+        entity.setType(1);
+        entity.setCommunityId(carEntity.getCommunityId());
+        entity.setCarPlate(carEntity.getCarPlate());
+        entity.setMonth(carEntity.getMonth());
+        entity.setMoney(carEntity.getMoney());
+        entity.setUid(carEntity.getUid());
+        carOrderRecordMapper.insert(entity);
+        return entity.getId();
+    }
+
+    /**
+     * @Description: 续费月租临时订单记录表
+     * @author: Hu
+     * @since: 2021/8/26 14:42
+     * @Param: [carEntity]
+     * @return: java.math.BigDecimal
+     */
+    @Override
+    public Long renewRecord(CarEntity carEntity) {
+        CarOrderRecordEntity entity = new CarOrderRecordEntity();
+        entity.setId(SnowFlake.nextId());
+        entity.setCarId(carEntity.getId());
+        entity.setType(2);
+        entity.setMonth(carEntity.getMonth());
+        entity.setMoney(carEntity.getMoney());
+        entity.setUid(carEntity.getUid());
+        carOrderRecordMapper.insert(entity);
+        return entity.getId();
+    }
+
     /**
      * @Description: 续费月租车辆
      * @author: Hu
@@ -197,24 +278,24 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     @Transactional
-    public void renewMonthCar(CarEntity carEntity) {
-        CarEntity entity = carMapper.selectById(carEntity.getId());
-        entity.setOverTime(entity.getOverTime().plusMonths(carEntity.getMonth()));
-        carMapper.updateById(entity);
+    public void renewMonthCar(CarOrderRecordEntity entity) {
+        CarEntity carEntity = carMapper.selectById(entity.getCarId());
+        carEntity.setOverTime(carEntity.getOverTime().plusMonths(carEntity.getMonth()));
+        carMapper.updateById(carEntity);
 
 
         //业主绑定车辆后修改车位状态
         carPositionService.bindingMonthCar(carEntity);
 
         CarOrderEntity carOrderEntity = new CarOrderEntity();
-        carOrderEntity.setCarId(entity.getId());
-        carOrderEntity.setCommunityId(entity.getCommunityId());
-        carOrderEntity.setCarPositionId(entity.getCarPositionId());
+        carOrderEntity.setCarId(carEntity.getId());
+        carOrderEntity.setCommunityId(carEntity.getCommunityId());
+        carOrderEntity.setCarPositionId(carEntity.getCarPositionId());
         carOrderEntity.setType(2);
         carOrderEntity.setUid(carEntity.getUid());
         carOrderEntity.setOrderTime(LocalDateTime.now());
-        carOrderEntity.setBeginTime(entity.getBeginTime());
-        carOrderEntity.setOverTime(entity.getOverTime());
+        carOrderEntity.setBeginTime(carEntity.getBeginTime());
+        carOrderEntity.setOverTime(carEntity.getOverTime());
         carOrderEntity.setMoney(carEntity.getMoney());
         carOrderEntity.setOrderNum(carEntity.getOrderNum());
         carOrderEntity.setOrderStatus(0);
@@ -222,6 +303,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         carOrderEntity.setId(SnowFlake.nextId());
 
         appCarOrderMapper.insert(carOrderEntity);
+
+        //停车临时收费表更新
+        entity.setStatus(1);
+        entity.setCommunityId(carEntity.getCommunityId());
+        entity.setCarPlate(carEntity.getCarPlate());
+        carOrderRecordMapper.updateById(entity);
     }
 
     /**
@@ -233,9 +320,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     @TxcTransaction
-    public void bindingMonthCar(CarEntity carEntity) {
-            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+    public void bindingMonthCar(CarOrderRecordEntity entity) {
+            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
+            CarEntity carEntity = new CarEntity();
             if (userEntity != null) {
+                BeanUtils.copyProperties(entity,carEntity);
                 carEntity.setId(SnowFlake.nextId());
                 carEntity.setBeginTime(LocalDateTime.now());
                 carEntity.setOverTime(LocalDateTime.now().plusMonths(carEntity.getMonth()));
@@ -264,6 +353,10 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setCarPlate(carEntity.getCarPlate());
                 carOrderEntity.setId(SnowFlake.nextId());
                 appCarOrderMapper.insert(carOrderEntity);
+
+                //停车临时收费表更新
+                entity.setStatus(1);
+                carOrderRecordMapper.updateById(entity);
             }
 
     }
