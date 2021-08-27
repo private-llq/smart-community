@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -32,9 +33,19 @@ public class CarOrderEntity extends BaseEntity {
      */
     private Long carPositionId;
     /**
+     *  车位编号
+     */
+    @TableField(exist = false)
+    private String carPositionText;
+    /**
      *  1临时收费，2月租收费
      */
     private Integer type;
+    /**
+     *  1临时收费，2月租收费
+     */
+    @TableField(exist = false)
+    private String typeText;
     /**
      *  支付时间
      */
@@ -55,6 +66,10 @@ public class CarOrderEntity extends BaseEntity {
      *  周期结束时间
      */
     private LocalDateTime overTime;
+    /**
+     *  月份
+     */
+    private Long month;
     /**
      *  1线上支付，2线下支付
      */

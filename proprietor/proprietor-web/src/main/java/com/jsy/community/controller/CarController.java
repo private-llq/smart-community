@@ -7,7 +7,6 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.DrivingLicense;
 import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
@@ -73,16 +72,14 @@ public class CarController {
 		carEntity.setUid(UserUtils.getUserId());
 		//1.效验前端新增车辆参数合法性
 		ValidatorUtils.validateEntity(carEntity, CarEntity.BindingMonthCarValidated.class);
-		carService.bindingMonthCar(carEntity);
-		return CommonResult.ok();
+		return CommonResult.ok(carService.bindingRecord(carEntity));
 	}
 
 	@Login
 	@ApiOperation("查询月租缴费")
-	@GetMapping("getMonthOrder")
-	public CommonResult MonthOrder(@RequestParam Long communityId) {
-		List<CarOrderEntity> list = carService.MonthOrder(communityId,UserUtils.getUserId());
-		return CommonResult.ok(list);
+	@PostMapping("getMonthOrder")
+	public CommonResult MonthOrder(@RequestBody BaseQO<CarEntity> baseQO) {
+		return CommonResult.ok(carService.MonthOrder(baseQO,UserUtils.getUserId()));
 	}
 
 	@Login
@@ -96,8 +93,8 @@ public class CarController {
 		carEntity.setUid(UserUtils.getUserId());
 		//1.效验前端新增车辆参数合法性
 		ValidatorUtils.validateEntity(carEntity, CarEntity.RenewMonthCarValidated.class);
-		carService.renewMonthCar(carEntity);
-		return CommonResult.ok();
+
+		return CommonResult.ok(carService.renewRecord(carEntity));
 	}
 
 	@Login

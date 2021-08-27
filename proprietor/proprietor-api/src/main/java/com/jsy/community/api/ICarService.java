@@ -3,7 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.CarOrderEntity;
+import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
@@ -142,7 +142,7 @@ public interface ICarService extends IService<CarEntity> {
      * @Param:
      * @return:
      */
-    void bindingMonthCar(CarEntity carEntity);
+    void bindingMonthCar(CarOrderRecordEntity entity);
 
     /**
      * @Description: 续费月租车辆
@@ -151,7 +151,7 @@ public interface ICarService extends IService<CarEntity> {
      * @Param:
      * @return:
      */
-    void renewMonthCar(CarEntity carEntity);
+    void renewMonthCar(CarOrderRecordEntity entity);
     /**
      * @Description: 获取车位费
      * @author: Hu
@@ -168,5 +168,33 @@ public interface ICarService extends IService<CarEntity> {
      * @Param:
      * @return:
      */
-    List<CarOrderEntity> MonthOrder(Long communityId, String userId);
+    Map<String, Object> MonthOrder(BaseQO<CarEntity> baseQO, String userId);
+
+    /**
+     * @Description: 续费月租临时订单记录表
+     * @author: Hu
+     * @since: 2021/8/26 14:42
+     * @Param: [carEntity]
+     * @return: java.math.BigDecimal
+     */
+    Long  renewRecord(CarEntity carEntity);
+
+
+    /**
+     * @Description: 绑定月租临时订单记录表
+     * @author: Hu
+     * @since: 2021/8/26 14:42
+     * @Param: [carEntity]
+     * @return: java.math.BigDecimal
+     */
+    Long bindingRecord(CarEntity carEntity);
+
+    /**
+     * @Description: 查询一条车辆缴费临时订单
+     * @author: Hu
+     * @since: 2021/8/27 13:56
+     * @Param:
+     * @return:
+     */
+    CarOrderRecordEntity findOne(Long id);
 }

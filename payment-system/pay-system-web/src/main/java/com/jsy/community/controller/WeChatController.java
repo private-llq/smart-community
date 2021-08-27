@@ -3,13 +3,11 @@ package com.jsy.community.controller;
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.IPropertyFinanceOrderService;
-import com.jsy.community.api.IPropertyFinanceReceiptService;
-import com.jsy.community.api.IShoppingMallService;
-import com.jsy.community.api.IWeChatService;
+import com.jsy.community.api.*;
 import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
@@ -75,6 +73,9 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceReceiptService propertyFinanceReceiptService;
 
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private ICarService carService;
+
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -134,7 +135,17 @@ public class WeChatController {
             redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),payOrderTimeout, TimeUnit.HOURS);
             map.put("attach",4+","+map.get("out_trade_no")+","+propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()));
         }
-
+        //停车缴费逻辑
+        if (weChatPayQO.getTradeFrom()==8){
+            if ("".equals(weChatPayQO.getCarOrderRecordId())||weChatPayQO.getCarOrderRecordId()==null){
+                return CommonResult.error("车位缴费临时订单记录id不能为空！");
+            }
+            if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
+                map.put("description", "车位缴费");
+            }
+//            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
+            map.put("attach",8+","+weChatPayQO.getCarOrderRecordId());
+        }
         //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
         msg.setId((String) map.get("out_trade_no"));
@@ -207,6 +218,18 @@ public class WeChatController {
                 receiptEntity.setReceiptMoney(new BigDecimal(split[2]));
                 propertyFinanceReceiptService.add(receiptEntity);
                 log.info("处理完成");
+            }
+            //停车缴费后记业务
+            if (split[0].equals("8")){
+                CarOrderRecordEntity recordEntity = carService.findOne(Long.valueOf(split[0]));
+                recordEntity.setOrderNum(map.get("out_trade_no"));
+                if (recordEntity!=null){
+                    if (recordEntity.getType()==1){
+                        carService.bindingMonthCar(recordEntity);
+                    }else {
+                        carService.renewMonthCar(recordEntity);
+                    }
+                }
             }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
