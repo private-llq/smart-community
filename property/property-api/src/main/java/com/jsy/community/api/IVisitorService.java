@@ -2,7 +2,7 @@ package com.jsy.community.api;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.entity.VisitorEntity;
-import com.jsy.community.entity.VisitorHistoryEntity;
+import com.jsy.community.entity.PeopleHistoryEntity;
 import com.jsy.community.entity.VisitorPersonRecordEntity;
 import com.jsy.community.entity.VisitorStrangerEntity;
 import com.jsy.community.qo.BaseQO;
@@ -18,13 +18,13 @@ import java.util.List;
 public interface IVisitorService {
 	
 	/**
-	* @Description: 访客记录 分页查询(现在主表数据是t_visitor,连表查询，以后主表可能会改为t_visitor_history)
+	* @Description: 访客记录 分页查询(现在主表数据是t_visitor,连表查询，以后主表可能会改为t_people_history)
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorHistoryEntity>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/14
 	**/
-	PageInfo<VisitorHistoryEntity> queryVisitorPage(BaseQO<VisitorHistoryEntity> baseQO);
+	PageInfo<PeopleHistoryEntity> queryVisitorPage(BaseQO<PeopleHistoryEntity> baseQO);
 
 	/**
 	 * @author: Pipi
@@ -79,4 +79,23 @@ public interface IVisitorService {
 	 * @date: 2021/8/13 14:17
 	 **/
 	Integer addVisitor(VisitorEntity visitorEntity);
+
+	/**
+	 * @author: Pipi
+	 * @description: 查询社区未同步的人脸信息
+	 * @param communityId: 社区ID
+	 * @param facilityId: 设备序列号
+	 * @return: java.util.List<com.jsy.community.entity.VisitorStrangerEntity>
+	 * @date: 2021/8/19 15:08
+	 **/
+	List<VisitorEntity> queryUnsyncFaceUrlList(Long communityId, String facilityId);
+
+	/**
+	 * @author: Pipi
+	 * @description: 批量更新访客人脸同步状态
+	 * @param ids: 访客ID列表
+	 * @return: void
+	 * @date: 2021/8/20 15:55
+	 **/
+	void updateFaceUrlSyncStatus(List<Long> ids);
 }

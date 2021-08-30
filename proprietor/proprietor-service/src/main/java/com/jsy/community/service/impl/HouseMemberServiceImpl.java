@@ -213,4 +213,18 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	public Map<Long,HouseMemberEntity> queryByIdBatch(Set<Long> ids){
 		return houseMemberMapper.queryByIdsBatch(ids);
 	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 查询社区里所有的成员
+	 * @param communityId: 社区ID
+	 * @return: java.util.List<com.jsy.community.entity.HouseMemberEntity>
+	 * @date: 2021/8/19 17:22
+	 **/
+	@Override
+	public List<HouseMemberEntity> queryByCommunityId(Long communityId) {
+		QueryWrapper<HouseMemberEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("community_id", communityId);
+		return houseMemberMapper.selectList(queryWrapper);
+	}
 }

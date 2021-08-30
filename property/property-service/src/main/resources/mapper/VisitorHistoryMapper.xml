@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jsy.community.mapper.VisitorHistoryMapper">
+<mapper namespace="com.jsy.community.mapper.PeopleHistoryMapper">
 
     <!-- 物业端 查询访客记录 分页查询 -->
-    <select id="queryPage" resultType="com.jsy.community.entity.VisitorHistoryEntity">
+    <select id="queryPage" resultType="com.jsy.community.entity.PeopleHistoryEntity">
         select v.name,v.contact,v.car_plate,v.reason,v.start_time,v.address,v.is_community_access,v.is_building_access,v.status,v.create_time
                ,vs.id,vs.visitor_id,vs.in_time,vs.out_time
         from t_visitor v
-        left join t_visitor_history vs on v.id = vs.visitor_id
+        left join t_people_history vs on v.id = vs.visitor_id
         <where>
             v.community_id = #{query.communityId}
             <if test="query.name != null and query.name != ''">
@@ -39,9 +39,55 @@
 
     <!-- 批量新增访客记录 -->
     <insert id="insertBatch">
-        insert into t_visitor_history(id,community_id,visitorId,name,access_type,create_time) values
-        <foreach collection="dataList" item="item">
-            #{item.}
+        insert into t_people_history
+            (
+                id,
+                community_id,
+                facesluice_id,
+                facesluice_name,
+                mobile,
+                id_card,
+                person_id,
+                uid,
+                name,
+                identity_type,
+                verify_status,
+                person_type,
+                access_type,
+                direction,
+                temperature,
+                temperature_alarm,
+                is_sync,
+                version,
+                deleted,
+                create_time,
+                update_time
+            )
+        values
+        <foreach collection="list" item="peopleHistoryEntity" separator=",">
+            (
+                #{peopleHistoryEntity.id},
+                #{peopleHistoryEntity.communityId},
+                #{peopleHistoryEntity.facesluiceId},
+                #{peopleHistoryEntity.facesluiceName},
+                #{peopleHistoryEntity.mobile},
+                #{peopleHistoryEntity.idCard},
+                #{peopleHistoryEntity.personId},
+                #{peopleHistoryEntity.uid},
+                #{peopleHistoryEntity.name},
+                #{peopleHistoryEntity.identityType},
+                #{peopleHistoryEntity.verifyStatus},
+                #{peopleHistoryEntity.personType},
+                #{peopleHistoryEntity.accessType},
+                #{peopleHistoryEntity.direction},
+                #{peopleHistoryEntity.temperature},
+                #{peopleHistoryEntity.temperatureAlarm},
+                #{peopleHistoryEntity.isSync},
+                #{peopleHistoryEntity.version},
+                #{peopleHistoryEntity.deleted},
+                #{peopleHistoryEntity.createTime},
+                null
+            )
         </foreach>
     </insert>
     

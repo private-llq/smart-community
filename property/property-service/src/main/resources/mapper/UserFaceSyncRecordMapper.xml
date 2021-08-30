@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.UserFaceSyncRecordMapper">
+    <!-- 批量新增用户人脸同步记录 -->
+    <insert id="insertBatchRecord">
+        insert into t_user_face_sync_record (
+            id,
+            uid,
+            community_id,
+            face_url,
+            facility_id,
+            create_time,
+            update_time,
+            deleted
+        ) values
+        <foreach collection="list" separator="," item="recordEntity">
+            (
+                #{recordEntity.id},
+                #{recordEntity.uid},
+                #{recordEntity.communityId},
+                #{recordEntity.faceUrl},
+                #{recordEntity.facilityId},
+                now(),
+                null,
+                0
+            )
+        </foreach>
+    </insert>
+</mapper>
