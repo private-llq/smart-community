@@ -1070,6 +1070,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return userMapper.queryUidOfNameLike(uids,nameLike);
     }
 
+    /**
+     * @Description: 删除业主人脸
+     * @author: Hu
+     * @since: 2021/8/24 16:59
+     * @Param: [userId]
+     * @return: void
+     */
+    @Override
+    public void deleteFaceAvatar(String userId) {
+        userMapper.deleteFaceAvatar(userId);
+    }
+
+
+
+    @Override
+    @Transactional
+    public void saveFace(String userId,String faceUrl) {
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+        if (userEntity!=null){
+            userEntity.setFaceUrl(faceUrl);
+            userMapper.updateById(userEntity);
+        }
+    }
+
+    @Override
+    public String getFace(String userId) {
+        UserEntity entity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+        if (entity!=null){
+            return entity.getFaceUrl();
+        }
+        throw new ProprietorException("当前用户不存在！");
+    }
 
     @Override
     public Integer userIsRealAuth(String userId) {

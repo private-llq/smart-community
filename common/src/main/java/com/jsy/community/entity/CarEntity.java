@@ -16,6 +16,8 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -26,7 +28,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="车辆登记对象", description="车辆实体")
+@ApiModel(value = "车辆登记对象", description = "车辆实体")
 @TableName("t_car")
 public class CarEntity extends BaseEntity {
 
@@ -40,13 +42,17 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车位ID")
     private Long carPositionId;
 
-    @Range(groups = {AddCarValidated.class,SaveCarValidated.class}, min = 1, message = "社区id不合法")
-    @NotNull(groups = {AddCarValidated.class,SaveCarValidated.class}, message = "社区不能为空")
+    @ApiModelProperty(value = "车位编号")
+    @TableField(exist = false)
+    private String carPositionText;
+
+    @Range(groups = {AddCarValidated.class,BindingMonthCarValidated.class}, min = 1, message = "社区id不合法")
+    @NotNull(groups = {AddCarValidated.class,BindingMonthCarValidated.class}, message = "社区不能为空")
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
 
-    @Pattern(groups = {AddCarValidated.class, ProprietorCarValidated.class,SaveCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
-    @NotNull(groups = {AddCarValidated.class, ProprietorCarValidated.class,SaveCarValidated.class}, message = "车牌不能为空!")
+    @Pattern(groups = {AddCarValidated.class, ProprietorCarValidated.class, SaveCarValidated.class,BindingMonthCarValidated.class}, regexp = RegexUtils.REGEX_CAR_PLATE, message = "请输入一个正确的车牌号!")
+    @NotNull(groups = {AddCarValidated.class, ProprietorCarValidated.class, SaveCarValidated.class,BindingMonthCarValidated.class}, message = "车牌不能为空!")
     @ApiModelProperty(value = "车辆牌照")
     private String carPlate;
 
@@ -65,12 +71,12 @@ public class CarEntity extends BaseEntity {
     @ApiModelProperty(value = "车辆所属人")
     private String owner;
 
-    @Range(groups = { AddCarValidated.class, ProprietorCarValidated.class}, min = BusinessEnum.CarTypeEnum.CAR_TYPE_MIN, max = BusinessEnum.CarTypeEnum.CAR_TYPE_MAX, message = "车辆类型选择错误!")
+    @Range(groups = {AddCarValidated.class, ProprietorCarValidated.class}, min = BusinessEnum.CarTypeEnum.CAR_TYPE_MIN, max = BusinessEnum.CarTypeEnum.CAR_TYPE_MAX, message = "车辆类型选择错误!")
     @NotNull(groups = {ProprietorCarValidated.class}, message = "车辆类型未选择!")
     @ApiModelProperty(value = "车辆类型： 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车")
     private Integer carType;
 
-    @TableField( exist = false)
+    @TableField(exist = false)
     @ApiModelProperty(value = "车辆类型文本")
     private String carTypeText;
 
@@ -81,34 +87,74 @@ public class CarEntity extends BaseEntity {
     private String drivingLicenseUrl;
 
     @ApiModelProperty(value = "审核时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date checkTime;
 
-    public static CarEntity getInstance(){
+    @ApiModelProperty(value = "1临时，2月租")
+    private Integer type;
+
+    @ApiModelProperty(value = "1临时，2月租")
+    @TableField(exist = false)
+    private String typeText;
+    @ApiModelProperty(value = "月租开始时间")
+    private LocalDateTime beginTime;
+    @ApiModelProperty(value = "月租结束时间")
+    private LocalDateTime overTime;
+
+    @ApiModelProperty(value = "剩余天数")
+    @TableField(exist = false)
+    private Long remainingDays;
+
+    @ApiModelProperty(value = "订单编号")
+    @TableField(exist = false)
+    private String orderNum;
+
+    @ApiModelProperty(value = "续约月份")
+    @TableField(exist = false)
+    @Range(groups = {BindingMonthCarValidated.class,RenewMonthCarValidated.class}, min = 1, message = "续约月份不能为0！")
+    @NotNull(message = "续约月份不能为空",groups = {BindingMonthCarValidated.class,RenewMonthCarValidated.class})
+    private Integer month;
+
+    @ApiModelProperty(value = "金额")
+    @TableField(exist = false)
+    @Range(groups = {BindingMonthCarValidated.class,RenewMonthCarValidated.class}, min = 1, message = "支付金额不能为0！")
+    private BigDecimal money;
+
+
+    public static CarEntity getInstance() {
         return new CarEntity();
     }
-
-
 
 
     /**
      * [业主信息和车辆信息登记]业主登记时的车辆参数验证
      */
-    public interface ProprietorCarValidated {}
+    public interface ProprietorCarValidated {
+    }
 
     /**
      * 单独[业主]登记车辆前端参数验证接口
      */
-    public interface AddCarValidated {}
+    public interface AddCarValidated {
+    }
 
     /**
      * 新app添加修改车辆
      */
-    public interface SaveCarValidated {}
+    public interface SaveCarValidated {
+    }
 
+    /**
+     * 绑定月租车辆验证
+     */
+    public interface BindingMonthCarValidated {
+    }
 
-
-
+    /**
+     * 续费月租车辆验证
+     */
+    public interface RenewMonthCarValidated {
+    }
 
 
 }

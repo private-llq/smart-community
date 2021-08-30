@@ -255,11 +255,34 @@ public class UserController {
      * @since  2021/2/23 17:23
      */
     @Login
-    @ApiOperation("业主人脸头像上传")
+    @ApiOperation("业主头人脸像上传")
     @PostMapping("uploadFaceAvatar")
     public CommonResult<String> uploadFaceAvatar(MultipartFile faceAvatar) {
         PicUtil.imageQualified(faceAvatar);
         return CommonResult.ok(MinioUtils.upload(faceAvatar, BusinessConst.FAVE_AVATAR_BUCKET_NAME), "上传成功!");
+    }
+
+    @Login
+    @ApiOperation("业主人脸上传")
+    @PostMapping("uploadFace")
+    public CommonResult<String> uploadFace(MultipartFile file) {
+        PicUtil.imageQualified(file);
+        return CommonResult.ok(MinioUtils.upload(file,"user-face"), "上传成功!");
+    }
+    @Login
+    @ApiOperation("查询上传的人脸")
+    @GetMapping("getFace")
+    public CommonResult<String> getFace() {
+        String face = userService.getFace(UserUtils.getUserId());
+        return CommonResult.ok(face,"查询成功！");
+    }
+
+    @Login
+    @ApiOperation("修改用户人脸接口")
+    @PutMapping("saveFace")
+    public CommonResult saveFace(@RequestParam String faceUrl) {
+        userService.saveFace(UserUtils.getUserId(),faceUrl);
+        return CommonResult.ok();
     }
 
     /**
@@ -328,6 +351,19 @@ public class UserController {
     @GetMapping("urora/tags")
     public CommonResult queryUroraTags(){
         return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
+    }
+
+
+    /**
+     * @author YuLF
+     * @since  2021/2/23 17:23
+     */
+    @Login
+    @ApiOperation("删除业主人脸接口")
+    @DeleteMapping("deleteFaceAvatar")
+    public CommonResult deleteFaceAvatar() {
+        userService.deleteFaceAvatar(UserUtils.getUserId());
+        return CommonResult.ok();
     }
     
     /**

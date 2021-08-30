@@ -1,8 +1,8 @@
 package com.jsy.community.vo.property;
 
+import com.jsy.community.vo.BaseVO;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -12,11 +12,7 @@ import java.math.BigDecimal;
  * @create: 2021-08-04 14:27
  **/
 @Data
-public class FeeRuleVO implements Serializable {
-    /**
-     * 数据id
-     */
-    private Long id;
+public class FeeRuleVO extends BaseVO {
 
     /**
      * 启用状态

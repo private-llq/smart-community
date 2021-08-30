@@ -8,8 +8,6 @@ import com.jsy.community.api.ICarChargeService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
-import com.jsy.community.exception.JSYException;
-import com.jsy.community.exception.JSYExceptionHandler;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
@@ -17,14 +15,12 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @DubboService(version = Const.version, group = Const.group)
@@ -105,6 +101,19 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         return insert;
     }
 
+
+    /**
+     * @Description: 按社区查询一条缴费规则
+     * @author: Hu
+     * @since: 2021/8/26 14:47
+     * @Param: [communityId]
+     * @return: com.jsy.community.entity.property.CarChargeEntity
+     */
+    @Override
+    public CarChargeEntity selectOne(Long communityId) {
+        return carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id",communityId).eq("position","地上").eq("type",0));
+    }
+
     /**
      * 计算该项设置的收费 Test charge
      */
@@ -155,6 +164,28 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     }
 
 
+    /**
+     * 查询包月车辆所有收费设置标准
+     * @param adminCommunityId
+     * @return
+     */
+    @Override
+    public List<CarChargeEntity> ListCharge(Long adminCommunityId) {
+        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>().eq("community_id", adminCommunityId));
+        return chargeEntityList;
+    }
+
+    /**
+     * 查询包月车辆单个收费设置标准
+     * @param uid
+     * @param adminCommunityId
+     * @return
+     */
+    @Override
+    public CarChargeEntity selectOneCharge(String uid, Long adminCommunityId) {
+        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", uid).eq("community_id", adminCommunityId));
+        return carChargeEntity;
+    }
 
 
 }

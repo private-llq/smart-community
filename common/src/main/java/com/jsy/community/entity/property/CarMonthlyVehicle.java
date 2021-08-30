@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@ToString
 @TableName("t_car_monthly_vehicle")
 public class CarMonthlyVehicle implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -44,9 +46,13 @@ public class CarMonthlyVehicle implements Serializable {
      */
     private String phone;
     /**
-     * 包月方式 1:地上 2：地下
+     * 包月方式 ID:接受收费标准的uid
      */
-    private Integer monthlyMethod;
+    private String monthlyMethodId;
+    /**
+     * 包月方式：收费设置里面的收费标准名字
+     */
+    private String monthlyMethodName;
     /**
      * 开始时间
      */

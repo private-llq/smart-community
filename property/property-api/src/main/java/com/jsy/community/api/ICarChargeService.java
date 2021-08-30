@@ -57,4 +57,18 @@ public interface ICarChargeService {
     Integer temporaryParkingSet(CarChargeEntity carChargeEntity, Long adminCommunityId);
 
     BigDecimal testCharge(CarChargeQO carChargeQO);
+
+    /**
+     * @Description: 按社区查询一条月租缴费规则
+     * @author: Hu
+     * @since: 2021/8/26 14:46
+     * @Param:
+     * @return:
+     */
+    CarChargeEntity selectOne(Long communityId);
+
+    List<CarChargeEntity> ListCharge(Long adminCommunityId);
+
+    CarChargeEntity selectOneCharge(String uid, Long adminCommunityId);
+
 }

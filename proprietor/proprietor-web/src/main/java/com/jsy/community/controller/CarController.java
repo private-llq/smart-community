@@ -7,6 +7,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.DrivingLicense;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
@@ -24,7 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 【已过期、按新需求改动】
@@ -49,7 +53,7 @@ public class CarController {
 	private DrivingLicense drivingLicense;
 
 	@Login
-	@ApiOperation("新app新增车辆")
+	@ApiOperation("新增车辆")
 	@PostMapping("add")
 	public CommonResult addRelationCar(@RequestBody CarEntity carEntity) {
 		//0.从JWT取uid
@@ -61,7 +65,40 @@ public class CarController {
 	}
 
 	@Login
-	@ApiOperation("新app修改车辆")
+	@ApiOperation("绑定月租车辆")
+	@PostMapping("bindingMonthCar")
+	public CommonResult bindingMonthCar(@RequestBody CarEntity carEntity) {
+		//0.从JWT取uid
+		carEntity.setUid(UserUtils.getUserId());
+		//1.效验前端新增车辆参数合法性
+		ValidatorUtils.validateEntity(carEntity, CarEntity.BindingMonthCarValidated.class);
+		return CommonResult.ok(carService.bindingRecord(carEntity));
+	}
+
+	@Login
+	@ApiOperation("查询月租缴费")
+	@PostMapping("getMonthOrder")
+	public CommonResult MonthOrder(@RequestBody BaseQO<CarEntity> baseQO) {
+		return CommonResult.ok(carService.MonthOrder(baseQO,UserUtils.getUserId()));
+	}
+
+	@Login
+	@ApiOperation("续费月租车辆")
+	@PostMapping("renewMonthCar")
+	public CommonResult renewMonthCar(@RequestBody CarEntity carEntity) {
+		if (carEntity.getId()==null){
+			return CommonResult.error("参数错误！");
+		}
+		//0.从JWT取uid
+		carEntity.setUid(UserUtils.getUserId());
+		//1.效验前端新增车辆参数合法性
+		ValidatorUtils.validateEntity(carEntity, CarEntity.RenewMonthCarValidated.class);
+
+		return CommonResult.ok(carService.renewRecord(carEntity));
+	}
+
+	@Login
+	@ApiOperation("修改车辆")
 	@PutMapping("update")
 	public CommonResult updateRelationCar(@RequestBody CarEntity carEntity) {
 		//0.从JWT取uid
@@ -73,18 +110,42 @@ public class CarController {
 	}
 
 	@Login
-	@ApiOperation("新app修改车辆")
-	@GetMapping("getCars")
-	public CommonResult getCars(@RequestParam Long communityId) {
-		List<CarEntity> carEntities = carService.getCars(communityId,UserUtils.getUserId());
+	@ApiOperation("查询车辆")
+	@PostMapping("getCars")
+	public CommonResult getCars(@RequestBody CarEntity carEntity) {
+		List<CarEntity> carEntities = carService.getCars(carEntity,UserUtils.getUserId());
 		return CommonResult.ok(carEntities);
 	}
 
 	@Login
-	@ApiOperation("新app删除车辆")
+	@ApiOperation("删除车辆")
 	@DeleteMapping("delete")
 	public CommonResult delete(@RequestParam Long id) {
 		carService.delete(id,UserUtils.getUserId());
+		return CommonResult.ok();
+	}
+
+	@Login
+	@ApiOperation("获取当前小区车位")
+	@GetMapping("getPosition")
+	public CommonResult getPosition(@RequestParam Long communityId) {
+		List<CarPositionEntity> list = carService.getPosition(communityId);
+		return CommonResult.ok(list);
+	}
+
+
+	@Login
+	@ApiOperation("获取车位费")
+	@PostMapping("payPositionFees")
+	public CommonResult payPositionFees(@RequestBody CarEntity carEntity) {
+		BigDecimal decimal = carService.payPositionFees(carEntity);
+		return CommonResult.ok(decimal);
+	}
+	@Login
+	@ApiOperation("接触月租车辆")
+	@DeleteMapping("deleteMonthCar")
+	public CommonResult deleteMonthCar(@RequestParam Long id) {
+		carService.deleteMonthCar(id);
 		return CommonResult.ok();
 	}
 

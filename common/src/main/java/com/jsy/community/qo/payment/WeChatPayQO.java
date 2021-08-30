@@ -14,7 +14,7 @@ import java.util.Map;
  **/
 @Data
 public class WeChatPayQO {
-    @ApiModelProperty(value = "支付描述 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包")
+    @ApiModelProperty(value = "交易来源 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包7.红包退回.8停车缴费")
     private Integer tradeFrom;
     @ApiModelProperty(value = "支付描述")
     private String descriptionStr;
@@ -25,6 +25,9 @@ public class WeChatPayQO {
 
     @ApiModelProperty("订单id集合")
     private String ids;
+
+    @ApiModelProperty("停车缴费临时记录id")
+    private Long carOrderRecordId;
 
 
 }

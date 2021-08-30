@@ -42,5 +42,7 @@ public interface IProprietorMarketCategoryService extends IService<ProprietorMar
      * @Author: Tian
      * @Date: 2021/8/21-9:44
      **/
-    List<ProprietorMarketCategoryEntity> selectMarketCategory(Long communityId);
+    List<ProprietorMarketCategoryEntity> selectMarketCategory();
+
+    ProprietorMarketCategoryEntity findOne(String categoryId);
 }

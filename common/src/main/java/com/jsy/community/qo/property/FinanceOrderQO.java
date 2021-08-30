@@ -22,6 +22,10 @@ public class FinanceOrderQO implements Serializable {
      * 房屋或者车位id
      */
     private Long targetId;
+    /**
+     * 支付状态0未支付1已缴费
+     */
+    private Integer status;
 
     /**
      * 缴费项目名称模糊查询

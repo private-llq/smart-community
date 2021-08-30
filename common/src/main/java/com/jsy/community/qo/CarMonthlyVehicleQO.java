@@ -18,9 +18,14 @@ public class CarMonthlyVehicleQO extends BaseQO<String>  {
      */
     private String phone;
     /**
-     * 包月方式
+     * 包月方式 name
      */
-    private Integer monthlyMethod;
+    private String monthlyMethodName;
+
+    /**
+     * 包月方式 id
+     */
+    private String monthlyMethodId;
 
     /**
      * 到期状态 0：到期 1：未到期

@@ -2,22 +2,25 @@ package com.jsy.community.entity.property;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.format.DateTimeFormat;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.alibaba.excel.annotation.write.style.ContentFontStyle;
+import com.alibaba.excel.annotation.write.style.ContentRowHeight;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 
+import java.awt.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
-
-import com.github.xiaoymin.knife4j.annotations.Ignore;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 
 
 /**
@@ -31,6 +34,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("t_car_position")
+//@ContentRowHeight(value = 8)
+//@ContentFontStyle(fontHeightInPoints=4)
 public class CarPositionEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -65,7 +70,7 @@ public class CarPositionEntity implements Serializable {
      * 关联车位类型
      */
     @ExcelProperty("关联车位类型")
-   @TableField(exist = false)//数据库没有
+    @TableField(exist = false)//数据库没有
     private String typeCarPosition;
     /**
      * 车位号
@@ -97,7 +102,9 @@ public class CarPositionEntity implements Serializable {
     /**
      * 车位状态（0空置，1业主自用，2租赁）
      */
-    @ExcelProperty("车位状态(0空置,1业主自用,2租赁)")
+//    @ExcelProperty("车位状态(0空置,1业主自用,2租赁)")
+//    @ColumnWidth(value = 43)
+    @ExcelIgnore
     private Integer carPosStatus;
 
     /**
@@ -109,16 +116,21 @@ public class CarPositionEntity implements Serializable {
     /**
      * 所属房屋
      */
-    @ExcelProperty("所属房屋")
+//    @ExcelProperty("所属房屋")
+//    @ColumnWidth(value = 23)
+    @ExcelIgnore
     private String belongHouse;
 
     /**
      * 业主电话
      */
-    @ExcelProperty("业主电话")
+//    @ExcelProperty("业主电话")
+//    @ColumnWidth(value = 23)
+    @ExcelIgnore
     private String ownerPhone;
 
-    @ExcelProperty("用户姓名")
+//    @ExcelProperty("用户姓名")
+    @ExcelIgnore
     private String userName;
 
     /**
@@ -130,22 +142,29 @@ public class CarPositionEntity implements Serializable {
     /**
      * 绑定状态(0未绑定1,绑定)
      */
-    @ExcelProperty("绑定状态(0未绑定,1绑定)")
+//    @ExcelProperty("绑定状态(0未绑定,1绑定)")
+//    @ColumnWidth(value = 23)
+    @ExcelIgnore
+//    @ExplicitConstraint(source = {"aaa1", "aaa2", "aaa3"})
+//    @CellStyle(fontStyle = @FontStyle(color = IndexedColors.LIGHT_BLUE, size = 14))
+
     private Integer bindingStatus;
 
     /**
      * 起始时间
      */
-    @ExcelProperty("起始时间")
-    @DateTimeFormat("yyyy-MM-dd")
-    private Date beginTime;
+//    @ExcelProperty("起始时间")
+    @ExcelIgnore
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd hh:mm:ss")
+    private LocalDateTime beginTime;
 
     /**
      * 到期时间
      */
-    @ExcelProperty("到期时间")
-    @DateTimeFormat("yyyy-MM-dd")
-    private Date endTime;
+//    @ExcelProperty("到期时间")
+    @ExcelIgnore
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd hh:mm:ss")
+    private LocalDateTime endTime;
     /**
      * 售价
      */

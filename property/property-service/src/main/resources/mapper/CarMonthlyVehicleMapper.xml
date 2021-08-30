@@ -20,8 +20,8 @@
             AND cm.car_position like CONCAT('%',#{query.carPosition},'%')
         </if>
 
-        <if test="query.monthlyMethod!=null and query.monthlyMethod!=''">
-            AND cm.monthly_method = #{query.monthlyMethod}
+        <if test="query.monthlyMethodId!=null and query.monthlyMethodId!=''">
+            AND cm.monthly_method_id = #{query.monthlyMethodId}
         </if>
 
         <if test="query.expirationStatus =='0'.toString() ">

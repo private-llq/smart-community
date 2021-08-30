@@ -45,6 +45,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 		return null;
 	}
 
+	@Override
+	public String selectUserUID(String phone, String username) {
+		QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
+		wrapper.eq("mobile",phone);
+		wrapper.eq("real_name",username);
+		UserEntity userEntity = baseMapper.selectOne(wrapper);
+		String UUID="";
+		if (userEntity!=null) {
+			UUID=userEntity.getUid();
+		}
+
+
+		return UUID;
+	}
+
 	//此方法不会进入，因为本端有同名Service，所以必须实现
 	@Override
 	public Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids){

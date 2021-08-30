@@ -42,7 +42,7 @@ public class OpLogController {
 	 **/
 	@Login
 	@ApiOperation("操作日志分页查询")
-	@PostMapping("/building/type/query")
+	@PostMapping("/query")
 	public CommonResult<PageInfo<OpLogEntity>> queryOpLogPage(@RequestBody BaseQO<OpLogQO> baseQO) {
 		OpLogQO query = baseQO.getQuery();
 		if(query == null){

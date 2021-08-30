@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyFinanceOrderService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyCollectionFormEntity;
 import com.jsy.community.entity.property.PropertyFinanceFormChargeEntity;
@@ -221,6 +222,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("获取财务报表-小区收入")
     @PostMapping("/getFinanceForm/community/income")
     public CommonResult getFinanceFormCommunityIncome(@RequestBody PropertyFinanceFormEntity propertyFinanceFormEntity) {
+        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
         try {
             if (propertyFinanceFormEntity.getYear() != null) {
                 String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyFinanceFormEntity.getYear());
@@ -242,7 +244,7 @@ public class PropertyFinanceOrderController {
 //            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 //        }
 //        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityIncome(propertyFinanceFormEntity),"查询成功");
+        return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityIncome(propertyFinanceFormEntity, communityIdList),"查询成功");
     }
     
     /**
@@ -256,6 +258,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("获取财务报表-小区收费报表")
     @PostMapping("/getFinanceForm/community/charge")
     public CommonResult getFinanceFormCommunityCharge(@RequestBody PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
+        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
         try {
             if (propertyFinanceFormChargeEntity.getMonth() != null) {
                 String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyFinanceFormChargeEntity.getMonth());
@@ -276,11 +279,11 @@ public class PropertyFinanceOrderController {
         switch (propertyFinanceFormChargeEntity.getType()) {
             case 1:
                 // 按账单生成时间
-                propertyFinanceFormChargeEntityList = propertyFinanceOrderService.getFinanceFormCommunityChargeByOrderGenerateTime(propertyFinanceFormChargeEntity);
+                propertyFinanceFormChargeEntityList = propertyFinanceOrderService.getFinanceFormCommunityChargeByOrderGenerateTime(propertyFinanceFormChargeEntity, communityIdList);
                 break;
             case 2:
                 // 按账单周期时间
-                propertyFinanceFormChargeEntityList = propertyFinanceOrderService.getFinanceFormCommunityChargeByOrderPeriodTime(propertyFinanceFormChargeEntity);
+                propertyFinanceFormChargeEntityList = propertyFinanceOrderService.getFinanceFormCommunityChargeByOrderPeriodTime(propertyFinanceFormChargeEntity, communityIdList);
                 break;
             default:
                 break;
@@ -302,6 +305,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("获取收款报表-收款报表")
     @PostMapping("/getCollectionForm/collection")
     public CommonResult getCollectionFormCollection(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
         try {
             if (propertyCollectionFormEntity.getYear() != null) {
                 String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
@@ -315,9 +319,9 @@ public class PropertyFinanceOrderController {
                 propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                 propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
-            if (propertyCollectionFormEntity.getDay() != null) {
+            if (propertyCollectionFormEntity.getDateTime() != null) {
                 ZoneId zone = ZoneId.systemDefault();
-                Instant instant = propertyCollectionFormEntity.getDay().atStartOfDay().atZone(zone).toInstant();
+                Instant instant = propertyCollectionFormEntity.getDateTime().atStartOfDay().atZone(zone).toInstant();
                 String firstDate = DateCalculateUtil.getFirstDate(Date.from(instant));
                 String lastDate = DateCalculateUtil.getLastDate(Date.from(instant));
                 propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
@@ -331,7 +335,7 @@ public class PropertyFinanceOrderController {
 //            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 //        }
 //        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity),"查询成功");
+        return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity, communityIdList),"查询成功");
     }
     
     /**
@@ -397,8 +401,9 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出财务报表-小区收入")
     @PostMapping("/downloadFinanceFormList")
     public ResponseEntity<byte[]> downloadFinanceFormList(@RequestBody PropertyFinanceFormEntity propertyFinanceFormEntity) {
+        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
 //        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        List<PropertyFinanceFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelFinanceFormList(propertyFinanceFormEntity);
+        List<PropertyFinanceFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelFinanceFormList(propertyFinanceFormEntity, communityIdList);
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
         //设置响应类型为附件类型直接下载这种
@@ -427,8 +432,9 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出财务报表-小区收费报表")
     @PostMapping("/downloadChargeList")
     public ResponseEntity<byte[]> downloadChargeList(@RequestBody PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
+        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
 //        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        List<PropertyFinanceFormChargeEntity> orderEntities = propertyFinanceOrderService.queryExportExcelChargeList(propertyFinanceFormChargeEntity);
+        List<PropertyFinanceFormChargeEntity> orderEntities = propertyFinanceOrderService.queryExportExcelChargeList(propertyFinanceFormChargeEntity, communityIdList);
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
         //设置响应类型为附件类型直接下载这种
@@ -457,8 +463,9 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出收款报表-收款报表")
     @PostMapping("/downloadCollectionFormList")
     public ResponseEntity<byte[]> downloadCollectionFormList(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
 //        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormList(propertyCollectionFormEntity);
+        List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormList(propertyCollectionFormEntity, communityIdList);
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
         //设置响应类型为附件类型直接下载这种
@@ -504,5 +511,28 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
+    }
+    
+    /**
+     * @Description: 新增物业账单临时收费
+     * @Param: [propertyFinanceOrderEntity]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/08/26 09:35
+     **/
+    @Login
+    @ApiOperation("新增物业账单临时收费")
+    @PostMapping("/temporary/charges")
+    @businessLog(operation = "新增",content = "新增了【物业账单临时收费】")
+    public CommonResult addTemporaryCharges(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity){
+        if(propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleId() == null
+            || propertyFinanceOrderEntity.getPropertyFee() == null || propertyFinanceOrderEntity.getBeginTime() == null || propertyFinanceOrderEntity.getOverTime() == null){
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
+        }
+        ValidatorUtils.validateEntity(propertyFinanceOrderEntity);
+        AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderEntity.setCommunityId(loginUser.getCommunityId());
+        return propertyFinanceOrderService.addTemporaryCharges(propertyFinanceOrderEntity)
+            ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增物业账单临时收费失败");
     }
 }

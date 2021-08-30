@@ -19,4 +19,6 @@ public class SelectCarPositionPagingQO implements Serializable {
     private  Integer carPositionStatus;
     @ApiModelProperty(value = "绑定状态")
     private Integer  bindingStatus;
+    @ApiModelProperty(value = "车位号")
+    private String  carNumber;
 }

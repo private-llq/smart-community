@@ -3,9 +3,12 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CarOrderRecordEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +115,7 @@ public interface ICarService extends IService<CarEntity> {
      * @Param:
      * @return:
      */
-    List<CarEntity> getCars(Long communityId,String uid);
+    List<CarEntity> getCars(CarEntity carEntity,String uid);
 
     /**
      * @Description: 新app删除车辆
@@ -122,4 +125,85 @@ public interface ICarService extends IService<CarEntity> {
      * @return:
      */
     void delete(Long id, String userId);
+
+    /**
+     * @Description: 获取当前小区空置车位
+     * @author: Hu
+     * @since: 2021/8/25 15:44
+     * @Param:
+     * @return:
+     */
+    List<CarPositionEntity> getPosition(Long communityId);
+
+    /**
+     * @Description: 绑定月租车辆
+     * @author: Hu
+     * @since: 2021/8/26 11:12
+     * @Param:
+     * @return:
+     */
+    void bindingMonthCar(CarOrderRecordEntity entity);
+
+    /**
+     * @Description: 续费月租车辆
+     * @author: Hu
+     * @since: 2021/8/26 11:51
+     * @Param:
+     * @return:
+     */
+    void renewMonthCar(CarOrderRecordEntity entity);
+    /**
+     * @Description: 获取车位费
+     * @author: Hu
+     * @since: 2021/8/26 14:42
+     * @Param:
+     * @return:
+     */
+    BigDecimal payPositionFees(CarEntity carEntity);
+
+    /**
+     * @Description: 查询月租缴费订单
+     * @author: Hu
+     * @since: 2021/8/26 17:31
+     * @Param:
+     * @return:
+     */
+    Map<String, Object> MonthOrder(BaseQO<CarEntity> baseQO, String userId);
+
+    /**
+     * @Description: 续费月租临时订单记录表
+     * @author: Hu
+     * @since: 2021/8/26 14:42
+     * @Param: [carEntity]
+     * @return: java.math.BigDecimal
+     */
+    Long  renewRecord(CarEntity carEntity);
+
+
+    /**
+     * @Description: 绑定月租临时订单记录表
+     * @author: Hu
+     * @since: 2021/8/26 14:42
+     * @Param: [carEntity]
+     * @return: java.math.BigDecimal
+     */
+    Long bindingRecord(CarEntity carEntity);
+
+    /**
+     * @Description: 查询一条车辆缴费临时订单
+     * @author: Hu
+     * @since: 2021/8/27 13:56
+     * @Param:
+     * @return:
+     */
+    CarOrderRecordEntity findOne(Long id);
+
+    /**
+     * @Description: 解除月租车辆绑定关系
+     * @author: Hu
+     * @since: 2021/8/27 16:33
+     * @Param:
+     * @return:
+     */
+    void deleteMonthCar(Long id);
 }

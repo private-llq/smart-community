@@ -80,4 +80,10 @@ public class CarPositionTypeServiceImpl extends ServiceImpl<CarPositionTypeMappe
         }
         return false;
     }
+
+    @Override
+    public List<CarPositionTypeEntity> getAllType() {
+        List<CarPositionTypeEntity> list = carPositionTypeMapper.selectList(null);
+        return list;
+    }
 }

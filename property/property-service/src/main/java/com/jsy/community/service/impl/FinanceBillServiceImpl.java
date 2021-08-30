@@ -234,7 +234,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
      * @Param:
      * @return:
      */
-    public String getOrderNum(String communityId,String serialNumber){
+    public static String getOrderNum(String communityId,String serialNumber){
         StringBuilder str=new StringBuilder();
         if (communityId.length()>=4){
             String s = communityId.substring(communityId.length() - 4, communityId.length());

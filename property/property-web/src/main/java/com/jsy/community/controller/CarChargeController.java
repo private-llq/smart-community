@@ -94,6 +94,24 @@ public class CarChargeController {
         return CommonResult.ok(charge);
     }
 
+    /**
+     * 查询包月的所有收费标准
+     */
+    @Login
+    @GetMapping("/ListCharge")
+    public CommonResult ListCharge(){
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+        List<CarChargeEntity> chargeEntityList= carChargeService.ListCharge(adminCommunityId);
+        return CommonResult.ok(chargeEntityList);
+    }
 
-
+    /**
+     * 根据uid查询单个收费设置标准
+     */
+    @Login
+    @GetMapping("/selectOneCharge")
+    public CommonResult selectOneCharge(@RequestParam("uid") String uid){
+       CarChargeEntity chargeEntity= carChargeService.selectOneCharge(uid,UserUtils.getAdminCommunityId());
+        return CommonResult.ok(chargeEntity);
+    }
 }

@@ -47,6 +47,15 @@ public interface IUserService extends IService<UserEntity> {
 	UserEntity queryUserDetailByUid(String uid);
 
 	/**
+	 * 根据电话和姓名获取uid
+	 * @param phone
+	 * @param username
+	 * @return
+	 */
+	String selectUserUID(String phone,String username);
+
+
+	/**
 	 * @author: Pipi
 	 * @description: 查询社区未同步的人脸信息
 	 * @param communityId: 社区ID

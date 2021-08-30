@@ -80,8 +80,8 @@ public class ProprietorMarketLabelController {
     @GetMapping("/selectMarketLabel")
     @ApiOperation("查询社区集市商品标签")
     @Login
-    public CommonResult selectMarketLabel(@RequestParam("communityId") Long communityId){
-        List<ProprietorMarketLabelEntity> list = labelService.selectMarketLabel(communityId);
+    public CommonResult selectMarketLabel(){
+        List<ProprietorMarketLabelEntity> list = labelService.selectMarketLabel();
         return CommonResult.ok(list,"查询成功");
     }
 

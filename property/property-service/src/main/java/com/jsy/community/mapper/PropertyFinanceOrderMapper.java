@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -246,4 +247,38 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @return:
      */
     void updates(FinanceOrderOperationQO financeOrderOperationQO);
+
+    /**
+     *@Author: DKS
+     *@Description: 根据时间段查询小区当月每天费用总计
+     *@Param: startTime,endTime,communityId:
+     *@Return: java.util.List<>
+     *@Date: 2021/8/24 15:55
+     **/
+    List<Map<String,BigDecimal>> chargeByDate(LocalDate startTime, LocalDate endTime, Long communityId);
+
+    /**
+     *@Author: DKS
+     *@Description: 根据时间段查询小区月费用总计
+     *@Param: startTime,endTime,communityId:
+     *@Date: 2021/8/24 15:55
+     **/
+    BigDecimal chargeByMonth(LocalDate startTime, LocalDate endTime, Long communityId);
+
+    /**
+     *@Author: DKS
+     *@Description: 查询communityIds下每月的物业费统计
+     *@Param: communityIdList
+     *@Return: java.util.List<>
+     *@Date: 2021/8/25 14:53
+     **/
+    List<Map<String,BigDecimal>> selectMonthPropertyFeeByCommunityIds(@Param("list") List<Long> communityIdList, @Param("startTime")LocalDate startTime, @Param("endTime")LocalDate endTime);
+
+    /**
+     *@Author: DKS
+     *@Description: 根据时间段查询物业所有小区年费用总计
+     *@Param: startTime,endTime,communityIdList:
+     *@Date: 2021/8/25 15:00
+     **/
+    BigDecimal chargeByYear(@Param("startTime")LocalDate startTime, @Param("endTime")LocalDate endTime, @Param("list") List<Long> communityIdList);
 }
