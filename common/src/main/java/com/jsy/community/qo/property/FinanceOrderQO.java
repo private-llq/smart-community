@@ -37,10 +37,6 @@ public class FinanceOrderQO implements Serializable {
      */
     private String orderNum;
 
-    /**
-     * 生成时间
-     */
-    private LocalDate orderTime;
 
     /**
      * 账单开始时间
@@ -55,4 +51,22 @@ public class FinanceOrderQO implements Serializable {
      * 状态1显示，2隐藏
      */
     private Integer hide;
+
+    /**
+     * 生成时间
+     */
+    private LocalDate beginOrderTime;
+    /**
+     * 生成结束时间
+     */
+    private LocalDate overOrderTime;
+
+    /**
+     * 支付时间
+     */
+    private LocalDate beginPayTime;
+    /**
+     * 支付结束时间
+     */
+    private LocalDate overPayTime;
 }
