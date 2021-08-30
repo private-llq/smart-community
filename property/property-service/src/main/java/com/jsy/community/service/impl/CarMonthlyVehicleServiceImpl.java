@@ -92,6 +92,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //修改车位的信息：为已绑定 开始结束时间变更
         CarPositionEntity carPositionEntity = new CarPositionEntity();
+        carPositionEntity.setBindingStatus(1);//已绑定
         carPositionEntity.setCarPosStatus(2);//租赁状态
         carPositionEntity.setOwnerPhone(carMonthlyVehicle.getPhone());//联系电话
         carPositionEntity.setRemark(carMonthlyVehicle.getRemarks());//备注
@@ -205,6 +206,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //修改车位的信息：为已绑定 结束时间变更
         CarPositionEntity carPositionEntity = new CarPositionEntity();
+        carPositionEntity.setBindingStatus(1);//已绑定
         carPositionEntity.setCarPosStatus(2);//租赁状态
         carPositionEntity.setOwnerPhone(reCarMonthlyVehicle.getPhone());//联系电话
         carPositionEntity.setRemark(reCarMonthlyVehicle.getRemarks());//备注
@@ -471,6 +473,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
             //修改车位的信息：为已绑定 结束时间变更
             CarPositionEntity carPositionEntity = new CarPositionEntity();
+            carPositionEntity.setBindingStatus(1);//已绑定
             carPositionEntity.setCarPosStatus(2);//租赁状态
             carPositionEntity.setOwnerPhone(phone);//联系电话
             carPositionEntity.setRemark(remarks);//备注
