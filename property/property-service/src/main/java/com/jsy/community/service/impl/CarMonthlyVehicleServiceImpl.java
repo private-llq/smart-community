@@ -8,9 +8,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.property.CarBlackListEntity;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.mapper.CarBlackListMapper;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.mapper.CarMonthlyVehicleMapper;
 import com.jsy.community.mapper.CarPositionMapper;
@@ -38,6 +40,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     private CarPositionMapper carPositionMapper;
     @Autowired
     private CarChargeMapper CarChargeMapper;
+    @Autowired
+    private CarBlackListMapper carBlackListMapper;
 
     /**
      * 新增
@@ -71,7 +75,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.isNull(carMonthlyVehicle.getMonthlyMethodId())){
             throw new PropertyException("包月方式不能为空！");
         }
-
+        //查询黑名单中是否存在该车辆
+        CarBlackListEntity car_number = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", carMonthlyVehicle.getCarNumber()));
+        if (Objects.nonNull(car_number)){
+            throw new PropertyException("该车辆已进入黑名单，无法进场或离场！");
+        }
         //查询收费设置数据
         String monthlyMethodId = carMonthlyVehicle.getMonthlyMethodId();
         CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", monthlyMethodId));

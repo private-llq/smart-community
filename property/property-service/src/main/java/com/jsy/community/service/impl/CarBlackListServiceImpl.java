@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.ICarBlackListService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarBlackListEntity;
 import com.jsy.community.mapper.CarBlackListMapper;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @DubboService(version = Const.version, group = Const.group)
 public class CarBlackListServiceImpl implements ICarBlackListService {
@@ -64,10 +66,14 @@ public class CarBlackListServiceImpl implements ICarBlackListService {
     @Override
     @Transactional
     public Integer saveBlackList(CarBlackListEntity carBlackListEntity,Long communityId) {
+
+        CarBlackListEntity car_number = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", carBlackListEntity.getCarNumber()));
+        if (Objects.nonNull(car_number)){
+            throw new PropertyException("该车辆已被加入黑名单，请勿重复添加！");
+        }
         carBlackListEntity.setUid(UserUtils.randomUUID());
         carBlackListEntity.setAddTime(LocalDateTime.now());
         carBlackListEntity.setCommunityId(communityId);
-
         int insert = carBlackListMapper.insert(carBlackListEntity);
         return insert;
     }
