@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.CarPositionEntity;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -31,4 +32,14 @@ public interface CarPositionMapper extends BaseMapper<CarPositionEntity> {
     Integer selectAllCarPositionByCommunityIds(@Param("list") List<Long> communityIdList);
 
 	int relieve(Long id);
+
+	/**
+	 * @Description: 修改车位状态
+	 * @author: Hu
+	 * @since: 2021/8/27 17:02
+	 * @Param:
+	 * @return:
+	 */
+	@Update("update t_car_position set community_id=null,car_pos_status=0,binding_status=0,uid=null,owner_phone=null,begin_time=null,end_time=null where id = #{carPositionId}")
+    void updateByPosition(@Param("carPositionId") Long carPositionId);
 }

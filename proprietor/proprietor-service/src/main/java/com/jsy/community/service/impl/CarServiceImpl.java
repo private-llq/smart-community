@@ -215,6 +215,20 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         return carChargeEntity.getMoney().multiply(new BigDecimal(carEntity.getMonth()));
     }
 
+    /**
+     * @Description: 解除月租车辆绑定关系
+     * @author: Hu
+     * @since: 2021/8/27 16:33
+     * @Param:
+     * @return:
+     */
+    @Override
+    @TxcTransaction
+    public void deleteMonthCar(Long id) {
+        CarEntity carEntity = carMapper.selectById(id);
+        carMapper.deleteById(id);
+        carPositionService.updateByPosition(carEntity.getCarPositionId());
+    }
 
     /**
      * @Description: 查询一条停车缴费临时订单

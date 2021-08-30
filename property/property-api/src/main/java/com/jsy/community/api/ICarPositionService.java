@@ -67,4 +67,13 @@ public interface ICarPositionService extends IService<CarPositionEntity> {
     Boolean relieve(Long id);
 
     Boolean deletedCarPosition(Long id);
+
+    /**
+     * @Description: 修改车位状态
+     * @author: Hu
+     * @since: 2021/8/27 16:57
+     * @Param:
+     * @return:
+     */
+    void updateByPosition(Long carPositionId);
 }

@@ -197,4 +197,13 @@ public interface ICarService extends IService<CarEntity> {
      * @return:
      */
     CarOrderRecordEntity findOne(Long id);
+
+    /**
+     * @Description: 解除月租车辆绑定关系
+     * @author: Hu
+     * @since: 2021/8/27 16:33
+     * @Param:
+     * @return:
+     */
+    void deleteMonthCar(Long id);
 }
