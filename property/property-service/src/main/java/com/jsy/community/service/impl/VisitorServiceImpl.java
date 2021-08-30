@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IUserService;
@@ -11,17 +12,15 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.admin.AdminUserEntity;
-import com.jsy.community.mapper.VisitorHistoryMapper;
-import com.jsy.community.mapper.VisitorMapper;
-import com.jsy.community.mapper.VisitorPersonRecordMapper;
-import com.jsy.community.mapper.VisitorStrangerMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
-import org.apache.dubbo.config.annotation.DubboReference;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +35,7 @@ import java.util.*;
  * @description 物业端访客实现类
  * @since 2021-04-12 13:35
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 public class VisitorServiceImpl implements IVisitorService {
 	
@@ -46,7 +46,7 @@ public class VisitorServiceImpl implements IVisitorService {
 	private VisitorPersonRecordMapper visitorPersonRecordMapper;
 	
 	@Autowired
-	private VisitorHistoryMapper visitorHistoryMapper;
+	private PeopleHistoryMapper visitorHistoryMapper;
 	
 	@Autowired
 	private VisitorStrangerMapper visitorStrangerMapper;
@@ -54,40 +54,44 @@ public class VisitorServiceImpl implements IVisitorService {
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 
-	// @DubboReference(version = Const.version, group = Const.group_property, check = false)
 	@Autowired
 	private IUserService userService;
 
-	// @DubboReference(version = Const.version, group = Const.group_property, check = false)
 	@Autowired
 	private IAdminUserService adminUserService;
-	
-	
+
+	@Autowired
+	private VisitorFaceSyncRecordMapper faceSyncRecordMapper;
+
+	@Autowired
+	private CommunityHardWareMapper communityHardWareMapper;
+
 	/**
-	 * @Description: 访客记录 分页查询(现在主表数据是t_visitor,连表查询，以后主表可能会改为t_visitor_history)
+	 * @Description: 访客记录 分页查询(现在主表数据是t_visitor,连表查询，以后主表可能会改为t_people_history)
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorHistoryEntity>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/14
 	 **/
 	@Override
-	public PageInfo<VisitorHistoryEntity> queryVisitorPage(BaseQO<VisitorHistoryEntity> baseQO){
-		VisitorHistoryEntity query = baseQO.getQuery();
-		Page<VisitorHistoryEntity> page = new Page<>();
+	public PageInfo<PeopleHistoryEntity> queryVisitorPage(BaseQO<PeopleHistoryEntity> baseQO){
+		PeopleHistoryEntity query = baseQO.getQuery();
+		Page<PeopleHistoryEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page,baseQO);
-		Page<VisitorHistoryEntity> pageData = visitorHistoryMapper.queryPage(page,query);
+		Page<PeopleHistoryEntity> pageData = visitorHistoryMapper.queryPage(page,query);
 		if(CollectionUtils.isEmpty(pageData.getRecords())){
 			return new PageInfo<>();
 		}
-		Set<Long> visitorIds = new HashSet<>();
-		for(VisitorHistoryEntity historyEntity : pageData.getRecords()){
+		// TODO 纠错
+		/*Set<Long> visitorIds = new HashSet<>();
+		for(PeopleHistoryEntity historyEntity : pageData.getRecords()){
 			visitorIds.add(historyEntity.getVisitorId());
 		}
 		//查随行人员表统计随行人员数量
 		Map<Long, Map<Long,Long>> countMap = visitorPersonRecordMapper.getFollowPersonBatch(visitorIds);
-		for(VisitorHistoryEntity historyEntity : pageData.getRecords()){
+		for(PeopleHistoryEntity historyEntity : pageData.getRecords()){
 			historyEntity.setFollowCount(countMap.get(historyEntity.getVisitorId()) == null ? null : countMap.get(historyEntity.getVisitorId()).get("count"));
-		}
+		}*/
 		PageInfo pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
@@ -160,7 +164,7 @@ public class VisitorServiceImpl implements IVisitorService {
 	}
 	
 	/**
-	* @Description: 访客记录 分页查询(需要待入园数据必须是t_visitor，但是此方案主表是t_visitor_history，暂时搁置)
+	* @Description: 访客记录 分页查询(需要待入园数据必须是t_visitor，但是此方案主表是t_people_history，暂时搁置)
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.VisitorEntity>
 	 * @Author: chq459799974
@@ -278,22 +282,88 @@ public class VisitorServiceImpl implements IVisitorService {
 	 * @date: 2021/8/13 14:17
 	 **/
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public Integer addVisitor(VisitorEntity visitorEntity) {
 		visitorEntity.setId(SnowFlake.nextId());
 		int resultNum = visitorMapper.insert(visitorEntity);
 		// 添加成功且有人脸信息
 		if (!StringUtils.isEmpty(visitorEntity.getFaceUrl()) && resultNum > 0) {
-			JSONObject pushMap = new JSONObject();
-			pushMap.put("op","editPerson");
-			pushMap.put("uid",visitorEntity.getContact());
-			pushMap.put("faceUrl",visitorEntity.getFaceUrl());
-			HashSet<Object> hashSet = new HashSet<>();
-			hashSet.add(visitorEntity.getCommunityId());
-			pushMap.put("communityIdSet", hashSet);
-			pushMap.put("sex", 0);
-			pushMap.put("realName",visitorEntity.getName());
-			rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, pushMap);
+			// 查询所有社区所有扫脸一体机设备
+			QueryWrapper<CommunityHardWareEntity> hardWareEntityQueryWrapper = new QueryWrapper<>();
+			hardWareEntityQueryWrapper.eq("community_id", visitorEntity.getCommunityId());
+			List<CommunityHardWareEntity> communityHardWareEntities = communityHardWareMapper.selectList(hardWareEntityQueryWrapper);
+			if (!CollectionUtils.isEmpty(communityHardWareEntities)) {
+				// 增加每个机器的同步记录
+				List<VisitorFaceSyncRecordEntity> visitorFaceSyncRecordEntities = new ArrayList<>();
+				for (CommunityHardWareEntity communityHardWareEntity : communityHardWareEntities) {
+					VisitorFaceSyncRecordEntity visitorFaceSyncRecordEntity = new VisitorFaceSyncRecordEntity();
+					visitorFaceSyncRecordEntity.setVisitorId(visitorEntity.getId());
+					visitorFaceSyncRecordEntity.setCommunityId(visitorEntity.getCommunityId());
+					visitorFaceSyncRecordEntity.setFaceUrl(visitorEntity.getFaceUrl());
+					visitorFaceSyncRecordEntity.setFacilityId(communityHardWareEntity.getHardwareId());
+					visitorFaceSyncRecordEntity.setId(SnowFlake.nextId());
+					visitorFaceSyncRecordEntity.setDeleted(0);
+					visitorFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
+					visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
+					// =================================== 向队列发送同步消息 =============================================
+					JSONObject pushMap = new JSONObject();
+					pushMap.put("op","editPerson");
+					pushMap.put("uid",visitorEntity.getContact());
+					pushMap.put("faceUrl",visitorEntity.getFaceUrl());
+					pushMap.put("communityId", visitorEntity.getCommunityId());
+					pushMap.put("facilityId", communityHardWareEntity.getHardwareId());
+					pushMap.put("tel", visitorEntity.getContact());
+					pushMap.put("sex", 0);
+					pushMap.put("realName",visitorEntity.getName());
+					log.info("发送消息到队列{}", TopicExConfig.TOPIC_FACE_XU_SERVER + "." + visitorEntity.getCommunityId());
+					rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER + "." + visitorEntity.getCommunityId(), pushMap.toString());
+				}
+				faceSyncRecordMapper.batchInsertRecord(visitorFaceSyncRecordEntities);
+			}
 		}
 		return resultNum;
+	}
+
+	/**
+	 * @param communityId : 社区ID
+	 * @param facilityId : 设备序列号
+	 * @author: Pipi
+	 * @description: 查询社区未同步的人脸信息
+	 * @return: java.util.List<com.jsy.community.entity.VisitorStrangerEntity>
+	 * @date: 2021/8/19 15:08
+	 **/
+	@Override
+	public List<VisitorEntity> queryUnsyncFaceUrlList(Long communityId, String facilityId) {
+		QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("community_id", communityId);
+		queryWrapper.isNotNull("face_url");
+		// 查已存在的访客同步记录
+		QueryWrapper<VisitorFaceSyncRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();
+		recordEntityQueryWrapper.eq("community_id", communityId);
+		recordEntityQueryWrapper.eq("facility_id", facilityId);
+		List<VisitorFaceSyncRecordEntity> faceSyncRecordEntities = faceSyncRecordMapper.selectList(recordEntityQueryWrapper);
+		if (!CollectionUtils.isEmpty(faceSyncRecordEntities)) {
+			List<String> faceUrlList = new ArrayList<>();
+			for (VisitorFaceSyncRecordEntity faceSyncRecordEntity : faceSyncRecordEntities) {
+				faceUrlList.add(faceSyncRecordEntity.getFaceUrl());
+			}
+			queryWrapper.notIn("face_url", faceUrlList);
+		}
+		return visitorMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * @param ids : 访客ID列表
+	 * @author: Pipi
+	 * @description: 批量更新访客人脸同步状态
+	 * @return: void
+	 * @date: 2021/8/20 15:55
+	 **/
+	@Override
+	public void updateFaceUrlSyncStatus(List<Long> ids) {
+		UpdateWrapper<VisitorEntity> updateWrapper = new UpdateWrapper<>();
+		updateWrapper.in("id", ids);
+		updateWrapper.set("face_url_sync_status", 1);
+		visitorMapper.update(new VisitorEntity(), updateWrapper);
 	}
 }

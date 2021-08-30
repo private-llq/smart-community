@@ -141,6 +141,13 @@ public class CarController {
 		BigDecimal decimal = carService.payPositionFees(carEntity);
 		return CommonResult.ok(decimal);
 	}
+	@Login
+	@ApiOperation("接触月租车辆")
+	@DeleteMapping("deleteMonthCar")
+	public CommonResult deleteMonthCar(@RequestParam Long id) {
+		carService.deleteMonthCar(id);
+		return CommonResult.ok();
+	}
 
 	
 	

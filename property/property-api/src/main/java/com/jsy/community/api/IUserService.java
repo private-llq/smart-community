@@ -25,8 +25,7 @@ public interface IUserService extends IService<UserEntity> {
 	 * @Param [uid]
 	 **/
 	UserEntity selectOne(String uid);
-
-
+	
 	/**
 	* @Description: uids批量查询 uid-姓名映射
 	 * @Param: [uids]
@@ -55,4 +54,14 @@ public interface IUserService extends IService<UserEntity> {
 	 */
 	String selectUserUID(String phone,String username);
 
+
+	/**
+	 * @author: Pipi
+	 * @description: 查询社区未同步的人脸信息
+	 * @param communityId: 社区ID
+	 * @param facilityId: 设备序列号
+	 * @return: java.util.List<com.jsy.community.entity.UserEntity>
+	 * @date: 2021/8/19 15:41
+	 **/
+	List<UserEntity> queryUnsyncFaceUrlList(Long communityId, String facilityId);
 }

@@ -197,7 +197,7 @@ public class RelationServiceImpl implements IRelationService {
         for (HouseMemberEntity houseMemberEntity : houseMemberEntities) {
             RelationVO relationVO = new RelationVO();
             BeanUtils.copyProperties(houseMemberEntity,relationVO);
-            relationVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(houseMemberEntity.getRelation()));
+            relationVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(houseMemberEntity.getRelation()));
             list.add(relationVO);
         }
         return list;
@@ -224,9 +224,9 @@ public class RelationServiceImpl implements IRelationService {
         relationVO.setName(houseMemberEntity.getName());
         relationVO.setIdCard(houseMemberEntity.getIdCard());
         relationVO.setRelation(houseMemberEntity.getRelation());
-        relationVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(houseMemberEntity.getRelation()));
+        relationVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(houseMemberEntity.getRelation()));
         relationVO.setSex(houseMemberEntity.getSex());
-        relationVO.setRelationText( BusinessEnum.RelationshipEnum.getCode(houseMemberEntity.getRelation()) );
+        relationVO.setRelationText( BusinessEnum.RelationshipEnum.getCodeName(houseMemberEntity.getRelation()) );
         relationVO.setCommunityId(houseMemberEntity.getCommunityId());
         relationVO.setIdentificationTypeText(BusinessEnum.IdentificationType.getKv().get(houseMemberEntity.getIdentificationType()));
         relationVO.setHouseId(houseMemberEntity.getHouseId());

@@ -21,6 +21,7 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.http.entity.ContentType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 

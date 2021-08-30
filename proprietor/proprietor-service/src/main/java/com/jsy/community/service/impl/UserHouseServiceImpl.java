@@ -290,7 +290,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			userHouseVO.setRelation(entity.getRelation());
 			userHouseVO.setHouseId(entity.getHouseId());
 			userHouseVO.setCommunityId(entity.getCommunityId());
-			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(entity.getRelation()));
+			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation()));
 			linkedList.add(userHouseVO);
 		}
 		return linkedList;
@@ -357,7 +357,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 			//当前登录人员为业主
 			UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 1);
-			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(userHouseVO.getRelation()));
+			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(userHouseVO.getRelation()));
 			userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
 			userHouseVO.setCommunityText(communityEntity.getName());
 
@@ -365,7 +365,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			List<MembersVO> voList = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 0);
 			for (MembersVO membersVO : voList) {
 				if (!membersVO.getRelation().equals(1)){
-					membersVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(membersVO.getRelation()));
+					membersVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(membersVO.getRelation()));
 					list.add(membersVO);
 				}
 
@@ -404,7 +404,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 				//查询当前登录人员信息
 				UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(),6);
-				userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(userHouseVO.getRelation()));
+				userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(userHouseVO.getRelation()));
 				userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
 				userHouseVO.setCommunityText(communityEntity.getName());
 
@@ -412,14 +412,14 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 				//当前房屋下业主的信息  一个房间只能有一个业主
 				List<MembersVO> user = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(),1);
 				MembersVO membersVO = user.get(0);
-				membersVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(membersVO.getRelation()));
+				membersVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(membersVO.getRelation()));
 				list.add(membersVO);
 
 
 				//当前房屋下所有关系为租户的成员
 				List<MembersVO> members = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 7);
 				for (MembersVO member : members) {
-					member.setRelationText(BusinessEnum.RelationshipEnum.getCode(member.getRelation()));
+					member.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(member.getRelation()));
 					list.add(member);
 				}
 				userHouseVO.setMembers(list);
@@ -455,14 +455,14 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 				//当前登录人员为租客
 				UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 7);
-				userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCode(userHouseVO.getRelation()));
+				userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(userHouseVO.getRelation()));
 				userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
 				userHouseVO.setCommunityText(communityEntity.getName());
 
 				//查询当前房屋业主
 				List<MembersVO> voList = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 1);
 				MembersVO vo = voList.get(0);
-				vo.setRelationText(BusinessEnum.RelationshipEnum.getCode(vo.getRelation()));
+				vo.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(vo.getRelation()));
 				list.add(vo);
 				userHouseVO.setMembers(list);
 				return userHouseVO;

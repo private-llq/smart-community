@@ -219,6 +219,19 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
         return false;
     }
 
+
+    /**
+     * @Description: 修改车位状态
+     * @author: Hu
+     * @since: 2021/8/27 16:58
+     * @Param: [carPositionId]
+     * @return: void
+     */
+    @Override
+    public void updateByPosition(Long carPositionId) {
+        carPositionMapper.updateByPosition(carPositionId);
+    }
+
     @Override
     public Boolean deletedCarPosition(Long id) {
         CarPositionEntity carPositionEntity = carPositionMapper.selectById(id);
