@@ -130,7 +130,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         qoQuery.setCommunityId(communityId);
         List<PropertyRelationVO> relationVOS = propertyRelationMapper.list(qoQuery, page, baseQO.getSize());
         for (PropertyRelationVO relationVO : relationVOS) {
-            relationVO.setRelationName(BusinessEnum.RelationshipEnum.getCode(relationVO.getRelation()));
+            relationVO.setRelationName(BusinessEnum.RelationshipEnum.getCodeName(relationVO.getRelation()));
             relationVO.setHousing(replaceStr(relationVO.getHousing()));
             relationVO.setHouseTypeName(relationVO.getHouseType()==1?"商铺":relationVO.getHouseType()==2?"住宅":"");
         }
@@ -196,7 +196,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         HouseMemberEntity memberEntity = propertyRelationMapper.selectById(id);
         HouseEntity entity = houseMapper.selectById(memberEntity.getHouseId());
         memberEntity.setHouseSite(entity.getBuilding()+entity.getUnit()+entity.getDoor());
-        memberEntity.setRelationName(BusinessEnum.RelationshipEnum.getCode(memberEntity.getRelation()));
+        memberEntity.setRelationName(BusinessEnum.RelationshipEnum.getCodeName(memberEntity.getRelation()));
         return memberEntity;
     }
 
@@ -235,7 +235,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 
         List<HouseMemberVO> list=propertyRelationMapper.pageList((baseQO.getPage()-1) * baseQO.getSize(),baseQO.getSize(),baseQO.getQuery());
         for (HouseMemberVO houseMemberVO : list) {
-            houseMemberVO.setRelationName(BusinessEnum.RelationshipEnum.getCode(houseMemberVO.getRelation()));
+            houseMemberVO.setRelationName(BusinessEnum.RelationshipEnum.getCodeName(houseMemberVO.getRelation()));
         }
         Long total = propertyRelationMapper.pageListTotal(baseQO.getQuery());
         map.put("list",list);

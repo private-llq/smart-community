@@ -293,4 +293,47 @@ public interface PropertyConstsEnum {
 			return null;
 		}
 	}
+
+	// 人脸同步状态
+	enum FaceUrlSyncStatusEnum{
+		SYNCHRONIZED("已同步", 1),
+		UNSYNCHRONIZED("未同步", 2);
+		private String name;
+		private Integer code;
+
+		FaceUrlSyncStatusEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static String getName(Integer code) {
+			for (FaceUrlSyncStatusEnum value : FaceUrlSyncStatusEnum.values()) {
+				if (code.equals(value.getCode())) {
+					return value.getName();
+				}
+			}
+			return null;
+		}
+	}
 }

@@ -308,7 +308,12 @@ public interface BusinessConst {
      * 用户头像 人脸头像
      */
     String FAVE_AVATAR_BUCKET_NAME = "user-face-avatar";
-    
+
+    /**
+     * 陌生人脸
+     */
+    String STRANGER_FACE_BUCKET_NAME = "stranger-face";
+
     /**
      * 物业押金凭证二维码
      */

@@ -6,7 +6,7 @@ import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitorEntity;
-import com.jsy.community.entity.VisitorHistoryEntity;
+import com.jsy.community.entity.PeopleHistoryEntity;
 import com.jsy.community.entity.VisitorStrangerEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MinioUtils;
@@ -38,16 +38,16 @@ public class VisitorController {
 	private IVisitorService visitorService;
 	
 	/**
-	* @Description: 访客记录 分页查询(现在主表数据是t_visitor,以后会改为t_visitor_history)
+	* @Description: 访客记录 分页查询(现在主表数据是t_visitor,以后会改为t_people_history)
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: chq459799974
 	 * @Date: 2021/4/12
 	**/
 	@PostMapping("page")
-	public CommonResult queryVisitorPage(@RequestBody BaseQO<VisitorHistoryEntity> baseQO){
+	public CommonResult queryVisitorPage(@RequestBody BaseQO<PeopleHistoryEntity> baseQO){
 		if(baseQO.getQuery() == null){
-			baseQO.setQuery(new VisitorHistoryEntity());
+			baseQO.setQuery(new PeopleHistoryEntity());
 		}
 		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 		return CommonResult.ok(visitorService.queryVisitorPage(baseQO),"查询成功");

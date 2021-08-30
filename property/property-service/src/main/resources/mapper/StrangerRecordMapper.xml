@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.StrangerRecordMapper">
+    <!-- 批量新增陌生人脸记录 -->
+    <insert id="batchInsertStrangerRecord">
+        insert into t_stranger_record (
+            id,
+            snap_id,
+            facesluice_id,
+            facesluice_name,
+            direction,
+            temperature,
+            temperature_alarm,
+            pic,
+            is_sync,
+            version,
+            create_time,
+            deleted,
+            update_time
+        ) values
+        <foreach collection="list" separator="," item="recordEntity">
+            (
+                #{recordEntity.id},
+                #{recordEntity.snapId},
+                #{recordEntity.facesluiceId},
+                #{recordEntity.facesluiceName},
+                #{recordEntity.direction},
+                #{recordEntity.temperature},
+                #{recordEntity.temperatureAlarm},
+                #{recordEntity.pic},
+                #{recordEntity.isSync},
+                #{recordEntity.version},
+                #{recordEntity.createTime},
+                #{recordEntity.deleted},
+                #{recordEntity.updateTime}
+            )
+        </foreach>
+    </insert>
+</mapper>

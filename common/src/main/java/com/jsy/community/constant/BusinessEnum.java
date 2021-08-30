@@ -616,19 +616,19 @@ public interface BusinessEnum {
 			this.name = name;
 			this.code = code;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public void setName(String name) {
 			this.name = name;
 		}
-		
+
 		public Integer getCode() {
 			return code;
 		}
-		
+
 		public void setCode(Integer code) {
 			this.code = code;
 		}
@@ -641,7 +641,7 @@ public interface BusinessEnum {
 		public static final List<Map<String, Object>> relationshipList = new ArrayList<>();
 		public static final Map<Integer, String> relationshipMap = new HashMap<>();
 
-		public static String getCode(Integer code){
+		public static String getCodeName(Integer code){
 			RelationshipEnum[] values = RelationshipEnum.values();
 			for(RelationshipEnum c : values){
 				if( c.code.equals(code) ){
@@ -650,6 +650,17 @@ public interface BusinessEnum {
 			}
 			return RELATIVES.name;
 		}
+
+		public static Integer getNameCode(String name){
+			RelationshipEnum[] values = RelationshipEnum.values();
+			for(RelationshipEnum c : values){
+				if( c.name.equals(name) ){
+					return c.code;
+				}
+			}
+			return RELATIVES.code;
+		}
+
 		static {
 			for (RelationshipEnum relationshipEnum : RelationshipEnum.values()) {
 				HashMap<String, Object> map = new HashMap<>();

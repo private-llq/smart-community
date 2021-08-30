@@ -111,4 +111,12 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	**/
 	Map<Long,HouseMemberEntity> queryByIdBatch(Set<Long> ids);
 
+	/**
+	 * @author: Pipi
+	 * @description: 查询社区里所有的成员
+	 * @param communityId: 社区ID
+	 * @return: java.util.List<com.jsy.community.entity.HouseMemberEntity>
+	 * @date: 2021/8/19 17:23
+	 **/
+	List<HouseMemberEntity> queryByCommunityId(Long communityId);
 }
