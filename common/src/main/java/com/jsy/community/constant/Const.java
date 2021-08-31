@@ -46,6 +46,11 @@ public interface Const {
 		 * 物业端操作员-重置密码
 		 */
 		String RESET_PASSWORD = "SMS_218172247";
+		
+		/**
+		 * 物业端-短信群发
+		 */
+		String SMS_GROUP_SENDING = "SMS_223191687";
 	}
 	
 }

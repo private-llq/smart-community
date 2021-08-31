@@ -146,4 +146,12 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @date: 2021/8/25 13:45
 	 **/
 	ConsoleEntity getPropertySurvey(Integer year, Long companyId, List<Long> communityIdList);
+	
+	/**
+	 * @author: DKS
+	 * @description: 物业端-系统设置-短信群发
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/30 17:22
+	 **/
+	Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime);
 }

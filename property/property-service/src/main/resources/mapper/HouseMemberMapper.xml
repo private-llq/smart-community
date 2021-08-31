@@ -30,4 +30,18 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="selectMobileListByCommunityIds" resultType="java.lang.String">
+        select mobile from t_house_member where mobile is not null and mobile &lt;&gt; "" and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectDistinctMobileListByCommunityIds" resultType="java.lang.String">
+        select distinct mobile from t_house_member where mobile is not null and mobile &lt;&gt; "" and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

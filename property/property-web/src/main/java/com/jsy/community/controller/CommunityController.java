@@ -6,6 +6,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IPropertyCompanyService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.exception.JSYError;
@@ -205,6 +206,22 @@ public class CommunityController {
 	@Login
 	public CommonResult getCompanyNameByCompanyId(){
 		return CommonResult.ok(propertyCompanyService.getCompanyNameByCompanyId(UserUtils.getAdminCompanyId()));
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 物业端-系统设置-短信群发
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/30 17:22
+	 **/
+	@Login
+	@GetMapping("/group/send/sms")
+	public CommonResult groupSendSMS(String content, boolean isDistinct, String taskTime) {
+		List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+		if (content == null) {
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+		}
+		return communityService.groupSendSMS(communityIdList, content, isDistinct, taskTime) ? CommonResult.ok("发送成功") : CommonResult.error("发送失败");
 	}
 }
 

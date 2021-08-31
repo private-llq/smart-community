@@ -38,6 +38,9 @@ public class PropertyFinanceFormEntity implements Serializable {
 	@ApiModelProperty(value = "小区线下收费")
 	private BigDecimal communityOfflineCharging;
 	
+	@ApiModelProperty(value = "小区退款或者体现")
+	private BigDecimal communityRefundOrWithdrawal;
+	
 	@ApiModelProperty(value = "小区收款合计")
 	private BigDecimal communityTotal;
 	
