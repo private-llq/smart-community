@@ -335,13 +335,13 @@
         where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and order_status = 1 and community_id = #{communityId} and deleted = 0
     </select>
 
-    <select id="selectMonthPropertyFeeByCommunityIds" resultType="java.util.Map">
-        select mid(order_time,1,7) as month,SUM(total_money) as totalMoney from t_property_finance_order
+    <select id="selectMonthPropertyFeeByCommunityIds" resultType="com.jsy.community.entity.property.ConsoleEntity">
+        select community_id as communityId,mid(order_time,1,7) as month,SUM(total_money) as propertyFee from t_property_finance_order
         where order_time &gt;= #{startTime} and order_time &lt;= #{endTime} and order_status = 1 and deleted = 0 and community_id in
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
-        group by month ORDER BY month
+        group by month,communityId  ORDER BY communityId,month
     </select>
 
     <select id="chargeByYear" resultType="java.math.BigDecimal">
