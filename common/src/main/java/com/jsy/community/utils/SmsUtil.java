@@ -1,8 +1,4 @@
 package com.jsy.community.utils;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.CommonRequest;
@@ -19,9 +15,9 @@ import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.methods.HttpGet;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
 * @Description: 阿里云短信服务
@@ -122,6 +118,16 @@ public class SmsUtil {
         map.put("phonenumber",mobile);
         map.put("password",password);
         sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.RESET_PASSWORD,JSON.toJSONString(map));
+    }
+    
+    /**
+     * 物业端-短信群发
+     */
+    public static void groupSendSMS(String mobile,String content) {
+        Map<String,String> map = new HashMap<>();
+        map.put("phonenumber",mobile);
+        map.put("content",content);
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.SMS_GROUP_SENDING,JSON.toJSONString(map));
     }
     
 }

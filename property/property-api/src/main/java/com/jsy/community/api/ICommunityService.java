@@ -141,9 +141,25 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	/**
 	 * @author: DKS
 	 * @description: 获取物业控制台
-	 * @param year:
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/25 13:45
 	 **/
-	ConsoleEntity getPropertySurvey(Integer year, Long companyId, List<Long> communityIdList);
+	ConsoleEntity getPropertySurvey(Long companyId, List<Long> communityIdList);
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取物业控制台里的收费统计
+	 * @param communityId:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/31 17:09
+	 **/
+	ConsoleEntity getPropertySurveyOrderFrom(Integer year, Long communityId);
+	
+	/**
+	 * @author: DKS
+	 * @description: 物业端-系统设置-短信群发
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/30 17:22
+	 **/
+	Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime);
 }

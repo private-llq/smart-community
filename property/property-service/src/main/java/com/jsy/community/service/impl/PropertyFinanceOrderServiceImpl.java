@@ -732,10 +732,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 押金查询
         QueryWrapper<PropertyDepositEntity> DepositWrapper = new QueryWrapper<>();
         if (qo.getStartTime() != null) {
-            DepositWrapper.ge("order_time", qo.getStartTime());
+            DepositWrapper.ge("create_time", qo.getStartTime());
         }
         if (qo.getEndTime() != null) {
-            DepositWrapper.le("order_time", qo.getEndTime());
+            DepositWrapper.le("create_time", qo.getEndTime());
         }
         if (qo.getCommunityId() != null) {
             DepositWrapper.eq("community_id", qo.getCommunityId());
@@ -757,6 +757,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         // 押金线上收费
         propertyFinanceFormEntity.setDepositOnlineCharging(depositSum);
+        // 押金线下收费
+        propertyFinanceFormEntity.setDepositOfflineCharging(new BigDecimal("0.00"));
         // 押金退款
         propertyFinanceFormEntity.setDepositRefund(depositRefund);
         // 押金合计
@@ -765,10 +767,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 预存款查询
         QueryWrapper<PropertyAdvanceDepositRecordEntity> advanceDepositRecordWrapper = new QueryWrapper<>();
         if (qo.getStartTime() != null) {
-            advanceDepositRecordWrapper.ge("order_time", qo.getStartTime());
+            advanceDepositRecordWrapper.ge("create_time", qo.getStartTime());
         }
         if (qo.getEndTime() != null) {
-            advanceDepositRecordWrapper.le("order_time", qo.getEndTime());
+            advanceDepositRecordWrapper.le("create_time", qo.getEndTime());
         }
         if (qo.getCommunityId() != null) {
             advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
@@ -792,6 +794,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         // 预存款线上收费
         propertyFinanceFormEntity.setAdvanceDepositOnlineCharging(advanceDepositSum);
+        // 预存款线下收费
+        propertyFinanceFormEntity.setAdvanceDepositOfflineCharging(new BigDecimal("0.00"));
         // 预存款提现
         propertyFinanceFormEntity.setAdvanceDepositWithdrawal(advanceDepositWithdrawal);
         // 预存款合计
@@ -822,6 +826,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         // 小区账单线上收费
         propertyFinanceFormEntity.setCommunityOnlineCharging(communitySum);
+        // 小区账单线下收费
+        propertyFinanceFormEntity.setCommunityOfflineCharging(new BigDecimal("0.00"));
+        // 小区账单退款或者体现
+        propertyFinanceFormEntity.setCommunityRefundOrWithdrawal(new BigDecimal("0.00"));
         // 小区账单合计
         propertyFinanceFormEntity.setCommunityTotal(communitySum);
         
@@ -843,6 +851,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             propertyFinanceFormEntity.setOnlineChargingSum(communitySum.add(advanceDepositSum).add(depositSum));
         }
+        // 线下收费合计
+        propertyFinanceFormEntity.setOfflineChargingSum(new BigDecimal("0.00"));
         
         // 退款或提现合计
         if (depositRefund == null && advanceDepositWithdrawal == null) {
@@ -914,6 +924,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             propertyFinanceFormChargeEntity.setCouponMoney(propertyFinanceOrderEntity.getCouponMoney());
             propertyFinanceFormChargeEntity.setReceivablePenalMoney(propertyFinanceOrderEntity.getReceivablePenalMoney());
             propertyFinanceFormChargeEntity.setDeductionMoney(propertyFinanceOrderEntity.getDeductionMoney());
+            propertyFinanceFormChargeEntity.setArrearsMoney(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setArrearsMoneySum(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setThisMonthArrearsMoney(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setCollectPenalMoney(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setCommunityOnlineCharging(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setCommunityOfflineCharging(new BigDecimal("0.00"));
             propertyFinanceFormChargeEntityList.add(propertyFinanceFormChargeEntity);
         }
     
@@ -1058,6 +1074,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             propertyFinanceFormChargeEntity.setCouponMoney(propertyFinanceOrderEntity.getCouponMoney());
             propertyFinanceFormChargeEntity.setReceivablePenalMoney(propertyFinanceOrderEntity.getReceivablePenalMoney());
             propertyFinanceFormChargeEntity.setDeductionMoney(propertyFinanceOrderEntity.getDeductionMoney());
+            propertyFinanceFormChargeEntity.setArrearsMoney(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setArrearsMoneySum(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setThisMonthArrearsMoney(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setCollectPenalMoney(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setCommunityOnlineCharging(new BigDecimal("0.00"));
+            propertyFinanceFormChargeEntity.setCommunityOfflineCharging(new BigDecimal("0.00"));
             propertyFinanceFormChargeEntityList.add(propertyFinanceFormChargeEntity);
         }
     
@@ -1201,6 +1223,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             propertyCollectionFormEntity = new PropertyCollectionFormEntity();
             propertyCollectionFormEntity.setFeeRuleId(propertyFinanceOrderEntity.getFeeRuleId());
             propertyCollectionFormEntity.setTotalSum(propertyFinanceOrderEntity.getTotalSum());
+            propertyCollectionFormEntity.setWeChatPaySum(new BigDecimal("0.00"));
+            propertyCollectionFormEntity.setAliPaySum(new BigDecimal("0.00"));
+            propertyCollectionFormEntity.setBalancePaySum(new BigDecimal("0.00"));
+            propertyCollectionFormEntity.setCashPaySum(new BigDecimal("0.00"));
+            propertyCollectionFormEntity.setUnionPaySum(new BigDecimal("0.00"));
+            propertyCollectionFormEntity.setBankPaySum(new BigDecimal("0.00"));
             propertyCollectionFormEntityList.add(propertyCollectionFormEntity);
         }
     
@@ -1686,6 +1714,43 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         propertyFinanceOrderEntity.setBuildType(2);
         int row = propertyFinanceOrderMapper.insert(propertyFinanceOrderEntity);
         return row == 1;
+    }
+
+    /**
+     * @Description: 批量修改账单状态
+     * @author: Hu
+     * @since: 2021/8/31 14:43
+     * @Param: [ids]
+     * @return: void
+     */
+    @Override
+    public void updateStatusIds(String ids,Integer hide) {
+        propertyFinanceOrderMapper.updateStatusIds(ids.split(","),hide);
+    }
+
+
+    /**
+     * @Description: 查询当前小区缴费项目
+     * @author: Hu
+     * @since: 2021/8/31 15:01
+     * @Param: [adminCommunityId]
+     * @return: java.util.List<com.jsy.community.entity.property.PropertyFeeRuleEntity>
+     */
+    @Override
+    public List<PropertyFeeRuleEntity> getFeeList(Long adminCommunityId) {
+        return propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>().select("id,name").eq("community_id",adminCommunityId));
+    }
+
+    /**
+     * @Description: 批量删除账单
+     * @author: Hu
+     * @since: 2021/8/31 14:50
+     * @Param: [ids]
+     * @return: void
+     */
+    @Override
+    public void deleteIds(String ids) {
+        propertyFinanceOrderMapper.delete(new QueryWrapper<PropertyFinanceOrderEntity>().in("id",ids.split(",")));
     }
 }
 

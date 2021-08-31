@@ -12,17 +12,30 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
+import com.jsy.community.util.MembersHandler;
+import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PicUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.HouseMemberVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -41,11 +54,37 @@ public class PropertyRelationController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyRelationService propertyRelationService;
 
+    @Autowired
+    private MembersHandler membersHandler;
+
     @ApiOperation("分页查询")
     @PostMapping("/pageList")
     @Login
     public CommonResult pageList(@RequestBody BaseQO<HouseMemberQO> baseQO){
     return CommonResult.ok(propertyRelationService.pageList(baseQO));
+    }
+
+    @ApiOperation("导出")
+    @PostMapping("/export")
+    @Login
+    public ResponseEntity<byte[]> export(@RequestBody HouseMemberQO houseMemberQO){
+        houseMemberQO.setCommunityId(UserUtils.getAdminCommunityId());
+        List<HouseMemberVO> houseMemberVOS = propertyRelationService.queryExportRelationExcel(houseMemberQO);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("成员信息表.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = membersHandler.exportRelation(houseMemberVOS);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
     }
 
     @ApiOperation("迁入")

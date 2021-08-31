@@ -6,10 +6,7 @@ import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.property.PropertyCollectionFormEntity;
-import com.jsy.community.entity.property.PropertyFinanceFormChargeEntity;
-import com.jsy.community.entity.property.PropertyFinanceFormEntity;
-import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -92,7 +89,24 @@ public class PropertyFinanceOrderController {
         propertyFinanceOrderService.delete(id);
         return CommonResult.ok();
     }
-    @ApiOperation("删除多条条账单")
+    @ApiOperation("删除多条账单")
+    @DeleteMapping("/deleteIds")
+    @Login
+    @businessLog(operation = "删除",content = "删除了【多条物业房间账单】")
+    public CommonResult deleteIds(@RequestParam("ids") String ids){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.deleteIds(ids);
+        return CommonResult.ok();
+    }
+    @ApiOperation("查询当前小区缴费项目")
+    @GetMapping("/getFeeList")
+    @Login
+    @businessLog(operation = "查询",content = "查询了【物业缴费项目】")
+    public CommonResult getFeeList(){
+        List<PropertyFeeRuleEntity> list = propertyFinanceOrderService.getFeeList(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(list);
+    }
+    @ApiOperation("条件删除多条账单")
     @DeleteMapping("/deletes")
     @Login
     @businessLog(operation = "删除",content = "删除了【多条物业房间账单】")
@@ -110,7 +124,16 @@ public class PropertyFinanceOrderController {
         propertyFinanceOrderService.update(id);
         return CommonResult.ok();
     }
-    @ApiOperation("条件修改订单状态")
+    @ApiOperation("修改多条物业账单状态")
+    @PutMapping("/updateStatusIds")
+    @Login
+    @businessLog(operation = "编辑",content = "更新了【多条条物业房间账单状态】")
+    public CommonResult updateStatusIds(@RequestParam("ids") String ids,Integer hide){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFinanceOrderService.updateStatusIds(ids,hide);
+        return CommonResult.ok();
+    }
+    @ApiOperation("条件修改物业订单状态")
     @PutMapping("/updates")
     @Login
     @businessLog(operation = "编辑",content = "更新了【多条物业房间账单状态】")
