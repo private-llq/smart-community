@@ -38,7 +38,6 @@ public class PeopleHistoryController {
     @Login
     @PostMapping("/v2/pagePeopleHistory")
     public CommonResult pagePeopleHistory(@RequestBody BaseQO<PeopleHistoryEntity> baseQO) {
-        UserUtils.getAdminCommunityIdList();
         return CommonResult.ok(peopleHistoryService.pagePeopleHistory(baseQO));
     }
 }
