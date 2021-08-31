@@ -69,7 +69,7 @@ public class CarOrderEntity extends BaseEntity {
     /**
      *  月份
      */
-    private Long month;
+    private Integer month;
     /**
      *  1线上支付，2线下支付
      */
