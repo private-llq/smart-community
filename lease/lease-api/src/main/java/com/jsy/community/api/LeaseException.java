@@ -9,19 +9,19 @@ import com.jsy.community.exception.JSYException;
  * @since 2020-11-11 14:13
  */
 public class LeaseException extends JSYException {
-	public LeaseException(Integer code, String message) {
-		super(code, message);
-	}
+    public LeaseException(Integer code, String message) {
+        super(code, message);
+    }
 
-	public LeaseException() {
-		super();
-	}
+    public LeaseException() {
+        super();
+    }
 
-	public LeaseException(String message) {
-		super(ConstError.NORMAL, message);
-	}
+    public LeaseException(String message) {
+        super(ConstError.NORMAL, message);
+    }
 
-	public LeaseException(JSYError error) {
-		super(error);
-	}
+    public LeaseException(JSYError error) {
+        super(error);
+    }
 }

@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 租赁配置类  用于租赁模块的一些自定义配置
+ *
  * @author YuLF
  * @since 2021-01-19 11:36
  */
@@ -24,13 +25,13 @@ public class LeaseConfig {
      * CallerRunsPolicy：，它直接在execute方法的调用线程中运行被拒绝的任务。
      * DiscardOldestPolicy：它放弃最旧的未处理请求，然后重试execute。
      * DiscardPolicy：默认情况下它将丢弃被拒绝的任务
-     *
+     * <p>
      * [使用方法]
      * 需要异步的方法上面增加：@Async(BusinessConst.LEASE_ASYNC_POOL) 注解
      * 建议异步使用线程执行的方法 放在Service 接口里面，像其他业务方法一样 实现 其实现方法
      * 而只在接口上面增加@Async(BusinessConst.LEASE_ASYNC_POOL) 注解
      * 或者单独使用一个类来执行异步任务，而这个类使用@Component注解修饰
-     *
+     * <p>
      * [踩坑记录]
      * 1.异步注解的方法如果返回类型是void,那么该方法不能将异步方法执行产生的异常信息传递到异步方法的调用方默认情况下，这些未捕获的异常只能在日志中记录。
      * 2.如果异步方法需要有返回值，则只接受 Future<?> 类型

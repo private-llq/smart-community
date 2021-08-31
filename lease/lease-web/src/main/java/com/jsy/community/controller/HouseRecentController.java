@@ -36,9 +36,9 @@ public class HouseRecentController {
     @Login
     @GetMapping()
     @ApiOperation("房屋最近浏览")
-    public CommonResult<List<HouseRecentEntity>> recentBrowse(@RequestParam( required = false, defaultValue = "0") Integer type,
-                                                              @RequestParam( required = false, defaultValue = "1") Long page,
-                                                              @RequestParam( required = false, defaultValue = "10") Long size) {
+    public CommonResult<List<HouseRecentEntity>> recentBrowse(@RequestParam(required = false, defaultValue = "0") Integer type,
+                                                              @RequestParam(required = false, defaultValue = "1") Long page,
+                                                              @RequestParam(required = false, defaultValue = "10") Long size) {
         BaseQO<Object> qo = new BaseQO<>();
         qo.setPage(page);
         qo.setSize(size);
@@ -50,7 +50,7 @@ public class HouseRecentController {
     @DeleteMapping()
     @ApiOperation("清空房屋最近浏览")
     public CommonResult<Boolean> clearRecentBrowse(@RequestParam Integer type) {
-        return houseRecentService.clearRecentBrowse(type, UserUtils.getUserId()) ? CommonResult.ok( "清空成功!" ) : CommonResult.error( "清空失败!" );
+        return houseRecentService.clearRecentBrowse(type, UserUtils.getUserId()) ? CommonResult.ok("清空成功!") : CommonResult.error("清空失败!");
     }
 
 

@@ -35,14 +35,15 @@ public class HouseFavoriteServiceImpl extends ServiceImpl<HouseFavoriteMapper, H
 
     /**
      * 房屋收藏
+     *
      * @author YuLF
-     * @since  2020/12/30 10:51
-     * @Param  qo         请求必要参数：uid（服务端）、收藏id、收藏房屋类型（1商铺 2租房）
+     * @Param qo         请求必要参数：uid（服务端）、收藏id、收藏房屋类型（1商铺 2租房）
+     * @since 2020/12/30 10:51
      */
     @Override
     public Boolean houseFavorite(HouseFavoriteQO qo) {
         HouseFavoriteEntity entity = HouseFavoriteEntity.getInstance();
-        BeanUtils.copyProperties( qo, entity );
+        BeanUtils.copyProperties(qo, entity);
         entity.setId(SnowFlake.nextId());
         return houseFavoriteMapper.insert(entity) > 0;
     }
@@ -50,10 +51,11 @@ public class HouseFavoriteServiceImpl extends ServiceImpl<HouseFavoriteMapper, H
 
     /**
      * 房屋收藏删除
+     *
      * @author YuLF
-     * @since  2020/12/30 11:00
-     * @Param   id              收藏房屋ID
-     * @Param   userId          用户ID
+     * @Param id              收藏房屋ID
+     * @Param userId          用户ID
+     * @since 2020/12/30 11:00
      */
     @Override
     public Boolean deleteFavorite(Long id, String userId) {
@@ -63,9 +65,10 @@ public class HouseFavoriteServiceImpl extends ServiceImpl<HouseFavoriteMapper, H
 
     /**
      * 查询房屋收藏列表
+     *
      * @author YuLF
-     * @since  2020/12/30 11:29
-     * @Param  qo           参数对象
+     * @Param qo           参数对象
+     * @since 2020/12/30 11:29
      */
     @Override
     public List<HouseFavoriteVO> leaseFavorite(BaseQO<HouseFavoriteQO> qo) {
@@ -73,13 +76,13 @@ public class HouseFavoriteServiceImpl extends ServiceImpl<HouseFavoriteMapper, H
         List<HouseFavoriteVO> vos = houseFavoriteMapper.leaseFavorite(qo);
         List<Long> houseIds = new ArrayList<>(vos.size());
         //拿到查询列表的所有房屋id  在通过房屋id 查出所有图片  最终设置一张图片到返回图片 用于列表显示
-        vos.forEach( v -> houseIds.add(v.getHouseId()));
-        if(CollectionUtil.isNotEmpty(houseIds)){
+        vos.forEach(v -> houseIds.add(v.getHouseId()));
+        if (CollectionUtil.isNotEmpty(houseIds)) {
             List<HouseImageVo> imageVos = houseFavoriteMapper.getHouseLeaseImage(houseIds);
-            Map<Long, HouseImageVo> collect = imageVos.stream().collect(Collectors.toMap(HouseImageVo::getHid, houseImageVo -> houseImageVo,(value1, value2) -> value1));
-            vos.forEach( v -> {
+            Map<Long, HouseImageVo> collect = imageVos.stream().collect(Collectors.toMap(HouseImageVo::getHid, houseImageVo -> houseImageVo, (value1, value2) -> value1));
+            vos.forEach(v -> {
                 HouseImageVo houseImageVo = collect.get(v.getHouseId());
-                if( Objects.nonNull(houseImageVo) ){
+                if (Objects.nonNull(houseImageVo)) {
                     v.setHouseImage(houseImageVo.getImgUrl());
                 }
             });
@@ -90,22 +93,23 @@ public class HouseFavoriteServiceImpl extends ServiceImpl<HouseFavoriteMapper, H
 
     /**
      * 查询我的商铺收藏列表
+     *
      * @author YuLF
-     * @since  2020/12/30 11:29
-     * @Param  qo           参数对象
+     * @Param qo           参数对象
+     * @since 2020/12/30 11:29
      */
     @Override
     public List<HouseFavoriteVO> shopFavorite(BaseQO<HouseFavoriteQO> qo) {
         qo.setPage((qo.getPage() - 1) * qo.getSize());
         List<HouseFavoriteVO> vos = houseFavoriteMapper.shopFavorite(qo);
         List<Long> houseIds = new ArrayList<>(vos.size());
-        vos.forEach( v -> houseIds.add(v.getHouseId()));
-        if(CollectionUtil.isNotEmpty(houseIds)){
+        vos.forEach(v -> houseIds.add(v.getHouseId()));
+        if (CollectionUtil.isNotEmpty(houseIds)) {
             List<HouseImageVo> imageVos = houseFavoriteMapper.getShopImage(houseIds);
-            Map<Long, HouseImageVo> collect = imageVos.stream().collect(Collectors.toMap(HouseImageVo::getHid, houseImageVo -> houseImageVo,(value1, value2) -> value1));
-            vos.forEach( v -> {
+            Map<Long, HouseImageVo> collect = imageVos.stream().collect(Collectors.toMap(HouseImageVo::getHid, houseImageVo -> houseImageVo, (value1, value2) -> value1));
+            vos.forEach(v -> {
                 HouseImageVo houseImageVo = collect.get(v.getHouseId());
-                if( Objects.nonNull(houseImageVo) ){
+                if (Objects.nonNull(houseImageVo)) {
                     v.setHouseImage(houseImageVo.getImgUrl());
                 }
             });
@@ -117,7 +121,7 @@ public class HouseFavoriteServiceImpl extends ServiceImpl<HouseFavoriteMapper, H
     @Override
     public boolean hasHouseOrShop(HouseFavoriteQO qo) {
         //收藏类型：1. 商铺 、2.出租房
-        if(qo.getFavoriteType().equals(BusinessConst.SHOP_FAVORITE_TYPE)){
+        if (qo.getFavoriteType().equals(BusinessConst.SHOP_FAVORITE_TYPE)) {
             //商铺
             return houseFavoriteMapper.existShop(qo.getFavoriteId()) > 0;
         }

@@ -26,14 +26,14 @@ public class HouseConstController {
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
-    
+
     /**
      * @Author lihao
      * @Description 配套设施常量类型
      * @Date 2021/1/13 15:55
      **/
     private static final Integer FACILITY_TYPE = 16;
-    
+
     /**
      * @Author lihao
      * @Description 客流人群常量类型
@@ -46,9 +46,9 @@ public class HouseConstController {
     @ApiOperation("房屋常量查询根据id")
     public CommonResult<Map<String, List<HouseLeaseConstEntity>>> all(@RequestBody Long[] ids) {
         Map<String, List<HouseLeaseConstEntity>> map = new HashMap<>();
-        for( Long id : ids ){
+        for (Long id : ids) {
             List<HouseLeaseConstEntity> houseConstListByType = houseConstService.getHouseConstListByType(String.valueOf(id));
-            if( houseConstListByType == null || houseConstListByType.isEmpty() ){
+            if (houseConstListByType == null || houseConstListByType.isEmpty()) {
                 continue;
             }
             map.put(houseConstListByType.get(0).getHouseConstType(), houseConstListByType);
@@ -66,12 +66,12 @@ public class HouseConstController {
      **/
     @GetMapping("/getTag")
     @ApiOperation("查询商铺标签")
-    public CommonResult getTag(){
-        Map<String,Object> list = houseConstService.getTag();
+    public CommonResult getTag() {
+        Map<String, Object> list = houseConstService.getTag();
         return CommonResult.ok(list);
     }
-    
-    
+
+
     @ApiOperation("商铺类型标签查询")
     @GetMapping("/getShopType")
     public CommonResult getShopType() {
@@ -79,7 +79,7 @@ public class HouseConstController {
         List<HouseLeaseConstEntity> constEntityList = houseConstService.getHouseConstListByType(type);
         return CommonResult.ok(constEntityList);
     }
-    
+
     @ApiOperation("商铺行业标签查询")
     @GetMapping("/getShopBusiness")
     public CommonResult getShopBusiness() {
@@ -87,14 +87,13 @@ public class HouseConstController {
         List<HouseLeaseConstEntity> constEntityList = houseConstService.getHouseConstListByType(type);
         return CommonResult.ok(constEntityList);
     }
-    
+
     @ApiOperation("商铺发布时的配套设施和客流人群选项")
     @GetMapping("/getShopTags")
-    public CommonResult getAddShopTags(){
-        Map<String, Object> map = houseConstService.getAddShopTags(FACILITY_TYPE,PEOPLE_TYPE);
+    public CommonResult getAddShopTags() {
+        Map<String, Object> map = houseConstService.getAddShopTags(FACILITY_TYPE, PEOPLE_TYPE);
         return CommonResult.ok(map);
     }
-    
-    
-    
+
+
 }

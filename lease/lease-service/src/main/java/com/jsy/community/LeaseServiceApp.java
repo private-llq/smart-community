@@ -10,9 +10,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- *
  * @author YuLF
- * @since  2021/2/5 17:19
+ * @since 2021/2/5 17:19
  */
 @EnableAsync
 @DubboComponentScan
@@ -22,7 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @PropertySource(value = "classpath:common-service.properties")
 @EnableDistributedTransaction
 public class LeaseServiceApp {
-	public static void main(String[] args) {
-		SpringApplication.run(LeaseServiceApp.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LeaseServiceApp.class, args);
+    }
 }

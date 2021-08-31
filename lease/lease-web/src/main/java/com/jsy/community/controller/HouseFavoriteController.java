@@ -42,20 +42,20 @@ public class HouseFavoriteController {
     public CommonResult<Boolean> houseFavorite(@RequestBody HouseFavoriteQO qo) {
         ValidatorUtils.validateEntity(qo, HouseFavoriteQO.AddFavorite.class);
         //验证数据有效性 如果不存在
-        if(!iHouseFavoriteService.hasHouseOrShop(qo)){
+        if (!iHouseFavoriteService.hasHouseOrShop(qo)) {
             throw new JSYException("被收藏房屋不存在!");
         }
         qo.setUid(UserUtils.getUserId());
-        return CommonResult.ok(iHouseFavoriteService.houseFavorite(qo),"收藏成功!");
+        return CommonResult.ok(iHouseFavoriteService.houseFavorite(qo), "收藏成功!");
     }
 
 
     @Login
     @PostMapping("/shop")
     @ApiOperation("商铺收藏列表")
-    public CommonResult<List<HouseFavoriteVO >> shopFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
+    public CommonResult<List<HouseFavoriteVO>> shopFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
         ValidatorUtils.validatePageParam(qo);
-        if( qo.getQuery() == null ){
+        if (qo.getQuery() == null) {
             qo.setQuery(new HouseFavoriteQO());
         }
         qo.getQuery().setUid(UserUtils.getUserId());
@@ -68,7 +68,7 @@ public class HouseFavoriteController {
     @ApiOperation("租房收藏列表")
     public CommonResult<List<HouseFavoriteVO>> leaseFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
         ValidatorUtils.validatePageParam(qo);
-        if( qo.getQuery() == null ){
+        if (qo.getQuery() == null) {
             qo.setQuery(new HouseFavoriteQO());
         }
         qo.getQuery().setUid(UserUtils.getUserId());
