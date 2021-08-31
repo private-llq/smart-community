@@ -325,22 +325,11 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	/**
 	 * @author: DKS
 	 * @description: 获取物业控制台
-	 * @param year:
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/25 13:45
 	 **/
 	@Override
-	public ConsoleEntity getPropertySurvey(Integer year, Long companyId, List<Long> communityIdList) {
-		LocalDate startTime = null;
-		LocalDate endTime = null;
-		try {
-			String firstMouthDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(year);
-			String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(year);
-			startTime = LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			endTime = LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public ConsoleEntity getPropertySurvey(Long companyId, List<Long> communityIdList) {
 
 		// 返回给前端实体
 		ConsoleEntity consoleEntity = new ConsoleEntity();
@@ -355,12 +344,37 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 
 		// 查询物业车位总数
 		consoleEntity.setCarPositionSum(carPositionMapper.selectAllCarPositionByCommunityIds(communityIdList));
-		// 查询年每月的物业费统计
-		List<ConsoleEntity> consoleEntities = propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityIds(communityIdList, startTime, endTime);
-		consoleEntity.setMonthByPropertyFee(consoleEntities);
-		// 查询年总计物业费收入统计
-		consoleEntity.setYearByPropertyFee(propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityIdList));
 
+		return consoleEntity;
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取物业控制台里的收费统计
+	 * @param communityId:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/31 17:09
+	 **/
+	@Override
+	public ConsoleEntity getPropertySurveyOrderFrom(Integer year, Long communityId) {
+		LocalDate startTime = null;
+		LocalDate endTime = null;
+		try {
+			String firstMouthDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(year);
+			String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(year);
+			startTime = LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			endTime = LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// 返回给前端实体
+		ConsoleEntity consoleEntity = new ConsoleEntity();
+		
+		// 查询年每月的物业费统计
+		consoleEntity.setMonthByPropertyFee(propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityId(communityId, startTime, endTime));
+		// 查询年总计物业费收入统计
+		consoleEntity.setYearByPropertyFee(propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityId));
+		
 		return consoleEntity;
 	}
 	

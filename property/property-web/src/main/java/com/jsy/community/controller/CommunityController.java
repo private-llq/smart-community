@@ -180,19 +180,31 @@ public class CommunityController {
 	/**
 	 * @author: DKS
 	 * @description: 获取物业控制台
-	 * @param year:
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/25 13:45
 	 **/
 	@Login
 	@GetMapping("/getPropertySurvey")
-	public CommonResult getPropertySurvey(Integer year) {
+	public CommonResult getPropertySurvey() {
 		Long companyId = UserUtils.getAdminCompanyId();
 		List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
-		if (year == null) {
+		return CommonResult.ok(communityService.getPropertySurvey(companyId, communityIdList));
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取物业控制台里的收费统计
+	 * @param communityId:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/31 17:09
+	 **/
+	@Login
+	@GetMapping("/getPropertySurvey/order/from")
+	public CommonResult getPropertySurvey(Integer year, Long communityId) {
+		if (communityId == null || year == null) {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 		}
-		return CommonResult.ok(communityService.getPropertySurvey(year, companyId, communityIdList));
+		return CommonResult.ok(communityService.getPropertySurveyOrderFrom(year, communityId));
 	}
 	
 	/**

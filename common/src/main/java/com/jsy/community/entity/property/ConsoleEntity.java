@@ -6,6 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author DKS
@@ -33,7 +34,7 @@ public class ConsoleEntity implements Serializable {
 	private Integer carPositionSum;
 	
 	@ApiModelProperty(value = "每月的物业费统计")
-	private List<ConsoleEntity> monthByPropertyFee;
+	private List<Map<String, BigDecimal>> monthByPropertyFee;
 	
 	@ApiModelProperty(value = "每年的物业费统计")
 	private BigDecimal yearByPropertyFee;

@@ -344,17 +344,29 @@
         group by month,communityId  ORDER BY communityId,month
     </select>
 
-    <select id="chargeByYear" resultType="java.math.BigDecimal">
+    <select id="selectMonthPropertyFeeByCommunityId" resultType="java.util.Map">
+        select mid(order_time,1,7) as month,SUM(total_money) as propertyFee from t_property_finance_order
+        where order_time &gt;= #{startTime} and order_time &lt;= #{endTime} and order_status = 1 and deleted = 0 and community_id = #{communityId}
+        group by month  ORDER BY month
+    </select>
+
+    <select id="chargeByYears" resultType="java.math.BigDecimal">
         select sum(total_money) AS totalMoneyByYear from t_property_finance_order
         where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and order_status = 1 and deleted = 0 and community_id in
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
+
     <update id="updateStatusIds">
         update t_property_finance_order set hide = #{hide} where id in
         <foreach collection="ids" item="id" separator="," close=")" open="(">
             #{id}
         </foreach>
     </update>
+
+    <select id="chargeByYear" resultType="java.math.BigDecimal">
+        select sum(total_money) AS totalMoneyByYear from t_property_finance_order
+        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and order_status = 1 and deleted = 0 and community_id = #{communityId}
+    </select>
 </mapper>
