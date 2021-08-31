@@ -1687,5 +1687,42 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         int row = propertyFinanceOrderMapper.insert(propertyFinanceOrderEntity);
         return row == 1;
     }
+
+    /**
+     * @Description: 批量修改账单状态
+     * @author: Hu
+     * @since: 2021/8/31 14:43
+     * @Param: [ids]
+     * @return: void
+     */
+    @Override
+    public void updateStatusIds(String ids,Integer hide) {
+        propertyFinanceOrderMapper.updateStatusIds(ids.split(","),hide);
+    }
+
+
+    /**
+     * @Description: 查询当前小区缴费项目
+     * @author: Hu
+     * @since: 2021/8/31 15:01
+     * @Param: [adminCommunityId]
+     * @return: java.util.List<com.jsy.community.entity.property.PropertyFeeRuleEntity>
+     */
+    @Override
+    public List<PropertyFeeRuleEntity> getFeeList(Long adminCommunityId) {
+        return propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>().select("id,name").eq("community_id",adminCommunityId));
+    }
+
+    /**
+     * @Description: 批量删除账单
+     * @author: Hu
+     * @since: 2021/8/31 14:50
+     * @Param: [ids]
+     * @return: void
+     */
+    @Override
+    public void deleteIds(String ids) {
+        propertyFinanceOrderMapper.delete(new QueryWrapper<PropertyFinanceOrderEntity>().in("id",ids.split(",")));
+    }
 }
 

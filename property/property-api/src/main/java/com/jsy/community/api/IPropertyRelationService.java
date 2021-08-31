@@ -1,11 +1,13 @@
 package com.jsy.community.api;
 
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.HouseMemberVO;
 
 import java.util.List;
 import java.util.Map;
@@ -131,4 +133,13 @@ public interface IPropertyRelationService {
      * @return:
      */
     void delete(Long id);
+
+    /**
+     * @Description: 导出成员信息表
+     * @author: Hu
+     * @since: 2021/8/31 15:36
+     * @Param:
+     * @return:
+     */
+    List<HouseMemberVO> queryExportRelationExcel(HouseMemberQO houseMemberQO);
 }

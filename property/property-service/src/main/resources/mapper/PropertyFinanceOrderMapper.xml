@@ -351,4 +351,10 @@
             #{item}
         </foreach>
     </select>
+    <update id="updateStatusIds">
+        update t_property_finance_order set hide = #{hide} where id in
+        <foreach collection="ids" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

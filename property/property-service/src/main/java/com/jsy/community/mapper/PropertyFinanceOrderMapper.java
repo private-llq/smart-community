@@ -281,4 +281,13 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Date: 2021/8/25 15:00
      **/
     BigDecimal chargeByYear(@Param("startTime")LocalDate startTime, @Param("endTime")LocalDate endTime, @Param("list") List<Long> communityIdList);
+
+    /**
+     * @Description: 批量修改订单状态
+     * @author: Hu
+     * @since: 2021/8/31 14:44
+     * @Param:
+     * @return:
+     */
+    void updateStatusIds(@Param("ids") String[] split,@Param("hide") Integer hide);
 }

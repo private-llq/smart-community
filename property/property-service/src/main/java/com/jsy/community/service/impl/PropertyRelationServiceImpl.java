@@ -260,6 +260,19 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     }
 
 
+
+    /**
+     * @Description: 导出成员信息表
+     * @author: Hu
+     * @since: 2021/8/31 15:37
+     * @Param: [houseMemberQO]
+     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+     */
+    @Override
+    public List<HouseMemberVO> queryExportRelationExcel(HouseMemberQO houseMemberQO) {
+        return propertyRelationMapper.queryExportRelationExcel(houseMemberQO);
+    }
+
     /**
      * @Description: 删除
      * @author: Hu
