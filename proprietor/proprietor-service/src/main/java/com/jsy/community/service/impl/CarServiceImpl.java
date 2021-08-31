@@ -260,6 +260,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         entity.setMoney(carEntity.getMoney());
         entity.setUid(carEntity.getUid());
         carOrderRecordMapper.insert(entity);
+
+        //支付成功后回调     测试阶段直接回调
+        renewMonthCar(entity);
         return entity.getId();
     }
 
@@ -280,6 +283,10 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         entity.setMoney(carEntity.getMoney());
         entity.setUid(carEntity.getUid());
         carOrderRecordMapper.insert(entity);
+
+
+        //支付成功后回调     测试阶段直接回调
+        renewMonthCar(entity);
         return entity.getId();
     }
 

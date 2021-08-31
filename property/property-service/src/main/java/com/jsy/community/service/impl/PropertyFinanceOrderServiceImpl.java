@@ -36,7 +36,6 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -624,8 +623,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     public void updateOrder(Long id, BigDecimal coupon) {
         PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(id);
         if (orderEntity!=null){
-            orderEntity.setTotalMoney(coupon);
-            orderEntity.setUpdateTime(LocalDateTime.now());
+            orderEntity.setCoupon(coupon);
             propertyFinanceOrderMapper.updateById(orderEntity);
         }
     }
