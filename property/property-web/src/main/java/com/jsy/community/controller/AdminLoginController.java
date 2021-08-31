@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
@@ -226,6 +227,7 @@ public class AdminLoginController {
 	@Login
 	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
 		Long communityId = jsonObject.getLong("communityId");
+		List<Long> communityIds = UserUtils.getAdminCommunityIdList();
 		UserUtils.validateCommunityId(communityId);
 		//用户资料
 		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
@@ -235,6 +237,7 @@ public class AdminLoginController {
 		user.setMenuList(userMenu);
 		//设置小区ID
 		user.setCommunityId(communityId);
+		user.setCommunityIdList(communityIds);
 		//创建token，保存redis
 		String token = adminUserTokenService.createToken(user);
 		user.setToken(token);
