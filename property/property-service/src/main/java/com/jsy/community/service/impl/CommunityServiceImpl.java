@@ -221,10 +221,10 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 			queryWrapper.eq("province_id", query.getProvinceId());
 		}
 		if (query.getCityId() != null) {
-			queryWrapper.eq("city_id", query.getProvinceId());
+			queryWrapper.eq("city_id", query.getCityId());
 		}
 		if (query.getAreaId() != null) {
-			queryWrapper.eq("area_id", query.getProvinceId());
+			queryWrapper.eq("area_id", query.getAreaId());
 		}
 		if (!CollectionUtils.isEmpty(communityIds)) {
 			queryWrapper.in("id", communityIds);
