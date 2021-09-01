@@ -161,5 +161,5 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/30 17:22
 	 **/
-	Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime);
+	Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime, int number);
 }

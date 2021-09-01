@@ -62,6 +62,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 
 	@Autowired
 	private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
+	
+	@Autowired
+	private PropertyCompanyMapper propertyCompanyMapper;
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
@@ -333,6 +336,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 
 		// 返回给前端实体
 		ConsoleEntity consoleEntity = new ConsoleEntity();
+		// 查该物业剩余短信数量
+		PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectOne(new QueryWrapper<PropertyCompanyEntity>().select("message_quantity").eq("id", companyId));
+		consoleEntity.setMessageQuantity(companyEntity.getMessageQuantity());
 		// 查该物业公司所属小区
 		List<CommunityEntity> communityEntities = communityMapper.queryCommunityByCompanyId(companyId);
 		// 设置物业所属小区数量
@@ -385,7 +391,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	 * @date: 2021/8/30 17:22
 	 **/
 	@Override
-	public Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime) {
+	public Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime, int number) {
 		List<String> mobileList;
 		//根据小区id查询出所有手机号
 		if (!isDistinct) {
@@ -436,7 +442,6 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		public Timer getTimer() {
 			return timer;
 		}
-		
 		public  void setTimer(Timer timer) {
 			this.timer = timer;
 		}
