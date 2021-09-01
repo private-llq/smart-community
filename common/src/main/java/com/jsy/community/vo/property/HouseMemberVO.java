@@ -30,6 +30,11 @@ public class HouseMemberVO implements Serializable {
     private String name;
 
     /**
+     * APPName
+     */
+    private String appName;
+
+    /**
      * 手机号码
      */
     private String mobile;

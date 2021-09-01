@@ -74,8 +74,8 @@
     <select id="pageList" resultType="com.jsy.community.vo.property.HouseMemberVO">
         SELECT thm.id as id,thm.house_id as houseId,thm.name as name,thm.mobile as mobile,CONCAT(th.building,th.unit,th.door) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
         FROM t_house_member thm
-        LEFT JOIN t_admin_user tu
-        on thm.householder_id=tu.uid
+        LEFT JOIN t_user tu
+        on thm.uid=tu.uid
         left JOIN t_house th
         on thm.house_id=th.id
         <include refid="memberQuery"></include>
@@ -85,8 +85,8 @@
     <select id="pageListTotal" resultType="java.lang.Long">
         SELECT count(*)
         FROM t_house_member thm
-        LEFT JOIN t_admin_user tu
-        on thm.householder_id=tu.uid
+        LEFT JOIN t_user tu
+        on thm.uid=tu.uid
         left JOIN t_house th
         on thm.house_id=th.id
         <include refid="memberQuery"></include>
@@ -104,10 +104,10 @@
         </foreach>
     </delete>
     <select id="queryExportRelationExcel" resultType="com.jsy.community.vo.property.HouseMemberVO">
-        SELECT thm.id as id,thm.house_id as houseId,thm.name as name,thm.mobile as mobile,CONCAT(th.building,th.unit,th.door) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
+        SELECT thm.id as id,thm.house_id as houseId,tu.nickname as appName,thm.name as name,thm.mobile as mobile,CONCAT(th.building,th.unit,th.door) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
         FROM t_house_member thm
-        LEFT JOIN t_admin_user tu
-        on thm.householder_id=tu.uid
+        LEFT JOIN t_user tu
+        on thm.uid=tu.uid
         left JOIN t_house th
         on thm.house_id=th.id
         <include refid="memberQuery"></include>
