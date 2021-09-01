@@ -51,7 +51,7 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
                     .houseImage(CollectionUtils.isEmpty(vo.getHouseImage()) ? null : vo.getHouseImage().get(0))
                     .price(vo.getHousePrice() + "/" + vo.getHouseUnit())
                     .tag(getTag(vo.getHouseAdvantageCode()))
-                    .houseTypeCode(HouseHelper.parseHouseType(vo.getHouseTypeCode()) )
+                    .houseTypeCode(HouseHelper.parseHouseType(vo.getHouseTypeCode()))
                     .leaseType(vo.getHouseLeaseMode())
                     .build();
         }
@@ -61,7 +61,7 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
             JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(data));
             ShopLeaseVO vo = JSONObject.parseObject(jsonObject.getString("shop"), new TypeReference<>() {
             });
-            if( Objects.isNull(vo) ){
+            if (Objects.isNull(vo)) {
                 return;
             }
             //添加至房屋最近浏览实体
@@ -98,12 +98,13 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
      * 取商铺 或者 出租房屋的 标签
      * 如果有多个 只取3个 用于列表显示
      * 把一个Map类型或者是List类型的标签组合成String存储 如：临街门面,商业街,地铁近
-     * @param obj   标签结果对象，出租房屋 是Map 商铺是List
+     *
+     * @param obj 标签结果对象，出租房屋 是Map 商铺是List
      */
-    public  String getTag(Object obj){
+    public String getTag(Object obj) {
         StringBuilder sb = new StringBuilder();
         Collection<String> collection;
-        if( obj instanceof Map ) {
+        if (obj instanceof Map) {
             JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(obj));
             Map<String, Long> tags = JSONObject.parseObject(jsonObject.toString(), new TypeReference<>() {
             });
@@ -111,12 +112,12 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
         } else {
             collection = castStrList(obj);
         }
-        if( CollectionUtils.isEmpty(collection) ){
+        if (CollectionUtils.isEmpty(collection)) {
             return StringUtil.EMPTY_STRING;
         }
         Object[] object = collection.toArray();
-        for( int i = 0; i < object.length; i++ ){
-            if( i == 2 || i == object.length - 1){
+        for (int i = 0; i < object.length; i++) {
+            if (i == 2 || i == object.length - 1) {
                 sb.append(object[i]);
                 break;
             }
@@ -126,13 +127,10 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
         return sb.toString();
     }
 
-    private  List<String> castStrList(Object obj)
-    {
+    private List<String> castStrList(Object obj) {
         List<String> result = new ArrayList<>();
-        if(obj instanceof List<?>)
-        {
-            for (Object o : (List<?>) obj)
-            {
+        if (obj instanceof List<?>) {
+            for (Object o : (List<?>) obj) {
                 result.add((String) o);
             }
             return result;
@@ -143,11 +141,11 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
     @Override
     public List<HouseRecentEntity> recentBrowseList(Integer leaseType, BaseQO<Object> qo, String uid) {
         QueryWrapper<HouseRecentEntity> wrapper = new QueryWrapper<>();
-        wrapper.select("house_id","browse_title","acreage","address","price","house_image","lease_type","create_time","tag","house_type_code");
+        wrapper.select("house_id", "browse_title", "acreage", "address", "price", "house_image", "lease_type", "create_time", "tag", "house_type_code");
         wrapper.eq("uid", uid);
         wrapper.eq("browse_type", leaseType);
         wrapper.orderByDesc("create_time");
-        Page<HouseRecentEntity> pageCondition = new Page<>( qo.getPage(), qo.getSize() );
+        Page<HouseRecentEntity> pageCondition = new Page<>(qo.getPage(), qo.getSize());
         Page<HouseRecentEntity> resultData = houseRecentMapper.selectPage(pageCondition, wrapper);
         return resultData.getRecords();
     }
@@ -156,8 +154,6 @@ public class HouseRecentServiceImpl extends ServiceImpl<HouseRecentMapper, House
     public Boolean clearRecentBrowse(Integer type, String userId) {
         return houseRecentMapper.deleteByUserInfo(type, userId) > 0;
     }
-
-
 
 
 }

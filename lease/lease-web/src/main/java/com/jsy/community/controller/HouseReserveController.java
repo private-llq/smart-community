@@ -50,7 +50,7 @@ public class HouseReserveController {
     public CommonResult<Map<String, List<String>>> datetime() {
         //获得租房可选择的预约时间常量
         List<HouseLeaseConstEntity> houseConstListByType = houseConstService.getHouseConstListByType(String.valueOf(15));
-        List<String> reserveTime =  houseConstListByType.stream().map(HouseLeaseConstEntity::getHouseConstName).collect(Collectors.toList());
+        List<String> reserveTime = houseConstListByType.stream().map(HouseLeaseConstEntity::getHouseConstName).collect(Collectors.toList());
         Map<String, List<String>> reserveDateTime = new HashMap<>(2);
         reserveDateTime.put("reserveTime", reserveTime);
         //算出今天、明天、+后面5天
@@ -74,32 +74,31 @@ public class HouseReserveController {
     @Login
     @DeleteMapping("/cancel")
     @ApiOperation("预约取消接口")
-    public CommonResult<Boolean> cancel( @RequestBody HouseReserveQO qo) {
+    public CommonResult<Boolean> cancel(@RequestBody HouseReserveQO qo) {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Cancel.class);
         qo.setReserveUid(UserUtils.getUserId());
         Boolean cancel = iHouseReserveService.cancel(qo);
-        return CommonResult.ok( cancel ? "取消预约成功!" : "取消预约失败!");
+        return CommonResult.ok(cancel ? "取消预约成功!" : "取消预约失败!");
     }
 
     @Login
     @DeleteMapping("/reject")
     @ApiOperation("预约拒绝接口")
     @Deprecated
-    public CommonResult<Boolean> reject( @RequestBody HouseReserveQO qo) {
+    public CommonResult<Boolean> reject(@RequestBody HouseReserveQO qo) {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);
         qo.setReserveUid(UserUtils.getUserId());
         Boolean cancel = iHouseReserveService.reject(qo);
-        return CommonResult.ok( cancel ? "拒绝预约成功!" : "拒绝预约失败!数据不存在");
+        return CommonResult.ok(cancel ? "拒绝预约成功!" : "拒绝预约失败!数据不存在");
     }
-
 
 
     @Login
     @PostMapping("/confirm")
     @ApiOperation("预约确认接口")
-    public CommonResult<Boolean> confirm( @RequestBody HouseReserveQO qo ) {
+    public CommonResult<Boolean> confirm(@RequestBody HouseReserveQO qo) {
         Boolean confirm = iHouseReserveService.confirm(qo, UserUtils.getUserId());
-        return CommonResult.ok( confirm ? "确认预约成功!" : "确认预约失败!重复提交或数据不存在!");
+        return CommonResult.ok(confirm ? "确认预约成功!" : "确认预约失败!重复提交或数据不存在!");
     }
 
 
@@ -114,11 +113,11 @@ public class HouseReserveController {
     }
 
     /**
-     *@Author: Pipi
-     *@Description: 删除预约信息
-     *@param: qo:
-     *@Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
-     *@Date: 2021/3/30 11:32
+     * @Author: Pipi
+     * @Description: 删除预约信息
+     * @param: qo:
+     * @Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
+     * @Date: 2021/3/30 11:32
      **/
     @Login
     @DeleteMapping("/deleteReserve")
@@ -132,11 +131,11 @@ public class HouseReserveController {
 
 
     /**
-     *@Author: Pipi
-     *@Description: 租房用户确认完成看房
-     *@param: qo:
-     *@Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
-     *@Date: 2021/3/30 15:23
+     * @Author: Pipi
+     * @Description: 租房用户确认完成看房
+     * @param: qo:
+     * @Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
+     * @Date: 2021/3/30 15:23
      **/
     @Login
     @PostMapping("/completeChecking")
@@ -151,7 +150,7 @@ public class HouseReserveController {
     /**
      * 获取今天、明天以及后面5天的字符串，
      */
-    private List<String> getWeekDate(){
+    private List<String> getWeekDate() {
         List<String> list = new ArrayList<>(7);
         list.add("今天");
         list.add("明天");
@@ -168,23 +167,24 @@ public class HouseReserveController {
 
     /**
      * 获取 day 天后的周几
-     * @param date  当前时间
-     * @param day   几天后
-     * @param cal   日期对象
-     * @return      返回 day天后的周几
+     *
+     * @param date 当前时间
+     * @param day  几天后
+     * @param cal  日期对象
+     * @return 返回 day天后的周几
      */
     private String getWeekOfDate(Date date, int day, Calendar cal) {
         //一周的天数
         int j = 7;
-        String[] weekDays = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
+        String[] weekDays = {"周日", "周一", "周二", "周三", "周四", "周五", "周六"};
         cal.setTime(date);
         //今天周几的下标
         int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
-        if (w < 0){
+        if (w < 0) {
             w = 0;
         }
         int i = w + day;
-        if(  i  - j < 0 ){
+        if (i - j < 0) {
             return weekDays[i];
         } else {
             return weekDays[i - 7];

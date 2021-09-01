@@ -6,6 +6,7 @@ import com.jsy.community.api.StrangerRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.StrangerRecordEntiy;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,6 @@ public class StrangerRecordController {
     @Login
     @PostMapping("/v2/pageStrangerRecord")
     public CommonResult pageStrangerRecord(@RequestBody BaseQO<StrangerRecordEntiy> baseQO) {
-        return CommonResult.ok(strangerRecordService.pageStrangerRecord(baseQO));
+        return CommonResult.ok(strangerRecordService.pageStrangerRecord(baseQO, UserUtils.getAdminCommunityId()));
     }
 }

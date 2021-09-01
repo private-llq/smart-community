@@ -209,11 +209,11 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     }
 
     /**
-     *@Author: Pipi
-     *@Description: 租房用户确认完成看房
-     *@param: qo:
-     *@Return: java.lang.Boolean
-     *@Date: 2021/3/30 15:25
+     * @Author: Pipi
+     * @Description: 租房用户确认完成看房
+     * @param: qo:
+     * @Return: java.lang.Boolean
+     * @Date: 2021/3/30 15:25
      **/
     @Override
     public Boolean completeChecking(HouseReserveQO qo) {
@@ -223,11 +223,11 @@ public class HouseReserveServiceImpl extends ServiceImpl<HouseReserveMapper, Hou
     }
 
     /**
-     *@Author: Pipi
-     *@Description: 定时完成看房
-     *@param: :
-     *@Return: java.lang.Integer
-     *@Date: 2021/3/31 10:44
+     * @Author: Pipi
+     * @Description: 定时完成看房
+     * @param: :
+     * @Return: java.lang.Integer
+     * @Date: 2021/3/31 10:44
      **/
     @Override
     public Integer timingCompleteChecking() {

@@ -29,5 +29,5 @@ public interface StrangerRecordService extends IService<StrangerRecordEntiy> {
      * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.StrangerRecordEntiy>
      * @date: 2021/8/27 11:33
      **/
-    PageInfo<StrangerRecordEntiy> pageStrangerRecord(BaseQO<StrangerRecordEntiy> baseQO);
+    PageInfo<StrangerRecordEntiy> pageStrangerRecord(BaseQO<StrangerRecordEntiy> baseQO, Long communityId);
 }

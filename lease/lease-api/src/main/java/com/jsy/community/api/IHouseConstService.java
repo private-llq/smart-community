@@ -8,17 +8,19 @@ import java.util.Map;
 
 /**
  * 房屋租售接口提供类
+ *
  * @author YuLF
  * @since 2020-12-16 09:21
  */
 public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
 
     /**
-     *  根据常量类型 获取属于这个类型的List数据
+     * 根据常量类型 获取属于这个类型的List数据
+     *
      * @author YuLF
-     * @since  2020/12/11 11:36
-     * @Param  type				常量类型
-     * @return					返回这个类型对应的List
+     * @Param type                常量类型
+     * @return 返回这个类型对应的List
+     * @since 2020/12/11 11:36
      */
     List<HouseLeaseConstEntity> getHouseConstListByType(String type);
 
@@ -29,34 +31,37 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @Date 2020/12/17 10:58
      * @Param [id]
      **/
-    Map<String,Object> getTag();
+    Map<String, Object> getTag();
 
 
     /**
      * 通过 常量代码 和常量类型 从缓存中取 名称
-     * @param code          常量标识码
-     * @param type          常量类型
-     * @return              返回常量名称
+     *
+     * @param code 常量标识码
+     * @param type 常量类型
+     * @return 返回常量名称
      */
     String getConstNameByConstTypeCode(Long code, Long type);
 
     /**
      * 通过 常量代码 和常量类型 从缓存中取 名称 list
-     * @param codes          常量标识码
-     * @param type          常量类型
-     * @return              返回常量名称和常量id
+     *
+     * @param codes 常量标识码
+     * @param type  常量类型
+     * @return 返回常量名称和常量id
      */
-    Map<String, Long>  getConstByTypeCodeForList(List<Long> codes, Long type);
+    Map<String, Long> getConstByTypeCodeForList(List<Long> codes, Long type);
 
 
     /**
      * 通过 常量代码 和常量类型 从缓存中取 名称 list
-     * @param codes         常量标识码
-     * @param type          常量类型
-     * @return              返回常量名称和常量id
+     *
+     * @param codes 常量标识码
+     * @param type  常量类型
+     * @return 返回常量名称和常量id
      */
-    List<String>  getConstByTypeCodeForString(List<Long> codes, Long type);
-    
+    List<String> getConstByTypeCodeForString(List<Long> codes, Long type);
+
     /**
      * @return java.util.List<java.lang.String>
      * @Author lihao
@@ -65,7 +70,7 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @Param [shopTypeIds]
      **/
     List<String> getConstNameByConstId(Long[] shopTypeIds);
-    
+
     /**
      * @return java.util.List<java.lang.Long>
      * @Author lihao
@@ -74,16 +79,16 @@ public interface IHouseConstService extends IService<HouseLeaseConstEntity> {
      * @Param [i]
      **/
     List<Long> getConstIdByType(Integer i);
-    
+
     List<String> getShopTags(Long shopFacility);
-    
+
     /**
-     * @return java.util.Map<java.lang.String,java.lang.Object>
+     * @return java.util.Map<java.lang.String, java.lang.Object>
      * @Author lihao
      * @Description 商铺发布时的配套设施和客流人群选项
      * @Date 2021/1/18 14:47
      * @Param []
      **/
-    Map<String, Object> getAddShopTags(Integer facilityType,Integer peopleType);
-    
+    Map<String, Object> getAddShopTags(Integer facilityType, Integer peopleType);
+
 }

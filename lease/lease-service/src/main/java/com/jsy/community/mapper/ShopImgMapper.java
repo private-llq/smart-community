@@ -14,13 +14,13 @@ import java.util.List;
  * @since 2020-12-17
  */
 public interface ShopImgMapper extends BaseMapper<ShopImgEntity> {
-	
-	/**
-	 * @return void
-	 * @Author lihao
-	 * @Description 存店铺图片集合
-	 * @Date 2020/12/17 14:20
-	 * @Param [imgPath]
-	 **/
-	void insertImg(List<ShopImgEntity> list);
+
+    /**
+     * @return void
+     * @Author lihao
+     * @Description 存店铺图片集合
+     * @Date 2020/12/17 14:20
+     * @Param [imgPath]
+     **/
+    void insertImg(List<ShopImgEntity> list);
 }

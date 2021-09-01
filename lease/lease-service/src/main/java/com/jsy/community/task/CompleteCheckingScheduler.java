@@ -1,4 +1,5 @@
 package com.jsy.community.task;
+
 import com.jsy.community.api.IHouseReserveService;
 import com.jsy.community.constant.Const;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +23,14 @@ public class CompleteCheckingScheduler {
     private IHouseReserveService iHouseReserveService;
 
     /**
-     *@Author: Pipi
-     *@Description: 每天凌晨1秒时,自动完成上一天的接受看房的预约修改为完成看房状态
-     *@param: :
-     *@Return: void
-     *@Date: 2021/3/31 11:10
+     * @Author: Pipi
+     * @Description: 每天凌晨1秒时, 自动完成上一天的接受看房的预约修改为完成看房状态
+     * @param: :
+     * @Return: void
+     * @Date: 2021/3/31 11:10
      **/
-     @Scheduled(cron = "01 0 0 * * ?")
-    private void completeChecking(){
+    @Scheduled(cron = "01 0 0 * * ?")
+    private void completeChecking() {
         log.info("执行完成看房任务,执行时间{}!", new Date().toString());
         Integer completeNum = iHouseReserveService.timingCompleteChecking();
         log.info("一共自动确认完成看房{}条预约!", completeNum);

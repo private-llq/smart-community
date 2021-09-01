@@ -66,10 +66,11 @@ public class StrangerRecordServiceImpl extends ServiceImpl<StrangerRecordMapper,
      * @date: 2021/8/27 11:33
      **/
     @Override
-    public PageInfo<StrangerRecordEntiy> pageStrangerRecord(BaseQO<StrangerRecordEntiy> baseQO) {
+    public PageInfo<StrangerRecordEntiy> pageStrangerRecord(BaseQO<StrangerRecordEntiy> baseQO, Long communityId) {
         Page<StrangerRecordEntiy> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO);
         QueryWrapper<StrangerRecordEntiy> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("community_id", communityId);
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new StrangerRecordEntiy());
         }

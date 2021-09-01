@@ -10,8 +10,8 @@ import org.apache.ibatis.annotations.Select;
  * @since 2021-04-21 11:44
  **/
 public interface UserIMMapper extends BaseMapper<UserIMEntity> {
-	
-	@Select("select im_id from t_user_im where uid = #{uid}")
-	String queryIMIdByUid(String uid);
-	
+
+    @Select("select im_id from t_user_im where uid = #{uid}")
+    String queryIMIdByUid(String uid);
+
 }
