@@ -374,7 +374,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		consoleEntity.setMonthByPropertyFee(propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityId(communityId, startTime, endTime));
 		// 查询年总计物业费收入统计
 		consoleEntity.setYearByPropertyFee(propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityId));
-		
+		// TODO:车位费car_order
 		return consoleEntity;
 	}
 	
@@ -388,7 +388,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	public Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime) {
 		List<String> mobileList;
 		//根据小区id查询出所有手机号
-		if (isDistinct == false) {
+		if (!isDistinct) {
 			mobileList = houseMemberMapper.selectMobileListByCommunityIds(communityIdList);
 		} else {
 			mobileList = houseMemberMapper.selectDistinctMobileListByCommunityIds(communityIdList);
