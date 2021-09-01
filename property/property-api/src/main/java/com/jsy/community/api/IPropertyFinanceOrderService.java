@@ -188,7 +188,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/8/17 16:00
      **/
-    PropertyFinanceFormEntity getFinanceFormCommunityIncome(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList);
+    List<PropertyFinanceFormEntity> getFinanceFormCommunityIncome(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList);
     
     /**
      *@Author: DKS
