@@ -59,4 +59,22 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      * @return:
      */
     void saveOne(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity);
+
+    /**
+     * @Description: 删除
+     * @author: Hu
+     * @since: 2021/9/1 9:50
+     * @Param:
+     * @return:
+     */
+    void delete(Long id);
+
+    /**
+     * @Description: 启用和停用报表状态
+     * @author: Hu
+     * @since: 2021/9/1 9:52
+     * @Param:
+     * @return:
+     */
+    void statementStatus(AdminInfoVo userInfo, Integer status, Long id);
 }
