@@ -28,8 +28,6 @@ public class CarCutOffEntity  extends BaseEntity {
     @ApiModelProperty(value = "车辆类型")
     private String carType;
 
-    @ApiModelProperty(value = "开闸时间")
-    private String openTime;
 
     @ApiModelProperty(value = "车道名称")
     private String  laneName;
@@ -37,11 +35,42 @@ public class CarCutOffEntity  extends BaseEntity {
     @ApiModelProperty(value = "进出方向")
     private String access;
 
-    @ApiModelProperty(value = "操作者")
-    private String  operator;
-
-    @ApiModelProperty(value = "照片")
+    @ApiModelProperty(value = "车子全景图")
     private String image;
+    @ApiModelProperty(value = "完成状态  0未完成 1已完成")
+    private Integer state;
+
+    @ApiModelProperty(value = "车辆子品牌")
+    private String carSublogo;
+
+    @ApiModelProperty(value = "触发模式表示视频触发，hwtriger 表示地感触发，swtriger 表示软触发")
+    private String trigerType;
+    @ApiModelProperty(value = "车牌底色")
+    private String plateColor;
+    @ApiModelProperty(value = "车牌特写图")
+    private String closeupPic;
+    @ApiModelProperty(value = "车主所属")
+    private String belong;
+
+    @ApiModelProperty(value = "进闸时间")
+    //@TableField(exist = false)
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(
+            pattern = "yyyy-MM-dd HH:mm:ss",
+            timezone = "GMT+8")
+    private LocalDateTime openTime;
+
+
+    @ApiModelProperty(value = "出闸时间")
+    //@TableField(exist = false)
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(
+            pattern = "yyyy-MM-dd HH:mm:ss",
+            timezone = "GMT+8")
+    private LocalDateTime stopTime;
+
+
+
 
     @ApiModelProperty(value = "创建时间")
     //@TableField(exist = false)

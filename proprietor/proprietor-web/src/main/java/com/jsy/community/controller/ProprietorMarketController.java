@@ -100,7 +100,7 @@ public class ProprietorMarketController {
      * @Date: 2021/8/21-15:44
      **/
     @DeleteMapping("/deleteMarket")
-    @ApiOperation("社区集市发布商品")
+    @ApiOperation("社区集市删除商品")
     @Login
     public CommonResult deleteMarket(@RequestParam("id") Long id){
 
