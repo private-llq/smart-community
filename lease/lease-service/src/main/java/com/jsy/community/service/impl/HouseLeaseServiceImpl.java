@@ -46,13 +46,13 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
-    
+
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private ILeaseUserService leaseUserService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IUserService userService;
-    
+
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
 
@@ -139,7 +139,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      * @param qo 请求参数
      */
     @Override
-    @Transactional( rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public boolean addCombineLeaseHouse(HouseLeaseQO qo) {
         //查询社区经纬度
         CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
@@ -204,7 +204,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         }
         //1.通过存在的条件 查出符合条件的分页所有房屋数据
         List<HouseLeaseVO> vos = houseLeaseMapper.queryHouseLeaseByList(qo);
-        if( CollectionUtils.isEmpty(vos) ){
+        if (CollectionUtils.isEmpty(vos)) {
             return vos;
         }
         //根据数据字段id 查询 一对多的 房屋标签name和id 如 邻地铁、可短租、临街商铺等多标签、之类
@@ -424,16 +424,16 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             //房屋类型code转换成文本 如 040202 转换为 4室2厅2卫
             vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         });
-        if( !CollectionUtils.isEmpty(voImageIds) ){
+        if (!CollectionUtils.isEmpty(voImageIds)) {
             //根据 图片 id 集合  in 查出所有的图片 url 和 对应的租赁id
             List<HouseImageVo> houseImageVos = houseLeaseMapper.selectBatchImage(voImageIds);
             //由于一个图片可能存在于多条 列表数据 只显示一条 根据图片id(field_id)是用Map 去重   toMap里面第一个逗号前面的参数 是作为Map的Key  第二个逗号前面的 是作为Map的值， 第三个参数是 重载函数，如果Map中有重复 那就还是用前面的值
-            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo,(value1, value2) -> value1));
+            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo, (value1, value2) -> value1));
             //把图片 设置到返回集合每一个对象
-            vos.forEach( vo -> {
+            vos.forEach(vo -> {
                 //该数据的图片对象不为空!
                 HouseImageVo houseImageVo = houseImageVoMap.get(vo.getHouseImageId());
-                if( Objects.nonNull(houseImageVo) ){
+                if (Objects.nonNull(houseImageVo)) {
                     vo.setHouseImage(Collections.singletonList(houseImageVo.getImgUrl()));
                 }
             });
@@ -452,17 +452,16 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
      */
     @Override
     public void checkHouse(String userId, Long houseCommunityId, Long houseId, Operation operation) {
-        if( houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId) == 0 ){
+        if (houseLeaseMapper.isExistUserHouse(userId, houseCommunityId, houseId) == 0) {
             throw new LeaseException(JSYError.BAD_REQUEST.getCode(), "您在此处未登记房产!");
         }
-        if( operation == Operation.INSERT ){
+        if (operation == Operation.INSERT) {
             Integer publishLeaseRow = houseLeaseMapper.getPublishLease(userId);
-            if( publishLeaseRow >= BusinessConst.USER_PUBLISH_LEASE_MAX){
+            if (publishLeaseRow >= BusinessConst.USER_PUBLISH_LEASE_MAX) {
                 throw new LeaseException(JSYError.NOT_IMPLEMENTED.getCode(), "您发布的房源已经达到最大发布数量!");
             }
         }
     }
-
 
 
     /**
@@ -529,9 +528,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         }
         //查出小区名称 和 房屋地址
         Map<String, String> communityNameAndHouseAddr = houseLeaseMapper.getUserAddrById(vo.getHouseCommunityId(), vo.getHouseId());
-        if( Objects.nonNull( communityNameAndHouseAddr ) ){
-            vo.setHouseCommunityName( communityNameAndHouseAddr.get("communityName") );
-            vo.setHouseAddress( communityNameAndHouseAddr.get("houseAddress") );
+        if (Objects.nonNull(communityNameAndHouseAddr)) {
+            vo.setHouseCommunityName(communityNameAndHouseAddr.get("communityName"));
+            vo.setHouseAddress(communityNameAndHouseAddr.get("houseAddress"));
         }
         //查出房屋朝向
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirectionId()));
@@ -542,11 +541,11 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     }
 
     /**
-     *@Author: Pipi
-     *@Description: 查询房屋出租数据单条简略详情
-     *@param: houseId: 出租房屋主键
-     *@Return: com.jsy.community.vo.lease.HouseLeaseSimpleVO
-     *@Date: 2021/3/27 16:25
+     * @Author: Pipi
+     * @Description: 查询房屋出租数据单条简略详情
+     * @param: houseId: 出租房屋主键
+     * @Return: com.jsy.community.vo.lease.HouseLeaseSimpleVO
+     * @Date: 2021/3/27 16:25
      **/
     @Override
     public HouseLeaseSimpleVO queryHouseLeaseSimpleDetail(Long houseId) {
@@ -562,9 +561,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         //1.4查出小区名称 和 房屋地址
         Map<String, String> communityNameAndHouseAddr = houseLeaseMapper.getUserAddrById(vo.getHouseCommunityId(), vo.getHouseId());
-        if( Objects.nonNull( communityNameAndHouseAddr ) ){
-            vo.setHouseCommunityName( communityNameAndHouseAddr.get("communityName") );
-            vo.setHouseAddress( communityNameAndHouseAddr.get("houseAddress") );
+        if (Objects.nonNull(communityNameAndHouseAddr)) {
+            vo.setHouseCommunityName(communityNameAndHouseAddr.get("communityName"));
+            vo.setHouseAddress(communityNameAndHouseAddr.get("houseAddress"));
         }
         return vo;
     }
@@ -636,16 +635,16 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             vo.setRedundancy(redundancy);
         }
         //设置图片url
-        if( !CollectionUtils.isEmpty(voImageIds) ){
+        if (!CollectionUtils.isEmpty(voImageIds)) {
             //根据 图片 id 集合  in 查出所有的图片 url 和 对应的租赁id
             List<HouseImageVo> houseImageVos = houseLeaseMapper.selectBatchImage(voImageIds);
             //由于一个图片可能存在于多条 列表数据 只显示一条 根据图片id(field_id)是用Map 去重   toMap里面第一个逗号前面的参数 是作为Map的Key  第二个逗号前面的 是作为Map的值， 第三个参数是 重载函数，如果Map中有重复 那就还是用前面的值
-            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo,(value1, value2) -> value1));
+            Map<Long, HouseImageVo> houseImageVoMap = houseImageVos.stream().collect(Collectors.toMap(HouseImageVo::getFieldId, houseImageVo -> houseImageVo, (value1, value2) -> value1));
             //把图片 设置到返回集合每一个对象
-            vos.forEach( vo -> {
+            vos.forEach(vo -> {
                 //该数据的图片对象不为空!
                 HouseImageVo houseImageVo = houseImageVoMap.get(vo.getHouseImageId());
-                if( Objects.nonNull(houseImageVo) ){
+                if (Objects.nonNull(houseImageVo)) {
                     vo.setHouseImage(Collections.singletonList(houseImageVo.getImgUrl()));
                 }
             });

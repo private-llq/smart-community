@@ -41,46 +41,47 @@ public class SourceConstExecutor {
     private HouseConstMapper houseConstMapper;
 
     @PostConstruct
-    public void initSourceConst(){
-        logger.info("com.jsy.community.task.SourceConstExecutor：{}","服务启动：装载houseConst常量数据");
+    public void initSourceConst() {
+        logger.info("com.jsy.community.task.SourceConstExecutor：{}", "服务启动：装载houseConst常量数据");
         setRedisForHouseConst(getAllHouseConstForDatabases());
     }
 
     /**
      * 从数据库获取所有t_house_const 常量
      */
-    private List<HouseLeaseConstEntity> getAllHouseConstForDatabases(){
+    private List<HouseLeaseConstEntity> getAllHouseConstForDatabases() {
         return houseConstMapper.getAllHouseConstForDatabases();
     }
 
-    private void setRedisForHouseConst(List<HouseLeaseConstEntity> list){
+    private void setRedisForHouseConst(List<HouseLeaseConstEntity> list) {
         //1.把所有 house_const_type 存入Set去重 得到所有常量类型
-        Set<String>  houseConstType = list.stream().map(HouseLeaseConstEntity::getHouseConstType).collect(Collectors.toSet());
+        Set<String> houseConstType = list.stream().map(HouseLeaseConstEntity::getHouseConstType).collect(Collectors.toSet());
         //2.遍历所有 house_const_type 类型   存入 redis
         //相同类型的数据
-        for(String constType : houseConstType){
+        for (String constType : houseConstType) {
             List<HouseLeaseConstEntity> alikeType = new ArrayList<>();
-            for(HouseLeaseConstEntity entity : list ){
-                if( entity.getHouseConstType().equals(constType) ){
+            for (HouseLeaseConstEntity entity : list) {
+                if (entity.getHouseConstType().equals(constType)) {
                     alikeType.add(entity);
                 }
             }
             //相同类型的数据存入redis
-            redisTemplate.opsForValue().set("houseConst:"+constType, JSONObject.toJSONString(alikeType));
+            redisTemplate.opsForValue().set("houseConst:" + constType, JSONObject.toJSONString(alikeType));
             list.removeAll(alikeType);
         }
     }
 
     /**
      * 每周一 凌晨4点执行 定时任务
+     *
      * @author YuLF
-     * @since  2020/12/11 14:19
+     * @since 2020/12/11 14:19
      */
     @Scheduled(cron = CRON)
     @DistributedLock(lockKey = "houseCo0nst", waitTimout = 30)
-    public void updateSourceConst(){
+    public void updateSourceConst() {
         //如果当前执行时间已经超过 指定 执行时间
-        if(DateUtils.notNeedImplemented(CRON)){
+        if (DateUtils.notNeedImplemented(CRON)) {
             return;
         }
         logger.info(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "：资源常量定时任务启动：从数据库获取资源更新至Redis!");

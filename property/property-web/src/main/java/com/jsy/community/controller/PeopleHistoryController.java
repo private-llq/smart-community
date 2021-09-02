@@ -6,6 +6,7 @@ import com.jsy.community.api.PeopleHistoryService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PeopleHistoryEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;

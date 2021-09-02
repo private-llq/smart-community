@@ -50,4 +50,16 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
     public String getCompanyNameByCompanyId(Long companyId) {
         return propertyCompanyMapper.selectCompanyNameByCompanyId(companyId);
     }
+    
+    /**
+     * @author: DKS
+     * @description: 物业端-系统设置-短信配置
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/1 11:50
+     **/
+    @Override
+    public Boolean updateSMSConfig(PropertyCompanyEntity propertyCompanyEntity) {
+        int i = propertyCompanyMapper.updateById(propertyCompanyEntity);
+        return i == 1;
+    }
 }

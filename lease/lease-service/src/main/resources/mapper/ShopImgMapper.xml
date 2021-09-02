@@ -3,9 +3,9 @@
 <mapper namespace="com.jsy.community.mapper.ShopImgMapper">
 
 
-    <insert id="insertImg" >
+    <insert id="insertImg">
         insert into t_shop_img (id,shop_id,img_url,create_time)values
-        <foreach collection="list"  item="shopImg" separator=",">
+        <foreach collection="list" item="shopImg" separator=",">
             (#{shopImg.id},#{shopImg.shopId},#{shopImg.imgUrl},now())
         </foreach>
     </insert>

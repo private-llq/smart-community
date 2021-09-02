@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -16,11 +15,11 @@ import java.util.Map;
  **/
 @Data
 public class ConsoleEntity implements Serializable {
-	@ApiModelProperty(value = "短信到期时间")
-	private LocalDate expirationTime;
+//	@ApiModelProperty(value = "短信到期时间")
+//	private LocalDate expirationTime;
 	
 	@ApiModelProperty(value = "短信剩余数量")
-	private Integer messageNumber;
+	private Integer messageQuantity;
 	
 	@ApiModelProperty(value = "小区数量")
 	private Integer communityNumber;
@@ -39,4 +38,13 @@ public class ConsoleEntity implements Serializable {
 	
 	@ApiModelProperty(value = "每年的物业费统计")
 	private BigDecimal yearByPropertyFee;
+	
+	@ApiModelProperty(value = "社区id")
+	private Long communityId;
+	
+	@ApiModelProperty(value = "月份")
+	private String month;
+	
+	@ApiModelProperty(value = "与月份相对应的物业费")
+	private BigDecimal propertyFee;
 }

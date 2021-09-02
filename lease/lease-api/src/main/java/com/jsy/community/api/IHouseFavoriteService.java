@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * 房屋租售收藏接口提供类
+ *
  * @author YuLF
  * @since 2020-12-11 09:21
  */
@@ -18,46 +19,51 @@ public interface IHouseFavoriteService extends IService<HouseFavoriteEntity> {
 
     /**
      * 房屋收藏
+     *
      * @param qo 请求参数
+     * @return 返回成功与否
      * @author YuLF
-     * @since  2020/12/30 10:51
-     * @return  返回成功与否
+     * @since 2020/12/30 10:51
      */
     Boolean houseFavorite(HouseFavoriteQO qo);
 
     /**
      * 房屋收藏删除
-     * @param id            收藏id
-     * @param userId        用户id
+     *
+     * @param id     收藏id
+     * @param userId 用户id
+     * @return 返回影响行数 > 0
      * @author YuLF
-     * @since  2020/12/30 11:00
-     * @return              返回影响行数 > 0
+     * @since 2020/12/30 11:00
      */
     Boolean deleteFavorite(Long id, String userId);
 
     /**
      * 查询我的出租房屋收藏列表
-     * @param qo           请求参数，带分页参数
+     *
+     * @param qo 请求参数，带分页参数
+     * @return 返回数据列表
      * @author YuLF
-     * @since  2020/12/30 11:29
-     * @return              返回数据列表
+     * @since 2020/12/30 11:29
      */
     List<HouseFavoriteVO> leaseFavorite(BaseQO<HouseFavoriteQO> qo);
 
 
     /**
      * 查询我的商铺收藏列表
+     *
      * @author YuLF
-     * @since  2020/12/30 11:29
-    * @Param  qo           参数对象
+     * @Param qo           参数对象
+     * @since 2020/12/30 11:29
      */
-    List<HouseFavoriteVO > shopFavorite(BaseQO<HouseFavoriteQO> qo);
+    List<HouseFavoriteVO> shopFavorite(BaseQO<HouseFavoriteQO> qo);
 
 
     /**
      * 通过收藏类型 收藏id  验证房屋是否存在
-     * @param qo            请求参数
-     * @return              返回是否存在
+     *
+     * @param qo 请求参数
+     * @return 返回是否存在
      */
     boolean hasHouseOrShop(HouseFavoriteQO qo);
 

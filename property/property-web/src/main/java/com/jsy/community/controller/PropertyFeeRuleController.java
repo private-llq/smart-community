@@ -62,9 +62,17 @@ public class PropertyFeeRuleController {
     @ApiOperation("启用或者停用")
     @GetMapping("/startOrOut")
     @Login
-    public CommonResult startOrOut(@RequestParam("status")Integer status,Long id){
+    public CommonResult startOrOut(@RequestParam("status")Integer status,@RequestParam("id") Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.startOrOut(userInfo,status,id);
+        return CommonResult.ok();
+    }
+    @ApiOperation("启用或者停用报表展示")
+    @GetMapping("/statementStatus")
+    @Login
+    public CommonResult statementStatus(@RequestParam("status")Integer status,@RequestParam("id") Long id){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFeeRuleService.statementStatus(userInfo,status,id);
         return CommonResult.ok();
     }
 
@@ -86,6 +94,16 @@ public class PropertyFeeRuleController {
         ValidatorUtils.validateEntity(propertyFeeRuleEntity, PropertyFeeRuleEntity.PropertyFeeRule.class);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.saveOne(userInfo,propertyFeeRuleEntity);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("删除")
+    @DeleteMapping("/delete")
+    @Login
+    @businessLog(operation = "删除",content = "删除了【物业收费规则】")
+    public CommonResult delete(@RequestParam Long id){
+        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFeeRuleService.delete(id);
         return CommonResult.ok();
     }
 

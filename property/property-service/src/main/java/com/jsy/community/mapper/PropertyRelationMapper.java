@@ -100,4 +100,13 @@ public interface PropertyRelationMapper extends BaseMapper<HouseMemberEntity> {
      * @return:
      */
     void deletes(@Param("longAry") Long[] longAry);
+
+    /**
+     * @Description: 导出成员信息表
+     * @author: Hu
+     * @since: 2021/8/31 15:37
+     * @Param:
+     * @return:
+     */
+    List<HouseMemberVO> queryExportRelationExcel(@Param("query") HouseMemberQO houseMemberQO);
 }

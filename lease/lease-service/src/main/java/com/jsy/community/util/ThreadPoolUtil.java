@@ -11,31 +11,31 @@ import java.util.concurrent.*;
  **/
 @Slf4j
 public class ThreadPoolUtil {
-	public static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(50, 500, 5, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<>(100000));
-	
-	public static void main(String[] args) {
-		Future<?> submit = ThreadPoolUtil.threadPool.submit(new Runnable() {
-			@Override
-			public void run() {
-				System.out.println(1);
-			}
-		});
-		try {
-			submit.get(1 * 500, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			log.error("线程中断：id - " + Thread.currentThread().getId() + Thread.currentThread().getName());
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			log.error("线程执行异常：" + Thread.currentThread().getId() + Thread.currentThread().getName());
-			e.printStackTrace();
-		} catch (TimeoutException e) {
-			log.error("线程超时：id - " + Thread.currentThread().getId() + Thread.currentThread().getName());
-			e.printStackTrace();
-		}
-		
-	}
-	
+    public static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(50, 500, 5, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(100000));
+
+    public static void main(String[] args) {
+        Future<?> submit = ThreadPoolUtil.threadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(1);
+            }
+        });
+        try {
+            submit.get(1 * 500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            log.error("线程中断：id - " + Thread.currentThread().getId() + Thread.currentThread().getName());
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            log.error("线程执行异常：" + Thread.currentThread().getId() + Thread.currentThread().getName());
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            log.error("线程超时：id - " + Thread.currentThread().getId() + Thread.currentThread().getName());
+            e.printStackTrace();
+        }
+
+    }
+
 //	public static Thread findThread(long threadId) {
 //		ThreadGroup group = Thread.currentThread().getThreadGroup();
 //		while(group != null) {

@@ -38,6 +38,31 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     private AdminUserMapper adminUserMapper;
 
 
+    @Override
+    public void statementStatus(AdminInfoVo userInfo, Integer status, Long id) {
+        PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectById(id);
+        if (entity!=null){
+            if (status==1){
+                entity.setReportStatus(1);;
+            }else {
+                entity.setReportStatus(0);;
+            }
+            propertyFeeRuleMapper.updateById(entity);
+        }
+
+    }
+
+    /**
+     * @Description: 删除
+     * @author: Hu
+     * @since: 2021/9/1 9:50
+     * @Param: [id]
+     * @return: void
+     */
+    @Override
+    public void delete(Long id) {
+        propertyFeeRuleMapper.deleteById(id);
+    }
 
     /**
      * @Description: 新增缴费规则

@@ -5,11 +5,13 @@ import com.jsy.community.annotation.HouseValid;
 import com.jsy.community.annotation.RequireRecentBrowse;
 import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.AssetLeaseRecordService;
 import com.jsy.community.api.IHouseLeaseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.UploadBucketConst;
 import com.jsy.community.constant.UploadRedisConst;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -25,7 +27,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,9 +34,8 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- *
  * @author YuLF
- * @since  2021/1/13 17:33
+ * @since 2021/1/13 17:33
  */
 @Slf4j
 @ApiJSYController
@@ -48,22 +48,25 @@ public class HouseLeaseController {
     private IHouseLeaseService iHouseLeaseService;
 
     @Resource
-    private  ShopLeaseController shopLeaseController;
+    private ShopLeaseController shopLeaseController;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private AssetLeaseRecordService assetLeaseRecordService;
 
 
     @Login
     @GetMapping("/allCommunity")
     @ApiOperation("获取用户所有小区")
-    public CommonResult<List<CommunityEntity>> allCommunity(@RequestParam Long cityid){
-        return CommonResult.ok(iHouseLeaseService.allCommunity( cityid, UserUtils.getUserId() ));
+    public CommonResult<List<CommunityEntity>> allCommunity(@RequestParam Long cityid) {
+        return CommonResult.ok(iHouseLeaseService.allCommunity(cityid, UserUtils.getUserId()));
     }
 
 
     @Login
     @PostMapping("/wholeLease")
     @ApiOperation("整租新增")
-    @HouseValid( validationInterface = HouseLeaseQO.AddWholeLeaseHouse.class, operation = Operation.INSERT)
-    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
+    @HouseValid(validationInterface = HouseLeaseQO.AddWholeLeaseHouse.class, operation = Operation.INSERT)
+    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL, attributeName = "houseImage")
     public CommonResult<Boolean> addWholeLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
         return iHouseLeaseService.addWholeLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
@@ -71,8 +74,8 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/singleRoom")
     @ApiOperation("单间新增")
-    @HouseValid( validationInterface = HouseLeaseQO.AddSingleRoomLeaseHouse.class, operation = Operation.INSERT)
-    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
+    @HouseValid(validationInterface = HouseLeaseQO.AddSingleRoomLeaseHouse.class, operation = Operation.INSERT)
+    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL, attributeName = "houseImage")
     public CommonResult<Boolean> addSingleLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
         return iHouseLeaseService.addSingleLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
@@ -81,8 +84,8 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/combineLease")
     @ApiOperation("合租新增")
-    @HouseValid( validationInterface = HouseLeaseQO.AddCombineLeaseHouse.class, operation = Operation.INSERT)
-    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL,attributeName = "houseImage")
+    @HouseValid(validationInterface = HouseLeaseQO.AddCombineLeaseHouse.class, operation = Operation.INSERT)
+    @UploadImg(redisKeyName = UploadRedisConst.HOUSE_IMG_ALL, attributeName = "houseImage")
     public CommonResult<Boolean> addCombineLeaseHouse(@RequestBody HouseLeaseQO houseLeaseQo) {
         return iHouseLeaseService.addCombineLeaseHouse(houseLeaseQo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
@@ -116,7 +119,8 @@ public class HouseLeaseController {
 
     /**
      * 在用户点击编辑房屋时，回显数据接口
-     * @param houseId       房屋id
+     *
+     * @param houseId 房屋id
      */
     @Login
     @GetMapping("/editDetails")
@@ -137,10 +141,10 @@ public class HouseLeaseController {
     @GetMapping("/latest")
     @ApiOperation("最新房屋详情")
     public CommonResult<?> leaseDetails(@RequestParam Long id, @RequestParam Boolean leaseHouse) {
-        if( id == null || leaseHouse == null){
+        if (id == null || leaseHouse == null) {
             throw new JSYException(JSYError.BAD_REQUEST);
         }
-        if(leaseHouse){
+        if (leaseHouse) {
             //房屋出租详情
             return houseLeaseDetails(id);
         }
@@ -155,14 +159,11 @@ public class HouseLeaseController {
     @ApiOperation("分页查询房屋出租数据")
     public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQo) {
         ValidatorUtils.validatePageParam(baseQo);
-        if( baseQo.getQuery() == null ){
+        if (baseQo.getQuery() == null) {
             baseQo.setQuery(new HouseLeaseQO());
         }
         return CommonResult.ok(iHouseLeaseService.queryHouseLeaseByList(baseQo));
     }
-
-
-
 
 
     @Login
@@ -170,18 +171,17 @@ public class HouseLeaseController {
     @ApiOperation("查询房屋出租数据单条详情")
     @RequireRecentBrowse
     public CommonResult<HouseLeaseVO> houseLeaseDetails(@RequestParam Long houseId) {
-        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId, UserUtils.getUserId()),"查询成功!");
+        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId, UserUtils.getUserId()), "查询成功!");
     }
 
 
     /**
-     *
-     * @param cid   社区id
+     * @param cid 社区id
      */
     @Login
     @GetMapping("/ownerHouse")
     @ApiOperation("查询业主当前社区拥有房屋")
-    public CommonResult<List<HouseVo>> ownerHouse(@RequestParam Long cid){
+    public CommonResult<List<HouseVo>> ownerHouse(@RequestParam Long cid) {
         return CommonResult.ok(iHouseLeaseService.ownerHouse(UserUtils.getUserId(), cid));
     }
 
@@ -189,9 +189,9 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/ownerHouseImages")
     @ApiOperation("房屋图片批量上传接口")
-    @UploadImg(bucketName = UploadBucketConst.HOUSE_BUCKET,redisKeyName = UploadRedisConst.HOUSE_IMG_PART)
-    public CommonResult<String[]> ownerHouseImages(MultipartFile[] houseImages,CommonResult<String[]> commonResult){
-        if( houseImages == null || houseImages.length == 0 ){
+    @UploadImg(bucketName = UploadBucketConst.HOUSE_BUCKET, redisKeyName = UploadRedisConst.HOUSE_IMG_PART)
+    public CommonResult<String[]> ownerHouseImages(MultipartFile[] houseImages, CommonResult<String[]> commonResult) {
+        if (houseImages == null || houseImages.length == 0) {
             throw new JSYException(JSYError.BAD_REQUEST);
         }
         String[] data = commonResult.getData();
@@ -202,15 +202,14 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/ownerLeaseHouse")
     @ApiOperation("查询业主已发布的房源")
-    public CommonResult<List<HouseLeaseVO>> ownerLeaseHouse(@RequestBody BaseQO<HouseLeaseQO> qo){
+    public CommonResult<List<HouseLeaseVO>> ownerLeaseHouse(@RequestBody BaseQO<HouseLeaseQO> qo) {
         ValidatorUtils.validatePageParam(qo);
-        if( qo.getQuery() == null ){
+        if (qo.getQuery() == null) {
             qo.setQuery(new HouseLeaseQO());
         }
         qo.getQuery().setUid(UserUtils.getUserId());
         return CommonResult.ok(iHouseLeaseService.ownerLeaseHouse(qo));
     }
-
 
 
     /**
@@ -219,23 +218,37 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/search")
     @ApiOperation("按小区名或标题或地址搜索房屋")
-    public CommonResult<List<HouseLeaseVO>> searchLeaseHouse(@RequestBody BaseQO<HouseLeaseQO> qo){
+    public CommonResult<List<HouseLeaseVO>> searchLeaseHouse(@RequestBody BaseQO<HouseLeaseQO> qo) {
         ValidatorUtils.validateEntity(qo.getQuery(), HouseLeaseQO.SearchLeaseHouse.class);
         ValidatorUtils.validatePageParam(qo);
         return CommonResult.ok(iHouseLeaseService.searchLeaseHouse(qo));
     }
 
     /**
-     *@Author: Pipi
-     *@Description: 查询房屋出租数据单条简略详情
-     *@param: houseId: 出租房屋主键
-     *@Return: com.jsy.community.vo.CommonResult<com.jsy.community.vo.lease.HouseLeaseSimpleVO>
-     *@Date: 2021/3/27 16:14
+     * @Author: Pipi
+     * @Description: 查询房屋出租数据单条简略详情
+     * @param: houseId: 出租房屋主键
+     * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.vo.lease.HouseLeaseSimpleVO>
+     * @Date: 2021/3/27 16:14
      **/
     @Login
     @GetMapping("/simpleDetail")
     @ApiOperation("查询房屋出租数据单条简略详情")
     public CommonResult<HouseLeaseSimpleVO> houseLeaseSimpleDetails(@RequestParam Long houseId) {
-        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseSimpleDetail(houseId),"查询成功!");
+        return CommonResult.ok(iHouseLeaseService.queryHouseLeaseSimpleDetail(houseId), "查询成功!");
+    }
+
+    /**
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @author: Pipi
+     * @description: 租赁发起签约
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/8/31 15:18
+     **/
+    @Login
+    @PostMapping("/v2/initContract")
+    public CommonResult initContract(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.InitContractValidate.class);
+        return CommonResult.ok();
     }
 }

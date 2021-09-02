@@ -12,7 +12,7 @@ import org.springframework.context.annotation.PropertySource;
 @DubboComponentScan
 @PropertySource(value = "classpath:common-web.properties")
 public class LeaseWebApp {
-	public static void main(String[] args) {
-		SpringApplication.run(LeaseWebApp.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LeaseWebApp.class, args);
+    }
 }

@@ -33,5 +33,5 @@ public class FinanceOrderOperationQO implements Serializable {
     /**
      * 物业类型
      */
-    private Integer type;
+    private Long type;
 }

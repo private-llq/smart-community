@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 /**
  * 对于 整租新增、更新。合租新增、更新。单间新增、更新 通用验证器
  * 同一种验证方式，只是验证组不一样
+ *
  * @author YuLF
  * @since 2021-03-02 11:21
  */

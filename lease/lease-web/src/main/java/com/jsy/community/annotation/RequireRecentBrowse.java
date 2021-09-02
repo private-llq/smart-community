@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 最近的租赁浏览 添加数据增加至数据库注解
  * 此注解标明了进入租赁房屋详情时 标记该条数据为用户最近浏览数据
+ *
  * @author YuLF
  * @since 2021-02-18 11:28
  */

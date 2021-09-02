@@ -18,24 +18,24 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class LeaseExceptionHandler extends JSYExceptionHandler {
 
 
-	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public CommonResult<Boolean> handleException(HttpMessageNotReadableException e) {
-		log.error(e.getMessage(), e);
-		return CommonResult.error(JSYError.REQUEST_PARAM);
-	}
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public CommonResult<Boolean> handleException(HttpMessageNotReadableException e) {
+        log.error(e.getMessage(), e);
+        return CommonResult.error(JSYError.REQUEST_PARAM);
+    }
 
-	@ExceptionHandler(LeaseException.class)
-	public CommonResult<Boolean> handlerProprietorException(LeaseException e) {
-		return CommonResult.error(e.getCode(), e.getMessage());
-	}
+    @ExceptionHandler(LeaseException.class)
+    public CommonResult<Boolean> handlerProprietorException(LeaseException e) {
+        return CommonResult.error(e.getCode(), e.getMessage());
+    }
 
-	@ExceptionHandler(Exception.class)
-	public CommonResult<Boolean> handleException(Exception e) {
-		log.error(e.getMessage(), e);
-		if (e instanceof LeaseException) {
-			return CommonResult.error(((LeaseException) e).getCode(), e.getMessage());
-		}
-		return CommonResult.error(JSYError.INTERNAL);
-	}
-	
+    @ExceptionHandler(Exception.class)
+    public CommonResult<Boolean> handleException(Exception e) {
+        log.error(e.getMessage(), e);
+        if (e instanceof LeaseException) {
+            return CommonResult.error(((LeaseException) e).getCode(), e.getMessage());
+        }
+        return CommonResult.error(JSYError.INTERNAL);
+    }
+
 }

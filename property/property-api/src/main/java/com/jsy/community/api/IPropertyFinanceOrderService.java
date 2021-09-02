@@ -2,10 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.property.PropertyCollectionFormEntity;
-import com.jsy.community.entity.property.PropertyFinanceFormChargeEntity;
-import com.jsy.community.entity.property.PropertyFinanceFormEntity;
-import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.entity.property.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
@@ -191,7 +188,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/8/17 16:00
      **/
-    PropertyFinanceFormEntity getFinanceFormCommunityIncome(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList);
+    List<PropertyFinanceFormEntity> getFinanceFormCommunityIncome(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList);
     
     /**
      *@Author: DKS
@@ -282,4 +279,31 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Date: 2021/08/26 09:35
      **/
     boolean addTemporaryCharges(PropertyFinanceOrderEntity propertyFinanceOrderEntity);
+
+    /**
+     * @Description: 批量修改账单状态
+     * @author: Hu
+     * @since: 2021/8/31 14:42
+     * @Param:
+     * @return:
+     */
+    void updateStatusIds(String ids,Integer hide);
+
+    /**
+     * @Description: 批量删除账单
+     * @author: Hu
+     * @since: 2021/8/31 14:49
+     * @Param:
+     * @return:
+     */
+    void deleteIds(String ids);
+
+    /**
+     * @Description: 查询当前小区缴费项目
+     * @author: Hu
+     * @since: 2021/8/31 15:01
+     * @Param:
+     * @return:
+     */
+    List<PropertyFeeRuleEntity> getFeeList(Long adminCommunityId);
 }

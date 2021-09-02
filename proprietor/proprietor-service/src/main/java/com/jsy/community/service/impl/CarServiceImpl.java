@@ -178,7 +178,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         Map<Long,String> positionMap = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
         Page<CarOrderEntity> page = appCarOrderMapper.selectPage(new Page<CarOrderEntity>(baseQO.getPage(), baseQO.getSize()), new QueryWrapper<CarOrderEntity>()
-                .select("id,order_num,month,begin_time,over_time,money,car_plate,car_position_id,type")
+                .select("id,order_num,month,order_time,over_time,money,car_plate,car_position_id,type")
                 .eq("community_id", baseQO.getQuery().getCommunityId())
                 .eq("uid", userId)
                 .eq("type", 2));
@@ -254,12 +254,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         CarOrderRecordEntity entity = new CarOrderRecordEntity();
         entity.setId(SnowFlake.nextId());
         entity.setType(1);
+        entity.setCarId(carEntity.getCarPositionId());
         entity.setCommunityId(carEntity.getCommunityId());
         entity.setCarPlate(carEntity.getCarPlate());
         entity.setMonth(carEntity.getMonth());
         entity.setMoney(carEntity.getMoney());
         entity.setUid(carEntity.getUid());
         carOrderRecordMapper.insert(entity);
+
+        //支付成功后回调     测试阶段直接回调
+        bindingMonthCar(entity);
         return entity.getId();
     }
 
@@ -280,6 +284,10 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         entity.setMoney(carEntity.getMoney());
         entity.setUid(carEntity.getUid());
         carOrderRecordMapper.insert(entity);
+
+
+        //支付成功后回调     测试阶段直接回调
+        renewMonthCar(entity);
         return entity.getId();
     }
 
@@ -294,35 +302,38 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Transactional
     public void renewMonthCar(CarOrderRecordEntity entity) {
         CarEntity carEntity = carMapper.selectById(entity.getCarId());
-        carEntity.setOverTime(carEntity.getOverTime().plusMonths(carEntity.getMonth()));
-        carMapper.updateById(carEntity);
+        if (carEntity!=null){
+            carEntity.setOverTime(carEntity.getOverTime().plusMonths(entity.getMonth()));
+            carMapper.updateById(carEntity);
 
 
-        //业主绑定车辆后修改车位状态
-        carPositionService.bindingMonthCar(carEntity);
+            //业主绑定车辆后修改车位状态
+            carPositionService.bindingMonthCar(carEntity);
 
-        CarOrderEntity carOrderEntity = new CarOrderEntity();
-        carOrderEntity.setCarId(carEntity.getId());
-        carOrderEntity.setCommunityId(carEntity.getCommunityId());
-        carOrderEntity.setCarPositionId(carEntity.getCarPositionId());
-        carOrderEntity.setType(2);
-        carOrderEntity.setUid(carEntity.getUid());
-        carOrderEntity.setOrderTime(LocalDateTime.now());
-        carOrderEntity.setBeginTime(carEntity.getBeginTime());
-        carOrderEntity.setOverTime(carEntity.getOverTime());
-        carOrderEntity.setMoney(carEntity.getMoney());
-        carOrderEntity.setOrderNum(carEntity.getOrderNum());
-        carOrderEntity.setOrderStatus(0);
-        carOrderEntity.setCarPlate(carEntity.getCarPlate());
-        carOrderEntity.setId(SnowFlake.nextId());
+            CarOrderEntity carOrderEntity = new CarOrderEntity();
+            carOrderEntity.setCarId(carEntity.getId());
+            carOrderEntity.setCommunityId(carEntity.getCommunityId());
+            carOrderEntity.setCarPositionId(carEntity.getCarPositionId());
+            carOrderEntity.setType(2);
+            carOrderEntity.setUid(carEntity.getUid());
+            carOrderEntity.setOrderTime(LocalDateTime.now());
+            carOrderEntity.setBeginTime(carEntity.getBeginTime());
+            carOrderEntity.setOverTime(carEntity.getOverTime());
+            carOrderEntity.setMoney(entity.getMoney());
+            carOrderEntity.setMonth(entity.getMonth());
+            carOrderEntity.setOrderNum(carEntity.getOrderNum());
+            carOrderEntity.setOrderStatus(0);
+            carOrderEntity.setCarPlate(carEntity.getCarPlate());
+            carOrderEntity.setId(SnowFlake.nextId());
 
-        appCarOrderMapper.insert(carOrderEntity);
+            appCarOrderMapper.insert(carOrderEntity);
 
-        //停车临时收费表更新
-        entity.setStatus(1);
-        entity.setCommunityId(carEntity.getCommunityId());
-        entity.setCarPlate(carEntity.getCarPlate());
-        carOrderRecordMapper.updateById(entity);
+            //停车临时收费表更新
+            entity.setStatus(1);
+            entity.setCommunityId(carEntity.getCommunityId());
+            entity.setCarPlate(carEntity.getCarPlate());
+            carOrderRecordMapper.updateById(entity);
+        }
     }
 
     /**
@@ -343,6 +354,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carEntity.setBeginTime(LocalDateTime.now());
                 carEntity.setOverTime(LocalDateTime.now().plusMonths(carEntity.getMonth()));
                 carEntity.setType(2);
+                carEntity.setCarPositionId(entity.getCarId());
                 carEntity.setOwner(userEntity.getRealName());
                 carEntity.setContact(userEntity.getMobile());
                 carMapper.insert(carEntity);

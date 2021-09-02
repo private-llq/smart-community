@@ -564,7 +564,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			}
 		}
 		//修改手机号
-		if(!StringUtils.isEmpty(adminUserEntity.getMobile())){
+		if(!StringUtils.isEmpty(adminUserEntity.getMobile()) && !adminUserEntity.getMobile().equals(user.getMobile())){
 			//用户是否已注册
 			boolean exists = checkUserExists(adminUserEntity.getMobile());
 			if(exists){

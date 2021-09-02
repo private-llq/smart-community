@@ -13,19 +13,19 @@ import org.springframework.beans.factory.annotation.Autowired;
  **/
 @DubboService(version = Const.version, group = Const.group_lease)
 public class ILeaseUserServiceImpl implements ILeaseUserService {
-	
-	@Autowired
-	private UserIMMapper userIMMapper;
-	
-	/**
-	* @Description: 用户uid查imID
-	 * @Param: [uid]
-	 * @Return: java.lang.String
-	 * @Author: chq459799974
-	 * @Date: 2021/4/21
-	**/
-	@Override
-	public String queryIMIdByUid(String uid){
-		return userIMMapper.queryIMIdByUid(uid);
-	}
+
+    @Autowired
+    private UserIMMapper userIMMapper;
+
+    /**
+     * @Description: 用户uid查imID
+     * @Param: [uid]
+     * @Return: java.lang.String
+     * @Author: chq459799974
+     * @Date: 2021/4/21
+     **/
+    @Override
+    public String queryIMIdByUid(String uid) {
+        return userIMMapper.queryIMIdByUid(uid);
+    }
 }

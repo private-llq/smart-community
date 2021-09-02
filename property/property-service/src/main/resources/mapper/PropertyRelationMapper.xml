@@ -32,16 +32,16 @@
         tu.real_name as ownerName,tu.id_card as ownerIdCard,tu.mobile as ownerMobile,
         th.building as building,th.unit as unit,th.floor as floor,th.house_type as houseType,thm.create_time as createTime
         FROM t_house_member thm
-        join t_user tu on tu.uid=thm.householder_id
-        join t_house th on thm.house_id=th.id
+        left join t_user tu on tu.uid=thm.householder_id
+        left join t_house th on thm.house_id=th.id
         <include refid="Query"></include>
         limit #{page},#{size}
     </select>
     <select id="getTotal" resultType="long">
         SELECT count(*)
         FROM t_house_member thm
-        join t_user tu on tu.uid=thm.householder_id
-        join t_house th on thm.house_id=th.id
+        left join t_user tu on tu.uid=thm.householder_id
+        left join t_house th on thm.house_id=th.id
         <include refid="Query"></include>
     </select>
 
@@ -74,8 +74,6 @@
     <select id="pageList" resultType="com.jsy.community.vo.property.HouseMemberVO">
         SELECT thm.id as id,thm.house_id as houseId,thm.name as name,thm.mobile as mobile,CONCAT(th.building,th.unit,th.door) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
         FROM t_house_member thm
-        LEFT JOIN t_admin_user tu
-        on thm.householder_id=tu.uid
         left JOIN t_house th
         on thm.house_id=th.id
         <include refid="memberQuery"></include>
@@ -85,8 +83,6 @@
     <select id="pageListTotal" resultType="java.lang.Long">
         SELECT count(*)
         FROM t_house_member thm
-        LEFT JOIN t_admin_user tu
-        on thm.householder_id=tu.uid
         left JOIN t_house th
         on thm.house_id=th.id
         <include refid="memberQuery"></include>
@@ -103,9 +99,20 @@
             #{id}
         </foreach>
     </delete>
+    <select id="queryExportRelationExcel" resultType="com.jsy.community.vo.property.HouseMemberVO">
+        SELECT thm.id as id,thm.house_id as houseId,tu.nickname as appName,thm.name as name,thm.mobile as mobile,CONCAT(th.building,th.unit,th.door) as houseSite,thm.relation as relation,thm.valid_time as validTime,thm.login_time as loginTime
+        FROM t_house_member thm
+        LEFT JOIN t_user tu
+        on thm.uid=tu.uid
+        left JOIN t_house th
+        on thm.house_id=th.id
+        <include refid="memberQuery"></include>
+        ORDER BY thm.house_id
+        DESC
+    </select>
     <sql id="memberQuery">
         <where>
-            thm.deleted=0 and tu.deleted=0 and th.deleted=0
+            thm.deleted=0 and th.deleted=0
             <if test="query.communityId!=null and query.communityId!=0">
                 and thm.community_id=#{query.communityId}
             </if>

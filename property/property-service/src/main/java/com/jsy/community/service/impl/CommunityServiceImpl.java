@@ -24,12 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 社区 服务实现类
@@ -63,6 +62,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 
 	@Autowired
 	private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
+	
+	@Autowired
+	private PropertyCompanyMapper propertyCompanyMapper;
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
@@ -222,10 +224,10 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 			queryWrapper.eq("province_id", query.getProvinceId());
 		}
 		if (query.getCityId() != null) {
-			queryWrapper.eq("city_id", query.getProvinceId());
+			queryWrapper.eq("city_id", query.getCityId());
 		}
 		if (query.getAreaId() != null) {
-			queryWrapper.eq("area_id", query.getProvinceId());
+			queryWrapper.eq("area_id", query.getAreaId());
 		}
 		if (!CollectionUtils.isEmpty(communityIds)) {
 			queryWrapper.in("id", communityIds);
@@ -326,25 +328,17 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	/**
 	 * @author: DKS
 	 * @description: 获取物业控制台
-	 * @param year:
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/25 13:45
 	 **/
 	@Override
-	public ConsoleEntity getPropertySurvey(Integer year, Long companyId, List<Long> communityIdList) {
-		LocalDate startTime = null;
-		LocalDate endTime = null;
-		try {
-			String firstMouthDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(year);
-			String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(year);
-			startTime = LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			endTime = LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public ConsoleEntity getPropertySurvey(Long companyId, List<Long> communityIdList) {
 
 		// 返回给前端实体
 		ConsoleEntity consoleEntity = new ConsoleEntity();
+		// 查该物业剩余短信数量
+		PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectOne(new QueryWrapper<PropertyCompanyEntity>().select("message_quantity").eq("id", companyId));
+		consoleEntity.setMessageQuantity(companyEntity.getMessageQuantity());
 		// 查该物业公司所属小区
 		List<CommunityEntity> communityEntities = communityMapper.queryCommunityByCompanyId(companyId);
 		// 设置物业所属小区数量
@@ -356,11 +350,128 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 
 		// 查询物业车位总数
 		consoleEntity.setCarPositionSum(carPositionMapper.selectAllCarPositionByCommunityIds(communityIdList));
-		// 查询年每月的物业费统计
-		consoleEntity.setMonthByPropertyFee(propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityIds(communityIdList, startTime, endTime));
-		// 查询年总计物业费收入统计
-		consoleEntity.setYearByPropertyFee(propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityIdList));
 
 		return consoleEntity;
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取物业控制台里的收费统计
+	 * @param communityId:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/31 17:09
+	 **/
+	@Override
+	public ConsoleEntity getPropertySurveyOrderFrom(Integer year, Long communityId) {
+		LocalDate startTime = null;
+		LocalDate endTime = null;
+		try {
+			String firstMouthDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(year);
+			String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(year);
+			startTime = LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			endTime = LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// 返回给前端实体
+		ConsoleEntity consoleEntity = new ConsoleEntity();
+		
+		// 查询年每月的物业费统计
+		consoleEntity.setMonthByPropertyFee(propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityId(communityId, startTime, endTime));
+		// 查询年总计物业费收入统计
+		consoleEntity.setYearByPropertyFee(propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityId));
+		// TODO:车位费car_order
+		return consoleEntity;
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 物业端-系统设置-短信群发
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/30 17:22
+	 **/
+	@Override
+	public Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime, int number) {
+		List<String> mobileList;
+		//根据小区id查询出所有手机号
+		if (!isDistinct) {
+			mobileList = houseMemberMapper.selectMobileListByCommunityIds(communityIdList);
+		} else {
+			mobileList = houseMemberMapper.selectDistinctMobileListByCommunityIds(communityIdList);
+		}
+		if (taskTime == null) {
+			for (String mobile : mobileList) {
+//			SmsUtil.groupSendSMS(mobile, content);
+				System.out.println(mobile);
+			}
+		} else {
+			try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date time = sdf.parse(taskTime);
+			Timer timer = new Timer();
+			timer.schedule(new NowTask(timer, mobileList, content), time);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+	}
+	
+	class NowTask extends TimerTask{
+		private Timer timer;
+		private List<String> mobile;
+		private String content;
+		/*
+		 * 构造器
+		 */
+		public NowTask(){
+		
+		}
+		public NowTask(List<String> mobile){
+			this.mobile = mobile;
+		}
+		public NowTask(Timer timer){
+			this.timer =timer;
+		}
+		public NowTask(Timer timer , List<String> mobile, String content){
+			this.timer = timer;
+			this.mobile = mobile;
+			this.content = content;
+		}
+		// 属性的get、set方法
+		public Timer getTimer() {
+			return timer;
+		}
+		public  void setTimer(Timer timer) {
+			this.timer = timer;
+		}
+		public List<String> getMobile() {
+			return mobile;
+		}
+		public void setMobile(List<String> mobile) {
+			this.mobile = mobile;
+		}
+		public String getContent() {
+			return content;
+		}
+		public void setContent(String content) {
+			this.content = content;
+		}
+		
+		@Override
+		public void run(){
+			// 这里写需要定时执行的方法
+			for (String s : mobile) {
+//				SmsUtil.groupSendSMS(mobile, content);
+				System.out.println(s);
+			}
+			System.out.println(content);
+			timer.cancel(); // 传递timer进来就是为了在方法执行完后退出,必须退出
+			System.out.println("结束");
+		}
+	}
+	
+	public static void main(String[] args) {
+		SmsUtil.groupSendSMS("15095880991","短信群发测试test");
 	}
 }

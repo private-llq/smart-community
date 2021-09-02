@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 /**
  * 出租房通用验证
+ *
  * @author YuLF
  * @since 2021-03-02 11:28
  */
@@ -42,12 +43,12 @@ public class HouseValidatorAop extends BaseAop {
         HouseLeaseQO qo = null;
         Object[] args = point.getArgs();
         for (Object arg : args) {
-            if( arg instanceof HouseLeaseQO ){
+            if (arg instanceof HouseLeaseQO) {
                 qo = (HouseLeaseQO) arg;
                 break;
             }
         }
-        if ( qo == null){
+        if (qo == null) {
             return point.proceed();
         }
         //验证参数

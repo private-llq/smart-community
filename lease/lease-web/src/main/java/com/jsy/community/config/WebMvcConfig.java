@@ -19,37 +19,37 @@ import javax.annotation.Resource;
 @Configuration
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class WebMvcConfig implements WebMvcConfigurer {
-	
-	@Value("${spring.application.name}")
-	private String name;
-	
-	private String prefix = "/api/v1/";
-	
-	@PostConstruct
-	public void init() {
-		prefix += name.split("-")[0];
-	}
-	
-	@Resource
-	private AuthorizationInterceptor authorizationInterceptor;
-	
-	@Override
-	public void configurePathMatch(PathMatchConfigurer configurer) {
-		configurer
-			.addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class));
-	}
-	
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(authorizationInterceptor).addPathPatterns("/**");
-	}
-	
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**")
-			.allowedOrigins("*")
-			.allowCredentials(true)
-			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-			.maxAge(3600);
-	}
+
+    @Value("${spring.application.name}")
+    private String name;
+
+    private String prefix = "/api/v1/";
+
+    @PostConstruct
+    public void init() {
+        prefix += name.split("-")[0];
+    }
+
+    @Resource
+    private AuthorizationInterceptor authorizationInterceptor;
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer
+                .addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class));
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authorizationInterceptor).addPathPatterns("/**");
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowCredentials(true)
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .maxAge(3600);
+    }
 }

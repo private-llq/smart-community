@@ -6,8 +6,10 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IPropertyCompanyService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -179,19 +181,31 @@ public class CommunityController {
 	/**
 	 * @author: DKS
 	 * @description: 获取物业控制台
-	 * @param year:
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/25 13:45
 	 **/
 	@Login
 	@GetMapping("/getPropertySurvey")
-	public CommonResult getPropertySurvey(Integer year) {
+	public CommonResult getPropertySurvey() {
 		Long companyId = UserUtils.getAdminCompanyId();
 		List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
-		if (year == null) {
+		return CommonResult.ok(communityService.getPropertySurvey(companyId, communityIdList));
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 获取物业控制台里的收费统计
+	 * @param communityId:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/31 17:09
+	 **/
+	@Login
+	@GetMapping("/getPropertySurvey/order/from")
+	public CommonResult getPropertySurvey(Integer year, Long communityId) {
+		if (communityId == null || year == null) {
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 		}
-		return CommonResult.ok(communityService.getPropertySurvey(year, companyId, communityIdList));
+		return CommonResult.ok(communityService.getPropertySurveyOrderFrom(year, communityId));
 	}
 	
 	/**
@@ -205,6 +219,37 @@ public class CommunityController {
 	@Login
 	public CommonResult getCompanyNameByCompanyId(){
 		return CommonResult.ok(propertyCompanyService.getCompanyNameByCompanyId(UserUtils.getAdminCompanyId()));
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 物业端-系统设置-短信群发
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/8/30 17:22
+	 **/
+	@Login
+	@GetMapping("/group/send/sms")
+	public CommonResult groupSendSMS(String content, boolean isDistinct, String taskTime, int number) {
+		List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+		if (content == null) {
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+		}
+		return communityService.groupSendSMS(communityIdList, content, isDistinct, taskTime, number) ? CommonResult.ok("发送成功") : CommonResult.error("发送失败");
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 物业端-系统设置-短信配置
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/9/1 11:50
+	 **/
+	@Login
+	@PostMapping("/update/sms/config")
+	public CommonResult updateSMSConfig(@RequestBody PropertyCompanyEntity propertyCompanyEntity) {
+		Long companyId = UserUtils.getAdminCompanyId();
+		ValidatorUtils.validateEntity(propertyCompanyEntity);
+		propertyCompanyEntity.setId(companyId);
+		return propertyCompanyService.updateSMSConfig(propertyCompanyEntity) ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");
 	}
 }
 
