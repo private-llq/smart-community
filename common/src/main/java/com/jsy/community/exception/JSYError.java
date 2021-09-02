@@ -24,7 +24,8 @@ public enum JSYError {
 	DUPLICATE_KEY(ConstError.DUPLICATE_KEY, "数据已存在!请检查重复的数据"),
 	NO_REAL_NAME_AUTH(ConstError.NO_REAL_NAME_AUTHENTICATION, "用户未实名认证!"),
 	OPERATOR_INFORMATION_NOT_OBTAINED(ConstError.BAD_REQUEST, "未获取到操作员信息!"),
-	NO_AUTH_HOUSE(ConstError.NO_AUTH_HOUSE, "房屋待认证!");
+	NO_AUTH_HOUSE(ConstError.NO_AUTH_HOUSE, "房屋待认证!"),
+	NOT_ENOUGH(ConstError.NOT_ENOUGH,"余额不足！");
 	
 	private final Integer code;
 	private final String message;

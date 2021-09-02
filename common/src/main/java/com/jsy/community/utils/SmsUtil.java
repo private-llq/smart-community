@@ -121,13 +121,45 @@ public class SmsUtil {
     }
     
     /**
-     * 物业端-短信群发
+     * 物业端-公告通知
      */
-    public static void groupSendSMS(String mobile,String content) {
+    public static void propertyNotice(String mobile,String content) {
         Map<String,String> map = new HashMap<>();
         map.put("phonenumber",mobile);
         map.put("content",content);
-        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.SMS_GROUP_SENDING,JSON.toJSONString(map));
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.PROPERTY_NOTICE,JSON.toJSONString(map));
+    }
+    
+    /**
+     * 物业端-意见报修通知
+     */
+    public static void repairNotice(String mobile, String content, String tel) {
+        Map<String,String> map = new HashMap<>();
+        map.put("phonenumber",mobile);
+        map.put("content",content);
+        map.put("tel",tel);
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.REPAIR_NOTICE,JSON.toJSONString(map));
+    }
+    
+    /**
+     * 物业端-挪车通知
+     */
+    public static void moveCarNotice(String mobile, String carNum, String linkWay) {
+        Map<String,String> map = new HashMap<>();
+        map.put("phonenumber",mobile);
+        map.put("car_num",carNum);
+        map.put("linkway",linkWay);
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.MOVE_CAR_NOTICE,JSON.toJSONString(map));
+    }
+    
+    /**
+     * 物业端-车禁月租到期通知
+     */
+    public static void expirationNotice(String mobile, String carNum, String linkWay) {
+        Map<String,String> map = new HashMap<>();
+        map.put("car_num",carNum);
+        map.put("linkway",linkWay);
+        sendSmsCode(mobile,Const.SMSSignName.SIGN_COMPANY,Const.SMSTemplateName.EXPIRATION_NOTICE,JSON.toJSONString(map));
     }
     
 }

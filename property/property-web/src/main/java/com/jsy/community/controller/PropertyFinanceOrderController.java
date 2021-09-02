@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.PropertyFinanceLog;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyFinanceOrderService;
@@ -547,6 +548,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("新增物业账单临时收费")
     @PostMapping("/temporary/charges")
     @businessLog(operation = "新增",content = "新增了【物业账单临时收费】")
+    @PropertyFinanceLog(operation = "创建了一个临时账单")
     public CommonResult addTemporaryCharges(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity){
         if(propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleId() == null
             || propertyFinanceOrderEntity.getPropertyFee() == null || propertyFinanceOrderEntity.getBeginTime() == null || propertyFinanceOrderEntity.getOverTime() == null){
