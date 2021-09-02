@@ -19,7 +19,7 @@ public class ConsoleEntity implements Serializable {
 //	private LocalDate expirationTime;
 	
 	@ApiModelProperty(value = "短信剩余数量")
-	private Integer messageNumber;
+	private Integer messageQuantity;
 	
 	@ApiModelProperty(value = "小区数量")
 	private Integer communityNumber;

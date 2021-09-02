@@ -108,5 +108,5 @@ public interface PropertyRelationMapper extends BaseMapper<HouseMemberEntity> {
      * @Param:
      * @return:
      */
-    List<HouseMemberVO> queryExportRelationExcel(HouseMemberQO houseMemberQO);
+    List<HouseMemberVO> queryExportRelationExcel(@Param("query") HouseMemberQO houseMemberQO);
 }

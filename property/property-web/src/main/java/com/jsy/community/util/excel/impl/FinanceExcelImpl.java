@@ -9,7 +9,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -716,122 +715,30 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                     case 0:
                         // 类型
                         if (index == 0) {
-                            cell.setCellValue("预存款充值");
+                            cell.setCellValue("物业押金");
                         } else if (index == 1) {
-                            cell.setCellValue("小区收费");
+                            cell.setCellValue("预存款充值");
                         } else if (index == 2) {
-                            cell.setCellValue("押金");
+                            cell.setCellValue("小区收费");
                         } else if (index == 3) {
                             cell.setCellValue("合计");
                         }
                         break;
                     case 1:
                         // 线上收费
-                        if (index == 0) {
-                            if (entity.getAdvanceDepositOnlineCharging() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getAdvanceDepositOnlineCharging()));
-                            }
-                        } else if (index == 1) {
-                            if (entity.getCommunityOnlineCharging() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getCommunityOnlineCharging()));
-                            }
-                        } else if (index == 2) {
-                            if (entity.getDepositOnlineCharging() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getDepositOnlineCharging()));
-                            }
-                        } else if (index == 3) {
-                            if (entity.getOnlineChargingSum() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getOnlineChargingSum()));
-                            }
-                        }
+                        cell.setCellValue(String.valueOf(entity.getOnlineCharging()));
                         break;
                     case 2:
                         // 线下收费
-                        if (index == 0) {
-                            if (entity.getAdvanceDepositOfflineCharging() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getAdvanceDepositOfflineCharging()));
-                            }
-                        } else if (index == 1) {
-                            if (entity.getCommunityOfflineCharging() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getCommunityOfflineCharging()));
-                            }
-                        } else if (index == 2) {
-                            if (entity.getDepositOfflineCharging() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getDepositOfflineCharging()));
-                            }
-                        } else if (index == 3) {
-                            if (entity.getOfflineChargingSum() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getOfflineChargingSum()));
-                            }
-                        }
+                        cell.setCellValue(String.valueOf(entity.getOfflineCharging()));
                         break;
                     case 3:
                         // 退款/提现
-                        if (index == 0) {
-                            if (entity.getAdvanceDepositWithdrawal() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getAdvanceDepositWithdrawal()));
-                            }
-                        } else if (index == 1) {
-                            cell.setCellValue(String.valueOf(new BigDecimal("0.00")));
-                        } else if (index == 2) {
-                            if (entity.getDepositRefund() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getDepositRefund()));
-                            }
-                        } else if (index == 3) {
-                            if (entity.getRefundOrWithdrawalSum() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getRefundOrWithdrawalSum()));
-                            }
-                        }
+                        cell.setCellValue(String.valueOf(entity.getRefundOrWithdrawal()));
                         break;
                     case 4:
                         // 合计收入
-                        if (index == 0) {
-                            if (entity.getAdvanceDepositTotal() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getAdvanceDepositTotal()));
-                            }
-                        } else if (index == 1) {
-                            if (entity.getCommunityTotal() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getCommunityTotal()));
-                            }
-                        } else if (index == 2) {
-                            if (entity.getDepositTotal() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getDepositTotal()));
-                            }
-                        } else if (index == 3) {
-                            if (entity.getTotalSum() == null) {
-                                cell.setCellValue("0.00");
-                            } else {
-                                cell.setCellValue(String.valueOf(entity.getTotalSum()));
-                            }
-                        }
+                        cell.setCellValue(String.valueOf(entity.getTotal()));
                         break;
                     default:
                         break;

@@ -1,8 +1,13 @@
 package com.jsy.community.util.excel.impl;
 
 import com.jsy.community.util.MembersHandler;
+import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.vo.property.HouseMemberVO;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +23,6 @@ public class MembersHandlerImpl implements MembersHandler {
 
     public static final String[] EXPORT_MEMBERS_TITLE = {"业主姓名", "APP用户名", "联系电话","房屋地址","身份","有效期"};
 
-    @Override
-    public Workbook exportRelation(List<HouseMemberVO> houseMemberVOS) {
-        return null;
-    }
 
 
     /**
@@ -31,7 +32,6 @@ public class MembersHandlerImpl implements MembersHandler {
      * @Param: [houseMemberVOS]
      * @return: org.apache.poi.ss.usermodel.Workbook
      */
-    /*
     @Override
     public Workbook exportRelation(List<HouseMemberVO> houseMemberVOS) {
         //工作表名称
@@ -50,12 +50,12 @@ public class MembersHandlerImpl implements MembersHandler {
         //每列数据
         XSSFCell cell;
         // 设置列宽
-        sheet.setColumnWidth(0, 10000);
+        sheet.setColumnWidth(0, 3000);
         sheet.setColumnWidth(1, 3000);
         sheet.setColumnWidth(2, 3000);
-        sheet.setColumnWidth(3, 3000);
+        sheet.setColumnWidth(3, 6000);
         sheet.setColumnWidth(4, 3000);
-        sheet.setColumnWidth(5, 6000);
+        sheet.setColumnWidth(5, 3000);
         for (int index = 0; index < houseMemberVOS.size(); index++) {
             row = sheet.createRow(index + 2);
             //创建列
@@ -64,48 +64,40 @@ public class MembersHandlerImpl implements MembersHandler {
                 HouseMemberVO entity = (HouseMemberVO) houseMemberVOS.get(index);
                 switch (j) {
                     case 0:
-                        // ID
+                        // 业主姓名
                         cell.setCellValue(entity.getName());
                         break;
                     case 1:
-                        // 房屋号码
-                        cell.setCellValue(entity.getDoor());
+                        // App用户名
+                        cell.setCellValue(entity.getAppName());
                         break;
                     case 2:
-                        // 所属楼宇
-                        cell.setCellValue(entity.getBuilding());
+                        // 联系电话
+                        cell.setCellValue(entity.getMobile());
                         break;
                     case 3:
-                        // 所属单元
-                        cell.setCellValue(entity.getUnit());
+                        // 房屋地址
+                        cell.setCellValue(entity.getHouseSite());
                         break;
                     case 4:
-                        // 所在楼层
-                        cell.setCellValue(entity.getFloor());
-                        break;
+                        // 身份
+                        if (entity.getRelation()==1){
+                            cell.setCellValue("业主");
+                            break;
+                        }else {
+                            if (entity.getRelation()==6){
+                                cell.setCellValue("家属");
+                                break;
+                            }else {
+                                cell.setCellValue("租客");
+                                break;
+                            }
+                        }
                     case 5:
-                        // 房屋地址
-                        cell.setCellValue(entity.getBuilding() + entity.getUnit() + entity.getDoor());
-                        break;
-                    case 6:
-                        // 建筑面积
-                        cell.setCellValue(entity.getBuildArea());
-                        break;
-                    case 7:
-                        // 实用面积
-                        cell.setCellValue(entity.getPracticalArea());
-                        break;
-                    case 8:
-                        // 状态
-                        cell.setCellValue(entity.getStatus());
-                        break;
-                    case 9:
-                        // 住户数量
-                        cell.setCellValue(entity.getHouseNumber());
-                        break;
-                    case 10:
-                        // 备注
-                        cell.setCellValue(entity.getComment());
+                        // 有效期
+                        if (entity.getValidTime()!=null){
+                            cell.setCellValue(entity.getValidTime().toString());
+                        }
                         break;
                     default:
                         break;
@@ -113,5 +105,5 @@ public class MembersHandlerImpl implements MembersHandler {
             }
         }
         return workbook;
-    }*/
+    }
 }

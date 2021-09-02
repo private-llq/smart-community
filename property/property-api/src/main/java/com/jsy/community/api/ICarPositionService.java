@@ -8,6 +8,8 @@ import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.property.InsterCarPositionQO;
 import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
+import com.jsy.community.qo.property.UpdateCarPositionQO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -76,4 +78,6 @@ public interface ICarPositionService extends IService<CarPositionEntity> {
      * @return:
      */
     void updateByPosition(Long carPositionId);
+
+    Boolean updateCarPosition(UpdateCarPositionQO qo);
 }
