@@ -231,10 +231,11 @@ public class CommunityController {
 	@GetMapping("/group/send/sms")
 	public CommonResult groupSendSMS(String content, boolean isDistinct, String taskTime, int number) {
 		List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+		Long adminCompanyId = UserUtils.getAdminCompanyId();
 		if (content == null) {
 			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 		}
-		return communityService.groupSendSMS(communityIdList, content, isDistinct, taskTime, number) ? CommonResult.ok("发送成功") : CommonResult.error("发送失败");
+		return communityService.groupSendSMS(communityIdList, content, isDistinct, taskTime, number, adminCompanyId) ? CommonResult.ok("发送成功") : CommonResult.error("发送失败");
 	}
 	
 	/**
@@ -250,6 +251,19 @@ public class CommunityController {
 		ValidatorUtils.validateEntity(propertyCompanyEntity);
 		propertyCompanyEntity.setId(companyId);
 		return propertyCompanyService.updateSMSConfig(propertyCompanyEntity) ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");
+	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 查询物业公司详情
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/9/2 09:51
+	 **/
+	@Login
+	@GetMapping("/select/company")
+	public CommonResult selectCompany() {
+		Long companyId = UserUtils.getAdminCompanyId();
+		return CommonResult.ok(propertyCompanyService.selectCompany(companyId),"查询成功");
 	}
 }
 

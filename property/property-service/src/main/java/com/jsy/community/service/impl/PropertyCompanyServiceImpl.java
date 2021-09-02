@@ -62,4 +62,15 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
         int i = propertyCompanyMapper.updateById(propertyCompanyEntity);
         return i == 1;
     }
+    
+    /**
+     * @author: DKS
+     * @description: 通过物业公司id查询物业公司详情
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/1 11:50
+     **/
+    @Override
+    public PropertyCompanyEntity selectCompany(Long companyId) {
+        return propertyCompanyMapper.selectOne(new QueryWrapper<PropertyCompanyEntity>().select("*").eq("id", companyId));
+    }
 }

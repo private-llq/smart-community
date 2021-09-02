@@ -1256,4 +1256,59 @@ public interface BusinessEnum {
 		}
 	}
 
+	/**
+	 * @Description: 房屋类型枚举
+	 * @Author: chq459799974
+	 * @Date: 2021/3/12
+	 **/
+	enum HouseTypeEnum{
+		SHOP("商铺",1),
+		HOUSE("住宅",2);
+		private String name;
+		private Integer code;
+		HouseTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public Integer getCode() {
+			return code;
+		}
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+		public static final Map<Integer, String> HOUSE_TYPE_MAP = new HashMap<>();
+		static{
+			for (PropertyEnum.HouseTypeEnum houseTypeEnum : PropertyEnum.HouseTypeEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", houseTypeEnum.getCode());
+				map.put("name", houseTypeEnum.getName());
+				HOUSE_TYPE_MAP.put(houseTypeEnum.getCode(), houseTypeEnum.getName());
+			}
+		}
+
+		public static Integer getCode(String name) {
+			for (PropertyEnum.HouseTypeEnum value : PropertyEnum.HouseTypeEnum.values()) {
+				if (value.getName().equals(name)) {
+					return value.getCode();
+				}
+			}
+			return null;
+		}
+
+		public static String getName(Integer code) {
+			for (PropertyEnum.HouseTypeEnum value : PropertyEnum.HouseTypeEnum.values()) {
+				if (value.getCode().equals(code)) {
+					return value.getName();
+				}
+			}
+			return null;
+		}
+	}
+
 }

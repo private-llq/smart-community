@@ -90,5 +90,27 @@
             )
         </foreach>
     </insert>
-    
+
+    <!-- 查询开门次数 -->
+    <select id="selectOpenDoorCount" resultType="java.lang.Integer">
+        select count(0)
+        from t_people_history
+        where create_time &gt;= #{beginTime}
+        and create_time &lt; #{overTime}
+        and community_id = #{adminCommunityId}
+        and verify_status != 2
+        and verify_status != 0
+        and deleted = 0
+    </select>
+
+    <!-- 查询访客次数 -->
+    <select id="selectVisitorCount" resultType="java.lang.Integer">
+        select count(0)
+        from t_people_history
+        where create_time &gt;= #{beginTime}
+        and create_time &lt; #{overTime}
+        and community_id = #{adminCommunityId}
+        and identity_type = '访客'
+        and deleted = 0
+    </select>
 </mapper>

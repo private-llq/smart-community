@@ -9,7 +9,6 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.entity.UserAuthEntity;
-import com.jsy.community.entity.UserThirdPlatformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.UserThirdPlatformQO;
@@ -39,7 +38,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -64,7 +62,7 @@ public class UserAuthController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	@SuppressWarnings("unused")
-	private IUserService userService;
+	private ProprietorUserService userService;
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	@SuppressWarnings("unused")

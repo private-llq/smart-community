@@ -166,6 +166,39 @@ public class MinioUtils {
 			throw new JSYException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
 		}
 	}
+	/**
+	 * 文件上传指定文件名
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	public static String uploadNameByCarJPG(MultipartFile file, String bucketName,String CarJpgName) {
+		try {
+			//获取minio客户端实例
+			minioClient = getMinioClientInstance();
+			//创建存储桶
+			createBucket(bucketName);
+			// 文件存储的目录结构
+			if(file == null){
+				throw new JSYException("请上传文件");
+			}
+			// 存储文件
+			minioClient.putObject(BUCKETNAME, CarJpgName, file.getInputStream(), file.getContentType());
+			//返回路径
+			return ENDPOINT + ":" + PROT + "/" + BUCKETNAME + "/" + CarJpgName;
+		} catch (Exception e) {
+			throw new JSYException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
+		}
+	}
+
+
+
+
+
+
+
+
+
 
 	private static  String getRandomFileName(String fileName){
 		return UUID.randomUUID().toString().replace("-","");

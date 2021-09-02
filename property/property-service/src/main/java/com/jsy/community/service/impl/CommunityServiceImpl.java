@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.ConsoleEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
@@ -65,6 +67,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	
 	@Autowired
 	private PropertyCompanyMapper propertyCompanyMapper;
+	
+	@Autowired
+	private PeopleHistoryMapper peopleHistoryMapper;
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
@@ -296,6 +301,29 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		}
 		// 返回给前端实体
 		CommunitySurveyEntity communitySurveyEntity = new CommunitySurveyEntity();
+		
+		// 获取当前时间
+		Date currentTime = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		String dateString = formatter.format(currentTime);
+		Date sDate = null;
+		try {
+			sDate = formatter.parse(dateString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		// 获取当前时间后一天日期
+		Calendar c = Calendar.getInstance();
+		c.setTime(sDate);
+		c.add(Calendar.DAY_OF_MONTH, 1);
+		sDate = c.getTime();
+		String format = formatter.format(sDate);
+		LocalDate beginTime = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		LocalDate overTime = LocalDate.parse(format, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		// 查小区开门次数
+		communitySurveyEntity.setOpenDoorCount(peopleHistoryMapper.selectOpenDoorCount(adminCommunityId, beginTime, overTime));
+		// 查访客次数
+		communitySurveyEntity.setVisitorCount(peopleHistoryMapper.selectVisitorCount(adminCommunityId, beginTime, overTime));
 		// 查小区下所有房屋总数和楼栋总数
 		List<HouseEntity> allHouse = houseMapper.getAllHouse(adminCommunityId);
 		List<HouseEntity> buildingList = houseMapper.getBuildingList(adminCommunityId);
@@ -391,7 +419,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	 * @date: 2021/8/30 17:22
 	 **/
 	@Override
-	public Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime, int number) {
+	public Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime, int number, Long companyId) {
 		List<String> mobileList;
 		//根据小区id查询出所有手机号
 		if (!isDistinct) {
@@ -399,11 +427,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		} else {
 			mobileList = houseMemberMapper.selectDistinctMobileListByCommunityIds(communityIdList);
 		}
+		// 查出短信剩余数量是否充足
+		PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectOne(new QueryWrapper<PropertyCompanyEntity>().select("message_quantity").eq("id", companyId));
+		if (companyEntity.getMessageQuantity() < mobileList.size()) {
+			throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),"短信余额不足！");
+		}
 		if (taskTime == null) {
 			for (String mobile : mobileList) {
-//			SmsUtil.groupSendSMS(mobile, content);
+//			SmsUtil.propertyNotice("15095880991","123456789");
 				System.out.println(mobile);
 			}
+			SmsUtil.propertyNotice("15095880991","123456789");
+			propertyCompanyMapper.updateSMSQuantity(number * mobileList.size(), companyId);
 		} else {
 			try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -462,16 +497,13 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		public void run(){
 			// 这里写需要定时执行的方法
 			for (String s : mobile) {
-//				SmsUtil.groupSendSMS(mobile, content);
+//				SmsUtil.propertyNotice("15095880991","123456789");
 				System.out.println(s);
 			}
+//			propertyCompanyMapper.updateSMSQuantity(number * mobile.size(), companyId);
 			System.out.println(content);
 			timer.cancel(); // 传递timer进来就是为了在方法执行完后退出,必须退出
 			System.out.println("结束");
 		}
-	}
-	
-	public static void main(String[] args) {
-		SmsUtil.groupSendSMS("15095880991","短信群发测试test");
 	}
 }

@@ -34,4 +34,12 @@ public interface IPropertyCompanyService {
      * @date: 2021/9/1 11:50
      **/
     Boolean updateSMSConfig(PropertyCompanyEntity propertyCompanyEntity);
+    
+    /**
+     * @author: DKS
+     * @description: 通过物业公司id查询物业公司详情
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/1 11:50
+     **/
+    PropertyCompanyEntity selectCompany(Long companyId);
 }

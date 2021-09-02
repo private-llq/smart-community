@@ -6,6 +6,7 @@
         insert into t_stranger_record (
             id,
             snap_id,
+            community_id,
             facesluice_id,
             facesluice_name,
             direction,
@@ -22,6 +23,7 @@
             (
                 #{recordEntity.id},
                 #{recordEntity.snapId},
+                #{recordEntity.communityId},
                 #{recordEntity.facesluiceId},
                 #{recordEntity.facesluiceName},
                 #{recordEntity.direction},

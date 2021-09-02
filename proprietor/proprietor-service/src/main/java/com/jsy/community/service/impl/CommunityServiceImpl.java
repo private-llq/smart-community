@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.ProprietorCommunityService;
 import com.jsy.community.api.IPropertyCompanyService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
@@ -33,7 +33,7 @@ import java.util.*;
  * @since 2020-11-19 16:57
  **/
 @DubboService(version = Const.version, group = Const.group_proprietor)
-public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityEntity> implements ICommunityService {
+public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityEntity> implements ProprietorCommunityService {
 	
 	@Autowired
 	private CommunityMapper communityMapper;
