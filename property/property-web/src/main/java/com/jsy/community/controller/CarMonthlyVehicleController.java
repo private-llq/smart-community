@@ -239,8 +239,8 @@ public class CarMonthlyVehicleController {
      */
     @Login
     @PostMapping("selectByStatus")
-    public Integer selectByStatus(@RequestParam String carNumber){
-       Integer status =vehicleService.selectByStatus(carNumber);
+    public Integer selectByStatus(@RequestParam("carNumber") String carNumber,@RequestParam("community_id") Long community_id){
+       Integer status =vehicleService.selectByStatus(carNumber,community_id);
         return status;
     }
 

@@ -24,7 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @DubboService(version = Const.version, group = Const.group)
 public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleMapper, CarMonthlyVehicle> implements ICarMonthlyVehicleService {
 
@@ -505,17 +504,16 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @return
      */
     @Override
-    public Integer selectByStatus(String carNumber) {
-        List<CarMonthlyVehicle> selectList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber));
+    public Integer selectByStatus(String carNumber,Long community_id) {
+        List<CarMonthlyVehicle> selectList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id",community_id));
         if (selectList.size()>0){
             return 2; //包月车辆
         }
 
-        List<CarProprietorEntity> selectList1 = carProprietorMapper.selectList(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber));
+        List<CarProprietorEntity> selectList1 = carProprietorMapper.selectList(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id",community_id).eq("delete",0));
         if (selectList1.size()>0){
             return 3;//业主车辆
         }
-
         return 1;//临时
     }
 }
