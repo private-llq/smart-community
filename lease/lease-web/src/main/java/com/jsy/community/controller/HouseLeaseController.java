@@ -50,7 +50,7 @@ public class HouseLeaseController {
     @Resource
     private ShopLeaseController shopLeaseController;
 
-    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private AssetLeaseRecordService assetLeaseRecordService;
 
 
@@ -249,6 +249,7 @@ public class HouseLeaseController {
     @PostMapping("/v2/initContract")
     public CommonResult initContract(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
         ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.InitContractValidate.class);
-        return CommonResult.ok();
+        assetLeaseRecordEntity.setTenantUid(UserUtils.getUserId());
+        return assetLeaseRecordService.addLeaseRecord(assetLeaseRecordEntity) > 0 ? CommonResult.ok("发起成功!") : CommonResult.error("发起失败!");
     }
 }

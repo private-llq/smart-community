@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @DubboService(version = Const.version, group = Const.group)
-public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements IUserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements ProprietorUserService {
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
@@ -102,7 +102,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     private HouseMemberMapper houseMemberMapper;
 
     @Autowired
-    private ICommunityService communityService;
+    private ProprietorCommunityService communityService;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -1209,4 +1209,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         controlVO.setHouseId(null);
         return controlVO;
     }
+
+
 }

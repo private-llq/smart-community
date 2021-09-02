@@ -3,7 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserHouseService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.UserHouseQO;
@@ -41,7 +41,7 @@ public class UserHouseController {
     private IUserHouseService userHouseService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
-    private IUserService userService;
+    private ProprietorUserService userService;
 
     @Autowired
     private RedisTemplate redisTemplate;

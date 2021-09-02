@@ -16,7 +16,7 @@ import java.util.Map;
  * @description 社区接口
  * @since 2020-11-20 09:06
  **/
-public interface ICommunityService extends IService<CommunityEntity> {
+public interface ProprietorCommunityService extends IService<CommunityEntity> {
 	/**
 	* @Description: 社区查询
 	 * @Param: [baseQO]

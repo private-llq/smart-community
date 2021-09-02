@@ -2,52 +2,49 @@ package com.jsy.community.controller;
 
 
 import cn.hutool.crypto.digest.MD5;
+import cn.hutool.http.HttpException;
+import cn.hutool.json.JSON;
 import com.alibaba.excel.EasyExcel;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.ICarPositionTypeService;
-import com.jsy.community.api.ISelectInformService;
 import com.jsy.community.api.IUserService;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.CarPositionTypeEntity;
-import com.jsy.community.qo.property.CustomerBindingQO;
-import com.jsy.community.qo.property.InsterCarPositionQO;
-import com.jsy.community.qo.property.MoreInsterCarPositionQO;
-import com.jsy.community.qo.property.SelectCarPositionPagingQO;
+import com.jsy.community.qo.property.*;
+import com.jsy.community.util.Base64UtilsTest;
+import com.jsy.community.util.HttpClientHelper;
+import com.jsy.community.util.HttpUtil;
+import com.jsy.community.utils.MD5Util;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.car.CarVO;
+import com.jsy.community.vo.car.GpioData;
+import com.jsy.community.vo.car.Rs485Data;
+import com.jsy.community.vo.car.WhitelistData;
 import com.jsy.community.vo.property.PageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.BeanUtils;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -116,6 +113,7 @@ public class CarPositionController {
     @ResponseBody
     @Login
     public String upload(MultipartFile file) throws IOException {
+        System.out.println("wenjian" + file);
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
         EasyExcel.read(file.getInputStream(), //文件流
                 CarPositionEntity.class, //实体类class
@@ -174,23 +172,16 @@ public class CarPositionController {
         CarPositionEntity carPositionEntity = new CarPositionEntity();
         BeanUtils.copyProperties(qo, carPositionEntity);
         carPositionEntity.setBindingStatus(1);
-
         LocalDateTime now = LocalDateTime.now();
-
         carPositionEntity.setBeginTime(now);
         System.out.println(qo.getNumber());
 
-        if (qo.getNumber()!=null) {
+        if (qo.getNumber() != null) {
 //            long ALL =  qo.getNumber() * 30 * 24 * 60 * 60 * 1000+System.currentTimeMillis() ;
 //            LocalDateTime dateTime = new Date(ALL).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
             LocalDateTime minus = now.minus(-30 * qo.getNumber(), ChronoUnit.DAYS);
             carPositionEntity.setEndTime(minus);
         }
-
-
-
-
-
 
 
         //查询用户的id
@@ -218,77 +209,147 @@ public class CarPositionController {
     @Login
     @RequestMapping(value = "/deletedCarPosition", method = RequestMethod.POST)
     public CommonResult<Boolean> deletedCarPosition(Long id) {
-        Boolean b=    iCarPositionService.deletedCarPosition(id);
+        Boolean b = iCarPositionService.deletedCarPosition(id);
         if (b) {
             return CommonResult.ok(b, "删除成功");
         }
         return CommonResult.ok(b, "删除失败");
     }
 
+    @ApiOperation("编辑车位")
+    @Login
+    @RequestMapping(value = "/updateCarPosition", method = RequestMethod.POST)
+    public CommonResult<Boolean> updateCarPosition(@RequestBody UpdateCarPositionQO qo) {
 
+        Boolean b = iCarPositionService.updateCarPosition(qo);
 
-
-
-
-
-
-    public static String sendPost(String url, String param) {
-        PrintWriter out = null;
-        BufferedReader in = null;
-        String result = "";
-        try {
-            URL realUrl = new URL(url);
-            // 打开和URL之间的连接
-            URLConnection conn = realUrl.openConnection();
-            // 设置通用的请求属性
-            conn.setRequestProperty("accept", "*/*");
-            conn.setRequestProperty("connection", "Keep-Alive");
-            conn.setRequestProperty("user-agent",
-                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-            // 发送POST请求必须设置如下两行
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
-            // 获取URLConnection对象对应的输出流
-            out = new PrintWriter(conn.getOutputStream());
-            // 发送请求参数
-            out.print(param);
-            // flush输出流的缓冲
-            out.flush();
-            // 定义BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream()));
-            String line;
-            while ((line = in.readLine()) != null) {
-                result += line;
-            }
-        } catch (Exception e) {
-            System.out.println("发送 POST 请求出现异常！" + e);
-            e.printStackTrace();
+        if (b) {
+            return CommonResult.ok(b, "更新成功");
         }
-        //使用finally块来关闭输出流、输入流
-        finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return result;
+        return CommonResult.ok(b, "更新失败");
     }
+    @ApiOperation("开闸")
+    @Login
+    @RequestMapping(value = "/open", method = RequestMethod.POST)
+    public void updateCarPosition() {
+        HttpClientHelper.sendPost("192.168.12.253:8000","{\"error_num\":0,\"error_str\":\"noerror\",\"gpio_data\":[{\"ionum\":\"io1\",\"action\":\"on\"}]}");
+
+    }
+
+
+    @ApiOperation("过车记录")
+    @RequestMapping(value = "/test", method = RequestMethod.POST)
+    public void carBeforeRecord(@RequestParam("type") String type,//type 固定 online 或 offline online 表示正常在线传输结果，offline 表示断网续传结果
+                                @RequestParam("mode") Integer mode,//mode 协议模式，数字表示 模式 5 以上才有此字段
+                                @RequestParam("park_id") String parkId,//车场 ID，最大支持 60 个字符
+                                @RequestParam("plate_num") String plateNum,//plate_num 车牌号码，UTF8 编码
+                                @RequestParam("plate_color") String plateColor,//plate_color 车牌底色，UTF8 编码
+                                @RequestParam("plate_val") boolean plateVal,// plate_val 虚假车牌信息，true 表示真牌，false 表示虚假车牌
+                                @RequestParam("car_sublogo") String carSubLogo,//车辆子品牌，UTF8 编码
+                                @RequestParam("vehicle_type") String vehicleType,//vehicle_type 车辆类型，UTF8 编码
+                                @RequestParam("start_time") Long startTime,//start_time 车牌识别时间,1970/01/01 到现在的秒数目
+                                @RequestParam("cam_id") String camId,//相机 ID 号根据配置决定是使用MAC 还是 UID
+                                @RequestParam("vdc_type") String vdcType,//出入口类型，in 表示入口，out 表示出口
+                                @RequestParam("is_whitelist") Boolean isWhitelist,//是否是白名单车辆，true 表示白名单，false 表示非白名
+                                @RequestParam("triger_type") String trigerType,//video 表示视频触发，hwtriger 表示地感触发，swtriger 表示软触发
+                                @RequestParam("picture") String picture,//全景图，BASE64 编码 为避免Http传输时URL编码意外
+                                @RequestParam("closeup_pic") String closeupPic//车牌特写图，BASE64 编码 为避免Http传输时URL编码意外改变图片的 BASE64 编码，作了特殊的替换：'+'替换为'-'，'/'替换为'_'，'='替换为'.
+            , HttpServletResponse response) throws IOException {
+
+        System.out.println(type);
+        System.out.println(mode);
+        System.out.println(parkId);
+        System.out.println(plateNum);
+        System.out.println(plateColor);
+        System.out.println(plateVal);
+        System.out.println(carSubLogo);
+        System.out.println(vehicleType);
+        System.out.println(startTime);
+        System.out.println(camId);
+        System.out.println(vdcType);
+        System.out.println(isWhitelist);
+        System.out.println(trigerType);
+
+
+
+
+
+
+
+
+
+
+
+        String s = picture.replace("-", "+");
+        String s1 = s.replace("_", "/");
+        String s2 = s1.replace(".", "=");
+        byte[] bytes = Base64.getDecoder().decode(s2);
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        MultipartFile file = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream);
+        String carInAndOutPicture = MinioUtils.uploadNameByCarJPG(file, "car-in-and-out-picture", "全景"+startTime+plateNum+".jpg" );
+        System.out.println(carInAndOutPicture);
+
+
+
+
+        String c = closeupPic.replace("-", "+");
+        String c1 = c.replace("_", "/");
+        String c2 = c1.replace(".", "=");
+        byte[] bytes1 = Base64.getDecoder().decode(c2);
+        InputStream inputStream1 = new ByteArrayInputStream(bytes1);
+        MultipartFile file1 = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream1);
+        String carInAndOutPicture1 = MinioUtils.uploadNameByCarJPG(file1, "car-in-and-out-picture", "車牌"+startTime+plateNum+".jpg" );
+        System.out.println(carInAndOutPicture1);
+
+
+
+
+        CarVO carVO = new CarVO();
+        carVO.setError_num(0);
+        carVO.setError_str("响应");
+        carVO.setPasswd("123456");
+        GpioData gpioData = new GpioData();
+        gpioData.setIonum("io1");
+        gpioData.setAction("on");
+        carVO.setGpio_data(new ArrayList<>());
+        carVO.getGpio_data().add(gpioData);
+        carVO.setRs485_data(new ArrayList<>());
+
+
+        Rs485Data e2 = new Rs485Data();
+        e2.setEncodetype("hex2string");
+        e2.setData("0064FFFF300901BBB6D3ADB9E2C1D93258");
+        carVO.getRs485_data().add(e2);
+
+
+
+        WhitelistData whitelistData = new WhitelistData();
+        whitelistData.setAction("add");
+        whitelistData.setPlateNumber("沪A99999");
+        whitelistData.setType("W");
+        whitelistData.setStart("2021/08/31 11:00:00");
+        whitelistData.setEnd("2022/12/31 23:59:59");
+        carVO.setWhitelist_data(new ArrayList<>());
+        carVO.getWhitelist_data().add(whitelistData);
+
+        response.setStatus(200);
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("application/json; charset=utf-8");
+        response.setContentLength(carVO.toString().length());
+        PrintWriter writer = response.getWriter();
+        System.out.println(JSONArray.toJSON(carVO).toString());
+        writer.write(JSONArray.toJSON(carVO).toString());
+        writer.flush();
+        writer.close();
+    }
+
+
 
 
     public static void main(String[] args) {
 
-        String param = "";
-
-
         //结束时间
-        String dateTimeStrEnd = "2018/07/28 14:11:15";
+        String dateTimeStrEnd = "2018/09/28 14:11:15";
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(dateTimeStrEnd, df);
         long lEnd = dateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
@@ -299,17 +360,29 @@ public class CarPositionController {
         LocalDateTime dateTimeStart = LocalDateTime.parse(dateTimeStrStart, dfStart);
         long lStart = dateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
 
+        HashMap<String, Object> values = new HashMap<>();
+
+        values.put("CarNo", "沪A99999");//车牌号
+        values.put("IssueTime", lStart); //发行日期
+        values.put("StartTime", lStart);//有效期开始
+        values.put("EndTime", lEnd);//有效期结束
+        values.put("UseState", 1);//(0空闲中,1使用中,2报修中 ,-1已下架)
+        values.put("ApprovalState", 1);//(0待审批,1审批成功,-1审批失败)
+        values.put("UserName", "李粤");//用户姓名
+        values.put("Phone", "13047315551");//联系电话
+
 
         String CarNo = "沪A99999";
-        Long IssueTime = 1L;
-        Long StartTime = 1L;
-        Long EndTime = 1L;
-        Integer UseState = 0;
-        Integer ApprovalState = 0;
+        Long IssueTime = lStart;
+        Long StartTime = lStart;
+        Long EndTime = lEnd;
+        Integer UseState = 1;
+        Integer ApprovalState = 1;
         String UserName = "李粤";
-        String Phone = "";
+        String Phone = "13047315551";
 
         List name = new ArrayList();
+        name.add("CarNo");
         name.add("IssueTime");
         name.add("StartTime");
         name.add("EndTime");
@@ -317,14 +390,48 @@ public class CarPositionController {
         name.add("ApprovalState");
         name.add("UserName");
         name.add("Phone");
-        Collections.sort(name);
-        System.out.println(name);
+        Collections.sort(name);//排序
 
+        String temporary = "";
 
-        String sr = CarPositionController.sendPost("http://192.168.1.100:9999/AddCarNo", param);
-        System.out.println(sr);
+        for (int i = 0; i < name.size(); i++) {
+            String KEY = (String) name.get(i);
+            String VALUE = values.get(KEY) + "";
+            temporary = temporary + KEY + "=" + VALUE + "&";
 
+        }
 
+        temporary = temporary.substring(0, temporary.length() - 1);
+
+        String signTemp = temporary + "&key=29bfd42e5a753522b2e77f3071901f98";
+
+        String sign = MD5Util.getMd5Str(signTemp).toUpperCase();
+        System.out.println(temporary);
+        System.out.println(sign);
+
+        String param = "{" +
+                "    \"pid\":\"1\"," +
+                "    \"serciceName\":\"AddCarNo\"," +
+                "    \"sign\":\"" + sign + "\"," +
+                "    \"timestamp\":1," +
+                "    \"msgId\":2," +
+                "    \"data\":\"{{" +
+                "    \"ApprovalState\":\"1\"," +
+                "    \"CarNo\":\"沪A99999\"," +
+                "   \"EndTime\":\"1532758275000\"," +
+                "   \"IssueTime\":\"1532758275000\"," +
+                "   \"Phone\":\"13047315551\"," +
+                "   \"StartTime\":\"1532758275000\"," +
+                "   \"UseState\":\"1\"," +
+                "   \"UserName\":\"李粤\"" +
+                "}}\"" +
+                "}";
+
+        String url ="http://192.168.12.253:8000";
+        String s = HttpClientHelper.sendPost(url, param);
+        System.out.println("返回"+s);
+
+        //HttpUtil.post(url,param);
     }
 
 }

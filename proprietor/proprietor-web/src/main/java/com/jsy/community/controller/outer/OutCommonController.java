@@ -1,20 +1,15 @@
 package com.jsy.community.controller.outer;
 
 import com.jsy.community.annotation.ApiOutController;
-import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -29,7 +24,7 @@ import java.util.Map;
 public class OutCommonController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IUserService userService;
+	private ProprietorUserService userService;
 	
 //	@IpLimit(prefix = "userDetail", second = 60, count = 30, desc = "【用户】获取uid和手机号")
 	@Login
