@@ -39,6 +39,6 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
     void issue(String uid, Long adminCommunityId);
 
-    Integer selectByStatus(String carNumber);
+    Integer selectByStatus(String carNumber,Long community_id);
 
 }
