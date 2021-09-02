@@ -3,6 +3,9 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,6 +29,8 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
+import com.jsy.community.utils.imutils.entity.RegisterDto;
+import com.jsy.community.utils.imutils.open.EncryptHelper;
 import com.jsy.community.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -191,6 +196,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public UserInfoVo login(LoginQO qo) {
         String uid = userAuthService.checkUser(qo);
         return queryUserInfo(uid);
+    }
+
+    /**
+     * @Description: 注册im聊天
+     * @author: Hu
+     * @since: 2021/9/2 13:45
+     * @Param: [imId,nickName,password,avatarUrl]
+     * @return:
+     */
+    public static void registerUser(String imId,String nickName,String password,String avatarUrl) {
+        String str = IdUtil.fastUUID();
+
+        RegisterDto registerDto = new RegisterDto();
+        registerDto.setImId(imId);
+        registerDto.setNickName(nickName);
+        registerDto.setPassword(MD5Util.getPassword(password));
+        registerDto.setIdentifier("1");
+        registerDto.setHeadImgMaxUrl(avatarUrl);
+        registerDto.setHeadImgSmallUrl(avatarUrl);
+        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/auth/login/register")
+                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
+                .header(EncryptHelper.HEAD_ONLY_REQ, str)
+                .header(EncryptHelper.HEAD_DEVICE, "mobile")
+                .body(EncryptHelper.doPost(JSON.toJSONString(registerDto), str,"mobile"))
+                .execute();
+
+        String body = response.body();
+        log.info("注册聊天返回数据:"+body);
+        System.out.println(EncryptHelper.resolvePost(body));
     }
 
     /**

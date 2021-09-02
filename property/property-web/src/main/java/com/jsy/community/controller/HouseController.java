@@ -192,7 +192,22 @@ public class HouseController {
 	public CommonResult deleteHouse(@RequestParam Long id){
 		return houseService.deleteHouse(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
-	
+
+	/**
+	* @Description: 【楼宇房屋】查询
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	**/
+	@Login
+	@ApiOperation("【楼宇房屋】查询")
+	@GetMapping("/getHouse")
+	@businessLog(operation = "删除",content = "删除了【楼宇房屋】")
+	public CommonResult getHouse(){
+		return CommonResult.ok(houseService.getHouse(UserUtils.getAdminCommunityId()));
+	}
+
 	/**
 	 * @Description: 【楼宇房屋】批量删除
 	 * @Param: [ids]

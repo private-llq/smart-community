@@ -1,6 +1,5 @@
 package com.jsy.community.utils;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +18,17 @@ public class MD5Util {
     public static final char AND = '&';
     public static final char EQ = '=';
     public static final int NumberCtt_42 = 42;
-    
+
+    /**
+     * 客户端对用户密码进行二次加密，修改密码也必须调用此方法
+     * @param password 源密码
+     * @return 新密码
+     */
+    public static String getPassword(String password) {
+        return getMd5Str("--zhsj--" + MD5Util.getMd5Str(password).substring(0, 10));
+    }
+
+
     public static String getMd5Str(String str){
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
