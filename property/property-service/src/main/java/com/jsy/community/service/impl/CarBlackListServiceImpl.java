@@ -19,7 +19,8 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @DubboService(version = Const.version, group = Const.group)
-public class CarBlackListServiceImpl implements ICarBlackListService {
+public class
+CarBlackListServiceImpl implements ICarBlackListService {
 
     @Autowired
     public CarBlackListMapper carBlackListMapper;

@@ -8,14 +8,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.property.CarBlackListEntity;
-import com.jsy.community.entity.property.CarChargeEntity;
-import com.jsy.community.entity.property.CarMonthlyVehicle;
-import com.jsy.community.entity.property.CarPositionEntity;
-import com.jsy.community.mapper.CarBlackListMapper;
-import com.jsy.community.mapper.CarChargeMapper;
-import com.jsy.community.mapper.CarMonthlyVehicleMapper;
-import com.jsy.community.mapper.CarPositionMapper;
+import com.jsy.community.entity.property.*;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -42,6 +36,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     private CarChargeMapper CarChargeMapper;
     @Autowired
     private CarBlackListMapper carBlackListMapper;
+    @Autowired
+    private CarProprietorMapper carProprietorMapper;
 
     /**
      * 新增
@@ -78,7 +74,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         //查询黑名单中是否存在该车辆
         CarBlackListEntity car_number = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", carMonthlyVehicle.getCarNumber()));
         if (Objects.nonNull(car_number)){
-            throw new PropertyException("该车辆已进入黑名单，无法进场或离场！");
+            throw new PropertyException("该车辆已进入黑名单，无法进场或离场!");
         }
         //查询收费设置数据
         String monthlyMethodId = carMonthlyVehicle.getMonthlyMethodId();
@@ -500,5 +496,26 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         CarMonthlyVehicle carMonthlyVehicle = new CarMonthlyVehicle();
         carMonthlyVehicle.setDistributionStatus(1);
         carMonthlyVehicleMapper.update(carMonthlyVehicle,new QueryWrapper<CarMonthlyVehicle>().eq("uid",uid).eq("community_id",adminCommunityId));
+    }
+
+
+    /**
+     * 1临时，2月租，3业主
+     * @param carNumber
+     * @return
+     */
+    @Override
+    public Integer selectByStatus(String carNumber) {
+        List<CarMonthlyVehicle> selectList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber));
+        if (selectList.size()>0){
+            return 2; //包月车辆
+        }
+
+        List<CarProprietorEntity> selectList1 = carProprietorMapper.selectList(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber));
+        if (selectList1.size()>0){
+            return 3;//业主车辆
+        }
+
+        return 1;//临时
     }
 }

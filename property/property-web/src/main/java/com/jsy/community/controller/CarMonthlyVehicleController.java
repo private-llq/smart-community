@@ -164,6 +164,8 @@ public class CarMonthlyVehicleController {
        return CommonResult.ok("添加失败,请联系管理员");
     }
 
+
+
     /**
      * 数据录入2.0
      */
@@ -177,11 +179,9 @@ public class CarMonthlyVehicleController {
             return CommonResult.ok(map);
         } catch (IOException e) {
             e.printStackTrace();
-            return CommonResult.ok("添加失败,请联系管理员！");
+            return CommonResult.ok("添加失败,请联系管理员!");
         }
-
     }
-
 
 
     /**
@@ -231,6 +231,17 @@ public class CarMonthlyVehicleController {
             e.printStackTrace();
         }
         return CommonResult.ok();
+    }
+
+
+    /**
+     * 根据车牌查询是什么类型的车辆
+     */
+    @Login
+    @PostMapping("selectByStatus")
+    public Integer selectByStatus(@RequestParam String carNumber){
+       Integer status =vehicleService.selectByStatus(carNumber);
+        return status;
     }
 
 }
