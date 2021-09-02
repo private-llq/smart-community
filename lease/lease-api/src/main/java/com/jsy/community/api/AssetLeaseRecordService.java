@@ -2,6 +2,8 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
 
 /**
  * @Author: Pipi
@@ -19,4 +21,14 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @date: 2021/8/31 16:01
      **/
     Integer addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity);
+
+    /**
+     * @author: Pipi
+     * @description: 分页查询签约列表
+     * @param baseQO: 分页查询条件
+     * @param uid: 登录用户uid
+     * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.proprietor.AssetLeaseRecordEntity>
+     * @date: 2021/9/2 14:38
+     **/
+    PageInfo<AssetLeaseRecordEntity> pageContractList(BaseQO<AssetLeaseRecordEntity> baseQO, String uid);
 }

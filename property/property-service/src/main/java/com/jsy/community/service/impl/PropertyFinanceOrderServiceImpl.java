@@ -57,7 +57,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     private IHouseService houseService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
-    private IUserService userService;
+    private ProprietorUserService userService;
 
     @Autowired
     private PropertyFeeRuleMapper propertyFeeRuleMapper;

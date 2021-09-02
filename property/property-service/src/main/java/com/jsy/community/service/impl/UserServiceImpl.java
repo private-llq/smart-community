@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.api.IUserService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserFaceSyncRecordEntity;

@@ -30,4 +30,8 @@ public interface ConstError {
 	 * 用户房屋待认证
 	 */
 	int NO_AUTH_HOUSE = 40002;
+	/**
+	 * 余额不足
+	 */
+	int NOT_ENOUGH = 40003;
 }

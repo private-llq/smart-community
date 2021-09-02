@@ -1,21 +1,13 @@
 package com.jsy.community.controller.outer;
 
-import cn.hutool.http.HttpRequest;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiOutController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRedbagService;
-import com.jsy.community.api.IUserService;
-import com.jsy.community.constant.BusinessConst;
+import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.qo.RedbagQO;
 import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -33,7 +25,7 @@ import java.util.Map;
 public class IMOutController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IUserService userService;
+	private ProprietorUserService userService;
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IRedbagService redbagService;

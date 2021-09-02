@@ -21,7 +21,7 @@ import java.util.Map;
  * @author ling
  * @since 2020-11-11 17:41
  */
-public interface IUserService extends IService<UserEntity> {
+public interface ProprietorUserService extends IService<UserEntity> {
 	
 	/**
 	* @Description: 生成带token的UserAuthVo
