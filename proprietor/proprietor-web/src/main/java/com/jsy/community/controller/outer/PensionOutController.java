@@ -1,7 +1,7 @@
 package com.jsy.community.controller.outer;
 
 import com.jsy.community.annotation.ApiOutController;
-import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.ProprietorCommunityService;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class PensionOutController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-	private ICommunityService iCommunityService;
+	private ProprietorCommunityService iCommunityService;
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IHouseService houseService;

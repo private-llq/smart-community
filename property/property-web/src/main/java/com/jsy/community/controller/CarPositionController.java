@@ -1,20 +1,16 @@
 package com.jsy.community.controller;
 
 
-import cn.hutool.crypto.digest.MD5;
 import com.alibaba.excel.EasyExcel;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.ICarPositionTypeService;
-import com.jsy.community.api.ISelectInformService;
 import com.jsy.community.api.IUserService;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.CarPositionTypeEntity;
 import com.jsy.community.qo.property.CustomerBindingQO;
@@ -27,12 +23,10 @@ import com.jsy.community.vo.property.PageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,7 +40,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**

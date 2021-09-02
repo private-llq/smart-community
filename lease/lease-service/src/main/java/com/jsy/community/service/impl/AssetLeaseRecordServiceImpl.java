@@ -2,15 +2,25 @@ package com.jsy.community.service.impl;
 
 import java.time.LocalDateTime;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.AssetLeaseRecordService;
+import com.jsy.community.api.ProprietorUserService;
+import com.jsy.community.api.LeaseException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
+import com.jsy.community.entity.shop.ShopImgEntity;
+import com.jsy.community.entity.shop.ShopLeaseEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AssetLeaseRecordMapper;
 import com.jsy.community.mapper.HouseLeaseMapper;
+import com.jsy.community.mapper.ShopImgMapper;
 import com.jsy.community.mapper.ShopLeaseMapper;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,14 +31,23 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @Version: 1.0
  **/
 @Slf4j
-@DubboService(version = Const.version, group = Const.group_proprietor)
+@DubboService(version = Const.version, group = Const.group_lease)
 public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMapper, AssetLeaseRecordEntity> implements AssetLeaseRecordService {
+
+    @Autowired
+    private AssetLeaseRecordMapper assetLeaseRecordMapper;
 
     @Autowired
     private ShopLeaseMapper shopLeaseMapper;
 
     @Autowired
     private HouseLeaseMapper houseLeaseMapper;
+
+    @Autowired
+    private ShopImgMapper shopImgMapper;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ProprietorUserService userService;
 
     /**
      * @param assetLeaseRecordEntity : 房屋租赁记录表实体
@@ -39,24 +58,56 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      **/
     @Override
     public Integer addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        // 检查租户是否实名认证
+        Integer integer = userService.userIsRealAuth(assetLeaseRecordEntity.getTenantUid());
+        if (integer <= 0) {
+            throw new LeaseException(JSYError.NO_REAL_NAME_AUTH);
+        }
+        // 检查申请是否已经存在
+        QueryWrapper<AssetLeaseRecordEntity> assetLeaseRecordEntityQueryWrapper = new QueryWrapper<>();
+        assetLeaseRecordEntityQueryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
+        assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", assetLeaseRecordEntity.getTenantUid());
+        AssetLeaseRecordEntity RecordExistEntity = assetLeaseRecordMapper.selectOne(assetLeaseRecordEntityQueryWrapper);
+        if (RecordExistEntity != null) {
+            throw new LeaseException("签约申请已经存在,请不要重复发起");
+        }
         assetLeaseRecordEntity.setId(SnowFlake.nextId());
-        assetLeaseRecordEntity.setAssetId(0L);
-        assetLeaseRecordEntity.setAssetType(0);
-        assetLeaseRecordEntity.setHomeOwnerUid("");
-        assetLeaseRecordEntity.setTenantUid("");
-        assetLeaseRecordEntity.setImageId("");
-        assetLeaseRecordEntity.setTitle("");
-        assetLeaseRecordEntity.setAdvantageId(0L);
-        assetLeaseRecordEntity.setTypeCode(0);
-        assetLeaseRecordEntity.setDirectionId(0);
-        assetLeaseRecordEntity.setCommunityId(0L);
-        assetLeaseRecordEntity.setPrice(0.0D);
-        assetLeaseRecordEntity.setId(0L);
-        assetLeaseRecordEntity.setIdStr("");
         assetLeaseRecordEntity.setDeleted(0);
         assetLeaseRecordEntity.setCreateTime(LocalDateTime.now());
-        assetLeaseRecordEntity.setUpdateTime(LocalDateTime.now());
-
-        return null;
+        // 查询资产信息
+        if (assetLeaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
+            // 房屋
+            QueryWrapper<HouseLeaseEntity> leaseEntityQueryWrapper = new QueryWrapper<>();
+            leaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
+            HouseLeaseEntity houseLeaseEntity = houseLeaseMapper.selectOne(leaseEntityQueryWrapper);
+            assetLeaseRecordEntity.setHomeOwnerUid(houseLeaseEntity.getUid());
+            assetLeaseRecordEntity.setImageId(houseLeaseEntity.getHouseImageId());
+            assetLeaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
+            assetLeaseRecordEntity.setAdvantageId(houseLeaseEntity.getHouseAdvantageId());
+            assetLeaseRecordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
+            assetLeaseRecordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
+            assetLeaseRecordEntity.setCommunityId(houseLeaseEntity.getHouseCommunityId());
+            assetLeaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());
+        } else if (assetLeaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
+            // 商铺
+            // 查商铺信息
+            QueryWrapper<ShopLeaseEntity> shopLeaseEntityQueryWrapper = new QueryWrapper<>();
+            shopLeaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
+            ShopLeaseEntity shopLeaseEntity = shopLeaseMapper.selectOne(shopLeaseEntityQueryWrapper);
+            // 查商铺图片
+            QueryWrapper<ShopImgEntity> shopImgEntityQueryWrapper = new QueryWrapper<>();
+            shopImgEntityQueryWrapper.eq("shop_id", assetLeaseRecordEntity.getAssetId());
+            shopImgEntityQueryWrapper.last("limit 1");
+            ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
+            assetLeaseRecordEntity.setHomeOwnerUid(shopLeaseEntity.getUid());
+            assetLeaseRecordEntity.setImageId(shopImgEntity.getId());
+            assetLeaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
+            assetLeaseRecordEntity.setAdvantageId(shopLeaseEntity.getShopFacility());
+            assetLeaseRecordEntity.setCommunityId(shopLeaseEntity.getCommunityId());
+            assetLeaseRecordEntity.setPrice(shopLeaseEntity.getMonthMoney());
+        } else {
+            throw new LeaseException("请传递正确的资产类型;1:商铺;2:房屋");
+        }
+        return assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
     }
 }

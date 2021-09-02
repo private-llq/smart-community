@@ -3,7 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IUserHouseService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -50,7 +50,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	private HouseMemberMapper houseMemberMapper;
 
 	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IUserService userService;
+	private ProprietorUserService userService;
 	
 	/**
 	 * @return java.lang.Boolean

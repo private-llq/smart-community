@@ -3,7 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.jsy.community.api.AiliAppPayRecordService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.api.PaymentException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PaymentEnum;
@@ -28,7 +28,7 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	private AiliAppPayRecordDao ailiAppPayRecordDao;
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private IUserService userService;
+	private ProprietorUserService userService;
 	
 	//创建支付宝订单记录
 	@Override

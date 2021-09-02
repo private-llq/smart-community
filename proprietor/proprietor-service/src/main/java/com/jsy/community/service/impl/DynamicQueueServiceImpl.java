@@ -1,6 +1,6 @@
 package com.jsy.community.service.impl;
 
-import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.ProprietorCommunityService;
 import com.jsy.community.api.IDynamicQueueService;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
@@ -31,7 +31,7 @@ public class DynamicQueueServiceImpl implements IDynamicQueueService {
 	private RabbitAdmin rabbitAdmin;
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-	private ICommunityService communityService;
+	private ProprietorCommunityService communityService;
 	
 	/**
 	* @Description: 项目启动自动任务，创建小区队列，便于MQ向小区下发指令

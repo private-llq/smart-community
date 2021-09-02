@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
@@ -56,7 +55,7 @@ public class AdminLoginController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICaptchaService captchaService;
 	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private ICommunityService communityService;
+	private ProprietorCommunityService communityService;
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyCompanyService iPropertyCompanyService;
 	

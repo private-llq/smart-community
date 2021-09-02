@@ -2,7 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.ProprietorCommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.PropertyCompanyEntity;
@@ -34,7 +34,7 @@ import java.util.Map;
 public class CommunityController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
-	private ICommunityService iCommunityService;
+	private ProprietorCommunityService iCommunityService;
 
 	/**
 	 * 通过社区名称和城市id查询相关的社区数据

@@ -51,7 +51,7 @@ public class UserController {
     private IUserAuthService userAuthService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
-    private IUserService userService;
+    private ProprietorUserService userService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;

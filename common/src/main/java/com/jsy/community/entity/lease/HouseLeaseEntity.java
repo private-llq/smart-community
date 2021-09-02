@@ -1,5 +1,6 @@
 package com.jsy.community.entity.lease;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsy.community.entity.BaseEntity;
@@ -10,7 +11,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  *
@@ -29,12 +29,6 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "所属人ID")
     @JsonIgnore
     private String uid;
-
-    @ApiModelProperty(value = "社区id")
-    private Integer houseCommunityId;
-
-    @ApiModelProperty(value = "房源id")
-    private Integer houseId;
 
     @ApiModelProperty(value = "房屋租售标题")
     private String houseTitle;
@@ -63,8 +57,8 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "房屋租售平方米")
     private BigDecimal houseSquareMeter;
 
-    @ApiModelProperty(value = "房屋出租方式/压一付一/压一付三/压一付六")
-    private String houseLeaseMode;
+    // 租赁方式:压一付一、压一付三、压一付六...
+    private Integer houseLeasedepositId;
 
     @ApiModelProperty(value = "房屋类型：四室一厅、二室一厅...")
     private String houseTypeCode;
@@ -72,58 +66,56 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty(value = "房屋所属楼层")
     private String houseFloor;
 
-    @ApiModelProperty(value = "房屋预约时间")
-    private String houseReserveTime;
-
     @ApiModelProperty(value = "房屋朝向")
     private String houseDirectionId;
-
-    @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
-    private String bedroomType;
-
-    @ApiModelProperty(value = "房屋介绍内容")
-    private String houseIntroduce;
 
     @ApiModelProperty(value = "房屋联系人电话")
     private String houseContact;
 
+    @ApiModelProperty(value = "房屋介绍内容")
+    private String houseIntroduce;
+
+    @ApiModelProperty(value = "房屋预约时间")
+    private String houseReserveTime;
+
     @ApiModelProperty(value = "房屋图片id,用于在中间表寻找拥有的图片地址")
     private Long houseImageId;
 
-    @ApiModelProperty(value = "房主称呼")
-    private String appellation;
-
-    /**
-     * 65不限 66普通住宅 67别墅 68公寓
-     */
     @ApiModelProperty(value = "房屋出租类型ID")
     private Integer houseLeasetypeId;
 
-    /**
-     * 69不限 70整租，71合租
-     */
     @ApiModelProperty(value = "房屋出租方式ID")
     private Integer houseLeasemodeId;
+
+    // 房屋来源类型id：1.不限 2.个人 4.物业
+    private Integer houseSourceId;
 
     @ApiModelProperty(value = "房屋家具code")
     private Long houseFurnitureId;
 
-    @ApiModelProperty(value = "经度")
-    private Double lon;
+    @ApiModelProperty(value = "卧室类型、主卧、次卧、其他")
+    private String bedroomType;
 
+    @ApiModelProperty(value = "经度")
+    private Double house_lon;
 
     @ApiModelProperty(value = "纬度")
-    private Double lat;
+    private Double house_lat;
 
+    @ApiModelProperty(value = "房主称呼")
+    private String appellation;
+
+    @ApiModelProperty(value = "社区id")
+    private Long houseCommunityId;
+
+    @ApiModelProperty(value = "房源id")
+    private Integer houseId;
 
     @ApiModelProperty( value = "出租要求位运算后的id")
     private Long leaseRequireId;
 
     @ApiModelProperty( value = "公共设施位运算后的id")
     private Long commonFacilitiesId;
-
-    @ApiModelProperty( value = "房间设施位运算后的id")
-    private Long roomFacilitiesId;
 
     @ApiModelProperty( value = "装修情况codeId：1.简单装修 2.精装修 4.豪华装修")
     private Long decorationTypeId;
@@ -133,4 +125,11 @@ public class HouseLeaseEntity extends BaseEntity {
 
     @ApiModelProperty( value = "室友性别code: 1.限女生 2.限男生 4.男女不限")
     private String roommateSex;
+
+    @ApiModelProperty( value = "房间设施位运算后的id")
+    private Long roomFacilitiesId;
+
+    @ApiModelProperty(value = "房屋出租方式/压一付一/压一付三/压一付六")
+    @TableField(exist = false)
+    private String houseLeaseMode;
 }
