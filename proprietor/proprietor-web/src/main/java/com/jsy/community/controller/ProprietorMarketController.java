@@ -78,13 +78,16 @@ public class ProprietorMarketController {
     @Login
     public CommonResult updateMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
-       int i = marketQO.getPrice().compareTo(BigDecimal.valueOf(BigDecimal.ROUND_DOWN));
-       if (marketQO.getNegotiable()==0){
+       if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
+           if (marketQO.getPrice()==null){
+               throw new JSYException("价格有误,请重新输入");
+           }
+           int i = marketQO.getPrice().compareTo(BigDecimal.valueOf(0));
            if (i<0){
                throw new JSYException("价格有误,请重新输入");
            }
        }else {
-           marketQO.setPrice(new BigDecimal(0));
+           marketQO.setPrice(new BigDecimal(0));  //面议价格设为0
        }
         boolean b = marketService.updateMarket(marketQO,userId);
         return CommonResult.ok("修改成功");
@@ -97,7 +100,7 @@ public class ProprietorMarketController {
      * @Date: 2021/8/21-15:44
      **/
     @DeleteMapping("/deleteMarket")
-    @ApiOperation("社区集市发布商品")
+    @ApiOperation("社区集市删除商品")
     @Login
     public CommonResult deleteMarket(@RequestParam("id") Long id){
 
@@ -220,6 +223,8 @@ public class ProprietorMarketController {
                 filePath.append(",");
             }
         }
+
+
         String[] split = filePath.toString().split(",");
         return CommonResult.ok(split,"上传成功");
     }

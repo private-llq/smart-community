@@ -58,7 +58,7 @@ public class ProprietorMarketCategoryServiceImpl extends ServiceImpl<ProprietorM
 
     @Override
     public List<ProprietorMarketCategoryEntity> selectMarketCategory() {
-        return categoryMapper.selectList(new QueryWrapper<ProprietorMarketCategoryEntity>().orderByAsc("category_id"));
+        return categoryMapper.selectList(new QueryWrapper<ProprietorMarketCategoryEntity>().orderByDesc("update_time"));
     }
 
     @Override
