@@ -4,14 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 
-@Component
 public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
 

@@ -24,7 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @DubboService(version = Const.version, group = Const.group)
 public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleMapper, CarMonthlyVehicle> implements ICarMonthlyVehicleService {
 
@@ -511,7 +510,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             return 2; //包月车辆
         }
 
-        List<CarProprietorEntity> selectList1 = carProprietorMapper.selectList(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id",community_id));
+        List<CarProprietorEntity> selectList1 = carProprietorMapper.selectList(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id",community_id).eq("delete",0));
         if (selectList1.size()>0){
             return 3;//业主车辆
         }
