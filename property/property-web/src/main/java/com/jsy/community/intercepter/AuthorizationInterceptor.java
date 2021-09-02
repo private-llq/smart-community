@@ -83,6 +83,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 				request.setAttribute(UserUtils.USER_COMMUNITY_ID_LIST, adminInfoVo.getCommunityIdList());
 				request.setAttribute(UserUtils.USER_COMPANY_ID, adminInfoVo.getCompanyId());
 				request.setAttribute(UserUtils.USER_ROLE_ID, adminInfoVo.getRoleId());
+				request.setAttribute(UserUtils.USER_TOKEN, adminInfoVo.getToken());
 				return true;
 			}
 		}
