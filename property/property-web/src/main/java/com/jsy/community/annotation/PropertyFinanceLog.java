@@ -12,4 +12,6 @@ import java.lang.annotation.*;
 @Documented //生成文档
 public @interface PropertyFinanceLog {
 	String operation() default "";
+	
+	int type() default 0;
 }

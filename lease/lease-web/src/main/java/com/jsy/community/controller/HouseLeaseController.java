@@ -252,4 +252,21 @@ public class HouseLeaseController {
         assetLeaseRecordEntity.setTenantUid(UserUtils.getUserId());
         return assetLeaseRecordService.addLeaseRecord(assetLeaseRecordEntity) > 0 ? CommonResult.ok("发起成功!") : CommonResult.error("发起失败!");
     }
+
+    /**
+     * @author: Pipi
+     * @description: 查询我的签约列表
+     * @param baseQO: 分页查询条件
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/2 14:36
+     **/
+    @Login
+    @PostMapping("/v2/contractList")
+    public CommonResult contractList(@RequestBody BaseQO<AssetLeaseRecordEntity> baseQO) {
+        if (baseQO.getQuery() == null) {
+            throw new JSYException(400, "列表查询参数错误!请传递查询条件。");
+        }
+        ValidatorUtils.validateEntity(baseQO.getQuery(), AssetLeaseRecordEntity.ContractListValidate.class);
+        return CommonResult.ok(assetLeaseRecordService.pageContractList(baseQO, UserUtils.getUserId()));
+    }
 }
