@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.PropertyFinanceLog;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IFinanceBillService;
@@ -62,6 +63,7 @@ public class PropertyFeeRuleController {
     @ApiOperation("启用或者停用")
     @GetMapping("/startOrOut")
     @Login
+    @PropertyFinanceLog(operation = "收费项目：",type = 1)
     public CommonResult startOrOut(@RequestParam("status")Integer status,@RequestParam("id") Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.startOrOut(userInfo,status,id);

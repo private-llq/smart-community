@@ -1,10 +1,12 @@
 package com.jsy.community.aspectj;
 
 import com.alibaba.fastjson.JSON;
-import com.jsy.community.annotation.businessLog;
+import com.jsy.community.annotation.PropertyFinanceLog;
+import com.jsy.community.api.IPropertyFeeRuleService;
 import com.jsy.community.api.IPropertyFinanceLogService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FinanceLogEntity;
+import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.utils.HttpUtils;
 import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -30,6 +32,9 @@ public class PropertyFinanceLogAop extends BaseAop {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyFinanceLogService propertyFinanceLogService;
 	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPropertyFeeRuleService propertyFeeRuleService;
+	
 	//定义切点 @Pointcut
 	//在注解的位置切入代码
 	@Pointcut("@annotation( com.jsy.community.annotation.PropertyFinanceLog)")
@@ -53,13 +58,6 @@ public class PropertyFinanceLogAop extends BaseAop {
 		financeLog.setCommunityId(UserUtils.getAdminCommunityId());
 		financeLog.setCreateBy(UserUtils.getUserId());
 		
-		//获取操作
-		businessLog businessLog = method.getAnnotation(businessLog.class);
-		if (businessLog != null) {
-			String operation = businessLog.operation();
-			financeLog.setOperation(operation);//保存获取的操作
-		}
-		
 		//获取请求的类名
 		String className = joinPoint.getTarget().getClass().getName();
 		//获取请求的方法名
@@ -71,6 +69,38 @@ public class PropertyFinanceLogAop extends BaseAop {
 		//将参数所在的数组转换成json
 		String params = JSON.toJSONString(args);
 		financeLog.setParams(params);
+		
+		//获取操作
+		PropertyFinanceLog propertyFinanceLog = method.getAnnotation(PropertyFinanceLog.class);
+		if (propertyFinanceLog.type() == 1) {
+			StringBuffer status = new StringBuffer();
+			StringBuffer propertyFeeRule = new StringBuffer();
+			for (int i = 0; i < args.length; i++) {
+				String arg = args[i].toString();
+				if (i == 0) {
+					if (arg.equals("0")) {
+						status.append("停用");
+					} else if (arg.equals("1")) {
+						status.append("启动");
+					}
+				}
+				if (i == 1) {
+					PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleService.selectByOne(Long.parseLong(arg));
+					propertyFeeRule.append(propertyFeeRuleEntity.getName());
+				}
+			}
+			if (propertyFinanceLog != null) {
+				String operation = propertyFinanceLog.operation();
+				StringBuffer sb =new StringBuffer(operation);
+				sb.append(propertyFeeRule).append(status);
+				financeLog.setOperation(sb.toString());//保存获取的操作
+			}
+		} else {
+			if (propertyFinanceLog != null) {
+				String operation = propertyFinanceLog.operation();
+				financeLog.setOperation(operation);//保存获取的操作
+			}
+		}
 		
 		//获取用户ip地址
 		HttpServletRequest request = HttpUtils.getHttpServletRequest();
