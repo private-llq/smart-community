@@ -53,10 +53,10 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
         marketEntity.setUid(userId);
         marketEntity.setId(SnowFlake.nextId());
 
-        //没有价格 面议（默认面议）
-        if (marketEntity.getPrice()!=null){
-            marketEntity.setNegotiable(NEGOTIABLE_ZERO);
-        }
+//        //没有价格 面议（默认面议）
+//        if (marketEntity.getPrice()!=null){
+//            marketEntity.setNegotiable(NEGOTIABLE_ZERO);
+//        }
         //默认下架
         marketEntity.setState(STATE_ZERO);
         return  marketMapper.insert(marketEntity)==1;
@@ -76,10 +76,6 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
     public boolean updateMarket(ProprietorMarketQO marketQO, String userId) {
         ProprietorMarketEntity marketEntity = new ProprietorMarketEntity();
         BeanUtils.copyProperties(marketQO,marketEntity);
-        //没有价格 面议（默认面议）
-        if (marketEntity.getPrice()!=null){
-            marketEntity.setNegotiable(NEGOTIABLE_ZERO);
-        }
         return marketMapper.update(marketEntity,new UpdateWrapper<ProprietorMarketEntity>().eq("id",marketQO.getId())) == 1;
     }
 
