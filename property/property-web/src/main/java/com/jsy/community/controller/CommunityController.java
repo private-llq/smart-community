@@ -107,7 +107,7 @@ public class CommunityController {
     @Login
     @PostMapping("/addCommunity")
     @businessLog(operation = "新增", content = "新增了【物业社区】")
-    public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity, HttpServletRequest request) {
+    public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity) {
         ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
         communityEntity.setPropertyId(UserUtils.getAdminCompanyId());
         // 设置默认的社区房屋层级模式
@@ -117,7 +117,7 @@ public class CommunityController {
         // 获取登录用户数据
         AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
         adminUserInfo.getCommunityIdList().add(communityId);
-        String token = request.getHeader("token");
+        String token = UserUtils.getUserToken();
         // 根据token,更新Redis数据
         userUtils.updateRedisByToken("Admin:Login", JSON.toJSONString(adminUserInfo), token, loginExpireHour);
         return CommonResult.ok("添加成功!");
