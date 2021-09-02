@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @program: com.jsy.community
- * @description: 物业预存款余额明细记录表
+ * @description: 物业预存款余额明细记录
  * @author: DKS
  * @create: 2021-08-12 14:15
  **/

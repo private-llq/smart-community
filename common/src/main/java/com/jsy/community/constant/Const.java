@@ -48,9 +48,24 @@ public interface Const {
 		String RESET_PASSWORD = "SMS_218172247";
 		
 		/**
-		 * 物业端-短信群发
+		 * 物业端-公告通知
 		 */
-		String SMS_GROUP_SENDING = "SMS_223191687";
+		String PROPERTY_NOTICE = "SMS_223191687";
+		
+		/**
+		 * 物业端-意见报修通知
+		 */
+		String REPAIR_NOTICE = "SMS_223178032";
+		
+		/**
+		 * 物业端-挪车通知
+		 */
+		String MOVE_CAR_NOTICE = "SMS_223178049";
+		
+		/**
+		 * 物业端-车禁月租到期通知
+		 */
+		String EXPIRATION_NOTICE = "SMS_223178051";
 	}
 	
 }

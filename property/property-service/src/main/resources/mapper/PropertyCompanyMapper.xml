@@ -5,4 +5,8 @@
     <select id="selectCompanyNameByCompanyId" resultType="java.lang.String">
         select `name` from t_property_company where id = #{companyId}
     </select>
+
+    <update id="updateSMSQuantity">
+        update t_property_company set message_quantity = (message_quantity - #{number}) where id = #{companyId}
+    </update>
 </mapper>
