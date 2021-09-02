@@ -13,6 +13,7 @@ import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.qo.property.InsterCarPositionQO;
 import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
+import com.jsy.community.qo.property.UpdateCarPositionQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -245,6 +246,22 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
             return true;
         }
         return false;
+
+    }
+
+    @Override
+    public Boolean updateCarPosition(UpdateCarPositionQO qo) {
+
+
+            CarPositionEntity carPositionEntity=new CarPositionEntity();
+            BeanUtils.copyProperties(qo,carPositionEntity);
+            int i = carPositionMapper.updateById(carPositionEntity);
+            if (i>0){
+                return true;
+            }
+            return false;
+
+
 
     }
 
