@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,13 +12,11 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
+import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
 import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.mapper.AssetLeaseRecordMapper;
-import com.jsy.community.mapper.HouseLeaseMapper;
-import com.jsy.community.mapper.ShopImgMapper;
-import com.jsy.community.mapper.ShopLeaseMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.MyMathUtils;
@@ -30,6 +29,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -54,6 +54,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     @Autowired
     private ShopImgMapper shopImgMapper;
 
+    @Autowired
+    private LeaseOperationRecordMapper leaseOperationRecordMapper;
+
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
 
@@ -68,6 +71,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @date: 2021/8/31 16:01
      **/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
         // 检查租户是否实名认证
         Integer integer = userService.userIsRealAuth(assetLeaseRecordEntity.getTenantUid());
@@ -85,6 +89,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         assetLeaseRecordEntity.setId(SnowFlake.nextId());
         assetLeaseRecordEntity.setDeleted(0);
         assetLeaseRecordEntity.setCreateTime(LocalDateTime.now());
+        assetLeaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode());
         // 查询资产信息
         if (assetLeaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
             // 房屋
@@ -125,7 +130,171 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         } else {
             throw new LeaseException("请传递正确的资产类型;1:商铺;2:房屋");
         }
+        //写入租赁操作数据
+        LeaseOperationRecordEntity leaseOperationRecordEntity = new LeaseOperationRecordEntity();
+        leaseOperationRecordEntity.setAssetType(assetLeaseRecordEntity.getAssetType());
+        leaseOperationRecordEntity.setAssetLeaseRecordId(assetLeaseRecordEntity.getId());
+        leaseOperationRecordEntity.setOperation(assetLeaseRecordEntity.getOperation());
+        leaseOperationRecordEntity.setId(SnowFlake.nextId());
+        leaseOperationRecordEntity.setDeleted(0);
+        leaseOperationRecordEntity.setCreateTime(LocalDateTime.now());
+        leaseOperationRecordMapper.insert(leaseOperationRecordEntity);
+        // 写入租赁数据
         return assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
+    }
+
+    /**
+     * @param assetLeaseRecordEntity : 房屋租赁记录表实体
+     * @param uid                    : 登录用户uid
+     * @author: Pipi
+     * @description: 停止签约(租客取消 / 房东拒绝)
+     * @return: java.lang.Integer
+     * @date: 2021/9/3 10:30
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer operationContract(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        Integer result = 0;
+        switch (assetLeaseRecordEntity.getOperationType()) {
+            case 2:
+                // 房东接受申请
+                result = acceptingApply(assetLeaseRecordEntity, uid);
+                break;
+            case 7:
+                // 租客取消申请
+                result = cancelApply(assetLeaseRecordEntity, uid);
+                break;
+            case 8:
+                // 8房东拒绝申请
+                result = rejectionApply(assetLeaseRecordEntity, uid);
+                break;
+            case 9:
+                // 租客再次申请
+                result = reapply(assetLeaseRecordEntity, uid);
+                break;
+            default:
+                throw new LeaseException("未知操作!");
+        }
+        return result;
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 房东接受申请
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid: 登录用户uid
+     * @return: java.lang.Integer
+     * @date: 2021/9/3 14:17
+     **/
+    public Integer acceptingApply(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        queryWrapper.eq("home_owner_uid", uid);
+        ArrayList<Integer> processStatusList = new ArrayList<>();
+        processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode());
+        processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.RELAUNCH.getCode());
+        queryWrapper.in("operation", processStatusList);
+        AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (recordEntity == null) {
+            throw new LeaseException("签约信息不存在");
+        }
+        recordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode());
+        //写入租赁操作数据
+        addLeaseOperationRecord(recordEntity);
+        return assetLeaseRecordMapper.updateById(recordEntity);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 租客取消申请
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid: 登录用户uid
+     * @return: java.lang.Integer
+     * @date: 2021/9/3 14:25
+     **/
+    public Integer cancelApply(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        queryWrapper.eq("tenant_uid", uid);
+        ArrayList<Integer> processStatusList = new ArrayList<>();
+        processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode());
+        processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode());
+        queryWrapper.in("operation", processStatusList);
+        AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (recordEntity == null) {
+            throw new LeaseException("签约信息不存在");
+        }
+        recordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.CANCELLATION_REQUEST.getCode());
+        //写入租赁操作数据
+        addLeaseOperationRecord(recordEntity);
+        return assetLeaseRecordMapper.updateById(recordEntity);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 房东拒绝申请
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid: 登录用户uid
+     * @return: java.lang.Integer
+     * @date: 2021/9/3 14:29
+     **/
+    public Integer rejectionApply(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        queryWrapper.eq("home_owner_uid", uid);
+        ArrayList<Integer> processStatusList = new ArrayList<>();
+        processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode());
+        processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.RELAUNCH.getCode());
+        queryWrapper.in("operation", processStatusList);
+        AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (recordEntity == null) {
+            throw new LeaseException("签约信息不存在");
+        }
+        recordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.REJECTION_OF_APPLICATION.getCode());
+        //写入租赁操作数据
+        addLeaseOperationRecord(recordEntity);
+        return assetLeaseRecordMapper.updateById(recordEntity);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 再次发起签约
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid: 登录用户uid
+     * @return: java.lang.Integer
+     * @date: 2021/9/3 14:35
+     **/
+    public Integer reapply(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        queryWrapper.eq("tenant_uid", uid);
+        queryWrapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.REJECTION_OF_APPLICATION.getCode());
+        AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (recordEntity == null) {
+            throw new LeaseException("签约信息不存在");
+        }
+        recordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.RELAUNCH.getCode());
+        //写入租赁操作数据
+        addLeaseOperationRecord(recordEntity);
+        return assetLeaseRecordMapper.updateById(recordEntity);
+    }
+
+    /**
+     * @author: Pipi
+     * @description:  写入租赁操作数据
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @return: void
+     * @date: 2021/9/3 14:22
+     **/
+    private void addLeaseOperationRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        LeaseOperationRecordEntity leaseOperationRecordEntity = new LeaseOperationRecordEntity();
+        leaseOperationRecordEntity.setAssetType(assetLeaseRecordEntity.getAssetType());
+        leaseOperationRecordEntity.setAssetLeaseRecordId(assetLeaseRecordEntity.getId());
+        leaseOperationRecordEntity.setOperation(assetLeaseRecordEntity.getOperation());
+        leaseOperationRecordEntity.setId(SnowFlake.nextId());
+        leaseOperationRecordEntity.setDeleted(0);
+        leaseOperationRecordEntity.setCreateTime(LocalDateTime.now());
+        leaseOperationRecordMapper.insert(leaseOperationRecordEntity);
     }
 
     /**

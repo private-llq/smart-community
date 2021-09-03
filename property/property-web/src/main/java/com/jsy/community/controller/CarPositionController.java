@@ -1,32 +1,35 @@
 package com.jsy.community.controller;
 
-
-import cn.hutool.crypto.digest.MD5;
-import cn.hutool.http.HttpException;
-import cn.hutool.json.JSON;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.ICarMonthlyVehicleService;
+import com.jsy.community.api.ICarPositionService;
+import com.jsy.community.api.ICarPositionTypeService;
+import com.jsy.community.api.IUserService;
 import com.jsy.community.api.*;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.property.CarCutOffEntity;
+import com.jsy.community.entity.property.CarEquipmentManageEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.entity.property.CarPositionTypeEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.qo.property.*;
-import com.jsy.community.util.Base64UtilsTest;
 import com.jsy.community.util.HttpClientHelper;
-import com.jsy.community.util.HttpUtil;
 import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.car.CarVO;
 import com.jsy.community.vo.car.GpioData;
 import com.jsy.community.vo.car.Rs485Data;
-import com.jsy.community.vo.car.WhitelistData;
 import com.jsy.community.vo.property.PageVO;
+import com.netflix.client.VipAddressResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -38,9 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -67,17 +68,16 @@ public class CarPositionController {
     private IUserService iUserService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionTypeService iCarPositionTypeService;
-
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarCutOffService carCutOffService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarEquipmentManageService equipmentManageService;
-
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICarMonthlyVehicleService iCarMonthlyVehicleService;
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICarBlackListService iCarBlackListService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private ICarBlackListService icarBlackListService;
-
-
-
+    private  ICarBasicsService iCarBasicsService;
 
     @ApiOperation("分页查询车位信息")
     @Login
@@ -238,13 +238,7 @@ public class CarPositionController {
         }
         return CommonResult.ok(b, "更新失败");
     }
-    @ApiOperation("开闸")
-    @Login
-    @RequestMapping(value = "/open", method = RequestMethod.POST)
-    public void updateCarPosition() {
-        HttpClientHelper.sendPost("192.168.12.253:8000","{\"error_num\":0,\"error_str\":\"noerror\",\"gpio_data\":[{\"ionum\":\"io1\",\"action\":\"on\"}]}");
 
-    }
 
 
     @ApiOperation("过车记录")
@@ -265,89 +259,174 @@ public class CarPositionController {
                                 @RequestParam("picture") String picture,//全景图，BASE64 编码 为避免Http传输时URL编码意外
                                 @RequestParam("closeup_pic") String closeupPic//车牌特写图，BASE64 编码 为避免Http传输时URL编码意外改变图片的 BASE64 编码，作了特殊的替换：'+'替换为'-'，'/'替换为'_'，'='替换为'.
             , HttpServletResponse response) throws IOException {
-
-
-
-
-
-        System.out.println(type);
-        System.out.println(mode);
-        System.out.println(parkId);
-        System.out.println(plateNum);
-        System.out.println(plateColor);
-        System.out.println(plateVal);
-        System.out.println(carSubLogo);
-        System.out.println(vehicleType);
-        System.out.println(startTime);
-        System.out.println(camId);
-        System.out.println(vdcType);
-        System.out.println(isWhitelist);
-        System.out.println(trigerType);
-
-
-
-
-
-
-
-
-
-
-
-        String s = picture.replace("-", "+");
-        String s1 = s.replace("_", "/");
-        String s2 = s1.replace(".", "=");
-        byte[] bytes = Base64.getDecoder().decode(s2);
-        InputStream inputStream = new ByteArrayInputStream(bytes);
-        MultipartFile file = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream);
-        String carInAndOutPicture = MinioUtils.uploadNameByCarJPG(file, "car-in-and-out-picture", "全景"+startTime+plateNum+".jpg" );
-        System.out.println(carInAndOutPicture);
-
-
-
-
-        String c = closeupPic.replace("-", "+");
-        String c1 = c.replace("_", "/");
-        String c2 = c1.replace(".", "=");
-        byte[] bytes1 = Base64.getDecoder().decode(c2);
-        InputStream inputStream1 = new ByteArrayInputStream(bytes1);
-        MultipartFile file1 = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream1);
-        String carInAndOutPicture1 = MinioUtils.uploadNameByCarJPG(file1, "car-in-and-out-picture", "車牌"+startTime+plateNum+".jpg" );
-        System.out.println(carInAndOutPicture1);
-
-
-        //新增开闸记录 和 关闸记录的时间
-        extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1,carSubLogo,plateColor);
-
-
-
-        CarVO carVO = new CarVO();
+        //全景图
+        String carInAndOutPicture = base64GetString(plateNum, startTime, picture, "全景");
+        //车位号
+        String carInAndOutPicture1 = base64GetString(plateNum, startTime, closeupPic, "車牌");
+        CarVO carVO = new CarVO();//返回對象
         carVO.setError_num(0);
         carVO.setError_str("响应");
         carVO.setPasswd("123456");
-        GpioData gpioData = new GpioData();
-        gpioData.setIonum("io1");
-        gpioData.setAction("on");
         carVO.setGpio_data(new ArrayList<>());
-        carVO.getGpio_data().add(gpioData);
         carVO.setRs485_data(new ArrayList<>());
-
-
-        Rs485Data e2 = new Rs485Data();
-        e2.setEncodetype("hex2string");
-        e2.setData("0064FFFF300901BBB6D3ADB9E2C1D93258");
-        carVO.getRs485_data().add(e2);
-
-
-
-        WhitelistData whitelistData = new WhitelistData();
-        whitelistData.setAction("add");
-        whitelistData.setPlateNumber("沪A99999");
-        whitelistData.setType("W");
-        whitelistData.setStart("2021/08/31 11:00:00");
-        whitelistData.setEnd("2022/12/31 23:59:59");
         carVO.setWhitelist_data(new ArrayList<>());
-        carVO.getWhitelist_data().add(whitelistData);
+
+
+        //查询社区代写
+        Long communityId = equipmentManageService.equipmentOne(camId).getCommunityId();
+
+        //是否是黑名单车辆
+        CarBlackListEntity carBlackListEntity = iCarBlackListService.carBlackListOne(plateNum);
+        if (carBlackListEntity == null) {//是白名单车辆
+            //根据车牌号查询车辆的3种状态
+            Map map = iCarMonthlyVehicleService.selectByStatus(plateNum, null, communityId);//1臨時，2包月3業主
+            Iterator<Integer> iterator = map.keySet().iterator();
+            Integer next=null;
+            while(iterator.hasNext()){//通过迭代器输出
+                next = iterator.next();
+            }
+            System.out.println("状态"+next);
+
+            if (next != null && next == 3) {//业主
+                if (vdcType.equals("in")) {//进口
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    gpioData.setAction("on");
+                    carVO.getGpio_data().add(gpioData);
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901BBB6D3ADBBD8BCD2737A");//欢迎回家
+                    carVO.getRs485_data().add(e2);
+
+                } else if (vdcType.equals("out")) {//出口
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    gpioData.setAction("on");
+                    carVO.getGpio_data().add(gpioData);
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
+                    carVO.getRs485_data().add(e2);
+                }
+                //开闸记录
+                extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+
+
+            } else if (next != null && next == 2) {//月租车
+
+                if (vdcType.equals("in")) {//进口
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    gpioData.setAction("on");
+                    carVO.getGpio_data().add(gpioData);
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901BBB6D3ADBBD8BCD2737A");//欢迎回家
+                    carVO.getRs485_data().add(e2);
+
+                } else if (vdcType.equals("out")) {//出口
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    gpioData.setAction("on");
+                    carVO.getGpio_data().add(gpioData);
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
+                    carVO.getRs485_data().add(e2);
+                }
+                //开闸记录
+                extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+
+            } else {//临时车
+
+                //查询车位（非业主车位和非月租车位的车位数量）
+                //Integer vacancyNumber = iCarPositionService.selectCarPositionVacancy(communityId);
+
+                //最大入场数
+                Integer maxNumber = iCarBasicsService.findOne(communityId).getMaxNumber();
+                CarCutOffQO carCutOffQO = new CarCutOffQO();
+                carCutOffQO.setCommunityId(communityId);
+                carCutOffQO.setState(0);
+                //查询临时车位的占用数量
+                long total = carCutOffService.selectPage(carCutOffQO).getTotal();
+
+                System.out.println("最大入场数"+maxNumber);
+                System.out.println("查询临时车位的占用数量"+total);
+
+                if (maxNumber > total) {//車位還有的情況
+
+                    if (vdcType.equals("in")) {//进口
+                        //是否开闸
+                        GpioData gpioData = new GpioData();
+                        gpioData.setIonum("io1");
+                        gpioData.setAction("on");
+                        carVO.getGpio_data().add(gpioData);
+                        //语音播报内容
+                        Rs485Data e2 = new Rs485Data();
+                        e2.setEncodetype("hex2string");
+                        e2.setData("0064FFFF300901BBB6D3ADB9E2C1D93258");//欢迎光临
+                        carVO.getRs485_data().add(e2);
+
+                    } else if (vdcType.equals("out")) {//出口
+                        //是否开闸
+                        GpioData gpioData = new GpioData();
+                        gpioData.setIonum("io1");
+                        gpioData.setAction("on");
+                        carVO.getGpio_data().add(gpioData);
+                        //语音播报内容
+                        Rs485Data e2 = new Rs485Data();
+                        e2.setEncodetype("hex2string");
+                        e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
+                        carVO.getRs485_data().add(e2);
+                    }
+                    //开闸记录
+                    extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+
+
+                } else {//車位不足的情況
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    gpioData.setAction("on");
+                    carVO.getGpio_data().add(gpioData);
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901B3B5CEBBD2D1C2FAE7B2");//车位已满
+                    carVO.getRs485_data().add(e2);
+                }
+            }
+
+
+        } else {
+            //是否开闸
+            GpioData gpioData = new GpioData();
+            gpioData.setIonum("io1");
+            //gpioData.setAction("on");
+            carVO.getGpio_data().add(gpioData);
+            //语音播报内容
+            Rs485Data e2 = new Rs485Data();
+            e2.setEncodetype("hex2string");
+            e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
+            carVO.getRs485_data().add(e2);
+        }
+
+
+//        WhitelistData whitelistData = new WhitelistData();
+//        whitelistData.setAction("add");
+//        whitelistData.setPlateNumber("沪A99999");
+//        whitelistData.setType("W");
+//        whitelistData.setStart("2021/08/31 11:00:00");
+//        whitelistData.setEnd("2022/12/31 23:59:59");
+//        carVO.getWhitelist_data().add(whitelistData);
 
         response.setStatus(200);
         response.setCharacterEncoding("utf-8");
@@ -360,13 +439,21 @@ public class CarPositionController {
         writer.close();
     }
 
+    private String base64GetString(@RequestParam("plate_num") String plateNum, @RequestParam("start_time") Long startTime, @RequestParam("picture") String picture, String name) throws IOException {
+        String s = picture.replace("-", "+");
+        String s1 = s.replace("_", "/");
+        String s2 = s1.replace(".", "=");
+        byte[] bytes = Base64.getDecoder().decode(s2);
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        MultipartFile file = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream);
+        return MinioUtils.uploadNameByCarJPG(file, "car-in-and-out-picture", name + startTime + plateNum + ".jpg");
+    }
 
-
-
-    //新增开闸记录和结算出闸时间
     private void extracted(String plateNum, String vehicleType, Long startTime,
-                           String camId, String vdcType, String trigerType, String picture, String closeupPic,String carSubLogo,String plateColor) {
-        if (vdcType.equals("in")){
+                           String camId, String vdcType, String trigerType,
+                           String picture, String closeupPic,
+                           String carSubLogo, String plateColor) {
+        if (vdcType.equals("in")) {
             //开闸记录实体类对象
             CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
             carCutOffEntity.setCarNumber(plateNum);
@@ -379,10 +466,10 @@ public class CarPositionController {
             carCutOffEntity.setPlateColor(plateColor);
 
             //时间戳转年月日       //进闸时间
-            LocalDateTime localDateTime = new Date(startTime*1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+            LocalDateTime localDateTime = new Date(startTime * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
             carCutOffEntity.setOpenTime(localDateTime);
 
-            //通过mac地址 获取社区id和设备名称
+            //通过mac地址 获取社区id和设备名称   还有临时车模式
             CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
 
             System.out.println(carEquipmentManageEntity);
@@ -392,23 +479,21 @@ public class CarPositionController {
 
             boolean b = carCutOffService.addCutOff(carCutOffEntity);
 
-        }else {
+        } else {
             CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
             List<CarCutOffEntity> carCutOffEntityList = carCutOffService.selectAccess(plateNum, 0);
             //时间戳转年月日       //进闸时间
-            LocalDateTime localDateTime = new Date(startTime*1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
-            for (CarCutOffEntity i:carCutOffEntityList) {
+            LocalDateTime localDateTime = new Date(startTime * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+            for (CarCutOffEntity i : carCutOffEntityList) {
                 i.setStopTime(localDateTime);
                 i.setState(1);
+                //出闸照片
+                i.setOutPic(closeupPic);
+                i.setOutImage(picture);
                 carCutOffService.updateCutOff(i);
             }
 
         }
-
-
-
-
-
     }
 
     public static void main(String[] args) {
@@ -492,21 +577,18 @@ public class CarPositionController {
                 "}}\"" +
                 "}";
 
-        String url ="http://192.168.12.253:8000";
+        String url = "http://192.168.12.253:8000";
         String s = HttpClientHelper.sendPost(url, param);
-        System.out.println("返回"+s);
+        System.out.println("返回" + s);
 
 
-//        LocalDateTime localDateTime =
-//                LocalDateTime.ofInstant(Instant.ofEpochMilli(1630563772), ZoneId.systemDefault());
         Date date = new Date();
-        date.setTime(1630563772*1000);
+        date.setTime(1630563772 * 1000);
         String format = new SimpleDateFormat().format(date);
-
         System.out.println();
-        LocalDateTime localDateTime = new Date(1630563772*1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+        LocalDateTime localDateTime = new Date(1630563772 * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
         System.out.println(localDateTime);
-        //HttpUtil.post(url,param);
+
     }
 
 }

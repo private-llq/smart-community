@@ -6,6 +6,7 @@ import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,23 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
     void issue(String uid, Long adminCommunityId);
 
-    Integer selectByStatus(String carNumber,Long community_id);
+    Map selectByStatus(String carNumber, String carColor, Long community_id);
 
+    /**
+     * @Description: app绑定月租车辆
+     * @author: Hu
+     * @since: 2021/9/3 10:37
+     * @Param:
+     * @return:
+     */
+    void appMonth(CarMonthlyVehicle vehicle);
+
+    /**
+     * @Description: app修改月租车辆到期时间
+     * @author: Hu
+     * @since: 2021/9/3 11:26
+     * @Param:
+     * @return:
+     */
+    void updateMonth(String carPlate, LocalDateTime orveTime);
 }

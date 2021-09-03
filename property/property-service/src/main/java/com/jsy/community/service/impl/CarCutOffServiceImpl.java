@@ -24,7 +24,7 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
    private CarCutOffMapper carCutOffMapper;
 
     @Override
-    public PageInfo<CarCutOffEntity> selectPage(CarCutOffQO carCutOffQO, Long adminCommunityId) {
+    public PageInfo<CarCutOffEntity> selectPage(CarCutOffQO carCutOffQO) {
 
         QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
         if (!StringUtils.isEmpty(carCutOffQO.getCarNumber())){
@@ -35,11 +35,11 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
             queryWrapper.like("car_type",carCutOffQO.getCarType());
         }
 
-        if (!StringUtils.isEmpty(carCutOffQO.getAccess())){
-            queryWrapper.like("access",carCutOffQO.getAccess());
-        }
+//        if (!StringUtils.isEmpty(carCutOffQO.getAccess())){
+//            queryWrapper.like("access",carCutOffQO.getAccess());
+//        }
 
-        queryWrapper.eq("community_id",adminCommunityId);
+        queryWrapper.eq("community_id",carCutOffQO.getCommunityId()).eq("state",carCutOffQO.getState());//状态
 
         Page<CarCutOffEntity> page = new Page<CarCutOffEntity>(carCutOffQO.getPage(),carCutOffQO.getSize());
         PageInfo<CarCutOffEntity> pageInfo = new PageInfo<>();
@@ -63,10 +63,18 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
 
     @Override
     public List<CarCutOffEntity> selectAccess(String carNumber, Integer state) {
-        QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
+
+        if (state==0){
+            QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("car_number",carNumber).eq("state",state).eq("belong",1);
+            List<CarCutOffEntity> carCutOffEntityList = carCutOffMapper.selectList(queryWrapper);
+            return carCutOffEntityList;
+        }else {
+            QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("car_number",carNumber).eq("state",state);
-        List<CarCutOffEntity> carCutOffEntityList = carCutOffMapper.selectList(queryWrapper);
-        return carCutOffEntityList;
+            List<CarCutOffEntity> carCutOffEntityList = carCutOffMapper.selectList(queryWrapper);
+            return carCutOffEntityList;
+        }
     }
 
     @Override

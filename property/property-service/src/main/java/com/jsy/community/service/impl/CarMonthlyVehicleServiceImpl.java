@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.mapper.*;
@@ -15,8 +17,10 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -37,6 +41,50 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     private CarBlackListMapper carBlackListMapper;
     @Autowired
     private CarProprietorMapper carProprietorMapper;
+
+
+
+    /**
+     * @Description: app修改月租车辆到期时间
+     * @author: Hu
+     * @since: 2021/9/3 11:39
+     * @Param: [carPlate, overTime]
+     * @return: void
+     */
+    @Override
+    @Transactional
+    public void updateMonth(String carPlate, LocalDateTime overTime) {
+        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carPlate));
+        if (vehicle!=null){
+            vehicle.setEndTime(overTime);
+            carMonthlyVehicleMapper.updateById(vehicle);
+        }
+        throw new ProprietorException("当前月租车辆不存在！");
+    }
+
+    /**
+     * @Description: app绑定月租车辆
+     * @author: Hu
+     * @since: 2021/9/3 10:37
+     * @Param: [vehicle]
+     * @return: void
+     */
+    @Override
+    @Transactional
+    public void appMonth(CarMonthlyVehicle vehicle) {
+        //查询黑名单中是否存在该车辆
+        CarBlackListEntity car_number = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", vehicle.getCarNumber()));
+        if (Objects.nonNull(car_number)){
+            throw new PropertyException("该车辆已进入黑名单，无法进场或离场!");
+        }
+        //查询收费设置数据
+        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", vehicle.getMonthlyMethodId()));
+        vehicle.setUid(UserUtils.randomUUID());
+        vehicle.setMonthlyMethodId(carChargeEntity.getUid());//存收费设置里面的id
+        vehicle.setMonthlyMethodName(carChargeEntity.getName());//存收费设置里面的名字
+        carMonthlyVehicleMapper.insert(vehicle);
+
+    }
 
     /**
      * 新增
@@ -75,6 +123,13 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.nonNull(car_number)){
             throw new PropertyException("该车辆已进入黑名单，无法进场或离场!");
         }
+
+        //查询数据库是否正在包月中
+        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",carMonthlyVehicle.getEndTime()));
+        if (Objects.nonNull(vehicle)){
+            throw new PropertyException("已进行包月，如果需要延期，请查询记录执行时间延期操作！");
+        }
+
         //查询收费设置数据
         String monthlyMethodId = carMonthlyVehicle.getMonthlyMethodId();
         CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", monthlyMethodId));
@@ -500,20 +555,49 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
     /**
      * 1临时，2月租，3业主
-     * @param carNumber
-     * @return
+     * @param carNumber 车牌号
+     * @param carColor 车牌颜色
+     * @param community_id 社区id
+     * @return map
      */
     @Override
-    public Integer selectByStatus(String carNumber,Long community_id) {
-        List<CarMonthlyVehicle> selectList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id",community_id));
-        if (selectList.size()>0){
-            return 2; //包月车辆
+    public Map selectByStatus(String carNumber,String carColor,Long community_id) {
+
+
+        CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).ge("end_time", LocalDateTime.now()));
+        if (Objects.nonNull(carMonthlyVehicle)){
+            HashMap<Integer, CarMonthlyVehicle> hashMap = new HashMap<>();
+            CarMonthlyVehicle vehicle = new CarMonthlyVehicle();
+            BeanUtil.copyProperties(carMonthlyVehicle,vehicle);
+            hashMap.put(2,vehicle);
+            return hashMap;//月租车辆
         }
 
-        List<CarProprietorEntity> selectList1 = carProprietorMapper.selectList(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id",community_id).eq("delete",0));
-        if (selectList1.size()>0){
-            return 3;//业主车辆
+        CarProprietorEntity carProprietorEntity = carProprietorMapper.selectOne(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id", community_id).eq("deleted", 0));
+        if (Objects.nonNull(carProprietorEntity)){
+            HashMap<Integer, CarProprietorEntity> hashMap = new HashMap<>();
+            CarProprietorEntity proprietorEntity = new CarProprietorEntity();
+            BeanUtil.copyProperties(carProprietorEntity,proprietorEntity);
+            hashMap.put(3,proprietorEntity);
+            return hashMap;//业主车辆
         }
-        return 1;//临时
+
+
+        //临时车 黄牌
+        if ("黄色".equals(carColor)){
+            CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq(StringUtils.isNotBlank(carColor),"plate_type", 0));
+            HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
+            CarChargeEntity chargeEntity = new CarChargeEntity();
+            BeanUtil.copyProperties(carChargeEntity,chargeEntity);
+            HashMap.put(1,chargeEntity);
+            return HashMap;
+        }
+        //临时车 其他拍照
+        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq(StringUtils.isNotBlank(carColor),"plate_type", 1));
+        HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
+        CarChargeEntity chargeEntity = new CarChargeEntity();
+        BeanUtil.copyProperties(carChargeEntity,chargeEntity);
+        HashMap.put(1,chargeEntity);
+        return HashMap;
     }
 }

@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -17,11 +18,13 @@ import java.time.LocalDateTime;
 @Data
 @TableName("t_community_hardware")
 public class CommunityHardWareEntity extends BaseEntity {
-	//硬件id(社保序列号)
+	//硬件id(设备序列号)
 	@NotBlank(groups = {addHardWareValidate.class}, message = "硬件id(社保序列号)必须填写")
 	private String hardwareId;
 	//硬件类型 1.炫优人脸识别一体机
 	private Integer hardwareType;
+	// 在线状态;1:在线;2:离线
+	private Integer onlineStatus;
 	//社区ID
 	private Long communityId;
 	// 楼栋/单元ID
@@ -46,6 +49,14 @@ public class CommunityHardWareEntity extends BaseEntity {
 	private LocalDateTime dataConnectTime;
 	//备注
 	private String remake;
+
+	// 搜索关键词
+	@TableField(exist = false)
+	private String searchText;
+
+	// 在线状态字符串
+	@TableField(exist = false)
+	private String onlineStatusStr;
 
 	// 物业端添加扫描设备(扫脸机)验证组
 	public interface addHardWareValidate{}

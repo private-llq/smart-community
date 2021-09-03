@@ -28,6 +28,10 @@ public class CarOrderRecordEntity implements Serializable {
      */
     private Long carId;
     /**
+     * 车辆id
+     */
+    private Long carPositionId;
+    /**
      * 1绑定车辆，2月租续费
      */
     private Integer type;

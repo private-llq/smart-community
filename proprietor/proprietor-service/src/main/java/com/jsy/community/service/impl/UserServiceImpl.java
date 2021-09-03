@@ -3,6 +3,9 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,6 +29,9 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
+import com.jsy.community.utils.imutils.entity.ImResponseEntity;
+import com.jsy.community.utils.imutils.entity.RegisterDto;
+import com.jsy.community.utils.imutils.open.EncryptHelper;
 import com.jsy.community.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -165,9 +171,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userInfoVo.setUroraTags(userUroraTagsEntity.getUroraTags());
         }
         //查询用户imId
-        UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().select("im_id").eq("uid", uid));
+        UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().select("im_id,im_password").eq("uid", uid));
         if(userIMEntity != null){
             userInfoVo.setImId(userIMEntity.getImId());
+            userInfoVo.setImPassword(userIMEntity.getImPassword());
         }
         return userInfoVo;
     }
@@ -194,6 +201,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     /**
+     * @Description: 注册im聊天
+     * @author: Hu
+     * @since: 2021/9/2 13:45
+     * @Param: [imId,nickName,password,avatarUrl]
+     * @return:
+     */
+    public static ImResponseEntity registerUser(String imId,String password,String nickName,String avatarUrl) {
+        String str = IdUtil.fastUUID();
+
+        RegisterDto registerDto = new RegisterDto();
+        registerDto.setImId(imId);
+        registerDto.setNickName(nickName);
+        registerDto.setPassword(MD5Util.getPassword(password));
+        registerDto.setIdentifier("1");
+        registerDto.setHeadImgMaxUrl(avatarUrl);
+        registerDto.setHeadImgSmallUrl(avatarUrl);
+        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/auth/login/register")
+                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
+                .header(EncryptHelper.HEAD_ONLY_REQ, str)
+                .header(EncryptHelper.HEAD_DEVICE, "mobile")
+                .body(EncryptHelper.doPost(JSON.toJSONString(registerDto), str,"mobile"))
+                .execute();
+
+        String body = response.body();
+        return JSON.parseObject(body, ImResponseEntity.class);
+    }
+
+
+    /**
      * 注册
      */
     @Transactional(rollbackFor = Exception.class)
@@ -206,6 +242,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         // 组装user表数据
         UserEntity user = new UserEntity();
         user.setUid(uuid);
+        user.setAvatarUrl("https://i.postimg.cc/1XgLJbXJ/home.jpg");
+        user.setNickname("E-home@"+qo.getAccount());
         user.setId(SnowFlake.nextId());
 
         // 账户数据(user_auth表)
@@ -245,9 +283,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         //创建imID(t_user_im表)
         UserIMEntity userIMEntity = new UserIMEntity();
+        userIMEntity.setImPassword("999999999");
         userIMEntity.setUid(uuid);
         userIMEntity.setImId(UserUtils.randomUUID());
         userIMMapper.insert(userIMEntity);
+        //调用聊天创建账号
+        ImResponseEntity responseEntity = registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
+        if (responseEntity.getErr_code()!=0){
+            log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(uuid);
@@ -265,6 +310,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
+
         return uuid;
     }
 
@@ -282,7 +328,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity user = new UserEntity();
         user.setId(SnowFlake.nextId());
         user.setUid(uuid);
-        user.setAvatarUrl("http://222.178.212.29:9000/avatar/dc2bf10509ec4636a2515708c372c849");
+        user.setAvatarUrl("https://i.postimg.cc/1XgLJbXJ/home.jpg");
+        user.setNickname("E-home@"+qo.getAccount());
         user.setRealName(qo.getName());
 
         // 账户数据(user_auth表)
@@ -325,8 +372,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //创建imID(t_user_im表)
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setUid(uuid);
+        userIMEntity.setImPassword("999999999");
         userIMEntity.setImId(UserUtils.randomUUID());
         userIMMapper.insert(userIMEntity);
+
+        //调用签章创建
+        ImResponseEntity responseEntity = registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
+        if (responseEntity.getErr_code()!=0){
+            log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(uuid);

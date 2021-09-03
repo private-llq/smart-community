@@ -71,4 +71,5 @@ public interface ICarChargeService {
 
     CarChargeEntity selectOneCharge(String uid, Long adminCommunityId);
 
+    List<CarChargeEntity> ListCharge2(Long adminCommunityId);
 }

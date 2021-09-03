@@ -35,8 +35,6 @@ public class CarCutOffEntity  extends BaseEntity {
     @ApiModelProperty(value = "进出方向")
     private String access;
 
-    @ApiModelProperty(value = "车子全景图")
-    private String image;
     @ApiModelProperty(value = "完成状态  0未完成 1已完成")
     private Integer state;
 
@@ -47,10 +45,23 @@ public class CarCutOffEntity  extends BaseEntity {
     private String trigerType;
     @ApiModelProperty(value = "车牌底色")
     private String plateColor;
-    @ApiModelProperty(value = "车牌特写图")
+
+    @ApiModelProperty(value = "车子进闸全景图")
+    private String image;
+    @ApiModelProperty(value = "车牌进闸特写图")
     private String closeupPic;
-    @ApiModelProperty(value = "车主所属")
-    private String belong;
+
+    @ApiModelProperty(value = "车子进闸全景图")
+    private String outImage;
+    @ApiModelProperty(value = "车牌进闸特写图")
+    private String outPic;
+
+    @ApiModelProperty(value = "车辆所属类型  1-临时 2-包月  3-业主")
+    private Integer belong;
+
+
+
+
 
     @ApiModelProperty(value = "进闸时间")
     //@TableField(exist = false)
