@@ -9,6 +9,8 @@ import com.jsy.community.qo.property.InsterCarPositionQO;
 import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
 import com.jsy.community.qo.property.UpdateCarPositionQO;
+import com.jsy.community.utils.UserUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -88,4 +90,13 @@ public interface ICarPositionService extends IService<CarPositionEntity> {
      * @return:
      */
     CarPositionEntity selectOne(Long carPositionId);
+    /**
+     * @Description: 查詢非業主個月租車位
+     * @author: arli
+     * @since: 2021/9/2 16:57
+     * @Param:
+     * @return:
+     */
+    Integer selectCarPositionVacancy( Long adminCommunityId);
+
 }

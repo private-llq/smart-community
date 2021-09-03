@@ -275,7 +275,23 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
             return false;
 
 
-
     }
+
+    @Override
+    public Integer selectCarPositionVacancy(Long adminCommunityId) {
+        QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("community_id",adminCommunityId);
+        queryWrapper.eq("binding_status",0);
+        Integer integer = carPositionMapper.selectCount(queryWrapper);
+        return integer;
+    }
+
+
+
+
+
+
+
+
 
 }
