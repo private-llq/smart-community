@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.ICommunityService;
+import com.jsy.community.api.IShopLeaseService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
@@ -74,6 +75,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
 	
+	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	private IShopLeaseService shopLeaseService;
+	
 	@Override
 	public List<CommunityEntity> listCommunityByName(String query,Integer areaId) {
 		QueryWrapper<CommunityEntity> wrapper = new QueryWrapper<>();
@@ -136,7 +140,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	**/
 	@Override
 	public CommunityEntity queryDetails(Long communityId){
-		return communityMapper.selectOne(new QueryWrapper<CommunityEntity>().select("*").eq("id",communityId));
+		QueryWrapper<CommunityEntity> queryWrapper = new QueryWrapper<CommunityEntity>().select("*").eq("id", communityId);
+		CommunityEntity communityEntity = communityMapper.selectOne(queryWrapper);
+		if (communityEntity != null) {
+			QueryWrapper<PropertyCompanyEntity> propertyCompanyEntityQueryWrapper = new QueryWrapper<>();
+			propertyCompanyEntityQueryWrapper.select("name");
+			propertyCompanyEntityQueryWrapper.eq("id", communityEntity.getPropertyId());
+			PropertyCompanyEntity propertyCompanyEntity = propertyCompanyMapper.selectOne(propertyCompanyEntityQueryWrapper);
+			if (propertyCompanyEntity != null) {
+				communityEntity.setCompanyName(propertyCompanyEntity.getName());
+			}
+		}
+		return communityEntity;
 	}
 	
 	/**
@@ -329,18 +344,29 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		List<HouseEntity> buildingList = houseMapper.getBuildingList(adminCommunityId);
 		communitySurveyEntity.setHouseSum(allHouse.size());
 		communitySurveyEntity.setBuildingSum(buildingList.size());
+		List<Long> communityIdList = new ArrayList<>();
+		communityIdList.add(adminCommunityId);
+		// 查住宅数量
+		communitySurveyEntity.setResidenceCount(houseMapper.selectAllHouseByCommunityIds(communityIdList));
+		// 查商铺数量
+		communitySurveyEntity.setShopCount(shopLeaseService.selectAllShopByCommunityIds(communityIdList));
 
 		// 查小区下业主数量和租户数量
 		List<HouseMemberEntity> allOwner = houseMemberMapper.getAllOwnerByCommunity(adminCommunityId);
 		List<HouseMemberEntity> allTenant = houseMemberMapper.getAllTenantByCommunity(adminCommunityId);
 		communitySurveyEntity.setOwnerCount(allOwner.size());
 		communitySurveyEntity.setTenantCount(allTenant.size());
-
+		
+		// 已占用车位
+		Integer occupyCarPosition = carPositionMapper.selectAllOccupyCarPositionByCommunityIds(communityIdList);
+		communitySurveyEntity.setOccupyCarPosition(occupyCarPosition);
 		// 查询小区下所有车位和车辆
 		List<CarPositionEntity> allCarPosition = carPositionMapper.getAllCarPositionByCommunity(adminCommunityId);
 		List<CarEntity> allCar = carMapper.getAllCarByCommunity(adminCommunityId);
 		communitySurveyEntity.setCarPositionCount(allCarPosition.size());
 		communitySurveyEntity.setCarCount(allCar.size());
+		// 未占用车位
+		communitySurveyEntity.setUnoccupiedCarPosition(allCarPosition.size() - occupyCarPosition);
 
 		// 小区月收费统计
 		if (startTime != null && endTime != null) {
@@ -361,7 +387,6 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	 **/
 	@Override
 	public ConsoleEntity getPropertySurvey(Long companyId, List<Long> communityIdList) {
-
 		// 返回给前端实体
 		ConsoleEntity consoleEntity = new ConsoleEntity();
 		// 查该物业剩余短信数量
@@ -371,14 +396,28 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		List<CommunityEntity> communityEntities = communityMapper.queryCommunityByCompanyId(companyId);
 		// 设置物业所属小区数量
 		consoleEntity.setCommunityNumber(communityEntities.size());
+		// 查住宅数量
+		Integer residenceCount = houseMapper.selectAllHouseByCommunityIds(communityIdList);
+		consoleEntity.setResidenceCount(residenceCount);
+		// 查商铺数量
+		Integer shopCount = shopLeaseService.selectAllShopByCommunityIds(communityIdList);
+		consoleEntity.setShopCount(shopCount);
 		// 查询物业房屋总数量
-		consoleEntity.setHouseSum(houseMapper.selectAllHouseByCommunityIds(communityIdList));
+		consoleEntity.setHouseSum(residenceCount + shopCount);
+		// 查业主数量
+		consoleEntity.setOwnerCount(houseMemberMapper.selectAllownerByCommunityIds(communityIdList));
+		// 查租户数量
+		consoleEntity.setTenantCount(houseMemberMapper.selectAlltenantByCommunityIds(communityIdList));
 		// 查询物业居住人数
 		consoleEntity.setLiveSum(houseMemberMapper.selectAllPeopleByCommunityIds(communityIdList));
-
+		// 已占用车位
+		Integer occupyCarPosition = carPositionMapper.selectAllOccupyCarPositionByCommunityIds(communityIdList);
+		consoleEntity.setOccupyCarPosition(occupyCarPosition);
 		// 查询物业车位总数
-		consoleEntity.setCarPositionSum(carPositionMapper.selectAllCarPositionByCommunityIds(communityIdList));
-
+		Integer carPosition = carPositionMapper.selectAllCarPositionByCommunityIds(communityIdList);
+		consoleEntity.setCarPositionSum(carPosition);
+		// 未占用车位
+		consoleEntity.setUnoccupiedCarPosition(carPosition - occupyCarPosition);
 		return consoleEntity;
 	}
 	

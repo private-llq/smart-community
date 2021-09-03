@@ -36,7 +36,17 @@ public class CarBlackListController {
         PageInfo<CarBlackListEntity> pageInfo = blackListService.carBlackListPage(baseQO, UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo);
     }
-
+    /**
+     * 查询车牌是否是 黑名单
+     * @param  车牌号
+     * @return
+     */
+    @Login
+    @PostMapping("carBlackListOne")
+    public CommonResult carBlackListEntity(@RequestParam("carNumber")String carNumber){
+        CarBlackListEntity carBlackListEntity = blackListService.carBlackListOne(carNumber);
+        return CommonResult.ok(carNumber,"查询成功");
+    }
 
 
     /**

@@ -1383,6 +1383,20 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
     public List<HouseEntity> selectAllBuildingUnitDoor(Long communityId) {
 	    return houseMapper.selectAllBuildingUnitDoor(communityId);
     }
+
+
+    /**
+     * @Description: 查询当前小区所有房屋地址
+     * @author: Hu
+     * @since: 2021/9/1 14:23
+     * @Param: [adminCommunityId]
+     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+     */
+    @Override
+    public List<HouseEntity> getHouse(Long adminCommunityId) {
+        return houseMapper.selectList(new QueryWrapper<HouseEntity>().select("id,concat(building,unit,door) as address").eq("community_id",adminCommunityId).eq("type",4));
+    }
+
     /**
      * 根据楼栋id和社区id查询楼栋名字集合
      * @param strings

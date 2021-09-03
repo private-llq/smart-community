@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.mapper.*;
@@ -19,6 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -39,6 +41,50 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     private CarBlackListMapper carBlackListMapper;
     @Autowired
     private CarProprietorMapper carProprietorMapper;
+
+
+
+    /**
+     * @Description: app修改月租车辆到期时间
+     * @author: Hu
+     * @since: 2021/9/3 11:39
+     * @Param: [carPlate, overTime]
+     * @return: void
+     */
+    @Override
+    @Transactional
+    public void updateMonth(String carPlate, LocalDateTime overTime) {
+        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carPlate));
+        if (vehicle!=null){
+            vehicle.setEndTime(overTime);
+            carMonthlyVehicleMapper.updateById(vehicle);
+        }
+        throw new ProprietorException("当前月租车辆不存在！");
+    }
+
+    /**
+     * @Description: app绑定月租车辆
+     * @author: Hu
+     * @since: 2021/9/3 10:37
+     * @Param: [vehicle]
+     * @return: void
+     */
+    @Override
+    @Transactional
+    public void appMonth(CarMonthlyVehicle vehicle) {
+        //查询黑名单中是否存在该车辆
+        CarBlackListEntity car_number = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", vehicle.getCarNumber()));
+        if (Objects.nonNull(car_number)){
+            throw new PropertyException("该车辆已进入黑名单，无法进场或离场!");
+        }
+        //查询收费设置数据
+        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", vehicle.getMonthlyMethodId()));
+        vehicle.setUid(UserUtils.randomUUID());
+        vehicle.setMonthlyMethodId(carChargeEntity.getUid());//存收费设置里面的id
+        vehicle.setMonthlyMethodName(carChargeEntity.getName());//存收费设置里面的名字
+        carMonthlyVehicleMapper.insert(vehicle);
+
+    }
 
     /**
      * 新增

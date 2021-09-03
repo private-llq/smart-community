@@ -89,6 +89,10 @@ public class CommunityEntity extends BaseEntity {
     
     @TableField(exist=false)
     private Long houseId;//房屋ID 小区定位返回用
+
+    // 物业公司名称
+    @TableField(exist=false)
+    private String companyName;
     
     /**
      * 大后台新增社区验证组

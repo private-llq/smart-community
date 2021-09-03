@@ -44,4 +44,18 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="selectAllownerByCommunityIds" resultType="java.lang.Integer">
+        select count(0) from t_house_member where relation = 1 and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectAlltenantByCommunityIds" resultType="java.lang.Integer">
+        select count(0) from t_house_member where relation = 7 and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

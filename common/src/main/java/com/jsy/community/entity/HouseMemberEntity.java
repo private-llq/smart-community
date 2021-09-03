@@ -2,8 +2,13 @@ package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jsy.community.utils.RegexUtils;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -38,10 +43,24 @@ public class HouseMemberEntity extends BaseEntity {
     /**
      * 房间ID
      */
+    @NotNull(message = "房间不能为空！",groups = {SaveVerification.class})
+    @Min(message = "房间不能为空",value = 1,groups = {SaveVerification.class})
     private Long houseId;
+
+    /**
+     * 房间ID
+     */
+    @TableField(exist = false)
+    private String houseIdStr;
+
+    public String getHouseIdStr() {
+        return String.valueOf(houseId);
+    }
+
     /**
      * 姓名
      */
+    @NotBlank(message = "姓名不能为空",groups = {SaveVerification.class})
     private String name;
     /**
      * 性别，0未知，1男，2女
@@ -50,6 +69,7 @@ public class HouseMemberEntity extends BaseEntity {
     /**
      * 手机号码
      */
+    @Pattern(message = "手机号格式不正确！",regexp = RegexUtils.REGEX_MOBILE,groups = {SaveVerification.class})
     private String mobile;
     /**
      * 与业主关系 0.临时，1.业主，6.亲属，7租户
@@ -174,6 +194,10 @@ public class HouseMemberEntity extends BaseEntity {
      * 有效时间
      */
     private LocalDateTime validTime;
+
+
+    //新增修改验证
+    public interface SaveVerification{}
 
 
 }

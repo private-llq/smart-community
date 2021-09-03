@@ -23,6 +23,9 @@ public class UserIMEntity implements Serializable {
 	
 	@ApiModelProperty(value = "idID")
 	private String imId;
+
+	@ApiModelProperty(value = "id密码")
+	private String imPassword;
 	
 	@TableField(fill = FieldFill.INSERT)
 	private LocalDateTime createTime;

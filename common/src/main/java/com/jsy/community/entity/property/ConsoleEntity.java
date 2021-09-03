@@ -24,11 +24,29 @@ public class ConsoleEntity implements Serializable {
 	@ApiModelProperty(value = "小区数量")
 	private Integer communityNumber;
 	
+	@ApiModelProperty(value = "住宅数量")
+	private Integer residenceCount;
+	
+	@ApiModelProperty(value = "商铺数量")
+	private Integer shopCount;
+	
 	@ApiModelProperty(value = "小区房屋总数")
 	private Integer houseSum;
 	
+	@ApiModelProperty(value = "业主人数")
+	private Integer ownerCount;
+	
+	@ApiModelProperty(value = "租户人数")
+	private Integer tenantCount;
+	
 	@ApiModelProperty(value = "居住人数")
 	private Integer liveSum;
+	
+	@ApiModelProperty(value = "未占用车位")
+	private Integer unoccupiedCarPosition;
+	
+	@ApiModelProperty(value = "已占用车位")
+	private Integer occupyCarPosition;
 	
 	@ApiModelProperty(value = "车位总数")
 	private Integer carPositionSum;

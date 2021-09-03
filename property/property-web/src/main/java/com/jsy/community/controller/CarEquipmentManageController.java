@@ -251,4 +251,23 @@ public class CarEquipmentManageController {
         boolean b = locationService.deleteLocation(locationId,UserUtils.getAdminCommunityId());
         return CommonResult.ok("修改成功");
     }
+
+    /**
+     * @Description: 通过序列号查询设备管理
+     * @Param: [baseQO]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: Tian
+     * @Date: 2021/8/9-11:22
+     **/
+    @GetMapping("/equipmentOne")
+    @Login
+    public CommonResult equipmentOne(@RequestParam("camId")String camId){
+        Long communityId = UserUtils.getAdminCommunityId();
+        CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
+
+
+        return CommonResult.ok(carEquipmentManageEntity,"查询成功");
+    }
+
+
 }

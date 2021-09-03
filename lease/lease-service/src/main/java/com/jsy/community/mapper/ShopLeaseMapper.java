@@ -58,4 +58,13 @@ public interface ShopLeaseMapper extends BaseMapper<ShopLeaseEntity> {
      * @return:
      */
     ShopLeaseEntity selectByShopId(Long shopId);
+    
+    /**
+     * @Description: 查询communityIds下所有商铺数量
+     * @author: DKS
+     * @since: 2021/9/3 9:31
+     * @Param: communityIdList
+     * @return: Integer
+     */
+    Integer selectAllShopByCommunityIds(@Param("list") List<Long> communityIdList);
 }

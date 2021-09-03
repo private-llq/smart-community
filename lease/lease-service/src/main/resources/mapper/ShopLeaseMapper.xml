@@ -94,4 +94,10 @@
         select * from t_shop_lease where id=#{shopId}
     </select>
 
+    <select id="selectAllShopByCommunityIds" resultType="java.lang.Integer">
+        select count(0) from t_shop_lease where community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

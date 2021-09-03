@@ -14,6 +14,8 @@ import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/cutOff")
 @ApiJSYController
@@ -25,7 +27,28 @@ public class CarCutOffController{
     @Login
     @PostMapping("/selectPage")
     public CommonResult selectPage(@RequestBody CarCutOffQO carCutOffQO){
-        PageInfo<CarCutOffEntity> pageInfo = carCutOffService.selectPage(carCutOffQO, UserUtils.getAdminCommunityId());
+        PageInfo<CarCutOffEntity> pageInfo = carCutOffService.selectPage(carCutOffQO);
         return CommonResult.ok(pageInfo,"查询成功");
     }
+
+    @Login
+    @PostMapping("/addCutOff")
+    public CommonResult addCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
+        boolean b=  carCutOffService.addCutOff(carCutOffEntity);
+        return CommonResult.ok("添加成功");
+    }
+    @Login
+    @PostMapping("/updateCutOff")
+    public CommonResult updateCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
+        boolean b=  carCutOffService.updateCutOff(carCutOffEntity);
+        return CommonResult.ok("修改成功");
+    }
+
+    @Login
+    @PostMapping("/selectAccess")
+    public CommonResult selectAccess(@RequestParam("car_number") String carNumber, @RequestParam("state") Integer state){
+        List<CarCutOffEntity>  carCutOffEntityList =  carCutOffService.selectAccess(carNumber,state);
+        return CommonResult.ok(carCutOffEntityList,"查询成功");
+    }
+
 }

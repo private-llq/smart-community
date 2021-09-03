@@ -93,8 +93,8 @@ public class CommunityController {
      **/
     @ApiOperation("id单查详情")
     @GetMapping("/details")
-    public CommonResult queryDetails() {
-        return CommonResult.ok(communityService.queryDetails(UserUtils.getAdminCommunityId()));
+    public CommonResult queryDetails(@RequestParam Long communityId) {
+        return CommonResult.ok(communityService.queryDetails(communityId));
     }
 
     /**

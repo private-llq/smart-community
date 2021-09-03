@@ -39,7 +39,10 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -858,5 +861,17 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
         BeanUtils.copyProperties(info, objectPageInfo);
         objectPageInfo.setRecords(shopVOS);
         return objectPageInfo;
+    }
+    
+    /**
+     * @Description: 查询communityIds下所有商铺数量
+     * @author: DKS
+     * @since: 2021/9/3 9:31
+     * @Param: communityIdList
+     * @return: Integer
+     */
+    @Override
+    public Integer selectAllShopByCommunityIds(List<Long> communityIdList) {
+        return shopLeaseMapper.selectAllShopByCommunityIds(communityIdList);
     }
 }
