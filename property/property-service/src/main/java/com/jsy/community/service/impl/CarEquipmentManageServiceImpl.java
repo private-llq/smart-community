@@ -115,5 +115,15 @@ public class CarEquipmentManageServiceImpl extends ServiceImpl<CarEquipmentManag
         return false;
     }
 
+    @Override
+    public CarEquipmentManageEntity equipmentOne(String camId) {
+        QueryWrapper<CarEquipmentManageEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("equipment_number",camId);
+        System.out.println(camId);
+        CarEquipmentManageEntity carEquipmentManageEntity = manageMapper.selectOne(queryWrapper);
+        System.out.println(carEquipmentManageEntity+"1111");
+        return carEquipmentManageEntity;
+    }
+
 
 }

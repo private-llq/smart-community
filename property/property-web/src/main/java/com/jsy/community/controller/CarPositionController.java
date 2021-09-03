@@ -9,14 +9,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.ICarPositionService;
-import com.jsy.community.api.ICarPositionTypeService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.*;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.property.CarPositionEntity;
-import com.jsy.community.entity.property.CarPositionTypeEntity;
+import com.jsy.community.entity.property.*;
 import com.jsy.community.qo.property.*;
 import com.jsy.community.util.Base64UtilsTest;
 import com.jsy.community.util.HttpClientHelper;
@@ -40,7 +37,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -67,6 +67,16 @@ public class CarPositionController {
     private IUserService iUserService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionTypeService iCarPositionTypeService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarCutOffService carCutOffService;
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarEquipmentManageService equipmentManageService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarBlackListService icarBlackListService;
+
+
 
 
     @ApiOperation("分页查询车位信息")
@@ -256,6 +266,10 @@ public class CarPositionController {
                                 @RequestParam("closeup_pic") String closeupPic//车牌特写图，BASE64 编码 为避免Http传输时URL编码意外改变图片的 BASE64 编码，作了特殊的替换：'+'替换为'-'，'/'替换为'_'，'='替换为'.
             , HttpServletResponse response) throws IOException {
 
+
+
+
+
         System.out.println(type);
         System.out.println(mode);
         System.out.println(parkId);
@@ -302,6 +316,9 @@ public class CarPositionController {
         System.out.println(carInAndOutPicture1);
 
 
+        //新增开闸记录 和 关闸记录的时间
+        extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1,carSubLogo,plateColor);
+
 
 
         CarVO carVO = new CarVO();
@@ -345,6 +362,54 @@ public class CarPositionController {
 
 
 
+
+    //新增开闸记录和结算出闸时间
+    private void extracted(String plateNum, String vehicleType, Long startTime,
+                           String camId, String vdcType, String trigerType, String picture, String closeupPic,String carSubLogo,String plateColor) {
+        if (vdcType.equals("in")){
+            //开闸记录实体类对象
+            CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
+            carCutOffEntity.setCarNumber(plateNum);
+            carCutOffEntity.setCarType(vehicleType);
+            carCutOffEntity.setAccess(vdcType);
+            carCutOffEntity.setTrigerType(trigerType);
+            carCutOffEntity.setImage(picture);
+            carCutOffEntity.setCloseupPic(closeupPic);
+            carCutOffEntity.setCarSublogo(carSubLogo);
+            carCutOffEntity.setPlateColor(plateColor);
+
+            //时间戳转年月日       //进闸时间
+            LocalDateTime localDateTime = new Date(startTime*1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+            carCutOffEntity.setOpenTime(localDateTime);
+
+            //通过mac地址 获取社区id和设备名称
+            CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
+
+            System.out.println(carEquipmentManageEntity);
+
+            carCutOffEntity.setLaneName(carEquipmentManageEntity.getEquipmentName());
+            carCutOffEntity.setCommunityId(carEquipmentManageEntity.getCommunityId());
+
+            boolean b = carCutOffService.addCutOff(carCutOffEntity);
+
+        }else {
+            CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
+            List<CarCutOffEntity> carCutOffEntityList = carCutOffService.selectAccess(plateNum, 0);
+            //时间戳转年月日       //进闸时间
+            LocalDateTime localDateTime = new Date(startTime*1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+            for (CarCutOffEntity i:carCutOffEntityList) {
+                i.setStopTime(localDateTime);
+                i.setState(1);
+                carCutOffService.updateCutOff(i);
+            }
+
+        }
+
+
+
+
+
+    }
 
     public static void main(String[] args) {
 
@@ -431,6 +496,16 @@ public class CarPositionController {
         String s = HttpClientHelper.sendPost(url, param);
         System.out.println("返回"+s);
 
+
+//        LocalDateTime localDateTime =
+//                LocalDateTime.ofInstant(Instant.ofEpochMilli(1630563772), ZoneId.systemDefault());
+        Date date = new Date();
+        date.setTime(1630563772*1000);
+        String format = new SimpleDateFormat().format(date);
+
+        System.out.println();
+        LocalDateTime localDateTime = new Date(1630563772*1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+        System.out.println(localDateTime);
         //HttpUtil.post(url,param);
     }
 

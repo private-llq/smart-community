@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpResponse;
 import java.util.List;
 
 @Api(tags = "社区集市-商品分类")
@@ -78,7 +79,18 @@ public class ProprietorMarketCategoryController {
     @Login
     public CommonResult selectMarketcategory(){
         List<ProprietorMarketCategoryEntity> list = categoryService.selectMarketCategory();
+
         return CommonResult.ok(list,"查询成功");
     }
+
+//
+//    @GetMapping("/cat1")
+//    @ApiOperation("查询社区集市商品类别")
+//    @Login
+//    public CommonResult cat1(HttpResponse response){
+//        response.set
+//        return CommonResult.ok("查询成功");
+//    }
+
 
 }

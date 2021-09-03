@@ -57,4 +57,13 @@ public interface ICarEquipmentManageService extends IService<CarEquipmentManageE
      * @Date: 2021/8/19-9:35
      **/
     boolean updateEquipment(CarEquipMentQO carEquipMentQO, Long adminCommunityId, String userId);
+
+    /**
+     * @Description:通过序列号来查询设备
+     * @Param: [communityId, camId]
+     * @Return: com.jsy.community.entity.property.CarEquipmentManageEntity
+     * @Author: Tian
+     * @Date: 2021/9/2-14:56
+     **/
+    CarEquipmentManageEntity equipmentOne(String camId);
 }

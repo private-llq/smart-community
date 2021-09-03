@@ -132,6 +132,13 @@
             <!--            <scope>compile</scope>-->
         </dependency>
 
+        <!-- 租房端API调用 -->
+        <dependency>
+            <groupId>com.jsy</groupId>
+            <artifactId>lease-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
 
         <!--*************  LCN	*************-->
         <dependency>

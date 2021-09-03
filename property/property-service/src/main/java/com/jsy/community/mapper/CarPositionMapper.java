@@ -42,4 +42,13 @@ public interface CarPositionMapper extends BaseMapper<CarPositionEntity> {
 	 */
 	@Update("update t_car_position set community_id=null,car_pos_status=0,binding_status=0,uid=null,owner_phone=null,begin_time=null,end_time=null where id = #{carPositionId}")
     void updateByPosition(@Param("carPositionId") Long carPositionId);
+	
+	/**
+	 * @Description: 查询communityIds下所有已占用车位数量
+	 * @author: DKS
+	 * @since: 2021/9/3 9:53
+	 * @Param: communityIdList
+	 * @return: Integer
+	 */
+	Integer selectAllOccupyCarPositionByCommunityIds(@Param("list") List<Long> communityIdList);
 }

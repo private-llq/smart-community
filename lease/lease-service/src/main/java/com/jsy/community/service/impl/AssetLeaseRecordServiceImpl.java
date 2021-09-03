@@ -91,6 +91,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             QueryWrapper<HouseLeaseEntity> leaseEntityQueryWrapper = new QueryWrapper<>();
             leaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
             HouseLeaseEntity houseLeaseEntity = houseLeaseMapper.selectOne(leaseEntityQueryWrapper);
+            if (houseLeaseEntity == null) {
+                throw new LeaseException("该房屋不存在!");
+            }
             assetLeaseRecordEntity.setHomeOwnerUid(houseLeaseEntity.getUid());
             assetLeaseRecordEntity.setImageId(houseLeaseEntity.getHouseImageId());
             assetLeaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
@@ -110,6 +113,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             shopImgEntityQueryWrapper.eq("shop_id", assetLeaseRecordEntity.getAssetId());
             shopImgEntityQueryWrapper.last("limit 1");
             ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
+            if (shopImgEntity == null) {
+                throw new LeaseException("该商铺不存在!");
+            }
             assetLeaseRecordEntity.setHomeOwnerUid(shopLeaseEntity.getUid());
             assetLeaseRecordEntity.setImageId(shopImgEntity.getId());
             assetLeaseRecordEntity.setTitle(shopLeaseEntity.getTitle());

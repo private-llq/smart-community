@@ -30,6 +30,12 @@ public class CommunitySurveyEntity implements Serializable {
 	@ApiModelProperty(value = "访客次数")
 	private Integer visitorCount;
 	
+	@ApiModelProperty(value = "住宅数量")
+	private Integer residenceCount;
+	
+	@ApiModelProperty(value = "商铺数量")
+	private Integer shopCount;
+	
 	@ApiModelProperty(value = "房屋总数")
 	private Integer houseSum;
 	
@@ -41,6 +47,12 @@ public class CommunitySurveyEntity implements Serializable {
 	
 	@ApiModelProperty(value = "业主数")
 	private Integer ownerCount;
+	
+	@ApiModelProperty(value = "未占用车位")
+	private Integer unoccupiedCarPosition;
+	
+	@ApiModelProperty(value = "已占用车位")
+	private Integer occupyCarPosition;
 	
 	@ApiModelProperty(value = "车位数")
 	private Integer carPositionCount;
