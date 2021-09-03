@@ -255,6 +255,24 @@ public class HouseLeaseController {
 
     /**
      * @author: Pipi
+     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请)
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/3 10:27
+     **/
+    @Login
+    @PostMapping("/v2/operationContract")
+    public CommonResult operationContract(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        if (assetLeaseRecordEntity.getId() == null) {
+            throw new JSYException(400, "签约ID不能为空");
+        }
+        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.OperationContractValidate.class);
+        Integer integer = assetLeaseRecordService.operationContract(assetLeaseRecordEntity, UserUtils.getUserId());
+        return integer > 0 ? CommonResult.ok("操作成功") : CommonResult.error("操作失败!");
+    }
+
+    /**
+     * @author: Pipi
      * @description: 查询我的签约列表
      * @param baseQO: 分页查询条件
      * @return: com.jsy.community.vo.CommonResult

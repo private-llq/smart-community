@@ -24,6 +24,16 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
 
     /**
      * @author: Pipi
+     * @description: 停止签约(租客取消/房东拒绝)
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid: 登录用户uid
+     * @return: java.lang.Integer
+     * @date: 2021/9/3 10:30
+     **/
+    Integer operationContract(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid);
+
+    /**
+     * @author: Pipi
      * @description: 分页查询签约列表
      * @param baseQO: 分页查询条件
      * @param uid: 登录用户uid

@@ -382,7 +382,7 @@ public class CarPositionController {
             LocalDateTime localDateTime = new Date(startTime*1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
             carCutOffEntity.setOpenTime(localDateTime);
 
-            //通过mac地址 获取社区id和设备名称
+            //通过mac地址 获取社区id和设备名称   还有临时车模式
             CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
 
             System.out.println(carEquipmentManageEntity);
@@ -407,11 +407,6 @@ public class CarPositionController {
             }
 
         }
-
-
-
-
-
     }
 
     public static void main(String[] args) {
