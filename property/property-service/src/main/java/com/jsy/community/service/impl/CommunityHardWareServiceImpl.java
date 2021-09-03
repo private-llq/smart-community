@@ -4,20 +4,26 @@ import java.time.LocalDateTime;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.mapper.CommunityHardWareMapper;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.CollUtils;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -181,6 +187,11 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
             // 推送消息
             assemblingAndPushingData(mapArrayList, facilityId, communityId, 0);
         }
+        // 更新设备同步时间
+        UpdateWrapper<CommunityHardWareEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("data_connect_time", LocalDateTime.now());
+        updateWrapper.set("is_connect_data", 1);
+        communityHardWareMapper.update(new CommunityHardWareEntity(), updateWrapper);
         return mapArrayList.size();
     }
 
@@ -201,6 +212,42 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
         updateWrapper.eq("hardware_id", hardwareId);
         updateWrapper.eq("community_id", communityId);
         communityHardWareMapper.update(new CommunityHardWareEntity(), updateWrapper);
+    }
+
+    /**
+     * @param baseQO : 分页查询条件
+     * @author: Pipi
+     * @description: 分页查询设备列表
+     * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.CommunityHardWareEntity>
+     * @date: 2021/9/3 15:00
+     **/
+    @Override
+    public PageInfo<CommunityHardWareEntity> hardWarePageList(BaseQO<CommunityHardWareEntity> baseQO) {
+        Page<CommunityHardWareEntity> page = new Page<>();
+        PageInfo<CommunityHardWareEntity> pageInfo = new PageInfo<>();
+        MyPageUtils.setPageAndSize(page, baseQO);
+        CommunityHardWareEntity query = baseQO.getQuery();
+        QueryWrapper<CommunityHardWareEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("community_id", query.getCommunityId());
+        if (StringUtils.isNotBlank(query.getSearchText())) {
+            queryWrapper.like("name", query.getSearchText());
+            queryWrapper.like("hardwareId", query.getSearchText());
+        }
+        if (query.getOnlineStatus() != null) {
+            queryWrapper.eq("online_status", query.getOnlineStatus());
+        }
+        page = communityHardWareMapper.selectPage(page, queryWrapper);
+        BeanUtils.copyProperties(page, pageInfo);
+        if (!CollectionUtils.isEmpty(pageInfo.getRecords())) {
+            for (CommunityHardWareEntity record : page.getRecords()) {
+                if (record.getOnlineStatus() == 1) {
+                    record.setOnlineStatusStr("在线");
+                } else {
+                    record.setOnlineStatusStr("离线");
+                }
+            }
+        }
+        return pageInfo;
     }
 
     /**

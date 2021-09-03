@@ -6,6 +6,7 @@ import com.jsy.community.api.CommunityHardWareService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityHardWareEntity;
 import com.jsy.community.exception.JSYException;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -46,6 +47,7 @@ public class CommunityHardWareController {
         communityHardWareEntity.setHardwareType(1);
         communityHardWareEntity.setCommunityId(UserUtils.getAdminCommunityId());
         communityHardWareEntity.setIsConnectData(2);
+        communityHardWareEntity.setOnlineStatus(2);
         communityHardWareService.addHardWare(communityHardWareEntity);
         return CommonResult.ok("添加成功!");
     }
@@ -85,5 +87,22 @@ public class CommunityHardWareController {
         redisTemplate.opsForValue().set("syncFaceUrl:" + id, "", 2, TimeUnit.MINUTES);
         Integer resultNum = communityHardWareService.syncFaceUrl(id, UserUtils.getAdminCommunityId());
         return CommonResult.ok("同步完成;一共同步" + resultNum + "条数据。");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 分页查询设备列表
+     * @param baseQO: 分页查询条件
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/3 14:59
+     **/
+    @Login
+    @PostMapping("/v2/hardWarePageList")
+    public CommonResult hardWarePageList(@RequestBody BaseQO<CommunityHardWareEntity> baseQO) {
+        if (baseQO.getQuery() == null) {
+            baseQO.setQuery(new CommunityHardWareEntity());
+        }
+        baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(communityHardWareService.hardWarePageList(baseQO));
     }
 }
