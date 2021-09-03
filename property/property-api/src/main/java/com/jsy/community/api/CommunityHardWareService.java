@@ -3,6 +3,8 @@ package com.jsy.community.api;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CommunityHardWareEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
 
 /**
  * @Author: Pipi
@@ -48,4 +50,13 @@ public interface CommunityHardWareService extends IService<CommunityHardWareEnti
      * @date: 2021/8/18 17:38
      **/
     void updateOnlineStatus(JSONObject jsonObject);
+
+    /**
+     * @author: Pipi
+     * @description: 分页查询设备列表
+     * @param baseQO: 分页查询条件
+     * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.CommunityHardWareEntity>
+     * @date: 2021/9/3 15:00
+     **/
+    PageInfo<CommunityHardWareEntity> hardWarePageList(BaseQO<CommunityHardWareEntity> baseQO);
 }
