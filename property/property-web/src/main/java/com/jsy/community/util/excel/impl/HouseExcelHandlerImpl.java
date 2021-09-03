@@ -511,47 +511,69 @@ public class HouseExcelHandlerImpl implements HouseExcelHandler {
                 switch (j) {
                     case 0:
                         // 房屋号码
-                        cell.setCellValue(vo.getDoor());
+                        if (StringUtils.isNotBlank(vo.getDoor())) {
+                            cell.setCellValue(vo.getDoor());
+                        }
                         break;
                     case 1:
                         // 所属楼宇
-                        cell.setCellValue(vo.getBuilding());
+                        if (StringUtils.isNotBlank(vo.getBuilding())) {
+                            cell.setCellValue(vo.getBuilding());
+                        }
                         break;
                     case 2:
                         // 楼宇总层数
-                        cell.setCellValue(vo.getTotalFloor());
+                        if (vo.getTotalFloor() != null) {
+                            cell.setCellValue(vo.getTotalFloor());
+                        }
                         break;
                     case 3:
                         // 所属单元
-                        cell.setCellValue(vo.getUnit());
+                        if (StringUtils.isNotBlank(vo.getUnit())) {
+                            cell.setCellValue(vo.getUnit());
+                        }
                         break;
                     case 4:
                         // 所属楼层
-                        cell.setCellValue(vo.getFloor());
+                        if (vo.getFloor() != null) {
+                            cell.setCellValue(vo.getFloor());
+                        }
                         break;
                     case 5:
                         // 建筑面积㎡
-                        cell.setCellValue(String.valueOf(vo.getBuildArea()));
+                        if (vo.getBuildArea() != null) {
+                            cell.setCellValue(String.valueOf(vo.getBuildArea()));
+                        }
                         break;
                     case 6:
                         // 实用面积㎡
-                        cell.setCellValue(String.valueOf(vo.getPracticalArea()));
+                        if (vo.getPracticalArea() != null) {
+                            cell.setCellValue(String.valueOf(vo.getPracticalArea()));
+                        }
                         break;
                     case 7:
                         // 房屋状态
-                        cell.setCellValue(vo.getStatus());
+                        if (StringUtils.isNotBlank(vo.getStatus())) {
+                            cell.setCellValue(vo.getStatus());
+                        }
                         break;
                     case 8:
                         // 备注
-                        cell.setCellValue(vo.getComment());
+                        if (StringUtils.isNotBlank(vo.getComment())) {
+                            cell.setCellValue(vo.getComment());
+                        }
                         break;
                     case 9:
                         // 房屋地址
-                        cell.setCellValue(vo.getAddress());
+                        if (StringUtils.isNotBlank(vo.getAddress())) {
+                            cell.setCellValue(vo.getAddress());
+                        }
                         break;
                     case 10:
                         // 错误提示
-                        cell.setCellValue(vo.getRemark());
+                        if (StringUtils.isNotBlank(vo.getRemark())) {
+                            cell.setCellValue(vo.getRemark());
+                        }
                         break;
                     default:
                         break;
@@ -590,21 +612,28 @@ public class HouseExcelHandlerImpl implements HouseExcelHandler {
         for (int index = 0; index < errorVos.size(); index++) {
             row = sheet.createRow(index + 2);
             //创建列
-            for (int j = 0; j < EXPORT_ERROR_INFO.length; j++) {
+            for (int j = 0; j < EXPORT_BUILDING_ERROR_INFO.length; j++) {
                 cell = row.createCell(j);
                 BuildingImportErrorVO vo = errorVos.get(index);
                 switch (j) {
                     case 0:
                         // 所属楼宇
-                        cell.setCellValue(vo.getBuilding());
+                        if (StringUtils.isNotBlank(vo.getBuilding())) {
+                            cell.setCellValue(vo.getBuilding());
+                        }
                         break;
                     case 1:
                         // 楼宇总层数
-                        cell.setCellValue(vo.getTotalFloor());
+                        if (vo.getTotalFloor() != null) {
+                            cell.setCellValue(vo.getTotalFloor());
+                        }
                         break;
                     case 2:
                         // 楼宇名称
-                        cell.setCellValue(vo.getBuildingTypeName());
+                        if (StringUtils.isNotBlank(vo.getBuildingTypeName())) {
+                            cell.setCellValue(vo.getBuildingTypeName());
+                        }
+                        
                         break;
                     case 3:
                         // 错误提示
@@ -714,7 +743,9 @@ public class HouseExcelHandlerImpl implements HouseExcelHandler {
                     vo.setBuilding(stringCellValue);
                     break;
                 case 1:
-                    vo.setTotalFloor(Integer.valueOf(stringCellValue));
+                    if (StringUtils.isNotBlank(stringCellValue)) {
+                        vo.setTotalFloor(Integer.valueOf(stringCellValue));
+                    }
                     break;
                 case 2:
                     vo.setBuildingTypeName(stringCellValue);

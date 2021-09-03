@@ -567,12 +567,14 @@ public class HouseController {
 		for (int i = 0; i < houseEntities.size(); i++) {
 			buildingTypeNames.add(houseEntities.get(i).getBuildingTypeName());
 		}
-		Map<String, Map<String, Long>> buildingTypeIdMap = houseService.queryHouseBuildingTypeId(buildingTypeNames);
-		//补楼宇分类名称id
-		for (HouseEntity houseEntity : houseEntities) {
-			if (houseEntity.getBuildingTypeName() != null) {
-				Map<String, Long> countMap = buildingTypeIdMap.get(houseEntity.getBuildingTypeName());
-				houseEntity.setBuildingType(countMap == null ? null : countMap.get("id"));
+		if (buildingTypeNames.size() > 0) {
+			Map<String, Map<String, Long>> buildingTypeIdMap = houseService.queryHouseBuildingTypeId(buildingTypeNames);
+			//补楼宇分类名称id
+			for (HouseEntity houseEntity : houseEntities) {
+				if (houseEntity.getBuildingTypeName() != null) {
+					Map<String, Long> countMap = buildingTypeIdMap.get(houseEntity.getBuildingTypeName());
+					houseEntity.setBuildingType(countMap == null ? null : countMap.get("id"));
+				}
 			}
 		}
 		// 通过物业提交的数据 和 数据库该社区已存在的数据进行效验
