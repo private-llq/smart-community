@@ -315,6 +315,9 @@ public class CarPositionController {
         String carInAndOutPicture1 = MinioUtils.uploadNameByCarJPG(file1, "car-in-and-out-picture", "車牌"+startTime+plateNum+".jpg" );
         System.out.println(carInAndOutPicture1);
 
+        //通过mac地址 获取社区id和设备名称   还有临时车模式
+        CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
+
 
 
 
