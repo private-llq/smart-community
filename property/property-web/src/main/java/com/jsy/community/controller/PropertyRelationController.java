@@ -17,6 +17,8 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.HouseMemberVO;
+import com.jsy.community.vo.property.RelationImportErrVO;
+import com.jsy.community.vo.property.RelationImportQO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -33,6 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +86,21 @@ public class PropertyRelationController {
             e.printStackTrace();
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
+    }
+    @ApiOperation("导入")
+    @PostMapping("/import")
+    @Login
+    public CommonResult importRelation(@RequestBody MultipartFile file){
+        String originalFilename = file.getOriginalFilename();
+        String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        if (!Arrays.asList(ExcelUtil.SUPPORT_EXCEL_EXTENSION).contains(s)) {
+            return CommonResult.error("错误文件！可用后缀"+ Arrays.toString(ExcelUtil.SUPPORT_EXCEL_EXTENSION));
+        }
+        List<RelationImportErrVO> errorVos = new LinkedList<>();
+        List<RelationImportQO> list = membersHandler.importRelation(file,errorVos);
+
+
+        return CommonResult.ok();
     }
 
     @ApiOperation("迁入")
