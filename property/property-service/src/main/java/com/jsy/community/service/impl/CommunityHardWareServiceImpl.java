@@ -245,6 +245,9 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
                 } else {
                     record.setOnlineStatusStr("离线");
                 }
+                if (record.getBuildingId() != null) {
+                    record.setBuildingIdStr(String.valueOf(record.getBuildingId()));
+                }
             }
         }
         return pageInfo;
