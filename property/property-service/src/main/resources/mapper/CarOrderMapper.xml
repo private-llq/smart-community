@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.CarOrderMapper">
+    <select id="selectMonthCarPositionFeeByCommunityId" resultType="java.util.Map">
+        select mid(order_time,1,7) as mon,SUM(money) as carPositionFee from t_car_order
+        where order_time &gt;= #{startTime} and order_time &lt;= #{endTime} and order_status = 1 and deleted = 0 and community_id = #{communityId}
+        group by mon  ORDER BY mon
+    </select>
+
+    <select id="CarPositionFeeByYear" resultType="java.math.BigDecimal">
+        select sum(money) AS totalMoneyByYear from t_car_order
+        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and order_status = 1 and deleted = 0 and community_id = #{communityId}
+    </select>
+
+    <select id="carPositionByDate" resultType="java.util.Map">
+        select DATE(order_time) AS time,sum(money) AS carPositionByDate from t_car_order
+        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and community_id = #{communityId} and order_status = 1 and deleted = 0
+        group by order_time ORDER BY order_time
+    </select>
+
+    <select id="carPositionByMonth" resultType="java.math.BigDecimal">
+        select sum(money) AS totalMoneyByMonth from t_car_order
+        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and order_status = 1 and community_id = #{communityId} and deleted = 0
+    </select>
+</mapper>
