@@ -372,17 +372,23 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		communitySurveyEntity.setUnoccupiedCarPosition(allCarPosition.size() - occupyCarPosition);
 
 		// 小区月物业费收费统计
-//		if (startTime != null && endTime != null) {}
 		communitySurveyEntity.setDateByPropertyFee(propertyFinanceOrderMapper.chargeByDate(startTime, endTime, adminCommunityId));
 		BigDecimal monthByPropertyFee = propertyFinanceOrderMapper.chargeByMonth(startTime, endTime, adminCommunityId);
 		communitySurveyEntity.setMonthByPropertyFee(monthByPropertyFee);
 		// 小区月车位费收费统计
-//		if (startTime != null && endTime != null) {}
 		communitySurveyEntity.setDateByCarPositionFee(carOrderMapper.carPositionByDate(startTime, endTime, adminCommunityId));
 		BigDecimal monthByCarPositionFee = carOrderMapper.carPositionByMonth(startTime, endTime, adminCommunityId);
 		communitySurveyEntity.setMonthByCarPositionFee(monthByCarPositionFee);
 		// 小区总月收入
-		communitySurveyEntity.setMonthByTotalFee(monthByPropertyFee.add(monthByCarPositionFee));
+		if (monthByPropertyFee == null && monthByCarPositionFee == null) {
+			communitySurveyEntity.setMonthByTotalFee(new BigDecimal("0.00"));
+		} else if (monthByPropertyFee == null) {
+			communitySurveyEntity.setMonthByTotalFee(monthByCarPositionFee);
+		} else if (monthByCarPositionFee == null) {
+			communitySurveyEntity.setMonthByTotalFee(monthByPropertyFee);
+		} else {
+			communitySurveyEntity.setMonthByTotalFee(monthByPropertyFee.add(monthByCarPositionFee));
+		}
 
 		return communitySurveyEntity;
 	}
@@ -462,7 +468,15 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		BigDecimal carPositionFee = carOrderMapper.CarPositionFeeByYear(startTime, endTime, communityId);
 		consoleEntity.setYearByCarPositionFee(carPositionFee);
 		// 物业年总收入
-		consoleEntity.setYearByTotalFee(propertyFee.add(carPositionFee));
+		if (propertyFee == null && carPositionFee == null) {
+			consoleEntity.setYearByTotalFee(new BigDecimal("0.00"));
+		} else if (propertyFee == null) {
+			consoleEntity.setYearByTotalFee(carPositionFee);
+		} else if (carPositionFee == null) {
+			consoleEntity.setYearByTotalFee(propertyFee);
+		} else {
+			consoleEntity.setYearByTotalFee(propertyFee.add(carPositionFee));
+		}
 		return consoleEntity;
 	}
 	
