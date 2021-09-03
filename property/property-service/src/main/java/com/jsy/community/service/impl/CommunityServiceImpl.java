@@ -71,6 +71,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	
 	@Autowired
 	private PeopleHistoryMapper peopleHistoryMapper;
+	
+	@Autowired
+	private CarOrderMapper carOrderMapper;
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
@@ -368,13 +371,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		// 未占用车位
 		communitySurveyEntity.setUnoccupiedCarPosition(allCarPosition.size() - occupyCarPosition);
 
-		// 小区月收费统计
-		if (startTime != null && endTime != null) {
-			List<Map<String, BigDecimal>> maps = propertyFinanceOrderMapper.chargeByDate(startTime, endTime, adminCommunityId);
-			communitySurveyEntity.setDateByPropertyFee(maps);
-			BigDecimal monthByPropertyFee = propertyFinanceOrderMapper.chargeByMonth(startTime, endTime, adminCommunityId);
-			communitySurveyEntity.setMonthByPropertyFee(monthByPropertyFee);
-		}
+		// 小区月物业费收费统计
+//		if (startTime != null && endTime != null) {}
+		communitySurveyEntity.setDateByPropertyFee(propertyFinanceOrderMapper.chargeByDate(startTime, endTime, adminCommunityId));
+		BigDecimal monthByPropertyFee = propertyFinanceOrderMapper.chargeByMonth(startTime, endTime, adminCommunityId);
+		communitySurveyEntity.setMonthByPropertyFee(monthByPropertyFee);
+		// 小区月车位费收费统计
+//		if (startTime != null && endTime != null) {}
+		communitySurveyEntity.setDateByCarPositionFee(carOrderMapper.carPositionByDate(startTime, endTime, adminCommunityId));
+		BigDecimal monthByCarPositionFee = carOrderMapper.carPositionByMonth(startTime, endTime, adminCommunityId);
+		communitySurveyEntity.setMonthByCarPositionFee(monthByCarPositionFee);
+		// 小区总月收入
+		communitySurveyEntity.setMonthByTotalFee(monthByPropertyFee.add(monthByCarPositionFee));
 
 		return communitySurveyEntity;
 	}
@@ -446,8 +454,15 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		// 查询年每月的物业费统计
 		consoleEntity.setMonthByPropertyFee(propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityId(communityId, startTime, endTime));
 		// 查询年总计物业费收入统计
-		consoleEntity.setYearByPropertyFee(propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityId));
-		// TODO:车位费car_order
+		BigDecimal propertyFee = propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityId);
+		consoleEntity.setYearByPropertyFee(propertyFee);
+		// 查询年每月的车位费统计
+		consoleEntity.setMonthByCarPositionFee(carOrderMapper.selectMonthCarPositionFeeByCommunityId(communityId, startTime, endTime));
+		// 查询年总计车位费收入统计
+		BigDecimal carPositionFee = carOrderMapper.CarPositionFeeByYear(startTime, endTime, communityId);
+		consoleEntity.setYearByCarPositionFee(carPositionFee);
+		// 物业年总收入
+		consoleEntity.setYearByTotalFee(propertyFee.add(carPositionFee));
 		return consoleEntity;
 	}
 	
