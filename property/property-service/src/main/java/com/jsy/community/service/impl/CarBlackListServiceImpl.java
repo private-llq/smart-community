@@ -19,7 +19,8 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @DubboService(version = Const.version, group = Const.group)
-public class CarBlackListServiceImpl implements ICarBlackListService {
+public class
+CarBlackListServiceImpl implements ICarBlackListService {
 
     @Autowired
     public CarBlackListMapper carBlackListMapper;
@@ -56,6 +57,12 @@ public class CarBlackListServiceImpl implements ICarBlackListService {
     public Integer delBlackList(String uid){
         int delete = carBlackListMapper.delete(new QueryWrapper<CarBlackListEntity>().eq("uid", uid));
         return delete;
+    }
+
+    @Override
+    public CarBlackListEntity carBlackListOne(String carNumber) {
+        CarBlackListEntity carBlackListEntity = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", carNumber));
+        return carBlackListEntity;
     }
 
     /**

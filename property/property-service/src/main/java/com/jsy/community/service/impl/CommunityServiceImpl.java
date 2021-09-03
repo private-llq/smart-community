@@ -140,7 +140,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	**/
 	@Override
 	public CommunityEntity queryDetails(Long communityId){
-		return communityMapper.selectOne(new QueryWrapper<CommunityEntity>().select("*").eq("id",communityId));
+		QueryWrapper<CommunityEntity> queryWrapper = new QueryWrapper<CommunityEntity>().select("*").eq("id", communityId);
+		CommunityEntity communityEntity = communityMapper.selectOne(queryWrapper);
+		if (communityEntity != null) {
+			QueryWrapper<PropertyCompanyEntity> propertyCompanyEntityQueryWrapper = new QueryWrapper<>();
+			propertyCompanyEntityQueryWrapper.select("name");
+			propertyCompanyEntityQueryWrapper.eq("id", communityEntity.getPropertyId());
+			PropertyCompanyEntity propertyCompanyEntity = propertyCompanyMapper.selectOne(propertyCompanyEntityQueryWrapper);
+			if (propertyCompanyEntity != null) {
+				communityEntity.setCompanyName(propertyCompanyEntity.getName());
+			}
+		}
+		return communityEntity;
 	}
 	
 	/**

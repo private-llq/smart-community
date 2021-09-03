@@ -72,7 +72,7 @@ public class CommunityEntity extends BaseEntity {
     private String promoter;
 
     // 物业id
-    @NotNull(groups = ProperyuAddValidatedGroup.class, message = "请填写物业信息")
+    // @NotNull(groups = ProperyuAddValidatedGroup.class, message = "请填写物业信息")
     private Long propertyId;
 
     // 联系人
@@ -89,6 +89,10 @@ public class CommunityEntity extends BaseEntity {
     
     @TableField(exist=false)
     private Long houseId;//房屋ID 小区定位返回用
+
+    // 物业公司名称
+    @TableField(exist=false)
+    private String companyName;
     
     /**
      * 大后台新增社区验证组

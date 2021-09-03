@@ -11,6 +11,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,17 @@ public class CarBlackListController {
         PageInfo<CarBlackListEntity> pageInfo = blackListService.carBlackListPage(baseQO, UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo);
     }
-
+    /**
+     * 查询车牌是否是 黑名单
+     * @param  车牌号
+     * @return
+     */
+    @Login
+    @PostMapping("carBlackListOne")
+    public CommonResult carBlackListEntity(@RequestParam("carNumber")String carNumber){
+        CarBlackListEntity carBlackListEntity = blackListService.carBlackListOne(carNumber);
+        return CommonResult.ok(carNumber,"查询成功");
+    }
 
 
     /**
@@ -65,6 +76,4 @@ public class CarBlackListController {
         blackListService.delBlackList(uid);
         return CommonResult.ok();
     }
-
-
-}
+    }

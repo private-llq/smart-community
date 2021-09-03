@@ -1,12 +1,12 @@
 package com.jsy.community.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.AssetLeaseRecordService;
-import com.jsy.community.api.ProprietorUserService;
-import com.jsy.community.api.LeaseException;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -18,11 +18,19 @@ import com.jsy.community.mapper.AssetLeaseRecordMapper;
 import com.jsy.community.mapper.HouseLeaseMapper;
 import com.jsy.community.mapper.ShopImgMapper;
 import com.jsy.community.mapper.ShopLeaseMapper;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.util.HouseHelper;
+import com.jsy.community.utils.MyMathUtils;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @Author: Pipi
@@ -45,6 +53,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @Autowired
     private ShopImgMapper shopImgMapper;
+
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
+    private IHouseConstService houseConstService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ProprietorUserService userService;
@@ -80,6 +91,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             QueryWrapper<HouseLeaseEntity> leaseEntityQueryWrapper = new QueryWrapper<>();
             leaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
             HouseLeaseEntity houseLeaseEntity = houseLeaseMapper.selectOne(leaseEntityQueryWrapper);
+            if (houseLeaseEntity == null) {
+                throw new LeaseException("该房屋不存在!");
+            }
             assetLeaseRecordEntity.setHomeOwnerUid(houseLeaseEntity.getUid());
             assetLeaseRecordEntity.setImageId(houseLeaseEntity.getHouseImageId());
             assetLeaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
@@ -99,6 +113,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             shopImgEntityQueryWrapper.eq("shop_id", assetLeaseRecordEntity.getAssetId());
             shopImgEntityQueryWrapper.last("limit 1");
             ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
+            if (shopImgEntity == null) {
+                throw new LeaseException("该商铺不存在!");
+            }
             assetLeaseRecordEntity.setHomeOwnerUid(shopLeaseEntity.getUid());
             assetLeaseRecordEntity.setImageId(shopImgEntity.getId());
             assetLeaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
@@ -109,5 +126,47 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             throw new LeaseException("请传递正确的资产类型;1:商铺;2:房屋");
         }
         return assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
+    }
+
+    /**
+     * @param baseQO : 分页查询条件
+     * @param uid : 登录用户uid
+     * @author: Pipi
+     * @description: 分页查询签约列表
+     * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.proprietor.AssetLeaseRecordEntity>
+     * @date: 2021/9/2 14:38
+     **/
+    @Override
+    public PageInfo<AssetLeaseRecordEntity> pageContractList(BaseQO<AssetLeaseRecordEntity> baseQO, String uid) {
+        Page<AssetLeaseRecordEntity> page = new Page<>();
+        MyPageUtils.setPageAndSize(page, baseQO);
+        PageInfo<AssetLeaseRecordEntity> pageInfo = new PageInfo<>();
+        AssetLeaseRecordEntity query = baseQO.getQuery();
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("asset_type", query.getAssetType());
+        if (query.getIdentityType() == 1) {
+            // 房东
+            queryWrapper.eq("home_owner_uid", uid);
+        } else if (query.getIdentityType() == 2) {
+            // 租客
+            queryWrapper.eq("tenant_uid", uid);
+        } else {
+            throw new LeaseException("查询用户身份不明确!");
+        }
+        page = assetLeaseRecordMapper.selectPage(page, queryWrapper);
+        BeanUtils.copyProperties(page, pageInfo);
+        if (!CollectionUtils.isEmpty(pageInfo.getRecords())) {
+            for (AssetLeaseRecordEntity record : pageInfo.getRecords()) {
+                // 资产优势标签
+                List<Long> advantageId = MyMathUtils.analysisTypeCode(record.getAdvantageId());
+                if (!CollectionUtils.isEmpty(advantageId)) {
+                    record.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                }
+                if (StringUtils.isNotBlank(record.getTypeCode())) {
+                    record.setHouseType(HouseHelper.parseHouseType(record.getTypeCode()));
+                }
+            }
+        }
+        return pageInfo;
     }
 }

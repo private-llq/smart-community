@@ -30,6 +30,7 @@ public class AdminUserTokenServiceImpl extends ServiceImpl<AdminUserTokenMapper,
 		String token = TokenGenerator.generateValue();
 		
 		try {
+			user.setToken(token);
 			redisUtils.setUserToken(token,user);
 		} catch (Exception e){
 			throw new PropertyException(JSYError.INTERNAL.getCode(),"redis超时");
