@@ -561,7 +561,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @return map
      */
     @Override
-    public Map selectByStatus(String carNumber,Integer carColor,Long community_id) {
+    public Map selectByStatus(String carNumber,String carColor,Long community_id) {
 
 
         CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).ge("end_time", LocalDateTime.now()));
@@ -593,7 +593,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             return HashMap;
         }
         //临时车 其他拍照
-        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq("plate_type", 0));
+        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq("plate_type", 1));
         HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
         CarChargeEntity chargeEntity = new CarChargeEntity();
         BeanUtil.copyProperties(carChargeEntity,chargeEntity);
