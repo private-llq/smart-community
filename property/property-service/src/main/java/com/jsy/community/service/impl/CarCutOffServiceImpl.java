@@ -35,11 +35,11 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
             queryWrapper.like("car_type",carCutOffQO.getCarType());
         }
 
-        if (!StringUtils.isEmpty(carCutOffQO.getAccess())){
-            queryWrapper.like("access",carCutOffQO.getAccess());
-        }
+//        if (!StringUtils.isEmpty(carCutOffQO.getAccess())){
+//            queryWrapper.like("access",carCutOffQO.getAccess());
+//        }
 
-        queryWrapper.eq("community_id",adminCommunityId);
+        queryWrapper.eq("community_id",adminCommunityId).eq("state",carCutOffQO.getState());//状态
 
         Page<CarCutOffEntity> page = new Page<CarCutOffEntity>(carCutOffQO.getPage(),carCutOffQO.getSize());
         PageInfo<CarCutOffEntity> pageInfo = new PageInfo<>();

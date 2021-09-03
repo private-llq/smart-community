@@ -400,6 +400,9 @@ public class CarPositionController {
             for (CarCutOffEntity i:carCutOffEntityList) {
                 i.setStopTime(localDateTime);
                 i.setState(1);
+                //出闸照片
+                i.setOutPic(closeupPic);
+                i.setOutImage(picture);
                 carCutOffService.updateCutOff(i);
             }
 
