@@ -11,4 +11,6 @@ public interface ICarBlackListService {
     Integer saveBlackList(CarBlackListEntity carBlackListEntity, Long communityId);
 
     Integer delBlackList(String uid);
+
+    CarBlackListEntity carBlackListOne(String carNumber);
 }
