@@ -231,7 +231,7 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
         queryWrapper.eq("community_id", query.getCommunityId());
         if (StringUtils.isNotBlank(query.getSearchText())) {
             queryWrapper.like("name", query.getSearchText());
-            queryWrapper.like("hardwareId", query.getSearchText());
+            queryWrapper.like("hardware_id", query.getSearchText());
         }
         if (query.getOnlineStatus() != null) {
             queryWrapper.eq("online_status", query.getOnlineStatus());
