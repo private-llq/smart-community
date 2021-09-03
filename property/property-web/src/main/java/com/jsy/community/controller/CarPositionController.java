@@ -76,6 +76,8 @@ public class CarPositionController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarBlackListService icarBlackListService;
 
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICarMonthlyVehicleService vehicleService;
 
 
 
@@ -268,8 +270,6 @@ public class CarPositionController {
 
 
 
-
-
         System.out.println(type);
         System.out.println(mode);
         System.out.println(parkId);
@@ -314,6 +314,8 @@ public class CarPositionController {
         MultipartFile file1 = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream1);
         String carInAndOutPicture1 = MinioUtils.uploadNameByCarJPG(file1, "car-in-and-out-picture", "車牌"+startTime+plateNum+".jpg" );
         System.out.println(carInAndOutPicture1);
+
+
 
 
         //新增开闸记录 和 关闸记录的时间

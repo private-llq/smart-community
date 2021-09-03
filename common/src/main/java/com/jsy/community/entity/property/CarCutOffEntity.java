@@ -56,8 +56,8 @@ public class CarCutOffEntity  extends BaseEntity {
     @ApiModelProperty(value = "车牌进闸特写图")
     private String outPic;
 
-    @ApiModelProperty(value = "车主所属")
-    private String belong;
+    @ApiModelProperty(value = "车辆所属类型  1-临时 2-包月  3-业主")
+    private Integer belong;
 
 
 
