@@ -5,6 +5,9 @@ import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @Author: Pipi
  * @Description: 房屋租赁记录表服务
@@ -35,10 +38,10 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
     /**
      * @author: Pipi
      * @description: 分页查询签约列表
-     * @param baseQO: 分页查询条件
+     * @param assetLeaseRecordEntity: 查询条件
      * @param uid: 登录用户uid
      * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.proprietor.AssetLeaseRecordEntity>
      * @date: 2021/9/2 14:38
      **/
-    PageInfo<AssetLeaseRecordEntity> pageContractList(BaseQO<AssetLeaseRecordEntity> baseQO, String uid);
+    Map<String, List<AssetLeaseRecordEntity>> pageContractList(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid);
 }

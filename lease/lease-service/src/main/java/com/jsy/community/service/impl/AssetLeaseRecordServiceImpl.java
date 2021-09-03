@@ -1,13 +1,11 @@
 package com.jsy.community.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.*;
+import com.jsy.community.api.AssetLeaseRecordService;
+import com.jsy.community.api.IHouseConstService;
+import com.jsy.community.api.LeaseException;
+import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -17,20 +15,22 @@ import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
-import com.jsy.community.qo.BaseQO;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.MyMathUtils;
-import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Pipi
@@ -298,7 +298,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
-     * @param baseQO : 分页查询条件
+     * @param assetLeaseRecordEntity : 查询条件
      * @param uid : 登录用户uid
      * @author: Pipi
      * @description: 分页查询签约列表
@@ -306,26 +306,25 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @date: 2021/9/2 14:38
      **/
     @Override
-    public PageInfo<AssetLeaseRecordEntity> pageContractList(BaseQO<AssetLeaseRecordEntity> baseQO, String uid) {
-        Page<AssetLeaseRecordEntity> page = new Page<>();
-        MyPageUtils.setPageAndSize(page, baseQO);
-        PageInfo<AssetLeaseRecordEntity> pageInfo = new PageInfo<>();
-        AssetLeaseRecordEntity query = baseQO.getQuery();
+    public Map<String, List<AssetLeaseRecordEntity>> pageContractList(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        HashMap<String, List<AssetLeaseRecordEntity>> hashMap = new HashMap<>();
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("asset_type", query.getAssetType());
-        if (query.getIdentityType() == 1) {
+        queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
+        if (assetLeaseRecordEntity.getIdentityType() == 1) {
             // 房东
             queryWrapper.eq("home_owner_uid", uid);
-        } else if (query.getIdentityType() == 2) {
+        } else if (assetLeaseRecordEntity.getIdentityType() == 2) {
             // 租客
             queryWrapper.eq("tenant_uid", uid);
         } else {
             throw new LeaseException("查询用户身份不明确!");
         }
-        page = assetLeaseRecordMapper.selectPage(page, queryWrapper);
-        BeanUtils.copyProperties(page, pageInfo);
-        if (!CollectionUtils.isEmpty(pageInfo.getRecords())) {
-            for (AssetLeaseRecordEntity record : pageInfo.getRecords()) {
+        List<AssetLeaseRecordEntity> contractedList = new ArrayList<>();
+        List<AssetLeaseRecordEntity> underContractList = new ArrayList<>();
+        List<AssetLeaseRecordEntity> notContractedList = new ArrayList<>();
+        List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
+            for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
                 // 资产优势标签
                 List<Long> advantageId = MyMathUtils.analysisTypeCode(record.getAdvantageId());
                 if (!CollectionUtils.isEmpty(advantageId)) {
@@ -334,8 +333,39 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 if (StringUtils.isNotBlank(record.getTypeCode())) {
                     record.setHouseType(HouseHelper.parseHouseType(record.getTypeCode()));
                 }
+                switch (record.getOperation()) {
+                    case 1:
+                        // 发起签约->未签约
+                        break;
+                    case 2:
+                        // 接受申请->未签约
+                        break;
+                    case 3:
+                        // 拟定合同->签约中
+                        break;
+                    case 4:
+                        // 等待支付房租->签约中
+                        break;
+                    case 5:
+                        // 支付完成->签约中
+                        break;
+                    case 6:
+                        // 完成签约->已签约
+                        break;
+                    case 7:
+                        // 取消申请
+                        break;
+                    case 8:
+                        // 拒绝申请
+                        break;
+                    case 9:
+                        // 重新发起
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-        return pageInfo;
+        return hashMap;
     }
 }
