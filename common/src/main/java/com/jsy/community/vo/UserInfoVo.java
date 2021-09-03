@@ -40,6 +40,9 @@ public class UserInfoVo implements Serializable {
 	
 	@ApiModelProperty(value = "用户imID")
 	private String imId;
+
+	@ApiModelProperty(value = "用户im密码")
+	private String imPassword;
 	
 	@ApiModelProperty("昵称")
 	private String nickname;

@@ -5,17 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.TxcTransaction;
-import com.jsy.community.api.ICarChargeService;
-import com.jsy.community.api.ICarPositionService;
-import com.jsy.community.api.ICarService;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.property.CarChargeEntity;
-import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.entity.property.*;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
@@ -32,10 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 车辆 服务实现类
@@ -64,6 +58,15 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @DubboReference(version = Const.version,  group = Const.group, check = false)
     private ICarChargeService carChargeService;
+
+    @DubboReference(version = Const.version,  group = Const.group, check = false)
+    private IPropertyFinanceOrderService propertyFinanceOrderService;
+
+    @DubboReference(version = Const.version,  group = Const.group, check = false)
+    private ICarBasicsService carBasicsService;
+
+    @DubboReference(version = Const.version,  group = Const.group, check = false)
+    private ICarMonthlyVehicleService carMonthlyVehicleService;
 
     @Autowired
     private HouseMemberMapper houseMemberMapper;
@@ -251,20 +254,39 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public Long bindingRecord(CarEntity carEntity) {
-        CarOrderRecordEntity entity = new CarOrderRecordEntity();
-        entity.setId(SnowFlake.nextId());
-        entity.setType(1);
-        entity.setCarId(carEntity.getCarPositionId());
-        entity.setCommunityId(carEntity.getCommunityId());
-        entity.setCarPlate(carEntity.getCarPlate());
-        entity.setMonth(carEntity.getMonth());
-        entity.setMoney(carEntity.getMoney());
-        entity.setUid(carEntity.getUid());
-        carOrderRecordMapper.insert(entity);
+        CarBasicsEntity basicsEntity = carBasicsService.findOne(carEntity.getCommunityId());
+        if (basicsEntity!=null){
+            if (basicsEntity.getMonthlyPayment()==1){
+                throw new ProprietorException("当前小区不允许车辆包月！");
+            }
+            if (basicsEntity.getWhetherAllowMonth()==0){
+                //查询车主在当前小区是否存在未交的物业费账单
+                List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.FeeOrderList(carEntity.getCommunityId(),carEntity.getUid());
+                if (list.size()!=0){
+                    throw new ProprietorException("您在当前小区存在未缴的物业费账单，请先缴清物业费！");
+                }
+            }
+            if (carEntity.getMonth()<=basicsEntity.getMonthMaxTime()){
+                CarOrderRecordEntity entity = new CarOrderRecordEntity();
+                entity.setId(SnowFlake.nextId());
+                entity.setType(1);
+                entity.setCarPositionId(carEntity.getCarPositionId());
+                entity.setCarId(carEntity.getCarPositionId());
+                entity.setCommunityId(carEntity.getCommunityId());
+                entity.setCarPlate(carEntity.getCarPlate());
+                entity.setMonth(carEntity.getMonth());
+                entity.setMoney(carEntity.getMoney());
+                entity.setUid(carEntity.getUid());
+                carOrderRecordMapper.insert(entity);
 
-        //支付成功后回调     测试阶段直接回调
-        bindingMonthCar(entity);
-        return entity.getId();
+                //支付成功后回调     测试阶段直接回调
+                bindingMonthCar(entity);
+                return entity.getId();
+            }
+            throw new ProprietorException("当前小区最大允许包月时长："+basicsEntity.getMonthMaxTime());
+
+        }
+            throw new ProprietorException("当前小区不允许车辆包月！");
     }
 
     /**
@@ -276,19 +298,39 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public Long renewRecord(CarEntity carEntity) {
-        CarOrderRecordEntity entity = new CarOrderRecordEntity();
-        entity.setId(SnowFlake.nextId());
-        entity.setCarId(carEntity.getId());
-        entity.setType(2);
-        entity.setMonth(carEntity.getMonth());
-        entity.setMoney(carEntity.getMoney());
-        entity.setUid(carEntity.getUid());
-        carOrderRecordMapper.insert(entity);
+        CarEntity entity = carMapper.selectById(carEntity.getId());
+        CarBasicsEntity basicsEntity = carBasicsService.findOne(entity.getCommunityId());
+        if (basicsEntity!=null) {
+            if (basicsEntity.getMonthlyPayment() == 1) {
+                throw new ProprietorException("当前小区不允许车辆包月！");
+            }
+            if (basicsEntity.getWhetherAllowMonth() == 0) {
+                //查询车主在当前小区是否存在未交的物业费账单
+                List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.FeeOrderList(entity.getCommunityId(), entity.getUid());
+                if (list.size() != 0) {
+                    throw new ProprietorException("您在当前小区存在未缴的物业费账单，请先缴清物业费！");
+                }
+            }
+            if (carEntity.getMonth()<=basicsEntity.getMonthMaxTime()){
+                CarOrderRecordEntity orderRecordEntity = new CarOrderRecordEntity();
+                orderRecordEntity.setId(SnowFlake.nextId());
+                orderRecordEntity.setCarPlate(entity.getCarPlate());
+                orderRecordEntity.setCommunityId(entity.getCommunityId());
+                orderRecordEntity.setCarId(carEntity.getId());
+                orderRecordEntity.setType(2);
+                orderRecordEntity.setCarPositionId(entity.getCarPositionId());
+                orderRecordEntity.setMonth(carEntity.getMonth());
+                orderRecordEntity.setMoney(carEntity.getMoney());
+                orderRecordEntity.setUid(carEntity.getUid());
+                carOrderRecordMapper.insert(orderRecordEntity);
 
-
-        //支付成功后回调     测试阶段直接回调
-        renewMonthCar(entity);
-        return entity.getId();
+                //支付成功后回调     测试阶段直接回调
+                renewMonthCar(orderRecordEntity);
+                return entity.getId();
+            }
+            throw new ProprietorException("当前小区最大允许包月时长："+basicsEntity.getMonthMaxTime());
+        }
+        throw new ProprietorException("当前小区不允许车辆包月！");
     }
 
     /**
@@ -301,6 +343,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     @Transactional
     public void renewMonthCar(CarOrderRecordEntity entity) {
+
         CarEntity carEntity = carMapper.selectById(entity.getCarId());
         if (carEntity!=null){
             carEntity.setOverTime(carEntity.getOverTime().plusMonths(entity.getMonth()));
@@ -310,6 +353,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             //业主绑定车辆后修改车位状态
             carPositionService.bindingMonthCar(carEntity);
 
+            //添加缴费记录
             CarOrderEntity carOrderEntity = new CarOrderEntity();
             carOrderEntity.setCarId(carEntity.getId());
             carOrderEntity.setCommunityId(carEntity.getCommunityId());
@@ -325,15 +369,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderEntity.setOrderStatus(0);
             carOrderEntity.setCarPlate(carEntity.getCarPlate());
             carOrderEntity.setId(SnowFlake.nextId());
-
             appCarOrderMapper.insert(carOrderEntity);
+
+            //修改月租车辆表
+            carMonthlyVehicleService.updateMonth(entity.getCarPlate(),carEntity.getOverTime());
 
             //停车临时收费表更新
             entity.setStatus(1);
-            entity.setCommunityId(carEntity.getCommunityId());
-            entity.setCarPlate(carEntity.getCarPlate());
             carOrderRecordMapper.updateById(entity);
         }
+        throw new ProprietorException("当前月租车辆不存在！");
     }
 
     /**
@@ -380,11 +425,29 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setId(SnowFlake.nextId());
                 appCarOrderMapper.insert(carOrderEntity);
 
+                //添加月租车辆表
+                CarPositionEntity carPositionEntity = carPositionService.selectOne(entity.getCarPositionId());
+                CarChargeEntity chargeEntity = carChargeService.selectOne(entity.getCommunityId());
+                if (Objects.isNull(carPositionEntity)||Objects.isNull(chargeEntity)){
+                    throw new ProprietorException("当前车位或者收费类型不存在！");
+                }
+                CarMonthlyVehicle vehicle = new CarMonthlyVehicle();
+                vehicle.setId(SnowFlake.nextId());
+                vehicle.setCarPosition(carPositionEntity.getCarPosition());
+                vehicle.setCommunityId(entity.getCommunityId());
+                vehicle.setCarNumber(entity.getCarPlate());
+                vehicle.setOwnerName(carEntity.getOwner());
+                vehicle.setPhone(carEntity.getContact());
+                vehicle.setStartTime(carEntity.getBeginTime());
+                vehicle.setEndTime(carEntity.getOverTime());
+                vehicle.setMonthlyFee(entity.getMoney());
+                vehicle.setMonthlyMethodId(chargeEntity.getUid());
+                carMonthlyVehicleService.appMonth(vehicle);
+
                 //停车临时收费表更新
                 entity.setStatus(1);
                 carOrderRecordMapper.updateById(entity);
             }
-
     }
 
     /**

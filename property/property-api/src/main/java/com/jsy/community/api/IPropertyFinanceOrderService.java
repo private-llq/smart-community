@@ -306,4 +306,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     List<PropertyFeeRuleEntity> getFeeList(Long adminCommunityId);
+
+    /**
+     * @Description: 查询车主在当前小区是否存在未交的物业费账单
+     * @author: Hu
+     * @since: 2021/9/3 9:51
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> FeeOrderList(Long communityId,String uid);
 }
