@@ -572,7 +572,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             return hashMap;//月租车辆
         }
 
-        CarProprietorEntity carProprietorEntity = carProprietorMapper.selectOne(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id", community_id).eq("delete", 0));
+        CarProprietorEntity carProprietorEntity = carProprietorMapper.selectOne(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id", community_id).eq("deleted", 0));
         if (Objects.nonNull(carProprietorEntity)){
             HashMap<Integer, CarProprietorEntity> hashMap = new HashMap<>();
             CarProprietorEntity proprietorEntity = new CarProprietorEntity();
@@ -582,7 +582,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         }
 
 
-        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq("plate_type", carColor));
+        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq(StringUtils.isNotBlank(carColor),"plate_type", carColor));
         HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
         CarChargeEntity chargeEntity = new CarChargeEntity();
         BeanUtil.copyProperties(carChargeEntity,chargeEntity);
