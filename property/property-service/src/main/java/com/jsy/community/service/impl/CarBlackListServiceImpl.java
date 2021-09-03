@@ -59,6 +59,12 @@ CarBlackListServiceImpl implements ICarBlackListService {
         return delete;
     }
 
+    @Override
+    public CarBlackListEntity carBlackListOne(String carNumber) {
+        CarBlackListEntity carBlackListEntity = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", carNumber));
+        return carBlackListEntity;
+    }
+
     /**
      * 添加进入黑名单
      * @param carBlackListEntity

@@ -280,4 +280,12 @@ public interface IHouseService extends IService<HouseEntity> {
 	List<String> selectBuildingNameByIdList(List<String> strings,Long communityId);
 
 
+	/**
+	 * @Description: 查询当前小区所有房屋
+	 * @author: Hu
+	 * @since: 2021/9/1 14:21
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> getHouse(Long adminCommunityId);
 }

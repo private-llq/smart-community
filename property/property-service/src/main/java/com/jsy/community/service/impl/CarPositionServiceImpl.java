@@ -249,6 +249,19 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
 
     }
 
+
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/9/3 10:45
+     * @Param: [carPositionId]
+     * @return: com.jsy.community.entity.property.CarPositionEntity
+     */
+    @Override
+    public CarPositionEntity selectOne(Long carPositionId) {
+        return carPositionMapper.selectById(carPositionId);
+    }
+
     @Override
     public Boolean updateCarPosition(UpdateCarPositionQO qo) {
 

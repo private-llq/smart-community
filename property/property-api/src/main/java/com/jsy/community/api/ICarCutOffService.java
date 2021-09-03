@@ -17,7 +17,7 @@ public interface ICarCutOffService extends IService<CarCutOffEntity> {
      * @Date: 2021/8/16-11:58
      *
      * @return*/
-    PageInfo<CarCutOffEntity> selectPage(CarCutOffQO carCutOffQO, Long adminCommunityId);
+    PageInfo<CarCutOffEntity> selectPage(CarCutOffQO carCutOffQO);
 
      /**
       * @Description: 新增开闸记录

@@ -13,10 +13,7 @@ import com.jsy.community.api.*;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.property.CarCutOffEntity;
-import com.jsy.community.entity.property.CarEquipmentManageEntity;
-import com.jsy.community.entity.property.CarPositionEntity;
-import com.jsy.community.entity.property.CarPositionTypeEntity;
+import com.jsy.community.entity.property.*;
 import com.jsy.community.qo.property.*;
 import com.jsy.community.util.Base64UtilsTest;
 import com.jsy.community.util.HttpClientHelper;
@@ -75,6 +72,9 @@ public class CarPositionController {
     private ICarCutOffService carCutOffService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarEquipmentManageService equipmentManageService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarBlackListService icarBlackListService;
 
 
 
@@ -316,7 +316,10 @@ public class CarPositionController {
         System.out.println(carInAndOutPicture1);
 
 
+        //新增开闸记录 和 关闸记录的时间
         extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1,carSubLogo,plateColor);
+
+
 
         CarVO carVO = new CarVO();
         carVO.setError_num(0);
@@ -357,6 +360,10 @@ public class CarPositionController {
         writer.close();
     }
 
+
+
+
+    //新增开闸记录和结算出闸时间
     private void extracted(String plateNum, String vehicleType, Long startTime,
                            String camId, String vdcType, String trigerType, String picture, String closeupPic,String carSubLogo,String plateColor) {
         if (vdcType.equals("in")){
@@ -393,10 +400,17 @@ public class CarPositionController {
             for (CarCutOffEntity i:carCutOffEntityList) {
                 i.setStopTime(localDateTime);
                 i.setState(1);
+                //出闸照片
+                i.setOutPic(closeupPic);
+                i.setOutImage(picture);
                 carCutOffService.updateCutOff(i);
             }
 
         }
+
+
+
+
 
     }
 

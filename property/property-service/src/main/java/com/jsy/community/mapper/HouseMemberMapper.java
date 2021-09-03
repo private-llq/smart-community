@@ -59,4 +59,22 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 * @return: java.util.List<String>
 	 */
 	List<String> selectDistinctMobileListByCommunityIds(@Param("list") List<Long> communityIdList);
+	
+	/**
+	 * @Description: 查询communityIds下所有居住人数数量
+	 * @author: DKS
+	 * @since: 2021/9/3 9:39
+	 * @Param: communityIdList
+	 * @return: Integer
+	 */
+	Integer selectAllownerByCommunityIds(@Param("list") List<Long> communityIdList);
+	
+	/**
+	 * @Description: 查询communityIds下所有居住人数数量
+	 * @author: DKS
+	 * @since: 2021/9/3 9:42
+	 * @Param: communityIdList
+	 * @return: Integer
+	 */
+	Integer selectAlltenantByCommunityIds(@Param("list") List<Long> communityIdList);
 }

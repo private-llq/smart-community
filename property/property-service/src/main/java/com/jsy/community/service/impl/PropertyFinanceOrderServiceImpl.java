@@ -1703,6 +1703,19 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     }
 
 
+
+    /**
+     * @Description: 查询车主在当前小区是否存在未交的物业费账单
+     * @author: Hu
+     * @since: 2021/9/3 9:51
+     * @Param: [communityId]
+     * @return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     */
+    @Override
+    public List<PropertyFinanceOrderEntity> FeeOrderList(Long communityId,String uid) {
+        return propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("uid",uid).eq("community_id",communityId));
+    }
+
     /**
      * @Description: 查询当前小区缴费项目
      * @author: Hu
