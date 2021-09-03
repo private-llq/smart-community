@@ -80,13 +80,32 @@ public class CommunityHardWareController {
     @Login
     @PostMapping("/v2/syncFaceUrl")
     public CommonResult syncFaceUrl(@RequestParam("id") Long id) {
+        if (id == null) {
+            throw new JSYException("ID不能为空");
+        }
         Object syncFaceUrlRecord = redisTemplate.opsForValue().get("syncFaceUrl:" + id);
         if (syncFaceUrlRecord != null) {
             return CommonResult.error("请不要频繁操作!");
         }
-        redisTemplate.opsForValue().set("syncFaceUrl:" + id, "", 2, TimeUnit.MINUTES);
         Integer resultNum = communityHardWareService.syncFaceUrl(id, UserUtils.getAdminCommunityId());
+        redisTemplate.opsForValue().set("syncFaceUrl:" + id, "", 2, TimeUnit.MINUTES);
         return CommonResult.ok("同步完成;一共同步" + resultNum + "条数据。");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 删除设备
+     * @param id: 设备ID
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/3 16:41
+     **/
+    @Login
+    @PostMapping("/v2/deleteHardWare")
+    public CommonResult deleteHardWare(@RequestParam("id") Long id) {
+        if (id == null) {
+            throw new JSYException("ID不能为空");
+        }
+        return communityHardWareService.deleteHardWare(id, UserUtils.getAdminCommunityId()) > 0 ? CommonResult.ok("删除成功!") : CommonResult.error("删除失败!") ;
     }
 
     /**

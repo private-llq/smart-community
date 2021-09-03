@@ -65,4 +65,13 @@ public class CommunitySurveyEntity implements Serializable {
 	
 	@ApiModelProperty(value = "每月的物业费统计")
 	private BigDecimal monthByPropertyFee;
+	
+	@ApiModelProperty(value = "每天的车位费统计")
+	private List<Map<String,BigDecimal>> dateByCarPositionFee;
+	
+	@ApiModelProperty(value = "每月的车位费统计")
+	private BigDecimal monthByCarPositionFee;
+	
+	@ApiModelProperty(value = "小区月总收入")
+	private BigDecimal monthByTotalFee;
 }
