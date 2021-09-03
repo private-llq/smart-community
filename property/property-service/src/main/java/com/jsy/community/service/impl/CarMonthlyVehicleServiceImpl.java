@@ -17,11 +17,13 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.poi.ss.formula.functions.T;
 import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -41,6 +43,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     private CarBlackListMapper carBlackListMapper;
     @Autowired
     private CarProprietorMapper carProprietorMapper;
+    @Autowired
+    private CarBasicsMapper carBasicsMapper;
 
 
 
@@ -128,6 +132,15 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",carMonthlyVehicle.getEndTime()));
         if (Objects.nonNull(vehicle)){
             throw new PropertyException("已进行包月，如果需要延期，请查询记录执行时间延期操作！");
+        }
+        //查询基础设置里面的最大续费月数
+        CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
+        Integer monthMaxTime = carBasicsEntity.getMonthMaxTime();//最大续费月数
+        LocalDateTime startTime = carMonthlyVehicle.getStartTime();
+        LocalDateTime endTime = carMonthlyVehicle.getEndTime();
+        long tempTime = Duration.between(startTime, endTime).toMinutes();//相差分钟
+        if (tempTime>monthMaxTime*30*24*60){
+            throw new PropertyException("当前包月时间已超过你设置的最大包月数，"+monthMaxTime+"个月！");
         }
 
         //查询收费设置数据
@@ -561,7 +574,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @return map
      */
     @Override
-    public Map selectByStatus(String carNumber,String carColor,Long community_id) {
+    public Map selectByStatus(String carNumber, String carColor, Long community_id) {
 
 
         CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).ge("end_time", LocalDateTime.now()));
