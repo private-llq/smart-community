@@ -127,13 +127,21 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         //收费价格 元/时
         BigDecimal chargePrice = carChargeEntity.getChargePrice();
 
-        /**
-         * 出场时间-（入场时间+免费时间）
-         */
-        LocalDateTime insertTime = carChargeQO.getInTime().plusMinutes(freeTime);//入场时间+免费时间
-        Long hours = Duration.between(insertTime,carChargeQO.getReTime()).toHours();//相差的小时数
 
+        /**
+         * 出场时间-入场时间
+         */
+        LocalDateTime insertTime = carChargeQO.getInTime();//入场时间
+        Long hours = Duration.between(insertTime,carChargeQO.getReTime()).toHours();//相差的小时数
         Long minutes = Duration.between(insertTime,carChargeQO.getReTime()).toMinutes();//相差的分钟
+
+
+        /**
+         * 未超过免费时间不收费
+         */
+        if (minutes<=freeTime){
+            return new BigDecimal(0);
+        }
 
         /**
          * 超过小时整点 自动加一小时
@@ -171,9 +179,21 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      */
     @Override
     public List<CarChargeEntity> ListCharge(Long adminCommunityId) {
-        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>().eq("community_id", adminCommunityId));
+        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>().eq("community_id", adminCommunityId).eq("type",0));
         return chargeEntityList;
     }
+
+
+    /**
+     * 查询临时停车收费标准
+     */
+
+    @Override
+    public List<CarChargeEntity> ListCharge2(Long adminCommunityId) {
+        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>().eq("community_id", adminCommunityId).eq("type", 1));
+        return chargeEntityList;
+    }
+
 
     /**
      * 查询包月车辆单个收费设置标准
@@ -186,6 +206,8 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", uid).eq("community_id", adminCommunityId));
         return carChargeEntity;
     }
+
+
 
 
 }

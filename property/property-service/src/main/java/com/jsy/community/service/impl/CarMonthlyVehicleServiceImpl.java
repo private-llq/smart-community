@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,6 +16,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -75,6 +77,13 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.nonNull(car_number)){
             throw new PropertyException("该车辆已进入黑名单，无法进场或离场!");
         }
+
+        //查询数据库是否正在包月中
+        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",carMonthlyVehicle.getEndTime()));
+        if (Objects.nonNull(vehicle)){
+            throw new PropertyException("已进行包月，如果需要延期，请查询记录执行时间延期操作！");
+        }
+
         //查询收费设置数据
         String monthlyMethodId = carMonthlyVehicle.getMonthlyMethodId();
         CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", monthlyMethodId));
@@ -500,20 +509,38 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
     /**
      * 1临时，2月租，3业主
-     * @param carNumber
-     * @return
+     * @param carNumber 车牌号
+     * @param carColor 车牌颜色
+     * @param community_id 社区id
+     * @return map
      */
     @Override
-    public Integer selectByStatus(String carNumber,Long community_id) {
-        List<CarMonthlyVehicle> selectList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id",community_id));
-        if (selectList.size()>0){
-            return 2; //包月车辆
+    public Map selectByStatus(String carNumber,String carColor,Long community_id) {
+
+        CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).ge("end_time", LocalDateTime.now()));
+        if (Objects.nonNull(carMonthlyVehicle)){
+            HashMap<Integer, CarMonthlyVehicle> hashMap = new HashMap<>();
+            CarMonthlyVehicle vehicle = new CarMonthlyVehicle();
+            BeanUtil.copyProperties(carMonthlyVehicle,vehicle);
+            hashMap.put(2,vehicle);
+            return hashMap;//月租车辆
         }
 
-        List<CarProprietorEntity> selectList1 = carProprietorMapper.selectList(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id",community_id).eq("delete",0));
-        if (selectList1.size()>0){
-            return 3;//业主车辆
+        CarProprietorEntity carProprietorEntity = carProprietorMapper.selectOne(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id", community_id).eq("delete", 0));
+        if (Objects.nonNull(carProprietorEntity)){
+            HashMap<Integer, CarProprietorEntity> hashMap = new HashMap<>();
+            CarProprietorEntity proprietorEntity = new CarProprietorEntity();
+            BeanUtil.copyProperties(carProprietorEntity,proprietorEntity);
+            hashMap.put(3,proprietorEntity);
+            return hashMap;//业主车辆
         }
-        return 1;//临时
+
+
+        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq("plate_type", carColor));
+        HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
+        CarChargeEntity chargeEntity = new CarChargeEntity();
+        BeanUtil.copyProperties(carChargeEntity,chargeEntity);
+        HashMap.put(1,chargeEntity);
+        return HashMap;//临时
     }
 }
