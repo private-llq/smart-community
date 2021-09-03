@@ -58,6 +58,10 @@ public class CommunityHardWareEntity extends BaseEntity {
 	@TableField(exist = false)
 	private String onlineStatusStr;
 
+	// 楼栋/单元ID字符串
+	@TableField(exist = false)
+	private String buildingIdStr;
+
 	// 物业端添加扫描设备(扫脸机)验证组
 	public interface addHardWareValidate{}
 

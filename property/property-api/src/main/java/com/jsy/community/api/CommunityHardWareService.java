@@ -44,6 +44,16 @@ public interface CommunityHardWareService extends IService<CommunityHardWareEnti
 
     /**
      * @author: Pipi
+     * @description: 删除设备
+     * @param id: 设备ID
+     * @param communityId: 社区ID
+     * @return: java.lang.Integer
+     * @date: 2021/9/3 16:41
+     **/
+    Integer deleteHardWare(Long id, Long communityId);
+
+    /**
+     * @author: Pipi
      * @description: 更新设备在线状态
      * @param :
      * @return: void

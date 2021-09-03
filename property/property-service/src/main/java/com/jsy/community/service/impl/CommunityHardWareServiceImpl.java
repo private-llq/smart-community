@@ -196,6 +196,22 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
     }
 
     /**
+     * @param id          : 设备ID
+     * @param communityId : 社区ID
+     * @author: Pipi
+     * @description: 删除设备
+     * @return: java.lang.Integer
+     * @date: 2021/9/3 16:41
+     **/
+    @Override
+    public Integer deleteHardWare(Long id, Long communityId) {
+        QueryWrapper<CommunityHardWareEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", id);
+        queryWrapper.eq("community_id", communityId);
+        return communityHardWareMapper.delete(queryWrapper);
+    }
+
+    /**
      * @author: Pipi
      * @description: 更新设备在线状态
      * @param :
@@ -244,6 +260,9 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
                     record.setOnlineStatusStr("在线");
                 } else {
                     record.setOnlineStatusStr("离线");
+                }
+                if (record.getBuildingId() != null) {
+                    record.setBuildingIdStr(String.valueOf(record.getBuildingId()));
                 }
             }
         }
