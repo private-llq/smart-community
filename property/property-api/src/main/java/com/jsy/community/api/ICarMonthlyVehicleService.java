@@ -38,7 +38,7 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
     void issue(String uid, Long adminCommunityId);
 
-    Map selectByStatus(String carNumber, String carColor, Long community_id);
+    Map selectByStatus(String carNumber, Integer carColor, Long community_id);
 
     /**
      * @Description: app绑定月租车辆
