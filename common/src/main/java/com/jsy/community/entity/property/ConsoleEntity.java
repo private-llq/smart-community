@@ -51,11 +51,20 @@ public class ConsoleEntity implements Serializable {
 	@ApiModelProperty(value = "车位总数")
 	private Integer carPositionSum;
 	
-	@ApiModelProperty(value = "每月的物业费统计")
+	@ApiModelProperty(value = "物业每月的物业费统计")
 	private List<Map<String, BigDecimal>> monthByPropertyFee;
 	
-	@ApiModelProperty(value = "每年的物业费统计")
+	@ApiModelProperty(value = "物业每年的物业费统计")
 	private BigDecimal yearByPropertyFee;
+	
+	@ApiModelProperty(value = "物业每月的车位费统计")
+	private List<Map<String, BigDecimal>> monthByCarPositionFee;
+	
+	@ApiModelProperty(value = "物业每年的车位费统计")
+	private BigDecimal yearByCarPositionFee;
+	
+	@ApiModelProperty(value = "物业年总收入")
+	private BigDecimal yearByTotalFee;
 	
 	@ApiModelProperty(value = "社区id")
 	private Long communityId;
