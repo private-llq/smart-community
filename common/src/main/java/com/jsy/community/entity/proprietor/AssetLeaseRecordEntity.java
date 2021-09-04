@@ -98,6 +98,10 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @NotNull(groups = {OperationContractValidate.class}, message = "操作类型不能为空;2房东接受申请;7:租客取消申请;8房东拒绝申请;9:租客再次申请;")
     private Integer operationType;
 
+    // 房东该资产签约条数
+    @TableField(exist = false)
+    private Integer contractNumber;
+
     /**
      * 发起签约验证组
      */

@@ -308,61 +308,187 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     @Override
     public Map<String, List<AssetLeaseRecordEntity>> pageContractList(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
         HashMap<String, List<AssetLeaseRecordEntity>> hashMap = new HashMap<>();
+        // 已签约
+        Map<Long, AssetLeaseRecordEntity> contractedMap = new HashMap<>();
+        // 签约中
+        Map<Long, AssetLeaseRecordEntity> underContractMap = new HashMap<>();
+        // 未签约
+        Map<Long, AssetLeaseRecordEntity> notContractedMap = new HashMap<>();
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
         if (assetLeaseRecordEntity.getIdentityType() == 1) {
             // 房东
             queryWrapper.eq("home_owner_uid", uid);
+            List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.selectList(queryWrapper);
+            if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
+                for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
+                    // 资产优势标签
+                    List<Long> advantageId = MyMathUtils.analysisTypeCode(record.getAdvantageId());
+                    if (!CollectionUtils.isEmpty(advantageId)) {
+                        record.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                    }
+                    if (StringUtils.isNotBlank(record.getTypeCode())) {
+                        record.setHouseType(HouseHelper.parseHouseType(record.getTypeCode()));
+                    }
+                    switch (record.getOperation()) {
+                        case 1:
+                            // 发起签约->未签约
+                            if (!notContractedMap.containsKey(record.getAssetId())) {
+                                record.setContractNumber(1);
+                                notContractedMap.put(record.getAssetId(), record);
+                            } else {
+                                notContractedMap.get(record.getAssetId()).setContractNumber(notContractedMap.get(record.getAssetId()).getContractNumber() + 1);
+                            }
+                            break;
+                        case 2:
+                            // 接受申请->签约中
+                            if (!underContractMap.containsKey(record.getAssetId())) {
+                                underContractMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 3:
+                            // 拟定合同->签约中
+                            if (!underContractMap.containsKey(record.getAssetId())) {
+                                underContractMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 4:
+                            // 等待支付房租->签约中
+                            if (!underContractMap.containsKey(record.getAssetId())) {
+                                underContractMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 5:
+                            // 支付完成->签约中
+                            if (!underContractMap.containsKey(record.getAssetId())) {
+                                underContractMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 6:
+                            // 完成签约->已签约
+                            if (!contractedMap.containsKey(record.getAssetId())) {
+                                contractedMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 7:
+                            // 取消申请->不在房东列表展示
+                            break;
+                        case 8:
+                            // 拒绝申请->不在房东列表展示
+                            break;
+                        case 9:
+                            // 重新发起->未签约
+                            if (!notContractedMap.containsKey(record.getAssetId())) {
+                                record.setContractNumber(1);
+                                notContractedMap.put(record.getAssetId(), record);
+                            } else {
+                                notContractedMap.get(record.getAssetId()).setContractNumber(notContractedMap.get(record.getAssetId()).getContractNumber() + 1);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         } else if (assetLeaseRecordEntity.getIdentityType() == 2) {
             // 租客
             queryWrapper.eq("tenant_uid", uid);
+            List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.selectList(queryWrapper);
+            if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
+                for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
+                    switch (record.getOperation()) {
+                        case 1:
+                            // 发起签约->未签约
+                            if (!notContractedMap.containsKey(record.getAssetId())) {
+                                notContractedMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 2:
+                            // 接受申请->签约中
+                            if (!underContractMap.containsKey(record.getAssetId())) {
+                                underContractMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 3:
+                            // 拟定合同->签约中
+                            if (!underContractMap.containsKey(record.getAssetId())) {
+                                underContractMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 4:
+                            // 等待支付房租->签约中
+                            if (!underContractMap.containsKey(record.getAssetId())) {
+                                underContractMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 5:
+                            // 支付完成->签约中
+                            if (!underContractMap.containsKey(record.getAssetId())) {
+                                underContractMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 6:
+                            // 完成签约->已签约
+                            if (!contractedMap.containsKey(record.getAssetId())) {
+                                contractedMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 7:
+                            // 取消申请->不在租客列表展示
+                            break;
+                        case 8:
+                            // 拒绝申请->未签约
+                            if (!notContractedMap.containsKey(record.getAssetId())) {
+                                notContractedMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        case 9:
+                            // 重新发起->未签约
+                            if (!notContractedMap.containsKey(record.getAssetId())) {
+                                notContractedMap.put(record.getAssetId(), record);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         } else {
             throw new LeaseException("查询用户身份不明确!");
         }
-        List<AssetLeaseRecordEntity> contractedList = new ArrayList<>();
-        List<AssetLeaseRecordEntity> underContractList = new ArrayList<>();
-        List<AssetLeaseRecordEntity> notContractedList = new ArrayList<>();
-        List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.selectList(queryWrapper);
-        if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
-            for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
-                // 资产优势标签
-                List<Long> advantageId = MyMathUtils.analysisTypeCode(record.getAdvantageId());
-                if (!CollectionUtils.isEmpty(advantageId)) {
-                    record.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+        // 组装已签约
+        if (!CollectionUtils.isEmpty(contractedMap)) {
+            for (Long assetId : contractedMap.keySet()) {
+                if (hashMap.containsKey("contracted")) {
+                    hashMap.get("contracted").add(contractedMap.get(assetId));
+                } else {
+                    List<AssetLeaseRecordEntity> assetLeaseRecordEntities = new ArrayList<>();
+                    assetLeaseRecordEntities.add(contractedMap.get(assetId));
+                    hashMap.put("contracted", assetLeaseRecordEntities);
                 }
-                if (StringUtils.isNotBlank(record.getTypeCode())) {
-                    record.setHouseType(HouseHelper.parseHouseType(record.getTypeCode()));
+            }
+        }
+        // 组装签约中
+        if (!CollectionUtils.isEmpty(underContractMap)) {
+            for (Long assetId : underContractMap.keySet()) {
+                if (hashMap.containsKey("underContract")) {
+                    hashMap.get("underContract").add(underContractMap.get(assetId));
+                } else {
+                    List<AssetLeaseRecordEntity> assetLeaseRecordEntities = new ArrayList<>();
+                    assetLeaseRecordEntities.add(underContractMap.get(assetId));
+                    hashMap.put("underContract", assetLeaseRecordEntities);
                 }
-                switch (record.getOperation()) {
-                    case 1:
-                        // 发起签约->未签约
-                        break;
-                    case 2:
-                        // 接受申请->未签约
-                        break;
-                    case 3:
-                        // 拟定合同->签约中
-                        break;
-                    case 4:
-                        // 等待支付房租->签约中
-                        break;
-                    case 5:
-                        // 支付完成->签约中
-                        break;
-                    case 6:
-                        // 完成签约->已签约
-                        break;
-                    case 7:
-                        // 取消申请
-                        break;
-                    case 8:
-                        // 拒绝申请
-                        break;
-                    case 9:
-                        // 重新发起
-                        break;
-                    default:
-                        break;
+            }
+        }
+        // 组装未签约
+        if (!CollectionUtils.isEmpty(notContractedMap)) {
+            for (Long assetId : notContractedMap.keySet()) {
+                if (hashMap.containsKey("notContracted")) {
+                    hashMap.get("notContracted").add(notContractedMap.get(assetId));
+                } else {
+                    List<AssetLeaseRecordEntity> assetLeaseRecordEntities = new ArrayList<>();
+                    assetLeaseRecordEntities.add(notContractedMap.get(assetId));
+                    hashMap.put("notContracted", assetLeaseRecordEntities);
                 }
             }
         }
