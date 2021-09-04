@@ -97,12 +97,6 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 throw new LeaseException("该房屋不存在!");
             }
             assetLeaseRecordEntity.setHomeOwnerUid(houseLeaseEntity.getUid());
-//            assetLeaseRecordEntity.setImageId(houseLeaseEntity.getHouseImageId());
-//            assetLeaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
-//            assetLeaseRecordEntity.setAdvantageId(houseLeaseEntity.getHouseAdvantageId());
-//            assetLeaseRecordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
-//            assetLeaseRecordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
-//            assetLeaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());
             assetLeaseRecordEntity.setCommunityId(houseLeaseEntity.getHouseCommunityId());
         } else if (assetLeaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
             // 商铺
@@ -113,17 +107,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             if (shopLeaseEntity == null) {
                 throw new LeaseException("该商铺不存在!");
             }
-            // 查商铺图片
-//            QueryWrapper<ShopImgEntity> shopImgEntityQueryWrapper = new QueryWrapper<>();
-//            shopImgEntityQueryWrapper.eq("shop_id", assetLeaseRecordEntity.getAssetId());
-//            shopImgEntityQueryWrapper.last("limit 1");
-//            ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
             assetLeaseRecordEntity.setHomeOwnerUid(shopLeaseEntity.getUid());
-//            assetLeaseRecordEntity.setImageId(shopImgEntity != null ? shopImgEntity.getId() : null);
-//            assetLeaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
-//            assetLeaseRecordEntity.setAdvantageId(shopLeaseEntity.getShopFacility());
             assetLeaseRecordEntity.setCommunityId(shopLeaseEntity.getCommunityId());
-//            assetLeaseRecordEntity.setPrice(shopLeaseEntity.getMonthMoney());
         } else {
             throw new LeaseException("请传递正确的资产类型;1:商铺;2:房屋");
         }
