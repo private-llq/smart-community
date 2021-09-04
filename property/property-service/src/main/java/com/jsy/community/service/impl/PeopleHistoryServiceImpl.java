@@ -129,7 +129,7 @@ public class PeopleHistoryServiceImpl extends ServiceImpl<PeopleHistoryMapper, P
             queryWrapper.or().like("name", query.getSearchText());
         }
         if (query.getOpenStatus() != null) {
-            if (query.getOpenStatus() == 1) {
+            if (query.getOpenStatus() == 0) {
                 queryWrapper.eq("verify_status", 1);
             } else {
                 queryWrapper.ne("verify_status", 1);
