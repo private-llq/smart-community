@@ -1186,7 +1186,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIdList, qo.getFeeRuleName());
             }
         }
-        
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS totalSum");
@@ -1201,8 +1200,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             queryWrapper.in("community_id", communityIdList);
         }
-        if (FeeRuleIdList != null && FeeRuleIdList.size() > 0) {
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             queryWrapper.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            queryWrapper.eq("fee_rule_id", 0);
         }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
@@ -1235,8 +1236,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             query.in("community_id", communityIdList);
         }
-        if (FeeRuleIdList != null && FeeRuleIdList.size() > 0) {
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             query.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            query.eq("fee_rule_id", 0);
         }
         query.eq("deleted", 0);
         query.eq("pay_type", 1);
@@ -1264,8 +1267,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             wrapper.in("community_id", communityIdList);
         }
-        if (FeeRuleIdList != null && FeeRuleIdList.size() > 0) {
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             wrapper.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            wrapper.eq("fee_rule_id", 0);
         }
         wrapper.eq("deleted", 0);
         wrapper.eq("pay_type", 2);
@@ -1293,8 +1298,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             entityQueryWrapper.in("community_id", communityIdList);
         }
-        if (FeeRuleIdList != null && FeeRuleIdList.size() > 0) {
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             entityQueryWrapper.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            entityQueryWrapper.eq("fee_rule_id", 0);
         }
         entityQueryWrapper.eq("deleted", 0);
         entityQueryWrapper.eq("pay_type", 3);
@@ -1322,8 +1329,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             orderEntityQueryWrapper.in("community_id", communityIdList);
         }
-        if (FeeRuleIdList != null && FeeRuleIdList.size() > 0) {
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             orderEntityQueryWrapper.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            orderEntityQueryWrapper.eq("fee_rule_id", 0);
         }
         orderEntityQueryWrapper.eq("deleted", 0);
         orderEntityQueryWrapper.eq("pay_type", 4);
@@ -1351,8 +1360,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             wrapper1.in("community_id", communityIdList);
         }
-        if (FeeRuleIdList != null && FeeRuleIdList.size() > 0) {
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             wrapper1.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            wrapper1.eq("fee_rule_id", 0);
         }
         wrapper1.eq("deleted", 0);
         wrapper1.eq("pay_type", 5);
@@ -1380,8 +1391,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             queryWrapper1.in("community_id", communityIdList);
         }
-        if (FeeRuleIdList != null && FeeRuleIdList.size() > 0) {
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             queryWrapper1.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            queryWrapper1.eq("fee_rule_id", 0);
         }
         queryWrapper1.eq("deleted", 0);
         queryWrapper1.eq("pay_type", 6);
