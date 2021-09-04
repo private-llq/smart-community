@@ -324,10 +324,57 @@
         </where>
     </update>
 
-    <select id="chargeByDate" resultType="java.util.Map">
-        select order_time AS time,sum(total_money) AS totalMoneyByDate from t_property_finance_order
-        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and community_id = #{communityId} and order_status = 1 and deleted = 0
-        group by order_time ORDER BY order_time
+<!--    <select id="chargeByDate" resultType="java.util.Map">-->
+<!--        select order_time AS time,sum(total_money) AS totalMoneyByDate from t_property_finance_order-->
+<!--        where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and community_id = #{communityId} and order_status = 1 and deleted = 0-->
+<!--        group by order_time ORDER BY order_time-->
+<!--    </select>-->
+
+    <select id="chargeByDate" resultType="com.jsy.community.entity.CommunitySurveyEntity">
+        SELECT
+        time,
+        sum(totalMoneyByDate) as totalMoneyByDate,
+        sum(carPositionByDate) as carPositionByDate
+        FROM
+        ((
+        SELECT
+        order_time AS time,
+        sum( total_money ) AS totalMoneyByDate,
+        '0' carPositionByDate
+        FROM
+        t_property_finance_order
+        WHERE
+        order_time &lt;= #{endTime} AND order_time &gt;= #{startTime}
+        AND community_id = #{communityId}
+        AND order_status = 1
+        AND deleted = 0
+        GROUP BY
+        order_time
+        ORDER BY
+        order_time
+        ) UNION ALL
+        (
+        SELECT
+        DATE( order_time ) AS time,
+        '0' totalMoneyByDate,
+        sum( money ) AS carPositionByDate
+        FROM
+        t_car_order
+        WHERE
+        order_time &lt;= #{endTime} AND order_time &gt;= #{startTime}
+        AND community_id = #{communityId}
+        AND order_status = 1
+        AND deleted = 0
+        GROUP BY
+        order_time
+        ORDER BY
+        order_time
+        )
+        ) a
+        GROUP BY
+        time
+        ORDER BY
+        time desc
     </select>
 
     <select id="chargeByMonth" resultType="java.math.BigDecimal">
@@ -344,10 +391,59 @@
         group by month,communityId  ORDER BY communityId,month
     </select>
 
-    <select id="selectMonthPropertyFeeByCommunityId" resultType="java.util.Map">
-        select mid(order_time,1,7) as month,SUM(total_money) as propertyFee from t_property_finance_order
-        where order_time &gt;= #{startTime} and order_time &lt;= #{endTime} and order_status = 1 and deleted = 0 and community_id = #{communityId}
-        group by month  ORDER BY month
+<!--    <select id="selectMonthPropertyFeeByCommunityId" resultType="java.util.Map">-->
+<!--        select mid(order_time,1,7) as month,SUM(total_money) as propertyFee from t_property_finance_order-->
+<!--        where order_time &gt;= #{startTime} and order_time &lt;= #{endTime} and order_status = 1 and deleted = 0 and community_id = #{communityId}-->
+<!--        group by month  ORDER BY month-->
+<!--    </select>-->
+
+    <select id="selectMonthPropertyFeeByCommunityId" resultType="com.jsy.community.entity.property.ConsoleEntity">
+        SELECT
+        mon,
+        sum( propertyFee ) AS totalMoneyByDate,
+        sum( carPositionFee ) AS carPositionByDate
+        FROM
+        ((
+        SELECT
+        mid( order_time, 1, 7 ) AS mon,
+        SUM( total_money ) AS propertyFee,
+        '0' carPositionFee
+        FROM
+        t_property_finance_order
+        WHERE
+        order_time &gt;= #{startTime}
+        AND order_time &lt;= #{endTime}
+        AND order_status = 1
+        AND deleted = 0
+        AND community_id = #{communityId}
+        GROUP BY
+        mon
+        ORDER BY
+        mon
+        ) UNION ALL
+        (
+        SELECT
+        mid( order_time, 1, 7 ) AS mon,
+        '0' propertyFee,
+        SUM( money ) AS carPositionFee
+        FROM
+        t_car_order
+        WHERE
+        order_time &gt;= #{startTime}
+        AND order_time &lt;= #{endTime}
+        AND order_status = 1
+        AND deleted = 0
+        AND community_id = #{communityId}
+        GROUP BY
+        mon
+        ORDER BY
+        mon
+        )
+        ) a
+        GROUP BY
+        mon
+        ORDER BY
+        mon desc
     </select>
 
     <select id="chargeByYears" resultType="java.math.BigDecimal">

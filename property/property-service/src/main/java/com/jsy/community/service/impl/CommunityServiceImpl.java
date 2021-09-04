@@ -372,13 +372,14 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		communitySurveyEntity.setUnoccupiedCarPosition(allCarPosition.size() - occupyCarPosition);
 
 		// 小区月物业费收费统计
-		communitySurveyEntity.setDateByPropertyFee(propertyFinanceOrderMapper.chargeByDate(startTime, endTime, adminCommunityId));
 		BigDecimal monthByPropertyFee = propertyFinanceOrderMapper.chargeByMonth(startTime, endTime, adminCommunityId);
 		communitySurveyEntity.setMonthByPropertyFee(monthByPropertyFee);
 		// 小区月车位费收费统计
-		communitySurveyEntity.setDateByCarPositionFee(carOrderMapper.carPositionByDate(startTime, endTime, adminCommunityId));
 		BigDecimal monthByCarPositionFee = carOrderMapper.carPositionByMonth(startTime, endTime, adminCommunityId);
 		communitySurveyEntity.setMonthByCarPositionFee(monthByCarPositionFee);
+		// 合并小区物业费和车位费统计
+		List<CommunitySurveyEntity> communitySurveyEntities = propertyFinanceOrderMapper.chargeByDate(startTime, endTime, adminCommunityId);
+		communitySurveyEntity.setChargeByDate(communitySurveyEntities);
 		// 小区总月收入
 		if (monthByPropertyFee == null && monthByCarPositionFee == null) {
 			communitySurveyEntity.setMonthByTotalFee(new BigDecimal("0.00"));
@@ -457,16 +458,15 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		// 返回给前端实体
 		ConsoleEntity consoleEntity = new ConsoleEntity();
 		
-		// 查询年每月的物业费统计
-		consoleEntity.setMonthByPropertyFee(propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityId(communityId, startTime, endTime));
 		// 查询年总计物业费收入统计
 		BigDecimal propertyFee = propertyFinanceOrderMapper.chargeByYear(startTime, endTime, communityId);
 		consoleEntity.setYearByPropertyFee(propertyFee);
-		// 查询年每月的车位费统计
-		consoleEntity.setMonthByCarPositionFee(carOrderMapper.selectMonthCarPositionFeeByCommunityId(communityId, startTime, endTime));
 		// 查询年总计车位费收入统计
 		BigDecimal carPositionFee = carOrderMapper.CarPositionFeeByYear(startTime, endTime, communityId);
 		consoleEntity.setYearByCarPositionFee(carPositionFee);
+		// 合并小区物业费和车位费统计
+		List<ConsoleEntity> consoleEntities = propertyFinanceOrderMapper.selectMonthPropertyFeeByCommunityId(communityId, startTime, endTime);
+		consoleEntity.setChargeByDate(consoleEntities);
 		// 物业年总收入
 		if (propertyFee == null && carPositionFee == null) {
 			consoleEntity.setYearByTotalFee(new BigDecimal("0.00"));

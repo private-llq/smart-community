@@ -1,10 +1,12 @@
 package com.jsy.community.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -74,4 +76,17 @@ public class CommunitySurveyEntity implements Serializable {
 	
 	@ApiModelProperty(value = "小区月总收入")
 	private BigDecimal monthByTotalFee;
+	
+	@ApiModelProperty(value = "小区概况收费统计返回参数")
+	private List<CommunitySurveyEntity> chargeByDate;
+	
+	@ApiModelProperty(value = "天返回字段")
+	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+	private LocalDate time;
+	
+	@ApiModelProperty(value = "物业费")
+	private BigDecimal totalMoneyByDate;
+	
+	@ApiModelProperty(value = "车位费")
+	private BigDecimal carPositionByDate;
 }
