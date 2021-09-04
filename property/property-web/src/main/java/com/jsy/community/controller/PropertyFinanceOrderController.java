@@ -42,6 +42,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -395,6 +396,7 @@ public class PropertyFinanceOrderController {
         }
 //        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
     
+        List<PropertyCollectionFormEntity> propertyCollectionFormEntities = new ArrayList<>();
         PropertyCollectionFormEntity propertyCollectionFormEntityList = null;
         switch (propertyCollectionFormEntity.getType()) {
             case 1:
@@ -411,7 +413,8 @@ public class PropertyFinanceOrderController {
         if (propertyCollectionFormEntityList == null) {
             throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
         }
-        return CommonResult.ok(propertyCollectionFormEntityList,"查询成功");
+        propertyCollectionFormEntities.add(propertyCollectionFormEntityList);
+        return CommonResult.ok(propertyCollectionFormEntities,"查询成功");
     }
     
     /**

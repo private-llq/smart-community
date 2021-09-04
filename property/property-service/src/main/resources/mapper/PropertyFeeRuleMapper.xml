@@ -18,4 +18,11 @@
         </foreach>
         and deleted = 0
     </select>
+
+    <select id="selectFeeRuleIdList" resultType="java.lang.Long">
+        select id from t_property_fee_rule where name like concat('%',#{feeRuleName},'%') and deleted = 0 and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

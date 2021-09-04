@@ -1175,6 +1175,17 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo, List<Long> communityIdList) {
         // 返回前端实体
         List<PropertyCollectionFormEntity> propertyCollectionFormEntityList = new LinkedList<>();
+        // 模糊查询收费项目名称找到全部收费项目id
+        List<Long> FeeRuleIdList = new ArrayList<>();
+        if (qo.getFeeRuleName() != null) {
+            if (qo.getCommunityId() != null) {
+                List<Long> communityIds = new ArrayList<>();
+                communityIds.add(qo.getCommunityId());
+                FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
+            } else {
+                FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIdList, qo.getFeeRuleName());
+            }
+        }
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("fee_rule_id as feeRuleId,SUM(total_money) AS totalSum");
@@ -1188,6 +1199,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             queryWrapper.eq("community_id", qo.getCommunityId());
         } else {
             queryWrapper.in("community_id", communityIdList);
+        }
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
+            queryWrapper.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            queryWrapper.eq("fee_rule_id", 0);
         }
         queryWrapper.eq("deleted", 0);
         queryWrapper.groupBy("fee_rule_id");
@@ -1220,6 +1236,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             query.in("community_id", communityIdList);
         }
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
+            query.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            query.eq("fee_rule_id", 0);
+        }
         query.eq("deleted", 0);
         query.eq("pay_type", 1);
         query.groupBy("fee_rule_id");
@@ -1245,6 +1266,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             wrapper.eq("community_id", qo.getCommunityId());
         } else {
             wrapper.in("community_id", communityIdList);
+        }
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
+            wrapper.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            wrapper.eq("fee_rule_id", 0);
         }
         wrapper.eq("deleted", 0);
         wrapper.eq("pay_type", 2);
@@ -1272,6 +1298,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             entityQueryWrapper.in("community_id", communityIdList);
         }
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
+            entityQueryWrapper.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            entityQueryWrapper.eq("fee_rule_id", 0);
+        }
         entityQueryWrapper.eq("deleted", 0);
         entityQueryWrapper.eq("pay_type", 3);
         entityQueryWrapper.groupBy("fee_rule_id");
@@ -1297,6 +1328,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
         } else {
             orderEntityQueryWrapper.in("community_id", communityIdList);
+        }
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
+            orderEntityQueryWrapper.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            orderEntityQueryWrapper.eq("fee_rule_id", 0);
         }
         orderEntityQueryWrapper.eq("deleted", 0);
         orderEntityQueryWrapper.eq("pay_type", 4);
@@ -1324,6 +1360,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         } else {
             wrapper1.in("community_id", communityIdList);
         }
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
+            wrapper1.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            wrapper1.eq("fee_rule_id", 0);
+        }
         wrapper1.eq("deleted", 0);
         wrapper1.eq("pay_type", 5);
         wrapper1.groupBy("fee_rule_id");
@@ -1349,6 +1390,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             queryWrapper1.eq("community_id", qo.getCommunityId());
         } else {
             queryWrapper1.in("community_id", communityIdList);
+        }
+        if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
+            queryWrapper1.in("fee_rule_id", FeeRuleIdList);
+        } else if (qo.getFeeRuleName() != null){
+            queryWrapper1.eq("fee_rule_id", 0);
         }
         queryWrapper1.eq("deleted", 0);
         queryWrapper1.eq("pay_type", 6);
@@ -1376,12 +1422,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
     
         // 补充小区名称
-        if (qo.getCommunityId() == null) {
-            for (PropertyCollectionFormEntity entity : propertyCollectionFormEntityList) {
-                PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(entity.getFeeRuleId());
-                CommunityEntity communityEntity = communityMapper.selectById(propertyFeeRuleEntity.getCommunityId());
-                entity.setCommunityName(communityEntity.getName());
-            }
+        for (PropertyCollectionFormEntity entity : propertyCollectionFormEntityList) {
+            PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(entity.getFeeRuleId());
+            CommunityEntity communityEntity = communityMapper.selectById(propertyFeeRuleEntity.getCommunityId());
+            entity.setCommunityName(communityEntity.getName());
         }
     
         return propertyCollectionFormEntityList;
@@ -1737,7 +1781,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      */
     @Override
     public void deleteIds(String ids) {
-        propertyFinanceOrderMapper.delete(new QueryWrapper<PropertyFinanceOrderEntity>().in("id",ids.split(",")));
+        propertyFinanceOrderMapper.delete(new QueryWrapper<PropertyFinanceOrderEntity>().in("id", (Object) ids.split(",")));
     }
 }
 

@@ -45,4 +45,11 @@ public interface PropertyFeeRuleMapper extends BaseMapper<PropertyFeeRuleEntity>
      */
     @MapKey("id")
     Map<String, Map<String,Object>> selectFeeRuleIdName(@Param("list") Collection<Long> feeRuleIds);
+    
+    /**
+     * @Description: 根据项目名称模糊查询所有项目id
+     * @author: DKS
+     * @since: 2021/9/4 11:02
+     */
+    List<Long> selectFeeRuleIdList(@Param("list")List<Long> communityIds, @Param("feeRuleName")String feeRuleName);
 }

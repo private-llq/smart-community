@@ -7,6 +7,7 @@ import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IFinanceBillService;
 import com.jsy.community.api.IPropertyFeeRuleConstService;
 import com.jsy.community.api.IPropertyFeeRuleService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.qo.BaseQO;
@@ -20,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 /**
@@ -49,9 +51,13 @@ public class PropertyFeeRuleController {
     public CommonResult feeRule(@RequestBody BaseQO<FeeRuleQO> baseQO){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<Object, Object> map=propertyFeeRuleService.findList(baseQO,userInfo.getCommunityId());
+
         return CommonResult.ok(map);
     }
-    
+
+    public static void main(String[] args) {
+        System.out.println(LocalDate.now().getDayOfMonth());
+    }
     @ApiOperation("查询当前小区物业收费规则")
     @GetMapping("/selectOne")
     @Login
@@ -95,6 +101,8 @@ public class PropertyFeeRuleController {
     public CommonResult save(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         ValidatorUtils.validateEntity(propertyFeeRuleEntity, PropertyFeeRuleEntity.PropertyFeeRule.class);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFeeRuleEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        propertyFeeRuleEntity.setName(BusinessEnum.FeeRuleNameEnum.getName(propertyFeeRuleEntity.getType()));
         propertyFeeRuleService.saveOne(userInfo,propertyFeeRuleEntity);
         return CommonResult.ok();
     }

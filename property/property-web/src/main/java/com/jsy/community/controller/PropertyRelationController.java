@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
 import com.jsy.community.annotation.auth.Login;
@@ -16,6 +17,7 @@ import com.jsy.community.util.MembersHandler;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.HouseImportErrorVO;
 import com.jsy.community.vo.property.HouseMemberVO;
 import com.jsy.community.vo.property.RelationImportErrVO;
 import com.jsy.community.vo.property.RelationImportQO;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,6 +68,25 @@ public class PropertyRelationController {
     return CommonResult.ok(propertyRelationService.pageList(baseQO));
     }
 
+    @Login
+    @ApiOperation("下载成员信息导入模板")
+    @PostMapping("/downloadRelationExcelTemplate")
+    public ResponseEntity<byte[]> downloadHouseExcelTemplate() {
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("房屋信息.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = membersHandler.exportRelationTemplate();
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
     @ApiOperation("导出")
     @PostMapping("/export")
     @Login
@@ -90,17 +112,47 @@ public class PropertyRelationController {
     @ApiOperation("导入")
     @PostMapping("/import")
     @Login
-    public CommonResult importRelation(@RequestBody MultipartFile file){
-        String originalFilename = file.getOriginalFilename();
+    public CommonResult importRelation(@RequestBody MultipartFile excel){
+        String originalFilename = excel.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         if (!Arrays.asList(ExcelUtil.SUPPORT_EXCEL_EXTENSION).contains(s)) {
             return CommonResult.error("错误文件！可用后缀"+ Arrays.toString(ExcelUtil.SUPPORT_EXCEL_EXTENSION));
         }
         List<RelationImportErrVO> errorVos = new LinkedList<>();
-        List<RelationImportQO> list = membersHandler.importRelation(file,errorVos);
+        List<RelationImportQO> list = membersHandler.importRelation(excel,errorVos);
+        //导入数据库返回其中错误信息
+        List<RelationImportErrVO> errVOList = propertyRelationService.importRelation(list,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
+        for (RelationImportErrVO errVO : errVOList) {
+            errorVos.add(errVO);
+        }
+        //excel导入失败的信息明细 文件下载地址
+        String errorExcelAddr = null;
+        //错误excel写入远程服务器 让物业人员可以直接下载
+        if( CollectionUtil.isNotEmpty(errorVos) ){
+            errorExcelAddr=uploadErrorExcel(errorVos);
+        }
 
+        //构造返回对象
+        return CommonResult.ok(new HouseImportErrorVO(list.size()-errVOList.size(), errorVos.size(), errorExcelAddr));
+    }
 
-        return CommonResult.ok();
+    /**
+     *@Author: Pipi
+     *@Description: 写入房屋信息导入错误信息 和 把错误信息excel文件上传至文件服务器
+     *@Param: errorVos:
+     *@Return: java.lang.String:  返回excel文件下载地址
+     *@Date: 2021/5/21 17:38
+     **/
+    public String uploadErrorExcel(List<RelationImportErrVO> errorVos) {
+        Workbook workbook = membersHandler.exportErrorExcel(errorVos);
+        try {
+            byte[] bytes = ExcelUtil.readWorkbook(workbook);
+            MultipartFile multipartFile = new MockMultipartFile("file", "relationErrorExcel", "application/vnd.ms-excel", bytes);
+            return MinioUtils.upload(multipartFile, "relation-error-excel");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @ApiOperation("迁入")

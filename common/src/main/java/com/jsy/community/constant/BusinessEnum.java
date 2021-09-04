@@ -648,7 +648,7 @@ public interface BusinessEnum {
 					return c.name;
 				}
 			}
-			return RELATIVES.name;
+			return null;
 		}
 
 		public static Integer getNameCode(String name){
@@ -658,7 +658,7 @@ public interface BusinessEnum {
 					return c.code;
 				}
 			}
-			return RELATIVES.code;
+			return null;
 		}
 
 		static {
@@ -1253,6 +1253,81 @@ public interface BusinessEnum {
 				maritalStatusList.add(map);
 			}
 			sourceMap.put("feeRulePeriod",maritalStatusList);
+		}
+	}
+
+	/**
+	 * @Description: 物业缴费项目生成周期
+	 * @author: Hu
+	 * @since: 2021/7/30 9:28
+	 * @Param:
+	 * @return:
+	 */
+	enum FeeRuleNameEnum {
+		FITMENT("装修管理费", 1),
+		HIGH_RISE("高层物业服务费", 2),
+		LOWER("低层物业服务费", 3),
+		VILLA("别墅物业服务费", 4),
+		BUSINESS("底商物业服务费", 5),
+		HEATING("供暖费", 6),
+		CUSTOM("自定义名称", 7),
+		ARCHITECTURE("建筑面积", 8),
+		PLEDGE("装修押金", 9),
+		IMMOBILIZATION("固定金额", 10),
+		VEHICLE("车辆管理费", 11),
+		STALL("车位租金", 12),
+		FAMILY("按户", 13),
+		MAINTENANCE("电梯维护", 14),
+		EMPLOY("电梯使用", 15),
+		SANITATION("公共卫生费", 16);
+		private String name;
+		private Integer code;
+
+		FeeRuleNameEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static final List<Map<String, Object>> maritalStatusList = new ArrayList<>();
+
+		public static String getName(Integer code) {
+			FeeRuleNameEnum[] values = FeeRuleNameEnum.values();
+			for (FeeRuleNameEnum c : values) {
+				if (c.code.equals(code)) {
+					return c.name;
+				}
+			}
+			return null;
+		}
+		static {
+			for (FeeRuleNameEnum feeRuleNameEnum : FeeRuleNameEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", feeRuleNameEnum.getCode());
+				map.put("name", feeRuleNameEnum.getName());
+				maritalStatusList.add(map);
+			}
+			sourceMap.put("feeRuleName",maritalStatusList);
 		}
 	}
 

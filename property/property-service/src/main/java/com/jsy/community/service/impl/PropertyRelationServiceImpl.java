@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -16,12 +17,13 @@ import com.jsy.community.vo.HouseTypeVo;
 import com.jsy.community.vo.PropertyRelationVO;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.HouseMemberVO;
+import com.jsy.community.vo.property.RelationImportErrVO;
+import com.jsy.community.vo.property.RelationImportQO;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -260,6 +262,59 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     }
 
 
+
+    /**
+     * @Description: 导入数据库返回其中错误信息
+     * @author: Hu
+     * @since: 2021/9/4 9:52
+     * @Param: [list, communityId, uid]
+     * @return: java.util.List<com.jsy.community.vo.property.RelationImportErrVO>
+     */
+    @Override
+    public List<RelationImportErrVO> importRelation(List<RelationImportQO> list, Long communityId, String uid) {
+        List<RelationImportErrVO> errVOList = new LinkedList<>();
+        List<HouseMemberEntity> entityList = new LinkedList<>();
+        HouseMemberEntity memberEntity = null;
+        RelationImportErrVO errVO = null;
+        for (RelationImportQO relationImportQO : list) {
+            //查询房屋
+            HouseEntity houseEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>()
+                    .eq("community_id", communityId)
+                    .eq("building", relationImportQO.getBuilding())
+                    .eq("unit", relationImportQO.getUnit())
+                    .eq("door", relationImportQO.getDoor())
+                    .eq("type",4));
+            if (Objects.isNull(houseEntity)){
+                errVO = new RelationImportErrVO();
+                BeanUtils.copyProperties(relationImportQO,errVO);
+                errVO.setError("房屋错误:请填写正确的房屋");
+                if (BusinessEnum.RelationshipEnum.getNameCode(relationImportQO.getRelation())==null){
+                    errVO.setError(errVO.getError()+",身份不正确！");
+                }
+                errVOList.add(errVO);
+            } else {
+                if (BusinessEnum.RelationshipEnum.getNameCode(relationImportQO.getRelation())==null){
+                    errVO=new RelationImportErrVO();
+                    BeanUtils.copyProperties(relationImportQO,errVO);
+                    errVO.setError("身份不正确！");
+                    errVOList.add(errVO);
+                    continue;
+                }
+                memberEntity = new HouseMemberEntity();
+                BeanUtils.copyProperties(relationImportQO,memberEntity);
+                memberEntity.setId(SnowFlake.nextId());
+                memberEntity.setHouseId(houseEntity.getId());
+                memberEntity.setRelation(BusinessEnum.RelationshipEnum.getNameCode(relationImportQO.getRelation()));
+                memberEntity.setCommunityId(communityId);
+                memberEntity.setUnit(relationImportQO.getUnit());
+                entityList.add(memberEntity);
+            }
+        }
+        if (entityList.size()!=0){
+            propertyRelationMapper.saveList(entityList);
+        }
+        return errVOList;
+    }
 
     /**
      * @Description: 导出成员信息表

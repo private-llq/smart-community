@@ -74,4 +74,16 @@ public class ConsoleEntity implements Serializable {
 	
 	@ApiModelProperty(value = "与月份相对应的物业费")
 	private BigDecimal propertyFee;
+	
+	@ApiModelProperty(value = "物业概况收费统计返回参数")
+	private List<ConsoleEntity> chargeByDate;
+	
+	@ApiModelProperty(value = "月返回字段")
+	private String mon;
+	
+	@ApiModelProperty(value = "物业费")
+	private BigDecimal totalMoneyByDate;
+	
+	@ApiModelProperty(value = "车位费")
+	private BigDecimal carPositionByDate;
 }

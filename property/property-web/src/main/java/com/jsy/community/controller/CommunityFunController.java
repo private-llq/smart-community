@@ -68,7 +68,7 @@ public class CommunityFunController {
     @ApiOperation("新增缩略图")
     @PostMapping("/smallImge")
     @Login
-    @businessLog(operation = "新增",content = "新增了【物业社区趣事缩略图】")
+//    @businessLog(operation = "新增",content = "新增了【物业社区趣事缩略图】")
     public CommonResult upload(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -82,7 +82,7 @@ public class CommunityFunController {
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
     @Login
-    @businessLog(operation = "新增",content = "新增了【物业社区趣事封面图片】")
+//    @businessLog(operation = "新增",content = "新增了【物业社区趣事封面图片】")
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -114,7 +114,7 @@ public class CommunityFunController {
     @ApiOperation("新增内容图片")
     @PostMapping("/contentImge")
     @Login
-    @businessLog(operation = "新增",content = "新增了【物业社区趣事内容图片】")
+//    @businessLog(operation = "新增",content = "新增了【物业社区趣事内容图片】")
     public CommonResult content(@RequestParam("file") MultipartFile file){
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();

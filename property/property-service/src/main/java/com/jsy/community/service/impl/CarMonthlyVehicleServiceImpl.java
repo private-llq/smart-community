@@ -6,19 +6,18 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.codingapi.txlcn.tc.annotation.TxcTransaction;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
-import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.*;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.poi.ss.formula.functions.T;
-import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,14 +55,14 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @return: void
      */
     @Override
-    @Transactional
+    @TxcTransaction
     public void updateMonth(String carPlate, LocalDateTime overTime) {
         CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carPlate));
         if (vehicle!=null){
             vehicle.setEndTime(overTime);
             carMonthlyVehicleMapper.updateById(vehicle);
         }
-        throw new ProprietorException("当前月租车辆不存在！");
+        throw new JSYException("当前月租车辆不存在！");
     }
 
     /**

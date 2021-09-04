@@ -1,6 +1,7 @@
 package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jsy.community.entity.CommunitySurveyEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.ConsoleEntity;
 import com.jsy.community.entity.property.PropertyFinanceCountEntity;
@@ -256,7 +257,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Return: java.util.List<>
      *@Date: 2021/8/24 15:55
      **/
-    List<Map<String,BigDecimal>> chargeByDate(LocalDate startTime, LocalDate endTime, Long communityId);
+    List<CommunitySurveyEntity> chargeByDate(LocalDate startTime, LocalDate endTime, Long communityId);
 
     /**
      *@Author: DKS
@@ -282,7 +283,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Return: java.util.List<>
      *@Date: 2021/8/31 17:17
      **/
-    List<Map<String, BigDecimal>> selectMonthPropertyFeeByCommunityId(@Param("communityId") Long communityId, @Param("startTime")LocalDate startTime, @Param("endTime")LocalDate endTime);
+    List<ConsoleEntity> selectMonthPropertyFeeByCommunityId(@Param("communityId") Long communityId, @Param("startTime")LocalDate startTime, @Param("endTime")LocalDate endTime);
 
     /**
      *@Author: DKS

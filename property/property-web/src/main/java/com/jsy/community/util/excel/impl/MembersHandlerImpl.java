@@ -1,9 +1,11 @@
 package com.jsy.community.util.excel.impl;
 
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.MembersHandler;
 import com.jsy.community.utils.ExcelUtil;
+import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.vo.property.HouseMemberVO;
 import com.jsy.community.vo.property.RelationImportErrVO;
 import com.jsy.community.vo.property.RelationImportQO;
@@ -83,25 +85,31 @@ public class MembersHandlerImpl implements MembersHandler {
                             if (StringUtils.isNotBlank(cellValue)) {
                                 relationImportQO.setName(cellValue);
                             } else {
-                                addResolverError(errorVos, dataRow, "姓名不能为空!");
+                                addResolverError(errorVos, dataRow, "住户姓名不能为空!");
                                 hasError = true;
                             }
                             break;
                         case 1:
                             // 住户身份(必填)
                             if (StringUtils.isNotBlank(cellValue)) {
+                                Integer code = BusinessEnum.RelationshipEnum.getNameCode(cellValue);
                                 relationImportQO.setRelation(cellValue);
                             } else {
-                                addResolverError(errorVos, dataRow, "请填写正确的楼栋名称!");
+                                addResolverError(errorVos, dataRow, "住户身份不能为空!");
                                 hasError = true;
                             }
                             break;
                         case 2:
                             // 手机号码(必填)
                             if (StringUtils.isNotBlank(cellValue)) {
-                                relationImportQO.setMobile(cellValue);
+                                if (cellValue.matches(RegexUtils.REGEX_MOBILE)){
+                                    relationImportQO.setMobile(cellValue);
+                                }else {
+                                    addResolverError(errorVos, dataRow, "不支持的手机号!");
+                                    hasError = true;
+                                }
                             } else {
-                                addResolverError(errorVos, dataRow, "请填写正确的总楼层数!");
+                                addResolverError(errorVos, dataRow, "手机号不能为空!");
                                 hasError = true;
                             }
                             break;
@@ -110,7 +118,7 @@ public class MembersHandlerImpl implements MembersHandler {
                             if (StringUtils.isNotBlank(cellValue)) {
                                 relationImportQO.setBuilding(cellValue);
                             } else {
-                                addResolverError(errorVos, dataRow, "请填写正确的单元名称!");
+                                addResolverError(errorVos, dataRow, "所属楼宇不能为空!");
                                 hasError = true;
                             }
                             break;
@@ -119,7 +127,7 @@ public class MembersHandlerImpl implements MembersHandler {
                             if (StringUtils.isNotBlank(cellValue)) {
                                 relationImportQO.setUnit(cellValue);
                             } else {
-                                addResolverError(errorVos, dataRow, "请填写正确的楼层!");
+                                addResolverError(errorVos, dataRow, "所属单元不能为空!");
                                 hasError = true;
                             }
                             break;
@@ -128,7 +136,7 @@ public class MembersHandlerImpl implements MembersHandler {
                             if (StringUtils.isNotBlank(cellValue)) {
                                 relationImportQO.setDoor(cellValue);
                             } else {
-                                addResolverError(errorVos, dataRow, "请填写正确的建筑面积!");
+                                addResolverError(errorVos, dataRow, "房间号码不能为空!");
                                 hasError = true;
                             }
                             break;
@@ -309,6 +317,20 @@ public class MembersHandlerImpl implements MembersHandler {
         //为该对象设置错误信息 多个以，分割 便于物业人员查看原因
         vo.setError(vo.getError() == null ? errorMsg :  vo.getError() + "，" + errorMsg );
         return vo;
+    }
+
+    @Override
+    public Workbook exportRelationTemplate() {
+        // 表名称
+        String titleName = "房屋成员信息";
+        // 创建Excel工作簿
+        Workbook workbook = new XSSFWorkbook();
+        // 创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, EXPORT_MEMBERS_TEMPLATE.length);
+        // 创建Excel字段列
+        ExcelUtil.createExcelField(workbook, sheet, EXPORT_MEMBERS_TEMPLATE);
+        return workbook;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.jsy.community.api;
 
-import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
@@ -8,6 +7,8 @@ import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.HouseMemberVO;
+import com.jsy.community.vo.property.RelationImportErrVO;
+import com.jsy.community.vo.property.RelationImportQO;
 
 import java.util.List;
 import java.util.Map;
@@ -142,4 +143,13 @@ public interface IPropertyRelationService {
      * @return:
      */
     List<HouseMemberVO> queryExportRelationExcel(HouseMemberQO houseMemberQO);
+
+    /**
+     * @Description: 导入数据库返回其中错误信息
+     * @author: Hu
+     * @since: 2021/9/4 9:49
+     * @Param:
+     * @return:
+     */
+    List<RelationImportErrVO> importRelation(List<RelationImportQO> list,Long communityId,String uid);
 }
