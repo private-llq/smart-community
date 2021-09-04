@@ -1,7 +1,10 @@
 package com.jsy.community.util;
 
 import com.jsy.community.vo.property.HouseMemberVO;
+import com.jsy.community.vo.property.RelationImportErrVO;
+import com.jsy.community.vo.property.RelationImportQO;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,4 +23,22 @@ public interface MembersHandler {
      * @return:
      */
     Workbook exportRelation(List<HouseMemberVO> houseMemberVOS);
+
+    /**
+     * @Description: 成员表导入
+     * @author: Hu
+     * @since: 2021/8/31 15:47
+     * @Param:
+     * @return:
+     */
+    List<RelationImportQO> importRelation(MultipartFile file,List<RelationImportErrVO> errorVos);
+
+    /**
+     * @Description: 导出错误信息
+     * @author: Hu
+     * @since: 2021/9/3 16:04
+     * @Param:
+     * @return: 
+     */
+    Workbook exportErrorExcel(List<RelationImportErrVO> errorVos);
 }

@@ -125,4 +125,7 @@ public class CarChargeController {
        CarChargeEntity chargeEntity= carChargeService.selectOneCharge(uid,UserUtils.getAdminCommunityId());
         return CommonResult.ok(chargeEntity);
     }
+
+
+
 }
