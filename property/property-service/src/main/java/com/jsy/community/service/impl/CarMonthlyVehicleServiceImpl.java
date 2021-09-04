@@ -597,7 +597,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
         //临时车 黄牌
-        if ("黄色".equals(carColor)){
+
+        if ( StringUtils.containsAny(carColor,"黄色","黄牌","黄")){
             CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq(StringUtils.isNotBlank(carColor),"plate_type", 0));
             HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
             CarChargeEntity chargeEntity = new CarChargeEntity();
