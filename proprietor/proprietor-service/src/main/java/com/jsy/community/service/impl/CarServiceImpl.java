@@ -22,7 +22,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -62,7 +61,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @DubboReference(version = Const.version,  group = Const.group, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
 
-    @DubboReference(version = Const.version,  group = Const.group, check = false)
+    @DubboReference(version = Const.version,  group = Const.group_property, check = false)
     private ICarBasicsService carBasicsService;
 
     @DubboReference(version = Const.version,  group = Const.group, check = false)
@@ -253,10 +252,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return: java.math.BigDecimal
      */
     @Override
+    @TxcTransaction
     public Long bindingRecord(CarEntity carEntity) {
         CarBasicsEntity basicsEntity = carBasicsService.findOne(carEntity.getCommunityId());
         if (basicsEntity!=null){
-            if (basicsEntity.getMonthlyPayment()==1){
+            if (basicsEntity.getMonthlyPayment()==0){
                 throw new ProprietorException("当前小区不允许车辆包月！");
             }
             if (basicsEntity.getWhetherAllowMonth()==0){
@@ -297,11 +297,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return: java.math.BigDecimal
      */
     @Override
+    @TxcTransaction
     public Long renewRecord(CarEntity carEntity) {
         CarEntity entity = carMapper.selectById(carEntity.getId());
         CarBasicsEntity basicsEntity = carBasicsService.findOne(entity.getCommunityId());
         if (basicsEntity!=null) {
-            if (basicsEntity.getMonthlyPayment() == 1) {
+            if (basicsEntity.getMonthlyPayment() == 0) {
                 throw new ProprietorException("当前小区不允许车辆包月！");
             }
             if (basicsEntity.getWhetherAllowMonth() == 0) {
@@ -341,7 +342,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return: void
      */
     @Override
-    @Transactional
+    @TxcTransaction
     public void renewMonthCar(CarOrderRecordEntity entity) {
 
         CarEntity carEntity = carMapper.selectById(entity.getCarId());

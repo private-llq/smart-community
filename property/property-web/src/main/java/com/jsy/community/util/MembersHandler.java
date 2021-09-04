@@ -41,4 +41,13 @@ public interface MembersHandler {
      * @return: 
      */
     Workbook exportErrorExcel(List<RelationImportErrVO> errorVos);
+
+    /**
+     * @Description: 下载成员信息导入模板
+     * @author: Hu
+     * @since: 2021/9/4 11:19
+     * @Param:
+     * @return:
+     */
+    Workbook exportRelationTemplate();
 }

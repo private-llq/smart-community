@@ -110,6 +110,14 @@
         ORDER BY thm.house_id
         DESC
     </select>
+    <insert id="saveList">
+        insert into t_house_member (id,community_id,name,sex,relation,mobile,house_id,birthday,enter_time,enter_reason,credit_card,unit) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.id},#{item.communityId},#{item.name},#{item.sex},#{item.relation},#{item.mobile},#{item.houseId},#{item.birthday},#{item.enterTime},#{item.enterReason},#{item.creditCard},#{item.unit}
+            )
+        </foreach>
+    </insert>
     <sql id="memberQuery">
         <where>
             thm.deleted=0 and th.deleted=0

@@ -71,8 +71,8 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "每月生成账单的那天")
     private Integer billDay;
 
-    @ApiModelProperty(value = "每月生成账单的那天的某个时间")
-    private Integer billTime;
+    @ApiModelProperty(value = "每月")
+    private Integer billMonth;
 
     @ApiModelProperty(value = "0不推送缴费通知，1推送缴费通知")
     private Integer pushStatus;
@@ -80,8 +80,8 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "每月向用户推送订单信息的那天")
     private Integer pushDay;
 
-    @ApiModelProperty(value = "每月向用户推送订单信息的那天的某个时间")
-    private Integer pushTime;
+    @ApiModelProperty(value = "每月向用户推送订单信息")
+    private Integer pushMonth;
 
     @ApiModelProperty(value = "0不预生成未来订单，1预先生成未来的账单")
     private Integer future;
