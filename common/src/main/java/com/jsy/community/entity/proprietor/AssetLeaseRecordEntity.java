@@ -44,7 +44,7 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     private Integer operation;
 
     // 图片id
-    private Long imageId;
+    private String imageUrl;
 
     // 标题
     private String title;
