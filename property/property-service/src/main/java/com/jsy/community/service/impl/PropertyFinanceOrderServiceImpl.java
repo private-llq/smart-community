@@ -1442,6 +1442,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     public PropertyCollectionFormEntity getCollectionFormOrderByOrderGenerateTime(PropertyCollectionFormEntity qo) {
         // 返回给前端实体
         PropertyCollectionFormEntity propertyCollectionFormEntity = new PropertyCollectionFormEntity();
+        propertyCollectionFormEntity.setStatementReceivableMoney(new BigDecimal("0.00"));
+        propertyCollectionFormEntity.setStatementArrearsMoney(new BigDecimal("0.00"));
+        propertyCollectionFormEntity.setStatementCollectMoney(new BigDecimal("0.00"));
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("order_status AS orderStatus,SUM(total_money) AS totalMoney");
@@ -1498,6 +1501,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     public PropertyCollectionFormEntity getCollectionFormOrderByOrderPeriodTime(PropertyCollectionFormEntity qo) {
         // 返回给前端实体
         PropertyCollectionFormEntity propertyCollectionFormEntity = new PropertyCollectionFormEntity();
+        propertyCollectionFormEntity.setStatementReceivableMoney(new BigDecimal("0.00"));
+        propertyCollectionFormEntity.setStatementArrearsMoney(new BigDecimal("0.00"));
+        propertyCollectionFormEntity.setStatementCollectMoney(new BigDecimal("0.00"));
     
         QueryWrapper<PropertyFinanceOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("order_status AS orderStatus,SUM(total_money) AS totalMoney");
