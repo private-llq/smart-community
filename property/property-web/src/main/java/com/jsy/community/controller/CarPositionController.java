@@ -41,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -275,6 +276,7 @@ public class CarPositionController {
         //查询社区代写
         Long communityId = equipmentManageService.equipmentOne(camId).getCommunityId();
 
+
         //是否是黑名单车辆
         CarBlackListEntity carBlackListEntity = iCarBlackListService.carBlackListOne(plateNum);
         if (carBlackListEntity == null) {//是白名单车辆
@@ -454,8 +456,16 @@ public class CarPositionController {
                            String picture, String closeupPic,
                            String carSubLogo, String plateColor) {
         if (vdcType.equals("in")) {
+            CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
+            //车主所属类型
+            Integer status = extracted(plateNum, carEquipmentManageEntity, plateColor);
+//            }
+
+
             //开闸记录实体类对象
             CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
+            //车子状态  1临时车  2包月  3业主
+            carCutOffEntity.setState(status);
             carCutOffEntity.setCarNumber(plateNum);
             carCutOffEntity.setCarType(vehicleType);
             carCutOffEntity.setAccess(vdcType);
@@ -464,19 +474,21 @@ public class CarPositionController {
             carCutOffEntity.setCloseupPic(closeupPic);
             carCutOffEntity.setCarSublogo(carSubLogo);
             carCutOffEntity.setPlateColor(plateColor);
+            Integer belong = extracted(plateNum, carEquipmentManageEntity, plateColor);
+            carCutOffEntity.setBelong(belong);
 
             //时间戳转年月日       //进闸时间
             LocalDateTime localDateTime = new Date(startTime * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
             carCutOffEntity.setOpenTime(localDateTime);
 
-            //通过mac地址 获取社区id和设备名称   还有临时车模式
-            CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
 
             System.out.println(carEquipmentManageEntity);
 
             carCutOffEntity.setLaneName(carEquipmentManageEntity.getEquipmentName());
             carCutOffEntity.setCommunityId(carEquipmentManageEntity.getCommunityId());
 
+            //还能停多少天
+            Long days = extracted(plateNum, plateColor, carEquipmentManageEntity);
             boolean b = carCutOffService.addCutOff(carCutOffEntity);
 
         } else {
@@ -494,6 +506,33 @@ public class CarPositionController {
             }
 
         }
+    }
+
+    //包月车辆剩余天数
+    private Long extracted(String plateNum, String plateColor, CarEquipmentManageEntity carEquipmentManageEntity) {
+        Map map = iCarMonthlyVehicleService.selectByStatus(plateNum, plateColor, carEquipmentManageEntity.getCommunityId());
+        Iterator<Integer> iterator = map.keySet().iterator();
+        Integer status=null;
+        while(iterator.hasNext()){//通过迭代器输出
+            status = iterator.next();
+        }
+        CarMonthlyVehicle o = (CarMonthlyVehicle)map.get(status);
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(now, o.getEndTime());
+        long days = duration.toDays();
+        return days;
+    }
+
+    //返回的车子所属类型  1临时 2包月 3业主
+    private Integer extracted(String plateNum,  CarEquipmentManageEntity carEquipmentManageEntity, String plateColor) {
+        Map map = iCarMonthlyVehicleService.selectByStatus(plateNum, plateColor, carEquipmentManageEntity.getCommunityId());
+        Iterator<Integer> iterator = map.keySet().iterator();
+        Integer status=null;
+        while(iterator.hasNext()){//通过迭代器输出
+            status = iterator.next();
+        }
+        return status;
+
     }
 
     public static void main(String[] args) {

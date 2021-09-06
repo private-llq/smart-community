@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ICarCutOffService extends IService<CarCutOffEntity> {
     /**
-     * @Description: 分页查询开闸记录
+     * @Description: 临时车在场
      * @Param: [carCutOffQO, adminCommunityId]
      * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.property.CarCutOffEntity>
      * @Author: Tian
