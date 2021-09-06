@@ -58,6 +58,8 @@ public interface ICarChargeService {
 
     BigDecimal testCharge(CarChargeQO carChargeQO);
 
+    BigDecimal charge(CarChargeQO carChargeQO);
+
     /**
      * @Description: 按社区查询一条月租缴费规则
      * @author: Hu

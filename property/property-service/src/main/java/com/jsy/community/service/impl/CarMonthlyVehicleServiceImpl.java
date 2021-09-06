@@ -575,7 +575,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Override
     public Map selectByStatus(String carNumber, String carColor, Long community_id) {
 
-
+        //查询未到期的包月车辆
         CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).ge("end_time", LocalDateTime.now()));
         if (Objects.nonNull(carMonthlyVehicle)){
             HashMap<Integer, CarMonthlyVehicle> hashMap = new HashMap<>();
