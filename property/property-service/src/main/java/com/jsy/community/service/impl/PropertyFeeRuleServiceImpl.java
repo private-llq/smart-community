@@ -6,10 +6,14 @@ import com.jsy.community.api.IPropertyFeeRuleService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
+import com.jsy.community.entity.property.PropertyFeeRuleRelevanceEntity;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.PropertyFeeRuleMapper;
+import com.jsy.community.mapper.PropertyFeeRuleRelevanceMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.qo.property.FeeRuleRelevanceQO;
+import com.jsy.community.qo.property.UpdateRelevanceQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FeeRuleVO;
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +41,58 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     private PropertyFeeRuleMapper propertyFeeRuleMapper;
     @Autowired
     private AdminUserMapper adminUserMapper;
+    @Autowired
+    private PropertyFeeRuleRelevanceMapper propertyFeeRuleRelevanceMapper;
 
+    @Override
+    public List selectRelevance(FeeRuleRelevanceQO feeRuleRelevanceQO) {
+        if (feeRuleRelevanceQO.getType()==1){
+            //查房屋
+            return propertyFeeRuleRelevanceMapper.selectHouse(feeRuleRelevanceQO);
+        }else{
+            //查车位
+            return propertyFeeRuleRelevanceMapper.selectCarPosition(feeRuleRelevanceQO);
+        }
+    }
+
+
+
+    /**
+     * @Description: 批量新增收费项目关联目标
+     * @author: Hu
+     * @since: 2021/9/6 14:07
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void addRelevance(UpdateRelevanceQO updateRelevanceQO) {
+        List<PropertyFeeRuleRelevanceEntity> list = new LinkedList();
+        PropertyFeeRuleRelevanceEntity entity = null;
+        String[] split = updateRelevanceQO.getIds().split(",");
+        for (String s : split) {
+            entity = new PropertyFeeRuleRelevanceEntity();
+            entity.setId(SnowFlake.nextId());
+            entity.setRelevanceId(Long.parseLong(s));
+            entity.setRuleId(updateRelevanceQO.getId());
+            entity.setType(updateRelevanceQO.getType());
+            list.add(entity);
+        }
+        if (list.size()!=0){
+            propertyFeeRuleRelevanceMapper.save(list);
+        }
+    }
+
+    /**
+     * @Description: 删除收费项目中关联的房屋或者车位
+     * @author: Hu
+     * @since: 2021/9/6 13:57
+     * @Param: [id]
+     * @return: void
+     */
+    @Override
+    public void deleteRelevance(Long id) {
+        propertyFeeRuleRelevanceMapper.deleteById(id);
+    }
 
     @Override
     public void statementStatus(AdminInfoVo userInfo, Integer status, Long id) {
@@ -120,22 +176,13 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      */
     @Override
     public void startOrOut(AdminInfoVo userInfo, Integer status,Long id) {
-        PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectById(id);
-        if (status==1){
-            PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type", entity.getType()).eq("status", 1).eq("community_id",entity.getCommunityId()));
-            if (ruleEntity!=null){
-                ruleEntity.setStatus(0);
-                ruleEntity.setUpdateBy(userInfo.getUid());
-                propertyFeeRuleMapper.updateById(ruleEntity);
-            }
-            entity.setUpdateBy(userInfo.getUid());
-            entity.setStatus(1);
-            propertyFeeRuleMapper.updateById(entity);
-        }else {
-            entity.setUpdateBy(userInfo.getUid());
-            entity.setStatus(0);
-            propertyFeeRuleMapper.updateById(entity);
+        PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectById(id);
+        if (ruleEntity!=null){
+            ruleEntity.setStatus(status);
+            ruleEntity.setUpdateBy(userInfo.getUid());
+            propertyFeeRuleMapper.updateById(ruleEntity);
         }
+
     }
 
 

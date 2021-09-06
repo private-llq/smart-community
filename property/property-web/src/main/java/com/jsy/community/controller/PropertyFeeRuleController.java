@@ -12,6 +12,8 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.qo.property.FeeRuleRelevanceQO;
+import com.jsy.community.qo.property.UpdateRelevanceQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -21,7 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,15 +57,35 @@ public class PropertyFeeRuleController {
         return CommonResult.ok(map);
     }
 
-    public static void main(String[] args) {
-        System.out.println(LocalDate.now().getDayOfMonth());
-    }
     @ApiOperation("查询当前小区物业收费规则")
     @GetMapping("/selectOne")
     @Login
     public CommonResult selectOne(@RequestParam("id")Long id){
         PropertyFeeRuleEntity propertyFeeRuleEntity=propertyFeeRuleService.selectByOne(id);
         return CommonResult.ok(propertyFeeRuleEntity);
+    }
+
+    @ApiOperation("删除关联的房屋或者车辆")
+    @DeleteMapping("/deleteRelevance")
+    @Login
+    public CommonResult deleteRelevance(@RequestParam("id")Long id){
+        propertyFeeRuleService.deleteRelevance(id);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("删除关联的房屋或者车辆")
+    @PostMapping("/deleteRelevance")
+    @Login
+    public CommonResult addRelevance(@RequestBody UpdateRelevanceQO updateRelevanceQO){
+        propertyFeeRuleService.addRelevance(updateRelevanceQO);
+        return CommonResult.ok();
+    }
+    @ApiOperation("查询关联目标")
+    @PostMapping("/selectRelevance")
+    @Login
+    public CommonResult selectRelevance(@RequestBody FeeRuleRelevanceQO feeRuleRelevanceQO){
+        List<Object> list = propertyFeeRuleService.selectRelevance(feeRuleRelevanceQO);
+        return CommonResult.ok(list);
     }
 
     @ApiOperation("启用或者停用")

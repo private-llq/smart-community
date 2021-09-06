@@ -378,8 +378,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             //停车临时收费表更新
             entity.setStatus(1);
             carOrderRecordMapper.updateById(entity);
+        } else {
+            throw new ProprietorException("当前月租车辆不存在！");
         }
-        throw new ProprietorException("当前月租车辆不存在！");
     }
 
     /**
