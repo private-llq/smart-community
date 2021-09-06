@@ -10,8 +10,10 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
+import com.jsy.community.mapper.AssetLeaseRecordMapper;
 import com.jsy.community.mapper.ShopImgMapper;
 import com.jsy.community.mapper.ShopLeaseMapper;
 import com.jsy.community.qo.BaseQO;
@@ -123,6 +125,9 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private AssetLeaseRecordMapper assetLeaseRecordMapper;
+
     /**
      * @Author lihao
      * @Description 商铺类型为不限
@@ -185,7 +190,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
     }
 
     @Override
-    public Map<String, Object> getShop(Long shopId) {
+    public Map<String, Object> getShop(Long shopId, String uid) {
         Map<String, Object> map = new HashMap<>();
 
 
@@ -197,6 +202,18 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
         ShopLeaseVO shopLeaseVo = new ShopLeaseVO();
         // 封装基本信息
         BeanUtils.copyProperties(shop, shopLeaseVo);
+
+        // 查询该商铺是否申请租赁签约
+        QueryWrapper<AssetLeaseRecordEntity> assetLeaseRecordEntityQueryWrapper = new QueryWrapper<>();
+        assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", uid);
+        assetLeaseRecordEntityQueryWrapper.eq("asset_id", shopId);
+        assetLeaseRecordEntityQueryWrapper.eq("asset_type", BusinessEnum.HouseTypeEnum.SHOP.getCode());
+        AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(assetLeaseRecordEntityQueryWrapper);
+        if (assetLeaseRecordEntity == null) {
+            shopLeaseVo.setOperation(0);
+        } else {
+            shopLeaseVo.setOperation(assetLeaseRecordEntity.getOperation());
+        }
 
 
         QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
@@ -284,14 +301,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 
 
         // 查询店铺发布人的电话和头像
-        String uid = shop.getUid();
-        UserEntity one = userService.selectOne(uid);
+        UserEntity one = userService.selectOne(shop.getUid());
         // 详情页展示的业主名称是用户在发布的时候填写的昵称
         // 详情页展示的电话是用户在发布的时候填写的电话
         one.setRealName(shop.getNickname());
         one.setMobile(shop.getMobile());
         //查询发布人聊天id(im_id)
-        String imId = leaseUserService.queryIMIdByUid(uid);
+        String imId = leaseUserService.queryIMIdByUid(shop.getUid());
         one.setImId(imId);
         map.put("user", one);
         return map;

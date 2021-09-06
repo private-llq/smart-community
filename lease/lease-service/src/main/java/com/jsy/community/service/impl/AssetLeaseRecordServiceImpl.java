@@ -228,6 +228,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
             assetLeaseRecordEntity.setAdvantageId(shopLeaseEntity.getShopFacility());
             assetLeaseRecordEntity.setPrice(shopLeaseEntity.getMonthMoney());
+            assetLeaseRecordEntity.setSummarize(shopLeaseEntity.getSummarize());
         }
         //写入租赁操作数据
         addLeaseOperationRecord(recordEntity);
@@ -421,6 +422,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                         record.setTitle(shopEntityMap.get(record.getAssetId()).getTitle());
                         record.setAdvantageId(shopEntityMap.get(record.getAssetId()).getShopFacility());
                         record.setPrice(shopEntityMap.get(record.getAssetId()).getMonthMoney());
+                        record.setSummarize(shopEntityMap.get(record.getAssetId()).getSummarize());
                     } else if (assetLeaseRecordEntity.getAssetType() == 2 && houseEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 9)) {
                         // 房屋
                         record.setImageUrl(houseEntityMap.get(record.getAssetId()).getHouseImgUrl());
@@ -552,6 +554,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                         record.setTitle(shopEntityMap.get(record.getAssetId()).getTitle());
                         record.setAdvantageId(shopEntityMap.get(record.getAssetId()).getShopFacility());
                         record.setPrice(shopEntityMap.get(record.getAssetId()).getMonthMoney());
+                        record.setSummarize(shopEntityMap.get(record.getAssetId()).getSummarize());
                     } else if (assetLeaseRecordEntity.getAssetType() == 2 && houseEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9)) {
                         // 房屋
                         record.setImageUrl(houseEntityMap.get(record.getAssetId()).getHouseImgUrl());

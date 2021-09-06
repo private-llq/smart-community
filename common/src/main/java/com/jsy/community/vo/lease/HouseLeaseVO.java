@@ -204,5 +204,9 @@ public class HouseLeaseVO implements Serializable {
 
     @ApiModelProperty("发布人信息")
     private UserEntity user;
+
+    // 签约操作状态;0;没有签约;1:发起签约;2:接受申请;3:拟定合同;4:等待支付房租;5:支付完成;6:完成签约;7:取消申请;8:拒绝申请;9:重新发起
+    @TableField(exist = false)
+    private Integer operation;
     
 }

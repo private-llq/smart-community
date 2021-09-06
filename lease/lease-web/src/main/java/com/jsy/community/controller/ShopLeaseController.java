@@ -237,7 +237,7 @@ public class ShopLeaseController {
     @RequireRecentBrowse
     @GetMapping("/getShop")
     public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
-        Map<String, Object> map = shopLeaseService.getShop(shopId);
+        Map<String, Object> map = shopLeaseService.getShop(shopId, UserUtils.getUserId());
         if (map == null) {
             return CommonResult.ok(null);
         }

@@ -284,4 +284,10 @@ public class HouseLeaseController {
         ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.ContractListValidate.class);
         return CommonResult.ok(assetLeaseRecordService.pageContractList(assetLeaseRecordEntity, UserUtils.getUserId()));
     }
+
+    public CommonResult contractDetail() {
+        return CommonResult.ok();
+    }
+
+
 }
