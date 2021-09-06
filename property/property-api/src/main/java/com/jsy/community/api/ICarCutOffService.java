@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.CarCutOffEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.utils.PageInfo;
 
@@ -52,5 +53,5 @@ public interface ICarCutOffService extends IService<CarCutOffEntity> {
      * @Author: Tian
      * @Date: 2021/9/6-11:45
      **/
-    PageInfo<CarCutOffEntity> selectCarPage(CarCutOffQO carCutOffQO);
+    Page<CarCutOffEntity> selectCarPage(BaseQO<CarCutOffQO> baseQO,Long communityId);
 }

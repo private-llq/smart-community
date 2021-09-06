@@ -17,8 +17,8 @@ public class CarCutOffQO extends BaseQO implements Serializable {
     @ApiModelProperty(value = "社区id")
     private Long communityId;
 
-    @ApiModelProperty(value = "车辆类型")
-    private String carType;
+//    @ApiModelProperty(value = "车辆类型")
+//    private String carType;
 
 //    @ApiModelProperty(value = "进出方向")
 //    private String access;
