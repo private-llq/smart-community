@@ -81,4 +81,35 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
     public boolean updateCutOff(CarCutOffEntity carCutOffEntity) {
         return  carCutOffMapper.updateById(carCutOffEntity) == 1;
     }
+
+    @Override
+    public PageInfo<CarCutOffEntity> selectCarPage(CarCutOffQO carCutOffQO) {
+        QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
+        if (!StringUtils.isEmpty(carCutOffQO.getCarNumber())){
+            queryWrapper.like("car_number",carCutOffQO.getCarNumber());
+        }
+
+        if (!StringUtils.isEmpty(carCutOffQO.getCarType())){
+            queryWrapper.like("car_type",carCutOffQO.getCarType());
+        }
+
+//        if (!StringUtils.isEmpty(carCutOffQO.getAccess())){
+//            queryWrapper.like("access",carCutOffQO.getAccess());
+//        }
+
+        queryWrapper.eq("community_id",carCutOffQO.getCommunityId()).eq("state",carCutOffQO.getState());//状态
+
+        Page<CarCutOffEntity> page = new Page<CarCutOffEntity>(carCutOffQO.getPage(),carCutOffQO.getSize());
+        PageInfo<CarCutOffEntity> pageInfo = new PageInfo<>();
+        if (carCutOffQO.getPage() == 0 || carCutOffQO.getPage() == null){
+            carCutOffQO.setPage(10L);
+        }
+        Page<CarCutOffEntity> selectPage = carCutOffMapper.selectPage(page, queryWrapper);
+        pageInfo.setRecords(selectPage.getRecords());
+        pageInfo.setTotal(selectPage.getTotal());
+        pageInfo.setCurrent(selectPage.getCurrent());
+        pageInfo.setSize(selectPage.getSize());
+
+        return pageInfo;
+    }
 }

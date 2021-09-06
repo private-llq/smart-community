@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ICarCutOffService extends IService<CarCutOffEntity> {
     /**
-     * @Description: 分页查询开闸记录
+     * @Description: 临时车在场
      * @Param: [carCutOffQO, adminCommunityId]
      * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.property.CarCutOffEntity>
      * @Author: Tian
@@ -44,4 +44,13 @@ public interface ICarCutOffService extends IService<CarCutOffEntity> {
      * @Date: 2021/9/2-17:37
      **/
     boolean updateCutOff(CarCutOffEntity carCutOffEntity);
+
+    /**
+     * @Description: 查询所有在场车辆
+     * @Param: [carCutOffQO]
+     * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.property.CarCutOffEntity>
+     * @Author: Tian
+     * @Date: 2021/9/6-11:45
+     **/
+    PageInfo<CarCutOffEntity> selectCarPage(CarCutOffQO carCutOffQO);
 }

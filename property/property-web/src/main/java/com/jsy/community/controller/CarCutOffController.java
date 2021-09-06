@@ -24,6 +24,7 @@ public class CarCutOffController{
     @DubboReference(version = Const.version,group = Const.group_property,check = false)
     private ICarCutOffService carCutOffService;
 
+
     @Login
     @PostMapping("/selectPage")
     public CommonResult selectPage(@RequestBody CarCutOffQO carCutOffQO){
@@ -31,6 +32,12 @@ public class CarCutOffController{
         return CommonResult.ok(pageInfo,"查询成功");
     }
 
+    @Login
+    @PostMapping("/selectCarPage")
+    public CommonResult selectCarPage(@RequestBody CarCutOffQO carCutOffQO){
+        PageInfo<CarCutOffEntity> pageInfo = carCutOffService.selectCarPage(carCutOffQO);
+        return CommonResult.ok(pageInfo,"查询成功");
+    }
     @Login
     @PostMapping("/addCutOff")
     public CommonResult addCutOff(@RequestBody CarCutOffEntity carCutOffEntity){

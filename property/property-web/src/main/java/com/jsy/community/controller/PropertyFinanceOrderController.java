@@ -410,9 +410,6 @@ public class PropertyFinanceOrderController {
             default:
                 break;
         }
-        if (propertyCollectionFormEntityList == null) {
-            throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
-        }
         propertyCollectionFormEntities.add(propertyCollectionFormEntityList);
         return CommonResult.ok(propertyCollectionFormEntities,"查询成功");
     }
