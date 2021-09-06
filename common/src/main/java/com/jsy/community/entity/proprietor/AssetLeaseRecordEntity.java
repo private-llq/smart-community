@@ -49,6 +49,9 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     // 标题
     private String title;
 
+    // (商铺)概述
+    private String summarize;
+
     // 优势标签
     private Long advantageId;
 

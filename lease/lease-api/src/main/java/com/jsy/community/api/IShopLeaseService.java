@@ -40,7 +40,7 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
      * @Date 2020/12/17 17:12
      * @Param [shopId]
      **/
-    Map<String, Object> getShop(Long shopId);
+    Map<String, Object> getShop(Long shopId, String uid);
 
     /**
      * @return void

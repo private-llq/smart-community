@@ -135,8 +135,8 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
          */
         LocalDateTime insertTime = carChargeQO.getInTime();//入场时间
         LocalDateTime reTime = carChargeQO.getReTime();//出场时间
-        Long hours = Duration.between(insertTime,carChargeQO.getReTime()).toHours();//相差的小时数
-        Long minutes = Duration.between(insertTime,carChargeQO.getReTime()).toMinutes();//相差的分钟
+        Long hours = Duration.between(insertTime,reTime).toHours();//相差的小时数
+        Long minutes = Duration.between(insertTime,reTime).toMinutes();//相差的分钟
 
 
         /**
@@ -191,6 +191,96 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         }
         return null;
     }
+
+    /**
+     * 计算临时车下单的费用
+     * @param carChargeQO {"社区id,车牌颜色,入场时间,结算时间"}
+     *                    如果结算时间到出闸时间超过5分钟（物业设置）,就拿到要出闸的时间和下次结算时间作为一个新订单
+     */
+    @Override
+    public BigDecimal charge(CarChargeQO carChargeQO) {
+
+        LocalDateTime inTime = carChargeQO.getInTime();//入场时间
+        LocalDateTime reTime = LocalDateTime.now();//结算时间(不出外部拿时间，直接获取当前时间)
+        String carColor = carChargeQO.getCarColor();//车牌颜色
+        String communityId = carChargeQO.getCommunityId();//社区id
+
+        Integer plateType;//默认其他车牌类型
+        if ( StringUtils.containsAny(carColor,"黄色","黄牌","黄")){
+            plateType=0;//黄牌
+        }else {
+            plateType=1;//其他车牌
+        }
+
+        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id",communityId).eq("plate_type",plateType));
+        //封顶费用 单位/元
+        BigDecimal cappingFee = carChargeEntity.getCappingFee();
+        //免费时间 单位/分钟
+        Integer freeTime = carChargeEntity.getFreeTime();
+        //收费价格 元/时
+        BigDecimal chargePrice = carChargeEntity.getChargePrice();
+
+
+        /**
+         * 出场时间-入场时间
+         */
+        Long hours = Duration.between(inTime,reTime).toHours();//相差的小时数
+        Long minutes = Duration.between(inTime,reTime).toMinutes();//相差的分钟
+
+
+        /**
+         * 未超过免费时间不收费
+         */
+        if (minutes<=freeTime){
+            return new BigDecimal(0);
+        }
+
+        /**
+         * 停车不足1个小时 按1个小时收费
+         */
+        if (minutes<60){
+            BigDecimal pic= new BigDecimal(1).multiply(chargePrice);
+            return pic;
+        }
+
+
+        /**
+         * 停车超过一小时，小于24小时
+         */
+        if (minutes>=60&&minutes<24*60){
+
+            BigDecimal pic=new BigDecimal(hours).multiply(chargePrice);
+            /**
+             * 超过小时整点 自动加一小时费用
+             */
+            if (minutes%60>0){
+                pic=pic.add(chargePrice);
+                return pic;
+            }
+            return pic;
+        }
+
+
+        /**
+         * 停车超过24小时 按一天的封顶费用计算，剩余的分钟不足一小时 按一小时计算
+         */
+        if (minutes>=24*60){
+            HashMap<String, Long> datePoor = TimeUtils.getDatePoor(inTime, reTime);
+            Long day = datePoor.get("day");
+            Long hour = datePoor.get("hour");
+            Long min = datePoor.get("min");
+            BigDecimal pic= cappingFee.multiply(BigDecimal.valueOf(day));//天数按封顶费用算
+            pic=pic.add(chargePrice.multiply(BigDecimal.valueOf(hour)));//小时按临时费用计算
+            if (min>0){
+                pic=pic.add(chargePrice);//不足一小时按1小时计算
+
+                return pic;
+            }
+            return pic;
+        }
+        return null;
+    }
+
 
 
     /**

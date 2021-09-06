@@ -17,6 +17,11 @@ public class CarChargeQO implements Serializable {
     private String uuid;
 
     /**
+     * 社区id
+     */
+    private String communityId;
+
+    /**
      * 入场时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8") //Json才需要时区
@@ -26,4 +31,9 @@ public class CarChargeQO implements Serializable {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8") //Json才需要时区
     private LocalDateTime reTime;
+
+    /**
+     * 车牌颜色
+     */
+    private String carColor;
 }
