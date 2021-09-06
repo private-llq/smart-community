@@ -68,7 +68,7 @@ public class CarMonthlyVehicle implements Serializable {
      */
     private BigDecimal monthlyFee;
     /**
-     * 下发状态
+     * 下发状态 0：未下发 1：已下发
      */
     private Integer distributionStatus;
     /**

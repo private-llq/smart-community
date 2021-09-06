@@ -147,6 +147,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", monthlyMethodId));
         carMonthlyVehicle.setUid(UserUtils.randomUUID());
         carMonthlyVehicle.setCommunityId(communityId);
+        carMonthlyVehicle.setDistributionStatus(0);//新增默认是未下发
         carMonthlyVehicle.setMonthlyMethodId(carChargeEntity.getUid());//存收费设置里面的id
         carMonthlyVehicle.setMonthlyMethodName(carChargeEntity.getName());//存收费设置里面的名字
         int insert = carMonthlyVehicleMapper.insert(carMonthlyVehicle);
@@ -575,8 +576,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Override
     public Map selectByStatus(String carNumber, String carColor, Long community_id) {
 
-        //查询未到期的包月车辆
-        CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).ge("end_time", LocalDateTime.now()));
+        //查询未到期的、已下发的包月车辆
+        CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).eq("distribution_status",1).ge("end_time", LocalDateTime.now()));
         if (Objects.nonNull(carMonthlyVehicle)){
             HashMap<Integer, CarMonthlyVehicle> hashMap = new HashMap<>();
             CarMonthlyVehicle vehicle = new CarMonthlyVehicle();
