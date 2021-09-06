@@ -207,6 +207,11 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             recordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
             recordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
             recordEntity.setPrice(houseLeaseEntity.getHousePrice());
+            recordEntity.setProvinceId(houseLeaseEntity.getHouseProvinceId());
+            recordEntity.setCityId(houseLeaseEntity.getHouseCityId());
+            recordEntity.setAreaId(houseLeaseEntity.getHouseAreaId());
+            recordEntity.setAddress(houseLeaseEntity.getHouseAddress());
+            recordEntity.setFloor(houseLeaseEntity.getHouseFloor());
         } else {
             // 1:商铺
             // 商铺同房屋整租;检查是否存在多个签约
@@ -229,6 +234,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordEntity.setAdvantageId(shopLeaseEntity.getShopFacility());
             assetLeaseRecordEntity.setPrice(shopLeaseEntity.getMonthMoney());
             assetLeaseRecordEntity.setSummarize(shopLeaseEntity.getSummarize());
+            assetLeaseRecordEntity.setCityId(shopLeaseEntity.getCityId());
+            assetLeaseRecordEntity.setAreaId(shopLeaseEntity.getAreaId());
+            assetLeaseRecordEntity.setFloor(shopLeaseEntity.getFloor());
         }
         //写入租赁操作数据
         addLeaseOperationRecord(recordEntity);
@@ -409,6 +417,15 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                                 // 查询房屋图片
                                 List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
                                 houseLeaseEntity.setHouseImgUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                                // 查出 房屋标签 ...
+                                List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
+                                if (!CollectionUtils.isEmpty(advantageId)) {
+                                    houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                                }
+                                // 房屋类型 code转换为文本 如 4室2厅1卫
+                                houseLeaseEntity.setHouseTypeStr(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
+                                // 房屋朝向
+                                houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
                                 houseEntityMap.put(houseLeaseEntity.getId(), houseLeaseEntity);
                             }
                         }
@@ -431,6 +448,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                         record.setTypeCode(houseEntityMap.get(record.getAssetId()).getHouseTypeCode());
                         record.setDirectionId(houseEntityMap.get(record.getAssetId()).getHouseDirectionId());
                         record.setPrice(houseEntityMap.get(record.getAssetId()).getHousePrice());
+                        record.setHouseAdvantageCode(houseEntityMap.get(record.getAssetId()).getHouseAdvantageMap());
+                        record.setHouseType(houseEntityMap.get(record.getAssetId()).getHouseTypeStr());
                     }
                     // 资产优势标签
                     List<Long> advantageId = MyMathUtils.analysisTypeCode(record.getAdvantageId());
@@ -542,6 +561,15 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                                 // 查询房屋图片
                                 List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
                                 houseLeaseEntity.setHouseImgUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                                // 查出 房屋标签 ...
+                                List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
+                                if (!CollectionUtils.isEmpty(advantageId)) {
+                                    houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                                }
+                                // 房屋类型 code转换为文本 如 4室2厅1卫
+                                houseLeaseEntity.setHouseTypeStr(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
+                                // 查出房屋朝向
+                                houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
                                 houseEntityMap.put(houseLeaseEntity.getId(), houseLeaseEntity);
                             }
                         }
@@ -563,6 +591,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                         record.setTypeCode(houseEntityMap.get(record.getAssetId()).getHouseTypeCode());
                         record.setDirectionId(houseEntityMap.get(record.getAssetId()).getHouseDirectionId());
                         record.setPrice(houseEntityMap.get(record.getAssetId()).getHousePrice());
+                        record.setHouseAdvantageCode(houseEntityMap.get(record.getAssetId()).getHouseAdvantageMap());
+                        record.setHouseType(houseEntityMap.get(record.getAssetId()).getHouseTypeStr());
                     }
                     switch (record.getOperation()) {
                         case 1:
@@ -661,5 +691,84 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             }
         }
         return hashMap;
+    }
+
+    /**
+     * @param assetLeaseRecordEntity : 查询条件
+     * @author: Pipi
+     * @description: 房东查看单个资产的签约列表
+     * @return: java.util.List<com.jsy.community.entity.proprietor.AssetLeaseRecordEntity>
+     * @date: 2021/9/6 14:53
+     **/
+    @Override
+    public List<AssetLeaseRecordEntity> landlordContractList(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        // 如果是未签约,要单独查资产信息,图片,这个时候要判断资产是房屋 还是商铺
+        List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.landlordContractListByAssetId(assetLeaseRecordEntity.getAssetId(),
+                assetLeaseRecordEntity.getAssetType(),
+                assetLeaseRecordEntity.getHomeOwnerUid(),
+                assetLeaseRecordEntity.getContractStatus()
+        );
+        if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
+            if (assetLeaseRecordEntity.getContractStatus() == 1) {
+                if (assetLeaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
+                    ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
+                    // 商铺
+                    QueryWrapper<ShopLeaseEntity> shopLeaseEntityQueryWrapper = new QueryWrapper<>();
+                    shopLeaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
+                    shopLeaseEntity = shopLeaseMapper.selectOne(shopLeaseEntityQueryWrapper);
+                    // 查商铺图片
+                    QueryWrapper<ShopImgEntity> shopImgEntityQueryWrapper = new QueryWrapper<>();
+                    shopImgEntityQueryWrapper.eq("shop_id", assetLeaseRecordEntity.getAssetId());
+                    shopImgEntityQueryWrapper.last("limit 1");
+                    ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
+                    for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
+                        leaseRecordEntity.setImageUrl(shopImgEntity == null ? null : shopImgEntity.getImgUrl());
+                        leaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
+                        leaseRecordEntity.setSummarize(shopLeaseEntity.getSummarize());
+                        leaseRecordEntity.setPrice(shopLeaseEntity.getMonthMoney());
+                    }
+                } else {
+                    // 房屋
+                    HouseLeaseEntity houseLeaseEntity = new HouseLeaseEntity();
+                    QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
+                    houseLeaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
+                    houseLeaseEntity = houseLeaseMapper.selectOne(houseLeaseEntityQueryWrapper);
+                    List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
+                    // 朝向
+                    houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
+                    // 查出 房屋标签 ...
+                    List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
+                    if (!CollectionUtils.isEmpty(advantageId)) {
+                        houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                    }
+                    for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
+                        leaseRecordEntity.setImageUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                        leaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
+                        leaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());
+                        leaseRecordEntity.setAdvantageId(houseLeaseEntity.getHouseAdvantageId());
+                        leaseRecordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
+                        leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
+                        leaseRecordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
+                        leaseRecordEntity.setHouseAdvantageCode(houseLeaseEntity.getHouseAdvantageMap());
+                    }
+                }
+            } else {
+                if (assetLeaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
+                    for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
+                        // 查出 房屋标签 ...
+                        List<Long> advantageId = MyMathUtils.analysisTypeCode(leaseRecordEntity.getAdvantageId());
+                        if (!CollectionUtils.isEmpty(advantageId)) {
+                            leaseRecordEntity.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                        }
+                        // 房屋类型 code转换为文本 如 4室2厅1卫
+                        leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(leaseRecordEntity.getTypeCode()));
+                        // 朝向
+                        leaseRecordEntity.setDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(leaseRecordEntity.getDirectionId())));
+                    }
+                }
+            }
+
+        }
+        return assetLeaseRecordEntities;
     }
 }

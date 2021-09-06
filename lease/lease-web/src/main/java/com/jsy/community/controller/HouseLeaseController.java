@@ -285,8 +285,19 @@ public class HouseLeaseController {
         return CommonResult.ok(assetLeaseRecordService.pageContractList(assetLeaseRecordEntity, UserUtils.getUserId()));
     }
 
-    public CommonResult contractDetail() {
-        return CommonResult.ok();
+    /**
+     * @author: Pipi
+     * @description: 房东查看单个资产的签约列表
+     * @param assetLeaseRecordEntity: 查询条件
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/6 14:50
+     **/
+    @Login
+    @PostMapping("/v2/landlordContractList")
+    public CommonResult landlordContractList(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.LandlordContractListValidate.class);
+        assetLeaseRecordEntity.setHomeOwnerUid(UserUtils.getUserId());
+        return CommonResult.ok(assetLeaseRecordService.landlordContractList(assetLeaseRecordEntity));
     }
 
 

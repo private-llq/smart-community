@@ -44,4 +44,13 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @date: 2021/9/2 14:38
      **/
     Map<String, List<AssetLeaseRecordEntity>> pageContractList(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid);
+
+    /**
+     * @author: Pipi
+     * @description: 房东查看单个资产的签约列表
+     * @param assetLeaseRecordEntity: 查询条件
+     * @return: java.util.List<com.jsy.community.entity.proprietor.AssetLeaseRecordEntity>
+     * @date: 2021/9/6 14:53
+     **/
+    List<AssetLeaseRecordEntity> landlordContractList(AssetLeaseRecordEntity assetLeaseRecordEntity);
 }

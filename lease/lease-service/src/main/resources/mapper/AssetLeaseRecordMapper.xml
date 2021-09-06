@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.AssetLeaseRecordMapper">
+    <!-- 房东查看单个资产的签约列表 -->
+    <select id="landlordContractListByAssetId" resultType="com.jsy.community.entity.proprietor.AssetLeaseRecordEntity">
+        select
+            alr.id,
+            alr.title,
+            alr.type_code,
+            alr.advantage_id,
+            alr.image_url,
+            alr.summarize,
+            alr.direction_id,
+            alr.price,
+            alr.operation,
+            u.real_name
+        from t_asset_lease_record alr
+        left join t_user u on u.uid = alr.tenant_uid
+        where alr.asset_id = #{assetId}
+        and alr.asset_type = #{assetType}
+        and alr.home_owner_uid = #{homeOwnerUid}
+        <if test="contractStatus == 1">
+            and alr.operation in (1, 9)
+        </if>
+        <if test="contractStatus == 2">
+            and alr.operation in (2, 3, 4, 5)
+        </if>
+        <if test="contractStatus == 3">
+            and alr.operation  = 6
+        </if>
+    </select>
+</mapper>

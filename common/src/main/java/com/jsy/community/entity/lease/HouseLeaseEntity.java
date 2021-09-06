@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  *
@@ -135,4 +136,12 @@ public class HouseLeaseEntity extends BaseEntity {
 
     @TableField(exist = false)
     private String houseImgUrl;
+
+    // 优势
+    @TableField(exist = false)
+    private Map<String, Long> houseAdvantageMap;
+
+    // 房型
+    @TableField(exist = false)
+    private String houseTypeStr;
 }
