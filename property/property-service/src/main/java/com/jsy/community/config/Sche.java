@@ -23,7 +23,7 @@ public class Sche {
     @Resource
     private CarPositionMapper carPositionMapper;
 
-    @Scheduled(fixedDelay =10000 )//固定的延迟时间点为为毫秒
+    @Scheduled(fixedDelay =120000 )//固定的延迟时间点为为毫秒
     public  void  sche(){
         List<CarPositionEntity> list = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().eq("binding_status",1).eq("car_pos_status",2));
         if (list!=null) {
