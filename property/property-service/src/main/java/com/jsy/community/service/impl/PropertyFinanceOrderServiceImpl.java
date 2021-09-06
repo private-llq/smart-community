@@ -36,6 +36,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -68,6 +69,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceStatementService propertyFinanceStatementService;
     
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyAdvanceDepositRecordService PropertyAdvanceDepositRecordService;
+    
     @Autowired
     private PropertyDepositMapper propertyDepositMapper;
     
@@ -79,6 +83,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     
     @Autowired
     private CommunityMapper communityMapper;
+    
+    @Autowired
+    private PropertyAdvanceDepositMapper propertyAdvanceDepositMapper;
+    
+    @Autowired
+    private CarPositionMapper carPositionMapper;
 
     /**
      * @Description: 查询房间所有未缴账单
@@ -1788,6 +1798,109 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     @Override
     public void deleteIds(String ids) {
         propertyFinanceOrderMapper.delete(new QueryWrapper<PropertyFinanceOrderEntity>().in("id", (Object) ids.split(",")));
+    }
+    
+    /**
+     * @Description: 收款
+     * @Param: [propertyFinanceOrderEntity]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/09/06 10:46
+     **/
+    @Override
+    public Boolean collection(List<Long> ids, Long communityId, Integer payType) {
+        int row;
+        
+        for (Long id : ids) {
+            PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(id);
+            if (propertyFinanceOrderEntity.getOrderStatus() == 1) {
+                throw new PropertyException(JSYError.DUPLICATE_KEY.getCode(),"已收款,请勿重复支付！");
+            }
+            // 支付类型为预存款抵扣,需要判断预存款余额是否充足
+            if (payType == 7) {
+                // 关联类型是车位的话，需查出车位绑定的房屋
+                if (propertyFinanceOrderEntity.getAssociatedType() == 2) {
+                    CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyFinanceOrderEntity.getTargetId());
+                    PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.selectById(carPositionEntity.getHouseId());
+                    if (propertyAdvanceDepositEntity != null) {
+                        if (propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney()).compareTo(BigDecimal.ZERO) == -1) {
+                            HouseEntity houseEntity = houseMapper.selectById(carPositionEntity.getHouseId());
+                            throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor() + "余额不足！");
+                        }
+                    }
+                } else if (propertyFinanceOrderEntity.getAssociatedType() == 1) {
+                    // 关联类型是房屋的话，根据id查询当前余额是否充足
+                    PropertyAdvanceDepositEntity entity = propertyAdvanceDepositMapper.selectById(propertyFinanceOrderEntity.getTargetId());
+                    if (entity != null) {
+                        if (entity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney()).compareTo(BigDecimal.ZERO) == -1) {
+                            HouseEntity houseEntity = houseMapper.selectById(propertyFinanceOrderEntity.getTargetId());
+                            throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor() + "余额不足！");
+                        }
+                    }
+                }
+            }
+        }
+        
+        //更新收款状态为已支付
+        row = propertyFinanceOrderMapper.collection(ids, payType);
+    
+        if (row == 1) {
+            for (Long id : ids) {
+                if (payType == 7) {
+                    PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(id);
+                    
+                    // 关联类型是车位的话，需查出车位绑定的房屋
+                    if (propertyFinanceOrderEntity.getAssociatedType() == 2) {
+                        CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyFinanceOrderEntity.getTargetId());
+                        PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(carPositionEntity.getHouseId(), communityId);
+                        // 放入这次抵扣的金额
+                        propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
+                        propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
+                        propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
+                        // 更新预存款余额
+                        propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
+                        // 抵扣成功后，立即生成预存款变更明细记录
+                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
+                        propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
+                        propertyAdvanceDepositRecordEntity.setType(1);
+                        propertyAdvanceDepositRecordEntity.setOrderId(id);
+                        // 查最新一次记录并设置余额明细
+                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
+                            propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
+                        propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
+                        propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
+                        propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
+                        propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
+                        propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
+                        PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
+                    } else if (propertyFinanceOrderEntity.getAssociatedType() == 1) {
+                        PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(propertyFinanceOrderEntity.getTargetId(), communityId);
+                        // 放入这次抵扣的金额
+                        propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
+                        propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
+                        propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
+                        // 更新预存款余额
+                        propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
+                        // 抵扣成功后，立即生成预存款变更明细记录
+                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
+                        propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
+                        propertyAdvanceDepositRecordEntity.setType(1);
+                        propertyAdvanceDepositRecordEntity.setOrderId(id);
+                        // 查最新一次记录并设置余额明细
+                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
+                            propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
+                        propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
+                        propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
+                        propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
+                        propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
+                        propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
+                        PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
+                    }
+                }
+            }
+        }
+        
+        return row == 1;
     }
 }
 

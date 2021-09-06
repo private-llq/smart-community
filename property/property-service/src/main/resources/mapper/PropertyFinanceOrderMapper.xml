@@ -465,4 +465,11 @@
         select sum(total_money) AS totalMoneyByYear from t_property_finance_order
         where order_time &lt;= #{endTime} and order_time &gt;= #{startTime} and order_status = 1 and deleted = 0 and community_id = #{communityId}
     </select>
+
+    <update id="collection">
+        update t_property_finance_order set order_status = 1,pay_type = #{payType},pay_time = now() where id in
+        <foreach collection="list" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

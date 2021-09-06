@@ -560,4 +560,23 @@ public class PropertyFinanceOrderController {
         return propertyFinanceOrderService.addTemporaryCharges(propertyFinanceOrderEntity)
             ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增物业账单临时收费失败");
     }
+    
+    /**
+     * @Description: 收款并更改状态
+     * @Param: [propertyFinanceOrderEntity]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/09/06 10:16
+     **/
+    @Login
+    @ApiOperation("收款并更改状态")
+    @PostMapping("/collection")
+    public CommonResult collection(@RequestParam(value = "ids")List<Long> ids, @RequestParam(value = "payType")Integer payType) {
+        if(ids == null || ids.size() <= 0 || payType == null){
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少参数");
+        }
+        Long communityId = UserUtils.getAdminCommunityId();
+        return propertyFinanceOrderService.collection(ids, communityId, payType)
+            ? CommonResult.ok("收款成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"收款失败");
+    }
 }
