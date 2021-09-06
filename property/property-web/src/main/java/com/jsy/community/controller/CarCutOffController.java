@@ -33,6 +33,12 @@ public class CarCutOffController{
     }
 
     @Login
+    @PostMapping("/selectCarPage")
+    public CommonResult selectCarPage(@RequestBody CarCutOffQO carCutOffQO){
+        PageInfo<CarCutOffEntity> pageInfo = carCutOffService.selectCarPage(carCutOffQO);
+        return CommonResult.ok(pageInfo,"查询成功");
+    }
+    @Login
     @PostMapping("/addCutOff")
     public CommonResult addCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
         boolean b=  carCutOffService.addCutOff(carCutOffEntity);

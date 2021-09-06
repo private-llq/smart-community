@@ -457,15 +457,8 @@ public class CarPositionController {
                            String carSubLogo, String plateColor) {
         if (vdcType.equals("in")) {
             CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
-            //车主所属类型
-            Integer status = extracted(plateNum, carEquipmentManageEntity, plateColor);
-//            }
-
-
             //开闸记录实体类对象
             CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
-            //车子状态  1临时车  2包月  3业主
-            carCutOffEntity.setState(status);
             carCutOffEntity.setCarNumber(plateNum);
             carCutOffEntity.setCarType(vehicleType);
             carCutOffEntity.setAccess(vdcType);
@@ -474,6 +467,8 @@ public class CarPositionController {
             carCutOffEntity.setCloseupPic(closeupPic);
             carCutOffEntity.setCarSublogo(carSubLogo);
             carCutOffEntity.setPlateColor(plateColor);
+
+            //车主所属类型
             Integer belong = extracted(plateNum, carEquipmentManageEntity, plateColor);
             carCutOffEntity.setBelong(belong);
 
@@ -481,13 +476,12 @@ public class CarPositionController {
             LocalDateTime localDateTime = new Date(startTime * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
             carCutOffEntity.setOpenTime(localDateTime);
 
-
             System.out.println(carEquipmentManageEntity);
 
             carCutOffEntity.setLaneName(carEquipmentManageEntity.getEquipmentName());
             carCutOffEntity.setCommunityId(carEquipmentManageEntity.getCommunityId());
 
-            //还能停多少天
+            //还剩多少天
             Long days = extracted(plateNum, plateColor, carEquipmentManageEntity);
             boolean b = carCutOffService.addCutOff(carCutOffEntity);
 
@@ -516,10 +510,15 @@ public class CarPositionController {
         while(iterator.hasNext()){//通过迭代器输出
             status = iterator.next();
         }
-        CarMonthlyVehicle o = (CarMonthlyVehicle)map.get(status);
-        LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.between(now, o.getEndTime());
-        long days = duration.toDays();
+
+        //1臨時，2包月   3業主
+        long days = 0;
+        if(status==2){
+            CarMonthlyVehicle o = (CarMonthlyVehicle)map.get(status);
+            LocalDateTime now = LocalDateTime.now();
+            Duration duration = Duration.between(now, o.getEndTime());
+            days = duration.toDays();
+        }
         return days;
     }
 
