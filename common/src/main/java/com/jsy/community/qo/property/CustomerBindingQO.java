@@ -45,6 +45,13 @@ public class CustomerBindingQO implements Serializable {
     private String belongHouse;
 
     /**
+     * 所属房屋ID
+     */
+    @ApiModelProperty("所属房屋id")
+    private Long houseId;
+
+
+    /**
      * 业主电话
      */
     @ApiModelProperty("业主电话")
