@@ -93,7 +93,7 @@ public class CarOrderEntity extends BaseEntity {
     /**
      * 是否出闸0为出闸1已出闸
      */
-    private LocalDateTime goStatus;
+    private Integer goStatus;
 
 
 }
