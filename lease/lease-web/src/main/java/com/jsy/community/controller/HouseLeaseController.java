@@ -300,5 +300,23 @@ public class HouseLeaseController {
         return CommonResult.ok(assetLeaseRecordService.landlordContractList(assetLeaseRecordEntity));
     }
 
+    /**
+     * @author: Pipi
+     * @description: 查询签约详情
+     * @param assetLeaseRecordEntity: 查询条件
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/6 17:32
+     **/
+    @Login
+    @PostMapping("/v2/contractDetail")
+    public CommonResult contractDetail(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        if (assetLeaseRecordEntity.getId() == null) {
+            throw new JSYException(400, "签约ID不能为空");
+        }
+        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.ContractDetailValidate.class);
+        AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordService.contractDetail(assetLeaseRecordEntity, UserUtils.getUserId());
+        return assetLeaseRecordEntity1 == null ? CommonResult.error("未查到相关签约") : CommonResult.ok(assetLeaseRecordEntity1);
+    }
+
 
 }

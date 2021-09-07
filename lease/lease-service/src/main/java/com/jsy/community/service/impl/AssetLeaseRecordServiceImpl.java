@@ -18,14 +18,17 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.UserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -53,6 +56,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @Autowired
     private LeaseOperationRecordMapper leaseOperationRecordMapper;
+
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
@@ -770,5 +776,120 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
         }
         return assetLeaseRecordEntities;
+    }
+
+    /**
+     * @param assetLeaseRecordEntity : 查询条件
+     * @param uid : 登录用户uid
+     * @author: Pipi
+     * @description: 查询签约详情
+     * @return: com.jsy.community.entity.proprietor.AssetLeaseRecordEntity
+     * @date: 2021/9/6 17:39
+     **/
+    @Override
+    public AssetLeaseRecordEntity contractDetail(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        if (assetLeaseRecordEntity.getIdentityType() == 1) {
+            // 房东
+            queryWrapper.eq("home_owner_uid", uid);
+        } else {
+            // 租客
+            queryWrapper.eq("tenant_uid", uid);
+        }
+        AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (leaseRecordEntity == null) {
+            // 为空直接返回
+            return leaseRecordEntity;
+        }
+        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 9) {
+            // 记录表里面没有资产数据,要单独查
+            if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
+                // 商铺
+                ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
+                // 商铺
+                QueryWrapper<ShopLeaseEntity> shopLeaseEntityQueryWrapper = new QueryWrapper<>();
+                shopLeaseEntityQueryWrapper.eq("id", leaseRecordEntity.getAssetId());
+                shopLeaseEntity = shopLeaseMapper.selectOne(shopLeaseEntityQueryWrapper);
+                // 查商铺图片
+                QueryWrapper<ShopImgEntity> shopImgEntityQueryWrapper = new QueryWrapper<>();
+                shopImgEntityQueryWrapper.eq("shop_id", leaseRecordEntity.getAssetId());
+                shopImgEntityQueryWrapper.last("limit 1");
+                ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
+                leaseRecordEntity.setImageUrl(shopImgEntity.getImgUrl());
+                leaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
+                leaseRecordEntity.setSummarize(shopLeaseEntity.getSummarize());
+                leaseRecordEntity.setPrice(shopLeaseEntity.getMonthMoney());
+                leaseRecordEntity.setFloor(shopLeaseEntity.getFloor());
+            } else {
+                // 房屋
+                HouseLeaseEntity houseLeaseEntity = new HouseLeaseEntity();
+                QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
+                houseLeaseEntityQueryWrapper.eq("id", leaseRecordEntity.getAssetId());
+                houseLeaseEntity = houseLeaseMapper.selectOne(houseLeaseEntityQueryWrapper);
+                List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
+                // 朝向
+                houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
+                // 查出 房屋标签 ...
+                List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
+                if (!CollectionUtils.isEmpty(advantageId)) {
+                    houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                }
+                // 房屋类型 code转换为文本 如 4室2厅1卫
+                houseLeaseEntity.setHouseTypeStr(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
+                leaseRecordEntity.setImageUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                leaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
+                leaseRecordEntity.setAdvantageId(houseLeaseEntity.getHouseAdvantageId());
+                leaseRecordEntity.setHouseAdvantageCode(houseLeaseEntity.getHouseAdvantageMap());
+                leaseRecordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
+                leaseRecordEntity.setHouseType(houseLeaseEntity.getHouseTypeStr());
+                leaseRecordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
+                leaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());
+                leaseRecordEntity.setProvinceId(houseLeaseEntity.getHouseProvinceId());
+                leaseRecordEntity.setCityId(houseLeaseEntity.getHouseCityId());
+                leaseRecordEntity.setAreaId(houseLeaseEntity.getHouseAreaId());
+                leaseRecordEntity.setFloor(houseLeaseEntity.getHouseFloor());
+                if (assetLeaseRecordEntity.getIdentityType() == 2) {
+                    String province = redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseProvinceId()) == null ? "" : redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseProvinceId());
+                    String city = redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseCityId()) == null ? "" : redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseCityId());
+                    String area = redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseAreaId()) == null ? "" : redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseAreaId());
+                    String fullAddress = province + city + area + houseLeaseEntity.getHouseAddress();
+                    leaseRecordEntity.setFullAddress(fullAddress);
+                }
+            }
+        } else {
+            // 记录表里面有资产数据
+            if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
+                // 房屋
+                // 朝向
+                leaseRecordEntity.setDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(leaseRecordEntity.getDirectionId())));
+                // 查出 房屋标签 ...
+                List<Long> advantageId = MyMathUtils.analysisTypeCode(leaseRecordEntity.getAdvantageId());
+                if (!CollectionUtils.isEmpty(advantageId)) {
+                    leaseRecordEntity.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                }
+                leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(leaseRecordEntity.getTypeCode()));
+                if (assetLeaseRecordEntity.getIdentityType() == 2) {
+                    String province = redisTemplate.opsForValue().get("RegionSingle:" + leaseRecordEntity.getProvinceId()) == null ? "" : redisTemplate.opsForValue().get("RegionSingle:" + leaseRecordEntity.getProvinceId());
+                    String city = redisTemplate.opsForValue().get("RegionSingle:" + leaseRecordEntity.getCityId()) == null ? "" : redisTemplate.opsForValue().get("RegionSingle:" + leaseRecordEntity.getCityId());
+                    String area = redisTemplate.opsForValue().get("RegionSingle:" + leaseRecordEntity.getAreaId()) == null ? "" : redisTemplate.opsForValue().get("RegionSingle:" + leaseRecordEntity.getAreaId());
+                    String fullAddress = province + city + area + leaseRecordEntity.getAddress();
+                    leaseRecordEntity.setFullAddress(fullAddress);
+                }
+            }
+        }
+        if (assetLeaseRecordEntity.getIdentityType() == 1) {
+            // 房东,查看租客信息
+            UserInfoVo userInfoVo = userService.proprietorDetails(leaseRecordEntity.getTenantUid());
+            leaseRecordEntity.setRealName(userInfoVo.getRealName());
+            leaseRecordEntity.setTenantPhone(userInfoVo.getMobile());
+            leaseRecordEntity.setTenantIdCard(userInfoVo.getIdCard());
+        } else {
+            // 租客,查看房东信息
+            UserInfoVo userInfoVo = userService.proprietorDetails(leaseRecordEntity.getHomeOwnerUid());
+            leaseRecordEntity.setLandlordName(userInfoVo.getRealName());
+            leaseRecordEntity.setLandlordPhone(userInfoVo.getMobile());
+        }
+        return leaseRecordEntity;
     }
 }

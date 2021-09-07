@@ -98,7 +98,7 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     private LocalDateTime contractEndTime;
 
     // 身份类型;1:房东;2:租客
-    @NotNull(groups = {ContractListValidate.class, OperationContractValidate.class}, message = "身份类型不能为空;1:房东;2:租客")
+    @NotNull(groups = {ContractListValidate.class, OperationContractValidate.class, ContractDetailValidate.class}, message = "身份类型不能为空;1:房东;2:租客")
     @Range(min = 1, max = 2, message = "身份类型超出范围;1:房东;2:租客")
     @TableField(exist = false)
     private Integer identityType;
@@ -130,6 +130,26 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @TableField(exist = false)
     private String realName;
 
+    // 租客电话
+    @TableField(exist = false)
+    private String tenantPhone;
+
+    // 租客身份证号码
+    @TableField(exist = false)
+    private String tenantIdCard;
+
+    // 房东姓名
+    @TableField(exist = false)
+    private String landlordName;
+
+    // 房东电话
+    @TableField(exist = false)
+    private String landlordPhone;
+
+    // 房屋完整地址
+    @TableField(exist = false)
+    private String fullAddress;
+
     /**
      * 发起签约验证组
      */
@@ -149,5 +169,10 @@ public class AssetLeaseRecordEntity extends BaseEntity {
      * 房东资产签约列表验证组
      */
     public interface LandlordContractListValidate {}
+
+    /**
+     *签约详情验证组
+     */
+    public interface ContractDetailValidate {}
 
 }
