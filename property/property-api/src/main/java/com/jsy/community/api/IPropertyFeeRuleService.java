@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.qo.property.FeeRuleRelevanceQO;
+import com.jsy.community.qo.property.UpdateRelevanceQO;
 import com.jsy.community.vo.admin.AdminInfoVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,4 +80,31 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      * @return:
      */
     void statementStatus(AdminInfoVo userInfo, Integer status, Long id);
+
+    /**
+     * @Description: 删除缴费项目的车位或者房屋
+     * @author: Hu
+     * @since: 2021/9/6 13:56
+     * @Param:
+     * @return:
+     */
+    void deleteRelevance(Long id);
+
+    /**
+     * @Description: 添加收费项目关联目标
+     * @author: Hu
+     * @since: 2021/9/6 14:03
+     * @Param:
+     * @return:
+     */
+    void addRelevance(UpdateRelevanceQO updateRelevanceQO);
+
+    /**
+     * @Description: 查询收费项目关联目标
+     * @author: Hu
+     * @since: 2021/9/6 14:14
+     * @Param:
+     * @return:
+     */
+    List selectRelevance(FeeRuleRelevanceQO feeRuleRelevanceQO);
 }

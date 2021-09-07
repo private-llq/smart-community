@@ -86,5 +86,14 @@ public class CarOrderEntity extends BaseEntity {
      *  车牌号
      */
     private String carPlate;
+    /**
+     * 扫码时间
+     */
+    private LocalDateTime scanTime;
+    /**
+     * 是否出闸0为出闸1已出闸
+     */
+    private Integer goStatus;
+
 
 }

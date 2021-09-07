@@ -309,4 +309,13 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Date: 2021/8/31 17:21
      **/
     BigDecimal chargeByYear(@Param("startTime")LocalDate startTime, @Param("endTime")LocalDate endTime, @Param("communityId") Long communityId);
+    
+    /**
+     * @Description: 收款
+     * @Param: [propertyFinanceOrderEntity]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/09/06 10:46
+     **/
+    Integer collection(@Param("list")List<Long> ids, @Param("payType")Integer payType);
 }

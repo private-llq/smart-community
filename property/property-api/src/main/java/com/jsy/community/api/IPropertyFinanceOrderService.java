@@ -315,4 +315,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     List<PropertyFinanceOrderEntity> FeeOrderList(Long communityId,String uid);
+    
+    /**
+     * @Description: 收款
+     * @Param: [propertyFinanceOrderEntity]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: DKS
+     * @Date: 2021/09/06 10:46
+     **/
+    Boolean collection(List<Long> ids, Long communityId, Integer payType);
 }
