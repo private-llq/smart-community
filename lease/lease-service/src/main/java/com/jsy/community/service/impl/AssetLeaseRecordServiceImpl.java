@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.AssetLeaseRecordService;
 import com.jsy.community.api.IHouseConstService;
@@ -891,6 +890,15 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setLandlordName(userInfoVo.getRealName());
             leaseRecordEntity.setLandlordPhone(userInfoVo.getMobile());
         }
+        if (leaseRecordEntity.getOperation() == 1 ||leaseRecordEntity.getOperation() == 7 ||leaseRecordEntity.getOperation() == 8 ||leaseRecordEntity.getOperation() == 9) {
+            leaseRecordEntity.setProgressNumber(1);
+        } else if (leaseRecordEntity.getOperation() == 2 || leaseRecordEntity.getOperation() == 3) {
+            leaseRecordEntity.setProgressNumber(2);
+        } else if (leaseRecordEntity.getOperation() == 4 || leaseRecordEntity.getOperation() == 5) {
+            leaseRecordEntity.setProgressNumber(3);
+        } else if (leaseRecordEntity.getOperation() == 6) {
+            leaseRecordEntity.setProgressNumber(4);
+        }
         return leaseRecordEntity;
     }
 
@@ -909,9 +917,12 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
         queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
         AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
-        assetLeaseRecordEntity1.setContractNo(assetLeaseRecordEntity.getContractNo());
-        assetLeaseRecordEntity1.setContractStartTime(assetLeaseRecordEntity.getContractStartTime());
-        assetLeaseRecordEntity1.setContractEndTime(assetLeaseRecordEntity.getContractEndTime());
+        assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
+        assetLeaseRecordEntity1.setStartTime(assetLeaseRecordEntity.getStartTime());
+        assetLeaseRecordEntity1.setEndTime(assetLeaseRecordEntity.getEndTime());
+        assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
+        assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
+        assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
         assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
         addLeaseOperationRecord(assetLeaseRecordEntity1);
         return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);

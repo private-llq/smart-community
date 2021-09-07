@@ -85,21 +85,30 @@ public class AssetLeaseRecordEntity extends BaseEntity {
 
     // 合同编号
     @NotBlank(groups = {SetContractNoValidate.class}, message = "合同编号不能为空")
-    private String contractNo;
+    private String conId;
+
+    // 合同名字
+    private String conName;
+
+    // 发起方(甲方)
+    private String initiator;
+
+    // 签约方(乙方)
+    private String signatory;
 
     // 合同开始时间
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @NotNull(groups = {SetContractNoValidate.class}, message = "合同开始时间不能为空")
-    private LocalDateTime contractStartTime;
+    private LocalDateTime startTime;
 
     // 合同结束时间
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @NotNull(groups = {SetContractNoValidate.class}, message = "合同结束时间不能为空")
-    private LocalDateTime contractEndTime;
+    private LocalDateTime endTime;
 
     // 身份类型;1:房东;2:租客
     @NotNull(groups = {ContractListValidate.class, OperationContractValidate.class, ContractDetailValidate.class}, message = "身份类型不能为空;1:房东;2:租客")
@@ -153,6 +162,10 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     // 房屋完整地址
     @TableField(exist = false)
     private String fullAddress;
+
+    // 进度数;1:发起签约;2:签约合同;3:租客支付房租;4:完成签约
+    @TableField(exist = false)
+    private Integer progressNumber;
 
     /**
      * 发起签约验证组
