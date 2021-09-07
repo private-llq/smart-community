@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.AssetLeaseRecordService;
 import com.jsy.community.api.IHouseConstService;
@@ -891,5 +892,28 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setLandlordPhone(userInfoVo.getMobile());
         }
         return leaseRecordEntity;
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 设置签约合同相关信息
+     * @param assetLeaseRecordEntity: 签约实体
+     * @return: java.lang.Integer
+     * @date: 2021/9/7 10:18
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer setContractNo(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
+        queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
+        queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
+        AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
+        assetLeaseRecordEntity1.setContractNo(assetLeaseRecordEntity.getContractNo());
+        assetLeaseRecordEntity1.setContractStartTime(assetLeaseRecordEntity.getContractStartTime());
+        assetLeaseRecordEntity1.setContractEndTime(assetLeaseRecordEntity.getContractEndTime());
+        assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
+        addLeaseOperationRecord(assetLeaseRecordEntity1);
+        return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
     }
 }
