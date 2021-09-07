@@ -916,15 +916,20 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
         queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
         queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
         AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
-        assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
-        assetLeaseRecordEntity1.setStartDate(assetLeaseRecordEntity.getStartDate());
-        assetLeaseRecordEntity1.setEndDate(assetLeaseRecordEntity.getEndDate());
-        assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
-        assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
-        assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
-        assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
-        addLeaseOperationRecord(assetLeaseRecordEntity1);
-        return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
+        if (assetLeaseRecordEntity1 != null) {
+            assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
+            assetLeaseRecordEntity1.setStartDate(assetLeaseRecordEntity.getStartDate());
+            assetLeaseRecordEntity1.setEndDate(assetLeaseRecordEntity.getEndDate());
+            assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
+            assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
+            assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
+            assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
+            addLeaseOperationRecord(assetLeaseRecordEntity1);
+            return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
+        } else {
+            return 0;
+        }
     }
 }

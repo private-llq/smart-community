@@ -328,6 +328,9 @@ public class HouseLeaseController {
     @Login
     @PostMapping("/v2/setContractNo")
     public CommonResult setContractNo(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        if (assetLeaseRecordEntity.getId() == null) {
+            throw new JSYException(400, "签约ID不能为空");
+        }
         ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.SetContractNoValidate.class);
         assetLeaseRecordEntity.setHomeOwnerUid(UserUtils.getUserId());
         return CommonResult.ok(assetLeaseRecordService.setContractNo(assetLeaseRecordEntity));
