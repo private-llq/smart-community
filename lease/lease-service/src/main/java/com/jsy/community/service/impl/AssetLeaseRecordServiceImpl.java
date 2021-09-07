@@ -918,8 +918,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
         AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
         assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
-        assetLeaseRecordEntity1.setStartTime(assetLeaseRecordEntity.getStartTime());
-        assetLeaseRecordEntity1.setEndTime(assetLeaseRecordEntity.getEndTime());
+        assetLeaseRecordEntity1.setStartDate(assetLeaseRecordEntity.getStartDate());
+        assetLeaseRecordEntity1.setEndDate(assetLeaseRecordEntity.getEndDate());
         assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
         assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
         assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());

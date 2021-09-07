@@ -14,6 +14,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -99,16 +100,16 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     // 合同开始时间
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     @NotNull(groups = {SetContractNoValidate.class}, message = "合同开始时间不能为空")
-    private LocalDateTime startTime;
+    private LocalDate startDate;
 
     // 合同结束时间
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     @NotNull(groups = {SetContractNoValidate.class}, message = "合同结束时间不能为空")
-    private LocalDateTime endTime;
+    private LocalDate endDate;
 
     // 身份类型;1:房东;2:租客
     @NotNull(groups = {ContractListValidate.class, OperationContractValidate.class, ContractDetailValidate.class}, message = "身份类型不能为空;1:房东;2:租客")
