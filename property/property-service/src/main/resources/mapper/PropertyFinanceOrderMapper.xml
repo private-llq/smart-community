@@ -472,4 +472,49 @@
             #{id}
         </foreach>
     </update>
+
+    <!-- 导入账单信息-->
+    <insert id="saveFinanceOrder">
+        insert into t_property_finance_order (
+        id,
+        community_id,
+        begin_time,
+        over_time,
+        order_time,
+        associated_type,
+        uid,
+        target_id,
+        property_fee,
+        total_money,
+        order_status,
+        build_type,
+        hide,
+        type,
+        fee_rule_id,
+        order_num,
+        create_time,
+        deleted
+        )
+        values
+        <foreach collection="list" separator="," item="propertyFinanceOrderEntity">
+            (#{propertyFinanceOrderEntity.id},
+            #{propertyFinanceOrderEntity.communityId},
+            #{propertyFinanceOrderEntity.beginTime},
+            #{propertyFinanceOrderEntity.overTime},
+            #{propertyFinanceOrderEntity.orderTime},
+            #{propertyFinanceOrderEntity.associatedType},
+            #{propertyFinanceOrderEntity.uid},
+            #{propertyFinanceOrderEntity.targetId},
+            #{propertyFinanceOrderEntity.propertyFee},
+            #{propertyFinanceOrderEntity.totalMoney},
+            #{propertyFinanceOrderEntity.orderStatus},
+            #{propertyFinanceOrderEntity.buildType},
+            #{propertyFinanceOrderEntity.hide},
+            #{propertyFinanceOrderEntity.type},
+            #{propertyFinanceOrderEntity.feeRuleId},
+            #{propertyFinanceOrderEntity.orderNum},
+            #{propertyFinanceOrderEntity.createTime},
+            #{propertyFinanceOrderEntity.deleted})
+        </foreach>
+    </insert>
 </mapper>

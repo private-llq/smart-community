@@ -1,12 +1,13 @@
 package com.jsy.community.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.PropertyFinanceLog;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
-import com.jsy.community.api.IPropertyFinanceOrderService;
-import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -15,15 +16,14 @@ import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.util.excel.impl.FinanceExcelImpl;
-import com.jsy.community.utils.DateCalculateUtil;
-import com.jsy.community.utils.ExcelUtil;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.property.FinanceImportErrorVO;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -31,8 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -42,10 +44,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: com.jsy.community
@@ -61,6 +60,18 @@ import java.util.Map;
 public class PropertyFinanceOrderController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
+    
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IHouseService houseService;
+    
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IProprietorService proprietorService;
+    
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarPositionService carPositionService;
+    
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyFeeRuleService propertyFeeRuleService;
 
     @Autowired
     private FinanceExcelImpl financeExcel;
@@ -578,5 +589,172 @@ public class PropertyFinanceOrderController {
         Long communityId = UserUtils.getAdminCommunityId();
         return propertyFinanceOrderService.collection(ids, communityId, payType)
             ? CommonResult.ok("收款成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"收款失败");
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 下载历史账单导入模板
+     *@Date: 2021/9/7 9:30
+     **/
+    @Login
+    @ApiOperation("下载历史账单导入模板")
+    @PostMapping("/downloadFinanceExcelTemplate")
+    public ResponseEntity<byte[]> downloadFinanceExcelTemplate() {
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("账单导入.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = financeExcel.exportFinanceTemplate();
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导入账单信息
+     *@Param: excel:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/9/7 11:25
+     **/
+    @Login
+    @ApiOperation("导入账单信息")
+    @PostMapping("/importFinanceExcel")
+    public CommonResult importFinanceExcel(MultipartFile excel) {
+        //参数验证
+        validFileSuffix(excel);
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+        String userId = UserUtils.getUserId();
+        ArrayList<FinanceImportErrorVO> errorVos = new ArrayList<>(32);
+        List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = financeExcel.importFinanceExcel(excel, errorVos);
+        List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);
+        List<CarPositionEntity> allCarPosition = carPositionService.getAll(adminCommunityId);
+        // 通过物业提交的数据 和 数据库该社区已存在的数据进行效验
+        Iterator<PropertyFinanceOrderEntity> iterator = propertyFinanceOrderEntities.iterator();
+        while (iterator.hasNext()) {
+            PropertyFinanceOrderEntity propertyFinanceOrderEntity = iterator.next();
+            // 关联类型为房屋
+            if (propertyFinanceOrderEntity.getAssociatedType() == 1) {
+                // 查询全部房屋
+                for (HouseEntity houseEntity : allHouse) {
+                    if ((houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor()).equals(propertyFinanceOrderEntity.getFinanceTarget())) {
+                        // 设置对应房屋id
+                        propertyFinanceOrderEntity.setTargetId(houseEntity.getId());
+                    }
+                }
+                List<Long> houseIdLists = new ArrayList<>();
+                // 查询手机号绑定房屋的id
+                List<Long> houseIdList = proprietorService.queryBindHouseByMobile(propertyFinanceOrderEntity.getMobile(), adminCommunityId);
+                for (Long houseId : houseIdList) {
+                    if (houseId.equals(propertyFinanceOrderEntity.getTargetId())) {
+                        houseIdLists.add(houseId);
+                    }
+                }
+                if (houseIdLists.size() <= 0) {
+                    iterator.remove();
+                    FinanceImportErrorVO errorVO = new FinanceImportErrorVO();
+                    errorVO.setRealName(propertyFinanceOrderEntity.getRealName());
+                    errorVO.setMobile(propertyFinanceOrderEntity.getMobile());
+                    errorVO.setTargetType("房屋");
+                    errorVO.setFinanceTarget(propertyFinanceOrderEntity.getFinanceTarget());
+                    errorVO.setFeeRuleName(propertyFinanceOrderEntity.getFeeRuleName());
+                    errorVO.setBeginTime(propertyFinanceOrderEntity.getBeginTime());
+                    errorVO.setOverTime(propertyFinanceOrderEntity.getOverTime());
+                    errorVO.setPropertyFee(propertyFinanceOrderEntity.getPropertyFee());
+                    errorVO.setRemark("该手机号和该房屋地址不是绑定关系!");
+                    errorVos.add(errorVO);
+                    // 关联类型为车位
+                }
+            } else if (propertyFinanceOrderEntity.getAssociatedType() == 2) {
+                // 查询全部车位
+                for (CarPositionEntity carPositionEntity : allCarPosition) {
+                    if (carPositionEntity.getCarPosition().equals(propertyFinanceOrderEntity.getFinanceTarget())) {
+                        // 设置对应车位id
+                        propertyFinanceOrderEntity.setTargetId(carPositionEntity.getId());
+                    }
+                }
+                List<Long> carPositionIdLists = new ArrayList<>();
+                // 查询手机号绑定车位的id
+                List<Long> carPositionList = carPositionService.queryBindCarPositionByMobile(propertyFinanceOrderEntity.getMobile(), adminCommunityId);
+                for (Long carPositionId : carPositionList) {
+                    if (carPositionId.equals(propertyFinanceOrderEntity.getTargetId())) {
+                        carPositionIdLists.add(carPositionId);
+                    }
+                }
+                if (carPositionIdLists.size() <= 0) {
+                    iterator.remove();
+                    FinanceImportErrorVO errorVO = new FinanceImportErrorVO();
+                    errorVO.setRealName(propertyFinanceOrderEntity.getRealName());
+                    errorVO.setMobile(propertyFinanceOrderEntity.getMobile());
+                    errorVO.setTargetType("车位");
+                    errorVO.setFinanceTarget(propertyFinanceOrderEntity.getFinanceTarget());
+                    errorVO.setFeeRuleName(propertyFinanceOrderEntity.getFeeRuleName());
+                    errorVO.setBeginTime(propertyFinanceOrderEntity.getBeginTime());
+                    errorVO.setOverTime(propertyFinanceOrderEntity.getOverTime());
+                    errorVO.setPropertyFee(propertyFinanceOrderEntity.getPropertyFee());
+                    errorVO.setRemark("该手机号和该车位编号不是绑定关系!");
+                    errorVos.add(errorVO);
+                }
+            }
+            // 补充收费项目id
+            propertyFinanceOrderEntity.setFeeRuleId(propertyFeeRuleService.selectFeeRuleIdByFeeRuleName(propertyFinanceOrderEntity.getFeeRuleName(), adminCommunityId));
+            // 补充uid
+            propertyFinanceOrderEntity.setUid(userId);
+        }
+        Integer row = 0;
+        if (CollectionUtil.isNotEmpty(propertyFinanceOrderEntities)) {
+            //获取管理员姓名 用于标识每条业主数据的创建人
+            row = propertyFinanceOrderService.saveFinanceOrder(propertyFinanceOrderEntities, adminCommunityId, userId);
+        }
+        //excel导入失败的信息明细 文件下载地址
+        String errorExcelAddr = null;
+        //错误excel写入远程服务器 让物业人员可以直接下载
+        if( CollectionUtil.isNotEmpty(errorVos) ){
+            errorExcelAddr = uploadFinanceOrderErrorExcel(errorVos);
+        }
+        
+        //构造返回对象
+        return CommonResult.ok(new FinanceImportErrorVO(row, errorVos.size(), errorExcelAddr));
+    }
+    
+    /**
+     * excel 文件上传上来后 验证方法
+     * @param file        excel文件
+     */
+    private void validFileSuffix(MultipartFile file) {
+        //参数非空验证
+        if (null == file) {
+            throw new JSYException(JSYError.BAD_REQUEST);
+        }
+        //文件后缀验证
+        boolean extension = FilenameUtils.isExtension(file.getOriginalFilename(), ExcelUtil.SUPPORT_EXCEL_EXTENSION);
+        if (!extension) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "只支持excel文件!");
+        }
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 写入充值余额导入错误信息 和 把错误信息excel文件上传至文件服务器
+     *@Param: errorVos:
+     *@Return: java.lang.String:  返回excel文件下载地址
+     *@Date: 2021/9/7 16:07
+     **/
+    public String uploadFinanceOrderErrorExcel(List<FinanceImportErrorVO> errorVos) {
+        Workbook workbook = financeExcel.exportFinanceOrderErrorExcel(errorVos);
+        try {
+            byte[] bytes = ExcelUtil.readWorkbook(workbook);
+            MultipartFile multipartFile = new MockMultipartFile("file", "houseErrorExcel", "application/vnd.ms-excel", bytes);
+            return MinioUtils.upload(multipartFile, "house-error-excel");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

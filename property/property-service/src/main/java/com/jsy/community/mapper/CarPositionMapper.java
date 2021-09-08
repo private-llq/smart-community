@@ -63,4 +63,13 @@ public interface CarPositionMapper extends BaseMapper<CarPositionEntity> {
 	 */
 	@Select("select id,car_position as name from t_car_position where deleted=0 and community_id=#{communityId} and car_pos_status=#{type}")
     List<FeeRelevanceTypeVo> getCarPosition(@Param("communityId") Long adminCommunityId, @Param("type") Integer type);
+
+	/**
+	 * @Description: 根据手机号查询绑定车位的id
+	 * @Param: [mobile]
+	 * @Return:
+	 * @Author: DKS
+	 * @Date: 2021/09/07
+	 **/
+	List<Long> queryBindCarPositionByMobile(@Param("mobile") String mobile, @Param("communityId") Long communityId);
 }

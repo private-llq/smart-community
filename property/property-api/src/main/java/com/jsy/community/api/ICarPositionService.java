@@ -9,8 +9,6 @@ import com.jsy.community.qo.property.InsterCarPositionQO;
 import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
 import com.jsy.community.qo.property.UpdateCarPositionQO;
-import com.jsy.community.utils.UserUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -98,5 +96,13 @@ public interface ICarPositionService extends IService<CarPositionEntity> {
      * @return:
      */
     Integer selectCarPositionVacancy( Long adminCommunityId);
-
+    
+    /**
+     * @Description: 根据手机号查询绑定车位的id
+     * @Param: [mobile]
+     * @Return:
+     * @Author: DKS
+     * @Date: 2021/09/07
+     **/
+    List<Long> queryBindCarPositionByMobile(String mobile, Long communityId);
 }

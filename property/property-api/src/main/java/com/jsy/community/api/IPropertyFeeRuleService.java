@@ -110,6 +110,14 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
     List selectRelevance(FeeRuleRelevanceQO feeRuleRelevanceQO);
 
     /**
+     *@Author: DKS
+     *@Description: 根据收费项目名称查询收费项目id
+     *@Param: excel:
+     *@Date: 2021/9/7 15:27
+     **/
+    Long selectFeeRuleIdByFeeRuleName(String feeRuleName, Long communityId);
+
+    /**
      * @Description: 查询当前小区业主认证过的房屋
      * @author: Hu
      * @since: 2021/9/7 11:08
