@@ -276,13 +276,20 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", uid);
         assetLeaseRecordEntityQueryWrapper.eq("asset_id", houseId);
         assetLeaseRecordEntityQueryWrapper.eq("asset_type", BusinessEnum.HouseTypeEnum.HOUSE.getCode());
+        assetLeaseRecordEntityQueryWrapper.and(
+                wapper -> wapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                        .or(newwapper ->
+                                newwapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                                        .gt("end_date", new Date())
+                        )
+        );
         AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(assetLeaseRecordEntityQueryWrapper);
         if (assetLeaseRecordEntity == null) {
             vo.setOperation(0);
         } else {
             vo.setOperation(assetLeaseRecordEntity.getOperation());
+            vo.setContractId(assetLeaseRecordEntity.getIdStr());
         }
-
 
         // 为冗余熟悉添加值
         if (vo.getCommonFacilitiesCode() != null) {

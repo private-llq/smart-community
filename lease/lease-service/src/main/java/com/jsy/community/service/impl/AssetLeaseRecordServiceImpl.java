@@ -81,10 +81,17 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         if (integer <= 0) {
             throw new LeaseException(JSYError.NO_REAL_NAME_AUTH);
         }
-        // 检查申请是否已经存在
+        // 检查签约是否已经存在(未完成签约或已签约但是还没到期的签约)
         QueryWrapper<AssetLeaseRecordEntity> assetLeaseRecordEntityQueryWrapper = new QueryWrapper<>();
         assetLeaseRecordEntityQueryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
         assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", assetLeaseRecordEntity.getTenantUid());
+        assetLeaseRecordEntityQueryWrapper.and(
+                wapper -> wapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                                .or(newwapper ->
+                                newwapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                                        .gt("end_date", new Date())
+                        )
+        );
         AssetLeaseRecordEntity RecordExistEntity = assetLeaseRecordMapper.selectOne(assetLeaseRecordEntityQueryWrapper);
         if (RecordExistEntity != null) {
             throw new LeaseException("签约申请已经存在,请不要重复发起");
@@ -381,9 +388,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         // 未签约
         Map<Long, AssetLeaseRecordEntity> notContractedMap = new HashMap<>();
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
         if (assetLeaseRecordEntity.getIdentityType() == 1) {
             // 房东
+            queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
             queryWrapper.eq("home_owner_uid", uid);
             List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.selectList(queryWrapper);
             if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
@@ -532,55 +539,61 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.selectList(queryWrapper);
             if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
                 // 查询操作类型为1,8,9的资产信息
-                List<Long> assetIds = new ArrayList<>();
+                List<Long> houseIds = new ArrayList<>();
+                List<Long> shopIds = new ArrayList<>();
                 for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
                     if (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9) {
-                        assetIds.add(record.getAssetId());
+                        if (record.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
+                            houseIds.add(record.getAssetId());
+                        } else {
+                            shopIds.add(record.getAssetId());
+                        }
                     }
                 }
                 Map<Long, ShopLeaseEntity> shopEntityMap = new HashMap<>();
                 Map<Long, HouseLeaseEntity> houseEntityMap = new HashMap<>();
-                if (!CollectionUtils.isEmpty(assetIds)) {
-                    if (assetLeaseRecordEntity.getAssetType() == 1) {
-                        // 商铺
-                        QueryWrapper<ShopLeaseEntity> shopLeaseEntityQueryWrapper = new QueryWrapper<>();
-                        shopLeaseEntityQueryWrapper.in("id", assetIds);
-                        List<ShopLeaseEntity> shopLeaseEntities = shopLeaseMapper.selectList(shopLeaseEntityQueryWrapper);
-                        if (!CollectionUtils.isEmpty(shopLeaseEntities)) {
-                            for (ShopLeaseEntity shopLeaseEntity : shopLeaseEntities) {
-                                // 查商铺图片
-                                QueryWrapper<ShopImgEntity> shopImgEntityQueryWrapper = new QueryWrapper<>();
-                                shopImgEntityQueryWrapper.eq("shop_id", shopLeaseEntity.getId());
-                                shopImgEntityQueryWrapper.last("limit 1");
-                                ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
-                                shopLeaseEntity.setShopShowImg(shopImgEntity == null ? null : shopImgEntity.getImgUrl());
-                                shopEntityMap.put(shopLeaseEntity.getId(), shopLeaseEntity);
-                            }
-                        }
-                    } else {
-                        // 房屋
-                        QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
-                        houseLeaseEntityQueryWrapper.in("id", assetIds);
-                        List<HouseLeaseEntity> houseLeaseEntities = houseLeaseMapper.selectList(houseLeaseEntityQueryWrapper);
-                        if (!CollectionUtils.isEmpty(houseLeaseEntities)) {
-                            for (HouseLeaseEntity houseLeaseEntity : houseLeaseEntities) {
-                                // 查询房屋图片
-                                List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
-                                houseLeaseEntity.setHouseImgUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
-                                // 查出 房屋标签 ...
-                                List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
-                                if (!CollectionUtils.isEmpty(advantageId)) {
-                                    houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
-                                }
-                                // 房屋类型 code转换为文本 如 4室2厅1卫
-                                houseLeaseEntity.setHouseTypeStr(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
-                                // 查出房屋朝向
-                                houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
-                                houseEntityMap.put(houseLeaseEntity.getId(), houseLeaseEntity);
-                            }
+
+                if (!CollectionUtils.isEmpty(shopIds)) {
+                    // 商铺
+                    QueryWrapper<ShopLeaseEntity> shopLeaseEntityQueryWrapper = new QueryWrapper<>();
+                    shopLeaseEntityQueryWrapper.in("id", shopIds);
+                    List<ShopLeaseEntity> shopLeaseEntities = shopLeaseMapper.selectList(shopLeaseEntityQueryWrapper);
+                    if (!CollectionUtils.isEmpty(shopLeaseEntities)) {
+                        for (ShopLeaseEntity shopLeaseEntity : shopLeaseEntities) {
+                            // 查商铺图片
+                            QueryWrapper<ShopImgEntity> shopImgEntityQueryWrapper = new QueryWrapper<>();
+                            shopImgEntityQueryWrapper.eq("shop_id", shopLeaseEntity.getId());
+                            shopImgEntityQueryWrapper.last("limit 1");
+                            ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
+                            shopLeaseEntity.setShopShowImg(shopImgEntity == null ? null : shopImgEntity.getImgUrl());
+                            shopEntityMap.put(shopLeaseEntity.getId(), shopLeaseEntity);
                         }
                     }
                 }
+                if (!CollectionUtils.isEmpty(houseIds)) {
+                    // 房屋
+                    QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
+                    houseLeaseEntityQueryWrapper.in("id", houseIds);
+                    List<HouseLeaseEntity> houseLeaseEntities = houseLeaseMapper.selectList(houseLeaseEntityQueryWrapper);
+                    if (!CollectionUtils.isEmpty(houseLeaseEntities)) {
+                        for (HouseLeaseEntity houseLeaseEntity : houseLeaseEntities) {
+                            // 查询房屋图片
+                            List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
+                            houseLeaseEntity.setHouseImgUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                            // 查出 房屋标签 ...
+                            List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
+                            if (!CollectionUtils.isEmpty(advantageId)) {
+                                houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                            }
+                            // 房屋类型 code转换为文本 如 4室2厅1卫
+                            houseLeaseEntity.setHouseTypeStr(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
+                            // 查出房屋朝向
+                            houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
+                            houseEntityMap.put(houseLeaseEntity.getId(), houseLeaseEntity);
+                        }
+                    }
+                }
+
                 for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
                     if (assetLeaseRecordEntity.getAssetType() == 1 && shopEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9)) {
                         // 商铺

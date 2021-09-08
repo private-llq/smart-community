@@ -34,7 +34,7 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     private Long assetId;
 
     // 资产类型;1:商铺;2:房屋
-    @NotNull(groups = {InitContractValidate.class, ContractListValidate.class, LandlordContractListValidate.class, SetContractNoValidate.class}, message = "资产类型不能为空;1:商铺;2:房屋")
+    @NotNull(groups = {InitContractValidate.class, LandlordContractListValidate.class, SetContractNoValidate.class}, message = "资产类型不能为空;1:商铺;2:房屋")
     @Range(min = 1, max = 2, message = "资产类型值超出范围;1:商铺;2:房屋")
     private Integer assetType;
 
@@ -145,6 +145,10 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     // 租客姓名
     @TableField(exist = false)
     private String realName;
+
+    // 租客头像
+    @TableField(exist = false)
+    private String avatarUrl;
 
     // 租客电话
     @TableField(exist = false)
