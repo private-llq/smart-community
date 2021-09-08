@@ -282,6 +282,9 @@ public class HouseLeaseController {
     @PostMapping("/v2/contractList")
     public CommonResult contractList(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
         ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.ContractListValidate.class);
+        if (assetLeaseRecordEntity.getIdentityType() == 1 && assetLeaseRecordEntity.getAssetType() == null) {
+            throw new JSYException(400, "当身份为房东时,资产类型不能为空");
+        }
         return CommonResult.ok(assetLeaseRecordService.pageContractList(assetLeaseRecordEntity, UserUtils.getUserId()));
     }
 

@@ -66,6 +66,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
     // 历史账单字段 如果增加字段  需要改变实现类逻辑
     protected static final String[] EXPORT_FINANCE_TEMPLATE = {"姓名", "手机号码", "主体类型", "账单主体", "收费项目", "起始时间", "截止时间", "物业费"};
     protected static final String[] EXPORT_FINANCE_ERROR_INFO = {"姓名", "手机号码", "主体类型", "账单主体", "收费项目", "起始时间", "截止时间", "物业费", "错误提示"};
+    protected static final String[] FINANCE_TITLE_FIELD = {"关联目标", "关联类型", "收费项目", "开始时间", "结束时间", "状态", "账单金额", "优惠金额", "预存款抵扣", "滞纳金", "实付金额", "支付方式", "账单状态", "生成时间", "支付时间", "房屋备注"};
     
     /**
      * @Author: Pipi
@@ -1150,7 +1151,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
             //从工作簿中读取工作表
             Sheet sheetAt = workbook.getSheetAt(0);
             //excel 字段列
-            String[] titleField = Arrays.copyOf(EXPORT_FINANCE_TEMPLATE, EXPORT_FINANCE_TEMPLATE.length - 1);
+            String[] titleField = Arrays.copyOf(EXPORT_FINANCE_TEMPLATE, EXPORT_FINANCE_TEMPLATE.length);
             //效验excel标题行
             ExcelUtil.validExcelField(sheetAt, titleField);
             //每一列对象 值
@@ -1411,4 +1412,132 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         }
         return workbook;
     }
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 导出历史账单表
+	 *@Param: :
+	 *@Return: org.apache.poi.ss.usermodel.Workbook
+	 *@Date: 2021/9/8 13:41
+	 **/
+	@Override
+	public Workbook exportFinance(List<?> entityList) {
+		//工作表名称
+		String titleName = "账单导出表";
+		//1.创建excel 工作簿
+		Workbook workbook = new XSSFWorkbook();
+		//2.创建工作表
+		XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+		String[] titleField = FINANCE_TITLE_FIELD;
+		//4.创建excel标题行头(最大的那个标题)
+		ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+		//5.创建excel 字段列  (表示具体的数据列字段)
+		ExcelUtil.createExcelField(workbook, sheet, titleField);
+		//每行excel数据
+		XSSFRow row;
+		//每列数据
+		XSSFCell cell;
+		// 设置列宽
+		sheet.setColumnWidth(0, 5000);
+		sheet.setColumnWidth(1, 1500);
+		sheet.setColumnWidth(2, 3500);
+		sheet.setColumnWidth(3, 3000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 1200);
+		sheet.setColumnWidth(6, 2500);
+		sheet.setColumnWidth(7, 2500);
+		sheet.setColumnWidth(8, 2500);
+		sheet.setColumnWidth(9, 2500);
+		sheet.setColumnWidth(10, 2500);
+		sheet.setColumnWidth(11, 3000);
+		sheet.setColumnWidth(12, 2000);
+		sheet.setColumnWidth(13, 5200);
+		sheet.setColumnWidth(14, 5200);
+		sheet.setColumnWidth(15, 2500);
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		for (int index = 0; index < entityList.size(); index++) {
+			row = sheet.createRow(index + 2);
+			//创建列
+			for (int j = 0; j < FINANCE_TITLE_FIELD.length; j++) {
+				cell = row.createCell(j);
+				PropertyFinanceOrderEntity entity = (PropertyFinanceOrderEntity) entityList.get(index);
+				switch (j) {
+					case 0:
+						// 关联目标
+						cell.setCellValue(entity.getAddress());
+						break;
+					case 1:
+						// 关联类型
+						cell.setCellValue(entity.getAssociatedType() == 1 ? "房屋" : "车位");
+						break;
+					case 2:
+						// 收费项目
+						cell.setCellValue(entity.getFeeRuleName());
+						break;
+					case 3:
+						// 开始时间
+						cell.setCellValue(String.valueOf(entity.getBeginTime()));
+						break;
+					case 4:
+						// 结束时间
+						cell.setCellValue(String.valueOf(entity.getOverTime()));
+						break;
+					case 5:
+						// 状态
+						cell.setCellValue(entity.getHide() == 1 ? "显示" : entity.getHide() == 2 ? "隐藏" : "");
+						break;
+					case 6:
+						// 账单金额
+						cell.setCellValue(String.valueOf(entity.getPropertyFee()));
+						break;
+					case 7:
+						// 优惠金额
+						cell.setCellValue(String.valueOf(entity.getCoupon()));
+						break;
+					case 8:
+						// 预存款抵扣
+						cell.setCellValue(String.valueOf(entity.getDeduction()));
+						break;
+					case 9:
+						// 滞纳金
+						cell.setCellValue(String.valueOf(entity.getPenalSum()));
+						break;
+					case 10:
+						// 实付金额
+						cell.setCellValue(String.valueOf(entity.getTotalMoney()));
+						break;
+                    case 11:
+                        // 支付方式
+                        if (entity.getPayType() != null) {
+                            cell.setCellValue(entity.getPayType() == 1 ? "微信" : entity.getPayType() == 2 ? "支付宝" : entity.getPayType() == 3 ? "余额" : entity.getPayType() == 4 ? "现金" :
+                                entity.getPayType() == 5 ? "银联刷卡" : entity.getPayType() == 6 ? "银行代扣" : entity.getPayType() == 7 ? "预存款抵扣" : "");
+                        }
+                        break;
+                    case 12:
+                        // 账单状态
+                        cell.setCellValue(entity.getOrderStatus() == 1 ? "已收款" : "待收款");
+                        break;
+                    case 13:
+                        // 生成时间
+                        cell.setCellValue(df.format(entity.getCreateTime()));
+                        break;
+                    case 14:
+                        // 支付时间
+                        if (entity.getPayTime() == null) {
+                            cell.setCellValue("");
+                        } else {
+                            cell.setCellValue(df.format(entity.getPayTime()));
+                        }
+                        break;
+                    case 15:
+                        // 房屋备注
+                        cell.setCellValue(entity.getBuildType() == 1 ? "系统生成" : entity.getBuildType() == 2 ? "临时收费" : entity.getBuildType() == 3 ? "手动导入" : "");
+                        break;
+					default:
+						break;
+				}
+			}
+		}
+		return workbook;
+	}
 }
