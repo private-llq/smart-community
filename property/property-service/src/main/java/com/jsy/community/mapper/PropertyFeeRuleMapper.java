@@ -52,4 +52,12 @@ public interface PropertyFeeRuleMapper extends BaseMapper<PropertyFeeRuleEntity>
      * @since: 2021/9/4 11:02
      */
     List<Long> selectFeeRuleIdList(@Param("list")List<Long> communityIds, @Param("feeRuleName")String feeRuleName);
+    
+    /**
+     *@Author: DKS
+     *@Description: 根据收费项目名称查询收费项目id
+     *@Param: feeRuleName:
+     *@Date: 2021/9/7 15:35
+     **/
+    Long selectFeeRuleIdByFeeRuleName(@Param("feeRuleName")String feeRuleName, @Param("communityId")Long communityId);
 }

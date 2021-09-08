@@ -223,4 +223,15 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         map.put("list",page);
         return map;
     }
+    
+    /**
+     *@Author: DKS
+     *@Description: 根据收费项目名称查询收费项目id
+     *@Param: feeRuleName:
+     *@Date: 2021/9/7 15:27
+     **/
+    @Override
+    public Long selectFeeRuleIdByFeeRuleName(String feeRuleName, Long communityId) {
+        return propertyFeeRuleMapper.selectFeeRuleIdByFeeRuleName(feeRuleName, communityId);
+    }
 }
