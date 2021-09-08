@@ -595,14 +595,14 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 }
 
                 for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
-                    if (assetLeaseRecordEntity.getAssetType() == 1 && shopEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9)) {
+                    if (record.getAssetType() == 1 && shopEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9)) {
                         // 商铺
                         record.setImageUrl(shopEntityMap.get(record.getAssetId()).getShopShowImg());
                         record.setTitle(shopEntityMap.get(record.getAssetId()).getTitle());
                         record.setAdvantageId(shopEntityMap.get(record.getAssetId()).getShopFacility());
                         record.setPrice(shopEntityMap.get(record.getAssetId()).getMonthMoney());
                         record.setSummarize(shopEntityMap.get(record.getAssetId()).getSummarize());
-                    } else if (assetLeaseRecordEntity.getAssetType() == 2 && houseEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9)) {
+                    } else if (record.getAssetType() == 2 && houseEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9)) {
                         // 房屋
                         record.setImageUrl(houseEntityMap.get(record.getAssetId()).getHouseImgUrl());
                         record.setTitle(houseEntityMap.get(record.getAssetId()).getHouseTitle());
