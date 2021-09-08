@@ -81,10 +81,17 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         if (integer <= 0) {
             throw new LeaseException(JSYError.NO_REAL_NAME_AUTH);
         }
-        // 检查申请是否已经存在
+        // 检查签约是否已经存在(未完成签约或已签约但是还没到期的签约)
         QueryWrapper<AssetLeaseRecordEntity> assetLeaseRecordEntityQueryWrapper = new QueryWrapper<>();
         assetLeaseRecordEntityQueryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
         assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", assetLeaseRecordEntity.getTenantUid());
+        assetLeaseRecordEntityQueryWrapper.and(
+                wapper -> wapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                                .or(newwapper ->
+                                newwapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                                        .gt("end_date", new Date())
+                        )
+        );
         AssetLeaseRecordEntity RecordExistEntity = assetLeaseRecordMapper.selectOne(assetLeaseRecordEntityQueryWrapper);
         if (RecordExistEntity != null) {
             throw new LeaseException("签约申请已经存在,请不要重复发起");

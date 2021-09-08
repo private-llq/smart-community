@@ -41,10 +41,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -208,11 +205,19 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
         assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", uid);
         assetLeaseRecordEntityQueryWrapper.eq("asset_id", shopId);
         assetLeaseRecordEntityQueryWrapper.eq("asset_type", BusinessEnum.HouseTypeEnum.SHOP.getCode());
+        assetLeaseRecordEntityQueryWrapper.and(
+                wapper -> wapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                        .or(newwapper ->
+                                newwapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                                        .gt("end_date", new Date())
+                        )
+        );
         AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(assetLeaseRecordEntityQueryWrapper);
         if (assetLeaseRecordEntity == null) {
             shopLeaseVo.setOperation(0);
         } else {
             shopLeaseVo.setOperation(assetLeaseRecordEntity.getOperation());
+            shopLeaseVo.setContractId(assetLeaseRecordEntity.getIdStr());
         }
 
 
