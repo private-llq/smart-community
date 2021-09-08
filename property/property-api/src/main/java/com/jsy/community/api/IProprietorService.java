@@ -6,7 +6,7 @@ import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.property.RelationListQO;
-import com.jsy.community.vo.HouseTypeVo;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.property.ProprietorVO;
 
 import java.util.List;
@@ -94,7 +94,7 @@ public interface IProprietorService extends IService<ProprietorEntity> {
      * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
      * @date: 2021/6/12 14:39
      **/
-    List<HouseTypeVo> getUnboundHouseList(BaseQO<RelationListQO> baseQO);
+    List<FeeRelevanceTypeVo> getUnboundHouseList(BaseQO<RelationListQO> baseQO);
     
     /**
      * @Description: 根据手机号查询绑定房屋的id

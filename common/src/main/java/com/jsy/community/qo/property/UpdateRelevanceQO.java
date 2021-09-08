@@ -3,6 +3,7 @@ package com.jsy.community.qo.property;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -19,7 +20,7 @@ public class UpdateRelevanceQO implements Serializable {
     /**
      * 关联的车位或者房屋ids  逗号隔开
      */
-    private String ids;
+    private List<String> relevanceIdList;
 
     /**
      * 关联类型  1房屋2车位

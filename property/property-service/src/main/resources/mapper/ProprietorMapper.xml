@@ -199,7 +199,7 @@
         select count(*) from t_house where id = #{houseId} and community_id = #{communityId} and deleted = 0
     </select>
     <!-- 查询未绑定房屋列表 -->
-    <select id="getUnboundHouseList" resultType="com.jsy.community.vo.HouseTypeVo">
+    <select id="getUnboundHouseList" resultType="com.jsy.community.vo.FeeRelevanceTypeVo">
         SELECT
             t.id AS id,
             concat(

@@ -1,9 +1,13 @@
 package com.jsy.community.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.joda.time.format.DateTimeFormat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -151,6 +155,32 @@ public class DateCalculateUtil {
 		Date d = sdf.parse(dateStr);
 		sdf = new SimpleDateFormat("yyyy-MM-dd");
 		return sdf.format(d);
+	}
+	
+	/**
+	 * 格林威治时间字符串转本地时间Date再转成localDate
+	 * @param: [strDate]
+	 * @return: java.util.Date
+	 * @author: DKS
+	 * @date: 2021/9/8 9:19
+	 */
+	public static LocalDate gtmToLocalDate(String strDate) {
+		String DATE_PATTERN = "yyyy-MM-dd";
+		SimpleDateFormat sdf = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy", Locale.US);
+		Date d;
+		LocalDate localDate = null;
+		try {
+			if(StringUtils.isNotBlank(strDate)){
+				d = sdf.parse(strDate);
+				sdf = new SimpleDateFormat(DATE_PATTERN);
+				org.joda.time.format.DateTimeFormatter fmt = DateTimeFormat.forPattern(DATE_PATTERN);
+				d=fmt.parseLocalDateTime(sdf.format(d)).toDate();
+				localDate = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			}
+		} catch (org.apache.http.ParseException | java.text.ParseException e) {
+			e.printStackTrace();
+		}
+		return localDate;
 	}
 	
 	public static void main(String[] args) throws ParseException {

@@ -4,6 +4,7 @@ import com.jsy.community.vo.BaseVO;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -50,9 +51,17 @@ public class FeeRuleVO extends BaseVO {
     private String periodName;
 
     /**
-     * 周期，1月，2季，3半年，4
+     * 关联目标
      */
-    private String relevance;
+    private Integer relevance;
+    /**
+     * 关联目标
+     */
+    private List<String> relevanceIdList;
+    /**
+     * 关联目标
+     */
+    private Integer relevanceType;
 
     /**
      * 报表展示0不展示，1展示

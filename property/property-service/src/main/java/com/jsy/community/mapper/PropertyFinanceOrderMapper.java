@@ -318,4 +318,13 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      * @Date: 2021/09/06 10:46
      **/
     Integer collection(@Param("list")List<Long> ids, @Param("payType")Integer payType);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导入账单信息
+     *@Param: excel:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/9/7 15:57
+     **/
+    Integer saveFinanceOrder(@Param("list")List<PropertyFinanceOrderEntity> addPropertyFinanceOrderEntityList);
 }

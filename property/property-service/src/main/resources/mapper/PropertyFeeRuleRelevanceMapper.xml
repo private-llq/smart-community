@@ -12,13 +12,19 @@
     <select id="selectHouse" resultType="com.jsy.community.vo.property.FeeRuleHouseVO">
         select fee.id,th.building,th.unit,th.floor,th.door,th.build_area from t_house th
         join t_property_fee_rule_relevance fee
-        on th.id=fee.elevance_id
-        where th.deleted=0 and fee.id=#{id}
-        <if test="key!=0 and key!=''">
+        on th.id=fee.relevance_id
+        where th.deleted=0 and fee.rule_id=#{id}
+        <if test="key!=null and key!=''">
             and th.door like concat("%",#{key},"%")
         </if>
     </select>
     <select id="selectCarPosition" resultType="com.jsy.community.vo.property.FeeRuleCarPositionVO">
-        select * from t_car_position tcp join
+        select fee.id,tcp.belong_house as houseSite,tcp.user_name as name,tcp.owner_phone  as mobile from t_car_position tcp
+        join t_property_fee_rule_relevance fee
+        on tcp.id=fee.relevance_id
+        where tcp.deleted=0 and fee.rule_id=#{id}
+        <if test="key!=null and key!=''">
+            and tcp.car_position like concat("%",#{key},"%")
+        </if>
     </select>
 </mapper>

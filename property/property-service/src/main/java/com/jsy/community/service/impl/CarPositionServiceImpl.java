@@ -285,13 +285,16 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
         Integer integer = carPositionMapper.selectCount(queryWrapper);
         return integer;
     }
-
-
-
-
-
-
-
-
-
+    
+    /**
+     * @Description: 根据手机号查询绑定车位的id
+     * @Param: [mobile]
+     * @Return:
+     * @Author: DKS
+     * @Date: 2021/09/07
+     **/
+    @Override
+    public List<Long> queryBindCarPositionByMobile(String mobile, Long communityId) {
+        return carPositionMapper.queryBindCarPositionByMobile(mobile, communityId);
+    }
 }

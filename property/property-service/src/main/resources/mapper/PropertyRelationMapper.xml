@@ -158,7 +158,7 @@
         <result property="ownerMobile" column="ownerMobile"/>
         <result property="createTime" column="createTime"/>
     </resultMap>
-    <resultMap id="HouseTypeMap" type="com.jsy.community.vo.HouseTypeVo">
+    <resultMap id="HouseTypeMap" type="com.jsy.community.vo.FeeRelevanceTypeVo">
         <result column="id" property="id"/>
         <result column="name" property="name"/>
     </resultMap>

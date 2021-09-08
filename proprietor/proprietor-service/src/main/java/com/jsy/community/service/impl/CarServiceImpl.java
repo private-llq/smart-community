@@ -280,7 +280,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderRecordMapper.insert(entity);
 
                 //支付成功后回调     测试阶段直接回调
-                bindingMonthCar(entity);
+//                bindingMonthCar(entity);
                 return entity.getId();
             }
             throw new ProprietorException("当前小区最大允许包月时长："+basicsEntity.getMonthMaxTime());
@@ -326,7 +326,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderRecordMapper.insert(orderRecordEntity);
 
                 //支付成功后回调     测试阶段直接回调
-                renewMonthCar(orderRecordEntity);
+//                renewMonthCar(orderRecordEntity);
                 return entity.getId();
             }
             throw new ProprietorException("当前小区最大允许包月时长："+basicsEntity.getMonthMaxTime());

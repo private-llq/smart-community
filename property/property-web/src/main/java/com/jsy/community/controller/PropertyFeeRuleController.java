@@ -17,6 +17,7 @@ import com.jsy.community.qo.property.UpdateRelevanceQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,7 +58,7 @@ public class PropertyFeeRuleController {
         return CommonResult.ok(map);
     }
 
-    @ApiOperation("查询当前小区物业收费规则")
+    @ApiOperation("查询一条详情")
     @GetMapping("/selectOne")
     @Login
     public CommonResult selectOne(@RequestParam("id")Long id){
@@ -73,13 +74,30 @@ public class PropertyFeeRuleController {
         return CommonResult.ok();
     }
 
-    @ApiOperation("删除关联的房屋或者车辆")
-    @PostMapping("/deleteRelevance")
+    @ApiOperation("添加关联的房屋或者车辆")
+    @PostMapping("/addRelevance")
     @Login
     public CommonResult addRelevance(@RequestBody UpdateRelevanceQO updateRelevanceQO){
         propertyFeeRuleService.addRelevance(updateRelevanceQO);
         return CommonResult.ok();
     }
+    @ApiOperation("查询当前小区业主认证过的房屋集合")
+    @GetMapping("/getHouse")
+    @Login
+    public CommonResult getHouse(){
+        List<FeeRelevanceTypeVo> list = propertyFeeRuleService.getHouse(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(list);
+    }
+
+    @ApiOperation("查询当前小区的月租或属于业主的车位")
+    @GetMapping("/getCarPosition")
+    @Login
+    public CommonResult getCarPosition(@RequestParam Integer type){
+        List<FeeRelevanceTypeVo> list = propertyFeeRuleService.getCarPosition(UserUtils.getAdminCommunityId(),type);
+        return CommonResult.ok(list);
+    }
+
+
     @ApiOperation("查询关联目标")
     @PostMapping("/selectRelevance")
     @Login
@@ -112,6 +130,7 @@ public class PropertyFeeRuleController {
     @businessLog(operation = "编辑",content = "更新了【物业收费规则】")
     public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFeeRuleEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);
         return CommonResult.ok();
     }

@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -270,7 +271,7 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Param:
 	 * @return:
 	 */
-	List<HouseEntity> selectUserHouseAuth(@Param("split") String[] split);
+	List<HouseEntity> selectUserHouseAuth(@Param("split") List<String> split);
 	
 	/**
 	 * @Description: 查询住户数量
@@ -300,4 +301,14 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @return: Integer
 	 */
 	Integer selectAllHouseByCommunityIds(@Param("list") List<Long> communityIdList);
+
+	/**
+	 * @Description: 查询小区下所有认证过的房屋
+	 * @author: Hu
+	 * @since: 2021/9/7 11:01
+	 * @Param:
+	 * @return:
+	 */
+	@Select("select th.id,concat(th.building,th.unit,th.door) as name from t_house th join t_user_house tuh on th.id=tuh.house_id where th.deleted=0 and tuh.deleted=0 and th.community_id=#{communityId}")
+	List<FeeRelevanceTypeVo> getUserHouse(@Param("communityId") Long communityId);
 }

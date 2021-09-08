@@ -1,8 +1,7 @@
 package com.jsy.community.vo.property;
 
+import com.jsy.community.vo.BaseVO;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * @program: com.jsy.community
@@ -11,38 +10,22 @@ import java.io.Serializable;
  * @create: 2021-09-06 10:16
  **/
 @Data
-public class FeeRuleCarPositionVO implements Serializable {
-    /**
-     * 关联表id
-     */
-    private Long id;
+public class FeeRuleCarPositionVO extends BaseVO {
     /**
      * 车位编号
      */
-    private Long carPosition;
+    private String carPosition;
     /**
-     * 楼栋
+     * 房屋地址
      */
-    private Long building;
-    /**
-     * 单元
-     */
-    private Long unit;
-    /**
-     * 楼层
-     */
-    private Long floor;
-    /**
-     * 房屋编号
-     */
-    private Long door;
+    private String houseSite;
     /**
      * 用户姓名
      */
-    private Long name;
+    private String name;
     /**
      * 手机号
      */
-    private Long mobile;
+    private String mobile;
 
 }

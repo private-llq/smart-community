@@ -229,8 +229,8 @@ public class CommunityController {
      **/
     @Login
     @GetMapping("/group/send/sms")
-    public CommonResult groupSendSMS(String content, boolean isDistinct, String taskTime, int number) {
-        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+    public CommonResult groupSendSMS(@RequestParam(value = "content")String content, @RequestParam(value = "isDistinct")boolean isDistinct,
+                                     @RequestParam(value = "taskTime")String taskTime, @RequestParam(value = "number")int number, @RequestParam(value = "communityIdList")List<Long> communityIdList) {
         Long adminCompanyId = UserUtils.getAdminCompanyId();
         if (content == null) {
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "缺少查询类型");

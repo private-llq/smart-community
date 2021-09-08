@@ -184,4 +184,12 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "合计支付")
     @TableField(exist = false)
     private BigDecimal totalSum;
+    
+    @ApiModelProperty("手机号码")
+    @TableField(exist = false)
+    private String mobile;
+    
+    @ApiModelProperty("账单主体")
+    @TableField(exist = false)
+    private String financeTarget;
 }
