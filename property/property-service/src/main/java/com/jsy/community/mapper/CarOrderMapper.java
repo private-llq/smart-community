@@ -51,4 +51,5 @@ public interface CarOrderMapper extends BaseMapper<CarOrderEntity> {
 	 *@Date: 2021/9/3 15:23
 	 **/
 	BigDecimal carPositionByMonth(LocalDate startTime, LocalDate endTime, Long communityId);
+
 }
