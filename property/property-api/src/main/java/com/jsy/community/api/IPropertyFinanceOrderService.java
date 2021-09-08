@@ -333,4 +333,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Date: 2021/9/7 11:25
      **/
     Integer saveFinanceOrder(List<PropertyFinanceOrderEntity> propertyFinanceOrderEntityList, Long communityId, String uid);
+
+    /**
+     * @Description: 查询当前小区所有车位
+     * @author: Hu
+     * @since: 2021/9/8 11:12
+     * @Param:
+     * @return:
+     */
+    List<CarPositionEntity> carList(Long adminCommunityId);
 }

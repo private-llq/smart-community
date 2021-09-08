@@ -160,15 +160,17 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("查询公共常量")
     @PostMapping("/getConst")
-//    @Login
+    @Login
     public CommonResult getConst(){
         return CommonResult.ok(propertyFeeRuleConstService.listAll());
     }
+
+
     @ApiOperation("查询公共常量")
     @PostMapping("/get")
 //    @Login
     public CommonResult get(){
-        financeBillService.updateDays();
+
         return CommonResult.ok();
     }
 

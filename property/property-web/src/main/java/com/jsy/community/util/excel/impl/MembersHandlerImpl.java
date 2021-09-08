@@ -4,6 +4,7 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.MembersHandler;
+import com.jsy.community.utils.DateCalculateUtil;
 import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.vo.property.HouseMemberVO;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,15 +147,14 @@ public class MembersHandlerImpl implements MembersHandler {
                         case 6:
                             // 出生日期
                             if (StringUtils.isNotBlank(cellValue)) {
-                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                String date = format.format(Date.valueOf(cellValue));
-                                relationImportQO.setBirthday(LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate());
+
+                                relationImportQO.setBirthday(DateCalculateUtil.gtmToLocalDate(cellValue));
                             }
                             break;
                         case 7:
                             // 入住日期
                             if (StringUtils.isNotBlank(cellValue)) {
-                                relationImportQO.setEnterTime(LocalDateTime.parse(cellValue, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate());
+                                relationImportQO.setEnterTime(DateCalculateUtil.gtmToLocalDate(cellValue));
                             }
                             break;
                         case 8:

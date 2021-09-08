@@ -99,27 +99,45 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      */
     @Override
     public Map<String, Object> findList(AdminInfoVo userInfo,BaseQO<FinanceOrderQO> baseQO) {
-        //查询所有房间
-        List<HouseEntity> list = houseService.selectAll();
-        Map<Long, String> map = new HashMap<>();
-        for (HouseEntity houseEntity : list) {
-            map.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getNumber());
+        //所有房间名称集合
+        Map<Long, String> houseMap = new HashMap<>();
+        //所有车位编号集合
+        Map<Long, String> carPositionMap = new HashMap<>();
+
+        //当前小区所有房间
+        List<HouseEntity> houseEntities = houseService.selectAll(baseQO.getQuery().getCommunityId());
+        //查询当前小区所有车位
+        List<CarPositionEntity> carPositionEntities = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().eq("community_id",baseQO.getQuery().getCommunityId()));
+        //封装房间map
+        for (HouseEntity houseEntity : houseEntities) {
+            houseMap.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getNumber());
+        }
+        //封装车位map
+        for (CarPositionEntity positionEntity : carPositionEntities) {
+            carPositionMap.put(positionEntity.getId(),positionEntity.getCarPosition());
         }
         if(baseQO.getPage()==null||baseQO.getPage()==0){
             baseQO.setPage(1L);
         }
+        //分页查询
         List<PropertyFinanceOrderEntity> orderEntities = propertyFinanceOrderMapper.findList((baseQO.getPage()-1)*baseQO.getSize(),baseQO.getSize(),baseQO.getQuery());
+        //封装总金额、房间地址、车位编号
         for (PropertyFinanceOrderEntity entity : orderEntities) {
+            //如果associatedType等于1表示关联房间   相反则是关联车位
             if (entity.getAssociatedType()==1){
-                entity.setAddress(map.get(entity.getTargetId()));
+                entity.setAddress(houseMap.get(entity.getTargetId()));
+            }else {
+                entity.setAddress(carPositionMap.get(entity.getTargetId()));
             }
+            //封装总金额  总金额=(propertyFee+penalSum)-coupon-deduction
             entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()).subtract(entity.getCoupon()).subtract(entity.getDeduction()));
         }
+        //查询总条数
         Integer total = propertyFinanceOrderMapper.getTotal(baseQO.getQuery());
-        Map<String, Object> hashMap = new HashMap<>();
-        hashMap.put("list",orderEntities);
-        hashMap.put("total",total);
-        return hashMap;
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("list",orderEntities);
+        returnMap.put("total",total);
+        return returnMap;
     }
 
 
@@ -1902,7 +1920,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         
         return row == 1;
     }
-    
+
+    @Override
+    public List<CarPositionEntity> carList(Long adminCommunityId) {
+        return carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().select("id,car_position").eq("community_id",adminCommunityId));
+    }
+
     /**
      *@Author: DKS
      *@Description: 导入账单信息

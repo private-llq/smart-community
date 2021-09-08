@@ -80,9 +80,17 @@ public class PropertyFinanceOrderController {
     @PostMapping("/list")
     @Login
     public CommonResult list(@RequestBody BaseQO<FinanceOrderQO> baseQO){
+        baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
         return CommonResult.ok(map);
+    }
+    @ApiOperation("查询当前小区所有车位")
+    @PostMapping("/carList")
+    @Login
+    public CommonResult carList(){
+        List<CarPositionEntity> list = propertyFinanceOrderService.carList(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(list);
     }
     @ApiOperation("修改订单优惠金额")
     @PutMapping("/updateOrder")

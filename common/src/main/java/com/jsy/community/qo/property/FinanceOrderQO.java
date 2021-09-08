@@ -23,6 +23,10 @@ public class FinanceOrderQO implements Serializable {
      */
     private Long targetId;
     /**
+     * 社区id
+     */
+    private Long communityId;
+    /**
      * 支付状态0未支付1已缴费
      */
     private Integer status;
@@ -30,7 +34,7 @@ public class FinanceOrderQO implements Serializable {
     /**
      * 缴费项目名称模糊查询
      */
-    private Long feeRuleName;
+    private String feeRuleName;
 
     /**
      * 收费单号

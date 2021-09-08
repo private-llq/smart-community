@@ -156,7 +156,9 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      * @return: void
      */
     @Override
+    @Transactional
     public void delete(Long id) {
+        propertyFeeRuleRelevanceMapper.delete(new QueryWrapper<PropertyFeeRuleRelevanceEntity>().eq("rule_id",id));
         propertyFeeRuleMapper.deleteById(id);
     }
 
@@ -201,7 +203,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         }
 
         //封装关联类型中间表数据
-        if (propertyFeeRuleEntity.getRelevance().equals("0")){
+        if (propertyFeeRuleEntity.getRelevance().equals(0)){
             //如果relevanceType等于2表示关联对象是车位
             if (propertyFeeRuleEntity.getType()==11||propertyFeeRuleEntity.getType()==12){
                 //查询当前小区所有业主自用车位
@@ -218,7 +220,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
                 }
             } else {
                 //其他现在表示都关联房屋各种费用
-                List<HouseEntity> house = houseMapper.getAllHouse(propertyFeeRuleEntity.getCommunityId());
+                List<HouseEntity> house = houseMapper.selectHouseAll(propertyFeeRuleEntity.getCommunityId());
                 for (HouseEntity houseEntity : house) {
                     entity=new PropertyFeeRuleRelevanceEntity();
                     entity.setId(SnowFlake.nextId());
@@ -229,7 +231,6 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
                 }
             }
         }else{
-            propertyFeeRuleEntity.setRelevance(1);
             //关联目标id集合
             List<String> idList = propertyFeeRuleEntity.getRelevanceIdList();
             //如果relevanceType等于2表示关联对象是车位
@@ -281,7 +282,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
 
         propertyFeeRuleRelevanceMapper.delete(new QueryWrapper<PropertyFeeRuleRelevanceEntity>().eq("rule_id",propertyFeeRuleEntity.getId()));
         //封装关联类型中间表数据
-        if (propertyFeeRuleEntity.getRelevance().equals("0")){
+        if (propertyFeeRuleEntity.getRelevance().equals(0)){
             //如果relevanceType等于2表示关联对象是车位
             if (propertyFeeRuleEntity.getType()==11||propertyFeeRuleEntity.getType()==12){
                 //查询当前小区所有业主自用车位
@@ -309,7 +310,6 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
                 }
             }
         }else{
-            propertyFeeRuleEntity.setRelevance(1);
             //关联目标id集合
             List<String> idList = propertyFeeRuleEntity.getRelevanceIdList();
             //如果relevanceType等于2表示关联对象是车位

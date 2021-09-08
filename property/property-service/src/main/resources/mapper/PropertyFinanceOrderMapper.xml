@@ -212,12 +212,11 @@
     </select>
     <insert id="saveList" parameterType="List">
         insert into t_property_finance_order
-        (id,order_num,order_time,uid,target_id,community_id,property_fee,total_money,create_time,associated_type,begin_time,over_time,
-        hide,coupon,deduction,build_type,type,fee_rule_id)
+        (id,order_num,order_time,uid,target_id,community_id,property_fee,associated_type,begin_time,over_time,type,fee_rule_id)
         values
         <foreach collection="list" item="item" separator=",">
-            (#{item.id},#{item.orderNum},#{item.orderTime},#{item.uid},#{item.targetId},#{item.communityId},#{item.propertyFee},#{item.totalMoney},now(),
-            #{item.associatedType},#{item.beginTime},#{item.overTime},#{item.hide},#{item.coupon},#{item.deduction},#{item.buildType},#{item.type},#{item.feeRuleId}
+            (#{item.id},#{item.orderNum},#{item.orderTime},#{item.uid},#{item.targetId},#{item.communityId},#{item.propertyFee},
+            #{item.associatedType},#{item.beginTime},#{item.overTime},#{item.type},#{item.feeRuleId}
             )
         </foreach>
     </insert>
@@ -253,7 +252,7 @@
     </update>
     <sql id="query">
         <where>
-            tp.deleted=0 and tf.deleted=0
+            tp.deleted=0 and tf.deleted=0 and tp.community_id=#{query.communityId}
             <if test="query.associatedType!=null">
                 and tp.associated_type = #{query.associatedType}
             </if>
