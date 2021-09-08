@@ -4,12 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IFinanceBillService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
-import com.jsy.community.mapper.HouseMapper;
-import com.jsy.community.mapper.PropertyFeeRuleMapper;
-import com.jsy.community.mapper.PropertyFinanceOrderMapper;
-import com.jsy.community.mapper.UserHouseMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +40,16 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     private PropertyFeeRuleMapper propertyFeeRuleMapper;
 
     @Autowired
+    private PropertyFeeRuleRelevanceMapper propertyFeeRuleRelevanceMapper;
+
+    @Autowired
     private UserHouseMapper userHouseMapper;
 
     @Autowired
     private HouseMapper houseMapper;
+
+    @Autowired
+    private CarPositionMapper carPositionMapper;
 
 
 
@@ -67,13 +71,13 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         for (PropertyFeeRuleEntity feeRuleEntity : feeRuleEntities) {
             LocalDate date = LocalDate.now().withMonth(LocalDate.now().getMonthValue()-1);
             //获取当前缴费项目关联的房间或者车位id集合
-            String[] split = feeRuleEntity.getRelevance().split(",");
+            List<String> ruleList = propertyFeeRuleRelevanceMapper.selectFeeRuleList(feeRuleEntity.getId());
+            //查询所有未空置的房间生成账单
+            List<HouseEntity> list=houseMapper.selectUserHouseAuth(ruleList);
             //如果chargeMode=1表示按面积计算
             if (feeRuleEntity.getChargeMode()==1) {
                 //disposable=1表示临时
                 if (feeRuleEntity.getDisposable()==1){
-                        //查询所有未空置的房间生成账单
-                        List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
                         for (HouseEntity houseEntity : list) {
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
@@ -102,8 +106,8 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     //leisure=1表示要生成空置房间的账单
                     if (feeRuleEntity.getLeisure()==1){
                         //查询缴费项目关联的所有房间（不管房间是否已经有业主认证，只要关联的都生成订单）
-                        List<HouseEntity> list=houseMapper.selectInIds(split);
-                        for (HouseEntity houseEntity : list) {
+                        List<HouseEntity> houseEntities=houseMapper.selectList(new QueryWrapper<HouseEntity>().eq("type",4).eq("community_id",feeRuleEntity.getCommunityId()));
+                        for (HouseEntity houseEntity : houseEntities) {
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
@@ -129,7 +133,6 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     //leisure！=1表示不生成空置房间的账单
                     else {
                         //查询缴费项目关联的所有房间中未空置的房间（房屋已有业主认证表示未空置）
-                        List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
                         for (HouseEntity houseEntity : list) {
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
@@ -159,8 +162,6 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
             else {
                 //disposable=1表示临时
                 if (feeRuleEntity.getDisposable()==1){
-                    //查询所有未空置的房间生成账单(临时是根据缴费项目固定金额生成账单)
-                    List<HouseEntity> list=houseMapper.selectUserHouseAuth(split);
                     for (HouseEntity houseEntity : list) {
                         entity = new PropertyFinanceOrderEntity();
                         entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
@@ -185,8 +186,30 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     }
 
                 } else {
-                    //车位费暂时空置
-
+                    //查询所有关联的车位
+                    List<CarPositionEntity> entityList = carPositionMapper.selectBatchIds(ruleList);
+                    for (CarPositionEntity carPositionEntity : entityList) {
+                        entity = new PropertyFinanceOrderEntity();
+                        entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
+                        entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
+                        entity.setHide(1);
+                        entity.setType(feeRuleEntity.getType());
+                        entity.setBuildType(1);
+                        entity.setFeeRuleId(feeRuleEntity.getId());
+                        entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId()),feeRuleEntity.getSerialNumber()));
+                        entity.setCommunityId(feeRuleEntity.getCommunityId());
+                        entity.setOrderTime(LocalDate.now());
+                        entity.setAssociatedType(2);
+                        entity.setUid(carPositionEntity.getUid());
+                        entity.setTargetId(carPositionEntity.getHouseId());
+                        entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
+                        entity.setPenalSum(new BigDecimal("0"));
+                        entity.setTotalMoney(feeRuleEntity.getMonetaryUnit());
+                        entity.setOrderStatus(0);
+                        entity.setId(SnowFlake.nextId());
+                        entity.setCreateTime(LocalDateTime.now());
+                        orderList.add(entity);
+                    }
                 }
             }
         }

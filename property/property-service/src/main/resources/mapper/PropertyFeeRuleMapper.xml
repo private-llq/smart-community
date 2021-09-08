@@ -3,7 +3,7 @@
 <mapper namespace="com.jsy.community.mapper.PropertyFeeRuleMapper">
 
     <select id="findList" resultType="com.jsy.community.vo.property.FeeRuleVO">
-        select id,status,name,report_status,formula,valuation,monetary_unit,period,create_time,relevance from t_property_fee_rule where deleted=0 order by create_time desc limit #{page},#{size}
+        select id,status,name,report_status,formula,valuation,monetary_unit,period,create_time,relevance,relevance_type from t_property_fee_rule where deleted=0 order by create_time desc limit #{page},#{size}
     </select>
     <select id="findTotal" resultType="java.lang.Integer">
         select count(*) from  t_property_fee_rule where deleted=0

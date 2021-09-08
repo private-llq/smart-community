@@ -19,7 +19,7 @@ import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.HouseTypeVo;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -434,7 +434,7 @@ public class ProprietorController {
             baseQO.setQuery(new RelationListQO());
         }
         baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
-        List<HouseTypeVo> unboundHouseList = iProprietorService.getUnboundHouseList(baseQO);
+        List<FeeRelevanceTypeVo> unboundHouseList = iProprietorService.getUnboundHouseList(baseQO);
         return CommonResult.ok(unboundHouseList);
     }
 

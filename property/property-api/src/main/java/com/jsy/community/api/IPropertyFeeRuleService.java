@@ -6,6 +6,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
 import com.jsy.community.qo.property.FeeRuleRelevanceQO;
 import com.jsy.community.qo.property.UpdateRelevanceQO;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 
 import java.util.List;
@@ -107,4 +108,22 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      * @return:
      */
     List selectRelevance(FeeRuleRelevanceQO feeRuleRelevanceQO);
+
+    /**
+     * @Description: 查询当前小区业主认证过的房屋
+     * @author: Hu
+     * @since: 2021/9/7 11:08
+     * @Param:
+     * @return:
+     */
+    List<FeeRelevanceTypeVo> getHouse(Long communityId);
+
+    /**
+     * @Description: 查询当前小区的月租或属于业主的车位
+     * @author: Hu
+     * @since: 2021/9/7 11:11
+     * @Param:
+     * @return:
+     */
+    List<FeeRelevanceTypeVo> getCarPosition(Long adminCommunityId, Integer type);
 }

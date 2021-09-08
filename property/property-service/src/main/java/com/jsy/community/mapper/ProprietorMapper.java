@@ -9,7 +9,7 @@ import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.property.RelationListQO;
-import com.jsy.community.vo.HouseTypeVo;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -126,7 +126,7 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
      * @date: 2021/6/12 15:17
      **/
-    List<HouseTypeVo> getUnboundHouseList(@Param("query") RelationListQO baseQO, @Param("page") Long page, @Param("pageSize") Long pageSize);
+    List<FeeRelevanceTypeVo> getUnboundHouseList(@Param("query") RelationListQO baseQO, @Param("page") Long page, @Param("pageSize") Long pageSize);
 
 
 //    /**

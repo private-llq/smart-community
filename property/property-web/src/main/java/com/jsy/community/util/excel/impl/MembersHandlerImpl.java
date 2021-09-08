@@ -20,9 +20,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @program: com.jsy.community
@@ -143,13 +149,15 @@ public class MembersHandlerImpl implements MembersHandler {
                         case 6:
                             // 出生日期
                             if (StringUtils.isNotBlank(cellValue)) {
-                                relationImportQO.setBirthday(LocalDate.parse(cellValue, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                String date = format.format(Date.valueOf(cellValue));
+                                relationImportQO.setBirthday(LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate());
                             }
                             break;
                         case 7:
                             // 入住日期
                             if (StringUtils.isNotBlank(cellValue)) {
-                                relationImportQO.setEnterTime(LocalDate.parse(cellValue, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                                relationImportQO.setEnterTime(LocalDateTime.parse(cellValue, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate());
                             }
                             break;
                         case 8:
@@ -188,6 +196,10 @@ public class MembersHandlerImpl implements MembersHandler {
         } catch (IOException e) {
             throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), e.getMessage());
         }
+    }
+
+    public static void main(String[] args) {
+
     }
 
     /**

@@ -1,8 +1,7 @@
 package com.jsy.community.vo.property;
 
+import com.jsy.community.vo.BaseVO;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * @program: com.jsy.community
@@ -11,34 +10,30 @@ import java.io.Serializable;
  * @create: 2021-09-06 09:49
  **/
 @Data
-public class FeeRuleHouseVO implements Serializable {
-    /**
-     * 关联id
-     */
-    private Long id;
+public class FeeRuleHouseVO extends BaseVO {
     /**
      * 楼栋
      */
-    private Long building;
+    private String building;
     /**
      * 单元
      */
-    private Long unit;
+    private String unit;
     /**
      * 楼层
      */
-    private Long floor;
+    private String floor;
     /**
      * 房屋编号
      */
-    private Long door;
+    private String door;
     /**
      * 建筑面积
      */
-    private Long buildArea;
+    private Double buildArea;
     /**
      * 实用面积
      */
-    private Long practicalArea;
+    private Double practicalArea;
 
 }
