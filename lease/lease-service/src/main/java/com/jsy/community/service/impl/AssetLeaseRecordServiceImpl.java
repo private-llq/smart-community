@@ -890,6 +890,46 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setLandlordName(userInfoVo.getRealName());
             leaseRecordEntity.setLandlordPhone(userInfoVo.getMobile());
         }
+        if (leaseRecordEntity.getOperation() == 1 ||leaseRecordEntity.getOperation() == 7 ||leaseRecordEntity.getOperation() == 8 ||leaseRecordEntity.getOperation() == 9) {
+            leaseRecordEntity.setProgressNumber(1);
+        } else if (leaseRecordEntity.getOperation() == 2 || leaseRecordEntity.getOperation() == 3) {
+            leaseRecordEntity.setProgressNumber(2);
+        } else if (leaseRecordEntity.getOperation() == 4 || leaseRecordEntity.getOperation() == 5) {
+            leaseRecordEntity.setProgressNumber(3);
+        } else if (leaseRecordEntity.getOperation() == 6) {
+            leaseRecordEntity.setProgressNumber(4);
+        }
         return leaseRecordEntity;
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 设置签约合同相关信息
+     * @param assetLeaseRecordEntity: 签约实体
+     * @return: java.lang.Integer
+     * @date: 2021/9/7 10:18
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer setContractNo(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
+        queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
+        queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (assetLeaseRecordEntity1 != null) {
+            assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
+            assetLeaseRecordEntity1.setStartDate(assetLeaseRecordEntity.getStartDate());
+            assetLeaseRecordEntity1.setEndDate(assetLeaseRecordEntity.getEndDate());
+            assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
+            assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
+            assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
+            assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
+            addLeaseOperationRecord(assetLeaseRecordEntity1);
+            return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
+        } else {
+            return 0;
+        }
     }
 }

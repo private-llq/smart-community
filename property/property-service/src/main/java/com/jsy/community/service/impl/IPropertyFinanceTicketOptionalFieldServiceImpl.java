@@ -60,6 +60,8 @@ public class IPropertyFinanceTicketOptionalFieldServiceImpl extends ServiceImpl<
         // 根据字段列表查询字段信息
         QueryWrapper<FinanceTicketOptionalFieldEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("id", fieldIds);
+        queryWrapper.orderByAsc("location_type");
+        queryWrapper.orderByAsc("sort");
         List<FinanceTicketOptionalFieldEntity> ticketOptionalFieldEntities = ticketOptionalFieldMapper.selectList(queryWrapper);
         if (CollectionUtil.isNotEmpty(ticketOptionalFieldEntities)) {
             for (FinanceTicketOptionalFieldEntity ticketOptionalFieldEntity : ticketOptionalFieldEntities) {

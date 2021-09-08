@@ -318,5 +318,22 @@ public class HouseLeaseController {
         return assetLeaseRecordEntity1 == null ? CommonResult.error("未查到相关签约") : CommonResult.ok(assetLeaseRecordEntity1);
     }
 
+    /**
+     * @author: Pipi
+     * @description: 设置签约合同相关信息
+     * @param assetLeaseRecordEntity: 签约实体
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/7 10:17
+     **/
+    @Login
+    @PostMapping("/v2/setContractNo")
+    public CommonResult setContractNo(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        if (assetLeaseRecordEntity.getId() == null) {
+            throw new JSYException(400, "签约ID不能为空");
+        }
+        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.SetContractNoValidate.class);
+        assetLeaseRecordEntity.setHomeOwnerUid(UserUtils.getUserId());
+        return CommonResult.ok(assetLeaseRecordService.setContractNo(assetLeaseRecordEntity));
+    }
 
 }

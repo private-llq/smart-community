@@ -146,7 +146,6 @@ public class AliAppPayController {
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/17 10:17
 	 **/
-	@Login
 	@GetMapping("/v2/checkPayTradeStatus")
 	public CommonResult checkPayTradeStatus(@RequestParam("orderNo") String orderNo, @RequestParam("serviceOrderNo") String serviceOrderNo) {
 		return CommonResult.ok(ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo),"查询成功");

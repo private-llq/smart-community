@@ -63,4 +63,13 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @date: 2021/9/6 17:39
      **/
     AssetLeaseRecordEntity contractDetail(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid);
+
+    /**
+     * @author: Pipi
+     * @description: 设置签约合同相关信息
+     * @param assetLeaseRecordEntity: 签约实体
+     * @return: java.lang.Integer
+     * @date: 2021/9/7 10:18
+     **/
+    Integer setContractNo(AssetLeaseRecordEntity assetLeaseRecordEntity);
 }
