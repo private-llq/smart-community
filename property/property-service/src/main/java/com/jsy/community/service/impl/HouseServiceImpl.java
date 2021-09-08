@@ -1101,8 +1101,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
      * @return: java.util.List<com.jsy.community.entity.HouseEntity>
      */
     @Override
-    public List<HouseEntity> selectAll() {
-        return houseMapper.selectList(null);
+    public List<HouseEntity> selectAll(Long communityId) {
+        return houseMapper.selectList(new QueryWrapper<HouseEntity>().eq("community_id",communityId).eq("type",4));
     }
 
     /**

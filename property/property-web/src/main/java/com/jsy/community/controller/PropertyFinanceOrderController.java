@@ -80,9 +80,17 @@ public class PropertyFinanceOrderController {
     @PostMapping("/list")
     @Login
     public CommonResult list(@RequestBody BaseQO<FinanceOrderQO> baseQO){
+        baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
         return CommonResult.ok(map);
+    }
+    @ApiOperation("查询当前小区所有车位")
+    @PostMapping("/carList")
+    @Login
+    public CommonResult carList(){
+        List<CarPositionEntity> list = propertyFinanceOrderService.carList(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(list);
     }
     @ApiOperation("修改订单优惠金额")
     @PutMapping("/updateOrder")
@@ -756,5 +764,35 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
         }
         return null;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出账单信息
+     *@Param: excel:
+     *@Return: com.jsy.community.vo.CommonResult
+     *@Date: 2021/9/8 10:30
+     **/
+    @Login
+    @ApiOperation("导出账单信息")
+    @PostMapping("/downloadFinanceList")
+    public ResponseEntity<byte[]> downloadFinanceList(@RequestBody PropertyFinanceOrderEntity qo) {
+        qo.setCommunityId(UserUtils.getAdminCommunityId());
+        List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = propertyFinanceOrderService.queryExportFinanceExcel(qo);
+        //设置excel 响应头信息
+        MultiValueMap<String, String> multiValueMap = new HttpHeaders();
+        //设置响应类型为附件类型直接下载这种
+        multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("账单导出表.xlsx", StandardCharsets.UTF_8));
+        //设置响应的文件mime类型为 xls类型
+        multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
+        Workbook workbook = new XSSFWorkbook();
+        workbook = financeExcel.exportFinance(propertyFinanceOrderEntities);
+        //把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
+        try {
+            return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
+        }
     }
 }

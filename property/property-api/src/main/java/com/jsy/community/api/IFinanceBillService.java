@@ -14,7 +14,7 @@ public interface IFinanceBillService {
      * @Param:
      * @return:
      */
-    void updateDays();
+    void updateMonth();
 
     /**
      * @Description: 每天更新账单违约金和总金额

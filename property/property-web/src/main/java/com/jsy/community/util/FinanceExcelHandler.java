@@ -125,4 +125,13 @@ public interface FinanceExcelHandler {
      *@Date: 2021/9/7 16:13
      **/
     Workbook exportFinanceOrderErrorExcel(List<FinanceImportErrorVO> errorVos);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出历史账单表
+     *@Param: :
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/9/8 13:41
+     **/
+    Workbook exportFinance(List<?> entityList);
 }

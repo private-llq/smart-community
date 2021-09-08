@@ -250,7 +250,7 @@
         select th.*,tuh.uid as uid from  t_user_house tuh
         join t_house th
         on tuh.house_id=th.id
-        where th.community_id=#{id}
+        where th.deleted=0 and tuh.deleted=0 and th.community_id=#{communityId}
     </select>
 
 	<!-- 通过社区ID查询出所有楼栋和单元 -->
@@ -321,4 +321,15 @@
 			#{item}
 		</foreach>
 	</select>
+	<select id="getHouseAll" resultType="com.jsy.community.entity.HouseEntity">
+        SELECT
+			th.*,tuh.uid
+		FROM
+			t_house th
+		LEFT JOIN t_user_house tuh ON th.id = tuh.house_id
+		WHERE
+			th.type = 4
+		AND th.deleted = 0
+		AND th.community_id =#{communityId}
+    </select>
 </mapper>

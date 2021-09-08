@@ -311,4 +311,13 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 */
 	@Select("select th.id,concat(th.building,th.unit,th.door) as name from t_house th join t_user_house tuh on th.id=tuh.house_id where th.deleted=0 and tuh.deleted=0 and th.community_id=#{communityId}")
 	List<FeeRelevanceTypeVo> getUserHouse(@Param("communityId") Long communityId);
+
+	/**
+	 * @Description: 查询所有房间包括房间没有业主认证的
+	 * @author: Hu
+	 * @since: 2021/9/8 14:41
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> getHouseAll(Long communityId);
 }

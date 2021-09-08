@@ -23,7 +23,7 @@ public class FinanceBillJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         System.out.println("操作执行了");
-        financeBillService.updateDays();
+//        financeBillService.updateDays();
         financeBillService.updatePenalSum();
         System.out.println(financeBillService);
         System.out.println("操作成功了");
