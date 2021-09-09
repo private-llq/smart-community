@@ -8,6 +8,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
+import com.jsy.community.api.IUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
@@ -65,6 +66,9 @@ public class ProprietorController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseService iHouseService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IUserService iUserService;
 
     /**
      * [2021.3.16] 根据物业端需求改造完成
@@ -450,7 +454,17 @@ public class ProprietorController {
     @PostMapping("/v2/facePageList")
     @ApiOperation("查询未绑定房屋列表")
     public CommonResult facePageList(@RequestBody BaseQO<UserEntity> baseQO) {
-        return CommonResult.ok();
+        if (baseQO.getQuery() == null) {
+            baseQO.setQuery(new UserEntity());
+        }
+        if (baseQO.getPage() == null || baseQO.getPage() <= 0) {
+            baseQO.setPage(1L);
+        }
+        if (baseQO.getSize() == null || baseQO.getSize() <= 0) {
+            baseQO.setSize(5L);
+        }
+        baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(iUserService.facePageList(baseQO));
     }
 
 }

@@ -119,4 +119,14 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @date: 2021/8/19 17:23
 	 **/
 	List<HouseMemberEntity> queryByCommunityId(Long communityId);
+
+	/**
+	 * @author: Pipi
+	 * @description: 查询社区所有成员信息 
+	 * @param communityId: 社区ID
+     * @param uidSet: 用户uid列表
+	 * @return: java.util.List<com.jsy.community.entity.HouseMemberEntity>
+	 * @date: 2021/9/9 15:07
+	 **/
+	List<HouseMemberEntity> queryByCommunityIdAndUids(Long communityId, Set<String> uidSet);
 }
