@@ -1991,14 +1991,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             queryWrapper.eq("target_id", qo.getTargetId());
         }
         //是否查收费项目
-        if (qo.getFeeRuleName() != null) {
+        if (StringUtils.isNotBlank(qo.getFeeRuleName())) {
             List<Long> communityIds = new ArrayList<>();
             communityIds.add(qo.getCommunityId());
             List<Long> feeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
             queryWrapper.in("fee_rule_id", feeRuleIdList);
         }
         //是否查交易单号
-        if (qo.getOrderNum() != null) {
+        if (StringUtils.isNotBlank(qo.getOrderNum())) {
             queryWrapper.eq("order_num", qo.getOrderNum());
         }
         //是否查生成时间
