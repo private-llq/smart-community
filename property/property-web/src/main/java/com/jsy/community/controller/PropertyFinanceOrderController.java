@@ -634,7 +634,7 @@ public class PropertyFinanceOrderController {
     @Login
     @ApiOperation("导入账单信息")
     @PostMapping("/importFinanceExcel")
-    public CommonResult importFinanceExcel(MultipartFile excel) {
+    public CommonResult importFinanceExcel(@RequestBody MultipartFile excel, @RequestParam("orderStatus")Integer orderStatus) {
         //参数验证
         validFileSuffix(excel);
         Long adminCommunityId = UserUtils.getAdminCommunityId();
@@ -714,6 +714,8 @@ public class PropertyFinanceOrderController {
             propertyFinanceOrderEntity.setFeeRuleId(propertyFeeRuleService.selectFeeRuleIdByFeeRuleName(propertyFinanceOrderEntity.getFeeRuleName(), adminCommunityId));
             // 补充uid
             propertyFinanceOrderEntity.setUid(userId);
+            // 补充账单状态
+            propertyFinanceOrderEntity.setOrderStatus(orderStatus);
         }
         Integer row = 0;
         if (CollectionUtil.isNotEmpty(propertyFinanceOrderEntities)) {
