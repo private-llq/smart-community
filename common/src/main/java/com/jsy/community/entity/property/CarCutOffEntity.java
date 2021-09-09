@@ -58,6 +58,10 @@ public class CarCutOffEntity  extends BaseEntity {
 
     @ApiModelProperty(value = "车辆所属类型  1-临时 2-包月  3-业主")
     private Integer belong;
+    /**
+     *  订单编号
+     */
+    private String orderNum;
 
 
 
