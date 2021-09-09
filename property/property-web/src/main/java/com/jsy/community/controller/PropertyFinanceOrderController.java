@@ -88,7 +88,7 @@ public class PropertyFinanceOrderController {
         return CommonResult.ok(map);
     }
     @ApiOperation("查询当前小区所有车位")
-    @PostMapping("/carList")
+    @GetMapping("/carList")
     @Login
     public CommonResult carList(){
         List<CarPositionEntity> list = propertyFinanceOrderService.carList(UserUtils.getAdminCommunityId());

@@ -1,5 +1,4 @@
 package com.jsy.community.service.impl;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -1970,7 +1969,30 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         return saveFinanceOrderRow;
     }
-    
+
+
+    /**
+     * @Description: app端绑定月租车辆向账单表里添加数据
+     * @author: Hu
+     * @since: 2021/9/9 14:19
+     * @Param: [entity]
+     * @return: void
+     */
+    @Override
+    public void insert(PropertyFinanceOrderEntity orderEntity) {
+        PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
+                .eq("disposable",2)
+                .eq("community_id",orderEntity.getCommunityId())
+                .eq("status",1)
+                .eq("relevance_type",2)
+                .eq("type",12));
+        if (orderEntity!=null){
+            orderEntity.setFeeRuleId(ruleEntity.getId());
+            orderEntity.setType(ruleEntity.getType());
+        }
+
+    }
+
     /**
      *@Author: DKS
      *@Description: 导出账单信息
