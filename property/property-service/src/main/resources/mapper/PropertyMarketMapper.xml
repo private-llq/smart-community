@@ -61,19 +61,17 @@
         select count(*) from t_proprietor_market tm
         left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
         left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
-        left join t_user tu on tm.uid = tu.uid
+        left join t_user tu on tm.uid = tu.uid and  tm.remove = 0 and tm.shield = 0
         <where>
-            <if test="#{query.categoryId}!=null and #{query.categoryId}!=''">
+            <if test="query.categoryId!=null and query.categoryId!=''">
                 and tm.category_id=#{query.categoryId}
             </if>
-            <if test="#{query.realName}!=null and #{query.realName}!=''">
+            <if test="query.realName !=null and query.realName!=''">
                 AND tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')
+                OR  tu.mobile LIKE CONCAT('%',#{query.phone,jdbcType=VARCHAR},'%')
             </if>
-            <if test="#{query.state}!=null and #{query.state}!=''">
-                AND tm.state=#{query.state}
-            </if>
-            <if test="#{query.phone}!=null and #{query.phone}!=''">
-                AND tu.mobile LIKE CONCAT('%',#{query.phone,jdbcType=VARCHAR},'%')
+            <if test="query.state !=null and query.state!=''">
+                AND tm.state=#{query.state}+0
             </if>
         </where>
     </select>
@@ -89,20 +87,16 @@
                  left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
                  left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
                  left join t_user tu on tm.uid = tu.uid
-        <where>
-            <if test="#{query.categoryId}!=null and #{query.categoryId}!=''">
-                and tm.category_id=#{query.categoryId}
-            </if>
-            <if test="#{query.realName}!=null and #{query.realName}!=''">
-                AND tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')
-            </if>
-            <if test="#{query.phone}!=null and #{query.phone}!=''">
-                AND tu.mobile LIKE CONCAT('%',#{query.phone,jdbcType=VARCHAR},'%')
-            </if>
-            <if test="#{query.state}!=null and #{query.state}!=''">
-                AND tm.state=#{query.state}
-            </if>
-        </where>
+        <if test="query.categoryId!=null and query.categoryId!=''">
+            and tm.category_id=#{query.categoryId}
+        </if>
+        <if test="query.realName !=null and query.realName!=''">
+            AND tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')
+            OR  tu.mobile LIKE CONCAT('%',#{query.phone,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="query.state !=null and query.state != '' ">
+            AND tm.state=#{query.state}
+        </if>
         limit #{page},#{size}
     </select>
 
@@ -134,7 +128,7 @@
                          left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
                          left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
                         left join t_user tu on tm.uid = tu.uid
-        where tm.remove = 0
+        where tm.remove = 0 and  tm.shield = 1
     </select>
 
     <select id="selectMarketBlacklist" resultMap="ProprietorMarketEntityMap">
@@ -147,7 +141,7 @@
         left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
         left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
         left join t_user tu on tm.uid = tu.uid
-        where tm.remove = 0
+        where tm.remove = 0 and tm.shield = 1
         limit #{page},#{size}
     </select>
 

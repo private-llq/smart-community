@@ -395,7 +395,7 @@ public class CarPositionController {
                 carCutOffQO.setCommunityId(communityId);
                 carCutOffQO.setState(0);
                 //查询临时车位的占用数量
-                long total = carCutOffService.selectPage(carCutOffQO).getTotal();
+                long total = carCutOffService.selectPage(carCutOffQO);
 
                 System.out.println("最大入场数" + maxNumber);
                 System.out.println("查询临时车位的占用数量" + total);

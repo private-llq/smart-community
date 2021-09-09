@@ -108,4 +108,9 @@ public class CarCutOffEntity  extends BaseEntity {
     @TableLogic(value = "0",delval = "1")
     private  Integer deleted;
 
+    /**
+     * 停车时长
+     */
+    @TableField(exist = false)
+    private String stopCarTime;
 }

@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -20,31 +21,38 @@ public class CarOrderEntity extends BaseEntity {
     /**
      *  车辆id
      */
+    @ExcelIgnore
     private Long carId;
     /**
      *  业主uid
      */
+    @ExcelIgnore
     private String uid;
     /**
      *  社区id
      */
+    @ExcelIgnore
     private Long communityId;
     /**
      *  车位id
      */
+    @ExcelIgnore
     private Long carPositionId;
     /**
      *  车位编号
      */
+    @ExcelIgnore
     @TableField(exist = false)
     private String carPositionText;
     /**
      *  1临时收费，2月租收费
      */
+    @ExcelIgnore
     private Integer type;
     /**
      *  1临时收费，2月租收费
      */
+    @ExcelIgnore
     @TableField(exist = false)
     private String typeText;
     /**
@@ -92,10 +100,12 @@ public class CarOrderEntity extends BaseEntity {
     /**
      * 扫码时间
      */
+    @ExcelIgnore
     private LocalDateTime scanTime;
     /**
      * 是否出闸0为出闸1已出闸
      */
+    @ExcelIgnore
     private Integer goStatus;
 
     /**

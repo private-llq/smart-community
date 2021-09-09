@@ -34,4 +34,14 @@ public class CarOrderQO extends BaseQO {
      *  1临时收费，2月租收费
      */
     private Integer type;
+
+    /**
+     * @Description: 导出字段  月租0  1临时
+     * @Param:
+     * @Return:
+     * @Author: Tian
+     * @Date: 2021/9/9-15:46
+     **/
+    private Integer state;
+
 }
