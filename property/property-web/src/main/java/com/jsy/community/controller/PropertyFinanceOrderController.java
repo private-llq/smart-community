@@ -80,7 +80,9 @@ public class PropertyFinanceOrderController {
     @PostMapping("/list")
     @Login
     public CommonResult list(@RequestBody BaseQO<FinanceOrderQO> baseQO){
-        baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
+        FinanceOrderQO query = baseQO.getQuery();
+        query.setCommunityId(UserUtils.getAdminCommunityId());
+        baseQO.setQuery(query);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
         return CommonResult.ok(map);
