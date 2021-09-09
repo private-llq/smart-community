@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
@@ -28,10 +29,6 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
     void delay(String uid, Integer type, Integer dayNum, BigDecimal fee);
 
 
-    void monthlyChange(String uid, Integer type);
-
-    Map<String, Object> addLinkByExcel(List<String[]> strings, Long communityId);
-
     List<CarMonthlyVehicle> selectList(Long communityId);
 
     Map<String, Object> addLinkByExcel2(List<String[]> strings, Long communityId);
@@ -57,4 +54,11 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
      * @return:
      */
     void updateMonth(String carPlate, LocalDateTime orveTime);
+
+    PageInfo findByMultiConditionPage2Position(CarMonthlyVehicleQO carMonthlyVehicleQO,Long communityId);
+
+    Integer SaveMonthlyVehicle2Position(CarMonthlyVehicle carMonthlyVehicle, Long adminCommunityId);
+
+    Map<String, Object> addLinkByExcel2Position(List<String[]> strings, Long communityId);
+
 }

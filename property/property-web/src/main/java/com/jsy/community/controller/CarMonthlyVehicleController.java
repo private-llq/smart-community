@@ -1,10 +1,14 @@
 package com.jsy.community.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.Log;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarMonthlyVehicleService;
+import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.util.POIUtil;
@@ -24,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Api(tags = "停车收费设置")
 @RestController
@@ -33,6 +38,10 @@ public class CarMonthlyVehicleController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarMonthlyVehicleService vehicleService;
+
+    @DubboReference(version = Const.version, group = Const.group_property,check = false)
+    private IHouseService houseService;
+
 
     /**
      * 新增
@@ -101,15 +110,7 @@ public class CarMonthlyVehicleController {
         return CommonResult.ok(0,"延期成功！");
     }
 
-    /**
-     * 包月变更： 0:地上 1：地下
-     */
-    //todo 该接口已舍弃
-    @PutMapping("monthlyChange")
-    public CommonResult monthlyChange(@RequestParam("uid") String uid,@RequestParam("type") Integer type){
-        vehicleService.monthlyChange(uid,type);
-        return CommonResult.ok();
-    }
+
     /**
      * 同步按钮 (下发业务)
      */
@@ -144,26 +145,8 @@ public class CarMonthlyVehicleController {
      */
     @PostMapping("dataExportTemplate")
     public String dataExportTemplate(){
-        return "http://222.178.212.29:9000/template/0fb57cc95c9c4a1b9a7892c66b99a2f6";
+        return "http://222.178.212.29:9000/template/d3134ee2d696455881ab6038ea205eab";
     }
-
-    /**
-     * 数据录入
-     */
-    //todo 已舍弃
-    @Login
-    @PostMapping("dataImport")
-    public CommonResult dataImport(MultipartFile file){
-        try {
-            List<String[]> strings = POIUtil.ReadMessage(file);
-            Map<String,Object> map= vehicleService.addLinkByExcel(strings,UserUtils.getAdminCommunityId());
-            return CommonResult.ok(map);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-       return CommonResult.ok("添加失败,请联系管理员");
-    }
-
 
 
     /**
@@ -187,7 +170,6 @@ public class CarMonthlyVehicleController {
     /**
      * 数据导出
      */
-    @Login
     @RequestMapping("dataExport")
     public CommonResult dataExport( HttpServletResponse response){
         List<CarMonthlyVehicle> vehicleList = vehicleService.selectList(UserUtils.getAdminCommunityId());
@@ -231,6 +213,109 @@ public class CarMonthlyVehicleController {
             e.printStackTrace();
         }
         return CommonResult.ok();
+    }
+
+    /**
+     * 多条件+分页查询包月车位
+     */
+    @Login
+    @PostMapping("findByMultiConditionPage2Position")
+    public CommonResult<PageInfo> findByMultiConditionPage2Position(@RequestBody CarMonthlyVehicleQO carMonthlyVehicleQO) {
+        PageInfo pageInfo = vehicleService.findByMultiConditionPage2Position(carMonthlyVehicleQO,UserUtils.getAdminCommunityId());
+        return CommonResult.ok(pageInfo);
+    }
+
+    /**
+     * 包月车位新增
+     */
+    @Login
+    @PostMapping("SaveMonthlyVehicle2Position")
+    public CommonResult SaveMonthlyVehicle2Position(@RequestBody CarMonthlyVehicle carMonthlyVehicle) {
+        vehicleService.SaveMonthlyVehicle2Position(carMonthlyVehicle, UserUtils.getAdminCommunityId());
+        return CommonResult.ok();
+    }
+
+    /**
+     * 包月车位导入
+     */
+    @Login
+    @PostMapping("dataImport2Position")
+    public CommonResult dataImport2Position(MultipartFile file){
+        try {
+            List<String[]> strings = POIUtils.readExcel(file);
+            Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+            Map<String, Object> map =vehicleService.addLinkByExcel2Position(strings,communityId);
+            return CommonResult.ok(map);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return CommonResult.ok("添加失败,请联系管理员!");
+        }
+    }
+
+    /**
+     * 包月车位导出
+     */
+    @Login
+    @RequestMapping("dataExport2Position")
+    public CommonResult dataExport2Position( HttpServletResponse response){
+        List<CarMonthlyVehicle> vehicleList = vehicleService.selectList(UserUtils.getAdminCommunityId());
+        List<String[]> list=new ArrayList<>();//封装返回的数据
+        String[] strings0=new String[10];
+        strings0[0]=  "车位号";
+        strings0[1]= "车主姓名";
+        strings0[2]= "联系电话";
+        strings0[3]= "车牌号";
+        strings0[4]= "开始时间";
+        strings0[5]= "到期时间";
+        strings0[6]= "备注";
+        strings0[7]= "所属房屋";
+        strings0[8]="下发状态";
+        list.add(strings0);//excel属性名
+        for (int i = 0; i < vehicleList.size(); i++) {
+            CarMonthlyVehicle carMonthlyVehicle = vehicleList.get(i);
+            String[] strings1=new String[10];
+            strings1[0]= String.valueOf( carMonthlyVehicle.getCarPosition());
+            strings1[1]= String.valueOf(carMonthlyVehicle.getOwnerName());
+            strings1[2]= String.valueOf(carMonthlyVehicle.getPhone());
+            strings1[3]=String.valueOf(carMonthlyVehicle.getCarNumber());
+            strings1[4]= String.valueOf(carMonthlyVehicle.getStartTime());
+            strings1[5]= String.valueOf(carMonthlyVehicle.getEndTime());
+            strings1[6]= String.valueOf(carMonthlyVehicle.getRemarks());
+
+            Long houseId = carMonthlyVehicle.getHouseId();
+            HouseEntity houseEntity = houseService.getById(houseId);
+            if (Objects.nonNull(houseEntity)){
+                String building = houseEntity.getBuilding();
+                String unit = houseEntity.getUnit();
+                Integer floor = houseEntity.getFloor();
+                String door = houseEntity.getDoor();
+                String getBelongHouse=building+unit+floor+door;
+                strings1[7]= getBelongHouse;//所属房屋
+            }
+            Integer distributionStatus = carMonthlyVehicle.getDistributionStatus();
+            if (0==distributionStatus || distributionStatus==null){
+                strings1[8]= ("未下发");
+            }
+            if (1==distributionStatus){
+                strings1[8]= ("已下发");
+            }
+            list.add(strings1);
+        }
+        try {
+            POIUtil.writePoi(list,"我的文件",2,response);
+        } catch (IOException e) {
+            return CommonResult.error("导出失败，请联系管理员");
+        }
+      return   CommonResult.ok();
+
+    }
+
+    /**
+     * 包月车位导入模板下载
+     */
+    @PostMapping("dataExportTemplate2Position")
+    public String dataExportTemplate2Position(){
+        return "http://222.178.212.29:9000/template/dac28811cce04c92ba37f50089fc4c9f";
     }
 
 

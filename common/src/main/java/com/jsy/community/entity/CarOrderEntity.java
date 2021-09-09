@@ -32,6 +32,7 @@ public class CarOrderEntity extends BaseEntity {
      *  车位id
      */
     private Long carPositionId;
+
     /**
      *  车位编号
      */

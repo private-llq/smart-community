@@ -12,4 +12,5 @@ public interface CarMonthlyVehicleMapper extends BaseMapper<CarMonthlyVehicle> {
 
     IPage<CarMonthlyVehicle> FindByMultiConditionPage(@Param("page") Page page, @Param("query") CarMonthlyVehicleQO carMonthlyVehicleQO);
 
+    IPage<CarMonthlyVehicle> FindByMultiConditionPage2Position(@Param("page")Page<CarMonthlyVehicle> page, @Param("query") CarMonthlyVehicleQO carMonthlyVehicleQO);
 }
