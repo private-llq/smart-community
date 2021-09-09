@@ -127,6 +127,7 @@ public class UserEntity extends BaseEntity {
 	private Integer distributionStatus;
 
 	// 人脸启用状态;1:启用;2:禁用
+	@TableField( exist = false )
 	private String faceEnableStatusStr;
 
 	// 下发状态;1:失败(未完整同步);2;成功
