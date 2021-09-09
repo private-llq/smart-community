@@ -6,6 +6,7 @@ import com.jsy.community.api.AssetLeaseRecordService;
 import com.jsy.community.api.IHouseConstService;
 import com.jsy.community.api.LeaseException;
 import com.jsy.community.api.ProprietorUserService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -142,7 +143,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @param assetLeaseRecordEntity : 房屋租赁记录表实体
      * @param uid                    : 登录用户uid
      * @author: Pipi
-     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请)
+     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请/拟定合同)
      * @return: java.lang.Integer
      * @date: 2021/9/3 10:30
      **/
@@ -155,6 +156,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 // 房东接受申请
                 // 房东接受申请后,资产不能编辑,所以在这里将房屋信息写入记录表
                 result = acceptingApply(assetLeaseRecordEntity, uid);
+                break;
+            case 3:
+                // 房东点击拟定合同
+                result = landlordContractPreparation(assetLeaseRecordEntity, uid);
                 break;
             case 7:
                 // 租客取消申请
@@ -251,6 +256,29 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordEntity.setAreaId(shopLeaseEntity.getAreaId());
             assetLeaseRecordEntity.setFloor(shopLeaseEntity.getFloor());
         }
+        //写入租赁操作数据
+        addLeaseOperationRecord(recordEntity);
+        return assetLeaseRecordMapper.updateById(recordEntity);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 房东点击你拟定合同
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid: 登录用户uid
+     * @return: java.lang.Integer
+     * @date: 2021/9/9 18:13
+     **/
+    public Integer landlordContractPreparation(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        queryWrapper.eq("home_owner_uid", uid);
+        queryWrapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode());
+        AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (recordEntity == null) {
+            throw new LeaseException("签约信息不存在");
+        }
+        recordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
         //写入租赁操作数据
         addLeaseOperationRecord(recordEntity);
         return assetLeaseRecordMapper.updateById(recordEntity);
@@ -815,7 +843,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             // 为空直接返回
             return leaseRecordEntity;
         }
-        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 9) {
+        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 8 || leaseRecordEntity.getOperation() == 9) {
             // 记录表里面没有资产数据,要单独查
             if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
                 // 商铺
@@ -905,7 +933,26 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         }
         if (leaseRecordEntity.getOperation() == 1 ||leaseRecordEntity.getOperation() == 7 ||leaseRecordEntity.getOperation() == 8 ||leaseRecordEntity.getOperation() == 9) {
             leaseRecordEntity.setProgressNumber(1);
+            if (leaseRecordEntity.getOperation() == 1) {
+                // 发起签约,倒计时就是发起签约的时间加7天
+                leaseRecordEntity.setCountdownFinish(leaseRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+            }
+            if (leaseRecordEntity.getOperation() == 9) {
+                // 重新发起,倒计时就是重新发起的时间加7天
+                // 查询重新发起的时间
+                LeaseOperationRecordEntity leaseOperationRecordEntity = queryLeaseOperationRecord(assetLeaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                }
+            }
         } else if (leaseRecordEntity.getOperation() == 2 || leaseRecordEntity.getOperation() == 3) {
+            if (leaseRecordEntity.getOperation() == 2) {
+                // 接受申请,倒计时就是接受申请的时间加7天
+                LeaseOperationRecordEntity leaseOperationRecordEntity = queryLeaseOperationRecord(assetLeaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                }
+            }
             leaseRecordEntity.setProgressNumber(2);
         } else if (leaseRecordEntity.getOperation() == 4 || leaseRecordEntity.getOperation() == 5) {
             leaseRecordEntity.setProgressNumber(3);
@@ -913,6 +960,23 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setProgressNumber(4);
         }
         return leaseRecordEntity;
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询操作记录
+     * @param leaseRecordId: 签约ID
+     * @param operation: 操作进程
+     * @return: com.jsy.community.entity.proprietor.LeaseOperationRecordEntity
+     * @date: 2021/9/9 17:52
+     **/
+    private LeaseOperationRecordEntity queryLeaseOperationRecord(Long leaseRecordId, Integer operation) {
+        QueryWrapper<LeaseOperationRecordEntity> leaseOperationRecordEntityQueryWrapper = new QueryWrapper<>();
+        leaseOperationRecordEntityQueryWrapper.eq("asset_lease_record_id", leaseRecordId);
+        leaseOperationRecordEntityQueryWrapper.eq("operation", operation);
+        leaseOperationRecordEntityQueryWrapper.orderByDesc("create_time");
+        leaseOperationRecordEntityQueryWrapper.last("limit 0, 1");
+        return leaseOperationRecordMapper.selectOne(leaseOperationRecordEntityQueryWrapper);
     }
 
     /**
@@ -938,11 +1002,35 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
             assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
             assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
-            assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
+            assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode());
             addLeaseOperationRecord(assetLeaseRecordEntity1);
             return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
         } else {
             return 0;
         }
+    }
+
+    /**
+     * @param conId : 合同编号
+     * @author: Pipi
+     * @description: 更新签约到支付完成状态
+     * @return: void
+     * @date: 2021/9/9 18:24
+     **/
+    @Override
+    public void updateOperationPayStatus(String conId) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("con_id", conId);
+        AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        log.info("签约合同:{}完成了支付", conId);
+        if (assetLeaseRecordEntity != null) {
+            log.info("找到合同:{}相关的签约ID,开始更新签约状态到已完成支付", conId, assetLeaseRecordEntity.getId());
+            assetLeaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.PAYMENT_COMPLETED.getCode());
+            addLeaseOperationRecord(assetLeaseRecordEntity);
+            assetLeaseRecordMapper.updateById(assetLeaseRecordEntity);
+        } else {
+            log.info("没有找到合同:{}相关的签约ID", conId);
+        }
+
     }
 }

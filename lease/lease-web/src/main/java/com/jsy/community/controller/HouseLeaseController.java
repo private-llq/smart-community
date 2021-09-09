@@ -255,7 +255,7 @@ public class HouseLeaseController {
 
     /**
      * @author: Pipi
-     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请)
+     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请/拟定合同)
      * @param assetLeaseRecordEntity: 房屋租赁记录表实体
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/3 10:27

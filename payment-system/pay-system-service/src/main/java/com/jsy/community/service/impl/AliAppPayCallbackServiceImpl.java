@@ -46,6 +46,9 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyFinanceReceiptService propertyFinanceReceiptService;
 
+	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	private AssetLeaseRecordService assetLeaseRecordService;
+
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 
@@ -137,7 +140,10 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			} else if (PaymentEnum.TradeFromEnum.HOUSE_RENT_PAYMENT.getIndex().equals(order.getTradeName())) {
 				// 房屋押金/房租缴费
 				log.info("开始修改房屋押金/房租缴费订单状态，订单号：" + order.getOrderNo());
+				// 修改签章合同支付状态
 				Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(order.getOrderNo(), order.getServiceOrderNo());
+				// 修改租房签约支付状态
+				assetLeaseRecordService.updateOperationPayStatus(order.getServiceOrderNo());
 				if(0 != (int)map.get("code")){
 					throw new PaymentException((int)map.get("code"),String.valueOf(map.get("msg")));
 				}

@@ -10,4 +10,5 @@ import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
  * @Version: 1.0
  **/
 public interface LeaseOperationRecordService extends IService<LeaseOperationRecordEntity> {
+
 }

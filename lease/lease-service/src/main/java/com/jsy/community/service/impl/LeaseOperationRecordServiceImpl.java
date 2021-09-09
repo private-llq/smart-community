@@ -17,4 +17,5 @@ import org.apache.dubbo.config.annotation.DubboService;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_lease)
 public class LeaseOperationRecordServiceImpl extends ServiceImpl<LeaseOperationRecordMapper, LeaseOperationRecordEntity> implements LeaseOperationRecordService {
+
 }

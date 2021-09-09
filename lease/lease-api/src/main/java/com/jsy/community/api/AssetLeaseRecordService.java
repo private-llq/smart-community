@@ -27,7 +27,7 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
 
     /**
      * @author: Pipi
-     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请)
+     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请/拟定合同)
      * @param assetLeaseRecordEntity: 房屋租赁记录表实体
      * @param uid: 登录用户uid
      * @return: java.lang.Integer
@@ -72,4 +72,13 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @date: 2021/9/7 10:18
      **/
     Integer setContractNo(AssetLeaseRecordEntity assetLeaseRecordEntity);
+
+    /**
+     * @author: Pipi
+     * @description: 更新签约到支付完成状态
+     * @param conId: 合同编号
+     * @return: void
+     * @date: 2021/9/9 18:24
+     **/
+    void updateOperationPayStatus(String conId);
 }
