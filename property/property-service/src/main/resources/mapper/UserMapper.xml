@@ -9,5 +9,90 @@
             #{id}
         </foreach>
     </select>
+    <!-- 人脸管理查询人脸分页列表 -->
+    <select id="queryFacePageList" resultType="com.jsy.community.entity.UserEntity">
+        SELECT
+            tu.uid,
+            tu.real_name as realName,
+            tu.mobile,
+            tu.id,
+            tu.face_url as faceUrl,
+            tu.face_enable_status as faceEnableStatus,
+            tu.create_time as createTime,
+            thm.relation as relationCode,
+            CASE
+            (
+                (SELECT count( tfsr.id ) FROM t_user_face_sync_record tfsr
+                    WHERE tfsr.uid = tu.uid
+                    AND tfsr.face_url = tu.face_url
+                    AND tfsr.deleted = 0
+                )
+                &gt;
+                (SELECT count( tch.id ) FROM t_community_hardware tch
+                    WHERE tch.community_id = 1 AND tch.deleted = 0
+                )
+            )
+            WHEN TRUE -- 同步记录小于设备数量,未完整同步
+            THEN 1 -- 未完整同步
+            ELSE 2 -- 完整同步
+            END AS distributionStatus
+        FROM
+            t_user tu
+            LEFT JOIN t_house_member thm ON thm.uid = tu.uid
+        WHERE
+            tu.face_url IS NOT NULL
+            AND tu.deleted = 0
+            <if test="userEntity.keyword != null and userEntity.keyword != ''">
+                tu.real_name like concat('%', #{userEntity.keyword}, '%')
+            </if>
+            <if test="userEntity.keyword != null and userEntity.keyword != ''">
+                tu.mobile like concat('%', #{userEntity.keyword}, '%')
+            </if>
+            <if test="userEntity.faceEnableStatus != null">
+                tu.face_enable_status = #{userEntity.faceEnableStatus}
+            </if>
+            <if test="userEntity.distributionStatus != null and userEntity.distributionStatus == 1">
+                CASE
+                (
+                (SELECT count( tfsr.id ) FROM t_user_face_sync_record tfsr
+                WHERE tfsr.uid = tu.uid
+                AND tfsr.face_url = tu.face_url
+                AND tfsr.deleted = 0
+                )
+                &gt;
+                (SELECT count( tch.id ) FROM t_community_hardware tch
+                WHERE tch.community_id = 1 AND tch.deleted = 0
+                )
+                )
+                WHEN TRUE -- 同步记录小于设备数量,未完整同步
+                THEN 1 -- 未完整同步
+                ELSE 2 -- 完整同步
+                END = 1
+            </if>
+        <if test="userEntity.distributionStatus != null and userEntity.distributionStatus == 2">
+            CASE
+            (
+            (SELECT count( tfsr.id ) FROM t_user_face_sync_record tfsr
+            WHERE tfsr.uid = tu.uid
+            AND tfsr.face_url = tu.face_url
+            AND tfsr.deleted = 0
+            )
+            &gt;
+            (SELECT count( tch.id ) FROM t_community_hardware tch
+            WHERE tch.community_id = 1 AND tch.deleted = 0
+            )
+            )
+            WHEN TRUE -- 同步记录小于设备数量,未完整同步
+            THEN 1 -- 未完整同步
+            ELSE 2 -- 完整同步
+            END = 2
+        </if>
+        <if test="userEntity.houseId != null">
+            thm.house_id = #{userEntity.houseId}
+        </if>
+        <if test="userEntity.relationCode != null">
 
+        </if>
+    </select>
 </mapper>
+

@@ -10,6 +10,7 @@ import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ProprietorEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -436,6 +437,20 @@ public class ProprietorController {
         baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
         List<FeeRelevanceTypeVo> unboundHouseList = iProprietorService.getUnboundHouseList(baseQO);
         return CommonResult.ok(unboundHouseList);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 人脸管理查询人脸分页列表
+     * @param baseQO: 查询条件
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/8 16:34
+     **/
+    @Login
+    @PostMapping("/v2/facePageList")
+    @ApiOperation("查询未绑定房屋列表")
+    public CommonResult facePageList(@RequestBody BaseQO<UserEntity> baseQO) {
+        return CommonResult.ok();
     }
 
 }
