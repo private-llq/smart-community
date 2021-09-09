@@ -47,6 +47,9 @@ public class ProprietorMarketEntity extends BaseEntity {
     @ApiModelProperty(value = "上下架（0下架  1上架）")
     private Integer state;
 
+    @ApiModelProperty(value = "屏蔽（0未屏蔽  1已屏蔽）")
+    private Integer shield;
+
     @ApiModelProperty(value = "商品类别id")
     private String categoryId;
 
@@ -68,6 +71,18 @@ public class ProprietorMarketEntity extends BaseEntity {
     @ApiModelProperty("类别名")
     @TableField(exist = false)
     private String categoryName;
+
+    @ApiModelProperty("业主名")
+    @TableField(exist = false)
+    private String realName;
+
+    @ApiModelProperty(value = "前端删除")
+    private Integer deleted;
+
+
+    @ApiModelProperty(value = "后端删除")
+    private Integer remove;
+
 
 
 }

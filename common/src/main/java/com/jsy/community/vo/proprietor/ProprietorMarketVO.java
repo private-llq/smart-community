@@ -1,6 +1,7 @@
 package com.jsy.community.vo.proprietor;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.jsy.community.vo.BaseVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,6 +17,9 @@ import java.math.BigDecimal;
 public class ProprietorMarketVO extends BaseVO {
     @ApiModelProperty(value = "商品名")
     private String goodsName;
+
+    @ApiModelProperty(value = "用户id")
+    private String uid;
 
     @ApiModelProperty(value = "价格")
     private BigDecimal price;
@@ -43,6 +47,10 @@ public class ProprietorMarketVO extends BaseVO {
     @TableField(exist = false)
     private String categoryName;
 
+    @ApiModelProperty("业主名")
+    @TableField(exist = false)
+    private String realName;
+
     @ApiModelProperty(value = "标签id")
     private String labelId;
 
@@ -50,4 +58,11 @@ public class ProprietorMarketVO extends BaseVO {
     private String categoryId;
     @ApiModelProperty(value = "点击率")
     private Integer click;
+
+    @ApiModelProperty(value = "前端删除")
+    private Integer deleted;
+
+
+    @ApiModelProperty(value = "后端删除")
+    private Integer remove;
 }

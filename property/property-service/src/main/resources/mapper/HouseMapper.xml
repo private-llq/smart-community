@@ -289,10 +289,19 @@
 		</where>
 	</select>
 	<select id="selectInIds" resultType="com.jsy.community.entity.HouseEntity">
-        select * from  t_house where id in
-        <foreach collection="split" item="item" open="(" close=")" separator=",">
-			#{item}
+		SELECT
+		th.*,tuh.uid
+		FROM
+		t_house th
+		LEFT JOIN t_user_house tuh ON th.id = tuh.house_id
+		WHERE
+		th.id in
+		<foreach collection="split" item="item" open="(" close=")" separator=",">
+		#{item}
 		</foreach>
+		AND th.deleted = 0
+		AND tuh.deleted = 0
+
     </select>
 	<select id="selectUserHouseAuth" resultType="com.jsy.community.entity.HouseEntity">
         SELECT tu.*,tuh.uid FROM t_house tu JOIN t_user_house tuh on tu.id=tuh.house_id where tuh.house_id in

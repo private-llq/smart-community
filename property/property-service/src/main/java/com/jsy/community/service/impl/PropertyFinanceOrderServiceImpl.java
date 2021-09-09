@@ -1953,7 +1953,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             entity.setTargetId(propertyFinanceOrderEntity.getTargetId());
             entity.setPropertyFee(propertyFinanceOrderEntity.getPropertyFee());
             entity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee());
-            entity.setOrderStatus(0);
+            entity.setOrderStatus(propertyFinanceOrderEntity.getOrderStatus());
             entity.setBuildType(3);
             entity.setHide(1);
             entity.setType(propertyFeeRuleEntity.getType());
@@ -2002,8 +2002,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             queryWrapper.eq("order_num", qo.getOrderNum());
         }
         //是否查生成时间
-        if (qo.getCreateTime() != null) {
-            queryWrapper.eq("create_time", qo.getCreateTime());
+        if (qo.getOrderStartDate() != null && qo.getOrderEndDate() != null) {
+            queryWrapper.gt("create_time", qo.getOrderStartDate());
+            queryWrapper.lt("create_time", qo.getOrderEndDate());
+        }
+        //是否查支付时间
+        if (qo.getOrderStartDate() != null && qo.getOrderEndDate() != null) {
+            queryWrapper.gt("pay_time", qo.getPayTimeStartDate());
+            queryWrapper.lt("pay_time", qo.getPayTimeEndDate());
         }
         //是否查开始时间和结束时间
         if (qo.getBeginTime() != null && qo.getOverTime() != null) {

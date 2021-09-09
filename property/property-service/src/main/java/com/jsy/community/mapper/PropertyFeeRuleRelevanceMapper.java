@@ -53,4 +53,5 @@ public interface PropertyFeeRuleRelevanceMapper extends BaseMapper<PropertyFeeRu
      */
     @Select("select relevance_id from t_property_fee_rule_relevance where rule_id = #{id}")
     List<String> selectFeeRuleList(Long id);
+
 }
