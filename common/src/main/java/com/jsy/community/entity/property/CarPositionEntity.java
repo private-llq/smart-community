@@ -2,24 +2,14 @@ package com.jsy.community.entity.property;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.write.style.ColumnWidth;
-import com.alibaba.excel.annotation.write.style.ContentFontStyle;
-import com.alibaba.excel.annotation.write.style.ContentRowHeight;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-
-import java.awt.*;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 
@@ -47,6 +37,12 @@ public class CarPositionEntity implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    @TableField(exist = false)
+    private String idStr;
+
+    public String getIdStr() {
+        return String.valueOf(id);
+    }
 
     /**
      * 所属小区
@@ -180,5 +176,6 @@ public class CarPositionEntity implements Serializable {
      */
     @ExcelIgnore
     private  Long     houseId;
+
 
 }

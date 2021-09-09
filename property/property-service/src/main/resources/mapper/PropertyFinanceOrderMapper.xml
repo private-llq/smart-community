@@ -280,10 +280,10 @@
             <if test="query.overTime!=null">
                 and tp.over_time &lt;= #{query.overTime}
             </if>
-            <if test="query.beginTime!=null">
+            <if test="query.beginPayTime!=null">
                 and tp.pay_time &gt;= #{query.beginPayTime}
             </if>
-            <if test="query.overTime!=null">
+            <if test="query.overPayTime!=null">
                 and tp.pay_time &lt;= #{query.overPayTime}
             </if>
             <if test="query.hide!=null and query.hide!=0">

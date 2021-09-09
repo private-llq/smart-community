@@ -1,5 +1,4 @@
 package com.jsy.community.service.impl;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -1759,7 +1758,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         propertyFinanceOrderEntity.setOrderTime(LocalDate.parse(dateNow, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(propertyFinanceOrderEntity.getFeeRuleId());
         // 设置账单号
-        propertyFinanceOrderEntity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFinanceOrderEntity.getCommunityId()), propertyFeeRuleEntity.getSerialNumber()));
+        propertyFinanceOrderEntity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFinanceOrderEntity.getCommunityId())));
         // 设置总金额
         propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee());
         // 设置临时收费类型
@@ -1958,7 +1957,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             entity.setHide(1);
             entity.setType(propertyFeeRuleEntity.getType());
             entity.setFeeRuleId(propertyFeeRuleEntity.getId());
-            entity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFeeRuleEntity.getCommunityId()),propertyFeeRuleEntity.getSerialNumber()));
+            entity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFeeRuleEntity.getCommunityId())));
             entity.setDeleted(0);
             entity.setCreateTime(LocalDateTime.now());
             addPropertyFinanceOrderEntityList.add(entity);
@@ -1970,7 +1969,30 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         return saveFinanceOrderRow;
     }
-    
+
+
+    /**
+     * @Description: app端绑定月租车辆向账单表里添加数据
+     * @author: Hu
+     * @since: 2021/9/9 14:19
+     * @Param: [entity]
+     * @return: void
+     */
+    @Override
+    public void insert(PropertyFinanceOrderEntity orderEntity) {
+        PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
+                .eq("disposable",2)
+                .eq("community_id",orderEntity.getCommunityId())
+                .eq("status",1)
+                .eq("relevance_type",2)
+                .eq("type",12));
+        if (orderEntity!=null){
+            orderEntity.setFeeRuleId(ruleEntity.getId());
+            orderEntity.setType(ruleEntity.getType());
+        }
+
+    }
+
     /**
      *@Author: DKS
      *@Description: 导出账单信息
@@ -1991,14 +2013,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             queryWrapper.eq("target_id", qo.getTargetId());
         }
         //是否查收费项目
-        if (qo.getFeeRuleName() != null) {
+        if (StringUtils.isNotBlank(qo.getFeeRuleName())) {
             List<Long> communityIds = new ArrayList<>();
             communityIds.add(qo.getCommunityId());
             List<Long> feeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
             queryWrapper.in("fee_rule_id", feeRuleIdList);
         }
         //是否查交易单号
-        if (qo.getOrderNum() != null) {
+        if (StringUtils.isNotBlank(qo.getOrderNum())) {
             queryWrapper.eq("order_num", qo.getOrderNum());
         }
         //是否查生成时间

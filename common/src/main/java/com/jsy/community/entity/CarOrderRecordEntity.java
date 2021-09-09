@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -59,5 +60,10 @@ public class CarOrderRecordEntity implements Serializable {
      * 订单编号
      */
     private String orderNum;
+    /**
+     *  1微信支付，2支付宝支付
+     */
+    @TableField(exist = false)
+    private Integer payType;
 
 }

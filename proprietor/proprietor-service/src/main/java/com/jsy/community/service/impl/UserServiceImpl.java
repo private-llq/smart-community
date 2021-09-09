@@ -127,6 +127,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     private long expire = 60*60*24*7; //暂时
 
+
+    /**
+     * @Description: 注册聊天账号
+     * @author: Hu
+     * @since: 2021/9/9 14:06
+     * @Param:
+     * @return:
+     */
+    public String getImId(){
+        Random r = new Random();
+        StringBuffer sb = new StringBuffer(10);
+        for (int j = 1; j <= 10; j++) {
+            int i = r.nextInt(10);
+            if (j == 1 || (j >= 8 && j <= 10)) {
+                while (i == 0) {
+                    i = r.nextInt(10);
+                }
+            }
+            return sb.append(i).toString();
+        }
+        return null;
+    }
     /**
      * 创建用户token
      */
@@ -285,7 +307,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setImPassword("999999999");
         userIMEntity.setUid(uuid);
-        userIMEntity.setImId(UserUtils.randomUUID());
+        userIMEntity.setImId(getImId());
         userIMMapper.insert(userIMEntity);
         //调用聊天创建账号
         ImResponseEntity responseEntity = registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
@@ -373,7 +395,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setUid(uuid);
         userIMEntity.setImPassword("999999999");
-        userIMEntity.setImId(UserUtils.randomUUID());
+        userIMEntity.setImId(getImId());
         userIMMapper.insert(userIMEntity);
 
         //调用签章创建

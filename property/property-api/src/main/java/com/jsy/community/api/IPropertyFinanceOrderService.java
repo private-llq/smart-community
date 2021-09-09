@@ -351,4 +351,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Date: 2021/9/8 10:40
      **/
     List<PropertyFinanceOrderEntity> queryExportFinanceExcel(PropertyFinanceOrderEntity qo);
+
+    /**
+     * @Description: app端绑定月租车辆向账单表里添加数据
+     * @author: Hu
+     * @since: 2021/9/9 14:19
+     * @Param:
+     * @return:
+     */
+    void insert(PropertyFinanceOrderEntity orderEntity);
 }
