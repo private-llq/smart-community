@@ -1759,7 +1759,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         propertyFinanceOrderEntity.setOrderTime(LocalDate.parse(dateNow, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(propertyFinanceOrderEntity.getFeeRuleId());
         // 设置账单号
-        propertyFinanceOrderEntity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFinanceOrderEntity.getCommunityId()), propertyFeeRuleEntity.getSerialNumber()));
+        propertyFinanceOrderEntity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFinanceOrderEntity.getCommunityId())));
         // 设置总金额
         propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee());
         // 设置临时收费类型
@@ -1958,7 +1958,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             entity.setHide(1);
             entity.setType(propertyFeeRuleEntity.getType());
             entity.setFeeRuleId(propertyFeeRuleEntity.getId());
-            entity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFeeRuleEntity.getCommunityId()),propertyFeeRuleEntity.getSerialNumber()));
+            entity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFeeRuleEntity.getCommunityId())));
             entity.setDeleted(0);
             entity.setCreateTime(LocalDateTime.now());
             addPropertyFinanceOrderEntityList.add(entity);

@@ -166,12 +166,4 @@ public class PropertyFeeRuleController {
     }
 
 
-    @ApiOperation("查询公共常量")
-    @PostMapping("/get")
-//    @Login
-    public CommonResult get(){
-
-        return CommonResult.ok();
-    }
-
 }
