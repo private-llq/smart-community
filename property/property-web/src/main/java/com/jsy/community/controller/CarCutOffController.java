@@ -34,16 +34,22 @@ public class CarCutOffController{
      * @Date: 2021/9/6-13:55
      **/
     @PostMapping("/selectPage")
-    public CommonResult selectPage(@RequestBody CarCutOffQO carCutOffQO){
-        PageInfo<CarCutOffEntity> page = carCutOffService.selectPage(carCutOffQO);
-        return CommonResult.ok("查询成功");
+    public CommonResult selectPage(@RequestParam CarCutOffQO carCutOffQO){
+        Long total = carCutOffService.selectPage(carCutOffQO);
+        return CommonResult.ok(total,"查询成功");
     }
 
+    /**
+     * @Description: 查询进出记录  和在场车辆
+     * @Param: [baseQO]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: Tian
+     * @Date: 2021/9/9-14:24
+     **/
     @Login
     @PostMapping("/selectCarPage")
     public CommonResult selectCarPage(@RequestBody BaseQO<CarCutOffQO> baseQO){
         Long communityId = UserUtils.getAdminCommunityId();
-
         Page<CarCutOffEntity> page = carCutOffService.selectCarPage(baseQO,communityId);
         return CommonResult.ok(page,"查询成功");
     }

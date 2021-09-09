@@ -174,7 +174,7 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
         PropertyMarketQO query = baseQO.getQuery();
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
 
-        List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(page1,baseQO.getSize(),query);
+        List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize());
         for (ProprietorMarketEntity li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
             BeanUtils.copyProperties(li,marketVO);
