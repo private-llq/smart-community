@@ -262,7 +262,7 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Param:
 	 * @return:
 	 */
-	List<HouseEntity> selectInIds(@Param("split") String[] split);
+	List<HouseEntity> selectInIds(@Param("split") List split);
 
 	/**
 	 * @Description: 查询认证的房间数据
