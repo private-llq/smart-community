@@ -10,4 +10,6 @@ import com.jsy.community.entity.admin.AdminUserRoleEntity;
  * @Version: 1.0
  **/
 public interface AdminUserRoleMapper extends BaseMapper<AdminUserRoleEntity> {
+
+
 }
