@@ -50,6 +50,7 @@ public class IPropertyFinanceTicketTemplateServiceImpl extends ServiceImpl<Finan
     public String insertTicketTemplate(FinanceTicketTemplateEntity templateEntity) {
         templateEntity.setId(SnowFlake.nextId());
         for (FinanceTicketTemplateFieldEntity templateFieldEntity : templateEntity.getTemplateFieldEntities()) {
+            templateFieldEntity.setFieldId(templateFieldEntity.getId());
             templateFieldEntity.setId(String.valueOf(SnowFlake.nextId()));
             templateFieldEntity.setTemplateId(String.valueOf(templateEntity.getId()));
         }

@@ -9,6 +9,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -59,10 +60,10 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "状态0未启用，1启用")
     private Integer status;
 
-    @ApiModelProperty(value = "计算方式")
+    @ApiModelProperty(value = "计算公式")
     private String formula;
 
-    @ApiModelProperty(value = "计价方式")
+    @ApiModelProperty(value = "计价单位")
     private String valuation;
 
     @ApiModelProperty(value = "报表展示0不展示，1展示")
@@ -89,8 +90,15 @@ public class PropertyFeeRuleEntity extends BaseEntity {
     @ApiModelProperty(value = "0不生成空置房间账单，1生成空置房间账单")
     private Integer leisure;
 
-    @ApiModelProperty(value = "关联车位id,0表示当前小区全部")
-    private String relevance;
+    @ApiModelProperty(value = "关联车位id,0表示当前小区全部,1表示部分")
+    private Integer relevance;
+
+    @ApiModelProperty(value = "关联车位id,0表示当前小区全部,1表示部分")
+    @TableField(exist = false)
+    private List<String> relevanceIdList;
+
+    @ApiModelProperty(value = "1表示关联房屋，2表示关联车位")
+    private Integer relevanceType;
 
     @ApiModelProperty(value = "创建人")
     private String createBy;

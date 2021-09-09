@@ -1,16 +1,27 @@
 package com.jsy.community.util.excel.impl;
 
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.entity.property.*;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.util.FinanceExcelHandler;
+import com.jsy.community.utils.DateCalculateUtil;
 import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.vo.StatementOrderVO;
 import com.jsy.community.vo.StatementVO;
-import org.apache.poi.ss.usermodel.Workbook;
+import com.jsy.community.vo.property.FinanceImportErrorVO;
+import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: Pipi
@@ -51,6 +62,11 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
     
     // 财务报表-小区收费字段 如果增加字段  需要改变实现类逻辑
     protected static final String[] COLLECTION_FORM_ORDER_TITLE_FIELD = {"楼宇", "应收", "实收", "欠缴"};
+    
+    // 历史账单字段 如果增加字段  需要改变实现类逻辑
+    protected static final String[] EXPORT_FINANCE_TEMPLATE = {"姓名", "手机号码", "主体类型", "账单主体", "收费项目", "起始时间", "截止时间", "物业费"};
+    protected static final String[] EXPORT_FINANCE_ERROR_INFO = {"姓名", "手机号码", "主体类型", "账单主体", "收费项目", "起始时间", "截止时间", "物业费", "错误提示"};
+    protected static final String[] FINANCE_TITLE_FIELD = {"关联目标", "关联类型", "收费项目", "开始时间", "结束时间", "状态", "账单金额", "优惠金额", "预存款抵扣", "滞纳金", "实付金额", "支付方式", "账单状态", "生成时间", "支付时间", "房屋备注"};
     
     /**
      * @Author: Pipi
@@ -1071,4 +1087,457 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
         }
         return workbook;
     }
+    
+    /**
+     *@Author: DKS
+     *@Description: 获取历史账单模板
+     *@Param: :
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/9/7 9:32
+     **/
+    @Override
+    public Workbook exportFinanceTemplate() {
+        // 表名称
+        String titleName = "账单导入";
+        // 创建Excel工作簿
+        Workbook workbook = new XSSFWorkbook();
+        // 创建工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+        ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, EXPORT_FINANCE_TEMPLATE.length);
+        // 创建Excel字段列
+        ExcelUtil.createExcelField(workbook, sheet, EXPORT_FINANCE_TEMPLATE);
+        //添加需要约束数据的列下标   "主体类型","收费项目"
+        int[] arrIndex = new int[]{2,4};
+        // 创建约束数据隐藏表 避免数据过大下拉框不显示问题
+        XSSFSheet hiddenSheet = (XSSFSheet) workbook.createSheet("hiddenSheet");
+        HashMap<Integer, String> constraintMap = new HashMap<>();
+         constraintMap.put(2, "房屋,车位");
+         StringBuffer bf = new StringBuffer();
+	    for (BusinessEnum.FeeRuleNameEnum value : BusinessEnum.FeeRuleNameEnum.values()) {
+            bf.append(value + ",");
+	    }
+        bf.replace(bf.length() - 2, bf.length() - 1, "");
+	    constraintMap.put(4, String.valueOf(bf).replaceAll("\\d{0,2}_", ""));
+        //表明验证约束 结束行
+        int endRow = 1000;
+        // 添加约束
+        for (int index : arrIndex) {
+            String[] constraintData = constraintMap.get(index).split(",");
+            //创建业主信息登记表与隐藏表的约束字段
+            ExcelUtil.createProprietorConstraintRef(workbook, hiddenSheet, constraintData, endRow, index);
+            //绑定验证
+            sheet.addValidationData(ExcelUtil.setBox(sheet, endRow, index));
+        }
+        //隐藏 隐藏表  下标1 就是隐藏表
+        workbook.setSheetHidden(1, true);
+        return workbook;
+    }
+    
+    /**
+     * @Author: DKS
+     * @Description: 解析、常规格式效验Excel数据
+     * @Param: excel:
+     * @Param: errorVos:
+     * @Return: java.util.List<com.jsy.community.entity.HouseEntity>
+     * @Date: 2021/9/7 10:00
+     */
+    @Override
+    public List<PropertyFinanceOrderEntity> importFinanceExcel(MultipartFile excel, List<FinanceImportErrorVO> errorVos) {
+        List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = new ArrayList<>();
+        //把文件流转换为工作簿
+        try {
+            //把文件流转换为工作簿
+            Workbook workbook = WorkbookFactory.create(excel.getInputStream());
+            //从工作簿中读取工作表
+            Sheet sheetAt = workbook.getSheetAt(0);
+            //excel 字段列
+            String[] titleField = Arrays.copyOf(EXPORT_FINANCE_TEMPLATE, EXPORT_FINANCE_TEMPLATE.length);
+            //效验excel标题行
+            ExcelUtil.validExcelField(sheetAt, titleField);
+            //每一列对象 值
+            String cellValue;
+            //列对象
+            Cell cell;
+            //行对象
+            Row dataRow;
+            //每一行的数据对象
+            PropertyFinanceOrderEntity propertyFinanceOrderEntity;
+            //标识当前行 如果有错误信息 读取到的数据就作废 不导入数据库
+            boolean hasError;
+            //开始读入excel数据 跳过标题和字段 从真正的数据行开始读取
+            for (int j = 2; j <= sheetAt.getLastRowNum(); j++) {
+                dataRow = sheetAt.getRow(j);
+                hasError = false;
+                //如果这行数据不为空 创建一个 实体接收 信息
+                propertyFinanceOrderEntity = new PropertyFinanceOrderEntity();
+                for (int z = 0; z < titleField.length; z++) {
+                    cell = dataRow.getCell(z);
+                    cellValue = ExcelUtil.getCellValForType(cell).toString();
+                    //列字段校验
+                    switch (z) {
+                        case 0:
+                            // 姓名
+                            if (StringUtils.isNotBlank(cellValue)) {
+                                propertyFinanceOrderEntity.setRealName(cellValue);
+                            } else {
+                                addFinanceResolverError(errorVos, dataRow, "请填写正确的姓名!");
+                                hasError = true;
+                            }
+                            break;
+                        case 1:
+                            // 手机号码
+                            if (StringUtils.isNotBlank(cellValue)) {
+                                propertyFinanceOrderEntity.setMobile(cellValue);
+                            } else {
+                                addFinanceResolverError(errorVos, dataRow, "请填写正确的手机号码!");
+                                hasError = true;
+                            }
+                            break;
+                        case 2:
+                            // 主体类型
+                            if (StringUtils.isNotBlank(cellValue)) {
+                                propertyFinanceOrderEntity.setAssociatedType(cellValue.equals("房屋") ? 1 : 2);
+                            } else {
+                                addFinanceResolverError(errorVos, dataRow, "请填写正确的主体类型!");
+                                hasError = true;
+                            }
+                            break;
+                        case 3:
+                            // 账单主体
+                            if (StringUtils.isNotBlank(cellValue)) {
+                                propertyFinanceOrderEntity.setFinanceTarget(cellValue);
+                            } else {
+                                addFinanceResolverError(errorVos, dataRow, "请填写正确的账单主体!");
+                                hasError = true;
+                            }
+                            break;
+                        case 4:
+                            // 收费项目
+                            if (StringUtils.isNotBlank(cellValue)) {
+                                propertyFinanceOrderEntity.setFeeRuleName(cellValue);
+                            } else {
+                                addFinanceResolverError(errorVos, dataRow, "请填写正确的收费项目!");
+                                hasError = true;
+                            }
+                            break;
+                        case 5:
+                            // 起始时间
+                            if (StringUtils.isNotBlank(cellValue)) {
+                                propertyFinanceOrderEntity.setBeginTime(DateCalculateUtil.gtmToLocalDate(cellValue));
+                            } else {
+                                addFinanceResolverError(errorVos, dataRow, "请填写正确的起始时间!");
+                                hasError = true;
+                            }
+                            break;
+                        case 6:
+                            // 截止时间
+                            if (StringUtils.isNotBlank(cellValue)) {
+                                propertyFinanceOrderEntity.setOverTime(DateCalculateUtil.gtmToLocalDate(cellValue));
+                            } else {
+                                addFinanceResolverError(errorVos, dataRow, "请填写正确的截止时间!");
+                                hasError = true;
+                            }
+                            break;
+                        case 7:
+                            // 物业费
+                            if (StringUtils.isNotBlank(cellValue)) {
+                                propertyFinanceOrderEntity.setPropertyFee(new BigDecimal(cellValue));
+                            } else {
+                                addFinanceResolverError(errorVos, dataRow, "请填写正确的物业费!");
+                                hasError = true;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if(!hasError){
+                    propertyFinanceOrderEntities.add(propertyFinanceOrderEntity);
+                }
+            }
+            return propertyFinanceOrderEntities;
+        } catch (IOException e) {
+            throw new JSYException(JSYError.NOT_IMPLEMENTED.getCode(), e.getMessage());
+        }
+    }
+    
+    /**
+     * 把解析验证异常的数据添加至 错误集合
+     *
+     * @param errorList 错误集合
+     * @param dataRow   数据行
+     * @param errorMsg  错误备注消息
+     */
+    private static void addFinanceResolverError(@NonNull List<FinanceImportErrorVO> errorList, @NonNull Row dataRow, String errorMsg) {
+        //获取单元格
+        XSSFCell valueCell = (XSSFCell) dataRow.getCell(0);
+        //设置单元格类型
+        valueCell.setCellType(CellType.STRING);
+        String number = valueCell.getStringCellValue();
+        //如果在错误集合里面已经存在这个编号的信息了，那备注信息就直接追加的形式 直接返回集合该对象 否则 新建对象
+        FinanceImportErrorVO vo = setAdvanceDepositVo(errorList, number, errorMsg);
+        //每一列对象
+        Cell cell;
+        //每一列对象值
+        String stringCellValue;
+        for (int cellIndex = 0; cellIndex < dataRow.getLastCellNum(); cellIndex++) {
+            cell = dataRow.getCell(cellIndex);
+            stringCellValue = String.valueOf(ExcelUtil.getCellValForType(cell));
+            switch (cellIndex) {
+                case 0:
+                    vo.setRealName(stringCellValue);
+                    break;
+                case 1:
+                    vo.setMobile(stringCellValue);
+                    break;
+                case 2:
+                    vo.setTargetType(stringCellValue);
+                    break;
+                case 3:
+                    vo.setFinanceTarget(stringCellValue);
+                    break;
+                case 4:
+                    vo.setFeeRuleName(stringCellValue);
+                    break;
+                case 5:
+                    vo.setBeginTime(LocalDate.parse(stringCellValue, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                    break;
+                case 6:
+                    vo.setOverTime(LocalDate.parse(stringCellValue, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                    break;
+                case 7:
+                    vo.setPropertyFee(new BigDecimal(stringCellValue));
+                default:
+                    break;
+            }
+        }
+        errorList.add(vo);
+    }
+    
+    /**
+     * 为错误对象设置错误msg 便于excel回显
+     * 使用realName作为属性字段查找是否有这个对象 如果 有直接返回 没有则创建一个对象返回
+     * @param errorList 查找的列表
+     * @param number  真实名称
+     * @param errorMsg  错误信息
+     * @return 返回列表对象
+     */
+    public static FinanceImportErrorVO setAdvanceDepositVo(List<FinanceImportErrorVO> errorList, String number, String errorMsg) {
+        FinanceImportErrorVO resVo = null;
+        //如果根据名称在错误信息列表里面找到了 那就返回这个对象 找不到则新创建一个对象返回
+        FinanceImportErrorVO vo = Optional.ofNullable(resVo).orElseGet(FinanceImportErrorVO::new);
+        //为该对象设置错误信息 多个以，分割 便于物业人员查看原因
+        vo.setRemark(vo.getRemark() == null ? errorMsg :  vo.getRemark() + "，" + errorMsg );
+        return vo;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 写入充值余额导入错误信息 和 把错误信息excel文件上传至文件服务器
+     *@Param: errorVos:
+     *@Return: java.lang.String:  返回excel文件下载地址
+     *@Date: 2021/9/7 16:12
+     **/
+    @Override
+    public Workbook exportFinanceOrderErrorExcel(List<FinanceImportErrorVO> errorVos) {
+        //创建excel 工作簿对象
+        Workbook workbook = new XSSFWorkbook();
+        //创建 一个工作表
+        XSSFSheet sheet = (XSSFSheet) workbook.createSheet("账单导入错误收集");
+        //创建excel标题行头
+        ExcelUtil.createExcelTitle(workbook, sheet, "账单导入", 380, "宋体", 15, EXPORT_FINANCE_ERROR_INFO.length);
+        //创建excel列字段
+        ExcelUtil.createExcelField(workbook, sheet, EXPORT_FINANCE_ERROR_INFO);
+        sheet.setColumnWidth(0, 4000);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 4000);
+        sheet.setColumnWidth(3, 4000);
+        sheet.setColumnWidth(4, 4000);
+        sheet.setColumnWidth(5, 4000);
+        sheet.setColumnWidth(6, 4000);
+        sheet.setColumnWidth(7, 4000);
+        sheet.setColumnWidth(8, 5000);
+        //每行excel数据
+        XSSFRow row;
+        //每列数据
+        XSSFCell cell;
+        //2.往excel模板内写入数据  从第三行开始 前两行是 标题和字段
+        for (int index = 0; index < errorVos.size(); index++) {
+            row = sheet.createRow(index + 2);
+            //创建列
+            for (int j = 0; j < EXPORT_FINANCE_ERROR_INFO.length; j++) {
+                cell = row.createCell(j);
+                FinanceImportErrorVO vo = errorVos.get(index);
+                switch (j) {
+                    case 0:
+                        // 姓名
+                        cell.setCellValue(vo.getRealName());
+                        break;
+                    case 1:
+                        // 手机
+                        cell.setCellValue(vo.getMobile());
+                        break;
+                    case 2:
+                        // 主体类型
+                        cell.setCellValue(vo.getTargetType());
+                        break;
+                    case 3:
+                        // 账单主体
+                        cell.setCellValue(vo.getFinanceTarget());
+                        break;
+                    case 4:
+                        // 收费项目
+                        cell.setCellValue(vo.getFeeRuleName());
+                        break;
+                    case 5:
+                        // 起始时间
+                        cell.setCellValue(String.valueOf(vo.getBeginTime()));
+                        break;
+                    case 6:
+                        // 截止时间
+                        cell.setCellValue(String.valueOf(vo.getOverTime()));
+                        break;
+                    case 7:
+                        // 物业费
+                        cell.setCellValue(String.valueOf(vo.getPropertyFee()));
+                        break;
+                    case 8:
+                        // 错误提示
+                        cell.setCellValue(vo.getRemark());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return workbook;
+    }
+	
+	/**
+	 *@Author: DKS
+	 *@Description: 导出历史账单表
+	 *@Param: :
+	 *@Return: org.apache.poi.ss.usermodel.Workbook
+	 *@Date: 2021/9/8 13:41
+	 **/
+	@Override
+	public Workbook exportFinance(List<?> entityList) {
+		//工作表名称
+		String titleName = "账单导出表";
+		//1.创建excel 工作簿
+		Workbook workbook = new XSSFWorkbook();
+		//2.创建工作表
+		XSSFSheet sheet = (XSSFSheet) workbook.createSheet(titleName);
+		String[] titleField = FINANCE_TITLE_FIELD;
+		//4.创建excel标题行头(最大的那个标题)
+		ExcelUtil.createExcelTitle(workbook, sheet, titleName, 530, "宋体", 20, titleField.length);
+		//5.创建excel 字段列  (表示具体的数据列字段)
+		ExcelUtil.createExcelField(workbook, sheet, titleField);
+		//每行excel数据
+		XSSFRow row;
+		//每列数据
+		XSSFCell cell;
+		// 设置列宽
+		sheet.setColumnWidth(0, 5000);
+		sheet.setColumnWidth(1, 1500);
+		sheet.setColumnWidth(2, 3500);
+		sheet.setColumnWidth(3, 3000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 1200);
+		sheet.setColumnWidth(6, 2500);
+		sheet.setColumnWidth(7, 2500);
+		sheet.setColumnWidth(8, 2500);
+		sheet.setColumnWidth(9, 2500);
+		sheet.setColumnWidth(10, 2500);
+		sheet.setColumnWidth(11, 3000);
+		sheet.setColumnWidth(12, 2000);
+		sheet.setColumnWidth(13, 5200);
+		sheet.setColumnWidth(14, 5200);
+		sheet.setColumnWidth(15, 2500);
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		for (int index = 0; index < entityList.size(); index++) {
+			row = sheet.createRow(index + 2);
+			//创建列
+			for (int j = 0; j < FINANCE_TITLE_FIELD.length; j++) {
+				cell = row.createCell(j);
+				PropertyFinanceOrderEntity entity = (PropertyFinanceOrderEntity) entityList.get(index);
+				switch (j) {
+					case 0:
+						// 关联目标
+						cell.setCellValue(entity.getAddress());
+						break;
+					case 1:
+						// 关联类型
+						cell.setCellValue(entity.getAssociatedType() == 1 ? "房屋" : "车位");
+						break;
+					case 2:
+						// 收费项目
+						cell.setCellValue(entity.getFeeRuleName());
+						break;
+					case 3:
+						// 开始时间
+						cell.setCellValue(String.valueOf(entity.getBeginTime()));
+						break;
+					case 4:
+						// 结束时间
+						cell.setCellValue(String.valueOf(entity.getOverTime()));
+						break;
+					case 5:
+						// 状态
+						cell.setCellValue(entity.getHide() == 1 ? "显示" : entity.getHide() == 2 ? "隐藏" : "");
+						break;
+					case 6:
+						// 账单金额
+						cell.setCellValue(String.valueOf(entity.getPropertyFee()));
+						break;
+					case 7:
+						// 优惠金额
+						cell.setCellValue(String.valueOf(entity.getCoupon()));
+						break;
+					case 8:
+						// 预存款抵扣
+						cell.setCellValue(String.valueOf(entity.getDeduction()));
+						break;
+					case 9:
+						// 滞纳金
+						cell.setCellValue(String.valueOf(entity.getPenalSum()));
+						break;
+					case 10:
+						// 实付金额
+						cell.setCellValue(String.valueOf(entity.getTotalMoney()));
+						break;
+                    case 11:
+                        // 支付方式
+                        if (entity.getPayType() != null) {
+                            cell.setCellValue(entity.getPayType() == 1 ? "微信" : entity.getPayType() == 2 ? "支付宝" : entity.getPayType() == 3 ? "余额" : entity.getPayType() == 4 ? "现金" :
+                                entity.getPayType() == 5 ? "银联刷卡" : entity.getPayType() == 6 ? "银行代扣" : entity.getPayType() == 7 ? "预存款抵扣" : "");
+                        }
+                        break;
+                    case 12:
+                        // 账单状态
+                        cell.setCellValue(entity.getOrderStatus() == 1 ? "已收款" : "待收款");
+                        break;
+                    case 13:
+                        // 生成时间
+                        cell.setCellValue(df.format(entity.getCreateTime()));
+                        break;
+                    case 14:
+                        // 支付时间
+                        if (entity.getPayTime() == null) {
+                            cell.setCellValue("");
+                        } else {
+                            cell.setCellValue(df.format(entity.getPayTime()));
+                        }
+                        break;
+                    case 15:
+                        // 房屋备注
+                        cell.setCellValue(entity.getBuildType() == 1 ? "系统生成" : entity.getBuildType() == 2 ? "临时收费" : entity.getBuildType() == 3 ? "手动导入" : "");
+                        break;
+					default:
+						break;
+				}
+			}
+		}
+		return workbook;
+	}
 }

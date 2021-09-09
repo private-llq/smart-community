@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.qo.property.FeeRuleRelevanceQO;
+import com.jsy.community.qo.property.UpdateRelevanceQO;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,4 +81,57 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
      * @return:
      */
     void statementStatus(AdminInfoVo userInfo, Integer status, Long id);
+
+    /**
+     * @Description: 删除缴费项目的车位或者房屋
+     * @author: Hu
+     * @since: 2021/9/6 13:56
+     * @Param:
+     * @return:
+     */
+    void deleteRelevance(Long id);
+
+    /**
+     * @Description: 添加收费项目关联目标
+     * @author: Hu
+     * @since: 2021/9/6 14:03
+     * @Param:
+     * @return:
+     */
+    void addRelevance(UpdateRelevanceQO updateRelevanceQO);
+
+    /**
+     * @Description: 查询收费项目关联目标
+     * @author: Hu
+     * @since: 2021/9/6 14:14
+     * @Param:
+     * @return:
+     */
+    List selectRelevance(FeeRuleRelevanceQO feeRuleRelevanceQO);
+
+    /**
+     *@Author: DKS
+     *@Description: 根据收费项目名称查询收费项目id
+     *@Param: excel:
+     *@Date: 2021/9/7 15:27
+     **/
+    Long selectFeeRuleIdByFeeRuleName(String feeRuleName, Long communityId);
+
+    /**
+     * @Description: 查询当前小区业主认证过的房屋
+     * @author: Hu
+     * @since: 2021/9/7 11:08
+     * @Param:
+     * @return:
+     */
+    List<FeeRelevanceTypeVo> getHouse(Long communityId);
+
+    /**
+     * @Description: 查询当前小区的月租或属于业主的车位
+     * @author: Hu
+     * @since: 2021/9/7 11:11
+     * @Param:
+     * @return:
+     */
+    List<FeeRelevanceTypeVo> getCarPosition(Long adminCommunityId, Integer type);
 }

@@ -18,4 +18,6 @@ public class FinanceTicketOptionalFieldEntity extends BaseEntity {
     private String name;
     // 字段英文名称
     private String nameEn;
+    // 排序
+    private Integer sort;
 }

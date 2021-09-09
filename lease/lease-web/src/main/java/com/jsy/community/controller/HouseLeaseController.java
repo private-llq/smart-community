@@ -282,6 +282,61 @@ public class HouseLeaseController {
     @PostMapping("/v2/contractList")
     public CommonResult contractList(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
         ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.ContractListValidate.class);
+        if (assetLeaseRecordEntity.getIdentityType() == 1 && assetLeaseRecordEntity.getAssetType() == null) {
+            throw new JSYException(400, "当身份为房东时,资产类型不能为空");
+        }
         return CommonResult.ok(assetLeaseRecordService.pageContractList(assetLeaseRecordEntity, UserUtils.getUserId()));
     }
+
+    /**
+     * @author: Pipi
+     * @description: 房东查看单个资产的签约列表
+     * @param assetLeaseRecordEntity: 查询条件
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/6 14:50
+     **/
+    @Login
+    @PostMapping("/v2/landlordContractList")
+    public CommonResult landlordContractList(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.LandlordContractListValidate.class);
+        assetLeaseRecordEntity.setHomeOwnerUid(UserUtils.getUserId());
+        return CommonResult.ok(assetLeaseRecordService.landlordContractList(assetLeaseRecordEntity));
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询签约详情
+     * @param assetLeaseRecordEntity: 查询条件
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/6 17:32
+     **/
+    @Login
+    @PostMapping("/v2/contractDetail")
+    public CommonResult contractDetail(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        if (assetLeaseRecordEntity.getId() == null) {
+            throw new JSYException(400, "签约ID不能为空");
+        }
+        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.ContractDetailValidate.class);
+        AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordService.contractDetail(assetLeaseRecordEntity, UserUtils.getUserId());
+        return assetLeaseRecordEntity1 == null ? CommonResult.error("未查到相关签约") : CommonResult.ok(assetLeaseRecordEntity1);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 设置签约合同相关信息
+     * @param assetLeaseRecordEntity: 签约实体
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/7 10:17
+     **/
+    @Login
+    @PostMapping("/v2/setContractNo")
+    public CommonResult setContractNo(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        if (assetLeaseRecordEntity.getId() == null) {
+            throw new JSYException(400, "签约ID不能为空");
+        }
+        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.SetContractNoValidate.class);
+        assetLeaseRecordEntity.setHomeOwnerUid(UserUtils.getUserId());
+        return CommonResult.ok(assetLeaseRecordService.setContractNo(assetLeaseRecordEntity));
+    }
+
 }

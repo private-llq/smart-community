@@ -91,6 +91,10 @@ public class ProprietorMarketQO extends BaseQO {
     @TableField(exist = false)
     private T query;
 
+    @ApiModelProperty("业主名")
+    @TableField(exist = false)
+    private String realName;
+
 
     public interface proprietorMarketValidated{}
 }

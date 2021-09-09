@@ -6,6 +6,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarCutOffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarCutOffEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -25,19 +26,31 @@ public class CarCutOffController{
     private ICarCutOffService carCutOffService;
 
 
-    @Login
+    /**
+     * @Description: 查询临时车在场数量
+     * @Param: [carCutOffQO]
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Author: Tian
+     * @Date: 2021/9/6-13:55
+     **/
     @PostMapping("/selectPage")
     public CommonResult selectPage(@RequestBody CarCutOffQO carCutOffQO){
-        PageInfo<CarCutOffEntity> pageInfo = carCutOffService.selectPage(carCutOffQO);
-        return CommonResult.ok(pageInfo,"查询成功");
+        PageInfo<CarCutOffEntity> page = carCutOffService.selectPage(carCutOffQO);
+        return CommonResult.ok("查询成功");
     }
 
     @Login
     @PostMapping("/selectCarPage")
-    public CommonResult selectCarPage(@RequestBody CarCutOffQO carCutOffQO){
-        PageInfo<CarCutOffEntity> pageInfo = carCutOffService.selectCarPage(carCutOffQO);
-        return CommonResult.ok(pageInfo,"查询成功");
+    public CommonResult selectCarPage(@RequestBody BaseQO<CarCutOffQO> baseQO){
+        Long communityId = UserUtils.getAdminCommunityId();
+
+        Page<CarCutOffEntity> page = carCutOffService.selectCarPage(baseQO,communityId);
+        return CommonResult.ok(page,"查询成功");
     }
+
+
+
+
     @Login
     @PostMapping("/addCutOff")
     public CommonResult addCutOff(@RequestBody CarCutOffEntity carCutOffEntity){

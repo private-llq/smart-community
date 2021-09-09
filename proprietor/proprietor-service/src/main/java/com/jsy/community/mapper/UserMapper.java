@@ -70,7 +70,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @since  2020/12/18 11:39
 	 * @return			返回业主详情信息
 	 */
-	@Select("select uid,real_name,is_real_auth,sex,id_card from t_user where uid = #{userId} and deleted = 0")
+	@Select("select uid,real_name,is_real_auth,sex,id_card,mobile from t_user where uid = #{userId} and deleted = 0")
 	UserInfoVo selectUserInfoById(@Param("userId") String userId);
 
 	/**

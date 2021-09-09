@@ -7,6 +7,7 @@ import com.jsy.community.api.ICarCutOffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.mapper.CarCutOffMapper;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
@@ -31,9 +32,10 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
             queryWrapper.like("car_number",carCutOffQO.getCarNumber());
         }
 
-        if (!StringUtils.isEmpty(carCutOffQO.getCarType())){
-            queryWrapper.like("car_type",carCutOffQO.getCarType());
-        }
+//        //车辆所属类型
+//        if (query.getBelong()!=null){
+//            queryWrapper.eq("belong",query.getBelong());
+//        }
 
 //        if (!StringUtils.isEmpty(carCutOffQO.getAccess())){
 //            queryWrapper.like("access",carCutOffQO.getAccess());
@@ -66,7 +68,7 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
 
         if (state==0){
             QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("car_number",carNumber).eq("state",state).eq("belong",1);
+            queryWrapper.eq("car_number",carNumber).eq("state",state);
             List<CarCutOffEntity> carCutOffEntityList = carCutOffMapper.selectList(queryWrapper);
             return carCutOffEntityList;
         }else {
@@ -83,33 +85,22 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
     }
 
     @Override
-    public PageInfo<CarCutOffEntity> selectCarPage(CarCutOffQO carCutOffQO) {
+    public Page<CarCutOffEntity> selectCarPage(BaseQO<CarCutOffQO> baseQO,Long communityId) {
         QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
-        if (!StringUtils.isEmpty(carCutOffQO.getCarNumber())){
-            queryWrapper.like("car_number",carCutOffQO.getCarNumber());
+
+        CarCutOffQO query = baseQO.getQuery();
+        if (!StringUtils.isEmpty(query.getCarNumber())){
+            queryWrapper.like("car_number",query.getCarNumber());
+        }
+        //车辆所属类型
+        if (query.getBelong()!=null){
+            queryWrapper.eq("belong",query.getBelong());
         }
 
-        if (!StringUtils.isEmpty(carCutOffQO.getCarType())){
-            queryWrapper.like("car_type",carCutOffQO.getCarType());
-        }
+        queryWrapper.eq("community_id",communityId).eq("state",query.getState());//状态
+        Page<CarCutOffEntity> page = new Page<CarCutOffEntity>(baseQO.getPage(),baseQO.getSize());
 
-//        if (!StringUtils.isEmpty(carCutOffQO.getAccess())){
-//            queryWrapper.like("access",carCutOffQO.getAccess());
-//        }
-
-        queryWrapper.eq("community_id",carCutOffQO.getCommunityId()).eq("state",carCutOffQO.getState());//状态
-
-        Page<CarCutOffEntity> page = new Page<CarCutOffEntity>(carCutOffQO.getPage(),carCutOffQO.getSize());
-        PageInfo<CarCutOffEntity> pageInfo = new PageInfo<>();
-        if (carCutOffQO.getPage() == 0 || carCutOffQO.getPage() == null){
-            carCutOffQO.setPage(10L);
-        }
-        Page<CarCutOffEntity> selectPage = carCutOffMapper.selectPage(page, queryWrapper);
-        pageInfo.setRecords(selectPage.getRecords());
-        pageInfo.setTotal(selectPage.getTotal());
-        pageInfo.setCurrent(selectPage.getCurrent());
-        pageInfo.setSize(selectPage.getSize());
-
-        return pageInfo;
+        Page<CarCutOffEntity> selectPage = carCutOffMapper.selectPage(page,queryWrapper);
+        return selectPage;
     }
 }

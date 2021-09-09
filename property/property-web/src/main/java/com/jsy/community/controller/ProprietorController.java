@@ -10,6 +10,7 @@ import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ProprietorEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -19,7 +20,7 @@ import com.jsy.community.util.ProprietorExcelCommander;
 import com.jsy.community.util.excel.impl.ProprietorInfoProvider;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.HouseTypeVo;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -434,8 +435,22 @@ public class ProprietorController {
             baseQO.setQuery(new RelationListQO());
         }
         baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
-        List<HouseTypeVo> unboundHouseList = iProprietorService.getUnboundHouseList(baseQO);
+        List<FeeRelevanceTypeVo> unboundHouseList = iProprietorService.getUnboundHouseList(baseQO);
         return CommonResult.ok(unboundHouseList);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 人脸管理查询人脸分页列表
+     * @param baseQO: 查询条件
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/8 16:34
+     **/
+    @Login
+    @PostMapping("/v2/facePageList")
+    @ApiOperation("查询未绑定房屋列表")
+    public CommonResult facePageList(@RequestBody BaseQO<UserEntity> baseQO) {
+        return CommonResult.ok();
     }
 
 }

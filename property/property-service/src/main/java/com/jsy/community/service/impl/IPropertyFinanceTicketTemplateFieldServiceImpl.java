@@ -76,6 +76,8 @@ public class IPropertyFinanceTicketTemplateFieldServiceImpl extends ServiceImpl<
     public List<FinanceTicketTemplateFieldEntity> getTicketTemplateFieldList(String templateId) {
         QueryWrapper<FinanceTicketTemplateFieldEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("template_id", templateId);
+        queryWrapper.orderByAsc("location_type");
+        queryWrapper.orderByAsc("sort");
         return ticketTemplateFieldMapper.selectList(queryWrapper);
     }
 }

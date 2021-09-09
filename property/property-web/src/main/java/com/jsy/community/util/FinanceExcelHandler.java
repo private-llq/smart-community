@@ -1,6 +1,9 @@
 package com.jsy.community.util;
 
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.vo.property.FinanceImportErrorVO;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -94,4 +97,41 @@ public interface FinanceExcelHandler {
      *@Date: 2021/8/20 11:12
      **/
     Workbook exportCollectionFormOrder(List<?> entityList);
+    
+    /**
+     *@Author: DKS
+     *@Description: 获取历史账单模板
+     *@Param: :
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/9/7 9:32
+     **/
+    Workbook exportFinanceTemplate();
+    
+    /**
+     * @Author: DKS
+     * @Description: 解析、常规格式效验Excel数据
+     * @Param: excel:
+     * @Param: errorVos:
+     * @Return: java.util.List<com.jsy.community.entity.HouseEntity>
+     * @Date: 2021/9/7 10:00
+     */
+   List<PropertyFinanceOrderEntity> importFinanceExcel(MultipartFile excel, List<FinanceImportErrorVO> errorVos);
+    
+    /**
+     *@Author: DKS
+     *@Description: 写入充值余额导入错误信息 和 把错误信息excel文件上传至文件服务器
+     *@Param: errorVos:
+     *@Return: java.lang.String:  返回excel文件下载地址
+     *@Date: 2021/9/7 16:13
+     **/
+    Workbook exportFinanceOrderErrorExcel(List<FinanceImportErrorVO> errorVos);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出历史账单表
+     *@Param: :
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/9/8 13:41
+     **/
+    Workbook exportFinance(List<?> entityList);
 }

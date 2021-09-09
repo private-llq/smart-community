@@ -13,7 +13,7 @@ import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.HouseTypeVo;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.PropertyRelationVO;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.HouseMemberVO;
@@ -51,7 +51,7 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
      */
     @Override
-    public List<HouseTypeVo> getHouseId(BaseQO<RelationListQO> baseQO,AdminInfoVo adminInfoVo) {
+    public List<FeeRelevanceTypeVo> getHouseId(BaseQO<RelationListQO> baseQO, AdminInfoVo adminInfoVo) {
         if (baseQO.getSize()==null||baseQO.getSize()==0){
             baseQO.setSize(10L);
         }

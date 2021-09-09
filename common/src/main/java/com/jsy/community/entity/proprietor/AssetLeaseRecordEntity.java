@@ -5,14 +5,18 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -26,11 +30,11 @@ import java.util.Map;
 @TableName("t_asset_lease_record")
 public class AssetLeaseRecordEntity extends BaseEntity {
     // 资产ID
-    @NotNull(groups = InitContractValidate.class, message = "资产ID不能为空")
+    @NotNull(groups = {InitContractValidate.class, LandlordContractListValidate.class, SetContractNoValidate.class}, message = "资产ID不能为空")
     private Long assetId;
 
     // 资产类型;1:商铺;2:房屋
-    @NotNull(groups = {InitContractValidate.class, ContractListValidate.class}, message = "资产类型不能为空;1:商铺;2:房屋")
+    @NotNull(groups = {InitContractValidate.class, LandlordContractListValidate.class, SetContractNoValidate.class}, message = "资产类型不能为空;1:商铺;2:房屋")
     @Range(min = 1, max = 2, message = "资产类型值超出范围;1:商铺;2:房屋")
     private Integer assetType;
 
@@ -43,11 +47,14 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     // 签约操作状态;1:发起签约;2:接受申请;3:拟定合同;4:等待支付房租;5:支付完成;6:完成签约;7:取消申请;8:拒绝申请;9:重新发起
     private Integer operation;
 
-    // 图片id
+    // 图片路径
     private String imageUrl;
 
     // 标题
     private String title;
+
+    // (商铺)概述
+    private String summarize;
 
     // 优势标签
     private Long advantageId;
@@ -64,23 +71,50 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     // 房屋价格/元
     private BigDecimal price;
 
+    // 省份id(房屋)
+    private  Long provinceId;
+
+    // 市id(共有)
+    private  Long cityId;
+
+    // 区域id(共有)
+    private  Long areaId;
+
+    // 详细地址(房屋)
+    private  String address;
+
+    // 楼层(共有)
+    private  String floor;
+
     // 合同编号
-    private String contractNo;
+    @NotBlank(groups = {SetContractNoValidate.class}, message = "合同编号不能为空")
+    private String conId;
+
+    // 合同名字
+    private String conName;
+
+    // 发起方(甲方)
+    private String initiator;
+
+    // 签约方(乙方)
+    private String signatory;
 
     // 合同开始时间
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
-    private LocalDateTime contractStartTime;
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @NotNull(groups = {SetContractNoValidate.class}, message = "合同开始时间不能为空")
+    private LocalDate startDate;
 
     // 合同结束时间
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
-    private LocalDateTime contractEndTime;
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @NotNull(groups = {SetContractNoValidate.class}, message = "合同结束时间不能为空")
+    private LocalDate endDate;
 
     // 身份类型;1:房东;2:租客
-    @NotNull(groups = {ContractListValidate.class, OperationContractValidate.class}, message = "身份类型不能为空;1:房东;2:租客")
+    @NotNull(groups = {ContractListValidate.class, OperationContractValidate.class, ContractDetailValidate.class}, message = "身份类型不能为空;1:房东;2:租客")
     @Range(min = 1, max = 2, message = "身份类型超出范围;1:房东;2:租客")
     @TableField(exist = false)
     private Integer identityType;
@@ -102,6 +136,44 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @TableField(exist = false)
     private Integer contractNumber;
 
+    // 签约状态;1:未签约;2:签约中;3已签约
+    @TableField(exist = false)
+    @NotNull(groups = {LandlordContractListValidate.class}, message = "签约状态不能为空;1:未签约;2:签约中;3已签约")
+    @Range(min = 1, max = 3, message = "签约状态传值超出范围;1:未签约;2:签约中;3已签约")
+    private Integer contractStatus;
+
+    // 租客姓名
+    @TableField(exist = false)
+    private String realName;
+
+    // 租客头像
+    @TableField(exist = false)
+    private String avatarUrl;
+
+    // 租客电话
+    @TableField(exist = false)
+    private String tenantPhone;
+
+    // 租客身份证号码
+    @TableField(exist = false)
+    private String tenantIdCard;
+
+    // 房东姓名
+    @TableField(exist = false)
+    private String landlordName;
+
+    // 房东电话
+    @TableField(exist = false)
+    private String landlordPhone;
+
+    // 房屋完整地址
+    @TableField(exist = false)
+    private String fullAddress;
+
+    // 进度数;1:发起签约;2:签约合同;3:租客支付房租;4:完成签约
+    @TableField(exist = false)
+    private Integer progressNumber;
+
     /**
      * 发起签约验证组
      */
@@ -113,8 +185,22 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     public interface ContractListValidate{}
 
     /**
-     * 停止签约(取消/拒绝)
+     * 停止签约(取消/拒绝)验证组
      */
     public interface OperationContractValidate {}
 
+    /**
+     * 房东资产签约列表验证组
+     */
+    public interface LandlordContractListValidate {}
+
+    /**
+     * 签约详情验证组
+     */
+    public interface ContractDetailValidate {}
+
+    /**
+     * 设置合同编号验证组
+     */
+    public interface SetContractNoValidate {}
 }

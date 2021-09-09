@@ -5,7 +5,7 @@ import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.qo.property.RelationListQO;
-import com.jsy.community.vo.HouseTypeVo;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.PropertyRelationVO;
 import com.jsy.community.vo.property.HouseMemberVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -45,7 +45,7 @@ public interface PropertyRelationMapper extends BaseMapper<HouseMemberEntity> {
      * @Param:
      * @return:
      */
-    List<HouseTypeVo> getHouseId(@Param("query")RelationListQO query, @Param("page")Long page,@Param("size")Long size);
+    List<FeeRelevanceTypeVo> getHouseId(@Param("query")RelationListQO query, @Param("page")Long page, @Param("size")Long size);
 
     /**
      * @Description: 楼栋下拉框
@@ -54,7 +54,7 @@ public interface PropertyRelationMapper extends BaseMapper<HouseMemberEntity> {
      * @Param:
      * @return:
      */
-    List<HouseTypeVo> getBuildingId(@Param("query")RelationListQO query, @Param("page")Long page,@Param("size")Long size);
+    List<FeeRelevanceTypeVo> getBuildingId(@Param("query")RelationListQO query, @Param("page")Long page, @Param("size")Long size);
 
     /**
      * @Description: 单元下拉框
@@ -63,7 +63,7 @@ public interface PropertyRelationMapper extends BaseMapper<HouseMemberEntity> {
      * @Param:
      * @return:
      */
-    List<HouseTypeVo> getUnitId(@Param("query")RelationListQO query, @Param("page")Long page,@Param("size")Long size);
+    List<FeeRelevanceTypeVo> getUnitId(@Param("query")RelationListQO query, @Param("page")Long page, @Param("size")Long size);
 
     /**
      * @Description: 分页查询

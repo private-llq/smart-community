@@ -20,7 +20,7 @@ import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.utils.CardUtil;
 import com.jsy.community.utils.DateUtils;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.HouseTypeVo;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -184,7 +184,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
      * @date: 2021/6/12 14:34
      */
     @Override
-    public List<HouseTypeVo> getUnboundHouseList(BaseQO<RelationListQO> baseQO) {
+    public List<FeeRelevanceTypeVo> getUnboundHouseList(BaseQO<RelationListQO> baseQO) {
         if (baseQO.getPage() == null || baseQO.getPage() <= 0) {
             baseQO.setPage(1L);
         }

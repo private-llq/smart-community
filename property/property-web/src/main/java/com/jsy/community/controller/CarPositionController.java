@@ -41,6 +41,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -249,7 +250,6 @@ public class CarPositionController {
     }
 
 
-
     @ApiOperation("过车记录")
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     public void carBeforeRecord(@RequestParam("type") String type,//type 固定 online 或 offline online 表示正常在线传输结果，offline 表示断网续传结果
@@ -362,7 +362,6 @@ public class CarPositionController {
 
                 //最大入场数
                 Integer maxNumber = iCarBasicsService.findOne(communityId).getMaxNumber();
-
                 CarCutOffQO carCutOffQO = new CarCutOffQO();
                 carCutOffQO.setCommunityId(communityId);
                 carCutOffQO.setState(0);
@@ -405,9 +404,6 @@ public class CarPositionController {
                             carVO.getRs485_data().add(e2);
 
 
-
-
-
                         } else if (vdcType.equals("out")) {//出口
                             //是否开闸
                             GpioData gpioData = new GpioData();
@@ -444,7 +440,7 @@ public class CarPositionController {
 
                             CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
                             entity.setType(1);//临时车
-                            entity.setOrderNum(UuidUtils.generateUuid().replace("-",""));//订单编号
+                            entity.setOrderNum(UuidUtils.generateUuid().replace("-", ""));//订单编号
                             entity.setBeginTime(LocalDateTime.now());//进入的时间
                             entity.setOrderStatus(0);//未支付
                             entity.setCarPlate(plateNum);//车牌号
@@ -452,56 +448,88 @@ public class CarPositionController {
                             Calendar calendar = Calendar.getInstance();
                             int month = calendar.get(Calendar.MONTH) + 1;
                             entity.setMonth(month);//月份
-
                             boolean save = iCarOrderService.save(entity);
-
-
 
 
                         } else if (vdcType.equals("out")) {//出口
 
-                            //查询订单状态状态0未缴费1缴费
-                            QueryWrapper<CarOrderEntity> queryWrapper = new QueryWrapper<>();
-                            queryWrapper.eq("community_id",communityId);//社区id
-                            queryWrapper.eq("type",1);//临时车
-                            queryWrapper.eq("car_plate",plateNum);//车牌号
-                            queryWrapper.eq("order_status",0);//订单未支付
-                            Map<String, Object> map1 = iCarOrderService.getMap(queryWrapper);
-                            if (map1.size()>0) {//有未支付的订单
+
+                            CarOrderEntity carOrderEntity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
+                            Integer orderStatus = carOrderEntity.getOrderStatus();
+                            System.out.println("支付状态" + orderStatus);
+                            if (orderStatus == 0) {//未支付
                                 //是否开闸
                                 GpioData gpioData = new GpioData();
                                 gpioData.setIonum("io1");
-                                gpioData.setAction("on");
                                 carVO.getGpio_data().add(gpioData);
                                 //语音播报内容
                                 Rs485Data e2 = new Rs485Data();
                                 e2.setEncodetype("hex2string");
-                                e2.setData("");//一路顺风
+                                e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
                                 carVO.getRs485_data().add(e2);
                             }
+                            if (orderStatus == 1) {//已经支付
 
-                            //缴费获取缴费时间和允许出入的时间是多久
+                                //缴费获取缴费时间和允许出入的时间是多久
+                                CarBasicsEntity one1 = iCarBasicsService.findOne(communityId);
+                                CarOrderEntity carOrderEntity1 = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
+                                LocalDateTime orderTime = carOrderEntity1.getOrderTime();//支付时间
+                                System.out.println("支付时间"+orderTime);
+                                Integer dwellTime = one1.getDwellTime();//允许滞留时间
+                                System.out.println("允许滞留时间"+dwellTime);
+                                LocalDateTime now = LocalDateTime.now();//当前时间
+                                System.out.println("当前时间"+now);
+                                Duration duration = Duration.between(orderTime, now);//时间差
+                                long l = duration.toMinutes();//分钟
+                                System.out.println("时间差"+l);
+                                if (l > dwellTime) {//超过了滞留时间
+                                    //是否开闸
+                                    GpioData gpioData = new GpioData();
+                                    gpioData.setIonum("io1");
+                                    carVO.getGpio_data().add(gpioData);
+                                    //语音播报内容
+                                    Rs485Data e2 = new Rs485Data();
+                                    e2.setEncodetype("hex2string");
+                                    e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
+                                    carVO.getRs485_data().add(e2);
+                                    CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
+                                    entity.setType(1);//临时车
+                                    entity.setOrderNum(UuidUtils.generateUuid().replace("-", ""));//订单编号
+                                    entity.setBeginTime(orderTime);//进入的时间（订单支付的时间）
+                                    entity.setOrderStatus(0);//未支付
+                                    entity.setCarPlate(plateNum);//车牌号
+                                    entity.setCommunityId(communityId);//社区id
+                                    Calendar calendar = Calendar.getInstance();
+                                    int month = calendar.get(Calendar.MONTH) + 1;
+                                    entity.setMonth(month);//月份
+                                    boolean save = iCarOrderService.save(entity);
 
-                            //是否开闸
-                            GpioData gpioData = new GpioData();
-                            gpioData.setIonum("io1");
-                            gpioData.setAction("on");
-                            carVO.getGpio_data().add(gpioData);
-                            //语音播报内容
-                            Rs485Data e2 = new Rs485Data();
-                            e2.setEncodetype("hex2string");
-                            e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
-                            carVO.getRs485_data().add(e2);
-                            //开闸记录
-                            extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+                                }
+
+                                if (l < dwellTime) {//没有超过滞留时间
+                                    //是否开闸
+                                    GpioData gpioData = new GpioData();
+                                    gpioData.setIonum("io1");
+                                    gpioData.setAction("on");
+                                    carVO.getGpio_data().add(gpioData);
+                                    //语音播报内容
+                                    Rs485Data e2 = new Rs485Data();
+                                    e2.setEncodetype("hex2string");
+                                    e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
+                                    carVO.getRs485_data().add(e2);
+                                    //开闸记录
+                                    extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+
+                                }
+
+                            }
 
 
                         }
 
 
-
                     }
-                }else{//車位不足的情況
+                } else {//車位不足的情況
                     //是否开闸
                     GpioData gpioData = new GpioData();
                     gpioData.setIonum("io1");
@@ -566,15 +594,10 @@ public class CarPositionController {
                            String carSubLogo, String plateColor) {
         if (vdcType.equals("in")) {
             CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
-            //车主所属类型
-            Integer status = extracted(plateNum, carEquipmentManageEntity, plateColor);
-//            }
-
 
             //开闸记录实体类对象
             CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
             //车子状态  1临时车  2包月  3业主
-            carCutOffEntity.setState(status);
             carCutOffEntity.setCarNumber(plateNum);
             carCutOffEntity.setCarType(vehicleType);
             carCutOffEntity.setAccess(vdcType);
@@ -583,6 +606,7 @@ public class CarPositionController {
             carCutOffEntity.setCloseupPic(closeupPic);
             carCutOffEntity.setCarSublogo(carSubLogo);
             carCutOffEntity.setPlateColor(plateColor);
+            //车子状态  1临时车  2包月  3业主
             Integer belong = extracted(plateNum, carEquipmentManageEntity, plateColor);
             carCutOffEntity.setBelong(belong);
 
@@ -601,8 +625,11 @@ public class CarPositionController {
             boolean b = carCutOffService.addCutOff(carCutOffEntity);
 
         } else {
+            System.out.println("chuzadlfjdoilj ");
             CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
             List<CarCutOffEntity> carCutOffEntityList = carCutOffService.selectAccess(plateNum, 0);
+
+            System.out.println("carCutOffEntityList" + carCutOffEntityList.size());
             //时间戳转年月日       //进闸时间
             LocalDateTime localDateTime = new Date(startTime * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
             for (CarCutOffEntity i : carCutOffEntityList) {
@@ -621,15 +648,15 @@ public class CarPositionController {
     private Long extracted(String plateNum, String plateColor, CarEquipmentManageEntity carEquipmentManageEntity) {
         Map map = iCarMonthlyVehicleService.selectByStatus(plateNum, plateColor, carEquipmentManageEntity.getCommunityId());
         Iterator<Integer> iterator = map.keySet().iterator();
-        Integer status=null;
-        while(iterator.hasNext()){//通过迭代器输出
+        Integer status = null;
+        while (iterator.hasNext()) {//通过迭代器输出
             status = iterator.next();
         }
 
         //1臨時，2包月   3業主
         long days = 0;
-        if(status==2){
-            CarMonthlyVehicle o = (CarMonthlyVehicle)map.get(status);
+        if (status == 2) {
+            CarMonthlyVehicle o = (CarMonthlyVehicle) map.get(status);
             LocalDateTime now = LocalDateTime.now();
             Duration duration = Duration.between(now, o.getEndTime());
             days = duration.toDays();
@@ -638,11 +665,11 @@ public class CarPositionController {
     }
 
     //返回的车子所属类型  1临时 2包月 3业主
-    private Integer extracted(String plateNum,  CarEquipmentManageEntity carEquipmentManageEntity, String plateColor) {
+    private Integer extracted(String plateNum, CarEquipmentManageEntity carEquipmentManageEntity, String plateColor) {
         Map map = iCarMonthlyVehicleService.selectByStatus(plateNum, plateColor, carEquipmentManageEntity.getCommunityId());
         Iterator<Integer> iterator = map.keySet().iterator();
-        Integer status=null;
-        while(iterator.hasNext()){//通过迭代器输出
+        Integer status = null;
+        while (iterator.hasNext()) {//通过迭代器输出
             status = iterator.next();
         }
         return status;

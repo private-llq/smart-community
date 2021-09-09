@@ -175,4 +175,10 @@ public class CarPositionEntity implements Serializable {
      */
     @ExcelProperty("月租")
     private  BigDecimal     monthlyPrice;
+    /**
+     * 房屋id
+     */
+    @ExcelIgnore
+    private  Long     houseId;
+
 }

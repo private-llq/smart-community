@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.codingapi.txlcn.tc.annotation.TxcTransaction;
+import com.codingapi.txlcn.tc.annotation.TxTransaction;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
@@ -63,14 +63,15 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      * @return: void
      */
     @Override
-    @TxcTransaction
+    @TxTransaction
     public void updateMonth(String carPlate, LocalDateTime overTime) {
         CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carPlate));
         if (vehicle!=null){
             vehicle.setEndTime(overTime);
             carMonthlyVehicleMapper.updateById(vehicle);
+        }else {
+            throw new JSYException("当前月租车辆不存在！");
         }
-        throw new JSYException("当前月租车辆不存在！");
     }
 
     /**

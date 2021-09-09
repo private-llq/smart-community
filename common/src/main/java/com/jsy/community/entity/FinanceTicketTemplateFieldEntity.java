@@ -33,4 +33,6 @@ public class FinanceTicketTemplateFieldEntity implements Serializable {
       //字段英文名称
       @NotBlank(message = "字段英文名称不能为空")
       private String nameEn;
+      // 排序
+      private Integer sort;
 }

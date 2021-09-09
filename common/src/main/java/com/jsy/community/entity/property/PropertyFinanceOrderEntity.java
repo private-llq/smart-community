@@ -103,6 +103,15 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate orderEndDate;
     
+    @ApiModelProperty(value = "查询条件 - 支付开始日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate payTimeStartDate;
+    @ApiModelProperty(value = "查询条件 - 支付结束日期")
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    private LocalDate payTimeEndDate;
+    
     @ApiModelProperty(value = "查询条件 - 收款单开始日期")
     @TableField(exist = false)
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
@@ -184,4 +193,12 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "合计支付")
     @TableField(exist = false)
     private BigDecimal totalSum;
+    
+    @ApiModelProperty("手机号码")
+    @TableField(exist = false)
+    private String mobile;
+    
+    @ApiModelProperty("账单主体")
+    @TableField(exist = false)
+    private String financeTarget;
 }

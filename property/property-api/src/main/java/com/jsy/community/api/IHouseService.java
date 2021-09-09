@@ -228,7 +228,7 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Param:
 	 * @return:
 	 */
-    List<HouseEntity> selectAll();
+    List<HouseEntity> selectAll(Long communityId);
 	
 	/**
 	 * @Description: 查询楼栋、单元、房屋导出数据

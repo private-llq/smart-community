@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.PropertyFeeRuleRelevanceMapper">
+    <insert id="save">
+        insert into t_property_fee_rule_relevance (id,rule_id,relevance_id,type) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},#{item.ruleId},#{item.relevanceId},#{item.type}
+            )
+        </foreach>
+    </insert>
+    <select id="selectHouse" resultType="com.jsy.community.vo.property.FeeRuleHouseVO">
+        select fee.id,th.building,th.unit,th.floor,th.door,th.build_area from t_house th
+        join t_property_fee_rule_relevance fee
+        on th.id=fee.relevance_id
+        where th.deleted=0 and fee.rule_id=#{id}
+        <if test="key!=null and key!=''">
+            and th.door like concat("%",#{key},"%")
+        </if>
+    </select>
+    <select id="selectCarPosition" resultType="com.jsy.community.vo.property.FeeRuleCarPositionVO">
+        select fee.id,tcp.belong_house as houseSite,tcp.user_name as name,tcp.owner_phone  as mobile from t_car_position tcp
+        join t_property_fee_rule_relevance fee
+        on tcp.id=fee.relevance_id
+        where tcp.deleted=0 and fee.rule_id=#{id}
+        <if test="key!=null and key!=''">
+            and tcp.car_position like concat("%",#{key},"%")
+        </if>
+    </select>
+</mapper>

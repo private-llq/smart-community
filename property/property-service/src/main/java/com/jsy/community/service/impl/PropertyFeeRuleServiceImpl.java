@@ -5,12 +5,17 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyFeeRuleService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
-import com.jsy.community.mapper.AdminUserMapper;
-import com.jsy.community.mapper.PropertyFeeRuleMapper;
+import com.jsy.community.entity.property.PropertyFeeRuleRelevanceEntity;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.qo.property.FeeRuleRelevanceQO;
+import com.jsy.community.qo.property.UpdateRelevanceQO;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FeeRuleVO;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -19,9 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: com.jsy.community
@@ -36,7 +39,100 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     private PropertyFeeRuleMapper propertyFeeRuleMapper;
     @Autowired
     private AdminUserMapper adminUserMapper;
+    @Autowired
+    private PropertyFeeRuleRelevanceMapper propertyFeeRuleRelevanceMapper;
+    @Autowired
+    private CarPositionMapper carPositionMapper;
+    @Autowired
+    private HouseMapper houseMapper;
 
+
+
+    /**
+     * @Description: 查询当前小区的月租或属于业主的车位
+     * @author: Hu
+     * @since: 2021/9/7 11:11
+     * @Param: [adminCommunityId]
+     * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
+     */
+    @Override
+    public List<FeeRelevanceTypeVo> getCarPosition(Long adminCommunityId, Integer type) {
+        return carPositionMapper.getCarPosition(adminCommunityId,type);
+    }
+
+
+    /**
+     * @Description: 查询当前小区业主认证过的房屋
+     * @author: Hu
+     * @since: 2021/9/7 11:11
+     * @Param: [communityId]
+     * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
+     */
+    @Override
+    public List<FeeRelevanceTypeVo> getHouse(Long communityId) {
+        List<FeeRelevanceTypeVo> list = houseMapper.getUserHouse(communityId);
+        return list;
+    }
+
+
+    /**
+     * @Description: 查询收费项目关联对象
+     * @author: Hu
+     * @since: 2021/9/7 11:22
+     * @Param: [feeRuleRelevanceQO]
+     * @return: java.util.List
+     */
+    @Override
+    public List selectRelevance(FeeRuleRelevanceQO feeRuleRelevanceQO) {
+        if (feeRuleRelevanceQO.getType()==1){
+            //查房屋
+            return propertyFeeRuleRelevanceMapper.selectHouse(feeRuleRelevanceQO);
+        }else{
+            //查车位
+            return propertyFeeRuleRelevanceMapper.selectCarPosition(feeRuleRelevanceQO);
+        }
+    }
+
+
+
+    /**
+     * @Description: 批量新增收费项目关联目标
+     * @author: Hu
+     * @since: 2021/9/6 14:07
+     * @Param:
+     * @return:
+     */
+    @Override
+    @Transactional
+    public void addRelevance(UpdateRelevanceQO updateRelevanceQO) {
+        List<PropertyFeeRuleRelevanceEntity> list = new LinkedList();
+        PropertyFeeRuleRelevanceEntity entity = null;
+        propertyFeeRuleRelevanceMapper.delete(new QueryWrapper<PropertyFeeRuleRelevanceEntity>().eq("rule_id",updateRelevanceQO.getId()));
+        List<String> idList = updateRelevanceQO.getRelevanceIdList();
+        for (String id : idList) {
+            entity = new PropertyFeeRuleRelevanceEntity();
+            entity.setId(SnowFlake.nextId());
+            entity.setRelevanceId(Long.parseLong(id));
+            entity.setRuleId(updateRelevanceQO.getId());
+            entity.setType(updateRelevanceQO.getType());
+            list.add(entity);
+        }
+        if (list.size()!=0){
+            propertyFeeRuleRelevanceMapper.save(list);
+        }
+    }
+
+    /**
+     * @Description: 删除收费项目中关联的房屋或者车位
+     * @author: Hu
+     * @since: 2021/9/6 13:57
+     * @Param: [id]
+     * @return: void
+     */
+    @Override
+    public void deleteRelevance(Long id) {
+        propertyFeeRuleRelevanceMapper.deleteById(id);
+    }
 
     @Override
     public void statementStatus(AdminInfoVo userInfo, Integer status, Long id) {
@@ -60,7 +156,9 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      * @return: void
      */
     @Override
+    @Transactional
     public void delete(Long id) {
+        propertyFeeRuleRelevanceMapper.delete(new QueryWrapper<PropertyFeeRuleRelevanceEntity>().eq("rule_id",id));
         propertyFeeRuleMapper.deleteById(id);
     }
 
@@ -72,15 +170,24 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      * @return: void
      */
     @Override
+    @Transactional
     public void saveOne(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
 //        propertyFeeRuleEntity.setCommunityId(userInfo.getCommunityId());
-        propertyFeeRuleEntity.setId(SnowFlake.nextId());
+        List<PropertyFeeRuleRelevanceEntity> list = new LinkedList<>();
+        PropertyFeeRuleRelevanceEntity entity = null;
+        if (propertyFeeRuleEntity.getType()==11||propertyFeeRuleEntity.getType()==12){
+            propertyFeeRuleEntity.setRelevanceType(2);
+        } else {
+            propertyFeeRuleEntity.setRelevanceType(1);
+        }
         propertyFeeRuleEntity.setCreateBy(userInfo.getUid());
+        propertyFeeRuleEntity.setId(SnowFlake.nextId());
         propertyFeeRuleEntity.setStatus(0);
         propertyFeeRuleEntity.setCreateTime(LocalDateTime.now());
         Integer size = propertyFeeRuleMapper.selectCount(new QueryWrapper<PropertyFeeRuleEntity>().eq("community_id", userInfo.getCommunityId()));
         size++;
         String value = String.valueOf(size);
+        //封装编号
         if (value.length()==1){
             propertyFeeRuleEntity.setSerialNumber("000"+value);
         }else {
@@ -94,6 +201,61 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
                 }
             }
         }
+
+        //封装关联类型中间表数据
+        if (propertyFeeRuleEntity.getRelevance().equals(0)){
+            //如果relevanceType等于2表示关联对象是车位
+            if (propertyFeeRuleEntity.getType()==11||propertyFeeRuleEntity.getType()==12){
+                //查询当前小区所有业主自用车位
+                List<CarPositionEntity> entities = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>()
+                        .eq("community_id", propertyFeeRuleEntity.getCommunityId())
+                        .eq("car_pos_status", 1));
+                for (CarPositionEntity carPositionEntity : entities) {
+                    entity=new PropertyFeeRuleRelevanceEntity();
+                    entity.setId(SnowFlake.nextId());
+                    entity.setType(2);
+                    entity.setRuleId(propertyFeeRuleEntity.getId());
+                    entity.setRelevanceId(carPositionEntity.getId());
+                    list.add(entity);
+                }
+            } else {
+                //其他现在表示都关联房屋各种费用
+                List<HouseEntity> house = houseMapper.selectHouseAll(propertyFeeRuleEntity.getCommunityId());
+                for (HouseEntity houseEntity : house) {
+                    entity=new PropertyFeeRuleRelevanceEntity();
+                    entity.setId(SnowFlake.nextId());
+                    entity.setType(1);
+                    entity.setRuleId(propertyFeeRuleEntity.getId());
+                    entity.setRelevanceId(houseEntity.getId());
+                    list.add(entity);
+                }
+            }
+        }else{
+            //关联目标id集合
+            List<String> idList = propertyFeeRuleEntity.getRelevanceIdList();
+            //如果relevanceType等于2表示关联对象是车位
+            if (propertyFeeRuleEntity.getType()==11||propertyFeeRuleEntity.getType()==12){
+                for (String id : idList) {
+                    entity=new PropertyFeeRuleRelevanceEntity();
+                    entity.setId(SnowFlake.nextId());
+                    entity.setType(2);
+                    entity.setRuleId(propertyFeeRuleEntity.getId());
+                    entity.setRelevanceId(Long.parseLong(id));
+                    list.add(entity);
+                }
+            } else {
+                //其他现在表示都关联房屋各种费用
+                for (String id : idList) {
+                    entity=new PropertyFeeRuleRelevanceEntity();
+                    entity.setId(SnowFlake.nextId());
+                    entity.setType(1);
+                    entity.setRuleId(propertyFeeRuleEntity.getId());
+                    entity.setRelevanceId(Long.parseLong(id));
+                    list.add(entity);
+                }
+            }
+        }
+        propertyFeeRuleRelevanceMapper.save(list);
         propertyFeeRuleMapper.insert(propertyFeeRuleEntity);
     }
 
@@ -106,7 +268,73 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      */
     @Override
     public void updateOneRule(AdminInfoVo userInfo, PropertyFeeRuleEntity propertyFeeRuleEntity) {
-        propertyFeeRuleEntity.setUpdateBy(userInfo.getUid());
+        List<PropertyFeeRuleRelevanceEntity> list = new LinkedList<>();
+        PropertyFeeRuleRelevanceEntity entity = null;
+
+        if (propertyFeeRuleEntity.getType()==11||propertyFeeRuleEntity.getType()==12){
+            propertyFeeRuleEntity.setRelevanceType(2);
+        } else {
+            propertyFeeRuleEntity.setRelevanceType(1);
+        }
+        propertyFeeRuleEntity.setName(BusinessEnum.FeeRuleNameEnum.getName(propertyFeeRuleEntity.getType()));
+        propertyFeeRuleEntity.setRelevance(propertyFeeRuleEntity.getRelevance());
+
+
+        propertyFeeRuleRelevanceMapper.delete(new QueryWrapper<PropertyFeeRuleRelevanceEntity>().eq("rule_id",propertyFeeRuleEntity.getId()));
+        //封装关联类型中间表数据
+        if (propertyFeeRuleEntity.getRelevance().equals(0)){
+            //如果relevanceType等于2表示关联对象是车位
+            if (propertyFeeRuleEntity.getType()==11||propertyFeeRuleEntity.getType()==12){
+                //查询当前小区所有业主自用车位
+                List<CarPositionEntity> entities = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>()
+                        .eq("community_id", propertyFeeRuleEntity.getCommunityId())
+                        .eq("car_pos_status", 1));
+                for (CarPositionEntity carPositionEntity : entities) {
+                    entity=new PropertyFeeRuleRelevanceEntity();
+                    entity.setId(SnowFlake.nextId());
+                    entity.setType(2);
+                    entity.setRuleId(propertyFeeRuleEntity.getId());
+                    entity.setRelevanceId(carPositionEntity.getId());
+                    list.add(entity);
+                }
+            } else {
+                //其他现在表示都关联房屋各种费用
+                List<HouseEntity> house = houseMapper.getAllHouse(propertyFeeRuleEntity.getCommunityId());
+                for (HouseEntity houseEntity : house) {
+                    entity=new PropertyFeeRuleRelevanceEntity();
+                    entity.setId(SnowFlake.nextId());
+                    entity.setType(1);
+                    entity.setRuleId(propertyFeeRuleEntity.getId());
+                    entity.setRelevanceId(houseEntity.getId());
+                    list.add(entity);
+                }
+            }
+        }else{
+            //关联目标id集合
+            List<String> idList = propertyFeeRuleEntity.getRelevanceIdList();
+            //如果relevanceType等于2表示关联对象是车位
+            if (propertyFeeRuleEntity.getType()==11||propertyFeeRuleEntity.getType()==12){
+                for (String id : idList) {
+                    entity=new PropertyFeeRuleRelevanceEntity();
+                    entity.setId(SnowFlake.nextId());
+                    entity.setType(2);
+                    entity.setRuleId(propertyFeeRuleEntity.getId());
+                    entity.setRelevanceId(Long.parseLong(id));
+                    list.add(entity);
+                }
+            } else {
+                //其他现在表示都关联房屋各种费用
+                for (String id : idList) {
+                    entity=new PropertyFeeRuleRelevanceEntity();
+                    entity.setId(SnowFlake.nextId());
+                    entity.setType(1);
+                    entity.setRuleId(propertyFeeRuleEntity.getId());
+                    entity.setRelevanceId(Long.parseLong(id));
+                    list.add(entity);
+                }
+            }
+        }
+        propertyFeeRuleRelevanceMapper.save(list);
         propertyFeeRuleMapper.updateById(propertyFeeRuleEntity);
     }
 
@@ -120,22 +348,13 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      */
     @Override
     public void startOrOut(AdminInfoVo userInfo, Integer status,Long id) {
-        PropertyFeeRuleEntity entity = propertyFeeRuleMapper.selectById(id);
-        if (status==1){
-            PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>().eq("type", entity.getType()).eq("status", 1).eq("community_id",entity.getCommunityId()));
-            if (ruleEntity!=null){
-                ruleEntity.setStatus(0);
-                ruleEntity.setUpdateBy(userInfo.getUid());
-                propertyFeeRuleMapper.updateById(ruleEntity);
-            }
-            entity.setUpdateBy(userInfo.getUid());
-            entity.setStatus(1);
-            propertyFeeRuleMapper.updateById(entity);
-        }else {
-            entity.setUpdateBy(userInfo.getUid());
-            entity.setStatus(0);
-            propertyFeeRuleMapper.updateById(entity);
+        PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectById(id);
+        if (ruleEntity!=null){
+            ruleEntity.setStatus(status);
+            ruleEntity.setUpdateBy(userInfo.getUid());
+            propertyFeeRuleMapper.updateById(ruleEntity);
         }
+
     }
 
 
@@ -148,7 +367,12 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
      */
     @Override
     public PropertyFeeRuleEntity selectByOne(Long id) {
-        return propertyFeeRuleMapper.selectById(id);
+        PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectById(id);
+        if (!Objects.isNull(ruleEntity)) {
+            ruleEntity.setRelevanceIdList(propertyFeeRuleRelevanceMapper.selectFeeRuleList(id));
+            return ruleEntity;
+        }
+        return null;
     }
 
 
@@ -168,6 +392,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         QueryWrapper<PropertyFeeRuleEntity> wrapper=new QueryWrapper<PropertyFeeRuleEntity>();
         List<FeeRuleVO> page = propertyFeeRuleMapper.findList((baseQO.getPage()-1)*baseQO.getSize(),baseQO.getSize(),baseQO.getQuery());
         for (FeeRuleVO feeRuleVO : page) {
+            feeRuleVO.setRelevanceIdList(propertyFeeRuleRelevanceMapper.selectFeeRuleList(feeRuleVO.getId()));
             feeRuleVO.setPeriodName(BusinessEnum.FeeRulePeriodEnum.getName(feeRuleVO.getPeriod()));
         }
         Integer total = propertyFeeRuleMapper.findTotal(baseQO.getQuery());
@@ -175,5 +400,16 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
         map.put("total",total);
         map.put("list",page);
         return map;
+    }
+    
+    /**
+     *@Author: DKS
+     *@Description: 根据收费项目名称查询收费项目id
+     *@Param: feeRuleName:
+     *@Date: 2021/9/7 15:27
+     **/
+    @Override
+    public Long selectFeeRuleIdByFeeRuleName(String feeRuleName, Long communityId) {
+        return propertyFeeRuleMapper.selectFeeRuleIdByFeeRuleName(feeRuleName, communityId);
     }
 }

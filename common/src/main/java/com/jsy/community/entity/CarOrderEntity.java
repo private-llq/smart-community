@@ -2,6 +2,7 @@ package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -50,6 +51,7 @@ public class CarOrderEntity extends BaseEntity {
     /**
      *  支付时间
      */
+
     private LocalDateTime orderTime;
     /**
      *  订单编号
@@ -66,6 +68,7 @@ public class CarOrderEntity extends BaseEntity {
     /**
      *  周期结束时间
      */
+
     private LocalDateTime overTime;
     /**
      *  月份
@@ -87,5 +90,20 @@ public class CarOrderEntity extends BaseEntity {
      *  车牌号
      */
     private String carPlate;
+    /**
+     * 扫码时间
+     */
+    private LocalDateTime scanTime;
+    /**
+     * 是否出闸0为出闸1已出闸
+     */
+    private Integer goStatus;
+
+    /**
+     * 停车时长
+     */
+    @TableField(exist = false)
+    private String stopCarTime;
+
 
 }

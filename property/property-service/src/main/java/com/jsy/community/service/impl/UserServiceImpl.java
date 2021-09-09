@@ -10,6 +10,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserFaceSyncRecordEntity;
 import com.jsy.community.mapper.UserFaceSyncRecordMapper;
 import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.qo.BaseQO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,5 +111,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 			return new ArrayList<UserEntity>();
 		}
 		return baseMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * @param baseQO : 查询条件
+	 * @author: Pipi
+	 * @description: 人脸管理查询人脸分页列表
+	 * @return: java.util.List<com.jsy.community.entity.UserEntity>
+	 * @date: 2021/9/8 16:35
+	 **/
+	@Override
+	public List<UserEntity> facePageList(BaseQO<UserEntity> baseQO) {
+		return null;
 	}
 }

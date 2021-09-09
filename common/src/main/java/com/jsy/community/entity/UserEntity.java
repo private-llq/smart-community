@@ -25,11 +25,6 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("业主ID")
 	private Long householderId;
 
-	@ApiModelProperty("房屋id")
-	@TableField( exist = false)
-	private Long houseId;
-
-
 	@ApiModelProperty("昵称")
 	private String nickname;
 	
@@ -38,6 +33,9 @@ public class UserEntity extends BaseEntity {
 
 	@ApiModelProperty("人脸地址")
 	private String faceUrl;
+
+	// 人脸启用状态;1:启用;2:禁用
+	private Integer faceEnableStatus;
 
 	@ApiModelProperty("电话号码")
 	private String mobile;
@@ -75,10 +73,6 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("离线推送id")
 	private String regId;
 
-	@ApiModelProperty("家属关系code")
-	@TableField( exist = false )
-	private Integer relationCode;
-
 	@ApiModelProperty("证件类型：1.身份证 2.护照")
 	private Integer identificationType;
 	
@@ -97,6 +91,11 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("联系邮箱")
 	private String email;
 
+
+	@ApiModelProperty("房屋id")
+	@TableField( exist = false)
+	private Long houseId;
+
 	@ApiModelProperty("车辆信息")
 	@TableField( exist = false )
 	private CarEntity carEntity;
@@ -108,6 +107,22 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("用户聊天ID")
 	@TableField( exist = false )
 	private String imId;
+
+	@ApiModelProperty("家属关系code")
+	@TableField( exist = false )
+	private Integer relationCode;
+
+	// 与业主关系 1.业主 6.亲属，7租户
+	@TableField( exist = false )
+	private String relationStr;
+
+	// (搜索用)关键字
+	@TableField( exist = false )
+	private String keyword;
+
+	// 下发状态;1:失败(未完整同步);2;成功
+	@TableField( exist = false )
+	private Integer distributionStatus;
 
 	/**
 	 * 业主登记验证接口

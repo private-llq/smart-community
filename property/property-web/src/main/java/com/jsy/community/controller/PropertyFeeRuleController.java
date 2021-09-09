@@ -12,16 +12,19 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
+import com.jsy.community.qo.property.FeeRuleRelevanceQO;
+import com.jsy.community.qo.property.UpdateRelevanceQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,15 +58,52 @@ public class PropertyFeeRuleController {
         return CommonResult.ok(map);
     }
 
-    public static void main(String[] args) {
-        System.out.println(LocalDate.now().getDayOfMonth());
-    }
-    @ApiOperation("查询当前小区物业收费规则")
+    @ApiOperation("查询一条详情")
     @GetMapping("/selectOne")
     @Login
     public CommonResult selectOne(@RequestParam("id")Long id){
         PropertyFeeRuleEntity propertyFeeRuleEntity=propertyFeeRuleService.selectByOne(id);
         return CommonResult.ok(propertyFeeRuleEntity);
+    }
+
+    @ApiOperation("删除关联的房屋或者车辆")
+    @DeleteMapping("/deleteRelevance")
+    @Login
+    public CommonResult deleteRelevance(@RequestParam("id")Long id){
+        propertyFeeRuleService.deleteRelevance(id);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation("添加关联的房屋或者车辆")
+    @PostMapping("/addRelevance")
+    @Login
+    public CommonResult addRelevance(@RequestBody UpdateRelevanceQO updateRelevanceQO){
+        propertyFeeRuleService.addRelevance(updateRelevanceQO);
+        return CommonResult.ok();
+    }
+    @ApiOperation("查询当前小区业主认证过的房屋集合")
+    @GetMapping("/getHouse")
+    @Login
+    public CommonResult getHouse(){
+        List<FeeRelevanceTypeVo> list = propertyFeeRuleService.getHouse(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(list);
+    }
+
+    @ApiOperation("查询当前小区的月租或属于业主的车位")
+    @GetMapping("/getCarPosition")
+    @Login
+    public CommonResult getCarPosition(@RequestParam Integer type){
+        List<FeeRelevanceTypeVo> list = propertyFeeRuleService.getCarPosition(UserUtils.getAdminCommunityId(),type);
+        return CommonResult.ok(list);
+    }
+
+
+    @ApiOperation("查询关联目标")
+    @PostMapping("/selectRelevance")
+    @Login
+    public CommonResult selectRelevance(@RequestBody FeeRuleRelevanceQO feeRuleRelevanceQO){
+        List<Object> list = propertyFeeRuleService.selectRelevance(feeRuleRelevanceQO);
+        return CommonResult.ok(list);
     }
 
     @ApiOperation("启用或者停用")
@@ -90,6 +130,7 @@ public class PropertyFeeRuleController {
     @businessLog(operation = "编辑",content = "更新了【物业收费规则】")
     public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        propertyFeeRuleEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);
         return CommonResult.ok();
     }
@@ -119,16 +160,10 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("查询公共常量")
     @PostMapping("/getConst")
-//    @Login
+    @Login
     public CommonResult getConst(){
         return CommonResult.ok(propertyFeeRuleConstService.listAll());
     }
-    @ApiOperation("查询公共常量")
-    @PostMapping("/get")
-//    @Login
-    public CommonResult get(){
-        financeBillService.updateDays();
-        return CommonResult.ok();
-    }
+
 
 }

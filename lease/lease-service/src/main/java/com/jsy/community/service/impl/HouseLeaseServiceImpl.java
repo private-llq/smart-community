@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
@@ -9,7 +10,9 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.AssetLeaseRecordMapper;
 import com.jsy.community.mapper.HouseLeaseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.HouseLeaseQO;
@@ -25,6 +28,7 @@ import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -55,6 +59,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
+
+    @Autowired
+    private AssetLeaseRecordMapper assetLeaseRecordMapper;
 
     /**
      * 保存房屋图片标签
@@ -264,6 +271,25 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         vo.setFavorite(houseLeaseMapper.isFavorite(houseId, uid) > 0);
         //1.9 房屋类型 code转换为文本 如 4室2厅1卫
         vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
+        // 1.10查询是否申请租赁该房屋,如果有返回申请状态
+        QueryWrapper<AssetLeaseRecordEntity> assetLeaseRecordEntityQueryWrapper = new QueryWrapper<>();
+        assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", uid);
+        assetLeaseRecordEntityQueryWrapper.eq("asset_id", houseId);
+        assetLeaseRecordEntityQueryWrapper.eq("asset_type", BusinessEnum.HouseTypeEnum.HOUSE.getCode());
+        assetLeaseRecordEntityQueryWrapper.and(
+                wapper -> wapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                        .or(newwapper ->
+                                newwapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                                        .gt("end_date", new Date())
+                        )
+        );
+        AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(assetLeaseRecordEntityQueryWrapper);
+        if (assetLeaseRecordEntity == null) {
+            vo.setOperation(0);
+        } else {
+            vo.setOperation(assetLeaseRecordEntity.getOperation());
+            vo.setContractId(assetLeaseRecordEntity.getIdStr());
+        }
 
         // 为冗余熟悉添加值
         if (vo.getCommonFacilitiesCode() != null) {
@@ -551,7 +577,6 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     public HouseLeaseSimpleVO queryHouseLeaseSimpleDetail(Long houseId) {
         //1.查出单条数据
         HouseLeaseSimpleVO vo = houseLeaseMapper.queryHouseLeaseSimpleDetail(houseId);
-
         if (vo == null) {
             return null;
         }
