@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author ling
@@ -115,7 +116,7 @@ public class UserEntity extends BaseEntity {
 
 	// 与业主关系 1.业主 6.亲属，7租户
 	@TableField( exist = false )
-	private List<String> relationList;
+	private Set<String> relationSet;
 
 	// (搜索用)关键字
 	@TableField( exist = false )

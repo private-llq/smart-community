@@ -134,19 +134,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 				uidSet.add(userEntity.getUid());
 			}
 			List<HouseMemberEntity> houseMemberEntities = houseMemberService.queryByCommunityIdAndUids(baseQO.getQuery().getCommunityId(), uidSet);
-			Map<String, List<String>> relationMap = new HashMap<>();
+			Map<String, Set<String>> relationMap = new HashMap<>();
 			for (HouseMemberEntity houseMemberEntity : houseMemberEntities) {
 				String relationStr = BusinessEnum.RelationshipEnum.getCodeName(houseMemberEntity.getRelation());
 				if (relationMap.containsKey(houseMemberEntity.getUid())) {
 					relationMap.get(houseMemberEntity.getUid()).add(relationStr);
 				} else {
-					ArrayList<String> relationString = new ArrayList<>();
+					Set<String> relationString = new HashSet<>();
 					relationString.add(relationStr);
 					relationMap.put(houseMemberEntity.getUid(), relationString);
 				}
 			}
 			for (UserEntity userEntity : userEntityList) {
-				userEntity.setRelationList(relationMap.get(userEntity.getUid()));
+				userEntity.setRelationSet(relationMap.get(userEntity.getUid()));
 			}
 		}
 		Integer count = 0;
