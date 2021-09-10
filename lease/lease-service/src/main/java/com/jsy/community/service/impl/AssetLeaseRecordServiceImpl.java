@@ -299,6 +299,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         ArrayList<Integer> processStatusList = new ArrayList<>();
         processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode());
         processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode());
+        processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.RELAUNCH.getCode());
         queryWrapper.in("operation", processStatusList);
         AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (recordEntity == null) {

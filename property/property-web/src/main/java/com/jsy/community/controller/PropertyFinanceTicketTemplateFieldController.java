@@ -83,6 +83,6 @@ public class PropertyFinanceTicketTemplateFieldController {
     @Login
     @GetMapping("/ticketTemplateFieldList")
     public CommonResult ticketTemplateFieldList(@RequestParam("templateId") String templateId) {
-        return CommonResult.ok(ticketTemplateFieldService.getTicketTemplateFieldList(templateId), "查询成功!");
+        return CommonResult.ok(ticketTemplateFieldService.getTicketTemplateFieldList(templateId));
     }
 }
