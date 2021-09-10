@@ -89,7 +89,7 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     private  String floor;
 
     // 合同编号
-    @NotBlank(groups = {SetContractNoValidate.class}, message = "合同编号不能为空")
+    @NotBlank(groups = {SetContractNoValidate.class, CompleteContractValidate.class}, message = "合同编号不能为空")
     private String conId;
 
     // 合同名字
@@ -129,9 +129,9 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @TableField(exist = false)
     private String houseType;
 
-    // 操作类型;7:租客取消申请;8房东拒绝申请;9:租客再次申请;2房东接受申请;3:房东点击拟定合同
+    // 操作类型;7:租客取消申请;8房东拒绝申请;9:租客再次申请;2房东接受申请;3:房东点击拟定合同;6:完成签约;
     @TableField(exist = false)
-    @NotNull(groups = {OperationContractValidate.class}, message = "操作类型不能为空;2房东接受申请;7:租客取消申请;8房东拒绝申请;9:租客再次申请;")
+    @NotNull(groups = {OperationContractValidate.class, SetContractNoValidate.class}, message = "操作类型;7:租客取消申请;8房东拒绝申请;9:租客再次申请;2房东接受申请;3:房东点击拟定合同;6:完成签约;")
     private Integer operationType;
 
     // 房东该资产签约条数
@@ -212,4 +212,9 @@ public class AssetLeaseRecordEntity extends BaseEntity {
      * 设置合同编号验证组
      */
     public interface SetContractNoValidate {}
+
+    /**
+     * 完成签约验证组
+     */
+    public interface CompleteContractValidate {}
 }

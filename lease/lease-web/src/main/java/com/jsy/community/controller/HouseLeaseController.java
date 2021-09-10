@@ -7,6 +7,7 @@ import com.jsy.community.annotation.UploadImg;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.AssetLeaseRecordService;
 import com.jsy.community.api.IHouseLeaseService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.UploadBucketConst;
 import com.jsy.community.constant.UploadRedisConst;
@@ -323,20 +324,31 @@ public class HouseLeaseController {
 
     /**
      * @author: Pipi
-     * @description: 设置签约合同相关信息
+     * @description: 签章调用相关操作(拟定合同后(设置合同信息,更新状态到等待支付)、完成签约)
      * @param assetLeaseRecordEntity: 签约实体
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/7 10:17
      **/
     @Login
-    @PostMapping("/v2/setContractNo")
-    public CommonResult setContractNo(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
-        if (assetLeaseRecordEntity.getId() == null) {
-            throw new JSYException(400, "签约ID不能为空");
+    @PostMapping("/v2/signatureOperationContract")
+    public CommonResult signatureOperationContract(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        if (assetLeaseRecordEntity.getOperationType() == null ||
+                (assetLeaseRecordEntity.getOperationType() != BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode()
+                        && assetLeaseRecordEntity.getOperationType() != BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())) {
+            throw new JSYException(400, "签章操作只能是设置合同信息:4或者完成签约:6");
         }
-        ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.SetContractNoValidate.class);
+        if (assetLeaseRecordEntity.getOperationType() == BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode()) {
+            if (assetLeaseRecordEntity.getId() == null) {
+                throw new JSYException(400, "签约ID不能为空");
+            }
+            // 设置合同信息(更新状态到等待支付)
+            ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.SetContractNoValidate.class);
+        } else {
+            // 完成签约
+            ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.CompleteContractValidate.class);
+        }
         assetLeaseRecordEntity.setHomeOwnerUid(UserUtils.getUserId());
-        return CommonResult.ok(assetLeaseRecordService.setContractNo(assetLeaseRecordEntity));
+        return CommonResult.ok(assetLeaseRecordService.signatureOperation(assetLeaseRecordEntity));
     }
 
 }

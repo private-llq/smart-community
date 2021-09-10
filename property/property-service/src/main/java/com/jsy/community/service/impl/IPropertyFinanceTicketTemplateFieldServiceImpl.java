@@ -11,10 +11,9 @@ import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: Pipi
@@ -73,11 +72,21 @@ public class IPropertyFinanceTicketTemplateFieldServiceImpl extends ServiceImpl<
      * @date: 2021/8/4 15:14
      **/
     @Override
-    public List<FinanceTicketTemplateFieldEntity> getTicketTemplateFieldList(String templateId) {
+    public Map<Integer, List<FinanceTicketTemplateFieldEntity>> getTicketTemplateFieldList(String templateId) {
+        Map<Integer, List<FinanceTicketTemplateFieldEntity>> fieldMap = new HashMap<>();
+        fieldMap.put(1, new ArrayList<FinanceTicketTemplateFieldEntity>());
+        fieldMap.put(2, new ArrayList<FinanceTicketTemplateFieldEntity>());
+        fieldMap.put(3, new ArrayList<FinanceTicketTemplateFieldEntity>());
         QueryWrapper<FinanceTicketTemplateFieldEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("template_id", templateId);
         queryWrapper.orderByAsc("location_type");
         queryWrapper.orderByAsc("sort");
-        return ticketTemplateFieldMapper.selectList(queryWrapper);
+        List<FinanceTicketTemplateFieldEntity> fieldEntities = ticketTemplateFieldMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(fieldEntities)) {
+            for (FinanceTicketTemplateFieldEntity fieldEntity : fieldEntities) {
+                fieldMap.get(fieldEntity.getLocationType()).add(fieldEntity);
+            }
+        }
+        return fieldMap;
     }
 }

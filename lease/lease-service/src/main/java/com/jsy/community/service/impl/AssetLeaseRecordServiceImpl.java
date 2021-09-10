@@ -981,33 +981,51 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     /**
      * @author: Pipi
-     * @description: 设置签约合同相关信息
+     * @description:签章调用相关操作(拟定合同(设置合同信息)、完成签约)
      * @param assetLeaseRecordEntity: 签约实体
      * @return: java.lang.Integer
      * @date: 2021/9/7 10:18
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer setContractNo(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+    public Integer signatureOperation(AssetLeaseRecordEntity assetLeaseRecordEntity) {
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
-        queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
-        queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
-        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
-        AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
-        if (assetLeaseRecordEntity1 != null) {
-            assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
-            assetLeaseRecordEntity1.setStartDate(assetLeaseRecordEntity.getStartDate());
-            assetLeaseRecordEntity1.setEndDate(assetLeaseRecordEntity.getEndDate());
-            assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
-            assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
-            assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
-            assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode());
-            addLeaseOperationRecord(assetLeaseRecordEntity1);
-            return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
+        AssetLeaseRecordEntity assetLeaseRecordEntity1 = new AssetLeaseRecordEntity();
+        if (assetLeaseRecordEntity.getOperationType() == BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode()) {
+            // 设置合同信息(更新状态到等待支付)
+            queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
+            queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
+            queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
+            queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+            assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
+            if (assetLeaseRecordEntity1 != null) {
+                assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
+                assetLeaseRecordEntity1.setStartDate(assetLeaseRecordEntity.getStartDate());
+                assetLeaseRecordEntity1.setEndDate(assetLeaseRecordEntity.getEndDate());
+                assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
+                assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
+                assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
+                assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode());
+            } else {
+                return 0;
+            }
         } else {
-            return 0;
+            // 完成签约
+            queryWrapper.eq("con_id", assetLeaseRecordEntity.getConId());
+            queryWrapper.and(wapper -> wapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid())
+                    .or().eq("tenant_uid", assetLeaseRecordEntity.getHomeOwnerUid()));
+            assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
+            if (assetLeaseRecordEntity1 != null) {
+                assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode());
+            } else {
+                return 0;
+            }
         }
+        addLeaseOperationRecord(assetLeaseRecordEntity1);
+        return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
+
+
+
     }
 
     /**

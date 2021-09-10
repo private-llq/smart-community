@@ -66,12 +66,12 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
 
     /**
      * @author: Pipi
-     * @description: 设置签约合同相关信息
+     * @description: 设签章调用相关操作(拟定合同(设置合同信息)、完成签约)
      * @param assetLeaseRecordEntity: 签约实体
      * @return: java.lang.Integer
      * @date: 2021/9/7 10:18
      **/
-    Integer setContractNo(AssetLeaseRecordEntity assetLeaseRecordEntity);
+    Integer signatureOperation(AssetLeaseRecordEntity assetLeaseRecordEntity);
 
     /**
      * @author: Pipi
