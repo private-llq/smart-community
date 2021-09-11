@@ -21,8 +21,8 @@ import java.util.List;
 @ApiModel("店铺详情")
 public class ShopLeaseVO implements Serializable {
 	
-//	@ApiModelProperty(value = "业主id")
-//	private String uid;
+	@ApiModelProperty(value = "业主id")
+	private String uid;
 //
 //	@ApiModelProperty(value = "城市id")
 //	private Long cityId;
@@ -35,6 +35,8 @@ public class ShopLeaseVO implements Serializable {
 //
 	@ApiModelProperty(value = "商铺id")
 	private Long Id;
+
+	private String idStr;
 	
 	@ApiModelProperty(value = "标题")
 	private String title;
