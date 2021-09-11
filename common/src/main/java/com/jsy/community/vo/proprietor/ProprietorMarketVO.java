@@ -68,4 +68,11 @@ public class ProprietorMarketVO extends BaseVO {
 
     @ApiModelProperty(value = "屏蔽（0未屏蔽  1已屏蔽）")
     private Integer shield;
+
+    @ApiModelProperty(value = "社区id")
+    private  Long communityId;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "社区名")
+    private  String communityName;
 }
