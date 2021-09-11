@@ -6,7 +6,10 @@ import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.property.CarAccessVO;
+import com.jsy.community.vo.property.CarSceneVO;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 public interface ICarCutOffService extends IService<CarCutOffEntity> {
@@ -54,4 +57,21 @@ public interface ICarCutOffService extends IService<CarCutOffEntity> {
      * @Date: 2021/9/6-11:45
      **/
     Page<CarCutOffEntity> selectCarPage(BaseQO<CarCutOffQO> baseQO,Long communityId);
+    /**
+     * @Description: 导出在场车辆
+     * @Param: [carCutOffQO, communityId]
+     * @Return: java.util.List<com.jsy.community.vo.property.CarSceneVO>
+     * @Author: Tian
+     * @Date: 2021/9/10-10:17
+     **/
+    List<CarSceneVO> selectCarSceneList(CarCutOffQO carCutOffQO, Long communityId) throws MalformedURLException;
+
+    /**
+     * @Description: 导出进出记录
+     * @Param: [carCutOffQO, communityId]
+     * @Return: java.util.List<com.jsy.community.vo.property.CarSceneVO>
+     * @Author: Tian
+     * @Date: 2021/9/10-10:17
+     **/
+    List<CarAccessVO> selectAccessList(CarCutOffQO carCutOffQO, Long communityId);
 }

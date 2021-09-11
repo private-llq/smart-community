@@ -12,6 +12,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CarTrackQO;
 import com.jsy.community.qo.property.CarOrderQO;
 import com.jsy.community.qo.property.CarTemporaryOrderQO;
+import com.jsy.community.qo.property.CarTemporaryQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -58,9 +59,15 @@ public class CarTemporaryOrderController {
     @ResponseBody
     public void downLoadFile(@RequestBody CarOrderQO carOrderQO,HttpServletResponse response) throws IOException {
         Long communityId = UserUtils.getAdminCommunityId();
-        List<CarTemporaryOrderQO>  list = iCarTemporaryOrder.selectCarOrderList(carOrderQO,communityId);
-        System.out.println(list);
-        ExcelUtils.exportModule("1111", response, CarTemporaryOrderQO.class, list, 2);
+
+        if (carOrderQO.getState()==0){
+            List<CarTemporaryOrderQO>  list = iCarTemporaryOrder.selectCarOrderList(carOrderQO,communityId);
+            ExcelUtils.exportModule("月租订单", response, CarTemporaryOrderQO.class, list, 2);
+
+        }else {
+            List<CarTemporaryQO>  list = iCarTemporaryOrder.selectTemporaryQOList(carOrderQO,communityId);
+            ExcelUtils.exportModule("临时订单", response, CarTemporaryOrderQO.class, list, 2);
+        }
 
     }
 

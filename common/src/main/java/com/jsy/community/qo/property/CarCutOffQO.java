@@ -29,4 +29,6 @@ public class CarCutOffQO extends BaseQO implements Serializable {
     @ApiModelProperty(value = "0为未完成 在场车辆   1为完成 进出车辆")
     private Integer state;
 
+
+
 }
