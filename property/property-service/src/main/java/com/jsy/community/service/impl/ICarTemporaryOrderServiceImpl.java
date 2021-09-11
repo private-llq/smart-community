@@ -10,6 +10,7 @@ import com.jsy.community.mapper.CarOrderMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarOrderQO;
 import com.jsy.community.qo.property.CarTemporaryOrderQO;
+import com.jsy.community.qo.property.CarTemporaryQO;
 import com.jsy.community.util.TimeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -97,6 +98,13 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
         return map;
     }
 
+    /**
+     * @Description:
+     * @Param: [query, communityId]
+     * @Return: java.util.List<com.jsy.community.qo.property.CarTemporaryOrderQO>
+     * @Author: Tian
+     * @Date: 2021/9/10-9:46
+     **/
     @Override
     public List<CarTemporaryOrderQO> selectCarOrderList(CarOrderQO query, Long communityId) {
         QueryWrapper<CarOrderEntity> queryWrapper = new QueryWrapper<CarOrderEntity>();
@@ -142,6 +150,61 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
             }
 
             orderQOS.add(carTemporaryOrderQO);
+        }
+        return orderQOS;
+    }
+
+   /**
+    * @Description: 导出临时车
+    * @Param: [query, communityId]
+    * @Return: java.util.List<com.jsy.community.qo.property.CarTemporaryQO>
+    * @Author: Tian
+    * @Date: 2021/9/10-9:46
+    **/ @Override
+    public List<CarTemporaryQO> selectTemporaryQOList(CarOrderQO query, Long communityId) {
+        QueryWrapper<CarOrderEntity> queryWrapper = new QueryWrapper<CarOrderEntity>();
+        if (StringUtils.isNotBlank(query.getCarPlate())){
+            //车牌
+            queryWrapper.like("car_plate", query.getCarPlate());
+        }
+        //临时车  1和 2  包月车
+        if (query.getType()!=null){
+            queryWrapper.eq("type", query.getType());
+        }
+        //支付类型 1已支付  2未支付
+        if (query.getOrderStatus()!=null){
+            queryWrapper.eq("order_status",query.getOrderStatus());
+        }
+        queryWrapper.eq("community_id",communityId);
+
+        //时间段
+        if (query.getBeginTime()!=null  && query.getOverTime()!=null){
+            queryWrapper.ge("order_time",query.getBeginTime())
+                    .le("order_time",query.getOverTime());
+        }
+        List<CarTemporaryQO> orderQOS = new ArrayList<>();
+        List<CarOrderEntity> list = carOrderMapper.selectList(queryWrapper);
+        Date date;
+        for (CarOrderEntity i: list) {
+            CarTemporaryQO carTemporaryQO = new CarTemporaryQO();
+            BeanUtils.copyProperties(i,carTemporaryQO);
+            if (i.getBeginTime()!=null){
+                date = Date.from(i.getBeginTime().atZone(ZoneId.systemDefault()).toInstant());
+                carTemporaryQO.setBeginTime(date);
+            }
+
+            if (i.getOverTime()!=null){
+                date = Date.from(i.getOverTime().atZone(ZoneId.systemDefault()).toInstant());
+                carTemporaryQO.setOverTime(date);
+            }
+
+            if (i.getOrderTime()!=null){
+
+                date = Date.from(i.getOrderTime().atZone(ZoneId.systemDefault()).toInstant());
+                carTemporaryQO.setOrderTime(date);
+            }
+
+            orderQOS.add(carTemporaryQO);
         }
         return orderQOS;
     }

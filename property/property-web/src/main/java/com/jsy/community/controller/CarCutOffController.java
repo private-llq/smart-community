@@ -4,17 +4,26 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarCutOffService;
+import com.jsy.community.config.ExcelUtils;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarCutOffQO;
+import com.jsy.community.qo.property.CarOrderQO;
+import com.jsy.community.qo.property.CarTemporaryOrderQO;
+import com.jsy.community.qo.property.CarTemporaryQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.property.CarAccessVO;
+import com.jsy.community.vo.property.CarSceneVO;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -75,6 +84,28 @@ public class CarCutOffController{
     public CommonResult selectAccess(@RequestParam("car_number") String carNumber, @RequestParam("state") Integer state){
         List<CarCutOffEntity>  carCutOffEntityList =  carCutOffService.selectAccess(carNumber,state);
         return CommonResult.ok(carCutOffEntityList,"查询成功");
+    }
+
+    @ApiOperation("导出模板")
+    @GetMapping("/carCutOFFExport")
+    @ResponseBody
+    public void downLoadFile(HttpServletResponse response) throws IOException {
+        Long communityId = UserUtils.getAdminCommunityId();
+        CarCutOffQO carCutOffQO = new CarCutOffQO();
+        carCutOffQO.setState(0);
+        communityId =  1l;
+        if (carCutOffQO.getState()==0){
+            System.out.println("在场车辆导出");
+            //在场车辆
+            List<CarSceneVO>  list = carCutOffService.selectCarSceneList(carCutOffQO,communityId);
+            ExcelUtils.exportModule("在场车辆表", response, CarSceneVO.class, list, 2);
+
+        }else {
+            //进出记录
+            List<CarAccessVO>  list = carCutOffService.selectAccessList(carCutOffQO,communityId);
+            ExcelUtils.exportModule("进出记录表", response, CarAccessVO.class, list, 2);
+        }
+
     }
 
 }

@@ -13,11 +13,19 @@ import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.util.TimeUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.property.CarAccessVO;
+import com.jsy.community.vo.property.CarSceneVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -100,5 +108,54 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
             }
         }
         return selectPage;
+    }
+
+    @Override
+    public List<CarSceneVO> selectCarSceneList(CarCutOffQO query, Long communityId) throws MalformedURLException {
+        QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
+
+        if (!StringUtils.isEmpty(query.getCarNumber())){
+            queryWrapper.like("car_number",query.getCarNumber());
+        }
+        //车辆所属类型
+        if (query.getBelong()!=null){
+            queryWrapper.eq("belong",query.getBelong());
+        }
+
+        queryWrapper.eq("community_id",communityId);//状态
+
+        if (query.getState()!=null){
+            queryWrapper.eq("state",query.getState());
+        }
+        List<CarCutOffEntity> carCutOffEntityList = carCutOffMapper.selectList(queryWrapper);
+        List<CarSceneVO> sceneVOS = new ArrayList<>();
+        Date date;
+        for (CarCutOffEntity i: carCutOffEntityList) {
+            CarSceneVO carSceneVO = new CarSceneVO();
+            BeanUtils.copyProperties(i,carSceneVO);
+            String outPic = i.getOutPic();
+            System.out.println(new URL(outPic));
+            URL url = new URL("https://raw.githubusercontent.com/alibaba/easyexcel/master/src/test/resources/converter/img.jpg");
+            carSceneVO.setOutPic(url);
+            if (i.getOpenTime()!=null){
+                date = Date.from(i.getOpenTime().atZone(ZoneId.systemDefault()).toInstant());
+                carSceneVO.setOpenTime(date);
+            }
+            System.out.println(carSceneVO);
+            sceneVOS.add(carSceneVO);
+
+
+//            if (i.getOpenTime()!=null  && i.getStopTime()!=null){
+//                HashMap<String, Long> datePoor = TimeUtils.getDatePoor(i.getOpenTime(), i.getStopTime());
+//                String s = datePoor.get("day")+"天："+datePoor.get("hour")+" 小时："+datePoor.get("min")+" 分钟";
+//                i.setStopCarTime(s);
+//            }
+        }
+        return sceneVOS;
+    }
+
+    @Override
+    public List<CarAccessVO> selectAccessList(CarCutOffQO carCutOffQO, Long communityId) {
+        return null;
     }
 }

@@ -6,6 +6,7 @@ import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarOrderQO;
 import com.jsy.community.qo.property.CarTemporaryOrderQO;
+import com.jsy.community.qo.property.CarTemporaryQO;
 
 import java.util.List;
 import java.util.Map;
@@ -37,4 +38,12 @@ public interface ICarTemporaryOrderService extends IService<CarOrderEntity> {
      * @Date: 2021/9/9-16:25
      **/
     List<CarTemporaryOrderQO> selectCarOrderList(CarOrderQO baseQO, Long communityId);
+    /**
+     * @Description: 导出临时车
+     * @Param: [carOrderQO, communityId]
+     * @Return: java.util.List<com.jsy.community.qo.property.CarTemporaryQO>
+     * @Author: Tian
+     * @Date: 2021/9/10-9:43
+     **/
+    List<CarTemporaryQO> selectTemporaryQOList(CarOrderQO carOrderQO, Long communityId);
 }
