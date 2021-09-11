@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.excel.util.FileUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,13 +14,26 @@ import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.util.TimeUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.property.CarAccessVO;
+import com.jsy.community.vo.property.CarSceneVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.alibaba.fastjson.util.IOUtils.readAll;
 
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
@@ -100,5 +114,62 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
             }
         }
         return selectPage;
+    }
+
+    @Override
+    public List<CarSceneVO> selectCarSceneList(CarCutOffQO query, Long communityId) throws IOException {
+        QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
+
+        if (!StringUtils.isEmpty(query.getCarNumber())){
+            queryWrapper.like("car_number",query.getCarNumber());
+        }
+        //车辆所属类型
+        if (query.getBelong()!=null){
+            queryWrapper.eq("belong",query.getBelong());
+        }
+
+        queryWrapper.eq("community_id",communityId);//状态
+
+        if (query.getState()!=null){
+            queryWrapper.eq("state",query.getState());
+        }
+        List<CarCutOffEntity> carCutOffEntityList = carCutOffMapper.selectList(queryWrapper);
+        List<CarSceneVO> sceneVOS = new ArrayList<>();
+        Date date;
+        for (CarCutOffEntity i: carCutOffEntityList) {
+            CarSceneVO carSceneVO = new CarSceneVO();
+            BeanUtils.copyProperties(i,carSceneVO);
+            String outPic = i.getOutPic();
+
+            if (i.getOpenTime()!=null){
+                date = Date.from(i.getOpenTime().atZone(ZoneId.systemDefault()).toInstant());
+                //carSceneVO.setOpenTime(date);
+
+            }
+            String imagePath = "http://222.178.212.29:9000/car-in-and-out-picture/車牌1631243995闽N00000.jpg";
+            String pic = "C:\\Users\\Administrator\\Downloads\\車牌1630917537沪A99999.jpg";
+            URL url = new URL(imagePath);
+            InputStream is = url.openStream();
+            try {
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                String jsonText = readAll(rd);
+                carSceneVO.setString(jsonText);
+            } finally {
+                is.close();
+            }
+            FileInputStream fileInputStream = FileUtils.openInputStream(new File(pic));
+
+            carSceneVO.setFile(fileInputStream);
+//            carSceneVO.setUrl(url);
+            System.out.println(carSceneVO);
+            sceneVOS.add(carSceneVO);
+        }
+
+        return sceneVOS;
+    }
+
+    @Override
+    public List<CarAccessVO> selectAccessList(CarCutOffQO carCutOffQO, Long communityId) {
+        return null;
     }
 }

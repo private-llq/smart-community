@@ -19,4 +19,7 @@ public class PropertyMarketQO extends BaseQO {
     @ApiModelProperty(value = "手机号")
     private String phone;
 
+    @ApiModelProperty(value = "社区id")
+    private  Long communityId;
+
 }

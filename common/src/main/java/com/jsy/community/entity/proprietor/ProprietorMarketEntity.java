@@ -76,6 +76,10 @@ public class ProprietorMarketEntity extends BaseEntity {
     @TableField(exist = false)
     private String realName;
 
+    @TableField(exist = false)
+    @ApiModelProperty(value = "社区名")
+    private  String communityName;
+
     @ApiModelProperty(value = "前端删除")
     private Integer deleted;
 
