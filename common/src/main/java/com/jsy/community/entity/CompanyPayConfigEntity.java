@@ -18,10 +18,6 @@ public class CompanyPayConfigEntity extends BaseEntity {
      */
     private Long companyId;
     /**
-     * 配置类型
-     */
-    private Integer type;
-    /**
      * 应用号
      */
     private String appId;

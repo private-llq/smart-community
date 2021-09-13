@@ -1,6 +1,7 @@
 package com.jsy.community.config;
 
 import com.jsy.community.entity.CompanyPayConfigEntity;
+import com.jsy.community.utils.AESOperator;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,13 +34,13 @@ public class WechatConfig {
     public static String MCH_SERIAL_NO;
 
     public static void setConfig(CompanyPayConfigEntity serviceConfig) {
-        APPID=serviceConfig.getAppId();
-        MCH_ID=serviceConfig.getMchId();
-        PRIVATE_KEY=serviceConfig.getPrivateKey();
-        API_V3_KEY=serviceConfig.getApiV3();
-        MCH_SERIAL_NO=serviceConfig.getMchSerialNo();
-        APICLIENT_KEY=serviceConfig.getApiclientKeyUrl();
-        APICLIENT_CRET=serviceConfig.getApiclientCertUrl();
+        APPID= AESOperator.decrypt(serviceConfig.getAppId());
+        MCH_ID=AESOperator.decrypt(serviceConfig.getMchId());
+        PRIVATE_KEY=AESOperator.decrypt(serviceConfig.getPrivateKey());
+        API_V3_KEY=AESOperator.decrypt(serviceConfig.getApiV3());
+        MCH_SERIAL_NO=AESOperator.decrypt(serviceConfig.getMchSerialNo());
+        APICLIENT_KEY=AESOperator.decrypt(serviceConfig.getApiclientKeyUrl());
+        APICLIENT_CRET=AESOperator.decrypt(serviceConfig.getApiclientCertUrl());
 
     }
 

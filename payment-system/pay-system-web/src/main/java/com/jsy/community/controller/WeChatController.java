@@ -72,7 +72,7 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceReceiptService propertyFinanceReceiptService;
 
-    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
@@ -195,21 +195,24 @@ public class WeChatController {
      * @Param: dsds
      * @return:
      */
-    @RequestMapping(value = "/callback/{id}", method = {RequestMethod.POST,RequestMethod.GET})
-    public void callback(HttpServletRequest request, HttpServletResponse response,@RequestParam("id") Long id) throws Exception {
-        System.out.println(id);
+    @RequestMapping(value = "/callback/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
+    public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
         log.info("回调成功");
+        log.info(String.valueOf(companyId));
+        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId);
+        if (Objects.nonNull(configEntity)){
+            WechatConfig.setConfig(configEntity);
+        }
+        log.info("配置参数："+configEntity);
         Map<String, String> map = PublicConfig.notifyParam(request , WechatConfig.API_V3_KEY);
-//        weChatService.saveStatus(out_trade_no);
         log.info(String.valueOf(map));
-        WeChatOrderEntity one = weChatService.getOrderOne(map.get("out_trade_no"));
-//        if ()
         weChatService.orderStatus(map);
         if (map.get("attach")!=null){
             String[] split = map.get("attach").split(",");
             //处理商城支付回调后的业务逻辑
             if (split[0].equals("2")){
                 shoppingMallService.completeShopOrder(split[1]);
+                log.info("处理完成");
             }
             //处理物业费支付回调后的业务逻辑
             if (split[0].equals("4")){
@@ -234,7 +237,7 @@ public class WeChatController {
             }
             //停车缴费后记业务
             if (split[0].equals("8")){
-                CarOrderRecordEntity recordEntity = carService.findOne(Long.valueOf(split[0]));
+                CarOrderRecordEntity recordEntity = carService.findOne(Long.valueOf(split[1]));
                 recordEntity.setOrderNum(map.get("out_trade_no"));
                 if (recordEntity!=null){
                     if (recordEntity.getType()==1){
@@ -243,6 +246,7 @@ public class WeChatController {
                         carService.renewMonthCar(recordEntity);
                     }
                 }
+                log.info("处理完成");
             }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);

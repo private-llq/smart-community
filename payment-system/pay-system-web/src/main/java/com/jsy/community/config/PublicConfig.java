@@ -155,7 +155,7 @@ public class PublicConfig {
      */
     public static Map<String, String> notifyParam(HttpServletRequest request, String privateKey) throws Exception {
         Map<String, String> map = new HashMap<>(12);
-        String result = readData(request);
+        String result = readDataParam(request);
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
         String plainText = verifyNotify(result, privateKey);
         if (StrUtil.isNotEmpty(plainText)) {
@@ -360,6 +360,28 @@ public class PublicConfig {
         );
     }
 
+    /**
+     * 处理返回对象
+     *
+     * @param request
+     * @return
+     */
+    public static String readDataParam(HttpServletRequest request) {
+        BufferedReader br = null;
+        try {
+            StringBuilder result = new StringBuilder();
+            br = request.getReader();
+            for (String line; (line = br.readLine()) != null; ) {
+                if (result.length() > 0) {
+                    result.append("\n");
+                }
+                result.append(line);
+            }
+            return result.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * 处理返回对象

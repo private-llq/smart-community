@@ -9,14 +9,6 @@ import com.jsy.community.entity.CompanyPayConfigEntity;
  * @create: 2021-09-10 14:25
  **/
 public interface ICompanyPayConfigService {
-    /**
-     * @Description: 更新私钥公钥
-     * @author: Hu
-     * @since: 2021/9/10 16:03
-     * @Param:
-     * @return:
-     */
-    void configUpdate(CompanyPayConfigEntity communityHardWareEntity,Long companyId);
 
     /**
      * @Description: 更新基本配置

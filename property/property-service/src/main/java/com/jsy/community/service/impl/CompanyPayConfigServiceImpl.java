@@ -5,8 +5,8 @@ import com.jsy.community.api.ICompanyPayConfigService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CompanyPayConfigEntity;
 import com.jsy.community.mapper.CompanyPayConfigMapper;
+import com.jsy.community.utils.AESOperator;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
@@ -83,53 +83,65 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
         CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId));
         if (Objects.isNull(entity)){
             CompanyPayConfigEntity configEntity = new CompanyPayConfigEntity();
-            BeanUtils.copyProperties(communityHardWareEntity,configEntity);
-            configEntity.setCompanyId(companyId);
             configEntity.setId(0L);
+            configEntity.setCompanyId(companyId);
+            if (!"".equals(communityHardWareEntity.getAppId())&&communityHardWareEntity.getAppId()!=null){
+                entity.setAppId(AESOperator.encrypt(communityHardWareEntity.getAppId()));
+            }
+            if (!"".equals(communityHardWareEntity.getAppSecret())&&communityHardWareEntity.getAppSecret()!=null){
+                entity.setAppSecret(AESOperator.encrypt(communityHardWareEntity.getAppSecret()));
+            }
+            if (!"".equals(communityHardWareEntity.getMchId())&&communityHardWareEntity.getMchId()!=null){
+                entity.setMchId(AESOperator.encrypt(communityHardWareEntity.getMchId()));
+            }
+            if (!"".equals(communityHardWareEntity.getApiV3())&&communityHardWareEntity.getApiV3()!=null){
+                entity.setApiV3(AESOperator.encrypt(communityHardWareEntity.getApiV3()));
+            }
+            if (!"".equals(communityHardWareEntity.getPrivateKey())&&communityHardWareEntity.getPrivateKey()!=null){
+                entity.setPrivateKey(AESOperator.encrypt(communityHardWareEntity.getPrivateKey()));
+            }
+            if (!"".equals(communityHardWareEntity.getMchSerialNo())&&communityHardWareEntity.getMchSerialNo()!=null){
+                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getMchSerialNo()));
+            }
+            if (!"".equals(communityHardWareEntity.getApiclientKeyUrl())&&communityHardWareEntity.getApiclientKeyUrl()!=null){
+                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getApiclientKeyUrl()));
+            }
+            if (!"".equals(communityHardWareEntity.getApiclientCertUrl())&&communityHardWareEntity.getApiclientCertUrl()!=null){
+                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getApiclientCertUrl()));
+            }
+            if (communityHardWareEntity.getRefundStatus()!=null&&communityHardWareEntity.getRefundStatus()!=0){
+                entity.setRefundStatus(communityHardWareEntity.getRefundStatus());
+            }
             companyPayConfigMapper.insert(configEntity);
         } else {
             if (!"".equals(communityHardWareEntity.getAppId())&&communityHardWareEntity.getAppId()!=null){
-                entity.setAppId(communityHardWareEntity.getAppId());
+                entity.setAppId(AESOperator.encrypt(communityHardWareEntity.getAppId()));
             }
             if (!"".equals(communityHardWareEntity.getAppSecret())&&communityHardWareEntity.getAppSecret()!=null){
-                entity.setAppSecret(communityHardWareEntity.getAppSecret());
+                entity.setAppSecret(AESOperator.encrypt(communityHardWareEntity.getAppSecret()));
             }
             if (!"".equals(communityHardWareEntity.getMchId())&&communityHardWareEntity.getMchId()!=null){
-                entity.setMchId(communityHardWareEntity.getMchId());
+                entity.setMchId(AESOperator.encrypt(communityHardWareEntity.getMchId()));
             }
             if (!"".equals(communityHardWareEntity.getApiV3())&&communityHardWareEntity.getApiV3()!=null){
-                entity.setApiV3(communityHardWareEntity.getApiV3());
+                entity.setApiV3(AESOperator.encrypt(communityHardWareEntity.getApiV3()));
             }
             if (!"".equals(communityHardWareEntity.getPrivateKey())&&communityHardWareEntity.getPrivateKey()!=null){
-                entity.setPrivateKey(communityHardWareEntity.getPrivateKey());
+                entity.setPrivateKey(AESOperator.encrypt(communityHardWareEntity.getPrivateKey()));
             }
             if (!"".equals(communityHardWareEntity.getMchSerialNo())&&communityHardWareEntity.getMchSerialNo()!=null){
-                entity.setMchSerialNo(communityHardWareEntity.getMchSerialNo());
+                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getMchSerialNo()));
+            }
+            if (!"".equals(communityHardWareEntity.getApiclientKeyUrl())&&communityHardWareEntity.getApiclientKeyUrl()!=null){
+                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getApiclientKeyUrl()));
+            }
+            if (!"".equals(communityHardWareEntity.getApiclientCertUrl())&&communityHardWareEntity.getApiclientCertUrl()!=null){
+                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getApiclientCertUrl()));
+            }
+            if (communityHardWareEntity.getRefundStatus()!=null&&communityHardWareEntity.getRefundStatus()!=0){
+                entity.setRefundStatus(communityHardWareEntity.getRefundStatus());
             }
             companyPayConfigMapper.updateById(entity);
         }
-    }
-
-    /**
-     * @Description: 更新私钥公钥
-     * @author: Hu
-     * @since: 2021/9/10 16:04
-     * @Param: [communityHardWareEntity]
-     * @return: void
-     */
-    @Override
-    public void configUpdate(CompanyPayConfigEntity communityHardWareEntity,Long companyId) {
-        CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId));
-        if (Objects.nonNull(entity)){
-            if ("".equals(communityHardWareEntity.getApiclientKeyUrl())&&communityHardWareEntity.getApiclientKeyUrl()!=null){
-                entity.setApiclientKeyUrl(communityHardWareEntity.getApiclientKeyUrl());
-            }
-            if ("".equals(communityHardWareEntity.getApiclientCertUrl())&&communityHardWareEntity.getApiclientCertUrl()!=null){
-                entity.setApiclientCertUrl(communityHardWareEntity.getApiclientCertUrl());
-            }
-            entity.setRefundStatus(communityHardWareEntity.getRefundStatus());
-            companyPayConfigMapper.updateById(entity);
-        }
-
     }
 }

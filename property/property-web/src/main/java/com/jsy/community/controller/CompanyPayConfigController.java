@@ -42,13 +42,6 @@ public class CompanyPayConfigController {
         return  CommonResult.ok(upload,"上传成功");
     }
     @Login
-    @ApiOperation("更新私钥公钥")
-    @PutMapping("configUpdate")
-    public CommonResult configUpdate(@RequestBody CompanyPayConfigEntity communityHardWareEntity) {
-        companyPayConfigService.configUpdate(communityHardWareEntity, UserUtils.getAdminUserInfo().getCompanyId());
-        return CommonResult.ok("添加成功!");
-    }
-    @Login
     @ApiOperation("更新基本配置")
     @PutMapping("basicConfig")
     public CommonResult basicConfig(@RequestBody CompanyPayConfigEntity communityHardWareEntity) {
@@ -59,8 +52,8 @@ public class CompanyPayConfigController {
     @ApiOperation("查询状态")
     @GetMapping("getConfig")
     public CommonResult getConfig() {
-        companyPayConfigService.getConfig(UserUtils.getAdminUserInfo().getCompanyId());
-        return CommonResult.ok("添加成功!");
+        CompanyPayConfigEntity entity = companyPayConfigService.getConfig(UserUtils.getAdminUserInfo().getCompanyId());
+        return CommonResult.ok(entity);
     }
 
 
