@@ -2,6 +2,8 @@ package com.jsy.community.api;
 
 import com.jsy.community.entity.CompanyPayConfigEntity;
 
+import java.util.Map;
+
 /**
  * @program: com.jsy.community
  * @description: 物业公司支付配置
@@ -36,4 +38,13 @@ public interface ICompanyPayConfigService {
      * @return:
      */
     CompanyPayConfigEntity getCompanyConfig(Long propertyId);
+
+    /**
+     * @Description: 查询退款配置
+     * @author: Hu
+     * @since: 2021/9/13 14:48
+     * @Param:
+     * @return:
+     */
+    Map getRefundConfig(Long companyId);
 }

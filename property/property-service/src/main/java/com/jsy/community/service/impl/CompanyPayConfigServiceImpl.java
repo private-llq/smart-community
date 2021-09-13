@@ -4,11 +4,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICompanyPayConfigService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CompanyPayConfigEntity;
+import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.mapper.CompanyPayConfigMapper;
+import com.jsy.community.mapper.PayConfigureMapper;
 import com.jsy.community.utils.AESOperator;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -23,7 +27,35 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
     @Autowired
     private CompanyPayConfigMapper companyPayConfigMapper;
 
+    @Autowired
+    private PayConfigureMapper payConfigureMapper;
 
+
+
+    /**
+     * @Description: 查询退款配置状态
+     * @author: Hu
+     * @since: 2021/9/13 14:56
+     * @Param: [companyId]
+     * @return: java.util.Map
+     */
+    @Override
+    public Map getRefundConfig(Long companyId) {
+        Map<String, Integer> map = new HashMap<>();
+        CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId));
+        if (entity!=null){
+            map.put("wechat",entity.getRefundStatus());
+        }else {
+            map.put("wechat",0);
+        }
+        PayConfigureEntity one = payConfigureMapper.selectOne(new QueryWrapper<PayConfigureEntity>().eq("company_id", companyId));
+        if (one!=null){
+            map.put("alipay",one.getRefundStatus());
+        }else {
+            map.put("alipay",0);
+        }
+        return map;
+    }
 
     /**
      * @Description: 查询支付配置

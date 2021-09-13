@@ -13,6 +13,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 /**
  * @program: com.jsy.community
  * @description: 物业公司支付配置
@@ -54,6 +56,13 @@ public class CompanyPayConfigController {
     public CommonResult getConfig() {
         CompanyPayConfigEntity entity = companyPayConfigService.getConfig(UserUtils.getAdminUserInfo().getCompanyId());
         return CommonResult.ok(entity);
+    }
+    @Login
+    @ApiOperation("查询退款配置状态")
+    @GetMapping("getRefundConfigStatus")
+    public CommonResult getRefundConfig() {
+        Map map = companyPayConfigService.getRefundConfig(UserUtils.getAdminUserInfo().getCompanyId());
+        return CommonResult.ok(map);
     }
 
 
