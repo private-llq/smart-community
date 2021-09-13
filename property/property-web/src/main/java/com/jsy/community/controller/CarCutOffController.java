@@ -98,7 +98,7 @@ public class CarCutOffController{
             System.out.println("在场车辆导出");
             //在场车辆
             List<CarSceneVO>  list = carCutOffService.selectCarSceneList(carCutOffQO,communityId);
-            ExcelUtils.exportModule("在场车辆表", response, CarSceneVO.class, list, 2);
+            ExcelUtils.exportModule("在场车辆表", response, CarSceneVO.class, list, 1);
 
         }else {
             //进出记录

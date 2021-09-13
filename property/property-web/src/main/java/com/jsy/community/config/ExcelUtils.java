@@ -2,6 +2,7 @@ package com.jsy.community.config;
 import com.alibaba.excel.EasyExcel;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.util.excel.impl.CustomImageCellWriteHandler;
+import com.jsy.community.util.excel.impl.ImageModifyHandler;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +34,7 @@ public class ExcelUtils {
         imageColumnIndexs.add(0);
         imageColumnIndexs.add(4);
         imageColumnIndexs.add(8);
-        EasyExcel.write(out, c).sheet(filename).registerWriteHandler(new CustomImageCellWriteHandler(imageColumnIndexs))
+        EasyExcel.write(out, c).sheet(filename).registerWriteHandler(new ImageModifyHandler())
                 .doWrite(data);
         out.flush();
         out.close();
