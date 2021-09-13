@@ -35,4 +35,13 @@ public interface ICompanyPayConfigService {
      * @return:
      */
     CompanyPayConfigEntity getConfig(Long companyId);
+
+    /**
+     * @Description: 查询小区支付配置
+     * @author: Hu
+     * @since: 2021/9/13 11:34
+     * @Param:
+     * @return:
+     */
+    CompanyPayConfigEntity getCompanyConfig(Long propertyId);
 }

@@ -26,6 +26,18 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
 
 
     /**
+     * @Description: 查询支付配置
+     * @author: Hu
+     * @since: 2021/9/13 11:35
+     * @Param: [propertyId]
+     * @return: com.jsy.community.entity.CompanyPayConfigEntity
+     */
+    @Override
+    public CompanyPayConfigEntity getCompanyConfig(Long propertyId) {
+        return companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id",propertyId));
+    }
+
+    /**
      * @Description: 查询支付公私钥状态
      * @author: Hu
      * @since: 2021/9/10 16:58
@@ -71,27 +83,27 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
         CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId));
         if (Objects.isNull(entity)){
             CompanyPayConfigEntity configEntity = new CompanyPayConfigEntity();
-            BeanUtils.copyProperties(communityHardWareEntity,entity);
+            BeanUtils.copyProperties(communityHardWareEntity,configEntity);
             configEntity.setCompanyId(companyId);
             configEntity.setId(0L);
             companyPayConfigMapper.insert(configEntity);
         } else {
-            if ("".equals(communityHardWareEntity.getAppId())&&communityHardWareEntity.getAppId()!=null){
+            if (!"".equals(communityHardWareEntity.getAppId())&&communityHardWareEntity.getAppId()!=null){
                 entity.setAppId(communityHardWareEntity.getAppId());
             }
-            if ("".equals(communityHardWareEntity.getAppSecret())&&communityHardWareEntity.getAppSecret()!=null){
+            if (!"".equals(communityHardWareEntity.getAppSecret())&&communityHardWareEntity.getAppSecret()!=null){
                 entity.setAppSecret(communityHardWareEntity.getAppSecret());
             }
-            if ("".equals(communityHardWareEntity.getMchId())&&communityHardWareEntity.getMchId()!=null){
+            if (!"".equals(communityHardWareEntity.getMchId())&&communityHardWareEntity.getMchId()!=null){
                 entity.setMchId(communityHardWareEntity.getMchId());
             }
-            if ("".equals(communityHardWareEntity.getApiV3())&&communityHardWareEntity.getApiV3()!=null){
+            if (!"".equals(communityHardWareEntity.getApiV3())&&communityHardWareEntity.getApiV3()!=null){
                 entity.setApiV3(communityHardWareEntity.getApiV3());
             }
-            if ("".equals(communityHardWareEntity.getPrivateKey())&&communityHardWareEntity.getPrivateKey()!=null){
+            if (!"".equals(communityHardWareEntity.getPrivateKey())&&communityHardWareEntity.getPrivateKey()!=null){
                 entity.setPrivateKey(communityHardWareEntity.getPrivateKey());
             }
-            if ("".equals(communityHardWareEntity.getMchSerialNo())&&communityHardWareEntity.getMchSerialNo()!=null){
+            if (!"".equals(communityHardWareEntity.getMchSerialNo())&&communityHardWareEntity.getMchSerialNo()!=null){
                 entity.setMchSerialNo(communityHardWareEntity.getMchSerialNo());
             }
             companyPayConfigMapper.updateById(entity);

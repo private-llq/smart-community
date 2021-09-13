@@ -75,10 +75,10 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICarService carService;
 
-    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
 
-    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
 
     @Autowired
@@ -107,7 +107,7 @@ public class WeChatController {
         CommunityEntity entity = communityService.getCommunityNameById(weChatPayQO.getCommunityId());
         CompanyPayConfigEntity serviceConfig = null;
         if (Objects.nonNull(entity)){
-            serviceConfig = companyPayConfigService.getConfig(entity.getPropertyId());
+            serviceConfig = companyPayConfigService.getCompanyConfig(entity.getPropertyId());
             WechatConfig.setConfig(serviceConfig);
         }
         //封装微信支付下单请求参数
@@ -118,7 +118,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback");
+        map.put("notify_url","http://jsy.free.svipss.top/api/v1/payment/callback/"+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
@@ -195,13 +195,15 @@ public class WeChatController {
      * @Param: dsds
      * @return:
      */
-    @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
-    public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = "/callback/{id}", method = {RequestMethod.POST,RequestMethod.GET})
+    public void callback(HttpServletRequest request, HttpServletResponse response,@RequestParam("id") Long id) throws Exception {
+        System.out.println(id);
         log.info("回调成功");
         Map<String, String> map = PublicConfig.notifyParam(request , WechatConfig.API_V3_KEY);
 //        weChatService.saveStatus(out_trade_no);
         log.info(String.valueOf(map));
-
+        WeChatOrderEntity one = weChatService.getOrderOne(map.get("out_trade_no"));
+//        if ()
         weChatService.orderStatus(map);
         if (map.get("attach")!=null){
             String[] split = map.get("attach").split(",");
