@@ -72,6 +72,9 @@ public class IPropertyFinanceTicketOptionalFieldServiceImpl extends ServiceImpl<
                     ticketOptionalFieldEntityList.add(ticketOptionalFieldEntity);
                     optionalFieldMap.put(ticketOptionalFieldEntity.getLocationType(), ticketOptionalFieldEntityList);
                 }
+                ticketOptionalFieldEntity.setCreateTime(null);
+                ticketOptionalFieldEntity.setUpdateTime(null);
+                ticketOptionalFieldEntity.setDeleted(null);
             }
         }
         return optionalFieldMap;

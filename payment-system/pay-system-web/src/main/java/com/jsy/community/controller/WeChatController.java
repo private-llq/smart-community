@@ -8,6 +8,8 @@ import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderRecordEntity;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.CompanyPayConfigEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
@@ -45,10 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -76,6 +75,11 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICarService carService;
 
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICompanyPayConfigService companyPayConfigService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICommunityService communityService;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -100,6 +104,12 @@ public class WeChatController {
     @Login
     @PostMapping("/wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+        CommunityEntity entity = communityService.getCommunityNameById(weChatPayQO.getCommunityId());
+        CompanyPayConfigEntity serviceConfig = null;
+        if (Objects.nonNull(entity)){
+            serviceConfig = companyPayConfigService.getConfig(entity.getPropertyId());
+            WechatConfig.setConfig(serviceConfig);
+        }
         //封装微信支付下单请求参数
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
@@ -156,6 +166,7 @@ public class WeChatController {
         msg.setAmount(weChatPayQO.getAmount());
         msg.setOrderStatus(1);
         msg.setArriveStatus(1);
+        msg.setCompanyId(serviceConfig.getCompanyId());
         msg.setCreateTime(LocalDateTime.now());
 
         //mq异步保存账单到数据库

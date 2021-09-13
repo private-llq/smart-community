@@ -277,9 +277,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         assetLeaseRecordEntityQueryWrapper.eq("asset_id", houseId);
         assetLeaseRecordEntityQueryWrapper.eq("asset_type", BusinessEnum.HouseTypeEnum.HOUSE.getCode());
         assetLeaseRecordEntityQueryWrapper.and(
-                wapper -> wapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
-                        .or(newwapper ->
-                                newwapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                wrapper -> wrapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                        .or(newWrapper ->
+                                newWrapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
                                         .gt("end_date", new Date())
                         )
         );

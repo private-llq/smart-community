@@ -361,6 +361,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderEntity.setCarPositionId(carEntity.getCarPositionId());
             carOrderEntity.setType(2);
             carOrderEntity.setUid(carEntity.getUid());
+            carOrderEntity.setPayType(1);
             carOrderEntity.setOrderTime(LocalDateTime.now());
             carOrderEntity.setBeginTime(carEntity.getBeginTime());
             carOrderEntity.setOverTime(carEntity.getOverTime());
@@ -389,7 +390,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             orderEntity.setTargetId(entity.getCarId());
             orderEntity.setPropertyFee(entity.getMoney());
             orderEntity.setOrderStatus(1);
-            orderEntity.setPayType(entity.getPayType());
+            orderEntity.setPayType(2);
             orderEntity.setPayTime(LocalDateTime.now());
             orderEntity.setBeginTime(carEntity.getBeginTime().toLocalDate());
             orderEntity.setOverTime(carEntity.getOverTime().toLocalDate());
@@ -466,6 +467,23 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 //停车临时收费表更新
                 entity.setStatus(1);
                 carOrderRecordMapper.updateById(entity);
+
+                //向账单表添加数据
+                PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
+                orderEntity.setAssociatedType(2);
+                orderEntity.setBuildType(4);
+                orderEntity.setCommunityId(entity.getCommunityId());
+                orderEntity.setOrderTime(LocalDate.now());
+                orderEntity.setUid(entity.getUid());
+                orderEntity.setTargetId(entity.getCarId());
+                orderEntity.setPropertyFee(entity.getMoney());
+                orderEntity.setOrderStatus(1);
+                orderEntity.setPayType(2);
+                orderEntity.setPayTime(LocalDateTime.now());
+                orderEntity.setBeginTime(carEntity.getBeginTime().toLocalDate());
+                orderEntity.setOverTime(carEntity.getOverTime().toLocalDate());
+                orderEntity.setId(SnowFlake.nextId());
+                propertyFinanceOrderService.insert(orderEntity);
             }
     }
 

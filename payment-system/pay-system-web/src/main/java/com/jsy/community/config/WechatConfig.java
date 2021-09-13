@@ -1,6 +1,6 @@
 package com.jsy.community.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.jsy.community.entity.CompanyPayConfigEntity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,33 +32,44 @@ public class WechatConfig {
     //证书编号
     public static String MCH_SERIAL_NO;
 
+    public static void setConfig(CompanyPayConfigEntity serviceConfig) {
+        APPID=serviceConfig.getAppId();
+        MCH_ID=serviceConfig.getMchId();
+        PRIVATE_KEY=serviceConfig.getPrivateKey();
+        API_V3_KEY=serviceConfig.getApiV3();
+        MCH_SERIAL_NO=serviceConfig.getMchSerialNo();
+        APICLIENT_KEY=serviceConfig.getApiclientKeyUrl();
+        APICLIENT_CRET=serviceConfig.getApiclientCertUrl();
 
-    @Value("${wechat.app_id}")
-    public void setAPPID(String APPID) {
-        WechatConfig.APPID = APPID;
     }
-    @Value("${wechat.apiclient_key}")
-    public void setApiclientKey(String apiclientKey) {
-        WechatConfig.APICLIENT_KEY = apiclientKey;
-    }
-    @Value("${wechat.apiclient_cret}")
-    public void setApiclientCret(String apiclientCret) {
-        WechatConfig.APICLIENT_CRET = apiclientCret;
-    }
-    @Value("${wechat.mch_id}")
-    public void setMchId(String mchId) {
-        WechatConfig.MCH_ID = mchId;
-    }
-    @Value("${wechat.private_key}")
-    public void setPrivateKey(String privateKey) {
-        WechatConfig.PRIVATE_KEY = privateKey;
-    }
-    @Value("${wechat.private_v3_key}")
-    public void setApiV3Key(String apiV3Key) {
-        WechatConfig.API_V3_KEY = apiV3Key;
-    }
-    @Value("${wechat.mch_serial_no}")
-    public void setMchSerialNo(String mchSerialNo) {
-        WechatConfig.MCH_SERIAL_NO = mchSerialNo;
-    }
+
+
+//    @Value("${wechat.app_id}")
+//    public void setAPPID(String APPID) {
+//        WechatConfig.APPID = APPID;
+//    }
+//    @Value("${wechat.apiclient_key}")
+//    public void setApiclientKey(String apiclientKey) {
+//        WechatConfig.APICLIENT_KEY = apiclientKey;
+//    }
+//    @Value("${wechat.apiclient_cret}")
+//    public void setApiclientCret(String apiclientCret) {
+//        WechatConfig.APICLIENT_CRET = apiclientCret;
+//    }
+//    @Value("${wechat.mch_id}")
+//    public void setMchId(String mchId) {
+//        WechatConfig.MCH_ID = mchId;
+//    }
+//    @Value("${wechat.private_key}")
+//    public void setPrivateKey(String privateKey) {
+//        WechatConfig.PRIVATE_KEY = privateKey;
+//    }
+//    @Value("${wechat.private_v3_key}")
+//    public void setApiV3Key(String apiV3Key) {
+//        WechatConfig.API_V3_KEY = apiV3Key;
+//    }
+//    @Value("${wechat.mch_serial_no}")
+//    public void setMchSerialNo(String mchSerialNo) {
+//        WechatConfig.MCH_SERIAL_NO = mchSerialNo;
+//    }
 }

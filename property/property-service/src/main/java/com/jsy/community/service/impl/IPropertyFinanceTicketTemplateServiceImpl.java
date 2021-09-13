@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyFinanceTicketTemplateService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
-import com.jsy.community.entity.FinanceTicketOptionalFieldEntity;
 import com.jsy.community.entity.FinanceTicketTemplateEntity;
 import com.jsy.community.entity.FinanceTicketTemplateFieldEntity;
 import com.jsy.community.mapper.FinanceTicketTemplateFieldMapper;
@@ -21,8 +20,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
 
 /**
  * @Author: Pipi
@@ -50,8 +47,8 @@ public class IPropertyFinanceTicketTemplateServiceImpl extends ServiceImpl<Finan
     public String insertTicketTemplate(FinanceTicketTemplateEntity templateEntity) {
         templateEntity.setId(SnowFlake.nextId());
         for (FinanceTicketTemplateFieldEntity templateFieldEntity : templateEntity.getTemplateFieldEntities()) {
-            templateFieldEntity.setFieldId(templateFieldEntity.getId());
-            templateFieldEntity.setId(String.valueOf(SnowFlake.nextId()));
+            templateFieldEntity.setFieldId(String.valueOf(templateFieldEntity.getId()));
+            templateFieldEntity.setId(SnowFlake.nextId());
             templateFieldEntity.setTemplateId(String.valueOf(templateEntity.getId()));
         }
         // 向模板字段关联表插入数据

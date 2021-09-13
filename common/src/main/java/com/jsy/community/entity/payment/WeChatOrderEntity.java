@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 public class WeChatOrderEntity implements Serializable {
     @ApiModelProperty(value = "订单号")
     private String id;
+    @ApiModelProperty(value = "物业公司id")
+    private Long companyId;
     @ApiModelProperty(value = "微信支付订单号")
     private String transactionId;
     @ApiModelProperty(value = "用户id")

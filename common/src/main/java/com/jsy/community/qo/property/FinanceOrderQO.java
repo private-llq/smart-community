@@ -55,6 +55,10 @@ public class FinanceOrderQO implements Serializable {
      * 状态1显示，2隐藏
      */
     private Integer hide;
+    /**
+     * 状态1后台缴费，2APP支付
+     */
+    private Integer payType;
 
     /**
      * 生成时间

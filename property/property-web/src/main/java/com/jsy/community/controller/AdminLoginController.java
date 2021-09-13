@@ -9,7 +9,6 @@ import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.admin.*;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.util.MyCaptchaUtil;
 import com.jsy.community.utils.RSAUtil;
@@ -27,7 +26,6 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -35,7 +33,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -170,9 +171,9 @@ public class AdminLoginController {
 		AdminInfoVo adminInfoVo = new AdminInfoVo();
 
 		//判断有无任一社区权限
-		if(CollectionUtils.isEmpty(adminCommunityList)){
+		/*if(CollectionUtils.isEmpty(adminCommunityList)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无社区管理权限，请联系管理员添加社区权限");
-		}
+		}*/
 		if (adminUserRoleEntity != null) {
 			adminInfoVo.setRoleId(adminUserRoleEntity.getRoleId());
 			userData.setRoleId(adminUserRoleEntity.getRoleId());

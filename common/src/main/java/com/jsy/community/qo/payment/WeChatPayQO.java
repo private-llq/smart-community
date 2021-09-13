@@ -29,5 +29,8 @@ public class WeChatPayQO {
     @ApiModelProperty("停车缴费临时记录id")
     private Long carOrderRecordId;
 
+    @ApiModelProperty("停车缴费临时记录id")
+    private Long communityId;
+
 
 }
