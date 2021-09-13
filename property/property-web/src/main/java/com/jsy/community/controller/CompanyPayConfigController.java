@@ -26,7 +26,7 @@ import java.util.Map;
 @RequestMapping("/company/config")
 public class CompanyPayConfigController {
 
-    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
 
     @ApiOperation("上传私钥")
@@ -48,7 +48,7 @@ public class CompanyPayConfigController {
     @PutMapping("basicConfig")
     public CommonResult basicConfig(@RequestBody CompanyPayConfigEntity communityHardWareEntity) {
         companyPayConfigService.basicConfig(communityHardWareEntity, UserUtils.getAdminUserInfo().getCompanyId());
-        return CommonResult.ok("添加成功!");
+        return CommonResult.ok();
     }
     @Login
     @ApiOperation("查询状态")
@@ -64,7 +64,6 @@ public class CompanyPayConfigController {
         Map map = companyPayConfigService.getRefundConfig(UserUtils.getAdminUserInfo().getCompanyId());
         return CommonResult.ok(map);
     }
-
 
 
 }

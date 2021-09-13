@@ -136,10 +136,10 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
                 entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getMchSerialNo()));
             }
             if (!"".equals(communityHardWareEntity.getApiclientKeyUrl())&&communityHardWareEntity.getApiclientKeyUrl()!=null){
-                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getApiclientKeyUrl()));
+                entity.setApiclientKeyUrl(AESOperator.encrypt(communityHardWareEntity.getApiclientKeyUrl()));
             }
             if (!"".equals(communityHardWareEntity.getApiclientCertUrl())&&communityHardWareEntity.getApiclientCertUrl()!=null){
-                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getApiclientCertUrl()));
+                entity.setApiclientCertUrl(AESOperator.encrypt(communityHardWareEntity.getApiclientCertUrl()));
             }
             if (communityHardWareEntity.getRefundStatus()!=null&&communityHardWareEntity.getRefundStatus()!=0){
                 entity.setRefundStatus(communityHardWareEntity.getRefundStatus());
@@ -165,10 +165,10 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
                 entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getMchSerialNo()));
             }
             if (!"".equals(communityHardWareEntity.getApiclientKeyUrl())&&communityHardWareEntity.getApiclientKeyUrl()!=null){
-                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getApiclientKeyUrl()));
+                entity.setApiclientKeyUrl(AESOperator.encrypt(communityHardWareEntity.getApiclientKeyUrl()));
             }
             if (!"".equals(communityHardWareEntity.getApiclientCertUrl())&&communityHardWareEntity.getApiclientCertUrl()!=null){
-                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getApiclientCertUrl()));
+                entity.setApiclientCertUrl(AESOperator.encrypt(communityHardWareEntity.getApiclientCertUrl()));
             }
             if (communityHardWareEntity.getRefundStatus()!=null&&communityHardWareEntity.getRefundStatus()!=0){
                 entity.setRefundStatus(communityHardWareEntity.getRefundStatus());
