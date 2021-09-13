@@ -33,14 +33,22 @@ public class CompanyPayConfigController {
     @PostMapping("/key")
 //    @Login
     public CommonResult uploadApiclientKey(@RequestParam("file") MultipartFile file) {
-        String upload = MinioUtils.upload(file, "apiclient");
+        String upload = MinioUtils.upload(file, "apiclient-key");
         return  CommonResult.ok(upload,"上传成功");
     }
     @ApiOperation("上传公钥")
     @PostMapping("/cert")
 //    @Login
     public CommonResult uploadApiclientCert(@RequestParam("file") MultipartFile file) {
-        String upload = MinioUtils.upload(file, "apiclient");
+        String upload = MinioUtils.upload(file, "apiclient-cert");
+        return  CommonResult.ok(upload,"上传成功");
+    }
+
+    @ApiOperation("上传apiclient_cert.p12")
+    @PostMapping("/certP12")
+//    @Login
+    public CommonResult uploadApiclientCertP12(@RequestParam("file") MultipartFile file) {
+        String upload = MinioUtils.upload(file, "apiclient-cert-p12");
         return  CommonResult.ok(upload,"上传成功");
     }
     @Login

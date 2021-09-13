@@ -235,6 +235,7 @@ public class AdminLoginController {
 		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
 		//设置小区级菜单
 		user.setMenuList(userMenu);
+		user.setCompanyId(UserUtils.getAdminCompanyId());
 		//设置小区ID
 		user.setCommunityId(communityId);
 		user.setCommunityIdList(communityIds);

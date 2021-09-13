@@ -57,6 +57,11 @@ public class CompanyPayConfigEntity extends BaseEntity {
      */
     @TableField(exist = false)
     private Integer apiclientCertStatus;
+
+    /**
+     * apiclient_cert.p12  URL
+     */
+    private String apiclientCertP12Url;
     /**
      * 证书编号
      */
