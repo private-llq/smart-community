@@ -41,7 +41,6 @@ public class ProprietorMarketQO extends BaseQO {
     private String goodsName;
 
 
-    @Range(min = 0,message = "交易金额错误")
     @ApiModelProperty(value = "价格")
     private BigDecimal price;
 

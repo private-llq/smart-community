@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.excel.util.FileUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,13 +22,18 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.alibaba.fastjson.util.IOUtils.readAll;
 
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
@@ -111,7 +117,7 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
     }
 
     @Override
-    public List<CarSceneVO> selectCarSceneList(CarCutOffQO query, Long communityId) throws MalformedURLException {
+    public List<CarSceneVO> selectCarSceneList(CarCutOffQO query, Long communityId) throws IOException {
         QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
 
         if (!StringUtils.isEmpty(query.getCarNumber())){
@@ -133,24 +139,29 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
         for (CarCutOffEntity i: carCutOffEntityList) {
             CarSceneVO carSceneVO = new CarSceneVO();
             BeanUtils.copyProperties(i,carSceneVO);
-            String outPic = i.getOutPic();
-            System.out.println(new URL(outPic));
-            URL url = new URL("https://raw.githubusercontent.com/alibaba/easyexcel/master/src/test/resources/converter/img.jpg");
-            carSceneVO.setOutPic(url);
+
             if (i.getOpenTime()!=null){
                 date = Date.from(i.getOpenTime().atZone(ZoneId.systemDefault()).toInstant());
                 carSceneVO.setOpenTime(date);
             }
-            System.out.println(carSceneVO);
+            URL url = new URL("http://222.178.212.29:9000/car-in-and-out-picture/車牌1630917537沪A99999.jpg");
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("GET");
+            con.setConnectTimeout(4 * 1000);
+            InputStream inStream = con .getInputStream();    //通过输入流获取图片数据
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[2048];
+            int len = 0;
+            while( (len=inStream.read(buffer)) != -1 ){
+                outStream.write(buffer, 0, len);
+            }
+            inStream.close();
+            byte[] data =  outStream.toByteArray();
+            carSceneVO.setByteArray(data);
+            System.out.println(data);
             sceneVOS.add(carSceneVO);
-
-
-//            if (i.getOpenTime()!=null  && i.getStopTime()!=null){
-//                HashMap<String, Long> datePoor = TimeUtils.getDatePoor(i.getOpenTime(), i.getStopTime());
-//                String s = datePoor.get("day")+"天："+datePoor.get("hour")+" 小时："+datePoor.get("min")+" 分钟";
-//                i.setStopCarTime(s);
-//            }
         }
+
         return sceneVOS;
     }
 

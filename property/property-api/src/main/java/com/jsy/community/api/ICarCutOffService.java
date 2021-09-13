@@ -9,6 +9,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.property.CarAccessVO;
 import com.jsy.community.vo.property.CarSceneVO;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
@@ -64,7 +65,7 @@ public interface ICarCutOffService extends IService<CarCutOffEntity> {
      * @Author: Tian
      * @Date: 2021/9/10-10:17
      **/
-    List<CarSceneVO> selectCarSceneList(CarCutOffQO carCutOffQO, Long communityId) throws MalformedURLException;
+    List<CarSceneVO> selectCarSceneList(CarCutOffQO carCutOffQO, Long communityId) throws IOException;
 
     /**
      * @Description: 导出进出记录

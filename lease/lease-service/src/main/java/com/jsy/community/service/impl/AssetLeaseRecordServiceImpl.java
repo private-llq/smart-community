@@ -377,7 +377,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.last("limit 0,1");
         AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (assetLeaseRecordEntity != null) {
-            throw new LeaseException("该房屋存在多个签约");
+            throw new LeaseException("该整租房屋/商铺已被其他人租赁");
         }
     }
 
@@ -858,7 +858,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 shopImgEntityQueryWrapper.eq("shop_id", leaseRecordEntity.getAssetId());
                 shopImgEntityQueryWrapper.last("limit 1");
                 ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
-                leaseRecordEntity.setImageUrl(shopImgEntity.getImgUrl());
+                leaseRecordEntity.setImageUrl(shopImgEntity == null ? null : shopImgEntity.getImgUrl());
                 leaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
                 leaseRecordEntity.setSummarize(shopLeaseEntity.getSummarize());
                 leaseRecordEntity.setPrice(shopLeaseEntity.getMonthMoney());
@@ -935,15 +935,15 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         if (leaseRecordEntity.getOperation() == 1 ||leaseRecordEntity.getOperation() == 7 ||leaseRecordEntity.getOperation() == 8 ||leaseRecordEntity.getOperation() == 9) {
             leaseRecordEntity.setProgressNumber(1);
             if (leaseRecordEntity.getOperation() == 1) {
-                // 发起签约,倒计时就是发起签约的时间加7天
-                leaseRecordEntity.setCountdownFinish(leaseRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                // 发起签约,倒计时就是发起签约的时间加3天
+                leaseRecordEntity.setCountdownFinish(leaseRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
             }
             if (leaseRecordEntity.getOperation() == 9) {
-                // 重新发起,倒计时就是重新发起的时间加7天
+                // 重新发起,倒计时就是重新发起的时间加3天
                 // 查询重新发起的时间
                 LeaseOperationRecordEntity leaseOperationRecordEntity = queryLeaseOperationRecord(assetLeaseRecordEntity.getId(), leaseRecordEntity.getOperation());
                 if (leaseOperationRecordEntity != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
                 }
             }
         } else if (leaseRecordEntity.getOperation() == 2 || leaseRecordEntity.getOperation() == 3) {
