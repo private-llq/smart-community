@@ -439,7 +439,7 @@ public class ExcelUtil {
                     }else{
                         //避免poi读入手机号 自动变为 科学计数
                         NumberFormat f=new DecimalFormat("############");
-                        f.setMaximumFractionDigits(0);
+                        f.setMaximumFractionDigits(999);
                         cellValue= f.format(cell.getNumericCellValue());
                     }
                     break;

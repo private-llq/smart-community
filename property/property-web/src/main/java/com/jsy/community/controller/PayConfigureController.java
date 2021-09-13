@@ -2,58 +2,75 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.ISmsSendRecordService;
+import com.jsy.community.api.IPayConfigureService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.SmsSendRecordEntity;
-import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
-import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.SmsSendRecordQO;
-import com.jsy.community.utils.PageInfo;
+import com.jsy.community.entity.PayConfigureEntity;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @program: com.jsy.community
- * @description: 支付配置
+ * @description: 支付宝支付配置
  * @author: DKS
  * @create: 2021-09-09 09:51
  **/
-@Api(tags = "支付配置")
+@Api(tags = "支付宝支付配置")
 @RestController
-@RequestMapping("/pay/configure")
+@RequestMapping("/alipay/configure")
 @ApiJSYController
 @Login
 public class PayConfigureController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private ISmsSendRecordService smsSendRecordService;
+    private IPayConfigureService payConfigureService;
     
-    /**
-     * @Description: 分页查询短信发送记录
-     * @Param: [baseQO]
-     * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.SmsSendRecordEntity>>
-     * @Author: DKS
-     * @Date: 2021/09/08
-     **/
-    @Login
-    @ApiOperation("分页查询短信发送记录")
-    @PostMapping("/query")
-    public CommonResult<PageInfo<SmsSendRecordEntity>> queryPropertyDeposit(@RequestBody BaseQO<SmsSendRecordQO> baseQO) {
-        SmsSendRecordQO query = baseQO.getQuery();
-        if(query == null){
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+    @ApiOperation("上传应用公钥证书路径")
+    @PostMapping("/upload/cert/path")
+    public CommonResult uploadCertPath(@RequestParam("file") MultipartFile file) {
+        String upload = MinioUtils.upload(file, "alipayCertPath");
+        if (StringUtils.isNotBlank(upload)) {
+            CommonResult.ok("上传失败");
         }
-        List<Long> adminCommunityIdList = UserUtils.getAdminCommunityIdList();
-        return CommonResult.ok(smsSendRecordService.querySmsSendRecord(baseQO, adminCommunityIdList));
+        return  CommonResult.ok(upload,"上传成功");
+    }
+    
+    @ApiOperation("上传支付宝公钥证书路径")
+    @PostMapping("/upload/public")
+    public CommonResult uploadAlipayPublicCertPath(@RequestParam("file") MultipartFile file) {
+        String upload = MinioUtils.upload(file, "alipayPublicCertPath");
+        if (StringUtils.isNotBlank(upload)) {
+            CommonResult.ok("上传失败");
+        }
+        return  CommonResult.ok(upload,"上传成功");
+    }
+    
+    @ApiOperation("上传支付宝根证书路径")
+    @PostMapping("/upload/root")
+    public CommonResult uploadRootCertPath(@RequestParam("file") MultipartFile file) {
+        String upload = MinioUtils.upload(file, "alipayRootCertPath");
+        if (StringUtils.isNotBlank(upload)) {
+            CommonResult.ok("上传失败");
+        }
+        return  CommonResult.ok(upload,"上传成功");
+    }
+    
+    @ApiOperation("更新配置")
+    @PutMapping("/basic/config")
+    public CommonResult basicConfig(@RequestBody PayConfigureEntity payConfigureEntity) {
+        payConfigureService.basicConfig(payConfigureEntity, UserUtils.getAdminUserInfo().getCompanyId());
+        return CommonResult.ok("添加成功!");
+    }
+    
+    @ApiOperation("查询证书上传状态")
+    @GetMapping("getConfig")
+    public CommonResult getConfig() {
+        return CommonResult.ok(payConfigureService.getConfig(UserUtils.getAdminUserInfo().getCompanyId()),"查询成功!");
     }
 }
