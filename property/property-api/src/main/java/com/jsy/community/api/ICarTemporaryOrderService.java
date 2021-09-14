@@ -50,7 +50,6 @@ public interface ICarTemporaryOrderService extends IService<CarOrderEntity> {
      * @Date: 2021/9/10-9:43
      **/
     List<CarTemporaryQO> selectTemporaryQOList(CarOrderQO carOrderQO, Long communityId);
-    Map<String, Object> selectMoney();
 
     List<Map<String, BigDecimal>> selectMoney2(Long adminCommunityId);
 
