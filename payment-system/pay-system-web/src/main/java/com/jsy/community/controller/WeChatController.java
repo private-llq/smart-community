@@ -149,20 +149,20 @@ public class WeChatController {
         }
         //停车缴费逻辑
         if (weChatPayQO.getTradeFrom()==8){
-            if ("".equals(weChatPayQO.getCarOrderRecordId())||weChatPayQO.getCarOrderRecordId()==null){
+            if ("".equals(weChatPayQO.getServiceOrderNo())||weChatPayQO.getServiceOrderNo()==null){
                 return CommonResult.error("车位缴费临时订单记录id不能为空！");
             }
             if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
                 map.put("description", "车位缴费");
             }
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
-            map.put("attach",8+","+weChatPayQO.getCarOrderRecordId());
+            map.put("attach",8+","+weChatPayQO.getServiceOrderNo());
         }
         //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
         msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
-        msg.setOpenId(null);
+        msg.setServiceOrderNo(null);
         msg.setPayType(weChatPayQO.getTradeFrom());
         msg.setDescription(weChatPayQO.getDescriptionStr());
         msg.setAmount(weChatPayQO.getAmount());

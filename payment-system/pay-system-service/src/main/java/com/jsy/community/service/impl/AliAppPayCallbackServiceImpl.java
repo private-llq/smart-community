@@ -6,6 +6,7 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.constant.PaymentEnum;
+import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
@@ -57,6 +58,9 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPayConfigureService payConfigureService;
+
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICarService carService;
 
 	@Autowired
 	private StringRedisTemplate redisTemplate;
@@ -185,6 +189,18 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				propertyFinanceReceiptService.add(receiptEntity);
 				//修改物业费账单
 				propertyFinanceOrderService.updateOrderStatusBatch(2, order.getOrderNo(), ids.split(","));
+			} else if (PaymentEnum.TradeFromEnum.TRADE_FROM_PARKING_PAYMENT.getIndex().equals(order.getTradeName())){
+				log.info("开始修改停车账单状态，订单号：" + order.getOrderNo());
+				CarOrderRecordEntity entity = carService.findOne(Long.parseLong(order.getServiceOrderNo()));
+				entity.setOrderNum(order.getOrderNo());
+				if (entity!=null){
+					if (entity.getType()==1){
+						carService.bindingMonthCar(entity);
+					}else {
+						carService.renewMonthCar(entity);
+					}
+				}
+				log.info("处理完成");
 			}
 		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(order.getTradeType())){  // 提现
 			log.info("开始处理提现订单");
