@@ -1390,7 +1390,7 @@ public interface BusinessEnum {
 	 * 租赁签约进程状态枚举
 	 */
 	enum ContractingProcessStatusEnum {
-		INITIATE_CONTRACT("发起签约", 1),
+		INITIATE_CONTRACT("(租客)申请签约", 1),
 		ACCEPTING_APPLICATIONS("接受申请", 2),
 		CONTRACT_PREPARATION("拟定合同", 3),
 		WAITING_TO_PAY_RENT("等待支付房租", 4),
@@ -1398,7 +1398,10 @@ public interface BusinessEnum {
 		COMPLETE_CONTRACT("完成签约", 6),
 		CANCELLATION_REQUEST("取消申请", 7),
 		REJECTION_OF_APPLICATION("拒绝申请", 8),
-		RELAUNCH("重新发起", 9);
+		REAPPLY("重新申请", 9),
+		LANDLORD_INITIATED_CONTRACT("(房东)发起签约", 31),
+		CANCEL_LAUNCH("取消发起", 32)
+		;
 		private String name;
 		private Integer code;
 

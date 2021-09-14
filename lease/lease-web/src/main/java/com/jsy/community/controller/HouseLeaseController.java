@@ -324,30 +324,38 @@ public class HouseLeaseController {
 
     /**
      * @author: Pipi
-     * @description: 签章调用相关操作(拟定合同后(设置合同信息,更新状态到等待支付)、完成签约)
+     * @description: 签章调用相关操作(区块链上链成功通知:4、完成签约:6、发起签约/重新发起:31、取消发起:32)
      * @param assetLeaseRecordEntity: 签约实体
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/7 10:17
      **/
-    @Login
     @PostMapping("/v2/signatureOperationContract")
     public CommonResult signatureOperationContract(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
         if (assetLeaseRecordEntity.getOperationType() == null ||
-                (assetLeaseRecordEntity.getOperationType() != BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode()
-                        && assetLeaseRecordEntity.getOperationType() != BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())) {
-            throw new JSYException(400, "签章操作只能是设置合同信息:4或者完成签约:6");
+                (assetLeaseRecordEntity.getOperationType() != BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode()
+                        && assetLeaseRecordEntity.getOperationType() != BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode()
+                        && assetLeaseRecordEntity.getOperationType() != BusinessEnum.ContractingProcessStatusEnum.CANCEL_LAUNCH.getCode()
+                        && assetLeaseRecordEntity.getOperationType() != 4
+                )
+        ) {
+            throw new JSYException(400, "签章操作只能是区块链上链成功通知:4、完成签约:6、发起签约/重新发起:31、取消发起:32");
         }
-        if (assetLeaseRecordEntity.getOperationType() == BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode()) {
+        if (assetLeaseRecordEntity.getOperationType() == BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode()) {
             if (assetLeaseRecordEntity.getId() == null) {
                 throw new JSYException(400, "签约ID不能为空");
             }
-            // 设置合同信息(更新状态到等待支付)
-            ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.SetContractNoValidate.class);
-        } else {
+            // 发起签约/重新发起
+            ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.LandlordInitiatedContractValidate.class);
+        } else if (assetLeaseRecordEntity.getOperationType() == BusinessEnum.ContractingProcessStatusEnum.CANCEL_LAUNCH.getCode()) {
+            // 房东取消发起签约
+            ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.CancelContractValidate.class);
+        } else if (assetLeaseRecordEntity.getOperationType() == BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode()) {
             // 完成签约
             ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.CompleteContractValidate.class);
+        } else if (assetLeaseRecordEntity.getOperationType() == 4) {
+            // 区块链上链成功通知
+            ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.BlockchainSuccessfulValidate.class);
         }
-        assetLeaseRecordEntity.setHomeOwnerUid(UserUtils.getUserId());
         return CommonResult.ok(assetLeaseRecordService.signatureOperation(assetLeaseRecordEntity));
     }
 

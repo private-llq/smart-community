@@ -407,4 +407,9 @@ public interface BusinessConst {
      */
     long COUNTDOWN_TO_CONTRACT_APPLY = 3;
 
+    /**
+     * 一天的毫秒数
+     */
+    long ONE_DAY = 1000 * 60 * 60 * 24;
+
 }
