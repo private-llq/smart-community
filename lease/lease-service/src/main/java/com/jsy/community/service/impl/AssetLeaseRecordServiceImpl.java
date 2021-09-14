@@ -398,6 +398,22 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         recordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.REAPPLY.getCode());
         //写入租赁操作数据
         addLeaseOperationRecord(recordEntity);
+        // 记录倒计时
+        JSONObject pushMap = new JSONObject();
+        pushMap.put("id", recordEntity.getId());
+        pushMap.put("operation", recordEntity.getOperation());
+        pushMap.put("operationTime", LocalDateTime.now());
+        rabbitTemplate.convertAndSend(LeaseTopicExConfig.DELAY_EX_TOPIC_TO_LEASE_CONTRACT,
+                LeaseTopicExConfig.DELAY_QUEUE_TO_LEASE_CONTRACT,
+                pushMap.toString(),
+                new MessagePostProcessor() {
+                    @Override
+                    public Message postProcessMessage(Message message) throws AmqpException {
+                        // 倒计时7天
+                        message.getMessageProperties().setHeader("x-delay", BusinessConst.ONE_DAY * BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT);
+                        return message;
+                    }
+                });
         return assetLeaseRecordMapper.updateById(recordEntity);
     }
 
@@ -919,7 +935,6 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
                 // 商铺
                 ShopLeaseEntity shopLeaseEntity = new ShopLeaseEntity();
-                // 商铺
                 QueryWrapper<ShopLeaseEntity> shopLeaseEntityQueryWrapper = new QueryWrapper<>();
                 shopLeaseEntityQueryWrapper.eq("id", leaseRecordEntity.getAssetId());
                 shopLeaseEntity = shopLeaseMapper.selectOne(shopLeaseEntityQueryWrapper);
@@ -1002,7 +1017,11 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setLandlordName(userInfoVo.getRealName());
             leaseRecordEntity.setLandlordPhone(userInfoVo.getMobile());
         }
-        if (leaseRecordEntity.getOperation() == 1 ||leaseRecordEntity.getOperation() == 7 ||leaseRecordEntity.getOperation() == 8 ||leaseRecordEntity.getOperation() == 9) {
+        if (leaseRecordEntity.getOperation() == 1
+                || leaseRecordEntity.getOperation() == 7
+                || leaseRecordEntity.getOperation() == 8
+                || leaseRecordEntity.getOperation() == 9
+        ) {
             leaseRecordEntity.setProgressNumber(1);
             if (leaseRecordEntity.getOperation() == 1) {
                 // 发起签约,倒计时就是发起签约的时间加3天
@@ -1016,7 +1035,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
                 }
             }
-        } else if (leaseRecordEntity.getOperation() == 2 || leaseRecordEntity.getOperation() == 3) {
+        } else if (leaseRecordEntity.getOperation() == 2 || leaseRecordEntity.getOperation() == 3 || leaseRecordEntity.getOperation() == 32) {
             if (leaseRecordEntity.getOperation() == 2) {
                 // 接受申请,倒计时就是接受申请的时间加7天
                 LeaseOperationRecordEntity leaseOperationRecordEntity = queryLeaseOperationRecord(assetLeaseRecordEntity.getId(), leaseRecordEntity.getOperation());
@@ -1025,7 +1044,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 }
             }
             leaseRecordEntity.setProgressNumber(2);
-        } else if (leaseRecordEntity.getOperation() == 4 || leaseRecordEntity.getOperation() == 5) {
+        } else if (leaseRecordEntity.getOperation() == 4 || leaseRecordEntity.getOperation() == 5 || leaseRecordEntity.getOperation() == 31) {
             leaseRecordEntity.setProgressNumber(3);
         } else if (leaseRecordEntity.getOperation() == 6) {
             leaseRecordEntity.setProgressNumber(4);
