@@ -47,4 +47,13 @@ public interface ICompanyPayConfigService {
      * @return:
      */
     Map getRefundConfig(Long companyId);
+    
+    /**
+     * @Description: 查询支付配置状态
+     * @author: DKS
+     * @since: 2021/9/13 15:04
+     * @Param: companyId
+     * @return: java.util.Map
+     */
+    Map getBasicConfig(Long companyId);
 }

@@ -27,4 +27,13 @@ public interface IPayConfigureService extends IService<PayConfigureEntity> {
      * @return: com.jsy.community.entity.PayConfigureEntity
      */
     PayConfigureEntity getConfig(Long companyId);
+    
+    /**
+     * @Description: 查询小区支付配置
+     * @author: DKS
+     * @since: 2021/9/13 15:44
+     * @Param: [propertyId]
+     * @return: com.jsy.community.entity.PayConfigureEntity
+     */
+    PayConfigureEntity getCompanyConfig(Long propertyId);
 }

@@ -46,19 +46,44 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
         if (entity!=null){
             map.put("wechat",entity.getRefundStatus());
         }else {
-            map.put("wechat",0);
+            map.put("wechat",2);
         }
         PayConfigureEntity one = payConfigureMapper.selectOne(new QueryWrapper<PayConfigureEntity>().eq("company_id", companyId));
         if (one!=null){
             map.put("alipay",one.getRefundStatus());
         }else {
-            map.put("alipay",0);
+            map.put("alipay",2);
+        }
+        return map;
+    }
+    
+    /**
+     * @Description: 查询支付配置状态
+     * @author: DKS
+     * @since: 2021/9/13 15:04
+     * @Param: companyId
+     * @return: java.util.Map
+     */
+    @Override
+    public Map getBasicConfig(Long companyId) {
+        Map<String, Integer> map = new HashMap<>();
+        CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId));
+        if (entity != null){
+            map.put("wechat",1);
+        }else {
+            map.put("wechat",2);
+        }
+        PayConfigureEntity one = payConfigureMapper.selectOne(new QueryWrapper<PayConfigureEntity>().eq("company_id", companyId));
+        if (one != null){
+            map.put("alipay",1);
+        }else {
+            map.put("alipay",2);
         }
         return map;
     }
 
     /**
-     * @Description: 查询支付配置
+     * @Description: 查询小区支付配置
      * @author: Hu
      * @since: 2021/9/13 11:35
      * @Param: [propertyId]
@@ -118,31 +143,31 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
             configEntity.setId(0L);
             configEntity.setCompanyId(companyId);
             if (!"".equals(communityHardWareEntity.getAppId())&&communityHardWareEntity.getAppId()!=null){
-                entity.setAppId(AESOperator.encrypt(communityHardWareEntity.getAppId()));
+                configEntity.setAppId(AESOperator.encrypt(communityHardWareEntity.getAppId()));
             }
             if (!"".equals(communityHardWareEntity.getAppSecret())&&communityHardWareEntity.getAppSecret()!=null){
-                entity.setAppSecret(AESOperator.encrypt(communityHardWareEntity.getAppSecret()));
+                configEntity.setAppSecret(AESOperator.encrypt(communityHardWareEntity.getAppSecret()));
             }
             if (!"".equals(communityHardWareEntity.getMchId())&&communityHardWareEntity.getMchId()!=null){
-                entity.setMchId(AESOperator.encrypt(communityHardWareEntity.getMchId()));
+                configEntity.setMchId(AESOperator.encrypt(communityHardWareEntity.getMchId()));
             }
             if (!"".equals(communityHardWareEntity.getApiV3())&&communityHardWareEntity.getApiV3()!=null){
-                entity.setApiV3(AESOperator.encrypt(communityHardWareEntity.getApiV3()));
+                configEntity.setApiV3(AESOperator.encrypt(communityHardWareEntity.getApiV3()));
             }
             if (!"".equals(communityHardWareEntity.getPrivateKey())&&communityHardWareEntity.getPrivateKey()!=null){
-                entity.setPrivateKey(AESOperator.encrypt(communityHardWareEntity.getPrivateKey()));
+                configEntity.setPrivateKey(AESOperator.encrypt(communityHardWareEntity.getPrivateKey()));
             }
             if (!"".equals(communityHardWareEntity.getMchSerialNo())&&communityHardWareEntity.getMchSerialNo()!=null){
-                entity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getMchSerialNo()));
+                configEntity.setMchSerialNo(AESOperator.encrypt(communityHardWareEntity.getMchSerialNo()));
             }
             if (!"".equals(communityHardWareEntity.getApiclientKeyUrl())&&communityHardWareEntity.getApiclientKeyUrl()!=null){
-                entity.setApiclientKeyUrl(AESOperator.encrypt(communityHardWareEntity.getApiclientKeyUrl()));
+                configEntity.setApiclientKeyUrl(AESOperator.encrypt(communityHardWareEntity.getApiclientKeyUrl()));
             }
             if (!"".equals(communityHardWareEntity.getApiclientCertUrl())&&communityHardWareEntity.getApiclientCertUrl()!=null){
-                entity.setApiclientCertUrl(AESOperator.encrypt(communityHardWareEntity.getApiclientCertUrl()));
+                configEntity.setApiclientCertUrl(AESOperator.encrypt(communityHardWareEntity.getApiclientCertUrl()));
             }
             if (communityHardWareEntity.getRefundStatus()!=null&&communityHardWareEntity.getRefundStatus()!=0){
-                entity.setRefundStatus(communityHardWareEntity.getRefundStatus());
+                configEntity.setRefundStatus(communityHardWareEntity.getRefundStatus());
             }
             companyPayConfigMapper.insert(configEntity);
         } else {

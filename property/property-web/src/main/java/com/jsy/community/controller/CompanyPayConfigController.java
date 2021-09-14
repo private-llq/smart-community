@@ -72,6 +72,12 @@ public class CompanyPayConfigController {
         Map map = companyPayConfigService.getRefundConfig(UserUtils.getAdminUserInfo().getCompanyId());
         return CommonResult.ok(map);
     }
-
-
+    
+    @Login
+    @ApiOperation("查询支付配置状态")
+    @GetMapping("getBasicConfigStatus")
+    public CommonResult getBasicConfig() {
+        Map map = companyPayConfigService.getBasicConfig(UserUtils.getAdminUserInfo().getCompanyId());
+        return CommonResult.ok(map);
+    }
 }
