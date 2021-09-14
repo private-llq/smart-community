@@ -6,6 +6,8 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.constant.PaymentEnum;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
@@ -21,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author chq459799974
@@ -48,6 +51,12 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 
 	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
 	private AssetLeaseRecordService assetLeaseRecordService;
+	
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICommunityService communityService;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPayConfigureService payConfigureService;
 
 	@Autowired
 	private StringRedisTemplate redisTemplate;
@@ -61,13 +70,22 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	**/
 	@Override
 	public String dealCallBack(Map<String, String> paramsMap){
-		boolean signVerified;
+//		CommunityEntity entity = communityService.getCommunityNameById(Long.parseLong(paramsMap.get("passback_params")));
+		CommunityEntity entity = communityService.getCommunityNameById(1L);
+		PayConfigureEntity serviceConfig;
+		if (Objects.nonNull(entity)){
+			serviceConfig = payConfigureService.getCompanyConfig(entity.getPropertyId());
+			ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
+		}
+		boolean signVerified = false;
 		//证书验签
 		try {
-			signVerified = AlipaySignature.rsaCertCheckV1(paramsMap, AlipayUtils.alipayPublicCertPath, "utf-8", "RSA2");
+			signVerified = AlipaySignature.rsaCheckV1(paramsMap, AlipayUtils.getPrivateKey(ConstClasses.AliPayDataEntity.alipayPublicCertPath), "utf-8", "RSA2");
 		} catch (AlipayApiException e1) {
 			e1.printStackTrace();
 			throw new PaymentException("验签出错");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		if (signVerified){
 			log.info("支付宝系统订单：" + paramsMap.get("out_trade_no") + "验签成功");

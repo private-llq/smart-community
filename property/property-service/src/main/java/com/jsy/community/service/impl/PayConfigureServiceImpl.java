@@ -6,10 +6,11 @@ import com.jsy.community.api.IPayConfigureService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.mapper.PayConfigureMapper;
+import com.jsy.community.utils.AESOperator;
+import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,19 +45,19 @@ public class PayConfigureServiceImpl extends ServiceImpl<PayConfigureMapper, Pay
 		PayConfigureEntity payConfigureEntity = new PayConfigureEntity();
 		PayConfigureEntity entity = payConfigureMapper.selectOne(new QueryWrapper<PayConfigureEntity>().eq("company_id", companyId));
 		if (entity != null){
-			if (StringUtils.isNotBlank(payConfigureEntity.getCertPath())){
+			if (StringUtils.isNotBlank(entity.getCertPath())){
 				payConfigureEntity.setCertPathStatus(1);
 			}else {
 				payConfigureEntity.setCertPathStatus(0);
 			}
 			
-			if (StringUtils.isNotBlank(payConfigureEntity.getAlipayPublicCertPath())){
+			if (StringUtils.isNotBlank(entity.getAlipayPublicCertPath())){
 				payConfigureEntity.setAlipayPublicCertPathStatus(1);
 			}else {
 				payConfigureEntity.setAlipayPublicCertPathStatus(0);
 			}
 			
-			if (StringUtils.isNotBlank(payConfigureEntity.getRootCertPath())){
+			if (StringUtils.isNotBlank(entity.getRootCertPath())){
 				payConfigureEntity.setRootCertPathStatus(1);
 			}else {
 				payConfigureEntity.setRootCertPathStatus(0);
@@ -85,37 +86,74 @@ public class PayConfigureServiceImpl extends ServiceImpl<PayConfigureMapper, Pay
 		PayConfigureEntity entity = payConfigureMapper.selectOne(new QueryWrapper<PayConfigureEntity>().eq("company_id", companyId));
 		if (Objects.isNull(entity)){
 			PayConfigureEntity configEntity = new PayConfigureEntity();
-			BeanUtils.copyProperties(payConfigureEntity,configEntity);
 			configEntity.setCompanyId(companyId);
-			configEntity.setId(0L);
+			configEntity.setId(SnowFlake.nextId());
+			if (StringUtils.isNotBlank(payConfigureEntity.getAppId())){
+				configEntity.setAppId(AESOperator.encrypt(payConfigureEntity.getAppId()));
+			}
+			if (StringUtils.isNotBlank(payConfigureEntity.getPrivateKey())){
+				configEntity.setPrivateKey(AESOperator.encrypt(payConfigureEntity.getPrivateKey()));
+			}
+			if (StringUtils.isNotBlank(payConfigureEntity.getSellerId())){
+				configEntity.setSellerId(AESOperator.encrypt(payConfigureEntity.getSellerId()));
+			}
+			if (StringUtils.isNotBlank(payConfigureEntity.getSellerEmail())){
+				configEntity.setSellerEmail(AESOperator.encrypt(payConfigureEntity.getSellerEmail()));
+			}
+			if (StringUtils.isNotBlank(payConfigureEntity.getSellerPid())){
+				configEntity.setSellerPid(AESOperator.encrypt(payConfigureEntity.getSellerPid()));
+			}
+			if (StringUtils.isNotBlank(payConfigureEntity.getCertPath())){
+				configEntity.setCertPath(AESOperator.encrypt(payConfigureEntity.getCertPath()));
+			}
+			if (StringUtils.isNotBlank(payConfigureEntity.getAlipayPublicCertPath())){
+				configEntity.setAlipayPublicCertPath(AESOperator.encrypt(payConfigureEntity.getAlipayPublicCertPath()));
+			}
+			if (StringUtils.isNotBlank(payConfigureEntity.getRootCertPath())){
+				configEntity.setRootCertPath(AESOperator.encrypt(payConfigureEntity.getRootCertPath()));
+			}
 			payConfigureMapper.insert(configEntity);
 		} else {
 			if (StringUtils.isNotBlank(payConfigureEntity.getAppId())){
-				entity.setAppId(payConfigureEntity.getAppId());
+				entity.setAppId(AESOperator.encrypt(payConfigureEntity.getAppId()));
 			}
 			if (StringUtils.isNotBlank(payConfigureEntity.getPrivateKey())){
-				entity.setPrivateKey(payConfigureEntity.getPrivateKey());
+				entity.setPrivateKey(AESOperator.encrypt(payConfigureEntity.getPrivateKey()));
 			}
 			if (StringUtils.isNotBlank(payConfigureEntity.getSellerId())){
-				entity.setSellerId(payConfigureEntity.getSellerId());
+				entity.setSellerId(AESOperator.encrypt(payConfigureEntity.getSellerId()));
 			}
 			if (StringUtils.isNotBlank(payConfigureEntity.getSellerEmail())){
-				entity.setSellerEmail(payConfigureEntity.getSellerEmail());
+				entity.setSellerEmail(AESOperator.encrypt(payConfigureEntity.getSellerEmail()));
 			}
 			if (StringUtils.isNotBlank(payConfigureEntity.getSellerPid())){
-				entity.setSellerPid(payConfigureEntity.getSellerPid());
+				entity.setSellerPid(AESOperator.encrypt(payConfigureEntity.getSellerPid()));
 			}
 			if (StringUtils.isNotBlank(payConfigureEntity.getCertPath())){
-				entity.setCertPath(payConfigureEntity.getCertPath());
+				entity.setCertPath(AESOperator.encrypt(payConfigureEntity.getCertPath()));
 			}
 			if (StringUtils.isNotBlank(payConfigureEntity.getAlipayPublicCertPath())){
-				entity.setAlipayPublicCertPath(payConfigureEntity.getAlipayPublicCertPath());
+				entity.setAlipayPublicCertPath(AESOperator.encrypt(payConfigureEntity.getAlipayPublicCertPath()));
 			}
 			if (StringUtils.isNotBlank(payConfigureEntity.getRootCertPath())){
-				entity.setRootCertPath(payConfigureEntity.getRootCertPath());
+				entity.setRootCertPath(AESOperator.encrypt(payConfigureEntity.getRootCertPath()));
 			}
-			entity.setRefundStatus(payConfigureEntity.getRefundStatus());
+			if (payConfigureEntity.getRefundStatus() != null) {
+				entity.setRefundStatus(payConfigureEntity.getRefundStatus());
+			}
 			payConfigureMapper.updateById(entity);
 		}
+	}
+	
+	/**
+	 * @Description: 查询小区支付配置
+	 * @author: DKS
+	 * @since: 2021/9/13 15:44
+	 * @Param: [propertyId]
+	 * @return: com.jsy.community.entity.PayConfigureEntity
+	 */
+	@Override
+	public PayConfigureEntity getCompanyConfig(Long propertyId) {
+		return payConfigureMapper.selectOne(new QueryWrapper<PayConfigureEntity>().eq("company_id",propertyId));
 	}
 }

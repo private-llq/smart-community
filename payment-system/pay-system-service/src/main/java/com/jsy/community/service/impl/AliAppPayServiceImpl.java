@@ -2,23 +2,23 @@ package com.jsy.community.service.impl;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
-import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
-import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
-import com.alipay.api.response.AlipayTradeWapPayResponse;
-import com.jsy.community.api.AiliAppPayRecordService;
-import com.jsy.community.api.AliAppPayService;
-import com.jsy.community.api.IShoppingMallService;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstClasses;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.qo.lease.AliAppPayQO;
 import com.jsy.community.utils.AlipayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.util.Objects;
 
 
 /**
@@ -41,9 +41,21 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private IShoppingMallService shoppingMallService;
 	
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICommunityService communityService;
+	
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPayConfigureService payConfigureService;
+	
 	//下单
 	@Override
 	public String getOrderStr(AliAppPayQO aliAppPayQO) {
+		CommunityEntity entity = communityService.getCommunityNameById(aliAppPayQO.getCommunityId());
+		PayConfigureEntity serviceConfig;
+		if (Objects.nonNull(entity)){
+			serviceConfig = payConfigureService.getCompanyConfig(entity.getPropertyId());
+			ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
+		}
 		AlipayClient alipayClient = alipayUtils.getDefaultCertClient();
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
 //		request.setNotifyUrl("http://blue99x.vicp.net:9951/api/v1/payment/callBack/pay");
@@ -55,6 +67,7 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 //		"\"body\":\"Iphone6 16G\"," +
 		"\"subject\":"+"\""+ aliAppPayQO.getSubject()+"\""+","+
 		"\"out_trade_no\":"+"\""+ aliAppPayQO.getOutTradeNo()+"\""+","+
+		"\"passback_params\":"+"\""+ aliAppPayQO.getCommunityId()+"\""+","+
 //		"\"time_expire\":\"5m\"," +
 		"  }");
 		AlipayTradeAppPayResponse response;

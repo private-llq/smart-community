@@ -17,6 +17,9 @@ import java.util.Map;
 @Data
 public class AliAppPayQO implements Serializable {
 	
+	@ApiModelProperty(value = "社区id")
+	private Long communityId;
+	
 	@ApiModelProperty(value = "系统订单号",hidden = true)
 	private String outTradeNo;
 	

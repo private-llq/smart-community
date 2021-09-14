@@ -34,7 +34,7 @@ public class PayConfigureController {
     @ApiOperation("上传应用公钥证书路径")
     @PostMapping("/upload/cert/path")
     public CommonResult uploadCertPath(@RequestParam("file") MultipartFile file) {
-        String upload = MinioUtils.upload(file, "alipayCertPath");
+        String upload = MinioUtils.upload(file, "alipay-cert-path");
         if (StringUtils.isNotBlank(upload)) {
             CommonResult.ok("上传失败");
         }
@@ -44,7 +44,7 @@ public class PayConfigureController {
     @ApiOperation("上传支付宝公钥证书路径")
     @PostMapping("/upload/public")
     public CommonResult uploadAlipayPublicCertPath(@RequestParam("file") MultipartFile file) {
-        String upload = MinioUtils.upload(file, "alipayPublicCertPath");
+        String upload = MinioUtils.upload(file, "alipay-public-cert-path");
         if (StringUtils.isNotBlank(upload)) {
             CommonResult.ok("上传失败");
         }
@@ -54,16 +54,18 @@ public class PayConfigureController {
     @ApiOperation("上传支付宝根证书路径")
     @PostMapping("/upload/root")
     public CommonResult uploadRootCertPath(@RequestParam("file") MultipartFile file) {
-        String upload = MinioUtils.upload(file, "alipayRootCertPath");
+        String upload = MinioUtils.upload(file, "alipay-root-cert-path");
         if (StringUtils.isNotBlank(upload)) {
             CommonResult.ok("上传失败");
         }
         return  CommonResult.ok(upload,"上传成功");
     }
     
+    @Login
     @ApiOperation("更新配置")
     @PutMapping("/basic/config")
     public CommonResult basicConfig(@RequestBody PayConfigureEntity payConfigureEntity) {
+        UserUtils.getAdminCompanyId();
         payConfigureService.basicConfig(payConfigureEntity, UserUtils.getAdminUserInfo().getCompanyId());
         return CommonResult.ok("添加成功!");
     }
