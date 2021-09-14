@@ -109,6 +109,8 @@ public class WeChatController {
         if (Objects.nonNull(entity)){
             serviceConfig = companyPayConfigService.getCompanyConfig(entity.getPropertyId());
             WechatConfig.setConfig(serviceConfig);
+        } else {
+            throw new PaymentException("当前小区不支持微信支付！");
         }
         //封装微信支付下单请求参数
         Map hashMap = new LinkedHashMap();
