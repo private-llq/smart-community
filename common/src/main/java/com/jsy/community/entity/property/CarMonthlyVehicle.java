@@ -1,7 +1,6 @@
 package com.jsy.community.entity.property;
 
 
-import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -76,6 +75,12 @@ public class CarMonthlyVehicle implements Serializable {
      */
     private String remarks;
 
+
+    /**
+     * 车位编号 (关联车位，前端通过查询传进来)
+     */
+    private String carPosition;
+
     /**
      * 到期状态 0 :到期  1：未到期
      */
@@ -83,9 +88,15 @@ public class CarMonthlyVehicle implements Serializable {
     private String expirationStatus;
 
     /**
-     * 车位编号 (关联车位，前端通过查询传进来)
+     * 所属房屋 (关联房屋，前端通过查询传进来)
      */
-    @ExcelProperty("车位编号")
-    private String carPosition;
+    private Long houseId;
+
+    /**
+     * 所属房屋 房屋表的冗余字段
+     */
+    @TableField(exist = false)
+    private String belongHouse;
+
 
 }

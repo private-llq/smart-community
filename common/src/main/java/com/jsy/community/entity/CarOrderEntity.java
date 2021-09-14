@@ -38,6 +38,7 @@ public class CarOrderEntity extends BaseEntity {
      */
     @ExcelIgnore
     private Long carPositionId;
+
     /**
      *  车位编号
      */
@@ -113,6 +114,4 @@ public class CarOrderEntity extends BaseEntity {
      */
     @TableField(exist = false)
     private String stopCarTime;
-
-
 }

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.ICarEquipmentManageService;
 import com.jsy.community.api.ICarLaneService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarLaneEntity;
@@ -13,7 +12,6 @@ import com.jsy.community.mapper.CarLaneMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +23,12 @@ public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity
     @Autowired
     public CarLaneMapper carLaneMapper;
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
-    public ICarEquipmentManageService carEquipmentManageService;
-
+    @Override
+    @Transactional
+    public CarLaneEntity getCarLaneOne(Long equipmentId,Long communityId) {
+        CarLaneEntity carLaneEntity = carLaneMapper.selectOne(new QueryWrapper<CarLaneEntity>().eq("community_id", communityId).eq("equipment_id", equipmentId));
+        return carLaneEntity;
+    }
 
     @Override
     @Transactional

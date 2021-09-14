@@ -3,7 +3,6 @@ package com.jsy.community.config;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
-import com.jsy.community.api.PaymentException;
 import com.jsy.community.utils.AesUtil;
 import com.jsy.community.utils.MyHttpClient;
 import net.sf.json.JSONObject;
@@ -151,35 +150,11 @@ public class PublicConfig {
      *
      * @param request
      * @param response
-     * @param privateKey APIv3 32的秘钥
+     * @param privateKey 32的秘钥
      */
-    public static Map<String, String> notifyParam(HttpServletRequest request, String privateKey) throws Exception {
+    public static Map<String, String> notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
         Map<String, String> map = new HashMap<>(12);
-        String result = readDataParam(request);
-        // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
-        String plainText = verifyNotify(result, privateKey);
-        if (StrUtil.isNotEmpty(plainText)) {
-            String out_trade_no = JSONObject.fromObject(plainText).getString("out_trade_no");
-            String transaction_id = JSONObject.fromObject(plainText).getString("transaction_id");
-            String attach = JSONObject.fromObject(plainText).getString("attach");
-            Map<String, String> hashMap = new HashMap<>();
-            hashMap.put("out_trade_no",out_trade_no);
-            hashMap.put("attach",attach);
-            hashMap.put("transaction_id",transaction_id);
-            return hashMap;
-        }
-        throw new PaymentException("验签出错！");
-
-    }
-    /**
-     * 异步验签
-     *
-     * @param request
-     * @param response
-     * @param privateKey APIv3 32的秘钥
-     */
-    public static void notify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
-        Map<String, String> map = new HashMap<>(12);
+        Map<String, String> returnMap = new HashMap<>();
         String result = readData(request);
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
         String plainText = verifyNotify(result, privateKey);
@@ -195,6 +170,10 @@ public class PublicConfig {
         response.setHeader("Content-type", ContentType.JSON.toString());
         response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
         response.flushBuffer();
+        returnMap.put("out_trade_no",JSONObject.fromObject(plainText).getString("out_trade_no"));
+        returnMap.put("attach",JSONObject.fromObject(plainText).getString("attach"));
+        returnMap.put("transaction_id",JSONObject.fromObject(plainText).getString("transaction_id"));
+        return returnMap;
     }
 
 

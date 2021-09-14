@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.CarEntranceMapper">
+
+
+    <select id="selectCarEntrance" resultType="com.jsy.community.vo.property.CarEntranceVO">
+        select tc.community_id, tc.car_number, tc.lane_name, tc.open_time,
+               tv.address,tv.name,tv.contact
+               from t_car_cut_off tc
+        left join t_visitor tv on tc.car_number = tv.car_plate
+            <where>
+                tc.community_id =  #{query.communityId}
+                and tc.open_time between tv.start_time and tv.end_time
+                <if test="query.carNumber!=null">
+                    and tc.car_number = #{query.carNumber}
+                </if>
+
+            </where>
+
+
+
+
+
+    </select>
+</mapper>
