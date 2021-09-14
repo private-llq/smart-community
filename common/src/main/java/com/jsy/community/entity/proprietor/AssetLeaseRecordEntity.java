@@ -32,21 +32,23 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public class AssetLeaseRecordEntity extends BaseEntity {
     // 资产ID
-    @NotNull(groups = {InitContractValidate.class, LandlordContractListValidate.class, SetContractNoValidate.class}, message = "资产ID不能为空")
+    @NotNull(groups = {InitContractValidate.class, LandlordContractListValidate.class, LandlordInitiatedContractValidate.class}, message = "资产ID不能为空")
     private Long assetId;
 
     // 资产类型;1:商铺;2:房屋
-    @NotNull(groups = {InitContractValidate.class, LandlordContractListValidate.class, SetContractNoValidate.class}, message = "资产类型不能为空;1:商铺;2:房屋")
+    @NotNull(groups = {InitContractValidate.class, LandlordContractListValidate.class, LandlordInitiatedContractValidate.class}, message = "资产类型不能为空;1:商铺;2:房屋")
     @Range(min = 1, max = 2, message = "资产类型值超出范围;1:商铺;2:房屋")
     private Integer assetType;
 
     // 业主uid
+    @NotBlank(groups = {LandlordInitiatedContractValidate.class, CancelContractValidate.class, CompleteContractValidate.class}, message = "房东uid不能为空")
     private String homeOwnerUid;
 
     // 租客uid
+    @NotBlank(groups = {CompleteContractValidate.class}, message = "房东uid不能为空")
     private String tenantUid;
 
-    // 签约操作状态;1:发起签约;2:接受申请;3:拟定合同;4:等待支付房租;5:支付完成;6:完成签约;7:取消申请;8:拒绝申请;9:重新发起
+    // 签约操作状态;1:(租客)发起租赁申请;2:接受申请;3:拟定合同;4:等待支付房租;5:支付完成;6:完成签约;7:取消申请;8:拒绝申请;9:重新发起;31:(房东)发起签约/重新发起;32:取消发起;
     private Integer operation;
 
     // 图片路径
@@ -89,11 +91,14 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     private  String floor;
 
     // 合同编号
-    @NotBlank(groups = {SetContractNoValidate.class, CompleteContractValidate.class}, message = "合同编号不能为空")
+    @NotBlank(groups = {LandlordInitiatedContractValidate.class, CompleteContractValidate.class, CancelContractValidate.class, BlockchainSuccessfulValidate.class}, message = "合同编号不能为空")
     private String conId;
 
     // 合同名字
     private String conName;
+
+    // 上链状态;1：签署中的合同;2：签署完成的合同，并未上链完成的合同;4：区块链信息上链完毕
+    private Integer blockStatus;
 
     // 发起方(甲方)
     private String initiator;
@@ -105,14 +110,14 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
-    @NotNull(groups = {SetContractNoValidate.class}, message = "合同开始时间不能为空")
+    @NotNull(groups = {LandlordInitiatedContractValidate.class}, message = "合同开始时间不能为空")
     private LocalDate startDate;
 
     // 合同结束时间
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
-    @NotNull(groups = {SetContractNoValidate.class}, message = "合同结束时间不能为空")
+    @NotNull(groups = {LandlordInitiatedContractValidate.class}, message = "合同结束时间不能为空")
     private LocalDate endDate;
 
     // 身份类型;1:房东;2:租客
@@ -131,7 +136,7 @@ public class AssetLeaseRecordEntity extends BaseEntity {
 
     // 操作类型;7:租客取消申请;8房东拒绝申请;9:租客再次申请;2房东接受申请;3:房东点击拟定合同;6:完成签约;
     @TableField(exist = false)
-    @NotNull(groups = {OperationContractValidate.class, SetContractNoValidate.class}, message = "操作类型;7:租客取消申请;8房东拒绝申请;9:租客再次申请;2房东接受申请;3:房东点击拟定合同;6:完成签约;")
+    @NotNull(groups = {OperationContractValidate.class, LandlordInitiatedContractValidate.class}, message = "操作类型;7:租客取消申请;8房东拒绝申请;9:租客再次申请;2房东接受申请;3:房东点击拟定合同;6:完成签约;")
     private Integer operationType;
 
     // 房东该资产签约条数
@@ -172,7 +177,7 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @TableField(exist = false)
     private String fullAddress;
 
-    // 进度数;1:发起签约;2:签约合同;3:租客支付房租;4:完成签约
+    // 进度数;1:(租客)发起租赁申请;2:签约合同;3:租客支付房租;4:完成签约
     @TableField(exist = false)
     private Integer progressNumber;
 
@@ -209,12 +214,22 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     public interface ContractDetailValidate {}
 
     /**
-     * 设置合同编号验证组
+     * 房东发起签约/重新发起签约验证组
      */
-    public interface SetContractNoValidate {}
+    public interface LandlordInitiatedContractValidate {}
 
     /**
      * 完成签约验证组
      */
     public interface CompleteContractValidate {}
+
+    /**
+     * 房东取消发起签约验证组
+     */
+    public interface CancelContractValidate {}
+
+    /**
+     * 区块链上链成功通知验证组
+     */
+    public interface BlockchainSuccessfulValidate {}
 }
