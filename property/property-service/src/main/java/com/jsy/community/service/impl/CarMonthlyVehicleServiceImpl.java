@@ -56,9 +56,10 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      */
     @Override
     @TxTransaction
-    public void updateMonth(String carPlate, LocalDateTime overTime) {
+    public void updateMonth(String carPlate, LocalDateTime overTime,BigDecimal money) {
         CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carPlate));
         if (vehicle!=null){
+            vehicle.setMonthlyFee(vehicle.getMonthlyFee().add(money));
             vehicle.setEndTime(overTime);
             carMonthlyVehicleMapper.updateById(vehicle);
         }else {

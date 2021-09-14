@@ -104,6 +104,9 @@ public class WeChatController {
     @Login
     @PostMapping("/wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+        if (weChatPayQO.getTradeFrom()==9){
+            weChatPayQO.setCommunityId(1L);
+        }
         CommunityEntity entity = communityService.getCommunityNameById(weChatPayQO.getCommunityId());
         CompanyPayConfigEntity serviceConfig = null;
         if (Objects.nonNull(entity)){
@@ -206,7 +209,8 @@ public class WeChatController {
             WechatConfig.setConfig(configEntity);
         }
         log.info("配置参数："+configEntity);
-        Map<String, String> map = PublicConfig.notifyParam(request , WechatConfig.API_V3_KEY);
+        //回调验证
+        Map<String, String> map = PublicConfig.notify(request ,response, WechatConfig.API_V3_KEY);
         log.info(String.valueOf(map));
         weChatService.orderStatus(map);
         if (map.get("attach")!=null){
@@ -251,7 +255,6 @@ public class WeChatController {
                 log.info("处理完成");
             }
         }
-        PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);
     }
 
     /**

@@ -110,6 +110,7 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
         if (positionEntity != null) {
             positionEntity.setCarPosStatus(2);
             positionEntity.setOwnerPhone(entity.getContact());
+            positionEntity.setUserName(entity.getOwner());
             positionEntity.setBindingStatus(1);
             positionEntity.setBeginTime(entity.getBeginTime());
             positionEntity.setEndTime(entity.getOverTime());
