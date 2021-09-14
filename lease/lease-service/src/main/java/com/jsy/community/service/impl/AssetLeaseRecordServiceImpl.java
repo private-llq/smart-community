@@ -506,6 +506,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                             // 查询房屋图片
                             List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
                             houseLeaseEntity.setHouseImgUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                            houseEntityMap.put(houseLeaseEntity.getId(), houseLeaseEntity);
                         }
                     }
                 }
@@ -662,6 +663,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                             // 查询房屋图片
                             List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
                             houseLeaseEntity.setHouseImgUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                            houseEntityMap.put(houseLeaseEntity.getId(), houseLeaseEntity);
                         }
                     }
                 }
