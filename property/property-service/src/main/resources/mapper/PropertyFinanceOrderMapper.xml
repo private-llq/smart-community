@@ -262,6 +262,9 @@
             <if test="query.status!=null">
                 and tp.order_status = #{query.status}
             </if>
+            <if test="query.payType!=null and query.payType!=0">
+                and tp.pay_type = #{query.payType}
+            </if>
             <if test="query.feeRuleName!=null and query.feeRuleName!=''">
                 and tf.name like concat("%",#{query.feeRuleName},"%")
             </if>

@@ -6,6 +6,7 @@ import com.jsy.community.api.AssetLeaseRecordService;
 import com.jsy.community.api.IHouseConstService;
 import com.jsy.community.api.LeaseException;
 import com.jsy.community.api.ProprietorUserService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -142,7 +143,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @param assetLeaseRecordEntity : 房屋租赁记录表实体
      * @param uid                    : 登录用户uid
      * @author: Pipi
-     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请)
+     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请/拟定合同)
      * @return: java.lang.Integer
      * @date: 2021/9/3 10:30
      **/
@@ -155,6 +156,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 // 房东接受申请
                 // 房东接受申请后,资产不能编辑,所以在这里将房屋信息写入记录表
                 result = acceptingApply(assetLeaseRecordEntity, uid);
+                break;
+            case 3:
+                // 房东点击拟定合同
+                result = landlordContractPreparation(assetLeaseRecordEntity, uid);
                 break;
             case 7:
                 // 租客取消申请
@@ -258,6 +263,29 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     /**
      * @author: Pipi
+     * @description: 房东点击你拟定合同
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid: 登录用户uid
+     * @return: java.lang.Integer
+     * @date: 2021/9/9 18:13
+     **/
+    public Integer landlordContractPreparation(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        queryWrapper.eq("home_owner_uid", uid);
+        queryWrapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode());
+        AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (recordEntity == null) {
+            throw new LeaseException("签约信息不存在");
+        }
+        recordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
+        //写入租赁操作数据
+        addLeaseOperationRecord(recordEntity);
+        return assetLeaseRecordMapper.updateById(recordEntity);
+    }
+
+    /**
+     * @author: Pipi
      * @description: 租客取消申请
      * @param assetLeaseRecordEntity: 房屋租赁记录表实体
      * @param uid: 登录用户uid
@@ -271,6 +299,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         ArrayList<Integer> processStatusList = new ArrayList<>();
         processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode());
         processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode());
+        processStatusList.add(BusinessEnum.ContractingProcessStatusEnum.RELAUNCH.getCode());
         queryWrapper.in("operation", processStatusList);
         AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (recordEntity == null) {
@@ -348,7 +377,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.last("limit 0,1");
         AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (assetLeaseRecordEntity != null) {
-            throw new LeaseException("该房屋存在多个签约");
+            throw new LeaseException("该整租房屋/商铺已被其他人租赁");
         }
     }
 
@@ -815,7 +844,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             // 为空直接返回
             return leaseRecordEntity;
         }
-        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 9) {
+        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 8 || leaseRecordEntity.getOperation() == 9) {
             // 记录表里面没有资产数据,要单独查
             if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
                 // 商铺
@@ -829,7 +858,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 shopImgEntityQueryWrapper.eq("shop_id", leaseRecordEntity.getAssetId());
                 shopImgEntityQueryWrapper.last("limit 1");
                 ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
-                leaseRecordEntity.setImageUrl(shopImgEntity.getImgUrl());
+                leaseRecordEntity.setImageUrl(shopImgEntity == null ? null : shopImgEntity.getImgUrl());
                 leaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
                 leaseRecordEntity.setSummarize(shopLeaseEntity.getSummarize());
                 leaseRecordEntity.setPrice(shopLeaseEntity.getMonthMoney());
@@ -905,7 +934,26 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         }
         if (leaseRecordEntity.getOperation() == 1 ||leaseRecordEntity.getOperation() == 7 ||leaseRecordEntity.getOperation() == 8 ||leaseRecordEntity.getOperation() == 9) {
             leaseRecordEntity.setProgressNumber(1);
+            if (leaseRecordEntity.getOperation() == 1) {
+                // 发起签约,倒计时就是发起签约的时间加3天
+                leaseRecordEntity.setCountdownFinish(leaseRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
+            }
+            if (leaseRecordEntity.getOperation() == 9) {
+                // 重新发起,倒计时就是重新发起的时间加3天
+                // 查询重新发起的时间
+                LeaseOperationRecordEntity leaseOperationRecordEntity = queryLeaseOperationRecord(assetLeaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
+                }
+            }
         } else if (leaseRecordEntity.getOperation() == 2 || leaseRecordEntity.getOperation() == 3) {
+            if (leaseRecordEntity.getOperation() == 2) {
+                // 接受申请,倒计时就是接受申请的时间加7天
+                LeaseOperationRecordEntity leaseOperationRecordEntity = queryLeaseOperationRecord(assetLeaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                }
+            }
             leaseRecordEntity.setProgressNumber(2);
         } else if (leaseRecordEntity.getOperation() == 4 || leaseRecordEntity.getOperation() == 5) {
             leaseRecordEntity.setProgressNumber(3);
@@ -917,32 +965,91 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     /**
      * @author: Pipi
-     * @description: 设置签约合同相关信息
+     * @description: 查询操作记录
+     * @param leaseRecordId: 签约ID
+     * @param operation: 操作进程
+     * @return: com.jsy.community.entity.proprietor.LeaseOperationRecordEntity
+     * @date: 2021/9/9 17:52
+     **/
+    private LeaseOperationRecordEntity queryLeaseOperationRecord(Long leaseRecordId, Integer operation) {
+        QueryWrapper<LeaseOperationRecordEntity> leaseOperationRecordEntityQueryWrapper = new QueryWrapper<>();
+        leaseOperationRecordEntityQueryWrapper.eq("asset_lease_record_id", leaseRecordId);
+        leaseOperationRecordEntityQueryWrapper.eq("operation", operation);
+        leaseOperationRecordEntityQueryWrapper.orderByDesc("create_time");
+        leaseOperationRecordEntityQueryWrapper.last("limit 0, 1");
+        return leaseOperationRecordMapper.selectOne(leaseOperationRecordEntityQueryWrapper);
+    }
+
+    /**
+     * @author: Pipi
+     * @description:签章调用相关操作(拟定合同(设置合同信息)、完成签约)
      * @param assetLeaseRecordEntity: 签约实体
      * @return: java.lang.Integer
      * @date: 2021/9/7 10:18
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer setContractNo(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+    public Integer signatureOperation(AssetLeaseRecordEntity assetLeaseRecordEntity) {
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
-        queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
-        queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
-        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
-        AssetLeaseRecordEntity assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
-        if (assetLeaseRecordEntity1 != null) {
-            assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
-            assetLeaseRecordEntity1.setStartDate(assetLeaseRecordEntity.getStartDate());
-            assetLeaseRecordEntity1.setEndDate(assetLeaseRecordEntity.getEndDate());
-            assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
-            assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
-            assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
-            assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.CONTRACT_PREPARATION.getCode());
-            addLeaseOperationRecord(assetLeaseRecordEntity1);
-            return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
+        AssetLeaseRecordEntity assetLeaseRecordEntity1 = new AssetLeaseRecordEntity();
+        if (assetLeaseRecordEntity.getOperationType() == BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode()) {
+            // 设置合同信息(更新状态到等待支付)
+            queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
+            queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
+            queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
+            queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+            assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
+            if (assetLeaseRecordEntity1 != null) {
+                assetLeaseRecordEntity1.setConId(assetLeaseRecordEntity.getConId());
+                assetLeaseRecordEntity1.setStartDate(assetLeaseRecordEntity.getStartDate());
+                assetLeaseRecordEntity1.setEndDate(assetLeaseRecordEntity.getEndDate());
+                assetLeaseRecordEntity1.setConName(assetLeaseRecordEntity.getConName());
+                assetLeaseRecordEntity1.setInitiator(assetLeaseRecordEntity.getInitiator());
+                assetLeaseRecordEntity1.setSignatory(assetLeaseRecordEntity.getSignatory());
+                assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.WAITING_TO_PAY_RENT.getCode());
+            } else {
+                return 0;
+            }
         } else {
-            return 0;
+            // 完成签约
+            queryWrapper.eq("con_id", assetLeaseRecordEntity.getConId());
+            queryWrapper.and(wapper -> wapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid())
+                    .or().eq("tenant_uid", assetLeaseRecordEntity.getHomeOwnerUid()));
+            assetLeaseRecordEntity1 = assetLeaseRecordMapper.selectOne(queryWrapper);
+            if (assetLeaseRecordEntity1 != null) {
+                assetLeaseRecordEntity1.setOperation(BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode());
+            } else {
+                return 0;
+            }
         }
+        addLeaseOperationRecord(assetLeaseRecordEntity1);
+        return assetLeaseRecordMapper.updateById(assetLeaseRecordEntity1);
+
+
+
+    }
+
+    /**
+     * @param conId : 合同编号
+     * @author: Pipi
+     * @description: 更新签约到支付完成状态
+     * @return: void
+     * @date: 2021/9/9 18:24
+     **/
+    @Override
+    public void updateOperationPayStatus(String conId) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("con_id", conId);
+        AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        log.info("签约合同:{}完成了支付", conId);
+        if (assetLeaseRecordEntity != null) {
+            log.info("找到合同:{}相关的签约ID,开始更新签约状态到已完成支付", conId, assetLeaseRecordEntity.getId());
+            assetLeaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.PAYMENT_COMPLETED.getCode());
+            addLeaseOperationRecord(assetLeaseRecordEntity);
+            assetLeaseRecordMapper.updateById(assetLeaseRecordEntity);
+        } else {
+            log.info("没有找到合同:{}相关的签约ID", conId);
+        }
+
     }
 }

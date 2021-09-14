@@ -47,7 +47,7 @@ public class PropertyFinanceTicketTemplateFieldController {
         }
         for (FinanceTicketTemplateFieldEntity ticketTemplateFieldEntity : ticketTemplateFieldEntities) {
             ValidatorUtils.validateEntity(ticketTemplateFieldEntity);
-            ticketTemplateFieldEntity.setId(String.valueOf(SnowFlake.nextId()));
+            ticketTemplateFieldEntity.setId(SnowFlake.nextId());
         }
         return ticketTemplateFieldService.insertTicketTemplateField(ticketTemplateFieldEntities) > 0 ? CommonResult.ok("保存成功!") : CommonResult.error("保存失败!");
     }
@@ -60,13 +60,14 @@ public class PropertyFinanceTicketTemplateFieldController {
      * @date: 2021/8/4 14:05
      **/
     @Login
-    @PostMapping("/updateTicketTemplateField")
+    @PutMapping("/updateTicketTemplateField")
     @businessLog(operation = "编辑",content = "更新了【票据字段】")
     public CommonResult updateTicketTemplateField(@RequestBody List<FinanceTicketTemplateFieldEntity> ticketTemplateFieldEntities) {
         if (CollectionUtil.isEmpty(ticketTemplateFieldEntities)) {
             throw new JSYException(400, "请选择票据字段");
         }
         for (FinanceTicketTemplateFieldEntity ticketTemplateFieldEntity : ticketTemplateFieldEntities) {
+            ticketTemplateFieldEntity.setFieldId(String.valueOf(ticketTemplateFieldEntity.getId()));
             ValidatorUtils.validateEntity(ticketTemplateFieldEntity);
         }
         ticketTemplateFieldService.updateTicketTemplateField(ticketTemplateFieldEntities);
@@ -83,6 +84,6 @@ public class PropertyFinanceTicketTemplateFieldController {
     @Login
     @GetMapping("/ticketTemplateFieldList")
     public CommonResult ticketTemplateFieldList(@RequestParam("templateId") String templateId) {
-        return CommonResult.ok(ticketTemplateFieldService.getTicketTemplateFieldList(templateId), "查询成功!");
+        return CommonResult.ok(ticketTemplateFieldService.getTicketTemplateFieldList(templateId));
     }
 }

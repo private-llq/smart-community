@@ -11,10 +11,9 @@ import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: Pipi
@@ -52,7 +51,7 @@ public class IPropertyFinanceTicketTemplateFieldServiceImpl extends ServiceImpl<
         HashSet<String> templateIdSet = new HashSet<>();
         for (FinanceTicketTemplateFieldEntity ticketTemplateFieldEntity : ticketTemplateFieldEntities) {
             templateIdSet.add(ticketTemplateFieldEntity.getTemplateId());
-            ticketTemplateFieldEntity.setId(String.valueOf(SnowFlake.nextId()));
+            ticketTemplateFieldEntity.setId(SnowFlake.nextId());
         }
         if (templateIdSet.size() > 1) {
             // 表示这次更新了多个打印模板(包含了其他人的模板)
@@ -73,11 +72,24 @@ public class IPropertyFinanceTicketTemplateFieldServiceImpl extends ServiceImpl<
      * @date: 2021/8/4 15:14
      **/
     @Override
-    public List<FinanceTicketTemplateFieldEntity> getTicketTemplateFieldList(String templateId) {
+    public Map<Integer, List<FinanceTicketTemplateFieldEntity>> getTicketTemplateFieldList(String templateId) {
+        Map<Integer, List<FinanceTicketTemplateFieldEntity>> fieldMap = new HashMap<>();
+        fieldMap.put(1, new ArrayList<FinanceTicketTemplateFieldEntity>());
+        fieldMap.put(2, new ArrayList<FinanceTicketTemplateFieldEntity>());
+        fieldMap.put(3, new ArrayList<FinanceTicketTemplateFieldEntity>());
         QueryWrapper<FinanceTicketTemplateFieldEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("field_id AS id,template_id,location_type,`name`,name_en,sort");
         queryWrapper.eq("template_id", templateId);
         queryWrapper.orderByAsc("location_type");
         queryWrapper.orderByAsc("sort");
-        return ticketTemplateFieldMapper.selectList(queryWrapper);
+        List<FinanceTicketTemplateFieldEntity> fieldEntities = ticketTemplateFieldMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(fieldEntities)) {
+            for (FinanceTicketTemplateFieldEntity fieldEntity : fieldEntities) {
+                fieldEntity.setTemplateId(null);
+                fieldEntity.setIdStr(String.valueOf(fieldEntity.getId()));
+                fieldMap.get(fieldEntity.getLocationType()).add(fieldEntity);
+            }
+        }
+        return fieldMap;
     }
 }

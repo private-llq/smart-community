@@ -3,9 +3,6 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -30,8 +27,6 @@ import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.utils.imutils.entity.ImResponseEntity;
-import com.jsy.community.utils.imutils.entity.RegisterDto;
-import com.jsy.community.utils.imutils.open.EncryptHelper;
 import com.jsy.community.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -127,6 +122,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     private long expire = 60*60*24*7; //暂时
 
+
+    /**
+     * @Description: 注册聊天账号
+     * @author: Hu
+     * @since: 2021/9/9 14:06
+     * @Param:
+     * @return:
+     */
+    public String getImId(){
+        Random r = new Random();
+        StringBuffer sb = new StringBuffer(10);
+        for (int j = 1; j <= 10; j++) {
+            int i = r.nextInt(10);
+            if (j == 1 || (j >= 8 && j <= 10)) {
+                while (i == 0) {
+                    i = r.nextInt(10);
+                }
+            }
+            return sb.append(i).toString();
+        }
+        return null;
+    }
     /**
      * 创建用户token
      */
@@ -200,34 +217,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return queryUserInfo(uid);
     }
 
-    /**
-     * @Description: 注册im聊天
-     * @author: Hu
-     * @since: 2021/9/2 13:45
-     * @Param: [imId,nickName,password,avatarUrl]
-     * @return:
-     */
-    public static ImResponseEntity registerUser(String imId,String password,String nickName,String avatarUrl) {
-        String str = IdUtil.fastUUID();
-
-        RegisterDto registerDto = new RegisterDto();
-        registerDto.setImId(imId);
-        registerDto.setNickName(nickName);
-        registerDto.setPassword(MD5Util.getPassword(password));
-        registerDto.setIdentifier("1");
-        registerDto.setHeadImgMaxUrl(avatarUrl);
-        registerDto.setHeadImgSmallUrl(avatarUrl);
-        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/auth/login/register")
-                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
-                .header(EncryptHelper.HEAD_ONLY_REQ, str)
-                .header(EncryptHelper.HEAD_DEVICE, "mobile")
-                .body(EncryptHelper.doPost(JSON.toJSONString(registerDto), str,"mobile"))
-                .execute();
-
-        String body = response.body();
-        return JSON.parseObject(body, ImResponseEntity.class);
-    }
-
 
     /**
      * 注册
@@ -285,10 +274,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setImPassword("999999999");
         userIMEntity.setUid(uuid);
-        userIMEntity.setImId(UserUtils.randomUUID());
+        userIMEntity.setImId(getImId());
         userIMMapper.insert(userIMEntity);
         //调用聊天创建账号
-        ImResponseEntity responseEntity = registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
+        ImResponseEntity responseEntity = PushInfoUtil.registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
         if (responseEntity.getErr_code()!=0){
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
@@ -373,11 +362,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setUid(uuid);
         userIMEntity.setImPassword("999999999");
-        userIMEntity.setImId(UserUtils.randomUUID());
+        userIMEntity.setImId(getImId());
         userIMMapper.insert(userIMEntity);
 
         //调用签章创建
-        ImResponseEntity responseEntity = registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
+        ImResponseEntity responseEntity = PushInfoUtil.registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
         if (responseEntity.getErr_code()!=0){
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);

@@ -277,9 +277,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         assetLeaseRecordEntityQueryWrapper.eq("asset_id", houseId);
         assetLeaseRecordEntityQueryWrapper.eq("asset_type", BusinessEnum.HouseTypeEnum.HOUSE.getCode());
         assetLeaseRecordEntityQueryWrapper.and(
-                wapper -> wapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
-                        .or(newwapper ->
-                                newwapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                wrapper -> wrapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
+                        .or(newWrapper ->
+                                newWrapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
                                         .gt("end_date", new Date())
                         )
         );
@@ -449,6 +449,13 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             voImageIds.add(vo.getHouseImageId());
             //房屋类型code转换成文本 如 040202 转换为 4室2厅2卫
             vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
+            // 优势标签
+            List<Long> advantageId = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
+            if (!CollectionUtils.isEmpty(advantageId)) {
+                vo.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+            }
+            //1.7查出房屋朝向
+            vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirectionId()));
         });
         if (!CollectionUtils.isEmpty(voImageIds)) {
             //根据 图片 id 集合  in 查出所有的图片 url 和 对应的租赁id

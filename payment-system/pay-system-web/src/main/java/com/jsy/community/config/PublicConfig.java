@@ -8,7 +8,10 @@ import com.jsy.community.utils.AesUtil;
 import com.jsy.community.utils.MyHttpClient;
 import net.sf.json.JSONObject;
 import okhttp3.HttpUrl;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -24,10 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -153,7 +155,7 @@ public class PublicConfig {
      */
     public static Map<String, String> notifyParam(HttpServletRequest request, String privateKey) throws Exception {
         Map<String, String> map = new HashMap<>(12);
-        String result = readData(request);
+        String result = readDataParam(request);
         // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
         String plainText = verifyNotify(result, privateKey);
         if (StrUtil.isNotEmpty(plainText)) {
@@ -262,13 +264,45 @@ public class PublicConfig {
     }
 
     /**
+     * 下载文件，返回输入流。
+     *
+     * @param apiUrl api接口
+     * @return (文件)输入流
+     * @throws Exception
+     */
+    public static InputStream getStreamDownloadOutFile(String apiUrl) throws Exception {
+        InputStream is = null;
+        CloseableHttpClient httpClient = HttpClients.createDefault();//创建默认http客户端
+        RequestConfig requestConfig= RequestConfig.DEFAULT;//采用默认请求配置
+        HttpGet request = new HttpGet(apiUrl);//通过get方法下载文件流
+        request.setConfig(requestConfig);//设置请头求配置
+        try {
+            CloseableHttpResponse httpResponse = httpClient.execute(request);//执行请求，接收返回信息
+            int statusCode = httpResponse.getStatusLine().getStatusCode();//获取执行状态
+            if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
+                request.abort();
+            } else {
+                HttpEntity entity = httpResponse.getEntity();
+                if (null != entity) {
+                    is = entity.getContent();//获取返回内容
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.abort();
+        }
+        return is;
+    }
+
+    /**
      * 获取私钥。
      *
-     * @param filename 私钥文件路径  (required)
+     * @param url 私钥文件路径  (required)
      * @return 私钥对象
      */
-    public static PrivateKey getPrivateKey(String filename) throws IOException {
-        String content = new String(Files.readAllBytes(Paths.get(filename)), "UTF-8");
+    public static PrivateKey getPrivateKey(String url) throws Exception {
+        String content = IOUtils.toString(getStreamDownloadOutFile(url));
+//        String content = new String(Files.readAllBytes(Paths.get(filename)), "UTF-8");
         try {
             String privateKey = content.replace("-----BEGIN PRIVATE KEY-----", "")
                     .replace("-----END PRIVATE KEY-----", "")
@@ -326,6 +360,28 @@ public class PublicConfig {
         );
     }
 
+    /**
+     * 处理返回对象
+     *
+     * @param request
+     * @return
+     */
+    public static String readDataParam(HttpServletRequest request) {
+        BufferedReader br = null;
+        try {
+            StringBuilder result = new StringBuilder();
+            br = request.getReader();
+            for (String line; (line = br.readLine()) != null; ) {
+                if (result.length() > 0) {
+                    result.append("\n");
+                }
+                result.append(line);
+            }
+            return result.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * 处理返回对象

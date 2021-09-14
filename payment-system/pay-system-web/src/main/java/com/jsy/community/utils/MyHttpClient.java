@@ -30,7 +30,7 @@ public class MyHttpClient {
         try {
             merchantPrivateKey = PublicConfig.getPrivateKey(WechatConfig.APICLIENT_KEY);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         // 加载平台证书（mchId：商户号,mchSerialNo：商户证书序列号,apiV3Key：V3秘钥）

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.FinanceTicketTemplateFieldEntity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Pipi
@@ -31,11 +32,11 @@ public interface IPropertyFinanceTicketTemplateFieldService extends IService<Fin
     Integer updateTicketTemplateField(List<FinanceTicketTemplateFieldEntity> ticketTemplateFieldEntities);
 
     /**
+     * @param templateId: 打印模板ID
      * @author: Pipi
      * @description: 获取打印模板字段列表
-     * @param templateId: 打印模板ID
      * @return: java.util.List<com.jsy.community.entity.FinanceTicketTemplateFieldEntity>
      * @date: 2021/8/4 15:14
      **/
-    List<FinanceTicketTemplateFieldEntity> getTicketTemplateFieldList(String templateId);
+    Map<Integer, List<FinanceTicketTemplateFieldEntity>> getTicketTemplateFieldList(String templateId);
 }

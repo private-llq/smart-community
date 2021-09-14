@@ -36,6 +36,15 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @date: 2021/9/8 16:40
 	 **/
 	List<UserEntity> queryFacePageList(@Param("userEntity") UserEntity userEntity,
-									   @Param("startNum") Integer startNum,
-									   @Param("endNum") Integer endNum);
+									   @Param("startNum") Long startNum,
+									   @Param("endNum") Long endNum);
+
+	/**
+	 * @author: Pipi
+	 * @description: 人脸管理查询人脸分页总数
+	 * @param userEntity: 用户实体
+	 * @return: java.util.List<com.jsy.community.entity.UserEntity>
+	 * @date: 2021/9/8 16:40
+	 **/
+	Integer queryFacePageListCount(@Param("userEntity") UserEntity userEntity);
 }

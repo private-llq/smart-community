@@ -8,8 +8,10 @@ import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.mapper.CarPositionMapper;
+import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.property.InsterCarPositionQO;
 import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
@@ -34,6 +36,8 @@ import java.util.List;
 public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPositionEntity> implements ICarPositionService {
     @Resource
     private CarPositionMapper carPositionMapper;
+    @Resource
+    private HouseMapper houseMapper;
 
     @Override
     public List<CarPositionEntity> selectCarPostionBystatustatus() {
@@ -58,10 +62,23 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
         if (qo.getBindingStatus() != null) {
             queryWrapper.eq("binding_status", qo.getBindingStatus());
         }
-        if (qo.getCarNumber()!= null) {
-            queryWrapper.like("car_position",qo.getCarNumber());
+        if (qo.getCarNumber() != null) {
+            queryWrapper.like("car_position", qo.getCarNumber());
         }
         Page<CarPositionEntity> carPositionEntityPage = carPositionMapper.selectPage(page, queryWrapper);
+        List<CarPositionEntity> records = carPositionEntityPage.getRecords();
+        for (CarPositionEntity record : records) {
+            //根据房屋id查询房屋详情信息
+            HouseEntity houseEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("type", 4).eq("community_id", adminCommunityId).eq("id",record.getHouseId()));
+            if (houseEntity!=null) {
+                String building = houseEntity.getBuilding();//楼栋名
+                String unit = houseEntity.getUnit();//单元名
+                String door = houseEntity.getDoor();//门牌
+                record.setBelongHouse(building+unit+door);
+            }
+        }
+
+
         return carPositionEntityPage;
     }
 
@@ -78,7 +95,6 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
 
         return carPositionEntity;
     }
-
 
 
     /**
@@ -141,8 +157,8 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     public Boolean insterCarPosition(InsterCarPositionQO qo, Long adminCommunityId) {
 
         List<CarPositionEntity> list = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().eq("car_position", qo.getCarPosition()));
-        if (list.size()>0) {
-            throw  new PropertyException(500,"车位号已经存在");
+        if (list.size() > 0) {
+            throw new PropertyException(500, "车位号已经存在");
         }
 
         CarPositionEntity carPositionEntity = new CarPositionEntity();
@@ -210,10 +226,10 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
 //        carPositionEntity.setUserName(null);
 //        int i = carPositionMapper.updateById(carPositionEntity);
 
-        int i =   carPositionMapper.relieve(id);
+        int i = carPositionMapper.relieve(id);
 
 
-        if (i>0){
+        if (i > 0) {
             return true;
         }
 
@@ -238,11 +254,11 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
         CarPositionEntity carPositionEntity = carPositionMapper.selectById(id);
 
         Integer bindingStatus = carPositionEntity.getBindingStatus();
-        if (bindingStatus==1) {
-            throw new PropertyException(500,"已经绑定不能删除");
+        if (bindingStatus == 1) {
+            throw new PropertyException(500, "已经绑定不能删除");
         }
         int i = carPositionMapper.deleteById(id);
-        if (i>0){
+        if (i > 0) {
             return true;
         }
         return false;
@@ -266,13 +282,13 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     public Boolean updateCarPosition(UpdateCarPositionQO qo) {
 
 
-            CarPositionEntity carPositionEntity=new CarPositionEntity();
-            BeanUtils.copyProperties(qo,carPositionEntity);
-            int i = carPositionMapper.updateById(carPositionEntity);
-            if (i>0){
-                return true;
-            }
-            return false;
+        CarPositionEntity carPositionEntity = new CarPositionEntity();
+        BeanUtils.copyProperties(qo, carPositionEntity);
+        int i = carPositionMapper.updateById(carPositionEntity);
+        if (i > 0) {
+            return true;
+        }
+        return false;
 
 
     }
@@ -280,12 +296,14 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     @Override
     public Integer selectCarPositionVacancy(Long adminCommunityId) {
         QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("community_id",adminCommunityId);
-        queryWrapper.eq("binding_status",0);
+        queryWrapper.eq("community_id", adminCommunityId);
+        queryWrapper.eq("binding_status", 0);
         Integer integer = carPositionMapper.selectCount(queryWrapper);
         return integer;
     }
-    
+
+
+
     /**
      * @Description: 根据手机号查询绑定车位的id
      * @Param: [mobile]

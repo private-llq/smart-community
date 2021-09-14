@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.api.IUserService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserEntity;
@@ -11,6 +12,8 @@ import com.jsy.community.entity.UserFaceSyncRecordEntity;
 import com.jsy.community.mapper.UserFaceSyncRecordMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +124,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 	 * @date: 2021/9/8 16:35
 	 **/
 	@Override
-	public List<UserEntity> facePageList(BaseQO<UserEntity> baseQO) {
-		return null;
+	public PageInfo<UserEntity> facePageList(BaseQO<UserEntity> baseQO) {
+		PageInfo<UserEntity> pageInfo = new PageInfo<>();
+		Long startNum = (baseQO.getPage() - 1) * baseQO.getSize();
+		List<UserEntity> userEntityList = baseMapper.queryFacePageList(baseQO.getQuery(), startNum, baseQO.getSize());
+		if (!CollectionUtils.isEmpty(userEntityList)) {
+			Set<String> uidSet = new HashSet<>();
+			for (UserEntity userEntity : userEntityList) {
+				uidSet.add(userEntity.getUid());
+			}
+			List<HouseMemberEntity> houseMemberEntities = houseMemberService.queryByCommunityIdAndUids(baseQO.getQuery().getCommunityId(), uidSet);
+			Map<String, Set<String>> relationMap = new HashMap<>();
+			for (HouseMemberEntity houseMemberEntity : houseMemberEntities) {
+				String relationStr = BusinessEnum.RelationshipEnum.getCodeName(houseMemberEntity.getRelation());
+				if (relationMap.containsKey(houseMemberEntity.getUid())) {
+					relationMap.get(houseMemberEntity.getUid()).add(relationStr);
+				} else {
+					Set<String> relationString = new HashSet<>();
+					relationString.add(relationStr);
+					relationMap.put(houseMemberEntity.getUid(), relationString);
+				}
+			}
+			for (UserEntity userEntity : userEntityList) {
+				userEntity.setRelationSet(relationMap.get(userEntity.getUid()));
+			}
+		}
+		Integer count = 0;
+		count = baseMapper.queryFacePageListCount(baseQO.getQuery()) == null ? 0 : baseMapper.queryFacePageListCount(baseQO.getQuery());
+		pageInfo.setSize(baseQO.getSize());
+		pageInfo.setTotal(count);
+		pageInfo.setCurrent(baseQO.getPage());
+		pageInfo.setRecords(userEntityList);
+		return pageInfo;
 	}
 }

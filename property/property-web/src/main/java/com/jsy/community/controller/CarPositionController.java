@@ -22,7 +22,10 @@ import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.CarPositionTypeEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.qo.property.*;
+import com.jsy.community.util.CarOperation;
 import com.jsy.community.util.HttpClientHelper;
+import com.jsy.community.util.QRCodeGenerator;
+import com.jsy.community.util.RecordCarLogUtils;
 import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
@@ -34,6 +37,8 @@ import com.jsy.community.vo.car.Rs485Data;
 import com.jsy.community.vo.property.PageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import net.bytebuddy.asm.Advice;
+import net.bytebuddy.implementation.bind.annotation.This;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.BeanUtils;
@@ -44,6 +49,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -235,19 +244,39 @@ public class CarPositionController {
         }
         return CommonResult.ok(b, "删除失败");
     }
-
+    @CarOperation(operation="编辑车位")
     @ApiOperation("编辑车位")
     @Login
     @RequestMapping(value = "/updateCarPosition", method = RequestMethod.POST)
-    public CommonResult<Boolean> updateCarPosition(@RequestBody UpdateCarPositionQO qo) {
+    public CommonResult<Boolean> updateCarPosition(@RequestBody UpdateCarPositionQO qo)  {
+
+
+            //日志记录
+        //RecordCarLogUtils.recordLog(this.getClass(),"updateCarPosition","操作日志",RoleId,UpdateCarPositionQO.class);
+
+
 
         Boolean b = iCarPositionService.updateCarPosition(qo);
-
         if (b) {
             return CommonResult.ok(b, "更新成功");
         }
         return CommonResult.ok(b, "更新失败");
     }
+
+//    @ApiOperation("获取二维码")
+//    @Login
+//    @RequestMapping(value = "/obtainTwoCode", method = RequestMethod.POST)
+//    public CommonResult<String> obtainTwoCode() {
+//        Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
+//
+//
+//        return null;
+//    }
+
+
+
+
+
 
 
     @ApiOperation("过车记录")
@@ -366,7 +395,7 @@ public class CarPositionController {
                 carCutOffQO.setCommunityId(communityId);
                 carCutOffQO.setState(0);
                 //查询临时车位的占用数量
-                long total = carCutOffService.selectPage(carCutOffQO).getTotal();
+                long total = carCutOffService.selectPage(carCutOffQO);
 
                 System.out.println("最大入场数" + maxNumber);
                 System.out.println("查询临时车位的占用数量" + total);
@@ -452,10 +481,12 @@ public class CarPositionController {
 
 
                         } else if (vdcType.equals("out")) {//出口
-
+                            Integer orderStatus = 0;
 
                             CarOrderEntity carOrderEntity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
-                            Integer orderStatus = carOrderEntity.getOrderStatus();
+                            if (carOrderEntity != null) {
+                                orderStatus = carOrderEntity.getOrderStatus();
+                            }
                             System.out.println("支付状态" + orderStatus);
                             if (orderStatus == 0) {//未支付
                                 //是否开闸
@@ -474,14 +505,14 @@ public class CarPositionController {
                                 CarBasicsEntity one1 = iCarBasicsService.findOne(communityId);
                                 CarOrderEntity carOrderEntity1 = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
                                 LocalDateTime orderTime = carOrderEntity1.getOrderTime();//支付时间
-                                System.out.println("支付时间"+orderTime);
+                                System.out.println("支付时间" + orderTime);
                                 Integer dwellTime = one1.getDwellTime();//允许滞留时间
-                                System.out.println("允许滞留时间"+dwellTime);
+                                System.out.println("允许滞留时间" + dwellTime);
                                 LocalDateTime now = LocalDateTime.now();//当前时间
-                                System.out.println("当前时间"+now);
+                                System.out.println("当前时间" + now);
                                 Duration duration = Duration.between(orderTime, now);//时间差
                                 long l = duration.toMinutes();//分钟
-                                System.out.println("时间差"+l);
+                                System.out.println("时间差" + l);
                                 if (l > dwellTime) {//超过了滞留时间
                                     //是否开闸
                                     GpioData gpioData = new GpioData();
@@ -643,6 +674,7 @@ public class CarPositionController {
 
         }
     }
+
 
     //包月车辆剩余天数
     private Long extracted(String plateNum, String plateColor, CarEquipmentManageEntity carEquipmentManageEntity) {

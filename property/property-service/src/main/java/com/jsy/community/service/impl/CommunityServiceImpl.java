@@ -411,28 +411,37 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		List<CommunityEntity> communityEntities = communityMapper.queryCommunityByCompanyId(companyId);
 		// 设置物业所属小区数量
 		consoleEntity.setCommunityNumber(communityEntities.size());
-		// 查住宅数量
-		Integer residenceCount = houseMapper.selectAllHouseByCommunityIds(communityIdList);
-		consoleEntity.setResidenceCount(residenceCount);
-		// 查商铺数量
-		Integer shopCount = shopLeaseService.selectAllShopByCommunityIds(communityIdList);
-		consoleEntity.setShopCount(shopCount);
-		// 查询物业房屋总数量
-		consoleEntity.setHouseSum(residenceCount + shopCount);
-		// 查业主数量
-		consoleEntity.setOwnerCount(houseMemberMapper.selectAllownerByCommunityIds(communityIdList));
-		// 查租户数量
-		consoleEntity.setTenantCount(houseMemberMapper.selectAlltenantByCommunityIds(communityIdList));
-		// 查询物业居住人数
-		consoleEntity.setLiveSum(houseMemberMapper.selectAllPeopleByCommunityIds(communityIdList));
-		// 已占用车位
-		Integer occupyCarPosition = carPositionMapper.selectAllOccupyCarPositionByCommunityIds(communityIdList);
-		consoleEntity.setOccupyCarPosition(occupyCarPosition);
-		// 查询物业车位总数
-		Integer carPosition = carPositionMapper.selectAllCarPositionByCommunityIds(communityIdList);
-		consoleEntity.setCarPositionSum(carPosition);
-		// 未占用车位
-		consoleEntity.setUnoccupiedCarPosition(carPosition - occupyCarPosition);
+		if (CollectionUtils.isEmpty(communityIdList)) {
+			consoleEntity.setResidenceCount(0);
+			consoleEntity.setShopCount(0);
+			consoleEntity.setHouseSum(0);
+			consoleEntity.setOccupyCarPosition(0);
+			consoleEntity.setCarPositionSum(0);
+			consoleEntity.setUnoccupiedCarPosition(0);
+		} else {
+			// 查住宅数量
+			Integer residenceCount = houseMapper.selectAllHouseByCommunityIds(communityIdList);
+			consoleEntity.setResidenceCount(residenceCount);
+			// 查商铺数量
+			Integer shopCount = shopLeaseService.selectAllShopByCommunityIds(communityIdList);
+			consoleEntity.setShopCount(shopCount);
+			// 查询物业房屋总数量
+			consoleEntity.setHouseSum(residenceCount + shopCount);
+			// 查业主数量
+			consoleEntity.setOwnerCount(houseMemberMapper.selectAllownerByCommunityIds(communityIdList));
+			// 查租户数量
+			consoleEntity.setTenantCount(houseMemberMapper.selectAlltenantByCommunityIds(communityIdList));
+			// 查询物业居住人数
+			consoleEntity.setLiveSum(houseMemberMapper.selectAllPeopleByCommunityIds(communityIdList));
+			// 已占用车位
+			Integer occupyCarPosition = carPositionMapper.selectAllOccupyCarPositionByCommunityIds(communityIdList);
+			consoleEntity.setOccupyCarPosition(occupyCarPosition);
+			// 查询物业车位总数
+			Integer carPosition = carPositionMapper.selectAllCarPositionByCommunityIds(communityIdList);
+			consoleEntity.setCarPositionSum(carPosition);
+			// 未占用车位
+			consoleEntity.setUnoccupiedCarPosition(carPosition - occupyCarPosition);
+		}
 		return consoleEntity;
 	}
 	

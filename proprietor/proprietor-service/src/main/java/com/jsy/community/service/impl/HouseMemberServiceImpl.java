@@ -227,4 +227,21 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 		queryWrapper.eq("community_id", communityId);
 		return houseMemberMapper.selectList(queryWrapper);
 	}
+
+	/**
+	 * @param communityId : 社区ID
+	 * @param uidSet      : 用户uid列表
+	 * @author: Pipi
+	 * @description: 查询社区所有成员信息
+	 * @return: java.util.List<com.jsy.community.entity.HouseMemberEntity>
+	 * @date: 2021/9/9 15:07
+	 **/
+	@Override
+	public List<HouseMemberEntity> queryByCommunityIdAndUids(Long communityId, Set<String> uidSet) {
+		QueryWrapper<HouseMemberEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("uid, relation");
+		queryWrapper.eq("community_id", communityId);
+		queryWrapper.in("uid", uidSet);
+		return houseMemberMapper.selectList(queryWrapper);
+	}
 }

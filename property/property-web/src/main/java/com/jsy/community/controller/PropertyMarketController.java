@@ -174,7 +174,7 @@ public class PropertyMarketController {
      * @Date: 2021/8/21-15:44
      **/
     @PostMapping("/selectMarketBlacklist")
-    @ApiOperation("社区集市所有已发布商品")
+    @ApiOperation("查询黑名单的商品")
     @Login
     public CommonResult selectMarketBlacklist(@RequestBody  BaseQO baseQO){
         ValidatorUtils.validatePageParam(baseQO);
@@ -191,7 +191,7 @@ public class PropertyMarketController {
      * @Date: 2021/8/21-15:44
      **/
     @PostMapping("/updateState")
-    @ApiOperation("社区集市发布商品")
+    @ApiOperation("修改上下架商品")
     @Login
     public CommonResult updateState(@RequestParam("id")Long id,@RequestParam("state") Integer state){
         boolean b = marketService.updateState(id,state);
@@ -206,7 +206,7 @@ public class PropertyMarketController {
      * @Date: 2021/8/21-15:44
      **/
     @PostMapping("/updateShield")
-    @ApiOperation("社区集市发布商品")
+    @ApiOperation("修改屏蔽商品")
     @Login
     public CommonResult updateShield(@RequestParam("id")Long id,@RequestParam("shield") Integer shield){
         boolean b = marketService.updateShield(id,shield);

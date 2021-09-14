@@ -88,7 +88,7 @@ public class PropertyFinanceOrderController {
         return CommonResult.ok(map);
     }
     @ApiOperation("查询当前小区所有车位")
-    @PostMapping("/carList")
+    @GetMapping("/carList")
     @Login
     public CommonResult carList(){
         List<CarPositionEntity> list = propertyFinanceOrderService.carList(UserUtils.getAdminCommunityId());
@@ -636,7 +636,7 @@ public class PropertyFinanceOrderController {
     @Login
     @ApiOperation("导入账单信息")
     @PostMapping("/importFinanceExcel")
-    public CommonResult importFinanceExcel(@RequestBody MultipartFile excel, @RequestParam("orderStatus")Integer orderStatus) {
+    public CommonResult importFinanceExcel(MultipartFile excel, @RequestParam("orderStatus")Integer orderStatus) {
         //参数验证
         validFileSuffix(excel);
         Long adminCommunityId = UserUtils.getAdminCommunityId();

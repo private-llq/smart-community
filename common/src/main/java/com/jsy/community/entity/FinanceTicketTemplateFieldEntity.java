@@ -17,7 +17,9 @@ import java.io.Serializable;
 @TableName("t_property_finance_ticket_template_field")
 public class FinanceTicketTemplateFieldEntity implements Serializable {
       //主键
-      private String id;
+      private Long id;
+
+      private String idStr;
       //票据模板ID
       @NotBlank(message = "票据模板ID不能为空")
       private String templateId;

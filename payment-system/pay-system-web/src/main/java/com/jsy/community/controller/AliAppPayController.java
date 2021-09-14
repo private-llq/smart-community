@@ -99,6 +99,12 @@ public class AliAppPayController {
 			}
 			aliAppPayQO.setServiceOrderNo(String.valueOf(aliAppPayQO.getOrderData().get("uuid")));
 		}
+		//停车缴费逻辑
+		if (aliAppPayQO.getTradeFrom()==8){
+			if ("".equals(aliAppPayQO.getServiceOrderNo())||aliAppPayQO.getServiceOrderNo()==null){
+				return CommonResult.error("车位缴费临时订单记录id不能为空！");
+			}
+		}
 		//TODO 测试金额 0.01
 		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
 		

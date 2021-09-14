@@ -397,4 +397,14 @@ public interface BusinessConst {
      */
     Short SHOP_FAVORITE_TYPE = 1;
 
+    /**
+     * 租赁模块 签约倒计时天数
+     */
+    long COUNTDOWN_DAYS_TO_CONTRACT = 7;
+
+    /**
+     * 租赁模块 签约申请倒计时天数
+     */
+    long COUNTDOWN_TO_CONTRACT_APPLY = 3;
+
 }

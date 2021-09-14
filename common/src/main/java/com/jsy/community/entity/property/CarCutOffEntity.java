@@ -1,5 +1,7 @@
 package com.jsy.community.entity.property;
 
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.converters.string.StringImageConverter;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -51,9 +53,10 @@ public class CarCutOffEntity  extends BaseEntity {
     @ApiModelProperty(value = "车牌进闸特写图")
     private String closeupPic;
 
-    @ApiModelProperty(value = "车子进闸全景图")
+    @ApiModelProperty(value = "车子出闸全景图")
     private String outImage;
-    @ApiModelProperty(value = "车牌进闸特写图")
+    @ApiModelProperty(value = "车牌出闸特写图")
+    @ExcelProperty(converter = StringImageConverter.class)
     private String outPic;
 
     @ApiModelProperty(value = "车辆所属类型  1-临时 2-包月  3-业主")
@@ -108,4 +111,9 @@ public class CarCutOffEntity  extends BaseEntity {
     @TableLogic(value = "0",delval = "1")
     private  Integer deleted;
 
+    /**
+     * 停车时长
+     */
+    @TableField(exist = false)
+    private String stopCarTime;
 }

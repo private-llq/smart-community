@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author ling
@@ -114,7 +116,7 @@ public class UserEntity extends BaseEntity {
 
 	// 与业主关系 1.业主 6.亲属，7租户
 	@TableField( exist = false )
-	private String relationStr;
+	private Set<String> relationSet;
 
 	// (搜索用)关键字
 	@TableField( exist = false )
@@ -123,6 +125,18 @@ public class UserEntity extends BaseEntity {
 	// 下发状态;1:失败(未完整同步);2;成功
 	@TableField( exist = false )
 	private Integer distributionStatus;
+
+	// 人脸启用状态;1:启用;2:禁用
+	@TableField( exist = false )
+	private String faceEnableStatusStr;
+
+	// 下发状态;1:失败(未完整同步);2;成功
+	@TableField( exist = false )
+	private String distributionStatusStr;
+
+	// 社区ID
+	@TableField( exist = false )
+	private Long communityId;
 
 	/**
 	 * 业主登记验证接口

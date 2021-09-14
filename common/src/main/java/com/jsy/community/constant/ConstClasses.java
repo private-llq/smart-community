@@ -1,5 +1,6 @@
 package com.jsy.community.constant;
 
+import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.utils.AESOperator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,39 +30,50 @@ public interface ConstClasses {
 		public static String sellerEmail;//商户账号(邮箱)
 		public static String sellerPID;//商户账号(PID)
 		
-		@Value("${alipay.appid}")
-		public void setAppid(String appid) {
-			AliPayDataEntity.appid = AESOperator.decrypt(appid);
-		}
-		@Value("${alipay.sellerId}")
-		public void setSellerId(String sellerId) {
-			AliPayDataEntity.sellerId = AESOperator.decrypt(sellerId);
-		}
-		@Value("${alipay.sellerEmail}")
-		public void setSellerEmail(String sellerEmail) {
-			AliPayDataEntity.sellerEmail = AESOperator.decrypt(sellerEmail);
-		}
-		@Value("${alipay.sellerPID}")
-		public void setSellerPID(String sellerPID) {
-			AliPayDataEntity.sellerPID = AESOperator.decrypt(sellerPID);
+		public static void setConfig(PayConfigureEntity payConfigureEntity) {
+			appid = AESOperator.decrypt(payConfigureEntity.getAppId());
+			privateKey = AESOperator.decrypt(payConfigureEntity.getPrivateKey());
+			certPath = AESOperator.decrypt(payConfigureEntity.getCertPath());
+			alipayPublicCertPath = AESOperator.decrypt(payConfigureEntity.getAlipayPublicCertPath());
+			rootCertPath = AESOperator.decrypt(payConfigureEntity.getRootCertPath());
+			sellerId = AESOperator.decrypt(payConfigureEntity.getSellerId());
+			sellerEmail = AESOperator.decrypt(payConfigureEntity.getSellerEmail());
+			sellerPID = AESOperator.decrypt(payConfigureEntity.getSellerPid());
 		}
 		
-		@Value("${alipay.app-private-key}")
-		public void setPrivateKey(String privateKey) {
-			AliPayDataEntity.privateKey = AESOperator.decrypt(privateKey);
-		}
-		@Value("${alipay.cert-path.app-public-cert}")
-		public void setCertPath(String certPath) {
-			AliPayDataEntity.certPath = AESOperator.decrypt(certPath);
-		}
-		@Value("${alipay.cert-path.alipay-public-cert}")
-		public void setAlipayPublicCertPath(String alipayPublicCertPath) {
-			AliPayDataEntity.alipayPublicCertPath = AESOperator.decrypt(alipayPublicCertPath);
-		}
-		@Value("${alipay.cert-path.root-cert}")
-		public void setRootCertPath(String rootCertPath) {
-			AliPayDataEntity.rootCertPath = AESOperator.decrypt(rootCertPath);
-		}
+//		@Value("${alipay.appid}")
+//		public void setAppid(String appid) {
+//			AliPayDataEntity.appid = AESOperator.decrypt(appid);
+//		}
+//		@Value("${alipay.sellerId}")
+//		public void setSellerId(String sellerId) {
+//			AliPayDataEntity.sellerId = AESOperator.decrypt(sellerId);
+//		}
+//		@Value("${alipay.sellerEmail}")
+//		public void setSellerEmail(String sellerEmail) {
+//			AliPayDataEntity.sellerEmail = AESOperator.decrypt(sellerEmail);
+//		}
+//		@Value("${alipay.sellerPID}")
+//		public void setSellerPID(String sellerPID) {
+//			AliPayDataEntity.sellerPID = AESOperator.decrypt(sellerPID);
+//		}
+//
+//		@Value("${alipay.app-private-key}")
+//		public void setPrivateKey(String privateKey) {
+//			AliPayDataEntity.privateKey = AESOperator.decrypt(privateKey);
+//		}
+//		@Value("${alipay.cert-path.app-public-cert}")
+//		public void setCertPath(String certPath) {
+//			AliPayDataEntity.certPath = AESOperator.decrypt(certPath);
+//		}
+//		@Value("${alipay.cert-path.alipay-public-cert}")
+//		public void setAlipayPublicCertPath(String alipayPublicCertPath) {
+//			AliPayDataEntity.alipayPublicCertPath = AESOperator.decrypt(alipayPublicCertPath);
+//		}
+//		@Value("${alipay.cert-path.root-cert}")
+//		public void setRootCertPath(String rootCertPath) {
+//			AliPayDataEntity.rootCertPath = AESOperator.decrypt(rootCertPath);
+//		}
 	}
 	
 	/**

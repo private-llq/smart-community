@@ -16,9 +16,14 @@ public class ProprietorMarketCategoryEntity extends BaseEntity implements Serial
 
     @ApiModelProperty(value = "标签id")
     private String categoryId;
+
+    @ApiModelProperty(value = "标签排序字段")
+    private Integer sort;
+
     @NotNull
     @ApiModelProperty(value = "类别名")
     private String category;
+
     @NotNull
     @ApiModelProperty(value = "社区id")
     private  Long communityId;

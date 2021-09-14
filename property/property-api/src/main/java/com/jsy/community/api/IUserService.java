@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -73,5 +74,5 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return: java.util.List<com.jsy.community.entity.UserEntity>
 	 * @date: 2021/9/8 16:35
 	 **/
-	List<UserEntity> facePageList(BaseQO<UserEntity> baseQO);
+	PageInfo<UserEntity> facePageList(BaseQO<UserEntity> baseQO);
 }
