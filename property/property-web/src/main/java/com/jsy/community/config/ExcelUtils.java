@@ -34,8 +34,7 @@ public class ExcelUtils {
         imageColumnIndexs.add(0);
         imageColumnIndexs.add(4);
         imageColumnIndexs.add(8);
-        EasyExcel.write(out, c).sheet(filename).registerWriteHandler(new ImageModifyHandler())
-                .doWrite(data);
+        EasyExcel.write(out, c).sheet(filename).doWrite(data);
         out.flush();
         out.close();
     }

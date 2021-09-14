@@ -96,6 +96,8 @@ public class CarPositionController {
     private ICarPatternService iCarPatternService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarOrderService iCarOrderService;
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarLaneService iCarLaneService;
 
 
     @ApiOperation("分页查询车位信息")

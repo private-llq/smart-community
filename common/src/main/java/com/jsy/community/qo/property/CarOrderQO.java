@@ -35,13 +35,13 @@ public class CarOrderQO extends BaseQO {
      */
     private Integer type;
 
-    /**
-     * @Description: 导出字段  月租0  1临时
-     * @Param:
-     * @Return:
-     * @Author: Tian
-     * @Date: 2021/9/9-15:46
-     **/
-    private Integer state;
+//    /**
+//     * @Description: 导出字段  月租0  1临时
+//     * @Param:
+//     * @Return:
+//     * @Author: Tian
+//     * @Date: 2021/9/9-15:46
+//     **/
+//    private Integer state;
 
 }

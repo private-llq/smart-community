@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarCutOffQO;
+import com.jsy.community.qo.property.CarEntranceQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.property.CarAccessVO;
 import com.jsy.community.vo.property.CarSceneVO;
@@ -74,5 +75,5 @@ public interface ICarCutOffService extends IService<CarCutOffEntity> {
      * @Author: Tian
      * @Date: 2021/9/10-10:17
      **/
-    List<CarAccessVO> selectAccessList(CarCutOffQO carCutOffQO, Long communityId);
+    List<CarAccessVO> selectAccessList(CarCutOffQO carCutOffQO, Long communityId) throws IOException;
 }

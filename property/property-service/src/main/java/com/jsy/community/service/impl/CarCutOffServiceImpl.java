@@ -12,6 +12,7 @@ import com.jsy.community.mapper.CarCutOffMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.util.TimeUtils;
+import com.jsy.community.util.UrlUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.property.CarAccessVO;
@@ -19,21 +20,17 @@ import com.jsy.community.vo.property.CarSceneVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.alibaba.fastjson.util.IOUtils.readAll;
 
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
@@ -116,7 +113,14 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
         return selectPage;
     }
 
-    @Override
+   /**
+    * @Description: 在场车辆
+    * @Param: [query, communityId]
+    * @Return: java.util.List<com.jsy.community.vo.property.CarSceneVO>
+    * @Author: Tian
+    * @Date: 2021/9/13-17:09
+    **/
+   @Override
     public List<CarSceneVO> selectCarSceneList(CarCutOffQO query, Long communityId) throws IOException {
         QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
 
@@ -144,29 +148,71 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
                 date = Date.from(i.getOpenTime().atZone(ZoneId.systemDefault()).toInstant());
                 carSceneVO.setOpenTime(date);
             }
-            URL url = new URL("http://222.178.212.29:9000/car-in-and-out-picture/車牌1630917537沪A99999.jpg");
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
-            con.setRequestMethod("GET");
-            con.setConnectTimeout(4 * 1000);
-            InputStream inStream = con .getInputStream();    //通过输入流获取图片数据
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            byte[] buffer = new byte[2048];
-            int len = 0;
-            while( (len=inStream.read(buffer)) != -1 ){
-                outStream.write(buffer, 0, len);
+            if (i.getCloseupPic()!=null){
+                carSceneVO.setCloseupPic(UrlUtils.getDate(i.getCloseupPic()));
             }
-            inStream.close();
-            byte[] data =  outStream.toByteArray();
-            carSceneVO.setByteArray(data);
-            System.out.println(data);
             sceneVOS.add(carSceneVO);
         }
 
         return sceneVOS;
     }
 
+    /**
+     * @Description: 进出记录
+     * @Param: [query, communityId]
+     * @Return: java.util.List<com.jsy.community.vo.property.CarAccessVO>
+     * @Author: Tian
+     * @Date: 2021/9/13-17:09
+     **/
     @Override
-    public List<CarAccessVO> selectAccessList(CarCutOffQO carCutOffQO, Long communityId) {
-        return null;
+    public List<CarAccessVO> selectAccessList(CarCutOffQO query, Long communityId) throws IOException {
+        QueryWrapper<CarCutOffEntity> queryWrapper = new QueryWrapper<>();
+
+        if (!StringUtils.isEmpty(query.getCarNumber())){
+            queryWrapper.like("car_number",query.getCarNumber());
+        }
+        //车辆所属类型
+        if (query.getBelong()!=null){
+            queryWrapper.eq("belong",query.getBelong());
+        }
+
+        queryWrapper.eq("community_id",communityId);//状态
+
+        if (query.getState()!=null){
+            queryWrapper.eq("state",query.getState());
+        }
+        List<CarCutOffEntity> carCutOffEntityList = carCutOffMapper.selectList(queryWrapper);
+        List<CarAccessVO> accessVOS = new ArrayList<>();
+        Date date;
+        for (CarCutOffEntity i: carCutOffEntityList) {
+            CarAccessVO accessVO = new CarAccessVO();
+            BeanUtils.copyProperties(i,accessVO);
+
+            if (i.getOpenTime()!=null){
+                date = Date.from(i.getOpenTime().atZone(ZoneId.systemDefault()).toInstant());
+                accessVO.setOpenTime(date);
+            }
+
+            if (i.getStopTime()!=null){
+
+                date = Date.from(i.getStopTime().atZone(ZoneId.systemDefault()).toInstant());
+                accessVO.setStopTime(date);
+            }
+
+            if (i.getCloseupPic()!=null){
+                accessVO.setCloseupPic(UrlUtils.getDate(i.getCloseupPic()));
+            }
+            if (i.getOutPic()!=null){
+                accessVO.setOutPic(UrlUtils.getDate(i.getOutPic()));
+            }
+
+            if (i.getOpenTime()!=null  && i.getStopTime()!=null){
+                HashMap<String, Long> datePoor = TimeUtils.getDatePoor(i.getOpenTime(), i.getStopTime());
+                String s = datePoor.get("day")+"天："+datePoor.get("hour")+" 小时："+datePoor.get("min")+" 分钟";
+                accessVO.setStopCarTime(s);
+            }
+           accessVOS.add(accessVO);
+        }
+        return  accessVOS;
     }
 }

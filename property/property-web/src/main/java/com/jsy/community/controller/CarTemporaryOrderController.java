@@ -59,13 +59,13 @@ public class CarTemporaryOrderController {
     public void downLoadFile(@RequestBody CarOrderQO carOrderQO, HttpServletResponse response) throws IOException {
         Long communityId = UserUtils.getAdminCommunityId();
 
-        if (carOrderQO.getState()==0){
+        if (carOrderQO.getType()==2){
             List<CarTemporaryOrderQO>  list = iCarTemporaryOrder.selectCarOrderList(carOrderQO,communityId);
             ExcelUtils.exportModule("月租订单", response, CarTemporaryOrderQO.class, list, 2);
 
         }else {
             List<CarTemporaryQO>  list = iCarTemporaryOrder.selectTemporaryQOList(carOrderQO,communityId);
-            ExcelUtils.exportModule("临时订单", response, CarTemporaryOrderQO.class, list, 2);
+            ExcelUtils.exportModule("临时订单", response, CarTemporaryQO.class, list, 2);
         }
 
     }
