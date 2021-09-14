@@ -1,7 +1,5 @@
 package com.jsy.community.service.impl;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IBindingPositionService;
 import com.jsy.community.api.PropertyException;
@@ -12,7 +10,6 @@ import com.jsy.community.mapper.BindingPositionMapper;
 import com.jsy.community.mapper.CarMonthlyVehicleMapper;
 import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +31,27 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
     @Override
     @Transactional
     public Integer saveBinding(BindingPositionEntity bindingPositionEntity) {
-        bindingPositionEntity.setBindingStatus(0);//未绑定状态
+
+        List<BindingPositionEntity> carList = bindingPositionMapper.selectList(new QueryWrapper<BindingPositionEntity>()
+                .eq("community_id", bindingPositionEntity.getCommunityId())
+                .eq("position_id", bindingPositionEntity.getPositionId())
+                .eq("car_number",bindingPositionEntity.getCarNumber())
+        );
+        if (carList.size()!=0){
+            throw new PropertyException("该车辆已添加，请勿重复添加！");
+        }
+
+        List<BindingPositionEntity> list = bindingPositionMapper.selectList(new QueryWrapper<BindingPositionEntity>()
+                .eq("community_id", bindingPositionEntity.getCommunityId())
+                .eq("position_id", bindingPositionEntity.getPositionId()));
+
+
+        if (list.size()==0){
+            bindingPositionEntity.setBindingStatus(1);//默认第一个添加进来的为绑定状态
+        }else {
+            bindingPositionEntity.setBindingStatus(0);//未绑定状态
+        }
+
         bindingPositionEntity.setUid(UserUtils.randomUUID());
         int insert = bindingPositionMapper.insert(bindingPositionEntity);
         return insert;
@@ -46,7 +63,10 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
     @Override
     public List<BindingPositionEntity> selectBinding(BindingPositionEntity bindingPositionEntity) {
         List<BindingPositionEntity> bindingPositionEntities = bindingPositionMapper.
-                selectList(new QueryWrapper<BindingPositionEntity>().eq("community_id",bindingPositionEntity.getCommunityId()));
+                selectList(new QueryWrapper<BindingPositionEntity>()
+                        .eq("community_id",bindingPositionEntity.getCommunityId())
+                        .eq("position_id",bindingPositionEntity.getPositionId())
+                );
         return bindingPositionEntities;
     }
 
@@ -56,7 +76,6 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
     /**
      * 包月车辆换绑车位
      */
-    //todo 有问题
     @Override
     @Transactional
     public void binding(BindingPositionEntity bindingPositionEntity) {
@@ -88,7 +107,15 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
 
     }
 
-
+    @Override
+    @Transactional
+    public void deleteBinding(String uid) {
+       /* BindingPositionEntity entity = bindingPositionMapper.selectOne(new QueryWrapper<BindingPositionEntity>().eq("uid", uid));
+        if (entity.getBindingStatus()==1){
+            throw new PropertyException("该车辆已绑定车位，如需删除请先解绑！");
+        }*/
+        bindingPositionMapper.delete(new QueryWrapper<BindingPositionEntity>().eq("uid",uid));
+    }
 
 
 }

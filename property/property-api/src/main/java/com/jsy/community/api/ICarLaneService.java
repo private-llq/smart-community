@@ -17,5 +17,7 @@ public interface ICarLaneService {
 
     PageInfo FindByLaneNamePage(BaseQO<String> baseQO, Long communityId);
 
+    CarLaneEntity  getCarLaneOne(Long equipmentId,Long communityId);
+
 
 }

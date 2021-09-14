@@ -10,6 +10,7 @@ import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
+import com.jsy.community.qo.CarMonthlyDelayQO;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.util.POIUtil;
 import com.jsy.community.utils.MinioUtils;
@@ -24,13 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@Api(tags = "停车收费设置")
+@Api(tags = "包月车辆")
 @RestController
 @RequestMapping("CarMonthlyVehicle")
 @ApiJSYController
@@ -98,15 +98,14 @@ public class CarMonthlyVehicleController {
 
     /**
      * 包月延期 0 按天 1 按月
-     * @param fee
+     * @param carMonthlyDelayQO
      */
-    @PutMapping("delay")
-    public CommonResult delay(@RequestParam("uid") String uid,
-               @RequestParam("type")Integer type,
-               @RequestParam("dayNum")Integer dayNum,
-               @RequestParam("fee")BigDecimal fee){
-
-        vehicleService.delay(uid,type,dayNum,fee);
+    @PostMapping("delay")
+    @Login
+    public CommonResult delay(@RequestBody CarMonthlyDelayQO carMonthlyDelayQO){
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+        carMonthlyDelayQO.setCommunityId(adminCommunityId);
+        vehicleService.delay(carMonthlyDelayQO);
         return CommonResult.ok(0,"延期成功！");
     }
 
@@ -168,11 +167,13 @@ public class CarMonthlyVehicleController {
 
 
     /**
-     * 数据导出
+     * 车辆数据导出
      */
-    @RequestMapping("dataExport")
-    public CommonResult dataExport( HttpServletResponse response){
-        List<CarMonthlyVehicle> vehicleList = vehicleService.selectList(UserUtils.getAdminCommunityId());
+    @PostMapping("dataExport")
+    @Login
+    public CommonResult dataExport(@RequestBody CarMonthlyVehicleQO carMonthlyVehicleQO, HttpServletResponse response){
+        carMonthlyVehicleQO.setCommunityId(UserUtils.getAdminCommunityId());
+        List<CarMonthlyVehicle> vehicleList = vehicleService.selectListCar(carMonthlyVehicleQO);
         List<String[]> list=new ArrayList<>();//封装返回的数据
         String[] strings0=new String[10];
         strings0[0]=  "车牌号";
@@ -256,9 +257,10 @@ public class CarMonthlyVehicleController {
      * 包月车位导出
      */
     @Login
-    @RequestMapping("dataExport2Position")
-    public CommonResult dataExport2Position( HttpServletResponse response){
-        List<CarMonthlyVehicle> vehicleList = vehicleService.selectList(UserUtils.getAdminCommunityId());
+    @PostMapping("dataExport2Position")
+    public CommonResult dataExport2Position(@RequestBody CarMonthlyVehicleQO carMonthlyVehicleQO, HttpServletResponse response){
+        carMonthlyVehicleQO.setCommunityId(UserUtils.getAdminCommunityId());
+        List<CarMonthlyVehicle> vehicleList = vehicleService.selectListPostion(carMonthlyVehicleQO);
         List<String[]> list=new ArrayList<>();//封装返回的数据
         String[] strings0=new String[10];
         strings0[0]=  "车位号";
@@ -307,7 +309,6 @@ public class CarMonthlyVehicleController {
             return CommonResult.error("导出失败，请联系管理员");
         }
       return   CommonResult.ok();
-
     }
 
     /**
@@ -315,7 +316,7 @@ public class CarMonthlyVehicleController {
      */
     @PostMapping("dataExportTemplate2Position")
     public String dataExportTemplate2Position(){
-        return "http://222.178.212.29:9000/template/dac28811cce04c92ba37f50089fc4c9f";
+        return "http://222.178.212.29:9000/template/485336f8ed1d46fea3d26f6475770f5a";
     }
 
 

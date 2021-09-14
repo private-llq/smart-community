@@ -5,8 +5,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.property.CarProprietorEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.OrderQO;
 import com.jsy.community.qo.property.CarOrderQO;
+import com.jsy.community.vo.SelectMoney3Vo;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 public interface ICarTemporaryOrderService extends IService<CarOrderEntity> {
@@ -26,4 +30,8 @@ public interface ICarTemporaryOrderService extends IService<CarOrderEntity> {
      * @Date: 2021/9/7-11:02
      **/
     Map<String, Object> selectMoney();
+
+    List<Map<String, BigDecimal>> selectMoney2(Long adminCommunityId);
+
+    List<SelectMoney3Vo> selectMoney3(OrderQO orderQO);
 }

@@ -9,10 +9,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -63,6 +60,16 @@ public class BindingPositionController {
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         bindingPositionEntity.setCommunityId(adminCommunityId);
         bindingPositionService.binding(bindingPositionEntity);
+        return CommonResult.ok();
+    }
+
+    /**
+     * 删除
+     */
+    @Login
+    @DeleteMapping("deleteBinding")
+    public CommonResult deleteBinding(@RequestParam("uid") String uid) {
+        bindingPositionService.deleteBinding(uid);
         return CommonResult.ok();
     }
 

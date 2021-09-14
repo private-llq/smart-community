@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
+import com.jsy.community.qo.CarMonthlyDelayQO;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
 
@@ -26,10 +27,23 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
     /**
      * 延期 0 按天  1 按月
      */
-    void delay(String uid, Integer type, Integer dayNum, BigDecimal fee);
+    void delay(CarMonthlyDelayQO carMonthlyDelayQO);
+
+    /**
+     * 车辆
+     * @param carMonthlyVehicleQO
+     * @return
+     */
+    List<CarMonthlyVehicle> selectListCar(CarMonthlyVehicleQO carMonthlyVehicleQO);
+
+    /**
+     * 车位
+     * @param carMonthlyVehicleQO
+     * @return
+     */
+    List<CarMonthlyVehicle> selectListPostion (CarMonthlyVehicleQO carMonthlyVehicleQO);
 
 
-    List<CarMonthlyVehicle> selectList(Long communityId);
 
     Map<String, Object> addLinkByExcel2(List<String[]> strings, Long communityId);
 

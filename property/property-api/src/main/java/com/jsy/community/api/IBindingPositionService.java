@@ -10,4 +10,6 @@ public interface IBindingPositionService extends IService<BindingPositionEntity>
     List<BindingPositionEntity> selectBinding(BindingPositionEntity bindingPositionEntity);
 
     void binding(BindingPositionEntity bindingPositionEntity);
+
+    void deleteBinding(String uid);
 }
