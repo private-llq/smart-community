@@ -5,6 +5,7 @@ import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +67,7 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
 
     /**
      * @author: Pipi
-     * @description: 设签章调用相关操作(拟定合同(设置合同信息)、完成签约)
+     * @description: 签章调用相关操作(发起签约/重新发起:31、完成签约:6、取消发起:32)
      * @param assetLeaseRecordEntity: 签约实体
      * @return: java.lang.Integer
      * @date: 2021/9/7 10:18
@@ -81,4 +82,14 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @date: 2021/9/9 18:24
      **/
     void updateOperationPayStatus(String conId);
+
+    /**
+     * @author: Pipi
+     * @description: 倒计时相关操作
+     * @param id: 签约ID
+     * @param opration: 操作类型;1:(租客)发起租赁申请;2:接受申请
+     * @return: void
+     * @date: 2021/9/13 16:10
+     **/
+    void countdownOpration(Long id, Integer opration, LocalDateTime operationTime);
 }

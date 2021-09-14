@@ -143,7 +143,7 @@ public class ShopLeaseVO implements Serializable {
 	@ApiModelProperty(value = "商铺地址")
 	private String shopAddress;
 
-	// 签约操作状态;0;没有签约;1:发起签约;2:接受申请;3:拟定合同;4:等待支付房租;5:支付完成;6:完成签约;7:取消申请;8:拒绝申请;9:重新发起
+	// 签约操作状态;0;没有签约;1:(租客)发起租赁申请;2:接受申请;3:拟定合同;4:等待支付房租;5:支付完成;6:完成签约;7:取消申请;8:拒绝申请;9:重新发起;31:(房东)发起签约/重新发起;32:取消发起;
 	@TableField(exist = false)
 	private Integer operation;
 

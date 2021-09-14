@@ -193,7 +193,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     }
 
     /**
-     * 计算临时车下单的费用
+     * 计算临时车下单的费用 
      * @param carChargeQO {"社区id,车牌颜色,入场时间,结算时间"}
      *                    如果结算时间到出闸时间超过5分钟（物业设置）,就拿到要出闸的时间和下次结算时间作为一个新订单
      */

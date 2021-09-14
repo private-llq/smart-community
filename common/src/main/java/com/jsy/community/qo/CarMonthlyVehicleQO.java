@@ -17,6 +17,7 @@ public class CarMonthlyVehicleQO extends BaseQO<String>  {
      * 联系电话
      */
     private String phone;
+
     /**
      * 包月方式 name
      */

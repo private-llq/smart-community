@@ -227,7 +227,8 @@ public class UserUtils {
 	 * @Date: 2020/12/3
 	**/
 	public static String randomUUID(){
-		return UUID.randomUUID().toString().replace("-", "");
+		/*UUID.randomUUID().toString().replace("-", "");*/
+		return String.valueOf(SnowFlake.nextId());//雪花算法 唯一键
 	}
 	
 	/**
