@@ -9,10 +9,8 @@ import com.jsy.community.qo.property.CarOrderQO;
 import com.jsy.community.qo.property.CarTemporaryOrderQO;
 import com.jsy.community.qo.property.CarTemporaryQO;
 import com.jsy.community.vo.SelectMoney3Vo;
-
 import java.util.List;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 public interface ICarTemporaryOrderService extends IService<CarOrderEntity> {
