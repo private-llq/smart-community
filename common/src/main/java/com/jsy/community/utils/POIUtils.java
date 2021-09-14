@@ -109,7 +109,8 @@ public class POIUtils {
 			}
 		}
 	}
-	
+
+	//校验版本
 	public static Workbook getWorkBook(MultipartFile file) {
 		//获得文件名
 		String fileName = file.getOriginalFilename();
@@ -118,8 +119,9 @@ public class POIUtils {
 		try {
 			//获取excel文件的io流
 			InputStream is = file.getInputStream();
-			
-			if (!StringUtils.isEmpty(fileName)) {
+			workbook = WorkbookFactory.create(is);//自带版本判断
+
+			/*if (!StringUtils.isEmpty(fileName)) {
 				//根据文件后缀名不同(xls和xlsx)用不同的Workbook实现类对象
 				if (fileName.endsWith(xls)) {
 					//2003版本
@@ -128,10 +130,11 @@ public class POIUtils {
 					//2007版本
 					workbook = new XSSFWorkbook(is);
 				}
-			}
+			}*/
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		return workbook;
 	}
 	

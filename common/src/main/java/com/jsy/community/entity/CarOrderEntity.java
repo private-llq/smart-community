@@ -38,6 +38,7 @@ public class CarOrderEntity extends BaseEntity {
      */
     @ExcelIgnore
     private Long carPositionId;
+
     /**
      *  车位编号
      */
