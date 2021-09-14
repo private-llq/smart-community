@@ -60,6 +60,9 @@ public class AliAppPayController {
 	@PostMapping("order")
 	@Login
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
+		if (aliAppPayQO.getTradeFrom()==9){
+			aliAppPayQO.setCommunityId(1L);
+		}
 		ValidatorUtils.validateEntity(aliAppPayQO,AliAppPayQO.addOrderGroup.class);
 		String sysType = req.getHeader("sysType");
 //		if(!NumberUtil.isInteger(sysType) || (CommonConsts.SYS_ANDROID != Integer.parseInt(sysType)

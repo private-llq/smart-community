@@ -58,7 +58,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @DubboReference(version = Const.version,  group = Const.group, check = false)
     private ICarChargeService carChargeService;
 
-    @DubboReference(version = Const.version,  group = Const.group, check = false)
+    @DubboReference(version = Const.version,  group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
 
     @DubboReference(version = Const.version,  group = Const.group_property, check = false)
@@ -327,7 +327,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
                 //支付成功后回调     测试阶段直接回调
 //                renewMonthCar(orderRecordEntity);
-                return entity.getId();
+                return orderRecordEntity.getId();
             }
             throw new ProprietorException("当前小区最大允许包月时长："+basicsEntity.getMonthMaxTime());
         }
@@ -374,7 +374,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             appCarOrderMapper.insert(carOrderEntity);
 
             //修改月租车辆表
-            carMonthlyVehicleService.updateMonth(entity.getCarPlate(),carEntity.getOverTime());
+            carMonthlyVehicleService.updateMonth(entity.getCarPlate(),carEntity.getOverTime(),entity.getMoney());
 
             //停车临时收费表更新
             entity.setStatus(1);

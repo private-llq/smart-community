@@ -87,6 +87,6 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 */
 	@Override
 	public List<AppMenuEntity> listAppMenuAll(Long communityId) {
-		return appMenuMapper.selectList(new QueryWrapper<AppMenuEntity>().eq("version","v2"));
+		return appMenuMapper.selectList(new QueryWrapper<AppMenuEntity>().eq("path","/community/hotline"));
 	}
 }
