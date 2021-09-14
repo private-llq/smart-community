@@ -649,7 +649,7 @@ public class CarPositionController {
 
 
             System.out.println(carEquipmentManageEntity);
-
+             iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(),carEquipmentManageEntity.getCommunityId());
             carCutOffEntity.setLaneName(carEquipmentManageEntity.getEquipmentName());
             carCutOffEntity.setCommunityId(carEquipmentManageEntity.getCommunityId());
 

@@ -6,12 +6,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarTemporaryOrderService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.CarOrderMapper;
+import com.jsy.community.mapper.CarPositionMapper;
+import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.OrderQO;
 import com.jsy.community.qo.property.CarOrderQO;
 import com.jsy.community.qo.property.CarTemporaryOrderQO;
 import com.jsy.community.qo.property.CarTemporaryQO;
 import com.jsy.community.util.TimeUtils;
+import com.jsy.community.vo.SelectMoney3Vo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -20,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @DubboService(version = Const.version, group = Const.group_property)
@@ -33,8 +41,7 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
     @Autowired
     private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
 
-    @Override
-    public Page<CarOrderEntity> selectCarOrder(BaseQO<CarOrderQO> baseQO, Long communityId) {
+
    /**
     * @Description: 订单管理查询
     * @Param: [baseQO, communityId]
