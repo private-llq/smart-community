@@ -18,7 +18,7 @@
                 #{ticketTemplateFieldEntity.fieldId},
                 #{ticketTemplateFieldEntity.locationType},
                 #{ticketTemplateFieldEntity.name},
-                #{ticketTemplateFieldEntity.nameEn}
+                #{ticketTemplateFieldEntity.nameEn},
                 #{ticketTemplateFieldEntity.sort}
             )
         </foreach>

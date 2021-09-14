@@ -21,16 +21,18 @@ import java.time.LocalDateTime;
 public class WeChatOrderEntity implements Serializable {
     @ApiModelProperty(value = "订单号")
     private String id;
+    @ApiModelProperty(value = "物业公司id")
+    private Long companyId;
     @ApiModelProperty(value = "微信支付订单号")
     private String transactionId;
     @ApiModelProperty(value = "用户id")
     private String uid;
-    @ApiModelProperty(value = "支付描述，1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包")
+    @ApiModelProperty(value = "交易来源 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包7.红包退回.8停车缴费.9房屋租赁")
     private Integer payType;
     @ApiModelProperty(value = "商品描述")
     private String description;
-    @ApiModelProperty(value = "用户标识")
-    private String openId;
+    @ApiModelProperty(value = "其他业务id")
+    private String serviceOrderNo;
     @ApiModelProperty(value = "支付金额")
     private BigDecimal amount;
     @ApiModelProperty(value = "订单状态，1已付款，2未付款")

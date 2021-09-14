@@ -40,6 +40,7 @@
             where tm.deleted = 0
             and tm.state = #{query.state}
             and tm.uid = #{query.uid}
+        order by tm.create_time desc
         limit #{page},#{size}
     </select>
 
@@ -76,6 +77,7 @@
           and tm.state = 1
           and tm.category_id=#{query.categoryId}
           and tm.shield= 0
+        order by tm.create_time desc
         limit #{page},#{size}
     </select>
     <select id="findLikeTotals" resultType="java.lang.Long">

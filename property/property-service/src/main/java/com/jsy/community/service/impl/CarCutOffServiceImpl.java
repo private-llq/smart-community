@@ -139,29 +139,26 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
         for (CarCutOffEntity i: carCutOffEntityList) {
             CarSceneVO carSceneVO = new CarSceneVO();
             BeanUtils.copyProperties(i,carSceneVO);
-            String outPic = i.getOutPic();
 
             if (i.getOpenTime()!=null){
                 date = Date.from(i.getOpenTime().atZone(ZoneId.systemDefault()).toInstant());
-                //carSceneVO.setOpenTime(date);
-
+                carSceneVO.setOpenTime(date);
             }
-            String imagePath = "http://222.178.212.29:9000/car-in-and-out-picture/車牌1631243995闽N00000.jpg";
-            String pic = "C:\\Users\\Administrator\\Downloads\\車牌1630917537沪A99999.jpg";
-            URL url = new URL(imagePath);
-            InputStream is = url.openStream();
-            try {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-                String jsonText = readAll(rd);
-                carSceneVO.setString(jsonText);
-            } finally {
-                is.close();
+            URL url = new URL("http://222.178.212.29:9000/car-in-and-out-picture/車牌1630917537沪A99999.jpg");
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("GET");
+            con.setConnectTimeout(4 * 1000);
+            InputStream inStream = con .getInputStream();    //通过输入流获取图片数据
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[2048];
+            int len = 0;
+            while( (len=inStream.read(buffer)) != -1 ){
+                outStream.write(buffer, 0, len);
             }
-            FileInputStream fileInputStream = FileUtils.openInputStream(new File(pic));
-
-            carSceneVO.setFile(fileInputStream);
-//            carSceneVO.setUrl(url);
-            System.out.println(carSceneVO);
+            inStream.close();
+            byte[] data =  outStream.toByteArray();
+            carSceneVO.setByteArray(data);
+            System.out.println(data);
             sceneVOS.add(carSceneVO);
         }
 

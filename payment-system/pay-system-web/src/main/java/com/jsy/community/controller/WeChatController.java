@@ -8,6 +8,8 @@ import com.jsy.community.config.PublicConfig;
 import com.jsy.community.config.WechatConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderRecordEntity;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.CompanyPayConfigEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
@@ -45,10 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -73,9 +72,14 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceReceiptService propertyFinanceReceiptService;
 
-    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
 
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICompanyPayConfigService companyPayConfigService;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICommunityService communityService;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -100,6 +104,14 @@ public class WeChatController {
     @Login
     @PostMapping("/wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
+        CommunityEntity entity = communityService.getCommunityNameById(weChatPayQO.getCommunityId());
+        CompanyPayConfigEntity serviceConfig = null;
+        if (Objects.nonNull(entity)){
+            serviceConfig = companyPayConfigService.getCompanyConfig(entity.getPropertyId());
+            WechatConfig.setConfig(serviceConfig);
+        } else {
+            throw new PaymentException("当前小区不支持微信支付！");
+        }
         //封装微信支付下单请求参数
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
@@ -108,7 +120,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback");
+        map.put("notify_url","http://jsy.free.svipss.top/api/v1/payment/callback/"+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
@@ -137,25 +149,26 @@ public class WeChatController {
         }
         //停车缴费逻辑
         if (weChatPayQO.getTradeFrom()==8){
-            if ("".equals(weChatPayQO.getCarOrderRecordId())||weChatPayQO.getCarOrderRecordId()==null){
+            if ("".equals(weChatPayQO.getServiceOrderNo())||weChatPayQO.getServiceOrderNo()==null){
                 return CommonResult.error("车位缴费临时订单记录id不能为空！");
             }
             if ("".equals(weChatPayQO.getDescriptionStr())||weChatPayQO.getDescriptionStr()==null) {
                 map.put("description", "车位缴费");
             }
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
-            map.put("attach",8+","+weChatPayQO.getCarOrderRecordId());
+            map.put("attach",8+","+weChatPayQO.getServiceOrderNo());
         }
         //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
         msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
-        msg.setOpenId(null);
+        msg.setServiceOrderNo(null);
         msg.setPayType(weChatPayQO.getTradeFrom());
         msg.setDescription(weChatPayQO.getDescriptionStr());
         msg.setAmount(weChatPayQO.getAmount());
         msg.setOrderStatus(1);
         msg.setArriveStatus(1);
+        msg.setCompanyId(serviceConfig.getCompanyId());
         msg.setCreateTime(LocalDateTime.now());
 
         //mq异步保存账单到数据库
@@ -184,19 +197,24 @@ public class WeChatController {
      * @Param: dsds
      * @return:
      */
-    @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
-    public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = "/callback/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
+    public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
         log.info("回调成功");
+        log.info(String.valueOf(companyId));
+        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId);
+        if (Objects.nonNull(configEntity)){
+            WechatConfig.setConfig(configEntity);
+        }
+        log.info("配置参数："+configEntity);
         Map<String, String> map = PublicConfig.notifyParam(request , WechatConfig.API_V3_KEY);
-//        weChatService.saveStatus(out_trade_no);
         log.info(String.valueOf(map));
-
         weChatService.orderStatus(map);
         if (map.get("attach")!=null){
             String[] split = map.get("attach").split(",");
             //处理商城支付回调后的业务逻辑
             if (split[0].equals("2")){
                 shoppingMallService.completeShopOrder(split[1]);
+                log.info("处理完成");
             }
             //处理物业费支付回调后的业务逻辑
             if (split[0].equals("4")){
@@ -221,7 +239,7 @@ public class WeChatController {
             }
             //停车缴费后记业务
             if (split[0].equals("8")){
-                CarOrderRecordEntity recordEntity = carService.findOne(Long.valueOf(split[0]));
+                CarOrderRecordEntity recordEntity = carService.findOne(Long.valueOf(split[1]));
                 recordEntity.setOrderNum(map.get("out_trade_no"));
                 if (recordEntity!=null){
                     if (recordEntity.getType()==1){
@@ -230,6 +248,7 @@ public class WeChatController {
                         carService.renewMonthCar(recordEntity);
                     }
                 }
+                log.info("处理完成");
             }
         }
         PublicConfig.notify(request, response, WechatConfig.API_V3_KEY);

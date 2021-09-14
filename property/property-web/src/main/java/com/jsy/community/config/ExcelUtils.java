@@ -1,12 +1,15 @@
 package com.jsy.community.config;
 import com.alibaba.excel.EasyExcel;
 import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.util.excel.impl.CustomImageCellWriteHandler;
+import com.jsy.community.util.excel.impl.ImageModifyHandler;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExcelUtils {
@@ -27,7 +30,11 @@ public class ExcelUtils {
         //response.setContentType("multipart/form-data");
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("UTF-8");
-        EasyExcel.write(out, c).sheet(filename)
+        List<Integer> imageColumnIndexs = new ArrayList<>();
+        imageColumnIndexs.add(0);
+        imageColumnIndexs.add(4);
+        imageColumnIndexs.add(8);
+        EasyExcel.write(out, c).sheet(filename).registerWriteHandler(new ImageModifyHandler())
                 .doWrite(data);
         out.flush();
         out.close();
