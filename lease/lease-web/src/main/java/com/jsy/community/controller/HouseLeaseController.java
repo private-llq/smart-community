@@ -251,7 +251,7 @@ public class HouseLeaseController {
     public CommonResult initContract(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
         ValidatorUtils.validateEntity(assetLeaseRecordEntity, AssetLeaseRecordEntity.InitContractValidate.class);
         assetLeaseRecordEntity.setTenantUid(UserUtils.getUserId());
-        return assetLeaseRecordService.addLeaseRecord(assetLeaseRecordEntity) > 0 ? CommonResult.ok("发起成功!") : CommonResult.error("发起失败!");
+        return  CommonResult.ok(assetLeaseRecordService.addLeaseRecord(assetLeaseRecordEntity), "申请成功!");
     }
 
     /**

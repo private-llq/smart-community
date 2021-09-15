@@ -24,7 +24,7 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @return: java.lang.Integer
      * @date: 2021/8/31 16:01
      **/
-    Integer addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity);
+    String addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity);
 
     /**
      * @author: Pipi

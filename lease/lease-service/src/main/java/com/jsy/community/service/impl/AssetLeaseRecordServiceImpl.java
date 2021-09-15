@@ -86,7 +86,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+    public String addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
         // 检查租户是否实名认证
         Integer integer = userService.userIsRealAuth(assetLeaseRecordEntity.getTenantUid());
         if (integer <= 0) {
@@ -163,7 +163,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 });
         // 写入租赁数据
-        return assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
+        assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
+        return String.valueOf(assetLeaseRecordEntity.getId());
     }
 
     /**
