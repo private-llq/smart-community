@@ -24,7 +24,7 @@ import java.util.List;
 @ApiJSYController
 public class CarChargeController {
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarChargeService carChargeService;
 
 

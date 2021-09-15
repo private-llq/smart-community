@@ -36,7 +36,7 @@ import java.util.Objects;
 @ApiJSYController
 public class CarMonthlyVehicleController {
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarMonthlyVehicleService vehicleService;
 
     @DubboReference(version = Const.version, group = Const.group_property,check = false)

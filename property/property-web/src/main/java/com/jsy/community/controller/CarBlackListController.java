@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @ApiJSYController
 public class CarBlackListController {
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarBlackListService blackListService;
 
 
@@ -38,7 +38,7 @@ public class CarBlackListController {
     }
     /**
      * 查询车牌是否是 黑名单
-     * @param  车牌号
+     * @param
      * @return
      */
     @Login

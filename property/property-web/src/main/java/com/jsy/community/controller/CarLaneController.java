@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @ApiJSYController
 public class CarLaneController {
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     public ICarLaneService carLaneService;
 
 
