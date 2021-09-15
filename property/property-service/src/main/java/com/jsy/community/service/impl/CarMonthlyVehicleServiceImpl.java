@@ -1,8 +1,5 @@
 package com.jsy.community.service.impl;
-
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.IdUtil;
-import com.alipay.api.domain.Car;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -13,7 +10,6 @@ import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYException;
@@ -27,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -37,7 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_property)
 public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleMapper, CarMonthlyVehicle> implements ICarMonthlyVehicleService {
 
     @Autowired
@@ -61,6 +56,10 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
     @Autowired
     private CarMapper carMapper;
+
+    @Autowired
+    private BindingPositionMapper bindingPositionMapper;
+
 
 
 
@@ -172,6 +171,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
 
+
+
         //查询收费设置数据
         String monthlyMethodId = carMonthlyVehicle.getMonthlyMethodId();
         CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", monthlyMethodId));
@@ -182,6 +183,20 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carMonthlyVehicle.setMonthlyMethodName(carChargeEntity.getName());//存收费设置里面的名字
 
         int insert = carMonthlyVehicleMapper.insert(carMonthlyVehicle);
+
+
+
+        //存入车辆管理 默认是已绑定
+        BindingPositionEntity entity = new BindingPositionEntity();
+        entity.setUid(UserUtils.randomUUID());//uuid主键
+        entity.setBindingStatus(1);//默认绑定
+        entity.setCommunityId(communityId);//社区id
+        entity.setCarNumber(carMonthlyVehicle.getCarNumber());//车牌号
+        entity.setPositionId(carMonthlyVehicle.getCarPosition());//车位号
+        bindingPositionMapper.insert(entity);
+
+
+
 
         //修改车位的信息：为已绑定 开始结束时间变更
         CarPositionEntity carPositionEntity = new CarPositionEntity();
@@ -536,6 +551,16 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             success += 1;
             carMonthlyVehicleMapper.insert(vehicle);
 
+
+            //存入车辆管理 默认是已绑定
+            BindingPositionEntity entity = new BindingPositionEntity();
+            entity.setUid(UserUtils.randomUUID());//uuid主键
+            entity.setBindingStatus(1);//默认绑定
+            entity.setCommunityId(communityId);//社区id
+            entity.setCarNumber(carNumber);//车牌号
+            entity.setPositionId(carPosition);//车位号
+            bindingPositionMapper.insert(entity);
+
             //修改车位的信息：为已绑定 结束时间变更
             CarPositionEntity carPositionEntity = new CarPositionEntity();
             carPositionEntity.setBindingStatus(1);//已绑定
@@ -778,6 +803,16 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         int insert = carMonthlyVehicleMapper.insert(carMonthlyVehicle);
 
 
+        //存入车辆管理 默认是已绑定
+        BindingPositionEntity entity = new BindingPositionEntity();
+        entity.setUid(UserUtils.randomUUID());//uuid主键
+        entity.setBindingStatus(1);//默认绑定
+        entity.setCommunityId(communityId);//社区id
+        entity.setCarNumber(carMonthlyVehicle.getCarNumber());//车牌号
+        entity.setPositionId(carMonthlyVehicle.getCarPosition());//车位号
+        bindingPositionMapper.insert(entity);
+
+
         //修改车位的信息：为已绑定 开始结束时间变更
         CarPositionEntity carPositionEntity = new CarPositionEntity();
         carPositionEntity.setBindingStatus(1);//已绑定
@@ -943,6 +978,15 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
             carMonthlyVehicleMapper.insert(vehicle);
+
+            //存入车辆管理 默认是已绑定
+            BindingPositionEntity entity = new BindingPositionEntity();
+            entity.setUid(UserUtils.randomUUID());//uuid主键
+            entity.setBindingStatus(1);//默认绑定
+            entity.setCommunityId(communityId);//社区id
+            entity.setCarNumber(carNumber);//车牌号
+            entity.setPositionId(carPosition);//车位号
+            bindingPositionMapper.insert(entity);
 
             //修改车位的信息：为已绑定 结束时间变更
             CarPositionEntity carPositionEntity = new CarPositionEntity();

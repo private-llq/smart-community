@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,4 +24,11 @@ public class SmsPurchaseRecordEntity extends BaseEntity {
 	
 	@ApiModelProperty(value = "订单金额")
 	private BigDecimal orderMoney;
+	
+	@ApiModelProperty(value = "状态(1.已支付 已收货)")
+	private Integer status;
+	
+	@ApiModelProperty(value = "状态名称(1.已支付 已收货)")
+	@TableField(exist = false)
+	private String statusName;
 }

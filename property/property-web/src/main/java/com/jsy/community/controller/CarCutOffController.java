@@ -63,15 +63,13 @@ public class CarCutOffController{
         return CommonResult.ok(page,"查询成功");
     }
 
-
-
-
     @Login
     @PostMapping("/addCutOff")
     public CommonResult addCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
         boolean b=  carCutOffService.addCutOff(carCutOffEntity);
         return CommonResult.ok("添加成功");
     }
+
     @Login
     @PostMapping("/updateCutOff")
     public CommonResult updateCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
