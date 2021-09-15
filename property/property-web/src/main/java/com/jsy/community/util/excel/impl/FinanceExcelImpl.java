@@ -726,7 +726,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
             //创建列
             for (int j = 0; j < FINANCE_FORM_TITLE_FIELD.length; j++) {
                 cell = row.createCell(j);
-                PropertyFinanceFormEntity entity = (PropertyFinanceFormEntity) entityList.get(0);
+                PropertyFinanceFormEntity entity = (PropertyFinanceFormEntity) entityList.get(index);
                 switch (j) {
                     case 0:
                         // 类型

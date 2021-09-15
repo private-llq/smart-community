@@ -3,6 +3,8 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.SmsPurchaseRecordEntity;
 
+import java.util.List;
+
 /**
  * @program: com.jsy.community
  * @description: 短信购买记录
@@ -18,4 +20,13 @@ public interface ISmsPurchaseRecordService extends IService<SmsPurchaseRecordEnt
 	 * @Date: 2021-09-02
 	 **/
 	boolean addSmsPurchaseRecord(SmsPurchaseRecordEntity smsPurchaseRecordEntity);
+	
+	/**
+	 * @Description: 查询短信购买记录
+	 * @Param: [adminCommunityIdList]
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.SmsPurchaseRecordEntity>>
+	 * @Author: DKS
+	 * @Date: 2021/09/14
+	 **/
+	List<SmsPurchaseRecordEntity> querySmsPurchaseRecord(Long companyId);
 }
