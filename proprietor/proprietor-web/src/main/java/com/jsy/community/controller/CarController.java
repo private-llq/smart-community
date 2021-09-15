@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -129,7 +130,12 @@ public class CarController {
 	@ApiOperation("获取当前小区车位")
 	@GetMapping("getPosition")
 	public CommonResult getPosition(@RequestParam Long communityId) {
-		List<CarPositionEntity> list = carService.getPosition(communityId);
+//		List<CarPositionEntity> list = carService.getPosition(communityId);
+		LinkedList<Object> list = new LinkedList<>();
+		CarPositionEntity entity = new CarPositionEntity();
+		entity.setId(999999999999999L);
+		entity.setCarPosition("地上");
+		list.add(entity);
 		return CommonResult.ok(list);
 	}
 
@@ -142,7 +148,7 @@ public class CarController {
 		return CommonResult.ok(decimal);
 	}
 	@Login
-	@ApiOperation("接触月租车辆")
+	@ApiOperation("解除月租车辆")
 	@DeleteMapping("deleteMonthCar")
 	public CommonResult deleteMonthCar(@RequestParam Long id) {
 		carService.deleteMonthCar(id);

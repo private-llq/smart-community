@@ -1,10 +1,13 @@
 package com.jsy.community.utils;
 
+import cn.hutool.json.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayTradeCloseRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
+import com.alipay.api.response.AlipayTradeCloseResponse;
 import com.jsy.community.constant.ConstClasses;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -109,6 +112,36 @@ public class AlipayUtils {
 		}
 		return is;
 	}
+
+	/**
+	 * @Description: 关闭订单
+	 * @author: Hu
+	 * @since: 2021/9/15 14:59
+	 * @Param:
+	 * @return:
+	 */
+	public static void closeOrder(String outTradeNo) throws Exception {
+//		AlipayClient alipayClient = new DefaultAlipayClient("https://openapi.alipay.com/gateway.do", ConstClasses.AliPayDataEntity.appid, ConstClasses.AliPayDataEntity.privateKey, "json", "GBK", getPrivateKey(ConstClasses.AliPayDataEntity.alipayPublicCertPath), "RSA2");
+		AlipayClient client = getDefaultCertClient();
+		AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
+		JSONObject bizContent = new JSONObject();
+		bizContent.put("out_trade_no",outTradeNo);
+		request.setBizContent(bizContent.toString());
+		AlipayTradeCloseResponse response = null;
+		try {
+			response = client.certificateExecute(request);
+			if (response.isSuccess()){
+				System.out.println("关闭成功！");
+				System.out.println(response);
+			}else {
+				System.out.println("关闭失败！");
+				System.out.println(response);
+			}
+		} catch (AlipayApiException e) {
+			e.printStackTrace();
+		}
+	}
+
 	
 	/**
 	 * 获取私钥。

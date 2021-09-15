@@ -296,7 +296,7 @@
     </sql>
     <select id="findList" resultType="com.jsy.community.entity.property.PropertyFinanceOrderEntity">
         select tp.id,tf.name as feeRuleName,tp.associated_type,tp.begin_time,tp.over_time,tp.hide,
-        tp.property_fee,tp.penal_sum,tp.coupon,tp.target_id,tp.deduction,tp.total_money,tp.order_time,tp.build_type,tp.receipt_num,tp.pay_type,tp.pay_time
+        tp.property_fee,tp.penal_sum,tp.coupon,tp.target_id,tp.deduction,tp.total_money,tp.order_time,tp.build_type,tp.receipt_num,tp.pay_type,tp.pay_time,tp.rise
         from  t_property_finance_order tp left join t_property_fee_rule tf on tp.fee_rule_id=tf.id
         <include refid="query"></include>
         limit #{page},#{size}
