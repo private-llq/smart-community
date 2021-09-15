@@ -120,6 +120,9 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @NotNull(groups = {LandlordInitiatedContractValidate.class}, message = "合同结束时间不能为空")
     private LocalDate endDate;
 
+    // 租客已读标识;0:未读;1:已读
+    private Integer readMark;
+
     // 身份类型;1:房东;2:租客
     @NotNull(groups = {ContractListValidate.class, OperationContractValidate.class, ContractDetailValidate.class}, message = "身份类型不能为空;1:房东;2:租客")
     @Range(min = 1, max = 2, message = "身份类型超出范围;1:房东;2:租客")
