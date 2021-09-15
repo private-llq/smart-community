@@ -44,6 +44,14 @@ public class CarChargeController {
         carChargeService.SaveCarCharge(carChargeEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
     }
+    @Login
+    @PostMapping("/openCarCharge")
+    @businessLog(operation = "启用模板",content = "新增了【停车收费设置】")
+    public CommonResult openCarCharge(@RequestParam("uid") String uid){
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+        carChargeService.openCarCharge(uid,adminCommunityId);
+        return CommonResult.ok();
+    }
 
     @PutMapping("/update")
     @businessLog(operation = "编辑",content = "更新了【停车收费设置】")

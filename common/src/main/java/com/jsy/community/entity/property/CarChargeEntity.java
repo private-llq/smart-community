@@ -3,7 +3,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -38,7 +37,13 @@ public class CarChargeEntity implements Serializable {
     /**
      * 位置 0:地上 1：地下
      */
-    private String position;
+    private Integer position;
+
+    /**
+     *是否启用 0:未启用  1：已启用
+     */
+    private Integer open;
+
     /**
      * 金额
      */
