@@ -74,8 +74,8 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	**/
 	@Override
 	public String dealCallBack(Map<String, String> paramsMap){
-//		CommunityEntity entity = communityService.getCommunityNameById(Long.parseLong(paramsMap.get("passback_params")));
-		CommunityEntity entity = communityService.getCommunityNameById(1L);
+		CommunityEntity entity = communityService.getCommunityNameById(Long.parseLong(paramsMap.get("passback_params")));
+//		CommunityEntity entity = communityService.getCommunityNameById(1L);
 		PayConfigureEntity serviceConfig;
 		if (Objects.nonNull(entity)){
 			serviceConfig = payConfigureService.getCompanyConfig(entity.getPropertyId());

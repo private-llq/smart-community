@@ -51,7 +51,6 @@ public class CarAccessVO implements Serializable {
     private String stopCarTime;
 
 
-
     @ColumnWidth(21)
     @ExcelProperty("出场特写图")
     private byte[] outPic;

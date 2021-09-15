@@ -15,6 +15,7 @@ import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +83,7 @@ public class SmsSendRecordServiceImpl extends ServiceImpl<SmsSendRecordMapper, S
 		MyPageUtils.setPageAndSize(page, baseQO);
 		QueryWrapper<SmsSendRecordEntity> queryWrapper = new QueryWrapper<>();
 		//是否查手机号
-		if (query.getMobile() != null) {
+		if (StringUtils.isNotBlank(query.getMobile())) {
 			queryWrapper.eq("mobile", query.getMobile());
 		}
 		//是否查状态
