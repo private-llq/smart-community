@@ -649,8 +649,8 @@ public class CarPositionController {
 
 
             System.out.println(carEquipmentManageEntity);
-             iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(),carEquipmentManageEntity.getCommunityId());
-            carCutOffEntity.setLaneName(carEquipmentManageEntity.getEquipmentName());
+            CarLaneEntity carLaneOne = iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(), carEquipmentManageEntity.getCommunityId());
+            carCutOffEntity.setLaneName(carLaneOne.getLaneName());
             carCutOffEntity.setCommunityId(carEquipmentManageEntity.getCommunityId());
 
             //还能停多少天
@@ -665,12 +665,15 @@ public class CarPositionController {
             System.out.println("carCutOffEntityList" + carCutOffEntityList.size());
             //时间戳转年月日       //进闸时间
             LocalDateTime localDateTime = new Date(startTime * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
+            CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
             for (CarCutOffEntity i : carCutOffEntityList) {
                 i.setStopTime(localDateTime);
                 i.setState(1);
                 //出闸照片
                 i.setOutPic(closeupPic);
                 i.setOutImage(picture);
+                CarLaneEntity carLaneOne = iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(), carEquipmentManageEntity.getCommunityId());
+                carCutOffEntity.setOutLane(carLaneOne.getLaneName());
                 carCutOffService.updateCutOff(i);
             }
 
