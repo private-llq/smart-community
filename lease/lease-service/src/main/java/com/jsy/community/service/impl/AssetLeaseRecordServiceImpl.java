@@ -942,7 +942,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         if (assetLeaseRecordEntity.getIdentityType() == 2) {
             updateReadMark(leaseRecordEntity, 1);
         }
-        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 8 || leaseRecordEntity.getOperation() == 9) {
+        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 7 || leaseRecordEntity.getOperation() == 8 || leaseRecordEntity.getOperation() == 9) {
             // 记录表里面没有资产数据,要单独查
             if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
                 // 商铺

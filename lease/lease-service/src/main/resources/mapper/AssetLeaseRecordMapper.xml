@@ -16,6 +16,7 @@
             alr.direction_id,
             alr.price,
             alr.operation,
+            alr.create_time,
             u.real_name,
             u.avatar_url
         from t_asset_lease_record alr
