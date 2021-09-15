@@ -17,6 +17,7 @@ import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Id;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -31,6 +32,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
     @Autowired
     public CarChargeMapper carChargeMapper;
+
 
 
     @Override
@@ -53,16 +55,28 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     @Override
     @Transactional
     public Integer DelCarCharge(String uid) {
+        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", uid));
+        if (carChargeEntity.getOpen()==1){
+            throw new PropertyException("启用状态的模板不能被删除，请保证至少启用一个模板！");
+        }
+
         int del = carChargeMapper.delete(new QueryWrapper<CarChargeEntity>().eq("uid", uid));
         return del;
     }
 
+
+    /**
+     * 查询所有模板
+     * @param type
+     * @param communityId
+     * @return
+     */
     @Override
     public List<CarChargeEntity> selectCharge(Integer type,Long communityId) {
         List<CarChargeEntity> list = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
                 .eq("type", type)
                 .eq("community_id",communityId)
-                .eq("open",1)
+                //.eq("open",1)//
         );
         return list;
     }
@@ -299,13 +313,17 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
 
     /**
-     * 查询包月车辆所有收费设置标准
+     * 查询启用的包月车辆所有收费设置标准
      * @param adminCommunityId
      * @return
      */
     @Override
     public List<CarChargeEntity> ListCharge(Long adminCommunityId) {
-        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>().eq("community_id", adminCommunityId).eq("type",0));
+        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", adminCommunityId)
+                .eq("type",0)
+                .eq("open",1)
+        );
         return chargeEntityList;
     }
 
@@ -316,7 +334,11 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
     @Override
     public List<CarChargeEntity> ListCharge2(Long adminCommunityId) {
-        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>().eq("community_id", adminCommunityId).eq("type", 1));
+        List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", adminCommunityId)
+                .eq("type", 1)
+                .eq("open",1)
+        );
         return chargeEntityList;
     }
 
@@ -327,56 +349,70 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      */
     @Override
     @Transactional
-    public void openCarCharge(String uid,Long adminCommunityId) {
+    public void openCarCharge(String uid,Integer type,Long adminCommunityId) {
 
-        //月租
-        List<CarChargeEntity> list1 = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
-                .eq("community_id", adminCommunityId)//社区id
-                .eq("type",0)//月租
-                .eq("position",0)//地上
-                .eq("open",1)//已启用
-        );
-        if (list1.size()>1){
-            throw new PropertyException("地上模板只有一个能被启用！");
+        CarChargeEntity entityBase = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", uid));
+        if (type==0){//月租
+            Integer position = entityBase.getPosition();
+            if (position==0){//地上
+
+                //查询之前地上的改为0
+                CarChargeEntity entity = new CarChargeEntity();
+                entity.setOpen(0);
+                carChargeMapper.update(entity,new QueryWrapper<CarChargeEntity>().eq("position",0).eq("community_id", adminCommunityId).eq("open",1));
+
+
+                //修改新启用状态为1
+                CarChargeEntity carChargeEntity = new CarChargeEntity();
+                carChargeEntity.setOpen(1);//已启用
+                carChargeMapper.update(carChargeEntity,new QueryWrapper<CarChargeEntity>().eq("uid",uid));
+
+
+            }
+            if (position==1){//地下
+
+                //查询之前地上的改为0
+                CarChargeEntity entity = new CarChargeEntity();
+                entity.setOpen(0);
+                carChargeMapper.update(entity,new QueryWrapper<CarChargeEntity>().eq("position",1).eq("community_id", adminCommunityId).eq("open",1));
+
+
+                //修改新启用状态为1
+                CarChargeEntity carChargeEntity = new CarChargeEntity();
+                carChargeEntity.setOpen(1);//已启用
+                carChargeMapper.update(carChargeEntity,new QueryWrapper<CarChargeEntity>().eq("uid",uid));
+            }
+
         }
+        if (type==1){//临时
+            Integer plateType = entityBase.getPlateType();
+            if (plateType==0){//黄牌
+                //查询之前地上的改为0
+                CarChargeEntity entity = new CarChargeEntity();
+                entity.setOpen(0);
+                carChargeMapper.update(entity,new QueryWrapper<CarChargeEntity>().eq("plate_type",0).eq("community_id", adminCommunityId).eq("open",1));
 
-        List<CarChargeEntity> list2 = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
-                .eq("community_id", adminCommunityId)//社区id
-                .eq("type",0)//月租
-                .eq("position",1)//地下
-                .eq("open",1)//已启用
-        );
-        if (list2.size()>1){
-            throw new PropertyException("地下模板只有一个能被启用！");
+
+                //修改新启用状态为1
+                CarChargeEntity carChargeEntity = new CarChargeEntity();
+                carChargeEntity.setOpen(1);//已启用
+                carChargeMapper.update(carChargeEntity,new QueryWrapper<CarChargeEntity>().eq("uid",uid));
+            }
+            if (plateType==1){//其他车牌
+
+                //查询之前地上的改为0
+                CarChargeEntity entity = new CarChargeEntity();
+                entity.setOpen(0);
+                carChargeMapper.update(entity,new QueryWrapper<CarChargeEntity>().eq("plate_type",1).eq("community_id", adminCommunityId).eq("open",1));
+
+
+                //修改新启用状态为1
+                CarChargeEntity carChargeEntity = new CarChargeEntity();
+                carChargeEntity.setOpen(1);//已启用
+                carChargeMapper.update(carChargeEntity,new QueryWrapper<CarChargeEntity>().eq("uid",uid));
+            }
+
         }
-
-
-        //临时
-        List<CarChargeEntity> list3 = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
-                .eq("community_id", adminCommunityId)//社区id
-                .eq("type",1)//临时
-                .eq("plate_type",0)//黄牌
-                .eq("open",1)//已启用
-        );
-        if (list3.size()>1){
-            throw new PropertyException("临时停车黄牌只有一个模板能被启用！");
-        }
-
-        List<CarChargeEntity> list4 = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
-                .eq("community_id", adminCommunityId)//社区id
-                .eq("type",1)//临时
-                .eq("plate_type",1)//其他车牌
-                .eq("open",1)//已启用
-        );
-        if (list4.size()>1){
-            throw new PropertyException("临时停车其他车牌只有一个模板能被启用！");
-        }
-
-
-        //修改状态
-        CarChargeEntity carChargeEntity = new CarChargeEntity();
-        carChargeEntity.setOpen(1);//已启用
-        carChargeMapper.update(carChargeEntity,new QueryWrapper<CarChargeEntity>().eq("uid",uid));
 
     }
 
@@ -389,7 +425,11 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      */
     @Override
     public CarChargeEntity selectOneCharge(String uid, Long adminCommunityId) {
-        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", uid).eq("community_id", adminCommunityId));
+        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                .eq("uid", uid)
+                .eq("community_id", adminCommunityId)
+                .eq("open",1)
+        );
         return carChargeEntity;
     }
 

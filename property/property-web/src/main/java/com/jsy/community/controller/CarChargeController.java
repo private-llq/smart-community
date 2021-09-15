@@ -47,9 +47,9 @@ public class CarChargeController {
     @Login
     @PostMapping("/openCarCharge")
     @businessLog(operation = "启用模板",content = "新增了【停车收费设置】")
-    public CommonResult openCarCharge(@RequestParam("uid") String uid){
+    public CommonResult openCarCharge(@RequestParam("uid") String uid,@RequestParam("type") Integer type){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
-        carChargeService.openCarCharge(uid,adminCommunityId);
+        carChargeService.openCarCharge(uid,type,adminCommunityId);
         return CommonResult.ok();
     }
 
