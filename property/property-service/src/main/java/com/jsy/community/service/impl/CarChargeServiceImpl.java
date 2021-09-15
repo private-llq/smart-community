@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @DubboService(version = Const.version, group = Const.group_property)
 public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarChargeEntity> implements ICarChargeService {
@@ -37,6 +38,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     public Integer SaveCarCharge(CarChargeEntity carChargeEntity,Long communityId) {
         carChargeEntity.setCommunityId(communityId);
         carChargeEntity.setUid(UserUtils.randomUUID());
+        carChargeEntity.setOpen(0);//未启用
         int insert = carChargeMapper.insert(carChargeEntity);
         return insert;
     }
@@ -60,6 +62,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         List<CarChargeEntity> list = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
                 .eq("type", type)
                 .eq("community_id",communityId)
+                .eq("open",1)
         );
         return list;
     }
@@ -96,6 +99,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      * @return
      */
     @Override
+    @Transactional
     public Integer temporaryParkingSet(CarChargeEntity carChargeEntity, Long adminCommunityId) {
         carChargeEntity.setCommunityId(adminCommunityId);
         carChargeEntity.setUid(UserUtils.randomUUID());
@@ -120,6 +124,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      * 计算该项设置的收费 Test charge
      */
     @Override
+    @Transactional
     public BigDecimal testCharge(CarChargeQO carChargeQO) {
         CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", carChargeQO.getUuid()));
         //封顶费用 单位/元
@@ -198,6 +203,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      *                    如果结算时间到出闸时间超过5分钟（物业设置）,就拿到要出闸的时间和下次结算时间作为一个新订单
      */
     @Override
+    @Transactional
     public BigDecimal charge(CarChargeQO carChargeQO) {
 
         LocalDateTime inTime = carChargeQO.getInTime();//入场时间
@@ -212,7 +218,16 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             plateType=1;//其他车牌
         }
 
-        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id",communityId).eq("plate_type",plateType));
+        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id",communityId)
+                .eq("type",1)
+                .eq("plate_type",plateType)
+                .eq("open",1)
+        );
+        if (Objects.isNull(carChargeEntity)){
+            throw new PropertyException("请先在收费设置临时里添加一个已启用的收费模板！");
+        }
+
         //封顶费用 单位/元
         BigDecimal cappingFee = carChargeEntity.getCappingFee();
         //免费时间 单位/分钟
@@ -303,6 +318,66 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     public List<CarChargeEntity> ListCharge2(Long adminCommunityId) {
         List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>().eq("community_id", adminCommunityId).eq("type", 1));
         return chargeEntityList;
+    }
+
+
+    /**
+     * 启用
+     * @param uid
+     */
+    @Override
+    @Transactional
+    public void openCarCharge(String uid,Long adminCommunityId) {
+
+        //月租
+        List<CarChargeEntity> list1 = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", adminCommunityId)//社区id
+                .eq("type",0)//月租
+                .eq("position",0)//地上
+                .eq("open",1)//已启用
+        );
+        if (list1.size()>1){
+            throw new PropertyException("地上模板只有一个能被启用！");
+        }
+
+        List<CarChargeEntity> list2 = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", adminCommunityId)//社区id
+                .eq("type",0)//月租
+                .eq("position",1)//地下
+                .eq("open",1)//已启用
+        );
+        if (list2.size()>1){
+            throw new PropertyException("地下模板只有一个能被启用！");
+        }
+
+
+        //临时
+        List<CarChargeEntity> list3 = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", adminCommunityId)//社区id
+                .eq("type",1)//临时
+                .eq("plate_type",0)//黄牌
+                .eq("open",1)//已启用
+        );
+        if (list3.size()>1){
+            throw new PropertyException("临时停车黄牌只有一个模板能被启用！");
+        }
+
+        List<CarChargeEntity> list4 = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", adminCommunityId)//社区id
+                .eq("type",1)//临时
+                .eq("plate_type",1)//其他车牌
+                .eq("open",1)//已启用
+        );
+        if (list4.size()>1){
+            throw new PropertyException("临时停车其他车牌只有一个模板能被启用！");
+        }
+
+
+        //修改状态
+        CarChargeEntity carChargeEntity = new CarChargeEntity();
+        carChargeEntity.setOpen(1);//已启用
+        carChargeMapper.update(carChargeEntity,new QueryWrapper<CarChargeEntity>().eq("uid",uid));
+
     }
 
 
