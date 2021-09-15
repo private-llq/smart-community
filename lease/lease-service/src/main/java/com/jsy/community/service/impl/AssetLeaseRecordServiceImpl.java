@@ -387,7 +387,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     /**
      * @author: Pipi
-     * @description: 再次发起申请;可操作的是:8:拒绝申请
+     * @description: 再次发起申请;可操作的是:8:拒绝申请;7:取消申请
      * @param assetLeaseRecordEntity: 房屋租赁记录表实体
      * @param uid: 登录用户uid
      * @return: java.lang.Integer
@@ -397,7 +397,11 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", assetLeaseRecordEntity.getId());
         queryWrapper.eq("tenant_uid", uid);
-        queryWrapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.REJECTION_OF_APPLICATION.getCode());
+        queryWrapper.in("operation", new ArrayList<>(
+                Arrays.asList(BusinessEnum.ContractingProcessStatusEnum.REJECTION_OF_APPLICATION.getCode(),
+                        BusinessEnum.ContractingProcessStatusEnum.CANCELLATION_REQUEST.getCode()
+                )
+        ));
         AssetLeaseRecordEntity recordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (recordEntity == null) {
             throw new LeaseException("签约信息不存在");
