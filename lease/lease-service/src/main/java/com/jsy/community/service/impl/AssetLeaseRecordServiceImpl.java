@@ -86,7 +86,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+    public String addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
         // 检查租户是否实名认证
         Integer integer = userService.userIsRealAuth(assetLeaseRecordEntity.getTenantUid());
         if (integer <= 0) {
@@ -163,7 +163,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 });
         // 写入租赁数据
-        return assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
+        assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
+        return String.valueOf(assetLeaseRecordEntity.getId());
     }
 
     /**
@@ -303,7 +304,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 });
         // 设置租客未读
-        updateReadMark(recordEntity, 0);
+        recordEntity.setReadMark(0);
         return assetLeaseRecordMapper.updateById(recordEntity);
     }
 
@@ -380,7 +381,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         //写入租赁操作数据
         addLeaseOperationRecord(recordEntity);
         // 设置租客未读
-        updateReadMark(recordEntity, 0);
+        recordEntity.setReadMark(0);
         return assetLeaseRecordMapper.updateById(recordEntity);
     }
 
@@ -941,7 +942,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         if (assetLeaseRecordEntity.getIdentityType() == 2) {
             updateReadMark(leaseRecordEntity, 1);
         }
-        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 8 || leaseRecordEntity.getOperation() == 9) {
+        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 7 || leaseRecordEntity.getOperation() == 8 || leaseRecordEntity.getOperation() == 9) {
             // 记录表里面没有资产数据,要单独查
             if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
                 // 商铺
@@ -1233,6 +1234,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setConName(assetLeaseRecordEntity.getConName());
             leaseRecordEntity.setInitiator(assetLeaseRecordEntity.getInitiator());
             leaseRecordEntity.setSignatory(assetLeaseRecordEntity.getSignatory());
+            leaseRecordEntity.setReadMark(0);
             leaseRecordEntity.setBlockStatus(1);
             leaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode());
             addLeaseOperationRecord(leaseRecordEntity);
