@@ -303,7 +303,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 });
         // 设置租客未读
-        updateReadMark(recordEntity, 0);
+        recordEntity.setReadMark(0);
         return assetLeaseRecordMapper.updateById(recordEntity);
     }
 
@@ -380,7 +380,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         //写入租赁操作数据
         addLeaseOperationRecord(recordEntity);
         // 设置租客未读
-        updateReadMark(recordEntity, 0);
+        recordEntity.setReadMark(0);
         return assetLeaseRecordMapper.updateById(recordEntity);
     }
 
@@ -1233,6 +1233,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setConName(assetLeaseRecordEntity.getConName());
             leaseRecordEntity.setInitiator(assetLeaseRecordEntity.getInitiator());
             leaseRecordEntity.setSignatory(assetLeaseRecordEntity.getSignatory());
+            leaseRecordEntity.setReadMark(0);
             leaseRecordEntity.setBlockStatus(1);
             leaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode());
             addLeaseOperationRecord(leaseRecordEntity);
