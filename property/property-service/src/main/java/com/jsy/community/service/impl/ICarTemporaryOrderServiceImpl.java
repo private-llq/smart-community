@@ -6,8 +6,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarTemporaryOrderService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.CarOrderMapper;
+import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.mapper.PropertyFinanceOrderMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.OrderQO;
@@ -22,25 +24,33 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.time.*;
-import java.time.temporal.TemporalAdjusters;
-import java.util.*;
-import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @DubboService(version = Const.version, group = Const.group_property)
 public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, CarOrderEntity> implements ICarTemporaryOrderService {
     @Autowired
     private CarOrderMapper carOrderMapper;
+    @Autowired
+    private CarPositionMapper positionMapper;
 
     @Autowired
     private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
 
-    @Override
-    public Page<CarOrderEntity> selectCarOrder(BaseQO<CarOrderQO> baseQO, Long communityId) {
+
+   /**
+    * @Description: 订单管理查询
+    * @Param: [baseQO, communityId]
+    * @Return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.CarOrderEntity>
+    * @Author: Tian
+    * @Date: 2021/9/13-16:46
+    **/
+   @Override
+    public Page<CarOrderEntity>     selectCarOrder(BaseQO<CarOrderQO> baseQO, Long communityId) {
         Page<CarOrderEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
         if (baseQO.getQuery()==null){
             baseQO.setQuery(new CarOrderQO());
@@ -67,6 +77,7 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
         }
         queryWrapper.eq("community_id",communityId);
         Page<CarOrderEntity> selectPage = carOrderMapper.selectPage(page, queryWrapper);
+
         List<CarOrderEntity> records = selectPage.getRecords();
         for (CarOrderEntity i: records) {
             if (i.getBeginTime()!=null  && i.getOverTime()!=null){
@@ -74,11 +85,24 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
                 String s = datePoor.get("day")+"天："+datePoor.get("hour")+" 小时："+datePoor.get("min")+" 分钟";
                 i.setStopCarTime(s);
             }
+            System.out.println(i.getCarPositionId());
+            if (i.getCarPositionId()!=null){
+                CarPositionEntity entity = positionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("id", i.getCarPositionId()));
+                i.setCarPositionText(entity.getCarPosition());
+            }
+
         }
         return selectPage;
     }
 
-    @Override
+  /**
+   * @Description: 查询今日订单数
+   * @Param: [communityId]
+   * @Return: java.util.Map<java.lang.String,java.lang.Object>
+   * @Author: Tian
+   * @Date: 2021/9/13-16:47
+   **/
+  @Override
     public Map<String, Object> selectMoney(Long communityId) {
         LocalDateTime now = LocalDateTime.now();
         QueryWrapper<CarOrderEntity> queryWrapper = new QueryWrapper<>();
@@ -110,7 +134,7 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
     }
 
     /**
-     * @Description:
+     * @Description:导出月租订单
      * @Param: [query, communityId]
      * @Return: java.util.List<com.jsy.community.qo.property.CarTemporaryOrderQO>
      * @Author: Tian
@@ -159,7 +183,10 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
                 date = Date.from(i.getOrderTime().atZone(ZoneId.systemDefault()).toInstant());
                 carTemporaryOrderQO.setOrderTime(date);
             }
-
+            if (i.getCarPositionId()!=null){
+                CarPositionEntity entity = positionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("id", i.getCarPositionId()));
+                carTemporaryOrderQO.setCarPosition(entity.getCarPosition());
+            }
             orderQOS.add(carTemporaryOrderQO);
         }
         return orderQOS;
@@ -210,11 +237,14 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
             }
 
             if (i.getOrderTime()!=null){
-
                 date = Date.from(i.getOrderTime().atZone(ZoneId.systemDefault()).toInstant());
                 carTemporaryQO.setOrderTime(date);
             }
-
+            if (i.getOverTime()!=null  && i.getBeginTime()!=null){
+                HashMap<String, Long> datePoor = TimeUtils.getDatePoor(i.getBeginTime(), i.getOverTime());
+                String s = datePoor.get("day")+"天："+datePoor.get("hour")+" 小时："+datePoor.get("min")+" 分钟";
+                carTemporaryQO.setStopCarTime(s);
+            }
             orderQOS.add(carTemporaryQO);
         }
         return orderQOS;

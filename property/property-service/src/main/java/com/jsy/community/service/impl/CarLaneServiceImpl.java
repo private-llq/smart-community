@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 
-@DubboService(version = Const.version, group = Const.group)
+@DubboService(version = Const.version, group = Const.group_property)
 public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity> implements ICarLaneService {
 
     @Autowired

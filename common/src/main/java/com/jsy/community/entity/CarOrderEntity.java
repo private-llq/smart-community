@@ -114,6 +114,4 @@ public class CarOrderEntity extends BaseEntity {
      */
     @TableField(exist = false)
     private String stopCarTime;
-
-
 }

@@ -26,7 +26,6 @@ public class PropertyMarketCategoryController {
     @ApiOperation("社区集市新增商品分类")
     @Login
     public CommonResult addMarketCategory(@RequestBody ProprietorMarketCategoryEntity categoryEntity){
-        categoryEntity.setCommunityId(UserUtils.getAdminCommunityId());
         boolean b = categoryService.addMarketCategory(categoryEntity);
         return CommonResult.ok("添加成功");
     }

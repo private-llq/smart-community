@@ -33,7 +33,6 @@ public class ProprietorMarketCategoryController {
     @ApiOperation("新增社区集市商品类别")
     @Login
     public CommonResult addMarketCategory(@RequestBody ProprietorMarketCategoryEntity  categoryEntity){
-        System.out.println(categoryEntity);
         boolean b = categoryService.addMarketCategory(categoryEntity);
         return CommonResult.ok("添加成功");
     }

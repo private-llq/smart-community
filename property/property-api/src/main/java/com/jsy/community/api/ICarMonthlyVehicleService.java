@@ -67,7 +67,7 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
      * @Param:
      * @return:
      */
-    void updateMonth(String carPlate, LocalDateTime orveTime);
+    void updateMonth(String carPlate, LocalDateTime orveTime,BigDecimal money);
 
     PageInfo findByMultiConditionPage2Position(CarMonthlyVehicleQO carMonthlyVehicleQO,Long communityId);
 

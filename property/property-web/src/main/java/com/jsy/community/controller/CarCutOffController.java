@@ -63,15 +63,13 @@ public class CarCutOffController{
         return CommonResult.ok(page,"查询成功");
     }
 
-
-
-
     @Login
     @PostMapping("/addCutOff")
     public CommonResult addCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
         boolean b=  carCutOffService.addCutOff(carCutOffEntity);
         return CommonResult.ok("添加成功");
     }
+
     @Login
     @PostMapping("/updateCutOff")
     public CommonResult updateCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
@@ -87,18 +85,15 @@ public class CarCutOffController{
     }
 
     @ApiOperation("导出模板")
-    @GetMapping("/carCutOFFExport")
+    @PostMapping("/carCutOFFExport")
     @ResponseBody
-    public void downLoadFile(HttpServletResponse response) throws IOException {
+    public void downLoadFile(@RequestBody CarCutOffQO carCutOffQO, HttpServletResponse response) throws IOException {
         Long communityId = UserUtils.getAdminCommunityId();
-        CarCutOffQO carCutOffQO = new CarCutOffQO();
-        carCutOffQO.setState(0);
-        communityId =  1l;
         if (carCutOffQO.getState()==0){
             System.out.println("在场车辆导出");
             //在场车辆
             List<CarSceneVO>  list = carCutOffService.selectCarSceneList(carCutOffQO,communityId);
-            ExcelUtils.exportModule("在场车辆表", response, CarSceneVO.class, list, 1);
+            ExcelUtils.exportModule("在场车辆表", response, CarSceneVO.class, list, 2);
 
         }else {
             //进出记录
