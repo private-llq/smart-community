@@ -5,6 +5,8 @@
     <select id="landlordContractListByAssetId" resultType="com.jsy.community.entity.proprietor.AssetLeaseRecordEntity">
         select
             alr.id,
+            alr.asset_id,
+            alr.asset_type,
             alr.tenant_uid,
             alr.title,
             alr.type_code,
@@ -19,6 +21,7 @@
         from t_asset_lease_record alr
         left join t_user u on u.uid = alr.tenant_uid
         where alr.asset_id = #{assetId}
+        and alr.deleted = 0
         and alr.asset_type = #{assetType}
         and alr.home_owner_uid = #{homeOwnerUid}
         <if test="contractStatus == 1">
