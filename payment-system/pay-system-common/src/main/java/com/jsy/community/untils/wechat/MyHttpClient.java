@@ -1,7 +1,7 @@
-package com.jsy.community.utils;
+package com.jsy.community.untils.wechat;
 
-import com.jsy.community.config.PublicConfig;
-import com.jsy.community.config.WechatConfig;
+import com.jsy.community.untils.wechat.PublicConfig;
+import com.jsy.community.untils.wechat.WechatConfig;
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
 import com.wechat.pay.contrib.apache.httpclient.auth.AutoUpdateCertificatesVerifier;
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;

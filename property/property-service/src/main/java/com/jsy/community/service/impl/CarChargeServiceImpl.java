@@ -131,7 +131,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      */
     @Override
     public CarChargeEntity selectOne(Long communityId) {
-        return carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id",communityId).eq("position","地上").eq("type",0));
+        return carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id",communityId).eq("position",0).eq("type",0).eq("open",1));
     }
 
     /**

@@ -3,7 +3,6 @@ package com.jsy.community.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -95,7 +94,6 @@ public class VisitorEntity extends BaseEntity {
     private String carPlate;
 
     @ApiModelProperty(value = "来访车辆类型 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车 6.其他车型", hidden = true)
-    @Range(min = 1, max = 6, message = "车辆类型不正确")
     private Integer carType;
 
     @ApiModelProperty(value = "审核方式，1业主审核，2物业审核")

@@ -4,8 +4,8 @@ import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
-import com.jsy.community.config.PublicConfig;
-import com.jsy.community.config.WechatConfig;
+import com.jsy.community.untils.wechat.PublicConfig;
+import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.CommunityEntity;
@@ -16,10 +16,10 @@ import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
-import com.jsy.community.utils.MyHttpClient;
-import com.jsy.community.utils.OrderNoUtil;
+import com.jsy.community.untils.wechat.MyHttpClient;
+import com.jsy.community.untils.wechat.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.XmlUtil;
+import com.jsy.community.untils.wechat.XmlUtil;
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -181,7 +181,7 @@ public class WeChatController {
         rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
-                    message.getMessageProperties().setHeader("x-delay",60000*30);
+                    message.getMessageProperties().setHeader("x-delay",60000*120);
                 return message;
             }
         });

@@ -1,4 +1,4 @@
-package com.jsy.community.utils;
+package com.jsy.community.untils.wechat;
 
 import cn.hutool.core.util.StrUtil;
 import com.xkzhangsan.time.converter.DateTimeConverterUtil;

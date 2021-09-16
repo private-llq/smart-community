@@ -1,4 +1,4 @@
-package com.jsy.community.config;
+package com.jsy.community.untils.wechat;
 
 import com.jsy.community.entity.CompanyPayConfigEntity;
 import com.jsy.community.utils.AESOperator;

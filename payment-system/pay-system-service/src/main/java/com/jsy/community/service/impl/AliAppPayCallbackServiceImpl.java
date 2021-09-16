@@ -84,7 +84,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 		boolean signVerified = false;
 		//证书验签
 		try {
-			signVerified = AlipaySignature.rsaCheckV1(paramsMap, AlipayUtils.getPrivateKey(ConstClasses.AliPayDataEntity.alipayPublicCertPath), "utf-8", "RSA2");
+			signVerified = AlipaySignature.rsaCheckV1(paramsMap, AlipayUtils.getAlipayPublicKey(ConstClasses.AliPayDataEntity.alipayPublicCertPath), "utf-8", "RSA2");
 		} catch (AlipayApiException e1) {
 			e1.printStackTrace();
 			throw new PaymentException("验签出错");
