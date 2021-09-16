@@ -6,13 +6,17 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.BindingPositionEntity;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.mapper.BindingPositionMapper;
 import com.jsy.community.mapper.CarMonthlyVehicleMapper;
+import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,6 +27,9 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
 
     @Autowired
     private CarMonthlyVehicleMapper carMonthlyVehicleMapper;
+
+    @Autowired
+    private CarPositionMapper carPositionMapper;
 
 
     /**
@@ -110,11 +117,28 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
     @Override
     @Transactional
     public void deleteBinding(String uid) {
+        //todo 新增的包月车辆默认是已绑定车位那一辆车
        /* BindingPositionEntity entity = bindingPositionMapper.selectOne(new QueryWrapper<BindingPositionEntity>().eq("uid", uid));
         if (entity.getBindingStatus()==1){
             throw new PropertyException("该车辆已绑定车位，如需删除请先解绑！");
         }*/
         bindingPositionMapper.delete(new QueryWrapper<BindingPositionEntity>().eq("uid",uid));
+    }
+
+    /**
+     * 定时任务 定期删除包月已过期车位的车位管理列表
+     */
+    @Scheduled(fixedRate=1000*300)//5分钟 一次
+    public void PeriodicallyDelete() {
+        List<CarPositionEntity> selectList = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>()
+                .eq("car_pos_status", 0)
+                .eq("binding_status", 0)
+        );
+        ArrayList<Object> list = new ArrayList<>();
+        for (CarPositionEntity positionEntity : selectList) {
+            list.add(positionEntity.getCarPosition());
+        }
+        bindingPositionMapper.delete(new QueryWrapper<BindingPositionEntity>().in("position_id",list));
     }
 
 

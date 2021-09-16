@@ -237,6 +237,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         orderEntity.setOverTime(carMonthlyVehicle.getEndTime().toLocalDate());//账单结束时间
         orderEntity.setBuildType(1);//系统生成
 
+
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
                 .eq("deleted", 0)
