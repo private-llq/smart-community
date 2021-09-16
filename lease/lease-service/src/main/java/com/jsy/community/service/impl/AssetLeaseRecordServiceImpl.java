@@ -1240,7 +1240,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
         queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
         queryWrapper.eq("id", assetLeaseRecordEntity.getId());
-        queryWrapper.in("operation", new ArrayList<>(Arrays.asList(3, 32)));
+        queryWrapper.in("operation", new ArrayList<>(Arrays.asList(2, 3, 32)));
         AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (leaseRecordEntity != null) {
             leaseRecordEntity.setConId(assetLeaseRecordEntity.getConId());

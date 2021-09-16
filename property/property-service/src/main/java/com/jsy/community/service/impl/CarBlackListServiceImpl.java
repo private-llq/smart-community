@@ -60,8 +60,10 @@ CarBlackListServiceImpl implements ICarBlackListService {
     }
 
     @Override
-    public CarBlackListEntity carBlackListOne(String carNumber) {
-        CarBlackListEntity carBlackListEntity = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", carNumber));
+    public CarBlackListEntity carBlackListOne(String carNumber ,Long communityId) {
+        CarBlackListEntity carBlackListEntity = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().
+                eq("car_number", carNumber).eq("community_id",communityId)
+                );
         return carBlackListEntity;
     }
 

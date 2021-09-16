@@ -39,6 +39,15 @@ public interface IWeChatService extends IService<WeChatOrderEntity> {
     void orderStatus(Map<String,String> map);
 
     /**
+     * @Description: 查询签章
+     * @author: Hu
+     * @since: 2021/9/16 16:32
+     * @Param:
+     * @return:
+     */
+    WeChatOrderEntity getSignature(String serviceOrderNo);
+
+    /**
      * @author: Pipi
      * @description: 查询微信支付订单ID
      * @param serviceOrderNo: 外部订单号

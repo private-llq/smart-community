@@ -34,6 +34,7 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.car.CarVO;
 import com.jsy.community.vo.car.GpioData;
 import com.jsy.community.vo.car.Rs485Data;
+import com.jsy.community.vo.car.WhitelistData;
 import com.jsy.community.vo.property.PageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -99,6 +100,8 @@ public class CarPositionController {
     private ICarOrderService iCarOrderService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarLaneService iCarLaneService;
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IVisitorService visitorService;
 
 
     @ApiOperation("分页查询车位信息")
@@ -133,9 +136,6 @@ public class CarPositionController {
     @RequestMapping(value = "/selectCarPosition", method = RequestMethod.POST)
     public CommonResult<List<CarPositionEntity>> selectCarPositionPaging(@RequestBody CarPositionEntity qo) {
         List<CarPositionEntity> carPositionEntity= iCarPositionService.selectCarPosition(qo);
-
-
-
         return CommonResult.ok(carPositionEntity,"查询成功") ;
     }*/
 
@@ -144,6 +144,7 @@ public class CarPositionController {
     @PostMapping("/carPositionUpload")
     @ResponseBody
     @Login
+    @CarOperation(operation = "导入车位信息")
     public String upload(MultipartFile file) throws IOException {
         System.out.println("wenjian" + file);
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
@@ -159,6 +160,7 @@ public class CarPositionController {
     @ApiOperation("导出模板")
     @GetMapping("/carPositionExport")
     @ResponseBody
+    @CarOperation(operation = "导出模板")
     public void downLoadFile(HttpServletResponse response) throws IOException {
 
         ExcelUtils.exportModule("车位信息表", response, CarPositionEntity.class, null, 2);
@@ -178,6 +180,7 @@ public class CarPositionController {
 
     @ApiOperation("新增车位信息")
     @Login
+    @CarOperation(operation = "新增车位信息")
     @RequestMapping(value = "/insterCarPosition", method = RequestMethod.POST)
     public CommonResult<Boolean> insterCarPosition(@RequestBody InsterCarPositionQO qo) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
@@ -187,6 +190,7 @@ public class CarPositionController {
 
     @ApiOperation("批量新增车位信息")
     @Login
+    @CarOperation(operation = "批量新增车位信息")
     @RequestMapping(value = "/moreInsterCarPosition", method = RequestMethod.POST)
     public CommonResult<Boolean> moreInsterCarPosition(@RequestBody MoreInsterCarPositionQO qo) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
@@ -199,6 +203,7 @@ public class CarPositionController {
 
     @ApiOperation("绑定用户")
     @Login
+    @CarOperation(operation = "绑定用户")
     @RequestMapping(value = "/customerBinding", method = RequestMethod.POST)
     public CommonResult<Boolean> customerBinding(@RequestBody CustomerBindingQO qo) {
         CarPositionEntity carPositionEntity = new CarPositionEntity();
@@ -228,6 +233,7 @@ public class CarPositionController {
 
     @ApiOperation("解除绑定")
     @Login
+    @CarOperation(operation = "解除绑定")
     @RequestMapping(value = "/relieve", method = RequestMethod.POST)
     public CommonResult<Boolean> relieve(Long id) {
         Boolean b = iCarPositionService.relieve(id);
@@ -239,6 +245,7 @@ public class CarPositionController {
 
     @ApiOperation("删除车位")
     @Login
+    @CarOperation(operation = "删除车位")
     @RequestMapping(value = "/deletedCarPosition", method = RequestMethod.POST)
     public CommonResult<Boolean> deletedCarPosition(Long id) {
         Boolean b = iCarPositionService.deletedCarPosition(id);
@@ -247,16 +254,16 @@ public class CarPositionController {
         }
         return CommonResult.ok(b, "删除失败");
     }
-    @CarOperation(operation="编辑车位")
+
+    @CarOperation(operation = "编辑车位")
     @ApiOperation("编辑车位")
     @Login
     @RequestMapping(value = "/updateCarPosition", method = RequestMethod.POST)
-    public CommonResult<Boolean> updateCarPosition(@RequestBody UpdateCarPositionQO qo)  {
+    public CommonResult<Boolean> updateCarPosition(@RequestBody UpdateCarPositionQO qo) {
 
 
-            //日志记录
+        //日志记录
         //RecordCarLogUtils.recordLog(this.getClass(),"updateCarPosition","操作日志",RoleId,UpdateCarPositionQO.class);
-
 
 
         Boolean b = iCarPositionService.updateCarPosition(qo);
@@ -275,11 +282,6 @@ public class CarPositionController {
 //
 //        return null;
 //    }
-
-
-
-
-
 
 
     @ApiOperation("过车记录")
@@ -317,8 +319,8 @@ public class CarPositionController {
         Long communityId = equipmentManageService.equipmentOne(camId).getCommunityId();
 
 
-        //是否是黑名单车辆
-        CarBlackListEntity carBlackListEntity = iCarBlackListService.carBlackListOne(plateNum);
+        //在小区是否是黑名单车辆
+        CarBlackListEntity carBlackListEntity = iCarBlackListService.carBlackListOne(plateNum,communityId);
         if (carBlackListEntity == null) {//不是黑名单
             //根据车牌号查询车辆的3种状态
             Map map = iCarMonthlyVehicleService.selectByStatus(plateNum, plateColor, communityId);//1临时，2包月3業主
@@ -366,7 +368,7 @@ public class CarPositionController {
                     e2.setEncodetype("hex2string");
                     e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
                     carVO.getRs485_data().add(e2);
-                }
+                }   
                 //开闸记录
                 extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
 
@@ -380,7 +382,7 @@ public class CarPositionController {
                     carVO.getGpio_data().add(gpioData);
                     //查询出包月车辆的剩余天数
                     Long extracted = extracted(plateNum, plateColor, communityId);
-                    System.out.println("包月车辆的剩余天数"+extracted);
+                    System.out.println("包月车辆的剩余天数" + extracted);
                     //语音播报内容
                     Rs485Data e2 = new Rs485Data();
                     e2.setEncodetype("hex2string");
@@ -403,11 +405,12 @@ public class CarPositionController {
                 extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
 
             } else {//临时车
-
                 // 查询特殊车辆是否收费
                 CarBasicsEntity one2 = iCarBasicsService.findOne(communityId);
                 Integer exceptionCar = one2.getExceptionCar();//0：不收费  1：收费
-                if (exceptionCar==0) {
+                System.out.println("特殊车辆是否收费" + exceptionCar);
+                if (plateColor.equals("白色") && exceptionCar == 0) {//特殊车辆且不收费
+
                     if (vdcType.equals("in")) {//进口
                         //是否开闸
                         GpioData gpioData = new GpioData();
@@ -417,7 +420,7 @@ public class CarPositionController {
                         //语音播报内容
                         Rs485Data e2 = new Rs485Data();
                         e2.setEncodetype("hex2string");
-                        e2.setData("0064FFFF300901BBB6D3ADB9E2C1D93258");//欢迎回家
+                        e2.setData("0064FFFF300901BBB6D3ADB9E2C1D93258");//欢迎光临
                         carVO.getRs485_data().add(e2);
 
                     } else if (vdcType.equals("out")) {//出口
@@ -435,12 +438,12 @@ public class CarPositionController {
                     //开闸记录
                     extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
 
-                }else {
+                } else {//不是特殊车辆或者是特殊车辆要收费
                     //最大入场数
                     Integer maxNumber = iCarBasicsService.findOne(communityId).getMaxNumber();
                     CarCutOffQO carCutOffQO = new CarCutOffQO();
                     carCutOffQO.setCommunityId(communityId);
-                    carCutOffQO.setState(0);
+                    carCutOffQO.setState(0);//0为未完成
                     //查询临时车位的占用数量
                     long total = carCutOffService.selectPage(carCutOffQO);
 
@@ -453,16 +456,26 @@ public class CarPositionController {
                         CarPatternEntity one = iCarPatternService.findOne(carEquipmentManageEntity.getPatternId());
                         String locationPattern = one.getLocationPattern();
 
+
                         if (locationPattern.equals("禁入禁出")) {//"禁入禁出"
-                            //是否开闸
-                            GpioData gpioData = new GpioData();
-                            gpioData.setIonum("io1");
-                            carVO.getGpio_data().add(gpioData);
-                            //语音播报内容
-                            Rs485Data e2 = new Rs485Data();
-                            e2.setEncodetype("hex2string");
-                            e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
-                            carVO.getRs485_data().add(e2);
+
+                            //查询车牌号是否收到邀请
+                            boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId,1);
+                            if (statusInvite) {//收到邀请可以开闸
+                                chargingMode(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
+                            } else {
+                                //是否开闸
+                                GpioData gpioData = new GpioData();
+                                gpioData.setIonum("io1");
+                                carVO.getGpio_data().add(gpioData);
+                                //语音播报内容
+                                Rs485Data e2 = new Rs485Data();
+                                e2.setEncodetype("hex2string");
+                                e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
+                                carVO.getRs485_data().add(e2);
+                            }
+
+
                         }
                         if (locationPattern.equals("免费模式")) {//免费模式
                             if (vdcType.equals("in")) {//进口
@@ -495,115 +508,8 @@ public class CarPositionController {
 
                         }
 
-                        if (locationPattern.equals("收费模式")) {/*****************************************************************************************************************************************************************************************/
-
-
-                            if (vdcType.equals("in")) {//进口
-                                //是否开闸
-                                GpioData gpioData = new GpioData();
-                                gpioData.setIonum("io1");
-                                gpioData.setAction("on");
-                                carVO.getGpio_data().add(gpioData);
-                                //语音播报内容
-                                Rs485Data e2 = new Rs485Data();
-                                e2.setEncodetype("hex2string");
-                                e2.setData("0064FFFF300901BBB6D3ADB9E2C1D93258");//欢迎光临
-                                carVO.getRs485_data().add(e2);
-                                //开闸记录
-                                extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
-
-                                CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
-                                entity.setType(1);//临时车
-                                entity.setOrderNum(UuidUtils.generateUuid().replace("-", ""));//订单编号
-                                entity.setBeginTime(LocalDateTime.now());//进入的时间
-                                entity.setOrderStatus(0);//未支付
-                                entity.setCarPlate(plateNum);//车牌号
-                                entity.setCommunityId(communityId);//社区id
-                                Calendar calendar = Calendar.getInstance();
-                                int month = calendar.get(Calendar.MONTH) + 1;
-                                entity.setMonth(month);//月份
-                                boolean save = iCarOrderService.save(entity);
-
-
-                            } else if (vdcType.equals("out")) {//出口
-                                Integer orderStatus = 0;
-
-                                CarOrderEntity carOrderEntity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
-                                if (carOrderEntity != null) {
-                                    orderStatus = carOrderEntity.getOrderStatus();
-                                }
-                                System.out.println("支付状态" + orderStatus);
-                                if (orderStatus == 0) {//未支付
-                                    //是否开闸
-                                    GpioData gpioData = new GpioData();
-                                    gpioData.setIonum("io1");
-                                    carVO.getGpio_data().add(gpioData);
-                                    //语音播报内容
-                                    Rs485Data e2 = new Rs485Data();
-                                    e2.setEncodetype("hex2string");
-                                    e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
-                                    carVO.getRs485_data().add(e2);
-                                }
-                                if (orderStatus == 1) {//已经支付
-
-                                    //缴费获取缴费时间和允许出入的时间是多久
-                                    CarBasicsEntity one1 = iCarBasicsService.findOne(communityId);
-                                    CarOrderEntity carOrderEntity1 = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
-                                    LocalDateTime orderTime = carOrderEntity1.getOrderTime();//支付时间
-                                    System.out.println("支付时间" + orderTime);
-                                    Integer dwellTime = one1.getDwellTime();//允许滞留时间
-                                    System.out.println("允许滞留时间" + dwellTime);
-                                    LocalDateTime now = LocalDateTime.now();//当前时间
-                                    System.out.println("当前时间" + now);
-                                    Duration duration = Duration.between(orderTime, now);//时间差
-                                    long l = duration.toMinutes();//分钟
-                                    System.out.println("时间差" + l);
-                                    if (l > dwellTime) {//超过了滞留时间
-                                        //是否开闸
-                                        GpioData gpioData = new GpioData();
-                                        gpioData.setIonum("io1");
-                                        carVO.getGpio_data().add(gpioData);
-                                        //语音播报内容
-                                        Rs485Data e2 = new Rs485Data();
-                                        e2.setEncodetype("hex2string");
-                                        e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
-                                        carVO.getRs485_data().add(e2);
-                                        CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
-                                        entity.setType(1);//临时车
-                                        entity.setOrderNum(UuidUtils.generateUuid().replace("-", ""));//订单编号
-                                        entity.setBeginTime(orderTime);//进入的时间（订单支付的时间）
-                                        entity.setOrderStatus(0);//未支付
-                                        entity.setCarPlate(plateNum);//车牌号
-                                        entity.setCommunityId(communityId);//社区id
-                                        Calendar calendar = Calendar.getInstance();
-                                        int month = calendar.get(Calendar.MONTH) + 1;
-                                        entity.setMonth(month);//月份
-                                        boolean save = iCarOrderService.save(entity);
-
-                                    }
-
-                                    if (l < dwellTime) {//没有超过滞留时间
-                                        //是否开闸
-                                        GpioData gpioData = new GpioData();
-                                        gpioData.setIonum("io1");
-                                        gpioData.setAction("on");
-                                        carVO.getGpio_data().add(gpioData);
-                                        //语音播报内容
-                                        Rs485Data e2 = new Rs485Data();
-                                        e2.setEncodetype("hex2string");
-                                        e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
-                                        carVO.getRs485_data().add(e2);
-                                        //开闸记录
-                                        extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
-
-                                    }
-
-                                }
-
-
-                            }
-
-
+                        if (locationPattern.equals("收费模式")) {
+                            chargingMode(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
                         }
                     } else {//車位不足的情況
                         //是否开闸
@@ -618,8 +524,6 @@ public class CarPositionController {
                         carVO.getRs485_data().add(e2);
                     }
                 }
-
-
             }
 
         } else {//是黑名单的这辆
@@ -634,9 +538,9 @@ public class CarPositionController {
             carVO.getRs485_data().add(e2);
         }
 
-
+////黑白名单的注册
 //        WhitelistData whitelistData = new WhitelistData();
-//        whitelistData.setAction("add");
+//        whitelistData.setAction("delete");
 //        whitelistData.setPlateNumber("沪A99999");
 //        whitelistData.setType("W");
 //        whitelistData.setStart("2021/08/31 11:00:00");
@@ -655,7 +559,130 @@ public class CarPositionController {
     }
 
 
-    private String base64GetString(@RequestParam("plate_num") String plateNum, @RequestParam("start_time") Long startTime, @RequestParam("picture") String picture, String name) throws IOException {
+    //临时车收费模式
+    private void chargingMode(String plateNum,//车牌号
+                              String plateColor,//车牌颜色
+                              String carSubLogo,//车辆子品牌
+                              String vehicleType,// 车辆类型
+                              Long startTime,//起闸时间
+                              String camId, //相机id
+                              String vdcType, //进出类型
+                              String trigerType,//video 表示视频触发，hwtriger 表示地感触发，swtriger 表示软触发
+                              String carInAndOutPicture,//全景图
+                              String carInAndOutPicture1,//车位号
+                              CarVO carVO, //相应對象
+                              Long communityId)//社区id
+    {
+        if (vdcType.equals("in")) {//进口
+            //是否开闸
+            GpioData gpioData = new GpioData();
+            gpioData.setIonum("io1");
+            gpioData.setAction("on");
+            carVO.getGpio_data().add(gpioData);
+            //语音播报内容
+            Rs485Data e2 = new Rs485Data();
+            e2.setEncodetype("hex2string");
+            e2.setData("0064FFFF300901BBB6D3ADB9E2C1D93258");//欢迎光临
+            carVO.getRs485_data().add(e2);
+            //开闸记录
+            extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+            //新增订单
+            insterCarOrder(plateNum, communityId, LocalDateTime.now());
+            //如果是收到邀请的车辆状态改变为已经进园
+            boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId,1);
+            if(statusInvite){
+                visitorService.updateCarStatus(plateNum,communityId,2);
+            }
+
+        } else if (vdcType.equals("out")) {//出口
+            Integer orderStatus = 0;
+            //查询临时车最后订单
+            CarOrderEntity carOrderEntity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
+            if (carOrderEntity != null) {
+                orderStatus = carOrderEntity.getOrderStatus();//获取订单的状态
+            }
+            System.out.println("支付状态" + orderStatus);
+            if (orderStatus == 0) {//未支付
+                //是否开闸
+                GpioData gpioData = new GpioData();
+                gpioData.setIonum("io1");
+                carVO.getGpio_data().add(gpioData);
+                //语音播报内容
+                Rs485Data e2 = new Rs485Data();
+                e2.setEncodetype("hex2string");
+                e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
+                carVO.getRs485_data().add(e2);
+            }
+            if (orderStatus == 1) {//已经支付
+
+                //缴费获取缴费时间和允许出入的时间是多久
+                CarBasicsEntity one1 = iCarBasicsService.findOne(communityId);
+                LocalDateTime now = LocalDateTime.now();//当前时间
+                LocalDateTime orderTime = carOrderEntity.getOrderTime();//支付时间
+                Integer dwellTime = one1.getDwellTime();//允许滞留时间
+                Duration duration = Duration.between(orderTime, now);//支付时间和当前时间差
+                long l = duration.toMinutes();//分钟
+                System.out.println("当前时间" + now);
+                System.out.println("支付时间" + orderTime);
+                System.out.println("允许滞留时间" + dwellTime + "分钟");
+                System.out.println("时间差" + l + "分钟");
+
+                if (l > dwellTime) {//超过了滞留时间
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    carVO.getGpio_data().add(gpioData);
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
+                    carVO.getRs485_data().add(e2);
+                    //新增订单
+                    insterCarOrder(plateNum, communityId, orderTime);
+                }
+                if (l < dwellTime) {//没有超过滞留时间
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    gpioData.setAction("on");
+                    carVO.getGpio_data().add(gpioData);
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
+                    carVO.getRs485_data().add(e2);
+                    //开闸记录
+                    extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+                    //如果是收到邀请的车辆状态改变为已经出园
+                    boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId,2);
+                    if(statusInvite){
+                        visitorService.updateCarStatus(plateNum,communityId,3);
+                    }
+                }
+
+            }
+
+
+        }
+    }
+
+    //新增一个车辆订单对象
+    private void insterCarOrder(String plateNum, Long communityId, LocalDateTime beginTime) {
+        CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
+        entity.setType(1);//临时车
+        entity.setOrderNum(UuidUtils.generateUuid().replace("-", ""));//订单编号
+        entity.setBeginTime(beginTime);//进入的时间
+        entity.setOrderStatus(0);//未支付
+        entity.setCarPlate(plateNum);//车牌号
+        entity.setCommunityId(communityId);//社区id
+        Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH) + 1;
+        entity.setMonth(month);//月份
+        boolean save = iCarOrderService.save(entity);
+    }
+
+    //转换base64图片上传获取url
+    private String base64GetString(String plateNum, Long startTime, String picture, String name) throws IOException {
         String s = picture.replace("-", "+");
         String s1 = s.replace("_", "/");
         String s2 = s1.replace(".", "=");
@@ -665,14 +692,14 @@ public class CarPositionController {
         return MinioUtils.uploadNameByCarJPG(file, "car-in-and-out-picture", name + startTime + plateNum + ".jpg");
     }
 
-
+    //新增开闸记录
     private void extracted(String plateNum, String vehicleType, Long startTime,
                            String camId, String vdcType, String trigerType,
                            String picture, String closeupPic,
                            String carSubLogo, String plateColor) {
         if (vdcType.equals("in")) {
             CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
-
+            System.out.println("开闸记录"+vdcType);
             //开闸记录实体类对象
             CarCutOffEntity carCutOffEntity = new CarCutOffEntity();
             //车子状态  1临时车  2包月  3业主
@@ -698,9 +725,10 @@ public class CarPositionController {
             carCutOffEntity.setLaneName(carLaneOne.getLaneName());
             carCutOffEntity.setCommunityId(carEquipmentManageEntity.getCommunityId());
 
-            //还能停多少天
 
+          //新增
             boolean b = carCutOffService.addCutOff(carCutOffEntity);
+            System.out.println("新增数量"+b);
 
         } else {
             System.out.println("chuzadlfjdoilj ");
@@ -724,7 +752,6 @@ public class CarPositionController {
 
         }
     }
-
 
     //包月车辆剩余天数
     private Long extracted(String plateNum, String plateColor, Long CommunityId) {

@@ -30,7 +30,7 @@ public class ICarEntranceServiceImpl extends ServiceImpl<CarEntranceMapper,CarEn
         query.setCommunityId(communityId);
         IPage<CarEntranceVO> iPage =  carEntranceMapper.selectCarEntrance(page,query);
         List<CarEntranceVO> records = iPage.getRecords();
-        System.out.println(records);
+
         long total = iPage.getTotal();
         Map<String, Object> map = new HashMap<>();
         map.put("total",total);

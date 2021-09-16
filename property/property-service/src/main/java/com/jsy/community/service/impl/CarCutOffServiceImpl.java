@@ -57,8 +57,14 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
 
     @Override
     public boolean addCutOff(CarCutOffEntity carCutOffEntity) {
+        System.out.println("新增一条");
         carCutOffEntity.setId(SnowFlake.nextId());
-        return carCutOffMapper.insert(carCutOffEntity) == 1;
+        int insert = carCutOffMapper.insert(carCutOffEntity);
+        if(insert>0){
+            return true;
+        }
+
+        return false;
     }
 
     @Override

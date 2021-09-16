@@ -98,4 +98,19 @@ public interface IVisitorService {
 	 * @date: 2021/8/20 15:55
 	 **/
 	void updateFaceUrlSyncStatus(List<Long> ids);
+
+	/**
+	 * @author: arli
+	 * @description: 根据车牌查询车辆是否被邀请
+	 **/
+
+	boolean selectCarNumberIsNoInvite(String carNumber,Long communityId,Integer status);
+
+	/**
+	 * @author: arli
+	 * @description: 改变入院状态
+	 *
+	 **/
+
+	boolean updateCarStatus(String carNumber,Long communityId,Integer status);
 }

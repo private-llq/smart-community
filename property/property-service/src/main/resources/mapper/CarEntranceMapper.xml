@@ -12,7 +12,7 @@
                 tc.community_id =  #{query.communityId}
                 and tc.open_time between tv.start_time and tv.end_time
                 <if test="query.carNumber!=null">
-                    and tc.car_number = #{query.carNumber}
+                    AND tc.car_number LIKE CONCAT('%', #{query.carNumber,jdbcType=VARCHAR},'%')
                 </if>
 
             </where>

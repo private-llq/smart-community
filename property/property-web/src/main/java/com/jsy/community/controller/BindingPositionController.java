@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IBindingPositionService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.BindingPositionEntity;
+import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -31,6 +32,7 @@ public class BindingPositionController {
      */
     @Login
     @PostMapping("saveBinding")
+    @CarOperation(operation = "新增了【未绑定状态的车辆】")
     public CommonResult saveBinding(@RequestBody BindingPositionEntity bindingPositionEntity) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         bindingPositionEntity.setCommunityId(adminCommunityId);
@@ -56,6 +58,7 @@ public class BindingPositionController {
      */
     @Login
     @PostMapping("binding")
+    @CarOperation(operation = "换绑了【车位管理车辆】")
     public CommonResult binding(@RequestBody BindingPositionEntity bindingPositionEntity) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         bindingPositionEntity.setCommunityId(adminCommunityId);
@@ -68,6 +71,7 @@ public class BindingPositionController {
      */
     @Login
     @DeleteMapping("deleteBinding")
+    @CarOperation(operation = "删除了【车位管理车辆】")
     public CommonResult deleteBinding(@RequestParam("uid") String uid) {
         bindingPositionService.deleteBinding(uid);
         return CommonResult.ok();

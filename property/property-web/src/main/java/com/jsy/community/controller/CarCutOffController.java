@@ -12,6 +12,7 @@ import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.qo.property.CarOrderQO;
 import com.jsy.community.qo.property.CarTemporaryOrderQO;
 import com.jsy.community.qo.property.CarTemporaryQO;
+import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -65,6 +66,7 @@ public class CarCutOffController{
 
     @Login
     @PostMapping("/addCutOff")
+    @CarOperation(operation = "新增了【开闸记录】")
     public CommonResult addCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
         boolean b=  carCutOffService.addCutOff(carCutOffEntity);
         return CommonResult.ok("添加成功");
@@ -72,6 +74,7 @@ public class CarCutOffController{
 
     @Login
     @PostMapping("/updateCutOff")
+    @CarOperation(operation = "新增了【出闸记录】")
     public CommonResult updateCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
         boolean b=  carCutOffService.updateCutOff(carCutOffEntity);
         return CommonResult.ok("修改成功");
@@ -87,6 +90,7 @@ public class CarCutOffController{
     @ApiOperation("导出模板")
     @PostMapping("/carCutOFFExport")
     @ResponseBody
+    @CarOperation(operation = "导出了【进出记录模板】")
     public void downLoadFile(@RequestBody CarCutOffQO carCutOffQO, HttpServletResponse response) throws IOException {
         Long communityId = UserUtils.getAdminCommunityId();
         if (carCutOffQO.getState()==0){

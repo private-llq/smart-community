@@ -53,6 +53,11 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
         iLivingPaymentOperationService.saveStatus(outTradeNo);
     }
 
+    @Override
+    public WeChatOrderEntity getSignature(String serviceOrderNo) {
+        return weChatMapper.selectOne(new QueryWrapper<WeChatOrderEntity>().eq("service_order_no",serviceOrderNo).eq("pay_type",9).eq("order_status",1).eq("arrive_status",1));
+    }
+
     /**
      * @Description: 微信支付订单状态
      * @author: Hu

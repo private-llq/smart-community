@@ -8,6 +8,7 @@ import com.jsy.community.api.ICarProprietorService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarProprietorEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
@@ -57,6 +58,7 @@ public class CarProprietorController {
     @Login
     @PostMapping("/addProprietor")
     @businessLog(operation = "新增",content = "新增了【业主车辆】")
+    @CarOperation(operation = "新增【业主车辆】")
     public CommonResult addProprietor(@RequestBody CarProprietorEntity carProprietorEntity){
         boolean b = carProprietorService.addProprietor(carProprietorEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok("添加成功");
@@ -72,6 +74,7 @@ public class CarProprietorController {
     @Login
     @PostMapping("/updateProprietor")
     @businessLog(operation = "编辑",content = "更新了【业主车辆】")
+    @CarOperation(operation = "编辑【业主车辆】")
     public CommonResult updateProprietor(@RequestBody CarProprietorEntity carProprietorEntity){
         boolean b = carProprietorService.updateProprietor(carProprietorEntity);
         return CommonResult.ok("修改成功");
@@ -86,6 +89,7 @@ public class CarProprietorController {
      **/
     @Login
     @DeleteMapping("/deleteProprietor")
+    @CarOperation(operation = "删除【业主车辆】")
     @businessLog(operation = "删除",content = "删除了【业主车辆】")
     public CommonResult deleteProprietor(@RequestParam Long id){
         boolean b = carProprietorService.deleteProprietor(id);

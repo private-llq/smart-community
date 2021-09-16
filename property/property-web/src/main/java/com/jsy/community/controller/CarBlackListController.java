@@ -7,6 +7,7 @@ import com.jsy.community.api.ICarBlackListService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarBlackListEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -44,7 +45,10 @@ public class CarBlackListController {
     @Login
     @PostMapping("carBlackListOne")
     public CommonResult carBlackListEntity(@RequestParam("carNumber")String carNumber){
-        CarBlackListEntity carBlackListEntity = blackListService.carBlackListOne(carNumber);
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+
+        CarBlackListEntity carBlackListEntity = blackListService.carBlackListOne(carNumber,adminCommunityId);
+
         return CommonResult.ok(carNumber,"查询成功");
     }
 
@@ -56,7 +60,7 @@ public class CarBlackListController {
      */
     @Login
     @PostMapping("saveBlackList")
-    @businessLog(operation = "新增",content = "新增了【车辆黑名单】")
+    @CarOperation(operation = "新增了【车辆黑名单】")
     public CommonResult saveBlackList(@RequestBody CarBlackListEntity carBlackListEntity){
         blackListService.saveBlackList(carBlackListEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
@@ -70,7 +74,7 @@ public class CarBlackListController {
      * @return
      */
     @DeleteMapping("delBlackList")
-    @businessLog(operation = "删除",content = "移除了【车辆黑名单】")
+    @CarOperation(operation = "移除了【车辆黑名单】")
     public CommonResult delBlackList(@RequestParam("uid") String uid){
         blackListService.delBlackList(uid);
         return CommonResult.ok();

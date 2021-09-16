@@ -8,6 +8,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
+import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Api(tags = "停车收费设置")
+@Api(tags = "收费设置")
 @RestController
 @RequestMapping("/carCharge")
 @ApiJSYController
@@ -39,14 +40,14 @@ public class CarChargeController {
 
     @Login
     @PostMapping("/save")
-    @businessLog(operation = "新增",content = "新增了【停车收费设置】")
+    @CarOperation(operation = "新增了【停车收费设置】")
     public CommonResult save(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.SaveCarCharge(carChargeEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
     }
     @Login
     @PostMapping("/openCarCharge")
-    @businessLog(operation = "启用模板",content = "新增了【停车收费设置】")
+    @CarOperation(operation = "启用了【停车收费设置模板】")
     public CommonResult openCarCharge(@RequestParam("uid") String uid,@RequestParam("type") Integer type){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         carChargeService.openCarCharge(uid,type,adminCommunityId);
@@ -54,14 +55,14 @@ public class CarChargeController {
     }
 
     @PutMapping("/update")
-    @businessLog(operation = "编辑",content = "更新了【停车收费设置】")
+    @CarOperation(operation = "更新了【停车收费设置模板】")
     public CommonResult update(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.UpdateCarCharge(carChargeEntity);
         return CommonResult.ok();
 
     }
     @DeleteMapping("/del")
-    @businessLog(operation = "删除",content = "删除了【停车收费设置】")
+    @CarOperation(operation = "删除了【停车收费设置模板】")
     public CommonResult delete(@RequestParam("uid") String uid){
         carChargeService.DelCarCharge(uid);
         return CommonResult.ok();
@@ -85,7 +86,7 @@ public class CarChargeController {
      */
     @Login
     @PostMapping("/temporaryParkingSet")
-    @businessLog(operation = "新增",content = "新增了【临时停车收费设置】")
+    @CarOperation(operation = "新增了【临时停车收费设置模板】")
     public CommonResult temporaryParkingSet(@RequestBody CarChargeEntity carChargeEntity){
         Integer integer = carChargeService.temporaryParkingSet(carChargeEntity, UserUtils.getAdminCommunityId());
         return CommonResult.ok();
@@ -97,6 +98,7 @@ public class CarChargeController {
 
     @Login
     @PostMapping("/TestCharge")
+    @CarOperation(operation = "计算了【模板设置的费用】")
     public CommonResult TestCharge(@RequestBody CarChargeQO carChargeQO){
        BigDecimal charge =carChargeService.testCharge(carChargeQO);
         return CommonResult.ok(charge);
