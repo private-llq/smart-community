@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -1756,7 +1757,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         String dateNow = sdf.format(new Date());
         // 设置账单日期
         propertyFinanceOrderEntity.setOrderTime(LocalDate.parse(dateNow, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(propertyFinanceOrderEntity.getFeeRuleId());
+        // 设置账单抬头
+	    CommunityEntity communityEntity = communityMapper.selectById(propertyFinanceOrderEntity.getCommunityId());
+	    propertyFinanceOrderEntity.setRise(communityEntity.getName() + "-" + propertyFinanceOrderEntity.getFeeRuleName());
         // 设置账单号
         propertyFinanceOrderEntity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFinanceOrderEntity.getCommunityId())));
         // 设置总金额
@@ -1825,6 +1828,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @Date: 2021/09/06 10:46
      **/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean collection(List<Long> ids, Long communityId, Integer payType) {
         int row;
         
@@ -1844,6 +1848,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                             HouseEntity houseEntity = houseMapper.selectById(carPositionEntity.getHouseId());
                             throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getFloor() + "-" + houseEntity.getDoor() + "余额不足！");
                         }
+                    } else {
+	                    throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),"没有预存款，无法抵扣！");
                     }
                 } else if (propertyFinanceOrderEntity.getAssociatedType() == 1) {
                     // 关联类型是房屋的话，根据id查询当前余额是否充足
@@ -1853,19 +1859,23 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                             HouseEntity houseEntity = houseMapper.selectById(propertyFinanceOrderEntity.getTargetId());
                             throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getFloor() + "-" + houseEntity.getDoor() + "余额不足！");
                         }
+                    } else {
+	                    throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),"没有预存款，无法抵扣！");
                     }
                 }
             }
         }
         
         //更新收款状态为已支付
-        row = propertyFinanceOrderMapper.collection(ids, payType);
+        row = propertyFinanceOrderMapper.collection(ids, 2);
     
         if (row == 1) {
             for (Long id : ids) {
                 if (payType == 7) {
                     PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(id);
-                    
+                    propertyFinanceOrderEntity.setDeduction(propertyFinanceOrderEntity.getTotalMoney());
+                    propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
+    
                     // 关联类型是车位的话，需查出车位绑定的房屋
                     if (propertyFinanceOrderEntity.getAssociatedType() == 2) {
                         CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyFinanceOrderEntity.getTargetId());

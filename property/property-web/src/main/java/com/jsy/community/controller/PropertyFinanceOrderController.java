@@ -571,7 +571,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "新增",content = "新增了【物业账单临时收费】")
     @PropertyFinanceLog(operation = "创建了一个临时账单")
     public CommonResult addTemporaryCharges(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity){
-        if(propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleId() == null
+        if(propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleName() == null
             || propertyFinanceOrderEntity.getPropertyFee() == null || propertyFinanceOrderEntity.getBeginTime() == null || propertyFinanceOrderEntity.getOverTime() == null){
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
         }
