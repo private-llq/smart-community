@@ -24,7 +24,7 @@ public class CarOrderServiceImpl extends ServiceImpl<CarOrderMapper, CarOrderEnt
         //查询订单状态状态0未缴费1缴费
         QueryWrapper<CarOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("community_id",communityId);//社区id
-        queryWrapper.eq("type",1);//临时车
+        queryWrapper.eq("type",type);//临时车
         queryWrapper.eq("car_plate",plateNum);//车牌号
         queryWrapper.orderByDesc("create_time");
         queryWrapper.last("LIMIT 1");
