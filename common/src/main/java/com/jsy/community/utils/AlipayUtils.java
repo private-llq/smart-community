@@ -5,6 +5,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.internal.util.codec.Base64;
 import com.alipay.api.request.AlipayTradeCloseRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipayTradeCloseResponse;
@@ -19,7 +20,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 /**
  * @author chq459799974
@@ -139,6 +146,38 @@ public class AlipayUtils {
 			}
 		} catch (AlipayApiException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @Description: 验签工具类
+	 * @author: Hu
+	 * @since: 2021/9/16 10:10
+	 * @Param:
+	 * @return:
+	 */
+	public static String getAlipayPublicKey(String alipayPublicCertPath) throws Exception {
+		InputStream outFile = null;
+		try {
+			outFile = getStreamDownloadOutFile(alipayPublicCertPath);
+			CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
+			X509Certificate cert = (X509Certificate) cf.generateCertificate(outFile);
+			PublicKey publicKey = cert.getPublicKey();
+			return Base64.encodeBase64String(publicKey.getEncoded());
+		} catch (NoSuchProviderException e) {
+			throw new AlipayApiException(e);
+		} catch (IOException e) {
+			throw new AlipayApiException(e);
+		} catch (CertificateException e) {
+			throw new AlipayApiException(e);
+		} finally {
+			try {
+				if (outFile != null) {
+					outFile.close();
+				}
+			} catch (IOException e) {
+				throw new AlipayApiException(e);
+			}
 		}
 	}
 

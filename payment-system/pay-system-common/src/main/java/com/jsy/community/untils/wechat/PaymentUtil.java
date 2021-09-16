@@ -1,4 +1,4 @@
-package com.jsy.community.utils;
+package com.jsy.community.untils.wechat;
 /**
  * @Description: 暂时没用
  * @author: Hu

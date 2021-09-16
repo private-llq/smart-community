@@ -13,7 +13,7 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.lease.AliAppPayQO;
 import com.jsy.community.utils.AlipayUtils;
-import com.jsy.community.utils.OrderNoUtil;
+import com.jsy.community.untils.wechat.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
