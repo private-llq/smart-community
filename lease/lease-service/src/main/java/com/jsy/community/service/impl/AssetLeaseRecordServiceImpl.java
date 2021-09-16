@@ -4,15 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.AssetLeaseRecordService;
-import com.jsy.community.api.IHouseConstService;
-import com.jsy.community.api.LeaseException;
-import com.jsy.community.api.ProprietorUserService;
+import com.jsy.community.api.*;
 import com.jsy.community.config.LeaseTopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
+import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
 import com.jsy.community.entity.shop.ShopImgEntity;
@@ -73,6 +72,12 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ProprietorUserService userService;
+
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private AiliAppPayRecordService ailiAppPayRecordService;
+
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private IWeChatService weChatService;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -1262,6 +1267,24 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.eq("operation", 31);
         AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (leaseRecordEntity != null) {
+            // 查询是否存在支付订单
+            AiliAppPayRecordEntity ailiAppPayRecordEntity = ailiAppPayRecordService.queryOrderNoByServiceOrderNo(assetLeaseRecordEntity.getConId());
+            if (ailiAppPayRecordEntity != null && ailiAppPayRecordEntity.getTradeStatus() == 2) {
+                // 已支付,不能退款
+                throw new LeaseException("租客已支付租金,不能取消");
+            }
+            WeChatOrderEntity weChatOrderEntity = weChatService.quereIdByServiceOrderNo(assetLeaseRecordEntity.getConId());
+            if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 1) {
+                // 已支付,不能退款
+                throw new LeaseException("租客已支付租金,不能取消");
+            }
+            if (ailiAppPayRecordEntity != null) {
+                // 作废支付宝支付订单
+            }
+            if (weChatOrderEntity != null) {
+                // 作废微信支付订单
+            }
+            // 更新签约数据
             leaseRecordEntity.setBlockStatus(null);
             leaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.CANCEL_LAUNCH.getCode());
             addLeaseOperationRecord(leaseRecordEntity);

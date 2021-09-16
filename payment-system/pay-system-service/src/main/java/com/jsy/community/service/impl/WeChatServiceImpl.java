@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ILivingPaymentOperationService;
 import com.jsy.community.api.IWeChatService;
@@ -68,5 +69,19 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
             entity.setTransactionId(map.get("transaction_id"));
             weChatMapper.updateById(entity);
         }
+    }
+
+    /**
+     * @param serviceOrderNo : 外部订单号
+     * @author: Pipi
+     * @description: 查询微信支付订单ID
+     * @return: java.lang.String
+     * @date: 2021/9/16 9:58
+     **/
+    @Override
+    public WeChatOrderEntity quereIdByServiceOrderNo(String serviceOrderNo) {
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("service_order_no", serviceOrderNo);
+        return weChatMapper.selectOne(queryWrapper);
     }
 }

@@ -37,4 +37,13 @@ public interface IWeChatService extends IService<WeChatOrderEntity> {
      * @return:
      */
     void orderStatus(Map<String,String> map);
+
+    /**
+     * @author: Pipi
+     * @description: 查询微信支付订单ID
+     * @param serviceOrderNo: 外部订单号
+     * @return: java.lang.String
+     * @date: 2021/9/16 9:58
+     **/
+    WeChatOrderEntity quereIdByServiceOrderNo(String serviceOrderNo);
 }
