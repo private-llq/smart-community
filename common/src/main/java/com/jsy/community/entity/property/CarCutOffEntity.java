@@ -31,10 +31,10 @@ public class CarCutOffEntity  extends BaseEntity {
     private String carType;
 
 
-    @ApiModelProperty(value = "进场车道名称")
+    @ApiModelProperty(value = "进场车道")
     private String  laneName;
 
-    @ApiModelProperty(value = "出场车道名称")
+    @ApiModelProperty(value = "出场车道")
     private String  outLane;
 
     @ApiModelProperty(value = "进出方向")
