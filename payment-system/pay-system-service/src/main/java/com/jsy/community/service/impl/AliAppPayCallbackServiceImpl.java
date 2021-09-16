@@ -12,6 +12,7 @@ import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.untils.OrderNoUtil;
 import com.jsy.community.utils.AlipayUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -162,14 +163,26 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			} else if (PaymentEnum.TradeFromEnum.HOUSE_RENT_PAYMENT.getIndex().equals(order.getTradeName())) {
 				// 房屋押金/房租缴费
 				log.info("开始修改房屋押金/房租缴费订单状态，订单号：" + order.getOrderNo());
-				// 修改签章合同支付状态
-				Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(order.getOrderNo(), order.getServiceOrderNo());
-				// 修改租房签约支付状态
-				assetLeaseRecordService.updateOperationPayStatus(order.getServiceOrderNo());
-				if(0 != (int)map.get("code")){
-					throw new PaymentException((int)map.get("code"),String.valueOf(map.get("msg")));
+				// 查询签约状态
+				AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(order.getServiceOrderNo());
+				if (leaseRecordEntity != null && leaseRecordEntity.getOperation() == 32) {
+					// 签约是房东取消发起状态,则退款,并且不修改合同签约的支付状态,同时删除支付订单
+					// TODO 退款功能需要测试
+					PayConfigureEntity serviceConfig;
+					serviceConfig = payConfigureService.getCompanyConfig(Long.parseLong(order.getCompanyId()));
+					ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
+					AlipayUtils.orderRefund(order.getServiceOrderNo(), order.getTradeAmount());
+					ailiAppPayRecordService.deleteByOrderNo(Long.parseLong(order.getOrderNo()));
+				} else {
+					// 修改签章合同支付状态
+					Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(order.getOrderNo(), order.getServiceOrderNo());
+					// 修改租房签约支付状态
+					assetLeaseRecordService.updateOperationPayStatus(order.getServiceOrderNo());
+					if(0 != (int)map.get("code")){
+						throw new PaymentException((int)map.get("code"),String.valueOf(map.get("msg")));
+					}
+					log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + order.getOrderNo());
 				}
-				log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + order.getOrderNo());
 			} else if (PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(order.getTradeName())) {
 				log.info("开始修改物业费账单状态，订单号：" + order.getOrderNo());
 				String ids = redisTemplate.opsForValue().get("PropertyFee:" + order.getOrderNo());

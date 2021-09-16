@@ -72,6 +72,7 @@ public class AliAppPayController {
 			aliAppPayQO.setCommunityId(1L);
 		}
 		ValidatorUtils.validateEntity(aliAppPayQO,AliAppPayQO.addOrderGroup.class);
+		CommunityEntity communityEntity = communityService.getCommunityNameById(aliAppPayQO.getCommunityId());
 		String sysType = req.getHeader("sysType");
 //		if(!NumberUtil.isInteger(sysType) || (CommonConsts.SYS_ANDROID != Integer.parseInt(sysType)
 //				&& CommonConsts.SYS_IOS != Integer.parseInt(sysType))){
@@ -117,7 +118,7 @@ public class AliAppPayController {
 			}
 		}
 		//TODO 测试金额 0.01
-		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
+		aliAppPayQO.setTotalAmount(new BigDecimal("1"));
 		
 		String orderStr = null;
 //		if(aliAppPayQO.getPayType() == 1){
@@ -128,6 +129,9 @@ public class AliAppPayController {
 //			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"支付类型错误");
 //		}
 		orderStr = aliAppPayService.getOrderStr(aliAppPayQO);
+		log.info("=============================================");
+		log.info(orderStr);
+		log.info("=============================================");
 		boolean createResult = false;
 		if(!StringUtils.isEmpty(orderStr)){
 			AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
@@ -139,6 +143,7 @@ public class AliAppPayController {
 			ailiAppPayRecordEntity.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex());
 			ailiAppPayRecordEntity.setTradeStatus(PaymentEnum.TradeStatusEnum.ORDER_PLACED.getIndex());
 			ailiAppPayRecordEntity.setSysType(Integer.valueOf(sysType));
+			ailiAppPayRecordEntity.setCompanyId(communityEntity.getPropertyId() == null ? null : String.valueOf(communityEntity.getPropertyId()));
 			createResult = ailiAppPayRecordService.createAliAppPayRecord(ailiAppPayRecordEntity);
 		}
 		Map<String, String> returnMap = new HashMap<>(2);
@@ -158,6 +163,7 @@ public class AliAppPayController {
 			ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
 		}
 		try {
+			AlipayUtils.queryOrder(orderId);
 			AlipayUtils.closeOrder(orderId);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -31,4 +31,13 @@ public interface AiliAppPayRecordService {
 	 * @date: 2021/9/16 9:55
 	 **/
 	AiliAppPayRecordEntity queryOrderNoByServiceOrderNo(String serviceOrderNo);
+
+	/**
+	 * @author: Pipi
+	 * @description: 删除支付订单
+	 * @param orderNo: 订单编号
+	 * @return: java.lang.Integer
+	 * @date: 2021/9/16 17:50
+	 **/
+	Integer deleteByOrderNo(Long orderNo);
 }

@@ -18,6 +18,7 @@ import java.util.Map;
 public class AliAppPayQO implements Serializable {
 	
 	@ApiModelProperty(value = "社区id")
+	@NotNull(groups = {addOrderGroup.class}, message = "社区ID不能为空")
 	private Long communityId;
 	
 	@ApiModelProperty(value = "系统订单号",hidden = true)

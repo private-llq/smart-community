@@ -70,6 +70,9 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 		"\"passback_params\":"+"\""+ aliAppPayQO.getCommunityId()+"\""+","+
 //		"\"time_expire\":\"5m\"," +
 		"  }");
+		System.out.println("=============================================");
+		System.out.println(request.getBizContent());
+		System.out.println("=============================================");
 		AlipayTradeAppPayResponse response;
 		try {
 			response = alipayClient.sdkExecute(request);

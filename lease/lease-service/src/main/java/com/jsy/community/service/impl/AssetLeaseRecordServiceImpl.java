@@ -9,6 +9,7 @@ import com.jsy.community.config.LeaseTopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CompanyPayConfigEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
@@ -18,6 +19,8 @@ import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
+import com.jsy.community.untils.wechat.PublicConfig;
+import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
@@ -78,6 +81,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private IWeChatService weChatService;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICompanyPayConfigService companyPayConfigService;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -1270,19 +1276,29 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             // 查询是否存在支付订单
             AiliAppPayRecordEntity ailiAppPayRecordEntity = ailiAppPayRecordService.queryOrderNoByServiceOrderNo(assetLeaseRecordEntity.getConId());
             if (ailiAppPayRecordEntity != null && ailiAppPayRecordEntity.getTradeStatus() == 2) {
-                // 已支付,不能退款
+                // 已支付,不能取消
                 throw new LeaseException("租客已支付租金,不能取消");
             }
             WeChatOrderEntity weChatOrderEntity = weChatService.quereIdByServiceOrderNo(assetLeaseRecordEntity.getConId());
             if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 1) {
-                // 已支付,不能退款
+                // 已支付,不能取消
                 throw new LeaseException("租客已支付租金,不能取消");
             }
-            if (ailiAppPayRecordEntity != null) {
-                // 作废支付宝支付订单
-            }
-            if (weChatOrderEntity != null) {
+            // 微信订单能够在未支付前作废
+            // 但是支付宝订单不行,所以这里做的处理是在租客支付回调时查看签约状态,如果是已经取消则退款
+            if (weChatOrderEntity != null && weChatOrderEntity.getCompanyId() != null) {
                 // 作废微信支付订单
+                CompanyPayConfigEntity companyConfig = companyPayConfigService.getCompanyConfig(weChatOrderEntity.getCompanyId());
+                WechatConfig.setConfig(companyConfig);
+                try {
+                    PublicConfig.closeOrder(weChatOrderEntity.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // TODO 需要测试
+                weChatService.deleteByOrder(weChatOrderEntity.getId());
+                // TODO 需要测试
+                redisTemplate.delete("Wechat_Lease:" + weChatOrderEntity.getServiceOrderNo());
             }
             // 更新签约数据
             leaseRecordEntity.setBlockStatus(null);
@@ -1377,5 +1393,19 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
             }
         }
+    }
+
+    /**
+     * @param conId : 合同ID
+     * @author: Pipi
+     * @description: 查询签约详情
+     * @return: com.jsy.community.entity.proprietor.AssetLeaseRecordEntity
+     * @date: 2021/9/16 17:26
+     **/
+    @Override
+    public AssetLeaseRecordEntity queryRecordByConId(String conId) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("con_id", conId);
+        return assetLeaseRecordMapper.selectOne(queryWrapper);
     }
 }
