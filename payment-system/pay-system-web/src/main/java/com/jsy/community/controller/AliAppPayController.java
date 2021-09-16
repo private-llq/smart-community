@@ -2,17 +2,18 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.AiliAppPayRecordService;
-import com.jsy.community.api.AliAppPayService;
-import com.jsy.community.api.IPropertyFinanceOrderService;
-import com.jsy.community.api.IShoppingMallService;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.constant.PaymentEnum;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.lease.AliAppPayQO;
-import com.jsy.community.utils.OrderNoUtil;
+import com.jsy.community.utils.AlipayUtils;
+import com.jsy.community.untils.wechat.OrderNoUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -49,6 +51,12 @@ public class AliAppPayController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyFinanceOrderService propertyFinanceOrderService;
+
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICommunityService communityService;
+
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
+	private IPayConfigureService payConfigureService;
 	
 	@Autowired
 	private RedisTemplate redisTemplate;
@@ -141,11 +149,20 @@ public class AliAppPayController {
 		return createResult ? CommonResult.ok(returnMap, "下单成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"下单失败");
 	}
 	
-//	@PostMapping("test")
-//	public String test(){
-//		aliAppPayService.transferByCert();
-//		return "success";
-//	}
+	@PostMapping("close")
+	public void test(@RequestParam Long communityId,@RequestParam String orderId){
+		CommunityEntity entity = communityService.getCommunityNameById(communityId);
+		PayConfigureEntity serviceConfig;
+		if (Objects.nonNull(entity)){
+			serviceConfig = payConfigureService.getCompanyConfig(entity.getPropertyId());
+			ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
+		}
+		try {
+			AlipayUtils.closeOrder(orderId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * @author: Pipi

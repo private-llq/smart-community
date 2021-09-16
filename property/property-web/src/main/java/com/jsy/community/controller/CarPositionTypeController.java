@@ -7,6 +7,7 @@ import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarPositionTypeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.property.UpdateCartPositionTypeQO;
+import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.property.SelectCartPositionTypeVO;
@@ -36,6 +37,7 @@ public class CarPositionTypeController {
 
     @ApiOperation("新增车位类型")
     @Login
+    @CarOperation(operation = "新增车位类型")
     @RequestMapping(value = "/insterCartPositionType", method = RequestMethod.POST)
     @businessLog(operation = "新增",content = "新增了【车位类型】")
     public CommonResult<Boolean> insterCartPositionType(@RequestParam("description") String description) {
@@ -48,6 +50,7 @@ public class CarPositionTypeController {
     }
 
     @ApiOperation("修改车位类型")
+    @CarOperation(operation = "修改车位类型")
     @RequestMapping(value = "/updateCartPositionType", method = RequestMethod.POST)
     @businessLog(operation = "编辑",content = "更新了【车位类型】")
     public CommonResult<Boolean> updateCartPositionType(@RequestBody UpdateCartPositionTypeQO qo) {
@@ -69,6 +72,7 @@ public class CarPositionTypeController {
 
     @ApiOperation("删除小区的车位分类")
     @Login
+    @CarOperation(operation = "删除小区的车位分类")
     @RequestMapping(value = "/deleteCartPositionType", method = RequestMethod.POST)
     @businessLog(operation = "删除",content = "删除了【车位类型】")
     public CommonResult<Boolean> udeleteCartPositionType(@RequestParam("id")String id) {

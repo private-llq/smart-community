@@ -35,4 +35,5 @@ public class CarEntranceVO implements Serializable {
 
     @ApiModelProperty(value = "来访地址")
     private String address;
+
 }

@@ -15,6 +15,7 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -365,5 +366,38 @@ public class VisitorServiceImpl implements IVisitorService {
 		updateWrapper.in("id", ids);
 		updateWrapper.set("face_url_sync_status", 1);
 		visitorMapper.update(new VisitorEntity(), updateWrapper);
+	}
+	/**
+	 * @author: arli
+	 * @description: 根据车牌查询车辆是否被邀请
+	 **/
+	@Override
+	public boolean selectCarNumberIsNoInvite(String carNumber, Long communityId,Integer status) {
+		QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>()
+				.eq("community_id", communityId)//社区id
+				.eq("status",status)//状态 1.待入园 2.已入园 3.已出园 4.已失效
+				.eq("check_status",1)//通过审核
+				.eq("car_plate",carNumber);
+		List<VisitorEntity> visitorEntities = visitorMapper.selectList(queryWrapper);
+		if (visitorEntities.size()>0) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean updateCarStatus(String carNumber, Long communityId, Integer status) {
+		VisitorEntity entity = new VisitorEntity();
+		entity.setStatus(status);
+
+		UpdateWrapper<VisitorEntity> updateWrapper = new UpdateWrapper<VisitorEntity>();
+		updateWrapper.eq("community_id", communityId);//社区id
+		updateWrapper.eq("check_status",1);//通过审核
+		updateWrapper.eq("car_plate",carNumber);//车牌号
+		int update = visitorMapper.update(entity, updateWrapper);
+		if (update>0) {
+			return true;
+		}
+		return false;
 	}
 }

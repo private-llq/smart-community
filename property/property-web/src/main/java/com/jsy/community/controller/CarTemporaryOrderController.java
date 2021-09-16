@@ -10,6 +10,7 @@ import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.OrderQO;
 import com.jsy.community.qo.property.CarOrderQO;
+import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.SelectMoney3Vo;
@@ -56,6 +57,7 @@ public class CarTemporaryOrderController {
     @ApiOperation("导出模板")
     @PostMapping("/carTemporaryOrderExport")
     @ResponseBody
+    @CarOperation(operation = "导出模板【订单管理】")
     public void downLoadFile(@RequestBody CarOrderQO carOrderQO, HttpServletResponse response) throws IOException {
         Long communityId = UserUtils.getAdminCommunityId();
 

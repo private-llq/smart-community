@@ -1,7 +1,7 @@
 package com.jsy.community.listener;
 
 import com.jsy.community.api.IWeChatService;
-import com.jsy.community.config.PublicConfig;
+import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.rabbitmq.client.Channel;
@@ -53,7 +53,7 @@ public class WeChatListener{
             }
         }
         //手动确认
-        //channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
     }
 
 

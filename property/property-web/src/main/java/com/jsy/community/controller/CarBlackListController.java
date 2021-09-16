@@ -45,7 +45,10 @@ public class CarBlackListController {
     @Login
     @PostMapping("carBlackListOne")
     public CommonResult carBlackListEntity(@RequestParam("carNumber")String carNumber){
-        CarBlackListEntity carBlackListEntity = blackListService.carBlackListOne(carNumber);
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+
+        CarBlackListEntity carBlackListEntity = blackListService.carBlackListOne(carNumber,adminCommunityId);
+
         return CommonResult.ok(carNumber,"查询成功");
     }
 

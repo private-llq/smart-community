@@ -8,10 +8,7 @@ import com.codingapi.txlcn.tc.annotation.TxcTransaction;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CarEntity;
-import com.jsy.community.entity.CarOrderEntity;
-import com.jsy.community.entity.CarOrderRecordEntity;
-import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
@@ -46,6 +43,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     private UserMapper userMapper;
 
     @Autowired
+    private CommunityMapper communityMapper;
+
+    @Autowired
     private AppCarOrderMapper appCarOrderMapper;
 
     @Autowired
@@ -55,7 +55,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionService carPositionService;
 
-    @DubboReference(version = Const.version,  group = Const.group, check = false)
+    @DubboReference(version = Const.version,  group = Const.group_property, check = false)
     private ICarChargeService carChargeService;
 
     @DubboReference(version = Const.version,  group = Const.group_property, check = false)
@@ -64,7 +64,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @DubboReference(version = Const.version,  group = Const.group_property, check = false)
     private ICarBasicsService carBasicsService;
 
-    @DubboReference(version = Const.version,  group = Const.group, check = false)
+    @DubboReference(version = Const.version,  group = Const.group_property, check = false)
     private ICarMonthlyVehicleService carMonthlyVehicleService;
 
     @Autowired
@@ -189,12 +189,14 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             for (CarOrderEntity record : records) {
                 ids.add(record.getCarPositionId());
             }
-            List<CarPositionEntity> service = carPositionService.getByIds(ids);
-            for (CarPositionEntity entity : service) {
-                positionMap.put(entity.getId(),entity.getCarPosition());
-            }
+//            List<CarPositionEntity> service = carPositionService.getByIds(ids);
+//            for (CarPositionEntity entity : service) {
+//                positionMap.put(entity.getId(),entity.getCarPosition());
+//            }
             for (CarOrderEntity record : records) {
-                record.setCarPositionText(positionMap.get(record.getCarPositionId()));
+                record.setCarPositionId(999999999999999L);
+//                record.setCarPositionText(positionMap.get(record.getCarPositionId()));
+                record.setCarPositionText("地上");
                 record.setTypeText("月租车");
             }
             map.put("total",page.getTotal());
@@ -229,7 +231,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     public void deleteMonthCar(Long id) {
         CarEntity carEntity = carMapper.selectById(id);
         carMapper.deleteById(id);
-        carPositionService.updateByPosition(carEntity.getCarPositionId());
+//        carPositionService.updateByPosition(carEntity.getCarPositionId());
     }
 
     /**
@@ -352,7 +354,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
 
             //业主绑定车辆后修改车位状态
-            carPositionService.bindingMonthCar(carEntity);
+//            carPositionService.bindingMonthCar(carEntity);
 
             //添加缴费记录
             CarOrderEntity carOrderEntity = new CarOrderEntity();
@@ -362,6 +364,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderEntity.setType(2);
             carOrderEntity.setUid(carEntity.getUid());
             carOrderEntity.setPayType(1);
+            carOrderEntity.setRise("月租车-"+carEntity.getCarPlate());
             carOrderEntity.setOrderTime(LocalDateTime.now());
             carOrderEntity.setBeginTime(carEntity.getBeginTime());
             carOrderEntity.setOverTime(carEntity.getOverTime());
@@ -381,9 +384,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderRecordMapper.updateById(entity);
 
             //向账单表添加数据
+            CommunityEntity communityEntity = communityMapper.selectById(entity.getCommunityId());
+            CarChargeEntity carChargeEntity = carChargeService.selectOne(carEntity.getCommunityId());
             PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
             orderEntity.setAssociatedType(2);
             orderEntity.setBuildType(4);
+            orderEntity.setRise(communityEntity.getName()+"-"+carChargeEntity.getName());
             orderEntity.setCommunityId(entity.getCommunityId());
             orderEntity.setOrderTime(LocalDate.now());
             orderEntity.setUid(entity.getUid());
@@ -419,13 +425,13 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carEntity.setBeginTime(LocalDateTime.now());
                 carEntity.setOverTime(LocalDateTime.now().plusMonths(carEntity.getMonth()));
                 carEntity.setType(2);
-                carEntity.setCarPositionId(entity.getCarId());
+                carEntity.setCarPositionId(null);
                 carEntity.setOwner(userEntity.getRealName());
                 carEntity.setContact(userEntity.getMobile());
                 carMapper.insert(carEntity);
 
                 //业主绑定车辆后修改车位状态
-                carPositionService.bindingMonthCar(carEntity);
+//                carPositionService.bindingMonthCar(carEntity);
 
                 //新增订单
                 CarOrderEntity carOrderEntity = new CarOrderEntity();
@@ -433,6 +439,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setCommunityId(carEntity.getCommunityId());
                 carOrderEntity.setCarPositionId(carEntity.getCarPositionId());
                 carOrderEntity.setType(2);
+                carOrderEntity.setRise("月租车-"+carEntity.getCarPlate());
                 carOrderEntity.setUid(carEntity.getUid());
                 carOrderEntity.setPayType(1);
                 carOrderEntity.setOrderTime(LocalDateTime.now());
@@ -446,14 +453,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 appCarOrderMapper.insert(carOrderEntity);
 
                 //添加月租车辆表
-                CarPositionEntity carPositionEntity = carPositionService.selectOne(entity.getCarPositionId());
                 CarChargeEntity chargeEntity = carChargeService.selectOne(entity.getCommunityId());
-                if (Objects.isNull(carPositionEntity)||Objects.isNull(chargeEntity)){
-                    throw new ProprietorException("当前车位或者收费类型不存在！");
-                }
                 CarMonthlyVehicle vehicle = new CarMonthlyVehicle();
                 vehicle.setId(SnowFlake.nextId());
-                vehicle.setCarPosition(carPositionEntity.getCarPosition());
                 vehicle.setCommunityId(entity.getCommunityId());
                 vehicle.setCarNumber(entity.getCarPlate());
                 vehicle.setOwnerName(carEntity.getOwner());
@@ -469,12 +471,15 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderRecordMapper.updateById(entity);
 
                 //向账单表添加数据
+                CommunityEntity communityEntity = communityMapper.selectById(entity.getCommunityId());
+                CarChargeEntity carChargeEntity = carChargeService.selectOne(carEntity.getCommunityId());
                 PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
                 orderEntity.setAssociatedType(2);
                 orderEntity.setBuildType(4);
                 orderEntity.setCommunityId(entity.getCommunityId());
                 orderEntity.setOrderTime(LocalDate.now());
                 orderEntity.setUid(entity.getUid());
+                orderEntity.setRise(communityEntity.getName()+"-"+carChargeEntity.getName());
                 orderEntity.setTargetId(entity.getCarId());
                 orderEntity.setPropertyFee(entity.getMoney());
                 orderEntity.setOrderStatus(1);
@@ -556,7 +561,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                         map.put(carPositionEntity.getId(),carPositionEntity.getCarPosition());
                     }
                     for (CarEntity entity : list) {
-                        entity.setCarPositionText(map.get(entity.getCarPositionId()));
+//                        entity.setCarPositionText(map.get(entity.getCarPositionId()));
+                        entity.setCarPositionId(999999999999999L);
+                        entity.setCarPositionText("地上");
                         entity.setTypeText("月租车");
                         //计算当前月租车所剩天数
                         long until = LocalDate.now().until(entity.getOverTime(), ChronoUnit.DAYS);

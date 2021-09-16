@@ -27,7 +27,7 @@ public class WeChatPayQO {
     private String ids;
 
     @ApiModelProperty("其他服务id")
-    private Long serviceOrderNo;
+    private String serviceOrderNo;
 
     @ApiModelProperty("停车缴费临时记录id")
     private Long communityId;

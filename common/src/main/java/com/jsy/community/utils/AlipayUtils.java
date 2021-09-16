@@ -1,10 +1,14 @@
 package com.jsy.community.utils;
 
+import cn.hutool.json.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.internal.util.codec.Base64;
+import com.alipay.api.request.AlipayTradeCloseRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
+import com.alipay.api.response.AlipayTradeCloseResponse;
 import com.jsy.community.constant.ConstClasses;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -16,7 +20,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 /**
  * @author chq459799974
@@ -109,6 +119,68 @@ public class AlipayUtils {
 		}
 		return is;
 	}
+
+	/**
+	 * @Description: 关闭订单
+	 * @author: Hu
+	 * @since: 2021/9/15 14:59
+	 * @Param:
+	 * @return:
+	 */
+	public static void closeOrder(String outTradeNo) throws Exception {
+//		AlipayClient alipayClient = new DefaultAlipayClient("https://openapi.alipay.com/gateway.do", ConstClasses.AliPayDataEntity.appid, ConstClasses.AliPayDataEntity.privateKey, "json", "GBK", getPrivateKey(ConstClasses.AliPayDataEntity.alipayPublicCertPath), "RSA2");
+		AlipayClient client = getDefaultCertClient();
+		AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
+		JSONObject bizContent = new JSONObject();
+		bizContent.put("out_trade_no",outTradeNo);
+		request.setBizContent(bizContent.toString());
+		AlipayTradeCloseResponse response = null;
+		try {
+			response = client.certificateExecute(request);
+			if (response.isSuccess()){
+				System.out.println("关闭成功！");
+				System.out.println(response);
+			}else {
+				System.out.println("关闭失败！");
+				System.out.println(response);
+			}
+		} catch (AlipayApiException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @Description: 验签工具类
+	 * @author: Hu
+	 * @since: 2021/9/16 10:10
+	 * @Param:
+	 * @return:
+	 */
+	public static String getAlipayPublicKey(String alipayPublicCertPath) throws Exception {
+		InputStream outFile = null;
+		try {
+			outFile = getStreamDownloadOutFile(alipayPublicCertPath);
+			CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
+			X509Certificate cert = (X509Certificate) cf.generateCertificate(outFile);
+			PublicKey publicKey = cert.getPublicKey();
+			return Base64.encodeBase64String(publicKey.getEncoded());
+		} catch (NoSuchProviderException e) {
+			throw new AlipayApiException(e);
+		} catch (IOException e) {
+			throw new AlipayApiException(e);
+		} catch (CertificateException e) {
+			throw new AlipayApiException(e);
+		} finally {
+			try {
+				if (outFile != null) {
+					outFile.close();
+				}
+			} catch (IOException e) {
+				throw new AlipayApiException(e);
+			}
+		}
+	}
+
 	
 	/**
 	 * 获取私钥。

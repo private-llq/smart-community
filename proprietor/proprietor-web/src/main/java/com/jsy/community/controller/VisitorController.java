@@ -85,9 +85,6 @@ public class VisitorController {
 				throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "车牌号不合法");
 			}
 		}
-		if(visitorEntity.getCarType() != null && StringUtils.isEmpty(visitorEntity.getCarPlate())){
-			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "填写车辆类型后车牌号不能为空");
-		}
 		visitorEntity.setUid(UserUtils.getUserId());
 		return CommonResult.ok(visitorService.addVisitor(visitorEntity),"操作成功");
 	}

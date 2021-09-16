@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IFinanceBillService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
@@ -41,6 +42,8 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
 
     @Autowired
     private UserHouseMapper userHouseMapper;
+    @Autowired
+    private CommunityMapper communityMapper;
 
     @Autowired
     private HouseMapper houseMapper;
@@ -83,6 +86,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                 LocalDate date = LocalDate.now().withMonth(LocalDate.now().getMonthValue() - 1);
                 //获取当前缴费项目关联的房间或者车位id集合
                 List<String> ruleList = propertyFeeRuleRelevanceMapper.selectFeeRuleList(feeRuleEntity.getId());
+                CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
                 //relevanceType等于1表示关联的是房屋，2表示关联的是车位
                 if (feeRuleEntity.getRelevanceType() == 1) {
                     //查询所有缴费项目关联的房间
@@ -92,6 +96,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                         entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                         entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
                         entity.setType(feeRuleEntity.getType());
+                        entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                         entity.setFeeRuleId(feeRuleEntity.getId());
                         entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
                         entity.setCommunityId(feeRuleEntity.getCommunityId());
@@ -110,6 +115,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     for (CarPositionEntity positionEntity : entityList) {
                         if (LocalDateTime.now().isAfter(positionEntity.getEndTime())) {
                             entity = new PropertyFinanceOrderEntity();
+                            entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
                             entity.setType(feeRuleEntity.getType());
@@ -159,6 +165,8 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                 List<String> ruleList = propertyFeeRuleRelevanceMapper.selectFeeRuleList(feeRuleEntity.getId());
                 //查询所有未空置的房间生成账单
                 List<HouseEntity> list = houseMapper.selectInIds(ruleList);
+                //查询小区
+                CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
                 for (HouseEntity houseEntity : list) {
                     entity = new PropertyFinanceOrderEntity();
                     //去年第一天
@@ -167,6 +175,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     entity.setOverTime(LocalDateTime.now().minusYears(1).with(TemporalAdjusters.lastDayOfYear()).withHour(23).withMinute(59).withSecond(59).toLocalDate());
                     entity.setType(feeRuleEntity.getType());
                     entity.setFeeRuleId(feeRuleEntity.getId());
+                    entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                     entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
                     entity.setCommunityId(feeRuleEntity.getCommunityId());
                     entity.setOrderTime(LocalDate.now());
@@ -209,6 +218,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                 List<String> ruleList = propertyFeeRuleRelevanceMapper.selectFeeRuleList(feeRuleEntity.getId());
                 //查询收费项目关联的所有房屋
                 List<HouseEntity> list=houseMapper.selectInIds(ruleList);
+                CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
                 //装修管理费
                 if (feeRuleEntity.getType()==1){
                     for (HouseEntity positionEntity : list) {
@@ -217,6 +227,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                     entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
                     entity.setType(feeRuleEntity.getType());
+                    entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                     entity.setFeeRuleId(feeRuleEntity.getId());
                     entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
                     entity.setCommunityId(feeRuleEntity.getCommunityId());
@@ -241,6 +252,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                             entity.setOrderTime(LocalDate.now());
                             entity.setAssociatedType(2);
                             entity.setUid(houseEntity.getUid());
+                            entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                             entity.setTargetId(houseEntity.getHouseId());
                             entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
                             entity.setId(SnowFlake.nextId());
