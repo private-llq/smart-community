@@ -1,15 +1,15 @@
 package com.jsy.community.api;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.VisitingCarRecordEntity;
+import com.jsy.community.entity.VisitorEntity;
+import com.jsy.community.entity.VisitorPersonRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.VisitorEntryVO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -93,5 +93,22 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @Date: 2020/11/12
      **/
     List<VisitingCarRecordEntity> queryCarRecordList(Long visitorid);
-    
+
+    /**
+     * @Description: 访客登记 新增V2
+     * @Param: [visitorEntity]
+     * @Return: void
+     * @Author: chq45799974
+     * @Date: 2020/11/12
+     **/
+    VisitorEntryVO addVisitorV2(VisitorEntity visitorEntity);
+
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/9/16 15:04
+     * @Param:
+     * @return:
+     */
+    VisitorEntity selectOneByIdv2(Long id);
 }

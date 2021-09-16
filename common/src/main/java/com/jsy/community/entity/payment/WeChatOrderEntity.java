@@ -35,9 +35,9 @@ public class WeChatOrderEntity implements Serializable {
     private String serviceOrderNo;
     @ApiModelProperty(value = "支付金额")
     private BigDecimal amount;
-    @ApiModelProperty(value = "订单状态，1已付款，2未付款")
+    @ApiModelProperty(value = "订单状态，2已付款，1未付款")
     private Integer orderStatus;
-    @ApiModelProperty(value = "到账状态，1已到账，2未到账")
+    @ApiModelProperty(value = "到账状态，2已到账，1未到账")
     private Integer arriveStatus;
     @ApiModelProperty(value = "创建时间")
     private LocalDateTime createTime;

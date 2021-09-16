@@ -88,7 +88,44 @@ public class VisitorController {
 		visitorEntity.setUid(UserUtils.getUserId());
 		return CommonResult.ok(visitorService.addVisitor(visitorEntity),"操作成功");
 	}
-	
+
+	//TODO 权限和一次访客登记对应还是和每个随行人员一一对应？
+	@ApiOperation("【访客】新增")
+	@PostMapping("v2")
+	public CommonResult<VisitorEntryVO> saveV2(@RequestBody VisitorEntity visitorEntity) {
+		ValidatorUtils.validateEntity(visitorEntity);
+		if(LocalDateTime.now().isAfter(visitorEntity.getStartTime())){
+			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "预计来访时间不得早于当前时间");
+		}
+		if(!StringUtils.isEmpty(visitorEntity.getCarPlate())){
+			if(!visitorEntity.getCarPlate().matches(BusinessConst.REGEX_OF_CAR) && !visitorEntity.getCarPlate().matches(BusinessConst.REGEX_OF_NEW_ENERGY_CAR)){
+				throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "车牌号不合法");
+			}
+		}
+		visitorEntity.setUid(UserUtils.getUserId());
+		return CommonResult.ok(visitorService.addVisitorV2(visitorEntity),"操作成功");
+	}
+
+	/**
+	 * @Description: 根据ID单查
+	 * @Param: [id]
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.entity.VisitorEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/11/18
+	 **/
+	@ApiOperation("【访客】根据ID单查详情")
+	@GetMapping("v2")
+	public CommonResult<VisitorEntity> queryByIdv2(@RequestParam("id") Long id) {
+		VisitorEntity visitorEntity = visitorService.selectOneByIdv2(id);
+		if (visitorEntity == null) {
+			return CommonResult.ok(null);
+		}
+//		visitorEntity.setVisitorPersonRecordList(visitorService.queryPersonRecordList(visitorEntity.getId()));
+//		visitorEntity.setVisitingCarRecordList(visitorService.queryCarRecordList(visitorEntity.getId()));
+		return CommonResult.ok(visitorEntity);
+	}
+
+
 //	//三方调用进来
 //	@ApiOperation("【访客】社区门禁验证(模拟)")
 //	@GetMapping("verifyCommunityEntry")
