@@ -110,7 +110,7 @@ public class HouseLeaseEntity extends BaseEntity {
     private Long houseCommunityId;
 
     @ApiModelProperty(value = "房源id")
-    private Integer houseId;
+    private Long houseId;
 
     @ApiModelProperty( value = "出租要求位运算后的id")
     private Long leaseRequireId;
