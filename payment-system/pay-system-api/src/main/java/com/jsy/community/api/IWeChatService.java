@@ -55,4 +55,14 @@ public interface IWeChatService extends IService<WeChatOrderEntity> {
      * @date: 2021/9/16 9:58
      **/
     WeChatOrderEntity quereIdByServiceOrderNo(String serviceOrderNo);
+
+    /**
+     * @author: Pipi
+     * @description: 查询订单支付状态
+     * @param id: 订单ID
+     * @param serviceOrderNo: 外部订单编号
+     * @return: java.lang.Boolean
+     * @date: 2021/9/17 17:07
+     **/
+    Boolean checkPayStatus(String id, String serviceOrderNo);
 }

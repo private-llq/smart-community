@@ -42,6 +42,9 @@ public class AliAppPayController {
 	
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AliAppPayService aliAppPayService;
+
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
+	private IWeChatService weChatService;
 	
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AiliAppPayRecordService ailiAppPayRecordService;
@@ -180,6 +183,8 @@ public class AliAppPayController {
 	 **/
 	@GetMapping("/v2/checkPayTradeStatus")
 	public CommonResult checkPayTradeStatus(@RequestParam("orderNo") String orderNo, @RequestParam("serviceOrderNo") String serviceOrderNo) {
-		return CommonResult.ok(ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo),"查询成功");
+		Boolean aliStatus = ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo);
+		Boolean wechatStatus = weChatService.checkPayStatus(orderNo, serviceOrderNo);
+		return aliStatus && wechatStatus ? CommonResult.ok(true,"查询成功") : CommonResult.ok(false,"查询成功");
 	}
 }
