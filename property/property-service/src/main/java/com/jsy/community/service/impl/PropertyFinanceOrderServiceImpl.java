@@ -2102,6 +2102,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 	    if (qo.getOrderStatus() != null) {
 		    queryWrapper.eq("order_status", qo.getOrderStatus());
 	    }
+	    //是否查社区
+	    if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
+        //是否查收费来源
+        if (qo.getPayType() != null) {
+            queryWrapper.eq("pay_type", qo.getPayType());
+        }
         queryWrapper.orderByDesc("create_time");
         propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(propertyFinanceOrderEntities)) {
