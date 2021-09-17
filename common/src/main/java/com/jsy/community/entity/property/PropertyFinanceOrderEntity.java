@@ -60,7 +60,7 @@ public class PropertyFinanceOrderEntity extends BaseEntity {
     private String statementNum;
     @ApiModelProperty(value = "结算状态 0.待结算 1.待审核 2.结算中 3.已结算 4.驳回 (关联结算单)")
     private Integer statementStatus;
-    @ApiModelProperty(value = "支付类型，1微信，2支付宝")
+    @ApiModelProperty(value = "支付方式 1 app支付 ，2 物业后台")
     private Integer payType;
     @ApiModelProperty(value = "付款时间")
     private LocalDateTime payTime;
