@@ -67,7 +67,7 @@ public class AdminCommunityInformController {
     @DeleteMapping("/delete")
     @ApiOperation("删除推送通知消息")
     @businessLog(operation = "删除",content = "删除了【社区推送通知消息】")
-    public CommonResult<Boolean> deletePushInform(HttpServletRequest request, @RequestParam Long id) {
+    public CommonResult<Boolean> deletePushInform(@RequestParam Long id) {
         return communityInformService.deletePushInform(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
@@ -83,7 +83,7 @@ public class AdminCommunityInformController {
     @PostMapping("/updateTopState")
     @ApiOperation("更新置顶状态")
     @businessLog(operation = "编辑",content = "更新了【社区消息置顶状态】")
-    public CommonResult<Boolean> updateTopState(HttpServletRequest request, @RequestBody OldPushInformQO qo) {
+    public CommonResult<Boolean> updateTopState(@RequestBody OldPushInformQO qo) {
         qo.setUpdateBy(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdateTopStateValidate.class);
         return communityInformService.updateTopState(qo) ? CommonResult.ok("操作成功!") : CommonResult.error("操作失败!");
@@ -101,7 +101,7 @@ public class AdminCommunityInformController {
     @PostMapping("/updatePushState")
     @ApiOperation("更新发布状态")
     @businessLog(operation = "编辑",content = "更新了【社区消息发布状态】")
-    public CommonResult<Boolean> updatePushState(HttpServletRequest request, @RequestBody OldPushInformQO qo) {
+    public CommonResult<Boolean> updatePushState(@RequestBody OldPushInformQO qo) {
         qo.setUpdateBy(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdatePushStateValidate.class);
         if (qo.getPushState() < 1) {
@@ -126,13 +126,13 @@ public class AdminCommunityInformController {
             baseQO.setQuery(new PushInformQO());
         }
 
-        if (CollectionUtil.isNotEmpty(UserUtils.getAdminCommunityIdList())) {
+        /*if (CollectionUtil.isNotEmpty(UserUtils.getAdminCommunityIdList())) {
             baseQO.getQuery().setCommunityIds(UserUtils.getAdminUserInfo().getCommunityIdList());
         }else {
             List<Long> communityIds = new ArrayList<>();
             communityIds.add(UserUtils.getAdminCommunityId());
             baseQO.getQuery().setCommunityIds(communityIds);
-        }
+        }*/
         return CommonResult.ok(communityInformService.queryInformList(baseQO));
     }
 
@@ -180,7 +180,7 @@ public class AdminCommunityInformController {
     @PutMapping("/updateDetail")
     @ApiOperation("(物业端)更新消息接口")
     @businessLog(operation = "编辑",content = "更新了【社区消息接口】")
-    public CommonResult updateDetail(HttpServletRequest request, @RequestBody PushInformQO qo) {
+    public CommonResult updateDetail(@RequestBody PushInformQO qo) {
         ValidatorUtils.validateEntity(qo, PushInformQO.UpdateDetailValidate.class);
         qo.setUid(UserUtils.getUserId());
         return communityInformService.updatePushInform(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败");
