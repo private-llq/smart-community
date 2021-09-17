@@ -1056,6 +1056,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @date: 2021/9/15 11:20
      **/
     public void setCountdown(AssetLeaseRecordEntity leaseRecordEntity) {
+        LeaseOperationRecordEntity leaseOperationRecordEntity = new LeaseOperationRecordEntity();
         switch (leaseRecordEntity.getOperation()) {
             case 1:
                 // 发起签约
@@ -1068,27 +1069,27 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 // 接受申请
                 leaseRecordEntity.setProgressNumber(2);
                 // 接受申请,倒计时就是接受申请的时间加7天
-                LeaseOperationRecordEntity leaseOperationRecordEntity2 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity2 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity2.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
                 }
                 break;
             case 3:
                 // 拟定合同
                 leaseRecordEntity.setProgressNumber(2);
                 // 倒计时就是接受申请的时间加7天
-                LeaseOperationRecordEntity leaseOperationRecordEntity3 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity3 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity3.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
                 }
                 break;
             case 4:
                 // 等待支付房租
                 leaseRecordEntity.setProgressNumber(2);
                 // 倒计时就是接受申请的时间加7天
-                LeaseOperationRecordEntity leaseOperationRecordEntity4 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity4 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity4.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
                 }
                 break;
             case 5:
@@ -1096,9 +1097,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 // 签约进程
                 leaseRecordEntity.setProgressNumber(3);
                 // 倒计时就是接受申请的时间加7天
-                LeaseOperationRecordEntity leaseOperationRecordEntity5 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity5 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity5.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
                 }
                 break;
             case 6:
@@ -1122,20 +1123,30 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 leaseRecordEntity.setProgressNumber(1);
                 // 重新发起,倒计时就是重新发起的时间加3天
                 // 查询重新发起的时间
-                LeaseOperationRecordEntity leaseOperationRecordEntity9 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity9 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity9.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
                 }
                 break;
             case 31:
                 // (房东)发起签约/重新发起
                 // 签约进程
                 leaseRecordEntity.setProgressNumber(2);
+                // 倒计时就是接受申请的时间加7天
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                }
                 break;
             case 32:
                 // 取消发起
                 // 签约进程
                 leaseRecordEntity.setProgressNumber(2);
+                // 倒计时就是接受申请的时间加7天
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                }
                 break;
             default:
                 break;
@@ -1387,12 +1398,31 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
                 }
             }
-            if (opration == BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode() && assetLeaseRecordEntity.getOperation() != BusinessEnum.ContractingProcessStatusEnum.PAYMENT_COMPLETED.getCode()) {
+            if (opration == BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode() && assetLeaseRecordEntity.getOperation() != BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode()) {
                 // 房东接受申请后,倒计时结束没完成签约的都删除
+                // 如果是房东发起状态,通知签章作废合同
+                if (assetLeaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode()) {
+                    // TODO 通知签章作废合同
+
+                }
                 // TODO 可能会涉及到退款业务,需要补上
                 assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
             }
         }
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 通知签章作废合同
+     * @param conId: 合同编号
+     * @return: void
+     * @date: 2021/9/17 11:20
+     **/
+    public void notificationOfSignatureCancellationContract(String conId) {
+        Map<String, Object> bodyMap = new HashMap<>();
+        bodyMap.put("conId", conId);
+        //url
+        String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.MODIFY_ORDER_PAY_STATUS;
     }
 
     /**
