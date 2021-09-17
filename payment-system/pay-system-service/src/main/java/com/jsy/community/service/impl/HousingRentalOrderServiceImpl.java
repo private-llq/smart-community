@@ -47,7 +47,7 @@ public class HousingRentalOrderServiceImpl implements HousingRentalOrderService 
         //url
         String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.MODIFY_ORDER_PAY_STATUS;
         // 加密参数
-        String bodyString = ZhsjUtil.postEncrypt(bodyMap.toString());
+        String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
         //组装http请求
         HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyString);
         //设置header

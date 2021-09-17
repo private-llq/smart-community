@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -22,13 +23,16 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.util.HouseHelper;
+import com.jsy.community.utils.MyHttpUtils;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.signature.ZhsjUtil;
 import com.jsy.community.vo.UserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.http.client.methods.HttpPost;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
@@ -1402,8 +1406,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 // 房东接受申请后,倒计时结束没完成签约的都删除
                 // 如果是房东发起状态,通知签章作废合同
                 if (assetLeaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode()) {
-                    // TODO 通知签章作废合同
-
+                    // 通知签章作废合同
+                    notificationOfSignatureCancellationContract(assetLeaseRecordEntity.getConId());
                 }
                 // TODO 可能会涉及到退款业务,需要补上
                 assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
@@ -1419,10 +1423,35 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @date: 2021/9/17 11:20
      **/
     public void notificationOfSignatureCancellationContract(String conId) {
+        Map<String, Object> returnMap = new HashMap<>();
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("conId", conId);
         //url
-        String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.MODIFY_ORDER_PAY_STATUS;
+        String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.CONTRACT_OVERDUE;
+        // 加密参数
+        String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
+        //组装http请求
+        HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyString);
+        //设置header
+        MyHttpUtils.setDefaultHeader(httpPost);
+        //设置默认配置
+        MyHttpUtils.setRequestConfig(httpPost);
+        //执行
+        String httpResult;
+        JSONObject result = null;
+        try {
+            //执行请求，解析结果
+            httpResult = (String)MyHttpUtils.exec(httpPost, MyHttpUtils.ANALYZE_TYPE_STR);
+            result = JSON.parseObject(httpResult);
+            if (0 == result.getIntValue("code")) {
+                log.info("合同{}作废成功", conId);
+            } else {
+                log.error("合同{}作废失败,状态码:{},信息:{}", conId, result.getIntValue("code"), result.getString("message"));
+            }
+        } catch (Exception e) {
+            log.error("合同作废 - http执行或解析异常，json解析结果" + result);
+            log.error(e.getMessage());
+        }
     }
 
     /**
