@@ -171,9 +171,7 @@ public class PropertyAdvanceDepositRecordServiceImpl extends ServiceImpl<Propert
 		} else if (propertyAdvanceDepositRecordEntity.getType() == 1) {
 			PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(propertyAdvanceDepositRecordEntity.getOrderId());
 			if (propertyFinanceOrderEntity.getPayType() != null) {
-				propertyAdvanceDepositRecordEntity.setPayTypeName(propertyFinanceOrderEntity.getPayType() == 1 ? "微信支付" :
-					propertyFinanceOrderEntity.getPayType() == 2 ? "支付宝支付" : propertyFinanceOrderEntity.getPayType() == 3 ? "余额支付" :
-						propertyFinanceOrderEntity.getPayType() == 4 ? "现金支付" : propertyFinanceOrderEntity.getPayType() == 5 ? "银联刷卡" : propertyFinanceOrderEntity.getPayType() == 6 ? "银行代扣" : "");
+				propertyAdvanceDepositRecordEntity.setPayTypeName(propertyFinanceOrderEntity.getPayType() == 1 ? "app支付" : "物业后台");
 			}
 		}
 		return propertyAdvanceDepositRecordEntity;
