@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.CommunityEntity;
@@ -110,7 +111,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         List<CarPositionEntity> carPositionEntities = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().eq("community_id",baseQO.getQuery().getCommunityId()));
         //封装房间map
         for (HouseEntity houseEntity : houseEntities) {
-            houseMap.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getNumber());
+            houseMap.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
         }
         //封装车位map
         for (CarPositionEntity positionEntity : carPositionEntities) {
@@ -1981,6 +1982,60 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     }
 
 
+
+    /**
+     * @Description: 批量查询账单
+     * @author: Hu
+     * @since: 2021/9/17 9:22
+     * @Param: [ids, adminCommunityId]
+     * @return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     */
+    @Override
+    public List<PropertyFinanceOrderEntity> getIds(String ids, Long adminCommunityId) {
+        List<String> list = Arrays.asList(ids.split(","));
+        Map<Long, String> carPositionMap = new HashMap<>();
+        Map<Long, String> houseMap = new HashMap<>();
+
+        //车位
+        List<CarPositionEntity> entityList = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().select("id,car_position,house_id").eq("community_id", adminCommunityId));
+        for (CarPositionEntity carPositionEntity : entityList) {
+            carPositionMap.put(carPositionEntity.getId(),carPositionEntity.getCarPosition()+","+carPositionEntity.getHouseId());
+        }
+        //房屋
+        List<HouseEntity> houseEntities = houseMapper.selectList(new QueryWrapper<HouseEntity>().eq("community_id", adminCommunityId).eq("type",4));
+        for (HouseEntity houseEntity : houseEntities) {
+            houseMap.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+        }
+
+        List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>()
+                .select("id,associated_type,target_id,type,begin_time,over_time,property_fee,penal_sum,coupon,total_money")
+                .in("id", list));
+        for (PropertyFinanceOrderEntity entity : entities) {
+
+            entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum().subtract(entity.getCoupon())));
+            entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+            if (entity.getAssociatedType()==1){
+                PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(entity.getTargetId(), adminCommunityId);
+                if (depositEntity!=null){
+                    entity.setDeduction(depositEntity.getBalance());
+                }else {
+                    entity.setDeduction(new BigDecimal(0));
+                }
+                entity.setAddress(houseMap.get(entity.getTargetId()));
+            }else {
+                String[] split = carPositionMap.get(entity.getTargetId()).split(",");
+                entity.setAddress(split[0]);
+                PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(Long.parseLong(split[1]), adminCommunityId);
+                if (depositEntity!=null){
+                    entity.setDeduction(depositEntity.getBalance());
+                }else {
+                    entity.setDeduction(new BigDecimal(0));
+                }
+            }
+        }
+        return entities;
+    }
+
     /**
      * @Description: app端绑定月租车辆向账单表里添加数据
      * @author: Hu
@@ -2055,6 +2110,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 	    //是否查账单状态
 	    if (qo.getOrderStatus() != null) {
 		    queryWrapper.eq("order_status", qo.getOrderStatus());
+	    }
+
+	    if (qo.getPayType() != null) {
+		    queryWrapper.eq("pay_type", qo.getPayType());
 	    }
         queryWrapper.orderByDesc("create_time");
         propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(queryWrapper);

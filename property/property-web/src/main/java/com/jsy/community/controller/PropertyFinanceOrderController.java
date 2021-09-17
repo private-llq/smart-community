@@ -87,6 +87,13 @@ public class PropertyFinanceOrderController {
         Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
         return CommonResult.ok(map);
     }
+    @ApiOperation("根据id查询账单")
+    @PostMapping("/getIds")
+    @Login
+    public CommonResult getIds(@RequestParam String ids){
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.getIds(ids,UserUtils.getAdminCommunityId());
+        return CommonResult.ok(list);
+    }
     @ApiOperation("查询当前小区所有车位")
     @GetMapping("/carList")
     @Login
