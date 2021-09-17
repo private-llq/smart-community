@@ -118,7 +118,7 @@ public class AliAppPayController {
 			}
 		}
 		//TODO 测试金额 0.01
-		aliAppPayQO.setTotalAmount(new BigDecimal("1"));
+		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
 		
 		String orderStr = null;
 //		if(aliAppPayQO.getPayType() == 1){

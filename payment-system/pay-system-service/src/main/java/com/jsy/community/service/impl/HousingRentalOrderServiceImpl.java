@@ -5,15 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.HousingRentalOrderService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
-import com.jsy.community.dto.signature.SignResult;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.utils.AESUtil;
-import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MyHttpUtils;
 import com.jsy.community.utils.signature.ZhsjUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
 import java.util.HashMap;
@@ -82,4 +78,5 @@ public class HousingRentalOrderServiceImpl implements HousingRentalOrderService 
             return returnMap;
         }
     }
+
 }

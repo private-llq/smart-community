@@ -29,7 +29,7 @@ public class FinanceOrderQO implements Serializable {
     /**
      * 支付状态0未支付1已缴费
      */
-    private Integer status;
+    private Integer orderStatus;
 
     /**
      * 缴费项目名称模糊查询

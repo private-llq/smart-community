@@ -78,6 +78,12 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
 
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private HousingRentalOrderService housingRentalOrderService;
+
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
+    private AssetLeaseRecordService assetLeaseRecordService;
+
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
 
@@ -166,6 +172,9 @@ public class WeChatController {
         } else
         //房屋租赁业务逻辑
         if (weChatPayQO.getTradeFrom()==9){
+            if (weChatPayQO.getServiceOrderNo()==null){
+                return CommonResult.error("合同id不能为空！");
+            }
             WeChatOrderEntity weChatOrderEntity = weChatService.getSignature(weChatPayQO.getServiceOrderNo());
             if (weChatOrderEntity!=null){
                 return CommonResult.ok(JSONObject.fromObject(redisTemplate.opsForValue().get(SIGNATURE + weChatPayQO.getServiceOrderNo())));
@@ -272,7 +281,15 @@ public class WeChatController {
             } else
             //房屋租赁业务逻辑
             if (split[0].equals("9")){
-                log.info("处理完成");
+                // 修改签章合同支付状态
+                Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
+                // 修改租房签约支付状态
+                assetLeaseRecordService.updateOperationPayStatus( split[1]);
+                if(0 != (int)houseMap.get("code")){
+                    throw new PaymentException((int)houseMap.get("code"),String.valueOf(map.get("msg")));
+                }
+                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + map.get("out_trade_no"));
+                log.info("租赁处理完成！");
             }
         }
     }
