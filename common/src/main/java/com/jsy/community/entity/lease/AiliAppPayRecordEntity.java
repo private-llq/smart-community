@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
 * @Description: 支付宝流水实体类
@@ -16,6 +17,7 @@ import lombok.Data;
  * @Date: 2021/1/8
 **/
 @Data
+@EqualsAndHashCode(callSuper=false)
 @TableName("t_alipay_record")
 public class AiliAppPayRecordEntity extends BaseEntity {
 	
@@ -36,7 +38,8 @@ public class AiliAppPayRecordEntity extends BaseEntity {
 	private String realName;
 	
 	@ApiModelProperty(value = "用户手机号")
-	private String phonenumber;
+	@TableField(exist = false)
+	private String phoneNumber;
 	
 	@ApiModelProperty(value = "交易金额(RMB)")
 	private BigDecimal tradeAmount;
