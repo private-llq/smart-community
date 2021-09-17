@@ -89,4 +89,24 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
         queryWrapper.eq("service_order_no", serviceOrderNo);
         return weChatMapper.selectOne(queryWrapper);
     }
+
+    /**
+     * @param id             : 订单ID
+     * @param serviceOrderNo : 外部订单编号
+     * @author: Pipi
+     * @description: 查询订单支付状态
+     * @return: java.lang.Boolean
+     * @date: 2021/9/17 17:07
+     **/
+    @Override
+    public Boolean checkPayStatus(String id, String serviceOrderNo) {
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("service_order_no", serviceOrderNo);
+        queryWrapper.eq("id", id);
+        WeChatOrderEntity weChatOrderEntity = weChatMapper.selectOne(queryWrapper);
+        if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 2) {
+            return true;
+        }
+        return false;
+    }
 }
