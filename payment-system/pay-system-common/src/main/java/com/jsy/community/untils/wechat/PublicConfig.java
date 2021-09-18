@@ -174,6 +174,38 @@ public class PublicConfig {
         return returnMap;
     }
 
+    /**
+     * 处理微信退款异步回调
+     *
+     * @param request
+     * @param response
+     * @param privateKey 32的秘钥
+     */
+    public static Map<String, String> refundNotify(HttpServletRequest request, HttpServletResponse response, String privateKey) throws Exception {
+        Map<String, String> map = new HashMap<>(12);
+        Map<String, String> returnMap = new HashMap<>();
+        String result = readData(request);
+        // 需要通过证书序列号查找对应的证书，verifyNotify 中有验证证书的序列号
+        String plainText = verifyNotify(result, privateKey);
+        if (StrUtil.isNotEmpty(plainText)) {
+            response.setStatus(200);
+            map.put("code", "SUCCESS");
+            map.put("message", "SUCCESS");
+        } else {
+            response.setStatus(500);
+            map.put("code", "ERROR");
+            map.put("message", "签名错误");
+        }
+        response.setHeader("Content-type", ContentType.JSON.toString());
+        response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
+        response.flushBuffer();
+        returnMap.put("out_trade_no",JSONObject.fromObject(plainText).getString("out_trade_no"));
+        returnMap.put("refund_id",JSONObject.fromObject(plainText).getString("refund_id"));
+        returnMap.put("transaction_id",JSONObject.fromObject(plainText).getString("transaction_id"));
+        returnMap.put("refund_status",JSONObject.fromObject(plainText).getString("refund_status"));
+        return returnMap;
+    }
+
 
 
     /**

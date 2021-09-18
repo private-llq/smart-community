@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @ApiJSYController
 @Slf4j
-public class WeChatController {
+public class WeChatPayController {
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private IWeChatService weChatService;
@@ -288,6 +288,7 @@ public class WeChatController {
                 if(0 != (int)houseMap.get("code")){
                     throw new PaymentException((int)houseMap.get("code"),String.valueOf(map.get("msg")));
                 }
+                redisTemplate.delete(SIGNATURE+split[1]);
                 log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + map.get("out_trade_no"));
                 log.info("租赁处理完成！");
             }
