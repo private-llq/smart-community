@@ -77,7 +77,7 @@ public class SmsSendRecordServiceImpl extends ServiceImpl<SmsSendRecordMapper, S
 	 * @Date: 2021/09/08
 	 **/
 	@Override
-	public PageInfo<SmsSendRecordEntity> querySmsSendRecord(BaseQO<SmsSendRecordQO> baseQO, List<Long> adminCommunityIdList) {
+	public PageInfo<SmsSendRecordEntity> querySmsSendRecord(BaseQO<SmsSendRecordQO> baseQO, List<String> adminCommunityIdList) {
 		SmsSendRecordQO query = baseQO.getQuery();
 		Page<SmsSendRecordEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);

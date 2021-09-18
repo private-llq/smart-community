@@ -53,7 +53,7 @@ public class SmsSendRecordController {
         if(query == null){
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
         }
-        List<Long> adminCommunityIdList = UserUtils.getAdminCommunityIdList();
+        List<String> adminCommunityIdList = UserUtils.getAdminCommunityIdList();
         return CommonResult.ok(smsSendRecordService.querySmsSendRecord(baseQO, adminCommunityIdList));
     }
 }

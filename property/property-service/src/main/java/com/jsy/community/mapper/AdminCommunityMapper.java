@@ -43,5 +43,5 @@ public interface AdminCommunityMapper extends BaseMapper<AdminCommunityEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/22
 	**/
-	void addAdminCommunityBatch(@Param("ids") Set<Long> menuIdsSet, @Param("uid") String uid);
+	void addAdminCommunityBatch(@Param("ids") Set<String> menuIdsSet, @Param("uid") String uid);
 }

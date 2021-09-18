@@ -40,5 +40,5 @@ public interface ISmsSendRecordService extends IService<SmsSendRecordEntity> {
 	 * @Author: DKS
 	 * @Date: 2021/09/08
 	 **/
-	PageInfo<SmsSendRecordEntity> querySmsSendRecord(BaseQO<SmsSendRecordQO> baseQO, List<Long> adminCommunityIdList);
+	PageInfo<SmsSendRecordEntity> querySmsSendRecord(BaseQO<SmsSendRecordQO> baseQO, List<String> adminCommunityIdList);
 }

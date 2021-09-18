@@ -37,7 +37,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 有权限的社区ids(List)
 	 */
 	@TableField(exist = false)
-	private List<Long> communityIdList;
+	private List<String> communityIdList;
 	
 	/**
 	 * 用户id
@@ -208,7 +208,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * token
 	 */
 	@TableField(exist = false)
-	private String token;
+	private String 	token;
 
 	@TableField(exist = false)
 	private Long roleId;

@@ -7,7 +7,7 @@
                 and c.community_id=#{query.communityId}
             <if test="query.type!=null and query.type>0">
                 and c.type=#{query.type}
-            </if>/
+            </if>
             <if test="query.complainTimeStart!=null">
                 and c.complain_time &gt;= #{query.complainTimeStart}
             </if>

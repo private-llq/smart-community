@@ -21,7 +21,7 @@ public class AdminUserQO implements Serializable {
 	private Long communityId;
 	
 	@ApiModelProperty(value = "有权限的社区ids(List)")
-	private List<Long> communityIdList;
+	private List<String> communityIdList;
 	
 	@ApiModelProperty(value = "查询条件 name")
 	private String name;
