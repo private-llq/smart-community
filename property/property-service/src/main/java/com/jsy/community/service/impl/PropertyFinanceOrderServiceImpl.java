@@ -677,6 +677,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @Author: chq459799974
      * @Date: 2021/7/7
     **/
+    @Override
     public void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids) {
         int rows = propertyFinanceOrderMapper.updateOrderBatch(payType,tripartiteOrder,ids);
         if(rows != ids.length){
@@ -754,7 +755,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/17 16:00
      **/
     @Override
-    public List<PropertyFinanceFormEntity> getFinanceFormCommunityIncome(PropertyFinanceFormEntity qo, List<Long> communityIdList) {
+    public List<PropertyFinanceFormEntity> getFinanceFormCommunityIncome(PropertyFinanceFormEntity qo, List<String> communityIdList) {
         // 返回给前端实体
         List<PropertyFinanceFormEntity> propertyFinanceFormEntityList = new LinkedList<>();
         // 押金查询
@@ -898,7 +899,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/18 11:08
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity qo, List<Long> communityIdList) {
+    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity qo, List<String> communityIdList) {
         // 返回给前端实体
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
         
@@ -1047,7 +1048,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/18 11:08
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity qo, List<Long> communityIdList) {
+    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity qo, List<String> communityIdList) {
         // 返回给前端实体
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
     
@@ -1200,15 +1201,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 9:31
      **/
     @Override
-    public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo, List<Long> communityIdList) {
+    public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo, List<String> communityIdList) {
         // 返回前端实体
         List<PropertyCollectionFormEntity> propertyCollectionFormEntityList = new LinkedList<>();
         // 模糊查询收费项目名称找到全部收费项目id
         List<Long> FeeRuleIdList = new ArrayList<>();
         if (qo.getFeeRuleName() != null) {
             if (qo.getCommunityId() != null) {
-                List<Long> communityIds = new ArrayList<>();
-                communityIds.add(qo.getCommunityId());
+                List<String> communityIds = new ArrayList<>();
+                communityIds.add(String.valueOf(qo.getCommunityId()));
                 FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
             } else {
                 FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIdList, qo.getFeeRuleName());
@@ -1586,7 +1587,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList) {
+    public List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity, List<String> communityIdList) {
         List<PropertyFinanceFormEntity> propertyFinanceFormEntityList = new LinkedList<>();
         try {
         if (propertyFinanceFormEntity.getYear() != null) {
@@ -1619,7 +1620,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<Long> communityIdList) {
+    public List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<String> communityIdList) {
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
         try {
             if (propertyFinanceFormChargeEntity.getYear() != null) {
@@ -1663,7 +1664,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity, List<Long> communityIdList) {
+    public List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity, List<String> communityIdList) {
         try {
             if (propertyCollectionFormEntity.getYear() != null) {
                 String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
@@ -2070,8 +2071,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         //是否查收费项目
         if (StringUtils.isNotBlank(qo.getFeeRuleName())) {
-            List<Long> communityIds = new ArrayList<>();
-            communityIds.add(qo.getCommunityId());
+            List<String> communityIds = new ArrayList<>();
+            communityIds.add(String.valueOf(qo.getCommunityId()));
             List<Long> feeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
             queryWrapper.in("fee_rule_id", feeRuleIdList);
         }

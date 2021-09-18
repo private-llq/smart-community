@@ -203,7 +203,7 @@ public class AdminLoginController {
 		//创建token，保存redis
 		List communityIdList = new ArrayList<>();
 		for(AdminCommunityEntity entity : adminCommunityList){
-			communityIdList.add(entity.getCommunityId());
+			communityIdList.add(String.valueOf(entity.getCommunityId()));
 		}
 		userData.setCommunityIdList(communityIdList);
 		String token = adminUserTokenService.createToken(userData);
@@ -227,7 +227,7 @@ public class AdminLoginController {
 	@Login
 	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
 		Long communityId = jsonObject.getLong("communityId");
-		List<Long> communityIds = UserUtils.getAdminCommunityIdList();
+		List communityIds = UserUtils.getAdminCommunityIdList();
 		UserUtils.validateCommunityId(communityId);
 		//用户资料
 		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
