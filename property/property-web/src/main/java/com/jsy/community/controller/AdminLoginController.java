@@ -239,7 +239,7 @@ public class AdminLoginController {
 		//设置小区ID
 		user.setCommunityId(communityId);
 		user.setCommunityIdList(communityIds);
-		//创建token，保存redis
+		//创建token，保存redisIShopLeaseService
 		String token = adminUserTokenService.createToken(user);
 		user.setToken(token);
 		AdminInfoVo adminInfoVo = new AdminInfoVo();

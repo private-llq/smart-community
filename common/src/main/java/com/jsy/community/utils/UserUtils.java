@@ -198,7 +198,7 @@ public class UserUtils {
 	**/
 	public static void validateCommunityId(Long communityId){
 		List<String> communityIdList = getAdminCommunityIdList();
-		if(!communityIdList.contains(communityId)){
+		if(!communityIdList.contains(String.valueOf(communityId))){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无该社区权限！");
 		}
 	}
