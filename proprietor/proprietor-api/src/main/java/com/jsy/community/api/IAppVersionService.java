@@ -29,4 +29,13 @@ public interface IAppVersionService extends IService<AppVersionEntity> {
 	 * @Date: 2021/7/12
 	**/
 	void addAppVersion(AppVersionEntity appVersionEntity);
+	
+	/**
+	 * @Description: 查询APP版本详情 1.安卓 2.IOS
+	 * @Param: [sysType]
+	 * @Return: com.jsy.community.entity.AppVersionEntity
+	 * @Author: DKS
+	 * @Date: 2021/9/22
+	 **/
+	AppVersionEntity queryAppVersion(Integer sysType);
 }
