@@ -10,6 +10,7 @@ import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYException;
@@ -59,6 +60,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
     @Autowired
     private BindingPositionMapper bindingPositionMapper;
+    @Autowired
+    private CommunityMapper communityMapper;
 
 
 
@@ -237,6 +240,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         orderEntity.setOverTime(carMonthlyVehicle.getEndTime().toLocalDate());//账单结束时间
         orderEntity.setBuildType(1);//系统生成
 
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
+        String communityName= communityEntity.getName();
+        String chargeName = carChargeEntity.getName();
+        orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
+
 
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
@@ -409,6 +417,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         orderEntity.setBeginTime(carMonthlyVehicle.getStartTime().toLocalDate());//账单开始时间
         orderEntity.setOverTime(carMonthlyVehicle.getEndTime().toLocalDate());//账单结束时间
         orderEntity.setBuildType(1);//系统生成
+
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
+        String communityName= communityEntity.getName();
+        String chargeName = "包月延期";
+        orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
 
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
@@ -601,6 +614,12 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setOverTime(endTime.toLocalDate());//账单结束时间
             orderEntity.setBuildType(1);//系统生成
 
+            CommunityEntity communityEntity = communityMapper.selectById(communityId);
+            String communityName= communityEntity.getName();
+            String chargeName ="车辆包月(表格导入)";
+            orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
+
+
             PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                     .eq("status", 1)
                     .eq("deleted", 0)
@@ -668,17 +687,26 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
         //临时车 黄牌
-
         if ( StringUtils.containsAny(carColor,"黄色","黄牌","黄")){
-            CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq(StringUtils.isNotBlank(carColor),"plate_type", 0));
+            CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                    .eq("community_id", community_id)
+                    .eq("type", 1)
+                    .eq(StringUtils.isNotBlank(carColor),"plate_type", 0)
+                    .eq("open",1)
+            );
             HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
             CarChargeEntity chargeEntity = new CarChargeEntity();
             BeanUtil.copyProperties(carChargeEntity,chargeEntity);
             HashMap.put(1,chargeEntity);
             return HashMap;
         }
-        //临时车 其他拍照
-        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq(StringUtils.isNotBlank(carColor),"plate_type", 1));
+        //临时车 其他牌照
+        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", community_id)
+                .eq("type", 1)
+                .eq(StringUtils.isNotBlank(carColor),"plate_type", 1)
+                .eq("open",1)
+        );
         HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
         CarChargeEntity chargeEntity = new CarChargeEntity();
         BeanUtil.copyProperties(carChargeEntity,chargeEntity);
@@ -852,6 +880,12 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         orderEntity.setBeginTime(carMonthlyVehicle.getStartTime().toLocalDate());//账单开始时间
         orderEntity.setOverTime(carMonthlyVehicle.getEndTime().toLocalDate());//账单结束时间
         orderEntity.setBuildType(1);//系统生成
+
+
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
+        String communityName= communityEntity.getName();
+        String chargeName = "车位包月";
+        orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
 
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
@@ -1029,6 +1063,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setBeginTime(startTime.toLocalDate());//账单开始时间
             orderEntity.setOverTime(endTime.toLocalDate());//账单结束时间
             orderEntity.setBuildType(1);//系统生成
+
+            CommunityEntity communityEntity = communityMapper.selectById(communityId);
+            String communityName= communityEntity.getName();
+            String chargeName = "包月车位(表格导入)";
+            orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
 
             PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                     .eq("status", 1)

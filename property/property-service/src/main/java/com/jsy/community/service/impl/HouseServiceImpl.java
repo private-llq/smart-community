@@ -609,7 +609,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                         }
                     }
                 }
-                houseEntity.setPidStr(String.valueOf(houseEntity.getPid()));
                 paramList.add(houseEntity.getId());
             }
             //查询住户数量
@@ -632,6 +631,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         for (HouseEntity houseEntity : pageData.getRecords()) {
             houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
             houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
+            // 补充pidStr
+            houseEntity.setPidStr(String.valueOf(houseEntity.getPid()));
         }
         PageInfo<HouseEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData, pageInfo);

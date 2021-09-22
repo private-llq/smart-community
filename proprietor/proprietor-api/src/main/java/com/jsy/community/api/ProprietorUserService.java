@@ -279,4 +279,13 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	void deleteFaceAvatar(String userId);
+
+	/**
+	 * @Description: 查询家属拥有的小区
+	 * @author: Hu
+	 * @since: 2021/9/22 13:53
+	 * @Param:
+	 * @return:
+	 */
+	Collection<Map<String, Object>> queryRelationHousesOfCommunity(String uid);
 }

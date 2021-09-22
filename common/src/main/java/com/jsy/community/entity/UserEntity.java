@@ -99,6 +99,7 @@ public class UserEntity extends BaseEntity {
 	private String email;
 
 	// 人脸启用状态;1:启用;2:禁用
+	@TableField( exist = false)
 	private String faceEnableStatusStr;
 
 	@ApiModelProperty("房屋id")
@@ -145,7 +146,7 @@ public class UserEntity extends BaseEntity {
 	// 设备ID
 	@TableField( exist = false )
 	@NotEmpty(groups = {FaceOprationValidate.class}, message = "设备列表不能为空")
-	private List<String> hardwareId;
+	private List<String> hardwareIds;
 
 	/**
 	 * 业主登记验证接口

@@ -322,7 +322,12 @@ public class UserController {
     @ApiOperation("查询用户所有社区(房屋已认证的)")
     @GetMapping("communityList")
     public CommonResult<Collection<Map<String, Object>>> queryUserHousesOfCommunity(){
-        return CommonResult.ok(userService.queryUserHousesOfCommunity(UserUtils.getUserId()));
+        String uid = UserUtils.getUserId();
+        ControlVO vo = UserUtils.getPermissions(uid, redisTemplate);
+        if (!vo.getAccessLevel().equals("1")){
+            return CommonResult.ok(userService.queryRelationHousesOfCommunity(uid));
+        }
+        return CommonResult.ok(userService.queryUserHousesOfCommunity(uid));
     }
     
     /**
