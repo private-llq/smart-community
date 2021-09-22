@@ -420,12 +420,12 @@ public interface BusinessConst {
     /**
      * 签章项目线上IP
      */
-//     String HOST = "222.178.212.29";
+     String HOST = "222.178.212.29";
 
     /**
      * 签章项目本地测试IP
      */
-    String HOST = "192.168.12.154";
+//    String HOST = "192.168.12.154";
 
     /**
      * 签章项目端口

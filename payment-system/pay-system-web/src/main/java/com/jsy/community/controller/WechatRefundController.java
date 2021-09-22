@@ -10,6 +10,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CompanyPayConfigEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.qo.payment.WechatRefundQO;
+import com.jsy.community.untils.OrderNoUtil;
 import com.jsy.community.untils.wechat.MyHttpClient;
 import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
@@ -87,9 +88,9 @@ public class WechatRefundController {
         //支付单号
         map.put("out_trade_no", entity.getId());
         //退款单号
-        map.put("out_refund_no",WechatConfig.MCH_ID);
+        map.put("out_refund_no", OrderNoUtil.getOrder());
         //回调地址
-        map.put("notify_url","http://jsy.free.svipss.top/api/v1/payment/refund/callback/"+entity.getCompanyId());
+        map.put("notify_url","http://tb2korpp.dongtaiyuming.net/api/v1/payment/refund/callback/"+entity.getCompanyId());
         map.put("amount",hashMap);
         //退款金额
         hashMap.put("refund",1);
