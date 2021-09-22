@@ -83,4 +83,14 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @return:
 	 */
     List<UserHouseVO> meHouse(@Param("uid") String uid);
+
+    /**
+     * @Description: 查询用户社区（家属和租户）
+     * @author: Hu
+     * @since: 2021/9/22 14:01
+     * @Param:
+     * @return:
+     */
+	@Select("select community_id from t_house_member where uid = #{uid} and deleted=0")
+	Set<Long> queryRelationHousesOfCommunityIds(@Param("uid") String uid);
 }

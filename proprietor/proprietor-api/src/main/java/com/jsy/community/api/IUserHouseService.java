@@ -190,4 +190,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @return:
 	 */
 	List<UserHouseVO> meHouse(String userId);
+
+	/**
+	 * @Description: 查询用户小区（家属租客的）
+	 * @author: Hu
+	 * @since: 2021/9/22 13:55
+	 * @Param:
+	 * @return:
+	 */
+	Set<Long> queryRelationHousesOfCommunityIds(String uid);
 }
