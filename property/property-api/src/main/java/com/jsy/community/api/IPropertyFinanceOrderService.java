@@ -188,7 +188,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/8/17 16:00
      **/
-    List<PropertyFinanceFormEntity> getFinanceFormCommunityIncome(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList);
+    List<PropertyFinanceFormEntity> getFinanceFormCommunityIncome(PropertyFinanceFormEntity propertyFinanceFormEntity, List<String> communityIdList);
     
     /**
      *@Author: DKS
@@ -197,7 +197,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: PropertyFinanceFormChargeEntity
      *@Date: 2021/8/18 11:08
      **/
-    List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<Long> communityIdList);
+    List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<String> communityIdList);
     
     /**
      *@Author: DKS
@@ -206,7 +206,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: PropertyFinanceFormChargeEntity
      *@Date: 2021/8/18 11:08
      **/
-    List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<Long> communityIdList);
+    List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<String> communityIdList);
     
     /**
      *@Author: DKS
@@ -215,7 +215,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/8/19 9:31
      **/
-    List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity propertyCollectionFormEntity, List<Long> communityIdList);
+    List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity propertyCollectionFormEntity, List<String> communityIdList);
     
     /**
      *@Author: DKS
@@ -242,7 +242,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceFormEntity>
      *@Date: 2021/8/19 15:52
      **/
-    List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList);
+    List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity, List<String> communityIdList);
     
     /**
      *@Author: DKS
@@ -251,7 +251,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: java.util.List<com.jsy.community.entity.property.PropertyFinanceFormChargeEntity>
      *@Date: 2021/8/19 15:52
      **/
-    List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<Long> communityIdList);
+    List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<String> communityIdList);
     
     /**
      *@Author: DKS
@@ -260,7 +260,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      *@Return: java.util.List<com.jsy.community.entity.property.PropertyCollectionFormEntity>
      *@Date: 2021/8/19 15:52
      **/
-    List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity, List<Long> communityIdList);
+    List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity, List<String> communityIdList);
     
     /**
      *@Author: DKS
@@ -360,4 +360,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     void insert(PropertyFinanceOrderEntity orderEntity);
+
+    /**
+     * @Description: 批量查询账单
+     * @author: Hu
+     * @since: 2021/9/17 9:22
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> getIds(String ids, Long adminCommunityId);
 }

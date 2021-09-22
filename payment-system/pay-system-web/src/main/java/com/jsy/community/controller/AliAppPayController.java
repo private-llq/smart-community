@@ -42,6 +42,9 @@ public class AliAppPayController {
 	
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AliAppPayService aliAppPayService;
+
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
+	private IWeChatService weChatService;
 	
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private AiliAppPayRecordService ailiAppPayRecordService;
@@ -72,6 +75,7 @@ public class AliAppPayController {
 			aliAppPayQO.setCommunityId(1L);
 		}
 		ValidatorUtils.validateEntity(aliAppPayQO,AliAppPayQO.addOrderGroup.class);
+		CommunityEntity communityEntity = communityService.getCommunityNameById(aliAppPayQO.getCommunityId());
 		String sysType = req.getHeader("sysType");
 //		if(!NumberUtil.isInteger(sysType) || (CommonConsts.SYS_ANDROID != Integer.parseInt(sysType)
 //				&& CommonConsts.SYS_IOS != Integer.parseInt(sysType))){
@@ -128,6 +132,9 @@ public class AliAppPayController {
 //			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"支付类型错误");
 //		}
 		orderStr = aliAppPayService.getOrderStr(aliAppPayQO);
+		log.info("=============================================");
+		log.info(orderStr);
+		log.info("=============================================");
 		boolean createResult = false;
 		if(!StringUtils.isEmpty(orderStr)){
 			AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
@@ -139,6 +146,7 @@ public class AliAppPayController {
 			ailiAppPayRecordEntity.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex());
 			ailiAppPayRecordEntity.setTradeStatus(PaymentEnum.TradeStatusEnum.ORDER_PLACED.getIndex());
 			ailiAppPayRecordEntity.setSysType(Integer.valueOf(sysType));
+			ailiAppPayRecordEntity.setCompanyId(communityEntity.getPropertyId() == null ? null : String.valueOf(communityEntity.getPropertyId()));
 			createResult = ailiAppPayRecordService.createAliAppPayRecord(ailiAppPayRecordEntity);
 		}
 		Map<String, String> returnMap = new HashMap<>(2);
@@ -158,6 +166,7 @@ public class AliAppPayController {
 			ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
 		}
 		try {
+			AlipayUtils.queryOrder(orderId);
 			AlipayUtils.closeOrder(orderId);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -174,6 +183,8 @@ public class AliAppPayController {
 	 **/
 	@GetMapping("/v2/checkPayTradeStatus")
 	public CommonResult checkPayTradeStatus(@RequestParam("orderNo") String orderNo, @RequestParam("serviceOrderNo") String serviceOrderNo) {
-		return CommonResult.ok(ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo),"查询成功");
+		Boolean aliStatus = ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo);
+		Boolean wechatStatus = weChatService.checkPayStatus(orderNo, serviceOrderNo);
+		return aliStatus || wechatStatus ? CommonResult.ok(true,"查询成功") : CommonResult.ok(false,"查询成功");
 	}
 }

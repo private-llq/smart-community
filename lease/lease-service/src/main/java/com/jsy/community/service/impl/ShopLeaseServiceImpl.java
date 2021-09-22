@@ -892,7 +892,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
      * @return: Integer
      */
     @Override
-    public Integer selectAllShopByCommunityIds(List<Long> communityIdList) {
+    public Integer selectAllShopByCommunityIds(List<String> communityIdList) {
         return shopLeaseMapper.selectAllShopByCommunityIds(communityIdList);
     }
 }

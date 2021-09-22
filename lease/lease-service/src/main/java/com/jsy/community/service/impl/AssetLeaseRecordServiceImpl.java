@@ -1,32 +1,38 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.AssetLeaseRecordService;
-import com.jsy.community.api.IHouseConstService;
-import com.jsy.community.api.LeaseException;
-import com.jsy.community.api.ProprietorUserService;
+import com.jsy.community.api.*;
 import com.jsy.community.config.LeaseTopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CompanyPayConfigEntity;
+import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
+import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
 import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
+import com.jsy.community.untils.wechat.PublicConfig;
+import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.util.HouseHelper;
+import com.jsy.community.utils.MyHttpUtils;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.signature.ZhsjUtil;
 import com.jsy.community.vo.UserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.http.client.methods.HttpPost;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
@@ -73,6 +79,15 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ProprietorUserService userService;
+
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private AiliAppPayRecordService ailiAppPayRecordService;
+
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private IWeChatService weChatService;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICompanyPayConfigService companyPayConfigService;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -1045,6 +1060,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @date: 2021/9/15 11:20
      **/
     public void setCountdown(AssetLeaseRecordEntity leaseRecordEntity) {
+        LeaseOperationRecordEntity leaseOperationRecordEntity = new LeaseOperationRecordEntity();
         switch (leaseRecordEntity.getOperation()) {
             case 1:
                 // 发起签约
@@ -1057,27 +1073,27 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 // 接受申请
                 leaseRecordEntity.setProgressNumber(2);
                 // 接受申请,倒计时就是接受申请的时间加7天
-                LeaseOperationRecordEntity leaseOperationRecordEntity2 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity2 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity2.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
                 }
                 break;
             case 3:
                 // 拟定合同
                 leaseRecordEntity.setProgressNumber(2);
                 // 倒计时就是接受申请的时间加7天
-                LeaseOperationRecordEntity leaseOperationRecordEntity3 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity3 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity3.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
                 }
                 break;
             case 4:
                 // 等待支付房租
                 leaseRecordEntity.setProgressNumber(2);
                 // 倒计时就是接受申请的时间加7天
-                LeaseOperationRecordEntity leaseOperationRecordEntity4 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity4 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity4.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
                 }
                 break;
             case 5:
@@ -1085,9 +1101,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 // 签约进程
                 leaseRecordEntity.setProgressNumber(3);
                 // 倒计时就是接受申请的时间加7天
-                LeaseOperationRecordEntity leaseOperationRecordEntity5 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity5 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity5.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
                 }
                 break;
             case 6:
@@ -1111,20 +1127,30 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 leaseRecordEntity.setProgressNumber(1);
                 // 重新发起,倒计时就是重新发起的时间加3天
                 // 查询重新发起的时间
-                LeaseOperationRecordEntity leaseOperationRecordEntity9 = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
-                if (leaseOperationRecordEntity9 != null) {
-                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity9.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_TO_CONTRACT_APPLY));
                 }
                 break;
             case 31:
                 // (房东)发起签约/重新发起
                 // 签约进程
                 leaseRecordEntity.setProgressNumber(2);
+                // 倒计时就是接受申请的时间加7天
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                }
                 break;
             case 32:
                 // 取消发起
                 // 签约进程
                 leaseRecordEntity.setProgressNumber(2);
+                // 倒计时就是接受申请的时间加7天
+                leaseOperationRecordEntity = queryLeaseOperationRecord(leaseRecordEntity.getId(), leaseRecordEntity.getOperation());
+                if (leaseOperationRecordEntity != null) {
+                    leaseRecordEntity.setCountdownFinish(leaseOperationRecordEntity.getCreateTime().plusDays(BusinessConst.COUNTDOWN_DAYS_TO_CONTRACT));
+                }
                 break;
             default:
                 break;
@@ -1229,7 +1255,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.eq("asset_id", assetLeaseRecordEntity.getAssetId());
         queryWrapper.eq("home_owner_uid", assetLeaseRecordEntity.getHomeOwnerUid());
         queryWrapper.eq("id", assetLeaseRecordEntity.getId());
-        queryWrapper.in("operation", new ArrayList<>(Arrays.asList(3, 32)));
+        queryWrapper.in("operation", new ArrayList<>(Arrays.asList(2, 3, 32)));
         AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (leaseRecordEntity != null) {
             leaseRecordEntity.setConId(assetLeaseRecordEntity.getConId());
@@ -1262,6 +1288,34 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         queryWrapper.eq("operation", 31);
         AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
         if (leaseRecordEntity != null) {
+            // 查询是否存在支付订单
+            AiliAppPayRecordEntity ailiAppPayRecordEntity = ailiAppPayRecordService.queryOrderNoByServiceOrderNo(assetLeaseRecordEntity.getConId());
+            if (ailiAppPayRecordEntity != null && ailiAppPayRecordEntity.getTradeStatus() == 2) {
+                // 已支付,不能取消
+                throw new LeaseException("租客已支付租金,不能取消");
+            }
+            WeChatOrderEntity weChatOrderEntity = weChatService.quereIdByServiceOrderNo(assetLeaseRecordEntity.getConId());
+            if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 1) {
+                // 已支付,不能取消
+                throw new LeaseException("租客已支付租金,不能取消");
+            }
+            // 微信订单能够在未支付前作废
+            // 但是支付宝订单不行,所以这里做的处理是在租客支付回调时查看签约状态,如果是已经取消则退款
+            if (weChatOrderEntity != null && weChatOrderEntity.getCompanyId() != null) {
+                // 作废微信支付订单
+                CompanyPayConfigEntity companyConfig = companyPayConfigService.getCompanyConfig(weChatOrderEntity.getCompanyId());
+                WechatConfig.setConfig(companyConfig);
+                try {
+                    PublicConfig.closeOrder(weChatOrderEntity.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // TODO 需要测试
+                weChatService.deleteByOrder(weChatOrderEntity.getId());
+                // TODO 需要测试
+                redisTemplate.delete("Wechat_Lease:" + weChatOrderEntity.getServiceOrderNo());
+            }
+            // 更新签约数据
             leaseRecordEntity.setBlockStatus(null);
             leaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.CANCEL_LAUNCH.getCode());
             addLeaseOperationRecord(leaseRecordEntity);
@@ -1348,11 +1402,69 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
                 }
             }
-            if (opration == BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode() && assetLeaseRecordEntity.getOperation() != BusinessEnum.ContractingProcessStatusEnum.PAYMENT_COMPLETED.getCode()) {
+            if (opration == BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode() && assetLeaseRecordEntity.getOperation() != BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode()) {
                 // 房东接受申请后,倒计时结束没完成签约的都删除
+                // 如果是房东发起状态,通知签章作废合同
+                if (assetLeaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode()) {
+                    // 通知签章作废合同
+                    notificationOfSignatureCancellationContract(assetLeaseRecordEntity.getConId());
+                }
                 // TODO 可能会涉及到退款业务,需要补上
                 assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
             }
         }
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 通知签章作废合同
+     * @param conId: 合同编号
+     * @return: void
+     * @date: 2021/9/17 11:20
+     **/
+    public void notificationOfSignatureCancellationContract(String conId) {
+        Map<String, Object> returnMap = new HashMap<>();
+        Map<String, Object> bodyMap = new HashMap<>();
+        bodyMap.put("conId", conId);
+        //url
+        String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.CONTRACT_OVERDUE;
+        // 加密参数
+        String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
+        //组装http请求
+        HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyString);
+        //设置header
+        MyHttpUtils.setDefaultHeader(httpPost);
+        //设置默认配置
+        MyHttpUtils.setRequestConfig(httpPost);
+        //执行
+        String httpResult;
+        JSONObject result = null;
+        try {
+            //执行请求，解析结果
+            httpResult = (String)MyHttpUtils.exec(httpPost, MyHttpUtils.ANALYZE_TYPE_STR);
+            result = JSON.parseObject(httpResult);
+            if (0 == result.getIntValue("code")) {
+                log.info("合同{}作废成功", conId);
+            } else {
+                log.error("合同{}作废失败,状态码:{},信息:{}", conId, result.getIntValue("code"), result.getString("message"));
+            }
+        } catch (Exception e) {
+            log.error("合同作废 - http执行或解析异常，json解析结果" + result);
+            log.error(e.getMessage());
+        }
+    }
+
+    /**
+     * @param conId : 合同ID
+     * @author: Pipi
+     * @description: 查询签约详情
+     * @return: com.jsy.community.entity.proprietor.AssetLeaseRecordEntity
+     * @date: 2021/9/16 17:26
+     **/
+    @Override
+    public AssetLeaseRecordEntity queryRecordByConId(String conId) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("con_id", conId);
+        return assetLeaseRecordMapper.selectOne(queryWrapper);
     }
 }

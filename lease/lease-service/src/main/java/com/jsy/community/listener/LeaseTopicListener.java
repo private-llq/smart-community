@@ -47,6 +47,7 @@ public class LeaseTopicListener {
             assetLeaseRecordService.countdownOpration(jsonObject.getLong("id"), jsonObject.getInteger("operation"), operationTime);
         } catch (Exception e) {
             e.printStackTrace();
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
     }

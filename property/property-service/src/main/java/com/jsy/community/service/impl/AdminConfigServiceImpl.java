@@ -574,11 +574,11 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateAdminCommunityBatch(List<Long> communityIds,String uid){
+	public void updateAdminCommunityBatch(List<String> communityIds,String uid){
 		//清空
 		adminCommunityMapper.clearAdminCommunityByUid(uid);
 		//去重
-		Set<Long> communityIdsSet = new HashSet<>(communityIds);
+		Set<String> communityIdsSet = new HashSet<>(communityIds);
 		//添加
 		adminCommunityMapper.addAdminCommunityBatch(communityIdsSet,uid);
 	}

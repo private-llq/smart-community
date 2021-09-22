@@ -147,7 +147,7 @@ public class ElasticsearchCarUtil {
      * @return:
      */
     public static Map<String, Object> search(BaseQO<ElasticsearchCarSearchQO> baseQO, AdminInfoVo info,RestHighLevelClient restHighLevelClient){
-        List<Long> idList = info.getCommunityIdList();
+        List<String> idList = info.getCommunityIdList();
         ElasticsearchCarSearchQO query = baseQO.getQuery();
         SearchRequest searchRequest = new SearchRequest(BusinessConst.INDEX_CAR);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();

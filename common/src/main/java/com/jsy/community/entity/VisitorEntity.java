@@ -88,7 +88,7 @@ public class VisitorEntity extends BaseEntity {
 
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限，0无，1二维码通行证，2可视对讲")
     @Range(min = 0,max = 2, message = "楼栋门禁授权选择出错")
-    private Integer isBuildingAccess;
+    private Integer isCarBanAccess;
 
     @ApiModelProperty(value = "来访车辆车牌", hidden = true)
     private String carPlate;
@@ -125,7 +125,7 @@ public class VisitorEntity extends BaseEntity {
 
     @ApiModelProperty(value = "是否授予来访人楼栋门禁权限 文字描述", hidden = true)
     @TableField(exist = false)
-    private String isBuildingAccessStr;
+    private String isCarBanAccessStr;
 
     @ApiModelProperty(value = "来访车辆类型名", hidden = true)
     @TableField(exist = false)

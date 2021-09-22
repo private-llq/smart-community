@@ -92,4 +92,13 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @date: 2021/9/13 16:10
      **/
     void countdownOpration(Long id, Integer opration, LocalDateTime operationTime);
+
+    /**
+     * @author: Pipi
+     * @description: 查询签约详情
+     * @param conId: 合同ID
+     * @return: com.jsy.community.entity.proprietor.AssetLeaseRecordEntity
+     * @date: 2021/9/16 17:26
+     **/
+    AssetLeaseRecordEntity queryRecordByConId(String conId);
 }

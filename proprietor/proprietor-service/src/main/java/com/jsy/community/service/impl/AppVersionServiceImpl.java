@@ -4,13 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAppVersionService;
 import com.jsy.community.api.ProprietorException;
-import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppVersionEntity;
 import com.jsy.community.mapper.AppVersionMapper;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.client.security.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.util.StringUtils;
@@ -66,4 +64,17 @@ public class AppVersionServiceImpl extends ServiceImpl<AppVersionMapper,AppVersi
 		}
 	}
 	
+	/**
+	 * @Description: 查询APP版本详情 1.安卓 2.IOS
+	 * @Param: [sysType]
+	 * @Return: com.jsy.community.entity.AppVersionEntity
+	 * @Author: DKS
+	 * @Date: 2021/9/22
+	 **/
+	@Override
+	public AppVersionEntity queryAppVersion(Integer sysType) {
+		AppVersionEntity appVersionEntity = aPPVersionMapper.selectOne(new QueryWrapper<AppVersionEntity>().eq("sys_type", sysType).eq("deleted", 0));
+		appVersionEntity.setSysVersionNumber(appVersionEntity.getSysVersion().replace(".",""));
+		return appVersionEntity;
+	}
 }

@@ -1,8 +1,10 @@
 package com.jsy.community.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.CommunityEntity;
@@ -109,7 +111,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         List<CarPositionEntity> carPositionEntities = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().eq("community_id",baseQO.getQuery().getCommunityId()));
         //封装房间map
         for (HouseEntity houseEntity : houseEntities) {
-            houseMap.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getNumber());
+            houseMap.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
         }
         //封装车位map
         for (CarPositionEntity positionEntity : carPositionEntities) {
@@ -676,6 +678,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @Author: chq459799974
      * @Date: 2021/7/7
     **/
+    @Override
     public void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids) {
         int rows = propertyFinanceOrderMapper.updateOrderBatch(payType,tripartiteOrder,ids);
         if(rows != ids.length){
@@ -753,7 +756,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/17 16:00
      **/
     @Override
-    public List<PropertyFinanceFormEntity> getFinanceFormCommunityIncome(PropertyFinanceFormEntity qo, List<Long> communityIdList) {
+    public List<PropertyFinanceFormEntity> getFinanceFormCommunityIncome(PropertyFinanceFormEntity qo, List<String> communityIdList) {
         // 返回给前端实体
         List<PropertyFinanceFormEntity> propertyFinanceFormEntityList = new LinkedList<>();
         // 押金查询
@@ -897,7 +900,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/18 11:08
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity qo, List<Long> communityIdList) {
+    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderGenerateTime(PropertyFinanceFormChargeEntity qo, List<String> communityIdList) {
         // 返回给前端实体
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
         
@@ -1046,7 +1049,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/18 11:08
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity qo, List<Long> communityIdList) {
+    public List<PropertyFinanceFormChargeEntity> getFinanceFormCommunityChargeByOrderPeriodTime(PropertyFinanceFormChargeEntity qo, List<String> communityIdList) {
         // 返回给前端实体
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
     
@@ -1199,15 +1202,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 9:31
      **/
     @Override
-    public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo, List<Long> communityIdList) {
+    public List<PropertyCollectionFormEntity> getCollectionFormCollection(PropertyCollectionFormEntity qo, List<String> communityIdList) {
         // 返回前端实体
         List<PropertyCollectionFormEntity> propertyCollectionFormEntityList = new LinkedList<>();
         // 模糊查询收费项目名称找到全部收费项目id
         List<Long> FeeRuleIdList = new ArrayList<>();
         if (qo.getFeeRuleName() != null) {
             if (qo.getCommunityId() != null) {
-                List<Long> communityIds = new ArrayList<>();
-                communityIds.add(qo.getCommunityId());
+                List<String> communityIds = new ArrayList<>();
+                communityIds.add(String.valueOf(qo.getCommunityId()));
                 FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
             } else {
                 FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIdList, qo.getFeeRuleName());
@@ -1585,7 +1588,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity, List<Long> communityIdList) {
+    public List<PropertyFinanceFormEntity> queryExportExcelFinanceFormList(PropertyFinanceFormEntity propertyFinanceFormEntity, List<String> communityIdList) {
         List<PropertyFinanceFormEntity> propertyFinanceFormEntityList = new LinkedList<>();
         try {
         if (propertyFinanceFormEntity.getYear() != null) {
@@ -1618,7 +1621,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<Long> communityIdList) {
+    public List<PropertyFinanceFormChargeEntity> queryExportExcelChargeList(PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity, List<String> communityIdList) {
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = new LinkedList<>();
         try {
             if (propertyFinanceFormChargeEntity.getYear() != null) {
@@ -1662,7 +1665,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      *@Date: 2021/8/19 15:52
      **/
     @Override
-    public List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity, List<Long> communityIdList) {
+    public List<PropertyCollectionFormEntity> queryExportExcelCollectionFormList(PropertyCollectionFormEntity propertyCollectionFormEntity, List<String> communityIdList) {
         try {
             if (propertyCollectionFormEntity.getYear() != null) {
                 String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
@@ -1756,7 +1759,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         String dateNow = sdf.format(new Date());
         // 设置账单日期
         propertyFinanceOrderEntity.setOrderTime(LocalDate.parse(dateNow, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(propertyFinanceOrderEntity.getFeeRuleId());
+        // 设置账单抬头
+	    CommunityEntity communityEntity = communityMapper.selectById(propertyFinanceOrderEntity.getCommunityId());
+	    propertyFinanceOrderEntity.setRise(communityEntity.getName() + "-" + propertyFinanceOrderEntity.getFeeRuleName());
         // 设置账单号
         propertyFinanceOrderEntity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFinanceOrderEntity.getCommunityId())));
         // 设置总金额
@@ -1825,6 +1830,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @Date: 2021/09/06 10:46
      **/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean collection(List<Long> ids, Long communityId, Integer payType) {
         int row;
         
@@ -1835,89 +1841,141 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             }
             // 支付类型为预存款抵扣,需要判断预存款余额是否充足
             if (payType == 7) {
+                PropertyFinanceOrderEntity propertyFinanceOrderEntity1 = propertyFinanceOrderMapper.selectById(id);
+                propertyFinanceOrderEntity1.setDeduction(propertyFinanceOrderEntity.getTotalMoney());
+                propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity1);
+                
                 // 关联类型是车位的话，需查出车位绑定的房屋
                 if (propertyFinanceOrderEntity.getAssociatedType() == 2) {
                     CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyFinanceOrderEntity.getTargetId());
                     PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(carPositionEntity.getHouseId(), communityId);
                     if (propertyAdvanceDepositEntity != null) {
-                        if (propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney()).compareTo(BigDecimal.ZERO) == -1) {
+                        if (propertyAdvanceDepositEntity.getBalance().subtract(propertyFinanceOrderEntity.getTotalMoney()).compareTo(BigDecimal.ZERO) == -1) {
                             HouseEntity houseEntity = houseMapper.selectById(carPositionEntity.getHouseId());
                             throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getFloor() + "-" + houseEntity.getDoor() + "余额不足！");
                         }
+                    } else {
+	                    throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),"没有预存款，无法抵扣！");
                     }
+    
+                    // 放入这次抵扣的金额
+                    propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
+                    propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
+                    propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
+                    // 更新预存款余额
+                    propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
+                    // 抵扣成功后，立即生成预存款变更明细记录
+                    PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
+                    propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
+                    propertyAdvanceDepositRecordEntity.setType(1);
+                    propertyAdvanceDepositRecordEntity.setOrderId(id);
+                    // 查最新一次记录并设置余额明细
+                    PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
+                        propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
+                    propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
+                    propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
+                    propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
+                    propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
+                    propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
+                    PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
                 } else if (propertyFinanceOrderEntity.getAssociatedType() == 1) {
                     // 关联类型是房屋的话，根据id查询当前余额是否充足
-                    PropertyAdvanceDepositEntity entity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(propertyFinanceOrderEntity.getTargetId(), communityId);
-                    if (entity != null) {
-                        if (entity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney()).compareTo(BigDecimal.ZERO) == -1) {
+                    PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(propertyFinanceOrderEntity.getTargetId(), communityId);
+                    if (propertyAdvanceDepositEntity != null) {
+                        if (propertyAdvanceDepositEntity.getBalance().subtract(propertyFinanceOrderEntity.getTotalMoney()).compareTo(BigDecimal.ZERO) == -1) {
                             HouseEntity houseEntity = houseMapper.selectById(propertyFinanceOrderEntity.getTargetId());
                             throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getFloor() + "-" + houseEntity.getDoor() + "余额不足！");
                         }
+                    } else {
+	                    throw new PropertyException(JSYError.NOT_ENOUGH.getCode(),"没有预存款，无法抵扣！");
                     }
+    
+                    // 放入这次抵扣的金额
+                    propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
+                    propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
+                    propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
+                    // 更新预存款余额
+                    propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
+                    // 抵扣成功后，立即生成预存款变更明细记录
+                    PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
+                    propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
+                    propertyAdvanceDepositRecordEntity.setType(1);
+                    propertyAdvanceDepositRecordEntity.setOrderId(id);
+                    // 查最新一次记录并设置余额明细
+                    PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
+                        propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
+                    propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
+                    propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
+                    propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
+                    propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
+                    propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
+                    PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
                 }
             }
         }
         
         //更新收款状态为已支付
-        row = propertyFinanceOrderMapper.collection(ids, payType);
+        row = propertyFinanceOrderMapper.collection(ids, 2);
     
-        if (row == 1) {
-            for (Long id : ids) {
-                if (payType == 7) {
-                    PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(id);
-                    
-                    // 关联类型是车位的话，需查出车位绑定的房屋
-                    if (propertyFinanceOrderEntity.getAssociatedType() == 2) {
-                        CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyFinanceOrderEntity.getTargetId());
-                        PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(carPositionEntity.getHouseId(), communityId);
-                        // 放入这次抵扣的金额
-                        propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
-                        propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
-                        propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
-                        // 更新预存款余额
-                        propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
-                        // 抵扣成功后，立即生成预存款变更明细记录
-                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
-                        propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
-                        propertyAdvanceDepositRecordEntity.setType(1);
-                        propertyAdvanceDepositRecordEntity.setOrderId(id);
-                        // 查最新一次记录并设置余额明细
-                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
-                            propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
-                        propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
-                        propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
-                        propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
-                        propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
-                        propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
-                        PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
-                    } else if (propertyFinanceOrderEntity.getAssociatedType() == 1) {
-                        PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(propertyFinanceOrderEntity.getTargetId(), communityId);
-                        // 放入这次抵扣的金额
-                        propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
-                        propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
-                        propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
-                        // 更新预存款余额
-                        propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
-                        // 抵扣成功后，立即生成预存款变更明细记录
-                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
-                        propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
-                        propertyAdvanceDepositRecordEntity.setType(1);
-                        propertyAdvanceDepositRecordEntity.setOrderId(id);
-                        // 查最新一次记录并设置余额明细
-                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
-                            propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
-                        propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
-                        propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
-                        propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
-                        propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
-                        propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
-                        PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
-                    }
-                }
-            }
-        }
+//        if (row == 1) {
+//            for (Long id : ids) {
+//                if (payType == 7) {
+//                    PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(id);
+//                    propertyFinanceOrderEntity.setDeduction(propertyFinanceOrderEntity.getTotalMoney());
+//                    propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
+//
+//                    // 关联类型是车位的话，需查出车位绑定的房屋
+//                    if (propertyFinanceOrderEntity.getAssociatedType() == 2) {
+//                        CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyFinanceOrderEntity.getTargetId());
+//                        PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(carPositionEntity.getHouseId(), communityId);
+//                        // 放入这次抵扣的金额
+//                        propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
+//                        propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
+//                        propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
+//                        // 更新预存款余额
+//                        propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
+//                        // 抵扣成功后，立即生成预存款变更明细记录
+//                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
+//                        propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
+//                        propertyAdvanceDepositRecordEntity.setType(1);
+//                        propertyAdvanceDepositRecordEntity.setOrderId(id);
+//                        // 查最新一次记录并设置余额明细
+//                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
+//                            propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
+//                        propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
+//                        propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
+//                        propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
+//                        propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
+//                        propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
+//                        PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
+//                    } else if (propertyFinanceOrderEntity.getAssociatedType() == 1) {
+//                        PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(propertyFinanceOrderEntity.getTargetId(), communityId);
+//                        // 放入这次抵扣的金额
+//                        propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
+//                        propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
+//                        propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
+//                        // 更新预存款余额
+//                        propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
+//                        // 抵扣成功后，立即生成预存款变更明细记录
+//                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
+//                        propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
+//                        propertyAdvanceDepositRecordEntity.setType(1);
+//                        propertyAdvanceDepositRecordEntity.setOrderId(id);
+//                        // 查最新一次记录并设置余额明细
+//                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
+//                            propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
+//                        propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
+//                        propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
+//                        propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
+//                        propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
+//                        propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
+//                        PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
+//                    }
+//                }
+//            }
+//        }
         
-        return row == 1;
+        return row >= 1;
     }
 
     @Override
@@ -1971,6 +2029,60 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     }
 
 
+
+    /**
+     * @Description: 批量查询账单
+     * @author: Hu
+     * @since: 2021/9/17 9:22
+     * @Param: [ids, adminCommunityId]
+     * @return: java.util.List<com.jsy.community.entity.property.PropertyFinanceOrderEntity>
+     */
+    @Override
+    public List<PropertyFinanceOrderEntity> getIds(String ids, Long adminCommunityId) {
+        List<String> list = Arrays.asList(ids.split(","));
+        Map<Long, String> carPositionMap = new HashMap<>();
+        Map<Long, String> houseMap = new HashMap<>();
+
+        //车位
+        List<CarPositionEntity> entityList = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().select("id,car_position,house_id").eq("community_id", adminCommunityId));
+        for (CarPositionEntity carPositionEntity : entityList) {
+            carPositionMap.put(carPositionEntity.getId(),carPositionEntity.getCarPosition()+","+carPositionEntity.getHouseId());
+        }
+        //房屋
+        List<HouseEntity> houseEntities = houseMapper.selectList(new QueryWrapper<HouseEntity>().eq("community_id", adminCommunityId).eq("type",4));
+        for (HouseEntity houseEntity : houseEntities) {
+            houseMap.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+        }
+
+        List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>()
+                .select("id,associated_type,target_id,type,begin_time,over_time,property_fee,penal_sum,coupon,total_money")
+                .in("id", list));
+        for (PropertyFinanceOrderEntity entity : entities) {
+
+            entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum().subtract(entity.getCoupon())));
+            entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+            if (entity.getAssociatedType()==1){
+                PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(entity.getTargetId(), adminCommunityId);
+                if (depositEntity!=null){
+                    entity.setDeduction(depositEntity.getBalance());
+                }else {
+                    entity.setDeduction(new BigDecimal(0));
+                }
+                entity.setAddress(houseMap.get(entity.getTargetId()));
+            }else {
+                String[] split = carPositionMap.get(entity.getTargetId()).split(",");
+                entity.setAddress(split[0]);
+                PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(Long.parseLong(split[1]), adminCommunityId);
+                if (depositEntity!=null){
+                    entity.setDeduction(depositEntity.getBalance());
+                }else {
+                    entity.setDeduction(new BigDecimal(0));
+                }
+            }
+        }
+        return entities;
+    }
+
     /**
      * @Description: app端绑定月租车辆向账单表里添加数据
      * @author: Hu
@@ -2014,8 +2126,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         //是否查收费项目
         if (StringUtils.isNotBlank(qo.getFeeRuleName())) {
-            List<Long> communityIds = new ArrayList<>();
-            communityIds.add(qo.getCommunityId());
+            List<String> communityIds = new ArrayList<>();
+            communityIds.add(String.valueOf(qo.getCommunityId()));
             List<Long> feeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
             queryWrapper.in("fee_rule_id", feeRuleIdList);
         }
@@ -2046,6 +2158,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 	    if (qo.getOrderStatus() != null) {
 		    queryWrapper.eq("order_status", qo.getOrderStatus());
 	    }
+	    //是否查社区
+	    if (qo.getCommunityId() != null) {
+            queryWrapper.eq("community_id", qo.getCommunityId());
+        }
+        //是否查收费来源
+        if (qo.getPayType() != null) {
+            queryWrapper.eq("pay_type", qo.getPayType());
+        }
         queryWrapper.orderByDesc("create_time");
         propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(propertyFinanceOrderEntities)) {

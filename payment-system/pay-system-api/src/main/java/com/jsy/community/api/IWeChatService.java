@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
+import com.jsy.community.qo.payment.WechatRefundQO;
 
 import java.util.Map;
 
@@ -37,4 +38,50 @@ public interface IWeChatService extends IService<WeChatOrderEntity> {
      * @return:
      */
     void orderStatus(Map<String,String> map);
+
+    /**
+     * @Description: 查询签章
+     * @author: Hu
+     * @since: 2021/9/16 16:32
+     * @Param:
+     * @return:
+     */
+    WeChatOrderEntity getSignature(String serviceOrderNo);
+
+    /**
+     * @author: Pipi
+     * @description: 查询微信支付订单ID
+     * @param serviceOrderNo: 外部订单号
+     * @return: java.lang.String
+     * @date: 2021/9/16 9:58
+     **/
+    WeChatOrderEntity quereIdByServiceOrderNo(String serviceOrderNo);
+
+    /**
+     * @author: Pipi
+     * @description: 查询订单支付状态
+     * @param id: 订单ID
+     * @param serviceOrderNo: 外部订单编号
+     * @return: java.lang.Boolean
+     * @date: 2021/9/17 17:07
+     **/
+    Boolean checkPayStatus(String id, String serviceOrderNo);
+
+    /**
+     * @Description: 条件查询支付订单
+     * @author: Hu
+     * @since: 2021/9/18 14:59
+     * @Param:
+     * @return:
+     */
+    WeChatOrderEntity getOrderByQuery(WechatRefundQO wechatRefundQO);
+
+    /**
+     * @Description: 微信退款回调修改状态
+     * @author: Hu
+     * @since: 2021/9/18 16:02
+     * @Param:
+     * @return:
+     */
+    void orderRefundStatus(Map<String,String> map);
 }

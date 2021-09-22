@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @ApiJSYController
 @Slf4j
-public class WeChatController {
+public class WeChatPayController {
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private IWeChatService weChatService;
@@ -78,6 +78,12 @@ public class WeChatController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
 
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private HousingRentalOrderService housingRentalOrderService;
+
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
+    private AssetLeaseRecordService assetLeaseRecordService;
+
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
 
@@ -85,6 +91,9 @@ public class WeChatController {
     private RedisTemplate redisTemplate;
     //物业费redis缓存分组key
     private final String PROPERTY_FEE="PropertyFee:";
+
+    //房屋租赁redis支付参数key
+    private final String SIGNATURE="Wechat_Lease:";
 
     @Value("${pay.order.timeout}")
     private int payOrderTimeout;
@@ -123,7 +132,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://jsy.free.svipss.top/api/v1/payment/callback/"+serviceConfig.getCompanyId());
+        map.put("notify_url","http://tb2korpp.dongtaiyuming.net/api/v1/payment/callback/"+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
@@ -136,7 +145,7 @@ public class WeChatController {
                 throw new JSYException((int)objectMap.get("code"),String.valueOf(objectMap.get("msg")));
             }
             map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
-        }
+        } else
         //物业费业务逻辑
         if (weChatPayQO.getTradeFrom()==4){
             if ("".equals(weChatPayQO.getIds())||weChatPayQO.getIds()==null){
@@ -149,7 +158,7 @@ public class WeChatController {
             //缓存物业缴费的账单id到redis
             redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),payOrderTimeout, TimeUnit.HOURS);
             map.put("attach",4+","+map.get("out_trade_no")+","+propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()));
-        }
+        } else
         //停车缴费逻辑
         if (weChatPayQO.getTradeFrom()==8){
             if ("".equals(weChatPayQO.getServiceOrderNo())||weChatPayQO.getServiceOrderNo()==null){
@@ -160,12 +169,25 @@ public class WeChatController {
             }
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
             map.put("attach",8+","+weChatPayQO.getServiceOrderNo());
+        } else
+        //房屋租赁业务逻辑
+        if (weChatPayQO.getTradeFrom()==9){
+            if (weChatPayQO.getServiceOrderNo()==null){
+                return CommonResult.error("合同id不能为空！");
+            }
+            WeChatOrderEntity weChatOrderEntity = weChatService.getSignature(weChatPayQO.getServiceOrderNo());
+            if (weChatOrderEntity!=null){
+                return CommonResult.ok(JSONObject.fromObject(redisTemplate.opsForValue().get(SIGNATURE + weChatPayQO.getServiceOrderNo())));
+            } else {
+//                hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
+                map.put("attach",9+","+weChatPayQO.getServiceOrderNo());
+            }
         }
         //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
         msg.setId((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
-        msg.setServiceOrderNo(null);
+        msg.setServiceOrderNo(weChatPayQO.getServiceOrderNo());
         msg.setPayType(weChatPayQO.getTradeFrom());
         msg.setDescription(weChatPayQO.getDescriptionStr());
         msg.setAmount(weChatPayQO.getAmount());
@@ -178,7 +200,7 @@ public class WeChatController {
 //        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
         weChatService.insertOrder(msg);
         //半个小时如果还没支付就自动删除数据库账单
-        rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
+        rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no")+","+entity.getPropertyId(), new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
                     message.getMessageProperties().setHeader("x-delay",60000*120);
@@ -190,6 +212,9 @@ public class WeChatController {
         //第二步获取调起支付的参数
         JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
         object.put("orderNum",map.get("out_trade_no"));
+        if (weChatPayQO.getTradeFrom()==9){
+            redisTemplate.opsForValue().set(SIGNATURE+weChatPayQO.getServiceOrderNo(),JSONUtil.toJsonStr(object),2,TimeUnit.HOURS);
+        }
         return CommonResult.ok(object);
     }
 
@@ -219,7 +244,7 @@ public class WeChatController {
             if (split[0].equals("2")){
                 shoppingMallService.completeShopOrder(split[1]);
                 log.info("处理完成");
-            }
+            } else
             //处理物业费支付回调后的业务逻辑
             if (split[0].equals("4")){
 	            log.info("开始处理物业费订单：" + map.get("out_trade_no"));
@@ -240,7 +265,7 @@ public class WeChatController {
                 receiptEntity.setReceiptMoney(new BigDecimal(split[2]));
                 propertyFinanceReceiptService.add(receiptEntity);
                 log.info("处理完成");
-            }
+            } else
             //停车缴费后记业务
             if (split[0].equals("8")){
                 CarOrderRecordEntity recordEntity = carService.findOne(Long.valueOf(split[1]));
@@ -253,6 +278,19 @@ public class WeChatController {
                     }
                 }
                 log.info("处理完成");
+            } else
+            //房屋租赁业务逻辑
+            if (split[0].equals("9")){
+                // 修改签章合同支付状态
+                Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
+                // 修改租房签约支付状态
+                assetLeaseRecordService.updateOperationPayStatus( split[1]);
+                if(0 != (int)houseMap.get("code")){
+                    throw new PaymentException((int)houseMap.get("code"),String.valueOf(map.get("msg")));
+                }
+                redisTemplate.delete(SIGNATURE+split[1]);
+                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + map.get("out_trade_no"));
+                log.info("租赁处理完成！");
             }
         }
     }

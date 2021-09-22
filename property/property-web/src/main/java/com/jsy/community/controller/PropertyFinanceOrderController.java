@@ -87,6 +87,13 @@ public class PropertyFinanceOrderController {
         Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
         return CommonResult.ok(map);
     }
+    @ApiOperation("根据id查询账单")
+    @PostMapping("/getIds")
+    @Login
+    public CommonResult getIds(@RequestParam String ids){
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.getIds(ids,UserUtils.getAdminCommunityId());
+        return CommonResult.ok(list);
+    }
     @ApiOperation("查询当前小区所有车位")
     @GetMapping("/carList")
     @Login
@@ -268,7 +275,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("获取财务报表-小区收入")
     @PostMapping("/getFinanceForm/community/income")
     public CommonResult getFinanceFormCommunityIncome(@RequestBody PropertyFinanceFormEntity propertyFinanceFormEntity) {
-        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+        List<String> communityIdList = UserUtils.getAdminCommunityIdList();
         try {
             if (propertyFinanceFormEntity.getYear() != null) {
                 String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyFinanceFormEntity.getYear());
@@ -304,7 +311,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("获取财务报表-小区收费报表")
     @PostMapping("/getFinanceForm/community/charge")
     public CommonResult getFinanceFormCommunityCharge(@RequestBody PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
-        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+        List<String> communityIdList = UserUtils.getAdminCommunityIdList();
         try {
             if (propertyFinanceFormChargeEntity.getMonth() != null) {
                 String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyFinanceFormChargeEntity.getMonth());
@@ -351,7 +358,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("获取收款报表-收款报表")
     @PostMapping("/getCollectionForm/collection")
     public CommonResult getCollectionFormCollection(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
-        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+        List<String> communityIdList = UserUtils.getAdminCommunityIdList();
         try {
             if (propertyCollectionFormEntity.getYear() != null) {
                 String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
@@ -446,7 +453,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出财务报表-小区收入")
     @PostMapping("/downloadFinanceFormList")
     public ResponseEntity<byte[]> downloadFinanceFormList(@RequestBody PropertyFinanceFormEntity propertyFinanceFormEntity) {
-        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+        List<String> communityIdList = UserUtils.getAdminCommunityIdList();
 //        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         List<PropertyFinanceFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelFinanceFormList(propertyFinanceFormEntity, communityIdList);
         //设置excel 响应头信息
@@ -477,7 +484,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出财务报表-小区收费报表")
     @PostMapping("/downloadChargeList")
     public ResponseEntity<byte[]> downloadChargeList(@RequestBody PropertyFinanceFormChargeEntity propertyFinanceFormChargeEntity) {
-        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+        List<String> communityIdList = UserUtils.getAdminCommunityIdList();
 //        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
         List<PropertyFinanceFormChargeEntity> orderEntities = propertyFinanceOrderService.queryExportExcelChargeList(propertyFinanceFormChargeEntity, communityIdList);
         //设置excel 响应头信息
@@ -508,7 +515,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("导出收款报表-收款报表")
     @PostMapping("/downloadCollectionFormList")
     public ResponseEntity<byte[]> downloadCollectionFormList(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
-        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+        List<String> communityIdList = UserUtils.getAdminCommunityIdList();
 //        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
         List<PropertyCollectionFormEntity> orderEntities = propertyFinanceOrderService.queryExportExcelCollectionFormList(propertyCollectionFormEntity, communityIdList);
         //设置excel 响应头信息
@@ -571,7 +578,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "新增",content = "新增了【物业账单临时收费】")
     @PropertyFinanceLog(operation = "创建了一个临时账单")
     public CommonResult addTemporaryCharges(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity){
-        if(propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleId() == null
+        if(propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleName() == null
             || propertyFinanceOrderEntity.getPropertyFee() == null || propertyFinanceOrderEntity.getBeginTime() == null || propertyFinanceOrderEntity.getOverTime() == null){
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
         }

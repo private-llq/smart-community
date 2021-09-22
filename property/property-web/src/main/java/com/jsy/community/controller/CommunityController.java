@@ -115,7 +115,7 @@ public class CommunityController {
         Long communityId = communityService.addCommunity(communityEntity, UserUtils.getUserId());
         // 获取登录用户数据
         AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
-        adminUserInfo.getCommunityIdList().add(communityId);
+        adminUserInfo.getCommunityIdList().add(String.valueOf(communityId));
         String token = UserUtils.getUserToken();
         // 根据token,更新Redis数据
         userUtils.updateRedisByToken("Admin:Login", JSON.toJSONString(adminUserInfo), token, loginExpireHour);
@@ -188,7 +188,7 @@ public class CommunityController {
     @GetMapping("/getPropertySurvey")
     public CommonResult getPropertySurvey() {
         Long companyId = UserUtils.getAdminCompanyId();
-        List<Long> communityIdList = UserUtils.getAdminCommunityIdList();
+        List<String> communityIdList = UserUtils.getAdminCommunityIdList();
         return CommonResult.ok(communityService.getPropertySurvey(companyId, communityIdList));
     }
 
@@ -230,7 +230,7 @@ public class CommunityController {
     @Login
     @GetMapping("/group/send/sms")
     public CommonResult groupSendSMS(@RequestParam(value = "content")String content, @RequestParam(value = "isDistinct")boolean isDistinct,
-                                     @RequestParam(value = "taskTime")String taskTime, @RequestParam(value = "number")int number, @RequestParam(value = "communityIdList")List<Long> communityIdList) {
+                                     @RequestParam(value = "taskTime")String taskTime, @RequestParam(value = "number")int number, @RequestParam(value = "communityIdList")List<String> communityIdList) {
         Long adminCompanyId = UserUtils.getAdminCompanyId();
         if (content == null) {
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "缺少查询类型");

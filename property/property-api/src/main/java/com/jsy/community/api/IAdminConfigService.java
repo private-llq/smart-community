@@ -196,6 +196,6 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/22
 	**/
-	void updateAdminCommunityBatch(List<Long> communityIds,String uid);
+	void updateAdminCommunityBatch(List<String> communityIds,String uid);
 	//================================================== 新版物业端原型 - 用户-菜单end =========================================================================
 }

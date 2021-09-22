@@ -1509,8 +1509,7 @@ public class FinanceExcelImpl implements FinanceExcelHandler {
                     case 11:
                         // 支付方式
                         if (entity.getPayType() != null) {
-                            cell.setCellValue(entity.getPayType() == 1 ? "微信" : entity.getPayType() == 2 ? "支付宝" : entity.getPayType() == 3 ? "余额" : entity.getPayType() == 4 ? "现金" :
-                                entity.getPayType() == 5 ? "银联刷卡" : entity.getPayType() == 6 ? "银行代扣" : entity.getPayType() == 7 ? "预存款抵扣" : "");
+                            cell.setCellValue(entity.getPayType() == 1 ? "app支付" : "物业后台");
                         }
                         break;
                     case 12:

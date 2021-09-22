@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.api.IUserService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
@@ -156,5 +157,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 		pageInfo.setCurrent(baseQO.getPage());
 		pageInfo.setRecords(userEntityList);
 		return pageInfo;
+	}
+
+	/**
+	 * @param userEntity :
+	 * @author: Pipi
+	 * @description: 人脸操作(启用 / 禁用人脸)
+	 * @return: java.lang.Integer
+	 * @date: 2021/9/22 10:35
+	 **/
+	@Override
+	public Integer faceOpration(UserEntity userEntity) {
+		QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("real_name", userEntity.getRealName());
+		queryWrapper.eq("mobile", userEntity.getMobile());
+		UserEntity userEntityResult = baseMapper.selectOne(queryWrapper);
+		if (userEntityResult.getFaceEnableStatus() == userEntity.getFaceEnableStatus()) {
+			throw new PropertyException("人脸已经启用/禁用,请勿重复操作");
+		}
+		if (userEntity.getFaceEnableStatus() == 1) {
+			// 启用操作
+		} else {
+			// 禁用操作
+		}
+		return null;
 	}
 }

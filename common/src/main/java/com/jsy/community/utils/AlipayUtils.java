@@ -7,9 +7,14 @@ import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.codec.Base64;
 import com.alipay.api.request.AlipayTradeCloseRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipayTradeCloseResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.jsy.community.constant.ConstClasses;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
@@ -33,6 +39,7 @@ import java.security.cert.X509Certificate;
  * @description 支付宝工具类
  * @since 2021-01-12 09:15
  **/
+@Slf4j
 @Component
 public class AlipayUtils {
 	
@@ -137,12 +144,11 @@ public class AlipayUtils {
 		AlipayTradeCloseResponse response = null;
 		try {
 			response = client.certificateExecute(request);
+			log.info("{}", response);
 			if (response.isSuccess()){
-				System.out.println("关闭成功！");
-				System.out.println(response);
+				log.info("关闭成功！");
 			}else {
-				System.out.println("关闭失败！");
-				System.out.println(response);
+				log.info("关闭失败！");
 			}
 		} catch (AlipayApiException e) {
 			e.printStackTrace();
@@ -150,9 +156,62 @@ public class AlipayUtils {
 	}
 
 	/**
+	 * @author: Pipi
+	 * @description: 查询订单
+	 * @param outTradeNo:
+	 * @return: java.lang.String
+	 * @date: 2021/9/16 14:06
+	 **/
+	public static String queryOrder(String outTradeNo) throws Exception {
+		AlipayClient client = getDefaultCertClient();
+		AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+		JSONObject bizContent = new JSONObject();
+		bizContent.put("out_trade_no",outTradeNo);
+		request.setBizContent(bizContent.toString());
+		AlipayTradeQueryResponse response = null;
+		try {
+			return client.certificateExecute(request).toString();
+		} catch (AlipayApiException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 支付宝订单退款
+	 * @param outTradeNo: 项目订单号
+     * @param refundAmount: 退款金额(单位:元;支持两位小数)
+	 * @return: void
+	 * @date: 2021/9/16 17:06
+	 **/
+	public static void orderRefund(String outTradeNo, BigDecimal refundAmount) {
+		AlipayClient client = getDefaultCertClient();
+		AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
+		JSONObject bizContent = new JSONObject();
+		bizContent.put("out_trade_no",outTradeNo);
+		bizContent.put("refund_amount", refundAmount);
+		request.setBizContent(bizContent.toString());
+		AlipayTradeRefundResponse response = null;
+		try {
+			response = client.certificateExecute(request);
+			log.info("订单{}退款响应信息:{}", outTradeNo, response);
+			if (response.isSuccess()){
+				log.info("订单:{}退款成功", outTradeNo);
+			}else {
+				log.info("订单:{}退款失败", outTradeNo);
+			}
+		} catch (AlipayApiException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	/**
 	 * @Description: 验签工具类
 	 * @author: Hu
 	 * @since: 2021/9/16 10:10
+	 *
 	 * @Param:
 	 * @return:
 	 */

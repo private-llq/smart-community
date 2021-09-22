@@ -60,7 +60,54 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     
 //    @Value("${}")
     private long visitorTimeLimit = 60*24*60; //单位 秒
-    
+
+    /**
+     * @Description: 访客登记 新增V2
+     * @Param: [visitorEntity]
+     * @Return: void
+     * @Author: chq459799974
+     * @Date: 2020/11/12
+     **/
+    @Override
+    public VisitorEntryVO addVisitorV2(VisitorEntity visitorEntity) {
+        long visitorId = SnowFlake.nextId();
+        visitorEntity.setId(visitorId);
+        int insert = visitorMapper.insert(visitorEntity);
+
+        //把访客登记数据推送给小区
+        rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_VISITOR_TO_COMMUNITY,TopicExConfig.QUEUE_VISITOR_TO_COMMUNITY + "." + visitorEntity.getCommunityId(),JSON.toJSONString(visitorEntity));
+
+        //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
+        if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())){
+            //小区是否有二维码设备(目前只用炫优一体机判断)
+            Integer count = communityHardWareMapper.countCommunityHardWare(visitorEntity.getCommunityId(), BusinessConst.HARDWARE_TYPE_XU_FACE);
+            if(count < 1){
+                return null;
+            }
+            VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
+            visitorEntryVO.setId(visitorEntity.getId());
+            return visitorEntryVO;
+        }
+        return null;
+    }
+
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/9/16 15:04
+     * @Param:
+     * @return:
+     */
+    @Override
+    public VisitorEntity selectOneByIdv2(Long id) {
+        VisitorEntity VisitorEntity = visitorMapper.selectOne(new QueryWrapper<VisitorEntity>().select("*").eq("id", id));
+        VisitorEntity.setReasonStr(BusinessEnum.VisitReasonEnum.visitReasonMap.get(VisitorEntity.getReason()));
+        VisitorEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.CAR_TYPE_MAP.get(VisitorEntity.getCarType()));
+        VisitorEntity.setIsCommunityAccessStr(BusinessEnum.CommunityAccessEnum.communityAccessMap.get(VisitorEntity.getIsCommunityAccess()));
+        VisitorEntity.setIsCarBanAccessStr(BusinessEnum.BuildingAccessEnum.buildingAccessMap.get(VisitorEntity.getIsCarBanAccess()));
+        return VisitorEntity;
+    }
+
     /**
     * @Description: 访客登记 新增
      * @Param: [visitorEntity]
@@ -132,7 +179,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         
         //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
         if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())
-            || BusinessEnum.BuildingAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsBuildingAccess())){
+            || BusinessEnum.BuildingAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCarBanAccess())){
             //小区是否有二维码设备(目前只用炫优一体机判断)
             Integer count = communityHardWareMapper.countCommunityHardWare(visitorEntity.getCommunityId(), BusinessConst.HARDWARE_TYPE_XU_FACE);
             if(count < 1){
@@ -392,7 +439,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         VisitorEntity.setReasonStr(BusinessEnum.VisitReasonEnum.visitReasonMap.get(VisitorEntity.getReason()));
         VisitorEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.CAR_TYPE_MAP.get(VisitorEntity.getCarType()));
         VisitorEntity.setIsCommunityAccessStr(BusinessEnum.CommunityAccessEnum.communityAccessMap.get(VisitorEntity.getIsCommunityAccess()));
-        VisitorEntity.setIsBuildingAccessStr(BusinessEnum.BuildingAccessEnum.buildingAccessMap.get(VisitorEntity.getIsBuildingAccess()));
+        VisitorEntity.setIsCarBanAccessStr(BusinessEnum.BuildingAccessEnum.buildingAccessMap.get(VisitorEntity.getIsCarBanAccess()));
         return VisitorEntity;
     }
     

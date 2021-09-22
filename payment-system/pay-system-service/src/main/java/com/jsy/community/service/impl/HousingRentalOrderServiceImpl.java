@@ -3,15 +3,13 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.HousingRentalOrderService;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
-import com.jsy.community.dto.signature.SignResult;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.utils.AESUtil;
-import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MyHttpUtils;
+import com.jsy.community.utils.signature.ZhsjUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
 import java.util.HashMap;
@@ -26,12 +24,6 @@ import java.util.Map;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_payment)
 public class HousingRentalOrderServiceImpl implements HousingRentalOrderService {
-
-    private static final String PROTOCOL_TYPE = "http://";
-    private static final String HOST = "222.178.212.29";
-    private static final String PORT = "13000";
-    // 修改租房订单支付状态
-    private static final String MODIFY_ORDER_PAY_STATUS = "/zh-sign/contract-server/houseLeaseContract/updateHouseLeaseContractPay";
 
     /**
      * @author: Pipi
@@ -49,9 +41,9 @@ public class HousingRentalOrderServiceImpl implements HousingRentalOrderService 
         bodyMap.put("isPayment", true);
         bodyMap.put("orderUuid", orderNo);
         //url
-        String url = PROTOCOL_TYPE + HOST + ":" + PORT + MODIFY_ORDER_PAY_STATUS;
+        String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.MODIFY_ORDER_PAY_STATUS;
         // 加密参数
-        String bodyString = paramEncryption(bodyMap);
+        String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
         //组装http请求
         HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyString);
         //设置header
@@ -87,24 +79,4 @@ public class HousingRentalOrderServiceImpl implements HousingRentalOrderService 
         }
     }
 
-    /**
-     * @author: Pipi
-     * @description: 参数加密
-     * @param o:
-     * @return: java.lang.String
-     * @date: 2021/8/16 17:27
-     **/
-    public String paramEncryption(Object o) {
-        String data = JSON.toJSONString(o);
-        String encrypt = AESUtil.encrypt(data, "?b@R~@Js6yH`aFal=LAHg?l~K|ExYJd;", "1E}@+?f-voEy;_?r");
-        System.out.println(AESUtil.decrypt(encrypt,"?b@R~@Js6yH`aFal=LAHg?l~K|ExYJd;", "1E}@+?f-voEy;_?r"));
-        SignResult<String> success = SignResult.success(encrypt);
-        Map map = JSON.parseObject(JSON.toJSONString(success), Map.class);
-        map.put("secret", "巴拉啦小魔仙");
-        map.put("time", success.getTime());
-        String signStr = MD5Util.signStr(map);
-        String md5Str = MD5Util.getMd5Str(signStr);
-        success.setSign(md5Str);
-        return md5Str;
-    }
 }

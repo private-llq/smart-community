@@ -183,10 +183,10 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/20
 	 **/
-	public static List<Long> getAdminCommunityIdList() {
+	public static List<String> getAdminCommunityIdList() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
-		return (List<Long>) request.getAttribute(USER_COMMUNITY_ID_LIST);
+		return (List<String>) request.getAttribute(USER_COMMUNITY_ID_LIST);
 	}
 	
 	/**
@@ -197,8 +197,8 @@ public class UserUtils {
 	 * @Date: 2021/7/20
 	**/
 	public static void validateCommunityId(Long communityId){
-		List<Long> communityIdList = getAdminCommunityIdList();
-		if(!communityIdList.contains(communityId)){
+		List<String> communityIdList = getAdminCommunityIdList();
+		if(!communityIdList.contains(String.valueOf(communityId))){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无该社区权限！");
 		}
 	}
@@ -210,9 +210,9 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/20
 	 **/
-	public static void validateCommunityIds(Collection<Long> communityIds){
-		List<Long> communityIdList = getAdminCommunityIdList();
-		for(Long communityId : communityIds){
+	public static void validateCommunityIds(Collection<String> communityIds){
+		List<String> communityIdList = getAdminCommunityIdList();
+		for(String communityId : communityIds){
 			if(!communityIdList.contains(communityId)){
 				throw new JSYException(JSYError.BAD_REQUEST.getCode(),"部分社区无权限！");
 			}

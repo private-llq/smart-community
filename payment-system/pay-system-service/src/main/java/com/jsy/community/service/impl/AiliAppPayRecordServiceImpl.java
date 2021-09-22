@@ -93,4 +93,32 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 			return false;
 		}
 	}
+
+	/**
+	 * @param serviceOrderNo : 外部订单号
+	 * @author: Pipi
+	 * @description: 通过外部订单号查询订单号
+	 * @return: java.lang.String
+	 * @date: 2021/9/16 9:51
+	 **/
+	@Override
+	public AiliAppPayRecordEntity queryOrderNoByServiceOrderNo(String serviceOrderNo) {
+		QueryWrapper<AiliAppPayRecordEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("service_order_no", serviceOrderNo);
+		return ailiAppPayRecordDao.selectOne(queryWrapper);
+	}
+
+	/**
+	 * @param orderNo        : 订单编号
+	 * @author: Pipi
+	 * @description: 删除支付订单
+	 * @return: java.lang.Integer
+	 * @date: 2021/9/16 17:50
+	 **/
+	@Override
+	public Integer deleteByOrderNo(Long orderNo) {
+		QueryWrapper<AiliAppPayRecordEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("order_no", orderNo);
+		return ailiAppPayRecordDao.delete(queryWrapper);
+	}
 }

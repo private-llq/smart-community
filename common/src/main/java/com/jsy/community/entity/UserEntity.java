@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +24,7 @@ import java.util.Set;
 public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("uid")
+	@NotBlank(groups = {FaceOprationValidate.class}, message = "uid不能为空")
 	private String uid;
 	
 	@ApiModelProperty("业主ID")
@@ -40,6 +43,7 @@ public class UserEntity extends BaseEntity {
 	private Integer faceEnableStatus;
 
 	@ApiModelProperty("电话号码")
+	@NotBlank(groups = {FaceOprationValidate.class}, message = "电话号码不能为空")
 	private String mobile;
 	
 	@ApiModelProperty("性别，0未知，1男，2女")
@@ -49,6 +53,7 @@ public class UserEntity extends BaseEntity {
 	private LocalDateTime birthdayTime;
 	
 	@ApiModelProperty("真实姓名")
+	@NotBlank(groups = {FaceOprationValidate.class}, message = "真实姓名不能为空")
 	private String realName;
 	
 	@ApiModelProperty("身份证")
@@ -93,6 +98,8 @@ public class UserEntity extends BaseEntity {
 	@ApiModelProperty("联系邮箱")
 	private String email;
 
+	// 人脸启用状态;1:启用;2:禁用
+	private String faceEnableStatusStr;
 
 	@ApiModelProperty("房屋id")
 	@TableField( exist = false)
@@ -126,9 +133,6 @@ public class UserEntity extends BaseEntity {
 	@TableField( exist = false )
 	private Integer distributionStatus;
 
-	// 人脸启用状态;1:启用;2:禁用
-	@TableField( exist = false )
-	private String faceEnableStatusStr;
 
 	// 下发状态;1:失败(未完整同步);2;成功
 	@TableField( exist = false )
@@ -138,9 +142,19 @@ public class UserEntity extends BaseEntity {
 	@TableField( exist = false )
 	private Long communityId;
 
+	// 设备ID
+	@TableField( exist = false )
+	@NotEmpty(groups = {FaceOprationValidate.class}, message = "设备列表不能为空")
+	private List<String> hardwareId;
+
 	/**
 	 * 业主登记验证接口
 	 */
 	public interface ProprietorRegister{}
+
+	/**
+	 * 用户人脸操作验证组
+	 */
+	public interface FaceOprationValidate{}
 
 }

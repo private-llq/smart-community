@@ -114,7 +114,7 @@ public class VisitorController {
 			visitorEntity.setIsCommunityAccess(1);
 		}
 		// 默认楼栋门禁为无
-		visitorEntity.setIsBuildingAccess(0);
+		visitorEntity.setIsCarBanAccess(0);
 		// 审核方式默认为物业审核
 		visitorEntity.setCheckType(2);
 		visitorEntity.setCheckTime(LocalDateTime.now());

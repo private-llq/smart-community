@@ -75,4 +75,13 @@ public interface IUserService extends IService<UserEntity> {
 	 * @date: 2021/9/8 16:35
 	 **/
 	PageInfo<UserEntity> facePageList(BaseQO<UserEntity> baseQO);
+
+	/**
+	 * @author: Pipi
+	 * @description: 人脸操作(启用/禁用人脸)
+	 * @param userEntity:
+	 * @return: java.lang.Integer
+	 * @date: 2021/9/22 10:35
+	 **/
+	Integer faceOpration(UserEntity userEntity);
 }
