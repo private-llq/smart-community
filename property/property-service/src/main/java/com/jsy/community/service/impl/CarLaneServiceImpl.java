@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarLaneService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarLaneEntity;
 import com.jsy.community.mapper.CarLaneMapper;
@@ -15,6 +16,8 @@ import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 
 @DubboService(version = Const.version, group = Const.group_property)
@@ -35,6 +38,13 @@ public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity
     public Integer SaveCarLane(CarLaneEntity CarLaneEntity,Long communityId) {
         CarLaneEntity.setUid((UserUtils.randomUUID()));
         CarLaneEntity.setCommunityId(communityId);
+       CarLaneEntity carLaneEntity = carLaneMapper.selectOne(new QueryWrapper<CarLaneEntity>()
+                .eq("community_id", communityId)
+                .eq("equipment_id", CarLaneEntity.getEquipmentId())
+        );
+       if (Objects.nonNull(carLaneEntity)){
+           throw new PropertyException("该设备已经被安装到其他车道，请勿重复添加！");
+       }
         int insert = carLaneMapper.insert(CarLaneEntity);
         return insert;
     }
