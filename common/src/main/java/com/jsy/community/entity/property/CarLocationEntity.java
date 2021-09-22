@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Data
 @ApiModel("设备管理-设备位置")
 @TableName("t_car_equipment_location")
-public class CarLocationEntity implements Serializable{
+public class CarLocationEntity extends BaseQO {
     @ApiModelProperty("主键id")
         private Long id;
 

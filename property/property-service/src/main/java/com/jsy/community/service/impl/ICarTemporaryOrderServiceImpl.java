@@ -57,14 +57,25 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
         }
         QueryWrapper<CarOrderEntity> queryWrapper = new QueryWrapper<CarOrderEntity>();
         CarOrderQO query = baseQO.getQuery();
-        if (StringUtils.isNotBlank(query.getCarPlate())){
-            //车牌
-            queryWrapper.like("car_plate", query.getCarPlate());
-        }
+
         //临时车  1和 2  包月车
         if (query.getType()!=null){
             queryWrapper.eq("type", query.getType());
         }
+
+       if (StringUtils.isNotBlank(query.getCarPlate())){
+           if (query.getType()==1){
+               //临时车根据车牌号
+               queryWrapper.like("car_plate", query.getCarPlate());
+           }else {
+               //包月车根据车位id
+               CarPositionEntity car_position = positionMapper.selectOne(new QueryWrapper<CarPositionEntity>().like("car_position", query.getCarPlate()));
+               if (car_position!=null){
+                   queryWrapper.like("car_position_id", car_position.getId());
+               }
+           }
+       }
+
         //支付类型 1已支付  2未支付
         if (query.getOrderStatus()!=null){
             queryWrapper.eq("order_status",query.getOrderStatus());
@@ -85,7 +96,7 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
                 String s = datePoor.get("day")+"天："+datePoor.get("hour")+" 小时："+datePoor.get("min")+" 分钟";
                 i.setStopCarTime(s);
             }
-            System.out.println(i.getCarPositionId());
+//            System.out.println(i.getCarPositionId());
             if (i.getCarPositionId()!=null){
                 CarPositionEntity entity = positionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("id", i.getCarPositionId()));
                 i.setCarPositionText(entity.getCarPosition());

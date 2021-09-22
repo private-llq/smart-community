@@ -15,7 +15,7 @@ public interface ICarLocationService extends IService<CarLocationEntity> {
      * @Author: Tian
      * @Date: 2021/8/9-11:28
      **/
-    Page<CarLocationEntity> listLocation(CarLocationEntity baseQO, Long communityId);
+    Page<CarLocationEntity> listLocation(BaseQO<CarLocationEntity> baseQO, Long communityId);
 
     /**
      * @Description: 添加设备管理--设备位置

@@ -25,27 +25,16 @@ public class CarLocationServiceImpl extends ServiceImpl<CarLocationMapper,CarLoc
     private CarLocationMapper locationMapper;
 
     @Override
-    public Page<CarLocationEntity> listLocation(CarLocationEntity baseQO, Long communityId) {
+    public Page<CarLocationEntity> listLocation(BaseQO<CarLocationEntity> baseQO, Long communityId) {
 
-//        if (baseQO.getPage()==0){
-//            throw new JSYException("页数不能为空");
-//        }
+
         Page<CarLocationEntity> page = new Page<>(baseQO.getPage(),baseQO.getSize());
 
-//        if (baseQO.getSize()==null || baseQO.getSize()==0){
-//            throw new JSYException("条数为空");
-//        }
-
-//        if (baseQO.getQuery()==null){
-//            baseQO.setQuery(new CarLocationEntity());
-//        }
-//        CarLocationEntity query = baseQO.getQuery();
-        System.out.println(communityId);
         QueryWrapper<CarLocationEntity> queryWrapper = new QueryWrapper<CarLocationEntity>().eq("community_id", communityId);
 
         //baseQO.setCommunityId(communityId);
-
-        if (!StringUtils.isEmpty(baseQO.getEquipmentLocation())){
+        CarLocationEntity query = baseQO.getQuery();
+        if (!StringUtils.isEmpty(query.getEquipmentLocation())){
             queryWrapper.like("equipment_location",baseQO.getQuery().getEquipmentLocation());
         }
 

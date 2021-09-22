@@ -89,7 +89,19 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public Set<Long> queryUserHousesOfCommunityIds(String uid){
 		return userHouseMapper.queryUserHousesOfCommunityIds(uid);
 	}
-	
+
+	/**
+	 * @Description: 查询用户社区id(家属租客的)
+	 * @Param: [uid]
+	 * @Return: java.util.Set<java.lang.Long>
+	 * @Author: chq459799974
+	 * @Date: 2021/3/31
+	 **/
+	@Override
+	public Set<Long> queryRelationHousesOfCommunityIds(String uid) {
+		return userHouseMapper.queryRelationHousesOfCommunityIds(uid);
+	}
+
 	/**
 	 * @Description: 查询业主所有拥有房屋id和相应社区id
 	 * @Param: [uid]
