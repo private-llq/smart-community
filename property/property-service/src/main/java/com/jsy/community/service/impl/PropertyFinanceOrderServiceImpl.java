@@ -957,10 +957,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 小区已支付账单查询
         List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(wrapper);
         for (PropertyFinanceOrderEntity entity : entities) {
-            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-                if (financeFormChargeEntity.getFeeRuleId().equals(entity.getFeeRuleId())) {
-                    financeFormChargeEntity.setCollectPenalMoney(entity.getCollectPenalMoney());
-                    financeFormChargeEntity.setCommunityOnlineCharging(entity.getCommunityOnlineCharging());
+            if (entity.getFeeRuleId() != null) {
+                for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                    if (financeFormChargeEntity.getFeeRuleId() != null) {
+                        if (financeFormChargeEntity.getFeeRuleId().equals(entity.getFeeRuleId())) {
+                            financeFormChargeEntity.setCollectPenalMoney(entity.getCollectPenalMoney());
+                            financeFormChargeEntity.setCommunityOnlineCharging(entity.getCommunityOnlineCharging());
+                        }
+                    }
                 }
             }
         }
@@ -981,9 +985,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 小区往月待支付账单查询
         List<PropertyFinanceOrderEntity> lastMonthEntities = propertyFinanceOrderMapper.selectList(financeOrderQueryWrapper);
         for (PropertyFinanceOrderEntity lastMonthEntity : lastMonthEntities) {
-            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-                if (financeFormChargeEntity.getFeeRuleId().equals(lastMonthEntity.getFeeRuleId())) {
-                    financeFormChargeEntity.setArrearsMoney(lastMonthEntity.getArrearsMoney());
+            if (lastMonthEntity.getFeeRuleId() != null) {
+                for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                    if (financeFormChargeEntity.getFeeRuleId() != null) {
+                        if (financeFormChargeEntity.getFeeRuleId().equals(lastMonthEntity.getFeeRuleId())) {
+                            financeFormChargeEntity.setArrearsMoney(lastMonthEntity.getArrearsMoney());
+                        }
+                    }
                 }
             }
         }
@@ -1007,9 +1015,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 小区本月待支付账单查询
         List<PropertyFinanceOrderEntity> entityList = propertyFinanceOrderMapper.selectList(financeOrderEntityQueryWrapper);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entityList) {
-            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-                if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
-                    financeFormChargeEntity.setThisMonthArrearsMoney(propertyFinanceOrderEntity.getThisMonthArrearsMoney());
+            if (propertyFinanceOrderEntity.getFeeRuleId() != null) {
+                for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                    if (financeFormChargeEntity.getFeeRuleId() != null) {
+                        if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
+                            financeFormChargeEntity.setThisMonthArrearsMoney(propertyFinanceOrderEntity.getThisMonthArrearsMoney());
+                        }
+                    }
                 }
             }
         }
@@ -1108,10 +1120,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 小区已支付账单查询
         List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(wrapper);
         for (PropertyFinanceOrderEntity entity : entities) {
-            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-                if (financeFormChargeEntity.getFeeRuleId().equals(entity.getFeeRuleId())) {
-                    financeFormChargeEntity.setCollectPenalMoney(entity.getCollectPenalMoney());
-                    financeFormChargeEntity.setCommunityOnlineCharging(entity.getCommunityOnlineCharging());
+            if (entity.getFeeRuleId() != null) {
+                for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                    if (financeFormChargeEntity.getFeeRuleId() != null) {
+                        if (financeFormChargeEntity.getFeeRuleId().equals(entity.getFeeRuleId())) {
+                            financeFormChargeEntity.setCollectPenalMoney(entity.getCollectPenalMoney());
+                            financeFormChargeEntity.setCommunityOnlineCharging(entity.getCommunityOnlineCharging());
+                        }
+                    }
                 }
             }
         }
@@ -1133,9 +1149,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 小区往月待支付账单查询
         List<PropertyFinanceOrderEntity> lastMonthEntities = propertyFinanceOrderMapper.selectList(financeOrderQueryWrapper);
         for (PropertyFinanceOrderEntity lastMonthEntity : lastMonthEntities) {
-            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-                if (financeFormChargeEntity.getFeeRuleId().equals(lastMonthEntity.getFeeRuleId())) {
-                    financeFormChargeEntity.setArrearsMoney(lastMonthEntity.getArrearsMoney());
+            if (lastMonthEntity.getFeeRuleId() != null) {
+                for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                    if (financeFormChargeEntity.getFeeRuleId() != null) {
+                        if (financeFormChargeEntity.getFeeRuleId().equals(lastMonthEntity.getFeeRuleId())) {
+                            financeFormChargeEntity.setArrearsMoney(lastMonthEntity.getArrearsMoney());
+                        }
+                    }
                 }
             }
         }
@@ -1160,9 +1180,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         // 小区本月待支付账单查询
         List<PropertyFinanceOrderEntity> entityList = propertyFinanceOrderMapper.selectList(financeOrderEntityQueryWrapper);
         for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : entityList) {
-            for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
-                if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
-                    financeFormChargeEntity.setThisMonthArrearsMoney(propertyFinanceOrderEntity.getThisMonthArrearsMoney());
+            if (propertyFinanceOrderEntity.getFeeRuleId() != null) {
+                for (PropertyFinanceFormChargeEntity financeFormChargeEntity : propertyFinanceFormChargeEntityList) {
+                    if (financeFormChargeEntity.getFeeRuleId() != null) {
+                        if (financeFormChargeEntity.getFeeRuleId().equals(propertyFinanceOrderEntity.getFeeRuleId())) {
+                            financeFormChargeEntity.setThisMonthArrearsMoney(propertyFinanceOrderEntity.getThisMonthArrearsMoney());
+                        }
+                    }
                 }
             }
         }

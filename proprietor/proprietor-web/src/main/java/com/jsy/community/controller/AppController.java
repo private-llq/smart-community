@@ -6,16 +6,13 @@ import com.jsy.community.api.IAppVersionService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppVersionEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -100,6 +97,23 @@ public class AppController {
 			return CommonResult.error("请传入id");
 		}
 		return appVersionService.removeById(id) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+	}
+	
+	/**
+	 * @Description: 查询APP版本详情
+	 * @author: DKS
+	 * @since: 2021/9/22 11:49
+	 * @Param: [sysType]
+	 * @return: com.jsy.community.vo.CommonResult
+	 */
+	@ApiOperation("查询APP版本详情")
+	@GetMapping("/v2/version")
+	public CommonResult queryAppVersion(Integer sysType){
+		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
+			return CommonResult.error("请传入正确的系统类型");
+		}
+		AppVersionEntity appVersionEntity = appVersionService.queryAppVersion(sysType);
+		return CommonResult.ok(appVersionEntity,"查询成功");
 	}
 	
 }
