@@ -197,7 +197,8 @@ public class CarEquipmentManageController {
      **/
     @Login
     @PostMapping("/listLocation")
-    public  CommonResult listLocation(@RequestBody CarLocationEntity baseQO){
+    public  CommonResult listLocation(@RequestBody BaseQO<CarLocationEntity> baseQO){
+
         Page<CarLocationEntity> locationEntityList = locationService.listLocation(baseQO,UserUtils.getAdminCommunityId());
         System.out.println(UserUtils.getAdminCommunityId());
         return CommonResult.ok(locationEntityList,"查询成功");
