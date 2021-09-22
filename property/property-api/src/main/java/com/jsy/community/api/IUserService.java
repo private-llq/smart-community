@@ -83,5 +83,5 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return: java.lang.Integer
 	 * @date: 2021/9/22 10:35
 	 **/
-	Integer faceOpration(UserEntity userEntity);
+	Integer faceOpration(UserEntity userEntity, String communityId);
 }
