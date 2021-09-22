@@ -118,10 +118,10 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
     @Transactional
     public void deleteBinding(String uid) {
         //todo 新增的包月车辆默认是已绑定车位那一辆车
-       /* BindingPositionEntity entity = bindingPositionMapper.selectOne(new QueryWrapper<BindingPositionEntity>().eq("uid", uid));
-        if (entity.getBindingStatus()==1){
-            throw new PropertyException("该车辆已绑定车位，如需删除请先解绑！");
-        }*/
+        /*BindingPositionEntity entity = bindingPositionMapper.selectOne(new QueryWrapper<BindingPositionEntity>().eq("uid", uid));
+         if (entity.getBindingStatus()==1){
+             throw new PropertyException("该车辆已绑定车位，如需删除请先解绑！");
+         }*/
         bindingPositionMapper.delete(new QueryWrapper<BindingPositionEntity>().eq("uid",uid));
     }
 
@@ -140,6 +140,5 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
         }
         bindingPositionMapper.delete(new QueryWrapper<BindingPositionEntity>().in("position_id",list));
     }
-
 
 }

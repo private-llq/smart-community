@@ -10,6 +10,7 @@ import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYException;
@@ -59,6 +60,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
     @Autowired
     private BindingPositionMapper bindingPositionMapper;
+    @Autowired
+    private CommunityMapper communityMapper;
 
 
 
@@ -237,6 +240,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         orderEntity.setOverTime(carMonthlyVehicle.getEndTime().toLocalDate());//账单结束时间
         orderEntity.setBuildType(1);//系统生成
 
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
+        String communityName= communityEntity.getName();
+        String chargeName = carChargeEntity.getName();
+        orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
+
 
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
@@ -409,6 +417,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         orderEntity.setBeginTime(carMonthlyVehicle.getStartTime().toLocalDate());//账单开始时间
         orderEntity.setOverTime(carMonthlyVehicle.getEndTime().toLocalDate());//账单结束时间
         orderEntity.setBuildType(1);//系统生成
+
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
+        String communityName= communityEntity.getName();
+        String chargeName = "包月延期";
+        orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
 
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
@@ -600,6 +613,12 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setBeginTime(startTime.toLocalDate());//账单开始时间
             orderEntity.setOverTime(endTime.toLocalDate());//账单结束时间
             orderEntity.setBuildType(1);//系统生成
+
+            CommunityEntity communityEntity = communityMapper.selectById(communityId);
+            String communityName= communityEntity.getName();
+            String chargeName ="车辆包月(表格导入)";
+            orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
+
 
             PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                     .eq("status", 1)
@@ -853,6 +872,12 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         orderEntity.setOverTime(carMonthlyVehicle.getEndTime().toLocalDate());//账单结束时间
         orderEntity.setBuildType(1);//系统生成
 
+
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
+        String communityName= communityEntity.getName();
+        String chargeName = "车位包月";
+        orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
+
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
                 .eq("deleted", 0)
@@ -1029,6 +1054,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setBeginTime(startTime.toLocalDate());//账单开始时间
             orderEntity.setOverTime(endTime.toLocalDate());//账单结束时间
             orderEntity.setBuildType(1);//系统生成
+
+            CommunityEntity communityEntity = communityMapper.selectById(communityId);
+            String communityName= communityEntity.getName();
+            String chargeName = "包月车位(表格导入)";
+            orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
 
             PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                     .eq("status", 1)
