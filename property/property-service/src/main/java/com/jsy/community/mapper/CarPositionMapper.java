@@ -31,7 +31,7 @@ public interface CarPositionMapper extends BaseMapper<CarPositionEntity> {
      * @Param: communityIdList
      * @return: Integer
      */
-    Integer selectAllCarPositionByCommunityIds(@Param("list") List<Long> communityIdList);
+    Integer selectAllCarPositionByCommunityIds(@Param("list") List<String> communityIdList);
 
 	int relieve(Long id);
 
@@ -52,7 +52,7 @@ public interface CarPositionMapper extends BaseMapper<CarPositionEntity> {
 	 * @Param: communityIdList
 	 * @return: Integer
 	 */
-	Integer selectAllOccupyCarPositionByCommunityIds(@Param("list") List<Long> communityIdList);
+	Integer selectAllOccupyCarPositionByCommunityIds(@Param("list") List<String> communityIdList);
 
 	/**
 	 * @Description: 查询所有业主自用或者月租车位

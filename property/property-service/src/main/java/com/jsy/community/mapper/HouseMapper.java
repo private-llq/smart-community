@@ -300,7 +300,7 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Param: communityIdList
 	 * @return: Integer
 	 */
-	Integer selectAllHouseByCommunityIds(@Param("list") List<Long> communityIdList);
+	Integer selectAllHouseByCommunityIds(@Param("list") List<String> communityIdList);
 
 	/**
 	 * @Description: 查询小区下所有认证过的房屋

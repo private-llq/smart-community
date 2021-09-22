@@ -232,7 +232,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	 * @date: 2021/7/22 11:46
 	 **/
 	@Override
-	public PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, List<Long> communityIds) {
+	public PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, List<String> communityIds) {
 		PageInfo<PropertyCommunityListVO> communityListVOPageInfo = new PageInfo<>();
 		Page<CommunityEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
@@ -347,8 +347,8 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		List<HouseEntity> buildingList = houseMapper.getBuildingList(adminCommunityId);
 		communitySurveyEntity.setHouseSum(allHouse.size());
 		communitySurveyEntity.setBuildingSum(buildingList.size());
-		List<Long> communityIdList = new ArrayList<>();
-		communityIdList.add(adminCommunityId);
+		List<String> communityIdList = new ArrayList<>();
+		communityIdList.add(String.valueOf(adminCommunityId));
 		// 查住宅数量
 		communitySurveyEntity.setResidenceCount(houseMapper.selectAllHouseByCommunityIds(communityIdList));
 		// 查商铺数量
@@ -401,7 +401,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	 * @date: 2021/8/25 13:45
 	 **/
 	@Override
-	public ConsoleEntity getPropertySurvey(Long companyId, List<Long> communityIdList) {
+	public ConsoleEntity getPropertySurvey(Long companyId, List<String> communityIdList) {
 		// 返回给前端实体
 		ConsoleEntity consoleEntity = new ConsoleEntity();
 		// 查该物业剩余短信数量
@@ -496,7 +496,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	 * @date: 2021/8/30 17:22
 	 **/
 	@Override
-	public Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime, int number, Long companyId) {
+	public Boolean groupSendSMS(List<String> communityIdList, String content, boolean isDistinct, String taskTime, int number, Long companyId) {
 		List<String> mobileList;
 		//根据小区id查询出所有手机号
 		if (!isDistinct) {

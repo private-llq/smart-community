@@ -119,7 +119,7 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.vo.property.PropertyCommunityListVO>
 	 * @date: 2021/7/22 11:46
 	 **/
-	PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, List<Long> communityIds);
+	PageInfo<PropertyCommunityListVO> queryPropertyCommunityList(BaseQO<CommunityEntity> baseQO, List<String> communityIds);
 
 	/**
 	 * @author: Pipi
@@ -144,7 +144,7 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/25 13:45
 	 **/
-	ConsoleEntity getPropertySurvey(Long companyId, List<Long> communityIdList);
+	ConsoleEntity getPropertySurvey(Long companyId, List<String> communityIdList);
 	
 	/**
 	 * @author: DKS
@@ -161,5 +161,5 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/30 17:22
 	 **/
-	Boolean groupSendSMS(List<Long> communityIdList, String content, boolean isDistinct, String taskTime, int number, Long companyId);
+	Boolean groupSendSMS(List<String> communityIdList, String content, boolean isDistinct, String taskTime, int number, Long companyId);
 }

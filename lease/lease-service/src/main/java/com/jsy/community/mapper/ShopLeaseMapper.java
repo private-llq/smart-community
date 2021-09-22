@@ -66,5 +66,5 @@ public interface ShopLeaseMapper extends BaseMapper<ShopLeaseEntity> {
      * @Param: communityIdList
      * @return: Integer
      */
-    Integer selectAllShopByCommunityIds(@Param("list") List<Long> communityIdList);
+    Integer selectAllShopByCommunityIds(@Param("list") List<String> communityIdList);
 }

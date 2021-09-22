@@ -40,7 +40,7 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 * @Param: communityIdList
 	 * @return: Integer
 	 */
-	Integer selectAllPeopleByCommunityIds(@Param("list") List<Long> communityIdList);
+	Integer selectAllPeopleByCommunityIds(@Param("list") List<String> communityIdList);
 	
 	/**
 	 * @Description: 查询communityIds下所有手机号码
@@ -49,7 +49,7 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 * @Param: communityIdList
 	 * @return: java.util.List<String>
 	 */
-	List<String> selectMobileListByCommunityIds(@Param("list") List<Long> communityIdList);
+	List<String> selectMobileListByCommunityIds(@Param("list") List<String> communityIdList);
 	
 	/**
 	 * @Description: 查询communityIds下所有手机号码并去重
@@ -58,7 +58,7 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 * @Param: communityIdList
 	 * @return: java.util.List<String>
 	 */
-	List<String> selectDistinctMobileListByCommunityIds(@Param("list") List<Long> communityIdList);
+	List<String> selectDistinctMobileListByCommunityIds(@Param("list") List<String> communityIdList);
 	
 	/**
 	 * @Description: 查询communityIds下所有居住人数数量
@@ -67,7 +67,7 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 * @Param: communityIdList
 	 * @return: Integer
 	 */
-	Integer selectAllownerByCommunityIds(@Param("list") List<Long> communityIdList);
+	Integer selectAllownerByCommunityIds(@Param("list") List<String> communityIdList);
 	
 	/**
 	 * @Description: 查询communityIds下所有居住人数数量
@@ -76,5 +76,5 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 * @Param: communityIdList
 	 * @return: Integer
 	 */
-	Integer selectAlltenantByCommunityIds(@Param("list") List<Long> communityIdList);
+	Integer selectAlltenantByCommunityIds(@Param("list") List<String> communityIdList);
 }

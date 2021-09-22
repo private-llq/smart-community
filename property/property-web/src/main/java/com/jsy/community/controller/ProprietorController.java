@@ -467,4 +467,16 @@ public class ProprietorController {
         return CommonResult.ok(iUserService.facePageList(baseQO));
     }
 
+    /**
+     * @author: Pipi
+     * @description: 人脸操作(启用/禁用人脸)
+     * @param userEntity:
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/22 10:33
+     **/
+    public CommonResult faceOpration(@RequestBody UserEntity userEntity) {
+        Integer integer = iUserService.faceOpration(userEntity);
+        return CommonResult.ok();
+    }
+
 }

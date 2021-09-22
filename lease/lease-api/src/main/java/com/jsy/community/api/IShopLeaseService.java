@@ -150,5 +150,5 @@ public interface IShopLeaseService extends IService<ShopLeaseEntity> {
      * @Param: communityIdList
      * @return: Integer
      */
-    Integer selectAllShopByCommunityIds(List<Long> communityIdList);
+    Integer selectAllShopByCommunityIds(List<String> communityIdList);
 }
