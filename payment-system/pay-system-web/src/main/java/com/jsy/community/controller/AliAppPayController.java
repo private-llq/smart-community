@@ -121,7 +121,7 @@ public class AliAppPayController {
 			}
 		}
 		//TODO 测试金额 0.01
-		aliAppPayQO.setTotalAmount(new BigDecimal("1"));
+		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
 		
 		String orderStr = null;
 //		if(aliAppPayQO.getPayType() == 1){
@@ -185,6 +185,6 @@ public class AliAppPayController {
 	public CommonResult checkPayTradeStatus(@RequestParam("orderNo") String orderNo, @RequestParam("serviceOrderNo") String serviceOrderNo) {
 		Boolean aliStatus = ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo);
 		Boolean wechatStatus = weChatService.checkPayStatus(orderNo, serviceOrderNo);
-		return aliStatus && wechatStatus ? CommonResult.ok(true,"查询成功") : CommonResult.ok(false,"查询成功");
+		return aliStatus || wechatStatus ? CommonResult.ok(true,"查询成功") : CommonResult.ok(false,"查询成功");
 	}
 }

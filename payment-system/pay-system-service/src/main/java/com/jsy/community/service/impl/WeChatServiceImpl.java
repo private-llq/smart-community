@@ -7,10 +7,12 @@ import com.jsy.community.api.IWeChatService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.mapper.WeChatMapper;
+import com.jsy.community.qo.payment.WechatRefundQO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -75,6 +77,24 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
             weChatMapper.updateById(entity);
         }
     }
+    /**
+     * @Description: 微信退款订单状态
+     * @author: Hu
+     * @since: 2021/3/3 14:35
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void orderRefundStatus(Map<String,String> map) {
+        WeChatOrderEntity entity = weChatMapper.selectById(map.get("out_trade_no"));
+        if (entity!=null){
+            entity.setOrderStatus(3);
+            entity.setArriveStatus(3);
+            entity.setRefundNum(map.get("refund_id"));
+            entity.setRefundTime(LocalDateTime.now());
+            weChatMapper.updateById(entity);
+        }
+    }
 
     /**
      * @param serviceOrderNo : 外部订单号
@@ -88,6 +108,19 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
         QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("service_order_no", serviceOrderNo);
         return weChatMapper.selectOne(queryWrapper);
+    }
+
+
+    /**
+     * @Description: 条件查询支付订单
+     * @author: Hu
+     * @since: 2021/9/18 14:59
+     * @Param: [wechatRefundQO]
+     * @return: com.jsy.community.entity.payment.WeChatOrderEntity
+     */
+    @Override
+    public WeChatOrderEntity getOrderByQuery(WechatRefundQO wechatRefundQO) {
+        return weChatMapper.selectOne(new QueryWrapper<WeChatOrderEntity>().eq("pay_type",wechatRefundQO.getTradeFrom()).eq("service_order_no",wechatRefundQO.getServiceOrderNo()));
     }
 
     /**

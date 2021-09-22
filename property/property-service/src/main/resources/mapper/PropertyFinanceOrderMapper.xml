@@ -259,8 +259,8 @@
             <if test="query.targetId!=null">
                 and tp.target_id = #{query.targetId}
             </if>
-            <if test="query.status!=null">
-                and tp.order_status = #{query.status}
+            <if test="query.orderStatus!=null">
+                and tp.order_status = #{query.orderStatus}
             </if>
             <if test="query.payType!=null and query.payType!=0">
                 and tp.pay_type = #{query.payType}

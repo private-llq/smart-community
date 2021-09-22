@@ -360,4 +360,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     void insert(PropertyFinanceOrderEntity orderEntity);
+
+    /**
+     * @Description: 批量查询账单
+     * @author: Hu
+     * @since: 2021/9/17 9:22
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> getIds(String ids, Long adminCommunityId);
 }

@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @ApiJSYController
 @Slf4j
-public class WeChatController {
+public class WeChatPayController {
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private IWeChatService weChatService;
@@ -77,6 +77,12 @@ public class WeChatController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
+
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private HousingRentalOrderService housingRentalOrderService;
+
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
+    private AssetLeaseRecordService assetLeaseRecordService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
@@ -126,7 +132,7 @@ public class WeChatController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://jsy.free.svipss.top/api/v1/payment/callback/"+serviceConfig.getCompanyId());
+        map.put("notify_url","http://tb2korpp.dongtaiyuming.net/api/v1/payment/callback/"+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
@@ -166,6 +172,9 @@ public class WeChatController {
         } else
         //房屋租赁业务逻辑
         if (weChatPayQO.getTradeFrom()==9){
+            if (weChatPayQO.getServiceOrderNo()==null){
+                return CommonResult.error("合同id不能为空！");
+            }
             WeChatOrderEntity weChatOrderEntity = weChatService.getSignature(weChatPayQO.getServiceOrderNo());
             if (weChatOrderEntity!=null){
                 return CommonResult.ok(JSONObject.fromObject(redisTemplate.opsForValue().get(SIGNATURE + weChatPayQO.getServiceOrderNo())));
@@ -272,7 +281,16 @@ public class WeChatController {
             } else
             //房屋租赁业务逻辑
             if (split[0].equals("9")){
-                log.info("处理完成");
+                // 修改签章合同支付状态
+                Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
+                // 修改租房签约支付状态
+                assetLeaseRecordService.updateOperationPayStatus( split[1]);
+                if(0 != (int)houseMap.get("code")){
+                    throw new PaymentException((int)houseMap.get("code"),String.valueOf(map.get("msg")));
+                }
+                redisTemplate.delete(SIGNATURE+split[1]);
+                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + map.get("out_trade_no"));
+                log.info("租赁处理完成！");
             }
         }
     }
