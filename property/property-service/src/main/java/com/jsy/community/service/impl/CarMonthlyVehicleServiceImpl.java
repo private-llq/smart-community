@@ -687,17 +687,26 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
         //临时车 黄牌
-
         if ( StringUtils.containsAny(carColor,"黄色","黄牌","黄")){
-            CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq(StringUtils.isNotBlank(carColor),"plate_type", 0));
+            CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                    .eq("community_id", community_id)
+                    .eq("type", 1)
+                    .eq(StringUtils.isNotBlank(carColor),"plate_type", 0)
+                    .eq("open",1)
+            );
             HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
             CarChargeEntity chargeEntity = new CarChargeEntity();
             BeanUtil.copyProperties(carChargeEntity,chargeEntity);
             HashMap.put(1,chargeEntity);
             return HashMap;
         }
-        //临时车 其他拍照
-        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("community_id", community_id).eq("type", 1).eq(StringUtils.isNotBlank(carColor),"plate_type", 1));
+        //临时车 其他牌照
+        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", community_id)
+                .eq("type", 1)
+                .eq(StringUtils.isNotBlank(carColor),"plate_type", 1)
+                .eq("open",1)
+        );
         HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
         CarChargeEntity chargeEntity = new CarChargeEntity();
         BeanUtil.copyProperties(carChargeEntity,chargeEntity);

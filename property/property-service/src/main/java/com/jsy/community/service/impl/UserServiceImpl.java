@@ -1,15 +1,21 @@
 package com.jsy.community.service.impl;
+import java.time.LocalDateTime;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.api.IUserService;
 import com.jsy.community.api.PropertyException;
+import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
+import com.jsy.community.entity.CommunityHardWareEntity;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.UserFaceSyncRecordEntity;
+import com.jsy.community.mapper.CommunityHardWareMapper;
 import com.jsy.community.mapper.UserFaceSyncRecordMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
@@ -17,10 +23,12 @@ import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 业主 服务实现类
@@ -35,6 +43,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
 	@Autowired
 	private UserFaceSyncRecordMapper userFaceSyncRecordMapper;
+
+	@Autowired
+	private CommunityHardWareMapper hardWareMapper;
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 	
 	@Override
 	public UserEntity selectOne(String uid) {
@@ -167,16 +181,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 	 * @date: 2021/9/22 10:35
 	 **/
 	@Override
-	public Integer faceOpration(UserEntity userEntity) {
+	public Integer faceOpration(UserEntity userEntity, String communityId) {
+		// 查询用户信息
 		QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("real_name", userEntity.getRealName());
-		queryWrapper.eq("mobile", userEntity.getMobile());
+		queryWrapper.eq("uid", userEntity.getUid());
 		UserEntity userEntityResult = baseMapper.selectOne(queryWrapper);
+		if (userEntityResult == null) {
+			throw new PropertyException("未找到该用户");
+		}
 		if (userEntityResult.getFaceEnableStatus() == userEntity.getFaceEnableStatus()) {
 			throw new PropertyException("人脸已经启用/禁用,请勿重复操作");
 		}
+		// 查询设备
+		QueryWrapper<CommunityHardWareEntity> hardWareQueryWrapper = new QueryWrapper<>();
+		hardWareQueryWrapper.in("id", userEntity.getHardwareIds());
+		List<CommunityHardWareEntity> communityHardWareEntities = hardWareMapper.selectList(hardWareQueryWrapper);
+		if (CollectionUtils.isEmpty(communityHardWareEntities)) {
+			throw new PropertyException("需要推送的设备为空");
+		}
+		Set<String> hardwareIds = communityHardWareEntities.stream().map(CommunityHardWareEntity::getHardwareId).collect(Collectors.toSet());
 		if (userEntity.getFaceEnableStatus() == 1) {
 			// 启用操作
+			XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
+			xuFaceEditPersonDTO.setCustomId(userEntityResult.getMobile());
+			xuFaceEditPersonDTO.setName(userEntityResult.getRealName());
+			xuFaceEditPersonDTO.setPersonType(0);
+			xuFaceEditPersonDTO.setTempCardType(0);
+			xuFaceEditPersonDTO.setPicURI(userEntityResult.getFaceUrl());
+			xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
+			xuFaceEditPersonDTO.setCommunityId(communityId);
+			rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
 		} else {
 			// 禁用操作
 		}

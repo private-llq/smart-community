@@ -475,7 +475,8 @@ public class ProprietorController {
      * @date: 2021/9/22 10:33
      **/
     public CommonResult faceOpration(@RequestBody UserEntity userEntity) {
-        Integer integer = iUserService.faceOpration(userEntity);
+        ValidatorUtils.validateEntity(userEntity, UserEntity.FaceOprationValidate.class);
+        Integer integer = iUserService.faceOpration(userEntity, String.valueOf(UserUtils.getAdminCommunityId()));
         return CommonResult.ok();
     }
 
