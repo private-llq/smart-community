@@ -1,7 +1,13 @@
 package com.jsy.community.vo.proprietor;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.jsy.community.vo.BaseVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,6 +16,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @ApiModel("我的发布商品返回参数")
@@ -75,4 +82,17 @@ public class ProprietorMarketVO extends BaseVO {
     @TableField(exist = false)
     @ApiModelProperty(value = "社区名")
     private  String communityName;
+
+
+    @TableField(fill = FieldFill.INSERT)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.UPDATE)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private LocalDateTime updateTime;
 }

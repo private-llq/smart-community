@@ -35,7 +35,7 @@ public interface IPropertyMarketService extends IService<ProprietorMarketEntity>
      * @Author: Tian
      * @Date: 2021/8/21-11:53
      **/
-    boolean deleteMarket(Long id);
+    boolean deleteBlacklist(Long id);
 
     /**
      * @Description: 修改商品上下架

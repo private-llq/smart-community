@@ -101,14 +101,18 @@ public class PropertyMarketController {
      * @Author: Tian
      * @Date: 2021/8/21-15:44
      **/
-    @DeleteMapping("/deleteMarket")
+    @DeleteMapping("/deleteBlacklist")
     @ApiOperation("社区集市删除商品")
     @Login
-    public CommonResult deleteMarket(@RequestParam("id") Long id){
+    public CommonResult deleteBlacklist(@RequestParam("id") Long id){
 
-        boolean b = marketService.deleteMarket(id);
+        boolean b = marketService.deleteBlacklist(id);
         return CommonResult.ok("删除成功");
     }
+
+
+
+
 //    /**
 //     * @Description: 查询用户已发布或已下架的商品
 //     * @Param: [id]
