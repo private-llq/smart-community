@@ -145,7 +145,7 @@ public class UserEntity extends BaseEntity {
 
 	// 设备ID
 	@TableField( exist = false )
-	@NotEmpty(groups = {FaceOprationValidate.class}, message = "设备列表不能为空")
+	// @NotEmpty(groups = {FaceOprationValidate.class}, message = "设备列表不能为空")
 	private List<String> hardwareIds;
 
 	/**

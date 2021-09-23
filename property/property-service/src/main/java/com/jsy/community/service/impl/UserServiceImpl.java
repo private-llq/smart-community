@@ -197,7 +197,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 		}
 		// 查询设备
 		QueryWrapper<CommunityHardWareEntity> hardWareQueryWrapper = new QueryWrapper<>();
-		hardWareQueryWrapper.in("id", userEntity.getHardwareIds());
+		hardWareQueryWrapper.eq("community_id", communityId);
 		List<CommunityHardWareEntity> communityHardWareEntities = hardWareMapper.selectList(hardWareQueryWrapper);
 		if (CollectionUtils.isEmpty(communityHardWareEntities)) {
 			throw new PropertyException("需要推送的设备为空");
