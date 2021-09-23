@@ -9,6 +9,7 @@ import com.jsy.community.util.QRCodeGenerator;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UrltoBatyUtils;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.property.PageVO;
 import io.swagger.annotations.Api;
@@ -59,11 +60,10 @@ public class CarQRController {
     }
 
     @ApiOperation("下载社区停车二维码")
- //   @Login
-    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.GET)
+    @Login
+    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.POST)
     public CommonResult uploadQRCode(HttpServletResponse response) throws Exception {
-//        Long communityId = UserUtils.getAdminCommunityId();
-        Long communityId = 7L;
+        Long communityId = UserUtils.getAdminCommunityId();
         CarQREntity carQREntity =  iCaQRService.findOne(communityId);
         if (carQREntity!=null){
             ServletOutputStream out = response.getOutputStream();
