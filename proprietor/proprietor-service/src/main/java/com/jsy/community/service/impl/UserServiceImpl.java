@@ -764,7 +764,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             throw new ProprietorException("用户已实人认证，人脸图片不存在！");
         }
         JSONObject pushMap = new JSONObject();
-        pushMap.put("op","editPerson");
+        pushMap.put("operator","editPerson");
         pushMap.put("uid",userEntity.getUid());
         pushMap.put("faceUrl",userEntity.getFaceUrl());
         pushMap.put("communityIdSet",communityIds);

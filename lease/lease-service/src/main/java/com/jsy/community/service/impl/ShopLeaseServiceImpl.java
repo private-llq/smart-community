@@ -776,6 +776,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
             }
             leaseVO.setAddress(city + area + community);
 
+            // 图片
             QueryWrapper<ShopImgEntity> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("shop_id", shopLeaseEntity.getId());
             List<ShopImgEntity> shopImgEntities = shopImgMapper.selectList(queryWrapper);

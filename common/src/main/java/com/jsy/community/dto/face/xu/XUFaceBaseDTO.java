@@ -13,4 +13,7 @@ import java.io.Serializable;
 public class XUFaceBaseDTO implements Serializable {
 	//通用messageId
 	private String messageId;
+
+	// 操作
+	private String operator;
 }

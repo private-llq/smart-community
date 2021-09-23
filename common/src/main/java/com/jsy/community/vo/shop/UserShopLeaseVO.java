@@ -41,4 +41,7 @@ public class UserShopLeaseVO implements Serializable {
 	
 	@ApiModelProperty(value = "商铺展示地址")
 	private String shopShowImg;
+
+	@ApiModelProperty(value = "标题")
+	private String title;
 }
