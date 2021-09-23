@@ -481,6 +481,8 @@ public class ProprietorController {
         return integer > 0 ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
     }
 
-//    public CommonResult
+    public CommonResult deleteFace() {
+        return CommonResult.ok();
+    }
 
 }
