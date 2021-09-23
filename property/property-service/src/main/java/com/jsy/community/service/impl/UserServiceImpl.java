@@ -21,10 +21,12 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -181,6 +183,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 	 * @date: 2021/9/22 10:35
 	 **/
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public Integer faceOpration(UserEntity userEntity, String communityId) {
 		// 查询用户信息
 		QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
@@ -200,20 +203,51 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 			throw new PropertyException("需要推送的设备为空");
 		}
 		Set<String> hardwareIds = communityHardWareEntities.stream().map(CommunityHardWareEntity::getHardwareId).collect(Collectors.toSet());
-		if (userEntity.getFaceEnableStatus() == 1) {
+		// 删除原有的同步记录
+		QueryWrapper<UserFaceSyncRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();
+		recordEntityQueryWrapper.in("facility_id", hardwareIds);
+		recordEntityQueryWrapper.eq("uid", userEntity.getUid());
+		recordEntityQueryWrapper.eq("community_id", communityId);
+		recordEntityQueryWrapper.eq("face_url", userEntityResult.getFaceUrl());
+		userFaceSyncRecordMapper.delete(recordEntityQueryWrapper);
+		// 设置人脸启用状态
+		userEntityResult.setFaceEnableStatus(userEntity.getFaceEnableStatus());
+		// 更新人脸启用状态
+		int updateResult = baseMapper.updateById(userEntityResult);
+		XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
+
+		if (userEntity.getFaceEnableStatus() == 1 && updateResult == 1) {
 			// 启用操作
-			XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
-			xuFaceEditPersonDTO.setCustomId(userEntityResult.getMobile());
+			xuFaceEditPersonDTO.setOperator("EditPerson");
 			xuFaceEditPersonDTO.setName(userEntityResult.getRealName());
 			xuFaceEditPersonDTO.setPersonType(0);
 			xuFaceEditPersonDTO.setTempCardType(0);
 			xuFaceEditPersonDTO.setPicURI(userEntityResult.getFaceUrl());
-			xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
-			xuFaceEditPersonDTO.setCommunityId(communityId);
-			rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+			// 新增同步记录
+			List<UserFaceSyncRecordEntity> userFaceSyncRecordEntities = new ArrayList<>();
+			for (String hardwareId : hardwareIds) {
+				UserFaceSyncRecordEntity userFaceSyncRecordEntity = new UserFaceSyncRecordEntity();
+				userFaceSyncRecordEntity.setUid(userEntity.getUid());
+				userFaceSyncRecordEntity.setCommunityId(Long.parseLong(communityId));
+				userFaceSyncRecordEntity.setFaceUrl(userEntity.getFaceUrl());
+				userFaceSyncRecordEntity.setFacilityId(hardwareId);
+				userFaceSyncRecordEntity.setId(SnowFlake.nextId());
+				userFaceSyncRecordEntity.setDeleted(0);
+				userFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
+				userFaceSyncRecordEntities.add(userFaceSyncRecordEntity);
+			}
+			userFaceSyncRecordMapper.insertBatchRecord(userFaceSyncRecordEntities);
 		} else {
 			// 禁用操作
+			xuFaceEditPersonDTO.setOperator("DelPerson");
 		}
-		return null;
+		xuFaceEditPersonDTO.setCustomId(userEntityResult.getMobile());
+		xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
+		xuFaceEditPersonDTO.setCommunityId(communityId);
+		// 发送消息到消息队列
+		if (updateResult == 1) {
+			rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+		}
+		return updateResult;
 	}
 }

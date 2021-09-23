@@ -308,7 +308,7 @@ public class VisitorServiceImpl implements IVisitorService {
 					visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
 					// =================================== 向队列发送同步消息 =============================================
 					JSONObject pushMap = new JSONObject();
-					pushMap.put("op","editPerson");
+					pushMap.put("operator","editPerson");
 					pushMap.put("uid",visitorEntity.getContact());
 					pushMap.put("faceUrl",visitorEntity.getFaceUrl());
 					pushMap.put("communityId", visitorEntity.getCommunityId());

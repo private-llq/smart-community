@@ -92,8 +92,9 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
      * @Date: 2021/8/21-15:58
      **/
     @Override
-    public boolean deleteMarket(Long id) {
-        return marketMapper.delete(new QueryWrapper<ProprietorMarketEntity>().eq("id",id)) == 1;
+    public boolean deleteBlacklist(Long id) {
+       marketMapper.deleteBlacklist(id);
+        return true;
     }
 
 

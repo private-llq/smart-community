@@ -76,4 +76,12 @@ public interface PropertyMarketMapper extends BaseMapper<ProprietorMarketEntity>
     List<ProprietorMarketEntity> selectMarketBlacklist(@Param("page") Long page, @Param("size") Long size);
 
     Long findCount();
+    /**
+     * @Description: 黑名单删除  大删除
+     * @Param: [id]
+     * @Return: boolean
+     * @Author: Tian
+     * @Date: 2021/9/18-10:27
+     **/
+    Long deleteBlacklist(@Param("id") Long id);
 }
