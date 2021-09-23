@@ -19,7 +19,11 @@ public class ActivityEntity extends BaseEntity {
     /**
      * 社区id
      */
-    private Long communityId;
+    private String communityId;
+    /**
+     * 1预发布，2报名进行中，3报名已结束，4活动进行中，5活动已结束
+     */
+    private Integer activityStatus;
     /**
      * 活动主题
      */

@@ -19,11 +19,19 @@ public class VoteEntity extends BaseEntity {
     /**
      * 社区id
      */
-    private Long communityId;
+    private String communityId;
+    /**
+     * 楼栋id
+     */
+    private String buildingId;
     /**
      * 主题
      */
     private String theme;
+    /**
+     * 1待发布，2进行中，3已结束
+     */
+    private Integer voteStatus;
     /**
      * 0当前用户未投票，1当前用户已投票
      */

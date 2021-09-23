@@ -10,10 +10,13 @@ import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.ControlVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +38,9 @@ public class CommunityController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private ProprietorCommunityService iCommunityService;
+
+	@Autowired
+	private RedisTemplate redisTemplate;
 
 	/**
 	 * 通过社区名称和城市id查询相关的社区数据
@@ -63,6 +69,10 @@ public class CommunityController {
 	@PostMapping("locate")
 	@Login(allowAnonymous = true)
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
+		ControlVO controlVO = UserUtils.getPermissions(UserUtils.getUserId(), redisTemplate);
+		if (!controlVO.getAccessLevel().equals(1)){
+			return CommonResult.ok(iCommunityService.getCommunity(controlVO));
+		}
 		return CommonResult.ok(iCommunityService.locateCommunity(UserUtils.getUserId(),location));
 	}
 

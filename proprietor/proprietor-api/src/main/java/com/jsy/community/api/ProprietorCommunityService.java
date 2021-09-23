@@ -6,6 +6,7 @@ import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.ControlVO;
 
 import java.util.Collection;
 import java.util.List;
@@ -79,4 +80,14 @@ public interface ProprietorCommunityService extends IService<CommunityEntity> {
 	 * @return:
 	 */
 	PropertyCompanyEntity getCompany(Long id);
+
+
+	/**
+	 * @Description: 查询家属或者租户或对应的小区
+	 * @author: Hu
+	 * @since: 2021/9/23 9:17
+	 * @Param:
+	 * @return:
+	 */
+	CommunityEntity getCommunity(ControlVO controlVO);
 }
