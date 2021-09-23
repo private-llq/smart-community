@@ -6,15 +6,22 @@ import io.minio.MinioClient;
 import io.minio.ObjectStat;
 import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.PropertyException;
+import java.beans.PropertyVetoException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -195,11 +202,6 @@ public class MinioUtils {
 
 
 
-
-
-
-
-
 	private static  String getRandomFileName(String fileName){
 		return UUID.randomUUID().toString().replace("-","");
 	}
@@ -239,9 +241,6 @@ public class MinioUtils {
 		}
 		return stringBuffer.toString();
 	}
-
-
-
 
 	/**
 	 * 根据存储名称创建存储桶目录
@@ -352,4 +351,31 @@ public class MinioUtils {
 			return "删除文件不存在!";
 		}
 	}
+
+	/**
+	 * 下载文件 使用Minio客户端下载
+	 *
+	 * @param bucketName 存储桶名称
+	 * @param objectName 存储桶里的文件名称
+	 * @return
+	 * @throws Exception
+	 */
+	public static InputStream getFile(String bucketName, String objectName) throws Exception {
+		InputStream inputStream = null;
+		try {
+			MinioClient minioClient = new MinioClient(ENDPOINT, PROT, ACCESSKEY, SECRETKET);
+			ObjectStat objectStat = minioClient.statObject(bucketName, objectName);
+			if (objectStat != null) {
+				inputStream = minioClient.getObject(bucketName, objectName);
+			} else {
+				throw new PropertyException("文件不存在");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new PropertyException("下载失败");
+		}
+		return inputStream;
+	}
+
+
 }

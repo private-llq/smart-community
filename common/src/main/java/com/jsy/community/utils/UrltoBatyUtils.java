@@ -1,16 +1,19 @@
-package com.jsy.community.util;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+package com.jsy.community.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-@Slf4j
-@Component
-public class UrlUtils {
+
+public class UrltoBatyUtils {
+    /**
+     * @Description: 根据url路劲转换为byte
+     * @Param: [UrlPath]
+     * @Return: byte[]
+     * @Author: Tian
+     * @Date: 2021/9/23-15:22
+     **/
     public static byte[] getDate(String UrlPath) throws IOException {
         URL url = new URL(UrlPath);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();

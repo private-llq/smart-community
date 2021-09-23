@@ -1,26 +1,22 @@
 package com.jsy.community.service.impl;
 
-import com.alibaba.excel.util.FileUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarCutOffService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.mapper.CarCutOffMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarCutOffQO;
 import com.jsy.community.util.TimeUtils;
-import com.jsy.community.util.UrlUtils;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UrltoBatyUtils;
 import com.jsy.community.vo.property.CarAccessVO;
 import com.jsy.community.vo.property.CarSceneVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -155,7 +151,7 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
                 carSceneVO.setOpenTime(date);
             }
             if (i.getCloseupPic()!=null){
-                carSceneVO.setCloseupPic(UrlUtils.getDate(i.getCloseupPic()));
+                carSceneVO.setCloseupPic(UrltoBatyUtils.getDate(i.getCloseupPic()));
             }
             sceneVOS.add(carSceneVO);
         }
@@ -206,10 +202,10 @@ public class CarCutOffServiceImpl extends ServiceImpl<CarCutOffMapper,CarCutOffE
             }
 
             if (i.getCloseupPic()!=null){
-                accessVO.setCloseupPic(UrlUtils.getDate(i.getCloseupPic()));
+                accessVO.setCloseupPic(UrltoBatyUtils.getDate(i.getCloseupPic()));
             }
             if (i.getOutPic()!=null){
-                accessVO.setOutPic(UrlUtils.getDate(i.getOutPic()));
+                accessVO.setOutPic(UrltoBatyUtils.getDate(i.getOutPic()));
             }
 
             if (i.getOpenTime()!=null  && i.getStopTime()!=null){
