@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyVoteService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.VoteEntity;
+import com.jsy.community.entity.proprietor.VoteUserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -13,6 +14,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -32,8 +34,8 @@ public class PropertyVoteController {
     @ApiOperation("查询列表")
     @PostMapping("/list")
     public CommonResult list(@RequestBody BaseQO<VoteEntity> baseQO){
-        List<VoteEntity> list = propertyVoteService.list(baseQO, UserUtils.getAdminCommunityId());
-        return CommonResult.ok();
+        Map<String, Object> map = propertyVoteService.list(baseQO, UserUtils.getAdminCommunityId());
+        return CommonResult.ok(map);
     }
 
     @ApiOperation("新增")
@@ -46,14 +48,21 @@ public class PropertyVoteController {
     @ApiOperation("查详情")
     @GetMapping("/getOne")
     public CommonResult getOne(@RequestParam Long id){
-        propertyVoteService.getOne(id);
-        return CommonResult.ok();
+        List<VoteUserEntity> one = propertyVoteService.getOne(id);
+        return CommonResult.ok(one);
     }
 
     @ApiOperation("查图表")
     @GetMapping("/getChart")
     public CommonResult getChart(@RequestParam Long id){
-        propertyVoteService.getChart(id);
+        Map<String, Object> chart = propertyVoteService.getChart(id);
+        return CommonResult.ok(chart);
+    }
+
+    @ApiOperation("撤销或者删除")
+    @DeleteMapping("/delete")
+    public CommonResult delete(@RequestParam Long id){
+        propertyVoteService.delete(id);
         return CommonResult.ok();
     }
 

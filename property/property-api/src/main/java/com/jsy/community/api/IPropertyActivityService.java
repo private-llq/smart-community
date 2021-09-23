@@ -1,9 +1,10 @@
 package com.jsy.community.api;
 
+import com.jsy.community.entity.property.ActivityUserEntity;
 import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.qo.BaseQO;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -19,7 +20,7 @@ public interface IPropertyActivityService {
      * @Param:
      * @return:
      */
-    List<ActivityEntity> list(BaseQO<ActivityEntity> baseQO, Long adminCommunityId);
+    Map<String, Object> list(BaseQO<ActivityEntity> baseQO, Long adminCommunityId);
 
     /**
      * @Description: 新增
@@ -37,7 +38,7 @@ public interface IPropertyActivityService {
      * @Param:
      * @return:
      */
-    void getOne(Long id);
+    ActivityEntity getOne(Long id);
 
     /**
      * @Description: 修改
@@ -47,4 +48,13 @@ public interface IPropertyActivityService {
      * @return:
      */
     void update(ActivityEntity activityEntity);
+
+    /**
+     * @Description: 查询报名详情
+     * @author: Hu
+     * @since: 2021/9/23 14:52
+     * @Param:
+     * @return:
+     */
+    Map<String, Object> detailPage(BaseQO<ActivityUserEntity> baseQO, Long adminCommunityId);
 }

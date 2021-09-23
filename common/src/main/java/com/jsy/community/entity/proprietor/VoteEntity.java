@@ -25,6 +25,11 @@ public class VoteEntity extends BaseEntity {
      */
     private String buildingId;
     /**
+     * 楼栋id
+     */
+    @TableField(exist = false)
+    private String scope;
+    /**
      * 主题
      */
     private String theme;
@@ -53,10 +58,20 @@ public class VoteEntity extends BaseEntity {
      * 1单选，2多选
      */
     private Integer choose;
+
+    /**
+     * 1发布，2撤销
+     */
+    private Integer issueStatus;
     /**
      * 当前投票能参与的最大人数
      */
     private Integer total;
+    /**
+     * 已投票人数
+     */
+    @TableField(exist = false)
+    private Integer voteTotal;
     /**
      * 投票题目
      */

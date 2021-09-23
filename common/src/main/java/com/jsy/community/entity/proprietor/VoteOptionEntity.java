@@ -18,7 +18,7 @@ public class VoteOptionEntity extends BaseEntity {
     /**
      * 投票id
      */
-    private Long voteId;
+    private String voteId;
     /**
      * 投票答案
      */
@@ -31,7 +31,7 @@ public class VoteOptionEntity extends BaseEntity {
     /**
      * 投票题目id
      */
-    private Long topicId;
+    private String topicId;
 
     /**
      * 1一选项，2而选项，3三选项。。。。。

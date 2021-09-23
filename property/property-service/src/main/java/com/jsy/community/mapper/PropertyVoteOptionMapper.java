@@ -2,6 +2,9 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.proprietor.VoteOptionEntity;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -11,4 +14,12 @@ import com.jsy.community.entity.proprietor.VoteOptionEntity;
  **/
 public interface PropertyVoteOptionMapper extends BaseMapper<VoteOptionEntity> {
 
+    /**
+     * @Description: 批量新增
+     * @author: Hu
+     * @since: 2021/9/23 13:58
+     * @Param:
+     * @return:
+     */
+    void saveAll(@Param("list") List<VoteOptionEntity> list);
 }

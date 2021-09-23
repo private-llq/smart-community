@@ -73,7 +73,10 @@ public class AppVersionServiceImpl extends ServiceImpl<AppVersionMapper,AppVersi
 	 **/
 	@Override
 	public AppVersionEntity queryAppVersion(Integer sysType) {
-		AppVersionEntity appVersionEntity = aPPVersionMapper.selectOne(new QueryWrapper<AppVersionEntity>().eq("sys_type", sysType).eq("deleted", 0));
+		QueryWrapper<AppVersionEntity> queryWrapper = new QueryWrapper<AppVersionEntity>().eq("sys_type", sysType).eq("deleted", 0);
+		queryWrapper.orderByDesc("create_time");
+		queryWrapper.last("limit 1");
+		AppVersionEntity appVersionEntity = aPPVersionMapper.selectOne(queryWrapper);
 		appVersionEntity.setSysVersionNumber(appVersionEntity.getSysVersion().replace(".",""));
 		return appVersionEntity;
 	}

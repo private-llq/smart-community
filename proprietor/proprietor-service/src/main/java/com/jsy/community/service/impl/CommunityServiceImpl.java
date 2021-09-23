@@ -145,8 +145,8 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		//暂未绑定小区
 		if(CollectionUtils.isEmpty(userHouseList)){
 			communityEntity = communityMapper.locateCommunity(communityIds, location);
-			communityEntity.setName("暂未认证房屋");
-			communityEntity.setId(0L); // 设置为通用小区
+//			communityEntity.setName("暂未认证房屋");
+//			communityEntity.setId(0L); // 设置为通用小区
 			return communityEntity;
 		}
 		//小区对应的最新一套已认证房屋id map

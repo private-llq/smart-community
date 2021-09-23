@@ -410,7 +410,7 @@ public interface BusinessConst {
     /**
      * 一天的毫秒数
      */
-    long ONE_DAY = 1000 * 60;
+    long ONE_DAY = 1000 * 60 * 60 * 24;
 
     /**
      * URL头部

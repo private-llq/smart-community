@@ -62,11 +62,11 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
         if (list.size()==0){
             for (Long option : voteQO.getOptions()) {
                 voteUserEntity = new VoteUserEntity();
-                voteUserEntity.setId(SnowFlake.nextId());
+                voteUserEntity.setId(String.valueOf(SnowFlake.nextId()));
                 voteUserEntity.setUid(uid);
-                voteUserEntity.setVoteId(voteQO.getId());
-                voteUserEntity.setTopicId(voteQO.getTopicId());
-                voteUserEntity.setOptionId(option);
+                voteUserEntity.setVoteId(voteQO.getId().toString());
+                voteUserEntity.setTopicId(voteQO.getTopicId().toString());
+                voteUserEntity.setOptionId(option.toString());
                 list1.add(voteUserEntity);
             }
             voteUserMapper.save(list1);
@@ -89,6 +89,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
         Set<String> set = voteUserMapper.getUserTotal(id);
         if (voteEntity!=null){
             List<VoteOptionEntity> list = voteOptionMapper.getPlan(id);
+            map.put("choose",voteEntity.getChoose());
             map.put("total",voteEntity.getTotal());
             map.put("list",list);
             map.put("haveTotal",set.size());
@@ -108,7 +109,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
     public VoteEntity getVote(Long id,String uid) {
         //已投过票的答案id集合
         String str = null;
-        Map<Long, Object> map = null;
+        Map<String, Object> map = null;
         VoteEntity voteEntity = voteMapper.selectById(id);
         VoteTopicEntity topicEntity = voteTopicMapper.selectOne(new QueryWrapper<VoteTopicEntity>().eq("vote_id", id));
         if (voteEntity!=null){
@@ -119,7 +120,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
                 map = new HashMap<>();
                 for (VoteUserEntity userEntity : userEntities) {
                     str+=userEntity.getOptionId()+",";
-                    map.put(userEntity.getOptionId(),userEntity);
+                    map.put(userEntity.getOptionId().toString(),userEntity);
                 }
                 topicEntity.setOptionsIds(str);
             }else {

@@ -1,16 +1,23 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyActivityService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.property.ActivityUserEntity;
 import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.mapper.PropertyActivityMapper;
 import com.jsy.community.mapper.PropertyActivityUserMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -37,8 +44,25 @@ public class PropertyActivityServiceImpl extends ServiceImpl<PropertyActivityMap
      * @return: java.util.List<com.jsy.community.entity.proprietor.ActivityEntity>
      */
     @Override
-    public List<ActivityEntity> list(BaseQO<ActivityEntity> baseQO, Long adminCommunityId) {
-        return null;
+    public Map<String, Object> list(BaseQO<ActivityEntity> baseQO, Long adminCommunityId) {
+        Map<String, Object> map = new HashMap<>();
+        ActivityEntity query = baseQO.getQuery();
+        QueryWrapper<ActivityEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("community_id",adminCommunityId);
+        if (query.getActivityStatus()!=0){
+            wrapper.eq("activity_status",query.getActivityStatus());
+        }
+        if (!"".equals(query.getTheme())&&query.getTheme()!=null){
+            wrapper.like("theme",query.getTheme());
+        }
+        Page<ActivityEntity> page = propertyActivityMapper.selectPage(new Page<ActivityEntity>(baseQO.getPage(), baseQO.getSize()), wrapper);
+        List<ActivityEntity> records = page.getRecords();
+        for (ActivityEntity record : records) {
+            record.setApplyCount(propertyActivityUserMapper.selectCount(new QueryWrapper<ActivityUserEntity>().eq("activity_id", record.getId())));
+        }
+        map.put("total",page.getTotal());
+        map.put("list",records);
+        return map;
     }
 
 
@@ -50,10 +74,35 @@ public class PropertyActivityServiceImpl extends ServiceImpl<PropertyActivityMap
      * @return: void
      */
     @Override
-    public void getOne(Long id) {
-
+    public ActivityEntity getOne(Long id) {
+        ActivityEntity entity = propertyActivityMapper.selectById(id);
+        return entity;
     }
 
+
+
+    /**
+     * @Description: 查询报名详情
+     * @author: Hu
+     * @since: 2021/9/23 14:52
+     * @Param: [baseQO, adminCommunityId]
+     * @return: java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> detailPage(BaseQO<ActivityUserEntity> baseQO, Long adminCommunityId) {
+        Map<String, Object> map = new HashMap<>();
+        ActivityUserEntity query = baseQO.getQuery();
+        QueryWrapper<ActivityUserEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("activity_id",query.getActivityId());
+        if (!"".equals(baseQO.getQuery())&&baseQO.getQuery()!=null){
+            wrapper.like("mobile",query.getKey()).or().like("name",query.getKey());
+        }
+        Page<ActivityUserEntity> page = propertyActivityUserMapper.selectPage(new Page<ActivityUserEntity>(baseQO.getPage(), baseQO.getSize()), wrapper);
+
+        map.put("total",page.getTotal());
+        map.put("list",page.getRecords());
+        return map;
+    }
 
     /**
      * @Description: 修改
@@ -63,8 +112,9 @@ public class PropertyActivityServiceImpl extends ServiceImpl<PropertyActivityMap
      * @return: void
      */
     @Override
+    @Transactional
     public void update(ActivityEntity activityEntity) {
-
+        propertyActivityMapper.updateById(activityEntity);
     }
 
 
@@ -76,7 +126,9 @@ public class PropertyActivityServiceImpl extends ServiceImpl<PropertyActivityMap
      * @return: void
      */
     @Override
+    @Transactional
     public void saveBy(ActivityEntity entity) {
-
+        entity.setId(SnowFlake.nextId());
+        propertyActivityMapper.insert(entity);
     }
 }

@@ -1,9 +1,11 @@
 package com.jsy.community.entity.proprietor;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
@@ -17,21 +19,30 @@ public class VoteUserEntity implements Serializable {
     /**
      * id
      */
-    private Long id;
+    private String id;
     /**
      * 用户id
      */
     private String uid;
     /**
-     * 投票id
+     * 用户名称
      */
-    private Long voteId;
+    @TableField(exist = false)
+    private String realName;
     /**
      * 投票id
      */
-    private Long topicId;
+    private String voteId;
+    /**
+     * 投票id
+     */
+    private String topicId;
     /**
      * 答案id
      */
-    private Long optionId;
+    private String optionId;
+    /**
+     * 答案id
+     */
+    private LocalDateTime createTime;
 }

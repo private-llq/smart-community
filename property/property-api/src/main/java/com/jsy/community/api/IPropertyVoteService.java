@@ -1,9 +1,11 @@
 package com.jsy.community.api;
 
 import com.jsy.community.entity.proprietor.VoteEntity;
+import com.jsy.community.entity.proprietor.VoteUserEntity;
 import com.jsy.community.qo.BaseQO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -19,7 +21,7 @@ public interface IPropertyVoteService {
      * @Param:
      * @return:
      */
-    List<VoteEntity> list(BaseQO<VoteEntity> baseQO, Long adminCommunityId);
+    Map<String, Object> list(BaseQO<VoteEntity> baseQO, Long adminCommunityId);
 
     /**
      * @Description: 新增
@@ -37,7 +39,7 @@ public interface IPropertyVoteService {
      * @Param:
      * @return:
      */
-    void getOne(Long id);
+    List<VoteUserEntity> getOne(Long id);
 
     /**
      * @Description: 查图表
@@ -46,5 +48,14 @@ public interface IPropertyVoteService {
      * @Param:
      * @return:
      */
-    void getChart(Long id);
+    Map<String, Object> getChart(Long id);
+
+    /**
+     * @Description: 删除或撤销
+     * @author: Hu
+     * @since: 2021/9/23 14:28
+     * @Param:
+     * @return:
+     */
+    void delete(Long id);
 }
