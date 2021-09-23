@@ -9,8 +9,11 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.utils.MinioUtils;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,10 +29,11 @@ import java.util.Hashtable;
  **/
 public class QRCodeGenerator {
 	
-	private static void generateQRCodeImage(String text, int width, int height, String filePath) throws WriterException, IOException {
+	public static void generateQRCodeImage(String text, int width, int height, String filePath) throws WriterException, IOException {
 		QRCodeWriter qrCodeWriter = new QRCodeWriter();
 		BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
 		Path path = FileSystems.getDefault().getPath(filePath);
+//		Path file = new File(filePath).toPath();
 		MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
 	}
 	
@@ -42,7 +46,9 @@ public class QRCodeGenerator {
 		MatrixToImageWriter.writeToFile(bitMatrix, format, outputFile);
 		return toByteArray(new File("new.png"));
 	}
-	
+
+
+
 	public static byte[] toByteArray(File imageFile) throws Exception {
 		BufferedImage img = ImageIO.read(imageFile);
 		ByteArrayOutputStream buf = new ByteArrayOutputStream((int) imageFile.length());
@@ -56,16 +62,34 @@ public class QRCodeGenerator {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String text = "https://www.baidu.com/";
+		String text = "https://home.firefoxchina.cn/";
+//		String text = "https://192.168.12.188:8081/?id=1";
+		/*
+		 * 图片的宽度和高度
+		 */
 		int width = 100;
 		int height = 100;
+		String path="E:\\3.jpg";
+
+		// 图片的格式
 		String format = "png";
-		Hashtable hints = new Hashtable();
-		hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
-		BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);
-		File outputFile = new File("new.png");
-		MatrixToImageWriter.writeToFile(bitMatrix, format, outputFile);
-		byte[] b = toByteArray(new File("new.png"));
-		MinioUtils.uploadDeposit(b, BusinessConst.DEPOSIT_QR_CODE);
+		QRCodeGenerator.generateQRCodeImage(text,width,height,path);
+		System.out.println("ok");
+
+
+
+//
+//		Hashtable hints = new Hashtable();
+//		// 定义字符集编码格式
+//		hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+//		// 最终生成 参数列表 （1.内容 2.格式 3.宽度 4.高度 5.二维码参数）
+//		BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);
+//		File outputFile = new File("new.png");
+
+//		new MockMultipartFile().enc
+//		MatrixToImageWriter.writeToFile(bitMatrix, format, outputFile);
+//		byte[] b = toByteArray(new File("new.png"));
+//		MinioUtils.uploadDeposit(b, BusinessConst.DEPOSIT_QR_CODE);
+
 	}
 }
