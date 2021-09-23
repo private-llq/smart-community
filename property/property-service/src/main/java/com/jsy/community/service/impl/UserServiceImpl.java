@@ -229,7 +229,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 				UserFaceSyncRecordEntity userFaceSyncRecordEntity = new UserFaceSyncRecordEntity();
 				userFaceSyncRecordEntity.setUid(userEntity.getUid());
 				userFaceSyncRecordEntity.setCommunityId(Long.parseLong(communityId));
-				userFaceSyncRecordEntity.setFaceUrl(userEntity.getFaceUrl());
+				userFaceSyncRecordEntity.setFaceUrl(userEntityResult.getFaceUrl());
 				userFaceSyncRecordEntity.setFacilityId(hardwareId);
 				userFaceSyncRecordEntity.setId(SnowFlake.nextId());
 				userFaceSyncRecordEntity.setDeleted(0);
