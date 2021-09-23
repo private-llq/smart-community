@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyVoteService;
 import com.jsy.community.api.IVoteService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
@@ -70,7 +71,7 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
         if (!"".equals(query.getTheme())&&query.getTheme()!=null){
             wrapper.like("theme",query.getTheme());
         }
-        if (query.getVoteStatus()!=0){
+        if (query.getVoteStatus()!=null&&query.getVoteStatus()!=0){
             wrapper.like("vote_status",query.getVoteStatus());
         }
         Page<VoteEntity> page = propertyVoteMapper.selectPage(new Page<VoteEntity>(baseQO.getPage(), baseQO.getSize()), wrapper);
@@ -108,13 +109,13 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
 
         VoteTopicEntity topicEntity = voteEntity.getVoteTopicEntity();
         topicEntity.setId(SnowFlake.nextId());
-        topicEntity.setVoteId(voteEntity.getId().toString());
+        topicEntity.setVoteId(voteEntity.getId());
         propertyVoteTopicMapper.insert(topicEntity);
 
         List<VoteOptionEntity> list = new LinkedList<>();
         List<VoteOptionEntity> options = topicEntity.getOptions();
         for (int i= 1;i<=options.size();i++) {
-            VoteOptionEntity option = options.get(i);
+            VoteOptionEntity option = options.get(i-1);
             option.setId(SnowFlake.nextId());
             option.setTopicId(topicEntity.getId().toString());
             option.setCode(i);
@@ -140,12 +141,14 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
         for (VoteUserEntity voteUserEntity : entityList) {
             ids.add(voteUserEntity.getUid());
         }
-        List<UserEntity> list = userMapper.listAuthUserInfo(ids);
-        for (UserEntity userEntity : list) {
-            map.put(userEntity.getUid(),userEntity.getRealName());
-        }
-        for (VoteUserEntity entity : entityList) {
-            entity.setRealName(map.get(entity.getUid()));
+        if (ids.size()!=0){
+            List<UserEntity> list = userMapper.listAuthUserInfo(ids);
+            for (UserEntity userEntity : list) {
+                map.put(userEntity.getUid(),userEntity.getRealName());
+            }
+            for (VoteUserEntity entity : entityList) {
+                entity.setRealName(map.get(entity.getUid()));
+            }
         }
         return entityList;
     }
@@ -161,13 +164,17 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
     @Override
     public void delete(Long id) {
         Integer integer = propertyVoteUserMapper.selectCount(new QueryWrapper<VoteUserEntity>().eq("vote_id", id));
-        if (integer!=0){
-            VoteEntity voteEntity = propertyVoteMapper.selectById(id);
-            voteEntity.setVoteStatus(1);
-            voteEntity.setIssueStatus(2);
-            propertyVoteMapper.updateById(voteEntity);
+        if (integer==0){
+            VoteEntity entity = propertyVoteMapper.selectById(id);
+            if (entity.getIssueStatus()==1){
+                entity.setVoteStatus(1);
+                entity.setIssueStatus(2);
+                propertyVoteMapper.updateById(entity);
+            }else {
+                propertyVoteMapper.deleteById(id);
+            }
         } else {
-            propertyVoteMapper.deleteById(id);
+            throw new PropertyException("当前问卷不能被撤销！");
         }
     }
 

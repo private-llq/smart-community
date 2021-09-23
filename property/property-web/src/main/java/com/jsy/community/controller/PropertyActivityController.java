@@ -7,11 +7,13 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.ActivityUserEntity;
 import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -40,7 +42,7 @@ public class PropertyActivityController {
     @ApiOperation("新增")
     @PostMapping("/save")
     public CommonResult save(@RequestBody ActivityEntity activityEntity){
-        activityEntity.setCommunityId(UserUtils.getAdminCommunityId().toString());
+        activityEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyActivityService.saveBy(activityEntity);
         return CommonResult.ok();
     }
@@ -64,5 +66,12 @@ public class PropertyActivityController {
     public CommonResult detailPage(@RequestBody BaseQO<ActivityUserEntity> baseQO){
         Map<String,Object> map = propertyActivityService.detailPage(baseQO,UserUtils.getAdminCommunityId());
         return CommonResult.ok(map);
+    }
+
+    @ApiOperation("上传图片")
+    @PostMapping("/file")
+    public CommonResult file(@RequestParam MultipartFile[] file){
+        String[] votes = MinioUtils.uploadForBatch(file, "activity");
+        return CommonResult.ok(votes);
     }
 }

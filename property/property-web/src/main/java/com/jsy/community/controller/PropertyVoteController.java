@@ -7,11 +7,13 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.VoteEntity;
 import com.jsy.community.entity.proprietor.VoteUserEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +25,7 @@ import java.util.Map;
  * @create: 2021-09-23 10:01
  **/
 @RestController
-@RequestMapping("/property/vote")
+@RequestMapping("/vote")
 @ApiJSYController
 @Login
 public class PropertyVoteController {
@@ -36,6 +38,13 @@ public class PropertyVoteController {
     public CommonResult list(@RequestBody BaseQO<VoteEntity> baseQO){
         Map<String, Object> map = propertyVoteService.list(baseQO, UserUtils.getAdminCommunityId());
         return CommonResult.ok(map);
+    }
+
+    @ApiOperation("上传图片")
+    @PostMapping("/file")
+    public CommonResult file(@RequestParam MultipartFile[] file){
+        String[] votes = MinioUtils.uploadForBatch(file, "vote");
+        return CommonResult.ok(votes);
     }
 
     @ApiOperation("新增")

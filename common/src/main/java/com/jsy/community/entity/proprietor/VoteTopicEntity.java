@@ -19,7 +19,7 @@ public class VoteTopicEntity extends BaseEntity {
     /**
      * 投票id
      */
-    private String voteId;
+    private Long voteId;
     /**
      * 问题内容
      */

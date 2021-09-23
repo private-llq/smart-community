@@ -11,6 +11,7 @@ import com.jsy.community.mapper.PropertyActivityMapper;
 import com.jsy.community.mapper.PropertyActivityUserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,7 @@ public class PropertyActivityServiceImpl extends ServiceImpl<PropertyActivityMap
         ActivityEntity query = baseQO.getQuery();
         QueryWrapper<ActivityEntity> wrapper = new QueryWrapper<>();
         wrapper.eq("community_id",adminCommunityId);
-        if (query.getActivityStatus()!=0){
+        if (query.getActivityStatus()!=null&&query.getActivityStatus()!=0){
             wrapper.eq("activity_status",query.getActivityStatus());
         }
         if (!"".equals(query.getTheme())&&query.getTheme()!=null){
@@ -94,7 +95,7 @@ public class PropertyActivityServiceImpl extends ServiceImpl<PropertyActivityMap
         ActivityUserEntity query = baseQO.getQuery();
         QueryWrapper<ActivityUserEntity> wrapper = new QueryWrapper<>();
         wrapper.eq("activity_id",query.getActivityId());
-        if (!"".equals(baseQO.getQuery())&&baseQO.getQuery()!=null){
+        if (!"".equals(query.getKey())&&query.getKey()!=null){
             wrapper.like("mobile",query.getKey()).or().like("name",query.getKey());
         }
         Page<ActivityUserEntity> page = propertyActivityUserMapper.selectPage(new Page<ActivityUserEntity>(baseQO.getPage(), baseQO.getSize()), wrapper);
@@ -129,6 +130,7 @@ public class PropertyActivityServiceImpl extends ServiceImpl<PropertyActivityMap
     @Transactional
     public void saveBy(ActivityEntity entity) {
         entity.setId(SnowFlake.nextId());
+        entity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyActivityMapper.insert(entity);
     }
 }

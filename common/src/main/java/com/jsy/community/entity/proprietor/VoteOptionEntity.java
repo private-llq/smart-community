@@ -18,7 +18,7 @@ public class VoteOptionEntity extends BaseEntity {
     /**
      * 投票id
      */
-    private String voteId;
+    private Long voteId;
     /**
      * 投票答案
      */

@@ -2,6 +2,7 @@ package com.jsy.community.entity.proprietor;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
@@ -19,7 +20,7 @@ public class VoteEntity extends BaseEntity {
     /**
      * 社区id
      */
-    private String communityId;
+    private Long communityId;
     /**
      * 楼栋id
      */
@@ -45,10 +46,12 @@ public class VoteEntity extends BaseEntity {
     /**
      * 开始时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime beginTime;
     /**
      * 结束时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime overTime;
     /**
      * 图片集合，以逗号分割

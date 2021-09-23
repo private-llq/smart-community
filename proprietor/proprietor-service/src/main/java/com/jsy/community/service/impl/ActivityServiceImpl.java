@@ -116,7 +116,8 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
         if (baseQO.getPage()==0){
             baseQO.setPage(1L);
         }
-        Page<ActivityEntity> entityPage = activityMapper.selectPage(new Page<ActivityEntity>(baseQO.getPage(), baseQO.getSize()), new QueryWrapper<ActivityEntity>().eq("community_id", baseQO.getQuery().getCommunityId()));
+        Page<ActivityEntity> entityPage = activityMapper.selectPage(new Page<ActivityEntity>(baseQO.getPage(), baseQO.getSize()), new QueryWrapper<ActivityEntity>()
+                .eq("community_id", baseQO.getQuery().getCommunityId()).in("activity_status",1,2));
         HashMap<String, Object> map = new HashMap<>();
         map.put("total",entityPage.getTotal());
         map.put("list",entityPage.getRecords());
