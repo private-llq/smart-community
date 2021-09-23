@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -40,10 +41,10 @@ public class UserEntity extends BaseEntity {
 	private String faceUrl;
 
 	// 人脸启用状态;1:启用;2:禁用
+	@NotNull(groups = {FaceOprationValidate.class}, message = "人脸启用状态不能为空;1:启用;2:禁用")
 	private Integer faceEnableStatus;
 
 	@ApiModelProperty("电话号码")
-	@NotBlank(groups = {FaceOprationValidate.class}, message = "电话号码不能为空")
 	private String mobile;
 	
 	@ApiModelProperty("性别，0未知，1男，2女")
@@ -53,7 +54,6 @@ public class UserEntity extends BaseEntity {
 	private LocalDateTime birthdayTime;
 	
 	@ApiModelProperty("真实姓名")
-	@NotBlank(groups = {FaceOprationValidate.class}, message = "真实姓名不能为空")
 	private String realName;
 	
 	@ApiModelProperty("身份证")

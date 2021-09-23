@@ -452,7 +452,6 @@ public class ProprietorController {
      **/
     @Login
     @PostMapping("/v2/facePageList")
-    @ApiOperation("查询未绑定房屋列表")
     public CommonResult facePageList(@RequestBody BaseQO<UserEntity> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new UserEntity());
@@ -474,10 +473,14 @@ public class ProprietorController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/22 10:33
      **/
+    @Login
+    @PostMapping("/v2/faceOpration")
     public CommonResult faceOpration(@RequestBody UserEntity userEntity) {
         ValidatorUtils.validateEntity(userEntity, UserEntity.FaceOprationValidate.class);
         Integer integer = iUserService.faceOpration(userEntity, String.valueOf(UserUtils.getAdminCommunityId()));
-        return CommonResult.ok();
+        return integer > 0 ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
     }
+
+//    public CommonResult
 
 }

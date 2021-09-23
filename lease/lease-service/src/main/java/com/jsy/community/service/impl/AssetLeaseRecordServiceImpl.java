@@ -1402,8 +1402,11 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
                 }
             }
-            if (opration == BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode() && assetLeaseRecordEntity.getOperation() != BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode()) {
-                // 房东接受申请后,倒计时结束没完成签约的都删除
+            if (opration == BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode()
+                    && assetLeaseRecordEntity.getOperation() != BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode()
+                    && assetLeaseRecordEntity.getOperation() != BusinessEnum.ContractingProcessStatusEnum.PAYMENT_COMPLETED.getCode()
+            ) {
+                // 房东接受申请后,倒计时结束没完成签约,支付的都删除
                 // 如果是房东发起状态,通知签章作废合同
                 if (assetLeaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode()) {
                     // 通知签章作废合同

@@ -763,6 +763,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             //数据异常，停止房屋相关操作
             throw new ProprietorException("用户已实人认证，人脸图片不存在！");
         }
+        // todo 已经不适配小区项目的新代码逻辑了,当这个业务重整的时候,可以适配修改这里的代码
         JSONObject pushMap = new JSONObject();
         pushMap.put("operator","editPerson");
         pushMap.put("uid",userEntity.getUid());
