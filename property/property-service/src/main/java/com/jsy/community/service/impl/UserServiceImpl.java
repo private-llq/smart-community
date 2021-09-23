@@ -218,7 +218,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
 		if (userEntity.getFaceEnableStatus() == 1 && updateResult == 1) {
 			// 启用操作
-			xuFaceEditPersonDTO.setOperator("EditPerson");
+			xuFaceEditPersonDTO.setOperator("editPerson");
 			xuFaceEditPersonDTO.setName(userEntityResult.getRealName());
 			xuFaceEditPersonDTO.setPersonType(0);
 			xuFaceEditPersonDTO.setTempCardType(0);

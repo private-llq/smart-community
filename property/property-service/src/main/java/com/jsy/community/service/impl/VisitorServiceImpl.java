@@ -1,4 +1,6 @@
 package com.jsy.community.service.impl;
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Sets;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,6 +12,7 @@ import com.jsy.community.api.IVisitorService;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
+import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.*;
@@ -296,6 +299,7 @@ public class VisitorServiceImpl implements IVisitorService {
 			if (!CollectionUtils.isEmpty(communityHardWareEntities)) {
 				// 增加每个机器的同步记录
 				List<VisitorFaceSyncRecordEntity> visitorFaceSyncRecordEntities = new ArrayList<>();
+				Set<String> facilityIds = new HashSet<>();
 				for (CommunityHardWareEntity communityHardWareEntity : communityHardWareEntities) {
 					VisitorFaceSyncRecordEntity visitorFaceSyncRecordEntity = new VisitorFaceSyncRecordEntity();
 					visitorFaceSyncRecordEntity.setVisitorId(visitorEntity.getId());
@@ -306,20 +310,21 @@ public class VisitorServiceImpl implements IVisitorService {
 					visitorFaceSyncRecordEntity.setDeleted(0);
 					visitorFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 					visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
-					// =================================== 向队列发送同步消息 =============================================
-					JSONObject pushMap = new JSONObject();
-					pushMap.put("operator","editPerson");
-					pushMap.put("uid",visitorEntity.getContact());
-					pushMap.put("faceUrl",visitorEntity.getFaceUrl());
-					pushMap.put("communityId", visitorEntity.getCommunityId());
-					pushMap.put("facilityId", communityHardWareEntity.getHardwareId());
-					pushMap.put("tel", visitorEntity.getContact());
-					pushMap.put("sex", 0);
-					pushMap.put("realName",visitorEntity.getName());
-					log.info("发送消息到队列{}", TopicExConfig.TOPIC_FACE_XU_SERVER + "." + visitorEntity.getCommunityId());
-					rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER + "." + visitorEntity.getCommunityId(), pushMap.toString());
+					facilityIds.add(communityHardWareEntity.getHardwareId());
 				}
 				faceSyncRecordMapper.batchInsertRecord(visitorFaceSyncRecordEntities);
+				// =================================== 向队列发送同步消息 =============================================
+				XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
+				xuFaceEditPersonDTO.setCustomId(visitorEntity.getContact());
+				xuFaceEditPersonDTO.setName(visitorEntity.getName());
+				xuFaceEditPersonDTO.setPersonType(0);
+				xuFaceEditPersonDTO.setTempCardType(0);
+				xuFaceEditPersonDTO.setPicURI(visitorEntity.getFaceUrl());
+				xuFaceEditPersonDTO.setHardwareIds(facilityIds);
+				xuFaceEditPersonDTO.setCommunityId(String.valueOf(visitorEntity.getCommunityId()));
+				xuFaceEditPersonDTO.setOperator("editPerson");
+				log.info("发送消息到队列{}", TopicExConfig.TOPIC_FACE_XU_SERVER + "." + visitorEntity.getCommunityId());
+				rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
 			}
 		}
 		return resultNum;
