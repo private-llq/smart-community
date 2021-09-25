@@ -1399,6 +1399,7 @@ public interface BusinessEnum {
 		CANCELLATION_REQUEST("取消申请", 7),
 		REJECTION_OF_APPLICATION("拒绝申请", 8),
 		REAPPLY("重新申请", 9),
+		EXPIRED("已过期", 10),
 		LANDLORD_INITIATED_CONTRACT("(房东)发起签约", 31),
 		CANCEL_LAUNCH("取消发起", 32)
 		;
