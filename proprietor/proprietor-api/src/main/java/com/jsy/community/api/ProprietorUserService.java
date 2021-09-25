@@ -65,7 +65,7 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @Param:
 	 * @return:
 	 */
-	String registerV2(RegisterQO qo);
+	String registerV2(RegisterQO qo,String uid,Integer relation,Long houseId,Long communityId);
 
 	/**
 	* @Description: 三方登录
@@ -288,4 +288,13 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	Collection<Map<String, Object>> queryRelationHousesOfCommunity(String uid);
+
+	/**
+	 * @Description: uid查询详情
+	 * @author: Hu
+	 * @since: 2021/9/25 15:37
+	 * @Param:
+	 * @return:
+	 */
+	UserEntity getUser(String tenantUid);
 }

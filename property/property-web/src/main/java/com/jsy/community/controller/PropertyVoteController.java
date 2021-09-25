@@ -50,6 +50,7 @@ public class PropertyVoteController {
     @ApiOperation("新增")
     @PostMapping("/save")
     public CommonResult save(@RequestBody VoteEntity voteEntity){
+        voteEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyVoteService.saveBy(voteEntity);
         return CommonResult.ok();
     }

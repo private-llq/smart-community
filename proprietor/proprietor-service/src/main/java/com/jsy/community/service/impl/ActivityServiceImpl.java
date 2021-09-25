@@ -6,17 +6,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IActivityService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.property.ActivityUserEntity;
 import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.mapper.ActivityMapper;
 import com.jsy.community.mapper.ActivityUserMapper;
+import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -31,6 +35,11 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
 
     @Autowired
     private ActivityUserMapper activityUserMapper;
+
+    @Autowired
+    private UserIMMapper userIMMapper;
+
+
 
 
 
@@ -101,6 +110,19 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
             }
             activityUserMapper.insert(activityUserEntity);
         }
+        UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", activityUserEntity.getUid()));
+        Map<Object, Object> map = new HashMap<>();
+        map.put("type",1);
+        map.put("dataId",entity.getId());
+        //推送消息
+        PushInfoUtil.PushPublicTextMsg(
+                userIMEntity.getImId(),
+                "活动投票",
+                entity.getTheme(),
+                null,
+                "活动报名成功" +
+                        entity.getBeginActivityTime()+"————"+entity.getOverActivityTime(),map);
+
     }
 
 

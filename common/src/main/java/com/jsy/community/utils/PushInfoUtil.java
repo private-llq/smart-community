@@ -8,6 +8,7 @@ import com.jsy.community.utils.imutils.entity.*;
 import com.jsy.community.utils.imutils.open.EncryptHelper;
 
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * @program: com.jsy.community
@@ -56,7 +57,7 @@ public class PushInfoUtil {
      * content：类容
      * @return: ImResponseEntity
      */
-    public static ImResponseEntity PushPublicTextMsg(String imId,String title,String desc,String url,String content) {
+    public static ImResponseEntity PushPublicTextMsg(String imId, String title, String desc, String url, String content, Map map) {
         String str = IdUtil.fastUUID();
 
         PushAppMsg pushAppMsg = new PushAppMsg();
@@ -69,6 +70,7 @@ public class PushInfoUtil {
         textAppMsg.setTemplateId("暂无模板");
         textAppMsg.setContent(content);
         textAppMsg.setLinks(Collections.singletonList(new Links(url, desc)));
+        textAppMsg.setExtraDta(map);
         pushAppMsg.setAppMsg(JSON.toJSONString(textAppMsg));
         SendInfo sendInfo = new SendInfo();
         sendInfo.setFromImId("houseManage");
@@ -98,7 +100,7 @@ public class PushInfoUtil {
      * desc：描述
      * @return: ImResponseEntity
      */
-    public static ImResponseEntity pushPayAppMsg(String imId,Integer type,String amount,String detailUrl,String desc){
+    public static ImResponseEntity pushPayAppMsg(String imId,Integer type,String amount,String detailUrl,String desc,Map map){
         String str = IdUtil.fastUUID();
 
         PushAppMsg pushAppMsg = new PushAppMsg();
@@ -118,6 +120,7 @@ public class PushInfoUtil {
         }
         payAppMsg.setTemplateId("");
         payAppMsg.setLinks(Collections.singletonList(new Links(detailUrl, "查看账单详情")));
+        payAppMsg.setExtraDta(map);
 
         pushAppMsg.setAppMsg(JSON.toJSONString(payAppMsg));
         SendInfo sendInfo = new SendInfo();

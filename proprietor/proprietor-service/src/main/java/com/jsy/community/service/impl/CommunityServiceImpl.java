@@ -173,7 +173,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	 */
 	@Override
 	public CommunityEntity getCommunity(ControlVO controlVO) {
-		return communityMapper.selectById(controlVO.getCommunityId());
+		return communityMapper.selectById(1);
 	}
 
 	/**

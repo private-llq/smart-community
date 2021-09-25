@@ -13,6 +13,7 @@ import com.jsy.community.entity.property.*;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
+import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -41,6 +42,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserIMMapper userIMMapper;
 
     @Autowired
     private CommunityMapper communityMapper;
@@ -402,6 +406,17 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             orderEntity.setOverTime(carEntity.getOverTime().toLocalDate());
             orderEntity.setId(SnowFlake.nextId());
             propertyFinanceOrderService.insert(orderEntity);
+
+            //推送消息
+            UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
+            HashMap<Object, Object> map = new HashMap<>();
+            map.put("type",2);
+            map.put("dataId",carOrderEntity.getId());
+            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+                    entity.getPayType(),
+                    entity.getMoney().toString(),
+                    null,
+                    "月租缴费",map);
         } else {
             throw new ProprietorException("当前月租车辆不存在！");
         }
@@ -489,6 +504,17 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 orderEntity.setOverTime(carEntity.getOverTime().toLocalDate());
                 orderEntity.setId(SnowFlake.nextId());
                 propertyFinanceOrderService.insert(orderEntity);
+
+                //推送消息
+                UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
+                HashMap<Object, Object> map = new HashMap<>();
+                map.put("type",2);
+                map.put("dataId",carOrderEntity.getId());
+                PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+                        entity.getPayType(),
+                        entity.getMoney().toString(),
+                        null,
+                        "月租缴费",map);
             }
     }
 

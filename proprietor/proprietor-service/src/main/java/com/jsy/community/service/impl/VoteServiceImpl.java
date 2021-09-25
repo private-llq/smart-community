@@ -10,12 +10,10 @@ import com.jsy.community.entity.proprietor.VoteEntity;
 import com.jsy.community.entity.proprietor.VoteOptionEntity;
 import com.jsy.community.entity.proprietor.VoteTopicEntity;
 import com.jsy.community.entity.proprietor.VoteUserEntity;
-import com.jsy.community.mapper.VoteMapper;
-import com.jsy.community.mapper.VoteOptionMapper;
-import com.jsy.community.mapper.VoteTopicMapper;
-import com.jsy.community.mapper.VoteUserMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.VoteQO;
+import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +42,9 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
     @Autowired
     private VoteTopicMapper voteTopicMapper;
 
+    @Autowired
+    private UserIMMapper userIMMapper;
+
 
 
     /**
@@ -62,17 +63,37 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
         if (list.size()==0){
             for (Long option : voteQO.getOptions()) {
                 voteUserEntity = new VoteUserEntity();
-                voteUserEntity.setId(String.valueOf(SnowFlake.nextId()));
+                voteUserEntity.setId(SnowFlake.nextId());
                 voteUserEntity.setUid(uid);
-                voteUserEntity.setVoteId(voteQO.getId().toString());
-                voteUserEntity.setTopicId(voteQO.getTopicId().toString());
-                voteUserEntity.setOptionId(option.toString());
+                voteUserEntity.setVoteId(voteQO.getId());
+                voteUserEntity.setTopicId(voteQO.getTopicId());
+                voteUserEntity.setOptionId(option);
                 list1.add(voteUserEntity);
             }
             voteUserMapper.save(list1);
         }else {
             throw new ProprietorException("你已经投过票了哦!");
         }
+        VoteEntity voteEntity = voteMapper.selectById(voteQO.getId());
+        Set<String> total = voteUserMapper.getUserTotal(voteQO.getId());
+        if (total.size()==voteEntity.getTotal()){
+            Map  map = null;
+            List<String> imId = userIMMapper.selectByUid(total);
+            for (String im : imId) {
+                map = new HashMap<>();
+                map.put("type",2);
+                map.put("dataId",voteEntity.getId());
+                //推送消息
+                PushInfoUtil.PushPublicTextMsg(
+                        im,
+                        "活动投票",
+                        voteEntity.getTheme(),
+                        null,
+                        "投票时间说明" +
+                                voteEntity.getBeginTime()+"————"+voteEntity.getOverTime(),map);
+            }
+        }
+
     }
 
     /**
@@ -109,7 +130,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
     public VoteEntity getVote(Long id,String uid) {
         //已投过票的答案id集合
         String str = null;
-        Map<String, Object> map = null;
+        Map<Long, Object> map = null;
         VoteEntity voteEntity = voteMapper.selectById(id);
         VoteTopicEntity topicEntity = voteTopicMapper.selectOne(new QueryWrapper<VoteTopicEntity>().eq("vote_id", id));
         if (voteEntity!=null){
@@ -120,7 +141,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
                 map = new HashMap<>();
                 for (VoteUserEntity userEntity : userEntities) {
                     str+=userEntity.getOptionId()+",";
-                    map.put(userEntity.getOptionId().toString(),userEntity);
+                    map.put(userEntity.getOptionId(),userEntity);
                 }
                 topicEntity.setOptionsIds(str);
             }else {

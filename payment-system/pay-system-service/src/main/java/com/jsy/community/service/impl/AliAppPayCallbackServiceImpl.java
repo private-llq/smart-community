@@ -205,6 +205,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			} else if (PaymentEnum.TradeFromEnum.TRADE_FROM_PARKING_PAYMENT.getIndex().equals(order.getTradeName())){
 				log.info("开始修改停车账单状态，订单号：" + order.getOrderNo());
 				CarOrderRecordEntity entity = carService.findOne(Long.parseLong(order.getServiceOrderNo()));
+				entity.setPayType(2);
 				entity.setOrderNum(order.getOrderNo());
 				if (entity!=null){
 					if (entity.getType()==1){

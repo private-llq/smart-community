@@ -212,11 +212,11 @@
     </select>
     <insert id="saveList" parameterType="List">
         insert into t_property_finance_order
-        (id,order_num,order_time,uid,target_id,community_id,property_fee,associated_type,begin_time,over_time,type,fee_rule_id)
+        (id,order_num,order_time,uid,target_id,community_id,property_fee,associated_type,begin_time,over_time,type,fee_rule_id,rise)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.id},#{item.orderNum},#{item.orderTime},#{item.uid},#{item.targetId},#{item.communityId},#{item.propertyFee},
-            #{item.associatedType},#{item.beginTime},#{item.overTime},#{item.type},#{item.feeRuleId}
+            #{item.associatedType},#{item.beginTime},#{item.overTime},#{item.type},#{item.feeRuleId},#{item.rise}
             )
         </foreach>
     </insert>

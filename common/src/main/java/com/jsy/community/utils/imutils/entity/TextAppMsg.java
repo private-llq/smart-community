@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -41,4 +42,9 @@ public class TextAppMsg {
      * 子集详情
      */
     private List<Links> links;
+
+    /**
+     * 子集详情
+     */
+    private Map extraDta;
 }

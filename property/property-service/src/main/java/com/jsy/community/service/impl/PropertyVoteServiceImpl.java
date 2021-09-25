@@ -117,6 +117,7 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
         for (int i= 1;i<=options.size();i++) {
             VoteOptionEntity option = options.get(i-1);
             option.setId(SnowFlake.nextId());
+            option.setVoteId(voteEntity.getId());
             option.setTopicId(topicEntity.getId().toString());
             option.setCode(i);
             list.add(option);

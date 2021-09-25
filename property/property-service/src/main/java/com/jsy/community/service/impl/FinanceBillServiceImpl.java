@@ -61,7 +61,6 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
      * @Param: []
      * @return: void
      */
-
     @Transactional(rollbackFor = Exception.class)
     public void updateMonth() {
         //上月個的天数
@@ -86,50 +85,52 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                 LocalDate date = LocalDate.now().withMonth(LocalDate.now().getMonthValue() - 1);
                 //获取当前缴费项目关联的房间或者车位id集合
                 List<String> ruleList = propertyFeeRuleRelevanceMapper.selectFeeRuleList(feeRuleEntity.getId());
-                CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
-                //relevanceType等于1表示关联的是房屋，2表示关联的是车位
-                if (feeRuleEntity.getRelevanceType() == 1) {
-                    //查询所有缴费项目关联的房间
-                    List<HouseEntity> house = houseMapper.selectInIds(ruleList);
-                    for (HouseEntity houseEntity : house) {
-                        entity = new PropertyFinanceOrderEntity();
-                        entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
-                        entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
-                        entity.setType(feeRuleEntity.getType());
-                        entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
-                        entity.setFeeRuleId(feeRuleEntity.getId());
-                        entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
-                        entity.setCommunityId(feeRuleEntity.getCommunityId());
-                        entity.setOrderTime(LocalDate.now());
-                        entity.setAssociatedType(1);
-                        entity.setUid(houseEntity.getUid());
-                        entity.setTargetId(houseEntity.getHouseId());
-                        //单价乘建筑面积乘周期
-                        entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())).multiply(new BigDecimal(dateOfMonth)));
-                        entity.setId(SnowFlake.nextId());
-                        orderList.add(entity);
-                    }
-                } else {
-                    //查询当前收费项目关联的车位
-                    List<CarPositionEntity> entityList = carPositionMapper.selectBatchIds(ruleList);
-                    for (CarPositionEntity positionEntity : entityList) {
-                        if (LocalDateTime.now().isAfter(positionEntity.getEndTime())) {
+                if (ruleList.size()!=0){
+                    CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
+                    //relevanceType等于1表示关联的是房屋，2表示关联的是车位
+                    if (feeRuleEntity.getRelevanceType() == 1) {
+                        //查询所有缴费项目关联的房间
+                        List<HouseEntity> house = houseMapper.selectInIds(ruleList);
+                        for (HouseEntity houseEntity : house) {
                             entity = new PropertyFinanceOrderEntity();
-                            entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
                             entity.setType(feeRuleEntity.getType());
+                            entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                             entity.setFeeRuleId(feeRuleEntity.getId());
                             entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
                             entity.setCommunityId(feeRuleEntity.getCommunityId());
                             entity.setOrderTime(LocalDate.now());
-                            entity.setAssociatedType(2);
-                            entity.setUid(positionEntity.getUid());
-                            entity.setTargetId(positionEntity.getHouseId());
-                            //单价乘周期
-                            entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(dateOfMonth)));
+                            entity.setAssociatedType(1);
+                            entity.setUid(houseEntity.getUid());
+                            entity.setTargetId(houseEntity.getId());
+                            //单价乘建筑面积乘周期
+                            entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())).multiply(new BigDecimal(dateOfMonth)));
                             entity.setId(SnowFlake.nextId());
                             orderList.add(entity);
+                        }
+                    } else {
+                        //查询当前收费项目关联的车位
+                        List<CarPositionEntity> entityList = carPositionMapper.selectBatchIds(ruleList);
+                        for (CarPositionEntity positionEntity : entityList) {
+                            if (LocalDateTime.now().isAfter(positionEntity.getEndTime())) {
+                                entity = new PropertyFinanceOrderEntity();
+                                entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
+                                entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
+                                entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
+                                entity.setType(feeRuleEntity.getType());
+                                entity.setFeeRuleId(feeRuleEntity.getId());
+                                entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
+                                entity.setCommunityId(feeRuleEntity.getCommunityId());
+                                entity.setOrderTime(LocalDate.now());
+                                entity.setAssociatedType(2);
+                                entity.setUid(positionEntity.getUid());
+                                entity.setTargetId(positionEntity.getId());
+                                //单价乘周期
+                                entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(dateOfMonth)));
+                                entity.setId(SnowFlake.nextId());
+                                orderList.add(entity);
+                            }
                         }
                     }
                 }
@@ -163,28 +164,30 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
             for (PropertyFeeRuleEntity feeRuleEntity : feeRuleEntities) {
                 //获取当前缴费项目关联的房间或者车位id集合
                 List<String> ruleList = propertyFeeRuleRelevanceMapper.selectFeeRuleList(feeRuleEntity.getId());
-                //查询所有未空置的房间生成账单
-                List<HouseEntity> list = houseMapper.selectInIds(ruleList);
-                //查询小区
-                CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
-                for (HouseEntity houseEntity : list) {
-                    entity = new PropertyFinanceOrderEntity();
-                    //去年第一天
-                    entity.setBeginTime(LocalDateTime.now().minusYears(1).with(TemporalAdjusters.firstDayOfYear()).withHour(0).withMinute(0).withSecond(0).toLocalDate());
-                    //去年最后一天
-                    entity.setOverTime(LocalDateTime.now().minusYears(1).with(TemporalAdjusters.lastDayOfYear()).withHour(23).withMinute(59).withSecond(59).toLocalDate());
-                    entity.setType(feeRuleEntity.getType());
-                    entity.setFeeRuleId(feeRuleEntity.getId());
-                    entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
-                    entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
-                    entity.setCommunityId(feeRuleEntity.getCommunityId());
-                    entity.setOrderTime(LocalDate.now());
-                    entity.setAssociatedType(1);
-                    entity.setUid(houseEntity.getUid());
-                    entity.setTargetId(houseEntity.getHouseId());
-                    entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
-                    entity.setId(SnowFlake.nextId());
-                    orderList.add(entity);
+                if (ruleList.size()!=0){
+                    //查询所有未空置的房间生成账单
+                    List<HouseEntity> list = houseMapper.selectInIds(ruleList);
+                    //查询小区
+                    CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
+                    for (HouseEntity houseEntity : list) {
+                        entity = new PropertyFinanceOrderEntity();
+                        //去年第一天
+                        entity.setBeginTime(LocalDateTime.now().minusYears(1).with(TemporalAdjusters.firstDayOfYear()).withHour(0).withMinute(0).withSecond(0).toLocalDate());
+                        //去年最后一天
+                        entity.setOverTime(LocalDateTime.now().minusYears(1).with(TemporalAdjusters.lastDayOfYear()).withHour(23).withMinute(59).withSecond(59).toLocalDate());
+                        entity.setType(feeRuleEntity.getType());
+                        entity.setFeeRuleId(feeRuleEntity.getId());
+                        entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
+                        entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
+                        entity.setCommunityId(feeRuleEntity.getCommunityId());
+                        entity.setOrderTime(LocalDate.now());
+                        entity.setAssociatedType(1);
+                        entity.setUid(houseEntity.getUid());
+                        entity.setTargetId(houseEntity.getId());
+                        entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
+                        entity.setId(SnowFlake.nextId());
+                        orderList.add(entity);
+                    }
                 }
             }
         }
@@ -216,49 +219,51 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                 LocalDate date = LocalDate.now().withMonth(LocalDate.now().getMonthValue()-1);
                 //获取当前缴费项目关联的房间或者车位id集合
                 List<String> ruleList = propertyFeeRuleRelevanceMapper.selectFeeRuleList(feeRuleEntity.getId());
-                //查询收费项目关联的所有房屋
-                List<HouseEntity> list=houseMapper.selectInIds(ruleList);
-                CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
-                //装修管理费
-                if (feeRuleEntity.getType()==1){
-                    for (HouseEntity positionEntity : list) {
+                if (ruleList.size()!=0){
+                    //查询收费项目关联的所有房屋
+                    List<HouseEntity> list=houseMapper.selectInIds(ruleList);
+                    CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
+                    //装修管理费
+                    if (feeRuleEntity.getType()==1){
+                        for (HouseEntity positionEntity : list) {
 
-                    entity = new PropertyFinanceOrderEntity();
-                    entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
-                    entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
-                    entity.setType(feeRuleEntity.getType());
-                    entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
-                    entity.setFeeRuleId(feeRuleEntity.getId());
-                    entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
-                    entity.setCommunityId(feeRuleEntity.getCommunityId());
-                    entity.setOrderTime(LocalDate.now());
-                    entity.setAssociatedType(2);
-                    entity.setUid(positionEntity.getUid());
-                    entity.setTargetId(positionEntity.getHouseId());
-                    entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(positionEntity.getBuildArea())));
-                    entity.setId(SnowFlake.nextId());
-                    orderList.add(entity);
-                }
-                } else {
-                    if (feeRuleEntity.getType()==9||feeRuleEntity.getType()==10){
-                        for (HouseEntity houseEntity : list) {
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
                             entity.setType(feeRuleEntity.getType());
+                            entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                             entity.setFeeRuleId(feeRuleEntity.getId());
                             entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
                             entity.setCommunityId(feeRuleEntity.getCommunityId());
                             entity.setOrderTime(LocalDate.now());
                             entity.setAssociatedType(2);
-                            entity.setUid(houseEntity.getUid());
-                            entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
-                            entity.setTargetId(houseEntity.getHouseId());
-                            entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
+                            entity.setUid(positionEntity.getUid());
+                            entity.setTargetId(positionEntity.getId());
+                            entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(positionEntity.getBuildArea())));
                             entity.setId(SnowFlake.nextId());
                             orderList.add(entity);
                         }
+                    } else {
+                        if (feeRuleEntity.getType()==9||feeRuleEntity.getType()==10){
+                            for (HouseEntity houseEntity : list) {
+                                entity = new PropertyFinanceOrderEntity();
+                                entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
+                                entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
+                                entity.setType(feeRuleEntity.getType());
+                                entity.setFeeRuleId(feeRuleEntity.getId());
+                                entity.setOrderNum(getOrderNum(String.valueOf(feeRuleEntity.getCommunityId())));
+                                entity.setCommunityId(feeRuleEntity.getCommunityId());
+                                entity.setOrderTime(LocalDate.now());
+                                entity.setAssociatedType(2);
+                                entity.setUid(houseEntity.getUid());
+                                entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
+                                entity.setTargetId(houseEntity.getId());
+                                entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
+                                entity.setId(SnowFlake.nextId());
+                                orderList.add(entity);
+                            }
 
+                        }
                     }
                 }
                 //修改收费项目启用状态

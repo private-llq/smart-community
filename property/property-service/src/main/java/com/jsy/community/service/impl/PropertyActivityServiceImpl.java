@@ -11,7 +11,6 @@ import com.jsy.community.mapper.PropertyActivityMapper;
 import com.jsy.community.mapper.PropertyActivityUserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,7 +129,6 @@ public class PropertyActivityServiceImpl extends ServiceImpl<PropertyActivityMap
     @Transactional
     public void saveBy(ActivityEntity entity) {
         entity.setId(SnowFlake.nextId());
-        entity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyActivityMapper.insert(entity);
     }
 }

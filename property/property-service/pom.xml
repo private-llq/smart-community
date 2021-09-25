@@ -26,6 +26,11 @@
             <artifactId>property-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.jsy</groupId>
+            <artifactId>proprietor-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
         <!-- nacos 服务发现 -->
         <dependency>

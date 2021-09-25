@@ -281,7 +281,12 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         }
         return flag;
     }
-    
+
+    @Override
+    public ProprietorEntity getByUser(String name, String mobile, Long houseId, Long communityId) {
+        return proprietorMapper.selectOne(new QueryWrapper<ProprietorEntity>().eq("community_id",communityId).eq("house_id",houseId).eq("real_name",name).eq("mobile",mobile));
+    }
+
     /**
      * @Description: 根据手机号查询绑定房屋的id
      * @Param: [mobile]

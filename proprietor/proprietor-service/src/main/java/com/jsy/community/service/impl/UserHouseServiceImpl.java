@@ -2,9 +2,10 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.IProprietorService;
 import com.jsy.community.api.IUserHouseService;
-import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
@@ -13,6 +14,7 @@ import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
+import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.MembersVO;
@@ -41,6 +43,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	private UserMapper userMapper;
 
 	@Autowired
+	private UserIMMapper userIMMapper;
+
+	@Autowired
 	private HouseMapper houseMapper;
 
 	@Autowired
@@ -51,6 +56,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private ProprietorUserService userService;
+
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private IProprietorService proprietorService;
 	
 	/**
 	 * @return java.lang.Boolean
@@ -215,7 +223,26 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 */
 	@Override
 	public void membersDelete(String ids, String userId) {
-		houseMemberMapper.deleteBatchIds(Arrays.asList(ids.split(",")));
+		List<String> list = Arrays.asList(ids.split(","));
+		for (String s : list) {
+			HouseMemberEntity entity = houseMemberMapper.selectById(s);
+			UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
+			CommunityEntity communityEntity = communityMapper.selectById(entity.getCommunityId());
+			HouseEntity houseEntity = houseMapper.selectById(entity.getHouseId());
+			//移除人
+			UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+			//推送消息
+			PushInfoUtil.PushPublicTextMsg(
+					userIMEntity.getImId(),
+					"房屋管理",
+					"你有房屋最新消息了！",
+					null,
+					"尊敬的用户，" +
+							"用户"+userEntity.getRealName()+"已房东的身份移除你在"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation())+"身份，如已知晓，请忽略。",
+					null);
+
+		}
+		houseMemberMapper.deleteBatchIds(list);
 	}
 
 	/**
@@ -228,6 +255,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Override
 	@Transactional
 	public void membersSave(MembersQO membersQO, String userId) {
+		CommunityEntity communityEntity = communityMapper.selectById(membersQO.getCommunityId());
+		HouseEntity houseEntity = houseMapper.selectById(membersQO.getHouseId());
 		//添加成员表数据
 		HouseMemberEntity entity = new HouseMemberEntity();
 		BeanUtils.copyProperties(membersQO,entity);
@@ -241,9 +270,19 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			RegisterQO qo = new RegisterQO();
 			qo.setAccount(membersQO.getMobile());
 			qo.setName(membersQO.getName());
-			entity.setUid(userService.registerV2(qo));
+			entity.setUid(userService.registerV2(qo,userId,membersQO.getRelation(),membersQO.getHouseId(),membersQO.getCommunityId()));
+		}else{
+			UserIMEntity imEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", userEntity.getUid()));
+			entity.setUid(userEntity.getUid());
+			//推送消息
+			PushInfoUtil.PushPublicTextMsg(imEntity.getImId(),
+					"房屋管理","你有房屋最新消息了！",
+					null,
+					"尊敬的用户，" +
+							"用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。",
+					null
+			);
 		}
-		entity.setUid(userEntity.getUid());
 
 		houseMemberMapper.insert(entity);
 
@@ -323,6 +362,11 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			if (userHouseEntity!=null){
 				throw new ProprietorException("当前房屋已被认证，若非本人认证请联系管理员！");
 			}else {
+				ProprietorEntity proprietorEntity = proprietorService.getByUser(userHouseQO.getName(),userHouseQO.getMobile(),userHouseQO.getHouseId(),userHouseQO.getCommunityId());
+				if (Objects.isNull(proprietorEntity)){
+					throw new ProprietorException("当前房屋不是你的哦！");
+				}
+
 				//房屋认证表里添加数据
 				UserHouseEntity houseEntity = new UserHouseEntity();
 				houseEntity.setUid(userId);
