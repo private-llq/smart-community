@@ -22,7 +22,7 @@
                 #{recordEntity.facilityId},
                 #{recordEntity.createTime},
                 null,
-                #{recordEntity.deleted},
+                #{recordEntity.deleted}
             )
         </foreach>
     </insert>

@@ -163,11 +163,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 				}
 			}
 			for (UserEntity userEntity : userEntityList) {
-				userEntity.setRelationSet(relationMap.get(userEntity.getUid()));
+				if (String.valueOf(userEntity.getId()).equals(userEntity.getUid())) {
+					HashSet<String> hashSet = new HashSet<>();
+					hashSet.add("物业");
+					userEntity.setRelationSet(hashSet);
+				} else {
+					userEntity.setRelationSet(relationMap.get(userEntity.getUid()));
+				}
 			}
 		}
-		Integer count = 0;
-		count = baseMapper.queryFacePageListCount(baseQO.getQuery()) == null ? 0 : baseMapper.queryFacePageListCount(baseQO.getQuery());
+		Integer count = baseMapper.queryFacePageListCount(baseQO.getQuery());
+		count = count == null ? 0 : count;
 		pageInfo.setSize(baseQO.getSize());
 		pageInfo.setTotal(count);
 		pageInfo.setCurrent(baseQO.getPage());

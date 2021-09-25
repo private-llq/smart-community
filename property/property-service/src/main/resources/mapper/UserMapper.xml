@@ -101,20 +101,144 @@
         <if test="userEntity.houseId != null">
             AND thm.house_id = #{userEntity.houseId}
         </if>
-        <if test="userEntity.relationCode != null">
+        <if test="userEntity.relationCode != null and userEntity.relationCode != 8">
             AND thm.relation = #{userEntity.relationCode}
         </if>
         group by tu.uid, thm.relation
+        union all
+        SELECT
+            tpf.id as uid,
+            tpf.real_name as realName,
+            tpf.mobile,
+            tpf.id,
+            tpf.face_url as faceUrl,
+            tpf.face_enable_status as faceEnableStatus,
+            CASE tpf.face_enable_status
+            WHEN 1 THEN '启用'
+            WHEN 2 THEN '禁用'
+            END AS faceEnableStatusStr,
+            tpf.create_time as createTime,
+            CASE
+            (
+                (
+                    SELECT count( tpfsr.id ) FROM t_property_face_sync_record tpfsr
+                    WHERE tpfsr.porperty_face_id = tpf.id
+                    AND tpfsr.face_url = tpf.face_url
+                    AND tpfsr.community_id = #{userEntity.communityId}
+                    AND tpfsr.deleted = 0
+                )
+                &gt;
+                (
+                    SELECT count( tch.id ) FROM t_community_hardware tch
+                    WHERE tch.community_id = #{userEntity.communityId}
+                    AND tch.deleted = 0
+                )
+            )
+            WHEN TRUE
+            THEN '失败'
+            ELSE '成功'
+            END AS distributionStatusStr
+        FROM t_property_face tpf
+        WHERE
+            tpf.face_url IS NOT NULL
+            AND tpf.face_deleted = 0
+            AND tpf.community_id = #{userEntity.communityId}
+            AND tpf.deleted = 0
+            <if test="userEntity.keyword != null and userEntity.keyword != ''">
+                AND (tpf.real_name like concat('%', #{userEntity.keyword}, '%') OR tpf.mobile like concat('%', #{userEntity.keyword}, '%'))
+            </if>
+            <if test="userEntity.faceEnableStatus != null">
+                AND tpf.face_enable_status = #{userEntity.faceEnableStatus}
+            </if>
+            <if test="userEntity.distributionStatus != null and userEntity.distributionStatus == 1">
+                AND CASE
+                (
+                    (
+                        SELECT count( tpfsr.id ) FROM t_property_face_sync_record tpfsr
+                        WHERE tpfsr.porperty_face_id = tpf.id
+                        AND tpfsr.face_url = tpf.face_url
+                        AND tpfsr.community_id = #{userEntity.communityId}
+                        AND tpfsr.deleted = 0
+                    )
+                    &gt;
+                    (
+                        SELECT count( tch.id ) FROM t_community_hardware tch
+                        WHERE tch.community_id = #{userEntity.communityId}
+                        AND tch.deleted = 0
+                    )
+                )
+                WHEN TRUE
+                THEN 1
+                ELSE 2
+                END = 1
+            </if>
+            <if test="userEntity.distributionStatus != null and userEntity.distributionStatus == 2">
+                AND CASE
+                (
+                    (
+                        SELECT count( tpfsr.id ) FROM t_property_face_sync_record tpfsr
+                        WHERE tpfsr.porperty_face_id = tpf.id
+                        AND tpfsr.face_url = tpf.face_url
+                        AND tpfsr.deleted = 0
+                    )
+                    &gt;
+                    (
+                        SELECT count( tch.id ) FROM t_community_hardware tch
+                        WHERE tch.community_id = 1 AND tch.deleted = 0
+                    )
+                )
+                WHEN TRUE
+                THEN 1
+                ELSE 2
+                END = 2
+            </if>
+            <if test="userEntity.houseId != null">
+                AND 1 = 0
+            </if>
+            <if test="userEntity.relationCode != null and userEntity.relationCode != 8">
+                AND 1 = 0
+            </if>
         limit #{startNum}, #{endNum}
     </select>
     <!-- 人脸管理查询人脸分页总数 -->
     <select id="queryFacePageListCount" resultType="java.lang.Integer">
-        SELECT
-            count(DISTINCT tu.uid)
-        FROM t_user tu
-        LEFT JOIN t_house_member thm ON thm.uid = tu.uid
-        WHERE
+        select count(*) from (
+            SELECT
+            DISTINCT tu.uid,
+            tu.real_name as realName,
+            tu.mobile,
+            tu.id,
+            tu.face_url as faceUrl,
+            tu.face_enable_status as faceEnableStatus,
+            CASE tu.face_enable_status
+            WHEN 1 THEN '启用'
+            WHEN 2 THEN '禁用'
+            END AS faceEnableStatusStr,
+            tu.create_time as createTime,
+            CASE
+            (
+            (SELECT count( tfsr.id ) FROM t_user_face_sync_record tfsr
+            WHERE tfsr.uid = tu.uid
+            AND tfsr.face_url = tu.face_url
+            AND tfsr.community_id = #{userEntity.communityId}
+            AND tfsr.deleted = 0
+            )
+            &gt;
+            (SELECT count( tch.id ) FROM t_community_hardware tch
+            WHERE tch.community_id = #{userEntity.communityId}
+            AND tch.deleted = 0
+            )
+            )
+            WHEN TRUE
+            THEN '失败'
+            ELSE '成功'
+            END AS distributionStatusStr
+            FROM
+            t_user tu
+            LEFT JOIN t_house_member thm ON thm.uid = tu.uid
+            WHERE
             tu.face_url IS NOT NULL
+            AND tu.face_deleted = 0
             AND thm.community_id = #{userEntity.communityId}
             AND tu.deleted = 0
             AND thm.deleted = 0
@@ -126,54 +250,147 @@
             </if>
             <if test="userEntity.distributionStatus != null and userEntity.distributionStatus == 1">
                 AND CASE
-                    (
-                        (
-                            SELECT count( tfsr.id ) FROM t_user_face_sync_record tfsr
-                            WHERE tfsr.uid = tu.uid
-                            AND tfsr.face_url = tu.face_url
-                            AND tfsr.community_id = #{userEntity.communityId}
-                            AND tfsr.deleted = 0
-                        )
-                        &gt;
-                        (
-                            SELECT count( tch.id ) FROM t_community_hardware tch
-                            WHERE tch.community_id = #{userEntity.communityId}
-                            AND tch.deleted = 0
-                        )
-                    )
-                    WHEN TRUE
-                    THEN 1
-                    ELSE 2
-                    END = 1
+                (
+                (
+                SELECT count( tfsr.id ) FROM t_user_face_sync_record tfsr
+                WHERE tfsr.uid = tu.uid
+                AND tfsr.face_url = tu.face_url
+                AND tfsr.community_id = #{userEntity.communityId}
+                AND tfsr.deleted = 0
+                )
+                &gt;
+                (
+                SELECT count( tch.id ) FROM t_community_hardware tch
+                WHERE tch.community_id = #{userEntity.communityId}
+                AND tch.deleted = 0
+                )
+                )
+                WHEN TRUE
+                THEN 1
+                ELSE 2
+                END = 1
             </if>
             <if test="userEntity.distributionStatus != null and userEntity.distributionStatus == 2">
                 AND CASE
-                    (
-                        (
-                            SELECT count( tfsr.id ) FROM t_user_face_sync_record tfsr
-                            WHERE tfsr.uid = tu.uid
-                            AND tfsr.face_url = tu.face_url
-                            AND tfsr.community_id = #{userEntity.communityId}
-                            AND tfsr.deleted = 0
-                        )
-                        &gt;
-                        (
-                            SELECT count( tch.id ) FROM t_community_hardware tch
-                            WHERE tch.community_id = #{userEntity.communityId}
-                            AND tch.deleted = 0
-                        )
-                    )
-                    WHEN TRUE
-                    THEN 1
-                    ELSE 2
-                    END = 2
+                (
+                (
+                SELECT count( tfsr.id ) FROM t_user_face_sync_record tfsr
+                WHERE tfsr.uid = tu.uid
+                AND tfsr.face_url = tu.face_url
+                AND tfsr.deleted = 0
+                )
+                &gt;
+                (
+                SELECT count( tch.id ) FROM t_community_hardware tch
+                WHERE tch.community_id = 1 AND tch.deleted = 0
+                )
+                )
+                WHEN TRUE
+                THEN 1
+                ELSE 2
+                END = 2
             </if>
             <if test="userEntity.houseId != null">
                 AND thm.house_id = #{userEntity.houseId}
             </if>
-            <if test="userEntity.relationCode != null">
+            <if test="userEntity.relationCode != null and userEntity.relationCode != 8">
                 AND thm.relation = #{userEntity.relationCode}
             </if>
+            group by tu.uid, thm.relation
+            union all
+            SELECT
+            tpf.id as uid,
+            tpf.real_name as realName,
+            tpf.mobile,
+            tpf.id,
+            tpf.face_url as faceUrl,
+            tpf.face_enable_status as faceEnableStatus,
+            CASE tpf.face_enable_status
+            WHEN 1 THEN '启用'
+            WHEN 2 THEN '禁用'
+            END AS faceEnableStatusStr,
+            tpf.create_time as createTime,
+            CASE
+            (
+            (
+            SELECT count( tpfsr.id ) FROM t_property_face_sync_record tpfsr
+            WHERE tpfsr.porperty_face_id = tpf.id
+            AND tpfsr.face_url = tpf.face_url
+            AND tpfsr.community_id = #{userEntity.communityId}
+            AND tpfsr.deleted = 0
+            )
+            &gt;
+            (
+            SELECT count( tch.id ) FROM t_community_hardware tch
+            WHERE tch.community_id = #{userEntity.communityId}
+            AND tch.deleted = 0
+            )
+            )
+            WHEN TRUE
+            THEN '失败'
+            ELSE '成功'
+            END AS distributionStatusStr
+            FROM t_property_face tpf
+            WHERE
+            tpf.face_url IS NOT NULL
+            AND tpf.face_deleted = 0
+            AND tpf.community_id = #{userEntity.communityId}
+            AND tpf.deleted = 0
+            <if test="userEntity.keyword != null and userEntity.keyword != ''">
+                AND (tpf.real_name like concat('%', #{userEntity.keyword}, '%') OR tpf.mobile like concat('%', #{userEntity.keyword}, '%'))
+            </if>
+            <if test="userEntity.faceEnableStatus != null">
+                AND tpf.face_enable_status = #{userEntity.faceEnableStatus}
+            </if>
+            <if test="userEntity.distributionStatus != null and userEntity.distributionStatus == 1">
+                AND CASE
+                (
+                (
+                SELECT count( tpfsr.id ) FROM t_property_face_sync_record tpfsr
+                WHERE tpfsr.porperty_face_id = tpf.id
+                AND tpfsr.face_url = tpf.face_url
+                AND tpfsr.community_id = #{userEntity.communityId}
+                AND tpfsr.deleted = 0
+                )
+                &gt;
+                (
+                SELECT count( tch.id ) FROM t_community_hardware tch
+                WHERE tch.community_id = #{userEntity.communityId}
+                AND tch.deleted = 0
+                )
+                )
+                WHEN TRUE
+                THEN 1
+                ELSE 2
+                END = 1
+            </if>
+            <if test="userEntity.distributionStatus != null and userEntity.distributionStatus == 2">
+                AND CASE
+                (
+                (
+                SELECT count( tpfsr.id ) FROM t_property_face_sync_record tpfsr
+                WHERE tpfsr.porperty_face_id = tpf.id
+                AND tpfsr.face_url = tpf.face_url
+                AND tpfsr.deleted = 0
+                )
+                &gt;
+                (
+                SELECT count( tch.id ) FROM t_community_hardware tch
+                WHERE tch.community_id = 1 AND tch.deleted = 0
+                )
+                )
+                WHEN TRUE
+                THEN 1
+                ELSE 2
+                END = 2
+            </if>
+            <if test="userEntity.houseId != null">
+                AND 1 = 0
+            </if>
+            <if test="userEntity.relationCode != null and userEntity.relationCode != 8">
+                AND 1 = 0
+            </if>
+        ) as a
     </select>
 </mapper>
 
