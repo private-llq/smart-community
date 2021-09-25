@@ -97,6 +97,12 @@ public class UserHouseController {
     @ApiOperation("房屋认证")
     @PostMapping("attestation")
     public CommonResult attestation(@RequestBody UserHouseQO userHouseQO){
+        if ("".equals(userHouseQO.getName())||userHouseQO.getName()==null){
+            return CommonResult.error("认证姓名或电话不能为空！");
+        }
+        if ("".equals(userHouseQO.getMobile())||userHouseQO.getMobile()==null){
+            return CommonResult.error("认证姓名或电话不能为空！");
+        }
         userHouseService.attestation(userHouseQO, UserUtils.getUserId());
         return CommonResult.ok();
     }

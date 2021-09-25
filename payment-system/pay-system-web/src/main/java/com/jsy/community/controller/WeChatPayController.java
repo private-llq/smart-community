@@ -269,6 +269,7 @@ public class WeChatPayController {
             //停车缴费后记业务
             if (split[0].equals("8")){
                 CarOrderRecordEntity recordEntity = carService.findOne(Long.valueOf(split[1]));
+                recordEntity.setPayType(1);
                 recordEntity.setOrderNum(map.get("out_trade_no"));
                 if (recordEntity!=null){
                     if (recordEntity.getType()==1){

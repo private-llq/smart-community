@@ -75,6 +75,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
 
+    @Autowired
+    private HouseMapper houseMapper;
+
+    @Autowired
+    private CommunityMapper communityMapper;
+
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserHouseService userHouseService;
 
@@ -308,7 +314,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public String registerV2(RegisterQO qo) {
+    public String registerV2(RegisterQO qo,String uid,Integer relation,Long houseId,Long communityId) {
 //        commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 
         String uuid = UserUtils.randomUUID();
@@ -371,6 +377,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
+        HouseEntity houseEntity = houseMapper.selectById(houseId);
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
+        //推送消息
+        PushInfoUtil.PushPublicTextMsg(
+                userIMEntity.getImId(),
+                "房屋管理",
+                "你有房屋最新消息了！",
+                null,
+                "尊敬的用户，" +
+                        "用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(relation)+"身份，如已知晓，请忽略。",null);
+
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(uuid);
@@ -389,6 +407,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             throw new ProprietorException(JSYError.INTERNAL);
         }
         return uuid;
+
+
     }
 
     /**
@@ -838,6 +858,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //查小区名称
         Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
         return communityIdAndName.values();
+    }
+
+    @Override
+    public UserEntity getUser(String tenantUid) {
+        return userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",tenantUid));
     }
 
     /**

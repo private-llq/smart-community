@@ -26,6 +26,15 @@ public class UserHouseQO implements Serializable {
     private Long communityId;
 
     /**
+     * 社区id
+     */
+    private String name;
+    /**
+     * 社区id
+     */
+    private String mobile;
+
+    /**
      * 成员集合
      */
     private List<MembersVO> members;

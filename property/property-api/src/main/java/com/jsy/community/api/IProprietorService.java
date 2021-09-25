@@ -104,4 +104,13 @@ public interface IProprietorService extends IService<ProprietorEntity> {
      * @Date: 2021/08/16
      **/
     List<Long> queryBindHouseByMobile(String mobile, Long communityId);
+
+    /**
+     * @Description: 查询业主
+     * @author: Hu
+     * @since: 2021/9/25 11:22
+     * @Param:
+     * @return:
+     */
+    ProprietorEntity getByUser(String name, String mobile, Long houseId, Long communityId);
 }

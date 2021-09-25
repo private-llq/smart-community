@@ -10,7 +10,10 @@ import com.jsy.community.config.LeaseTopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.CompanyPayConfigEntity;
+import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
@@ -25,6 +28,7 @@ import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.MyHttpUtils;
 import com.jsy.community.utils.MyMathUtils;
+import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.signature.ZhsjUtil;
 import com.jsy.community.vo.UserInfoVo;
@@ -80,6 +84,15 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ProprietorUserService userService;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICommunityService communityService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IHouseService houseService;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IUserImService userImService;
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private AiliAppPayRecordService ailiAppPayRecordService;
@@ -180,6 +193,18 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 });
         // 写入租赁数据
         assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
+
+        //消息推送
+        UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getHomeOwnerUid());
+        UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
+        HashMap<Object, Object> map = new HashMap<>();
+        map.put("type",1);
+        map.put("dataId",null);
+        PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+                "合同签约",
+                userEntity.getRealName()+"向你发起了房屋签约！",
+                null,
+                userEntity.getRealName()+"向你发起了房屋签约请求，在我的租赁中去查看吧，请在7天时间内处理房屋签约请求，过时系统将自动取消。",map);
         return String.valueOf(assetLeaseRecordEntity.getId());
     }
 
@@ -1265,6 +1290,38 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setBlockStatus(2);
             leaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode());
             addLeaseOperationRecord(leaseRecordEntity);
+
+
+
+
+            CommunityEntity communityEntity = communityService.getCommunityNameById(leaseRecordEntity.getCommunityId());
+            //租客
+            UserIMEntity userIM = userImService.selectUid(leaseRecordEntity.getTenantUid());
+            UserEntity user = userService.getUser(leaseRecordEntity.getTenantUid());
+
+            //房东
+            UserIMEntity userIMEntity = userImService.selectUid(leaseRecordEntity.getHomeOwnerUid());
+            UserEntity userEntity = userService.getUser(leaseRecordEntity.getHomeOwnerUid());
+
+
+            HashMap<Object, Object> map = new HashMap<>();
+            map.put("type",3);
+            map.put("dataId",null);
+            PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+                    "合同签约",
+                    "恭喜你，和租客"+user.getRealName()+"签约完成",
+                    null,
+                    "恭喜你，和租客"+user.getRealName()+"签约完成："+communityEntity.getName()+"小区"+leaseRecordEntity.getAddress()+"房屋的房屋合同签署。",map);
+
+            HashMap<Object, Object> map1 = new HashMap<>();
+            map1.put("type",3);
+            map1.put("dataId",null);
+            PushInfoUtil.PushPublicTextMsg(userIM.getImId(),
+                    "合同签约",
+                    "恭喜你，和房东"+userEntity.getRealName()+"签约完成",
+                    null,
+                    "恭喜你，和房东"+userEntity.getRealName()+"签约完成："+communityEntity.getName()+"小区"+leaseRecordEntity.getAddress()+"房屋的房屋合同签署。",map1);
+
             return assetLeaseRecordMapper.updateById(leaseRecordEntity);
         } else {
             return 0;
@@ -1297,6 +1354,18 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setBlockStatus(1);
             leaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode());
             addLeaseOperationRecord(leaseRecordEntity);
+
+            //消息推送
+            UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getTenantUid());
+            UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getHomeOwnerUid());
+            HashMap<Object, Object> map = new HashMap<>();
+            map.put("type",2);
+            map.put("dataId",leaseRecordEntity.getId());
+            PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+                    "合同签约",
+                    userEntity.getRealName()+"向你发起了房屋签约！",
+                    null,
+                    userEntity.getRealName()+"向你发起了房屋租赁合同签约，请在24小时处理。过时系统将自动取消。查看详情",map);
             return assetLeaseRecordMapper.updateById(leaseRecordEntity);
         } else {
             return 0;

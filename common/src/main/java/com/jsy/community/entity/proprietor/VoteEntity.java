@@ -35,6 +35,10 @@ public class VoteEntity extends BaseEntity {
      */
     private String theme;
     /**
+     * 内容
+     */
+    private String content;
+    /**
      * 1待发布，2进行中，3已结束
      */
     private Integer voteStatus;

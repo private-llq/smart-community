@@ -165,6 +165,16 @@ public class PropertyFeeRuleController {
         return CommonResult.ok(propertyFeeRuleConstService.listAll());
     }
 
+    @ApiOperation("查询公共常量")
+    @GetMapping("/get")
+    public CommonResult get(){
+        financeBillService.updateAnnual();
+        financeBillService.updateTemporary();
+        financeBillService.updateMonth();
+//        financeBillService.updatePenalSum();
+        return CommonResult.ok();
+    }
+
 
 
 }
