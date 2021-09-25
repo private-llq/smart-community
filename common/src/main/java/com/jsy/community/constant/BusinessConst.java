@@ -437,6 +437,9 @@ public interface BusinessConst {
      */
     String MODIFY_ORDER_PAY_STATUS = "/zh-sign/contract-server/houseLeaseContract/updateHouseLeaseContractPay";
 
+    /**
+     * 签章合同作废
+     */
     String CONTRACT_OVERDUE = "/zh-sign/contract-server/community/sign/contractOverdue";
 
 }

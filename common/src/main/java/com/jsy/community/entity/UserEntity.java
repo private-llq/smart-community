@@ -25,7 +25,7 @@ import java.util.Set;
 public class UserEntity extends BaseEntity {
 	
 	@ApiModelProperty("uid")
-	@NotBlank(groups = {FaceOprationValidate.class}, message = "uid不能为空")
+	@NotBlank(groups = {FaceOprationValidate.class, FaceDeleteValidate.class}, message = "uid不能为空")
 	private String uid;
 	
 	@ApiModelProperty("业主ID")
@@ -38,13 +38,18 @@ public class UserEntity extends BaseEntity {
 	private String avatarUrl;
 
 	@ApiModelProperty("人脸地址")
+	@NotBlank(groups = {AddFaceValidate.class}, message = "人脸地址不能为空")
 	private String faceUrl;
 
 	// 人脸启用状态;1:启用;2:禁用
 	@NotNull(groups = {FaceOprationValidate.class}, message = "人脸启用状态不能为空;1:启用;2:禁用")
 	private Integer faceEnableStatus;
 
+	// 人脸删除状态;0:未删除;1:已删除
+	private Integer faceDeleted;
+
 	@ApiModelProperty("电话号码")
+	@NotBlank(groups = {AddFaceValidate.class}, message = "电话号码不能为空")
 	private String mobile;
 	
 	@ApiModelProperty("性别，0未知，1男，2女")
@@ -54,6 +59,7 @@ public class UserEntity extends BaseEntity {
 	private LocalDateTime birthdayTime;
 	
 	@ApiModelProperty("真实姓名")
+	@NotBlank(groups = {AddFaceValidate.class}, message = "真实姓名不能为空")
 	private String realName;
 	
 	@ApiModelProperty("身份证")
@@ -157,5 +163,15 @@ public class UserEntity extends BaseEntity {
 	 * 用户人脸操作验证组
 	 */
 	public interface FaceOprationValidate{}
+
+	/**
+	 * 用户人脸删除验证组
+	 */
+	public interface FaceDeleteValidate{}
+
+	/**
+	 * 用户人脸删除验证组
+	 */
+	public interface AddFaceValidate{}
 
 }

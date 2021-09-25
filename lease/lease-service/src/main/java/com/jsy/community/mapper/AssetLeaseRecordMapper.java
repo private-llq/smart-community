@@ -27,4 +27,13 @@ public interface AssetLeaseRecordMapper extends BaseMapper<AssetLeaseRecordEntit
                                                                @Param("assetType") Integer assetType,
                                                                @Param("homeOwnerUid") String homeOwnerUid,
                                                                @Param("contractStatus") Integer contractStatus);
+
+    /**
+     * @author: Pipi
+     * @description: 根据条件查列表
+     * @param assetLeaseRecordEntity:
+     * @return: java.util.List<com.jsy.community.entity.proprietor.AssetLeaseRecordEntity>
+     * @date: 2021/9/25 13:38
+     **/
+    List<AssetLeaseRecordEntity> queryList(@Param("entity") AssetLeaseRecordEntity assetLeaseRecordEntity);
 }

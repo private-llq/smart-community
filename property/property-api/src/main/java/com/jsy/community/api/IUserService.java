@@ -83,5 +83,25 @@ public interface IUserService extends IService<UserEntity> {
 	 * @return: java.lang.Integer
 	 * @date: 2021/9/22 10:35
 	 **/
-	Integer faceOpration(UserEntity userEntity, String communityId);
+	Integer faceOpration(UserEntity userEntity, Long communityId);
+
+	/**
+	 * @author: Pipi
+	 * @description: 删除人脸
+	 * @param userEntity:
+     * @param communityId:
+	 * @return: java.lang.Integer
+	 * @date: 2021/9/23 17:34
+	 **/
+	Integer deleteFace(UserEntity userEntity, Long communityId);
+
+	/**
+	 * @author: Pipi
+	 * @description: 新增人脸
+	 * @param userEntity:
+     * @param communityId:
+	 * @return: java.lang.Integer
+	 * @date: 2021/9/23 17:58
+	 **/
+	Integer addFace(UserEntity userEntity, Long communityId);
 }

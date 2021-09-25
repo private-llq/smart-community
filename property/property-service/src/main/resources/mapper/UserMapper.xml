@@ -46,6 +46,7 @@
             LEFT JOIN t_house_member thm ON thm.uid = tu.uid
         WHERE
             tu.face_url IS NOT NULL
+            AND tu.face_deleted = 0
             AND thm.community_id = #{userEntity.communityId}
             AND tu.deleted = 0
             AND thm.deleted = 0

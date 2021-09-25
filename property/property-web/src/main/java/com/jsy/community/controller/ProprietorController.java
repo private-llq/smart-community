@@ -477,12 +477,51 @@ public class ProprietorController {
     @PostMapping("/v2/faceOpration")
     public CommonResult faceOpration(@RequestBody UserEntity userEntity) {
         ValidatorUtils.validateEntity(userEntity, UserEntity.FaceOprationValidate.class);
-        Integer integer = iUserService.faceOpration(userEntity, String.valueOf(UserUtils.getAdminCommunityId()));
+        Integer integer = iUserService.faceOpration(userEntity, UserUtils.getAdminCommunityId());
         return integer > 0 ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
     }
 
-    public CommonResult deleteFace() {
-        return CommonResult.ok();
+    /**
+     * @author: Pipi
+     * @description: 删除人脸
+     * @param userEntity:
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/23 17:19
+     **/
+    @Login
+    @PostMapping("/v2/deleteFace")
+    public CommonResult deleteFace(@RequestBody UserEntity userEntity) {
+        ValidatorUtils.validateEntity(userEntity, UserEntity.FaceDeleteValidate.class);
+        Integer integer = iUserService.deleteFace(userEntity, UserUtils.getAdminCommunityId());
+        return integer > 0 ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
     }
 
+    /**
+     * @author: Pipi
+     * @description: 新增APP用户人脸
+     * @param userEntity:
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/23 17:54
+     **/
+    @Login
+    @PostMapping("/v2/addFace")
+    public CommonResult addFace(@RequestBody UserEntity userEntity) {
+        ValidatorUtils.validateEntity(userEntity, UserEntity.AddFaceValidate.class);
+        Integer integer = iUserService.addFace(userEntity, UserUtils.getAdminCommunityId());
+        return integer > 0 ? CommonResult.ok("新增成功") : CommonResult.error("新增失败");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 上传用户人脸
+     * @param file:
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/9/24 9:35
+     **/
+    @Login
+    @PostMapping("/v2/uploadFace")
+    public CommonResult uploadFace(MultipartFile file) {
+        String upload = MinioUtils.upload(file, "face-url");
+        return CommonResult.ok(upload);
+    }
 }

@@ -45,6 +45,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: Pipi
@@ -500,12 +501,13 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         Map<Long, AssetLeaseRecordEntity> underContractMap = new HashMap<>();
         // 未签约
         Map<Long, AssetLeaseRecordEntity> notContractedMap = new HashMap<>();
-        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        // 已过期
+        Map<Long, AssetLeaseRecordEntity> expiredContractedMap = new HashMap<>();
+
         if (assetLeaseRecordEntity.getIdentityType() == 1) {
             // 房东
-            queryWrapper.eq("asset_type", assetLeaseRecordEntity.getAssetType());
-            queryWrapper.eq("home_owner_uid", uid);
-            List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.selectList(queryWrapper);
+            assetLeaseRecordEntity.setHomeOwnerUid(uid);
+            List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.queryList(assetLeaseRecordEntity);
             if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
                 // 查询状态为1,9的资产信息
                 List<Long> houseIds = new ArrayList<>();
@@ -552,7 +554,6 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                         }
                     }
                 }
-
                 for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
                     if (record.getAssetType() == 1 && shopEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 9)) {
                         // 商铺
@@ -585,6 +586,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     if (StringUtils.isNotBlank(record.getDirectionId())) {
                         record.setDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(record.getDirectionId())));
                     }
+                }
+                List<AssetLeaseRecordEntity> unexpired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 0).collect(Collectors.toList());
+                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 1).collect(Collectors.toList());
+                for (AssetLeaseRecordEntity record : unexpired) {
                     switch (record.getOperation()) {
                         case 1:
                             // 发起签约->未签约
@@ -658,11 +663,16 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                             break;
                     }
                 }
+                for (AssetLeaseRecordEntity entity : expired) {
+                    if (!expiredContractedMap.containsKey(entity.getAssetId())) {
+                        expiredContractedMap.put(entity.getAssetId(), entity);
+                    }
+                }
             }
         } else if (assetLeaseRecordEntity.getIdentityType() == 2) {
             // 租客
-            queryWrapper.eq("tenant_uid", uid);
-            List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.selectList(queryWrapper);
+            assetLeaseRecordEntity.setTenantUid(uid);
+            List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.queryList(assetLeaseRecordEntity);
             if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
                 // 查询操作类型为1,8,9的资产信息
                 List<Long> houseIds = new ArrayList<>();
@@ -742,6 +752,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     if (StringUtils.isNotBlank(record.getDirectionId())) {
                         record.setDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(record.getDirectionId())));
                     }
+                }
+                List<AssetLeaseRecordEntity> unexpired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 0).collect(Collectors.toList());
+                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 1).collect(Collectors.toList());
+                for (AssetLeaseRecordEntity record : unexpired) {
                     switch (record.getOperation()) {
                         case 1:
                             // 发起签约->未签约
@@ -810,6 +824,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                             break;
                     }
                 }
+                for (AssetLeaseRecordEntity entity : expired) {
+                    expiredContractedMap.put(entity.getId(), entity);
+                }
             }
         } else {
             throw new LeaseException("查询用户身份不明确!");
@@ -847,6 +864,18 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     List<AssetLeaseRecordEntity> assetLeaseRecordEntities = new ArrayList<>();
                     assetLeaseRecordEntities.add(notContractedMap.get(assetId));
                     hashMap.put("notContracted", assetLeaseRecordEntities);
+                }
+            }
+        }
+        // 组装已过期
+        if (!CollectionUtils.isEmpty(expiredContractedMap)) {
+            for (Long assetId : expiredContractedMap.keySet()) {
+                if (hashMap.containsKey("expiredContracted")) {
+                    hashMap.get("expiredContracted").add(expiredContractedMap.get(assetId));
+                } else {
+                    List<AssetLeaseRecordEntity> assetLeaseRecordEntities = new ArrayList<>();
+                    assetLeaseRecordEntities.add(expiredContractedMap.get(assetId));
+                    hashMap.put("expiredContracted", assetLeaseRecordEntities);
                 }
             }
         }
