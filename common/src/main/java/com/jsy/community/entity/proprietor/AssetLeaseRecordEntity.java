@@ -146,7 +146,7 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @TableField(exist = false)
     private Integer contractNumber;
 
-    // 签约状态;1:未签约;2:签约中;3已签约
+    // 签约状态;1:未签约;2:签约中;3已签约;4已过期
     @TableField(exist = false)
     @NotNull(groups = {LandlordContractListValidate.class}, message = "签约状态不能为空;1:未签约;2:签约中;3已签约")
     @Range(min = 1, max = 3, message = "签约状态传值超出范围;1:未签约;2:签约中;3已签约")

@@ -36,4 +36,13 @@ public interface AssetLeaseRecordMapper extends BaseMapper<AssetLeaseRecordEntit
      * @date: 2021/9/25 13:38
      **/
     List<AssetLeaseRecordEntity> queryList(@Param("entity") AssetLeaseRecordEntity assetLeaseRecordEntity);
+
+    /**
+     * @author: Pipi
+     * @description: 设置为过期
+     * @param id:
+     * @return: java.lang.Integer
+     * @date: 2021/9/25 15:11
+     **/
+    Integer setExpiredById(Long id);
 }

@@ -1484,7 +1484,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         if (assetLeaseRecordEntity != null) {
             if (opration == BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode() && assetLeaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode()) {
                 // 发起签约后,房东接受申请超时,删除签约
-                assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
+                assetLeaseRecordMapper.setExpiredById(id);
             }
             if (opration == BusinessEnum.ContractingProcessStatusEnum.REAPPLY.getCode() && assetLeaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.REAPPLY.getCode()) {
                 // 重新申请签约后,因为可以重发重新申请,所以要判断倒计时之后,是否有重复的重新申请
@@ -1497,7 +1497,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 LeaseOperationRecordEntity leaseOperationRecordEntity = leaseOperationRecordMapper.selectOne(leaseOperationRecordEntityQueryWrapper);
                 if (leaseOperationRecordEntity.getCreateTime().compareTo(operationTime) == 0) {
                     // 时间相同,是同一次操作,删除签约
-                    assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
+                    assetLeaseRecordMapper.setExpiredById(id);
                 }
             }
             if (opration == BusinessEnum.ContractingProcessStatusEnum.ACCEPTING_APPLICATIONS.getCode()
@@ -1511,7 +1511,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     notificationOfSignatureCancellationContract(assetLeaseRecordEntity.getConId());
                 }
                 // TODO 可能会涉及到退款业务,需要补上
-                assetLeaseRecordMapper.deleteById(assetLeaseRecordEntity.getId());
+                assetLeaseRecordMapper.setExpiredById(id);
             }
         }
     }
