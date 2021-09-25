@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
+import com.jsy.community.qo.property.orderChargeDto;
 import com.jsy.community.utils.PageInfo;
 
 import java.math.BigDecimal;
@@ -76,4 +77,6 @@ public interface ICarChargeService {
     List<CarChargeEntity> ListCharge2(Long adminCommunityId);
 
     void openCarCharge(String uid,Integer type,Long adminCommunityId);
+
+    orderChargeDto orderCharge(Long adminCommunityId, String carNumber);
 }
