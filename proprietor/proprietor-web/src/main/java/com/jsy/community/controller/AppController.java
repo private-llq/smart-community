@@ -108,11 +108,11 @@ public class AppController {
 	 */
 	@ApiOperation("查询APP版本详情")
 	@GetMapping("/v2/version")
-	public CommonResult queryAppVersion(Integer sysType){
+	public CommonResult queryAppVersion(Integer sysType, String sysVersion){
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
 			return CommonResult.error("请传入正确的系统类型");
 		}
-		AppVersionEntity appVersionEntity = appVersionService.queryAppVersion(sysType);
+		AppVersionEntity appVersionEntity = appVersionService.queryAppVersion(sysType, sysVersion);
 		return CommonResult.ok(appVersionEntity,"查询成功");
 	}
 	

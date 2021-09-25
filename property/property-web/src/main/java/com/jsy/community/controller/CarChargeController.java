@@ -8,6 +8,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
+import com.jsy.community.qo.property.orderChargeDto;
 import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -104,9 +105,20 @@ public class CarChargeController {
         return CommonResult.ok(charge);
     }
 
+
+    /**
+     * 订单支付返回收费详情
+     */
+    @PostMapping("/orderCharge")
+    public CommonResult orderCharge(@RequestParam Long adminCommunityId,@RequestParam String carNumber){
+        orderChargeDto orderCharge =carChargeService.orderCharge(adminCommunityId,carNumber);
+        return CommonResult.ok(orderCharge,"查询成功");
+    }
+
     /**
      * 查询包月的所有收费标准
      */
+    //todo 暂时没用到
     @Login
     @GetMapping("/ListCharge")
     public CommonResult ListCharge(){
@@ -118,6 +130,7 @@ public class CarChargeController {
     /**
      * 查询临时停车收费标准
      */
+    //todo 暂时没用到
     @Login
     @GetMapping("/ListCharge2")
     public CommonResult ListCharge2(){

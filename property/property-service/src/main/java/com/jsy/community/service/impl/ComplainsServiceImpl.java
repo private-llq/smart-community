@@ -70,9 +70,6 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
         }
         qoQuery.setCommunityId(userInfo.getCommunityId());
         Long page=(baseQO.getPage()-1)*baseQO.getSize();
-        if (page==0){
-            page++;
-        }
         List<ComplainVO> complainVOS = complainsMapper.listAll(page, baseQO.getSize(), qoQuery);
         Long totel = complainsMapper.findTotel(baseQO.getQuery());
         Map<String, Object> map = new HashMap<>();

@@ -1,5 +1,6 @@
 package com.jsy.community.entity.property;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.utils.RegexUtils;
 import lombok.Data;
@@ -41,6 +42,9 @@ public class ActivityUserEntity implements Serializable {
      */
     @NotBlank(message = "姓名不能为空！",groups ={ActivityUserVerification.class})
     private String name;
+
+    @TableField(exist = false)
+    private String key;
 
     public interface ActivityUserVerification{}
 

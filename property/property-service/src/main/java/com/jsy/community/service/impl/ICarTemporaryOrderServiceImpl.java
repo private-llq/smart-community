@@ -155,8 +155,16 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
     public List<CarTemporaryOrderQO> selectCarOrderList(CarOrderQO query, Long communityId) {
         QueryWrapper<CarOrderEntity> queryWrapper = new QueryWrapper<CarOrderEntity>();
         if (StringUtils.isNotBlank(query.getCarPlate())){
-            //车牌
-            queryWrapper.like("car_plate", query.getCarPlate());
+            if (query.getType()==1){
+                //临时车根据车牌号
+                queryWrapper.like("car_plate", query.getCarPlate());
+            }else {
+                //包月车根据车位id
+                CarPositionEntity car_position = positionMapper.selectOne(new QueryWrapper<CarPositionEntity>().like("car_position", query.getCarPlate()));
+                if (car_position!=null){
+                    queryWrapper.like("car_position_id", car_position.getId());
+                }
+            }
         }
         //临时车  1和 2  包月车
         if (query.getType()!=null){

@@ -43,6 +43,7 @@ public class PushInfoUtil {
         String body = response.body();
         return JSON.parseObject(body, ImResponseEntity.class);
     }
+
     /**
      * @Description: 推送一般消息
      * @author: Hu

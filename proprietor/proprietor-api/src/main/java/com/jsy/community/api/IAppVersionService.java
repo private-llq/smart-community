@@ -37,5 +37,5 @@ public interface IAppVersionService extends IService<AppVersionEntity> {
 	 * @Author: DKS
 	 * @Date: 2021/9/22
 	 **/
-	AppVersionEntity queryAppVersion(Integer sysType);
+	AppVersionEntity queryAppVersion(Integer sysType, String sysVersion);
 }

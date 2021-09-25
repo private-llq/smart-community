@@ -17,6 +17,7 @@ import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.DistanceUtil;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.ControlVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -144,8 +145,8 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		//暂未绑定小区
 		if(CollectionUtils.isEmpty(userHouseList)){
 			communityEntity = communityMapper.locateCommunity(communityIds, location);
-			communityEntity.setName("暂未认证房屋");
-			communityEntity.setId(0L); // 设置为通用小区
+//			communityEntity.setName("暂未认证房屋");
+//			communityEntity.setId(0L); // 设置为通用小区
 			return communityEntity;
 		}
 		//小区对应的最新一套已认证房屋id map
@@ -161,7 +162,20 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		communityEntity.setHouseId(communityHouseMap.get(communityEntity.getId())); //家属界面默认房屋用
 		return communityEntity;
 	}
-	
+
+
+	/**
+	 * @Description: 查询业主或者租户的社区
+	 * @author: Hu
+	 * @since: 2021/9/23 9:18
+	 * @Param: [controlVO]
+	 * @return: com.jsy.community.entity.CommunityEntity
+	 */
+	@Override
+	public CommunityEntity getCommunity(ControlVO controlVO) {
+		return communityMapper.selectById(controlVO.getCommunityId());
+	}
+
 	/**
 	 * @Description: 根据社区id批量查询社区名
 	 * @Param: [ids]

@@ -8,9 +8,12 @@ import com.jsy.community.api.ICarChargeService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
+import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.mapper.CarChargeMapper;
+import com.jsy.community.mapper.CarCutOffMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
+import com.jsy.community.qo.property.orderChargeDto;
 import com.jsy.community.util.TimeUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -32,6 +35,10 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
     @Autowired
     public CarChargeMapper carChargeMapper;
+
+    @Autowired
+    public CarCutOffMapper carCutOffMapper;
+
 
 
 
@@ -313,7 +320,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
 
     /**
-     * 查询启用的包月车辆所有收费设置标准
+     * 查询所有包月车辆所有收费设置标准
      * @param adminCommunityId
      * @return
      */
@@ -322,14 +329,14 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
                 .eq("community_id", adminCommunityId)
                 .eq("type",0)
-                .eq("open",1)
+
         );
         return chargeEntityList;
     }
 
 
     /**
-     * 查询临时停车收费标准
+     * 查询所有临时停车收费标准
      */
 
     @Override
@@ -337,7 +344,6 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
                 .eq("community_id", adminCommunityId)
                 .eq("type", 1)
-                .eq("open",1)
         );
         return chargeEntityList;
     }
@@ -414,6 +420,65 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
         }
 
+    }
+
+    /**
+     * 订单支付返回收费详情
+     * @param adminCommunityId
+     * @param carNumber
+     * @return
+     */
+    @Override
+    public orderChargeDto orderCharge(Long adminCommunityId, String carNumber) {
+        /**
+         * 查询开闸记录
+         */
+        CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("car_number", carNumber).eq("community_id", adminCommunityId).isNull("stop_time"));
+        LocalDateTime openTime = carCutOffEntity.getOpenTime();//进闸时间
+        LocalDateTime now = LocalDateTime.now();//当前时间作为出闸时间
+        String plateColor = carCutOffEntity.getPlateColor();//车牌颜色
+
+        CarChargeQO carChargeQO = new CarChargeQO();
+        carChargeQO.setCommunityId(String.valueOf(adminCommunityId));
+        carChargeQO.setCarColor(plateColor);
+        carChargeQO.setInTime(openTime);
+        carChargeQO.setReTime(now);
+
+        /**
+         * //查询收费金额
+         */
+        BigDecimal money = this.charge(carChargeQO);
+
+
+        /**
+         * 查询收费标准
+         */
+        Integer plateType;//默认其他车牌类型
+        if ( StringUtils.containsAny(plateColor,"黄色","黄牌","黄")){
+            plateType=0;//黄牌
+        }else {
+            plateType=1;//其他车牌
+        }
+        CarChargeEntity carChargeEntity = carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                .eq("community_id", adminCommunityId)
+                .eq("type", 1)
+                .eq("plate_type", plateType)
+                .eq("open", 1)
+        );
+
+        HashMap<String, Long> datePoor = TimeUtils.getDatePoor(openTime, LocalDateTime.now());
+        Long day = datePoor.get("day");
+        Long hour = datePoor.get("hour");
+        Long min = datePoor.get("min");
+        String time = day + "天" + hour + "时" + min + "分";
+
+        orderChargeDto orderChargeDto = new orderChargeDto();
+        orderChargeDto.setCarNumber(carNumber);
+        orderChargeDto.setChargePrice(carChargeEntity.getChargePrice());//收费标准
+        orderChargeDto.setInTime(openTime);//进闸时间
+        orderChargeDto.setTime(time);//停车时长
+        orderChargeDto.setMoney(money);//金额
+        return orderChargeDto;
     }
 
 

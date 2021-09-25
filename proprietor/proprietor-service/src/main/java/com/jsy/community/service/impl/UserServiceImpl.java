@@ -130,7 +130,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Param:
      * @return:
      */
-    public String getImId(){
+    public static String getImId(){
         Random r = new Random();
         StringBuffer sb = new StringBuffer(10);
         for (int j = 1; j <= 10; j++) {
@@ -140,9 +140,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                     i = r.nextInt(10);
                 }
             }
-            return sb.append(i).toString();
+            sb.append(i).toString();
         }
-        return null;
+        return sb.toString();
     }
     /**
      * 创建用户token
