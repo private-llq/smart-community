@@ -536,15 +536,17 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordEntity.setHomeOwnerUid(uid);
             List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.queryList(assetLeaseRecordEntity);
             if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
-                // 查询状态为1,9的资产信息
-                List<Long> houseIds = new ArrayList<>();
-                List<Long> shopIds = new ArrayList<>();
+                // 查询状态为1,8,9,10的资产信息
+                Set<Long> houseIds = new HashSet<>();
+                Set<Long> shopIds = new HashSet<>();
                 for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
-                    if (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9) {
-                        if (record.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
-                            houseIds.add(record.getAssetId());
-                        } else {
-                            shopIds.add(record.getAssetId());
+                    if (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9 || record.getOperation() == 10) {
+                        if (StringUtils.isBlank(record.getTitle())) {
+                            if (record.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
+                                houseIds.add(record.getAssetId());
+                            } else {
+                                shopIds.add(record.getAssetId());
+                            }
                         }
                     }
                 }
@@ -582,14 +584,14 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 }
                 for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
-                    if (record.getAssetType() == 1 && shopEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 9)) {
+                    if (record.getAssetType() == 1 && shopEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 9 || record.getOperation() == 10)) {
                         // 商铺
                         record.setImageUrl(shopEntityMap.get(record.getAssetId()).getShopShowImg());
                         record.setTitle(shopEntityMap.get(record.getAssetId()).getTitle());
                         record.setAdvantageId(shopEntityMap.get(record.getAssetId()).getShopFacility());
                         record.setPrice(shopEntityMap.get(record.getAssetId()).getMonthMoney());
                         record.setSummarize(shopEntityMap.get(record.getAssetId()).getSummarize());
-                    } else if (record.getAssetType() == 2 && houseEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 9)) {
+                    } else if (record.getAssetType() == 2 && houseEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 9 || record.getOperation() == 10)) {
                         // 房屋
                         record.setImageUrl(houseEntityMap.get(record.getAssetId()).getHouseImgUrl());
                         record.setTitle(houseEntityMap.get(record.getAssetId()).getHouseTitle());
@@ -701,15 +703,17 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordEntity.setTenantUid(uid);
             List<AssetLeaseRecordEntity> assetLeaseRecordEntities = assetLeaseRecordMapper.queryList(assetLeaseRecordEntity);
             if (!CollectionUtils.isEmpty(assetLeaseRecordEntities)) {
-                // 查询操作类型为1,8,9的资产信息
+                // 查询操作类型为1,8,9,10的资产信息
                 List<Long> houseIds = new ArrayList<>();
                 List<Long> shopIds = new ArrayList<>();
                 for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
-                    if (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9) {
-                        if (record.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
-                            houseIds.add(record.getAssetId());
-                        } else {
-                            shopIds.add(record.getAssetId());
+                    if (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9 || record.getOperation() == 10) {
+                        if (StringUtils.isBlank(record.getTitle())) {
+                            if (record.getAssetType() == BusinessEnum.HouseTypeEnum.HOUSE.getCode()) {
+                                houseIds.add(record.getAssetId());
+                            } else {
+                                shopIds.add(record.getAssetId());
+                            }
                         }
                     }
                 }
@@ -748,14 +752,14 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 }
 
                 for (AssetLeaseRecordEntity record : assetLeaseRecordEntities) {
-                    if (record.getAssetType() == 1 && shopEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9)) {
+                    if (record.getAssetType() == 1 && shopEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9 || record.getOperation() == 10)) {
                         // 商铺
                         record.setImageUrl(shopEntityMap.get(record.getAssetId()).getShopShowImg());
                         record.setTitle(shopEntityMap.get(record.getAssetId()).getTitle());
                         record.setAdvantageId(shopEntityMap.get(record.getAssetId()).getShopFacility());
                         record.setPrice(shopEntityMap.get(record.getAssetId()).getMonthMoney());
                         record.setSummarize(shopEntityMap.get(record.getAssetId()).getSummarize());
-                    } else if (record.getAssetType() == 2 && houseEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9)) {
+                    } else if (record.getAssetType() == 2 && houseEntityMap.get(record.getAssetId()) != null && (record.getOperation() == 1 || record.getOperation() == 8 || record.getOperation() == 9 || record.getOperation() == 10)) {
                         // 房屋
                         record.setImageUrl(houseEntityMap.get(record.getAssetId()).getHouseImgUrl());
                         record.setTitle(houseEntityMap.get(record.getAssetId()).getHouseTitle());
@@ -962,6 +966,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.CANCELLATION_REQUEST.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.REJECTION_OF_APPLICATION.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.REAPPLY.getCode()
+                            || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.EXPIRED.getCode()
                     ) {
                         leaseRecordEntity.setImageUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
                         leaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
@@ -1017,7 +1022,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         if (assetLeaseRecordEntity.getIdentityType() == 2) {
             updateReadMark(leaseRecordEntity, 1);
         }
-        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 7 || leaseRecordEntity.getOperation() == 8 || leaseRecordEntity.getOperation() == 9) {
+        if (leaseRecordEntity.getOperation() == 1 || leaseRecordEntity.getOperation() == 7 || leaseRecordEntity.getOperation() == 8 || leaseRecordEntity.getOperation() == 9 || leaseRecordEntity.getOperation() == 10) {
             // 记录表里面没有资产数据,要单独查
             if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
                 // 商铺

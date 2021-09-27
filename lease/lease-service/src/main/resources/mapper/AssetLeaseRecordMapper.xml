@@ -25,19 +25,22 @@
         from t_asset_lease_record alr
         left join t_user u on u.uid = alr.tenant_uid
         where alr.asset_id = #{assetId}
-        and alr.deleted = 0
         and alr.asset_type = #{assetType}
         and alr.home_owner_uid = #{homeOwnerUid}
         <if test="contractStatus == 1">
+            and alr.deleted = 0
             and alr.operation in (1, 9)
         </if>
         <if test="contractStatus == 2">
+            and alr.deleted = 0
             and alr.operation in (2, 3, 4, 5, 31, 32)
         </if>
         <if test="contractStatus == 3">
+            and alr.deleted = 0
             and alr.operation  = 6
         </if>
         <if test="contractStatus == 4">
+            and alr.deleted = 1
             and alr.operation  = 10
         </if>
     </select>
