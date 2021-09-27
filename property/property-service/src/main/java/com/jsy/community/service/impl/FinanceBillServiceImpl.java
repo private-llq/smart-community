@@ -2,14 +2,19 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IFinanceBillService;
+import com.jsy.community.api.IUserImService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.*;
+import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,6 +47,10 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
 
     @Autowired
     private UserHouseMapper userHouseMapper;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IUserImService userImService;
+
     @Autowired
     private CommunityMapper communityMapper;
 
@@ -71,7 +80,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
 
         List<PropertyFinanceOrderEntity> orderList = new LinkedList<>();
         PropertyFinanceOrderEntity entity = null;
-
+        Set<String> uidAll = new HashSet<>();
         //查询所有小区收费类型为周期  收费周期为按月的收费项目
         List<PropertyFeeRuleEntity> feeRuleEntities = propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
@@ -107,6 +116,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                             //单价乘建筑面积乘周期
                             entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(houseEntity.getBuildArea())).multiply(new BigDecimal(dateOfMonth)));
                             entity.setId(SnowFlake.nextId());
+                            uidAll.add(houseEntity.getUid());
                             orderList.add(entity);
                         }
                     } else {
@@ -129,6 +139,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                                 //单价乘周期
                                 entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(dateOfMonth)));
                                 entity.setId(SnowFlake.nextId());
+                                uidAll.add(positionEntity.getUid());
                                 orderList.add(entity);
                             }
                         }
@@ -140,6 +151,19 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         if (orderList!=null&&orderList.size()!=0){
             //把封装好的list批量新增到数据库订单表
             propertyFinanceOrderMapper.saveList(orderList);
+        }
+        //消息推送
+        if (uidAll.size()!=0){
+            List<UserIMEntity> list = userImService.selectUidAll(uidAll);
+            for (UserIMEntity userIMEntity : list) {
+                PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+                        "账单通知",
+                        "上月账单出来了，及时缴费哦！",
+                        null,
+                        "尊敬的用户您好，您的"+LocalDate.now().minusMonths(1L).getDayOfMonth()+"已出炉，请前往生活缴费进行处理。",
+                        null,
+                        BusinessEnum.PushInfromEnum.BILLINGNOTICE.getName());
+            }
         }
 
     }
@@ -154,6 +178,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     public void updateAnnual() {
         List<PropertyFinanceOrderEntity> orderList = new LinkedList<>();
         PropertyFinanceOrderEntity entity = null;
+        Set<String> uidAll = new HashSet<>();
         //查询今天所有需要年度收费的项目
         List<PropertyFeeRuleEntity> feeRuleEntities = propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
@@ -186,6 +211,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                         entity.setTargetId(houseEntity.getId());
                         entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
                         entity.setId(SnowFlake.nextId());
+                        uidAll.add(houseEntity.getUid());
                         orderList.add(entity);
                     }
                 }
@@ -194,6 +220,20 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         if (orderList!=null&&orderList.size()!=0){
             //把封装好的list批量新增到数据库订单表
             propertyFinanceOrderMapper.saveList(orderList);
+        }
+
+        //消息推送
+        if (uidAll.size()!=0){
+            List<UserIMEntity> list = userImService.selectUidAll(uidAll);
+            for (UserIMEntity userIMEntity : list) {
+                PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+                        "账单通知",
+                        "上月账单出来了，及时缴费哦！",
+                        null,
+                        "尊敬的用户您好，您的"+LocalDate.now().minusMonths(1L).getDayOfMonth()+"已出炉，请前往生活缴费进行处理。",
+                        null,
+                        BusinessEnum.PushInfromEnum.BILLINGNOTICE.getName());
+            }
         }
 
     }
@@ -210,6 +250,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     public void updateTemporary(){
         List<PropertyFinanceOrderEntity> orderList = new LinkedList<>();
         PropertyFinanceOrderEntity entity=null;
+        Set<String> uidAll = new HashSet<>();
         //查询当前天所要生成订单的缴费项目
         List<PropertyFeeRuleEntity> feeRuleEntities = propertyFeeRuleMapper.selectList(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
@@ -241,6 +282,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                             entity.setTargetId(positionEntity.getId());
                             entity.setPropertyFee(feeRuleEntity.getMonetaryUnit().multiply(new BigDecimal(positionEntity.getBuildArea())));
                             entity.setId(SnowFlake.nextId());
+                            uidAll.add(positionEntity.getUid());
                             orderList.add(entity);
                         }
                     } else {
@@ -260,6 +302,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                                 entity.setTargetId(houseEntity.getId());
                                 entity.setPropertyFee(feeRuleEntity.getMonetaryUnit());
                                 entity.setId(SnowFlake.nextId());
+                                uidAll.add(houseEntity.getUid());
                                 orderList.add(entity);
                             }
 
@@ -275,6 +318,19 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         if (orderList!=null&&orderList.size()!=0){
             //把封装好的list批量新增到数据库订单表
             propertyFinanceOrderMapper.saveList(orderList);
+        }
+        //消息推送
+        if (uidAll.size()!=0){
+            List<UserIMEntity> list = userImService.selectUidAll(uidAll);
+            for (UserIMEntity userIMEntity : list) {
+                PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+                        "账单通知",
+                        "上月账单出来了，及时缴费哦！",
+                        null,
+                        "尊敬的用户您好，您的"+LocalDate.now().minusMonths(1L).getDayOfMonth()+"已出炉，请前往生活缴费进行处理。",
+                        null,
+                        BusinessEnum.PushInfromEnum.BILLINGNOTICE.getName());
+            }
         }
 
     }

@@ -384,10 +384,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         PushInfoUtil.PushPublicTextMsg(
                 userIMEntity.getImId(),
                 "房屋管理",
-                "你有房屋最新消息了！",
+                "您有房屋最新消息了！",
                 null,
-                "尊敬的用户，" +
-                        "用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(relation)+"身份，如已知晓，请忽略。",null);
+                "尊敬的用户您好，\n" +
+                        "用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(relation)+"身份，如已知晓，请忽略。"
+                ,null,
+                BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();

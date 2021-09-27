@@ -238,6 +238,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 //        carPositionService.updateByPosition(carEntity.getCarPositionId());
     }
 
+    @Override
+    public CarOrderEntity getOrder(Long id) {
+        CarOrderEntity entity = appCarOrderMapper.selectById(id);
+        return entity;
+    }
+
     /**
      * @Description: 查询一条停车缴费临时订单
      * @author: Hu
@@ -416,7 +422,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                     entity.getPayType(),
                     entity.getMoney().toString(),
                     null,
-                    "月租缴费",map);
+                    "月租缴费",
+                    map,
+                    BusinessEnum.PushInfromEnum.PAYHELPER.getName());
         } else {
             throw new ProprietorException("当前月租车辆不存在！");
         }
@@ -514,7 +522,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                         entity.getPayType(),
                         entity.getMoney().toString(),
                         null,
-                        "月租缴费",map);
+                        "月租缴费",
+                        map,
+                        BusinessEnum.PushInfromEnum.PAYHELPER.getName());
             }
     }
 

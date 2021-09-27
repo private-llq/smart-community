@@ -235,11 +235,11 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			PushInfoUtil.PushPublicTextMsg(
 					userIMEntity.getImId(),
 					"房屋管理",
-					"你有房屋最新消息了！",
+					"您有房屋最新消息了！",
 					null,
-					"尊敬的用户，" +
+					"尊敬的用户您好，\n" +
 							"用户"+userEntity.getRealName()+"已房东的身份移除你在"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation())+"身份，如已知晓，请忽略。",
-					null);
+					null,BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 
 		}
 		houseMemberMapper.deleteBatchIds(list);
@@ -276,11 +276,12 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			entity.setUid(userEntity.getUid());
 			//推送消息
 			PushInfoUtil.PushPublicTextMsg(imEntity.getImId(),
-					"房屋管理","你有房屋最新消息了！",
+					"房屋管理","您有房屋最新消息了！",
 					null,
-					"尊敬的用户，" +
+					"尊敬的用户您好，\n" +
 							"用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。",
-					null
+					null,
+					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName()
 			);
 		}
 

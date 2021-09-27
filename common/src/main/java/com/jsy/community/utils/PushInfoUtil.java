@@ -57,7 +57,7 @@ public class PushInfoUtil {
      * content：类容
      * @return: ImResponseEntity
      */
-    public static ImResponseEntity PushPublicTextMsg(String imId, String title, String desc, String url, String content, Map map) {
+    public static ImResponseEntity PushPublicTextMsg(String imId, String title, String desc, String url, String content, Map map, String fromImId) {
         String str = IdUtil.fastUUID();
 
         PushAppMsg pushAppMsg = new PushAppMsg();
@@ -73,7 +73,7 @@ public class PushInfoUtil {
         textAppMsg.setExtraDta(map);
         pushAppMsg.setAppMsg(JSON.toJSONString(textAppMsg));
         SendInfo sendInfo = new SendInfo();
-        sendInfo.setFromImId("houseManage");
+        sendInfo.setFromImId(fromImId);
         sendInfo.setReceiveType(1);
         sendInfo.setTo(imId);
         pushAppMsg.setSendInfo(sendInfo);
@@ -100,7 +100,7 @@ public class PushInfoUtil {
      * desc：描述
      * @return: ImResponseEntity
      */
-    public static ImResponseEntity pushPayAppMsg(String imId,Integer type,String amount,String detailUrl,String desc,Map map){
+    public static ImResponseEntity pushPayAppMsg(String imId,Integer type,String amount,String detailUrl,String desc,Map map,String fromImId){
         String str = IdUtil.fastUUID();
 
         PushAppMsg pushAppMsg = new PushAppMsg();
@@ -124,7 +124,7 @@ public class PushInfoUtil {
 
         pushAppMsg.setAppMsg(JSON.toJSONString(payAppMsg));
         SendInfo sendInfo = new SendInfo();
-        sendInfo.setFromImId("monthlyRentPayment");
+        sendInfo.setFromImId(fromImId);
         sendInfo.setReceiveType(1);
         sendInfo.setTo(imId);
 
