@@ -8,6 +8,7 @@ import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.mapper.CarOrderMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 
 @DubboService(version = Const.version, group = Const.group_property)
@@ -31,5 +32,18 @@ public class CarOrderServiceImpl extends ServiceImpl<CarOrderMapper, CarOrderEnt
         CarOrderEntity carOrderEntity = carOrderMapper.selectOne(queryWrapper);
 
         return carOrderEntity;
+    }
+    //删除未支付的订单
+    @Override
+    public void deletedNOpayOrder(String plateNum, Long communityId, LocalDateTime beginTime) {
+        QueryWrapper<CarOrderEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("community_id",communityId);
+        wrapper.eq("car_plate",plateNum);//车牌号
+        wrapper.eq("begin_time",beginTime);//进闸时间
+        wrapper.eq("order_status",0);//未支付
+        wrapper.eq("type",1);//临时车
+        int delete = carOrderMapper.delete(wrapper);
+        System.out.println("删除情况");
+
     }
 }
