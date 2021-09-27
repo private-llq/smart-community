@@ -48,16 +48,18 @@ public class UserDataServiceImpl implements IUserDataService {
     @Override
     public void updateUserData(UserDataQO userDataQO, String userId) {
         userDataMapper.updateUserData(userDataQO, userId);
+        if (StringUtils.isEmpty(userDataQO.getAvatarUrl()) && StringUtils.isEmpty(userDataQO.getNickname())) {
+            return;
+        }
         //同步修改签章用户信息
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(userId);
         //在这里如果头像和昵称都没更新的话，是不需要更新签章信息的
         if (!StringUtils.isEmpty(userDataQO.getAvatarUrl())) {
             signatureUserDTO.setImage(userDataQO.getAvatarUrl());
-        } else if (!StringUtils.isEmpty(userDataQO.getNickname())) {
+        }
+        if (!StringUtils.isEmpty(userDataQO.getNickname())) {
             signatureUserDTO.setNickName(userDataQO.getNickname());
-        } else {
-            return;
         }
         boolean b = signatureService.updateUser(signatureUserDTO);
         if (!b) {
