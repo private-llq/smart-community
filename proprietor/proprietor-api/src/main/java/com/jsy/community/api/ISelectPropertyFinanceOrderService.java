@@ -2,7 +2,6 @@ package com.jsy.community.api;
 
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,5 +28,5 @@ public interface ISelectPropertyFinanceOrderService {
      * @Param:
      * @return:
      */
-    HashMap<String, Object> findOne(Long orderId);
+    List<PropertyFinanceOrderEntity> findOne(String orderId);
 }

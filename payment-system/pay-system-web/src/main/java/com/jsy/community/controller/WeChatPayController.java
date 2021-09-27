@@ -4,8 +4,6 @@ import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
-import com.jsy.community.untils.wechat.PublicConfig;
-import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.CommunityEntity;
@@ -16,10 +14,8 @@ import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
-import com.jsy.community.untils.wechat.MyHttpClient;
-import com.jsy.community.untils.wechat.OrderNoUtil;
+import com.jsy.community.untils.wechat.*;
 import com.jsy.community.utils.UserUtils;
-import com.jsy.community.untils.wechat.XmlUtil;
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -253,8 +249,13 @@ public class WeChatPayController {
                     log.error("微信物业费订单回调处理异常，订单号：" + map.get("out_trade_no"));
                     return;
                 }
+                String amount = map.get("amount");
+                String total = JSONObject.fromObject(amount).getString("payer_total");
+                BigDecimal decimal = BigDecimal.valueOf(Long.parseLong(total));
+                BigDecimal divide = decimal.divide(new BigDecimal(100));
+
                 log.info("账单ids：" + String.valueOf(ids).split(","));
-                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","));
+                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","),divide);
                 //获取一条账单，得到社区id
                 PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(String.valueOf(ids).split(",")[0]));
                 PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();

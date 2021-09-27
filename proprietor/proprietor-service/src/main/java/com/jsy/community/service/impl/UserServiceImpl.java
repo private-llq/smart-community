@@ -314,7 +314,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public String registerV2(RegisterQO qo,String uid,Integer relation,Long houseId,Long communityId) {
+    public String registerV2(RegisterQO qo) {
 //        commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 
         String uuid = UserUtils.randomUUID();
@@ -377,20 +377,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
-        HouseEntity houseEntity = houseMapper.selectById(houseId);
-        CommunityEntity communityEntity = communityMapper.selectById(communityId);
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
-        //推送消息
-        PushInfoUtil.PushPublicTextMsg(
-                userIMEntity.getImId(),
-                "房屋管理",
-                "您有房屋最新消息了！",
-                null,
-                "尊敬的用户您好，\n" +
-                        "用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(relation)+"身份，如已知晓，请忽略。"
-                ,null,
-                BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(uuid);

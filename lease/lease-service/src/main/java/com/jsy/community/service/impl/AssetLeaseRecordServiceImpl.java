@@ -1402,7 +1402,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 throw new LeaseException("租客已支付租金,不能取消");
             }
             WeChatOrderEntity weChatOrderEntity = weChatService.quereIdByServiceOrderNo(assetLeaseRecordEntity.getConId());
-            if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 1) {
+            if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 2) {
                 // 已支付,不能取消
                 throw new LeaseException("租客已支付租金,不能取消");
             }

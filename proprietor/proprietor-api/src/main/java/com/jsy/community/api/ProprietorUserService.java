@@ -65,7 +65,7 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @Param:
 	 * @return:
 	 */
-	String registerV2(RegisterQO qo,String uid,Integer relation,Long houseId,Long communityId);
+	String registerV2(RegisterQO qo);
 
 	/**
 	* @Description: 三方登录

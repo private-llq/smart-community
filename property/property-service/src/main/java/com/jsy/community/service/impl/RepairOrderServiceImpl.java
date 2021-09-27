@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IRepairOrderService;
+import com.jsy.community.api.IUserImService;
 import com.jsy.community.api.PropertyException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.admin.AdminUserEntity;
@@ -12,7 +14,9 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.vo.repair.RepairPlanVO;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +47,9 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	
 	@Autowired
 	private UserMapper userMapper;
+
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private IUserImService userImService;
 	
 	@Autowired
 	private CommonConstMapper constMapper;
@@ -135,6 +142,15 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		}
 		repairEntity.setStatus(1); // 将状态设置为 处理中
 		repairMapper.updateById(repairEntity); // 更新报修表
+
+		UserIMEntity imEntity = userImService.selectUid(repairEntity.getUserId());
+		if (imEntity!=null){
+			PushInfoUtil.PushPublicTextMsg(imEntity.getImId(),
+					"报修通知",
+					"您提交的报修事项处理中",
+					null,"您提交的报修事项处理中\n请耐心等待处理结果。",null, BusinessEnum.PushInfromEnum.REPAIRNOTICE.getName());
+		}
+
 	}
 	
 	@Override
@@ -161,6 +177,15 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		}
 		repairEntity.setStatus(2); // 将状态设置为 已处理
 		repairMapper.updateById(repairEntity); // 更新报修表
+
+		UserIMEntity imEntity = userImService.selectUid(repairEntity.getUserId());
+		if (imEntity!=null){
+			PushInfoUtil.PushPublicTextMsg(imEntity.getImId(),
+					"报修通知",
+					"报修事项处理完成",
+					null,"报修事项处理完成\n您提交的报修事项工作人员已近处理完成了。",null, BusinessEnum.PushInfromEnum.REPAIRNOTICE.getName());
+		}
+
 	}
 	
 	@Override
