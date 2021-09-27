@@ -74,6 +74,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	
 	@Autowired
 	private CarOrderMapper carOrderMapper;
+	
+	@Autowired
+	private CarCutOffMapper carCutOffMapper;
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
@@ -342,6 +345,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		communitySurveyEntity.setOpenDoorCount(peopleHistoryMapper.selectOpenDoorCount(adminCommunityId, beginTime, overTime));
 		// 查访客次数
 		communitySurveyEntity.setVisitorCount(peopleHistoryMapper.selectVisitorCount(adminCommunityId, beginTime, overTime));
+		// 查车辆进入、外出
+		communitySurveyEntity.setCarInfoCount(carCutOffMapper.selectCarIntoCount(adminCommunityId, beginTime, overTime));
+		communitySurveyEntity.setCarOutCount(carCutOffMapper.selectCarGoOutCount(adminCommunityId, beginTime, overTime));
 		// 查小区下所有房屋总数和楼栋总数
 		List<HouseEntity> allHouse = houseMapper.getAllHouse(adminCommunityId);
 		List<HouseEntity> buildingList = houseMapper.getBuildingList(adminCommunityId);
