@@ -187,7 +187,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
             faceEntity.setRealName(propertyFaceEntity.getRealName());
             faceEntity.setMobile(propertyFaceEntity.getMobile());
             faceEntity.setFaceUrl(propertyFaceEntity.getFaceUrl());
-            faceEntity.setFaceEnableStatus(1);
+            faceEntity.setFaceEnableStatus(propertyFaceEntity.getFaceEnableStatus());
             faceEntity.setFaceDeleted(0);
             faceEntity.setDeleted(0);
             faceEntity.setId(SnowFlake.nextId());
@@ -196,7 +196,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
         } else {
             // 更新
             faceEntity.setFaceUrl(propertyFaceEntity.getFaceUrl());
-            faceEntity.setFaceEnableStatus(1);
+            faceEntity.setFaceEnableStatus(propertyFaceEntity.getFaceEnableStatus());
             faceEntity.setFaceDeleted(0);
             faceEntity.setDeleted(0);
             result = propertyFaceMapper.updateById(faceEntity);
@@ -207,34 +207,36 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
             syncRecordMapper.delete(recordEntityQueryWrapper);
         }
         // 查询设备
-        List<CommunityHardWareEntity> communityHardWareEntities = hardWareMapper.selectAllByCommunityId(communityId);
-        if (result == 1 && !CollectionUtils.isEmpty(communityHardWareEntities)) {
-            Set<String> hardwareIds = communityHardWareEntities.stream().map(CommunityHardWareEntity::getHardwareId).collect(Collectors.toSet());
-            // 新增同步记录
-            List<PropertyFaceSyncRecordEntity> faceSyncRecordEntities = new ArrayList<>();
-            for (String hardwareId : hardwareIds) {
-                PropertyFaceSyncRecordEntity propertyFaceSyncRecordEntity = new PropertyFaceSyncRecordEntity();
-                propertyFaceSyncRecordEntity.setPorpertyFaceId(faceEntity.getId());
-                propertyFaceSyncRecordEntity.setCommunityId(communityId);
-                propertyFaceSyncRecordEntity.setFaceUrl(faceEntity.getFaceUrl());
-                propertyFaceSyncRecordEntity.setFacilityId(hardwareId);
-                propertyFaceSyncRecordEntity.setId(SnowFlake.nextId());
-                propertyFaceSyncRecordEntity.setDeleted(0);
-                propertyFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
-                faceSyncRecordEntities.add(propertyFaceSyncRecordEntity);
+        if (propertyFaceEntity.getFaceEnableStatus() == 1) {
+            List<CommunityHardWareEntity> communityHardWareEntities = hardWareMapper.selectAllByCommunityId(communityId);
+            if (result == 1 && !CollectionUtils.isEmpty(communityHardWareEntities)) {
+                Set<String> hardwareIds = communityHardWareEntities.stream().map(CommunityHardWareEntity::getHardwareId).collect(Collectors.toSet());
+                // 新增同步记录
+                List<PropertyFaceSyncRecordEntity> faceSyncRecordEntities = new ArrayList<>();
+                for (String hardwareId : hardwareIds) {
+                    PropertyFaceSyncRecordEntity propertyFaceSyncRecordEntity = new PropertyFaceSyncRecordEntity();
+                    propertyFaceSyncRecordEntity.setPorpertyFaceId(faceEntity.getId());
+                    propertyFaceSyncRecordEntity.setCommunityId(communityId);
+                    propertyFaceSyncRecordEntity.setFaceUrl(faceEntity.getFaceUrl());
+                    propertyFaceSyncRecordEntity.setFacilityId(hardwareId);
+                    propertyFaceSyncRecordEntity.setId(SnowFlake.nextId());
+                    propertyFaceSyncRecordEntity.setDeleted(0);
+                    propertyFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
+                    faceSyncRecordEntities.add(propertyFaceSyncRecordEntity);
+                }
+                syncRecordMapper.batchInsertSyncRecord(faceSyncRecordEntities);
+                // 启用人脸
+                XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
+                xuFaceEditPersonDTO.setOperator("editPerson");
+                xuFaceEditPersonDTO.setName(faceEntity.getRealName());
+                xuFaceEditPersonDTO.setPersonType(0);
+                xuFaceEditPersonDTO.setTempCardType(0);
+                xuFaceEditPersonDTO.setPicURI(faceEntity.getFaceUrl());
+                xuFaceEditPersonDTO.setCustomId(faceEntity.getMobile());
+                xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
+                xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
+                rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
             }
-            syncRecordMapper.batchInsertSyncRecord(faceSyncRecordEntities);
-            // 启用人脸
-            XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
-            xuFaceEditPersonDTO.setOperator("editPerson");
-            xuFaceEditPersonDTO.setName(faceEntity.getRealName());
-            xuFaceEditPersonDTO.setPersonType(0);
-            xuFaceEditPersonDTO.setTempCardType(0);
-            xuFaceEditPersonDTO.setPicURI(faceEntity.getFaceUrl());
-            xuFaceEditPersonDTO.setCustomId(faceEntity.getMobile());
-            xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
-            xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
-            rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
         }
         return result;
     }

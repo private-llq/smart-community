@@ -5,6 +5,7 @@ import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @Author: Pipi
@@ -31,6 +32,7 @@ public class PropertyFaceEntity extends BaseEntity {
     private String faceUrl;
 
     // 人脸启用状态;1:启用;2:禁用
+    @NotNull(groups = {AddFaceValidate.class}, message = "人脸启用状态不能为空;1:启用;2:禁用")
     private Integer faceEnableStatus;
 
     // 人脸删除状态;0:未删除;1:已删除

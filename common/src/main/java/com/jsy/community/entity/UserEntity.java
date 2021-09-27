@@ -42,7 +42,7 @@ public class UserEntity extends BaseEntity {
 	private String faceUrl;
 
 	// 人脸启用状态;1:启用;2:禁用
-	@NotNull(groups = {FaceOprationValidate.class}, message = "人脸启用状态不能为空;1:启用;2:禁用")
+	@NotNull(groups = {FaceOprationValidate.class, AddFaceValidate.class}, message = "人脸启用状态不能为空;1:启用;2:禁用")
 	private Integer faceEnableStatus;
 
 	// 人脸删除状态;0:未删除;1:已删除
@@ -170,7 +170,7 @@ public class UserEntity extends BaseEntity {
 	public interface FaceDeleteValidate{}
 
 	/**
-	 * 用户人脸删除验证组
+	 * 用户人脸新增验证组
 	 */
 	public interface AddFaceValidate{}
 
