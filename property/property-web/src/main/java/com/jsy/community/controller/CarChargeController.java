@@ -145,7 +145,7 @@ public class CarChargeController {
     @Login
     @GetMapping("/selectOneCharge")
     public CommonResult selectOneCharge(@RequestParam("uid") String uid){
-       CarChargeEntity chargeEntity= carChargeService.selectOneCharge(uid,UserUtils.getAdminCommunityId());
+        CarChargeEntity chargeEntity= carChargeService.selectOneCharge(uid,UserUtils.getAdminCommunityId());
         return CommonResult.ok(chargeEntity);
     }
 
