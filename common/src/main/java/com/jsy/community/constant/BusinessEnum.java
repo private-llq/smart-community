@@ -1445,5 +1445,61 @@ public interface BusinessEnum {
 			}
 		}
 	}
+	/**
+	 * 租赁签约进程状态枚举
+	 */
+	enum PushInfromEnum {
+		PAYHELPER("payHelper", 1),
+		HOUSEMANAGE("houseManage", 2),
+		ACTIVITYVOTING("activityVoting", 3),
+		CONTRACTSIGNING("contractSigning", 4),
+		PROPERTYPAYMENT("propertyPayment", 5),
+		TEMPORARYPARKING("temporaryParking", 6),
+		MONTHLYRENTPAYMENT("monthlyRentPayment", 7),
+		SYSMESSAGE("sysMessage", 8),
+		REPAIRNOTICE("repairNotice", 9),
+		BILLINGNOTICE("billingNotice", 10);
+		private String name;
+		private Integer code;
+
+		PushInfromEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static final List<Map<String, Object>> ORDER_STATUS_LIST = new ArrayList<>();
+		public static final Map<Integer, String> ORDER_STATUS_MAP = new HashMap<>();
+
+		static {
+			for (PushInfromEnum processStatusEnum : PushInfromEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", processStatusEnum.getCode());
+				map.put("name", processStatusEnum.getName());
+				ORDER_STATUS_LIST.add(map);
+				ORDER_STATUS_MAP.put(processStatusEnum.getCode(), processStatusEnum.getName());
+			}
+		}
+	}
 
 }

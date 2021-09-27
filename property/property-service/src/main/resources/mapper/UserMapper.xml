@@ -50,6 +50,7 @@
             AND thm.community_id = #{userEntity.communityId}
             AND tu.deleted = 0
             AND thm.deleted = 0
+            AND thm.status = 1
             <if test="userEntity.keyword != null and userEntity.keyword != ''">
                 AND (tu.real_name like concat('%', #{userEntity.keyword}, '%') OR tu.mobile like concat('%', #{userEntity.keyword}, '%'))
             </if>
@@ -103,6 +104,9 @@
         </if>
         <if test="userEntity.relationCode != null and userEntity.relationCode != 8">
             AND thm.relation = #{userEntity.relationCode}
+        </if>
+        <if test="userEntity.relationCode != null and userEntity.relationCode == 8">
+            AND 1 = 0
         </if>
         group by tu.uid, thm.relation
         union all
@@ -242,6 +246,7 @@
             AND thm.community_id = #{userEntity.communityId}
             AND tu.deleted = 0
             AND thm.deleted = 0
+            AND thm.status = 1
             <if test="userEntity.keyword != null and userEntity.keyword != ''">
                 AND (tu.real_name like concat('%', #{userEntity.keyword}, '%') OR tu.mobile like concat('%', #{userEntity.keyword}, '%'))
             </if>
@@ -295,6 +300,9 @@
             </if>
             <if test="userEntity.relationCode != null and userEntity.relationCode != 8">
                 AND thm.relation = #{userEntity.relationCode}
+            </if>
+            <if test="userEntity.relationCode != null and userEntity.relationCode == 8">
+                AND 1 = 0
             </if>
             group by tu.uid, thm.relation
             union all

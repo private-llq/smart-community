@@ -522,6 +522,6 @@ public class ProprietorController {
     @PostMapping("/v2/uploadFace")
     public CommonResult uploadFace(MultipartFile file) {
         String upload = MinioUtils.upload(file, "face-url");
-        return CommonResult.ok(upload);
+        return CommonResult.ok(upload, "上传成功");
     }
 }

@@ -38,6 +38,7 @@ import io.swagger.annotations.ApiOperation;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.implementation.bind.annotation.This;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.entity.ContentType;
 import org.elasticsearch.search.sort.MinAndMax;
 import org.springframework.beans.BeanUtils;
@@ -100,7 +101,8 @@ public class CarPositionController {
     private ICarLaneService iCarLaneService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IVisitorService visitorService;
-
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarChargeService carChargeService;
 
     @ApiOperation("分页查询车位信息")
     @Login
@@ -384,10 +386,8 @@ public class CarPositionController {
         carVO.setRs485_data(new ArrayList<>());
         carVO.setWhitelist_data(new ArrayList<>());
 
-
         //查询社区代写
         Long communityId = equipmentManageService.equipmentOne(camId).getCommunityId();
-
 
         //在小区是否是黑名单车辆
         CarBlackListEntity carBlackListEntity = iCarBlackListService.carBlackListOne(plateNum, communityId);
@@ -717,15 +717,55 @@ public class CarPositionController {
             }
             System.out.println("支付状态" + orderStatus);
             if (orderStatus == 0) {//未支付
-                //是否开闸
-                GpioData gpioData = new GpioData();
-                gpioData.setIonum("io1");
-                carVO.getGpio_data().add(gpioData);
-                //语音播报内容
-                Rs485Data e2 = new Rs485Data();
-                e2.setEncodetype("hex2string");
-                e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
-                carVO.getRs485_data().add(e2);
+                
+                Integer plateType=1;
+                if (plateColor.equals("黄色")) {
+                    plateType=0;
+                }
+                LocalDateTime beginTime = carOrderEntity.getBeginTime();//进入时间
+                LocalDateTime now = LocalDateTime.now();//当前时间
+                Integer difference =(int) Duration.between(beginTime, now).toMinutes();//时间差
+                System.out.println("时间差"+difference);
+                //查询临时车的免费分钟数difference
+                Integer temporaryFreTime = carChargeService.selectTemporaryFreTime(communityId, plateType);
+                System.out.println("免费分钟数"+temporaryFreTime);
+                if(difference<temporaryFreTime){//在免费时间内
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    gpioData.setAction("on");
+                    carVO.getGpio_data().add(gpioData);
+                    //开闸记录
+                    extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+                    //将免费时间内的订单删除
+                    iCarOrderService.deletedNOpayOrder(plateNum,communityId,beginTime);
+
+                    Long aLong = selectResidueCarPositionCount(communityId);//查询临时车余位
+                    String standard = Crc16Util.getStandard(aLong.intValue());
+                    String ultimatelyValue = Crc16Util.getUltimatelyValue("余位" + standard);
+                    //led
+                    Rs485Data e1 = new Rs485Data();
+                    e1.setEncodetype("hex2string");
+                    e1.setData(ultimatelyValue);//余位
+                    carVO.getRs485_data().add(e1);
+
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901D2BBC2B7CBB3B7E79F40");//一路顺风
+                    carVO.getRs485_data().add(e2);
+                }else {
+                    //是否开闸
+                    GpioData gpioData = new GpioData();
+                    gpioData.setIonum("io1");
+                    carVO.getGpio_data().add(gpioData);
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
+                    carVO.getRs485_data().add(e2);
+                }
+
             }
             if (orderStatus == 1) {//已经支付
 

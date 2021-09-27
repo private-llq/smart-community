@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.BaseQO;
@@ -206,4 +207,13 @@ public interface ICarService extends IService<CarEntity> {
      * @return:
      */
     void deleteMonthCar(Long id);
+
+    /**
+     * @Description: 查询一条详情
+     * @author: Hu
+     * @since: 2021/9/27 13:41
+     * @Param:
+     * @return:
+     */
+    CarOrderEntity getOrder(Long id);
 }

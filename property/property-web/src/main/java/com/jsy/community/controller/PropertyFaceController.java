@@ -78,7 +78,7 @@ public class PropertyFaceController {
     @PostMapping("/v2/uploadPropertyFace")
     public CommonResult uploadFace(MultipartFile file) {
         String upload = MinioUtils.upload(file, "property-face-url");
-        return CommonResult.ok(upload);
+        return CommonResult.ok(upload, "上传成功");
     }
 
     /**
