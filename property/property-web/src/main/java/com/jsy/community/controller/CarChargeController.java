@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarChargeService;
+import com.jsy.community.api.ICommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.qo.BaseQO;
@@ -15,6 +16,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -28,6 +30,7 @@ public class CarChargeController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarChargeService carChargeService;
+
 
 
     @Login
@@ -112,6 +115,10 @@ public class CarChargeController {
     @PostMapping("/orderCharge")
     public CommonResult orderCharge(@RequestParam Long adminCommunityId,@RequestParam String carNumber){
         orderChargeDto orderCharge =carChargeService.orderCharge(adminCommunityId,carNumber);
+
+        if (orderCharge==null) {
+            return CommonResult.error(501,"暂无临时车信息");
+        }
         return CommonResult.ok(orderCharge,"查询成功");
     }
 

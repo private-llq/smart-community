@@ -79,4 +79,7 @@ public interface ICarChargeService {
     void openCarCharge(String uid,Integer type,Long adminCommunityId);
 
     orderChargeDto orderCharge(Long adminCommunityId, String carNumber);
+
+     //查询临时车免费停车时长
+    public Integer selectTemporaryFreTime(Long CommunityId,Integer plateType);
 }
