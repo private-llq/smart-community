@@ -10,6 +10,12 @@ import java.time.LocalDateTime;
 @Data
 public class orderChargeDto implements Serializable {
     /**
+     * 社区名
+     */
+    private String communityName;
+
+
+    /**
      * 车辆信息（车牌号）
      */
     private String carNumber;
