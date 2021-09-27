@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IActivityService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.property.ActivityUserEntity;
@@ -120,8 +121,8 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
                 "活动投票",
                 entity.getTheme(),
                 null,
-                "活动报名成功" +
-                        entity.getBeginActivityTime()+"————"+entity.getOverActivityTime(),map);
+                "活动报名成功\n" +
+                        entity.getBeginActivityTime()+"——"+entity.getOverActivityTime(),map, BusinessEnum.PushInfromEnum.ACTIVITYVOTING.getName());
 
     }
 

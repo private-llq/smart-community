@@ -9,6 +9,9 @@ import com.jsy.community.mapper.UserIMMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * @program: com.jsy.community
  * @description: im
@@ -20,6 +23,12 @@ public class UserImServiceImpl extends ServiceImpl<UserIMMapper, UserIMEntity> i
 
     @Autowired
     private UserIMMapper userIMMapper;
+
+    @Override
+    public List<UserIMEntity> selectUidAll(Set<String> uidAll) {
+        return userIMMapper.selectList(new QueryWrapper<UserIMEntity>().in("uid",uidAll));
+    }
+
     @Override
     public UserIMEntity selectUid(String uid) {
         return userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid",uid));

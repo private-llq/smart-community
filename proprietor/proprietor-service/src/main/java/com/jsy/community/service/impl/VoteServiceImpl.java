@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVoteService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.VoteEntity;
 import com.jsy.community.entity.proprietor.VoteOptionEntity;
@@ -89,8 +90,9 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
                         "活动投票",
                         voteEntity.getTheme(),
                         null,
-                        "投票时间说明" +
-                                voteEntity.getBeginTime()+"————"+voteEntity.getOverTime(),map);
+                        "投票时间说明\n" +
+                                voteEntity.getBeginTime()+"——"+voteEntity.getOverTime(),
+                        map, BusinessEnum.PushInfromEnum.ACTIVITYVOTING.getName());
             }
         }
 
