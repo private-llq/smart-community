@@ -59,4 +59,17 @@
             </if>
         </where>
     </select>
+    <!-- 查询单个详情 -->
+    <select id="queryDetail" resultType="com.jsy.community.entity.proprietor.AssetLeaseRecordEntity">
+        select * from t_asset_lease_record
+        <where>
+                id = #{entity.id}
+                <if test="entity.homeOwnerUid != null">
+                    and home_owner_uid = #{entity.homeOwnerUid}
+                </if>
+                <if test="entity.tenantUid != null">
+                    tenant_uid = #{entity.tenantUid}
+                </if>
+        </where>
+    </select>
 </mapper>

@@ -1002,16 +1002,14 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      **/
     @Override
     public AssetLeaseRecordEntity contractDetail(AssetLeaseRecordEntity assetLeaseRecordEntity, String uid) {
-        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
         if (assetLeaseRecordEntity.getIdentityType() == 1) {
             // 房东
-            queryWrapper.eq("home_owner_uid", uid);
+            assetLeaseRecordEntity.setHomeOwnerUid(uid);
         } else {
             // 租客
-            queryWrapper.eq("tenant_uid", uid);
+            assetLeaseRecordEntity.setTenantUid(uid);
         }
-        AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.queryDetail(assetLeaseRecordEntity);
         if (leaseRecordEntity == null) {
             // 为空直接返回
             return leaseRecordEntity;
