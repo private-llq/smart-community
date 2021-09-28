@@ -57,8 +57,8 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
 //        if (marketEntity.getPrice()!=null){
 //            marketEntity.setNegotiable(NEGOTIABLE_ZERO);
 //        }
-        //默认下架
-        marketEntity.setState(STATE_ZERO);
+        //默认上架
+        marketEntity.setState(STATE_ONE);
         return  marketMapper.insert(marketEntity)==1;
 
         /*List list = Arrays.asList(marketQO.getImages().split(","));*/

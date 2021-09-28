@@ -185,6 +185,8 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
         HashMap<String, Object> map = new HashMap<>();
         map.put("total",total);
         map.put("list",arrayList);
+
+        marketMapper.findCount();
         return map;
     }
 

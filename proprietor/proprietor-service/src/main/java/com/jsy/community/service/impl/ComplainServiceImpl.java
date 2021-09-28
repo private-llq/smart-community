@@ -135,7 +135,7 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
     @Override
     public List<ComplainVO> selectComplain(String userId) {
         List<ComplainVO> list = new ArrayList<>();
-        List<ComplainEntity> selectList = complainMapper.selectList(new QueryWrapper<ComplainEntity>().eq("uid", userId));
+        List<ComplainEntity> selectList = complainMapper.selectList(new QueryWrapper<ComplainEntity>().eq("uid", userId).orderByDesc("create_time"));
         for(ComplainEntity entity :selectList){
             ComplainVO complainVO = new ComplainVO();
             BeanUtils.copyProperties(entity,complainVO);
