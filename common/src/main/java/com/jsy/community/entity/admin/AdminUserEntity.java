@@ -210,8 +210,14 @@ public class AdminUserEntity extends BaseEntity {
 	@TableField(exist = false)
 	private String 	token;
 
+	// 角色Id
 	@TableField(exist = false)
+	@NotNull(groups = {addOperatorValidatedGroup.class}, message = "角色Id不能为空")
 	private Long roleId;
+
+	// 角色名称
+	@TableField(exist = false)
+	private String roleName;
 	
 	/**
 	 * 注册邀请传参验证

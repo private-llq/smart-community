@@ -40,4 +40,11 @@ public class AdminUserQO implements Serializable {
 	
 	@ApiModelProperty(value = "状态 0.正常 1.禁用")
 	private Integer status;
+
+	// 公司ID
+	private Long companyId;
+
+	// 角色ID
+	private Long roleId;
+
 }

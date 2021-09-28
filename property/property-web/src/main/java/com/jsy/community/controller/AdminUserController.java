@@ -228,6 +228,7 @@ public class AdminUserController {
 		}
 //		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 		baseQO.getQuery().setCommunityIdList(UserUtils.getAdminCommunityIdList());
+		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
 		return CommonResult.ok(adminUserService.queryOperator(baseQO));
 	}
 	

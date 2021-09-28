@@ -81,4 +81,54 @@
 	<select id="queryUidListByRealName" resultType="String">
 		SELECT uid FROM t_admin_user WHERE real_name LIKE CONCAT(CONCAT('%', #{userName}), '%') AND deleted = 0
 	</select>
+	<!-- 操作员条件查询 -->
+    <select id="queryPageUserEntity" resultType="com.jsy.community.entity.admin.AdminUserEntity">
+		select
+			au.id,
+			au.uid,
+			au.real_name,
+			au.mobile,
+			au.create_time,
+			aur.role_id,
+			ar.name as roleName
+		from t_admin_user au
+		left join t_admin_user_role aur on aur.uid = au.uid
+		left join t_admin_role ar on ar.id = aur.role_id
+		<where>
+			ar.company_id = #{qo.companyId}
+			<if test="qo.name != null and qo.name !=''">
+				and (au.real_name like concat("%", #{qo.name}, "%")
+				or au.mobile like concat("%", #{qo.name}, "%"))
+			</if>
+			<if test="qo.roleId != null">
+				aur.role_id = #{qo.roleId}
+			</if>
+		</where>
+		order by au.create_time
+		limit #{startSize}, #{size}
+	</select>
+	<select id="countPageUserEntity" resultType="java.lang.Integer">
+		select count(*) from (
+		select
+			au.id,
+			au.uid,
+			au.real_name,
+			au.mobile,
+			au.create_time,
+			aur.role_id,
+			ar.name as roleName
+		from t_admin_user au
+		left join t_admin_user_role aur on aur.uid = au.uid
+		left join t_admin_role ar on ar.id = aur.role_id
+		<where>
+			ar.company_id = #{qo.companyId}
+			<if test="qo.name != null and qo.name !=''">
+				and (au.real_name like concat("%", #{qo.name}, "%")
+				or au.mobile like concat("%", #{qo.name}, "%"))
+			</if>
+			<if test="qo.roleId != null">
+				aur.role_id = #{qo.roleId}
+			</if>
+		</where>) as a
+	</select>
 </mapper>
