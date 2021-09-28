@@ -447,28 +447,23 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         /**
          * 查询该车辆进闸时生成的订单
          */
-        List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>().eq("type", 1).eq("order_status", 0).eq("community_id", adminCommunityId));
-
+        List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
+                .eq("car_plate",carNumber)
+                .eq("type", 1)
+                .eq("order_status", 0)
+                .eq("community_id", adminCommunityId));
         if (list.size()!=0){
-
-        }
-
         List<CarOrderEntity> carOrderEntityList = list.stream().sorted(Comparator.comparing(x -> {
             return x.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
         })).collect(Collectors.toList());
 
         CarOrderEntity carOrderEntity = carOrderEntityList.get(carOrderEntityList.size() - 1);
-        LocalDateTime openTime = carOrderEntity.getBeginTime();//进闸时间
-        String orderNum = carOrderEntity.getOrderNum();//订单号
 
-        /**
-         * 查询开闸记录
-         */
-        CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("car_number", carNumber).eq("community_id", adminCommunityId).isNull("stop_time"));
-
-        if (carCutOffEntity!=null) {
+            LocalDateTime openTime = carOrderEntity.getBeginTime();//进闸时间
+            String orderNum = carOrderEntity.getOrderNum();//订单号
+            String plateColor = carOrderEntity.getPlateColor();//车牌颜色
             LocalDateTime now = LocalDateTime.now();//当前时间作为出闸时间
-            String plateColor = carCutOffEntity.getPlateColor();//车牌颜色
+
             CarChargeQO carChargeQO = new CarChargeQO();
             carChargeQO.setCommunityId(String.valueOf(adminCommunityId));
             carChargeQO.setCarColor(plateColor);
