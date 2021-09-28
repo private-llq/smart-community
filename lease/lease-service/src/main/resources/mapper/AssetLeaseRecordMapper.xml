@@ -68,7 +68,7 @@
                     and home_owner_uid = #{entity.homeOwnerUid}
                 </if>
                 <if test="entity.tenantUid != null">
-                    tenant_uid = #{entity.tenantUid}
+                    and tenant_uid = #{entity.tenantUid}
                 </if>
         </where>
     </select>

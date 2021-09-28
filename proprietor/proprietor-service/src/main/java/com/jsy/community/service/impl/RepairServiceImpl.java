@@ -5,16 +5,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IRepairService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairEntity;
 import com.jsy.community.entity.RepairOrderEntity;
-import com.jsy.community.mapper.CommonConstMapper;
-import com.jsy.community.mapper.RepairMapper;
-import com.jsy.community.mapper.RepairOrderMapper;
-import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.entity.UserIMEntity;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.proprietor.RepairCommentQO;
 import com.jsy.community.utils.MyMathUtils;
+import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.repair.RepairVO;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +56,9 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	
 	@Autowired
 	private UserMapper userMapper;
+
+	@Autowired
+	private UserIMMapper userIMMapper;
 	
 	// 个人报修事项
 	private static final int TYPEPERSON = 1;
@@ -110,6 +113,14 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		orderEntity.setRepairId(repairId);
 		orderEntity.setOrderTime(repairEntity.getCreateTime());
 		repairOrderMapper.insert(orderEntity);
+
+		UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", repairEntity.getUserId()));
+		if (userIMEntity!=null){
+			PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+					"报修通知",
+					"报修事项提交成功",
+					null,"报修事项提交成功\n请耐心等待工作人员处理。",null, BusinessEnum.PushInfromEnum.REPAIRNOTICE.getName());
+		}
 	}
 	
 	@Override

@@ -99,6 +99,9 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
     public void apply(ActivityUserEntity activityUserEntity) {
         activityUserEntity.setId(SnowFlake.nextId());
         ActivityEntity entity = activityMapper.selectById(activityUserEntity.getActivityId());
+        if (LocalDateTime.now().isBefore(entity.getBeginApplyTime())){
+            throw new ProprietorException("当前活动还未到报名时间");
+        }
 
         ActivityUserEntity one = activityUserMapper.selectOne(new QueryWrapper<ActivityUserEntity>().eq("uid", activityUserEntity.getUid()).eq("activity_id", activityUserEntity.getActivityId()));
         if (one!=null){

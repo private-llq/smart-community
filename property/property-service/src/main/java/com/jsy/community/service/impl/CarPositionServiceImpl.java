@@ -21,7 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -138,7 +138,7 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
      * @return: java.util.List<com.jsy.community.entity.property.CarPositionEntity>
      */
     @Override
-    public List<CarPositionEntity> getByIds(LinkedList<Long> positionIds) {
+    public List<CarPositionEntity> getByIds(Collection<Long> positionIds) {
         return carPositionMapper.selectBatchIds(positionIds);
     }
 

@@ -201,7 +201,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				receiptEntity.setReceiptMoney(order.getTradeAmount());
 				propertyFinanceReceiptService.add(receiptEntity);
 				//修改物业费账单
-				propertyFinanceOrderService.updateOrderStatusBatch(2, order.getOrderNo(), ids.split(","));
+				propertyFinanceOrderService.updateOrderStatusBatch(2, order.getOrderNo(), ids.split(","),order.getTradeAmount());
 			} else if (PaymentEnum.TradeFromEnum.TRADE_FROM_PARKING_PAYMENT.getIndex().equals(order.getTradeName())){
 				log.info("开始修改停车账单状态，订单号：" + order.getOrderNo());
 				CarOrderRecordEntity entity = carService.findOne(Long.parseLong(order.getServiceOrderNo()));

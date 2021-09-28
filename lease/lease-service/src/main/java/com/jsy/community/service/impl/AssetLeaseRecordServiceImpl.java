@@ -127,7 +127,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", assetLeaseRecordEntity.getTenantUid());
         assetLeaseRecordEntityQueryWrapper.and(
                 wapper -> wapper.ne("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
-                                .or(newwapper ->
+                        .or(newwapper ->
                                 newwapper.eq("operation", BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode())
                                         .gt("end_date", new Date())
                         )
@@ -214,7 +214,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @param assetLeaseRecordEntity : 房屋租赁记录表实体
      * @param uid                    : 登录用户uid
      * @author: Pipi
-     * @description: 对签约进行操作(租客取消申请/房东拒绝申请/租客再次申请/房东接受申请/拟定合同)
+     * @description: 对签约进行操作(租客取消申请 / 房东拒绝申请 / 租客再次申请 / 房东接受申请 / 拟定合同)
      * @return: java.lang.Integer
      * @date: 2021/9/3 10:30
      **/
@@ -251,13 +251,13 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid:                    登录用户uid
      * @author: Pipi
      * @description: 房东接受申请;房东接受申请后,资产不能编辑,所以在这里将房屋信息写入记录表;
      * 房屋:整租不能同时接受多个申请,合租和单间出租可以
      * 商铺:不能同时接受多个申请
      * 可操作的是:1:租客发出申请;9:再次申请
-     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
-     * @param uid: 登录用户uid
      * @return: java.lang.Integer
      * @date: 2021/9/3 14:17
      **/
@@ -352,10 +352,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
-     * @author: Pipi
-     * @description: 房东点击你拟定合同(可操作的是:接受申请:2)
      * @param assetLeaseRecordEntity: 房屋租赁记录表实体
-     * @param uid: 登录用户uid
+     * @param uid:                    登录用户uid
+     * @author: Pipi
+     * @description: 房东点击你拟定合同(可操作的是 : 接受申请 : 2)
      * @return: java.lang.Integer
      * @date: 2021/9/9 18:13
      **/
@@ -375,10 +375,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
-     * @author: Pipi
-     * @description: 租客取消申请(可取消的包含:发起申请:1;重新申请:9)
      * @param assetLeaseRecordEntity: 房屋租赁记录表实体
-     * @param uid: 登录用户uid
+     * @param uid:                    登录用户uid
+     * @author: Pipi
+     * @description: 租客取消申请(可取消的包含 : 发起申请 : 1 ; 重新申请 : 9)
      * @return: java.lang.Integer
      * @date: 2021/9/3 14:25
      **/
@@ -401,10 +401,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
-     * @author: Pipi
-     * @description: 房东拒绝申请(可操作的是:发起申请:1;重新发起:9)
      * @param assetLeaseRecordEntity: 房屋租赁记录表实体
-     * @param uid: 登录用户uid
+     * @param uid:                    登录用户uid
+     * @author: Pipi
+     * @description: 房东拒绝申请(可操作的是 : 发起申请 : 1 ; 重新发起 : 9)
      * @return: java.lang.Integer
      * @date: 2021/9/3 14:29
      **/
@@ -429,10 +429,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @param uid:                    登录用户uid
      * @author: Pipi
      * @description: 再次发起申请;可操作的是:8:拒绝申请;7:取消申请
-     * @param assetLeaseRecordEntity: 房屋租赁记录表实体
-     * @param uid: 登录用户uid
      * @return: java.lang.Integer
      * @date: 2021/9/3 14:35
      **/
@@ -472,11 +472,11 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param id:      当前签约ID
+     * @param assetId: 资产id
      * @author: Pipi
      * @description: 检查是否有多个签约;
      * 怎么算是多个签约:2:接受申请;3:拟定合同;4:等待支付房租;5:支付完成;31:(房东)发起签约/重新发起;32:取消发起;
-     * @param id: 当前签约ID
-     * @param assetId: 资产id
      * @return: java.lang.Boolean
      * @date: 2021/9/4 14:20
      **/
@@ -494,9 +494,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
-     * @author: Pipi
-     * @description:  写入租赁操作数据
      * @param assetLeaseRecordEntity: 房屋租赁记录表实体
+     * @author: Pipi
+     * @description: 写入租赁操作数据
      * @return: void
      * @date: 2021/9/3 14:22
      **/
@@ -513,7 +513,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     /**
      * @param assetLeaseRecordEntity : 查询条件
-     * @param uid : 登录用户uid
+     * @param uid                    : 登录用户uid
      * @author: Pipi
      * @description: 分页查询签约列表
      * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.proprietor.AssetLeaseRecordEntity>
@@ -996,7 +996,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     /**
      * @param assetLeaseRecordEntity : 查询条件
-     * @param uid : 登录用户uid
+     * @param uid                    : 登录用户uid
      * @author: Pipi
      * @description: 查询签约详情
      * @return: com.jsy.community.entity.proprietor.AssetLeaseRecordEntity
@@ -1112,9 +1112,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param leaseRecordEntity:
      * @author: Pipi
      * @description: 设置签约倒计时和签约进程
-     * @param leaseRecordEntity:
      * @return: void
      * @date: 2021/9/15 11:20
      **/
@@ -1217,9 +1217,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param assetLeaseRecordEntity:
      * @author: Pipi
      * @description: 租客已读状态更新
-     * @param assetLeaseRecordEntity:
      * @return: void
      * @date: 2021/9/14 18:26
      **/
@@ -1231,10 +1231,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param leaseRecordId: 签约ID
+     * @param operation:     操作进程
      * @author: Pipi
      * @description: 查询操作记录
-     * @param leaseRecordId: 签约ID
-     * @param operation: 操作进程
      * @return: com.jsy.community.entity.proprietor.LeaseOperationRecordEntity
      * @date: 2021/9/9 17:52
      **/
@@ -1248,9 +1248,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param assetLeaseRecordEntity: 签约实体
      * @author: Pipi
      * @description:签章调用相关操作(发起签约/重新发起:31、完成签约:6、取消发起:32)
-     * @param assetLeaseRecordEntity: 签约实体
      * @return: java.lang.Integer
      * @date: 2021/9/7 10:18
      **/
@@ -1278,9 +1278,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param assetLeaseRecordEntity:
      * @author: Pipi
      * @description: 完成签约
-     * @param assetLeaseRecordEntity:
      * @return: java.lang.Integer
      * @date: 2021/9/14 10:55
      **/
@@ -1334,9 +1334,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param assetLeaseRecordEntity:
      * @author: Pipi
      * @description: 房东发起签约/重新发起签约
-     * @param assetLeaseRecordEntity:
      * @return: java.lang.Integer
      * @date: 2021/9/14 10:58
      **/
@@ -1382,9 +1382,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param assetLeaseRecordEntity:
      * @author: Pipi
      * @description: 房东取消发起签约
-     * @param assetLeaseRecordEntity:
      * @return: java.lang.Integer
      * @date: 2021/9/14 11:04
      **/
@@ -1402,7 +1402,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 throw new LeaseException("租客已支付租金,不能取消");
             }
             WeChatOrderEntity weChatOrderEntity = weChatService.quereIdByServiceOrderNo(assetLeaseRecordEntity.getConId());
-            if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 1) {
+            if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 2) {
                 // 已支付,不能取消
                 throw new LeaseException("租客已支付租金,不能取消");
             }
@@ -1433,9 +1433,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param assetLeaseRecordEntity:
      * @author: Pipi
      * @description: 更新区块链上链状态到成功
-     * @param assetLeaseRecordEntity:
      * @return: java.lang.Integer
      * @date: 2021/9/14 11:19
      **/
@@ -1526,9 +1526,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param conId: 合同编号
      * @author: Pipi
      * @description: 通知签章作废合同
-     * @param conId: 合同编号
      * @return: void
      * @date: 2021/9/17 11:20
      **/
@@ -1551,7 +1551,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         JSONObject result = null;
         try {
             //执行请求，解析结果
-            httpResult = (String)MyHttpUtils.exec(httpPost, MyHttpUtils.ANALYZE_TYPE_STR);
+            httpResult = (String) MyHttpUtils.exec(httpPost, MyHttpUtils.ANALYZE_TYPE_STR);
             result = JSON.parseObject(httpResult);
             if (0 == result.getIntValue("code")) {
                 log.info("合同{}作废成功", conId);

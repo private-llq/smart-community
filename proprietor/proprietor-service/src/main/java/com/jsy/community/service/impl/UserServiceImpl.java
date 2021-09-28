@@ -126,7 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private ISignatureService signatureService;
 
-    private long expire = 60*60*24*7; //暂时
+    private long expire = 60 * 60 * 24 * 7; //暂时
 
 
     /**
@@ -136,7 +136,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Param:
      * @return:
      */
-    public static String getImId(){
+    public static String getImId() {
         Random r = new Random();
         StringBuffer sb = new StringBuffer(10);
         for (int j = 1; j <= 10; j++) {
@@ -150,11 +150,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return sb.toString();
     }
+
     /**
      * 创建用户token
      */
     @Override
-    public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo){
+    public UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo) {
         Date expireDate = new Date(new Date().getTime() + expire * 1000);
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setExpiredTime(LocalDateTimeUtil.of(expireDate));
@@ -169,7 +170,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * 查询用户信息
      */
-    private UserInfoVo queryUserInfo(String uid){
+    private UserInfoVo queryUserInfo(String uid) {
         UserEntity user = baseMapper.queryUserInfoByUid(uid);
         if (user == null || user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");
@@ -190,12 +191,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         //查询极光推送标签
         UserUroraTagsEntity userUroraTagsEntity = userUroraTagsService.queryUroraTags(uid);
-        if(userUroraTagsEntity != null){
+        if (userUroraTagsEntity != null) {
             userInfoVo.setUroraTags(userUroraTagsEntity.getUroraTags());
         }
         //查询用户imId
         UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().select("im_id,im_password").eq("uid", uid));
-        if(userIMEntity != null){
+        if (userIMEntity != null) {
             userInfoVo.setImId(userIMEntity.getImId());
             userInfoVo.setImPassword(userIMEntity.getImPassword());
         }
@@ -203,17 +204,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     /**
-    * @Description: 更新用户极光ID
+     * @Description: 更新用户极光ID
      * @Param: [regId, uid]
      * @Return: int
      * @Author: chq459799974
      * @Date: 2021/3/31
-    **/
+     **/
     @Override
-    public boolean updateUserRegId(String regId, String uid){
+    public boolean updateUserRegId(String regId, String uid) {
         return userMapper.updateUserRegId(regId, uid) == 1;
     }
-    
+
     /**
      * 登录
      */
@@ -238,7 +239,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity user = new UserEntity();
         user.setUid(uuid);
         user.setAvatarUrl("https://i.postimg.cc/1XgLJbXJ/home.jpg");
-        user.setNickname("E-home@"+qo.getAccount());
+        user.setNickname("E-home@" + qo.getAccount());
         user.setId(SnowFlake.nextId());
 
         // 账户数据(user_auth表)
@@ -253,17 +254,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         } else { //用户名注册
             userAuth.setUsername(qo.getAccount());
         }
-        try{
+        try {
             //添加业主(user表)
             save(user);
             //添加账户(user_auth表)
             userAuthService.save(userAuth);
-        }catch (DuplicateKeyException e){
+        } catch (DuplicateKeyException e) {
             throw new ProprietorException("该用户已注册");
         }
         //创建金钱账户(t_user_account表)
         boolean userAccountResult = userAccountService.createUserAccount(uuid);
-        if(!userAccountResult){
+        if (!userAccountResult) {
             log.error("用户账户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
@@ -272,25 +273,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userUroraTagsEntity.setUid(uuid);
         userUroraTagsEntity.setCommunityTags("all"); //给所有用户加一个通用tag，用于全体消息推送
         boolean uroraTagsResult = userUroraTagsService.createUroraTags(userUroraTagsEntity);
-        if(!uroraTagsResult){
+        if (!uroraTagsResult) {
             log.error("用户极光推送tags设置失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
         //创建imID(t_user_im表)
+        String imId = getImId();
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setImPassword("999999999");
         userIMEntity.setUid(uuid);
-        userIMEntity.setImId(getImId());
+        userIMEntity.setImId(imId);
         userIMMapper.insert(userIMEntity);
         //调用聊天创建账号
         ImResponseEntity responseEntity = PushInfoUtil.registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
-        if (responseEntity.getErr_code()!=0){
+        if (responseEntity.getErr_code() != 0) {
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(uuid);
+        signatureUserDTO.setImId(imId);
         if (RegexUtils.isMobile(qo.getAccount())) { //手机注册
             signatureUserDTO.setTelephone(qo.getAccount());
         } else if (RegexUtils.isEmail(qo.getAccount())) { // 邮箱注册
@@ -301,7 +304,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
         boolean signUserResult = signatureService.insertUser(signatureUserDTO);
-        if(!signUserResult){
+        if (!signUserResult) {
             log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
@@ -314,7 +317,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public String registerV2(RegisterQO qo,String uid,Integer relation,Long houseId,Long communityId) {
+    public String registerV2(RegisterQO qo) {
 //        commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 
         String uuid = UserUtils.randomUUID();
@@ -324,7 +327,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         user.setId(SnowFlake.nextId());
         user.setUid(uuid);
         user.setAvatarUrl("https://i.postimg.cc/1XgLJbXJ/home.jpg");
-        user.setNickname("E-home@"+qo.getAccount());
+        user.setNickname("E-home@" + qo.getAccount());
         user.setRealName(qo.getName());
 
         // 账户数据(user_auth表)
@@ -339,19 +342,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         } else { //用户名注册
             userAuth.setUsername(qo.getAccount());
         }
-        try{
+        try {
             //添加业主(user表)
             save(user);
 
             //添加账户(user_auth表)
             userAuthService.save(userAuth);
 
-        }catch (DuplicateKeyException e){
+        } catch (DuplicateKeyException e) {
             throw new ProprietorException("该用户已注册");
         }
         //创建金钱账户(t_user_account表)
         boolean userAccountResult = userAccountService.createUserAccount(uuid);
-        if(!userAccountResult){
+        if (!userAccountResult) {
             log.error("用户账户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
@@ -360,40 +363,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userUroraTagsEntity.setUid(uuid);
         userUroraTagsEntity.setCommunityTags("all"); //给所有用户加一个通用tag，用于全体消息推送
         boolean uroraTagsResult = userUroraTagsService.createUroraTags(userUroraTagsEntity);
-        if(!uroraTagsResult){
+        if (!uroraTagsResult) {
             log.error("用户极光推送tags设置失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
         //创建imID(t_user_im表)
+        String imId = getImId();
         UserIMEntity userIMEntity = new UserIMEntity();
         userIMEntity.setUid(uuid);
         userIMEntity.setImPassword("999999999");
-        userIMEntity.setImId(getImId());
+        userIMEntity.setImId(imId);
         userIMMapper.insert(userIMEntity);
 
         //调用签章创建
         ImResponseEntity responseEntity = PushInfoUtil.registerUser(userIMEntity.getImId(), userIMEntity.getImPassword(), user.getNickname(), user.getAvatarUrl());
-        if (responseEntity.getErr_code()!=0){
+        if (responseEntity.getErr_code() != 0) {
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
-        HouseEntity houseEntity = houseMapper.selectById(houseId);
-        CommunityEntity communityEntity = communityMapper.selectById(communityId);
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
-        //推送消息
-        PushInfoUtil.PushPublicTextMsg(
-                userIMEntity.getImId(),
-                "房屋管理",
-                "您有房屋最新消息了！",
-                null,
-                "尊敬的用户您好，\n" +
-                        "用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(relation)+"身份，如已知晓，请忽略。"
-                ,null,
-                BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(uuid);
+        signatureUserDTO.setImId(imId);
         if (RegexUtils.isMobile(qo.getAccount())) { //手机注册
             signatureUserDTO.setTelephone(qo.getAccount());
         } else if (RegexUtils.isEmail(qo.getAccount())) { // 邮箱注册
@@ -404,7 +395,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
         boolean signUserResult = signatureService.insertUser(signatureUserDTO);
-        if(!signUserResult){
+        if (!signUserResult) {
             log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
@@ -416,30 +407,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * 调用三方接口获取会员信息(走后端备用)(返回三方平台唯一id)
      */
-    private String  getUserInfoFromThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
+    private String getUserInfoFromThirdPlatform(UserThirdPlatformQO userThirdPlatformQO) {
         String thirdUid = null;
-        switch (userThirdPlatformQO.getThirdPlatformType()){
-            case Const.ThirdPlatformConsts.ALIPAY :
+        switch (userThirdPlatformQO.getThirdPlatformType()) {
+            case Const.ThirdPlatformConsts.ALIPAY:
                 //若前端传递了accessToken，尝试取userid
-                if(!StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())){
+                if (!StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())) {
                     thirdUid = alipayService.getUserid(userThirdPlatformQO.getAccessToken());
                 }
                 //若前端传递的accessToekn没取到userid，用前端传递的authCode从三方取accessToken再取userid
-                if(StringUtils.isEmpty(thirdUid) && !StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
+                if (StringUtils.isEmpty(thirdUid) && !StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())) {
                     String accessToken = alipayService.getAccessToken(userThirdPlatformQO.getAuthCode());
-                    if(StringUtils.isEmpty(accessToken)){ //第一步取accessToekn就失败了直接退出
+                    if (StringUtils.isEmpty(accessToken)) { //第一步取accessToekn就失败了直接退出
                         break;
                     }
                     thirdUid = alipayService.getUserid(accessToken);
                 }
                 break;
-            case Const.ThirdPlatformConsts.WECHAT :
+            case Const.ThirdPlatformConsts.WECHAT:
                 break;
-            case Const.ThirdPlatformConsts.QQ :
+            case Const.ThirdPlatformConsts.QQ:
                 break;
             default:
         }
-        if(StringUtils.isEmpty(thirdUid)){
+        if (StringUtils.isEmpty(thirdUid)) {
             throw new ProprietorException("三方平台uid获取失败 三方登录失败");
         }
         return thirdUid;
@@ -453,15 +444,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Date: 2021/1/12
      **/
     @Override
-    public UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO){
+    public UserAuthVo thirdPlatformLogin(UserThirdPlatformQO userThirdPlatformQO) {
 //        Map<String, Object> returnMap = new HashMap<>();
         //获取三方uid
         String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
         userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
                 .eq("third_platform_id", userThirdPlatformQO.getThirdPlatformId())
-                .eq("third_platform_type",userThirdPlatformQO.getThirdPlatformType()));
-        if(entity == null) { //首次授权
+                .eq("third_platform_type", userThirdPlatformQO.getThirdPlatformType()));
+        if (entity == null) { //首次授权
             UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
             userThirdPlatformEntity.setThirdPlatformType(userThirdPlatformQO.getThirdPlatformType());
             userThirdPlatformEntity.setThirdPlatformId(thirdPlatformUid);
@@ -470,8 +461,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //            returnMap.put("exists",false);
 //            returnMap.put("data",userThirdPlatformEntity.getId());
             return createBindMobile(userThirdPlatformEntity.getId());
-        }else{
-            if(!StringUtils.isEmpty(entity.getUid())){
+        } else {
+            if (!StringUtils.isEmpty(entity.getUid())) {
                 //登录成功
                 UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
                 userInfoVo.setIdCard(null);
@@ -479,8 +470,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //                returnMap.put("exists",true);
 //                returnMap.put("data",userAuthVo);
                 return userAuthVo;
-            }else{
-                  //非首次授权，但未绑定手机
+            } else {
+                //非首次授权，但未绑定手机
 //                //继续返回id
 //                returnMap.put("exists",false);
 //                returnMap.put("data",entity.getId());
@@ -499,7 +490,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO){
+    public UserAuthVo bindThirdPlatform(UserThirdPlatformQO userThirdPlatformQO) {
         Long id = Long.valueOf(userThirdPlatformQO.getThirdPlatformId());
         //手机验证码验证 不过报错
         commonService.checkVerifyCode(userThirdPlatformQO.getMobile(), userThirdPlatformQO.getCode());
@@ -507,29 +498,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //        String thirdPlatformUid = getUserInfoFromThirdPlatform(userThirdPlatformQO);
 //        userThirdPlatformQO.setThirdPlatformId(thirdPlatformUid);
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("id", id));
-        if(entity == null){
-            throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(),"数据不存在，请重新授权登录");
+        if (entity == null) {
+            throw new ProprietorException(JSYError.REQUEST_PARAM.getCode(), "数据不存在，请重新授权登录");
         }
         userThirdPlatformQO.setThirdPlatformId(entity.getThirdPlatformId());
         //查询是否注册
         String uid = userAuthService.queryUserIdByMobile(userThirdPlatformQO.getMobile());
         //若没有注册 立即注册
-        if(StringUtils.isEmpty(uid)){
+        if (StringUtils.isEmpty(uid)) {
             RegisterQO registerQO = new RegisterQO();
             registerQO.setAccount(userThirdPlatformQO.getMobile());
             registerQO.setCode(userThirdPlatformQO.getCode());
             uid = register(registerQO);
             //三方登录表入库
             UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
-            BeanUtils.copyProperties(userThirdPlatformQO,userThirdPlatformEntity);
+            BeanUtils.copyProperties(userThirdPlatformQO, userThirdPlatformEntity);
             userThirdPlatformEntity.setId(SnowFlake.nextId());
             userThirdPlatformEntity.setUid(uid);//把uid设置进三方登录表关联上
             userThirdPlatformMapper.insert(userThirdPlatformEntity);
-        }else{
+        } else {
             //更新uid
             UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
             userThirdPlatformEntity.setUid(uid);
-            userThirdPlatformMapper.update(userThirdPlatformEntity,new UpdateWrapper<UserThirdPlatformEntity>().eq("id",id));
+            userThirdPlatformMapper.update(userThirdPlatformEntity, new UpdateWrapper<UserThirdPlatformEntity>().eq("id", id));
         }
 //        UserInfoVo userInfoVo = new UserInfoVo();
 //        userInfoVo.setUid(uid);
@@ -538,8 +529,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setIdCard(null);
         return createAuthVoWithToken(userInfoVo);
     }
-    
-    public UserAuthVo createBindMobile(Long id){
+
+    public UserAuthVo createBindMobile(Long id) {
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setExpiredTime(null);
         UserInfoVo vo = new UserInfoVo();
@@ -552,11 +543,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
-
     /**
      * 添加社区硬件权限
      */
-    private void setCommunityHardwareAuth(ProprietorQO proprietorQO){
+    private void setCommunityHardwareAuth(ProprietorQO proprietorQO) {
         //TODO 根据uid查询所有房屋已审核社区 or 一个小区一次认证
 //        List<Long> communityIds = xxxxxx.getUserCommunitys(proprietorQO.getUid());
         //TODO 获取对应社区的硬件服务器id、地址等相关数据 待设计，确认业务登记操作需要增加的权限
@@ -606,19 +596,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     /**
      * 更新车辆信息 如果 id = 0 | id = null 则新增
-     * @param qo        请求参数
+     *
+     * @param qo 请求参数
      */
-    private void updateCar(ProprietorQO qo){
+    private void updateCar(ProprietorQO qo) {
         //========================================== 业主车辆 =========================================================
         //如果有车辆的情况下 更新或新增 车辆信息
-        if(qo.getHasCar()){
+        if (qo.getHasCar()) {
             //如果有需要新增的数据 id == null 或者 == 0 就是需要新增 只要有一个条件满足即返回true
             List<CarQO> cars = qo.getCars();
             //用户是否有需要新增的车辆？默认为false
             AtomicBoolean hasAddCar = new AtomicBoolean(false);
             cars.forEach(e -> {
                 //如果参数id为null 或者 参数id为0 则表明这条数据是需要新增
-                if( e.getId() == null || e.getId() == 0 ){
+                if (e.getId() == null || e.getId() == 0) {
                     //新增数据需要设置id
                     hasAddCar.set(true);
                 }
@@ -637,17 +628,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 carService.addProprietorCarForList(any, qo.getUid());
                 //循环保存车辆到es
 
-                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.insert",getInsertElasticsearchCar(qo.getUid(),qo.getHouses(),any));
+                rabbitTemplate.convertAndSend("exchange_car_topics", "queue.car.insert", getInsertElasticsearchCar(qo.getUid(), qo.getHouses(), any));
 
             }
             //批量更新车辆信息
-            cars.forEach( c -> {
-                carService.update(c, qo.getUid());
+            cars.forEach(c -> {
+                        carService.update(c, qo.getUid());
 
-                }
+                    }
             );
-            if (cars!=null&&cars.size()!=0){
-                rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.update",getUpdateElasticsearchCar(cars));
+            if (cars != null && cars.size() != 0) {
+                rabbitTemplate.convertAndSend("exchange_car_topics", "queue.car.update", getUpdateElasticsearchCar(cars));
             }
         }
     }
@@ -659,13 +650,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Param:
      * @return:
      */
-    public List<ElasticsearchCarQO> getInsertElasticsearchCar(String uid,List<UserHouseQo> qo,List<CarQO> carQO){
+    public List<ElasticsearchCarQO> getInsertElasticsearchCar(String uid, List<UserHouseQo> qo, List<CarQO> carQO) {
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
         HouseEntity entity = houseService.getById(qo.get(0).getHouseId());
         LinkedList<ElasticsearchCarQO> list = new LinkedList<>();
         ElasticsearchCarQO elasticsearchCarQO = null;
         for (CarQO car : carQO) {
-            elasticsearchCarQO=new ElasticsearchCarQO();
+            elasticsearchCarQO = new ElasticsearchCarQO();
             elasticsearchCarQO.setId(car.getId());
             elasticsearchCarQO.setCommunityId(qo.get(0).getCommunityId());
             elasticsearchCarQO.setCarPlate(car.getCarPlate());
@@ -683,12 +674,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             elasticsearchCarQO.setUnit(entity.getUnit());
             elasticsearchCarQO.setNumber(entity.getNumber());
             elasticsearchCarQO.setHouseType(entity.getHouseType());
-            elasticsearchCarQO.setHouseTypeText(entity.getHouseType()==1?"商铺":"住宅");
+            elasticsearchCarQO.setHouseTypeText(entity.getHouseType() == 1 ? "商铺" : "住宅");
             elasticsearchCarQO.setCreateTime(LocalDateTime.now());
             list.add(elasticsearchCarQO);
         }
         return list;
     }
+
     /**
      * @Description: 修改车辆到es的qo封装方法
      * @author: Hu
@@ -696,11 +688,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Param:
      * @return:
      */
-    public List<ElasticsearchCarQO> getUpdateElasticsearchCar(List<CarQO> carQO){
+    public List<ElasticsearchCarQO> getUpdateElasticsearchCar(List<CarQO> carQO) {
         ElasticsearchCarQO elasticsearchCarQO = null;
         LinkedList<ElasticsearchCarQO> list = new LinkedList<>();
         for (CarQO qo : carQO) {
-            elasticsearchCarQO=new ElasticsearchCarQO();
+            elasticsearchCarQO = new ElasticsearchCarQO();
             elasticsearchCarQO.setId(qo.getId());
             elasticsearchCarQO.setCarPlate(qo.getCarPlate());
             elasticsearchCarQO.setCarType(qo.getCarType());
@@ -709,15 +701,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         return list;
     }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateImprover(ProprietorQO qo) {
         //========================================== 1.业主房屋 =========================================================
         List<UserHouseQo> houseList = qo.getHouses();
-    
+
         List<UserHouseQo> any = null;
-	
-	    UserEntity userEntity = null;
+
+        UserEntity userEntity = null;
         //用户提交的房屋信息不为空
         if (CollectionUtil.isNotEmpty(houseList)) {
             //用来找用户提交的房屋信息 和 物业用户所属的房屋信息 差集的集合
@@ -727,25 +720,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userEntity = queryUserDetailByUid(qo.getUid());
             //通过 业主身份证 拿到 业主表的 该业主的所有 房屋id + 社区id
             List<UserHouseQo> resHouseList = userMapper.getProprietorInfo(userEntity.getIdCard());
-            if( CollectionUtil.isEmpty(resHouseList) ){
+            if (CollectionUtil.isEmpty(resHouseList)) {
                 throw new ProprietorException("物业没有添加您的房屋信息!");
             }
             //取出 业主房屋信息 和 物业信息的差异集合  如果 differenceList 不为空 业主提交了 物业没有认证的房屋信息
-	        //剔除带了id的数据，带id目的是修改，差集只对比新增数据
-	        ArrayList<UserHouseQo> forInsert = new ArrayList<>();
-	        for(UserHouseQo userHouseQo : tmpQos){
-	        	if(userHouseQo.getId() == null || userHouseQo.getId() == 0){
-			        forInsert.add(userHouseQo);
-		        }
-	        }
-            List<UserHouseQo> differenceList = differenceSet( forInsert, resHouseList );
+            //剔除带了id的数据，带id目的是修改，差集只对比新增数据
+            ArrayList<UserHouseQo> forInsert = new ArrayList<>();
+            for (UserHouseQo userHouseQo : tmpQos) {
+                if (userHouseQo.getId() == null || userHouseQo.getId() == 0) {
+                    forInsert.add(userHouseQo);
+                }
+            }
+            List<UserHouseQo> differenceList = differenceSet(forInsert, resHouseList);
             log.error("差集" + differenceList);
             log.error("差集size：" + differenceList.size());
-            if( CollectionUtil.isEmpty(differenceList) ){
+            if (CollectionUtil.isEmpty(differenceList)) {
                 //操作用户所在房屋
                 //id==null || id == 0 就是需要新增的 验证房屋信息是否有需要新增的数据
                 any = houseList.stream().filter(w -> w.getId() == null || w.getId() == 0).collect(Collectors.toList());
-                if( CollectionUtil.isNotEmpty(any) ){
+                if (CollectionUtil.isNotEmpty(any)) {
                     houseList.removeAll(any);
                     //批量新增房屋信息
                     userHouseService.addHouseBatch(any, qo.getUid());
@@ -755,67 +748,68 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             } else {
                 //存在差集 用户提交了 在业主表中他没有的房子
                 List<String> houseAddressNames = differenceList.stream().map(UserHouseQo::getHouseAddress).collect(Collectors.toList());
-                throw new ProprietorException( "物业没有给您认证该房屋：" + houseAddressNames );
+                throw new ProprietorException("物业没有给您认证该房屋：" + houseAddressNames);
             }
         }
         updateCar(qo);
         //没有添加房屋
-        if(CollectionUtils.isEmpty(any)){
+        if (CollectionUtils.isEmpty(any)) {
             return true;
         }
         Set<Long> communityIds = new HashSet<>();
-        for(UserHouseQo userHouseQo : any){
+        for (UserHouseQo userHouseQo : any) {
             communityIds.add(userHouseQo.getCommunityId());
         }
         //下发人脸数据
-        setFaceUrlToCommunityMachine(userEntity,communityIds);
+        setFaceUrlToCommunityMachine(userEntity, communityIds);
         return true;
     }
-    
+
     /**
      * 向小区设备下发人脸数据
      */
-    private void setFaceUrlToCommunityMachine(UserEntity userEntity, Set<Long> communityIds){
+    private void setFaceUrlToCommunityMachine(UserEntity userEntity, Set<Long> communityIds) {
         //查询用户实名信息
-        if(userEntity.getIsRealAuth() == null || userEntity.getIsRealAuth() != 2){
+        if (userEntity.getIsRealAuth() == null || userEntity.getIsRealAuth() != 2) {
             // 用户实名认证未人脸认证 放弃后续操作
             return;
         }
-        if(StringUtils.isEmpty(userEntity.getFaceUrl())){
+        if (StringUtils.isEmpty(userEntity.getFaceUrl())) {
             //数据异常，停止房屋相关操作
             throw new ProprietorException("用户已实人认证，人脸图片不存在！");
         }
         // todo 已经不适配小区项目的新代码逻辑了,当这个业务重整的时候,可以适配修改这里的代码
         JSONObject pushMap = new JSONObject();
-        pushMap.put("operator","editPerson");
-        pushMap.put("uid",userEntity.getUid());
-        pushMap.put("faceUrl",userEntity.getFaceUrl());
-        pushMap.put("communityIdSet",communityIds);
-    
-        pushMap.put("sex",userEntity.getSex());
-        pushMap.put("realName",userEntity.getRealName());
-        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER,pushMap);
+        pushMap.put("operator", "editPerson");
+        pushMap.put("uid", userEntity.getUid());
+        pushMap.put("faceUrl", userEntity.getFaceUrl());
+        pushMap.put("communityIdSet", communityIds);
+
+        pushMap.put("sex", userEntity.getSex());
+        pushMap.put("realName", userEntity.getRealName());
+        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, pushMap);
     }
 
 
     /**
      * 根据两个集合的两个属性 对比 差异 并取出 有差异的对象
      * 通过 社区 id 和 房屋id 对比两个集合中的差集
-     * @param source    源集合
-     * @param target    目标集合
-     * @return          返回差异集合
+     *
+     * @param source 源集合
+     * @param target 目标集合
+     * @return 返回差异集合
      */
     private static List<UserHouseQo> differenceSet(List<UserHouseQo> source, List<UserHouseQo> target) {
         List<UserHouseQo> list = new ArrayList<>(8);
-        source.forEach( so ->{
+        source.forEach(so -> {
             AtomicBoolean atomicBoolean = new AtomicBoolean(false);
-            for( UserHouseQo ta : target ){
-                if( Objects.equals( so.getCommunityId(), ta.getCommunityId() ) && Objects.equals( so.getHouseId(), ta.getHouseId() ) ){
+            for (UserHouseQo ta : target) {
+                if (Objects.equals(so.getCommunityId(), ta.getCommunityId()) && Objects.equals(so.getHouseId(), ta.getHouseId())) {
                     atomicBoolean.set(true);
                     break;
                 }
             }
-            if( atomicBoolean.get() == Boolean.FALSE ){
+            if (atomicBoolean.get() == Boolean.FALSE) {
                 list.add(so);
             }
         });
@@ -826,12 +820,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * 根据业主id查询业主信息及业主家属信息
      *
      * @author YuLF
-     * @since  2020/12/10 16:25
+     * @since 2020/12/10 16:25
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
     public UserInfoVo proprietorQuery(String userId, Long houseId) {
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",userId).select("real_name,sex,detail_address,avatar_url"));
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId).select("real_name,sex,detail_address,avatar_url"));
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(userEntity, userInfoVo);
         //业主家属查询
@@ -842,20 +836,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setProprietorHouses(houseVos);
         return userInfoVo;
     }
-    
+
     /**
-    * @Description: 查询用户社区(房屋已认证的)
+     * @Description: 查询用户社区(房屋已认证的)
      * @Param: [uid]
-     * @Return: java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Return: java.util.Collection<java.util.Map < java.lang.String, java.lang.Object>>
      * @Author: chq459799974
      * @Date: 2021/3/31
-    **/
+     **/
     @Override
-    public Collection<Map<String, Object>> queryUserHousesOfCommunity(String uid){
+    public Collection<Map<String, Object>> queryUserHousesOfCommunity(String uid) {
         //查所有房屋已认证的小区
         Set<Long> communityIds = userHouseService.queryUserHousesOfCommunityIds(uid);
-        if(CollectionUtils.isEmpty(communityIds)){
-           return null;
+        if (CollectionUtils.isEmpty(communityIds)) {
+            return null;
         }
         //查小区名称
         Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
@@ -864,13 +858,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Override
     public UserEntity getUser(String tenantUid) {
-        return userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",tenantUid));
+        return userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", tenantUid));
     }
 
     /**
      * @Description: 查询用户社区(家属租客的)
      * @Param: [uid]
-     * @Return: java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Return: java.util.Collection<java.util.Map < java.lang.String, java.lang.Object>>
      * @Author: chq459799974
      * @Date: 2021/3/31
      **/
@@ -878,7 +872,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public Collection<Map<String, Object>> queryRelationHousesOfCommunity(String uid) {
         //查所有房屋已认证的小区
         Set<Long> communityIds = userHouseService.queryRelationHousesOfCommunityIds(uid);
-        if(CollectionUtils.isEmpty(communityIds)){
+        if (CollectionUtils.isEmpty(communityIds)) {
             return null;
         }
         //查小区名称
@@ -894,17 +888,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Date: 2020/12/16
      **/
     @Override
-    public List<HouseEntity> queryUserHouseList(String uid){
+    public List<HouseEntity> queryUserHouseList(String uid) {
 
         //步骤一
         /* t_user_house */
         List<UserHouseEntity> userHouseList = userHouseService.queryUserHouses(uid);
-        if(CollectionUtils.isEmpty(userHouseList)){
+        if (CollectionUtils.isEmpty(userHouseList)) {
             return null;
         }
         HashSet<Long> communityIdSet = new HashSet<>();
         LinkedList<Long> houseIdList = new LinkedList<>();
-        for(UserHouseEntity userHouseEntity : userHouseList){
+        for (UserHouseEntity userHouseEntity : userHouseList) {
             communityIdSet.add(userHouseEntity.getCommunityId());
             houseIdList.add(userHouseEntity.getHouseId());
         }
@@ -915,7 +909,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         /* t_house */
         List<HouseEntity> houses = houseService.queryHouses(houseIdList);
         //组装buildingId
-        for(HouseEntity tempEntity : houses){
+        for (HouseEntity tempEntity : houses) {
             //递归查父节点，组装楼栋级节点id进buildingId
             setBuildingId(tempEntity);
         }
@@ -923,9 +917,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //步骤三
         //查小区名、业主姓名
         /* t_community *//* t_user */
-        Map<String, Map<String,Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
+        Map<String, Map<String, Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
         UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
-        for(HouseEntity userHouseEntity : houses){
+        for (HouseEntity userHouseEntity : houses) {
             Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
             userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));
             userHouseEntity.setOwner(userInfoVo.getRealName());
@@ -933,14 +927,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return houses;
     }
 
-    private HouseEntity setBuildingId(HouseEntity tempEntity){
+    private HouseEntity setBuildingId(HouseEntity tempEntity) {
         Long pid = 0L; //id和pid相同的问题数据导致死循环
         HouseEntity parent = houseService.getParent(tempEntity);
-        if(parent != null && parent.getPid() != null && parent.getPid() != 0 && pid != parent.getPid()){
+        if (parent != null && parent.getPid() != null && parent.getPid() != 0 && pid != parent.getPid()) {
             pid = tempEntity.getPid();
             HouseEntity houseEntity = setBuildingId(parent);
             tempEntity.setBuildingId(houseEntity.getBuildingId());
-        }else{
+        } else {
             tempEntity.setBuildingId(tempEntity.getPid());
         }
         return parent;
@@ -950,9 +944,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * 业主详情查看
      *
      * @param userId 用户ID
+     * @return 返回业主详情信息
      * @Param houseId       房屋ID
      * @author YuLF
-     * @return 返回业主详情信息
      * @since 2020/12/18 11:39
      */
     @Transactional(rollbackFor = Exception.class)
@@ -975,37 +969,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * @Description: 小区业主/家属获取门禁权限
      * @Param: [uid, communityId]
-     * @Return: java.util.Map<java.lang.String,java.lang.String>
+     * @Return: java.util.Map<java.lang.String, java.lang.String>
      * @Author: chq459799974
      * @Date: 2020/12/23
      **/
     @Override
-    public Map<String,String> getAccess(String uid, Long communityId){
+    public Map<String, String> getAccess(String uid, Long communityId) {
         Map<String, String> returnMap = new HashMap<>();
         //获取登录用户手机号
         String mobile = userMapper.queryUserMobileByUid(uid);
         //检查身份
-        if(canGetLongAccess(uid,communityId,mobile)){
+        if (canGetLongAccess(uid, communityId, mobile)) {
             //刷新通用权限并返回最新数据 //TODO 目前是返回一个token 后期根据硬件接口需要修改
             String access = setUserLongAccess(uid);
-            returnMap.put("access",access);
-        }else{
-            returnMap.put("msg","当前用户不是小区业主或家属");
+            returnMap.put("access", access);
+        } else {
+            returnMap.put("msg", "当前用户不是小区业主或家属");
         }
         return returnMap;
     }
 
     //查询身份(是不是小区业主或家属)
-    private boolean canGetLongAccess(String uid, Long communityId, String mobile){
-        if(userHouseService.hasHouse(uid,communityId)
-                || relationService.isHouseMember(mobile,communityId)){
+    private boolean canGetLongAccess(String uid, Long communityId, String mobile) {
+        if (userHouseService.hasHouse(uid, communityId)
+                || relationService.isHouseMember(mobile, communityId)) {
             return true;
         }
         return false;
     }
 
     //设置不过期门禁
-    private String setUserLongAccess(String uid){
+    private String setUserLongAccess(String uid) {
         String token = UUID.randomUUID().toString().replace("-", "");
         VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
         visitorEntryVO.setToken(token);
@@ -1016,23 +1010,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * @Description: 查询用户是否存在
      * @Param: [uid]
-     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
      * @Author: chq459799974
      * @Date: 2021/1/13
      **/
     @Override
-    public Map<String,Object> checkUserAndGetUid(String uid){
+    public Map<String, Object> checkUserAndGetUid(String uid) {
         Map<String, Object> map = new HashMap<>();
-        if(StringUtils.isEmpty(uid)){
-            map.put("exists",false);
+        if (StringUtils.isEmpty(uid)) {
+            map.put("exists", false);
             return map;
         }
         Integer count = userMapper.selectCount(new QueryWrapper<UserEntity>().eq("uid", uid));
-        if(count == 1){
-            map.put("exists",true);
-            map.put("uid",uid);
-        }else{
-            map.put("exists",false);
+        if (count == 1) {
+            map.put("exists", true);
+            map.put("uid", uid);
+        } else {
+            map.put("exists", false);
         }
         return map;
     }
@@ -1045,10 +1039,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @Date: 2021/1/20
      **/
     @Override
-    public UserEntity queryUserDetailByUid(String uid){
-        return userMapper.selectOne(new QueryWrapper<UserEntity>().select("*").eq("uid",uid));
+    public UserEntity queryUserDetailByUid(String uid) {
+        return userMapper.selectOne(new QueryWrapper<UserEntity>().select("*").eq("uid", uid));
     }
-
 
 
     @Override
@@ -1098,18 +1091,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     /**
-    * @Description: 实名认证后修改用户信息
+     * @Description: 实名认证后修改用户信息
      * @Param: [userEntity]
      * @Return: void
      * @Author: chq459799974
      * @Date: 2021/3/2
-    **/
+     **/
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateUserAfterRealnameAuth(UserEntity userEntity){
+    public void updateUserAfterRealnameAuth(UserEntity userEntity) {
         //改本地库
         int result = userMapper.update(userEntity, new UpdateWrapper<UserEntity>().eq("uid", userEntity.getUid()));
-        if(result != 1){
+        if (result != 1) {
             log.error("实名信息修改失败，用户：" + userEntity.getUid());
             throw new ProprietorException(JSYError.INTERNAL);
         }
@@ -1120,45 +1113,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
         signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
         boolean b = signatureService.realNameUpdateUser(signatureUserDTO);
-        if(!b){
+        if (!b) {
             log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
-                throw new ProprietorException(JSYError.INTERNAL);
+            throw new ProprietorException(JSYError.INTERNAL);
         }
     }
 
     /**
-    * @Description: uids批量查询 uid-姓名映射
+     * @Description: uids批量查询 uid-姓名映射
      * @Param: [uids]
-     * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+     * @Return: java.util.Map<java.lang.String, java.util.Map < java.lang.String, java.lang.String>>
      * @Author: chq459799974
      * @Date: 2021/4/23
-    **/
+     **/
     @Override
-    public Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uids){
-        if(CollectionUtils.isEmpty(uids) || (uids.size() == 1 && uids.contains(null))){
+    public Map<String, Map<String, String>> queryNameByUidBatch(Collection<String> uids) {
+        if (CollectionUtils.isEmpty(uids) || (uids.size() == 1 && uids.contains(null))) {
             return new HashMap<>();
         }
         return userMapper.queryNameByUidBatch(uids);
     }
 
 
-
     @Override
     public void deleteCar(String userId, Long id) {
-        carMapper.delete(new QueryWrapper<CarEntity>().eq("uid",userId).eq("id",id));
-        rabbitTemplate.convertAndSend("exchange_car_topics","queue.car.delete",id);
+        carMapper.delete(new QueryWrapper<CarEntity>().eq("uid", userId).eq("id", id));
+        rabbitTemplate.convertAndSend("exchange_car_topics", "queue.car.delete", id);
     }
 
     /**
-    * @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
+     * @Description: 在固定的uid范围内筛选姓名满足模糊匹配条件的uid
      * @Param: [uids, nameLike]
      * @Return: java.util.List<java.lang.String>
      * @Author: chq459799974
      * @Date: 2021/4/23
-    **/
+     **/
     @Override
-    public List<String> queryUidOfNameLike(List<String> uids,String nameLike){
-        return userMapper.queryUidOfNameLike(uids,nameLike);
+    public List<String> queryUidOfNameLike(List<String> uids, String nameLike) {
+        return userMapper.queryUidOfNameLike(uids, nameLike);
     }
 
     /**
@@ -1174,12 +1166,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
-
     @Override
     @Transactional
-    public void saveFace(String userId,String faceUrl) {
+    public void saveFace(String userId, String faceUrl) {
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-        if (userEntity!=null){
+        if (userEntity != null) {
             userEntity.setFaceUrl(faceUrl);
             userMapper.updateById(userEntity);
         }
@@ -1188,7 +1179,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public String getFace(String userId) {
         UserEntity entity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-        if (entity!=null){
+        if (entity != null) {
             return entity.getFaceUrl();
         }
         throw new ProprietorException("当前用户不存在！");
@@ -1209,40 +1200,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public ControlVO control(Long communityId, String uid) {
         ControlVO controlVO = new ControlVO();
-        ControlVO control =null;
+        ControlVO control = null;
         List<UserHouseEntity> list = userHouseService.selectUserHouse(communityId, uid);
-        List<HouseMemberEntity> memberEntities = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("community_id",communityId).eq("uid",uid));
+        List<HouseMemberEntity> memberEntities = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("community_id", communityId).eq("uid", uid));
 
-        if (uid.equals("00000tourist")){
+        if (uid.equals("00000tourist")) {
             controlVO.setAccessLevel(5);
             controlVO.setCommunityId(communityId);
             controlVO.setHouseId(null);
             return controlVO;
         }
 
-        if (list.size()!=0){
+        if (list.size() != 0) {
             UserHouseEntity entity = list.get(0);
             controlVO.setAccessLevel(1);
             controlVO.setCommunityId(entity.getCommunityId());
             controlVO.setHouseId(entity.getHouseId());
-            if (memberEntities!=null){
+            if (memberEntities != null) {
                 for (HouseMemberEntity memberEntity : memberEntities) {
-                    if (memberEntity.getRelation()==1){
-                        control=new ControlVO();
+                    if (memberEntity.getRelation() == 1) {
+                        control = new ControlVO();
                         control.setAccessLevel(1);
                         control.setCommunityId(memberEntity.getCommunityId());
                         control.setHouseId(memberEntity.getHouseId());
                         controlVO.getPermissions().add(control);
                     }
-                    if (memberEntity.getRelation()==6){
-                        control=new ControlVO();
+                    if (memberEntity.getRelation() == 6) {
+                        control = new ControlVO();
                         control.setAccessLevel(2);
                         control.setCommunityId(memberEntity.getCommunityId());
                         control.setHouseId(memberEntity.getHouseId());
                         controlVO.getPermissions().add(control);
                     }
-                    if (memberEntity.getRelation()==7){
-                        control=new ControlVO();
+                    if (memberEntity.getRelation() == 7) {
+                        control = new ControlVO();
                         control.setAccessLevel(3);
                         control.setCommunityId(memberEntity.getCommunityId());
                         control.setHouseId(memberEntity.getHouseId());
@@ -1252,20 +1243,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             }
             return controlVO;
         } else {
-            if (memberEntities.size()!=0){
+            if (memberEntities.size() != 0) {
                 //查询当前角色最高权限
                 for (HouseMemberEntity memberEntity : memberEntities) {
-                    if (memberEntity.getRelation()==6){
+                    if (memberEntity.getRelation() == 6) {
                         controlVO.setAccessLevel(2);
                         controlVO.setCommunityId(memberEntity.getCommunityId());
                         controlVO.setHouseId(memberEntity.getHouseId());
                         for (HouseMemberEntity userHouseEntity : memberEntities) {
-                            control=new ControlVO();
+                            control = new ControlVO();
                             control.setHouseId(userHouseEntity.getHouseId());
                             control.setCommunityId(userHouseEntity.getCommunityId());
-                            if (memberEntity.getRelation().equals(6)){
+                            if (memberEntity.getRelation().equals(6)) {
                                 control.setAccessLevel(2);
-                            }else {
+                            } else {
                                 control.setAccessLevel(3);
                             }
                             controlVO.getPermissions().add(control);
@@ -1274,17 +1265,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                     }
                 }
                 for (HouseMemberEntity memberEntity : memberEntities) {
-                    if (memberEntity.getRelation()==7){
+                    if (memberEntity.getRelation() == 7) {
                         controlVO.setAccessLevel(3);
                         controlVO.setCommunityId(memberEntity.getCommunityId());
                         controlVO.setHouseId(memberEntity.getHouseId());
                         for (HouseMemberEntity userHouseEntity : memberEntities) {
-                            control=new ControlVO();
+                            control = new ControlVO();
                             control.setHouseId(userHouseEntity.getHouseId());
                             control.setCommunityId(userHouseEntity.getCommunityId());
-                            if (memberEntity.getRelation().equals(6)){
+                            if (memberEntity.getRelation().equals(6)) {
                                 control.setAccessLevel(2);
-                            }else {
+                            } else {
                                 control.setAccessLevel(3);
                             }
                             controlVO.getPermissions().add(control);

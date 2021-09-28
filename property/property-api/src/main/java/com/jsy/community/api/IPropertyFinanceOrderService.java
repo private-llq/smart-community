@@ -124,7 +124,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Author: chq459799974
      * @Date: 2021/7/7
      **/
-    void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids);
+    void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids,BigDecimal total);
     
     /**
      * @Description: 查询一条物业账单详情
@@ -369,4 +369,13 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     List<PropertyFinanceOrderEntity> getIds(String ids, Long adminCommunityId);
+
+    /**
+     * @Description: 查询当前订单号所有账单
+     * @author: Hu
+     * @since: 2021/9/27 14:13
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> findOrder(String orderId);
 }

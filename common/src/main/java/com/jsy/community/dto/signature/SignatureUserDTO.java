@@ -12,6 +12,7 @@ import java.io.Serializable;
 @Data
 public class SignatureUserDTO implements Serializable {
 	private String uuid;//用户uid
+	private String imId;//用户聊天的imId
 	private String nickName;//昵称
 	private String telephone;//电话
 	private String email;//邮箱

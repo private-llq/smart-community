@@ -9,6 +9,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -17,10 +18,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
-import com.jsy.community.utils.DateCalculateUtil;
-import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +58,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ProprietorUserService userService;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IUserImService userImService;
 
     @Autowired
     private PropertyFeeRuleMapper propertyFeeRuleMapper;
@@ -679,10 +680,18 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @Date: 2021/7/7
     **/
     @Override
-    public void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids) {
+    public void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids,BigDecimal total) {
         int rows = propertyFinanceOrderMapper.updateOrderBatch(payType,tripartiteOrder,ids);
         if(rows != ids.length){
             log.info("物业账单支付后处理失败，单号：" + tripartiteOrder + " 账单ID：" + Arrays.toString(ids));
+        }
+        PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(ids[0]);
+        UserIMEntity userIMEntity = userImService.selectUid(orderEntity.getUid());
+        if (userIMEntity!=null){
+            Map<Object, Object> map = new HashMap<>();
+            map.put("type",3);
+            map.put("dataId",tripartiteOrder);
+            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),1,total.toString(),null,"物业缴费",map,BusinessEnum.PushInfromEnum.PAYHELPER.getName());
         }
     }
 
@@ -714,7 +723,16 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if(qo.getOrderStatus() != null && (qo.getOrderStatus() == 0 || qo.getOrderStatus() == 1)){
             queryWrapper.eq("order_status",qo.getOrderStatus());
         }
-        return propertyFinanceOrderMapper.selectList(queryWrapper);
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderMapper.selectList(queryWrapper);
+        for (PropertyFinanceOrderEntity orderEntity : list) {
+            if (orderEntity.getAssociatedType()==2){
+                CarPositionEntity entity = carPositionMapper.selectById(orderEntity.getTargetId());
+                if (entity!=null){
+                    orderEntity.setTargetId(entity.getHouseId());
+                }
+            }
+        }
+        return list;
     }
 
     /**
@@ -2052,6 +2070,10 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     }
 
 
+    @Override
+    public List<PropertyFinanceOrderEntity> findOrder(String orderId) {
+        return propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("tripartite_order",orderId));
+    }
 
     /**
      * @Description: 批量查询账单
@@ -2121,11 +2143,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 .eq("status",1)
                 .eq("relevance_type",2)
                 .eq("type",12));
-        if (orderEntity!=null){
-            orderEntity.setFeeRuleId(ruleEntity.getId());
-            orderEntity.setType(ruleEntity.getType());
-        }
 
+        propertyFinanceOrderMapper.insert(orderEntity);
     }
 
     /**

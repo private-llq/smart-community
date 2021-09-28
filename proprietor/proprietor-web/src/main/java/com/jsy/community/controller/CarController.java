@@ -85,7 +85,7 @@ public class CarController {
 
 	@Login
 	@ApiOperation("查询缴费详情")
-	@PostMapping("getOrder")
+	@GetMapping("getOrder")
 	public CommonResult getOrder(@RequestParam Long id) {
 		return CommonResult.ok(carService.getOrder(id));
 	}
