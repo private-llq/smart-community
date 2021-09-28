@@ -20,6 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -82,7 +83,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
             List<String> imId = userIMMapper.selectByUid(total);
             for (String im : imId) {
                 map = new HashMap<>();
-                map.put("type",2);
+                map.put("type",5);
                 map.put("dataId",voteEntity.getId());
                 //推送消息
                 PushInfoUtil.PushPublicTextMsg(
@@ -91,7 +92,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
                         voteEntity.getTheme(),
                         null,
                         "投票时间说明\n" +
-                                voteEntity.getBeginTime()+"——"+voteEntity.getOverTime(),
+                                voteEntity.getBeginTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))+"——"+voteEntity.getOverTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                         map, BusinessEnum.PushInfromEnum.ACTIVITYVOTING.getName());
             }
         }

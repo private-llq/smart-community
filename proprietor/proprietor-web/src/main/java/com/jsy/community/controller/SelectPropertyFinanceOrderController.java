@@ -42,8 +42,8 @@ public class SelectPropertyFinanceOrderController {
     }
     @ApiOperation("查询物业账单（详情）")
     @GetMapping("/findOne")
-    public CommonResult findOne(@RequestParam("id") String id){
-        return CommonResult.ok(selectPropertyFinanceOrderService.findOne(id),"查询成功");
+    public CommonResult findOne(@RequestParam("id") String id,Integer orderStatus){
+        return CommonResult.ok(selectPropertyFinanceOrderService.findOne(id,orderStatus),"查询成功");
     }
 
 }

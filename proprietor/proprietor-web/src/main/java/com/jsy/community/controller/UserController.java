@@ -323,11 +323,7 @@ public class UserController {
     @GetMapping("communityList")
     public CommonResult<Collection<Map<String, Object>>> queryUserHousesOfCommunity(){
         String uid = UserUtils.getUserId();
-        ControlVO vo = UserUtils.getPermissions(uid, redisTemplate);
-        if (!vo.getAccessLevel().equals("1")){
-            return CommonResult.ok(userService.queryRelationHousesOfCommunity(uid));
-        }
-        return CommonResult.ok(userService.queryUserHousesOfCommunity(uid));
+        return CommonResult.ok(userService.queryRelationHousesOfCommunity(uid));
     }
     
     /**

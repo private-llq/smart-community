@@ -198,7 +198,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getHomeOwnerUid());
         UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
         HashMap<Object, Object> map = new HashMap<>();
-        map.put("type",1);
+        map.put("type",6);
         map.put("dataId",null);
         PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
                 "合同签约",

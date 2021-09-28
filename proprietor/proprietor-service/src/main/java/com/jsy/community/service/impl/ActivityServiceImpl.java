@@ -20,6 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,7 +101,10 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
         activityUserEntity.setId(SnowFlake.nextId());
         ActivityEntity entity = activityMapper.selectById(activityUserEntity.getActivityId());
         if (LocalDateTime.now().isBefore(entity.getBeginApplyTime())){
-            throw new ProprietorException("当前活动还未到报名时间");
+            throw new ProprietorException("当前活动还未到报名时间！");
+        }
+        if (LocalDateTime.now().isAfter(entity.getOverApplyTime())){
+            throw new ProprietorException("当前活动已结束报名！");
         }
 
         ActivityUserEntity one = activityUserMapper.selectOne(new QueryWrapper<ActivityUserEntity>().eq("uid", activityUserEntity.getUid()).eq("activity_id", activityUserEntity.getActivityId()));
@@ -116,7 +120,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
         }
         UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", activityUserEntity.getUid()));
         Map<Object, Object> map = new HashMap<>();
-        map.put("type",1);
+        map.put("type",4);
         map.put("dataId",entity.getId());
         //推送消息
         PushInfoUtil.PushPublicTextMsg(
@@ -125,7 +129,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
                 entity.getTheme(),
                 null,
                 "活动报名成功\n" +
-                        entity.getBeginActivityTime()+"——"+entity.getOverActivityTime(),map, BusinessEnum.PushInfromEnum.ACTIVITYVOTING.getName());
+                        entity.getBeginActivityTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))+"——"+entity.getOverActivityTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),map, BusinessEnum.PushInfromEnum.ACTIVITYVOTING.getName());
 
     }
 
