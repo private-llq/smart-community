@@ -8,11 +8,13 @@ import com.jsy.community.api.ICarChargeService;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.mapper.CarCutOffMapper;
+import com.jsy.community.mapper.CarOrderMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
 import com.jsy.community.qo.property.orderChargeDto;
@@ -29,9 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @DubboService(version = Const.version, group = Const.group_property)
 public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarChargeEntity> implements ICarChargeService {
@@ -41,6 +46,9 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
     @Autowired
     public CarCutOffMapper carCutOffMapper;
+
+    @Autowired
+    public CarOrderMapper carOrderMapper;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
@@ -434,13 +442,31 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      */
     @Override
     public orderChargeDto orderCharge(Long adminCommunityId, String carNumber) {
+
+        orderChargeDto orderChargeDto = new orderChargeDto();
+        /**
+         * 查询该车辆进闸时生成的订单
+         */
+        List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>().eq("type", 1).eq("order_status", 0).eq("community_id", adminCommunityId));
+
+        if (list.size()!=0){
+
+        }
+
+        List<CarOrderEntity> carOrderEntityList = list.stream().sorted(Comparator.comparing(x -> {
+            return x.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        })).collect(Collectors.toList());
+
+        CarOrderEntity carOrderEntity = carOrderEntityList.get(carOrderEntityList.size() - 1);
+        LocalDateTime openTime = carOrderEntity.getBeginTime();//进闸时间
+        String orderNum = carOrderEntity.getOrderNum();//订单号
+
         /**
          * 查询开闸记录
          */
         CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("car_number", carNumber).eq("community_id", adminCommunityId).isNull("stop_time"));
 
         if (carCutOffEntity!=null) {
-            LocalDateTime openTime = carCutOffEntity.getOpenTime();//进闸时间
             LocalDateTime now = LocalDateTime.now();//当前时间作为出闸时间
             String plateColor = carCutOffEntity.getPlateColor();//车牌颜色
             CarChargeQO carChargeQO = new CarChargeQO();
@@ -479,9 +505,10 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             CommunityEntity communityNameById = communityService.getCommunityNameById(adminCommunityId);
             String name = communityNameById.getName();
 
-            orderChargeDto orderChargeDto = new orderChargeDto();
-            orderChargeDto.setCommunityName(name);
-            orderChargeDto.setCarNumber(carNumber);
+
+            orderChargeDto.setOrderNum(orderNum);//订单编号
+            orderChargeDto.setCommunityName(name);//社区名称
+            orderChargeDto.setCarNumber(carNumber);//车牌号
             orderChargeDto.setChargePrice(carChargeEntity.getChargePrice());//收费标准
             orderChargeDto.setInTime(openTime);//进闸时间
             orderChargeDto.setTime(time);//停车时长

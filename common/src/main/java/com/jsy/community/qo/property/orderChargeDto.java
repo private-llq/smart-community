@@ -35,4 +35,9 @@ public class orderChargeDto implements Serializable {
      * 应缴金额
      */
     private BigDecimal money;
+
+    /**
+     * 订单编号
+     */
+    private String orderNum;
 }
