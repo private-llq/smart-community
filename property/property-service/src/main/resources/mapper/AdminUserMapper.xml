@@ -101,7 +101,7 @@
 				or au.mobile like concat("%", #{qo.name}, "%"))
 			</if>
 			<if test="qo.roleId != null">
-				aur.role_id = #{qo.roleId}
+				and aur.role_id = #{qo.roleId}
 			</if>
 		</where>
 		order by au.create_time
@@ -127,7 +127,7 @@
 				or au.mobile like concat("%", #{qo.name}, "%"))
 			</if>
 			<if test="qo.roleId != null">
-				aur.role_id = #{qo.roleId}
+				and aur.role_id = #{qo.roleId}
 			</if>
 		</where>) as a
 	</select>
