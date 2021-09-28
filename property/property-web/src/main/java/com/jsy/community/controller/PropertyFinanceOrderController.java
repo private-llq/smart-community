@@ -21,6 +21,7 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FinanceImportErrorVO;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
+import com.jsy.community.vo.property.TemplateAndFinanceOrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FilenameUtils;
@@ -60,16 +61,16 @@ import java.util.*;
 public class PropertyFinanceOrderController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;
-    
+
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseService houseService;
-    
+
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IProprietorService proprietorService;
-    
+
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionService carPositionService;
-    
+
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFeeRuleService propertyFeeRuleService;
 
@@ -79,108 +80,119 @@ public class PropertyFinanceOrderController {
     @ApiOperation("查询房屋所有未缴账单")
     @PostMapping("/list")
     @Login
-    public CommonResult list(@RequestBody BaseQO<FinanceOrderQO> baseQO){
+    public CommonResult list(@RequestBody BaseQO<FinanceOrderQO> baseQO) {
         FinanceOrderQO query = baseQO.getQuery();
         query.setCommunityId(UserUtils.getAdminCommunityId());
         baseQO.setQuery(query);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        Map<String, Object> map=propertyFinanceOrderService.findList(userInfo,baseQO);
+        Map<String, Object> map = propertyFinanceOrderService.findList(userInfo, baseQO);
         return CommonResult.ok(map);
     }
+
     @ApiOperation("根据id查询账单")
     @PostMapping("/getIds")
     @Login
-    public CommonResult getIds(@RequestParam String ids){
-        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.getIds(ids,UserUtils.getAdminCommunityId());
+    public CommonResult getIds(@RequestParam String ids) {
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.getIds(ids, UserUtils.getAdminCommunityId());
         return CommonResult.ok(list);
     }
+
     @ApiOperation("查询当前小区所有车位")
     @GetMapping("/carList")
     @Login
-    public CommonResult carList(){
+    public CommonResult carList() {
         List<CarPositionEntity> list = propertyFinanceOrderService.carList(UserUtils.getAdminCommunityId());
         return CommonResult.ok(list);
     }
+
     @ApiOperation("修改订单优惠金额")
     @PutMapping("/updateOrder")
     @Login
-    @businessLog(operation = "编辑",content = "更新了【订单优惠金额】")
-    public CommonResult updateOrder(@RequestParam("id") Long id, @RequestParam("coupon")BigDecimal coupon){
+    @businessLog(operation = "编辑", content = "更新了【订单优惠金额】")
+    public CommonResult updateOrder(@RequestParam("id") Long id, @RequestParam("coupon") BigDecimal coupon) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        propertyFinanceOrderService.updateOrder(id,coupon);
+        propertyFinanceOrderService.updateOrder(id, coupon);
         return CommonResult.ok();
     }
+
     @ApiOperation("删除一条账单")
     @DeleteMapping("/delete")
     @Login
-    @businessLog(operation = "删除",content = "删除了【一条物业房间账单】")
-    public CommonResult delete(@RequestParam("id") Long id){
+    @businessLog(operation = "删除", content = "删除了【一条物业房间账单】")
+    public CommonResult delete(@RequestParam("id") Long id) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.delete(id);
         return CommonResult.ok();
     }
+
     @ApiOperation("删除多条账单")
     @DeleteMapping("/deleteIds")
     @Login
-    @businessLog(operation = "删除",content = "删除了【多条物业房间账单】")
-    public CommonResult deleteIds(@RequestParam("ids") String ids){
+    @businessLog(operation = "删除", content = "删除了【多条物业房间账单】")
+    public CommonResult deleteIds(@RequestParam("ids") String ids) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.deleteIds(ids);
         return CommonResult.ok();
     }
+
     @ApiOperation("查询当前小区缴费项目")
     @GetMapping("/getFeeList")
     @Login
-    @businessLog(operation = "查询",content = "查询了【物业缴费项目】")
-    public CommonResult getFeeList(){
+    @businessLog(operation = "查询", content = "查询了【物业缴费项目】")
+    public CommonResult getFeeList() {
         List<PropertyFeeRuleEntity> list = propertyFinanceOrderService.getFeeList(UserUtils.getAdminCommunityId());
         return CommonResult.ok(list);
     }
+
     @ApiOperation("条件删除多条账单")
     @DeleteMapping("/deletes")
     @Login
-    @businessLog(operation = "删除",content = "删除了【多条物业房间账单】")
-    public CommonResult deletes(@RequestBody FinanceOrderOperationQO financeOrderOperationQO){
+    @businessLog(operation = "删除", content = "删除了【多条物业房间账单】")
+    public CommonResult deletes(@RequestBody FinanceOrderOperationQO financeOrderOperationQO) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.deletes(financeOrderOperationQO);
         return CommonResult.ok();
     }
+
     @ApiOperation("修改一条订单状态")
     @PutMapping("/update")
     @Login
-    @businessLog(operation = "编辑",content = "更新了【一条物业房间账单状态】")
-    public CommonResult update(@RequestParam("id") Long id){
+    @businessLog(operation = "编辑", content = "更新了【一条物业房间账单状态】")
+    public CommonResult update(@RequestParam("id") Long id) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.update(id);
         return CommonResult.ok();
     }
+
     @ApiOperation("修改多条物业账单状态")
     @PutMapping("/updateStatusIds")
     @Login
-    @businessLog(operation = "编辑",content = "更新了【多条条物业房间账单状态】")
-    public CommonResult updateStatusIds(@RequestParam("ids") String ids,Integer hide){
+    @businessLog(operation = "编辑", content = "更新了【多条条物业房间账单状态】")
+    public CommonResult updateStatusIds(@RequestParam("ids") String ids, Integer hide) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        propertyFinanceOrderService.updateStatusIds(ids,hide);
+        propertyFinanceOrderService.updateStatusIds(ids, hide);
         return CommonResult.ok();
     }
+
     @ApiOperation("条件修改物业订单状态")
     @PutMapping("/updates")
     @Login
-    @businessLog(operation = "编辑",content = "更新了【多条物业房间账单状态】")
-    public CommonResult updates(@RequestBody FinanceOrderOperationQO financeOrderOperationQO){
+    @businessLog(operation = "编辑", content = "更新了【多条物业房间账单状态】")
+    public CommonResult updates(@RequestBody FinanceOrderOperationQO financeOrderOperationQO) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFinanceOrderService.updates(financeOrderOperationQO);
         return CommonResult.ok();
     }
+
     @ApiOperation("查询一条已交账单详情")
     @GetMapping("/getOrderNum")
     @Login
-    public CommonResult getOrderNum(@RequestParam("id") Long id){
+    public CommonResult getOrderNum(@RequestParam("id") Long id) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
-        PropertyFinanceOrderVO propertyFinanceOrderVO=propertyFinanceOrderService.getOrderNum(userInfo,id);
+        PropertyFinanceOrderVO propertyFinanceOrderVO = propertyFinanceOrderService.getOrderNum(userInfo, id);
         return CommonResult.ok(propertyFinanceOrderVO);
     }
-    
+
     /**
      * @Description: 分页查询已缴费 (缴费模块)
      * @Param: [baseQO]
@@ -190,37 +202,37 @@ public class PropertyFinanceOrderController {
      **/
     @ApiOperation("分页查询已缴费")
     @PostMapping("paid")
-    public CommonResult queryPaid(@RequestBody BaseQO<PropertyFinanceOrderEntity> baseQO){
-        if(baseQO.getQuery() == null){
+    public CommonResult queryPaid(@RequestBody BaseQO<PropertyFinanceOrderEntity> baseQO) {
+        if (baseQO.getQuery() == null) {
             baseQO.setQuery(new PropertyFinanceOrderEntity());
         }
         baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
-        return CommonResult.ok(propertyFinanceOrderService.queryPaid(baseQO),"查询成功");
+        return CommonResult.ok(propertyFinanceOrderService.queryPaid(baseQO), "查询成功");
     }
-    
+
     /**
-    * @Description: 分页查询 (财务模块)
+     * @Description: 分页查询 (财务模块)
      * @Param: [baseQO]
      * @Return: com.jsy.community.vo.CommonResult
      * @Author: chq459799974
      * @Date: 2021/4/23
-    **/
+     **/
     @ApiOperation("分页查询")
     @PostMapping("page")
-    public CommonResult queryUnionPage(@RequestBody BaseQO<PropertyFinanceOrderEntity> baseQO){
-        if(baseQO.getQuery() == null){
+    public CommonResult queryUnionPage(@RequestBody BaseQO<PropertyFinanceOrderEntity> baseQO) {
+        if (baseQO.getQuery() == null) {
             baseQO.setQuery(new PropertyFinanceOrderEntity());
         }
         baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
-        return CommonResult.ok(propertyFinanceOrderService.queryPage(baseQO),"查询成功");
+        return CommonResult.ok(propertyFinanceOrderService.queryPage(baseQO), "查询成功");
     }
 
     /**
-     *@Author: Pipi
-     *@Description: 分页获取结算单的账单列表
-     *@Param: baseQO:
-     *@Return: com.jsy.community.vo.CommonResult
-     *@Date: 2021/4/24 11:42
+     * @Author: Pipi
+     * @Description: 分页获取结算单的账单列表
+     * @Param: baseQO:
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Date: 2021/4/24 11:42
      **/
     @Login
     @ApiOperation("分页获取结算单的账单列表")
@@ -231,15 +243,15 @@ public class PropertyFinanceOrderController {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
         ValidatorUtils.validateEntity(baseQO.getQuery());
-        return CommonResult.ok(propertyFinanceOrderService.queryPageByStatemenNum(baseQO),"查询成功");
+        return CommonResult.ok(propertyFinanceOrderService.queryPageByStatemenNum(baseQO), "查询成功");
     }
 
     /**
-     *@Author: Pipi
-     *@Description: 物业财务-导出账单
-     *@Param: :
-     *@Return: org.springframework.http.ResponseEntity<byte[]>
-     *@Date: 2021/4/25 15:49
+     * @Author: Pipi
+     * @Description: 物业财务-导出账单
+     * @Param: :
+     * @Return: org.springframework.http.ResponseEntity<byte [ ]>
+     * @Date: 2021/4/25 15:49
      **/
     @Login
     @ApiOperation("物业财务-导出账单")
@@ -263,13 +275,13 @@ public class PropertyFinanceOrderController {
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 获取财务报表-小区收入
-     *@Param:
-     *@Return: com.jsy.community.vo.CommonResult
-     *@Date: 2021/8/17 16:00
+     * @Author: DKS
+     * @Description: 获取财务报表-小区收入
+     * @Param:
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Date: 2021/8/17 16:00
      **/
     @Login
     @ApiOperation("获取财务报表-小区收入")
@@ -297,15 +309,15 @@ public class PropertyFinanceOrderController {
 //            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 //        }
 //        propertyFinanceFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityIncome(propertyFinanceFormEntity, communityIdList),"查询成功");
+        return CommonResult.ok(propertyFinanceOrderService.getFinanceFormCommunityIncome(propertyFinanceFormEntity, communityIdList), "查询成功");
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 获取财务报表-小区收费报表
-     *@Param:
-     *@Return: com.jsy.community.vo.CommonResult
-     *@Date: 2021/8/18 11:08
+     * @Author: DKS
+     * @Description: 获取财务报表-小区收费报表
+     * @Param:
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Date: 2021/8/18 11:08
      **/
     @Login
     @ApiOperation("获取财务报表-小区收费报表")
@@ -324,10 +336,10 @@ public class PropertyFinanceOrderController {
         }
         ValidatorUtils.validateEntity(propertyFinanceFormChargeEntity);
         if (propertyFinanceFormChargeEntity.getType() == null) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "缺少查询类型");
         }
 //        propertyFinanceFormChargeEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        
+
         List<PropertyFinanceFormChargeEntity> propertyFinanceFormChargeEntityList = null;
         switch (propertyFinanceFormChargeEntity.getType()) {
             case 1:
@@ -342,17 +354,17 @@ public class PropertyFinanceOrderController {
                 break;
         }
         if (propertyFinanceFormChargeEntityList == null) {
-            throw new JSYException(JSYError.NOT_FOUND.getCode(),"查询为空");
+            throw new JSYException(JSYError.NOT_FOUND.getCode(), "查询为空");
         }
-        return CommonResult.ok(propertyFinanceFormChargeEntityList,"查询成功");
+        return CommonResult.ok(propertyFinanceFormChargeEntityList, "查询成功");
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 获取收款报表-收款报表
-     *@Param:
-     *@Return: com.jsy.community.vo.CommonResult
-     *@Date: 2021/8/19 9:31
+     * @Author: DKS
+     * @Description: 获取收款报表-收款报表
+     * @Param:
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Date: 2021/8/19 9:31
      **/
     @Login
     @ApiOperation("获取收款报表-收款报表")
@@ -388,15 +400,15 @@ public class PropertyFinanceOrderController {
 //            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
 //        }
 //        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
-        return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity, communityIdList),"查询成功");
+        return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity, communityIdList), "查询成功");
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 获取收款报表-账单统计
-     *@Param:
-     *@Return: com.jsy.community.vo.CommonResult
-     *@Date: 2021/8/19 11:24
+     * @Author: DKS
+     * @Description: 获取收款报表-账单统计
+     * @Param:
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Date: 2021/8/19 11:24
      **/
     @Login
     @ApiOperation("获取收款报表-账单统计")
@@ -420,10 +432,10 @@ public class PropertyFinanceOrderController {
         }
         ValidatorUtils.validateEntity(propertyCollectionFormEntity);
         if (propertyCollectionFormEntity.getType() == null) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "缺少查询类型");
         }
 //        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
-    
+
         List<PropertyCollectionFormEntity> propertyCollectionFormEntities = new ArrayList<>();
         PropertyCollectionFormEntity propertyCollectionFormEntityList = null;
         switch (propertyCollectionFormEntity.getType()) {
@@ -439,15 +451,15 @@ public class PropertyFinanceOrderController {
                 break;
         }
         propertyCollectionFormEntities.add(propertyCollectionFormEntityList);
-        return CommonResult.ok(propertyCollectionFormEntities,"查询成功");
+        return CommonResult.ok(propertyCollectionFormEntities, "查询成功");
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 导出财务报表-小区收入
-     *@Param: :
-     *@Return: org.springframework.http.ResponseEntity<byte[]>
-     *@Date: 2021/8/19 15:49
+     * @Author: DKS
+     * @Description: 导出财务报表-小区收入
+     * @Param: :
+     * @Return: org.springframework.http.ResponseEntity<byte [ ]>
+     * @Date: 2021/8/19 15:49
      **/
     @Login
     @ApiOperation("导出财务报表-小区收入")
@@ -472,13 +484,13 @@ public class PropertyFinanceOrderController {
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 导出财务报表-小区收费报表
-     *@Param: :
-     *@Return: org.springframework.http.ResponseEntity<byte[]>
-     *@Date: 2021/8/19 16:09
+     * @Author: DKS
+     * @Description: 导出财务报表-小区收费报表
+     * @Param: :
+     * @Return: org.springframework.http.ResponseEntity<byte [ ]>
+     * @Date: 2021/8/19 16:09
      **/
     @Login
     @ApiOperation("导出财务报表-小区收费报表")
@@ -505,11 +517,11 @@ public class PropertyFinanceOrderController {
     }
 
     /**
-     *@Author: DKS
-     *@Description: 导出收款报表-收款报表
-     *@Param: :
-     *@Return: org.springframework.http.ResponseEntity<byte[]>
-     *@Date: 2021/8/19 16:11
+     * @Author: DKS
+     * @Description: 导出收款报表-收款报表
+     * @Param: :
+     * @Return: org.springframework.http.ResponseEntity<byte [ ]>
+     * @Date: 2021/8/19 16:11
      **/
     @Login
     @ApiOperation("导出收款报表-收款报表")
@@ -536,11 +548,11 @@ public class PropertyFinanceOrderController {
     }
 
     /**
-     *@Author: DKS
-     *@Description: 导出收款报表-账单统计
-     *@Param: :
-     *@Return: org.springframework.http.ResponseEntity<byte[]>
-     *@Date: 2021/8/19 15:49
+     * @Author: DKS
+     * @Description: 导出收款报表-账单统计
+     * @Param: :
+     * @Return: org.springframework.http.ResponseEntity<byte [ ]>
+     * @Date: 2021/8/19 15:49
      **/
     @Login
     @ApiOperation("导出收款报表-账单统计")
@@ -564,7 +576,7 @@ public class PropertyFinanceOrderController {
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
     }
-    
+
     /**
      * @Description: 新增物业账单临时收费
      * @Param: [propertyFinanceOrderEntity]
@@ -575,20 +587,20 @@ public class PropertyFinanceOrderController {
     @Login
     @ApiOperation("新增物业账单临时收费")
     @PostMapping("/temporary/charges")
-    @businessLog(operation = "新增",content = "新增了【物业账单临时收费】")
+    @businessLog(operation = "新增", content = "新增了【物业账单临时收费】")
     @PropertyFinanceLog(operation = "创建了一个临时账单")
-    public CommonResult addTemporaryCharges(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity){
-        if(propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleName() == null
-            || propertyFinanceOrderEntity.getPropertyFee() == null || propertyFinanceOrderEntity.getBeginTime() == null || propertyFinanceOrderEntity.getOverTime() == null){
-            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
+    public CommonResult addTemporaryCharges(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity) {
+        if (propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleName() == null
+                || propertyFinanceOrderEntity.getPropertyFee() == null || propertyFinanceOrderEntity.getBeginTime() == null || propertyFinanceOrderEntity.getOverTime() == null) {
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "缺少类型参数");
         }
         ValidatorUtils.validateEntity(propertyFinanceOrderEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
         propertyFinanceOrderEntity.setCommunityId(loginUser.getCommunityId());
         return propertyFinanceOrderService.addTemporaryCharges(propertyFinanceOrderEntity)
-            ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增物业账单临时收费失败");
+                ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "新增物业账单临时收费失败");
     }
-    
+
     /**
      * @Description: 收款并更改状态
      * @Param: [propertyFinanceOrderEntity]
@@ -599,19 +611,19 @@ public class PropertyFinanceOrderController {
     @Login
     @ApiOperation("收款并更改状态")
     @PostMapping("/collection")
-    public CommonResult collection(@RequestParam(value = "ids")List<Long> ids, @RequestParam(value = "payType")Integer payType) {
-        if(ids == null || ids.size() <= 0 || payType == null){
-            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"缺少参数");
+    public CommonResult collection(@RequestParam(value = "ids") List<Long> ids, @RequestParam(value = "payType") Integer payType) {
+        if (ids == null || ids.size() <= 0 || payType == null) {
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "缺少参数");
         }
         Long communityId = UserUtils.getAdminCommunityId();
         return propertyFinanceOrderService.collection(ids, communityId, payType)
-            ? CommonResult.ok("收款成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"收款失败");
+                ? CommonResult.ok("收款成功") : CommonResult.error(JSYError.INTERNAL.getCode(), "收款失败");
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 下载历史账单导入模板
-     *@Date: 2021/9/7 9:30
+     * @Author: DKS
+     * @Description: 下载历史账单导入模板
+     * @Date: 2021/9/7 9:30
      **/
     @Login
     @ApiOperation("下载历史账单导入模板")
@@ -632,18 +644,18 @@ public class PropertyFinanceOrderController {
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 导入账单信息
-     *@Param: excel:
-     *@Return: com.jsy.community.vo.CommonResult
-     *@Date: 2021/9/7 11:25
+     * @Author: DKS
+     * @Description: 导入账单信息
+     * @Param: excel:
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Date: 2021/9/7 11:25
      **/
     @Login
     @ApiOperation("导入账单信息")
     @PostMapping("/importFinanceExcel")
-    public CommonResult importFinanceExcel(MultipartFile excel, @RequestParam("orderStatus")Integer orderStatus) {
+    public CommonResult importFinanceExcel(MultipartFile excel, @RequestParam("orderStatus") Integer orderStatus) {
         //参数验证
         validFileSuffix(excel);
         Long adminCommunityId = UserUtils.getAdminCommunityId();
@@ -734,17 +746,18 @@ public class PropertyFinanceOrderController {
         //excel导入失败的信息明细 文件下载地址
         String errorExcelAddr = null;
         //错误excel写入远程服务器 让物业人员可以直接下载
-        if( CollectionUtil.isNotEmpty(errorVos) ){
+        if (CollectionUtil.isNotEmpty(errorVos)) {
             errorExcelAddr = uploadFinanceOrderErrorExcel(errorVos);
         }
-        
+
         //构造返回对象
         return CommonResult.ok(new FinanceImportErrorVO(row, errorVos.size(), errorExcelAddr));
     }
-    
+
     /**
      * excel 文件上传上来后 验证方法
-     * @param file        excel文件
+     *
+     * @param file excel文件
      */
     private void validFileSuffix(MultipartFile file) {
         //参数非空验证
@@ -757,13 +770,13 @@ public class PropertyFinanceOrderController {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "只支持excel文件!");
         }
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 写入充值余额导入错误信息 和 把错误信息excel文件上传至文件服务器
-     *@Param: errorVos:
-     *@Return: java.lang.String:  返回excel文件下载地址
-     *@Date: 2021/9/7 16:07
+     * @Author: DKS
+     * @Description: 写入充值余额导入错误信息 和 把错误信息excel文件上传至文件服务器
+     * @Param: errorVos:
+     * @Return: java.lang.String:  返回excel文件下载地址
+     * @Date: 2021/9/7 16:07
      **/
     public String uploadFinanceOrderErrorExcel(List<FinanceImportErrorVO> errorVos) {
         Workbook workbook = financeExcel.exportFinanceOrderErrorExcel(errorVos);
@@ -776,13 +789,13 @@ public class PropertyFinanceOrderController {
         }
         return null;
     }
-    
+
     /**
-     *@Author: DKS
-     *@Description: 导出账单信息
-     *@Param: excel:
-     *@Return: com.jsy.community.vo.CommonResult
-     *@Date: 2021/9/8 10:30
+     * @Author: DKS
+     * @Description: 导出账单信息
+     * @Param: excel:
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Date: 2021/9/8 10:30
      **/
     @Login
     @ApiOperation("导出账单信息")
@@ -805,5 +818,13 @@ public class PropertyFinanceOrderController {
             e.printStackTrace();
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
+    }
+
+    @ApiOperation("根据账单id和模板id查询账单和模板的数据")
+    @GetMapping("/queryTemplateAndFinanceOrder")
+    public CommonResult<TemplateAndFinanceOrderVO> queryTemplateAndFinanceOrder(@RequestParam("id") Long id,
+                                                                                @RequestParam("templateId") String templateId) {
+        TemplateAndFinanceOrderVO result = propertyFinanceOrderService.queryTemplateAndFinanceOrder(id, templateId);
+        return CommonResult.ok(result);
     }
 }
