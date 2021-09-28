@@ -49,6 +49,9 @@ public class CarOrderEntity extends BaseEntity {
      */
     @ExcelIgnore
     private Integer type;
+    /*车牌颜色*/
+    @ExcelIgnore
+    private String plateColor;
     /**
      *  1临时收费，2月租收费
      */

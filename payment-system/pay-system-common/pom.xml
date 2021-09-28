@@ -82,6 +82,10 @@
             <artifactId>xk-time</artifactId>
             <version>2.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+        </dependency>
         <!-- 银联支付相关结束 -->
     </dependencies>
 </project>
