@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.AdminUserRoleMapper">
+    <!-- 查询用户角色列表 -->
+    <select id="queryByUids" resultType="com.jsy.community.entity.admin.AdminUserRoleEntity">
+        select
+            ur.*,
+            ar.name as roleName
+        from t_admin_user_role ur
+        left join t_admin_role ar on ar.id = ur.role_id
+        <where>
+            ur.uid in
+            <foreach collection="uidSet" open="(" close=")" separator="," item="uid">
+                #{uid}
+            </foreach>
+            and ar.company_id = #{companyId}
+        </where>
+    </select>
+</mapper>

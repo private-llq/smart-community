@@ -10,6 +10,7 @@ import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
+import com.jsy.community.vo.property.TemplateAndFinanceOrderVO;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -124,7 +125,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Author: chq459799974
      * @Date: 2021/7/7
      **/
-    void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids);
+    void updateOrderStatusBatch(Integer payType, String tripartiteOrder , String[] ids,BigDecimal total);
     
     /**
      * @Description: 查询一条物业账单详情
@@ -369,4 +370,21 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @return:
      */
     List<PropertyFinanceOrderEntity> getIds(String ids, Long adminCommunityId);
+
+    /**
+     * @Description: 查询当前订单号所有账单
+     * @author: Hu
+     * @since: 2021/9/27 14:13
+     * @Param:
+     * @return:
+     */
+    List<PropertyFinanceOrderEntity> findOrder(String orderId);
+
+    /**
+     * 根据账单ID和模板ID返回相应的数据
+     * @param id 账单ID
+     * @param tid 模板ID
+     * @return TemplateAndFinanceOrderVO
+     */
+    TemplateAndFinanceOrderVO queryTemplateAndFinanceOrder(Long id, String tid);
 }

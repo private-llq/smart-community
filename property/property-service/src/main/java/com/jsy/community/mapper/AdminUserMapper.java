@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.qo.admin.AdminUserQO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.Collection;
@@ -205,4 +206,26 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @Date: 2021/8/23 14:16
 	 **/
 	List<String> queryUidListByRealName(@Param("userName")String userName);
+
+	/**
+	 * @author: Pipi
+	 * @description: 操作员条件查询
+	 * @param adminUserQO: 查询条件
+     * @param startSize: 分页起点
+     * @param size: 每页数量
+	 * @return: java.util.List<com.jsy.community.entity.admin.AdminUserEntity>
+	 * @date: 2021/9/28 10:21
+	 **/
+	List<AdminUserEntity> queryPageUserEntity(@Param("qo") AdminUserQO adminUserQO,
+											  @Param("startSize") Long startSize,
+											  @Param("size") Long size);
+
+	/**
+	 * @author: Pipi
+	 * @description: 操作员条件查询数量
+	 * @param adminUserQO:
+	 * @return: java.lang.Integer
+	 * @date: 2021/9/28 11:41
+	 **/
+	Integer countPageUserEntity(@Param("qo") AdminUserQO adminUserQO);
 }

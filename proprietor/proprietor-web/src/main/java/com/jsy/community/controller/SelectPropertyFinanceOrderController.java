@@ -42,7 +42,7 @@ public class SelectPropertyFinanceOrderController {
     }
     @ApiOperation("查询物业账单（详情）")
     @GetMapping("/findOne")
-    public CommonResult findOne(@RequestParam("id") Long id){
+    public CommonResult findOne(@RequestParam("id") String id){
         return CommonResult.ok(selectPropertyFinanceOrderService.findOne(id),"查询成功");
     }
 

@@ -1,4 +1,6 @@
 package com.jsy.community.service.impl;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
@@ -11,13 +13,14 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.consts.PropertyConstsEnum;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminUserAuthMapper;
 import com.jsy.community.mapper.AdminUserMapper;
+import com.jsy.community.mapper.AdminUserRoleMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
@@ -42,6 +45,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
@@ -74,6 +78,9 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	
 	@Autowired
 	private UserUtils userUtils;
+
+	@Autowired
+	private AdminUserRoleMapper adminUserRoleMapper;
 	
 	@Value("${propertyLoginExpireHour}")
 	private long loginExpireHour = 12;
@@ -458,9 +465,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	public PageInfo queryOperator(BaseQO<AdminUserQO> baseQO){
 		AdminUserQO query = baseQO.getQuery();
+		/*AdminUserQO query = baseQO.getQuery();
 		Page<AdminUserEntity> page = new Page();
 		MyPageUtils.setPageAndSize(page,baseQO);
-		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,real_name,mobile,create_time");
+		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,uid,real_name,mobile,create_time");
 		//是否查详情
 		Integer menuCount = null;
 		if(query.getId() != null){
@@ -478,11 +486,35 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		}
 		queryWrapper.orderByDesc("create_time");
 		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
+
 		if(CollectionUtils.isEmpty(pageData.getRecords())){
 			return new PageInfo<>();
 		}
+		Set<String> uidSet = pageData.getRecords().stream().map(adminUserEntity -> adminUserEntity.getUid()).collect(Collectors.toSet());
+		List<AdminUserRoleEntity> userRoleEntities = adminUserRoleMapper.queryByUids(uidSet, query.getCompanyId());
+		if (!CollectionUtils.isEmpty(userRoleEntities)) {
+			for (AdminUserEntity record : pageData.getRecords()) {
+				for (AdminUserRoleEntity userRoleEntity : userRoleEntities) {
+					if (record.getUid().equals(userRoleEntity.getUid())) {
+						record.setRoleId(userRoleEntity.getRoleId());
+						record.setRoleName(userRoleEntity.getRoleName());
+						break;
+					}
+				}
+			}
+		}*/
+		List<AdminUserEntity> adminUserEntities = adminUserMapper.queryPageUserEntity(query, (baseQO.getPage() - 1) * baseQO.getSize(), baseQO.getSize());
+		Integer integer = adminUserMapper.countPageUserEntity(query);
+		if (integer == null) {
+			integer = 0;
+		}
 		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(pageData,pageInfo);
+		pageInfo.setRecords(adminUserEntities);
+		pageInfo.setTotal(integer);
+		pageInfo.setSize(baseQO.getSize());
+		pageInfo.setCurrent(baseQO.getPage());
+
+//		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
 	}
 	
@@ -508,6 +540,11 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserEntity.setSalt(salt);
 		adminUserMapper.addOperator(adminUserEntity);
 		// TODO 变为添加角色
+		AdminUserRoleEntity adminUserRoleEntity = new AdminUserRoleEntity();
+		adminUserRoleEntity.setUid(uid);
+		adminUserRoleEntity.setRoleId(adminUserEntity.getRoleId());
+		adminUserRoleEntity.setCreateTime(LocalDateTime.now());
+		adminUserRoleMapper.insert(adminUserRoleEntity);
 //		//t_admin_user_menu添加菜单权限
 //		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
 		//t_admin_user_auth用户登录表插入数据

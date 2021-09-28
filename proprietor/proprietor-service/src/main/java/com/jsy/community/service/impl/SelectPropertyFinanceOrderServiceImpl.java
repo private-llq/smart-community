@@ -1,12 +1,13 @@
 package com.jsy.community.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.IPropertyFinanceOrderService;
 import com.jsy.community.api.ISelectPropertyFinanceOrderService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
+import com.jsy.community.mapper.AppCarOrderMapper;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.mapper.UserMapper;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -32,23 +33,40 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
 
     @Autowired
     private HouseMapper houseMapper;
+
+    @Autowired
+    private AppCarOrderMapper carOrderMapper;
+    
+    @Autowired
+    private ICarPositionService carPositionService;
+
     @Autowired
     private UserMapper userMapper;
 
 
     @Override
-    public HashMap<String, Object> findOne(Long orderId) {
-        PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderService.findOne(orderId);
-        propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee().add(propertyFinanceOrderEntity.getPenalSum()));
-        HouseEntity entity = houseMapper.selectById(propertyFinanceOrderEntity.getTargetId());
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("roomName",entity.getBuilding()+entity.getUnit()+entity.getFloor()+entity.getDoor());
-        map.put("entity",propertyFinanceOrderEntity);
-        if (propertyFinanceOrderEntity.getPayType()!=null&&propertyFinanceOrderEntity.getTripartiteOrder()!=null&&propertyFinanceOrderEntity.getPayTime()!=null){
-            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", propertyFinanceOrderEntity.getUid()));
-            propertyFinanceOrderEntity.setRealName(userEntity.getRealName());
+    public List<PropertyFinanceOrderEntity> findOne(String orderId) {
+        LinkedList<Map<String,Object>> objects = new LinkedList<>();
+        Map houseMap = new HashMap();
+        Map<String,List<PropertyFinanceOrderEntity>> map = new HashMap();
+        Set<Long> houseIds = new HashSet();
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.findOrder(orderId);
+        for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
+            if (propertyFinanceOrderEntity.getAssociatedType()==1){
+                houseIds.add(propertyFinanceOrderEntity.getTargetId());
+            }
         }
-        return map;
+        if (houseIds.size()!=0){
+            List<HouseEntity> houseEntities = houseMapper.selectBatchIds(houseIds);
+            for (HouseEntity entity : houseEntities) {
+                houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
+            }
+            for (PropertyFinanceOrderEntity entity : list) {
+                entity.setAddress((String) houseMap.get(entity.getTargetId()));
+                entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+            }
+        }
+        return list;
     }
 
     /**

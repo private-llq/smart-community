@@ -84,6 +84,13 @@ public class CarController {
 	}
 
 	@Login
+	@ApiOperation("查询缴费详情")
+	@GetMapping("getOrder")
+	public CommonResult getOrder(@RequestParam Long id) {
+		return CommonResult.ok(carService.getOrder(id));
+	}
+
+	@Login
 	@ApiOperation("续费月租车辆")
 	@PostMapping("renewMonthCar")
 	public CommonResult renewMonthCar(@RequestBody CarEntity carEntity) {

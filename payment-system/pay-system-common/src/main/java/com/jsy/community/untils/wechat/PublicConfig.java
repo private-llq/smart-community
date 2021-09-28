@@ -171,6 +171,8 @@ public class PublicConfig {
         returnMap.put("out_trade_no",JSONObject.fromObject(plainText).getString("out_trade_no"));
         returnMap.put("attach",JSONObject.fromObject(plainText).getString("attach"));
         returnMap.put("transaction_id",JSONObject.fromObject(plainText).getString("transaction_id"));
+        returnMap.put("amount",JSONObject.fromObject(plainText).getString("amount"));
+
         return returnMap;
     }
 

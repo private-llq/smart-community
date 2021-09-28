@@ -45,4 +45,13 @@ public interface AssetLeaseRecordMapper extends BaseMapper<AssetLeaseRecordEntit
      * @date: 2021/9/25 15:11
      **/
     Integer setExpiredById(Long id);
+
+    /**
+     * @author: Pipi
+     * @description: 查询单个详情
+     * @param assetLeaseRecordEntity:
+     * @return: com.jsy.community.entity.proprietor.AssetLeaseRecordEntity
+     * @date: 2021/9/27 15:49
+     **/
+    AssetLeaseRecordEntity queryDetail(@Param("entity") AssetLeaseRecordEntity assetLeaseRecordEntity);
 }

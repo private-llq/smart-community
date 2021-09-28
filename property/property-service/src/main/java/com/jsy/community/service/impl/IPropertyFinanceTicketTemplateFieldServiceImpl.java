@@ -26,6 +26,7 @@ import java.util.*;
 public class IPropertyFinanceTicketTemplateFieldServiceImpl extends ServiceImpl<FinanceTicketTemplateFieldMapper, FinanceTicketTemplateFieldEntity> implements IPropertyFinanceTicketTemplateFieldService {
     @Autowired
     private FinanceTicketTemplateFieldMapper ticketTemplateFieldMapper;
+
     /**
      * @param ticketTemplateFieldEntities : 票据字段列表
      * @author: Pipi
@@ -74,9 +75,9 @@ public class IPropertyFinanceTicketTemplateFieldServiceImpl extends ServiceImpl<
     @Override
     public Map<Integer, List<FinanceTicketTemplateFieldEntity>> getTicketTemplateFieldList(String templateId) {
         Map<Integer, List<FinanceTicketTemplateFieldEntity>> fieldMap = new HashMap<>();
-        fieldMap.put(1, new ArrayList<FinanceTicketTemplateFieldEntity>());
-        fieldMap.put(2, new ArrayList<FinanceTicketTemplateFieldEntity>());
-        fieldMap.put(3, new ArrayList<FinanceTicketTemplateFieldEntity>());
+        fieldMap.put(1, new ArrayList<>());
+        fieldMap.put(2, new ArrayList<>());
+        fieldMap.put(3, new ArrayList<>());
         QueryWrapper<FinanceTicketTemplateFieldEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("field_id AS id,template_id,location_type,`name`,name_en,sort");
         queryWrapper.eq("template_id", templateId);

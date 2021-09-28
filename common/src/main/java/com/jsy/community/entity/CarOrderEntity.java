@@ -3,7 +3,6 @@ package com.jsy.community.entity;
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -50,6 +49,9 @@ public class CarOrderEntity extends BaseEntity {
      */
     @ExcelIgnore
     private Integer type;
+    /*车牌颜色*/
+    @ExcelIgnore
+    private String plateColor;
     /**
      *  1临时收费，2月租收费
      */
@@ -65,6 +67,11 @@ public class CarOrderEntity extends BaseEntity {
      *  订单编号
      */
     private String orderNum;
+
+    /**
+     *  账单编号
+     */
+    private String billNum;
     /**
      *  账单抬头
      */

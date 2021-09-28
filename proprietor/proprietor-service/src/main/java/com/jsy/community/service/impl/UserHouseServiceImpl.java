@@ -235,11 +235,11 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			PushInfoUtil.PushPublicTextMsg(
 					userIMEntity.getImId(),
 					"房屋管理",
-					"你有房屋最新消息了！",
+					"您有房屋最新消息了！",
 					null,
-					"尊敬的用户，" +
+					"尊敬的用户您好，\n" +
 							"用户"+userEntity.getRealName()+"已房东的身份移除你在"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation())+"身份，如已知晓，请忽略。",
-					null);
+					null,BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 
 		}
 		houseMemberMapper.deleteBatchIds(list);
@@ -255,6 +255,10 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Override
 	@Transactional
 	public void membersSave(MembersQO membersQO, String userId) {
+		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()));
+		if (memberEntity!=null){
+			throw new ProprietorException("当前成员以添加，请勿重复添加！");
+		}
 		CommunityEntity communityEntity = communityMapper.selectById(membersQO.getCommunityId());
 		HouseEntity houseEntity = houseMapper.selectById(membersQO.getHouseId());
 		//添加成员表数据
@@ -270,17 +274,31 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			RegisterQO qo = new RegisterQO();
 			qo.setAccount(membersQO.getMobile());
 			qo.setName(membersQO.getName());
-			entity.setUid(userService.registerV2(qo,userId,membersQO.getRelation(),membersQO.getHouseId(),membersQO.getCommunityId()));
+			entity.setUid(userService.registerV2(qo));
+
+			UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
+			//推送消息
+			PushInfoUtil.PushPublicTextMsg(
+					userIMEntity.getImId(),
+					"房屋管理",
+					"您有房屋最新消息了！",
+					null,
+					"尊敬的用户您好，\n" +
+							"用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。"
+					,null,
+					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
+
 		}else{
 			UserIMEntity imEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", userEntity.getUid()));
 			entity.setUid(userEntity.getUid());
 			//推送消息
 			PushInfoUtil.PushPublicTextMsg(imEntity.getImId(),
-					"房屋管理","你有房屋最新消息了！",
+					"房屋管理","您有房屋最新消息了！",
 					null,
-					"尊敬的用户，" +
+					"尊敬的用户您好，\n" +
 							"用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。",
-					null
+					null,
+					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName()
 			);
 		}
 
