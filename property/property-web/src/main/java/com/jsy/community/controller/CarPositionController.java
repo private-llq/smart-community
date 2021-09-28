@@ -701,7 +701,7 @@ public class CarPositionController {
 
 
             //新增订单
-            insterCarOrder(plateNum, communityId, LocalDateTime.now());
+            insterCarOrder(plateNum, communityId, LocalDateTime.now(),plateColor);
             //如果是收到邀请的车辆状态改变为已经进园
             boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);
             if (statusInvite) {
@@ -792,7 +792,7 @@ public class CarPositionController {
                     e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
                     carVO.getRs485_data().add(e2);
                     //新增订单
-                    insterCarOrder(plateNum, communityId, orderTime);
+                    insterCarOrder(plateNum, communityId, orderTime,plateColor);
                 }
                 if (l < dwellTime) {//没有超过滞留时间
                     //是否开闸
@@ -832,10 +832,11 @@ public class CarPositionController {
     }
 
     //新增一个车辆订单对象
-    private void insterCarOrder(String plateNum, Long communityId, LocalDateTime beginTime) {
+    private void insterCarOrder(String plateNum, Long communityId, LocalDateTime beginTime,String plateColor) {
         CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
         entity.setType(1);//临时车
-        entity.setOrderNum(UuidUtils.generateUuid().replace("-", ""));//订单编号
+        entity.setPlateColor(plateColor);
+        entity.setOrderNum(UuidUtils.generateUuid().replace("-", "")+System.currentTimeMillis());//订单编号
         entity.setBeginTime(beginTime);//进入的时间
         entity.setOrderStatus(0);//未支付
         entity.setRise("临时-" + plateNum);//账单标题
