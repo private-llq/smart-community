@@ -116,7 +116,7 @@ public class VisitorServiceImpl implements IVisitorService {
 		QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("*, TIMESTAMPDIFF(MINUTE, start_time, end_time) as effectiveMinutes");
 		if (!StringUtils.isEmpty(query.getName())) {
-			queryWrapper.like("name", query.getName());
+			queryWrapper.and(wrapper -> wrapper.like("name", query.getName()).or().like("contact", query.getName()));
 		}
 		if (!StringUtils.isEmpty(query.getBuildingId())) {
 			queryWrapper.eq("building_id", query.getBuildingId());
