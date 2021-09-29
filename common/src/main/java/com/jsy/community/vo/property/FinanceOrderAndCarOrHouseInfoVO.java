@@ -24,5 +24,7 @@ public class FinanceOrderAndCarOrHouseInfoVO implements Serializable {
     @ApiModelProperty(value = "房屋信息")
     private HouseEntity houseInfo;
 
+    @ApiModelProperty(value = "收费项目")
+    private String feeName;
 
 }
