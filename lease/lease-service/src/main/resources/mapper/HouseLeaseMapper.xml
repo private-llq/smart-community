@@ -104,7 +104,24 @@
     <!-- 按列表查询房屋出租信息 -->
     <select id="queryHouseLeaseByList" resultType="com.jsy.community.vo.lease.HouseLeaseVO">
         select
-        id,bedroom_type,house_direction_id,decoration_type_id,house_title,house_address,house_advantage_id,house_price,house_unit,house_square_meter,house_image_id,house_leasemode_id,house_type_code,house_lon,house_lat,house_furniture_id
+            id,
+            bedroom_type,
+            house_direction_id,
+            decoration_type_id,
+            house_title,
+            house_address,
+            house_advantage_id,
+            house_area_id,
+            house_price,
+            house_unit,
+            house_square_meter,
+            house_image_id,
+            house_leasemode_id,
+            house_type_code,
+            house_lon,
+            house_lat,
+            house_furniture_id,
+            house_community_id
         from t_house_lease
         <where>
             <!-- 如果查询筛选增加了搜索文本 -->
@@ -355,6 +372,7 @@
         l.house_contact,
         l.appellation,
         l.house_address,
+        l.house_area_id,
         l.house_image_id,
         l.house_price,
         l.house_unit,
@@ -379,7 +397,8 @@
         l.roommate_sex,
         c.house_const_name AS houseLeaseMode,
         d.house_const_name AS houseLeaseDeposit,
-        e.house_const_name as decorationType
+        e.house_const_name as decorationType,
+        tc.name as houseCommunityName
         FROM
         t_house_lease AS l
         LEFT JOIN t_house_const AS c ON l.house_leasemode_id = c.house_const_code
@@ -388,6 +407,7 @@
         AND d.house_const_type = 1
         LEFT JOIN t_house_const AS e ON l.decoration_type_id = d.house_const_code
         AND d.house_const_type = 18
+        LEFT JOIN t_community tc on tc.id = l.house_community_id
         WHERE
         l.id = #{houseId}
     </select>

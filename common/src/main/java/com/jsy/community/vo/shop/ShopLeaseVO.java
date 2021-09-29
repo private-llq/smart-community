@@ -150,4 +150,8 @@ public class ShopLeaseVO implements Serializable {
 	// 签约ID
 	@TableField(exist = false)
 	private String contractId;
+
+	// 社区名称
+	@TableField(exist = false)
+	private String communityAddress;
 }
