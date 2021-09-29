@@ -1449,7 +1449,6 @@ public interface BusinessEnum {
 	 * 租赁签约进程状态枚举
 	 */
 	enum PushInfromEnum {
-		PAYHELPER("payHelper", 1),
 		HOUSEMANAGE("houseManage", 2),
 		ACTIVITYVOTING("activityVoting", 3),
 		CONTRACTSIGNING("contractSigning", 4),

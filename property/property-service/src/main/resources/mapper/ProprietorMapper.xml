@@ -232,4 +232,12 @@
     <select id="queryNameAndMobileByHouseId" resultType="com.jsy.community.entity.ProprietorEntity">
         select real_name,mobile from t_proprietor where house_id = #{houseId} and community_id = #{communityId} and deleted = 0
     </select>
+    <insert id="saveList">
+        insert into t_proprietor ( id,community_id,real_name,house_id,mobile , id_card) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.id},#{item.communityId},#{item.realName},#{item.houseId},#{item.mobile},#{item.idCard}
+            )
+        </foreach>
+    </insert>
 </mapper>

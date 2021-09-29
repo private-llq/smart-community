@@ -692,7 +692,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             Map<Object, Object> map = new HashMap<>();
             map.put("type", 3);
             map.put("dataId", tripartiteOrder);
-            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(), 1, total.toString(), null, "物业缴费", map, BusinessEnum.PushInfromEnum.PAYHELPER.getName());
+            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+                    1,
+                    total.toString(),
+                    null,
+                    "物业缴费",
+                    map,
+                    BusinessEnum.PushInfromEnum.PROPERTYPAYMENT.getName());
         }
     }
 

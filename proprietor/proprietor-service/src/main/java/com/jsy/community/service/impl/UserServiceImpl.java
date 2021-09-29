@@ -880,6 +880,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return communityIdAndName.values();
     }
 
+    @Override
+    public Collection<Map<String, Object>> queryCommunityUserList(String uid) {
+        //查所有房屋已认证的小区
+        Set<Long> communityIds = userHouseService.queryUserHousesOfCommunityIds(uid);
+        if (CollectionUtils.isEmpty(communityIds)) {
+            return null;
+        }
+        //查小区名称
+        Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
+        return communityIdAndName.values();
+    }
+
     /**
      * @Description: 查询业主所有小区的房屋
      * @Param: [uid]

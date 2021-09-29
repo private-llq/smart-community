@@ -185,6 +185,6 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
      */
     @Override
     public List<ComplainEntity> selectUserIdComplain(String userId) {
-        return complainMapper.selectList(new QueryWrapper<ComplainEntity>().eq("uid",userId));
+        return complainMapper.selectList(new QueryWrapper<ComplainEntity>().eq("uid",userId).orderByDesc("complain_time"));
     }
 }
