@@ -29,6 +29,7 @@ import com.jsy.community.vo.lease.HouseLeaseVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -59,6 +60,9 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private AssetLeaseRecordMapper assetLeaseRecordMapper;
@@ -214,6 +218,20 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         if (CollectionUtils.isEmpty(vos)) {
             return vos;
         }
+        // 查询社区名称
+        List<Long> communityIdSet = vos.stream().map(HouseLeaseVO::getHouseCommunityId).collect(Collectors.toList());
+        List<CommunityEntity> communityEntityList = communityService.queryCommunityBatch(communityIdSet);
+        for (HouseLeaseVO vo : vos) {
+            for (CommunityEntity communityEntity : communityEntityList) {
+                if (communityEntity.getId() == vo.getHouseCommunityId()) {
+                    String area = (String) redisTemplate.opsForValue().get("RegionSingle:" + vo.getHouseAreaId());
+                    if (area == null) {
+                        area = "";
+                    }
+                    vo.setCommunityAddress(area + communityEntity.getName());
+                }
+            }
+        }
         //根据数据字段id 查询 一对多的 房屋标签name和id 如 邻地铁、可短租、临街商铺等多标签、之类
         getHouseFieldTag(vos);
         return vos;
@@ -230,6 +248,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     public HouseLeaseVO queryHouseLeaseOne(Long houseId, String uid) {
         //1.查出单条数据
         HouseLeaseVO vo = houseLeaseMapper.queryHouseLeaseOne(houseId);
+
 
         if (vo == null) {
             return null;
@@ -305,6 +324,11 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             redundancy.putAll(houseFurniture);
         }
         vo.setRedundancy(redundancy);
+        String area = (String) redisTemplate.opsForValue().get("RegionSingle:" + vo.getHouseAreaId());
+        if (area == null) {
+            area = "";
+        }
+        vo.setCommunityAddress(area + vo.getHouseCommunityName());
 
         UserEntity one = userService.selectOne(vo.getUid());
         // 详情页展示的业主名称是用户在发布的时候填写的昵称

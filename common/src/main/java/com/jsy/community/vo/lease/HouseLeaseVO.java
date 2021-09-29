@@ -211,5 +211,8 @@ public class HouseLeaseVO implements Serializable {
     // 签约ID
     @TableField(exist = false)
     private String contractId;
+    // 签约ID
+    @TableField(exist = false)
+    private String communityAddress;
     
 }

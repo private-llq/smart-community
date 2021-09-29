@@ -54,4 +54,6 @@ public class IndexShopVO implements Serializable {
 	@ApiModelProperty(value = "房源类型")
 	private String defrayType;
 
+	// 社区位置名称
+	private String communityAddress;
 }
