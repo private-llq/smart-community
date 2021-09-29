@@ -21,7 +21,7 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FinanceImportErrorVO;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
-import com.jsy.community.vo.property.TemplateAndFinanceOrderVO;
+import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FilenameUtils;
@@ -820,11 +820,11 @@ public class PropertyFinanceOrderController {
         }
     }
 
-    @ApiOperation("根据账单id和模板id查询账单和模板的数据")
+    @Login(allowAnonymous = true)
+    @ApiOperation("根据账单ID查询账单信息和房屋/车辆信息")
     @GetMapping("/queryTemplateAndFinanceOrder")
-    public CommonResult<TemplateAndFinanceOrderVO> queryTemplateAndFinanceOrder(@RequestParam("id") Long id,
-                                                                                @RequestParam("templateId") String templateId) {
-        TemplateAndFinanceOrderVO result = propertyFinanceOrderService.queryTemplateAndFinanceOrder(id, templateId);
+    public CommonResult<FinanceOrderAndCarOrHouseInfoVO> queryTemplateAndFinanceOrder(@RequestParam("id") Long id) {
+        FinanceOrderAndCarOrHouseInfoVO result = propertyFinanceOrderService.queryTemplateAndFinanceOrder(id);
         return CommonResult.ok(result);
     }
 }
