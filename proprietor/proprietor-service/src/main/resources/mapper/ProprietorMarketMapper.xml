@@ -5,25 +5,25 @@
    <resultMap id="ProprietorMarketEntityMap" type="com.jsy.community.entity.proprietor.ProprietorMarketEntity">
        <result column="id" property="id"/>
        <result column="communityId" property="communityId"/>
-       <result column="uid" property="uid"></result>
-       <result column="createTime" property="createTime"></result>
-       <result column="updateTime" property="updateTime"></result>
-       <result column="deleted" property="deleted"></result>
-       <result column="state" property="state"></result>
+       <result column="uid" property="uid"/>
+       <result column="createTime" property="createTime"/>
+       <result column="updateTime" property="updateTime"/>
+       <result column="deleted" property="deleted"/>
+       <result column="state" property="state"/>
 
-       <result column="goodsName" property="goodsName"></result>
-       <result column="price" property="price"></result>
-       <result column="goodsExplain" property="goodsExplain"></result>
-       <result column="negotiable" property="negotiable"></result>
-       <result column="labelId" property="labelId"></result>
-       <result column="categoryId" property="categoryId"></result>
-       <result column="click" property="click"></result>
-       <result column="phone" property="phone"></result>
-       <result column="images" property="images"></result>
-       <result column="shield" property="shield"></result>
+       <result column="goodsName" property="goodsName"/>
+       <result column="price" property="price"/>
+       <result column="goodsExplain" property="goodsExplain"/>
+       <result column="negotiable" property="negotiable"/>
+       <result column="labelId" property="labelId"/>
+       <result column="categoryId" property="categoryId"/>
+       <result column="click" property="click"/>
+       <result column="phone" property="phone"/>
+       <result column="images" property="images"/>
+       <result column="shield" property="shield"/>
 
-       <result column="labelName" property="labelName"></result>
-       <result column="categoryName" property="categoryName"></result>
+       <result column="labelName" property="labelName"/>
+       <result column="categoryName" property="categoryName"/>
 
    </resultMap>
 

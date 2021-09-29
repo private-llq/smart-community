@@ -10,7 +10,7 @@ import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
-import com.jsy.community.vo.property.TemplateAndFinanceOrderVO;
+import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -383,8 +383,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
     /**
      * 根据账单ID和模板ID返回相应的数据
      * @param id 账单ID
-     * @param tid 模板ID
-     * @return TemplateAndFinanceOrderVO
+     * @return FinanceOrderAndCarOrHouseInfoVO
      */
-    TemplateAndFinanceOrderVO queryTemplateAndFinanceOrder(Long id, String tid);
+    FinanceOrderAndCarOrHouseInfoVO queryTemplateAndFinanceOrder(Long id);
 }
