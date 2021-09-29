@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarOrderService;
 import com.jsy.community.constant.Const;
@@ -44,6 +45,28 @@ public class CarOrderServiceImpl extends ServiceImpl<CarOrderMapper, CarOrderEnt
         wrapper.eq("type",1);//临时车
         int delete = carOrderMapper.delete(wrapper);
         System.out.println("删除情况");
+    }
+
+    //根据订单号查询订单记录
+    @Override
+    public CarOrderEntity selectOneOrder(String orderNumber){
+        CarOrderEntity entity = carOrderMapper.selectOne(new QueryWrapper<CarOrderEntity>().eq("order_num", orderNumber));
+        return entity;
+    }
+
+    //修改订单
+    @Override
+    public  boolean updateOrder(CarOrderEntity carOrderEntity,String orderNumber){
+        UpdateWrapper<CarOrderEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("order_num",orderNumber);
+        int update = carOrderMapper.update(carOrderEntity, updateWrapper);
+        if(update>0){
+            return true;
+        }
+        return false;
 
     }
+
+
+
 }
