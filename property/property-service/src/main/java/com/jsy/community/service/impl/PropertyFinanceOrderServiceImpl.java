@@ -2264,6 +2264,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             CarPositionEntity carPositionEntity = carPositionMapper.selectById(targetId);
             templateAndFinanceOrderVO.setCarInfo(carPositionEntity);
         }
+        //查询收费项目
+        if (propertyFinanceOrder.getFeeRuleId() != null) {
+            PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(propertyFinanceOrder.getFeeRuleId());
+            if (propertyFeeRuleEntity != null) {
+                templateAndFinanceOrderVO.setFeeName(propertyFeeRuleEntity.getName());
+            }
+        }
         return templateAndFinanceOrderVO;
     }
 }
