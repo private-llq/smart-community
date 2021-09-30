@@ -40,7 +40,7 @@ public class CarQRController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICaQRService iCaQRService;
 
-   private static final String URL = "http://isi3pz.natappfree.cc/#/?CommunityID=";
+   private static final String URL = "http://192.168.12.122:8080/#/?CommunityID=";
     private static final String BUCKET_NAME = "qrcode";
     private static final Integer WIDTH = 400;
     private static final Integer HEIGHT = 400;
@@ -60,11 +60,11 @@ public class CarQRController {
 //    }
 
     @ApiOperation("下载社区停车二维码")
-   // @Login
-    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.GET)
-    public CommonResult uploadQRCode(HttpServletResponse response) throws Exception {
-//        Long communityId = UserUtils.getAdminCommunityId();
-        Long communityId = 1L;
+    @Login
+    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.POST)
+    public void uploadQRCode(HttpServletResponse response) throws Exception {
+        Long communityId = UserUtils.getAdminCommunityId();
+//        Long communityId = 1L;
         CarQREntity carQREntity =  iCaQRService.findOne(communityId);
         if (carQREntity!=null){
             ServletOutputStream out = response.getOutputStream();
@@ -75,7 +75,7 @@ public class CarQRController {
             out.write(date);
             out.flush();
             out.close();
-            return CommonResult.ok("下载成功");
+           // return CommonResult.ok("下载成功");
         }else {
             String text = URL+communityId;
             System.out.println("新增二维码");
@@ -92,6 +92,6 @@ public class CarQRController {
             out.close();
             System.out.println(path);
         }
-        return CommonResult.ok("下载成功");
+       // return CommonResult.ok("下载成功");
     }
 }
