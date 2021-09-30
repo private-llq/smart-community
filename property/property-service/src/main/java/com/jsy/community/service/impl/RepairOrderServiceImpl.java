@@ -83,10 +83,11 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 			if (orderEntity.getAssignId() != null) {
 				QueryWrapper<AdminUserEntity> wrapper = new QueryWrapper<>();
 				wrapper.eq("uid", orderEntity.getAssignId());
-				wrapper.eq("community_id", orderEntity.getCommunityId());
 				AdminUserEntity adminUserEntity = adminUserMapper.selectOne(wrapper);
-				orderEntity.setAssignName(adminUserEntity.getRealName());
-				orderEntity.setAssignNameNumber(adminUserEntity.getNumber());
+				if (adminUserEntity != null) {
+					orderEntity.setAssignName(adminUserEntity.getRealName());
+					orderEntity.setAssignNameNumber(adminUserEntity.getNumber());
+				}
 			}
 			
 			if (orderEntity.getStatus() == 0) {
@@ -161,7 +162,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		if (orderEntity == null) {
 			throw new PropertyException("该报修订单不存在");
 		}
-		orderEntity.setStatus(2); // 将状态设置为 处理中
+		orderEntity.setStatus(2); // 将状态设置为 已完成
 		orderEntity.setAssignId(uid);
 		orderEntity.setSuccessTime(new Date());
 		repairOrderMapper.updateById(orderEntity);
@@ -175,7 +176,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		if (!status.equals(1)) {
 			throw new PropertyException("该报修订单未曾处理，不能直接完成");
 		}
-		repairEntity.setStatus(2); // 将状态设置为 已处理
+		repairEntity.setStatus(2); // 将状态设置为 已完成
 		repairMapper.updateById(repairEntity); // 更新报修表
 
 		UserIMEntity imEntity = userImService.selectUid(repairEntity.getUserId());

@@ -26,7 +26,7 @@ public class RepairOrderQO implements Serializable {
 	@ApiModelProperty(value = "社区id")
 	private Long communityId;
 	
-	@ApiModelProperty(value = "0 待处理 1 处理中 2 已处理 3 已驳回")
+	@ApiModelProperty(value = "0 待处理 1 修复中 2 已完成  3 驳回")
 	private Integer status;
 	
 	@ApiModelProperty(value = "报修类别 0 个人报修 1 公共报修")
