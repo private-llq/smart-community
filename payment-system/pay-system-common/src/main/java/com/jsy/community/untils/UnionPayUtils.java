@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @Date: 2021/4/11 11:31
  * @Version: 1.0
  **/
-@Component
+//@Component
 @Slf4j
 public class UnionPayUtils {
 

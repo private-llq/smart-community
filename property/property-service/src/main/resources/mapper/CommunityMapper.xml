@@ -4,7 +4,7 @@
 
     <!-- ids批量查小区 -->
     <select id="queryCommunityBatch" resultType="com.jsy.community.entity.CommunityEntity">
-        select id,name,detail_address from t_community
+        select * from t_community
         where id in
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item}
