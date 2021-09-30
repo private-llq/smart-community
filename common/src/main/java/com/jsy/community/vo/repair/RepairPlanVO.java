@@ -58,5 +58,7 @@ public class RepairPlanVO implements Serializable {
 	@ApiModelProperty(value = "评价描述")
 	private String comment;
 	
+	@ApiModelProperty(value = "进度状态")
+	private Integer status;
 
 }

@@ -73,7 +73,6 @@
                 (u.real_name like concat ("%",#{condition},"%") or u.number like concat ("%",#{condition},"%") or o.name like concat("%",#{condition},"%"))
 			</if>
             and u.org_id = o.id
-            and u.community_id = #{communityId}
             and o.is_repair = 1
 		</where>
 	</select>
