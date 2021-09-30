@@ -55,10 +55,12 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                 CarPositionEntity entity = carPositionService.selectOne(propertyFinanceOrderEntity.getTargetId());
                 HouseEntity houseEntity = houseMapper.selectById(entity.getHouseId());
                 propertyFinanceOrderEntity.setAddress(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+                propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPenalSum().add(propertyFinanceOrderEntity.getPenalSum()));
                 propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
             } else {
                 HouseEntity houseEntity = houseMapper.selectById(propertyFinanceOrderEntity.getTargetId());
                 propertyFinanceOrderEntity.setAddress(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+                propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPenalSum().add(propertyFinanceOrderEntity.getPenalSum()));
                 propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
             }
             list.add(propertyFinanceOrderEntity);
@@ -80,6 +82,7 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                     houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
                 }
                 for (PropertyFinanceOrderEntity entity : list) {
+                    entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()));
                     entity.setAddress((String) houseMap.get(entity.getTargetId()));
                     entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
                 }

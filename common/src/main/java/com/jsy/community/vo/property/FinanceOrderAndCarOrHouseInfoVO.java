@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,5 +27,8 @@ public class FinanceOrderAndCarOrHouseInfoVO implements Serializable {
 
     @ApiModelProperty(value = "收费项目")
     private String feeName;
+
+    @ApiModelProperty(value = "收费单价")
+    private BigDecimal monetaryUnit;
 
 }
