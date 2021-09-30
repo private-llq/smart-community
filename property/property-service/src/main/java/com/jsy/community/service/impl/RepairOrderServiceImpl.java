@@ -319,9 +319,19 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 				planVO.setCommentTime(orderEntity.getCommentTime());
 				planVO.setCommentStatus(orderEntity.getCommentStatus());
 				planVO.setComment(orderEntity.getComment());
+				if (orderEntity.getCommentTime() != null && orderEntity.getCommentStatus() != null) {
+					// 返回进度状态
+					planVO.setStatus(4);
+				} else {
+					// 返回进度状态
+					planVO.setStatus(3);
+				}
 			} else {
+				// 返回进度状态
+				planVO.setStatus(orderEntity.getStatus() + 1);
 				planVO.setCommentStatus(null);
 			}
+			
 			
 			return planVO;
 		}
