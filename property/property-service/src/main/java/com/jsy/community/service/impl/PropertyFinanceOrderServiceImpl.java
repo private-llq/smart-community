@@ -2269,6 +2269,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(propertyFinanceOrder.getFeeRuleId());
             if (propertyFeeRuleEntity != null) {
                 templateAndFinanceOrderVO.setFeeName(propertyFeeRuleEntity.getName());
+                templateAndFinanceOrderVO.setMonetaryUnit(propertyFeeRuleEntity.getMonetaryUnit());
             }
         }
         return templateAndFinanceOrderVO;
