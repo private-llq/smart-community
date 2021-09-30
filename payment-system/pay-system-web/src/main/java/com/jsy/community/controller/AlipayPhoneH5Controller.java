@@ -15,9 +15,11 @@ import com.jsy.community.config.web.AlipayConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.qo.payment.AliOrderContentQO;
+import com.jsy.community.utils.AlipayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -45,18 +47,23 @@ public class AlipayPhoneH5Controller {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarOrderService carOrderService;
 
-
+    @Autowired
+    private AlipayUtils alipayUtils;
 
     @RequestMapping(value = "/pay")
     public String test(@RequestBody AliOrderContentQO qo) throws IOException {
-        AlipayClient alipayClient = new DefaultAlipayClient(
-                AlipayConfig.URL,
-                AlipayConfig.APPID,
-                AlipayConfig.RSA_PRIVATE_KEY,
-                AlipayConfig.FORMAT,
-                AlipayConfig.CHARSET,
-                AlipayConfig.ALIPAY_PUBLIC_KEY,
-                AlipayConfig.SIGNTYPE);
+//        AlipayClient alipayClient = new DefaultAlipayClient(
+//                AlipayConfig.URL,
+//                AlipayConfig.APPID,
+//                AlipayConfig.RSA_PRIVATE_KEY,
+//                AlipayConfig.FORMAT,
+//                AlipayConfig.CHARSET,
+//                AlipayConfig.ALIPAY_PUBLIC_KEY,
+//                AlipayConfig.SIGNTYPE);
+        AlipayClient alipayClient = alipayUtils.getDefaultCertClient();
+
+
+
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
         request.setNotifyUrl(AlipayConfig.notify_url);// 设置异步通知地址
         request.setReturnUrl(AlipayConfig.return_url);// 设置同步地址
