@@ -268,6 +268,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		entity.setHouseholderId(userId);
 
 		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", membersQO.getMobile()));
+		//房主数据
+		UserEntity user = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
 
 		if (userEntity==null||userEntity.equals(null)){
 			//注册
@@ -284,7 +286,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					"您有房屋最新消息了！",
 					null,
 					"尊敬的用户您好，\n" +
-							"用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。"
+							"用户"+user.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。"
 					,null,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 
@@ -296,7 +298,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					"房屋管理","您有房屋最新消息了！",
 					null,
 					"尊敬的用户您好，\n" +
-							"用户"+userEntity.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。",
+							"用户"+user.getRealName()+"已房东的身份添加你为"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。",
 					null,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName()
 			);
@@ -396,17 +398,23 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 				//房间成员表里添加数据
 				UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-				HouseMemberEntity memberEntity = new HouseMemberEntity();
-				memberEntity.setUid(userId);
-				memberEntity.setCommunityId(userHouseQO.getCommunityId());
-				memberEntity.setHouseId(userHouseQO.getHouseId());
-				memberEntity.setName(userEntity.getRealName());
-				memberEntity.setSex(userEntity.getSex());
-				memberEntity.setMobile(userEntity.getMobile());
-				memberEntity.setRelation(1);
-				memberEntity.setIdCard(userEntity.getIdCard());
-				memberEntity.setId(SnowFlake.nextId());
-				houseMemberMapper.insert(memberEntity);
+				HouseMemberEntity houseMemberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("community_id", userHouseQO.getCommunityId()).eq("house_id", userHouseQO.getHouseId()).eq("mobile", userHouseQO.getMobile()).eq("name", userHouseQO.getName()));
+				if (houseMemberEntity!=null){
+					houseMemberEntity.setUid(userId);
+					houseMemberMapper.updateById(houseMemberEntity);
+				} else {
+					HouseMemberEntity memberEntity = new HouseMemberEntity();
+					memberEntity.setUid(userId);
+					memberEntity.setCommunityId(userHouseQO.getCommunityId());
+					memberEntity.setHouseId(userHouseQO.getHouseId());
+					memberEntity.setName(userEntity.getRealName());
+					memberEntity.setSex(userEntity.getSex());
+					memberEntity.setMobile(userEntity.getMobile());
+					memberEntity.setRelation(1);
+					memberEntity.setIdCard(userEntity.getIdCard());
+					memberEntity.setId(SnowFlake.nextId());
+					houseMemberMapper.insert(memberEntity);
+				}
 			}
 		}else {
 			throw new ProprietorException("当前房屋不存在！");

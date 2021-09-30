@@ -1,13 +1,14 @@
 package com.jsy.community.service.impl;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.mapper.PropertyRelationMapper;
+import com.jsy.community.mapper.ProprietorMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
@@ -22,6 +23,7 @@ import com.jsy.community.vo.property.RelationImportQO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -40,6 +42,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 
     @Autowired
     private HouseMapper houseMapper;
+
+    @Autowired
+    private ProprietorMapper proprietorMapper;
 
 
 
@@ -165,11 +170,21 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      * @return: void
      */
     @Override
+    @Transactional
     public void save(HouseMemberEntity houseMemberEntity,String uid) {
 //        houseMemberEntity.setStatus(1);
         houseMemberEntity.setId(SnowFlake.nextId());
         houseMemberEntity.setHouseholderId(uid);
         propertyRelationMapper.insert(houseMemberEntity);
+
+        if (houseMemberEntity.getRelation()==1){
+            ProprietorEntity entity = new ProprietorEntity();
+            BeanUtils.copyProperties(houseMemberEntity,entity);
+            entity.setRealName(houseMemberEntity.getName());
+            entity.setMobile(houseMemberEntity.getMobile());
+            entity.setId(SnowFlake.nextId());
+            proprietorMapper.insert(entity);
+        }
     }
 
 
@@ -182,7 +197,32 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      */
     @Override
     public void update(HouseMemberEntity houseMemberEntity) {
+        HouseMemberEntity memberEntity = propertyRelationMapper.selectById(houseMemberEntity.getId());
+        if (memberEntity.getRelation()==1){
+            ProprietorEntity entity = proprietorMapper.selectOne(new QueryWrapper<ProprietorEntity>().eq("house_id", memberEntity.getHouseId())
+                    .eq("community_id", memberEntity.getCommunityId()).eq("real_name", memberEntity.getName()).eq("mobile", memberEntity.getMobile()));
+            if (entity!=null){
+                if (houseMemberEntity.getRelation()!=1){
+                    proprietorMapper.deleteById(entity.getId());
+                }else {
+                    entity.setRealName(houseMemberEntity.getName());
+                    entity.setMobile(houseMemberEntity.getMobile());
+                    entity.setHouseId(houseMemberEntity.getHouseId());
+                    entity.setCommunityId(houseMemberEntity.getCommunityId());
+                    proprietorMapper.updateById(entity);
+                }
+            }
+        }else if (houseMemberEntity.getRelation()==1){
+            ProprietorEntity proprietorEntity = new ProprietorEntity();
+            BeanUtils.copyProperties(houseMemberEntity,proprietorEntity);
+            proprietorEntity.setId(SnowFlake.nextId());
+            proprietorEntity.setRealName(houseMemberEntity.getName());
+            proprietorMapper.insert(proprietorEntity);
+        }
+
         propertyRelationMapper.updateById(houseMemberEntity);
+
+
     }
 
 
@@ -271,9 +311,12 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      * @return: java.util.List<com.jsy.community.vo.property.RelationImportErrVO>
      */
     @Override
+    @Transactional
     public List<RelationImportErrVO> importRelation(List<RelationImportQO> list, Long communityId, String uid) {
         List<RelationImportErrVO> errVOList = new LinkedList<>();
         List<HouseMemberEntity> entityList = new LinkedList<>();
+        List<ProprietorEntity> entities = new LinkedList<>();
+        ProprietorEntity proprietorEntity = null;
         HouseMemberEntity memberEntity = null;
         RelationImportErrVO errVO = null;
         for (RelationImportQO relationImportQO : list) {
@@ -308,10 +351,21 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
                 memberEntity.setCommunityId(communityId);
                 memberEntity.setUnit(relationImportQO.getUnit());
                 entityList.add(memberEntity);
+
+                if (memberEntity.getRelation()==1){
+                    proprietorEntity = new ProprietorEntity();
+                    BeanUtils.copyProperties(memberEntity,proprietorEntity);
+                    proprietorEntity.setId(SnowFlake.nextId());
+                    proprietorEntity.setRealName(memberEntity.getName());
+                    entities.add(proprietorEntity);
+                }
             }
         }
         if (entityList.size()!=0){
             propertyRelationMapper.saveList(entityList);
+        }
+        if (entities.size()!=0){
+            proprietorMapper.saveList(entities);
         }
         return errVOList;
     }
@@ -337,6 +391,10 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
      */
     @Override
     public void delete(Long id) {
+        HouseMemberEntity memberEntity = propertyRelationMapper.selectById(id);
+        if (memberEntity.getRelation()==1){
+            proprietorMapper.delete(new QueryWrapper<ProprietorEntity>().eq("real_name",memberEntity.getName()).eq("house_id",memberEntity.getHouseId()).eq("community_id",memberEntity.getCommunityId()).eq("mobile",memberEntity.getMobile()));
+        }
         propertyRelationMapper.deleteById(id);
     }
 

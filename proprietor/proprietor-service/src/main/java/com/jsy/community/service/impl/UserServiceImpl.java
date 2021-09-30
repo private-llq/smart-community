@@ -880,6 +880,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return communityIdAndName.values();
     }
 
+    @Override
+    public Collection<Map<String, Object>> queryCommunityUserList(String uid) {
+        //查所有房屋已认证的小区
+        Set<Long> communityIds = userHouseService.queryUserHousesOfCommunityIds(uid);
+        if (CollectionUtils.isEmpty(communityIds)) {
+            return null;
+        }
+        //查小区名称
+        Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
+        return communityIdAndName.values();
+    }
+
     /**
      * @Description: 查询业主所有小区的房屋
      * @Param: [uid]
@@ -919,6 +931,53 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         /* t_community *//* t_user */
         Map<String, Map<String, Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
         UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
+        for (HouseEntity userHouseEntity : houses) {
+            Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
+            userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));
+            userHouseEntity.setOwner(userInfoVo.getRealName());
+        }
+        return houses;
+    }
+
+
+    /**
+     * @Description: 查询当前用户所有身份的房屋信息
+     * @author: Hu
+     * @since: 2021/9/29 16:08
+     * @Param: [userId, permissions]
+     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+     */
+    @Override
+    public List<HouseEntity> queryUserHouseListAll(String userId) {
+        //步骤一
+        /* t_user_house */
+        List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid", userId));
+        if (entityList.size()==0){
+            return null;
+        }
+        HashSet<Long> communityIdSet = new HashSet<>();
+        LinkedList<Long> houseIdList = new LinkedList<>();
+        for (HouseMemberEntity permission : entityList) {
+            communityIdSet.add(permission.getCommunityId());
+            houseIdList.add(permission.getHouseId());
+        }
+
+        //步骤二
+        //查社区id,房间id,楼栋id,地址拼接
+        //补buildingId如果pid!=0
+        /* t_house */
+        List<HouseEntity> houses = houseService.queryHouses(houseIdList);
+        //组装buildingId
+        for (HouseEntity tempEntity : houses) {
+            //递归查父节点，组装楼栋级节点id进buildingId
+            setBuildingId(tempEntity);
+        }
+
+        //步骤三
+        //查小区名、业主姓名
+        /* t_community *//* t_user */
+        Map<String, Map<String, Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
+        UserInfoVo userInfoVo = userMapper.selectUserInfoById(userId);
         for (HouseEntity userHouseEntity : houses) {
             Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
             userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));

@@ -48,7 +48,7 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @Date: 2021/3/31
 	**/
 //	@Select("select community_id from t_user_house where uid = #{uid} and check_status = 1")
-	@Select("select community_id from t_user_house where uid = #{uid}")
+	@Select("select community_id from t_user_house where uid = #{uid} and deleted=0")
 	Set<Long> queryUserHousesOfCommunityIds(String uid);
 
 

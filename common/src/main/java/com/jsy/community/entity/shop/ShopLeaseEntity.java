@@ -109,7 +109,10 @@ public class ShopLeaseEntity extends BaseEntity {
     // 业主查询商铺列表时的展示
     @TableField(exist = false)
     private String shopShowImg;
-    
+
+    // 社区名称
+    @TableField(exist = false)
+    private String communityName;
     
     
     

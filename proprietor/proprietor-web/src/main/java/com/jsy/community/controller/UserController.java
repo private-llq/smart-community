@@ -325,6 +325,21 @@ public class UserController {
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userService.queryRelationHousesOfCommunity(uid));
     }
+
+    /**
+    * @Description: 查询用户是业主身份社区
+     * @Param: []
+     * @Return: com.jsy.community.vo.CommonResult<java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: chq459799974
+     * @Date: 2021/3/31
+    **/
+    @Login
+    @ApiOperation("查询用户是业主身份的社区(房屋已认证的)")
+    @GetMapping("communityUserList")
+    public CommonResult<Collection<Map<String, Object>>> queryCommunityUserList(){
+        String uid = UserUtils.getUserId();
+        return CommonResult.ok(userService.queryCommunityUserList(uid));
+    }
     
     /**
     * @Description: 查询业主所有社区的房屋
@@ -338,6 +353,20 @@ public class UserController {
     @GetMapping("houseList")
     public CommonResult<List<HouseEntity>> queryUserHouseList(){
         return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
+    }
+
+    /**
+    * @Description: 查询业主所有社区的房屋
+     * @Param: []
+     * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.UserHouseEntity>>
+     * @Author: chq459799974
+     * @Date: 2020/12/16
+    **/
+    @Login
+    @ApiOperation("查询业主所有社区的房屋")
+    @GetMapping("houseListAll")
+    public CommonResult<List<HouseEntity>> queryUserHouseListAll(){
+        return CommonResult.ok(userService.queryUserHouseListAll(UserUtils.getUserId()));
     }
 
     /**
