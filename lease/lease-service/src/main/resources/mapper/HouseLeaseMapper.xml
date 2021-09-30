@@ -398,7 +398,7 @@
         c.house_const_name AS houseLeaseMode,
         d.house_const_name AS houseLeaseDeposit,
         e.house_const_name as decorationType,
-        tc.name as houseCommunityName
+        tc.`name` as houseCommunityName
         FROM
         t_house_lease AS l
         LEFT JOIN t_house_const AS c ON l.house_leasemode_id = c.house_const_code

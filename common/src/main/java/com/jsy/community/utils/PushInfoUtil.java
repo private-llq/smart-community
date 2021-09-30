@@ -34,7 +34,8 @@ public class PushInfoUtil {
         registerDto.setIdentifier("1");
         registerDto.setHeadImgMaxUrl(avatarUrl);
         registerDto.setHeadImgSmallUrl(avatarUrl);
-        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/auth/login/register")
+//        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/auth/login/register")
+        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/auth/login/register")
                 .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
                 .header(EncryptHelper.HEAD_ONLY_REQ, str)
                 .header(EncryptHelper.HEAD_DEVICE, "mobile")
@@ -77,7 +78,8 @@ public class PushInfoUtil {
         sendInfo.setReceiveType(1);
         sendInfo.setTo(imId);
         pushAppMsg.setSendInfo(sendInfo);
-        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
+//        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
+        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/open/public/pushAppMsg")
                 .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
                 .header(EncryptHelper.HEAD_ONLY_REQ, str)
                 .header(EncryptHelper.HEAD_DEVICE, "mobile")
@@ -130,7 +132,8 @@ public class PushInfoUtil {
 
         pushAppMsg.setSendInfo(sendInfo);
 
-        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
+//        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
+        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/open/public/pushAppMsg")
                 .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
                 .header(EncryptHelper.HEAD_ONLY_REQ, str)
                 .header(EncryptHelper.HEAD_DEVICE, "mobile")
