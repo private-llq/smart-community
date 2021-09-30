@@ -1,5 +1,11 @@
 server:
   port: 9527
+  ssl:
+    key-store: classpath:6363465_im.zhsi.co.pfx
+    key-store-password: H1w5C1hj
+    key-store-type: PKCS12
+    enabled: true
+
 spring:
   application:
     name: server-gateway
