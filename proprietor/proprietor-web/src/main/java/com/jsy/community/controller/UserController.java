@@ -356,6 +356,20 @@ public class UserController {
     }
 
     /**
+    * @Description: 查询业主所有社区的房屋
+     * @Param: []
+     * @Return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.UserHouseEntity>>
+     * @Author: chq459799974
+     * @Date: 2020/12/16
+    **/
+    @Login
+    @ApiOperation("查询业主所有社区的房屋")
+    @GetMapping("houseListAll")
+    public CommonResult<List<HouseEntity>> queryUserHouseListAll(){
+        return CommonResult.ok(userService.queryUserHouseListAll(UserUtils.getUserId()));
+    }
+
+    /**
     * @Description: 查询用户极光推送tags
      * @Param: []
      * @Return: com.jsy.community.vo.CommonResult

@@ -306,4 +306,13 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	Collection<Map<String, Object>> queryCommunityUserList(String uid);
+
+	/**
+	 * @Description: 查询当前用户所有身份的房屋信息
+	 * @author: Hu
+	 * @since: 2021/9/29 16:08
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> queryUserHouseListAll(String userId);
 }
