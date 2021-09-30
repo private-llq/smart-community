@@ -58,8 +58,8 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 		}
 		AlipayClient alipayClient = alipayUtils.getDefaultCertClient();
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-		request.setNotifyUrl("http://tb2korpp.dongtaiyuming.net/api/v1/payment/callBack/pay");
-//		request.setNotifyUrl(notifyUrl);
+//		request.setNotifyUrl("http://tb2korpp.dongtaiyuming.net/api/v1/payment/callBack/pay");
+		request.setNotifyUrl("http://222.168.212.28:9527/api/v1/payment/callBack/pay");
 		request.setBizContent("{" +
 //		"\"timeout_express\":\"90m\"," +
 		"\"total_amount\":"+"\""+ aliAppPayQO.getTotalAmount()+"\""+","+

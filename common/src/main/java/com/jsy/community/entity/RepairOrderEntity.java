@@ -63,7 +63,7 @@ public class RepairOrderEntity extends BaseEntity {
     @ApiModelProperty(value = "报修类别 0 个人报修 1 公共报修")
     private Integer repairType;
     
-    @ApiModelProperty(value = "订单状态 0 待处理 1 处理中 2 已处理 3已驳回")
+    @ApiModelProperty(value = "订单状态 0 待处理 1 修复中 2 已完成  3 驳回")
     private Integer status;
     @TableField(exist = false)
     private String statusStr;

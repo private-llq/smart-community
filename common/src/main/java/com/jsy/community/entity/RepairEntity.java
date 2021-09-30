@@ -32,6 +32,9 @@ public class RepairEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     
+    @ApiModelProperty(value = "报修编号")
+    private String repairNum;
+    
     @ApiModelProperty(value = "业主id")
     @NotBlank(groups = {addRepairValidate.class},message = "业主id不能为空")
     private String userId;
@@ -53,7 +56,7 @@ public class RepairEntity extends BaseEntity {
     @NotBlank(groups = {addRepairValidate.class},message = "报修地址不能为空")
     private String address;
 
-    @ApiModelProperty(value = "报修状态 0 待处理 1 处理中 2 已处理 3已驳回")
+    @ApiModelProperty(value = "报修状态 0 待处理 1 修复中 2 已完成  3 驳回")
     private Integer status;
     
     @ApiModelProperty(value = "保修状态字符串形式")
