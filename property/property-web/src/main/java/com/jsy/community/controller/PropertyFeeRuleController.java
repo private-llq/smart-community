@@ -171,7 +171,8 @@ public class PropertyFeeRuleController {
         financeBillService.updateAnnual();
         financeBillService.updateTemporary();
         financeBillService.updateMonth();
-//        financeBillService.updatePenalSum();
+        financeBillService.pushMonth();
+        financeBillService.pushAnnual();
         return CommonResult.ok();
     }
 

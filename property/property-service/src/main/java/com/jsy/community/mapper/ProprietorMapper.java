@@ -233,4 +233,13 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @Date: 2021/08/12
      **/
     ProprietorEntity queryNameAndMobileByHouseId(@Param("houseId") Long houseId, @Param("communityId") Long communityId);
+
+    /**
+     * @Description: 批量新增
+     * @author: Hu
+     * @since: 2021/9/29 9:40
+     * @Param:
+     * @return:
+     */
+    void saveList(@Param("list") List<ProprietorEntity> entities);
 }

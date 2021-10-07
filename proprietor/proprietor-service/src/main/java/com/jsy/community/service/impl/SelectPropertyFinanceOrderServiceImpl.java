@@ -61,6 +61,12 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                 propertyFinanceOrderEntity.setAddress(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
                 propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
             }
+            if (propertyFinanceOrderEntity.getPenalSum()!=null||!propertyFinanceOrderEntity.getPenalSum().equals(0.00)){
+
+                propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee().add(propertyFinanceOrderEntity.getPenalSum()));
+            }else {
+                propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee());
+            }
             list.add(propertyFinanceOrderEntity);
             return list;
         } else {
@@ -80,6 +86,7 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                     houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
                 }
                 for (PropertyFinanceOrderEntity entity : list) {
+                    entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()));
                     entity.setAddress((String) houseMap.get(entity.getTargetId()));
                     entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
                 }

@@ -26,8 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -66,6 +69,8 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 	// 公共报修事项
 	private static final int TYPECOMMON = 4;
 	
+	private String repairNumber="repair_number:";
+	
 	@Override
 	public List<RepairEntity> testList() {
 		return repairMapper.selectList(null);
@@ -101,6 +106,31 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 			}
 		}
 		
+		String str = null;
+		String s = null;
+		Object number = redisTemplate.opsForValue().get(repairNumber + repairEntity.getCommunityId());
+		if (number!=null){
+			s = String.valueOf(number);
+		}else {
+			s = String.valueOf(1);
+		}
+		if (s.length()==1) {
+			str = "000" + s;
+		} else if (s.length()==2) {
+			str = "00" + s;
+		} else if (s.length()==3) {
+			str = "0" + s;
+		} else if (s.length()==4) {
+			str = s;
+		} else {
+			str = s;
+		}
+		int anInt = Integer.parseInt(s);
+		++anInt;
+		redisTemplate.opsForValue().set(repairNumber + repairEntity.getCommunityId(), String.valueOf(anInt), getMinute(), TimeUnit.MINUTES);
+		String format = new SimpleDateFormat("yyyyMMdd").format(new Date());
+		String sb = "BX" + format + str;
+		repairEntity.setRepairNum(sb);
 		repairEntity.setId(SnowFlake.nextId());
 		repairMapper.insert(repairEntity); // 1.png;2.png;3.png;   或 1.png;2.png;3.png 都可以            redis 现在存的是  3个 xx.png
 		Long repairId = repairEntity.getId();// 得到新添加报修的报修id
@@ -123,6 +153,21 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		}
 	}
 	
+	/**
+	 * @Description: 获取当前时间到0点钟的分钟数
+	 * @author: Hu
+	 * @since: 2021/5/19 9:48
+	 * @Param:
+	 * @return:
+	 */
+	public int getMinute() {
+		int hour = LocalDateTime.now().getHour();
+		int minute = LocalDateTime.now().getMinute();
+		int remainHour=24-hour-1;
+		int remainMinute=60-minute;
+		return remainHour*60+remainMinute;
+	}
+	
 	@Override
 	public List<RepairEntity> getRepair(String id, Integer status) {
 		List<RepairEntity> list = null;
@@ -132,7 +177,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 			wrapper.eq("user_id", id).orderByDesc("create_time").orderByAsc("status");
 			list = repairMapper.selectList(wrapper);
 		} else {
-			// 根据报修状态查询响应数据 0待处理 1处理中 2已完成 3已驳回
+			// 根据报修状态查询响应数据 0 待处理 1 修复中 2 已完成  3 驳回
 			QueryWrapper<RepairEntity> wrapper = new QueryWrapper<>();
 			wrapper.eq("user_id", id).orderByDesc("create_time").eq("status", status);
 			list = repairMapper.selectList(wrapper);
@@ -156,7 +201,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 				repairEntity.setStatusString("待处理");
 			}
 			if (repairEntity.getStatus() == 1) {
-				repairEntity.setStatusString("处理中");
+				repairEntity.setStatusString("修复中");
 			}
 			if (repairEntity.getStatus() == 2) {
 				repairEntity.setStatusString("已完成");
@@ -172,7 +217,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 				}
 			}
 			if (repairEntity.getStatus() == 3) {
-				repairEntity.setStatusString("已驳回");
+				repairEntity.setStatusString("驳回");
 			}
 		}
 		return list;

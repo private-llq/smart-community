@@ -29,6 +29,8 @@ public class FinanceBillJob extends QuartzJobBean {
         financeBillService.updateMonth();
         financeBillService.updatePenalSum();
         financeBillService.updateTemporary();
+        financeBillService.pushAnnual();
+        financeBillService.pushMonth();
         log.info("账单更新完成");
     }
 
