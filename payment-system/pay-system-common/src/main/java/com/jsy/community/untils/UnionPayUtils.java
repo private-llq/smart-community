@@ -26,7 +26,7 @@ public class UnionPayUtils {
      *@Return: com.jsy.community.vo.OpenApiResponseVO
      *@Date: 2021/4/11 13:34
      **/
-    public OpenApiResponseVO transApi(String jsonString, String apiName) {
+    public static OpenApiResponseVO transApi(String jsonString, String apiName) {
         log.info("银联接口请求参数++++++++++{}", jsonString);
         DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> client = buildClient();
         OpenApiRequestQO openApiRequestDemo = new OpenApiRequestQO(jsonString);
@@ -40,7 +40,7 @@ public class UnionPayUtils {
         return response;
     }
 
-    public OpenApiResponseVO credentialApi(String jsonString, String apiName) {
+    public static OpenApiResponseVO credentialApi(String jsonString, String apiName) {
         log.info("银联接口请求参数++++++++++{}", jsonString);
         DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> client = buildClient();
         OpenApiRequestQO openApiRequestDemo = new OpenApiRequestQO(jsonString);
@@ -62,7 +62,7 @@ public class UnionPayUtils {
      *@Return: com.jsy.community.vo.OpenApiResponseVO
      *@Date: 2021/4/14 14:14
      **/
-    public OpenApiResponseVO queryApi(String jsonString, String apiName) {
+    public static OpenApiResponseVO queryApi(String jsonString, String apiName) {
         log.info("银联接口请求参数++++++++++{}", jsonString);
         DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> client = buildClient();
         OpenApiRequestQO openApiRequestDemo = new OpenApiRequestQO(jsonString);
@@ -84,7 +84,7 @@ public class UnionPayUtils {
      *@Return: com.jsy.community.vo.OpenApiResponseVO
      *@Date: 2021/4/11 13:34
      **/
-    public OpenApiResponseVO redPacketApi(String jsonString, String apiName) {
+    public static OpenApiResponseVO redPacketApi(String jsonString, String apiName) {
         log.info("银联接口请求参数++++++++++{}", jsonString);
         DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> client = buildClient();
         OpenApiRequestQO openApiRequestDemo = new OpenApiRequestQO(jsonString);
@@ -105,7 +105,7 @@ public class UnionPayUtils {
      *@Return: com.gnete.openapi.internal.DefaultOpenApiRequestClient<com.jsy.community.common.OpenApiResponseDemo,com.jsy.community.common.OpenApiRequestDemo>
      *@Date: 2021/4/10 14:00
      **/
-    private DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> buildClient() {
+    private static DefaultOpenApiRequestClient<OpenApiResponseVO, OpenApiRequestQO> buildClient() {
         String certificatePath = new String();
         if (System.getProperty("os.name").startsWith("Win")) {
             // windows操作系统
@@ -128,7 +128,7 @@ public class UnionPayUtils {
      *@Return: java.lang.String
      *@Date: 2021/4/10 14:02
      **/
-    public String buildMsgBody(Object o) {
+    public static String buildMsgBody(Object o) {
         Object jsonObject = JSONArray.toJSON(o);
         String jsonString = jsonObject.toString();
         StringBuilder stringBuilder = new StringBuilder("{\"msgBody\":");
@@ -143,7 +143,7 @@ public class UnionPayUtils {
      *@Return: java.lang.String
      *@Date: 2021/5/8 9:47
      **/
-    public String buildBizContent(Object o) {
+    public static String buildBizContent(Object o) {
         Object jsonObject = JSONArray.toJSON(o);
         String jsonString = jsonObject.toString();
         return jsonString;

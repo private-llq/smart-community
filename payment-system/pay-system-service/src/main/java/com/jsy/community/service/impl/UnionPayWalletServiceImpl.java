@@ -46,8 +46,8 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Autowired
-    private UnionPayUtils unionPayUtils;
+//    @Autowired
+//    private UnionPayUtils UnionPayUtils;
 
     @Autowired
     private UnionPayWalletBankMapper unionPayWalletBankMapper;
@@ -288,8 +288,8 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         }
         BeanUtils.copyProperties(baseAcctInfo, acctInfoVO);
         //获取钱包关联信息(只允许查询C端)
-        String relationMsgBody = unionPayUtils.buildMsgBody(walletIdQO);
-        OpenApiResponseVO relationResponse = unionPayUtils.queryApi(relationMsgBody, UnionPayConfig.QUERY_ACCT_RELATED_INFO);
+        String relationMsgBody = UnionPayUtils.buildMsgBody(walletIdQO);
+        OpenApiResponseVO relationResponse = UnionPayUtils.queryApi(relationMsgBody, UnionPayConfig.QUERY_ACCT_RELATED_INFO);
         if (relationResponse.getResponse() == null || !SUCCESS_STATUS_CODE.equals(relationResponse.getCode())) {
             return acctInfoVO;
         }
