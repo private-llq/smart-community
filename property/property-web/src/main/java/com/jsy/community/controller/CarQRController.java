@@ -40,7 +40,7 @@ public class CarQRController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICaQRService iCaQRService;
 
-   private static final String URL = "http://192.168.12.122:8080/#/?CommunityID=";
+   private static final String URL = "http://192.168.12.125:8080/#/?CommunityID=";
     private static final String BUCKET_NAME = "qrcode";
     private static final Integer WIDTH = 400;
     private static final Integer HEIGHT = 400;
