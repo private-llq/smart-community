@@ -43,8 +43,8 @@ import java.math.BigDecimal;
 @DubboService(version = Const.version, group = Const.group_payment)
 public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRecordMapper, UnionPayOrderRecordEntity> implements UnionPayOrderRecordService {
 
-    @Autowired
-    private UnionPayUtils unionPayUtils;
+//    @Autowired
+//    private UnionPayUtils UnionPayUtils;
 
     @Autowired
     private UnionPayWalletMapper unionPayWalletMapper;

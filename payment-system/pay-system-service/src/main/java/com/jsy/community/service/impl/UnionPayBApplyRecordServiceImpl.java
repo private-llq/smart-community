@@ -39,8 +39,8 @@ import java.math.BigDecimal;
 @DubboService(version = Const.version, group = Const.group_payment)
 public class UnionPayBApplyRecordServiceImpl extends ServiceImpl<UnionPayBApplyRecordMapper, UnionPayBApplyRecordEntity> implements UnionPayBApplyRecordService {
 
-    @Autowired
-    private UnionPayUtils unionPayUtils;
+    /*@Autowired
+    private UnionPayUtils UnionPayUtils;*/
 
     @Autowired
     private UnionPayBApplyRecordMapper bApplyRecordMapper;
@@ -136,8 +136,8 @@ public class UnionPayBApplyRecordServiceImpl extends ServiceImpl<UnionPayBApplyR
     @Override
     public Boolean resetBtypeAcctPwd(ResetBtypeAcctPwdQO resetBtypeAcctPwdQO) {
         // 构建请求json
-        String msgBody = unionPayUtils.buildMsgBody(resetBtypeAcctPwdQO);
-        OpenApiResponseVO response = unionPayUtils.transApi(msgBody, UnionPayConfig.RESET_BTYPE_ACCT_PWD);
+        String msgBody = UnionPayUtils.buildMsgBody(resetBtypeAcctPwdQO);
+        OpenApiResponseVO response = UnionPayUtils.transApi(msgBody, UnionPayConfig.RESET_BTYPE_ACCT_PWD);
         if (response.getResponse() == null || !UnionPayConfig.SUCCESS_CODE.equals(response.getCode())) {
             log.info("B端钱包重置支付密码失败!{}", response.getMsg());
             return false;

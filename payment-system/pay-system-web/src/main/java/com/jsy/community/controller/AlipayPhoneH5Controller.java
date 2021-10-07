@@ -10,33 +10,25 @@ import com.alipay.api.request.AlipayTradeWapPayRequest;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICarOrderService;
-import com.jsy.community.api.IPropertyCarService;
+import com.jsy.community.config.web.AliH5CertificateConfig;
 import com.jsy.community.config.web.AlipayConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.qo.payment.AliOrderContentQO;
+import com.jsy.community.utils.AlipayUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.net.SocketTimeoutException;
-import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @ApiJSYController
 @RestController
@@ -45,7 +37,8 @@ public class AlipayPhoneH5Controller {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarOrderService carOrderService;
 
-
+    @Autowired
+    private AlipayUtils alipayUtils;
 
     @RequestMapping(value = "/pay")
     public String test(@RequestBody AliOrderContentQO qo) throws IOException {
@@ -57,6 +50,9 @@ public class AlipayPhoneH5Controller {
                 AlipayConfig.CHARSET,
                 AlipayConfig.ALIPAY_PUBLIC_KEY,
                 AlipayConfig.SIGNTYPE);
+
+//        AlipayClient alipayClient = AliH5CertificateConfig.getDefaultCertClient();
+
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
         request.setNotifyUrl(AlipayConfig.notify_url);// 设置异步通知地址
         request.setReturnUrl(AlipayConfig.return_url);// 设置同步地址
