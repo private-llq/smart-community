@@ -465,6 +465,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             if (!StringUtils.isEmpty(entity.getUid())) {
                 //登录成功
                 UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+                UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
+                if (userEntity!=null){
+                    userInfoVo.setMobile(userEntity.getMobile());
+                }
                 userInfoVo.setIdCard(null);
                 UserAuthVo userAuthVo = createAuthVoWithToken(userInfoVo);
 //                returnMap.put("exists",true);
@@ -526,6 +530,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //        userInfoVo.setUid(uid);
         //登录成功
         UserInfoVo userInfoVo = queryUserInfo(uid);
+        userInfoVo.setMobile(userThirdPlatformQO.getMobile());
         userInfoVo.setIdCard(null);
         return createAuthVoWithToken(userInfoVo);
     }

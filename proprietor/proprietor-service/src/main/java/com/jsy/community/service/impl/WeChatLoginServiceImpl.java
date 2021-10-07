@@ -185,6 +185,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         entity.setUid(uid);
         userThirdPlatformMapper.updateById(entity);
         UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setMobile(bindingMobileQO.getMobile());
         userInfoVo.setUid(uid);
         return createAuthVoWithToken(userInfoVo);
     }
