@@ -109,7 +109,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
     private IHouseLeaseService iHouseLeaseService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private IUserService userService;
+    private PropertyUserService userService;
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;

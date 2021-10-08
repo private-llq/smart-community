@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessEnum;
@@ -19,7 +19,6 @@ import com.jsy.community.mapper.CommunityHardWareMapper;
 import com.jsy.community.mapper.UserFaceSyncRecordMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -38,7 +37,7 @@ import java.util.stream.Collectors;
  * @since 2020-11-25
  */
 @DubboService(version = Const.version, group = Const.group_property)
-public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements IUserService {
+public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements PropertyUserService {
 
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IHouseMemberService houseMemberService;
@@ -360,5 +359,63 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 			}
 		}
 		return updateResult;
+	}
+
+	/**
+	 * @param userEntity   :
+	 * @param communityIds :
+	 * @author: Pipi
+	 * @description: app用户修改人脸照片
+	 * @return: void
+	 * @date: 2021/10/8 17:58
+	 **/
+	@Override
+	public void saveFace(UserEntity userEntity, List<Long> communityIds) {
+		// 删除原有的同步记录
+		QueryWrapper<UserFaceSyncRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();;
+		recordEntityQueryWrapper.eq("uid", userEntity.getUid());
+		recordEntityQueryWrapper.in("community_id", communityIds);
+		userFaceSyncRecordMapper.delete(recordEntityQueryWrapper);
+		// 查询设备
+		List<CommunityHardWareEntity> communityHardWareEntities = hardWareMapper.selectAllByCommunityIds(communityIds);
+		if (!CollectionUtils.isEmpty(communityHardWareEntities)) {
+			Map<Long, Set<String>> hardwareMap = new HashMap<>();
+			for (CommunityHardWareEntity communityHardWareEntity : communityHardWareEntities) {
+				if (hardwareMap.containsKey(communityHardWareEntity.getCommunityId())) {
+					hardwareMap.get(communityHardWareEntity.getCommunityId()).add(communityHardWareEntity.getHardwareId());
+				} else {
+					Set<String> hardwareIds = new HashSet<>();
+					hardwareIds.add(communityHardWareEntity.getHardwareId());
+					hardwareMap.put(communityHardWareEntity.getCommunityId(), hardwareIds);
+				}
+			}
+			// 新增同步记录
+			ArrayList<UserFaceSyncRecordEntity> recordEntities = new ArrayList<>();
+			for (Long communityId : hardwareMap.keySet()) {
+				for (String hardwareId : hardwareMap.get(communityId)) {
+					UserFaceSyncRecordEntity userFaceSyncRecordEntity = new UserFaceSyncRecordEntity();
+					userFaceSyncRecordEntity.setUid(userEntity.getUid());
+					userFaceSyncRecordEntity.setCommunityId(communityId);
+					userFaceSyncRecordEntity.setFaceUrl(userEntity.getFaceUrl());
+					userFaceSyncRecordEntity.setFacilityId(hardwareId);
+					userFaceSyncRecordEntity.setId(SnowFlake.nextId());
+					userFaceSyncRecordEntity.setDeleted(0);
+					userFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
+					recordEntities.add(userFaceSyncRecordEntity);
+				}
+				// 启用人脸
+				XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
+				xuFaceEditPersonDTO.setOperator("editPerson");
+				xuFaceEditPersonDTO.setName(userEntity.getRealName());
+				xuFaceEditPersonDTO.setPersonType(0);
+				xuFaceEditPersonDTO.setTempCardType(0);
+				xuFaceEditPersonDTO.setPicURI(userEntity.getFaceUrl());
+				xuFaceEditPersonDTO.setCustomId(userEntity.getMobile());
+				xuFaceEditPersonDTO.setHardwareIds(hardwareMap.get(communityId));
+				xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
+				rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+			}
+			userFaceSyncRecordMapper.insertBatchRecord(recordEntities);
+		}
 	}
 }

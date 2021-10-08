@@ -56,7 +56,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     private ILeaseUserService leaseUserService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private IUserService userService;
+    private PropertyUserService userService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;

@@ -3,14 +3,13 @@ package com.jsy.community.controller;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.nacos.common.utils.UuidUtils;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.ICarPositionTypeService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.api.*;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
@@ -25,36 +24,24 @@ import com.jsy.community.qo.property.*;
 import com.jsy.community.util.*;
 import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.car.CarVO;
 import com.jsy.community.vo.car.GpioData;
 import com.jsy.community.vo.car.Rs485Data;
-import com.jsy.community.vo.car.WhitelistData;
 import com.jsy.community.vo.property.PageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.implementation.bind.annotation.This;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.entity.ContentType;
-import org.elasticsearch.search.sort.MinAndMax;
 import org.springframework.beans.BeanUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -80,7 +67,7 @@ public class CarPositionController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionService iCarPositionService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private IUserService iUserService;
+    private PropertyUserService iUserService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionTypeService iCarPositionTypeService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

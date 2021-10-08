@@ -17,7 +17,7 @@ import java.util.Map;
  * @author YuLF
  * @since 2020-11-25
  */
-public interface IUserService extends IService<UserEntity> {
+public interface PropertyUserService extends IService<UserEntity> {
 	
 	/**
 	 * @return com.jsy.community.entity.UserEntity
@@ -104,4 +104,14 @@ public interface IUserService extends IService<UserEntity> {
 	 * @date: 2021/9/23 17:58
 	 **/
 	Integer addFace(UserEntity userEntity, Long communityId);
+
+	/**
+	 * @author: Pipi
+	 * @description: app用户修改人脸照片
+	 * @param userEntity:
+     * @param communityIds:
+	 * @return: void
+	 * @date: 2021/10/8 17:58
+	 **/
+	void saveFace(UserEntity userEntity, List<Long> communityIds);
 }

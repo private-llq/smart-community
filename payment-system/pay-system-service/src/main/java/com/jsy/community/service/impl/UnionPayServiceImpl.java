@@ -78,7 +78,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      **/
     @Override
     public OpenApiResponseVO getPlugRandomKey(Integer num) {
-        Map<String,Integer> bizMap = new HashMap<>(1);
+        Map<String, Integer> bizMap = new HashMap<>(1);
         // 获取随机因子数量,最多100个
         bizMap.put("applyCount", num);
         String msgBody = UnionPayUtils.buildMsgBody(bizMap);

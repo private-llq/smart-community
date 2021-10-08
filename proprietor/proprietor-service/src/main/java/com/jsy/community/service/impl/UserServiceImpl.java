@@ -87,6 +87,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
 
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private PropertyUserService propertyUserService;
+
     @Autowired
     private IUserAccountService userAccountService;
 
@@ -1230,6 +1233,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
+    //保存人脸
     @Override
     @Transactional
     public void saveFace(String userId, String faceUrl) {
@@ -1237,6 +1241,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (userEntity != null) {
             userEntity.setFaceUrl(faceUrl);
             userMapper.updateById(userEntity);
+            if (userEntity.getFaceEnableStatus() == 1) {
+                // 修改人脸之后,查询相关社区及相关社区设备列表
+                QueryWrapper<HouseMemberEntity> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("uid", userId);
+                List<HouseMemberEntity> houseMemberEntities = houseMemberMapper.selectList(queryWrapper);
+                if (!CollectionUtils.isEmpty(houseMemberEntities)) {
+                    List<Long> communityIds = houseMemberEntities.stream().map(HouseMemberEntity::getCommunityId).collect(Collectors.toList());
+                    // 然后同步人脸
+                    propertyUserService.saveFace(userEntity, communityIds);
+                }
+            }
         }
     }
 

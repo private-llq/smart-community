@@ -20,4 +20,13 @@ public interface CommunityHardWareMapper extends BaseMapper<CommunityHardWareEnt
      * @date: 2021/9/24 15:10
      **/
     List<CommunityHardWareEntity> selectAllByCommunityId(Long communityId);
+
+    /**
+     * @author: Pipi
+     * @description: 查询多个社区的设备列表
+     * @param communityIds:
+     * @return: java.util.List<com.jsy.community.entity.CommunityHardWareEntity>
+     * @date: 2021/10/8 18:00
+     **/
+    List<CommunityHardWareEntity> selectAllByCommunityIds(List<Long> communityIds);
 }
