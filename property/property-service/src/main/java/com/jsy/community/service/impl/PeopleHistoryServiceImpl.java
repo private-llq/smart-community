@@ -23,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,10 +68,13 @@ public class PeopleHistoryServiceImpl extends ServiceImpl<PeopleHistoryMapper, P
             }
         }
         // ================== 查询可能的用户信息 ==================================
-        QueryWrapper<HouseMemberEntity> houseMemberEntityQueryWrapper = new QueryWrapper<>();
-        houseMemberEntityQueryWrapper.eq("community_id", communityId);
-        houseMemberEntityQueryWrapper.in("mobile", mobileSet);
-        List<HouseMemberEntity> houseMemberEntities = propertyRelationMapper.selectList(houseMemberEntityQueryWrapper);
+        List<HouseMemberEntity> houseMemberEntities = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(mobileSet)) {
+            QueryWrapper<HouseMemberEntity> houseMemberEntityQueryWrapper = new QueryWrapper<>();
+            houseMemberEntityQueryWrapper.eq("community_id", communityId);
+            houseMemberEntityQueryWrapper.in("mobile", mobileSet);
+            houseMemberEntities = propertyRelationMapper.selectList(houseMemberEntityQueryWrapper);
+        }
         Set<String> needRemoveMobileSet = new HashSet<>();
         if (!CollectionUtils.isEmpty(houseMemberEntities)) {
             for (HouseMemberEntity houseMemberEntity : houseMemberEntities) {
@@ -90,10 +94,13 @@ public class PeopleHistoryServiceImpl extends ServiceImpl<PeopleHistoryMapper, P
         }
         mobileSet.removeAll(needRemoveMobileSet);
         // ================== 查询可能的访客信息 ==================================
-        QueryWrapper<VisitorEntity> visitorEntityQueryWrapper = new QueryWrapper<>();
-        visitorEntityQueryWrapper.eq("community_id", communityId);
-        visitorEntityQueryWrapper.in("contact", mobileSet);
-        List<VisitorEntity> visitorEntities = visitorMapper.selectList(visitorEntityQueryWrapper);
+        List<VisitorEntity> visitorEntities = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(mobileSet)) {
+            QueryWrapper<VisitorEntity> visitorEntityQueryWrapper = new QueryWrapper<>();
+            visitorEntityQueryWrapper.eq("community_id", communityId);
+            visitorEntityQueryWrapper.in("contact", mobileSet);
+            visitorEntities = visitorMapper.selectList(visitorEntityQueryWrapper);
+        }
         if (!CollectionUtils.isEmpty(visitorEntities)) {
             for (VisitorEntity visitorEntity : visitorEntities) {
                 for (PeopleHistoryEntity historyEntity : historyEntities) {
@@ -135,6 +142,7 @@ public class PeopleHistoryServiceImpl extends ServiceImpl<PeopleHistoryMapper, P
                 queryWrapper.ne("verify_status", 1);
             }
         }
+        queryWrapper.orderByDesc("create_time");
         page = peopleHistoryMapper.selectPage(page, queryWrapper);
         PageInfo<PeopleHistoryEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(page, pageInfo);

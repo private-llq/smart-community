@@ -270,6 +270,7 @@ public class VisitorServiceImpl implements IVisitorService {
 		if(!StringUtils.isEmpty(query.getMachineName())){
 			queryWrapper.like("machine_name",query.getMachineName());
 		}
+		queryWrapper.orderByDesc("snap_time");
 		Page<VisitorStrangerEntity> pageData = visitorStrangerMapper.selectPage(page,queryWrapper);
 		PageInfo<VisitorStrangerEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);
