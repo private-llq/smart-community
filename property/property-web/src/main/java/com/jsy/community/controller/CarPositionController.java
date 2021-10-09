@@ -913,7 +913,8 @@ public class CarPositionController {
                 i.setOutPic(closeupPic);
                 i.setOutImage(picture);
                 CarLaneEntity carLaneOne = iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(), carEquipmentManageEntity.getCommunityId());
-                carCutOffEntity.setOutLane(carLaneOne.getLaneName());
+                i.setOutLane(carLaneOne.getLaneName());
+                System.out.println("*********"+carLaneOne.getLaneName());
                 carCutOffService.updateCutOff(i);
             }
 
