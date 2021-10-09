@@ -73,7 +73,6 @@ public class WeChatH5PayController {
             amount.put("currency","CNY");
             //下单金额
             Map<String, Object> payer = new HashMap<String, Object>();
-
             //返回参数
             Map<String, Object> result = new HashMap<String, Object>();
             //获取ip地址
