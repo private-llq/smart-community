@@ -167,7 +167,7 @@ public class WeChatH5PayController {
 //                    result.put("sign",sign1);//签名
 //                    result.put("appid",appid);//appid
 //                    result.put("msg","支付成功");
-//
+
 //                    //时间搓
 //                    long timestamp = new Date().getTime();
 //                    result.put("timestamp",timestamp);

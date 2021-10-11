@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "社区集市-商品分类")
 @RestController
@@ -82,6 +83,21 @@ public class ProprietorMarketCategoryController {
         return CommonResult.ok(list,"查询成功");
     }
 
+    /**
+     * @Description: 查询社区集市商品类别
+     * @Param: [categoryEntity]
+     * @Return: List
+     * @Author: Tian
+     * @Date: 2021/8/21-9:44
+     **/
+    @GetMapping("/selectMarketcategoryList")
+    @ApiOperation("查询社区集市商品类别")
+    @Login
+    public CommonResult selectMarketcategoryList(){
+        List<ProprietorMarketCategoryEntity> list = categoryService.selectMarketCategory();
+        List<ProprietorMarketCategoryEntity> list1 = list.stream().filter(s->s.getId()!=94113194666233856l).collect(Collectors.toList());
+        return CommonResult.ok(list1,"查询成功");
+    }
 //
 //    @GetMapping("/cat1")
 //    @ApiOperation("查询社区集市商品类别")
