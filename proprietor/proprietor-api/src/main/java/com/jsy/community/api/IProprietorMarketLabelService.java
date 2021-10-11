@@ -42,4 +42,5 @@ public interface IProprietorMarketLabelService extends IService<ProprietorMarket
      * @Date: 2021/8/21-9:44
      **/
     List<ProprietorMarketLabelEntity> selectMarketLabel();
+
 }

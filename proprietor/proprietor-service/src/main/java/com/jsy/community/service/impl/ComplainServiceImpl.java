@@ -142,7 +142,7 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
                 throw new ProprietorException("你还没有反馈信息");
             }
             complainVO.setCommunityName(communityEntity.getName());
-            list.add(complainVO);
+            list.add(complainVO); 
         }
         return list;
     }

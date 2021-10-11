@@ -74,7 +74,7 @@ public class CarCutOffController{
 
     @Login
     @PostMapping("/updateCutOff")
-    @CarOperation(operation = "新增了【出闸记录】")
+    @CarOperation(operation = "修改【出闸记录】")
     public CommonResult updateCutOff(@RequestBody CarCutOffEntity carCutOffEntity){
         boolean b=  carCutOffService.updateCutOff(carCutOffEntity);
         return CommonResult.ok("修改成功");

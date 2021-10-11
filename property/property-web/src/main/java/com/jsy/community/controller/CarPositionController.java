@@ -9,7 +9,6 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.ICarPositionTypeService;
-import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.api.*;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
@@ -814,13 +813,14 @@ public class CarPositionController {
             //时间戳转年月日       //进闸时间
             LocalDateTime localDateTime = new Date(startTime * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
             CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
+            CarLaneEntity carLaneOne = iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(), carEquipmentManageEntity.getCommunityId());
             for (CarCutOffEntity i : carCutOffEntityList) {
                 i.setStopTime(localDateTime);
                 i.setState(1);
                 //出闸照片
                 i.setOutPic(closeupPic);
                 i.setOutImage(picture);
-                CarLaneEntity carLaneOne = iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(), carEquipmentManageEntity.getCommunityId());
+
                 i.setOutLane(carLaneOne.getLaneName());
                 System.out.println("*********"+carLaneOne.getLaneName());
                 carCutOffService.updateCutOff(i);

@@ -50,7 +50,7 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
     * @Date: 2021/9/13-16:46
     **/
    @Override
-    public Page<CarOrderEntity>     selectCarOrder(BaseQO<CarOrderQO> baseQO, Long communityId) {
+    public Page<CarOrderEntity>   selectCarOrder(BaseQO<CarOrderQO> baseQO, Long communityId) {
         Page<CarOrderEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
         if (baseQO.getQuery()==null){
             baseQO.setQuery(new CarOrderQO());
