@@ -524,6 +524,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setBeginTime(carEntity.getBeginTime());
                 carOrderEntity.setOverTime(carEntity.getOverTime());
                 carOrderEntity.setMoney(carEntity.getMoney());
+                carOrderEntity.setMonth(entity.getMonth());
                 carOrderEntity.setOrderNum(carEntity.getOrderNum());
                 carOrderEntity.setOrderStatus(0);
                 carOrderEntity.setCarPlate(carEntity.getCarPlate());
