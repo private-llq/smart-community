@@ -3,6 +3,6 @@
 <mapper namespace="com.jsy.community.mapper.DepartmentMapper">
 
     <delete id="deleteDepartmentById">
-        update t_department set deleted = 1 where id = #{departmentId} and community_id = #{communityId} and deleted = 0
+        update t_department set deleted = #{departmentId} where id = #{departmentId} and community_id = #{communityId} and deleted = 0
     </delete>
 </mapper>

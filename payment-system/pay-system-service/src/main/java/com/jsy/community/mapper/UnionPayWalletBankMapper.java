@@ -38,5 +38,5 @@ public interface UnionPayWalletBankMapper extends BaseMapper<UnionPayWalletBankE
      *@Return: java.lang.Integer
      *@Date: 2021/4/16 10:42
      **/
-    Integer updateDeleted(@Param("walletId") String walletId, @Param("bankAcctNo") String bankAcctNo);
+    Integer updateDeleted(@Param("id")Long id, @Param("walletId") String walletId, @Param("bankAcctNo") String bankAcctNo);
 }

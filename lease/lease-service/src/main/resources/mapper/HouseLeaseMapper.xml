@@ -98,7 +98,7 @@
 
     <!-- 删除用户t_house_lease表中的数据 -->
     <delete id="delHouseLeaseInfo">
-        update t_house_lease set deleted = 1,update_time = now() where id = #{id} and uid = #{uid} and deleted = 0
+        update t_house_lease set deleted = #{id},update_time = now() where id = #{id} and uid = #{uid} and deleted = 0
     </delete>
 
     <!-- 按列表查询房屋出租信息 -->
