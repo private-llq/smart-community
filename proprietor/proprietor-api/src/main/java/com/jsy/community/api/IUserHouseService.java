@@ -199,4 +199,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @return:
 	 */
 	Set<Long> queryRelationHousesOfCommunityIds(String uid);
+
+	/**
+	 * @Description: 根据用户手机更新成员表uid
+	 * @author: Hu
+	 * @since: 2021/10/12 14:52
+	 * @Param:
+	 * @return:
+	 */
+	void updateMobileUser(String uid);
 }

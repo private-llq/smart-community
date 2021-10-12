@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jsy.community.mapper.UserHouseMapper">
+<mapper namespace="com.jsy.community.mapper.PropertyUserHouseMapper">
 
     <!-- 2021.7.9 去除查询条件 and check_status = 1 -->
     <select id="listAuthUserId" resultType="string">
         select uid from t_user_house where community_id = #{communityId}
     </select>
+
+    <insert id="saveList">
+        insert into t_user_house (id,community_id,house_id,check_status) values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id},#{entity.communityId},#{entity.houseId},#{entity.checkStatus})
+        </foreach>
+    </insert>
 </mapper>

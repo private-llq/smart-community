@@ -9,11 +9,7 @@ import com.jsy.community.callback.FDSearch;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.hk.FacilityEntity;
-import com.jsy.community.entity.hk.FacilityTypeEntity;
-import com.jsy.community.mapper.FacilityMapper;
-import com.jsy.community.mapper.FacilityTypeMapper;
-import com.jsy.community.mapper.UserHouseMapper;
-import com.jsy.community.mapper.UserMapper;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.hk.FacilityQO;
 import com.jsy.community.util.facility.FacilityUtils;
@@ -50,7 +46,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	private FacilityTypeMapper facilityTypeMapper;
 	
 	@Autowired
-	private UserHouseMapper houseMapper;
+	private PropertyUserHouseMapper houseMapper;
 	
 	@Autowired
 	private UserMapper userMapper;
@@ -316,7 +312,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		} else {
 			//是
 			//1. 查询该社区的所有已认证的用户id
-			List<String> ids = houseMapper.listAuthUserId(communityId);
+			List<String> ids = (List<String>) houseMapper.listAuthUserId(communityId);
 			//2. 批量查询已认证的用户数据
 			List<UserEntity> userList = userMapper.listAuthUserInfo(ids);
 			//2. 上传数据

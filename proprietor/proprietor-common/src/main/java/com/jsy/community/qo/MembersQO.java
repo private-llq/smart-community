@@ -23,6 +23,11 @@ public class MembersQO implements Serializable {
     private Long id;
 
     /**
+     * 登录用户uid
+     */
+    private String uid;
+
+    /**
      * id
      */
     @NotNull(groups = {MembersVerify.class},message = "房间id不能为空！" )

@@ -46,7 +46,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
     private PropertyFeeRuleRelevanceMapper propertyFeeRuleRelevanceMapper;
 
     @Autowired
-    private UserHouseMapper userHouseMapper;
+    private PropertyUserHouseMapper propertyUserHouseMapper;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserImService userImService;

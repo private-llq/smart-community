@@ -34,5 +34,8 @@
 			and thm.relation=#{relation}
 		</if>
     </select>
+	<update id="updateByUid">
+		update t_house_member set uid=#{uid} where mobile=#{mobile}
+	</update>
 
 </mapper>
