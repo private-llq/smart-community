@@ -1095,18 +1095,17 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 }
             }
         }
-        if (assetLeaseRecordEntity.getIdentityType() == 1) {
-            // 房东,查看租客信息
-            UserInfoVo userInfoVo = userService.proprietorDetails(leaseRecordEntity.getTenantUid());
-            leaseRecordEntity.setRealName(userInfoVo.getRealName());
-            leaseRecordEntity.setTenantPhone(userInfoVo.getMobile());
-            leaseRecordEntity.setTenantIdCard(userInfoVo.getIdCard());
-        } else {
+        if (assetLeaseRecordEntity.getIdentityType() == 2) {
             // 租客,查看房东信息
             UserInfoVo userInfoVo = userService.proprietorDetails(leaseRecordEntity.getHomeOwnerUid());
             leaseRecordEntity.setLandlordName(userInfoVo.getRealName());
             leaseRecordEntity.setLandlordPhone(userInfoVo.getMobile());
         }
+        // 租客信息
+        UserInfoVo userInfoVo = userService.proprietorDetails(leaseRecordEntity.getTenantUid());
+        leaseRecordEntity.setRealName(userInfoVo.getRealName());
+        leaseRecordEntity.setTenantPhone(userInfoVo.getMobile());
+        leaseRecordEntity.setTenantIdCard(userInfoVo.getIdCard());
         setCountdown(leaseRecordEntity);
         return leaseRecordEntity;
     }
