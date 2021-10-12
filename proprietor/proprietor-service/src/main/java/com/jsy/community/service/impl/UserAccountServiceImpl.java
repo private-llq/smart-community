@@ -16,14 +16,15 @@ import com.jsy.community.mapper.UserTicketMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.UserTicketQO;
 import com.jsy.community.qo.proprietor.UserAccountTradeQO;
-import com.jsy.community.utils.*;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.UserAccountVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -242,7 +243,8 @@ public class UserAccountServiceImpl implements IUserAccountService {
 	**/
 	@Scheduled(cron = "0 0 3 * * ?")
 	public void deleteExpiredTicket(){
-		userTicketMapper.deleteExpiredTicket();
+		Long id = SnowFlake.nextId();
+		userTicketMapper.deleteExpiredTicket(id);
 	}
 	
 }

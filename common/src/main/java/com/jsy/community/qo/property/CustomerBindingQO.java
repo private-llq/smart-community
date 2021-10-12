@@ -50,7 +50,6 @@ public class CustomerBindingQO implements Serializable {
     @ApiModelProperty("所属房屋id")
     private Long houseId;
 
-
     /**
      * 业主电话
      */
@@ -63,7 +62,6 @@ public class CustomerBindingQO implements Serializable {
 
 
     @ApiModelProperty("几个月")
-
     private Integer number;
 
 }

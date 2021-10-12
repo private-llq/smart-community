@@ -195,7 +195,7 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      * @param id            id
      * @return              返回影响行数
      */
-    @Update("update t_proprietor set deleted = 1 where id = #{id} and deleted = 0")
+    @Update("update t_proprietor set deleted = #{id} where id = #{id} and deleted = 0")
     Integer unbindHouse(Long id);
 
     /**

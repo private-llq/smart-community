@@ -91,7 +91,7 @@ public interface AdminCommunityInformMapper extends BaseMapper<PushInformEntity>
      *@Return: java.lang.Integer
      *@Date: 2021/4/20 10:14
      **/
-    @Update("update t_push_inform set deleted = 1, top_state = 0, update_by = #{updateBy}, update_time = now() where id = #{id}")
+    @Update("update t_push_inform set deleted = #{id}, top_state = 0, update_by = #{updateBy}, update_time = now() where id = #{id}")
     Integer updateDeleted(@Param("id") Long id, @Param("updateBy") String updateBy);
 
     /**

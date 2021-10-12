@@ -187,7 +187,8 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         }
         if (bindBankCardQO.getOprtType() == 3) {
             // 解绑,则软删数据
-            unionPayWalletBankMapper.updateDeleted(bindBankCardQO.getWalletId(), bindBankCardQO.getBankAcctNo());
+            Long id = SnowFlake.nextId();
+            unionPayWalletBankMapper.updateDeleted(id, bindBankCardQO.getWalletId(), bindBankCardQO.getBankAcctNo());
         }
         if (bindBankCardQO.getOprtType() == 4) {
             // 设置默认

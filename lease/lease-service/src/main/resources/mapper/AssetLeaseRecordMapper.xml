@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jsy.community.mapper.AssetLeaseRecordMapper">
     <update id="setExpiredById">
-        update t_asset_lease_record set operation = 10, deleted = 1, update_time = now() where id = #{id}
+        update t_asset_lease_record set operation = 10, deleted = #{id}, update_time = now() where id = #{id}
     </update>
     <!-- 房东查看单个资产的签约列表 -->
     <select id="landlordContractListByAssetId" resultType="com.jsy.community.entity.proprietor.AssetLeaseRecordEntity">
@@ -40,7 +40,7 @@
             and alr.operation  = 6
         </if>
         <if test="contractStatus == 4">
-            and alr.deleted = 1
+            and alr.deleted != 1
             and alr.operation  = 10
         </if>
     </select>

@@ -11,6 +11,6 @@
     </update>
     <!-- 根据钱包ID和银行账号更新为软删 -->
     <update id="updateDeleted">
-        update t_user_union_pay_wallet_bank set deleted = 1 where wallet_id = #{walletId} and bank_acct_no = #{bankAcctNo}
+        update t_user_union_pay_wallet_bank set deleted = #{id} where wallet_id = #{walletId} and bank_acct_no = #{bankAcctNo}
     </update>
 </mapper>
