@@ -27,7 +27,7 @@ public interface PropertyUserService extends IService<UserEntity> {
 	 * @Param [uid]
 	 **/
 	UserEntity selectOne(String uid);
-	
+
 	/**
 	* @Description: uids批量查询 uid-姓名映射
 	 * @Param: [uids]
@@ -56,7 +56,6 @@ public interface PropertyUserService extends IService<UserEntity> {
 	 */
 	String selectUserUID(String phone,String username);
 
-
 	/**
 	 * @author: Pipi
 	 * @description: 查询社区未同步的人脸信息
@@ -75,7 +74,6 @@ public interface PropertyUserService extends IService<UserEntity> {
 	 * @date: 2021/9/8 16:35
 	 **/
 	PageInfo<UserEntity> facePageList(BaseQO<UserEntity> baseQO);
-
 	/**
 	 * @author: Pipi
 	 * @description: 人脸操作(启用/禁用人脸)
@@ -84,7 +82,6 @@ public interface PropertyUserService extends IService<UserEntity> {
 	 * @date: 2021/9/22 10:35
 	 **/
 	Integer faceOpration(UserEntity userEntity, Long communityId);
-
 	/**
 	 * @author: Pipi
 	 * @description: 删除人脸
@@ -94,7 +91,6 @@ public interface PropertyUserService extends IService<UserEntity> {
 	 * @date: 2021/9/23 17:34
 	 **/
 	Integer deleteFace(UserEntity userEntity, Long communityId);
-
 	/**
 	 * @author: Pipi
 	 * @description: 新增人脸
@@ -104,7 +100,6 @@ public interface PropertyUserService extends IService<UserEntity> {
 	 * @date: 2021/9/23 17:58
 	 **/
 	Integer addFace(UserEntity userEntity, Long communityId);
-
 	/**
 	 * @author: Pipi
 	 * @description: app用户修改人脸照片
