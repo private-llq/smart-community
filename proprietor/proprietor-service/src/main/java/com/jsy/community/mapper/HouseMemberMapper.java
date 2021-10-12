@@ -73,4 +73,13 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
      * @return:
      */
 	List<MembersVO> selectRelation(@Param("communityId") Long communityId, @Param("houseId") Long houseId, @Param("relation") int relation);
+
+	/**
+	 * @Description: 修改成员表uid
+	 * @author: Hu
+	 * @since: 2021/10/12 15:00
+	 * @Param:
+	 * @return:
+	 */
+    void updateByUid(@Param("uid") String uid, @Param("mobile") String mobile);
 }

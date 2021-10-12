@@ -3,12 +3,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.entity.ProprietorEntity;
-import com.jsy.community.mapper.HouseMapper;
-import com.jsy.community.mapper.PropertyRelationMapper;
-import com.jsy.community.mapper.ProprietorMapper;
+import com.jsy.community.entity.*;
+import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
@@ -45,6 +41,12 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 
     @Autowired
     private ProprietorMapper proprietorMapper;
+
+    @Autowired
+    private PropertyUserHouseMapper propertyUserHouseMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
 
 
@@ -184,6 +186,13 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
             entity.setMobile(houseMemberEntity.getMobile());
             entity.setId(SnowFlake.nextId());
             proprietorMapper.insert(entity);
+
+            UserHouseEntity userHouseEntity = new UserHouseEntity();
+            userHouseEntity.setCommunityId(houseMemberEntity.getCommunityId());
+            userHouseEntity.setHouseId(houseMemberEntity.getHouseId());
+            userHouseEntity.setCheckStatus(1);
+            userHouseEntity.setId(SnowFlake.nextId());
+            propertyUserHouseMapper.insert(userHouseEntity);
         }
     }
 
@@ -316,6 +325,8 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         List<RelationImportErrVO> errVOList = new LinkedList<>();
         List<HouseMemberEntity> entityList = new LinkedList<>();
         List<ProprietorEntity> entities = new LinkedList<>();
+        List<UserHouseEntity> userHouseList = new LinkedList<>();
+        UserHouseEntity userHouseEntity = null;
         ProprietorEntity proprietorEntity = null;
         HouseMemberEntity memberEntity = null;
         RelationImportErrVO errVO = null;
@@ -358,6 +369,17 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
                     proprietorEntity.setId(SnowFlake.nextId());
                     proprietorEntity.setRealName(memberEntity.getName());
                     entities.add(proprietorEntity);
+
+                    UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", memberEntity.getMobile()));
+                    userHouseEntity = new UserHouseEntity();
+                    if (userEntity != null) {
+                        userHouseEntity.setUid(userEntity.getUid());
+                    }
+                    userHouseEntity.setHouseId(memberEntity.getHouseId());
+                    userHouseEntity.setId(SnowFlake.nextId());
+                    userHouseEntity.setCommunityId(memberEntity.getCommunityId());
+                    userHouseEntity.setCheckStatus(1);
+                    userHouseList.add(userHouseEntity);
                 }
             }
         }
@@ -366,6 +388,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
         }
         if (entities.size()!=0){
             proprietorMapper.saveList(entities);
+        }
+        if (userHouseList.size()!=0){
+            propertyUserHouseMapper.saveList(userHouseList);
         }
         return errVOList;
     }
