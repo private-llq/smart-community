@@ -577,6 +577,18 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         return houseLeaseMapper.allCommunity(cityId, userId);
     }
 
+    /**
+     * @param userId :
+     * @author: Pipi
+     * @description: 按用户id获取所有小区名称
+     * @return: java.util.List<com.jsy.community.entity.CommunityEntity>
+     * @date: 2021/10/13 11:36
+     **/
+    @Override
+    public List<CommunityEntity> allCommunity(String userId) {
+        return houseLeaseMapper.allUserCommunity(userId);
+    }
+
     @Override
     public HouseLeaseVO editDetails(Long houseId, String uid) {
         HouseLeaseVO vo = houseLeaseMapper.editDetails(houseId, uid);

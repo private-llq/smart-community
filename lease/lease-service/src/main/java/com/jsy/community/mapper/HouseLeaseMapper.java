@@ -207,6 +207,15 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
     List<CommunityEntity> allCommunity(Long cityId, String uid);
 
     /**
+     * @author: Pipi
+     * @description: 按用户id获取所有小区名称
+     * @param uid:
+     * @return: java.util.List<com.jsy.community.entity.CommunityEntity>
+     * @date: 2021/10/13 11:40
+     **/
+    List<CommunityEntity> allUserCommunity(String uid);
+
+    /**
      * 按id查询房屋详情数据
      *
      * @param houseId 房屋id
