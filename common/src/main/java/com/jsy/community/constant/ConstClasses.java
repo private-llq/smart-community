@@ -3,6 +3,7 @@ package com.jsy.community.constant;
 import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.utils.AESOperator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * @author chq459799974
@@ -16,6 +17,7 @@ public interface ConstClasses {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/12
 	**/
+	@Component
 	class AliPayDataEntity{
 		public static String appid;//appid
 		public static String privateKey;//秘钥
@@ -79,6 +81,7 @@ public interface ConstClasses {
 	 * @Author: chq459799974
 	 * @Date: 2021/5/31
 	 **/
+	@Component
 	class AliYunDataEntity{
 		
 		public static String smsAccessKeyId;//阿里云短信子账号accessKeyId

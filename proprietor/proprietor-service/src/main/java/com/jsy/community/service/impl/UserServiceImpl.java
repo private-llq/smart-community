@@ -1180,6 +1180,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
         signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
         boolean b = signatureService.realNameUpdateUser(signatureUserDTO);
+        //根据手机更新成员表uid
+        userHouseService.updateMobileUser(userEntity.getUid());
+
         if (!b) {
             log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
             throw new ProprietorException(JSYError.INTERNAL);

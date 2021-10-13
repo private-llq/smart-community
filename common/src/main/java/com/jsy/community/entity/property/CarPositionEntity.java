@@ -38,6 +38,7 @@ public class CarPositionEntity implements Serializable {
     private Long id;
 
     @TableField(exist = false)
+    @ExcelIgnore
     private String idStr;
 
     public String getIdStr() {

@@ -126,11 +126,10 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                 //取相应房间map
                 Map<String, Object> roomMap = roomMaps.get(BigInteger.valueOf(entity.getTargetId()));
                 //在相应房间节点下添加物业费数据
-                List dataList = (List) roomMap.get("list");
-                if(dataList == null){
-                    roomMap.put("list",new ArrayList<>());
-                    dataList = (List) roomMap.get("list");
+                if (roomMap.get("list") == null) {
+                    roomMap.put("list", new ArrayList<>());
                 }
+                List dataList = (List) roomMap.get("list");
                 dataList.add(entity);
                 //在相应房间节点下累加总金额
                 BigDecimal totalAmount = entity.getPropertyFee().add(entity.getPenalSum());

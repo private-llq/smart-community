@@ -24,12 +24,9 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -59,7 +56,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	private RabbitTemplate rabbitTemplate;
 	
 	@Autowired
-	private UserHouseMapper houseMapper;
+	private PropertyUserHouseMapper houseMapper;
 	
 	@Autowired
 	private UserMapper userMapper;

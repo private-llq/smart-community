@@ -93,4 +93,13 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
      */
 	@Select("select community_id from t_house_member where uid = #{uid} and deleted=0")
 	Set<Long> queryRelationHousesOfCommunityIds(@Param("uid") String uid);
+
+	/**
+	 * @Description: 给房间认证表添加用户uid
+	 * @author: Hu
+	 * @since: 2021/10/12 15:03
+	 * @Param:
+	 * @return:
+	 */
+    void updateByUid(@Param("ids") Set<Long> ids, @Param("uid") String uid);
 }
