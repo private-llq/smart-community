@@ -83,4 +83,13 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
      * @Date: 2021/1/12
     **/
 	String queryUserIdByMobile(String mobile);
+
+	/**
+	 * @Description: 查询当前用户是否设置支付密码
+	 * @author: Hu
+	 * @since: 2021/10/13 14:46
+	 * @Param:
+	 * @return:
+	 */
+    UserAuthEntity selectByPayPassword(String uid);
 }

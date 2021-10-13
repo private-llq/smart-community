@@ -59,6 +59,18 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         return list();
     }
 
+    /**
+     * @Description: 查询当前用户是否设置支付密码
+     * @author: Hu
+     * @since: 2021/10/13 14:46
+     * @Param:
+     * @return:
+     */
+    @Override
+    public UserAuthEntity selectByPayPassword(String uid) {
+        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid",uid));
+    }
+
     @Override
     public String queryUserIdByMobile(String mobile) {
         return baseMapper.queryUserIdByMobile(mobile);

@@ -70,7 +70,7 @@ public class PushInfoUtil {
         textAppMsg.setUrl(url);
         textAppMsg.setTemplateId("暂无模板");
         textAppMsg.setContent(content);
-        textAppMsg.setLinks(Collections.singletonList(new Links(url, desc)));
+        textAppMsg.setLinks(Collections.singletonList(new Links(url, "查看详情")));
         textAppMsg.setExtraDta(map);
         pushAppMsg.setAppMsg(JSON.toJSONString(textAppMsg));
         SendInfo sendInfo = new SendInfo();

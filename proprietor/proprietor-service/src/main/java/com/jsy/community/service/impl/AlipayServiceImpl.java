@@ -5,6 +5,7 @@ import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.jsy.community.api.IAlipayService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.utils.AlipayLoginUtils;
 import com.jsy.community.utils.AlipayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -21,7 +22,7 @@ import org.springframework.util.StringUtils;
 public class AlipayServiceImpl implements IAlipayService {
 	
 	@Autowired
-	private AlipayUtils alipayUtils;
+	private AlipayLoginUtils alipayUtils;
 	
 	/**
 	* @Description: 换取accessToken
