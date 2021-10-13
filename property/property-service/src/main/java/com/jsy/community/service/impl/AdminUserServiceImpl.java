@@ -1,15 +1,15 @@
 package com.jsy.community.service.impl;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.*;
+import com.jsy.community.api.IAdminConfigService;
+import com.jsy.community.api.IAdminUserService;
+import com.jsy.community.api.IOrganizationService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.consts.PropertyConstsEnum;
@@ -26,7 +26,10 @@ import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
-import com.jsy.community.utils.*;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.RSAUtil;
+import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -41,11 +44,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 
 /**
@@ -619,6 +620,24 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 //		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
 		//更新资料
 		adminUserMapper.updateOperator(adminUserEntity);
+	}
+	
+	/**
+	 * @Description: 删除操作员
+	 * @author: DKS
+	 * @since: 2021/10/13 15:38
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 */
+	public void deleteOperator(Long id) {
+		AdminUserEntity adminUserEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("id", id));
+		if (adminUserEntity == null) {
+			throw new PropertyException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED.getCode(),"未获取到操作员信息");
+		}
+		int i = adminUserMapper.deleteById(id);
+		if (i != 1) {
+			throw new PropertyException(JSYError.INTERNAL.getCode(),"删除失败");
+		}
 	}
 	
 //	/**

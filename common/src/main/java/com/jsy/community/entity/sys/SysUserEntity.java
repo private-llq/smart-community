@@ -79,6 +79,10 @@ public class SysUserEntity extends BaseEntity {
 	 */
 	private String token;
 	
+	// 角色Id
+	@TableField(exist = false)
+	private Long roleId;
+	
 	/**
 	 * 注册邀请传参验证
 	 */

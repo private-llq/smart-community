@@ -30,7 +30,7 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@PostMapping("")
+	@PostMapping("add")
 	public CommonResult addMenu(@RequestBody SysMenuEntity sysMenuEntity){
 		ValidatorUtils.validateEntity(sysMenuEntity);
 		boolean b = sysConfigService.addMenu(sysMenuEntity);
@@ -44,7 +44,7 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@DeleteMapping("")
+	@DeleteMapping("delete")
 	public CommonResult delMenu(@RequestParam("id") Long id){
 		boolean b = sysConfigService.delMenu(id);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
@@ -57,7 +57,7 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@PutMapping("")
+	@PutMapping("update")
 	public CommonResult updateMenu(@RequestBody SysMenuQO sysMenuQO){
 		boolean b = sysConfigService.updateMenu(sysMenuQO);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
@@ -70,7 +70,7 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@GetMapping("")
+	@GetMapping("query")
 	public CommonResult<List<SysMenuEntity>> listOfMenu(){
 		return CommonResult.ok(sysConfigService.listOfMenu());
 	}
