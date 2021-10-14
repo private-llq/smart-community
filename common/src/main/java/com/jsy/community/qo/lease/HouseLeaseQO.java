@@ -56,9 +56,10 @@ public class HouseLeaseQO implements Serializable {
     private Long houseProvinceId;
 
     @ApiModelProperty(value = "房屋租售所属城市ID")
-    @Range(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class, UpdateWholeLeaseHouse.class}, min = 1, max = BusinessConst.HOUSE_ID_RANGE_MAX, message = "请选择一个正确的城市Code!")
-    @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "城市未选择!")
+    // @Range(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class, UpdateWholeLeaseHouse.class}, min = 1, max = BusinessConst.HOUSE_ID_RANGE_MAX, message = "请选择一个正确的城市Code!")
+    // @NotNull(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "城市未选择!")
     private Long houseCityId;
+
 
     @ApiModelProperty(value = "房屋租售所属区ID")
     private Long houseAreaId;

@@ -130,6 +130,11 @@ public class HouseLeaseEntity extends BaseEntity {
     @ApiModelProperty( value = "房间设施位运算后的id")
     private Long roomFacilitiesId;
 
+    /**
+     * 租赁状态;0:未出租;1已出租;单间和合租,可以多次出租,整租不能
+     */
+    private Integer leaseStatus;
+
     @ApiModelProperty(value = "房屋出租方式/压一付一/压一付三/压一付六")
     @TableField(exist = false)
     private String houseLeaseMode;

@@ -7,64 +7,211 @@
     <!-- [整租新增]保存房屋租售信息 -->
     <insert id="addWholeLeaseHouse">
         insert into t_house_lease
-        (id,uid,house_title,house_city_id,house_address,house_advantage_id,house_price,house_square_meter,house_leasedeposit_id
-        ,house_type_code,house_floor,house_direction_id,appellation
-        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_furniture_id,house_lon,house_lat,house_id,house_community_id,create_time
-        ,lease_require_id,decoration_type_id,house_area_id
+        (
+            id,
+            uid,
+            house_title,
+            house_city_id,
+            house_address,
+            house_advantage_id,
+            house_price,
+            house_square_meter,
+            house_leasedeposit_id,
+            house_type_code,
+            house_floor,
+            house_direction_id,
+            appellation,
+            house_introduce,
+            house_image_id,
+            house_leasetype_id,
+            house_leasemode_id,
+            house_contact,
+            house_furniture_id,
+            house_lon,
+            house_lat,
+            house_id,
+            house_community_id,
+            create_time,
+            lease_require_id,
+            decoration_type_id,
+            house_area_id
         )
         values
-        (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseSquareMeter},#{houseLeasedepositId}
-        ,#{houseTypeCode},#{houseFloor},#{houseDirectionId},#{appellation}
-        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseFurnitureId},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},now()
-        ,#{leaseRequireId},#{decorationTypeId},#{houseAreaId}
+        (
+            #{id},
+            #{uid},
+            #{houseTitle},
+            #{houseCityId},
+            #{houseAddress},
+            #{houseAdvantageId},
+            #{housePrice},
+            #{houseSquareMeter},
+            #{houseLeasedepositId},
+            #{houseTypeCode},
+            #{houseFloor},
+            #{houseDirectionId},
+            #{appellation},
+            #{houseIntroduce},
+            #{houseImageId},
+            #{houseLeasetypeId},
+            #{houseLeasemodeId},
+            #{houseContact},
+            #{houseFurnitureId},
+            #{houseLon},
+            #{houseLat},
+            #{houseId},
+            #{houseCommunityId},
+            now(),
+            #{leaseRequireId},
+            #{decorationTypeId},
+            #{houseAreaId}
         )
     </insert>
     <!-- [单间新增]保存房屋租售信息 -->
     <insert id="addSingleLeaseHouse">
         insert into t_house_lease
-        (id,uid,house_title,house_city_id,house_address,house_advantage_id,house_price,house_square_meter,house_leasedeposit_id
-        ,house_type_code,house_floor,house_direction_id,appellation
-        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_lon,house_lat,house_id,house_community_id,create_time,
-        <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
-            common_facilities_id,
-        </if>
-        lease_require_id,room_facilities_id,bedroom_type,decoration_type_id,house_area_id
+        (
+            id,
+            uid,
+            house_title,
+            house_city_id,
+            house_address,
+            house_advantage_id,
+            house_price,
+            house_square_meter,
+            house_leasedeposit_id,
+            house_type_code,
+            house_floor,
+            house_direction_id,
+            appellation,
+            house_introduce,
+            house_image_id,
+            house_leasetype_id,
+            house_leasemode_id,
+            house_contact,
+            house_lon,
+            house_lat,
+            house_id,
+            house_community_id,
+            create_time,
+            <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+                common_facilities_id,
+            </if>
+            lease_require_id,
+            room_facilities_id,
+            bedroom_type,
+            decoration_type_id,
+            house_area_id
         )
         values
-        (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseSquareMeter},#{houseLeasedepositId}
-        ,#{houseTypeCode},#{houseFloor},#{houseDirectionId},#{appellation}
-        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},now(),
-        <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
-            #{commonFacilitiesId},
-        </if>
-        #{leaseRequireId},#{roomFacilitiesId},#{bedroomType},#{decorationTypeId},#{houseAreaId}
+        (
+            #{id},
+            #{uid},
+            #{houseTitle},
+            #{houseCityId},
+            #{houseAddress},
+            #{houseAdvantageId},
+            #{housePrice},
+            #{houseSquareMeter},
+            #{houseLeasedepositId},
+            #{houseTypeCode},
+            #{houseFloor},
+            #{houseDirectionId},
+            #{appellation},
+            #{houseIntroduce},
+            #{houseImageId},
+            #{houseLeasetypeId},
+            #{houseLeasemodeId},
+            #{houseContact},
+            #{houseLon},
+            #{houseLat},
+            #{houseId},
+            #{houseCommunityId},
+            now(),
+            <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+                #{commonFacilitiesId},
+            </if>
+            #{leaseRequireId},
+            #{roomFacilitiesId},
+            #{bedroomType},
+            #{decorationTypeId},
+            #{houseAreaId}
         )
     </insert>
     <!-- [合租新增]保存房屋租售信息 -->
     <insert id="addCombineLeaseHouse">
         insert into t_house_lease
-        (id,uid,house_title,house_city_id,house_address,house_advantage_id,house_price,house_square_meter,house_leasedeposit_id
-        ,house_type_code,house_floor,house_direction_id,appellation
-        ,house_introduce,house_image_id,house_leasetype_id,house_leasemode_id,house_contact,house_lon,house_lat,house_id,house_community_id,create_time,
-        <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
-            common_facilities_id,
-        </if>
-        <if test="roommateExpectId != null and roommateExpectId &gt; 0">
-            roommate_expect_id,
-        </if>
-        room_facilities_id,bedroom_type,decoration_type_id,roommate_sex,house_area_id
+        (id,
+            uid,
+            house_title,
+            house_city_id,
+            house_address,
+            house_advantage_id,
+            house_price,
+            house_square_meter,
+            house_leasedeposit_id,
+            house_type_code,
+            house_floor,
+            house_direction_id,
+            appellation,
+            house_introduce,
+            house_image_id,
+            house_leasetype_id,
+            house_leasemode_id,
+            house_contact,
+            house_lon,
+            house_lat,
+            house_id,
+            house_community_id,
+            create_time,
+            <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+                common_facilities_id,
+            </if>
+            <if test="roommateExpectId != null and roommateExpectId &gt; 0">
+                roommate_expect_id,
+            </if>
+            room_facilities_id,
+            bedroom_type,
+            decoration_type_id,
+            roommate_sex,
+            house_area_id
         )
         values
-        (#{id},#{uid},#{houseTitle},#{houseCityId},#{houseAddress},#{houseAdvantageId},#{housePrice},#{houseSquareMeter},#{houseLeasedepositId}
-        ,#{houseTypeCode},#{houseFloor},#{houseDirectionId},#{appellation}
-        ,#{houseIntroduce},#{houseImageId},#{houseLeasetypeId},#{houseLeasemodeId},#{houseContact},#{houseLon},#{houseLat},#{houseId},#{houseCommunityId},now(),
-        <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
-            #{commonFacilitiesId},
-        </if>
-        <if test="roommateExpectId != null and roommateExpectId &gt; 0">
-            #{roommateExpectId},
-        </if>
-        #{roomFacilitiesId},#{bedroomType},#{decorationTypeId},#{roommateSex},#{houseAreaId}
+        (
+            #{id},
+            #{uid},
+            #{houseTitle},
+            #{houseCityId},
+            #{houseAddress},
+            #{houseAdvantageId},
+            #{housePrice},
+            #{houseSquareMeter},
+            #{houseLeasedepositId},
+            #{houseTypeCode},
+            #{houseFloor},
+            #{houseDirectionId},
+            #{appellation},
+            #{houseIntroduce},
+            #{houseImageId},
+            #{houseLeasetypeId},
+            #{houseLeasemodeId},
+            #{houseContact},
+            #{houseLon},
+            #{houseLat},
+            #{houseId},
+            #{houseCommunityId},
+            now(),
+            <if test="commonFacilitiesId != null and commonFacilitiesId &gt; 0">
+                #{commonFacilitiesId},
+            </if>
+            <if test="roommateExpectId != null and roommateExpectId &gt; 0">
+                #{roommateExpectId},
+            </if>
+            #{roomFacilitiesId},
+            #{bedroomType},
+            #{decorationTypeId},
+            #{roommateSex},
+            #{houseAreaId}
         )
     </insert>
 
@@ -168,6 +315,7 @@
             <if test="query.houseAdvantageId != null">
                 and #{query.houseAdvantageId} | house_advantage_id = house_advantage_id
             </if>
+            and ((house_leasemode_id = 2 and lease_status = 0) or house_leasemode_id != 2 )
             and deleted = 0
         </where>
         order by create_time desc
@@ -538,5 +686,21 @@
         AND c.house_const_type = 11
         WHERE
         l.id = #{houseId} and l.deleted = 0
+    </select>
+
+    <!-- 按用户id获取所有小区名称 -->
+    <select id="allUserCommunity" resultType="com.jsy.community.entity.CommunityEntity">
+        SELECT DISTINCT
+            c.id,
+            c.lon,
+            c.lat,
+            CONCAT( c.detail_address, c.`name` ) AS 'name'
+            FROM
+        t_community AS c
+        LEFT JOIN t_user_house AS h ON h.community_id = c.id
+        WHERE
+        c.deleted = 0
+        AND h.deleted = 0
+        AND h.uid = #{uid}
     </select>
 </mapper>

@@ -154,6 +154,15 @@ public interface IHouseLeaseService extends IService<HouseLeaseEntity> {
     List<CommunityEntity> allCommunity(Long cityId, String userId);
 
     /**
+     * @author: Pipi
+     * @description: 按用户id获取所有小区名称
+     * @param userId:
+     * @return: java.util.List<com.jsy.community.entity.CommunityEntity>
+     * @date: 2021/10/13 11:36
+     **/
+    List<CommunityEntity> allCommunity(String userId);
+
+    /**
      * 按id查询房屋详情数据
      *
      * @param houseId 房屋id
