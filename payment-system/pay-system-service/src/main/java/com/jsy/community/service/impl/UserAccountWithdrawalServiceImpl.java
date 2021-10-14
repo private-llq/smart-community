@@ -7,8 +7,11 @@ import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
+import com.jsy.community.api.IPayConfigureService;
+import com.jsy.community.api.ProprietorException;
 import com.jsy.community.api.UserAccountWithdrawalService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.utils.AESOperator;
 import com.jsy.community.utils.AlipayUtils;
 import com.jsy.community.vo.WithdrawalResulrVO;
@@ -166,7 +169,7 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
         }
         SSLContext sslcontext = org.apache.http.conn.ssl.SSLContexts.custom().loadKeyMaterial(keyStore, mchId.toCharArray()).build();
         // 指定TLS版本
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[]{"TLSv1"}, null,
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, null, null,
                 SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
         // 设置httpclient的SSLSocketFactory
         try (CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build()) {
@@ -313,7 +316,7 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
                 if (map.get("err_code") != null) {
                     //支付失败
                     log.error("提现失败：{}", map.get("err_code_des"));
-                    return new WithdrawalResulrVO("-1", map.get("err_code_des"), false);
+                    return new WithdrawalResulrVO("-1", map.get("err_code_des"), false, map.get("err_code"));
                 } else if (map.get("result_code").equalsIgnoreCase(
                         "SUCCESS")) {
                     //支付成功  paymentNo：微信付款单号  payment_time：付款成功时间
@@ -336,22 +339,29 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
     private static final String ALIPAY_CHARSET = "UTF-8";
     private static final String ALIPAY_SIGN_TYPE = "RSA2";
 
+    @DubboReference(version = Const.version, group = Const.group_property)
+    private IPayConfigureService iPayConfigureService;
+
     private CertAlipayRequest initRequest() throws Exception {
+        PayConfigureEntity companyConfig = iPayConfigureService.getCompanyConfig(1L);
+        if (companyConfig == null) {
+            throw new ProprietorException("没有支付宝配置");
+        }
         CertAlipayRequest certAlipayRequest = new CertAlipayRequest();
         certAlipayRequest.setServerUrl(ALIPAY_SERVER_URL);  //gateway:支付宝网关（固定）https://openapi.alipay.com/gateway.do
-        certAlipayRequest.setAppId(AESOperator.decrypt("dPHlJ8MTKFM/fTLpyfSzuFWQ8DMH1pOlHzcwcge1NVo="));  //APPID 即创建应用后生成,详情见创建应用并获取 APPID
-        certAlipayRequest.setPrivateKey(AESOperator.decrypt("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"));  //开发者应用私钥，由开发者自己生成
         certAlipayRequest.setFormat(ALIPAY_FORMAT);  //参数返回格式，只支持 json 格式
         certAlipayRequest.setCharset(ALIPAY_CHARSET);  //请求和签名使用的字符编码格式，支持 GBK和 UTF-8
         certAlipayRequest.setSignType(ALIPAY_SIGN_TYPE);  //商户生成签名字符串所使用的签名算法类型，目前支持 RSA2 和 RSA，推荐商家使用 RSA2。
+        certAlipayRequest.setAppId(AESOperator.decrypt(companyConfig.getAppId()));  //APPID 即创建应用后生成,详情见创建应用并获取 APPID
+        certAlipayRequest.setPrivateKey(AESOperator.decrypt(companyConfig.getPrivateKey()));  //开发者应用私钥，由开发者自己生成
         //设置应用公钥证书路径
-        String decrypt = AESOperator.decrypt("3PjlcjSZZepenDlCR34MHUc86k9z3wJQ2tkh00tICdcO0Mmt9hP4yxYYx9ilfD9HCAYLZ/9VlGbb9yxtX6GhLbR3caL0mJzxRd8CwaFoHMQ=");
+        String decrypt = AESOperator.decrypt(companyConfig.getCertPath());
         certAlipayRequest.setCertContent(AlipayUtils.getPrivateKey(decrypt));
         //设置支付宝公钥证书路径
-        String decrypt1 = AESOperator.decrypt("3PjlcjSZZepenDlCR34MHUc86k9z3wJQ2tkh00tICdfeJwK2hoZMyxHY9QBa8gfOvBbWgzl2fdY+b65+KG7sQtxgkpBmord/Irs0eOVYnra5057WvoOO4DxBSerqV1mX");
+        String decrypt1 = AESOperator.decrypt(companyConfig.getAlipayPublicCertPath());
         certAlipayRequest.setAlipayPublicCertContent(AlipayUtils.getPrivateKey(decrypt1));
         //设置支付宝根证书路径
-        String decrypt2 = AESOperator.decrypt("3PjlcjSZZepenDlCR34MHUc86k9z3wJQ2tkh00tICdcBA8ht7d3utUDz1A4QP7CUDutWtxmn7ISYYMoKw5dOM+4Z2vTkxSjcTG23PR65asbuYAQpkMkvCw8jc12pXZhe");
+        String decrypt2 = AESOperator.decrypt(companyConfig.getRootCertPath());
         certAlipayRequest.setRootCertContent(AlipayUtils.getPrivateKey(decrypt2));
         return certAlipayRequest;
     }
@@ -399,15 +409,15 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
             if (response.isSuccess()) {
                 log.info("支付宝转账API调用成功。");
                 if ("10000".equals(response.getCode())) {
-                    log.info("转账成功,支付宝返回参数:{}", response);
+                    log.info("转账成功,支付宝返回参数:{}", JSONObject.toJSONString(response));
                     return new WithdrawalResulrVO("0", "转账成功", true);
                 } else {
-                    log.error("转账失败,支付宝返回参数:{}", response);
-                    return new WithdrawalResulrVO("-1", response.getSubMsg(), false, response.getSubCode());
+                    log.error("转账失败,支付宝返回参数:{}", JSONObject.toJSONString(response));
+                    return new WithdrawalResulrVO(response.getCode(), response.getSubMsg(), false, response.getSubCode());
                 }
             } else {
-                log.error("支付宝转账API调用失败：{}", response);
-                return new WithdrawalResulrVO("-1", "转账失败,调用支付宝转账API失败", false, response.getSubCode());
+                log.error("支付宝转账API调用失败：{}", JSONObject.toJSONString(response));
+                return new WithdrawalResulrVO(response.getCode(), "转账失败,调用支付宝转账API失败", false, response.getSubCode());
             }
         } catch (AlipayApiException e) {
             log.error("调用支付宝转账API异常：{}", e);
