@@ -273,8 +273,10 @@
         <where>
             <!-- 如果查询筛选增加了搜索文本 -->
             <if test="query.searchText != null and !query.searchText.equals(&apos;&apos;)">
-                house_title like concat('%',#{query.searchText},'%') or house_address like
-                concat('%',#{query.searchText},'%')
+                (
+                    house_title like concat('%',#{query.searchText},'%')
+                    or house_address like concat('%',#{query.searchText},'%')
+                )
             </if>
             <!-- 如果查询筛选增加了市条件 -->
             <if test="query.houseAreaId != null and query.houseAreaId != &quot;&quot; and query.houseAreaId &gt; 0">
@@ -282,18 +284,16 @@
             </if>
             <!-- 如果增加了租金筛选条件 大于最小租金 小于最大租金 -->
             <if test="query.housePriceMin != null and query.housePriceMin >= 0">
-                and house_price &gt; #{query.housePriceMin}
+                and house_price &gt;= #{query.housePriceMin}
             </if>
             <if test="query.housePriceMax != null and query.housePriceMax > 0">
-                and house_price &lt; #{query.housePriceMax}
+                and house_price &lt;= #{query.housePriceMax}
             </if>
-
-
             <!-- 如果增加了房屋面积筛选条件 大于最小房屋面积 小于最大房屋面积 -->
             <if test="query.houseSquareMeterMin != null and query.houseSquareMeterMin != &quot;&quot; and query.houseSquareMeterMin &gt; 0
                 and query.houseSquareMeterMax != null and query.houseSquareMeterMax != &quot;&quot; and query.houseSquareMeterMax &gt; 0">
-                and house_square_meter &gt; #{query.houseSquareMeterMin} and house_square_meter &lt;
-                #{query.houseSquareMeterMax}
+                and house_square_meter &gt;= #{query.houseSquareMeterMin}
+                and house_square_meter &lt;= #{query.houseSquareMeterMax}
             </if>
             <!-- 如果查询筛选增加了户型条件 几室几厅之类 -->
             <if test="query.houseTypeCode != null and query.houseTypeCode != &quot;&quot; and query.houseTypeCode &gt; 0">
