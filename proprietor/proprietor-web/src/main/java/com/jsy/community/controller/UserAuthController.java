@@ -178,7 +178,6 @@ public class UserAuthController {
 	public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
 		ValidatorUtils.validateEntity(qo,AddPasswordQO.passwordVGroup.class);
 		String uid = UserUtils.getUserId();
-		
 		boolean b = userAuthService.addPassword(uid, qo);
 		return b ? CommonResult.ok() : CommonResult.error("密码设置失败");
 	}
@@ -187,13 +186,13 @@ public class UserAuthController {
 	@PostMapping("/password/pay")
 	@Login
 	public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
+		//todo 个人觉得明文传递支付密码有问题
 		ValidatorUtils.validateEntity(qo,AddPasswordQO.payPasswordVGroup.class);
 		String uid = UserUtils.getUserId();
-		
 		boolean b = userAuthService.addPayPassword(uid, qo);
 		return b ? CommonResult.ok() : CommonResult.error("支付密码设置失败");
 	}
-	
+
 	@ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
 	@GetMapping("/check/code")
 	public CommonResult<Map<String,Object>> checkCode(@RequestParam String account, @RequestParam String code) {
