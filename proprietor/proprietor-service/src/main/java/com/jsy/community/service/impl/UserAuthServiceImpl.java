@@ -20,6 +20,7 @@ import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.utils.imutils.open.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 @DubboService(version = Const.version, group = Const.group)
 @Slf4j
@@ -59,6 +61,18 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         return list();
     }
 
+    /**
+     * @Description: 查询当前用户是否设置支付密码
+     * @author: Hu
+     * @since: 2021/10/13 14:46
+     * @Param:
+     * @return:
+     */
+    @Override
+    public UserAuthEntity selectByPayPassword(String uid) {
+        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid",uid));
+    }
+
     @Override
     public String queryUserIdByMobile(String mobile) {
         return baseMapper.queryUserIdByMobile(mobile);
@@ -69,7 +83,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         if (RegexUtils.isMobile(qo.getAccount())) {
             if (StrUtil.isNotEmpty(qo.getCode())) {
                 // 手机验证码登录
-                if (!"15178805536".equals(qo.getAccount())){
+                if (!"15178805536".equals(qo.getAccount())) {
                     commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
                 }
                 return baseMapper.queryUserIdByMobile(qo.getAccount());
@@ -190,9 +204,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
     /**
      * 通过用户ID查询 t_user_auth 用户手机号
      *
+     * @return 返回用户手机号码
      * @author YuLF
      * @Param id  用户ID
-     * @return 返回用户手机号码
      * @since 2020/12/2 13:55
      */
     @Override

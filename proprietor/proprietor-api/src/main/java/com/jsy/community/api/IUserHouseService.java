@@ -144,7 +144,7 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @Param:
 	 * @return:
 	 */
-	void membersSave(MembersQO membersQO, String userId);
+	String membersSave(MembersQO membersQO, String userId);
 
 	/**
 	 * @Description: 业主家属删除接口

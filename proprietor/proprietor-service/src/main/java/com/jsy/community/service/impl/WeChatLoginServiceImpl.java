@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserIMEntity;
-import com.jsy.community.entity.UserThirdPlatformEntity;
-import com.jsy.community.entity.UserUroraTagsEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.mapper.UserThirdPlatformMapper;
@@ -132,7 +129,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         return createNotBindMobile(platformEntity.getId());
     }
     /**
-     * @Description:
+     * @Description: ios登录
      * @author: Hu
      * @since: 2021/6/1 10:15
      * @Param: [sub]
@@ -184,7 +181,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectById(bindingMobileQO.getThirdPlatformId());
         entity.setUid(uid);
         userThirdPlatformMapper.updateById(entity);
-        UserInfoVo userInfoVo = new UserInfoVo();
+        UserInfoVo userInfoVo = queryUserInfo(uid);
         userInfoVo.setMobile(bindingMobileQO.getMobile());
         userInfoVo.setUid(uid);
         return createAuthVoWithToken(userInfoVo);
@@ -251,11 +248,12 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
     /**
      * 查询用户信息
      */
-    private UserInfoVo queryUserInfo(String uid){
+    private UserInfoVo queryUserInfo(String uid) {
         UserEntity user = userMapper.queryUserInfoByUid(uid);
         if (user == null || user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");
         }
+
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(user, userInfoVo);
         // 刷新省市区
@@ -271,14 +269,30 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         }
         //查询极光推送标签
         UserUroraTagsEntity userUroraTagsEntity = userUroraTagsService.queryUroraTags(uid);
-        if(userUroraTagsEntity != null){
+        if (userUroraTagsEntity != null) {
             userInfoVo.setUroraTags(userUroraTagsEntity.getUroraTags());
         }
         //查询用户imId
-        UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().select("im_id").eq("uid", uid));
-        if(userIMEntity != null){
+        UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().select("im_id,im_password").eq("uid", uid));
+        if (userIMEntity != null) {
             userInfoVo.setImId(userIMEntity.getImId());
+            userInfoVo.setImPassword(userIMEntity.getImPassword());
+        }
+        //查询用户是否绑定微信
+        UserThirdPlatformEntity platformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 2));
+        if (platformEntity != null) {
+            userInfoVo.setIsBindWechat(1);
+        } else {
+            userInfoVo.setIsBindWechat(0);
+        }
+        //查询用户是否设置支付密码
+        UserAuthEntity userAuthEntity = userAuthService.selectByPayPassword(uid);
+        if (userAuthEntity != null&&userAuthEntity.getPayPassword()!=null) {
+            userInfoVo.setIsBindPayPassword(1);
+        } else {
+            userInfoVo.setIsBindPayPassword(0);
         }
         return userInfoVo;
     }
+
 }

@@ -17,6 +17,7 @@ import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
+import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
@@ -126,6 +127,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IHouseInfoService houseInfoService;
+
     @Autowired
     private ISignatureService signatureService;
 
@@ -202,6 +206,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (userIMEntity != null) {
             userInfoVo.setImId(userIMEntity.getImId());
             userInfoVo.setImPassword(userIMEntity.getImPassword());
+        }
+        //查询用户是否绑定微信
+        UserThirdPlatformEntity platformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 2));
+        if (platformEntity != null) {
+            userInfoVo.setIsBindWechat(1);
+        } else {
+            userInfoVo.setIsBindWechat(0);
+        }
+        //查询用户是否设置支付密码
+        UserAuthEntity userAuthEntity = userAuthService.selectByPayPassword(uid);
+        if (userAuthEntity != null&&userAuthEntity.getPayPassword()!=null) {
+            userInfoVo.setIsBindPayPassword(1);
+        } else {
+            userInfoVo.setIsBindPayPassword(0);
         }
         return userInfoVo;
     }
@@ -292,6 +310,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (responseEntity.getErr_code() != 0) {
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
+        }
+        String str = redisTemplate.opsForValue().get("pushInFormMember:" + qo.getAccount());
+        if (str!=null){
+
+            MembersQO membersQO = JSON.parseObject(str, MembersQO.class);
+
+            List<HouseInfoEntity> houseInfoEntities = houseInfoService.selectList(membersQO.getMobile());
+            if (houseInfoEntities.size()!=0){
+                for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
+                    //推送消息
+                    PushInfoUtil.PushPublicTextMsg(
+                            imId,
+                            "房屋管理",
+                            houseInfoEntity.getTitle(),
+                            "www.baidu.com"+"?id="+houseInfoEntity.getId(),
+                            houseInfoEntity.getDesc(),
+                            null,
+                            BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
+                }
+            }
+
         }
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();

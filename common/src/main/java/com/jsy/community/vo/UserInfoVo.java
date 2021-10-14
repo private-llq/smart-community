@@ -23,6 +23,12 @@ public class UserInfoVo implements Serializable {
 	@ApiModelProperty("是否绑定手机1已绑定，0未绑定")
 	private Integer isBindMobile;
 
+	@ApiModelProperty("是否绑定微信1已绑定，0未绑定")
+	private Integer isBindWechat;
+
+	@ApiModelProperty("是否设置登录密码1已绑定，0未绑定")
+	private Integer isBindPayPassword;
+
 	@ApiModelProperty("手机号")
 	private String mobile;
 

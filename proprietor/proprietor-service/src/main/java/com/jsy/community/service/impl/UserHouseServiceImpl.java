@@ -1,12 +1,8 @@
 package com.jsy.community.service.impl;
-
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.IProprietorService;
-import com.jsy.community.api.IUserHouseService;
-import com.jsy.community.api.ProprietorException;
-import com.jsy.community.api.ProprietorUserService;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
@@ -21,12 +17,12 @@ import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -65,6 +61,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IProprietorService proprietorService;
+
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private IHouseInfoService houseInfoService;
 	
 	/**
 	 * @return java.lang.Boolean
@@ -287,38 +286,82 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 */
 	@Override
 	@Transactional
-	public void membersSave(MembersQO membersQO, String userId) {
+	public String membersSave(MembersQO membersQO, String userId) {
+
+		String url="www.baidu.com";
+
 		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()));
 		if (memberEntity!=null){
 			throw new ProprietorException("当前成员以添加，请勿重复添加！");
 		}
-		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", memberEntity.getMobile()));
+		//社区
+		CommunityEntity communityEntity = communityMapper.selectById(membersQO.getCommunityId());
+		//房间
+		HouseEntity houseEntity = houseMapper.selectById(membersQO.getHouseId());
+		//被添加的用户
+		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", membersQO.getMobile()));
+		//业主
+		UserEntity user = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
 		if (userEntity != null) {
-			UserEntity userEntity1 = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-			CommunityEntity communityEntity = communityMapper.selectById(membersQO.getCommunityId());
-			HouseEntity houseEntity = houseMapper.selectById(membersQO.getHouseId());
+
 			UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", userEntity.getUid()));
+
 			String relation = membersQO.getRelation()==6?"亲属":membersQO.getRelation()==7?"租客":"";
+			String str = membersQO.getRelation()==6?"点击此处确定关系。":"点击此处确定入驻。";
+			String title="房屋绑定"+relation+"!";
+			String desc="房屋绑定"+relation  +"\n"+
+					"我是"+user.getRealName()+"，邀请您("+membersQO.getName()+")加入"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+",成为我的"+relation+"成员，"+ str;
+
+			HouseInfoEntity houseInfoEntity = new HouseInfoEntity();
+			houseInfoEntity.setId(String.valueOf(SnowFlake.nextId()));
+			houseInfoEntity.setMobile(membersQO.getMobile());
+			houseInfoEntity.setTitle(title);
+			houseInfoEntity.setDesc(desc);
+			houseInfoEntity.setCreateTime(LocalDateTime.now());
+			houseInfoEntity.setOverdueTime(LocalDateTime.now().plusHours(1));
+			houseInfoEntity.setYzUid(userId);
+			houseInfoEntity.setYhUid(userEntity.getUid());
+			houseInfoService.saveOne(houseInfoEntity);
+
 			//推送消息
 			PushInfoUtil.PushPublicTextMsg(
 					userIMEntity.getImId(),
 					"房屋管理",
-					"房屋绑定"+relation+"!",
+					title,
+					url+"?"+houseInfoEntity.getId(),
+					desc,
 					null,
-					"房屋绑定"+relation  +"\n"+
-							"我是"+userEntity.getRealName()+"，邀请您("+membersQO.getName()+")加入"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(membersQO.getRelation())+"身份，如已知晓，请忽略。"
-					,null,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 
+			return url;
+
 			//添加成员表数据
-			HouseMemberEntity entity = new HouseMemberEntity();
-			BeanUtils.copyProperties(membersQO,entity);
-			entity.setId(SnowFlake.nextId());
-			entity.setHouseholderId(userId);
-			houseMemberMapper.insert(entity);
+//			HouseMemberEntity entity = new HouseMemberEntity();
+//			BeanUtils.copyProperties(membersQO,entity);
+//			entity.setId(SnowFlake.nextId());
+//			entity.setHouseholderId(userId);
+//			houseMemberMapper.insert(entity);
 		} else {
+			String relation = membersQO.getRelation()==6?"亲属":membersQO.getRelation()==7?"租客":"";
+			String str = membersQO.getRelation()==6?"点击此处确定关系。":"点击此处确定入驻。";
+			String title="房屋绑定"+relation+"!";
+			String desc="房屋绑定"+relation  +"\n"+
+					"我是"+user.getRealName()+"，邀请您("+membersQO.getName()+")加入"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+",成为我的"+relation+"成员，"+ str;
+
+			HouseInfoEntity houseInfoEntity = new HouseInfoEntity();
+			houseInfoEntity.setId(String.valueOf(SnowFlake.nextId()));
+			houseInfoEntity.setMobile(membersQO.getMobile());
+			houseInfoEntity.setTitle(title);
+			houseInfoEntity.setDesc(desc);
+			houseInfoEntity.setCreateTime(LocalDateTime.now());
+			houseInfoEntity.setOverdueTime(LocalDateTime.now().plusHours(1));
+			houseInfoEntity.setYzUid(userId);
+			houseInfoEntity.setYhUid(userEntity.getUid());
+			houseInfoService.saveOne(houseInfoEntity);
 			membersQO.setUid(userId);
+
 			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
+			return url+"?id="+houseInfoEntity.getId();
 		}
 
 		/*

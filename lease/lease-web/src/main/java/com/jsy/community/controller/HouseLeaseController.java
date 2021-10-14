@@ -62,6 +62,17 @@ public class HouseLeaseController {
         return CommonResult.ok(iHouseLeaseService.allCommunity(cityid, UserUtils.getUserId()));
     }
 
+    /**
+     * @author: Pipi
+     * @description: 获取用户所有小区
+     * @return: com.jsy.community.vo.CommonResult<java.util.List<com.jsy.community.entity.CommunityEntity>>
+     * @date: 2021/10/13 11:32
+     **/
+    @Login
+    @GetMapping("/v2/allCommunity")
+    public CommonResult<List<CommunityEntity>> allCommunity() {
+        return CommonResult.ok(iHouseLeaseService.allCommunity(UserUtils.getUserId()));
+    }
 
     @Login
     @PostMapping("/wholeLease")
