@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysRoleMenuEntity;
@@ -22,6 +23,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("role")
+@ApiJSYController
 public class SysRoleController {
 	
 	@Autowired

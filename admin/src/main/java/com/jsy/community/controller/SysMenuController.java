@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.exception.JSYError;
@@ -19,6 +20,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("menu")
+@ApiJSYController
 public class SysMenuController {
 	
 	@Autowired

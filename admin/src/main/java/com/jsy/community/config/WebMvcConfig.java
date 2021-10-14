@@ -2,7 +2,6 @@ package com.jsy.community.config;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -20,8 +19,7 @@ import javax.annotation.Resource;
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class WebMvcConfig implements WebMvcConfigurer {
 	
-	@Value("${spring.application.name}")
-	private String name;
+	private String name="admin";
 	
 	private String prefix = "/api/v1/";
 	
