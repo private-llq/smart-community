@@ -69,4 +69,12 @@ public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntit
      **/
     Long findLikeTotals();
 
+    /**
+     * @Description: 查询单条商品详细信息
+     * @Param: [id]
+     * @Return: com.jsy.community.entity.proprietor.ProprietorMarketEntity
+     * @Author: Tian
+     * @Date: 2021/10/14-9:50
+     **/
+    ProprietorMarketEntity selectMarketOne(@Param("id") Long id);
 }
