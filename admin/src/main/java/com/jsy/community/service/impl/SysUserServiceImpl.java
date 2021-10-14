@@ -520,6 +520,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		if (i != 1) {
 			throw new AdminException(JSYError.INTERNAL.getCode(),"删除失败");
 		}
+		SysUserAuthEntity sysUserAuthEntity = sysUserAuthMapper.selectOne(new QueryWrapper<SysUserAuthEntity>().eq("mobile", sysUserEntity.getMobile()));
+		sysUserAuthMapper.deleteById(sysUserAuthEntity.getId());
 	}
 	
 	/**

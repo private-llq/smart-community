@@ -50,7 +50,7 @@
 		aur.role_id,
 		ar.name as roleName
 		from t_sys_user au
-		left join t_sys_user_role aur on aur.uid = au.uid
+		left join t_sys_user_role aur on aur.user_id = au.id
 		left join t_sys_role ar on ar.id = aur.role_id
 		<where>
 			au.deleted = 0
@@ -76,7 +76,7 @@
 		aur.role_id,
 		ar.name as roleName
 		from t_sys_user au
-		left join t_sys_user_role aur on aur.uid = au.uid
+		left join t_sys_user_role aur on aur.user_id = au.id
 		left join t_sys_role ar on ar.id = aur.role_id
 		<where>
 			au.deleted = 0

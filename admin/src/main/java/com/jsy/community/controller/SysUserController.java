@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.sys.SysUserEntity;
@@ -43,6 +44,7 @@ import java.util.Map;
 @Api(tags = "系统用户控制器")
 @Slf4j
 @RestController
+@ApiJSYController
 public class SysUserController {
 	
 	@Autowired
@@ -195,6 +197,7 @@ public class SysUserController {
 	 **/
 	@Login
 	@DeleteMapping("delete")
+	@Transactional(rollbackFor = Exception.class)
 	public CommonResult deleteOperator(Long id){
 		sysUserService.deleteOperator(id);
 		return CommonResult.ok("操作成功");

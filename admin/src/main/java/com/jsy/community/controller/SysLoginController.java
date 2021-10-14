@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.UserAuthEntity;
@@ -10,7 +9,6 @@ import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
-import com.jsy.community.qo.sys.SysLoginQO;
 import com.jsy.community.service.*;
 import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.RegexUtils;
@@ -31,12 +29,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,58 +57,58 @@ public class SysLoginController {
 	@Resource
 	private UserUtils userUtils;
 	
-	/**
-	 * 验证码
-	 */
-	@GetMapping("captcha.jpg")
-	public void captcha(HttpServletResponse response, String uuid) throws IOException {
-		response.setHeader("Cache-Control", "no-store, no-cache");
-		response.setContentType("image/jpeg");
-		
-		//获取图片验证码
-		BufferedImage image = sysCaptchaService.getCaptcha(uuid);
-		
-		ServletOutputStream out = response.getOutputStream();
-		ImageIO.write(image, "jpg", out);
-		IoUtil.close(out);
-	}
-	
-	/**
-	 * 登录
-	 */
-	@PostMapping("/sys/login")
-	public CommonResult<?> login(@RequestBody SysLoginQO form) {
-		boolean captcha = sysCaptchaService.validate(form.getUsername(), form.getCaptcha());
-		if (!captcha) {
-			return CommonResult.error("验证码无效");
-		}
-		
-		//用户信息
-		SysUserEntity user;
-		if(form.getUsername().contains("@")){
-			user = sysUserService.queryByEmail(form.getUsername());
-		}else{
-			user = sysUserService.queryByUserName(form.getUsername());
-		}
-		
-		//账号不存在、密码错误
-		if (user == null || !user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())) {
-			return CommonResult.error("账号或密码不正确");
-		}
-		
-		//账号锁定
-		if (user.getStatus() == 1) {
-			return CommonResult.error("账号已被锁定,请联系管理员");
-		}
-		
-		//生成token，并保存到redis
-		String token = sysUserTokenService.createToken(user);
-		user.setToken(token);
-		//查询用户菜单
-		List<SysMenuEntity> menuList = sysConfigService.queryUserMenu(user.getId());
-		user.setMenuList(menuList);
-		return CommonResult.ok(user);
-	}
+//	/**
+//	 * 验证码
+//	 */
+//	@GetMapping("captcha.jpg")
+//	public void captcha(HttpServletResponse response, String uuid) throws IOException {
+//		response.setHeader("Cache-Control", "no-store, no-cache");
+//		response.setContentType("image/jpeg");
+//
+//		//获取图片验证码
+//		BufferedImage image = sysCaptchaService.getCaptcha(uuid);
+//
+//		ServletOutputStream out = response.getOutputStream();
+//		ImageIO.write(image, "jpg", out);
+//		IoUtil.close(out);
+//	}
+//
+//	/**
+//	 * 登录
+//	 */
+//	@PostMapping("/sys/login")
+//	public CommonResult<?> login(@RequestBody SysLoginQO form) {
+//		boolean captcha = sysCaptchaService.validate(form.getUsername(), form.getCaptcha());
+//		if (!captcha) {
+//			return CommonResult.error("验证码无效");
+//		}
+//
+//		//用户信息
+//		SysUserEntity user;
+//		if(form.getUsername().contains("@")){
+//			user = sysUserService.queryByEmail(form.getUsername());
+//		}else{
+//			user = sysUserService.queryByUserName(form.getUsername());
+//		}
+//
+//		//账号不存在、密码错误
+//		if (user == null || !user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())) {
+//			return CommonResult.error("账号或密码不正确");
+//		}
+//
+//		//账号锁定
+//		if (user.getStatus() == 1) {
+//			return CommonResult.error("账号已被锁定,请联系管理员");
+//		}
+//
+//		//生成token，并保存到redis
+//		String token = sysUserTokenService.createToken(user);
+//		user.setToken(token);
+//		//查询用户菜单
+//		List<SysMenuEntity> menuList = sysConfigService.queryUserMenu(user.getId());
+//		user.setMenuList(menuList);
+//		return CommonResult.ok(user);
+//	}
 	
 	/**
 	 * 发送手机验证码

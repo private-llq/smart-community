@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 @ApiModel("大后台用户VO")
 public class SysInfoVo implements Serializable {
+	private String id;
 	/**
 	 * 角色类型(第一版直接放进用户表)  1：超级管理员   2：普通用户
 	 */

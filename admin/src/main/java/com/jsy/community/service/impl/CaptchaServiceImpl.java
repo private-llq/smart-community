@@ -7,7 +7,6 @@ import com.jsy.community.service.ICaptchaService;
 import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.SmsUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +22,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service("captchaService")
 public class CaptchaServiceImpl implements ICaptchaService {
-	
-	@Value(value = "${jsy.mobileCodeExpiredTime}")
-	private Integer mobileExpiredTime;
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
@@ -53,7 +49,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
 		//发短信
 		String code = SmsUtil.sendVcode(mobile, BusinessConst.SMS_VCODE_LENGTH_DEFAULT);
 		//5分钟有效期
-		redisTemplate.opsForValue().set("vCodeAdmin:" + mobile, code, mobileExpiredTime, TimeUnit.MINUTES);
+		redisTemplate.opsForValue().set("vCodeSys:" + mobile, code, 5, TimeUnit.MINUTES);
 		
 		// 验证码暂时固定1111
 //		String code = "1111";

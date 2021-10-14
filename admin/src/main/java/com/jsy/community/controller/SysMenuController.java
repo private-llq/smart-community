@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.sys.SysMenuQO;
@@ -70,6 +71,7 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@Login
 	@GetMapping("query")
 	public CommonResult<List<SysMenuEntity>> listOfMenu(){
 		return CommonResult.ok(sysConfigService.listOfMenu());

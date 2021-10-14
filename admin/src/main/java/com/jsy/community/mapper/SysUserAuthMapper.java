@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.sys.SysUserAuthEntity;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
@@ -11,6 +12,7 @@ import org.apache.ibatis.annotations.Update;
  * @description 用户登录账户Mapper t_sys_user_auth表
  * @since 2021-10-12 16:24
  **/
+@Mapper
 public interface SysUserAuthMapper extends BaseMapper<SysUserAuthEntity> {
 	
 	/**

@@ -17,6 +17,7 @@ import com.jsy.community.qo.sys.SysRoleQO;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -273,6 +274,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 **/
 	@Override
 	public boolean addRole(SysRoleEntity sysRoleEntity){
+		sysRoleEntity.setId(SnowFlake.nextId());
+		//设置角色菜单
+		if(!CollectionUtils.isEmpty(sysRoleEntity.getMenuIds())){
+			setRoleMenus(sysRoleEntity.getMenuIds(),sysRoleEntity.getId());
+		}
 		int result = sysRoleMapper.insert(sysRoleEntity);
         return result == 1;
     }
@@ -301,6 +307,10 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	public boolean updateRole(SysRoleQO sysRoleOQ){
 		SysRoleEntity entity = new SysRoleEntity();
 		BeanUtils.copyProperties(sysRoleOQ,entity);
+		//更新角色菜单
+		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
+			setRoleMenus(entity.getMenuIds(),entity.getId());
+		}
 		int result = sysRoleMapper.updateById(entity);
         return result == 1;
     }

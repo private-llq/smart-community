@@ -1,5 +1,6 @@
 package com.jsy.community.entity.sys;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
@@ -27,8 +28,9 @@ public class SysUserAuthEntity extends BaseEntity {
 	/**
 	 * 有权限的社区ids
 	 */
+	@TableField(exist = false)
 	private String communityIds;
-	
+	@TableField(exist = false)
 	private String token;//登录token
 	
 	private String createBy;//创建人

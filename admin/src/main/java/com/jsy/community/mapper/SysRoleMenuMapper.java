@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.sys.SysRoleMenuEntity;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * @Date: 2021/10/13 9:10
  * @Version: 1.0
  **/
+@Mapper
 public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenuEntity> {
     /**
      * @author: Pipi

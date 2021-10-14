@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysRoleMenuEntity;
 import com.jsy.community.exception.JSYError;
@@ -34,6 +35,7 @@ public class SysRoleController {
 	 * @Date: 2020/12/14
 	**/
 	@PostMapping("add")
+	@Transactional(rollbackFor = Exception.class)
 	public CommonResult addRole(@RequestBody SysRoleEntity sysRoleEntity){
 		ValidatorUtils.validateEntity(sysRoleEntity);
 		boolean b = sysConfigService.addRole(sysRoleEntity);
@@ -61,6 +63,7 @@ public class SysRoleController {
 	 * @Date: 2020/12/14
 	**/
 	@PutMapping("update")
+	@Transactional(rollbackFor = Exception.class)
 	public CommonResult updateMenu(@RequestBody SysRoleQO sysRoleQO){
 		boolean b = sysConfigService.updateRole(sysRoleQO);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
@@ -85,6 +88,7 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
+	@Login
 	@PostMapping("/page")
 	public CommonResult queryPage(@RequestBody BaseQO<SysRoleEntity> baseQO){
 		if(baseQO.getQuery() == null){
