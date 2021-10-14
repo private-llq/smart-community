@@ -92,6 +92,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
         qo.setHouseLon(community.getLon().doubleValue());
         qo.setHouseLat(community.getLat().doubleValue());
+        qo.setHouseCityId(community.getHouseId());
         //1.保存房源数据
         qo.setId(SnowFlake.nextId());
         //保存房屋优势标签至中间表 随时入住、电梯楼、家电齐全等等
@@ -121,6 +122,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
         qo.setHouseLon(community.getLon().doubleValue());
         qo.setHouseLat(community.getLat().doubleValue());
+        qo.setHouseCityId(community.getHouseId());
         //单间新增房源 相对于 整租 只是多一个 公共设施 、 房间设施  相当于把整租的家具(houseFurnitureCode) 分成了两部分
         qo.setId(SnowFlake.nextId());
         //保存房屋优势标签至中间表 随时入住、电梯楼、家电齐全等等
@@ -156,6 +158,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
         qo.setHouseLon(community.getLon().doubleValue());
         qo.setHouseLat(community.getLat().doubleValue());
+        qo.setHouseCityId(community.getHouseId());
         qo.setCommonFacilitiesId(null);
         qo.setRoommateExpectId(null);
         //单间新增房源 相对于 整租 只是多一个 公共设施 、 房间设施  相当于把整租的家具(houseFurnitureCode) 分成了两部分
