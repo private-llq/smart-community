@@ -168,6 +168,7 @@ public class SysUserController {
 	 **/
 	@Login
 	@PostMapping("add")
+	@Transactional(rollbackFor = Exception.class)
 	public CommonResult addOperator(@RequestBody SysUserEntity sysUserEntity){
 		ValidatorUtils.validateEntity(sysUserEntity);
 		sysUserService.addOperator(sysUserEntity);
@@ -183,6 +184,7 @@ public class SysUserController {
 	 **/
 	@Login
 	@PutMapping("update")
+	@Transactional(rollbackFor = Exception.class)
 	public CommonResult updateOperator(@RequestBody SysUserEntity sysUserEntity){
 		sysUserService.updateOperator(sysUserEntity);
 		return CommonResult.ok("操作成功");
