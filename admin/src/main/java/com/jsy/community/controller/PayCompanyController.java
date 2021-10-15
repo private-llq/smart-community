@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.entity.PayCompanyEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.service.IPayCompanyService;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/payCompany")
+@ApiJSYController
 public class PayCompanyController {
 	
 	@Autowired

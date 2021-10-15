@@ -79,6 +79,15 @@ public class ProprietorMarketVO extends BaseVO {
     @ApiModelProperty(value = "社区id")
     private  Long communityId;
 
+    @ApiModelProperty("昵称")
+    private String nickName;
+
+    @ApiModelProperty("头像地址")
+    private String avatarUrl;
+
+    @ApiModelProperty("是否实名")
+    private Integer isRealAuth;
+
     @TableField(exist = false)
     @ApiModelProperty(value = "社区名")
     private  String communityName;

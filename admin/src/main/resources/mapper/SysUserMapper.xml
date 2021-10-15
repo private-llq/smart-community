@@ -39,4 +39,65 @@
 		from t_sys_user
 		where email = #{email}
 	</select>
+
+	<!-- 操作员条件查询 -->
+	<select id="queryPageUserEntity" resultType="com.jsy.community.entity.sys.SysUserEntity">
+		select
+		au.id,
+		au.real_name,
+		au.mobile,
+		au.create_time,
+		aur.role_id,
+		ar.name as roleName
+		from t_sys_user au
+		left join t_sys_user_role aur on aur.user_id = au.id
+		left join t_sys_role ar on ar.id = aur.role_id
+		<where>
+			au.deleted = 0
+			<if test="qo.name != null and qo.name !=''">
+				and (au.real_name like concat("%", #{qo.name}, "%")
+				or au.mobile like concat("%", #{qo.name}, "%"))
+			</if>
+			<if test="qo.roleId != null">
+				and aur.role_id = #{qo.roleId}
+			</if>
+		</where>
+		order by au.create_time
+		limit #{startSize}, #{size}
+	</select>
+
+	<select id="countPageUserEntity" resultType="java.lang.Integer">
+		select count(*) from (
+		select
+		au.id,
+		au.real_name,
+		au.mobile,
+		au.create_time,
+		aur.role_id,
+		ar.name as roleName
+		from t_sys_user au
+		left join t_sys_user_role aur on aur.user_id = au.id
+		left join t_sys_role ar on ar.id = aur.role_id
+		<where>
+			au.deleted = 0
+			<if test="qo.name != null and qo.name !=''">
+				and (au.real_name like concat("%", #{qo.name}, "%")
+				or au.mobile like concat("%", #{qo.name}, "%"))
+			</if>
+			<if test="qo.roleId != null">
+				and aur.role_id = #{qo.roleId}
+			</if>
+		</where>) as a
+	</select>
+
+	<!-- 编辑操作员 -->
+	<update id="updateOperator">
+		update t_sys_user u
+		<set>
+			<if test="entity.realName != null and entity.realName != ''">,u.real_name = #{entity.realName}</if>
+			<if test="entity.mobile != null and entity.mobile != ''">,u.mobile = #{entity.mobile}</if>
+			,update_time = now()
+		</set>
+		where id = #{entity.id}
+	</update>
 </mapper>

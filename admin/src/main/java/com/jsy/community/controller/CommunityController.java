@@ -1,7 +1,7 @@
 package com.jsy.community.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jsy.community.annotation.Perms;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.exception.JSYError;
@@ -31,6 +31,7 @@ import java.util.Map;
 @Login( allowAnonymous = true)
 @Slf4j
 @RestController
+@ApiJSYController
 public class CommunityController {
 	
 	@Autowired

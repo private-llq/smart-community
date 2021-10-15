@@ -3,22 +3,32 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.entity.sys.SysRoleEntity;
+import com.jsy.community.entity.sys.SysUserRoleEntity;
 import com.jsy.community.mapper.SysMenuMapper;
 import com.jsy.community.mapper.SysRoleMapper;
+import com.jsy.community.mapper.SysRoleMenuMapper;
+import com.jsy.community.mapper.SysUserRoleMapper;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.qo.sys.SysRoleQO;
 import com.jsy.community.service.ISysConfigService;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,6 +49,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	
 	@Resource
 	private SysRoleMapper sysRoleMapper;
+	
+	@Resource
+	private SysUserRoleMapper sysUserRoleMapper;
+	
+	@Resource
+	private SysRoleMenuMapper sysRoleMenuMapper;
 	
 	//==================================================== Menu菜单 ===============================================================
 	/**
@@ -195,6 +211,59 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		return list;
 	}
 	
+	/**
+	 * @Description: 查询用户菜单权限(新接口)
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.sys.SysMenuEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	@Override
+	public List<SysMenuEntity> queryMenuByUid(Long roleId){
+		//查ID
+		List<Long> menuIdList = sysRoleMenuMapper.queryRoleMuneIdsByRoleIdAndLoginType(roleId);
+		if(CollectionUtils.isEmpty(menuIdList)){
+			return null;
+		}
+		//查实体
+		List<SysMenuEntity> menuEntityList = sysMenuMapper.queryMenuBatch(menuIdList);
+		//组装数据
+		List<SysMenuEntity> returnList = new ArrayList<>();
+		for(SysMenuEntity sysMenuEntity : menuEntityList){
+			if(sysMenuEntity.getPid() == 0L){
+				returnList.add(sysMenuEntity);
+			}
+		}
+		menuEntityList.removeAll(returnList);
+		setChildrenMenu(returnList,menuEntityList);
+		return returnList;
+	}
+	
+	/**
+	 * 组装子菜单
+	 */
+	private void setChildrenMenu(List<SysMenuEntity> childrenList, List<SysMenuEntity> childrenCopy){
+		List<SysMenuEntity> selected = new ArrayList<>();
+		for(SysMenuEntity child : childrenList){
+			for(SysMenuEntity entity : childrenCopy){
+				if(entity.getPid().equals(child.getId())){
+					if(!CollectionUtils.isEmpty(child.getChildrenList())){
+						child.getChildrenList().add(entity);
+					}else{
+						List<SysMenuEntity> childOfChild = new ArrayList<>();
+						childOfChild.add(entity);
+						child.setChildrenList(childOfChild);
+					}
+					selected.add(entity);
+				}
+			}
+			if(!CollectionUtils.isEmpty(child.getChildrenList())){
+				setChildrenMenu(child.getChildrenList(),childrenCopy);
+			}
+			childrenCopy.removeAll(selected);
+		}
+	}
+	
 	//==================================================== Role角色 ===============================================================
 	/**
 	 * @Description: 添加角色
@@ -205,6 +274,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 **/
 	@Override
 	public boolean addRole(SysRoleEntity sysRoleEntity){
+		sysRoleEntity.setId(SnowFlake.nextId());
+		//设置角色菜单
+		if(!CollectionUtils.isEmpty(sysRoleEntity.getMenuIds())){
+			setRoleMenus(sysRoleEntity.getMenuIds(),sysRoleEntity.getId());
+		}
 		int result = sysRoleMapper.insert(sysRoleEntity);
         return result == 1;
     }
@@ -233,6 +307,10 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	public boolean updateRole(SysRoleQO sysRoleOQ){
 		SysRoleEntity entity = new SysRoleEntity();
 		BeanUtils.copyProperties(sysRoleOQ,entity);
+		//更新角色菜单
+		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
+			setRoleMenus(entity.getMenuIds(),entity.getId());
+		}
 		int result = sysRoleMapper.updateById(entity);
         return result == 1;
     }
@@ -247,6 +325,53 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	@Override
 	public List<SysRoleEntity> listOfRole(){
 		return sysRoleMapper.selectList(new QueryWrapper<SysRoleEntity>().select("*"));
+	}
+	
+	/**
+	 * @Description: 角色列表 分页查询
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.SysRoleEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	@Override
+	public PageInfo<SysRoleEntity> queryPage(BaseQO<SysRoleEntity> baseQO){
+		Page<SysRoleEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page,baseQO);
+		SysRoleEntity query = baseQO.getQuery();
+		QueryWrapper<SysRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("id,name,remark,create_time");
+		if(!StringUtils.isEmpty(query.getName())){
+			queryWrapper.like("name",query.getName());
+		}
+		if(query.getId() != null){
+			//查详情
+			queryWrapper.eq("id",query.getId());
+		}
+		Page<SysRoleEntity> pageData = sysRoleMapper.selectPage(page,queryWrapper);
+		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+			//查菜单权限
+			SysRoleEntity entity = pageData.getRecords().get(0);
+			entity.setMenuIds(sysRoleMapper.getRoleMenu(entity.getId()));
+		}
+		PageInfo<SysRoleEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData,pageInfo);
+		return pageInfo;
+	}
+	
+	/**
+	 * @param uid : 用户uid
+	 * @author: Pipi
+	 * @description: 根据用户uid查询用户的角色id
+	 * @return: java.lang.Long
+	 * @date: 2021/8/6 10:50
+	 **/
+	@Override
+	public SysUserRoleEntity queryRoleIdByUid(String uid) {
+		QueryWrapper<SysUserRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("user_id,role_id");
+		queryWrapper.eq("user_id", uid);
+		return sysUserRoleMapper.selectOne(queryWrapper);
 	}
 	
 	//==================================================== 角色-菜单 ===============================================================

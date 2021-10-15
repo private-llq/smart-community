@@ -26,4 +26,7 @@ public class UserThirdPlatformEntity extends BaseEntity{
 	@NotNull(message = "缺少三方平台类型")
 	private Integer thirdPlatformType;
 
+	@ApiModelProperty(value = "账户真实姓名")
+	private String realname;
+
 }

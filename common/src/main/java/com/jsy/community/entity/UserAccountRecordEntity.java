@@ -51,4 +51,9 @@ public class UserAccountRecordEntity  extends BaseEntity{
 	@ApiModelProperty(value = "备注")
 	private String comment;
 
+	@ApiModelProperty(value = "流水号")
+	private String serialNumber;
+
+
+
 }

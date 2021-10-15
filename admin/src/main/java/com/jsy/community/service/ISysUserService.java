@@ -2,9 +2,13 @@ package com.jsy.community.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.sys.SysUserAuthEntity;
 import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.qo.sys.NameAndCreatorQO;
+import com.jsy.community.qo.sys.SysUserQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -65,12 +69,8 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	
 	/**
 	 * 修改密码
-	 *
-	 * @param userId      用户ID
-	 * @param password    原密码
-	 * @param newPassword 新密码
 	 */
-	boolean updatePassword(Long userId, String password, String newPassword);
+	boolean updatePassword(ResetPasswordQO qo, String uid);
 	
 	/**
 	* @Description: 邮件注册邀请
@@ -98,4 +98,94 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	 * @Date: 2020/12/1
 	**/
 	Map<String,String> setUserName(Long uid,String username);
+	
+	/**
+	 * @Description: 根据手机号查询用户是否存在
+	 * @Param: [mobile]
+	 * @Return: boolean
+	 * @Author: DKS
+	 * @Date: 2021/10/12
+	 **/
+	boolean isExistsByMobile(String mobile);
+	
+	/**
+	 * @Description: 根据手机号查询登录用户
+	 * @Param: [mobile]
+	 * @Return: com.jsy.community.entity.sys.SysUserAuthEntity
+	 * @Author: DKS
+	 * @Date: 2021/10/12
+	 **/
+	SysUserAuthEntity queryLoginUserByMobile(String mobile);
+	
+	/**
+	 * @Description: 查询用户小区账户资料
+	 * @Param: [mobile, communityId]
+	 * @Return: com.jsy.community.entity.sys.SysUserEntity
+	 * @Author: DKS
+	 * @Date: 2021/10/12
+	 **/
+	SysUserEntity queryUserByMobile(String mobile, Long communityId);
+	
+	/**
+	 * @Description: 操作员条件查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.utils.PageInfo
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	PageInfo queryOperator(BaseQO<SysUserQO> baseQO);
+	
+	/**
+	 * @Description: 添加操作员
+	 * @Param: [sysUserEntity]
+	 * @Return: boolean
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	void addOperator(SysUserEntity sysUserEntity);
+	
+	/**
+	 * @Description: 编辑操作员
+	 * @Param: [sysUserEntity]
+	 * @Return: boolean
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	void updateOperator(SysUserEntity sysUserEntity);
+	
+	/**
+	 * @Description: 删除操作员
+	 * @author: DKS
+	 * @since: 2021/10/13 15:38
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 */
+	void deleteOperator(Long id);
+	
+	/**
+	 * @Description: 根据手机号检查小区用户是否存在(t_sys_user)
+	 * @Param: [mobile]
+	 * @Return: boolean
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	boolean checkUserExists(String mobile);
+	
+	/**
+	 * @Description: 根据uid查询手机号
+	 * @Param: [uid]
+	 * @Return: java.lang.String
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	String queryMobileByUid(String uid);
+	
+	/**
+	 * @Description: 修改手机号
+	 * @Param: [newMobile, oldMobile]
+	 * @Return: boolean
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	boolean changeMobile(String newMobile,String oldMobile);
 }

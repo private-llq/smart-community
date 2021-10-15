@@ -6,12 +6,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IProprietorMarketService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketLabelEntity;
 import com.jsy.community.mapper.ProprietorMarketCategoryMapper;
 import com.jsy.community.mapper.ProprietorMarketLabelMapper;
 import com.jsy.community.mapper.ProprietorMarketMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import com.jsy.community.utils.SnowFlake;
@@ -39,6 +41,9 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
    @Autowired
    private ProprietorMarketCategoryMapper categoryMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     /**
      * @Description: 发布商品信息
      * @Param: [marketQO, userId]
@@ -50,13 +55,14 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
     public boolean addMarket(ProprietorMarketQO marketQO, String userId) {
         ProprietorMarketEntity marketEntity = new ProprietorMarketEntity();
         BeanUtils.copyProperties(marketQO,marketEntity);
+
         marketEntity.setUid(userId);
         marketEntity.setId(SnowFlake.nextId());
 
-//        //没有价格 面议（默认面议）
-//        if (marketEntity.getPrice()!=null){
-//            marketEntity.setNegotiable(NEGOTIABLE_ZERO);
-//        }
+//        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",userId));
+//        marketEntity.setIsRealAuth(userEntity.getIsRealAuth());
+//        marketEntity.setNickName(userEntity.getNickname());
+//        marketEntity.set
         //默认上架
         marketEntity.setState(STATE_ONE);
         return  marketMapper.insert(marketEntity)==1;
@@ -191,15 +197,9 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
      * @Date: 2021/8/23-14:06
      **/
     @Override
-    public ProprietorMarketVO findOne(Long id) {
-        ProprietorMarketEntity marketEntity = marketMapper.selectOne(new QueryWrapper<ProprietorMarketEntity>().eq("id", id));
-        ProprietorMarketLabelEntity labelEntity = labelMapper.selectOne(new QueryWrapper<ProprietorMarketLabelEntity>().eq("label_id", marketEntity.getLabelId()));
-        ProprietorMarketCategoryEntity categoryEntity = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("category_id", marketEntity.getCategoryId()));
-        ProprietorMarketVO marketVO = new ProprietorMarketVO();
-        BeanUtils.copyProperties(marketEntity,marketVO);
-        marketVO.setLabelName(labelEntity.getLabel());
-        marketVO.setCategoryName(categoryEntity.getCategory());
-        return marketVO;
+    public ProprietorMarketEntity findOne(Long id) {
+          ProprietorMarketEntity marketEntity =  marketMapper.selectMarketOne(id);
+        return marketEntity;
     }
 
     /**

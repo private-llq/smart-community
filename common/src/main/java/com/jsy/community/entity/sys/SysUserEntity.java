@@ -21,13 +21,11 @@ public class SysUserEntity extends BaseEntity {
 	/**
 	 * 用户名
 	 */
-	@NotBlank(message = "用户名不能为空")
 	private String username;
 	
 	/**
 	 * 密码
 	 */
-	@NotBlank(message = "密码不能为空")
 	private String password;
 	
 	/**
@@ -77,7 +75,12 @@ public class SysUserEntity extends BaseEntity {
 	/**
 	 * token
 	 */
+	@TableField(exist = false)
 	private String token;
+	
+	// 角色Id
+	@TableField(exist = false)
+	private Long roleId;
 	
 	/**
 	 * 注册邀请传参验证

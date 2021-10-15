@@ -1,5 +1,7 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.sys.SysMenuQO;
@@ -18,6 +20,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("menu")
+@ApiJSYController
 public class SysMenuController {
 	
 	@Autowired
@@ -30,7 +33,7 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@PostMapping("")
+	@PostMapping("add")
 	public CommonResult addMenu(@RequestBody SysMenuEntity sysMenuEntity){
 		ValidatorUtils.validateEntity(sysMenuEntity);
 		boolean b = sysConfigService.addMenu(sysMenuEntity);
@@ -44,7 +47,7 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@DeleteMapping("")
+	@DeleteMapping("delete")
 	public CommonResult delMenu(@RequestParam("id") Long id){
 		boolean b = sysConfigService.delMenu(id);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
@@ -57,7 +60,7 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@PutMapping("")
+	@PutMapping("update")
 	public CommonResult updateMenu(@RequestBody SysMenuQO sysMenuQO){
 		boolean b = sysConfigService.updateMenu(sysMenuQO);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
@@ -70,7 +73,8 @@ public class SysMenuController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@GetMapping("")
+	@Login
+	@GetMapping("query")
 	public CommonResult<List<SysMenuEntity>> listOfMenu(){
 		return CommonResult.ok(sysConfigService.listOfMenu());
 	}
