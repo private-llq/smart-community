@@ -6,6 +6,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -129,4 +130,17 @@ public interface IHouseMemberService extends IService<HouseMemberEntity> {
 	 * @date: 2021/9/9 15:07
 	 **/
 	List<HouseMemberEntity> queryByCommunityIdAndUids(Long communityId, Set<String> uidSet);
+
+	/**
+	 * @author: Pipi
+	 * @description: 新增房屋成员
+	 * @param uid: 新增成员uid
+     * @param homeOwnerUid: 业主uid
+     * @param communityId: 社区ID
+     * @param houseId: 房屋ID
+     * @param validTime: 租户有效时间,此处传合同截止时间即可
+	 * @return: java.lang.Integer
+	 * @date: 2021/10/15 17:45
+	 **/
+	Integer addMember(String uid, String homeOwnerUid, Long communityId, Long houseId, LocalDateTime validTime);
 }

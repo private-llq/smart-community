@@ -149,9 +149,6 @@ public class ShopQO implements Serializable {
 	@NotEmpty(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少上传一张图片")
 	private String[] imgPath;
 	
-
-	
-	
 	@ApiModelProperty(value = "客流人群Code")
 	@NotEmpty(groups = {ShopQO.addShopValidate.class, ShopQO.updateShopValidate.class}, message = "请至少选择一个客流人群")
 	private List<Long> shopPeoples;

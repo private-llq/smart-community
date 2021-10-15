@@ -92,6 +92,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IHouseService houseService;
 
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IHouseMemberService houseMemberService;
+
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserImService userImService;
 
@@ -1309,6 +1312,14 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 updateWrapper.set("lease_status", 1);
                 shopLeaseMapper.update(new ShopLeaseEntity(), updateWrapper);
             }
+
+            // 绑定租客为房屋租客身份,向house_member表增加数据
+            houseMemberService.addMember(leaseRecordEntity.getTenantUid(),
+                    leaseRecordEntity.getHomeOwnerUid(),
+                    leaseRecordEntity.getCommunityId(),
+                    leaseRecordEntity.getAssetId(),
+                    leaseRecordEntity.getEndDate().atStartOfDay()
+            );
 
             CommunityEntity communityEntity = communityService.getCommunityNameById(leaseRecordEntity.getCommunityId());
             //租客
