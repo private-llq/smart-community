@@ -320,12 +320,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             if (houseInfoEntities.size()!=0){
                 for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
                     //推送消息
-                    PushInfoUtil.PushPublicTextMsg(
+                    PushInfoUtil.PushPublicMsg(
                             imId,
                             "房屋管理",
                             houseInfoEntity.getTitle(),
-                            "www.baidu.com"+"?id="+houseInfoEntity.getId(),
-                            houseInfoEntity.getDesc(),
+                            "http://192.168.12.113:8080/"+"?id="+houseInfoEntity.getId(),
+                            houseInfoEntity.getContent(),
                             null,
                             BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
                 }
@@ -986,6 +986,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return houses;
     }
 
+
+    /**
+     * @Description: 用户绑定微信
+     * @author: Hu
+     * @since: 2021/10/15 10:05
+     * @Param:
+     * @return:
+     */
+    @Override
+    @Transactional
+    public String bindingWechat(String userId, String openid) {
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+        if (userEntity != null) {
+            UserThirdPlatformEntity thirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("third_platform_id", openid).eq("third_platform_type", 2).eq("uid",userId));
+            if (userEntity != null) {
+                throw new ProprietorException("当前用户已绑定微信！");
+            }
+            UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
+            userThirdPlatformEntity.setUid(userId);
+            userThirdPlatformEntity.setThirdPlatformId(openid);
+            userThirdPlatformEntity.setThirdPlatformType(2);
+            userThirdPlatformEntity.setId(SnowFlake.nextId());
+            userThirdPlatformMapper.insert(userThirdPlatformEntity);
+
+            return userEntity.getRealName();
+        }
+        return null;
+    }
 
     /**
      * @Description: 查询当前用户所有身份的房屋信息

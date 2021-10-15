@@ -15,10 +15,7 @@ import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
-import com.jsy.community.utils.OrderInfoUtil2_0;
-import com.jsy.community.utils.RegexUtils;
-import com.jsy.community.utils.UserUtils;
-import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
@@ -180,6 +177,18 @@ public class UserAuthController {
 		String uid = UserUtils.getUserId();
 		boolean b = userAuthService.addPassword(uid, qo);
 		return b ? CommonResult.ok() : CommonResult.error("密码设置失败");
+	}
+
+	@ApiOperation("绑定微信")
+	@PostMapping("/bindingWechat")
+	public CommonResult bindingWechat(@RequestParam("code")String code) {
+		JSONObject object = WeCharUtil.getAccessToken(code);
+		if ("".equals(object)||object==null){
+			return CommonResult.error("系统异常，请稍后再试！");
+		}
+		String accessToken = object.getString("access_token");
+		String openid = object.getString("openid");
+		return CommonResult.ok(userService.bindingWechat(UserUtils.getUserId(),openid));
 	}
 	
 	@ApiOperation(value = "设置支付密码", notes = "需要登录")

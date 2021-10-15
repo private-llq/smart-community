@@ -5,9 +5,11 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
+import com.jsy.community.api.IHouseInfoService;
 import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseInfoEntity;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
@@ -57,6 +59,9 @@ public class PropertyRelationController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyRelationService propertyRelationService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IHouseInfoService houseInfoService;
 
     @Autowired
     private MembersHandler membersHandler;
@@ -168,6 +173,20 @@ public class PropertyRelationController {
     @Login
     public CommonResult emigration(@RequestParam Long id){
         propertyRelationService.emigration(id);
+        return CommonResult.ok();
+    }
+    @ApiOperation("查询推送消息类容")
+    @GetMapping("/getByPushInfo")
+//    @Login
+    public CommonResult getByPushInfo(@RequestParam Long id){
+        return CommonResult.ok(houseInfoService.getByPushInfo(id));
+    }
+
+    @ApiOperation("用户确定入驻房间")
+    @PostMapping("/relationSave")
+//    @Login
+    public CommonResult relationSave(@RequestBody HouseInfoEntity houseInfoEntity){
+        houseInfoService.relationSave(houseInfoEntity);
         return CommonResult.ok();
     }
 

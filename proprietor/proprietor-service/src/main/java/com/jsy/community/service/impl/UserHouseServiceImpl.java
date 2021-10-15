@@ -62,7 +62,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IProprietorService proprietorService;
 
-	@DubboReference(version = Const.version, group = Const.group, check = false)
+	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IHouseInfoService houseInfoService;
 	
 	/**
@@ -288,7 +288,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Transactional
 	public String membersSave(MembersQO membersQO, String userId) {
 
-		String url="www.baidu.com";
+		String url="http://192.168.12.113:8080/";
 
 		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()));
 		if (memberEntity!=null){
@@ -316,7 +316,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			houseInfoEntity.setId(String.valueOf(SnowFlake.nextId()));
 			houseInfoEntity.setMobile(membersQO.getMobile());
 			houseInfoEntity.setTitle(title);
-			houseInfoEntity.setDesc(desc);
+			houseInfoEntity.setContent(desc);
 			houseInfoEntity.setCreateTime(LocalDateTime.now());
 			houseInfoEntity.setOverdueTime(LocalDateTime.now().plusHours(1));
 			houseInfoEntity.setYzUid(userId);
@@ -324,7 +324,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			houseInfoService.saveOne(houseInfoEntity);
 
 			//推送消息
-			PushInfoUtil.PushPublicTextMsg(
+			PushInfoUtil.PushPublicMsg(
 					userIMEntity.getImId(),
 					"房屋管理",
 					title,
@@ -332,7 +332,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					desc,
 					null,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-
+			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
 			return url;
 
 			//添加成员表数据
@@ -352,11 +352,10 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			houseInfoEntity.setId(String.valueOf(SnowFlake.nextId()));
 			houseInfoEntity.setMobile(membersQO.getMobile());
 			houseInfoEntity.setTitle(title);
-			houseInfoEntity.setDesc(desc);
+			houseInfoEntity.setContent(desc);
 			houseInfoEntity.setCreateTime(LocalDateTime.now());
 			houseInfoEntity.setOverdueTime(LocalDateTime.now().plusHours(1));
 			houseInfoEntity.setYzUid(userId);
-			houseInfoEntity.setYhUid(userEntity.getUid());
 			houseInfoService.saveOne(houseInfoEntity);
 			membersQO.setUid(userId);
 

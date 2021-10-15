@@ -28,4 +28,22 @@ public interface IHouseInfoService {
      * @return:
      */
     List<HouseInfoEntity> selectList(String mobile);
+
+    /**
+     * @Description: 查询房屋推送消息详情
+     * @author: Hu
+     * @since: 2021/10/14 14:02
+     * @Param:
+     * @return:
+     */
+    HouseInfoEntity getByPushInfo(Long id);
+
+    /**
+     * @Description: 用户确定关系后添加到成员表
+     * @author: Hu
+     * @since: 2021/10/14 14:05
+     * @Param:
+     * @return:
+     */
+    void relationSave(HouseInfoEntity houseInfoEntity);
 }

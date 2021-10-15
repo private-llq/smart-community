@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @TableName("t_house_info")
 public class HouseInfoEntity implements Serializable {
+    @TableId
     private String id;
     /**
      * 电话
@@ -27,7 +29,7 @@ public class HouseInfoEntity implements Serializable {
     /**
      * 描述
      */
-    private String desc;
+    private String content;
     /**
      * 创建时间
      */
@@ -44,5 +46,9 @@ public class HouseInfoEntity implements Serializable {
      * 用户uid
      */
     private String yhUid;
+    /**
+     * 0未确认，1已确认
+     */
+    private Integer status;
 
 }
