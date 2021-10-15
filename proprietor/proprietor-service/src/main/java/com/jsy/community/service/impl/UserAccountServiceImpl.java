@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
@@ -66,6 +67,9 @@ public class UserAccountServiceImpl implements IUserAccountService {
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    private UserAccountRecordMapper userAccountRecordMapper;
 
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
@@ -427,6 +431,56 @@ public class UserAccountServiceImpl implements IUserAccountService {
         }
     }
 
+    /**
+     * @param conId  : 合同ID,传合同ID的原因是防止重复加金额
+     * @param amount : 入账金额
+     * @param uid    : 房东ID
+     * @author: Pipi
+     * @description: 签约支付后租金入账房东账户
+     * @return: java.lang.Integer
+     * @date: 2021/10/15 11:43
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer rentalIncome(String conId, BigDecimal amount, String uid) {
+        //查询合同对应的流水记录是否存在.合同ID对应goods_id
+        QueryWrapper<UserAccountRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();
+        recordEntityQueryWrapper.eq("goods_id", conId);
+        recordEntityQueryWrapper.last(" limit 1");
+        UserAccountRecordEntity userAccountRecordEntity = userAccountRecordMapper.selectOne(recordEntityQueryWrapper);
+        if (userAccountRecordEntity == null) {
+            // 已经有入账数据,说明入过账,跳过
+            return 0;
+        }
+        // 没有入账,则入账
+        // 查询余额
+        QueryWrapper<UserAccountEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("uid", uid);
+        UserAccountEntity userAccountEntity = userAccountMapper.selectOne(queryWrapper);
+        if (userAccountEntity == null) {
+            throw new ProprietorException("未找到用户余额信息,合同编号:" + conId);
+        }
+        // 修改用户余额
+        UpdateWrapper<UserAccountEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("uid", uid);
+        updateWrapper.set("balance", userAccountEntity.getBalance().add(amount));
+        int result = userAccountMapper.update(new UserAccountEntity(), updateWrapper);
+        if (result == 1) {
+            // 添加入账记录
+            UserAccountRecordEntity ucoinRecordEntity = new UserAccountRecordEntity();
+            ucoinRecordEntity.setId(SnowFlake.nextId());
+            ucoinRecordEntity.setUid(uid);
+            ucoinRecordEntity.setTradeFrom(5);
+            ucoinRecordEntity.setTradeType(1);
+            ucoinRecordEntity.setTradeAmount(amount);
+            ucoinRecordEntity.setBalance(userAccountEntity.getBalance().add(amount));//交易后余额
+            ucoinRecordEntity.setComment("租金入账");
+            ucoinRecordEntity.setDeleted(0);
+            ucoinRecordEntity.setSerialNumber(Long.toString(ucoinRecordEntity.getId()));
+            userAccountRecordMapper.insert(ucoinRecordEntity);
+        }
+        return result;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public WithdrawalResulrVO transactionWithdrawal(long serialNumber, BigDecimal amount, String thirdPlatformId,
@@ -459,7 +513,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
         ucoinRecordEntity.setId(SnowFlake.nextId());
         ucoinRecordEntity.setUid(uid);
         ucoinRecordEntity.setTradeFrom(1);
-        ucoinRecordEntity.setTradeType(1);
+        ucoinRecordEntity.setTradeType(2);
         ucoinRecordEntity.setTradeAmount(amount);
         ucoinRecordEntity.setBalance(subtract);//交易后余额
         ucoinRecordEntity.setComment(typeStr + "提现");

@@ -11,6 +11,8 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.UserAccountVO;
 import com.jsy.community.vo.WithdrawalResulrVO;
 
+import java.math.BigDecimal;
+
 /**
  * @author chq459799974
  * @description 用户账户Service
@@ -135,4 +137,15 @@ public interface IUserAccountService {
      * @param accountBindingQO 绑定的支付宝账户信息
      */
     void bindingZhiFuBaoAccount(String uid, ZhiFuBaoAccountBindingQO accountBindingQO);
+
+    /**
+     * @author: Pipi
+     * @description: 签约支付后租金入账房东账户 
+     * @param conId: 合同ID,传合同ID的原因是防止重复加金额
+     * @param amount: 入账金额
+     * @param uid: 房东ID
+     * @return: java.lang.Integer
+     * @date: 2021/10/15 11:43
+     **/
+    Integer rentalIncome(String conId, BigDecimal amount, String uid);
 }
