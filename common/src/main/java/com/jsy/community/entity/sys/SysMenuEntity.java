@@ -21,7 +21,7 @@ public class SysMenuEntity extends BaseEntity {
 	
 	@NotBlank(message = "菜单名不能为空")
 	private String name;//菜单名
-	private String url;//菜单url
+	private String path;//菜单url
 	private Integer sort;//排序
 	private Long pid;//父级id
 	@JsonIgnore
