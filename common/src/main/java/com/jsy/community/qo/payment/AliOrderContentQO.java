@@ -23,4 +23,5 @@ public class AliOrderContentQO implements Serializable {
     private  String      time;          //停车时长
     private  BigDecimal  money;         //收费金额
     private  String    orderNum;       //订单号
+    private String code;//微信授权code
 }

@@ -40,12 +40,10 @@ public class CarQRController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICaQRService iCaQRService;
 
-   private static final String URL = "http://192.168.12.125:8080/#/?CommunityID=";
+   private static final String URL = "http://192.168.12.111:8080/#/?CommunityID=";
     private static final String BUCKET_NAME = "qrcode";
     private static final Integer WIDTH = 400;
     private static final Integer HEIGHT = 400;
-
-
 
 //    public static void main(String[] args) throws Exception {
 //        String text = "http://192.168.12.188:8080/#/?CommunityID=11L";
@@ -58,13 +56,12 @@ public class CarQRController {
 //        System.out.println(s);
 //        System.out.println("ok");
 //    }
-
     @ApiOperation("下载社区停车二维码")
-    @Login
-    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.POST)
+//    @Login
+    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.GET)
     public void uploadQRCode(HttpServletResponse response) throws Exception {
-        Long communityId = UserUtils.getAdminCommunityId();
-//        Long communityId = 1L;
+//        Long communityId = UserUtils.getAdminCommunityId();
+                Long communityId = 1L;
         CarQREntity carQREntity =  iCaQRService.findOne(communityId);
         if (carQREntity!=null){
             ServletOutputStream out = response.getOutputStream();

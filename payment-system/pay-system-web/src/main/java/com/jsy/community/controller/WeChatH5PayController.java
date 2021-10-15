@@ -5,6 +5,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.CompanyPayConfigEntity;
@@ -12,6 +13,7 @@ import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.exception.JSYException;
+import com.jsy.community.qo.payment.AliOrderContentQO;
 import com.jsy.community.qo.payment.WeChatH5PayQO;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
@@ -44,7 +46,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -60,125 +66,73 @@ import java.util.concurrent.TimeUnit;
 public class WeChatH5PayController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
-    private static String unifiedorder_url = "/pay/unifiedorder";
+    private static String unifiedorder_url = "/v3/pay/transactions/jsapi";
+//    private static String code="021uWhml26CwT74Kkeml25h4Ia1uWhmG";
+    private static String APPID="wxc7e3b98bb50243a6";
+    //获取openid的地址
+    private static String getopenid_url = "https://api.weixin.qq.com/sns/oauth2/access_token";
+    //公众号的参数
+    private static String secret="ffef760d5868be78a88506122ee6bcfa";
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarOrderService carOrderService;
 
 //    @Login
     @PostMapping("/wxH5Pay")
-    public CommonResult<Map<String, Object>> wxH5Pay(HttpServletRequest request,String code) throws Exception {
-            //拼接下单地址参数
-            Map<String, Object> paraMap = new HashMap<String, Object>();
-            //下单金额
-            Map<String, Object> amount = new HashMap<String, Object>();
-            amount.put("total",1);
-            amount.put("currency","CNY");
-            //下单金额
-            Map<String, Object> payer = new HashMap<String, Object>();
-            //返回参数
+    public CommonResult<Map<String, Object>> wxH5Pay(@RequestBody AliOrderContentQO qo) throws Exception {
+//        System.out.println(qo);
+
+
+            //返回前端参数
             Map<String, Object> result = new HashMap<String, Object>();
-            //获取ip地址
-            String ip = getClientIpAddress(request);
+
             //获取微信需要的相关参数
             CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(1l);
             WechatConfig.setConfig(serviceConfig);
 
-            //获取openid的地址
-            String getopenid_url = "https://api.weixin.qq.com/sns/oauth2/access_token";
-            //公众号的参数
-            String secret="";
-      //  @RequestBody WeChatH5PayQO weChatH5PayQO,
+        System.out.println("code\n\n"+qo.getCode());
 
+        //拼接下单所需要的参数
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        //参数中：下单金额
+        Map<String, Object> amount = new HashMap<String, Object>();
+        amount.put("total",1);
+        amount.put("currency","CNY");
+        //参数中：openid
+        Map<String, Object> payer = new HashMap<String, Object>();
+        //获取openid
+        String openid = PublicConfig.getOpenId(APPID, secret, qo.getCode());
 
-        //拼接相关参数
-        String  param="appid="+WechatConfig.APPID+"&secret="+secret+"&code="+code+"&grant_type=authorization_code";
-
-        //发送请求 得到openId
-        String openid = HttpRequest.sendGet(getopenid_url,param);
+        System.out.println(qo+"\n\n");
         payer.put("openid",openid);
+        paraMap.put("appid", APPID);//微信分配的公众账号ID
+        paraMap.put("mchid", WechatConfig.MCH_ID);//微信支付分配的商户号
+        paraMap.put("out_trade_no",qo.getOrderNum());//商品的订单号每次要唯一
+        paraMap.put("description",qo.getCommunityName()+"-临时停车" + qo.getTime());
+        //接收微信支付异步通知回调地址，通知url必须为直接可访问的url  不能携带参数。
+        paraMap.put("notify_url", "http://wodemao.nat300.top/api/v1/payment/callback"); // 此路径是微信服务器调用支付结果通知路径
+        paraMap.put("payer",payer);
+        paraMap.put("amount",amount);
+        paraMap.put("attach",qo.getCommunityName()+"-临时停车" + qo.getTime());
 
-            paraMap.put("appid", WechatConfig.APPID);//微信分配的公众账号ID
-            paraMap.put("mch_id", WechatConfig.MCH_ID);//微信支付分配的商户号
-//            paraMap.put("nonce_str", UUID.randomUUID().toString().replace("-", ""));//随机字符串，不长于32位。推荐随机数生成算法
-//            paraMap.put("body", "E到家-停车缴费");//商品描述
-            paraMap.put("out_trade_no","20150806125346");//商品的订单号每次要唯一
-//            paraMap.put("total_fee", "1");//订单总金额，单位为分，详见支付金额
-//            paraMap.put("spbill_create_ip", ip);//必须传正确的用户端IP
-            paraMap.put("description","Image形象店-深圳腾大-QQ公仔");
-            //接收微信支付异步通知回调地址，通知url必须为直接可访问的url  不能携带参数。
-            paraMap.put("notify_url", "http://baidu.com"); // 此路径是微信服务器调用支付结果通知路径
-            paraMap.put("payer",payer);
-//            paraMap.put("trade_type", "JSAPI");//JSAPI支付
-//            paraMap.put("scene_info", "{\"h5_info\":{\"type\":\"Wap\",\"wap_url\":\"https://zhsj.co\",\"wap_name\": \"订单支付\"}}");
+        //将所有参数(map)转xml格式
+        String xml = PublicConfig.getXml(paraMap);
 
-//            //生成签名
-//            String sign = PublicConfig.getSignToken(paraMap, WechatConfig.PRIVATE_KEY);
-//            paraMap.put("sign",sign);
-//            paraMap.put("openid",openid);
-
-          //将所有参数(map)转xml格式
-            String xml = PublicConfig.getXml(paraMap);
-            System.out.println("ip"+ip);
-            System.out.println("xml"+xml);
-
-//            StringEntity s = new StringEntity(xml, "UTF-8");//将xml转换为实体类
-//            Map map = new HashMap();
-//
-//            String mweb_url = "";
-        String prepayId = PublicConfig.V3PayGet(unifiedorder_url,JSONUtil.toJsonStr(paraMap),WechatConfig.MCH_ID,WechatConfig.MCH_SERIAL_NO,WechatConfig.APICLIENT_KEY);
+        String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/jsapi",JSONUtil.toJsonStr(paraMap),WechatConfig.MCH_ID,WechatConfig.MCH_SERIAL_NO,WechatConfig.APICLIENT_KEY);
         //第二步获取调起支付的参数
-        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp(prepayId, WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
-        object.put("msg","后台相应成功");
-        System.out.println("微信返回参数m"+object);
-//            //统一下单
-//            try {
-                //将map参数转为xml格式的字符串 像微信发送请求  获取map参数
-//                map = WebUtils.getMwebUrl(unifiedorder_url, xml);
+        System.out.println(prepayId);
+        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp1(prepayId,APPID, WechatConfig.APICLIENT_KEY));
 
+        result.put("appId",APPID);
+        result.put("timeStamp",object.get("timestamp"));
+        result.put("nonceStr",object.get("noncestr"));
+        result.put("package",object.get("prepayid"));
+        result.put("signType","RSA");
+        result.put("paySign",object.get("sign"));
+        result.put("money",1);
 
-//                String return_code = (String) map.get("return_code");
-//                String return_msg = (String) map.get("return_msg");
-//
-//                if ("SUCCESS".equals(return_code) && "OK".equals(return_msg)) {
-//                    System.out.println("请求成功");
-//                    System.out.println("mweb_url=" + mweb_url);
-//                } else {
-//                    System.out.println("统一支付接口获取预支付订单出错");
-//                    result.put("msg", "支付错误");
-//                }
-//                //当俩个结果都成功是  才能拿到mweb_url
-//                if ("SUCCESS".equals(map.get("result_code"))&&"SUCCESS".equals(map.get("return_code"))){
-//                    System.out.println("返回参数没问题");
-//                    String prepay_id = (String) map.get("prepay_id");
-//                    String trade_type = (String) map.get("trade_type");
-//                    String nonce_str = (String) map.get("nonce_str");
-//                    String sign1 = (String) map.get("sign");
-//                    String appid = (String) map.get("appid");
-//                    JSONObject jsonObject = PublicConfig.WxTuneUp(prepay_id, appid, WechatConfig.APICLIENT_KEY);
-//                    mweb_url = (String) map.get("mweb_url");//调微信支付接口地址
-//                    System.out.println("mweb_url="+mweb_url);
-////                    //支付完返回浏览器跳转的地址，如跳到查看订单页面   重定向地址  需要拼接到后面返给前端
-////                    String redirect_url = "https://music.163.com/";
-////                    String redirect_urlEncode =  URLEncoder.encode(redirect_url,"utf-8");//对上面地址urlencode
-////
-////                mweb_url = mweb_url + "&redirect_url="+redirect_urlEncode;//拼接返回地址
-//
-//                    result.put("prepay_id",prepay_id);//交易标识
-//                    result.put("trade_type",trade_type);//交易类型
-//                    result.put("nonce_str",nonce_str);//随机字串
-//                    result.put("sign",sign1);//签名
-//                    result.put("appid",appid);//appid
-//                    result.put("msg","支付成功");
-
-//                    //时间搓
-//                    long timestamp = new Date().getTime();
-//                    result.put("timestamp",timestamp);
-//                    result.put("mweb_url",mweb_url);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                System.out.println("统一支付接口获取预支付订单出错");
-//              result.put("msg", "支付错误");
-//            }
-        return CommonResult.ok(object);
+        System.out.println("\n\n返回结果\n"+result);
+        return CommonResult.ok(result);
     }
 
 /**
@@ -190,10 +144,48 @@ public class WeChatH5PayController {
  **/
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        log.info("回调成功");
+        log.info("\n\n\n\n回调成功\n\n\n\n");
         //回调验证
-        Map<String, String> map = PublicConfig.notify(request ,response, WechatConfig.API_V3_KEY);
-        log.info(String.valueOf(map));
+        Map<String, String> params = PublicConfig.notify(request ,response, WechatConfig.API_V3_KEY);
+        log.info(String.valueOf(params));
+        System.out.println(params);
+//        return CommonResult.ok("okok");
+
+
+        //处理业务逻辑
+        CarOrderEntity entity;
+        //订单号
+        entity = carOrderService.selectOneOrder(params.get("out_trade_no"));
+        //付款金额 单位是分 需要除 100在存入数据库
+        String amount = params.get("amount");
+        String total = JSONObject.fromObject(amount).getString("payer_total");
+        BigDecimal decimal = BigDecimal.valueOf(Long.parseLong(total));
+        BigDecimal divide = decimal.divide(new BigDecimal(100));
+        entity.setMoney(divide);//支付金额
+        //支付状态
+        entity.setOrderStatus(1);//0未支付，1已支付
+        //支付类型
+        entity.setPayType(4);//1app支付 2物业后台 3支付宝手机H5 4微信公众号
+
+
+        entity.setRise(params.get("attach"));//商品订单抬头
+
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date date = null;
+        try {
+            //获取支付时间  2018-06-08T10:34:56+08:00
+            date = formatter.parse(params.get("success_time"));
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+            //支付时间
+            entity.setOrderTime(localDateTime);//付款时间
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        entity.setOrderNum(params.get("out_trade_no"));//商户订单编号
+        entity.setBillNum(params.get("transaction_id"));//微信账单编号
+        boolean b = carOrderService.updateOrder(entity,params.get("out_trade_no"));//根据订单号修改订单信息
     }
 
     @GetMapping("ip")
